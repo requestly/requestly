@@ -19,6 +19,7 @@ import { isRecordMock } from "../MocksTable/utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
+import { trackMocksListFilterChanged } from "modules/analytics/events/features/mocksV2";
 
 interface Props {
   source?: MockListSource;
@@ -28,7 +29,6 @@ interface Props {
   searchValue?: string;
   setSearchValue?: (s: string) => void;
   filter?: MockTableHeaderFilter;
-  setFilter?: (filter: MockTableHeaderFilter) => void;
   handleCreateNewMockFromPickerModal?: () => void;
 }
 
@@ -39,7 +39,6 @@ export const MocksListContentHeader: React.FC<Props> = ({
   mockType,
   filter,
   searchValue,
-  setFilter,
   setSearchValue = () => {},
   handleCreateNewMockFromPickerModal = () => {},
 }) => {
@@ -154,9 +153,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
             ) : null}
           </div>
         ),
-        onClick: () => {
-          setFilter("all");
-        },
+        onClick: () => trackMocksListFilterChanged("all"),
       },
       {
         key: "starred",
@@ -172,12 +169,10 @@ export const MocksListContentHeader: React.FC<Props> = ({
             ) : null}
           </div>
         ),
-        onClick: () => {
-          setFilter("starred");
-        },
+        onClick: () => trackMocksListFilterChanged("starred"),
       },
     ],
-    [mockRecords, setFilter]
+    [mockRecords]
   );
 
   const contentListHeaderSearchProps = mockType

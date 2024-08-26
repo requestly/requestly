@@ -56,7 +56,7 @@ div.members-email-input > input {
 }
 
 .add-members-modal-info-text {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 22px;
 }
 

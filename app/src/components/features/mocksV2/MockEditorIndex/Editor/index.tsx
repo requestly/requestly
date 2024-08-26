@@ -393,7 +393,7 @@ const MockEditor: React.FC<Props> = ({
   };
 
   return (
-    <div className="mock-parent">
+    <div className="mock-parent mock-editor-layout-container">
       <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
         <MockEditorHeader
           isNewMock={isNew}

@@ -63,13 +63,13 @@
       }
 
       .api-method {
-        font-size: 11px;
+        font-size: var(--requestly-font-size-xs, 11px);
         vertical-align: middle;
         flex-shrink: 0;
       }
 
       .api-history-url {
-        font-size: 13px;
+        font-size: var(--requestly-font-size-sm, 13px);
         width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -81,7 +81,7 @@
       }
 
       .api-history-start-marker {
-        font-size: 13px;
+        font-size: var(--requestly-font-size-sm, 13px);
       }
     }
   }
