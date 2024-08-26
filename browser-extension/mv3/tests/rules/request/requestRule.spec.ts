@@ -8,7 +8,7 @@ import testScenarios from "./testScenarios";
 
 test.describe("Request Rule", () => {
   testScenarios.forEach((scenario, i) => {
-    test.only(`${i + 1}. @RequestRule: ${scenario.description}`, async ({ appPage, context }) => {
+    test(`${i + 1}. @RequestRule: ${scenario.description}`, async ({ appPage, context }) => {
       await testRequestRule({ appPage, context, ...scenario });
     });
   });
