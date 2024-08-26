@@ -29,6 +29,7 @@ export interface RQMockMetadataSchema extends MockMetadataSchema {
   collectionId?: string;
   createdBy?: string;
   lastUpdatedBy?: string;
+  storagePath?: string;
 }
 
 export interface RQMockCollection {

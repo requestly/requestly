@@ -3,6 +3,7 @@ import { WEB_URL, OTHER_WEB_URLS } from "../../../../config/dist/config.build.js
 import { Variable, onVariableChange } from "../variable";
 import { RuleType } from "common/types";
 import rulesStorageService from "../../rulesStorageService";
+import { globalStateManager } from "./globalStateManager";
 
 const excludeMatchesPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern);
 
@@ -155,7 +156,7 @@ const updateTabRuleCache = async (tabId: number, frameId?: number) => {
   );
 };
 
-export const initClientRuleCaching = async () => {
+export const initClientSideCaching = async () => {
   // TODO: Do not inject in Requestly Pages and blocklisted domains. No harm in injecting though
   let isExtensionStatusEnabled = await isExtensionEnabled();
   onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, (extensionStatus) => {
@@ -165,6 +166,7 @@ export const initClientRuleCaching = async () => {
   chrome.webNavigation.onCommitted.addListener(async (navigatedTabData) => {
     if (isExtensionStatusEnabled) {
       updateTabRuleCache(navigatedTabData.tabId, navigatedTabData.frameId);
+      globalStateManager.initSharedStateCaching(navigatedTabData.tabId);
     }
   });
 
