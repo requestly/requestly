@@ -1,7 +1,7 @@
 import { Log } from "backend/mocks/getMockLogs";
 import { RQNetworkTable } from "lib/design-system/components";
 import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
-import useGetMockLogs from "./useGetMockLogs";
+import useGetMockLogs from "components/features/mocksV2/hooks/useGetMockLogs";
 import { useMemo } from "react";
 
 import { MdNetworkCheck } from "@react-icons/all-files/md/MdNetworkCheck";
