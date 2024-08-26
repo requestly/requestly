@@ -139,7 +139,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             <span className="text-bold">Starts at</span>
             <Typography.Text className="plan-price enterprice-plan-price">$59</Typography.Text>
             <div className="caption">
-              <Typography.Text>member per month</Typography.Text>
+              <Typography.Text>member / month</Typography.Text>
             </div>
           </Space>
         </Row>
@@ -172,7 +172,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
               )}
             <div className="caption text-white">
               {planName !== PRICING.PLAN_NAMES.FREE && (
-                <div>{planName === PRICING.PLAN_NAMES.LITE ? "per month" : "member per month"}</div>
+                <div>{planName === PRICING.PLAN_NAMES.LITE ? "/ month" : "member / month"}</div>
               )}
             </div>
           </Space>
