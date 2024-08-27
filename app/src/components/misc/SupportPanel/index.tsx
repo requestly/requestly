@@ -1,9 +1,8 @@
-import { CloseOutlined, SlackOutlined } from "@ant-design/icons";
+import { CloseOutlined, GithubOutlined, SlackOutlined } from "@ant-design/icons";
 import { Badge, Button, Dropdown } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { PiChatTeardropTextFill } from "@react-icons/all-files/pi/PiChatTeardropTextFill";
 import { BsFillChatLeftTextFill } from "@react-icons/all-files/bs/BsFillChatLeftTextFill";
-import { PiRedditLogo } from "@react-icons/all-files/pi/PiRedditLogo";
 import BotIcon from "assets/icons/bot.svg?react";
 import { TbMailForward } from "@react-icons/all-files/tb/TbMailForward";
 
@@ -22,6 +21,7 @@ import {
   trackSupportOptionClicked,
   trackSupportOptionOpened,
 } from "modules/analytics/events/misc/UnifiedSupport";
+import LINKS from "config/constants/sub/links";
 
 const SupportPanel = () => {
   const user = useSelector(getUserAuthDetails);
@@ -62,19 +62,19 @@ const SupportPanel = () => {
           key: "2",
           label: (
             <a
-              href="https://www.reddit.com/r/requestly/"
+              href={LINKS.REQUESTLY_GITHUB_ISSUES}
               target="_blank"
               rel="noreferrer"
               className="support-panel-item-style"
               onClick={() => {
                 setIsPanelVisible(false);
-                trackSupportOptionClicked("reddit");
+                trackSupportOptionClicked("github");
               }}
             >
-              <span className="support-panel-label-style">Ask us on Reddit</span>
+              <span className="support-panel-label-style">Report an issue on GitHub</span>
             </a>
           ),
-          icon: <PiRedditLogo className="support-panel-icon-style" />,
+          icon: <GithubOutlined className="support-panel-icon-style" />,
         },
         {
           key: "3",
