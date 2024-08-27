@@ -1,56 +1,66 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { NetworkEvent, RuleEditorUrlFragment } from "../../../../types";
-import Editor, { loader } from "@monaco-editor/react";
 import { createRule, generateRuleName, getBaseUrl, isContentBodyEditable } from "../../../../utils";
 import { Button, Collapse, Tooltip } from "antd";
 import { SourceKey, SourceOperator } from "../../../../../types";
 import { EditOutlined } from "@ant-design/icons";
+import CodeMirror, { EditorView } from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { json } from "@codemirror/lang-json";
+import { html } from "@codemirror/lang-html";
+import { css } from "@codemirror/lang-css";
+import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import "./responseTabContent.scss";
 
 interface Props {
   networkEvent: NetworkEvent;
 }
 
-enum EditorLanguage {
-  JSON = "json",
-  JAVASCRIPT = "javascript",
-  HTML = "html",
-  CSS = "css",
-}
+// enum EditorLanguage {
+//   JSON = "json",
+//   JAVASCRIPT = "javascript",
+//   HTML = "html",
+//   CSS = "css",
+// }
 
-const mimeTypeToLangugageMap: { [mimeType: string]: EditorLanguage } = {
-  "application/json": EditorLanguage.JSON,
-  "text/javascript": EditorLanguage.JAVASCRIPT,
-  "application/javascript": EditorLanguage.JAVASCRIPT,
-  "text/html": EditorLanguage.HTML,
-  "text/css": EditorLanguage.CSS,
+const mimeTypeToLangugageMap: { [mimeType: string]: any } = {
+  "application/json": json(),
+  "text/javascript": javascript({ jsx: false }),
+  "application/javascript": javascript({ jsx: false }),
+  "text/html": html(),
+  "text/css": css(),
 };
 
 const getEditorLanguageFromMimeType = (mimeType: string) => {
-  let language: EditorLanguage = null;
+  let language = null;
 
   if (mimeType) {
     language = mimeTypeToLangugageMap[mimeType.toLowerCase().split(";")?.[0]];
   }
 
-  return language || "";
+  return language;
 };
 
 const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
-  const [response, setResponse] = useState(null);
-  const [isEditorMount, setIsEditorMount] = useState(false);
-  const [editorLangugage, setEditorLanguage] = useState("");
+  const [response, setResponse] = useState("");
+  const [editorExtensions, setEditorExtensions] = useState([EditorView.lineWrapping]);
 
   useEffect(() => {
     networkEvent.getContent((content, encoding) => {
-      setResponse(content || "");
-      setEditorLanguage(getEditorLanguageFromMimeType(networkEvent.response?.content?.mimeType));
-    });
-  }, [networkEvent, setResponse, setEditorLanguage]);
+      try {
+        setResponse(JSON.stringify(JSON.parse(content), null, 2) || "");
+      } catch (e) {
+        setResponse(content || "");
+      }
 
-  useEffect(() => {
-    loader.init().then((module) => module && setIsEditorMount(true));
-  }, []);
+      const language = getEditorLanguageFromMimeType(networkEvent.response?.content?.mimeType);
+      if (language) {
+        setEditorExtensions([language, EditorView.lineWrapping]);
+      } else {
+        setEditorExtensions([EditorView.lineWrapping]);
+      }
+    });
+  }, [networkEvent]);
 
   const editResponseBody = useCallback(() => {
     createRule(
@@ -111,27 +121,7 @@ const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
           extra={renderEditResponseBodyButton()}
         ></Collapse.Panel>
       </Collapse>
-      {isEditorMount && (
-        <Editor
-          theme={"vs-dark"}
-          language={editorLangugage}
-          value={response}
-          height={"95%"}
-          options={{
-            scrollbar: {
-              alwaysConsumeMouseWheel: false,
-            },
-            minimap: {
-              enabled: false,
-            },
-            readOnly: true,
-            unicodeHighlight: {
-              ambiguousCharacters: false,
-            },
-            wordWrap: "on",
-          }}
-        />
-      )}
+      <CodeMirror basicSetup theme={vscodeDark} value={response} height="95%" extensions={editorExtensions} readOnly />
     </div>
   );
 };
