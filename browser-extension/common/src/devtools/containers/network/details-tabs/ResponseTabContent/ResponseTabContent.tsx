@@ -52,7 +52,7 @@ const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
       if (language) {
         setEditorExtensions([...commonExtensions, language]);
       } else {
-        setEditorExtensions([...commonExtensions, EditorView.lineWrapping]);
+        setEditorExtensions([...commonExtensions]);
       }
     });
   }, [networkEvent]);
