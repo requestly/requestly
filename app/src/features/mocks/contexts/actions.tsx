@@ -21,7 +21,10 @@ import {
 import { useNavigate } from "react-router-dom";
 import { redirectToMockEditorCreateMock } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
-import { isRecordMock } from "../screens/mocksList/components/MocksList/components/MocksTable/utils";
+import {
+  isRecordMock,
+  isRecordMockCollection,
+} from "../screens/mocksList/components/MocksList/components/MocksTable/utils";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH } from "../constants";
 
@@ -36,6 +39,7 @@ type MocksActionContextType = {
   createNewFileAction: () => void;
   createNewMockAction: (mockType: MockType, source: MockListSource, collectionId?: string) => void;
   removeMocksFromCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
+  exportMocksAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
 };
 
 const MocksActionContext = createContext<MocksActionContextType>(null);
@@ -58,6 +62,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     openUpdateMocksCollectionModalAction,
     openMockUploaderModalAction,
     openNewFileModalAction,
+    openShareMocksModalAction,
   } = useMocksModalsContext();
 
   const createNewCollectionAction = useCallback(
@@ -163,6 +168,33 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [uid, teamId]
   );
 
+  const exportMocksAction = useCallback(
+    async (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
+      Logger.log("[DEBUG]", "exportMocksAction", { records });
+
+      const mockIds: RQMockMetadataSchema["id"][] = [];
+      const collectionIds: RQMockMetadataSchema["id"][] = [];
+
+      records.forEach((record) => {
+        if (isRecordMockCollection(record)) {
+          collectionIds.push(record.id);
+        } else {
+          mockIds.push(record.id);
+        }
+      });
+
+      const selectedRecordIds = [...mockIds, ...collectionIds];
+
+      console.log("exportMocksAction", { selectedRecordIds });
+
+      openShareMocksModalAction(selectedRecordIds);
+
+      // toast.success(`${mockIds.length > 1 ? "Mocks" : "Mock"} removed from collection!`);
+      // onSuccess?.();
+    },
+    [openShareMocksModalAction]
+  );
+
   const value = {
     createNewCollectionAction,
     updateCollectionNameAction,
@@ -174,6 +206,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     createNewFileAction,
     createNewMockAction,
     removeMocksFromCollectionAction,
+    exportMocksAction,
   };
 
   return <MocksActionContext.Provider value={value}>{children}</MocksActionContext.Provider>;
