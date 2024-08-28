@@ -47,13 +47,21 @@
   padding: 1.25rem 4px 1.25rem 2px;
 }
 
-.pending-tag-container {
+.pending-tag-container,
+.invite-expired-tag-container {
   border: 1px solid #4f5053;
   border-radius: 47px;
-  color: #ff6905;
   padding: 8px;
   font-weight: 500;
-  margin-left: 12px;
+  font-size: var(--requestly-font-size-xs);
+  margin-left: 5px;
+}
+
+.pending-tag-container {
+  color: #ff6905;
+}
+.invite-expired-tag-container {
+  color: var(--requestly-color-error-500);
 }
 
 .member-email {

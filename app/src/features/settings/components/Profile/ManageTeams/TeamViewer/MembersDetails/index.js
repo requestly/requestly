@@ -107,6 +107,7 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
         <TeamMembersTable
           teamId={teamId}
           isTeamAdmin={isTeamAdmin}
+          teamDetails={teamDetails}
           refresh={refreshTeamMembersTable}
           callback={doRefreshTeamMembersTable}
         />

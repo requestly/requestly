@@ -14,10 +14,11 @@ import RemoveUserModal from "./RemoveUserModal";
 import ContactUsModal from "./ContactUsModal";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
 import "./TeamMembersTable.css";
-import PendingMemberRoleDropwdown from "../../common/PendingMemberRoleDropwdown";
-import { ClockCircleOutlined } from "@ant-design/icons";
+import MemberActionsDropdown from "../../common/MemberActionsDropdown";
+import { ClockCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { SendInviteButton } from "./SendInviteButton/SendInviteButton";
 
-const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
+const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails }) => {
   const navigate = useNavigate();
   const mountedRef = useRef(true);
 
@@ -86,8 +87,8 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
       key: "img",
       align: "left",
       ellipsis: true,
-      colSpan: 2,
-      onCell: () => ({ colSpan: 2 }),
+      colSpan: 4,
+      onCell: () => ({ colSpan: 4 }),
       render: (member) => (
         <Row align="middle">
           <Col>
@@ -113,15 +114,39 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
               </span>
 
               {member?.isPending ? (
-                <Badge
-                  count={
-                    <div className="pending-tag-container">
-                      <span>
-                        <ClockCircleOutlined /> Pending
-                      </span>
-                    </div>
-                  }
-                />
+                <>
+                  <Badge
+                    count={
+                      <div
+                        className={member?.isInviteExpired ? "invite-expired-tag-container" : "pending-tag-container"}
+                      >
+                        <span>
+                          {member?.isInviteExpired ? (
+                            <>
+                              <InfoCircleOutlined /> Invite Expired
+                            </>
+                          ) : (
+                            <>
+                              {" "}
+                              <ClockCircleOutlined /> Pending
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    }
+                  />
+                  {member?.isInviteExpired && (
+                    <SendInviteButton
+                      role={member?.isAdmin ? "admin" : "write"}
+                      teamId={teamId}
+                      teamName={teamDetails?.name}
+                      numberOfMembers={teamDetails?.accessCount}
+                      email={member.email}
+                      onInvite={fetchTeamMembers}
+                      source="team_members_table"
+                    />
+                  )}
+                </>
               ) : null}
             </Row>
           </Col>
@@ -131,40 +156,23 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
     {
       title: "Role",
       dataIndex: "role",
-      align: "center",
       render: (member) => {
-        if (member.isPending) {
-          return (
-            <PendingMemberRoleDropwdown
-              showLoader
-              isHoverEffect
-              placement="bottomLeft"
-              isCurrentUserAdmin={isLoggedInUserAdmin}
-              isAdmin={member.isAdmin}
-              isLoggedInUserAdmin={isLoggedInUserAdmin}
-              inviteId={member?.inviteId}
-              fetchTeamMembers={fetchTeamMembers}
-            />
-          );
+        if (member.isPending) return null;
+
+        if (member.id === loggedInUserId) {
+          return <div>{member.isAdmin ? "Admin" : "Member"}</div>;
         }
 
         return (
           <MemberRoleDropdown
             showLoader
-            isHoverEffect={isLoggedInUserAdmin && member.id !== loggedInUserId}
+            isHoverEffect={isLoggedInUserAdmin && member?.id !== loggedInUserId}
             placement="bottomLeft"
             isAdmin={member.isAdmin}
             memberId={member.id}
             isPending={member.isPending}
             loggedInUserId={loggedInUserId}
             isLoggedInUserAdmin={isLoggedInUserAdmin}
-            handleRemoveMember={() =>
-              setDeleteUserModal({
-                ...deleteUserModal,
-                isActive: true,
-                userId: member.id,
-              })
-            }
             handleMemberRoleChange={(_, role, setIsLoading) =>
               changeTeamUserRole({
                 teamId,
@@ -174,6 +182,27 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
                 setIsLoading,
               })
             }
+          />
+        );
+      },
+    },
+    {
+      title: "",
+      dataIndex: "role",
+      align: "right",
+      render: (member) => {
+        if (member.id === loggedInUserId || !isLoggedInUserAdmin) return null;
+
+        return (
+          <MemberActionsDropdown
+            showLoader
+            teamId={teamId}
+            isHoverEffect
+            placement="bottomLeft"
+            isCurrentUserAdmin={isLoggedInUserAdmin}
+            isLoggedInUserAdmin={isLoggedInUserAdmin}
+            member={member}
+            fetchTeamMembers={fetchTeamMembers}
           />
         );
       },
@@ -305,15 +334,6 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
     <>
       {/* Since members array can never be empty in any case, we can use it to show/hide loader */}
       {isEmpty(members) ? renderLoader() : renderTable()}
-
-      <RemoveUserModal
-        teamId={teamId}
-        isOpen={deleteUserModal.isActive}
-        toggleModal={toggleDeleteUserModal}
-        userId={deleteUserModal.userId}
-        callbackOnSuccess={modifyMembersCallback}
-      />
-
       <ContactUsModal isOpen={contactUsModal} toggleModal={toggleContactUsModal} />
     </>
   );
