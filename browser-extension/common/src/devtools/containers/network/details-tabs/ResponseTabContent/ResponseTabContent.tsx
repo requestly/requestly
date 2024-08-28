@@ -16,13 +16,6 @@ interface Props {
   networkEvent: NetworkEvent;
 }
 
-// enum EditorLanguage {
-//   JSON = "json",
-//   JAVASCRIPT = "javascript",
-//   HTML = "html",
-//   CSS = "css",
-// }
-
 const mimeTypeToLangugageMap: { [mimeType: string]: any } = {
   "application/json": json(),
   "text/javascript": javascript({ jsx: false }),
@@ -41,12 +34,14 @@ const getEditorLanguageFromMimeType = (mimeType: string) => {
   return language;
 };
 
+const commonExtensions = [EditorView.lineWrapping];
+
 const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
   const [response, setResponse] = useState("");
-  const [editorExtensions, setEditorExtensions] = useState([EditorView.lineWrapping]);
+  const [editorExtensions, setEditorExtensions] = useState(commonExtensions);
 
   useEffect(() => {
-    networkEvent.getContent((content, encoding) => {
+    networkEvent.getContent((content) => {
       try {
         setResponse(JSON.stringify(JSON.parse(content), null, 2) || "");
       } catch (e) {
@@ -55,9 +50,9 @@ const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
 
       const language = getEditorLanguageFromMimeType(networkEvent.response?.content?.mimeType);
       if (language) {
-        setEditorExtensions([language, EditorView.lineWrapping]);
+        setEditorExtensions([...commonExtensions, language]);
       } else {
-        setEditorExtensions([EditorView.lineWrapping]);
+        setEditorExtensions([...commonExtensions, EditorView.lineWrapping]);
       }
     });
   }, [networkEvent]);
