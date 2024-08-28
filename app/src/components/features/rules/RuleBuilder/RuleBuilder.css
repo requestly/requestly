@@ -17,7 +17,7 @@
   display: inline-flex;
   align-items: center;
   font-weight: 500;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   color: var(--white);
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);

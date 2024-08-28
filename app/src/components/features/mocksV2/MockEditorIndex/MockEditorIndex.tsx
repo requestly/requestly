@@ -1,7 +1,8 @@
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
+  navigateBack,
   redirectToFileMockEditorEditMock,
   redirectToFileMocksList,
   redirectToMockEditorEditMock,
@@ -46,6 +47,7 @@ const MockEditorIndex: React.FC<Props> = ({
   const { mockId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const userAttributes = useSelector(getUserAttributes);
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
@@ -97,7 +99,7 @@ const MockEditorIndex: React.FC<Props> = ({
       .finally(() => {
         setIsMockCollectionLoading(false);
       });
-  }, [mockEditorData?.collectionId]);
+  }, [mockEditorData?.collectionId, teamId, uid]);
 
   const onMockSave = (data: MockEditorDataSchema) => {
     setSavingInProgress(true);
@@ -168,10 +170,10 @@ const MockEditorIndex: React.FC<Props> = ({
 
   const handleOnClose = () => {
     if (mockType === MockType.FILE) {
-      return redirectToFileMocksList(navigate);
+      return navigateBack(navigate, location, () => redirectToFileMocksList(navigate));
     }
 
-    return redirectToMocksList(navigate);
+    return navigateBack(navigate, location, () => redirectToMocksList(navigate));
   };
 
   if (isNew) {

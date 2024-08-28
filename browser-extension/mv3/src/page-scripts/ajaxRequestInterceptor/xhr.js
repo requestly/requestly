@@ -102,21 +102,23 @@ export const initXhrInterceptor = (debug) => {
         const responseType = this.responseType;
         const contentType = this.getResponseHeader("content-type");
 
-        let customResponse =
-          responseModification.type === "code"
-            ? getFunctionFromCode(
-                responseModification.value,
-                "response"
-              )({
-                method: this._method,
-                url: this._requestURL,
-                requestHeaders: this._requestHeaders,
-                requestData: jsonifyValidJSONString(this._requestData),
-                responseType: contentType,
-                response: this.response,
-                responseJSON: jsonifyValidJSONString(this.response, true),
-              })
-            : responseModification.value;
+        let customResponse;
+
+        if (responseModification.type === "code") {
+          const evaluatorArgs = {
+            method: this._method,
+            url: this._requestURL,
+            requestHeaders: this._requestHeaders,
+            requestData: jsonifyValidJSONString(this._requestData),
+            responseType: contentType,
+            response: this.response,
+            responseJSON: jsonifyValidJSONString(this.response, true),
+          };
+
+          customResponse = getFunctionFromCode(responseModification.value, "response")(evaluatorArgs);
+        } else {
+          customResponse = responseModification.value;
+        }
 
         if (typeof customResponse === "undefined") {
           return;

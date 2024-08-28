@@ -43,6 +43,6 @@
   text-decoration: none;
   border-top: #e1e3e8 1px solid;
   border-radius: 0 0 16px 16px;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   cursor: pointer;
 }

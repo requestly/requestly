@@ -24,7 +24,7 @@
 
     .description {
       color: var(--text-subtle);
-      font-size: 13px;
+      font-size: var(--requestly-font-size-sm, 13px);
       line-height: 18px;
       letter-spacing: 0.25px;
     }
@@ -37,7 +37,7 @@
 
       .ant-btn {
         font-weight: 500;
-        font-size: 13px;
+        font-size: var(--requestly-font-size-sm, 13px);
         font-weight: 500;
         line-height: 18px;
         letter-spacing: 0.25px;

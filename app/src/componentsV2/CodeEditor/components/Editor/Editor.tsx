@@ -103,8 +103,7 @@ const Editor: React.FC<EditorProps> = ({
     } else {
       setEditorContent(value);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultValue]);
+  }, [defaultValue, value]);
 
   const handleEditorClose = useCallback(
     (id: string) => {

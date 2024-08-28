@@ -17,7 +17,7 @@
     background: var(--success);
     font-weight: 700;
     color: var(--black);
-    font-size: 11px;
+    font-size: var(--requestly-font-size-xs, 11px);
   }
 
   & .ant-input-number-handler-wrap {
@@ -44,7 +44,7 @@
 }
 
 .plan-price-row .ant-space-item:first-child {
-  min-width: 25px;
+  min-width: 40px;
 }
 
 .plan-price.enterprice-plan-price {
@@ -52,7 +52,7 @@
 }
 
 .plan-card {
-  min-width: 300px;
+  min-width: 310px;
   height: auto;
   padding: 20px;
   border-radius: var(--border-radius-sm);
@@ -73,7 +73,7 @@
 }
 
 .plan-description {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   color: var(--text-light);
 }
 

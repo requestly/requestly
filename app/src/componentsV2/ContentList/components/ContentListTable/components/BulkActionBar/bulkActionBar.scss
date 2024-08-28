@@ -21,7 +21,7 @@
     margin-right: auto;
     color: var(--requestly-color-text-subtle);
     text-align: center;
-    font-size: 13px;
+    font-size: var(--requestly-font-size-sm, 13px);
     line-height: 20px;
     letter-spacing: 0.25px;
   }
@@ -34,7 +34,7 @@
   }
 
   .rq-bulk-action-bar-action-btn.ant-btn {
-    font-size: 13px;
+    font-size: var(--requestly-font-size-sm, 13px);
     line-height: 16px;
     letter-spacing: 0.25px;
     color: var(--requestly-color-text-default);
