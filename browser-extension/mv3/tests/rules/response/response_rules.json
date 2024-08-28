@@ -222,7 +222,7 @@
     "currentOwner": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
     "description": "",
     "groupId": "",
-    "id": "Response_fsete",
+    "id": "Response_5",
     "isSample": false,
     "lastModifiedBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
     "modificationDate": 1716787719241,
@@ -250,65 +250,32 @@
     "schemaVersion": "3.0.0",
     "status": "Active"
   },
-  "Response_6": {
-    "createdBy": "oVzEimT53QYBSBokU6xokra2Tc13",
-    "creationDate": 1716787814264,
-    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+  "Response_8": {
+    "createdBy": "BZCVNattZfUeqe0t78mwgxC5cQx1",
+    "creationDate": 1724666497201,
+    "currentOwner": "BZCVNattZfUeqe0t78mwgxC5cQx1",
     "description": "",
     "groupId": "",
-    "id": "Response_6kcaj",
+    "id": "Response_8",
     "isSample": false,
-    "lastModifiedBy": "oVzEimT53QYBSBokU6xokra2Tc13",
-    "modificationDate": 1716788049035,
-    "name": "Fetch dynamic modification",
+    "lastModifiedBy": "BZCVNattZfUeqe0t78mwgxC5cQx1",
+    "modificationDate": 1724666967446,
+    "name": "[XHR] response-sharedState",
     "objectType": "rule",
     "pairs": [
       {
-        "id": "eel80",
-        "isCompressed": false,
+        "id": "0ciik",
         "response": {
           "resourceType": "restApi",
           "statusCode": "",
           "type": "code",
-          "value": "function modifyResponse(args) {\n  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;\n  // Change response below depending upon request attributes received in args\n  \n  const updatedResponse = response.replaceAll(\"requestly\", \"rq\");\n  console.log(\"Hello\", {updatedResponse});\n  return updatedResponse;\n}"
+          "value": "function modifyResponse(args) {\n  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;\n  // Change response below depending upon request attributes received in args\n  if($sharedState.count>1){\n    return {isSharedStateCountGteOne:true}\n  }\n  let count=$sharedState.count??0;\n  count++;\n  $sharedState.count=count;\n  return response;\n}"
         },
         "source": {
+          "filters": [],
           "key": "Url",
           "operator": "Contains",
-          "value": "github"
-        }
-      }
-    ],
-    "ruleType": "Response",
-    "schemaVersion": "3.0.0",
-    "status": "Active"
-  },
-  "Response_7": {
-    "createdBy": "oVzEimT53QYBSBokU6xokra2Tc13",
-    "creationDate": 1716787746422,
-    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
-    "description": "",
-    "groupId": "",
-    "id": "Response_79nqd",
-    "isSample": false,
-    "lastModifiedBy": "oVzEimT53QYBSBokU6xokra2Tc13",
-    "modificationDate": 1716787806595,
-    "name": "Fetch Static Modification",
-    "objectType": "rule",
-    "pairs": [
-      {
-        "id": "o0xe3",
-        "isCompressed": false,
-        "response": {
-          "resourceType": "restApi",
-          "statusCode": "",
-          "type": "static",
-          "value": "{\"foo\":\"bar\"}"
-        },
-        "source": {
-          "key": "Url",
-          "operator": "Contains",
-          "value": "github"
+          "value": "https://requestly.tech/api/mockv2/"
         }
       }
     ],
