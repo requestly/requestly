@@ -178,6 +178,11 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
       records.forEach((record) => {
         if (isRecordMockCollection(record)) {
           collectionIds.push(record.id);
+
+          // add all the child mocks too
+          ((record as unknown) as RQMockCollection)?.children?.forEach((mock) => {
+            mockIds.push(mock.id);
+          });
         } else {
           mockIds.push(record.id);
         }

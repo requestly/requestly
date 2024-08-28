@@ -17,6 +17,7 @@ import {
   UpdateMocksCollectionModalWrapper,
   MockUploaderModalWrapper,
   NewFileModalWrapper,
+  DownloadMocksModalWrapper,
 } from "features/mocks/modals";
 import { getFilteredRecords } from "./components/MocksListContentHeader/utils";
 import "./mocksList.scss";
@@ -126,6 +127,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
       <NewFileModalWrapper />
 
       <MockUploaderModalWrapper />
+      <DownloadMocksModalWrapper />
 
       {/* FIXME: Remove force re-render and instead update the local state */}
       <CreateOrUpdateCollectionModalWrapper forceRender={_forceRender} />
