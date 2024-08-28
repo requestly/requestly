@@ -136,7 +136,7 @@ export const DownloadMocksModal: React.FC<ShareMocksModalProps> = ({
                 <div className="download-rules-details">
                   <span className="line-clamp">{fileName}</span>
                   <span className="text-gray">
-                    {selectedMockIds?.length} {selectedMockIds?.length === 1 ? " mock" : " mocks"}
+                    {mocksDownloadDetails?.mocksCount} {selectedMockIds?.length === 1 ? " mock" : " mocks"}
                   </span>
                 </div>
                 <Button type="primary" onClick={handleMocksDownload}>

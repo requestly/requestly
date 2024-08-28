@@ -14,6 +14,7 @@ import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOut
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { MdOutlineDriveFileMove } from "@react-icons/all-files/md/MdOutlineDriveFileMove";
 import { MdOutlineRemoveCircleOutline } from "@react-icons/all-files/md/MdOutlineRemoveCircleOutline";
+import { MdDownload } from "@react-icons/all-files/md/MdDownload";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
@@ -49,6 +50,7 @@ export const useMocksTableColumns = ({
     updateMocksCollectionAction,
     toggleMockStarAction,
     removeMocksFromCollectionAction,
+    exportMocksAction,
   } = useMocksActionContext() ?? {};
 
   const columns: ContentListTableProps<RQMockSchema>["columns"] = [
@@ -230,6 +232,19 @@ export const useMocksTableColumns = ({
           },
           {
             key: 1,
+            disabled: ((record as unknown) as RQMockCollection)?.children?.length === 0,
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
+              exportMocksAction([record]);
+            },
+            label: (
+              <div className="mock-action">
+                <MdDownload /> Export
+              </div>
+            ),
+          },
+          {
+            key: 2,
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
@@ -313,6 +328,18 @@ export const useMocksTableColumns = ({
           },
           {
             key: 4,
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
+              exportMocksAction([record]);
+            },
+            label: (
+              <div className="mock-action">
+                <MdDownload /> Export
+              </div>
+            ),
+          },
+          {
+            key: 5,
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
