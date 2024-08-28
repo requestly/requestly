@@ -20,7 +20,7 @@ type MocksModalsContextType = {
   openNewFileModalAction: (collectionId?: string) => void;
   setOpenNewFileModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openShareMocksModalAction: (selectedMockIds: string[]) => void;
+  openShareMocksModalAction: (selectedMockIds: string[], onSuccess?: () => void) => void;
   setOpenShareMocksModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 };
 

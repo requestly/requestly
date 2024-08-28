@@ -25,6 +25,7 @@ import { enhanceRecords, isRecordMockCollection, recordsToContentTableDataAdapte
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
+import { MdDownload } from "@react-icons/all-files/md/MdDownload";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import PATHS from "config/constants/sub/paths";
 import { trackMocksListBulkActionPerformed } from "modules/analytics/events/features/mocksV2";
@@ -104,7 +105,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     allRecordsMap,
   });
 
-  const { deleteRecordsAction, updateMocksCollectionAction, removeMocksFromCollectionAction } =
+  const { deleteRecordsAction, updateMocksCollectionAction, removeMocksFromCollectionAction, exportMocksAction } =
     useMocksActionContext() ?? {};
 
   const getBulkActionBarInfoText = useCallback((selectedRows: RQMockMetadataSchema[]) => {
@@ -235,6 +236,18 @@ export const MocksTable: React.FC<MocksTableProps> = ({
                       };
 
                       removeMocksFromCollectionAction(selectedRows, onSuccess);
+                    },
+                  },
+                  {
+                    label: "Export",
+                    icon: <MdDownload />,
+                    onClick: (selectedRows) => {
+                      const onSuccess = () => {
+                        trackMocksListBulkActionPerformed("export", mockType);
+                        clearSelectedRows();
+                      };
+
+                      exportMocksAction(selectedRows, onSuccess);
                     },
                   },
                   {

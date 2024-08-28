@@ -99,11 +99,13 @@ export const DownloadMocksModal: React.FC<ShareMocksModalProps> = ({
   const handleMocksDownload = () => {
     // TODO: add analytics
     fileDownload(mocksDownloadDetails?.fileContent ?? "", fileName, "application/json");
+    onSuccess();
     setTimeout(
       () => toast.success(`${mocksDownloadDetails.mocksCount === 1 ? "Mock" : "Mocks"} downloaded successfully`),
-      0
+      1000
     );
-    onSuccess();
+
+    toggleModal();
   };
 
   return (
@@ -136,7 +138,7 @@ export const DownloadMocksModal: React.FC<ShareMocksModalProps> = ({
                 <div className="download-rules-details">
                   <span className="line-clamp">{fileName}</span>
                   <span className="text-gray">
-                    {mocksDownloadDetails?.mocksCount} {selectedMockIds?.length === 1 ? " mock" : " mocks"}
+                    {mocksDownloadDetails?.mocksCount} {mocksDownloadDetails?.mocksCount === 1 ? " mock" : " mocks"}
                   </span>
                 </div>
                 <Button type="primary" onClick={handleMocksDownload}>

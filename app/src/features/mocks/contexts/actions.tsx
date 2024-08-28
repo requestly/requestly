@@ -172,7 +172,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     async (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
       Logger.log("[DEBUG]", "exportMocksAction", { records });
 
-      const mockIds: RQMockMetadataSchema["id"][] = [];
+      const mockIds: Record<RQMockMetadataSchema["id"], RQMockMetadataSchema> = {};
       const collectionIds: RQMockMetadataSchema["id"][] = [];
 
       records.forEach((record) => {
@@ -181,21 +181,16 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
           // add all the child mocks too
           ((record as unknown) as RQMockCollection)?.children?.forEach((mock) => {
-            mockIds.push(mock.id);
+            mockIds[mock.id] = mock;
           });
         } else {
-          mockIds.push(record.id);
+          mockIds[record.id] = record;
         }
       });
 
-      const selectedRecordIds = [...mockIds, ...collectionIds];
+      const selectedRecordIds = [...Object.keys(mockIds), ...collectionIds];
 
-      console.log("exportMocksAction", { selectedRecordIds });
-
-      openShareMocksModalAction(selectedRecordIds);
-
-      // toast.success(`${mockIds.length > 1 ? "Mocks" : "Mock"} removed from collection!`);
-      // onSuccess?.();
+      openShareMocksModalAction(selectedRecordIds, onSuccess);
     },
     [openShareMocksModalAction]
   );
