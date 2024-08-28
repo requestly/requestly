@@ -1,7 +1,6 @@
 import { Rule } from "common/types";
-import { getVariable, setVariable, Variable } from "../variable";
 
-type DevtoolsMap = Record<string, chrome.runtime.Port>;
+const portConnections = new Map<number, chrome.runtime.Port>();
 
 export const initDevtoolsListener = () => {
   chrome.runtime.onConnect.addListener(function (port) {
@@ -10,26 +9,21 @@ export const initDevtoolsListener = () => {
     }
 
     port.onMessage.addListener(function (msg) {
-      if (msg.action === "registerDevTool") {
-        console.log("!!!debug", "devtool msg", msg, port);
-        getVariable<DevtoolsMap>(Variable.DEVTOOLS, {}).then((devtools) => {
-          console.log("!!!debug", "devtools var", devtools);
-          const map = {
-            ...devtools,
-            [msg.tabId]: port,
-          };
-          console.log("!!!debug", "mapp", map);
-          setVariable(Variable.DEVTOOLS, map);
-        });
+      switch (msg.action) {
+        case "registerDevTool": {
+          portConnections.set(msg.tabId, port);
+          break;
+        }
+
+        case "heartbeat":
+          return;
       }
     });
 
-    port.onDisconnect.addListener(function () {
-      getVariable<DevtoolsMap>(Variable.DEVTOOLS, {}).then((devtools) => {
-        const tabId = Object.keys(devtools).find((tabId) => devtools[tabId] === port);
-        if (tabId) {
-          delete devtools[tabId];
-          setVariable(Variable.DEVTOOLS, devtools);
+    port.onDisconnect.addListener(function (port) {
+      portConnections.forEach((value, key) => {
+        if (value === port) {
+          portConnections.delete(key);
         }
       });
     });
@@ -47,10 +41,8 @@ export const sendLogToDevtools = (rule: Rule, requestDetails: chrome.webRequest.
 };
 
 const sendMessageToDevtools = (tabId: number, message: any) => {
-  getVariable<DevtoolsMap>(Variable.DEVTOOLS, {}).then((devtools) => {
-    const port = devtools[tabId];
-    if (port) {
-      port.postMessage(message);
-    }
-  });
+  const port = portConnections.get(tabId);
+  if (port) {
+    port.postMessage(message);
+  }
 };
