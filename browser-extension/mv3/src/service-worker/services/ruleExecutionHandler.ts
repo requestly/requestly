@@ -35,12 +35,19 @@ class RuleExecutionHandler {
     return appliedRules;
   };
 
-  processTabCachedRulesExecutions = (tabId: number) => {
+  processTabCachedRulesExecutions = async (tabId: number) => {
     const rulesExecutionLogs: RulesExecutionLog[] =
       tabService.getData(tabId, TAB_SERVICE_DATA.RULES_EXECUTION_LOGS, []) || [];
 
+    const uniqueAppliedRuleIds = Array.from(new Set(rulesExecutionLogs.map((executionLog) => executionLog.ruleId)));
+
+    const appliedRules = (await rulesStorageService.getRules(uniqueAppliedRuleIds)).reduce((acc, rule) => {
+      acc[rule.id] = rule;
+      return acc;
+    }, {} as Record<string, Rule>);
+
     rulesExecutionLogs.forEach((executionLog) => {
-      this.onRuleExecuted({ id: executionLog.ruleId } as Rule, executionLog.requestDetails);
+      this.onRuleExecuted(appliedRules[executionLog.ruleId] as Rule, executionLog.requestDetails);
     });
 
     tabService.removeData(tabId, TAB_SERVICE_DATA.RULES_EXECUTION_LOGS);
