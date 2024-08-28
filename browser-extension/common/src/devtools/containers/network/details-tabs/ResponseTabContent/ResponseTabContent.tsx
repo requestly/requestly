@@ -42,10 +42,14 @@ const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
 
   useEffect(() => {
     networkEvent.getContent((content) => {
-      try {
-        setResponse(JSON.stringify(JSON.parse(content), null, 2) || "");
-      } catch (e) {
-        setResponse(content || "");
+      if (content) {
+        try {
+          setResponse(JSON.stringify(JSON.parse(content), null, 2) || "");
+        } catch (e) {
+          setResponse(content);
+        }
+      } else {
+        setResponse("");
       }
 
       const language = getEditorLanguageFromMimeType(networkEvent.response?.content?.mimeType);
@@ -116,7 +120,17 @@ const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
           extra={renderEditResponseBodyButton()}
         ></Collapse.Panel>
       </Collapse>
-      <CodeMirror basicSetup theme={vscodeDark} value={response} height="95%" extensions={editorExtensions} readOnly />
+      <CodeMirror
+        basicSetup={{
+          lineNumbers: true,
+          syntaxHighlighting: true,
+        }}
+        theme={vscodeDark}
+        value={response}
+        height="95%"
+        extensions={editorExtensions}
+        readOnly
+      />
     </div>
   );
 };
