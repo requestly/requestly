@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
 import { Radio, Space, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { CopyValue } from "components/misc/CopyValue";
@@ -19,8 +19,10 @@ import { getAllRecords } from "store/features/rules/selectors";
 import { StorageRecord } from "features/rules/types/rules";
 import { trackSharedListCreatedEvent } from "modules/analytics/events/features/sharedList";
 import { trackSharedListUrlCopied } from "features/rules/screens/sharedLists";
-import "./index.css";
 import EmailInputWithDomainBasedSuggestions from "../EmailInputWithDomainBasedSuggestions";
+import { useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
+import "./index.css";
 
 interface ShareLinkProps {
   selectedRules: StorageRecord["id"][];
@@ -31,8 +33,10 @@ interface ShareLinkProps {
 // TODO: handle copy changes for session replay in V1
 
 export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source, onSharedLinkCreated = () => {} }) => {
+  const location = useLocation();
   const appMode = useSelector(getAppMode);
   const records = useSelector(getAllRecords);
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const [sharedLinkVisibility, setSharedLinkVisibility] = useState(SharedLinkVisibility.PUBLIC);
   const [sharedListRecipients, setSharedListRecipients] = useState([]);
   const [sharedListName, setSharedListName] = useState(null);
@@ -40,13 +44,18 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
   const [isLinkGenerating, setIsLinkGenerating] = useState(false);
   const [isMailSent, setIsMailSent] = useState(false);
   const [error, setError] = useState(null);
+  const isRuleEditor = location?.pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const sendSharedListShareEmail = useMemo(() => httpsCallable(getFunctions(), "sharedLists-sendShareEmail"), []);
-  const singleRuleData = useMemo(
-    () =>
-      selectedRules && selectedRules?.length === 1 ? records.find((record) => record.id === selectedRules[0]) : null,
-    [records, selectedRules]
-  );
+  const singleRuleData = useMemo(() => {
+    if (isRuleEditor) {
+      return currentlySelectedRuleData;
+    }
+
+    return selectedRules && selectedRules?.length === 1
+      ? records.find((record) => record.id === selectedRules[0])
+      : null;
+  }, [records, selectedRules, isRuleEditor, currentlySelectedRuleData?.name]);
 
   const visibilityOptions = useMemo(
     () => [
