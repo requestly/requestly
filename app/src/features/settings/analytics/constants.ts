@@ -19,6 +19,9 @@ export const SETTINGS = {
     BILLING_TEAM_INVITE_MEMBER_EMAIL_ENTERRED: "billing_team_invite_member_email_enterred",
     BILLING_TEAM_INVITE_SENT_SUCCESSFULLY: "billing_team_invite_sent_successfully",
     BILLING_TEAM_INVITE_SENDING_FAILED: "billing_team_invite_sending_failed",
+    BILLING_TEAM_INVOICE_REQUEST_SENT: "billing_team_invoice_request_sent",
+    BILLING_TEAM_INVOICE_REQUEST_FAILED: "billing_team_invoice_request_failed",
+    BILLING_TEAM_INVOICE_REQUESTED: "billing_team_invoice_requested",
   },
 
   WORKSPACE: {
