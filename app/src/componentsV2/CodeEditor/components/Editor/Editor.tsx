@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
@@ -36,7 +36,7 @@ interface EditorProps {
 
 const Editor: React.FC<EditorProps> = ({
   value,
-  defaultValue,
+  defaultValue = "",
   language,
   isReadOnly = false,
   height = 225,
@@ -97,11 +97,16 @@ const Editor: React.FC<EditorProps> = ({
     }
   }, [language]);
 
+  const isEditorContentSet = useRef(false);
+
   useEffect(() => {
-    if (!value?.length) {
-      setEditorContent(defaultValue ?? "");
-    } else {
-      setEditorContent(value);
+    if (!isEditorContentSet.current) {
+      if (!value?.length) {
+        setEditorContent(defaultValue);
+      } else {
+        setEditorContent(value);
+        isEditorContentSet.current = true;
+      }
     }
   }, [defaultValue, value]);
 
