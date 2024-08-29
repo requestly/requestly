@@ -93,12 +93,12 @@ export const DownloadMocksModal: React.FC<ShareMocksModalProps> = ({
 
   const fileName =
     mocksDownloadDetails?.mocksCount === 1
-      ? mocks[0].name ?? ""
-      : `requestly_mocks_export_${getFormattedDate("DD_MM_YYYY")}.json`;
+      ? `${mocks[0].name}` ?? ""
+      : `requestly_mocks_export_${getFormattedDate("DD_MM_YYYY")}`;
 
   const handleMocksDownload = () => {
     // TODO: add analytics
-    fileDownload(mocksDownloadDetails?.fileContent ?? "", fileName, "application/json");
+    fileDownload(mocksDownloadDetails?.fileContent ?? "", `${fileName}.json`, "application/json");
     onSuccess();
     setTimeout(
       () => toast.success(`${mocksDownloadDetails.mocksCount === 1 ? "Mock" : "Mocks"} downloaded successfully`),
