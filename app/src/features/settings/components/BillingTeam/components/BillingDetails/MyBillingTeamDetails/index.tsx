@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Col } from "antd";
 import { TeamPlanDetails } from "./components/TeamPlanDetails";
 import { BillingTeamMembers } from "./components/BillingTeamMembers";
-import { BillingInvoiceTable } from "./components/BillingInvoiceTable";
+import { BillingInvoiceCard } from "./components/BillingInvoiceCard";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getAvailableBillingTeams, getBillingTeamById } from "store/features/billing/selectors";
@@ -57,7 +57,7 @@ export const MyBillingTeamDetails: React.FC = () => {
         </Col>
         {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member && (
           <Col style={{ marginTop: "24px" }}>
-            <BillingInvoiceTable />
+            <BillingInvoiceCard />
           </Col>
         )}
         {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role === BillingTeamRoles.Manager && (
