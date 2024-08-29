@@ -9,7 +9,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
 import {
-  trackBillingTeamInvoiceRequested,
+  trackBillingTeamInvoiceRequestClicked,
   trackBillingTeamInvoiceRequestFailed,
   trackBillingTeamInvoiceRequestSent,
 } from "features/settings/analytics";
@@ -25,7 +25,7 @@ export const BillingInvoiceCard: React.FC = () => {
   const handleSendInvoiceRequest = useCallback(() => {
     setIsLoading(true);
     setIsRequestProcessed(false);
-    trackBillingTeamInvoiceRequested(billingId);
+    trackBillingTeamInvoiceRequestClicked(billingId);
     const sendInvoiceRequest = httpsCallable(getFunctions(), "internalNotifications-sendBillingTeamInvoiceRequest");
     sendInvoiceRequest({ billingId })
       .then(() => {
