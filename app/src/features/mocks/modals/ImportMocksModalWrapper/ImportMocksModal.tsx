@@ -42,7 +42,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
     mocksCount: 0,
     collectionsCount: 0,
     mockTypeToImport: null,
-    success: false,
+    success: true,
   });
   const [processingRecordsToImport, setProcessingRecordsToImport] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -75,8 +75,12 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
           // @ts-ignore
           parsedRecords = JSON.parse(reader.result) as RQMockSchema;
 
-          //Start processing data
           const result = processMocksToImport(user?.details?.profile?.uid, parsedRecords);
+
+          if (!result.success) {
+            throw new Error("Invalid file!");
+          }
+
           setDataToImport(result);
 
           // trackRulesJsonParsed({
@@ -86,7 +90,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
           // });
         } catch (error) {
           Logger.log(error);
-          alert("Imported file doesn't match Requestly format. Please choose another file.");
+          alert("Imported file doesn't match Requestly mocks format. Please choose another file.");
           // trackRulesJsonParsed({
           //   successful: false,
           // });
@@ -138,7 +142,6 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
           .then((mockId) => mockId)
           .catch((e) => {
             // NOOP
-            console.log("for each error", e);
           });
 
         mocksPromises.push(promise);
@@ -208,7 +211,13 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
               </Col>
             )}
           </>
-        ) : null}
+        ) : (
+          <Col lg="12" md="12" xl="12" sm="12" xs="12" className="text-center">
+            <h4>
+              <AiOutlineWarning /> No mocks to import, please try another file!
+            </h4>
+          </Col>
+        )}
       </div>
     </Modal>
   );
