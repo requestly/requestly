@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
+import { useNavigate } from "react-router-dom";
 import Logger from "lib/logger";
 import { FilePicker } from "components/common/FilePicker";
 import { Button, Col, Modal, Row } from "antd";
@@ -12,6 +13,7 @@ import { toast } from "utils/Toast";
 import { createMock } from "backend/mocks/createMock";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { createCollection } from "backend/mocks/createCollection";
+import PATHS from "config/constants/sub/paths";
 import "./ImportMocksModal.scss";
 
 interface ImportMocksModalProps {
@@ -27,6 +29,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
   mockType,
   onSuccess = () => {},
 }) => {
+  const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -38,12 +41,14 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
     collections: [],
     mocksCount: 0,
     collectionsCount: 0,
+    mockTypeToImport: null,
     success: false,
   });
   const [processingRecordsToImport, setProcessingRecordsToImport] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
   const {
+    mockTypeToImport,
     mocks: mocksToImport,
     collections: collectionsToImport,
     success: isValidRecords,
@@ -93,7 +98,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
       };
       reader.readAsText(file);
     },
-    [user, toggleModal]
+    [toggleModal]
   );
 
   const handleRecordsImport = async () => {
@@ -142,6 +147,8 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
       await Promise.all(mocksPromises);
       toast.success("Mocks imported successfully");
       onSuccess();
+
+      navigate(mockTypeToImport === MockType.API ? PATHS.MOCK_SERVER_V2.ABSOLUTE : PATHS.FILE_SERVER_V2.ABSOLUTE);
       toggleModal();
 
       // TODO: send analytics
@@ -171,7 +178,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
             onFilesDrop={onDrop}
             loaderMessage="Processing rules..."
             isProcessing={processingRecordsToImport}
-            title="Drag and drop your rules JSON file."
+            title="Drag and drop your rules JSON file"
           />
         ) : recordsToImport.length > 0 ? (
           <>

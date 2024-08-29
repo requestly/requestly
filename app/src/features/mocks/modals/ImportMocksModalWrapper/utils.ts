@@ -8,7 +8,15 @@ export const processMocksToImport = (uid: string, parsedRecords: RQMockSchema[])
     });
 
     if (!isValidRecords) {
-      return { records: [], mocks: [], collections: [], mocksCount: 0, collectionsCount: 0, success: false };
+      return {
+        records: [],
+        mocks: [],
+        collections: [],
+        mocksCount: 0,
+        collectionsCount: 0,
+        mockTypeToImport: null,
+        success: false,
+      };
     }
 
     const mocks: RQMockSchema[] = [];
@@ -32,6 +40,7 @@ export const processMocksToImport = (uid: string, parsedRecords: RQMockSchema[])
       collections,
       mocksCount: mocks.length,
       collectionsCount: collections.length,
+      mockTypeToImport: mocks[0]?.type,
       success: true,
     };
   } catch (error) {
