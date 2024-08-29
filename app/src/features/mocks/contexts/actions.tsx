@@ -40,6 +40,7 @@ type MocksActionContextType = {
   createNewMockAction: (mockType: MockType, source: MockListSource, collectionId?: string) => void;
   removeMocksFromCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   exportMocksAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
+  importMocksAction: (mockType: MockType, onSuccess?: () => void) => void;
 };
 
 const MocksActionContext = createContext<MocksActionContextType>(null);
@@ -63,6 +64,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     openMockUploaderModalAction,
     openNewFileModalAction,
     openShareMocksModalAction,
+    openMocksImportModalAction,
   } = useMocksModalsContext();
 
   const createNewCollectionAction = useCallback(
@@ -195,6 +197,15 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [openShareMocksModalAction]
   );
 
+  const importMocksAction = useCallback(
+    (mockType: MockType, onSuccess?: () => void) => {
+      Logger.log("[DEBUG]", "importMocksAction", { mockType });
+      // trackMockUploadWorkflowStarted(mockType);
+      openMocksImportModalAction(mockType, onSuccess);
+    },
+    [openMocksImportModalAction]
+  );
+
   const value = {
     createNewCollectionAction,
     updateCollectionNameAction,
@@ -207,6 +218,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     createNewMockAction,
     removeMocksFromCollectionAction,
     exportMocksAction,
+    importMocksAction,
   };
 
   return <MocksActionContext.Provider value={value}>{children}</MocksActionContext.Provider>;

@@ -18,6 +18,7 @@ import {
   MockUploaderModalWrapper,
   NewFileModalWrapper,
   DownloadMocksModalWrapper,
+  ImportMocksModalWrapper,
 } from "features/mocks/modals";
 import { getFilteredRecords } from "./components/MocksListContentHeader/utils";
 import "./mocksList.scss";
@@ -89,6 +90,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
       />
 
       <MockUploaderModalWrapper selectMockOnUpload={handleSelectAction} />
+      <ImportMocksModalWrapper />
     </>
   ) : mockRecords.length > 0 ? (
     <>
@@ -128,6 +130,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
 
       <MockUploaderModalWrapper />
       <DownloadMocksModalWrapper />
+      <ImportMocksModalWrapper forceRender={_forceRender} />
 
       {/* FIXME: Remove force re-render and instead update the local state */}
       <CreateOrUpdateCollectionModalWrapper forceRender={_forceRender} />
@@ -138,7 +141,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
       <UpdateMocksCollectionModalWrapper mockType={type} forceRender={_forceRender} mocks={mockRecords} />
     </>
   ) : (
-    <GettingStarted mockType={type} source={source} />
+    <GettingStarted mockType={type} source={source} forceRender={_forceRender} />
   );
 };
 

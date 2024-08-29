@@ -22,6 +22,9 @@ type MocksModalsContextType = {
 
   openShareMocksModalAction: (selectedMockIds: string[], onSuccess?: () => void) => void;
   setOpenShareMocksModalAction: React.Dispatch<React.SetStateAction<() => void>>;
+
+  openMocksImportModalAction: (mockType: MockType, onSuccess?: () => void) => void;
+  setOpenMocksImportModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 };
 
 const MocksModalsContext = createContext<MocksModalsContextType>(null);
@@ -46,6 +49,7 @@ export const MocksModalsContextProvider: React.FC<MocksModalsContextProviderProp
   const [openMockUploaderModalAction, setOpenMockUploaderModalAction] = useState<ModalAction>(() => DEFAULT_ACTION);
   const [openNewFileModalAction, setOpenNewFileModalAction] = useState<ModalAction>(() => DEFAULT_ACTION);
   const [openShareMocksModalAction, setOpenShareMocksModalAction] = useState<ModalAction>(() => DEFAULT_ACTION);
+  const [openMocksImportModalAction, setOpenMocksImportModalAction] = useState<ModalAction>(() => DEFAULT_ACTION);
 
   const value = {
     openCollectionModalAction,
@@ -68,6 +72,9 @@ export const MocksModalsContextProvider: React.FC<MocksModalsContextProviderProp
 
     openShareMocksModalAction,
     setOpenShareMocksModalAction,
+
+    openMocksImportModalAction,
+    setOpenMocksImportModalAction,
   };
 
   return <MocksModalsContext.Provider value={value}>{children}</MocksModalsContext.Provider>;

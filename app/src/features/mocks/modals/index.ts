@@ -8,3 +8,4 @@ export { NewFileModalWrapper } from "./NewFileModalWrapper";
 export { NewFileModal } from "./NewFileModalWrapper/NewFileModal";
 export { MockUploaderModal } from "./MockUploaderModalWrapper/MockUploaderModal";
 export { DownloadMocksModalWrapper } from "./DownloadMocksModalWrapper";
+export { ImportMocksModalWrapper } from "./ImportMocksModalWrapper";
