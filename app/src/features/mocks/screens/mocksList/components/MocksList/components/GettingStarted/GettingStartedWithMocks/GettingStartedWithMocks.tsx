@@ -7,6 +7,7 @@ import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPop
 import { AiOutlineCloudUpload } from "@react-icons/all-files/ai/AiOutlineCloudUpload";
 import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";
 import { FiArrowUpRight } from "@react-icons/all-files/fi/FiArrowUpRight";
+import { MdDownload } from "@react-icons/all-files/md/MdDownload";
 import noMocksIcon from "../../../../../../../../../assets/img/icons/common/no-mocks.svg";
 import { SOURCE } from "modules/analytics/events/common/constants.js";
 import { MockType } from "components/features/mocksV2/types";
@@ -16,9 +17,15 @@ interface Props {
   mockType: MockType;
   handleCreateNew: () => void;
   handleUploadAction: () => void;
+  handleImportAction: () => void;
 }
 
-export const GettingStartedWithMocks: React.FC<Props> = ({ mockType, handleCreateNew, handleUploadAction }) => {
+export const GettingStartedWithMocks: React.FC<Props> = ({
+  mockType,
+  handleCreateNew,
+  handleUploadAction,
+  handleImportAction,
+}) => {
   const user = useSelector(getUserAuthDetails);
 
   const renderDescription = () => {
@@ -105,6 +112,19 @@ export const GettingStartedWithMocks: React.FC<Props> = ({ mockType, handleCreat
                 onClick={() => user?.loggedIn && handleUploadAction()}
               >
                 <span>Upload {mockType === MockType.FILE ? "File" : "JSON"}</span>
+              </RQButton>
+            </AuthConfirmationPopover>
+            <AuthConfirmationPopover
+              title="You need to sign up to import mocks"
+              callback={handleImportAction}
+              source={SOURCE.MOCKS_GETTING_STARTED}
+            >
+              <RQButton
+                type="default"
+                icon={<MdDownload className="anticon" />}
+                onClick={() => user?.loggedIn && handleImportAction?.()}
+              >
+                <span>Import</span>
               </RQButton>
             </AuthConfirmationPopover>
             <AuthConfirmationPopover
