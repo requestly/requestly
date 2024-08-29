@@ -46,12 +46,13 @@ export const redirectToCreateRuleEditor = (navigate, rule) => {
 };
 
 /* FEATURE - RULES - Edit a Rule */
-export const redirectToRuleEditor = (navigate, ruleId, source, newTab = false) => {
+export const redirectToRuleEditor = (navigate, ruleId, source, newTab = false, popCurrentRouteFromHistory = false) => {
   if (newTab) {
     window.open(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`, "_blank");
   } else {
     navigate(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`, {
       state: { source },
+      replace: popCurrentRouteFromHistory,
     });
   }
 };
@@ -451,14 +452,14 @@ export const redirectToDownloadPage = () => {
   window.open(APP_CONSTANTS.LINKS.REQUESTLY_DOWNLOAD_PAGE, "_blank");
 };
 
-export const redirectToMockEditorEditMock = (navigate, mockId) => {
+export const redirectToMockEditorEditMock = (navigate, mockId, popCurrentRouteFromHistory = false) => {
   const mockEditUrl = `${PATHS.MOCK_SERVER_V2.EDIT.ABSOLUTE}`.replace(":mockId", mockId);
-  navigate(mockEditUrl);
+  navigate(mockEditUrl, { replace: popCurrentRouteFromHistory });
 };
 
-export const redirectToFileMockEditorEditMock = (navigate, mockId) => {
+export const redirectToFileMockEditorEditMock = (navigate, mockId, popCurrentRouteFromHistory = false) => {
   const mockEditUrl = `${PATHS.FILE_SERVER_V2.EDIT.ABSOLUTE}`.replace(":mockId", mockId);
-  navigate(mockEditUrl);
+  navigate(mockEditUrl, { replace: popCurrentRouteFromHistory });
 };
 
 export const redirectToMockEditorCreateMock = (navigate, newTab = false, collectionId = "") => {
