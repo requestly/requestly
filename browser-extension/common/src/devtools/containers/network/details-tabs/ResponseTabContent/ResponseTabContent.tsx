@@ -9,6 +9,7 @@ import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
+import { markdown } from "@codemirror/lang-markdown";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import "./responseTabContent.scss";
 
@@ -25,20 +26,16 @@ const mimeTypeToLangugageMap: { [mimeType: string]: any } = {
 };
 
 const getEditorLanguageFromMimeType = (mimeType: string) => {
-  let language = null;
+  const language = mimeTypeToLangugageMap[mimeType.toLowerCase().split(";")?.[0]];
 
-  if (mimeType) {
-    language = mimeTypeToLangugageMap[mimeType.toLowerCase().split(";")?.[0]];
-  }
-
-  return language;
+  return language || markdown();
 };
 
 const commonExtensions = [EditorView.lineWrapping];
 
 const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
   const [response, setResponse] = useState("");
-  const [editorExtensions, setEditorExtensions] = useState(commonExtensions);
+  const [editorExtensions, setEditorExtensions] = useState([...commonExtensions, markdown()]);
 
   useEffect(() => {
     networkEvent.getContent((content) => {
@@ -53,11 +50,7 @@ const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
       }
 
       const language = getEditorLanguageFromMimeType(networkEvent.response?.content?.mimeType);
-      if (language) {
-        setEditorExtensions([...commonExtensions, language]);
-      } else {
-        setEditorExtensions([...commonExtensions]);
-      }
+      setEditorExtensions([...commonExtensions, language]);
     });
   }, [networkEvent]);
 
