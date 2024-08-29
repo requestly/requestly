@@ -80,3 +80,15 @@ export const trackBillingTeamInviteSentSuccessfully = (hasExternalDomainUser: bo
 export const trackBillingTeamInviteSendingFailed = (hasExternalDomainUser: boolean) => {
   trackEvent(SETTINGS.BILLING.BILLING_TEAM_INVITE_SENDING_FAILED, { hasExternalDomainUser });
 };
+
+export const trackBillingTeamInvoiceRequested = (team_id: string) => {
+  trackEvent(SETTINGS.BILLING.BILLING_TEAM_INVOICE_REQUESTED, { team_id });
+};
+
+export const trackBillingTeamInvoiceRequestSent = (team_id: string) => {
+  trackEvent(SETTINGS.BILLING.BILLING_TEAM_INVOICE_REQUEST_SENT, { team_id });
+};
+
+export const trackBillingTeamInvoiceRequestFailed = (team_id: string) => {
+  trackEvent(SETTINGS.BILLING.BILLING_TEAM_INVOICE_REQUEST_FAILED, { team_id });
+};
