@@ -12,6 +12,7 @@ import { prepareMocksToExport } from "./utils";
 import fileDownload from "js-file-download";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
+import { trackMocksExported } from "modules/analytics/events/features/mocksV2";
 import "./DownloadMocksModal.scss";
 
 const EmptySelectionView = () => {
@@ -97,7 +98,7 @@ export const DownloadMocksModal: React.FC<ShareMocksModalProps> = ({
       : `requestly_mocks_export_${getFormattedDate("DD_MM_YYYY")}`;
 
   const handleMocksDownload = () => {
-    // TODO: add analytics
+    trackMocksExported(mocksDownloadDetails?.mocksCount, mocksDownloadDetails?.collectionsCount);
     fileDownload(mocksDownloadDetails?.fileContent ?? "", `${fileName}.json`, "application/json");
     onSuccess();
     setTimeout(

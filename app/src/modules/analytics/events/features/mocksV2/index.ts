@@ -89,6 +89,11 @@ export const trackMockUploadFailed = (type: string, cause: string) => {
   trackEvent(MOCKSV2.MOCK_UPLOAD_FAILED, params);
 };
 
+export const trackMocksExported = (mocksCount: number, collectionsCount: number) => {
+  const params = { mocksCount, collectionsCount };
+  trackEvent(MOCKSV2.MOCKS_EXPORTED, params);
+};
+
 export const trackTestMockClicked = () => {
   trackEvent(MOCKSV2.TEST_MOCK_CLICKED);
 };
