@@ -14,7 +14,11 @@ import { createMock } from "backend/mocks/createMock";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { createCollection } from "backend/mocks/createCollection";
 import PATHS from "config/constants/sub/paths";
-import { trackMocksJsonParsed } from "modules/analytics/events/features/mocksV2";
+import {
+  trackMocksImportCompleted,
+  trackMocksImportFailed,
+  trackMocksJsonParsed,
+} from "modules/analytics/events/features/mocksV2";
 import "./ImportMocksModal.scss";
 
 interface ImportMocksModalProps {
@@ -102,7 +106,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
           });
 
           alert("Imported file doesn't match Requestly mocks format. Please choose another file.");
-          // trackRulesImportFailed("json_parse_failed");
+          trackMocksImportFailed("json_parse_failed");
           toggleModal();
         } finally {
           setProcessingRecordsToImport(false);
@@ -157,13 +161,19 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
 
       await Promise.all(mocksPromises);
       toast.success("Mocks imported successfully");
-      onSuccess();
 
+      trackMocksImportCompleted({
+        source,
+        mockTypeToImport,
+        mocksCount: mocksToImportCount,
+        collectionsCount: collectionsToImportCount,
+      });
+
+      onSuccess();
       navigate(mockTypeToImport === MockType.API ? PATHS.MOCK_SERVER_V2.ABSOLUTE : PATHS.FILE_SERVER_V2.ABSOLUTE);
       toggleModal();
-
-      // TODO: send analytics
     } catch (error) {
+      trackMocksImportFailed("import_click");
       Logger.log("handleRecordsImport", error);
       toast.error("Something went wrong, please try again!");
     } finally {

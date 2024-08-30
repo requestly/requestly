@@ -116,6 +116,26 @@ export const trackMocksJsonParsed = ({
   trackEvent(MOCKSV2.MOCKS_JSON_PARSED, params);
 };
 
+export const trackMocksImportFailed = (source: string) => {
+  const params = { source };
+  trackEvent(MOCKSV2.MOCKS_IMPORT_FAILED, params);
+};
+
+export const trackMocksImportCompleted = ({
+  mockTypeToImport = "",
+  source,
+  mocksCount = 0,
+  collectionsCount = 0,
+}: {
+  mockTypeToImport?: string;
+  source: string;
+  mocksCount?: number;
+  collectionsCount?: number;
+}) => {
+  const params = { mockTypeToImport, source, mocksCount, collectionsCount };
+  trackEvent(MOCKSV2.MOCKS_IMPORT_COMPLETED, params);
+};
+
 export const trackTestMockClicked = () => {
   trackEvent(MOCKSV2.TEST_MOCK_CLICKED);
 };
