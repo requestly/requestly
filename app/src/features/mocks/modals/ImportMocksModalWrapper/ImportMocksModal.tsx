@@ -204,9 +204,9 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
         {recordsToImport.length === 0 ? (
           <FilePicker
             onFilesDrop={onDrop}
-            loaderMessage="Processing rules..."
+            loaderMessage="Processing mocks..."
             isProcessing={processingRecordsToImport}
-            title="Drag and drop your rules JSON file"
+            title="Drag and drop your mocks JSON file"
           />
         ) : recordsToImport.length > 0 ? (
           <>
