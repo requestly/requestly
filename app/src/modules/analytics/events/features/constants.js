@@ -142,6 +142,7 @@ export const MOCKSV2 = {
   MOCK_UPLOAD_FAILED: "mock_upload_failed",
   MOCKS_EXPORTED: "mocks_exported",
   MOCK_IMPORT_BUTTON_CLICKED: "mock_import_button_clicked",
+  MOCKS_JSON_PARSED: "mocks_json_parsed",
   TEST_MOCK_CLICKED: "test_mock_clicked",
   MOCKS_LIST_FILTER_CHANGED: "mocks_list_filter_changed",
 

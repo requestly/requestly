@@ -14,6 +14,7 @@ import { createMock } from "backend/mocks/createMock";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { createCollection } from "backend/mocks/createCollection";
 import PATHS from "config/constants/sub/paths";
+import { trackMocksJsonParsed } from "modules/analytics/events/features/mocksV2";
 import "./ImportMocksModal.scss";
 
 interface ImportMocksModalProps {
@@ -85,17 +86,22 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
 
           setDataToImport(result);
 
-          // trackRulesJsonParsed({
-          //   parsed_rules_count: result.rulesCount,
-          //   parsed_groups_count: result.groupsCount,
-          //   successful: true,
-          // });
+          trackMocksJsonParsed({
+            source,
+            successful: true,
+            mockTypeToImport: result.mockTypeToImport,
+            mocksCount: result.mocksCount,
+            collectionsCount: result.collectionsCount,
+          });
         } catch (error) {
           Logger.log(error);
+
+          trackMocksJsonParsed({
+            source,
+            successful: false,
+          });
+
           alert("Imported file doesn't match Requestly mocks format. Please choose another file.");
-          // trackRulesJsonParsed({
-          //   successful: false,
-          // });
           // trackRulesImportFailed("json_parse_failed");
           toggleModal();
         } finally {
