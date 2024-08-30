@@ -351,7 +351,7 @@ export const localSampleRules = [
     data: {
       ruleData: {
         createdBy: null,
-        creationDate: 1723631960856,
+        creationDate: 1725001710738,
         currentOwner: null,
         description: "",
         extensionRules: [
@@ -366,7 +366,7 @@ export const localSampleRules = [
               excludedInitiatorDomains: ["requestly.io"],
               excludedRequestDomains: ["requestly.io"],
               isUrlFilterCaseSensitive: true,
-              urlFilter: "https://www.requestly-playground.com/_next/static/Oh7Cq1GJMWkgJh_0tQXWX/_buildManifest.js",
+              regexFilter: "^https://www\\.requestly\\-playground\\.com/_next/static/(.*)/_buildManifest\\.js$",
             },
           },
         ],
@@ -385,8 +385,8 @@ export const localSampleRules = [
             id: "esfg9",
             source: {
               key: "Url",
-              operator: "Contains",
-              value: "https://www.requestly-playground.com/_next/static/Oh7Cq1GJMWkgJh_0tQXWX/_buildManifest.js",
+              operator: "Wildcard_Matches",
+              value: "https://www.requestly-playground.com/_next/static/*/_buildManifest.js",
             },
           },
         ],
