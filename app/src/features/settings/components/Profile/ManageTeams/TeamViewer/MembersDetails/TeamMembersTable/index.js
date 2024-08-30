@@ -159,6 +159,8 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
       render: (member) => {
         if (member.isPending) return null;
 
+        if (member.isOwner) return <div>Admin</div>;
+
         if (member.id === loggedInUserId) {
           return <div>{member.isAdmin ? "Admin" : "Member"}</div>;
         }
@@ -191,7 +193,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
       dataIndex: "role",
       align: "right",
       render: (member) => {
-        if (member.id === loggedInUserId || !isLoggedInUserAdmin) return null;
+        if (member.id === loggedInUserId || !isLoggedInUserAdmin || member.isOwner) return null;
 
         return (
           <MemberActionsDropdown
