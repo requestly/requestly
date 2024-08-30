@@ -7,7 +7,7 @@ import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPop
 import { AiOutlineCloudUpload } from "@react-icons/all-files/ai/AiOutlineCloudUpload";
 import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";
 import { FiArrowUpRight } from "@react-icons/all-files/fi/FiArrowUpRight";
-import { MdDownload } from "@react-icons/all-files/md/MdDownload";
+import { LuImport } from "@react-icons/all-files/lu/LuImport";
 import noMocksIcon from "../../../../../../../../../assets/img/icons/common/no-mocks.svg";
 import { SOURCE } from "modules/analytics/events/common/constants.js";
 import { MockType } from "components/features/mocksV2/types";
@@ -121,7 +121,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
             >
               <RQButton
                 type="default"
-                icon={<MdDownload className="anticon" />}
+                icon={<LuImport className="anticon" />}
                 onClick={() => user?.loggedIn && handleImportAction?.()}
               >
                 <span>Import</span>

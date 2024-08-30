@@ -15,7 +15,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails } from "store/selectors";
 import { MdOutlineCreateNewFolder } from "@react-icons/all-files/md/MdOutlineCreateNewFolder";
 import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOutline";
-import { MdDownload } from "@react-icons/all-files/md/MdDownload";
+import { LuImport } from "@react-icons/all-files/lu/LuImport";
 import { isRecordMock } from "../MocksTable/utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { useLocation } from "react-router-dom";
@@ -68,7 +68,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
     {
       hide: isRuleEditor,
       type: "default" as ButtonProps["type"],
-      icon: <MdDownload className="anticon" />,
+      icon: <LuImport className="anticon" />,
       buttonText: "Import",
       onClickHandler: () => {
         if (user?.details?.isLoggedIn) {
