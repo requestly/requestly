@@ -23,7 +23,7 @@ type MocksModalsContextType = {
   openShareMocksModalAction: (selectedMockIds: string[], onSuccess?: () => void) => void;
   setOpenShareMocksModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openMocksImportModalAction: (mockType: MockType, onSuccess?: () => void) => void;
+  openMocksImportModalAction: (mockType: MockType, source: string, onSuccess?: () => void) => void;
   setOpenMocksImportModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 };
 

@@ -10,14 +10,16 @@ interface ImportMocksModalWrapperProps {
 export const ImportMocksModalWrapper: React.FC<ImportMocksModalWrapperProps> = ({ forceRender = () => {} }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [mockType, setMockType] = useState(null);
+  const [eventSource, setEventSource] = useState("");
   const [onSuccess, setOnSuccess] = useState(() => () => {});
 
   const { setOpenMocksImportModalAction } = useMocksModalsContext();
 
   useEffect(() => {
-    const openModal = (mockType: MockType, onSuccess?: () => void) => {
+    const openModal = (mockType: MockType, source: string = "", onSuccess?: () => void) => {
       setIsOpen(true);
       setMockType(mockType);
+      setEventSource(source);
 
       setOnSuccess(() => () => {
         forceRender?.();
@@ -33,6 +35,12 @@ export const ImportMocksModalWrapper: React.FC<ImportMocksModalWrapperProps> = (
   };
 
   return isOpen ? (
-    <ImportMocksModal mockType={mockType} isOpen={isOpen} toggleModal={onClose} onSuccess={onSuccess} />
+    <ImportMocksModal
+      source={eventSource}
+      mockType={mockType}
+      isOpen={isOpen}
+      toggleModal={onClose}
+      onSuccess={onSuccess}
+    />
   ) : null;
 };

@@ -72,13 +72,13 @@ export const MocksListContentHeader: React.FC<Props> = ({
       buttonText: "Import",
       onClickHandler: () => {
         if (user?.details?.isLoggedIn) {
-          importMocksAction(mockType);
+          importMocksAction(mockType, SOURCE.MOCKS_LIST);
         }
       },
       isAuthRequired: true,
       authPopover: {
         title: "You need to sign up to import mocks!",
-        callback: () => importMocksAction(mockType),
+        callback: () => importMocksAction(mockType, SOURCE.MOCKS_LIST),
         source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
       },
     },

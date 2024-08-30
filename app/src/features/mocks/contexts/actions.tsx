@@ -14,6 +14,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import {
+  trackMockImportClicked,
   trackMockStarToggledEvent,
   trackMockUploadWorkflowStarted,
   trackNewMockButtonClicked,
@@ -40,7 +41,7 @@ type MocksActionContextType = {
   createNewMockAction: (mockType: MockType, source: MockListSource, collectionId?: string) => void;
   removeMocksFromCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   exportMocksAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
-  importMocksAction: (mockType: MockType, onSuccess?: () => void) => void;
+  importMocksAction: (mockType: MockType, source: string, onSuccess?: () => void) => void;
 };
 
 const MocksActionContext = createContext<MocksActionContextType>(null);
@@ -198,10 +199,10 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   );
 
   const importMocksAction = useCallback(
-    (mockType: MockType, onSuccess?: () => void) => {
+    (mockType: MockType, source: string, onSuccess?: () => void) => {
       Logger.log("[DEBUG]", "importMocksAction", { mockType });
-      // trackMockUploadWorkflowStarted(mockType);
-      openMocksImportModalAction(mockType, onSuccess);
+      trackMockImportClicked(mockType, source);
+      openMocksImportModalAction(mockType, source, onSuccess);
     },
     [openMocksImportModalAction]
   );

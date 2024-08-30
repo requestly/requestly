@@ -94,6 +94,11 @@ export const trackMocksExported = (mocksCount: number, collectionsCount: number)
   trackEvent(MOCKSV2.MOCKS_EXPORTED, params);
 };
 
+export const trackMockImportClicked = (type: string, source: string) => {
+  const params = { type, source };
+  trackEvent(MOCKSV2.MOCK_IMPORT_BUTTON_CLICKED, params);
+};
+
 export const trackTestMockClicked = () => {
   trackEvent(MOCKSV2.TEST_MOCK_CLICKED);
 };

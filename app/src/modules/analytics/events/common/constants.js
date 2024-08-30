@@ -68,6 +68,7 @@ export const AUTH = {
 export const SOURCE = {
   NAVBAR: "navbar",
   GETTING_STARTED: "getting_started",
+  MOCKS_LIST: "mocks_list",
   MOCKS_GETTING_STARTED: "mocks_getting_started",
   CREATE_FILE_MOCK: "create_file_mock",
   CREATE_NEW_RULE: "create_new_rule",

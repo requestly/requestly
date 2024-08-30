@@ -21,6 +21,7 @@ interface ImportMocksModalProps {
   mockType: MockType;
   toggleModal: () => void;
   onSuccess: () => void;
+  source: string;
 }
 
 export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
@@ -28,6 +29,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
   toggleModal,
   mockType,
   onSuccess = () => {},
+  source = "",
 }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
@@ -172,7 +174,14 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
   };
 
   return (
-    <Modal open={isOpen} onCancel={toggleModal} width={550} className="mocks-import-modal" footer={null}>
+    <Modal
+      open={isOpen}
+      onCancel={toggleModal}
+      width={550}
+      footer={null}
+      className="mocks-import-modal"
+      maskClosable={false}
+    >
       <div className="mocks-import-modal-content">
         <div className="heading">Import mocks</div>
 
