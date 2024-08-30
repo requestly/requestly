@@ -36,8 +36,12 @@
 .member-role-dropdown-trigger {
   cursor: pointer;
   position: relative;
-  padding: 6px 8px;
+  padding: 6px 4px;
   border-radius: var(--border-radius-sm);
+}
+
+.dropdown-trigger.dropdown-trigger-three-dots {
+  padding: 8px;
 }
 
 .member-role-dropdown-trigger:hover {
