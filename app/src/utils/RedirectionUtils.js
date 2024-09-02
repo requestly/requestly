@@ -46,12 +46,28 @@ export const redirectToCreateRuleEditor = (navigate, rule) => {
 };
 
 /* FEATURE - RULES - Edit a Rule */
-export const redirectToRuleEditor = (navigate, ruleId, source, newTab = false) => {
+/**
+ * Redirects the user to the rule editor for a specific rule.
+ *
+ * @param {function} navigate - The navigation function from react-router.
+ * @param {string} ruleId - The ID of the rule to edit.
+ * @param {string} source - The source of the navigation (for analytics or state management).
+ * @param {boolean} [newTab=false] - If true, opens the rule editor in a new tab.
+ * @param {boolean} [replaceCurrentRouteInHistory=false] - If true, replaces the current route in history instead of adding a new one.
+ */
+export const redirectToRuleEditor = (
+  navigate,
+  ruleId,
+  source,
+  newTab = false,
+  replaceCurrentRouteInHistory = false
+) => {
   if (newTab) {
     window.open(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`, "_blank");
   } else {
     navigate(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`, {
       state: { source },
+      replace: replaceCurrentRouteInHistory,
     });
   }
 };
@@ -451,14 +467,28 @@ export const redirectToDownloadPage = () => {
   window.open(APP_CONSTANTS.LINKS.REQUESTLY_DOWNLOAD_PAGE, "_blank");
 };
 
-export const redirectToMockEditorEditMock = (navigate, mockId) => {
+/**
+ * Redirects to the mock editor for editing an existing mock.
+ *
+ * @param {function} navigate - The navigation function from react-router.
+ * @param {string} mockId - The ID of the mock to edit.
+ * @param {boolean} [replaceCurrentRouteInHistory=false] - If true, replaces the current route in history instead of adding a new one.
+ */
+export const redirectToMockEditorEditMock = (navigate, mockId, replaceCurrentRouteInHistory = false) => {
   const mockEditUrl = `${PATHS.MOCK_SERVER_V2.EDIT.ABSOLUTE}`.replace(":mockId", mockId);
-  navigate(mockEditUrl);
+  navigate(mockEditUrl, { replace: replaceCurrentRouteInHistory });
 };
 
-export const redirectToFileMockEditorEditMock = (navigate, mockId) => {
+/**
+ * Redirects to the file mock editor for editing an existing file mock.
+ *
+ * @param {function} navigate - The navigation function from react-router.
+ * @param {string} mockId - The ID of the file mock to edit.
+ * @param {boolean} [replaceCurrentRouteInHistory=false] - If true, replaces the current route in history instead of adding a new one.
+ */
+export const redirectToFileMockEditorEditMock = (navigate, mockId, replaceCurrentRouteInHistory = false) => {
   const mockEditUrl = `${PATHS.FILE_SERVER_V2.EDIT.ABSOLUTE}`.replace(":mockId", mockId);
-  navigate(mockEditUrl);
+  navigate(mockEditUrl, { replace: replaceCurrentRouteInHistory });
 };
 
 export const redirectToMockEditorCreateMock = (navigate, newTab = false, collectionId = "") => {

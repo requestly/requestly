@@ -1,6 +1,6 @@
 .dropdown-trigger,
 .dropdown-menu.ant-dropdown-menu {
-  max-width: 16.375rem;
+  width: fit-content;
 }
 
 .dropdown-access-type-menu-item .ant-dropdown-menu-title-content {
@@ -36,7 +36,7 @@
 .member-role-dropdown-trigger {
   cursor: pointer;
   position: relative;
-  padding: 6px 8px;
+  padding: 6px 4px;
   border-radius: var(--border-radius-sm);
 }
 
@@ -47,7 +47,6 @@
 .member-role-dropdown-trigger span.ant-typography {
   display: flex;
   align-items: center;
-  justify-content: center;
   flex-wrap: nowrap;
 }
 
