@@ -149,9 +149,6 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
         ({ sharedListId, sharedListName, sharedListData, nonRQEmails }: any) => {
           trackRQLastActivity("sharedList_created");
           onSharedLinkCreated();
-
-          // TODO: send sharedList created email
-
           if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
             sendSharedListShareEmail({
               sharedListData: sharedListData,
