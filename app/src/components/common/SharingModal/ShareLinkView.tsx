@@ -248,6 +248,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
                       </div>
                     )}
                     <CopyValue
+                      title="Copy link"
                       value={shareableLinkData.link}
                       trackCopiedEvent={() =>
                         trackSharedListUrlCopied(
