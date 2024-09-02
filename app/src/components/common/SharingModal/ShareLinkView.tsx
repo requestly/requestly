@@ -13,6 +13,7 @@ import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { AiFillCheckCircle } from "@react-icons/all-files/ai/AiFillCheckCircle";
 import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCircle";
+import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import { SharedLinkVisibility } from "./types";
 import Logger from "lib/logger";
 import { getAllRecords } from "store/features/rules/selectors";
@@ -129,11 +130,12 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
 
   const handleSharedListCreation = useCallback(() => {
     const isSharedListNameNotValid = validateSharedListName();
-    if (!sharedListName) {
+    if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && !sharedListName) {
       setError("Shared list name cannot be empty");
       return;
     }
-    if (isSharedListNameNotValid) {
+
+    if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && isSharedListNameNotValid) {
       setError("Shared list name cannot have special characters");
       return;
     }
@@ -147,6 +149,9 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
         ({ sharedListId, sharedListName, sharedListData, nonRQEmails }: any) => {
           trackRQLastActivity("sharedList_created");
           onSharedLinkCreated();
+
+          // TODO: send sharedList created email
+
           if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
             sendSharedListShareEmail({
               sharedListData: sharedListData,
@@ -203,6 +208,15 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
     else setSharedListName(singleRuleData?.name);
   }, [selectedRules?.length, singleRuleData?.name]);
 
+  useEffect(() => {
+    if (
+      shareableLinkData?.visibility !== SharedLinkVisibility.PUBLIC &&
+      sharedLinkVisibility === SharedLinkVisibility.PUBLIC
+    ) {
+      handleSharedListCreation();
+    }
+  }, [shareableLinkData?.visibility, sharedLinkVisibility, handleSharedListCreation]);
+
   return (
     <div className="sharing-modal-body">
       <Space direction="vertical" size={12} className="w-full">
@@ -252,24 +266,36 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
                   </>
                 ) : (
                   <>
-                    {sharedListNameField}
-                    {option.value === SharedLinkVisibility.PRIVATE && (
-                      <div className="mt-8 sharing-modal-email-input-wrapper">
-                        <label htmlFor="user_emails" className="text-gray caption">
-                          Email addresses
-                        </label>
-                        <EmailInputWithDomainBasedSuggestions onChange={handleAddRecipient} />
+                    {option.value === SharedLinkVisibility.PUBLIC && isLinkGenerating ? (
+                      <div className="link-generation-loader">
+                        <FaSpinner className="icon-spin" /> <span>Creating shared list...</span>
                       </div>
+                    ) : null}
+
+                    {option.value === SharedLinkVisibility.PRIVATE && (
+                      <>
+                        {sharedListNameField}
+
+                        <div className="mt-8 sharing-modal-email-input-wrapper">
+                          <label htmlFor="user_emails" className="text-gray caption">
+                            Email addresses
+                          </label>
+                          <EmailInputWithDomainBasedSuggestions onChange={handleAddRecipient} />
+                        </div>
+
+                        <RQButton
+                          type="primary"
+                          className="mt-8"
+                          onClick={handleSharedListCreation}
+                          disabled={
+                            sharedLinkVisibility === SharedLinkVisibility.PRIVATE && !sharedListRecipients.length
+                          }
+                          loading={isLinkGenerating}
+                        >
+                          Create list
+                        </RQButton>
+                      </>
                     )}
-                    <RQButton
-                      type="primary"
-                      className="mt-8"
-                      onClick={handleSharedListCreation}
-                      disabled={sharedLinkVisibility === SharedLinkVisibility.PRIVATE && !sharedListRecipients.length}
-                      loading={isLinkGenerating}
-                    >
-                      Create list
-                    </RQButton>
                   </>
                 )}
               </>
