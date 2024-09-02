@@ -1,4 +1,4 @@
-import { MockRecordType, RQMockSchema } from "components/features/mocksV2/types";
+import { MockRecordType, RQMockCollection, RQMockSchema } from "components/features/mocksV2/types";
 import { isRecordMockCollection } from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
 
 export const processMocksToImport = (uid: string, parsedRecords: RQMockSchema[]) => {
@@ -28,6 +28,7 @@ export const processMocksToImport = (uid: string, parsedRecords: RQMockSchema[])
       record.ownerId = uid || null;
 
       if (isRecordMockCollection(record)) {
+        ((record as unknown) as RQMockCollection).children = [];
         collections.push(record);
       } else {
         mocks.push(record);
