@@ -130,6 +130,7 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
   useEffect(() => {
     if (isLoading && isPreLoaderRemoved) {
       if (tabId === TabId.IFRAME) return;
+
       if (tabId === TabId.IMPORTED) {
         setIsLoading(false);
       } else if (tabId === TabId.MOCK) {
