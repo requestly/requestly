@@ -30,23 +30,10 @@ export const SharingModal: React.FC<ModalProps> = ({
   callback = () => {},
 }) => {
   const availableTeams = useSelector(getAvailableTeams);
-  const [activeTab, setActiveTab] = useState(SharingOptions.WORKSPACE);
+  const [activeTab, setActiveTab] = useState(SharingOptions.SHARE_LINK);
 
   const sharingOptions: TabsProps["items"] = useMemo(
     () => [
-      {
-        key: SharingOptions.WORKSPACE,
-        label: "Share in workspace",
-        children: (
-          <>
-            {selectedRules?.length ? (
-              <ShareInWorkspaces selectedRules={selectedRules} toggleModal={toggleModal} onRulesShared={callback} />
-            ) : (
-              <EmptySelectionView />
-            )}
-          </>
-        ),
-      },
       {
         key: SharingOptions.SHARE_LINK,
         label: "Shared list",
@@ -54,6 +41,19 @@ export const SharingModal: React.FC<ModalProps> = ({
           <>
             {selectedRules?.length ? (
               <ShareLinkView selectedRules={selectedRules} source={source} onSharedLinkCreated={callback} />
+            ) : (
+              <EmptySelectionView />
+            )}
+          </>
+        ),
+      },
+      {
+        key: SharingOptions.WORKSPACE,
+        label: "Share in workspace",
+        children: (
+          <>
+            {selectedRules?.length ? (
+              <ShareInWorkspaces selectedRules={selectedRules} toggleModal={toggleModal} onRulesShared={callback} />
             ) : (
               <EmptySelectionView />
             )}
