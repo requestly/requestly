@@ -18,6 +18,7 @@ import PATHS from "config/constants/sub/paths";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import usePreLoadRemover from "hooks/usePreLoadRemover";
 
 export interface DraftSessionViewerProps {
   desktopMode?: boolean;
@@ -36,6 +37,7 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(null);
   const metadata = useSelector(getSessionRecordingMetaData);
+  const { isPreLoaderRemoved } = usePreLoadRemover();
 
   const tempTabId = useParams().tabId;
   const tabId = useMemo(() => (desktopMode ? TabId.IMPORTED : tempTabId), [desktopMode, tempTabId]);
@@ -126,40 +128,42 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
   }, [dispatch, tabId, populateSessionDataInStore]);
 
   useEffect(() => {
-    setIsLoading(true);
-    if (tabId === TabId.IFRAME) return;
-
-    if (tabId === TabId.IMPORTED) {
-      setIsLoading(false);
-    } else if (tabId === TabId.MOCK) {
-      // TODO: remove mock flow
-      dispatch(
-        sessionRecordingActions.setSessionRecordingMetadata({
-          sessionAttributes: mockSession.attributes,
-          name: "Mock Session Recording",
-        })
-      );
-      dispatch(sessionRecordingActions.setEvents(mockSession.events));
-      setIsLoading(false);
-    } else {
-      dispatch(sessionRecordingActions.setTrimmedSessiondata(null));
-      getTabSession(parseInt(tabId))
-        .then((payload: unknown) => {
-          if (typeof payload === "string") {
-            setLoadingError(payload);
-          } else {
-            populateSessionDataInStore(payload);
-          }
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          Logger.log("Error while fetching tab session", error);
-          toast.error("Error while fetching your recorded session");
-          setIsLoading(false);
-          setLoadingError("Something went wrong while fetching your recorded session");
-        });
+    if (isLoading && isPreLoaderRemoved) {
+      if (tabId === TabId.IFRAME) return;
+      if (tabId === TabId.IMPORTED) {
+        setIsLoading(false);
+      } else if (tabId === TabId.MOCK) {
+        // TODO: remove mock flow
+        dispatch(
+          sessionRecordingActions.setSessionRecordingMetadata({
+            sessionAttributes: mockSession.attributes,
+            name: "Mock Session Recording",
+          })
+        );
+        dispatch(sessionRecordingActions.setEvents(mockSession.events));
+        setIsLoading(false);
+      } else {
+        dispatch(sessionRecordingActions.setTrimmedSessiondata(null));
+        getTabSession(parseInt(tabId))
+          .then((payload: unknown) => {
+            if (payload) {
+              if (typeof payload === "string") {
+                setLoadingError(payload);
+              } else {
+                populateSessionDataInStore(payload);
+              }
+              setIsLoading(false);
+            }
+          })
+          .catch((error) => {
+            Logger.log("Error while fetching tab session", error);
+            toast.error("Error while fetching your recorded session");
+            setIsLoading(false);
+            setLoadingError("Something went wrong while fetching your recorded session");
+          });
+      }
     }
-  }, [dispatch, tabId, populateSessionDataInStore]);
+  }, [dispatch, tabId, populateSessionDataInStore, isLoading, isPreLoaderRemoved]);
 
   useEffect(() => {
     if (loadingError) {

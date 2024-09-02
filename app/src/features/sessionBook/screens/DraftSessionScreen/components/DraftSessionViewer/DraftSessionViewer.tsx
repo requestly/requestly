@@ -33,7 +33,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const metadata = useSelector(getSessionRecordingMetaData);
   const isOpenedInIframe = location.pathname.includes("iframe");
-  const attributes = useMemo(() => metadata.sessionAttributes, [metadata]);
+  const attributes = useMemo(() => metadata?.sessionAttributes, [metadata]);
 
   if (!isDesktopMode) {
     unstable_usePrompt({

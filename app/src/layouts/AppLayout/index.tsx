@@ -11,7 +11,7 @@ import { CommandBar } from "components/misc/CommandBar";
 import { GrowthBookProvider } from "@growthbook/growthbook-react";
 import { growthbook } from "utils/feature-flag/growthbook";
 import LocalUserAttributesHelperComponent from "hooks/LocalUserAttributesHelperComponent";
-import PreLoadRemover from "hooks/PreLoadRemover";
+import usePreLoadRemover from "hooks/usePreLoadRemover";
 import AppModeInitializer from "hooks/AppModeInitializer";
 import DBListeners from "hooks/DbListenerInit/DBListeners";
 // import RuleExecutionsSyncer from "hooks/RuleExecutionsSyncer";
@@ -39,6 +39,7 @@ const App: React.FC = () => {
     growthbook.loadFeatures({ autoRefresh: true });
   }, []);
 
+  usePreLoadRemover();
   useGeoLocation();
   useIsExtensionEnabled();
   useBillingTeamsListener();
@@ -72,7 +73,6 @@ const App: React.FC = () => {
       <ExtensionContextInvalidationNotice />
       <AutomationNotAllowedNotice />
       <AuthHandler />
-      <PreLoadRemover />
       <AppModeInitializer />
       <DBListeners />
       {/* <RuleExecutionsSyncer /> */}
