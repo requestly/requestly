@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Divider, Dropdown, DropDownProps, Menu, Spin, Typography } from "antd";
+import { Dropdown, DropDownProps, Menu, Spin, Typography } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import "./MemberRoleDropdown.css";
 
@@ -15,7 +15,6 @@ interface MemberRoleDropdownProps extends DropDownProps {
     updatedRole: "admin" | "user",
     setIsLoading: (status: boolean) => void
   ) => void;
-  handleRemoveMember?: () => void;
 }
 
 const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
@@ -26,7 +25,6 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
   isHoverEffect = false,
   isLoggedInUserAdmin = false,
   handleMemberRoleChange,
-  handleRemoveMember,
   ...props
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -66,33 +64,9 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
             src="/assets/img/workspaces/tick.svg"
           />
         </Menu.Item>
-
-        {handleRemoveMember ? (
-          <>
-            {memberId === loggedInUserId ? (
-              <>
-                <Divider className="member-role-dropdown" />
-                <Menu.Item key="remove" onClick={() => handleRemoveMember()}>
-                  <Typography.Text type="danger" className="remove-user-menu-item-text">
-                    Leave workspace
-                  </Typography.Text>
-                </Menu.Item>
-              </>
-            ) : isLoggedInUserAdmin ? (
-              <>
-                <Divider className="member-role-dropdown" />
-                <Menu.Item key="remove" onClick={() => handleRemoveMember()}>
-                  <Typography.Text type="danger" className="remove-user-menu-item-text">
-                    Remove from workspace
-                  </Typography.Text>
-                </Menu.Item>
-              </>
-            ) : null}
-          </>
-        ) : null}
       </Menu>
     ),
-    [isAdmin, memberId, loggedInUserId, isLoggedInUserAdmin, handleMemberRoleChange, handleRemoveMember]
+    [isAdmin, memberId, loggedInUserId, isLoggedInUserAdmin, handleMemberRoleChange]
   );
 
   return (
@@ -104,7 +78,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
     >
       <div className={`dropdown-trigger ${isHoverEffect ? "member-role-dropdown-trigger" : ""}`}>
         <Typography.Text className={!props.disabled && "cursor-pointer"}>
-          {isAdmin ? "Admin" : "Member"} access{" "}
+          {isAdmin ? "Admin" : "Member"}
           {isLoggedInUserAdmin && memberId !== loggedInUserId && (
             <img
               width="10px"
