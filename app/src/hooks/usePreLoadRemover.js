@@ -1,19 +1,23 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getAuthInitialization } from "../store/selectors";
 import removePreloader from "actions/UI/removePreloader";
 import Logger from "lib/logger";
 
-const PreLoadRemover = () => {
+const usePreLoadRemover = () => {
   const hasAuthInitialized = useSelector(getAuthInitialization);
+  const [isPreLoaderRemoved, setIsPreLoaderRemoved] = useState(false);
 
   useEffect(() => {
     if (hasAuthInitialized) {
       Logger.timeEnd("AuthHandler-preloader");
       removePreloader();
+      setIsPreLoaderRemoved(true);
     }
   }, [hasAuthInitialized]);
-  return null;
+  return {
+    isPreLoaderRemoved,
+  };
 };
 
-export default PreLoadRemover;
+export default usePreLoadRemover;
