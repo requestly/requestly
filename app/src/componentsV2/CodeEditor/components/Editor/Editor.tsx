@@ -97,8 +97,10 @@ const Editor: React.FC<EditorProps> = ({
     }
   }, [language]);
 
+  // This is to set the editor content only once when the value is set for the first time
+  // Remove this when the editor is refactored to use controlled input and current problem is fixed
+  // Current problem: When the value is set for the first time, the consequent changes in props.value is not reflected in the editor @nafees87n
   const isEditorContentSet = useRef(false);
-
   useEffect(() => {
     if (!isEditorContentSet.current) {
       if (!value?.length) {
@@ -109,6 +111,16 @@ const Editor: React.FC<EditorProps> = ({
       }
     }
   }, [defaultValue, value]);
+
+  // Had to keep both useEffects because some cases were not handled with the above useEffect
+  useEffect(() => {
+    if (!value?.length) {
+      setEditorContent(defaultValue);
+    } else {
+      setEditorContent(value);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultValue]);
 
   const handleEditorClose = useCallback(
     (id: string) => {
