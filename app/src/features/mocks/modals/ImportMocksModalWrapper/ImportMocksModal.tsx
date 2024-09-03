@@ -65,8 +65,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
   } = dataToImport;
 
   const onDrop = useCallback(
-    // @ts-ignore
-    async (acceptedFiles) => {
+    async (acceptedFiles: File[]) => {
       //Ignore other uploaded files
       const file = acceptedFiles[0];
 
