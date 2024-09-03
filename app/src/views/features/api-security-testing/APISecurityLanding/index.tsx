@@ -121,7 +121,7 @@ export const APISecurityLanding: React.FC<APISecurityLandingProps> = () => {
               <div>
                 <Text strong> Discover, protect, and test</Text> all your APIs with{" "}
                 <Text strong style={{ color: WOLFSAFE_BLUE }}>
-                  <WolfSafeIcon height={"1rem"} /> WolfSafe
+                  <WolfSafeIcon height={"1rem"} /> WolfSafe<sup>&reg;</sup>
                 </Text>
               </div>
               <br />
