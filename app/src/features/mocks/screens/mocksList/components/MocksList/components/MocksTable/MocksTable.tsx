@@ -21,7 +21,7 @@ import {
   withContentListTableContext,
 } from "componentsV2/ContentList";
 import { useMocksTableColumns } from "./hooks/useMocksTableColumns";
-import { enhanceRecords, isRecordMockCollection, recordsToContentTableDataAdapter } from "./utils";
+import { enhanceRecords, isCollection, recordsToContentTableDataAdapter } from "./utils";
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
@@ -113,7 +113,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     let collections = 0;
 
     selectedRows.forEach((record) => {
-      isRecordMockCollection(record) ? collections++ : mocks++;
+      isCollection(record) ? collections++ : mocks++;
     });
 
     const formatCount = (count: number, singular: string, plural: string) => {
@@ -194,7 +194,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
           onClick: (e) => {
             e.preventDefault();
 
-            if (isRecordMockCollection(record)) {
+            if (isCollection(record)) {
               return;
             }
 

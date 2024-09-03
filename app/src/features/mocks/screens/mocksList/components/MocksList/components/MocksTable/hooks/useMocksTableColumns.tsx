@@ -21,7 +21,7 @@ import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RQButton } from "lib/design-system/components";
 import { MocksTableProps } from "../MocksTable";
-import { isRecordMock, isRecordMockCollection } from "../utils";
+import { isRecordMock, isCollection } from "../utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
 import PATHS from "config/constants/sub/paths";
@@ -82,10 +82,9 @@ export const useMocksTableColumns = ({
       ellipsis: true,
       width: isWorkspaceMode ? (isOpenedInRuleEditor ? 110 : 290) : isOpenedInRuleEditor ? 290 : 360,
       render: (_: any, record: RQMockSchema) => {
-        const isCollection = isRecordMockCollection(record);
         const collectionPath = ((record as unknown) as RQMockCollection)?.path ?? "";
 
-        return isCollection ? (
+        return isCollection(record) ? (
           <div className="mock-collection-details-container">
             <span className="collection-icon">
               <MdOutlineFolder />
@@ -134,7 +133,7 @@ export const useMocksTableColumns = ({
                 e.preventDefault();
                 e.stopPropagation();
 
-                if (!isRecordMockCollection(record)) {
+                if (!isCollection(record)) {
                   handleNameClick(record.id, record.isOldMock);
                 }
               }}
@@ -357,7 +356,7 @@ export const useMocksTableColumns = ({
         const updatedMockActions = mockActions.filter((action) => (record.collectionId ? true : action.key !== 3));
 
         return handleSelectAction ? (
-          isRecordMockCollection(record) ? null : (
+          isCollection(record) ? null : (
             <RQButton
               size="small"
               type="primary"
@@ -385,7 +384,7 @@ export const useMocksTableColumns = ({
           )
         ) : (
           <Dropdown
-            menu={{ items: isRecordMockCollection(record) ? collectionActions : updatedMockActions }}
+            menu={{ items: isCollection(record) ? collectionActions : updatedMockActions }}
             trigger={["click"]}
             overlayClassName="mocks-more-actions-dropdown"
           >

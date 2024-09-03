@@ -22,10 +22,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { redirectToMockEditorCreateMock } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
-import {
-  isRecordMock,
-  isRecordMockCollection,
-} from "../screens/mocksList/components/MocksList/components/MocksTable/utils";
+import { isRecordMock, isCollection } from "../screens/mocksList/components/MocksList/components/MocksTable/utils";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH } from "../constants";
 
@@ -179,7 +176,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
       const collectionIds: RQMockMetadataSchema["id"][] = [];
 
       records.forEach((record) => {
-        if (isRecordMockCollection(record)) {
+        if (isCollection(record)) {
           collectionIds.push(record.id);
 
           // add all the child mocks too

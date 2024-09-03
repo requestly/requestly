@@ -4,7 +4,7 @@ import { useMocksModalsContext } from "features/mocks/contexts/modals";
 import { UpdateMocksCollectionModal } from "./UpdateMocksCollectionModal";
 import {
   isRecordMock,
-  isRecordMockCollection,
+  isCollection,
 } from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
 
 export const UpdateMocksCollectionModalWrapper: React.FC<{
@@ -34,7 +34,7 @@ export const UpdateMocksCollectionModalWrapper: React.FC<{
     setMocksToBeUpdated([]);
   };
 
-  const collections = (mocks.filter((mock) => isRecordMockCollection(mock)) as unknown) as RQMockCollection[];
+  const collections = (mocks.filter((mock) => isCollection(mock)) as unknown) as RQMockCollection[];
 
   return isVisible ? (
     <UpdateMocksCollectionModal
