@@ -15,11 +15,16 @@ import { IncentiveTasksListScreen } from "features/incentivization";
 import { ImportFromCharlesWrapperView } from "features/rules/screens/rulesList/components/RulesList/components";
 import { ImportFromModheaderWrapperView } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ModheaderImporter/ImportFromModheaderScreen";
 import SeleniumImporter from "views/misc/SeleniumImporter";
+import APISecurityLanding from "views/features/api-security-testing/APISecurityLanding";
 
 export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.EXTENSION_INSTALLED.RELATIVE,
     element: <ExtensionInstalled />,
+  },
+  {
+    path: PATHS.API_SECURITY_TESTING.RELATIVE,
+    element: <APISecurityLanding />,
   },
   {
     path: PATHS.EXTENSION_UPDATED.RELATIVE,

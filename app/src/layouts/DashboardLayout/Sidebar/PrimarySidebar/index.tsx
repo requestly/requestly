@@ -7,6 +7,7 @@ import { ApiOutlined, HomeOutlined } from "@ant-design/icons";
 import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
 import HttpRulesIcon from "assets/icons/http-rules.svg?react";
 import SessionIcon from "assets/icons/session.svg?react";
+import WolfSafeIcon from "assets/icons/wolfsafe.svg?react";
 import MockServerIcon from "assets/icons/mock-server.svg?react";
 import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
 import { PrimarySidebarLink } from "./components/PrimarySidebarLink/PrimarySidebarLink";
@@ -72,6 +73,18 @@ export const PrimarySidebar: React.FC = () => {
         activeColor: "var(--http-rules)",
       },
       {
+        id: 6,
+        title: "API Security & Testing",
+        path: PATHS.API_SECURITY_TESTING.INDEX,
+        icon: (
+          <span className="icon-with-badge">
+            <WolfSafeIcon /> <RQBadge badgeText="NEW" />
+          </span>
+        ),
+        display: true,
+        activeColor: "var(--session-recording)",
+      },
+      {
         id: 3,
         title: "Sessions",
         path: PATHS.SESSIONS.INDEX,
@@ -82,13 +95,14 @@ export const PrimarySidebar: React.FC = () => {
             title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
           >
             <span className="icon-with-badge">
-              <SessionIcon /> <RQBadge badgeText="BETA" />
+              <SessionIcon />
             </span>
           </Tooltip>
         ),
         display: true,
         activeColor: "var(--session-recording)",
       },
+
       {
         id: 4,
         title: "Mock server",
