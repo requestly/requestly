@@ -8,6 +8,10 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.9.2",
+    logs: ["[ENGG-2136] feat: sharedState in extension dynamic request, response rules (#2072)"],
+  },
+  {
     version: "24.8.13",
     logs: [
       "fix: blocklist check in script rule (#2074)",
