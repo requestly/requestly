@@ -162,10 +162,15 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
                 toast.error("Opps! Couldn't send the notification");
               });
           }
-          setShareableLinkData({
+
+          const shareableLinkData = {
             link: getSharedListURL(sharedListId, sharedListName),
             visibility: sharedLinkVisibility,
-          });
+          };
+
+          setShareableLinkData(shareableLinkData);
+
+          navigator.clipboard.writeText(shareableLinkData.link);
 
           const nonRQEmailsCount = sharedLinkVisibility === SharedLinkVisibility.PRIVATE ? nonRQEmails?.length : null;
           const recipientsCount =
@@ -239,11 +244,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
                           </div>
                         )}
                       </>
-                    ) : (
-                      <div className="mt-8 text-gray success-message">
-                        <AiFillCheckCircle className="success" /> Shared list created
-                      </div>
-                    )}
+                    ) : null}
                     <CopyValue
                       title="Copy link"
                       value={shareableLinkData.link}
