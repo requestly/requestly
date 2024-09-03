@@ -114,7 +114,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
       };
       reader.readAsText(file);
     },
-    [toggleModal]
+    [toggleModal, user?.details?.profile?.uid]
   );
 
   const handleRecordsImport = async () => {
