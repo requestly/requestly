@@ -58,5 +58,4 @@ const slice = createSlice({
   },
 });
 
-/* KEEPING THE NAME `rule` HERE SO THAT IT IS OBVIOUS THAT THESE ARE FOR WORKING WITH RULES (and in extension, also groups) */
 export const { actions: recordsActions, reducer: recordsReducer } = slice;
