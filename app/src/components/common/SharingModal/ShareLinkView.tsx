@@ -267,7 +267,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
                   <>
                     {option.value === SharedLinkVisibility.PUBLIC && isLinkGenerating ? (
                       <div className="link-generation-loader">
-                        <FaSpinner className="icon-spin" /> <span>Creating shared list...</span>
+                        <FaSpinner className="icon-spin" /> <span>Generating a sharing link...</span>
                       </div>
                     ) : null}
 
