@@ -1,5 +1,6 @@
 import { MockRecordType, RQMockCollection, RQMockSchema } from "components/features/mocksV2/types";
 import { isCollection } from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
+import Logger from "lib/logger";
 
 export const processMocksToImport = (uid: string, parsedRecords: RQMockSchema[]) => {
   try {
@@ -45,6 +46,6 @@ export const processMocksToImport = (uid: string, parsedRecords: RQMockSchema[])
       success: true,
     };
   } catch (error) {
-    // NOOP
+    Logger.log("processMocksToImport - error", error);
   }
 };
