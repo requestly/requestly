@@ -45,7 +45,7 @@ export const SavedSessionViewer = () => {
   const [isLinkCopied, setIsLinkCopied] = useState(false);
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
   const [sessionPlayerOffset, setSessionPlayerOffset] = useState(0);
-  const currentSessionOffset = useRef(0);
+  const currentSessionOffset = useRef(null);
 
   const isMobileView = useMediaQuery({ query: "(max-width: 768px)" });
   const bottomSheetLayoutBreakpoint = useMediaQuery({ query: "(max-width: 940px)" });
@@ -63,7 +63,7 @@ export const SavedSessionViewer = () => {
   const handleShareModalVisibiliity = useCallback(() => {
     trackSessionRecordingShareClicked();
     setIsShareModalVisible((prev) => !prev);
-    currentSessionOffset.current = sessionPlayerOffset;
+    currentSessionOffset.current = secToMinutesAndSeconds(sessionPlayerOffset);
   }, [sessionPlayerOffset]);
 
   const handleSessionPlayerTimeOffsetChange = useCallback((offset: number) => {
@@ -140,7 +140,7 @@ export const SavedSessionViewer = () => {
             setVisible={handleShareModalVisibiliity}
             recordingId={id}
             currentVisibility={currentVisibility}
-            currentOffset={secToMinutesAndSeconds(currentSessionOffset.current)}
+            currentOffset={currentSessionOffset.current}
           />
         ) : null}
       </BottomSheetProvider>
