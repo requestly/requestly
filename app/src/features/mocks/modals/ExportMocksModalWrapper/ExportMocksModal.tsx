@@ -13,7 +13,7 @@ import fileDownload from "js-file-download";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
 import { trackMocksExported } from "modules/analytics/events/features/mocksV2";
-import "./DownloadMocksModal.scss";
+import "./ExportMocksModal.scss";
 
 const EmptySelectionView = () => {
   return (
@@ -31,7 +31,7 @@ interface ShareMocksModalProps {
   onSuccess?: () => void;
 }
 
-export const DownloadMocksModal: React.FC<ShareMocksModalProps> = ({
+export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
   isOpen,
   toggleModal,
   selectedMockIds,
@@ -44,7 +44,7 @@ export const DownloadMocksModal: React.FC<ShareMocksModalProps> = ({
 
   const [isMocksLoading, setIsMocksLoading] = useState(false);
   const [mocks, setMocks] = useState<RQMockSchema[]>([]);
-  const [mocksDownloadDetails, setMocksDownloadDetails] = useState<{
+  const [mocksExportDetails, setMocksExportDetails] = useState<{
     fileContent: string;
     mocksCount: number;
     collectionsCount: number;
@@ -78,7 +78,7 @@ export const DownloadMocksModal: React.FC<ShareMocksModalProps> = ({
         setMocks(mocks);
 
         const result = prepareMocksToExport(mocks);
-        setMocksDownloadDetails(result);
+        setMocksExportDetails(result);
       })
       .catch((error) => {
         // NOOP
@@ -88,21 +88,21 @@ export const DownloadMocksModal: React.FC<ShareMocksModalProps> = ({
       });
 
     return () => {
-      setMocksDownloadDetails(null);
+      setMocksExportDetails(null);
     };
   }, [selectedMockIds]);
 
   const fileName =
-    mocksDownloadDetails?.mocksCount === 1
+    mocksExportDetails?.mocksCount === 1
       ? `${mocks[0].name}` ?? ""
       : `requestly_mocks_export_${getFormattedDate("DD_MM_YYYY")}`;
 
-  const handleMocksDownload = () => {
-    trackMocksExported(mocksDownloadDetails?.mocksCount, mocksDownloadDetails?.collectionsCount);
-    fileDownload(mocksDownloadDetails?.fileContent ?? "", `${fileName}.json`, "application/json");
+  const handleMocksExport = () => {
+    trackMocksExported(mocksExportDetails?.mocksCount, mocksExportDetails?.collectionsCount);
+    fileDownload(mocksExportDetails?.fileContent ?? "", `${fileName}.json`, "application/json");
     onSuccess();
     setTimeout(
-      () => toast.success(`${mocksDownloadDetails.mocksCount === 1 ? "Mock" : "Mocks"} downloaded successfully`),
+      () => toast.success(`${mocksExportDetails.mocksCount === 1 ? "Mock" : "Mocks"} exported successfully`),
       1000
     );
 
@@ -114,14 +114,13 @@ export const DownloadMocksModal: React.FC<ShareMocksModalProps> = ({
       centered
       open={isOpen}
       destroyOnClose
-      title="Share mocks"
       onCancel={toggleModal}
-      wrapClassName="mocks-sharing-modal-wrapper"
+      wrapClassName="export-mocks-modal-wrapper"
       maskClosable={false}
     >
       <div className="rq-modal-content">
-        <div className="sharing-modal-header">
-          <HiOutlineShare /> Download mocks
+        <div className="export-mocks-modal-header">
+          <HiOutlineShare /> Export mocks
         </div>
       </div>
 
@@ -129,21 +128,21 @@ export const DownloadMocksModal: React.FC<ShareMocksModalProps> = ({
         <EmptySelectionView />
       ) : (
         <>
-          <div className="sharing-modal-body">
+          <div className="export-mocks-modal-body">
             {isMocksLoading ? (
               <div className="skeleton-container">
                 <Spin tip="Preparing mocks to export..." size="large" />
               </div>
             ) : (
               <>
-                <div className="download-rules-details">
+                <div className="export-mocks-details ">
                   <span className="line-clamp">{fileName}</span>
                   <span className="text-gray">
-                    {mocksDownloadDetails?.mocksCount} {mocksDownloadDetails?.mocksCount === 1 ? " mock" : " mocks"}
+                    {mocksExportDetails?.mocksCount} {mocksExportDetails?.mocksCount === 1 ? " mock" : " mocks"}
                   </span>
                 </div>
-                <Button type="primary" onClick={handleMocksDownload}>
-                  Download mock
+                <Button type="primary" onClick={handleMocksExport}>
+                  Export mocks
                 </Button>
               </>
             )}

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { DownloadMocksModal } from "./DownloadMocksModal";
 import { useMocksModalsContext } from "features/mocks/contexts/modals";
+import { ExportMocksModal } from "./ExportMocksModal";
 
-export const DownloadMocksModalWrapper: React.FC = () => {
+export const ExportMocksModalWrapper: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedMockIds, setSelectedMockIds] = useState([]);
   const [onSuccess, setOnSuccess] = useState(() => () => {});
@@ -25,6 +25,6 @@ export const DownloadMocksModalWrapper: React.FC = () => {
   };
 
   return isOpen ? (
-    <DownloadMocksModal isOpen={isOpen} toggleModal={onClose} selectedMockIds={selectedMockIds} onSuccess={onSuccess} />
+    <ExportMocksModal isOpen={isOpen} toggleModal={onClose} selectedMockIds={selectedMockIds} onSuccess={onSuccess} />
   ) : null;
 };

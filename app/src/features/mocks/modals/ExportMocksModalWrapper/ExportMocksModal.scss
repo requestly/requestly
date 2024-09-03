@@ -1,4 +1,4 @@
-.mocks-sharing-modal-wrapper {
+.export-mocks-modal-wrapper {
   .ant-modal-body .rq-modal-content {
     padding: 0;
   }
@@ -7,7 +7,7 @@
     padding: 1rem;
   }
 
-  .sharing-modal-header {
+  .export-mocks-modal-header {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -17,11 +17,11 @@
     padding: 12px;
   }
 
-  .sharing-modal-header .premium-icon {
+  .export-mocks-modal-header .premium-icon {
     padding-left: 0;
   }
 
-  .sharing-modal-body {
+  .export-mocks-modal-body {
     padding: 1.2rem;
     font-size: var(--requestly-font-size-sm, 13px);
 
@@ -32,7 +32,7 @@
       padding: 12px;
     }
 
-    .download-rules-details {
+    .export-mocks-details {
       display: flex;
       flex-direction: column;
       justify-content: center;

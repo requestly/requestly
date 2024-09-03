@@ -29,7 +29,7 @@ import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "co
 import MockLogs from "./BottomSheet/MockLogs";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { useFeatureValue } from "@growthbook/growthbook-react";
-import { DownloadMocksModalWrapper } from "features/mocks/modals";
+import { ExportMocksModalWrapper } from "features/mocks/modals";
 
 interface Props {
   isNew?: boolean;
@@ -398,7 +398,7 @@ const MockEditor: React.FC<Props> = ({
 
   return (
     <>
-      <DownloadMocksModalWrapper />
+      <ExportMocksModalWrapper />
 
       {areLogsVisible ? (
         <div className="mock-parent mock-editor-layout-container">
