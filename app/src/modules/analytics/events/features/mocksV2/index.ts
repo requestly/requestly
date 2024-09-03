@@ -100,11 +100,11 @@ export const trackMockImportClicked = (type: string, source: string) => {
 };
 
 export const trackMocksJsonParsed = ({
-  mockTypeToImport = "",
+  mockTypeToImport,
   source,
   successful,
-  mocksCount = 0,
-  collectionsCount = 0,
+  mocksCount,
+  collectionsCount,
 }: {
   mockTypeToImport?: string;
   source: string;
@@ -122,10 +122,10 @@ export const trackMocksImportFailed = (source: string) => {
 };
 
 export const trackMocksImportCompleted = ({
-  mockTypeToImport = "",
+  mockTypeToImport,
   source,
-  mocksCount = 0,
-  collectionsCount = 0,
+  mocksCount,
+  collectionsCount,
 }: {
   mockTypeToImport?: string;
   source: string;
