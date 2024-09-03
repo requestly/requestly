@@ -120,24 +120,21 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
     try {
       setIsImporting(true);
 
-      const collectionsPromises: Promise<{ oldId: string; newId: string } | void>[] = [];
+      const collectionsPromises: Promise<{ oldId: string; newId: string }>[] = [];
 
       collectionsToImport.forEach((collection) => {
         const promise = createCollection(uid, collection, teamId)
           .then((newCollection) => {
             return { oldId: collection.id, newId: newCollection.id };
           })
-          .catch(() => {
-            // NOOP
+          .catch((error) => {
+            return error;
           });
 
         collectionsPromises.push(promise);
       });
 
-      const collectionPromisesResult = ((await Promise.all(collectionsPromises)) as unknown) as {
-        oldId: string;
-        newId: string;
-      }[];
+      const collectionPromisesResult = await Promise.all(collectionsPromises);
 
       // Old to new collection mapping
       const oldToNewCollectionIds: Record<string, string> = collectionPromisesResult.reduce((result, details) => {
