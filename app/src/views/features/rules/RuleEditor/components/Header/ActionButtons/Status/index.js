@@ -6,7 +6,6 @@ import {
 } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getAppMode, getCurrentlySelectedRuleData, getUserAuthDetails } from "../../../../../../../../store/selectors";
-import { getAllRules } from "store/features/rules/selectors";
 import { Switch, Tooltip } from "antd";
 import { toast } from "utils/Toast.js";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
@@ -25,7 +24,6 @@ const Status = ({ isDisabled = false, isRuleEditorModal, isSampleRule = false, s
   const location = useLocation();
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const allRules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
 
@@ -104,7 +102,7 @@ const Status = ({ isDisabled = false, isRuleEditorModal, isSampleRule = false, s
         stableChangeRuleStatus(GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE);
       }
     }
-  }, [allRules, stableChangeRuleStatus, user, location.pathname, hasUserTriedToChangeRuleStatus]);
+  }, [stableChangeRuleStatus, user, location.pathname, hasUserTriedToChangeRuleStatus]);
 
   const isChecked = isRuleCurrentlyActive();
 
