@@ -13,6 +13,7 @@ import fileDownload from "js-file-download";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
 import { trackMocksExported } from "modules/analytics/events/features/mocksV2";
+import Logger from "lib/logger";
 import "./ExportMocksModal.scss";
 
 const EmptySelectionView = () => {
@@ -67,7 +68,7 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
           }
         })
         .catch((error: any) => {
-          // NOOP
+          Logger.log("ExportMocksModal - Error while fetching mocks!", error);
         });
 
       mockPromises.push(promise);
@@ -81,7 +82,8 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
         setMocksExportDetails(result);
       })
       .catch((error) => {
-        // NOOP
+        Logger.log("ExportMocksModal - Something went wrong while preparing for export!", error);
+        toast.error("Something went wrong, please retry exporting the mocks!");
       })
       .finally(() => {
         setIsMocksLoading(false);
@@ -93,8 +95,8 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
   }, [selectedMockIds]);
 
   const fileName =
-    mocksExportDetails?.mocksCount === 1
-      ? `${mocks[0].name}` ?? ""
+    selectedMockIds.length === 1
+      ? `${mocks?.[0]?.name}` ?? ""
       : `requestly_mocks_export_${getFormattedDate("DD_MM_YYYY")}`;
 
   const handleMocksExport = () => {
