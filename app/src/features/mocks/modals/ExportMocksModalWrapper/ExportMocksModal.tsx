@@ -107,7 +107,7 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
     onSuccess();
     setTimeout(
       () => toast.success(`${mocksExportDetails.mocksCount === 1 ? "Mock" : "Mocks"} exported successfully`),
-      1000
+      0
     );
 
     toggleModal();
