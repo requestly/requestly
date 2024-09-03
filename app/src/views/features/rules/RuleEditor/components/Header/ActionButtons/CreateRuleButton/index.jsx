@@ -324,7 +324,7 @@ const CreateRuleButton = ({
         .then(() => {
           if (!isRuleEditorModal && MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
             dispatch(actions.updateSecondarySidebarCollapse(true));
-            redirectToRuleEditor(navigate, finalRuleData.id, MODE);
+            redirectToRuleEditor(navigate, finalRuleData.id, MODE, false, true);
           }
         })
         .catch(() => {

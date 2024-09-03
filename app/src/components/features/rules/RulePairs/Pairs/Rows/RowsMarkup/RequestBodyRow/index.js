@@ -22,9 +22,6 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
   const [requestTypePopupSelection, setRequestTypePopupSelection] = useState(
     pair?.request?.type ?? GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
   );
-  const [editorStaticValue, setEditorStaticValue] = useState(
-    pair?.request?.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC && pair.request.value
-  );
 
   const codeFormattedFlag = useRef(null);
   const { getFeatureLimitValue } = useFeatureLimiter();
@@ -35,8 +32,6 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
         let value = "{}";
         if (requestType === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE) {
           value = ruleDetails["REQUEST_BODY_JAVASCRIPT_DEFAULT_VALUE"];
-        } else if (requestType === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
-          setEditorStaticValue(value);
         }
 
         dispatch(
@@ -74,10 +69,6 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
   }, [pair.request.type]);
 
   const requestBodyChangeHandler = (value) => {
-    if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
-      setEditorStaticValue(value);
-    }
-
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
@@ -196,11 +187,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                     : EditorLanguage.JSON
                 }
                 defaultValue={getEditorDefaultValue()}
-                value={
-                  pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
-                    ? editorStaticValue
-                    : pair.request.value
-                }
+                value={pair.request.value}
                 handleChange={requestBodyChangeHandler}
                 isReadOnly={isInputDisabled}
                 analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.REQUEST }}

@@ -4,17 +4,15 @@ import React from "react";
 const getTroubleshootLink = (appId) => {
   switch (appId) {
     case "ios":
-      return "https://docs.requestly.io/desktop-app/mac/getting-started/setup/ios";
+      return "https://docs.requestly.com/desktop-app/setup/ios/ios-devices";
     case "android":
-      return "https://docs.requestly.io/desktop-app/mac/getting-started/setup/android";
+      return "https://docs.requestly.com/desktop-app/setup/android/android-devices#4-if-required-ssl-pinning-ignore";
     case "system-wide":
-      return "https://docs.requestly.io/desktop-app/troubleshooting/osx-troubleshooting";
-    case "fresh-firefox":
-      return "https://docs.requestly.io/desktop-app/troubleshooting/osx-troubleshooting";
+      return "https://docs.requestly.com/desktop-app/others/troubleshooting/system-wide-proxy-not-working-macos";
     case "existing-terminal":
-      return "https://docs.requestly.io/desktop-app/mac/getting-started/setup/terminal";
+      return "https://docs.requestly.com/desktop-app/setup/terminal";
     case "manual-setup":
-      return "https://docs.requestly.io/desktop-app/mac/category/troubleshooting";
+      return "https://docs.requestly.com/desktop-app/setup/terminal";
     default:
       return "https://docs.requestly.io/";
   }
