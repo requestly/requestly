@@ -66,6 +66,8 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
           if (data) {
             return data;
           }
+
+          throw new Error("No mock found!");
         })
         .catch((error: any) => {
           Logger.log("ExportMocksModal - Error while fetching mocks!", error);
