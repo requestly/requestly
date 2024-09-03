@@ -37,8 +37,7 @@ const Popup: React.FC = () => {
       .sendMessage({
         action: EXTENSION_MESSAGES.IS_EXTENSION_BLOCKED_ON_TAB,
         tabUrl: currentTab?.url,
-      })
-      .then(setIsBlockedOnTab);
+      })?.then(setIsBlockedOnTab);
   }, [currentTab]);
 
   const handleToggleExtensionStatus = useCallback(() => {
