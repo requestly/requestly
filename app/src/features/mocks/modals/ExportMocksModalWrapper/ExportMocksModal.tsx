@@ -141,6 +141,11 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
                   <span className="line-clamp">{fileName}</span>
                   <span className="text-gray">
                     {mocksExportDetails?.mocksCount} {mocksExportDetails?.mocksCount === 1 ? " mock" : " mocks"}
+                    {mocksExportDetails?.collectionsCount > 0
+                      ? ` and ${mocksExportDetails?.collectionsCount} ${
+                          mocksExportDetails?.collectionsCount === 1 ? " collection" : " collections"
+                        }`
+                      : ""}
                   </span>
                 </div>
                 <Button type="primary" onClick={handleMocksExport}>
