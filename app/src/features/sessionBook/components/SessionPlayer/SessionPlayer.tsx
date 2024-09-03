@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
   getSessionRecordingAttributes,
@@ -41,6 +41,9 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   const [playerTimeOffset, setPlayerTimeOffset] = useState(0);
   const [isSkipInactiveEnabled, setIsSkipInactiveEnabled] = useState(true);
   const [isFullScreenMode, setIsFullScreenMode] = useState(false);
+
+  const [searchParams] = useSearchParams();
+  const startFromOffset = searchParams.get("t");
 
   const playerRef = useRef<HTMLDivElement>(null);
   const playerContainerRef = useRef<HTMLDivElement>(null);
@@ -219,6 +222,12 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
     },
     [player]
   );
+
+  useEffect(() => {
+    if (startFromOffset && player) {
+      player.goto(0 + Number(startFromOffset) * 1000);
+    }
+  }, [startFromOffset, player, startTime]);
 
   // NOTE: effect is not working as expected when in fullscreen mode
   useEffect(() => {

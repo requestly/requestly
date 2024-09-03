@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Tooltip } from "antd";
@@ -25,6 +25,7 @@ import { useMediaQuery } from "react-responsive";
 import { hideElement, showElement } from "utils/domUtils";
 import StaticSessionViewerBottomSheet from "features/sessionBook/components/SessionViewerBottomSheet/StaticSessionViewerBottomSheet";
 import "./savedSessionViewer.scss";
+import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -44,6 +45,7 @@ export const SavedSessionViewer = () => {
   const [isLinkCopied, setIsLinkCopied] = useState(false);
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
   const [sessionPlayerOffset, setSessionPlayerOffset] = useState(0);
+  const currentSessionOffset = useRef(0);
 
   const isMobileView = useMediaQuery({ query: "(max-width: 768px)" });
   const bottomSheetLayoutBreakpoint = useMediaQuery({ query: "(max-width: 940px)" });
@@ -61,7 +63,8 @@ export const SavedSessionViewer = () => {
   const handleShareModalVisibiliity = useCallback(() => {
     trackSessionRecordingShareClicked();
     setIsShareModalVisible((prev) => !prev);
-  }, []);
+    currentSessionOffset.current = sessionPlayerOffset;
+  }, [sessionPlayerOffset]);
 
   const handleSessionPlayerTimeOffsetChange = useCallback((offset: number) => {
     setSessionPlayerOffset(offset);
@@ -137,6 +140,7 @@ export const SavedSessionViewer = () => {
             setVisible={handleShareModalVisibiliity}
             recordingId={id}
             currentVisibility={currentVisibility}
+            currentOffset={secToMinutesAndSeconds(currentSessionOffset.current)}
           />
         ) : null}
       </BottomSheetProvider>
