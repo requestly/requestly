@@ -1,7 +1,7 @@
 import { MockRecordType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { MockTableRecord } from "../types";
 
-export const isRecordMock = (record: RQMockMetadataSchema) => {
+export const isMock = (record: RQMockMetadataSchema) => {
   return !record?.recordType || record?.recordType === MockRecordType.MOCK;
 };
 
@@ -28,7 +28,7 @@ export const enhanceRecords = (
     } // Add all the child mocks if collection
     else if (isCollection(record)) {
       Object.values(allRecordsMap)
-        .filter((mockRecord) => isRecordMock(mockRecord) && record.id === mockRecord.collectionId)
+        .filter((mockRecord) => isMock(mockRecord) && record.id === mockRecord.collectionId)
         .forEach((record) => {
           enhancedRecordsMap[record.id] = record;
         });

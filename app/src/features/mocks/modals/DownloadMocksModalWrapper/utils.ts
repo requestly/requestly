@@ -1,5 +1,5 @@
 import { RQMockSchema } from "components/features/mocksV2/types";
-import { isRecordMock } from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
+import { isMock } from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
 
 export const prepareMocksToExport = (mocks: RQMockSchema[]) => {
   try {
@@ -11,7 +11,7 @@ export const prepareMocksToExport = (mocks: RQMockSchema[]) => {
       mock.lastUpdatedBy = null;
       mock.ownerId = null;
 
-      if (isRecordMock(mock)) {
+      if (isMock(mock)) {
         mocksCount += 1;
         mock.storagePath = null;
         mock.responses?.forEach((response) => {

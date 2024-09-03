@@ -21,7 +21,7 @@ import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RQButton } from "lib/design-system/components";
 import { MocksTableProps } from "../MocksTable";
-import { isRecordMock, isCollection } from "../utils";
+import { isMock, isCollection } from "../utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
 import PATHS from "config/constants/sub/paths";
@@ -212,7 +212,7 @@ export const useMocksTableColumns = ({
       width: isWorkspaceMode ? (isOpenedInRuleEditor ? 50 : 90) : 90,
       render: (_: any, record: RQMockSchema) => {
         const collectionPath =
-          isRecordMock(record) && record.collectionId
+          isMock(record) && record.collectionId
             ? ((allRecordsMap[record.collectionId] as unknown) as RQMockCollection).path
             : "";
 

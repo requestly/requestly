@@ -16,7 +16,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { MdOutlineCreateNewFolder } from "@react-icons/all-files/md/MdOutlineCreateNewFolder";
 import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOutline";
 import { LuImport } from "@react-icons/all-files/lu/LuImport";
-import { isRecordMock } from "../MocksTable/utils";
+import { isMock } from "../MocksTable/utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
@@ -170,7 +170,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
           <div className="label">
             All{" "}
             {records?.length ? (
-              <Badge count={records?.filter((record) => isRecordMock(record)).length} overflowCount={20} />
+              <Badge count={records?.filter((record) => isMock(record)).length} overflowCount={20} />
             ) : null}
           </div>
         ),
@@ -185,7 +185,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
             {mockRecords?.length ? (
               <Badge
                 overflowCount={20}
-                count={mockRecords?.filter((record) => isRecordMock(record) && record.isFavourite).length}
+                count={mockRecords?.filter((record) => isMock(record) && record.isFavourite).length}
               />
             ) : null}
           </div>
