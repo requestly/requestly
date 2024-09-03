@@ -49,7 +49,7 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
     fileContent: string;
     mocksCount: number;
     collectionsCount: number;
-  } | null>(null);
+  }>(null);
 
   useEffect(() => {
     if (selectedMockIds.length === 0) {
