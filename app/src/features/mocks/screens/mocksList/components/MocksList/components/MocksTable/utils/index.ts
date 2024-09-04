@@ -2,15 +2,15 @@ import { MockRecordType, RQMockMetadataSchema } from "components/features/mocksV
 import { MockTableRecord } from "../types";
 
 export const isMock = (record: RQMockMetadataSchema) => {
-  return !record?.recordType || record?.recordType === MockRecordType.MOCK;
+  return !record.recordType || record.recordType === MockRecordType.MOCK;
 };
 
 export const isCollection = (record: RQMockMetadataSchema) => {
-  return record?.recordType === MockRecordType.COLLECTION;
+  return record.recordType === MockRecordType.COLLECTION;
 };
 
 export const isMockInCollection = (mock: RQMockMetadataSchema) => {
-  return !!mock?.collectionId;
+  return !!mock.collectionId;
 };
 
 export const enhanceRecords = (
