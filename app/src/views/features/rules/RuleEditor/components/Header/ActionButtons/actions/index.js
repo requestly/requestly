@@ -1,10 +1,8 @@
-//UTILS
-import { redirectToRules } from "../../../../../../../../utils/RedirectionUtils";
 //EXTERNALS
 import { StorageService } from "../../../../../../../../init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
-import { trackErrorInRuleCreation, trackRuleEditorClosed } from "modules/analytics/events/common/rules";
-import { cloneDeep, snakeCase } from "lodash";
+import { trackErrorInRuleCreation } from "modules/analytics/events/common/rules";
+import { cloneDeep } from "lodash";
 import Logger from "lib/logger";
 import * as Sentry from "@sentry/react";
 import { detectUnsettledPromise } from "utils/FunctionUtils";

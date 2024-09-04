@@ -271,3 +271,8 @@ export const TEMPLATES = {
 export const ECOSYSTEM = {
   ECOSYSTEM_FEATURE_CLICKED: "ecosystem_feature_clicked",
 };
+
+export const API_SECURITY_TESTING = {
+  API_SECURITY_TESTING_LANDING_PAGE_VIEWED: "api_security_landing_page_viewed",
+  API_SECURITY_TESTING_START_PRESSED: "api_security_start_pressed",
+};
