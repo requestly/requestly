@@ -292,9 +292,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
                           type="primary"
                           className="mt-8"
                           onClick={handleSharedListCreation}
-                          disabled={
-                            sharedLinkVisibility === SharedLinkVisibility.PRIVATE && !sharedListRecipients.length
-                          }
+                          disabled={!sharedListRecipients.length}
                           loading={isLinkGenerating}
                         >
                           Create list
