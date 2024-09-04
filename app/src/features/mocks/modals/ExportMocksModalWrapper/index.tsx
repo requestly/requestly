@@ -21,10 +21,9 @@ export const ExportMocksModalWrapper: React.FC = () => {
 
   const onClose = () => {
     setIsOpen(false);
-    setSelectedMockIds([]);
   };
 
   return isOpen ? (
-    <ExportMocksModal isOpen={isOpen} toggleModal={onClose} selectedMockIds={selectedMockIds} onSuccess={onSuccess} />
+    <ExportMocksModal isOpen={isOpen} closeModal={onClose} selectedMockIds={selectedMockIds} onSuccess={onSuccess} />
   ) : null;
 };

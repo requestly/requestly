@@ -27,14 +27,14 @@ const EmptySelectionView = () => {
 
 interface ShareMocksModalProps {
   isOpen: boolean;
-  toggleModal: () => void;
+  closeModal: () => void;
   selectedMockIds: string[];
   onSuccess?: () => void;
 }
 
 export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
   isOpen,
-  toggleModal,
+  closeModal,
   selectedMockIds,
   onSuccess = () => {},
 }) => {
@@ -110,7 +110,7 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
       0
     );
 
-    toggleModal();
+    closeModal();
   };
 
   return (
@@ -118,7 +118,7 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
       centered
       open={isOpen}
       destroyOnClose
-      onCancel={toggleModal}
+      onCancel={closeModal}
       wrapClassName="export-mocks-modal-wrapper"
       maskClosable={false}
     >
