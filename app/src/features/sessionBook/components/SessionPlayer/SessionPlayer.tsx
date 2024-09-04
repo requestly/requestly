@@ -24,6 +24,7 @@ import PlayerFrameOverlay from "./components/PlayerOverlay/PlayerOverlay";
 import { useTheme } from "styled-components";
 import { useHasChanged } from "hooks";
 import PATHS from "config/constants/sub/paths";
+import { SessionTrimmer } from "features/sessionBook/screens/DraftSessionScreen/components/SessionTrimmer/SessionTrimmer";
 import "./sessionPlayer.scss";
 
 interface SessionPlayerProps {
@@ -244,6 +245,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
       >
         <div ref={playerRef} className="session-player"></div>
         <PlayerFrameOverlay playerContainer={playerRef.current} playerState={playerState} />
+        <SessionTrimmer duration={attributes?.duration} sessionStartTime={attributes?.startTime} player={player} />
         <div className="session-player-controller">
           <div className="session-status-container">
             <RQButton

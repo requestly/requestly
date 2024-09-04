@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation, useNavigate } from "react-router-dom";
 import { Col, Modal, Row } from "antd";
@@ -15,7 +15,6 @@ import { trackDraftSessionDiscarded, trackDraftSessionViewed } from "features/se
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
-import { SessionTrimmer } from "../SessionTrimmer/SessionTrimmer";
 import "./draftSessionViewer.scss";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 
@@ -33,7 +32,6 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const metadata = useSelector(getSessionRecordingMetaData);
   const isOpenedInIframe = location.pathname.includes("iframe");
-  const attributes = useMemo(() => metadata.sessionAttributes, [metadata]);
 
   if (!isDesktopMode) {
     unstable_usePrompt({
@@ -110,7 +108,6 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
           <Row className="draft-session-viewer-body" gutter={8} justify="space-between">
             <Col span={16}>
               <SessionPlayer onPlayerTimeOffsetChange={setSessionPlayerOffset} />
-              <SessionTrimmer duration={attributes?.duration} sessionStartTime={attributes?.startTime} />
             </Col>
             <Col span={8}>
               <DraftSessionDetailsPanel playerTimeOffset={sessionPlayerOffset} />

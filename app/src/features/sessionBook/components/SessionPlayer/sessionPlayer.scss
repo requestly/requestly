@@ -33,22 +33,23 @@
       }
 
       .rr-progress {
-        margin-top: -8px;
+        margin-top: -10px;
         background: var(--requestly-color-text-placeholder);
+        border-radius: var(--space-4, 8px);
         border: none;
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 6px;
-        height: 8px;
+        height: 3rem;
 
         .rr-progress__step {
           background: var(--requestly-color-primary);
+          border-radius: var(--space-4, 8px);
         }
 
         .rr-progress__handler {
-          background: var(--requestly-color-primary);
-          width: 1rem;
-          height: 1rem;
-          top: 4px;
+          background: var(--requestly-color-text-placeholder);
+          width: 2px;
+          height: 5rem;
+          top: 26px;
+          z-index: 2;
         }
       }
     }

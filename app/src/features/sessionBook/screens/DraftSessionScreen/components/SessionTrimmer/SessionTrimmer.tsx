@@ -1,74 +1,29 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getSessionRecordingEvents, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
-import { RQButton } from "lib/design-system/components";
+import { getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import "./sessionTrimmer.scss";
 import { EventType, eventWithTime } from "rrweb";
 import { fullSnapshotEvent, IncrementalSource } from "@rrweb/types";
 import { NetworkEventData, RQSessionEventType } from "@requestly/web-sdk";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { partition } from "lodash";
-import { Divider } from "antd";
 import { TrimHandle } from "./components/TrimHandle/TrimHandle";
 import { msToMinutesAndSeconds } from "utils/DateTimeUtils";
+import { useDebounce } from "hooks/useDebounce";
 
 interface SessionTrimmerProps {
   duration: number;
   sessionStartTime: number;
+  player: unknown;
 }
 
-export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessionStartTime }) => {
+export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessionStartTime, player }) => {
   const dispatch = useDispatch();
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(duration);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isSessionTrimmed, setIsSessionTrimmed] = useState(false);
   const events = useSelector(getSessionRecordingEvents);
-  const metadata = useSelector(getSessionRecordingMetaData);
-
-  const handleDrag = useCallback(
-    (event: MouseEvent, isStart: boolean) => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const newTime = Math.round((x / rect.width) * duration);
-      if (!isSessionTrimmed) {
-        setIsSessionTrimmed(true);
-      }
-      if (isStart) {
-        setStartTime(Math.max(0, Math.min(newTime, endTime - 1)));
-      } else {
-        setEndTime(Math.min(duration, Math.max(newTime, startTime + 1)));
-      }
-    },
-    [duration, startTime, endTime, isSessionTrimmed]
-  );
-
-  const startDrag = useCallback(
-    (isStart: boolean) => {
-      const handleMouseMove = (e: MouseEvent) => handleDrag(e, isStart);
-      const handleMouseUp = () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
-      };
-
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-    },
-    [handleDrag]
-  );
-
-  const handleDiscardTrim = () => {
-    setIsSessionTrimmed(false);
-    setStartTime(0);
-    setEndTime(duration);
-    dispatch(
-      sessionRecordingActions.setTrimmedSessiondata({
-        duration: metadata.sessionAttributes?.duration,
-        events: events,
-      })
-    );
-  };
 
   const trimSessionEvents = useCallback(() => {
     const sessionEvents = events[RQSessionEventType.RRWEB] as eventWithTime[];
@@ -137,6 +92,52 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
     dispatch(sessionRecordingActions.setTrimmedSessiondata(trimmedData));
   }, [trimSessionEvents, dispatch]);
 
+  const debouncedTrimSessionEvents = useDebounce(handleTrim, 200);
+
+  const handleDrag = useCallback(
+    (event: MouseEvent, isStart: boolean) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const newTime = Math.round((x / rect.width) * duration);
+      if (!isSessionTrimmed) {
+        setIsSessionTrimmed(true);
+      }
+      if (isStart) {
+        setStartTime(Math.max(0, Math.min(newTime, endTime - 1)));
+      } else {
+        setEndTime(Math.min(duration, Math.max(newTime, startTime + 1)));
+      }
+      debouncedTrimSessionEvents();
+    },
+    [duration, startTime, endTime, isSessionTrimmed, debouncedTrimSessionEvents]
+  );
+
+  const startDrag = useCallback(
+    (isStart: boolean) => {
+      const handleMouseMove = (e: MouseEvent) => handleDrag(e, isStart);
+      const handleMouseUp = () => {
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
+
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    },
+    [handleDrag]
+  );
+
+  useEffect(() => {
+    if (player) {
+      const sessionProgressBar = document.querySelector(".rr-progress") as HTMLElement;
+      if (sessionProgressBar) {
+        sessionProgressBar.style.setProperty("width", `${((endTime - startTime) / duration) * 100}%`, "important");
+        sessionProgressBar.style.setProperty("flex", "unset", "important");
+        sessionProgressBar.style.setProperty("left", `${(startTime / duration) * 100}%`, "important");
+      }
+    }
+  }, [startTime, endTime, duration, player]);
+
   return (
     <div className="session-trimmer-container">
       <div className="session-trimmer-area" ref={containerRef}>
@@ -159,15 +160,6 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
           time={endTime}
           duration={duration}
         />
-      </div>
-      <div className="session-trim-actions">
-        <Divider type="vertical" className="session-trim-divider" />
-        <RQButton type="default" onClick={handleDiscardTrim} disabled={!isSessionTrimmed}>
-          Revert
-        </RQButton>
-        <RQButton type="primary" disabled={!isSessionTrimmed} onClick={handleTrim}>
-          Trim & Preview
-        </RQButton>
       </div>
     </div>
   );
