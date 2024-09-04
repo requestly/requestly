@@ -170,7 +170,9 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
 
           setShareableLinkData(shareableLinkData);
 
-          navigator.clipboard.writeText(shareableLinkData.link);
+          navigator.clipboard.writeText(shareableLinkData.link).catch((e) => {
+            // NOOP
+          });
 
           const nonRQEmailsCount = sharedLinkVisibility === SharedLinkVisibility.PRIVATE ? nonRQEmails?.length : null;
           const recipientsCount =
