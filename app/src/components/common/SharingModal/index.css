@@ -86,6 +86,15 @@
   font-size: var(--requestly-font-size-sm, 13px);
 }
 
+.sharing-modal-wrapper .link-generation-loader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: var(--requestly-font-size-sm, 13px);
+  color: var(--requestly-color-text-subtle);
+}
+
 .sharing-modal-wrapper .shared-list-name-input-wrapper {
   display: flex;
   gap: 6px;
