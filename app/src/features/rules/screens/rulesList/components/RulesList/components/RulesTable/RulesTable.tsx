@@ -258,6 +258,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
         columns={columns}
         data={contentTableData}
         rowKey="id"
+        groupIdKey="groupId"
         loading={loading}
         customRowClassName={(record) => getRowClassNames(record)}
         locale={{
