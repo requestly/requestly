@@ -130,8 +130,12 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
 
   const handleSharedListCreation = useCallback(() => {
     const isSharedListNameNotValid = validateSharedListName();
-    if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && !sharedListName) {
-      setError("Shared list name cannot be empty");
+
+    if (!sharedListName) {
+      if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE) {
+        setError("Shared list name cannot be empty");
+      }
+
       return;
     }
 
