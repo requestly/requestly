@@ -86,6 +86,7 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
       .catch((error) => {
         Logger.log("ExportMocksModal - Something went wrong while preparing for export!", error);
         toast.error("Something went wrong, please retry exporting the mocks!");
+        closeModal();
       })
       .finally(() => {
         setIsMocksLoading(false);

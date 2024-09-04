@@ -1,38 +1,33 @@
 import { RQMockSchema } from "components/features/mocksV2/types";
 import { isMock } from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
-import Logger from "lib/logger";
 
 export const prepareMocksToExport = (mocks: RQMockSchema[]) => {
-  try {
-    let mocksCount = 0;
-    let collectionsCount = 0;
+  let mocksCount = 0;
+  let collectionsCount = 0;
 
-    const mocksToExport = mocks.map((mock) => {
-      mock.createdBy = null;
-      mock.lastUpdatedBy = null;
-      mock.ownerId = null;
-      mock.createdTs = null;
-      mock.updatedTs = null;
+  const mocksToExport = mocks.map((mock) => {
+    mock.createdBy = null;
+    mock.lastUpdatedBy = null;
+    mock.ownerId = null;
+    mock.createdTs = null;
+    mock.updatedTs = null;
 
-      if (isMock(mock)) {
-        mocksCount += 1;
-        mock.storagePath = null;
-        mock.responses?.forEach((response) => {
-          response.filePath = null;
-        });
-      } else {
-        collectionsCount += 1;
-      }
+    if (isMock(mock)) {
+      mocksCount += 1;
+      mock.storagePath = null;
+      mock.responses?.forEach((response) => {
+        response.filePath = null;
+      });
+    } else {
+      collectionsCount += 1;
+    }
 
-      return mock;
-    });
+    return mock;
+  });
 
-    return {
-      mocksCount,
-      collectionsCount,
-      fileContent: JSON.stringify(mocksToExport, null, 2),
-    };
-  } catch (error) {
-    Logger.log("prepareMocksToExport - error", error);
-  }
+  return {
+    mocksCount,
+    collectionsCount,
+    fileContent: JSON.stringify(mocksToExport, null, 2),
+  };
 };
