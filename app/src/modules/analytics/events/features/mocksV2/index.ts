@@ -2,6 +2,14 @@ import { trackEvent } from "modules/analytics";
 import { MOCKSV2 } from "../constants";
 import { MockRecordType, MockTableHeaderFilter, MockType } from "components/features/mocksV2/types";
 
+interface MocksJsonParsedParams {
+  mockTypeToImport?: string;
+  source: string;
+  successful: boolean;
+  mocksCount?: number;
+  collectionsCount?: number;
+}
+
 export const trackCreateMockEvent = (
   id: string,
   type: string,
@@ -99,13 +107,7 @@ export const trackMockImportClicked = (type: string, source: string) => {
   trackEvent(MOCKSV2.MOCK_IMPORT_BUTTON_CLICKED, params);
 };
 
-export const trackMocksJsonParsed = (params: {
-  mockTypeToImport?: string;
-  source: string;
-  successful: boolean;
-  mocksCount?: number;
-  collectionsCount?: number;
-}) => {
+export const trackMocksJsonParsed = (params: MocksJsonParsedParams) => {
   trackEvent(MOCKSV2.MOCKS_JSON_PARSED, params);
 };
 
@@ -114,12 +116,7 @@ export const trackMocksImportFailed = (source: string) => {
   trackEvent(MOCKSV2.MOCKS_IMPORT_FAILED, params);
 };
 
-export const trackMocksImportCompleted = (params: {
-  mockTypeToImport?: string;
-  source: string;
-  mocksCount?: number;
-  collectionsCount?: number;
-}) => {
+export const trackMocksImportCompleted = (params: Omit<MocksJsonParsedParams, "successful">) => {
   trackEvent(MOCKSV2.MOCKS_IMPORT_COMPLETED, params);
 };
 
