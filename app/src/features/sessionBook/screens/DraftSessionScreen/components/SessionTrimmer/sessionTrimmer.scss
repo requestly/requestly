@@ -1,17 +1,19 @@
 .session-trimmer-container {
   width: 100%;
   margin-top: 1rem;
-  padding: 8px;
-  background: var(--requestly-color-surface-1);
-  border-radius: var(--space-4, 8px);
-  border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
   display: flex;
   align-items: center;
+  pointer-events: none;
 
   .session-trimmer-area {
+    pointer-events: none;
+
     width: 100%;
     position: relative;
     height: 50px;
+    background: var(--requestly-color-surface-1);
+    border-radius: var(--space-4, 8px);
+    margin-top: -3rem;
 
     &:hover {
       .session-trimmer-bar,
@@ -33,6 +35,7 @@
       align-items: center;
       justify-content: center;
       z-index: 2;
+      pointer-events: auto;
 
       & svg {
         width: 20px;
