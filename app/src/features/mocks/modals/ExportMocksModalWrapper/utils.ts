@@ -10,6 +10,8 @@ export const prepareMocksToExport = (mocks: RQMockSchema[]) => {
       mock.createdBy = null;
       mock.lastUpdatedBy = null;
       mock.ownerId = null;
+      mock.createdTs = null;
+      mock.updatedTs = null;
 
       if (isMock(mock)) {
         mocksCount += 1;
