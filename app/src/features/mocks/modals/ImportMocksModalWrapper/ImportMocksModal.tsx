@@ -70,13 +70,11 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
         toggleModal();
       };
       reader.onload = () => {
-        //Render the loader
         setProcessingRecordsToImport(true);
-        let parsedRecords = [];
+        let parsedRecords: RQMockSchema[] = [];
 
         try {
-          // @ts-ignore
-          parsedRecords = JSON.parse(reader.result) as RQMockSchema;
+          parsedRecords = JSON.parse(reader.result as string);
 
           const result = processMocksToImport(user?.details?.profile?.uid, parsedRecords);
 
