@@ -71,8 +71,14 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
 
       const reader = new FileReader();
 
-      reader.onabort = () => toggleModal();
-      reader.onerror = () => toggleModal();
+      reader.onabort = function (this) {
+        Logger.log("ImportMocksModal - onDrop aborted", this.error);
+        toggleModal();
+      };
+      reader.onerror = function (this) {
+        Logger.log("ImportMocksModal - onDrop error", this.error);
+        toggleModal();
+      };
       reader.onload = () => {
         //Render the loader
         setProcessingRecordsToImport(true);
