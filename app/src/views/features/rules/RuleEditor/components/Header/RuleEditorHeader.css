@@ -6,7 +6,7 @@
   max-width: 1600px;
   margin: 0 auto;
   height: auto;
-  padding: 0 16px;
+  line-height: 36px;
 }
 
 .rule-editor-header.ant-layout-header .rule-editor-row {
@@ -42,7 +42,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  column-gap: 8px;
   flex-wrap: wrap;
 }
 
