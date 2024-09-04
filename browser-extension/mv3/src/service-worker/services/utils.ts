@@ -3,6 +3,8 @@ import { setVariable, Variable } from "../variable";
 import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
 import { updateActivationStatus } from "./contextMenu";
+import { getRecord } from "common/storage";
+import { STORAGE_KEYS } from "common/constants";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -186,4 +188,9 @@ export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
   }
 
   return appTabs;
+};
+
+export const getIsUserLoggedIn = async () => {
+  const refreshToken = await getRecord(STORAGE_KEYS.REFRESH_TOKEN);
+  return !!refreshToken;
 };

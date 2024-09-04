@@ -16,7 +16,7 @@ import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import PATHS from "config/constants/sub/paths";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
-import { isAppOpenedInIframe } from "utils/AppUtils";
+import { getAppFlavour, isAppOpenedInIframe } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 export interface DraftSessionViewerProps {
@@ -169,10 +169,14 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
 
   useEffect(() => {
     if (isOpenedInIframe) {
+      const appFlavour = getAppFlavour();
       window.parent.postMessage(
         {
           action: "draftSessionViewerLoaded",
-          source: GLOBAL_CONSTANTS.CLIENT_SOURCE.SESSIONBEAR,
+          source:
+            appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR
+              ? GLOBAL_CONSTANTS.CLIENT_SOURCE.SESSIONBEAR
+              : GLOBAL_CONSTANTS.CLIENT_SOURCE.REQUESTLY,
         },
         "*"
       );

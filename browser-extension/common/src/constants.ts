@@ -13,6 +13,7 @@ export const EXTENSION_MESSAGES = {
   CLEAR_LOGS_FOR_DOMAIN: "clearLogsForDomain",
   GET_RULES_AND_GROUPS: "getRulesAndGroups",
   GET_TAB_SESSION: "getTabSession",
+  GET_IS_USER_LOGGED_IN: "getIsUserLoggedIn",
   HANDSHAKE_CLIENT: "handshakeClient",
   GET_API_RESPONSE: "getAPIResponse",
   GET_EXECUTED_RULES: "getExecutedRules",
@@ -50,6 +51,7 @@ export const CLIENT_MESSAGES = {
   UPDATE_APPLIED_SCRIPT_RULES: "updateAppliedScriptRules",
   START_RECORDING: "startRecording",
   STOP_RECORDING: "stopRecording",
+  VIEW_RECORDING: "viewRecording",
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
   NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
   ON_BEFORE_AJAX_REQUEST_PROCESSED: "onBeforeAjaxRequest:processed",
@@ -84,9 +86,16 @@ export const STORAGE_KEYS = {
   TEST_REPORTS: "testReports",
   IMPLICIT_RULE_TESTING_WIDGET_CONFIG: "implicit_rule_testing_widget_config",
   BLOCKED_DOMAINS: "blocked_domains",
+  REFRESH_TOKEN: "refreshToken",
+  ACTIVE_WORKSPACE_ID: "activeWorkspaceId",
 };
 
 export const LINKS = {
   REQUESTLY_EXTENSION_TROUBLESHOOTING:
     "https://docs.requestly.io/browser-extension/chrome/category/troubleshooting?source=popup",
+};
+
+export const CUSTOM_ELEMENTS = {
+  DRAFT_SESSION_VIEWER: "rq-draft-session-viewer",
+  POST_SESSION_SAVE_WIDGET: "rq-post-session-save-widget",
 };
