@@ -10,7 +10,6 @@ import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { prepareMocksToExport } from "./utils";
 import fileDownload from "js-file-download";
-import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
 import { trackMocksExported } from "modules/analytics/events/features/mocksV2";
 import Logger from "lib/logger";
@@ -44,12 +43,12 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
   const teamId = workspace?.id;
 
   const [isMocksLoading, setIsMocksLoading] = useState(false);
-  const [mocks, setMocks] = useState<RQMockSchema[]>([]);
-  const [mocksExportDetails, setMocksExportDetails] = useState<{
-    fileContent: string;
-    mocksCount: number;
-    collectionsCount: number;
-  }>(null);
+  const [mocksExportDetails, setMocksExportDetails] = useState({
+    fileName: "",
+    fileContent: "",
+    mocksCount: 0,
+    collectionsCount: 0,
+  });
 
   useEffect(() => {
     if (selectedMockIds.length === 0) {
@@ -78,8 +77,6 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
 
     Promise.all(mockPromises)
       .then((mocks) => {
-        setMocks(mocks);
-
         const result = prepareMocksToExport(mocks);
         setMocksExportDetails(result);
       })
@@ -97,14 +94,9 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
     };
   }, [selectedMockIds]);
 
-  const fileName =
-    selectedMockIds.length === 1
-      ? `${mocks?.[0]?.name}` ?? ""
-      : `requestly_mocks_export_${getFormattedDate("DD_MM_YYYY")}`;
-
   const handleMocksExport = () => {
     trackMocksExported(mocksExportDetails.mocksCount, mocksExportDetails.collectionsCount);
-    fileDownload(mocksExportDetails.fileContent, `${fileName}.json`, "application/json");
+    fileDownload(mocksExportDetails.fileContent, `${mocksExportDetails.fileName}.json`, "application/json");
     onSuccess();
     setTimeout(
       () => toast.success(`${mocksExportDetails.mocksCount === 1 ? "Mock" : "Mocks"} exported successfully`),
@@ -141,7 +133,7 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
             ) : (
               <>
                 <div className="export-mocks-details ">
-                  <span className="line-clamp">{fileName}</span>
+                  <span className="line-clamp">{mocksExportDetails.fileName}</span>
                   <span className="text-gray">
                     {mocksExportDetails?.mocksCount} {mocksExportDetails?.mocksCount === 1 ? " mock" : " mocks"}
                     {mocksExportDetails?.collectionsCount > 0
