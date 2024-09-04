@@ -99,20 +99,13 @@ export const trackMockImportClicked = (type: string, source: string) => {
   trackEvent(MOCKSV2.MOCK_IMPORT_BUTTON_CLICKED, params);
 };
 
-export const trackMocksJsonParsed = ({
-  mockTypeToImport,
-  source,
-  successful,
-  mocksCount,
-  collectionsCount,
-}: {
+export const trackMocksJsonParsed = (params: {
   mockTypeToImport?: string;
   source: string;
   successful: boolean;
   mocksCount?: number;
   collectionsCount?: number;
 }) => {
-  const params = { mockTypeToImport, source, successful, mocksCount, collectionsCount };
   trackEvent(MOCKSV2.MOCKS_JSON_PARSED, params);
 };
 
@@ -121,18 +114,12 @@ export const trackMocksImportFailed = (source: string) => {
   trackEvent(MOCKSV2.MOCKS_IMPORT_FAILED, params);
 };
 
-export const trackMocksImportCompleted = ({
-  mockTypeToImport,
-  source,
-  mocksCount,
-  collectionsCount,
-}: {
+export const trackMocksImportCompleted = (params: {
   mockTypeToImport?: string;
   source: string;
   mocksCount?: number;
   collectionsCount?: number;
 }) => {
-  const params = { mockTypeToImport, source, mocksCount, collectionsCount };
   trackEvent(MOCKSV2.MOCKS_IMPORT_COMPLETED, params);
 };
 
