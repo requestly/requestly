@@ -140,14 +140,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
 
       dataToImport.mocks.forEach((mock) => {
         const updatedMock = { ...mock, collectionId: oldToNewCollectionIds[mock.collectionId] ?? "" };
-
-        const promise = createMock(uid, updatedMock, teamId)
-          .then((mockId) => mockId)
-          .catch((e) => {
-            // NOOP
-          });
-
-        mocksPromises.push(promise);
+        mocksPromises.push(createMock(uid, updatedMock, teamId));
       });
 
       await Promise.all(mocksPromises);
