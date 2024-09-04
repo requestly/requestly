@@ -60,19 +60,7 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
     const mockPromises: Promise<RQMockSchema>[] = [];
 
     selectedMockIds.forEach((mockId) => {
-      const promise = getMock(uid, mockId, teamId)
-        .then((data: any) => {
-          if (data) {
-            return data;
-          }
-
-          throw new Error("No mock found!");
-        })
-        .catch((error: any) => {
-          Logger.log("ExportMocksModal - Error while fetching mocks!", error);
-        });
-
-      mockPromises.push(promise);
+      mockPromises.push(getMock(uid, mockId, teamId));
     });
 
     Promise.all(mockPromises)
