@@ -54,16 +54,6 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
   const [processingRecordsToImport, setProcessingRecordsToImport] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
-  const {
-    mockTypeToImport,
-    mocks: mocksToImport,
-    collections: collectionsToImport,
-    success: isValidRecords,
-    records: recordsToImport,
-    mocksCount: mocksToImportCount,
-    collectionsCount: collectionsToImportCount,
-  } = dataToImport;
-
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       //Ignore other uploaded files
@@ -128,7 +118,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
 
       const collectionsPromises: Promise<{ oldId: string; newId: string }>[] = [];
 
-      collectionsToImport.forEach((collection) => {
+      dataToImport.collections.forEach((collection) => {
         const promise = createCollection(uid, collection, teamId)
           .then((newCollection) => {
             return { oldId: collection.id, newId: newCollection.id };
@@ -149,7 +139,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
 
       const mocksPromises: Promise<unknown>[] = [];
 
-      mocksToImport.forEach((mock) => {
+      dataToImport.mocks.forEach((mock) => {
         const updatedMock = { ...mock, collectionId: oldToNewCollectionIds[mock.collectionId] ?? "" };
 
         const promise = createMock(uid, updatedMock, teamId)
@@ -166,13 +156,15 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
 
       trackMocksImportCompleted({
         source,
-        mockTypeToImport,
-        mocksCount: mocksToImportCount,
-        collectionsCount: collectionsToImportCount,
+        mockTypeToImport: dataToImport.mockTypeToImport,
+        mocksCount: dataToImport.mocksCount,
+        collectionsCount: dataToImport.collectionsCount,
       });
 
       onSuccess();
-      navigate(mockTypeToImport === MockType.API ? PATHS.MOCK_SERVER_V2.ABSOLUTE : PATHS.FILE_SERVER_V2.ABSOLUTE);
+      navigate(
+        dataToImport.mockTypeToImport === MockType.API ? PATHS.MOCK_SERVER_V2.ABSOLUTE : PATHS.FILE_SERVER_V2.ABSOLUTE
+      );
       toggleModal();
     } catch (error) {
       trackMocksImportFailed("import_click");
@@ -184,9 +176,9 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
   };
 
   const getSuccessfullyParsedMessage = () => {
-    return `Successfully parsed ${mocksToImportCount} ${mocksToImportCount === 1 ? "mock" : "mocks"} ${
-      collectionsToImportCount > 0
-        ? `and ${collectionsToImportCount} ${collectionsToImportCount === 1 ? "collection" : "collections"}.`
+    return `Successfully parsed ${dataToImport.mocksCount} ${dataToImport.mocksCount === 1 ? "mock" : "mocks"} ${
+      dataToImport.collectionsCount > 0
+        ? `and ${dataToImport.collectionsCount} ${dataToImport.collectionsCount === 1 ? "collection" : "collections"}.`
         : ""
     }`;
   };
@@ -203,16 +195,16 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
       <div className="mocks-import-modal-content">
         <div className="heading">Import mocks</div>
 
-        {recordsToImport.length === 0 ? (
+        {dataToImport.records.length === 0 ? (
           <FilePicker
             onFilesDrop={onDrop}
             loaderMessage="Processing mocks..."
             isProcessing={processingRecordsToImport}
             title="Drag and drop your mocks JSON file"
           />
-        ) : recordsToImport.length > 0 ? (
+        ) : dataToImport.records.length > 0 ? (
           <>
-            {(mocksToImportCount || collectionsToImportCount) && isValidRecords ? (
+            {(dataToImport.mocksCount || dataToImport.collectionsCount) && dataToImport.success ? (
               <Col lg="12" md="12" xl="12" sm="12" xs="12" className="text-center" style={{ textAlign: "center" }}>
                 <h1 className="display-2">
                   <BsFileEarmarkCheck className="success" />
