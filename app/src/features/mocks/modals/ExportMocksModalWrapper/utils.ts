@@ -1,5 +1,6 @@
 import { RQMockSchema } from "components/features/mocksV2/types";
 import { isMock } from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
+import Logger from "lib/logger";
 
 export const prepareMocksToExport = (mocks: RQMockSchema[]) => {
   try {
@@ -32,6 +33,6 @@ export const prepareMocksToExport = (mocks: RQMockSchema[]) => {
       fileContent: JSON.stringify(mocksToExport, null, 2),
     };
   } catch (error) {
-    // NOOP
+    Logger.log("prepareMocksToExport - error", error);
   }
 };
