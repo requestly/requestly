@@ -103,8 +103,8 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
       : `requestly_mocks_export_${getFormattedDate("DD_MM_YYYY")}`;
 
   const handleMocksExport = () => {
-    trackMocksExported(mocksExportDetails?.mocksCount, mocksExportDetails?.collectionsCount);
-    fileDownload(mocksExportDetails?.fileContent ?? "", `${fileName}.json`, "application/json");
+    trackMocksExported(mocksExportDetails.mocksCount, mocksExportDetails.collectionsCount);
+    fileDownload(mocksExportDetails.fileContent, `${fileName}.json`, "application/json");
     onSuccess();
     setTimeout(
       () => toast.success(`${mocksExportDetails.mocksCount === 1 ? "Mock" : "Mocks"} exported successfully`),
