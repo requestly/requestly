@@ -11,14 +11,54 @@
     }
   }
 
+  .session-player.saved-session-player {
+    .rr-progress {
+      margin-top: -8px;
+
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 6px;
+      height: 8px;
+    }
+
+    .rr-progress__handler {
+      width: 1rem;
+      height: 1rem;
+      top: 4px;
+    }
+  }
+
+  .session-player.draft-session-player {
+    .rr-progress {
+      margin-top: -8px;
+      top: -4px;
+      border-radius: var(--space-4, 8px);
+      height: 40px;
+    }
+
+    .rr-progress__step {
+      border-radius: var(--space-4, 8px);
+      background: var(--requestly-color-black) !important;
+    }
+
+    .rr-progress__handler {
+      width: 2px;
+      height: 40px;
+      top: 20px;
+      z-index: 2;
+      box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.948);
+    }
+  }
+
   .session-player {
     .rr-player {
       width: 100% !important;
       height: auto !important;
+      background: var(--requestly-color-black);
     }
 
     .rr-controller {
       height: auto !important;
+      background: var(--requestly-color-black) !important;
 
       .rr-timeline {
         width: 100%;
@@ -33,12 +73,8 @@
       }
 
       .rr-progress {
-        margin-top: -8px;
         background: var(--requestly-color-text-placeholder);
         border: none;
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 6px;
-        height: 8px;
 
         .rr-progress__step {
           background: var(--requestly-color-primary);
@@ -46,9 +82,6 @@
 
         .rr-progress__handler {
           background: var(--requestly-color-primary);
-          width: 1rem;
-          height: 1rem;
-          top: 4px;
         }
       }
     }
