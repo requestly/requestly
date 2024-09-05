@@ -11,6 +11,42 @@
     }
   }
 
+  .session-player.saved-session-player {
+    .rr-progress {
+      margin-top: -8px;
+
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 6px;
+      height: 8px;
+    }
+
+    .rr-progress__handler {
+      width: 1rem;
+      height: 1rem;
+      top: 4px;
+    }
+  }
+
+  .session-player.draft-session-player {
+    .rr-progress {
+      margin-top: -10px;
+      border-radius: var(--space-4, 8px);
+      height: 3rem;
+    }
+
+    .rr-progress__step {
+      border-radius: var(--space-4, 8px);
+    }
+
+    .rr-progress__handler {
+      width: 2px;
+      height: 3rem;
+      top: 24px;
+      z-index: 2;
+      box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.948);
+    }
+  }
+
   .session-player {
     .rr-player {
       width: 100% !important;
@@ -19,6 +55,7 @@
 
     .rr-controller {
       height: auto !important;
+      background: var(--requestly-color-black);
 
       .rr-timeline {
         width: 100%;
@@ -33,23 +70,15 @@
       }
 
       .rr-progress {
-        margin-top: -10px;
         background: var(--requestly-color-text-placeholder);
-        border-radius: var(--space-4, 8px);
         border: none;
-        height: 3rem;
 
         .rr-progress__step {
           background: var(--requestly-color-primary);
-          border-radius: var(--space-4, 8px);
         }
 
         .rr-progress__handler {
-          background: var(--requestly-color-text-placeholder);
-          width: 2px;
-          height: 5rem;
-          top: 26px;
-          z-index: 2;
+          background: var(--requestly-color-primary);
         }
       }
     }
