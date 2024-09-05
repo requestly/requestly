@@ -18,7 +18,9 @@ export const SharedLists = () => {
   const filteredSharedLists = useMemo(() => {
     if (!sharedLists) return [];
     else {
-      return sharedLists?.filter((list: SharedList) => list.listName.toLowerCase().includes(searchValue.toLowerCase()));
+      return sharedLists?.filter((list: SharedList) =>
+        list.listName?.toLowerCase().includes(searchValue.toLowerCase())
+      );
     }
   }, [sharedLists, searchValue]);
 
