@@ -8,12 +8,16 @@ import SessionRecordingView from "../SessionRecording/SessionRecordingView";
 import { getExtensionVersion } from "../../utils";
 import "./popup.css";
 import { BlockedExtensionView } from "../BlockedExtensionView/BlockedExtensionView";
+import DesktopAppProxy from "../DesktopAppProxy";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
   const [isExtensionEnabled, setIsExtensionEnabled] = useState<boolean>(true);
   const [isBlockedOnTab, setIsBlockedOnTab] = useState<boolean>(false);
   const [currentTab, setCurrentTab] = useState<chrome.tabs.Tab>(null);
+  const [checkingProxyStatus, setCheckingProxyStatus] = useState<boolean>(true);
+  const [isProxyApplied, setIsProxyApplied] = useState<boolean>(false);
+  const [isProxyRunning, setIsProxyRunning] = useState<boolean>(false);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([activeTab]) => {
@@ -37,7 +41,8 @@ const Popup: React.FC = () => {
       .sendMessage({
         action: EXTENSION_MESSAGES.IS_EXTENSION_BLOCKED_ON_TAB,
         tabUrl: currentTab?.url,
-      })?.then(setIsBlockedOnTab);
+      })
+      ?.then(setIsBlockedOnTab);
   }, [currentTab]);
 
   const handleToggleExtensionStatus = useCallback(() => {
@@ -48,6 +53,34 @@ const Popup: React.FC = () => {
       });
     });
   }, []);
+
+  useEffect(() => {
+    setCheckingProxyStatus(true);
+    fetch("http://127.0.0.1:8281")
+      .then(() => {
+        setIsProxyRunning(true);
+        console.log("Proxy Running");
+        setCheckingProxyStatus(false);
+      })
+      .catch((err) => {
+        console.log("Proxy Not Running");
+        setIsProxyRunning(false);
+        setCheckingProxyStatus(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetchProxyEnabledStatus();
+  }, []);
+
+  const handleToggleProxyStatus = () => {
+    // TODO: @rohan add/remove proxy code here
+    setIsProxyApplied(!isProxyApplied);
+  };
+
+  const fetchProxyEnabledStatus = () => {
+    // TODO: @rohan fetch the initial status of proxy. COnnected to chrome or not
+  };
 
   return (
     <>
@@ -65,6 +98,12 @@ const Popup: React.FC = () => {
               <div className="popup-content">
                 {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
                 <SessionRecordingView />
+                <DesktopAppProxy
+                  handleToggleProxyStatus={handleToggleProxyStatus}
+                  checkingProxyStatus={checkingProxyStatus}
+                  isProxyApplied={isProxyApplied}
+                  isProxyRunning={isProxyRunning}
+                />
               </div>
             </>
           )}
