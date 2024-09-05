@@ -8,8 +8,8 @@ import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActi
 import { isValidUrl } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import { prefixUrlWithHttps } from "utils/URLUtils";
-import StartSessionRecordingGif from "./assets/sessions-banner.gif";
-import SessionBearRecordingGif from "./assets/SessionBear.gif";
+import StartSessionRecordingGif from "features/sessionBook/screens/SessionsListScreen/assets/sessions-banner.gif";
+import SessionBearRecordingGif from "features/sessionBook/screens/SessionsListScreen/assets/SessionBear.gif";
 import {
   trackInstallExtensionDialogShown,
   trackOnboardingToSettingsNavigate,
@@ -22,7 +22,7 @@ import {
 // import { ImportHarModalButton } from "../NetworkSessions/ImportHarModalButton";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import "./index.scss";
+// import "./index.scss";
 import { useNavigate } from "react-router-dom";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
@@ -38,7 +38,7 @@ const CheckItem: React.FC<{ label: string }> = ({ label }) => {
   );
 };
 
-const GreenVerifiedCheck: React.FC<{}> = () => {
+export const GreenVerifiedCheck: React.FC<{}> = () => {
   return (
     <>
       <BsShieldCheck style={{ fill: "url(#green-gradient)" }} className="check-icon" />
