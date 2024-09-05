@@ -38,9 +38,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   const [responseTypePopupSelection, setResponseTypePopupSelection] = useState(
     pair?.response?.type ?? GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
   );
-  const [editorStaticValue, setEditorStaticValue] = useState(
-    pair?.response?.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC && pair.response.value
-  );
 
   const codeFormattedFlag = useRef(null);
   const { getFeatureLimitValue } = useFeatureLimiter();
@@ -53,9 +50,8 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
           value = ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"];
         } else if (responseBodyType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE) {
           value = "";
-        } else {
-          setEditorStaticValue(value);
         }
+
         dispatch(
           actions.updateRulePairAtGivenPath({
             pairIndex,
@@ -144,10 +140,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   };
 
   const responseBodyChangeHandler = (value) => {
-    if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
-      setEditorStaticValue(value);
-    }
-
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
@@ -307,11 +299,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                     : EditorLanguage.JSON
                 }
                 defaultValue={getEditorDefaultValue()}
-                value={
-                  pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
-                    ? editorStaticValue
-                    : pair.response.value
-                }
+                value={pair.response.value}
                 isReadOnly={isInputDisabled}
                 handleChange={responseBodyChangeHandler}
                 isResizable

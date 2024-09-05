@@ -147,9 +147,9 @@ const MockEditorIndex: React.FC<Props> = ({
             return;
           }
           if (mockType === MockType.FILE) {
-            return redirectToFileMockEditorEditMock(navigate, mockId);
+            return redirectToFileMockEditorEditMock(navigate, mockId, true);
           }
-          return redirectToMockEditorEditMock(navigate, mockId);
+          return redirectToMockEditorEditMock(navigate, mockId, true);
         }
         toast.error("Mock Create Error");
       });
