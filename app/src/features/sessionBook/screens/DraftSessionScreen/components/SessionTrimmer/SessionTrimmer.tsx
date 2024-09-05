@@ -118,7 +118,7 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
       const handleMouseMove = (e: MouseEvent) => handleDrag(e, isStart);
       const handleMouseUp = () => {
         document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
+        // document.removeEventListener("mouseup", handleMouseUp);
       };
 
       document.addEventListener("mousemove", handleMouseMove);
