@@ -80,7 +80,7 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
     return () => {
       setMocksExportDetails(null);
     };
-  }, [selectedMockIds]);
+  }, [selectedMockIds, uid, teamId]);
 
   const handleMocksExport = () => {
     trackMocksExported(mocksExportDetails.mocksCount, mocksExportDetails.collectionsCount);
