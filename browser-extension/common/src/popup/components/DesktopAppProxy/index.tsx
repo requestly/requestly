@@ -7,11 +7,11 @@ interface DesktopAppProxyProps {
 
 interface ProxyDetails {
   proxyPort: number;
-  proxyHost: string;
+  proxyIp: string;
   proxyUrl: string;
 }
 
-const DESKTOP_APP_PROXY_INFO_URL = "http://127.0.0.0:7040/proxy";
+const DESKTOP_APP_PROXY_INFO_URL = "http://127.0.0.1:7040/proxy";
 
 const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ handleToggleExtensionStatus }) => {
   const [checkingProxyStatus, setCheckingProxyStatus] = useState(true);
@@ -23,11 +23,11 @@ const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ handleToggleExtension
     fetch(DESKTOP_APP_PROXY_INFO_URL)
       .then((res) => res.json())
       .then((data) => {
-        console.log("!!!debug", "proxydetails", proxyDetails);
+        console.log("!!!debug", "proxydetails", data);
         setProxyDetails(data);
       })
       .catch((err) => {
-        console.error("Error fetching proxy status", err);
+        console.error("!!!Error fetching proxy status", err);
         setProxyDetails(null);
       })
       .finally(() => {
@@ -35,18 +35,63 @@ const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ handleToggleExtension
       });
   }, []);
 
-  const applyProxy = () => {
-    // Apply the proxy to browser and deactivate extension
-    setIsProxyApplied(true);
-  };
+  const applyProxy = useCallback(() => {
+    if (!proxyDetails) {
+      return;
+    }
 
-  const removeProxy = () => {
-    // Remove the proxy from browser and activate extension
-    setIsProxyApplied(false);
-  };
+    chrome.proxy.settings
+      .set({
+        value: {
+          mode: "fixed_servers",
+          rules: {
+            singleProxy: {
+              scheme: "http",
+              host: proxyDetails.proxyIp,
+              port: proxyDetails.proxyPort,
+            },
+            bypassList: [], // @TODO
+          },
+        },
+        scope: "regular",
+      })
+      // @ts-ignore
+      ?.then(() => {
+        setIsProxyApplied(true);
+        // handleToggleExtensionStatus();
+      })
+      ?.catch((err: unknown) => {
+        console.error("!!!Error applying proxy", err);
+      });
+  }, [proxyDetails]);
+  // Need a way to check proxy application status
+
+  const removeProxy = useCallback(() => {
+    chrome.proxy.settings
+      .clear({ scope: "regular" })
+      // @ts-ignore
+      // null check for building popup in MV2
+      ?.then(() => {
+        setIsProxyApplied(false);
+        // handleToggleExtensionStatus();
+      })
+      ?.catch((err: unknown) => {
+        console.error("!!!Error removing proxy", err);
+      });
+  }, []);
+
+  const checkIfProxyApplied = useCallback(() => {
+    chrome.proxy.settings.get({}, (config) => {
+      console.log("!!!debug", "proxyConfig", config);
+      if (config.levelOfControl === "controlled_by_this_extension" && config.value.mode === "fixed_servers") {
+        setIsProxyApplied(true);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     fetchProxyDetails();
+    checkIfProxyApplied();
   }, []);
 
   return (

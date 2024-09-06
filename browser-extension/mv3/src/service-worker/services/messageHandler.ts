@@ -149,6 +149,7 @@ export const initMessageHandler = () => {
 
       case EXTENSION_MESSAGES.CACHE_SHARED_STATE:
         globalStateManager.updateSharedStateInStorage(sender.tab.id, message.sharedState);
+        break;
     }
 
     return false;
