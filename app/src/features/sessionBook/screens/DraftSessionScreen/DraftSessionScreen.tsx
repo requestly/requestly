@@ -55,7 +55,6 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
       if (tabSession.events.rrweb?.length < 2) {
         setLoadingError("RRWeb events not captured");
       } else {
-        console.log("tabSession events", tabSession.events);
         dispatch(
           sessionRecordingActions.setSessionRecordingMetadata({
             sessionAttributes: tabSession.attributes,
