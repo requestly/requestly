@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
@@ -36,7 +36,7 @@ interface EditorProps {
 
 const Editor: React.FC<EditorProps> = ({
   value,
-  defaultValue,
+  defaultValue = "",
   language,
   isReadOnly = false,
   height = 225,
@@ -97,13 +97,30 @@ const Editor: React.FC<EditorProps> = ({
     }
   }, [language]);
 
+  // This is to set the editor content only once when the value is set for the first time
+  // Remove this when the editor is refactored to use controlled input and current problem is fixed
+  // Current problem: When the value is set for the first time, the consequent changes in props.value is not reflected in the editor @nafees87n
+  const isEditorContentSet = useRef(false);
+  useEffect(() => {
+    if (!isEditorContentSet.current) {
+      if (!value?.length) {
+        setEditorContent(defaultValue);
+      } else {
+        setEditorContent(value);
+        isEditorContentSet.current = true;
+      }
+    }
+  }, [defaultValue, value]);
+
+  // Had to keep both useEffects because some cases were not handled with the above useEffect
   useEffect(() => {
     if (!value?.length) {
-      setEditorContent(defaultValue ?? "");
+      setEditorContent(defaultValue);
     } else {
       setEditorContent(value);
     }
-  }, [defaultValue, value]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultValue]);
 
   const handleEditorClose = useCallback(
     (id: string) => {

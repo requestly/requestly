@@ -6,7 +6,7 @@ import ThirdPartyIntegrationsHandler from "hooks/ThirdPartyIntegrationsHandler";
 import { GrowthBookProvider } from "@growthbook/growthbook-react";
 import { growthbook } from "utils/feature-flag/growthbook";
 import LocalUserAttributesHelperComponent from "hooks/LocalUserAttributesHelperComponent";
-import PreLoadRemover from "hooks/PreLoadRemover";
+import usePreLoadRemover from "hooks/usePreLoadRemover";
 import AppModeInitializer from "hooks/AppModeInitializer";
 import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
@@ -30,13 +30,13 @@ const App: React.FC = () => {
   useIsExtensionEnabled();
   submitAppDetailAttributes();
   useInitializeNewUserSessionRecordingConfig();
+  usePreLoadRemover();
 
   return (
     <>
       <ExtensionContextInvalidationNotice />
       <AutomationNotAllowedNotice />
       <AuthHandler />
-      <PreLoadRemover />
       <AppModeInitializer />
       <DBListeners />
       {/* @ts-ignore */}
