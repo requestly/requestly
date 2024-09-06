@@ -53,7 +53,7 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
 
   const handleSessionDownload = () => {
     const recordingOptions = getRecordingOptionsToSave(debugInfoToBeIncluded);
-    const sessionEventsToDownload = trimmedSessionData.events ?? sessionEvents;
+    const sessionEventsToDownload = trimmedSessionData?.events ?? sessionEvents;
     const attributes = { ...sessionAttributes, duration: trimmedSessionData?.duration ?? sessionAttributes?.duration };
     const metadata = { ...sessionRecordingMetadata, sessionAttributes: attributes };
 
@@ -102,7 +102,15 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
       .finally(() => {
         setIsLoading(false);
       });
-  }, [saveDraftSession, user.loggedIn, dispatch, sessionRecordingMetadata, onSaveClick, isOpenedInIframe]);
+  }, [
+    saveDraftSession,
+    user.loggedIn,
+    dispatch,
+    sessionRecordingMetadata,
+    onSaveClick,
+    isOpenedInIframe,
+    trimmedSessionData,
+  ]);
 
   return (
     <div className="save-session-btn-container">
