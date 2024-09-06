@@ -5,7 +5,7 @@ import { RQModal } from "lib/design-system/components";
 import { toast } from "utils/Toast";
 import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import deleteIcon from "../../assets/delete.svg";
-import { isMock } from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
+import { isRecordMock } from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
 import * as FilesService from "../../../../../utils/files/FilesService";
 import { trackDeleteMockEvent } from "modules/analytics/events/features/mocksV2";
 import { deleteMock } from "backend/mocks/deleteMock";
@@ -31,7 +31,7 @@ export const DeleteRecordsModal: React.FC<Props> = ({ visible, records, toggleMo
 
   const recordType =
     records.length === 1
-      ? isMock(records[0])
+      ? isRecordMock(records[0])
         ? records[0]?.type === MockType.API
           ? "Mock"
           : "File"
