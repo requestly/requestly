@@ -147,3 +147,13 @@ export const getFormattedTimestamp = (timestamp) => {
   const formattedDate = `${day} ${month} ${year} - ${hours}:${minutes < 10 ? "0" : ""}${minutes}${ampm}`;
   return formattedDate;
 };
+
+export const getSecondsFromStringifiedMinSec = (timestamp) => {
+  if (!timestamp) return 0;
+  const parts = timestamp.split(":");
+  const minutes = parts[0] || "0";
+  const seconds = parts[1] || "0";
+  const parsedMinutes = parseInt(minutes, 10);
+  const parsedSeconds = parseInt(seconds.substring(0, 2), 10);
+  return (isNaN(parsedMinutes) ? 0 : parsedMinutes) * 60 + (isNaN(parsedSeconds) ? 0 : parsedSeconds);
+};
