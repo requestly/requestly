@@ -49,7 +49,6 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
     mocksCount: 0,
     collectionsCount: 0,
     mockTypeToImport: null,
-    success: true,
   });
   const [processingRecordsToImport, setProcessingRecordsToImport] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -77,10 +76,6 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
           parsedRecords = JSON.parse(reader.result as string);
 
           const result = processMocksToImport(user?.details?.profile?.uid, parsedRecords);
-
-          if (!result.success) {
-            throw new Error("Invalid file!");
-          }
 
           setDataToImport(result);
 
@@ -115,12 +110,12 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
     try {
       setIsImporting(true);
 
-      const collectionsPromises: Promise<{ oldId: string; newId: string }>[] = [];
+      const collectionsPromises: Promise<{ oldId: string; newId: string; path: string }>[] = [];
 
       dataToImport.collections.forEach((collection) => {
         const promise = createCollection(uid, collection, teamId)
           .then((newCollection) => {
-            return { oldId: collection.id, newId: newCollection.id };
+            return { oldId: collection.id, newId: newCollection.id, path: newCollection.path };
           })
           .catch((error) => {
             return error;
@@ -132,15 +127,21 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
       const collectionPromisesResult = await Promise.all(collectionsPromises);
 
       // Old to new collection mapping
-      const oldToNewCollectionIds: Record<string, string> = collectionPromisesResult.reduce((result, details) => {
-        return { ...result, [details.oldId]: details.newId };
+      const oldToNewCollectionDetails: Record<
+        string,
+        { newId: string; path: string }
+      > = collectionPromisesResult.reduce((result, details) => {
+        return { ...result, [details.oldId]: { newId: details.newId, path: details.path } };
       }, {});
 
       const mocksPromises: Promise<unknown>[] = [];
 
       dataToImport.mocks.forEach((mock) => {
-        const updatedMock = { ...mock, collectionId: oldToNewCollectionIds[mock.collectionId] ?? "" };
-        mocksPromises.push(createMock(uid, updatedMock, teamId));
+        const newCollectionId = oldToNewCollectionDetails[mock.collectionId].newId;
+        const collectionPath = oldToNewCollectionDetails[mock.collectionId].path;
+        const updatedMock = { ...mock, collectionId: newCollectionId ?? "" };
+
+        mocksPromises.push(createMock(uid, updatedMock, teamId, newCollectionId, collectionPath));
       });
 
       await Promise.all(mocksPromises);
@@ -196,7 +197,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
           />
         ) : dataToImport.records.length > 0 ? (
           <>
-            {(dataToImport.mocksCount || dataToImport.collectionsCount) && dataToImport.success ? (
+            {dataToImport.mocksCount || dataToImport.collectionsCount ? (
               <Col lg="12" md="12" xl="12" sm="12" xs="12" className="text-center" style={{ textAlign: "center" }}>
                 <h1 className="display-2">
                   <BsFileEarmarkCheck className="success" />
