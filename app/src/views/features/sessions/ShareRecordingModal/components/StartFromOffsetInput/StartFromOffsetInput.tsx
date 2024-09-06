@@ -16,10 +16,18 @@ export const StartFromOffsetInput: React.FC<StartFromOffsetInputProps> = ({
   const [offset, setOffset] = useState(currentOffset);
 
   const handleOffsetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setOffset(e.target.value);
-    if (isChecked) {
-      onOffsetChange(e.target.value);
+    const input = e.target.value;
+    if (isValidTimeOffsetInput(input)) {
+      setOffset(input);
+      if (isChecked) {
+        onOffsetChange(input);
+      }
     }
+  };
+
+  const isValidTimeOffsetInput = (input: string): boolean => {
+    if (input === "") return true;
+    return /^(\d{1,2}:?(?!\d:)\d{0,2}|:?\d{1,2})$/.test(input);
   };
 
   return (
@@ -38,6 +46,11 @@ export const StartFromOffsetInput: React.FC<StartFromOffsetInputProps> = ({
       <div className="start-offset-container">
         <span>Start from</span>
         <RQInput
+          onBlur={() => {
+            if (offset === "") {
+              setOffset("00:00");
+            }
+          }}
           disabled={!isChecked}
           value={offset}
           onChange={handleOffsetChange}
