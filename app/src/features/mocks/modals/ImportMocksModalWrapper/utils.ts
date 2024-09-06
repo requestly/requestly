@@ -1,4 +1,4 @@
-import { MockRecordType, RQMockCollection, RQMockSchema } from "components/features/mocksV2/types";
+import { MockRecordType, RQMockSchema } from "components/features/mocksV2/types";
 import { isCollection } from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
 
 export const processMocksToImport = (uid: string, parsedRecords: RQMockSchema[]) => {
@@ -7,15 +7,7 @@ export const processMocksToImport = (uid: string, parsedRecords: RQMockSchema[])
   });
 
   if (!isValidRecords) {
-    return {
-      records: [],
-      mocks: [],
-      collections: [],
-      mocksCount: 0,
-      collectionsCount: 0,
-      mockTypeToImport: null,
-      success: false,
-    };
+    throw new Error("Invalid records!");
   }
 
   const mocks: RQMockSchema[] = [];
@@ -27,7 +19,6 @@ export const processMocksToImport = (uid: string, parsedRecords: RQMockSchema[])
     record.ownerId = uid || null;
 
     if (isCollection(record)) {
-      ((record as unknown) as RQMockCollection).children = [];
       collections.push(record);
     } else {
       mocks.push(record);
