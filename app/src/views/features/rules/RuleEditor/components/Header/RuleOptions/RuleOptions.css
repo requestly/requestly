@@ -7,6 +7,9 @@
   background-color: var(--component-dark-background);
   border: 1px solid transparent;
   transition: border 0.3s;
+  display: block;
+  line-height: 1rem;
+  flex-shrink: 0;
 }
 
 .editor-rule-options-trigger.editor-rule-options-active {
