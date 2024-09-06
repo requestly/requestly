@@ -7,5 +7,3 @@ export { MockUploaderModalWrapper } from "./MockUploaderModalWrapper";
 export { NewFileModalWrapper } from "./NewFileModalWrapper";
 export { NewFileModal } from "./NewFileModalWrapper/NewFileModal";
 export { MockUploaderModal } from "./MockUploaderModalWrapper/MockUploaderModal";
-export { ExportMocksModalWrapper } from "./ExportMocksModalWrapper";
-export { ImportMocksModalWrapper } from "./ImportMocksModalWrapper";

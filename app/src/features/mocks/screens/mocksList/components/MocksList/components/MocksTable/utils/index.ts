@@ -1,11 +1,11 @@
 import { MockRecordType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { MockTableRecord } from "../types";
 
-export const isMock = (record: RQMockMetadataSchema) => {
+export const isRecordMock = (record: RQMockMetadataSchema) => {
   return !record.recordType || record.recordType === MockRecordType.MOCK;
 };
 
-export const isCollection = (record: RQMockMetadataSchema) => {
+export const isRecordMockCollection = (record: RQMockMetadataSchema) => {
   return record.recordType === MockRecordType.COLLECTION;
 };
 
@@ -26,9 +26,9 @@ export const enhanceRecords = (
     if (record.collectionId && !enhancedRecordsMap[record.collectionId]) {
       enhancedRecordsMap[record.collectionId] = allRecordsMap[record.collectionId];
     } // Add all the child mocks if collection
-    else if (isCollection(record)) {
+    else if (isRecordMockCollection(record)) {
       Object.values(allRecordsMap)
-        .filter((mockRecord) => isMock(mockRecord) && record.id === mockRecord.collectionId)
+        .filter((mockRecord) => isRecordMock(mockRecord) && record.id === mockRecord.collectionId)
         .forEach((record) => {
           enhancedRecordsMap[record.id] = record;
         });
@@ -44,7 +44,7 @@ export const recordsToContentTableDataAdapter = (records: RQMockMetadataSchema[]
   } = {};
 
   records.forEach((record) => {
-    if (isCollection(record)) {
+    if (isRecordMockCollection(record)) {
       mockCollections[record.id] = { ...record, children: [] };
     }
   });
@@ -56,7 +56,7 @@ export const recordsToContentTableDataAdapter = (records: RQMockMetadataSchema[]
       if (mockCollections[record.collectionId]) {
         mockCollections[record.collectionId].children.push(record);
       }
-    } else if (!isCollection(record)) {
+    } else if (!isRecordMockCollection(record)) {
       otherRecords.push(record);
     }
   });
@@ -70,7 +70,7 @@ export const recordsToContentTableDataAdapter = (records: RQMockMetadataSchema[]
 };
 
 export const normalizeRecord = (tableRecord: MockTableRecord): RQMockMetadataSchema => {
-  if (isCollection(tableRecord)) {
+  if (isRecordMockCollection(tableRecord)) {
     const _tableRecord = {
       ...tableRecord,
     };
