@@ -225,7 +225,16 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
 
   useEffect(() => {
     if (startFromOffset && player) {
-      player.goto(0 + Number(startFromOffset) * 1000);
+      const checkIsOffsetValid = () => {
+        if (isNaN(Number(startFromOffset)) || Number(startFromOffset) < 0) {
+          return false;
+        }
+        return true;
+      };
+
+      if (checkIsOffsetValid()) {
+        player.goto(0 + Number(startFromOffset) * 1000);
+      }
     }
   }, [startFromOffset, player, startTime]);
 
