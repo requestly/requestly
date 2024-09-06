@@ -4,13 +4,24 @@ import { collection, doc, deleteField, getFirestore, setDoc, updateDoc } from "f
 import { createFile } from "services/firebaseStorageService";
 import { createResponseBodyFilepath } from "./utils";
 
-export const updateUserMockSelectorsMap = async (ownerId: string, mockId: string, mockData: RQMockSchema) => {
+export const updateUserMockSelectorsMap = async (
+  ownerId: string,
+  mockId: string,
+  mockData: RQMockSchema,
+  collectionId?: string,
+  collectionPath?: string
+) => {
   const db = getFirestore(firebaseApp);
 
-  const selectorData = {
+  const selectorData: Record<string, string> = {
     endpoint: mockData.endpoint,
     method: mockData.method,
   };
+
+  if (collectionId) {
+    selectorData.collectionId = collectionId;
+    selectorData.collectionPath = collectionPath || "";
+  }
 
   const rootUserMocksMetadataRef = collection(db, "user-mocks-metadata");
   const rootUserDocRef = doc(rootUserMocksMetadataRef, ownerId);
