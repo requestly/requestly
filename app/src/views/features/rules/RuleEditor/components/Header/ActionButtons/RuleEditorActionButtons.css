@@ -6,6 +6,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  width: min-content;
 }
 
 .rule-header-share-btn-icon {
