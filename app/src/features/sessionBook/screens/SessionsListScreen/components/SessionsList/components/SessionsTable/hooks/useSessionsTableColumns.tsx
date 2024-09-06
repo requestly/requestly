@@ -109,6 +109,8 @@ export const useSessionsTableColumns = ({
     {
       title: "",
       dataIndex: "id",
+      width: 120,
+      align: "right",
       render: (id, record) => {
         return (
           <div className="sessions-table-actions">

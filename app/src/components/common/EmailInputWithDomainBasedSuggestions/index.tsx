@@ -9,7 +9,7 @@ import { MultiValue } from "react-select";
 
 interface Props {
   autoFocus?: boolean;
-  defaultValue: string;
+  defaultValue?: string;
   onChange: (emails: string[]) => void;
   transparentBackground?: boolean;
 }
