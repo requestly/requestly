@@ -21,11 +21,10 @@ import {
   withContentListTableContext,
 } from "componentsV2/ContentList";
 import { useMocksTableColumns } from "./hooks/useMocksTableColumns";
-import { enhanceRecords, isCollection, recordsToContentTableDataAdapter } from "./utils";
+import { enhanceRecords, isRecordMockCollection, recordsToContentTableDataAdapter } from "./utils";
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
-import { MdDownload } from "@react-icons/all-files/md/MdDownload";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import PATHS from "config/constants/sub/paths";
 import { trackMocksListBulkActionPerformed } from "modules/analytics/events/features/mocksV2";
@@ -105,7 +104,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     allRecordsMap,
   });
 
-  const { deleteRecordsAction, updateMocksCollectionAction, removeMocksFromCollectionAction, exportMocksAction } =
+  const { deleteRecordsAction, updateMocksCollectionAction, removeMocksFromCollectionAction } =
     useMocksActionContext() ?? {};
 
   const getBulkActionBarInfoText = useCallback((selectedRows: RQMockMetadataSchema[]) => {
@@ -113,7 +112,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     let collections = 0;
 
     selectedRows.forEach((record) => {
-      isCollection(record) ? collections++ : mocks++;
+      isRecordMockCollection(record) ? collections++ : mocks++;
     });
 
     const formatCount = (count: number, singular: string, plural: string) => {
@@ -194,7 +193,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
           onClick: (e) => {
             e.preventDefault();
 
-            if (isCollection(record)) {
+            if (isRecordMockCollection(record)) {
               return;
             }
 
@@ -236,18 +235,6 @@ export const MocksTable: React.FC<MocksTableProps> = ({
                       };
 
                       removeMocksFromCollectionAction(selectedRows, onSuccess);
-                    },
-                  },
-                  {
-                    label: "Export",
-                    icon: <MdDownload />,
-                    onClick: (selectedRows) => {
-                      const onSuccess = () => {
-                        trackMocksListBulkActionPerformed("export", mockType);
-                        clearSelectedRows();
-                      };
-
-                      exportMocksAction(selectedRows, onSuccess);
                     },
                   },
                   {
