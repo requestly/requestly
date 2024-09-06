@@ -3,8 +3,8 @@ import { MockType, RQMockCollection, RQMockMetadataSchema } from "components/fea
 import { useMocksModalsContext } from "features/mocks/contexts/modals";
 import { UpdateMocksCollectionModal } from "./UpdateMocksCollectionModal";
 import {
-  isMock,
-  isCollection,
+  isRecordMock,
+  isRecordMockCollection,
 } from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
 
 export const UpdateMocksCollectionModalWrapper: React.FC<{
@@ -20,7 +20,7 @@ export const UpdateMocksCollectionModalWrapper: React.FC<{
 
   useEffect(() => {
     const openModal = (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
-      const mocks = records.filter(isMock);
+      const mocks = records.filter(isRecordMock);
       setMocksToBeUpdated(mocks);
       setOnSuccess(() => onSuccess);
       setIsVisible(true);
@@ -34,7 +34,7 @@ export const UpdateMocksCollectionModalWrapper: React.FC<{
     setMocksToBeUpdated([]);
   };
 
-  const collections = (mocks.filter((mock) => isCollection(mock)) as unknown) as RQMockCollection[];
+  const collections = (mocks.filter((mock) => isRecordMockCollection(mock)) as unknown) as RQMockCollection[];
 
   return isVisible ? (
     <UpdateMocksCollectionModal

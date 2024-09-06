@@ -14,14 +14,13 @@ import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOut
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { MdOutlineDriveFileMove } from "@react-icons/all-files/md/MdOutlineDriveFileMove";
 import { MdOutlineRemoveCircleOutline } from "@react-icons/all-files/md/MdOutlineRemoveCircleOutline";
-import { MdDownload } from "@react-icons/all-files/md/MdDownload";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RQButton } from "lib/design-system/components";
 import { MocksTableProps } from "../MocksTable";
-import { isMock, isCollection } from "../utils";
+import { isRecordMock, isRecordMockCollection } from "../utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
 import PATHS from "config/constants/sub/paths";
@@ -50,7 +49,6 @@ export const useMocksTableColumns = ({
     updateMocksCollectionAction,
     toggleMockStarAction,
     removeMocksFromCollectionAction,
-    exportMocksAction,
   } = useMocksActionContext() ?? {};
 
   const columns: ContentListTableProps<RQMockSchema>["columns"] = [
@@ -82,9 +80,10 @@ export const useMocksTableColumns = ({
       ellipsis: true,
       width: isWorkspaceMode ? (isOpenedInRuleEditor ? 110 : 290) : isOpenedInRuleEditor ? 290 : 360,
       render: (_: any, record: RQMockSchema) => {
+        const isCollection = isRecordMockCollection(record);
         const collectionPath = ((record as unknown) as RQMockCollection)?.path ?? "";
 
-        return isCollection(record) ? (
+        return isCollection ? (
           <div className="mock-collection-details-container">
             <span className="collection-icon">
               <MdOutlineFolder />
@@ -133,7 +132,7 @@ export const useMocksTableColumns = ({
                 e.preventDefault();
                 e.stopPropagation();
 
-                if (!isCollection(record)) {
+                if (!isRecordMockCollection(record)) {
                   handleNameClick(record.id, record.isOldMock);
                 }
               }}
@@ -212,7 +211,7 @@ export const useMocksTableColumns = ({
       width: isWorkspaceMode ? (isOpenedInRuleEditor ? 50 : 90) : 90,
       render: (_: any, record: RQMockSchema) => {
         const collectionPath =
-          isMock(record) && record.collectionId
+          isRecordMock(record) && record.collectionId
             ? ((allRecordsMap[record.collectionId] as unknown) as RQMockCollection).path
             : "";
 
@@ -231,19 +230,6 @@ export const useMocksTableColumns = ({
           },
           {
             key: 1,
-            disabled: ((record as unknown) as RQMockCollection)?.children?.length === 0,
-            onClick: (info) => {
-              info.domEvent?.stopPropagation?.();
-              exportMocksAction([record]);
-            },
-            label: (
-              <div className="mock-action">
-                <MdDownload /> Export
-              </div>
-            ),
-          },
-          {
-            key: 2,
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
@@ -327,18 +313,6 @@ export const useMocksTableColumns = ({
           },
           {
             key: 4,
-            onClick: (info) => {
-              info.domEvent?.stopPropagation?.();
-              exportMocksAction([record]);
-            },
-            label: (
-              <div className="mock-action">
-                <MdDownload /> Export
-              </div>
-            ),
-          },
-          {
-            key: 5,
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
@@ -356,7 +330,7 @@ export const useMocksTableColumns = ({
         const updatedMockActions = mockActions.filter((action) => (record.collectionId ? true : action.key !== 3));
 
         return handleSelectAction ? (
-          isCollection(record) ? null : (
+          isRecordMockCollection(record) ? null : (
             <RQButton
               size="small"
               type="primary"
@@ -384,7 +358,7 @@ export const useMocksTableColumns = ({
           )
         ) : (
           <Dropdown
-            menu={{ items: isCollection(record) ? collectionActions : updatedMockActions }}
+            menu={{ items: isRecordMockCollection(record) ? collectionActions : updatedMockActions }}
             trigger={["click"]}
             overlayClassName="mocks-more-actions-dropdown"
           >
