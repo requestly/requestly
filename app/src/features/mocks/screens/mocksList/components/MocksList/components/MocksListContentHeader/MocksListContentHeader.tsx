@@ -15,7 +15,8 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails } from "store/selectors";
 import { MdOutlineCreateNewFolder } from "@react-icons/all-files/md/MdOutlineCreateNewFolder";
 import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOutline";
-import { isRecordMock } from "../MocksTable/utils";
+import { LuImport } from "@react-icons/all-files/lu/LuImport";
+import { isMock } from "../MocksTable/utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
@@ -28,8 +29,10 @@ interface Props {
   mockRecords?: RQMockMetadataSchema[];
   searchValue?: string;
   setSearchValue?: (s: string) => void;
+  forceRender?: () => void;
   filter?: MockTableHeaderFilter;
   handleCreateNewMockFromPickerModal?: () => void;
+  handleImportMocksClick?: (mockType: MockType) => void;
 }
 
 export const MocksListContentHeader: React.FC<Props> = ({
@@ -44,7 +47,8 @@ export const MocksListContentHeader: React.FC<Props> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const { pathname } = useLocation();
-  const { createNewCollectionAction, uploadMockAction, createNewMockAction } = useMocksActionContext() ?? {};
+  const { createNewCollectionAction, uploadMockAction, createNewMockAction, importMocksAction } =
+    useMocksActionContext() ?? {};
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const actionbuttonsData = [
@@ -58,6 +62,23 @@ export const MocksListContentHeader: React.FC<Props> = ({
       authPopover: {
         title: "You need to sign up to upload mocks",
         callback: () => uploadMockAction(mockType),
+        source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
+      },
+    },
+    {
+      hide: isRuleEditor,
+      type: "default" as ButtonProps["type"],
+      icon: <LuImport className="anticon" />,
+      buttonText: "Import",
+      onClickHandler: () => {
+        if (user?.details?.isLoggedIn) {
+          importMocksAction(mockType, SOURCE.MOCKS_LIST);
+        }
+      },
+      isAuthRequired: true,
+      authPopover: {
+        title: "You need to sign up to import mocks!",
+        callback: () => importMocksAction(mockType, SOURCE.MOCKS_LIST),
         source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
       },
     },
@@ -149,7 +170,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
           <div className="label">
             All{" "}
             {records?.length ? (
-              <Badge count={records?.filter((record) => isRecordMock(record)).length} overflowCount={20} />
+              <Badge count={records?.filter((record) => isMock(record)).length} overflowCount={20} />
             ) : null}
           </div>
         ),
@@ -164,7 +185,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
             {mockRecords?.length ? (
               <Badge
                 overflowCount={20}
-                count={mockRecords?.filter((record) => isRecordMock(record) && record.isFavourite).length}
+                count={mockRecords?.filter((record) => isMock(record) && record.isFavourite).length}
               />
             ) : null}
           </div>
