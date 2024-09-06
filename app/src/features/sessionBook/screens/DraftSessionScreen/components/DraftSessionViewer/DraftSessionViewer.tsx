@@ -106,10 +106,10 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
         </div>
         <div className="draft-session-viewer-body-wrapper">
           <Row className="draft-session-viewer-body" gutter={8} justify="space-between">
-            <Col span={16}>
+            <Col span={15}>
               <SessionPlayer onPlayerTimeOffsetChange={setSessionPlayerOffset} />
             </Col>
-            <Col span={8}>
+            <Col span={9}>
               <DraftSessionDetailsPanel playerTimeOffset={sessionPlayerOffset} />
             </Col>
           </Row>

@@ -83,6 +83,7 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
       events: {
         [RQSessionEventType.RRWEB]: finalTrimmedRRWebEvents,
         [RQSessionEventType.NETWORK]: trimmedNetworkLogs,
+        [RQSessionEventType.STORAGE]: events[RQSessionEventType.STORAGE],
       },
     };
   }, [startTime, endTime, events, sessionStartTime]);

@@ -78,6 +78,9 @@ export const getSessionEventsToSave = (sessionEvents: RQSessionEvents, options: 
   const filteredSessionEvents: RQSessionEvents = {
     [RQSessionEventType.RRWEB]: sessionEvents[RQSessionEventType.RRWEB],
     [RQSessionEventType.NETWORK]: sessionEvents[RQSessionEventType.NETWORK],
+    // TODO: Remove the 'storage' literal key once the SDK is updated
+    // [RQSessionEventType.STORAGE]: sessionEvents[RQSessionEventType.STORAGE],
+    storage: sessionEvents["storage"],
   };
 
   if (options.includeNetworkLogs === false) {
