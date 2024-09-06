@@ -14,7 +14,6 @@ import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import {
-  trackMockImportClicked,
   trackMockStarToggledEvent,
   trackMockUploadWorkflowStarted,
   trackNewMockButtonClicked,
@@ -22,7 +21,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { redirectToMockEditorCreateMock } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
-import { isMock, isCollection } from "../screens/mocksList/components/MocksList/components/MocksTable/utils";
+import { isRecordMock } from "../screens/mocksList/components/MocksList/components/MocksTable/utils";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH } from "../constants";
 
@@ -37,8 +36,6 @@ type MocksActionContextType = {
   createNewFileAction: () => void;
   createNewMockAction: (mockType: MockType, source: MockListSource, collectionId?: string) => void;
   removeMocksFromCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
-  exportMocksAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
-  importMocksAction: (mockType: MockType, source: string, onSuccess?: () => void) => void;
 };
 
 const MocksActionContext = createContext<MocksActionContextType>(null);
@@ -61,8 +58,6 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     openUpdateMocksCollectionModalAction,
     openMockUploaderModalAction,
     openNewFileModalAction,
-    openShareMocksModalAction,
-    openMocksImportModalAction,
   } = useMocksModalsContext();
 
   const createNewCollectionAction = useCallback(
@@ -158,7 +153,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const removeMocksFromCollectionAction = useCallback(
     async (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
       Logger.log("[DEBUG]", "removeMocksFromCollectionAction", { records });
-      const mockIds = records.filter(isMock).map((mock) => mock.id);
+      const mockIds = records.filter(isRecordMock).map((mock) => mock.id);
 
       updateMocksCollection(uid, mockIds, DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH, teamId).then(() => {
         toast.success(`${mockIds.length > 1 ? "Mocks" : "Mock"} removed from collection!`);
@@ -166,42 +161,6 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
       });
     },
     [uid, teamId]
-  );
-
-  const exportMocksAction = useCallback(
-    async (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
-      Logger.log("[DEBUG]", "exportMocksAction", { records });
-
-      const mockIds: Record<RQMockMetadataSchema["id"], RQMockMetadataSchema> = {};
-      const collectionIds: RQMockMetadataSchema["id"][] = [];
-
-      records.forEach((record) => {
-        if (isCollection(record)) {
-          collectionIds.push(record.id);
-
-          // add all the child mocks too
-          ((record as unknown) as RQMockCollection)?.children?.forEach((mock) => {
-            mockIds[mock.id] = mock;
-          });
-        } else {
-          mockIds[record.id] = record;
-        }
-      });
-
-      const selectedRecordIds = [...Object.keys(mockIds), ...collectionIds];
-
-      openShareMocksModalAction(selectedRecordIds, onSuccess);
-    },
-    [openShareMocksModalAction]
-  );
-
-  const importMocksAction = useCallback(
-    (mockType: MockType, source: string, onSuccess?: () => void) => {
-      Logger.log("[DEBUG]", "importMocksAction", { mockType });
-      trackMockImportClicked(mockType, source);
-      openMocksImportModalAction(mockType, source, onSuccess);
-    },
-    [openMocksImportModalAction]
   );
 
   const value = {
@@ -215,8 +174,6 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     createNewFileAction,
     createNewMockAction,
     removeMocksFromCollectionAction,
-    exportMocksAction,
-    importMocksAction,
   };
 
   return <MocksActionContext.Provider value={value}>{children}</MocksActionContext.Provider>;
