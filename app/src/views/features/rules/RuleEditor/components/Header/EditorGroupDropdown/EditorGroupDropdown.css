@@ -1,3 +1,7 @@
+.editor-group-list-container {
+  flex-shrink: 0;
+}
+
 .editor-group-dropdown-trigger {
   font-size: var(--requestly-font-size-sm, 13px);
   cursor: pointer;
