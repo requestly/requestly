@@ -1,19 +1,54 @@
 import { Button, Col, Row } from "antd";
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 interface DesktopAppProxyProps {
-  handleToggleProxyStatus: () => void;
-  checkingProxyStatus: boolean;
-  isProxyApplied: boolean;
-  isProxyRunning: boolean;
+  handleToggleExtensionStatus: () => void;
 }
 
-const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({
-  handleToggleProxyStatus,
-  checkingProxyStatus,
-  isProxyApplied,
-  isProxyRunning,
-}) => {
+interface ProxyDetails {
+  proxyPort: number;
+  proxyHost: string;
+  proxyUrl: string;
+}
+
+const DESKTOP_APP_PROXY_INFO_URL = "http://127.0.0.0:7040/proxy";
+
+const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ handleToggleExtensionStatus }) => {
+  const [checkingProxyStatus, setCheckingProxyStatus] = useState(true);
+  const [isProxyApplied, setIsProxyApplied] = useState(false);
+  const [proxyDetails, setProxyDetails] = useState<ProxyDetails>(null);
+
+  const fetchProxyDetails = useCallback(async () => {
+    setCheckingProxyStatus(true);
+    fetch(DESKTOP_APP_PROXY_INFO_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("!!!debug", "proxydetails", proxyDetails);
+        setProxyDetails(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching proxy status", err);
+        setProxyDetails(null);
+      })
+      .finally(() => {
+        setCheckingProxyStatus(false);
+      });
+  }, []);
+
+  const applyProxy = () => {
+    // Apply the proxy to browser and deactivate extension
+    setIsProxyApplied(true);
+  };
+
+  const removeProxy = () => {
+    // Remove the proxy from browser and activate extension
+    setIsProxyApplied(false);
+  };
+
+  useEffect(() => {
+    fetchProxyDetails();
+  }, []);
+
   return (
     <Row>
       <Col>Connect to desktop app</Col>
@@ -21,10 +56,14 @@ const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({
         {!isProxyApplied ? (
           <Button
             onClick={() => {
-              if (!isProxyRunning) {
+              if (!proxyDetails) {
                 //Open desktop app
                 window.open("requestly://desktop");
               }
+              fetchProxyDetails().then(() => {
+                applyProxy();
+              });
+
               // Wait for desktop app to start and then fetch for proxy info
               // Apply the proxy and deactivate the extension
             }}
@@ -34,10 +73,7 @@ const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({
         ) : (
           <Button
             onClick={() => {
-              if (isProxyRunning) {
-                // Remove the proxy
-                // Activate the extension
-              }
+              removeProxy();
             }}
           >
             Disconnect
