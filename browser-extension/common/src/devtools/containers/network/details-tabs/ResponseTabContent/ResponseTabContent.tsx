@@ -1,56 +1,58 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { NetworkEvent, RuleEditorUrlFragment } from "../../../../types";
-import Editor, { loader } from "@monaco-editor/react";
 import { createRule, generateRuleName, getBaseUrl, isContentBodyEditable } from "../../../../utils";
 import { Button, Collapse, Tooltip } from "antd";
 import { SourceKey, SourceOperator } from "../../../../../types";
 import { EditOutlined } from "@ant-design/icons";
+import CodeMirror, { EditorView } from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { json } from "@codemirror/lang-json";
+import { html } from "@codemirror/lang-html";
+import { css } from "@codemirror/lang-css";
+import { markdown } from "@codemirror/lang-markdown";
+import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import "./responseTabContent.scss";
 
 interface Props {
   networkEvent: NetworkEvent;
 }
 
-enum EditorLanguage {
-  JSON = "json",
-  JAVASCRIPT = "javascript",
-  HTML = "html",
-  CSS = "css",
-}
-
-const mimeTypeToLangugageMap: { [mimeType: string]: EditorLanguage } = {
-  "application/json": EditorLanguage.JSON,
-  "text/javascript": EditorLanguage.JAVASCRIPT,
-  "application/javascript": EditorLanguage.JAVASCRIPT,
-  "text/html": EditorLanguage.HTML,
-  "text/css": EditorLanguage.CSS,
+const mimeTypeToLangugageMap: { [mimeType: string]: any } = {
+  "application/json": json(),
+  "text/javascript": javascript({ jsx: false }),
+  "application/javascript": javascript({ jsx: false }),
+  "text/html": html(),
+  "text/css": css(),
 };
 
 const getEditorLanguageFromMimeType = (mimeType: string) => {
-  let language: EditorLanguage = null;
+  const language = mimeTypeToLangugageMap[mimeType.toLowerCase().split(";")?.[0]];
 
-  if (mimeType) {
-    language = mimeTypeToLangugageMap[mimeType.toLowerCase().split(";")?.[0]];
-  }
-
-  return language || "";
+  return language || markdown();
 };
 
+const commonExtensions = [EditorView.lineWrapping];
+
 const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
-  const [response, setResponse] = useState(null);
-  const [isEditorMount, setIsEditorMount] = useState(false);
-  const [editorLangugage, setEditorLanguage] = useState("");
+  const [response, setResponse] = useState("");
+  const [editorExtensions, setEditorExtensions] = useState([...commonExtensions, markdown()]);
 
   useEffect(() => {
-    networkEvent.getContent((content, encoding) => {
-      setResponse(content || "");
-      setEditorLanguage(getEditorLanguageFromMimeType(networkEvent.response?.content?.mimeType));
+    networkEvent.getContent((content) => {
+      if (content) {
+        try {
+          setResponse(JSON.stringify(JSON.parse(content), null, 2) || "");
+        } catch (e) {
+          setResponse(content);
+        }
+      } else {
+        setResponse("");
+      }
+
+      const language = getEditorLanguageFromMimeType(networkEvent.response?.content?.mimeType);
+      setEditorExtensions([...commonExtensions, language]);
     });
-  }, [networkEvent, setResponse, setEditorLanguage]);
-
-  useEffect(() => {
-    loader.init().then((module) => module && setIsEditorMount(true));
-  }, []);
+  }, [networkEvent]);
 
   const editResponseBody = useCallback(() => {
     createRule(
@@ -111,27 +113,17 @@ const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
           extra={renderEditResponseBodyButton()}
         ></Collapse.Panel>
       </Collapse>
-      {isEditorMount && (
-        <Editor
-          theme={"vs-dark"}
-          language={editorLangugage}
-          value={response}
-          height={"95%"}
-          options={{
-            scrollbar: {
-              alwaysConsumeMouseWheel: false,
-            },
-            minimap: {
-              enabled: false,
-            },
-            readOnly: true,
-            unicodeHighlight: {
-              ambiguousCharacters: false,
-            },
-            wordWrap: "on",
-          }}
-        />
-      )}
+      <CodeMirror
+        basicSetup={{
+          lineNumbers: true,
+          syntaxHighlighting: true,
+        }}
+        theme={vscodeDark}
+        value={response}
+        height="95%"
+        extensions={editorExtensions}
+        readOnly
+      />
     </div>
   );
 };
