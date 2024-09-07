@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import { ConfigProvider, Tabs, theme } from "antd";
 import { ThemeProvider } from "@devtools-ds/themes";
 import NetworkContainer from "./containers/network/NetworkContainer";
 import ExecutionsContainer from "./containers/executions/ExecutionsContainer";
 import { ColorScheme } from "./types";
-import { getCurrentColorScheme, isExtensionManifestV3, onColorSchemeChange } from "./utils";
+import { getCurrentColorScheme, onColorSchemeChange } from "./utils";
 import useLocalStorageState from "./hooks/useLocalStorageState";
 import "./index.scss";
 import { EVENT, sendEvent } from "./events";
@@ -44,40 +44,34 @@ const App: React.FC = () => {
     return { token, algorithm };
   }, [colorScheme]);
 
-  const isManifestV3 = useMemo(isExtensionManifestV3, []);
-
   return (
     <ConfigProvider theme={antDesignTheme}>
       <ThemeProvider theme={"chrome"} colorScheme={colorScheme}>
-        {isManifestV3 ? (
-          <NetworkContainer />
-        ) : (
-          <Tabs
-            className="devtools-tabs"
-            activeKey={selectedTab}
-            onChange={setSelectedTab}
-            tabPosition="left"
-            tabBarStyle={{ minWidth: 150 }}
-            tabBarGutter={0}
-            items={[
-              {
-                label: "Network Traffic",
-                key: DevtoolsTabKeys.NETWORK,
-                children: <NetworkContainer />,
-                forceRender: true,
-              },
-              {
-                label: "Rule Executions",
-                key: DevtoolsTabKeys.EXECUTIONS,
-                children: <ExecutionsContainer />,
-                forceRender: true,
-              },
-            ]}
-          />
-        )}
+        <Tabs
+          className="devtools-tabs"
+          activeKey={selectedTab}
+          onChange={setSelectedTab}
+          tabPosition="left"
+          tabBarStyle={{ minWidth: 150 }}
+          tabBarGutter={0}
+          items={[
+            {
+              label: "Network Traffic",
+              key: DevtoolsTabKeys.NETWORK,
+              children: <NetworkContainer />,
+              forceRender: true,
+            },
+            {
+              label: "Rule Executions",
+              key: DevtoolsTabKeys.EXECUTIONS,
+              children: <ExecutionsContainer />,
+              forceRender: true,
+            },
+          ]}
+        />
       </ThemeProvider>
     </ConfigProvider>
   );
 };
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);

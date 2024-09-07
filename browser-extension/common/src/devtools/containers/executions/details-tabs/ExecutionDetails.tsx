@@ -20,7 +20,7 @@ const ExecutionDetails: React.FC<Props> = ({ execution }) => {
           </a>
         }
       />
-      <PropertyRow name="Modification" value={execution.modification} />
+      {/* <PropertyRow name="Modification" value={execution.modification} /> */}
     </div>
   );
 };

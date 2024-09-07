@@ -47,6 +47,8 @@ export const applyScriptRules = async (tabId: number, frameId: number, url: stri
       ruleExecutionHandler.onRuleExecuted(rule, {
         url: url,
         tabId: tabId,
+        method: "GET",
+        type: frameId === 0 ? ResourceType.MainDocument : ResourceType.IFrameDocument,
       } as chrome.webRequest.WebRequestDetails);
     });
   }
