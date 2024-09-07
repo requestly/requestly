@@ -17,8 +17,10 @@ const WOLFSAFE_BLUE = "#03a9f4";
 
 interface APISecurityLandingProps {}
 
-const trackAPISecurityLandingPageViewed = () => {
+const trackAPISecurityLandingPageViewed = (forwardToApollo: Boolean) => {
   trackEvent(API_SECURITY_TESTING.API_SECURITY_TESTING_LANDING_PAGE_VIEWED);
+  if (!forwardToApollo) return;
+
   const captureWolfSafeInterest = httpsCallable(getFunctions(), "wolfsafe-captureWolfSafeInterest");
   try {
     captureWolfSafeInterest({});
@@ -101,7 +103,7 @@ export const APISecurityLanding: React.FC<APISecurityLandingProps> = () => {
   };
 
   useEffect(() => {
-    trackAPISecurityLandingPageViewed();
+    trackAPISecurityLandingPageViewed(isUserLoggedIn);
   }, []);
 
   return (
