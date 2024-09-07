@@ -3,10 +3,11 @@ import extensionIconManager from "./extensionIconManager";
 import { DataScope, TAB_SERVICE_DATA, tabService } from "./tabService";
 import rulesStorageService from "../../rulesStorageService";
 import { CLIENT_MESSAGES } from "common/constants";
+import { sendLogToDevtools } from "./devtools";
 
 interface RulesExecutionLog {
   ruleId: string;
-  requestDetails: chrome.webRequest.WebRequestDetails | chrome.webRequest.WebResponseDetails;
+  requestDetails: chrome.webRequest.WebRequestDetails;
 }
 
 class RuleExecutionHandler {
@@ -34,22 +35,25 @@ class RuleExecutionHandler {
     return appliedRules;
   };
 
-  processTabCachedRulesExecutions = (tabId: number) => {
+  processTabCachedRulesExecutions = async (tabId: number) => {
     const rulesExecutionLogs: RulesExecutionLog[] =
       tabService.getData(tabId, TAB_SERVICE_DATA.RULES_EXECUTION_LOGS, []) || [];
 
+    const uniqueAppliedRuleIds = Array.from(new Set(rulesExecutionLogs.map((executionLog) => executionLog.ruleId)));
+
+    const appliedRules = (await rulesStorageService.getRules(uniqueAppliedRuleIds)).reduce((acc, rule) => {
+      acc[rule.id] = rule;
+      return acc;
+    }, {} as Record<string, Rule>);
+
     rulesExecutionLogs.forEach((executionLog) => {
-      this.onRuleExecuted({ id: executionLog.ruleId } as Rule, executionLog.requestDetails);
+      this.onRuleExecuted(appliedRules[executionLog.ruleId] as Rule, executionLog.requestDetails);
     });
 
     tabService.removeData(tabId, TAB_SERVICE_DATA.RULES_EXECUTION_LOGS);
   };
 
-  onRuleExecuted = (
-    rule: Rule,
-    requestDetails: chrome.webRequest.WebRequestDetails | chrome.webRequest.WebResponseDetails,
-    isMainFrameRequest?: boolean
-  ) => {
+  onRuleExecuted = (rule: Rule, requestDetails: chrome.webRequest.WebRequestDetails, isMainFrameRequest?: boolean) => {
     const tabDataScope = isMainFrameRequest ? DataScope.TAB : DataScope.PAGE;
 
     extensionIconManager.markRuleExecuted(requestDetails.tabId);
@@ -58,6 +62,8 @@ class RuleExecutionHandler {
       action: CLIENT_MESSAGES.NOTIFY_RULE_EXECUTED,
       rule,
     });
+
+    sendLogToDevtools(rule, requestDetails);
 
     const rulesExecutionLogs: RulesExecutionLog[] =
       tabService.getDataForScope(tabDataScope, requestDetails.tabId, TAB_SERVICE_DATA.RULES_EXECUTION_LOGS, []) || [];
