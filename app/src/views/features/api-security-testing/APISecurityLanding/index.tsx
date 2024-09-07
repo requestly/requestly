@@ -17,8 +17,16 @@ const WOLFSAFE_BLUE = "#03a9f4";
 
 interface APISecurityLandingProps {}
 
-const trackAPISecurityLandingPageViewed = () =>
+const trackAPISecurityLandingPageViewed = () => {
   trackEvent(API_SECURITY_TESTING.API_SECURITY_TESTING_LANDING_PAGE_VIEWED);
+  const captureWolfSafeInterest = httpsCallable(getFunctions(), "wolfsafe-captureWolfSafeInterest");
+  try {
+    captureWolfSafeInterest({});
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const trackAPISecurityStartPressed = () => trackEvent(API_SECURITY_TESTING.API_SECURITY_TESTING_START_PRESSED);
 
 export const APISecurityLanding: React.FC<APISecurityLandingProps> = () => {
