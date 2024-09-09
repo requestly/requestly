@@ -89,11 +89,11 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
     (id: string, email: string) => {
       removeMemberFromBillingTeam(billingId, id)
         .then(() => {
-          toast.success("User removed from the billing team");
+          toast.success("License revoked for the user");
           trackBillingTeamMemberRemoved(email, billingId);
         })
         .catch(() => {
-          toast.error("Error while removing user");
+          toast.error("Error while revoking license for the user");
         })
         .finally(() => {
           setLoadingRows(loadingRows.filter((row) => row !== id));
@@ -325,7 +325,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
     <>
       <Col className="billing-teams-primary-card billing-team-members-section">
         <Row className="billing-team-members-section-header w-full" justify="space-between" align="middle">
-          <Col className="billing-team-members-section-header-title">Members in billing team</Col>
+          <Col className="billing-team-members-section-header-title">Licensed members</Col>
           <Col>
             <RQButton
               type="default"

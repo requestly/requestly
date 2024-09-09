@@ -33,8 +33,8 @@ const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
   return isTeamAdmin ? (
     <div className="billing-details-container">
       <p className="text-gray billing-subscription-info">
-        Members of this workspace are now integrated into a designated billing team.
-        <br /> Please refer to the billing team for plan details, invoices, and more.
+        Members of this workspace have now been assigned a license. Please refer to the billing team to manage license,
+        refer plan details, invoices, and more
       </p>
       <Row gutter={8} align="middle">
         <Col>
@@ -74,9 +74,9 @@ const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
               .then(() => {
                 trackWorkspaceSettingsAutomaticMappingToggleClicked(teamDetails.id, checked);
                 if (checked) {
-                  toast.success("Members will be automatically added to the billing team.");
+                  toast.success("Members will be automatically assigned a license.");
                 } else {
-                  toast.warn("Members will not be automatically added to the billing team.");
+                  toast.warn("Members will not be automatically assigned a license.");
                 }
                 setIsBillingTeamMapped(checked);
               })
@@ -85,12 +85,12 @@ const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
                 toast.error("Something went wrong. Please contact support.");
               });
           }}
-          title="Automatically include members who join this workspace in the billing team"
+          title="Automatically assign license to the members joinning this workspace"
           caption="Enable automatic inclusion in the billing team for members joining this workspace"
         />
       </Row>
       <Typography.Text className="billing-non-admin-message">
-        Premium features will be enabled for the users who are part of a billing team
+        Premium features will be enabled for the users who are assigned a license
       </Typography.Text>
     </div>
   ) : (

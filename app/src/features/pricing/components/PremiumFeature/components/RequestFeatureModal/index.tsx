@@ -82,7 +82,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
           message: (
             <>
               Billing team admins been notified.
-              <br /> Please get in touch with them for further details.
+              <br /> Please get in touch with them for approval and details.
             </>
           ),
         });

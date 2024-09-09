@@ -89,11 +89,11 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
   const getResultMessage = useCallback(() => {
     switch (reviewResult?.result?.message) {
       case ReviewResultMessage.REQUEST_APPROVED:
-        return <>{reviewResult?.result?.userName ?? "User"} has been added to the Billing Team.</>;
+        return <>{reviewResult?.result?.userName ?? "User"} has been assigned a license.</>;
       case ReviewResultMessage.REQUEST_DECLINED:
-        return <>{reviewResult?.result?.userName ?? "User"} has not been added to the Billing Team.</>;
+        return <>{reviewResult?.result?.userName ?? "User"} has not been assigned a license.</>;
       case ReviewResultMessage.EXISTING_MEMBER:
-        return <>{reviewResult?.result?.userName ?? "User"} is already a member of the Billing Team.</>;
+        return <>{reviewResult?.result?.userName ?? "User"} is already having a license.</>;
       case ReviewResultMessage.NO_ADMIN_ACCESS:
         return "Only admins or billing managers can accept/decline requests.";
       case ReviewResultMessage.NO_USER_FOUND:

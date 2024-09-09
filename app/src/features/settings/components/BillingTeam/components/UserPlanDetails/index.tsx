@@ -267,7 +267,7 @@ export const UserPlanDetails = () => {
                     <>
                       Your professional plan free trail will expire in {daysLeft} days.{" "}
                       {billingTeams.length
-                        ? "Please consider upgrading or connect directly with billing team admins already enjoying premium features."
+                        ? "Consider upgrading or reach out directly to your organization's billing team admins for a license."
                         : "Get access to premium rule types and extended rule limits"}
                     </>
                   ) : (
