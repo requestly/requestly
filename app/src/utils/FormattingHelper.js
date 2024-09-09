@@ -3,6 +3,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { PRICING } from "features/pricing";
 import { capitalize } from "lodash";
+import { isDisposableEmail } from "./AuthUtils";
 
 export const generateObjectId = () => {
   return Math.random().toString(36).substr(2, 5);
@@ -75,6 +76,11 @@ export const isCompanyEmail = (email) => {
   if (!domain) {
     return false;
   }
+
+  if (isDisposableEmail(email)) {
+    return false;
+  }
+
   return !(
     APP_CONSTANTS.EMAIL_DOMAINS.PERSONAL.includes(domain) || APP_CONSTANTS.EMAIL_DOMAINS.DESTROYABLE.includes(domain)
   );
@@ -90,7 +96,7 @@ export const getEmailType = (email) => {
     return "UNDEFINED";
   } else if (APP_CONSTANTS.EMAIL_DOMAINS.PERSONAL.includes(domain)) {
     return "PERSONAL";
-  } else if (APP_CONSTANTS.EMAIL_DOMAINS.DESTROYABLE.includes(domain)) {
+  } else if (isDisposableEmail(email)) {
     return "DESTROYABLE";
   } else if (isCompanyEmail(email)) {
     return "BUSINESS";
