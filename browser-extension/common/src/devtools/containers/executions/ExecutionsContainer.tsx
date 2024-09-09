@@ -31,9 +31,14 @@ const ExecutionsContainer: React.FC = () => {
   }, [settings]);
 
   useEffect(() => {
-    const port = chrome.runtime.connect({ name: "rq_devtools" });
+    const bgPortConnection = chrome.runtime.connect({ name: "rq_devtools" });
 
-    port.onMessage.addListener((executionEvent: ExecutionEvent) => {
+    // Send a heartbeat message to the background script every 15 seconds to keep the connection alive
+    setInterval(() => {
+      bgPortConnection.postMessage("heartbeat");
+    }, 15000);
+
+    bgPortConnection.onMessage.addListener((executionEvent: ExecutionEvent) => {
       setExecutionEvents((executionEvents) => [
         ...executionEvents,
         {
@@ -49,7 +54,7 @@ const ExecutionsContainer: React.FC = () => {
       }
     });
 
-    port.postMessage({
+    bgPortConnection.postMessage({
       action: "registerDevTool",
       tabId: chrome.devtools.inspectedWindow.tabId,
     });

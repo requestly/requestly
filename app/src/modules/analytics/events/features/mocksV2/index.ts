@@ -2,6 +2,14 @@ import { trackEvent } from "modules/analytics";
 import { MOCKSV2 } from "../constants";
 import { MockRecordType, MockTableHeaderFilter, MockType } from "components/features/mocksV2/types";
 
+interface MocksJsonParsedParams {
+  mockTypeToImport?: string;
+  source: string;
+  successful: boolean;
+  mocksCount?: number;
+  collectionsCount?: number;
+}
+
 export const trackCreateMockEvent = (
   id: string,
   type: string,
@@ -87,6 +95,29 @@ export const trackMockUploaded = (type: string) => {
 export const trackMockUploadFailed = (type: string, cause: string) => {
   const params = { type, cause };
   trackEvent(MOCKSV2.MOCK_UPLOAD_FAILED, params);
+};
+
+export const trackMocksExported = (mocksCount: number, collectionsCount: number) => {
+  const params = { mocksCount, collectionsCount };
+  trackEvent(MOCKSV2.MOCKS_EXPORTED, params);
+};
+
+export const trackMockImportClicked = (type: string, source: string) => {
+  const params = { type, source };
+  trackEvent(MOCKSV2.MOCK_IMPORT_BUTTON_CLICKED, params);
+};
+
+export const trackMocksJsonParsed = (params: MocksJsonParsedParams) => {
+  trackEvent(MOCKSV2.MOCKS_JSON_PARSED, params);
+};
+
+export const trackMocksImportFailed = (source: string) => {
+  const params = { source };
+  trackEvent(MOCKSV2.MOCKS_IMPORT_FAILED, params);
+};
+
+export const trackMocksImportCompleted = (params: Omit<MocksJsonParsedParams, "successful">) => {
+  trackEvent(MOCKSV2.MOCKS_IMPORT_COMPLETED, params);
 };
 
 export const trackTestMockClicked = () => {
