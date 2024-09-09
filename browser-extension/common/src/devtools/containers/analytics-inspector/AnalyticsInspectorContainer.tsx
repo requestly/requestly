@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ExecutionEvent, NetworkSettings, ExecutionFilters } from "../../types";
+import { NetworkEvent, NetworkSettings } from "../../types";
 // import { PrimaryToolbar, FiltersToolbar } from "./toolbars";
 import EmptyContainerPlaceholder from "../../components/EmptyContainerPlaceholder/EmptyContainerPlaceholder";
 import { ResourceTable } from "@requestly-ui/resource-table";
@@ -15,73 +15,40 @@ import getAnalyticsVendorsRegistry from "@requestly/analytics-vendors";
 const AnalyticsInspectorContainer: React.FC = () => {
   const analyticsVendorsRegistry = getAnalyticsVendorsRegistry();
 
-  // const [executionEvents, setExecutionEvents] = useState<ExecutionEvent[]>([]);
-  // const [filters, setFilters] = useState<ExecutionFilters>({
-  //   url: "",
-  //   resourceType: ResourceTypeFilterValue.ALL,
-  //   ruleName: "",
-  // });
-  // const [settings, setSettings] = useState<NetworkSettings>({
-  //   preserveLog: false,
-  // });
-  // const preserveLogRef = useRef(false);
+  const [vendorEvents, setVendorEvents] = useState<Map<string, NetworkEvent[]>>(new Map());
 
-  // const clearEvents = useCallback(() => {
-  //   setExecutionEvents([]);
-  // }, []);
+  const [settings, setSettings] = useState<NetworkSettings>({
+    preserveLog: false,
+  });
+  const preserveLogRef = useRef(false);
 
-  // useEffect(() => {
-  //   preserveLogRef.current = settings.preserveLog;
-  // }, [settings]);
+  const clearEvents = useCallback(() => {
+    setVendorEvents(new Map());
+  }, []);
 
-  // useEffect(() => {
-  //   const bgPortConnection = chrome.runtime.connect({ name: "rq_devtools" });
+  useEffect(() => {
+    chrome.devtools.network.onRequestFinished.addListener((networkEvent: NetworkEvent) => {
+      const vendor = analyticsVendorsRegistry.getInstance().getVendorByUrl(networkEvent.request.url);
 
-  //   // Send a heartbeat message to the background script every 15 seconds to keep the connection alive
-  //   setInterval(() => {
-  //     bgPortConnection.postMessage("heartbeat");
-  //   }, 15000);
+      // If there is no matching vendor for this network request, do nothing.
+      if (!vendor) return;
 
-  //   bgPortConnection.onMessage.addListener((executionEvent: ExecutionEvent) => {
-  //     setExecutionEvents((executionEvents) => [
-  //       ...executionEvents,
-  //       {
-  //         ...executionEvent,
-  //         _resourceType: getResourceType(executionEvent.requestType),
-  //       },
-  //     ]);
-  //   });
+      setVendorEvents((prev) => {
+        const existingEvents = prev.get(vendor.name) || [];
+        return new Map(prev).set(vendor.name, [...existingEvents, networkEvent]);
+      });
+    });
 
-  //   chrome.devtools.network.onNavigated.addListener(() => {
-  //     if (!preserveLogRef.current) {
-  //       clearEvents();
-  //     }
-  //   });
+    chrome.devtools.network.onNavigated.addListener(() => {
+      if (!preserveLogRef.current) {
+        //clearEvents();
+      }
+    });
+  }, [clearEvents]);
 
-  //   bgPortConnection.postMessage({
-  //     action: "registerDevTool",
-  //     tabId: chrome.devtools.inspectedWindow.tabId,
-  //   });
-  // }, [clearEvents]);
-
-  // const filterExecutions = useCallback(
-  //   (execution: ExecutionEvent): boolean => {
-  //     if (filters.url && !execution.requestURL.toLowerCase().includes(filters.url.toLowerCase())) {
-  //       return false;
-  //     }
-
-  //     if (filters.resourceType && !matchResourceTypeFilter(execution._resourceType, filters.resourceType)) {
-  //       return false;
-  //     }
-
-  //     if (filters.ruleName && !execution.rule.name.toLowerCase().includes(filters.ruleName.toLowerCase())) {
-  //       return false;
-  //     }
-
-  //     return true;
-  //   },
-  //   [filters]
-  // );
+  useEffect(() => {
+    preserveLogRef.current = settings.preserveLog;
+  }, [settings]);
 
   return (
     // <div className="executions-container">
@@ -117,7 +84,10 @@ const AnalyticsInspectorContainer: React.FC = () => {
       />
 
       <div className="analytics-inspector-container">
-        <span>{analyticsVendorsRegistry.getInstance().getVendorByUrl("api.bluecore.com/api/track/123").name}</span>
+        <span>
+          {analyticsVendorsRegistry.getInstance().getVendorByUrl("api.bluecore.com/api/track/123").name}+ '-' +
+          {vendorEvents.get("BlueCore")?.length}
+        </span>
       </div>
     </div>
   );

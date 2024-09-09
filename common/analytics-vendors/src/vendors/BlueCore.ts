@@ -8,6 +8,6 @@ export class BlueCore implements Vendor {
   urlPatterns: string[] = ["api.bluecore.com/api/track", "onsitestats.bluecore.com/events"];
 
   identify(url: string, method: string): boolean {
-    return this.urlPatterns.some((pattern) => url.includes(pattern));
+    return urlPatterns.some((pattern) => url.includes(pattern));
   }
 }
