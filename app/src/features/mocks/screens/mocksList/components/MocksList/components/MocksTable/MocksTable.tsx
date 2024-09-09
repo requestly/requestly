@@ -174,6 +174,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
       onRowDropped={onRowDropped}
       loading={isLoading}
       id="mock-list-table"
+      groupIdKey="collectionId"
       pagination={false}
       size="middle"
       rowKey="id"
