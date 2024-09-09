@@ -75,7 +75,7 @@
         background: var(--requestly-color-surface-2, #383838);
       }
 
-      &[data-drag-and-drop-target-group-active="true"] {
+      &[data-drag-and-drop-target-group-active="true"].ant-table-row-level-1 {
         background: rgb(135, 135, 135);
       }
 
