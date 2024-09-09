@@ -9,11 +9,6 @@
     border: 1px solid var(--requestly-color-white-t-10);
     border-radius: 4px;
 
-    .rq-dnd-target-row {
-      // opacity: 0.5;
-      background-color: rgba(46, 45, 45, 0.414) !important;
-    }
-
     .rq-content-list-table-header {
       th,
       &:hover th {
@@ -75,6 +70,14 @@
     .rq-content-list-table-row {
       font-size: var(--requestly-font-size-sm, 13px);
       background: var(--requestly-color-background);
+
+      &[data-drag-and-drop-target-group="true"] {
+        background: var(--requestly-color-surface-2, #383838);
+      }
+
+      &[data-drag-and-drop-target-group-active="true"] {
+        background: rgb(135, 135, 135);
+      }
 
       &.ant-table-row-level-0 {
         cursor: auto !important;

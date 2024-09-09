@@ -13,9 +13,11 @@ import "./contentListTable.scss";
 
 interface DraggableBodyRowProps<DataType> extends React.HTMLAttributes<HTMLTableRowElement> {
   index: number;
-  recordId: string;
+  groupIdKey: string;
   record: DataType;
   onRowDrop: (sourceRecord: DataType, targetRecord: DataType) => void;
+  dropTargetGroup: string;
+  setCurrentDropTargetGroup: React.Dispatch<string>;
 }
 
 const DRAGGABLE_ELEMENT_TYPE = "DraggableContentListRow";
@@ -25,42 +27,49 @@ const DraggableBodyRow = <DataType extends { [key: string]: any }>({
   onRowDrop,
   className,
   style,
-  recordId,
+  groupIdKey,
   record,
+  dropTargetGroup,
+  setCurrentDropTargetGroup,
   ...restProps
 }: DraggableBodyRowProps<DataType>) => {
   const ref = useRef<HTMLTableRowElement>(null);
+
   const [{ isOver, dropClassName }, drop] = useDrop({
     accept: DRAGGABLE_ELEMENT_TYPE,
 
     collect: (monitor) => {
-      const { recordId: dragRecordId } =
+      const { record: draggedRecord } =
         monitor.getItem<{
           index: number;
           recordId: string;
+          record: DataType;
         }>() || {};
 
-      if (recordId === dragRecordId) {
+      if (record?.id === draggedRecord?.id) {
         return {};
+      }
+
+      if (monitor.isOver()) {
+        setCurrentDropTargetGroup(record?.[groupIdKey] || record?.id);
       }
 
       return {
         isOver: monitor.isOver(),
-        dropClassName: " rq-dnd-target-row",
+        dropClassName: ` rq-dnd-target-row`,
       };
     },
 
     drop: (sourceItem: { index: number; recordId: string; record: DataType }) => {
       onRowDrop(sourceItem.record, record);
+      setCurrentDropTargetGroup(null);
     },
   });
 
   const [, drag] = useDrag({
     type: DRAGGABLE_ELEMENT_TYPE,
-    item: { index, recordId, record },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
+    item: { index, record },
+    collect: (monitor) => ({}),
   });
 
   drop(drag(ref));
@@ -68,6 +77,8 @@ const DraggableBodyRow = <DataType extends { [key: string]: any }>({
   return (
     <tr
       ref={ref}
+      data-drag-and-drop-target-group={record?.id === dropTargetGroup}
+      data-drag-and-drop-target-group-active={record?.[groupIdKey] === dropTargetGroup}
       className={`${className}${isOver ? dropClassName : ""}`}
       style={{ cursor: "move", ...style }}
       {...restProps}
@@ -82,6 +93,8 @@ export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   columns: ColumnsType<DataType>;
   data: DataType[];
   rowKey?: string; // Primary Key of the Table Row Data. Use for selection of row. Defaults to 'key'
+  /** Gives the key for the groupId in record */
+  groupIdKey?: string;
   loading?: boolean;
   customRowClassName?: (record: DataType) => string;
   bulkActionBarConfig?: BulkActionBarConfig<DataType>;
@@ -97,6 +110,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   columns,
   data,
   rowKey = "key",
+  groupIdKey = "id",
   loading = false,
   customRowClassName = (record: DataType) => "",
   bulkActionBarConfig,
@@ -112,6 +126,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
 }: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
+  const [currentDropTargetGroup, setCurrentDropTargetGroup] = useState<string>("");
   const isDragAndDropEnabled = useFeatureIsOn("content_table_drag_and_drop_support");
 
   useEffect(() => {
@@ -234,8 +249,10 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
               const attr = {
                 index,
                 onRowDrop,
-                recordId: record[rowKey],
+                groupIdKey,
                 record: record,
+                dropTargetGroup: currentDropTargetGroup,
+                setCurrentDropTargetGroup,
                 ...onRowAttr,
               };
 
