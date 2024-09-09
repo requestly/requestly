@@ -42,8 +42,8 @@ const SessionRecordingView: React.FC = () => {
       setIsRecordingSession(false);
     } else {
       sendEvent(EVENT.VIEW_RECORDING_CLICKED, { recording_mode: "auto" });
-      chrome.runtime.sendMessage({
-        action: EXTENSION_MESSAGES.WATCH_RECORDING,
+      chrome.tabs.sendMessage(currentTabId, {
+        action: CLIENT_MESSAGES.VIEW_RECORDING,
         tabId: currentTabId,
       });
     }
