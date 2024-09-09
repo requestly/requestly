@@ -316,12 +316,6 @@ const ShareRecordingModal = ({
                                 </Tag>
                               )}
                             </Row>
-                            {sessionVisibility === Visibility.PUBLIC && option.key === sessionVisibility && (
-                              <StartFromOffsetInput
-                                currentOffset={currentOffset}
-                                onOffsetChange={(offset) => setStartFromOffset(offset)}
-                              />
-                            )}
                           </Radio>
                           {sessionVisibility === option.key && (
                             <div className="share-option-description">
@@ -334,6 +328,12 @@ const ShareRecordingModal = ({
                   </Radio.Group>
                   {sessionVisibility === Visibility.CUSTOM && (
                     <div className="share-option-description">{renderRestrictedUsersList()}</div>
+                  )}
+                  {sessionVisibility !== Visibility.ONLY_ME && (
+                    <StartFromOffsetInput
+                      currentOffset={currentOffset}
+                      onOffsetChange={(offset) => setStartFromOffset(offset)}
+                    />
                   )}
                 </Col>
               </Row>
