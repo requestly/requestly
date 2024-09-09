@@ -2,8 +2,29 @@
   height: 100%;
 
   .session-storage-logs-table {
-    border: 1px solid var(--requestly-color-surface-2);
     border-radius: 4px;
+
+    &.saved-session-storage-logs-table {
+      height: calc(100% - 15px);
+    }
+
+    &.draft-session-storage-logs-table {
+      height: inherit;
+    }
+
+    .ant-spin-nested-loading,
+    .ant-spin-container,
+    .ant-table,
+    .ant-table-container,
+    .ant-table-body {
+      height: inherit;
+    }
+    .ant-table-container {
+      overflow: hidden;
+    }
+    .ant-table-body {
+      overflow-y: hidden;
+    }
   }
   th.ant-table-cell {
     background: var(--requestly-color-surface-2);
