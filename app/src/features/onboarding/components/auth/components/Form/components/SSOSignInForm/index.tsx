@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { BiArrowBack } from "@react-icons/all-files/bi/BiArrowBack";
 import { AuthFormInput } from "../AuthFormInput";
 import { RQButton } from "lib/design-system/components";
@@ -25,7 +25,9 @@ interface Props {
 export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, source }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isNoConnectionFoundCardVisible, setIsNoConnectionFoundCardVisible] = useState(false);
-  const domain = getDomainFromEmail(email);
+
+  const domain = useMemo(() => getDomainFromEmail(email), [email]);
+  const emailType = useMemo(() => getEmailType(email), [email]);
 
   const handleLoginWithSSO = useCallback(async () => {
     if (!email) {
@@ -47,8 +49,8 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
       auth_provider: AUTH_PROVIDERS.SSO,
       email,
       place: window.location.href,
-      email_type: getEmailType(email),
-      domain: getDomainFromEmail(email),
+      email_type: emailType,
+      domain: domain,
       source,
     });
 
@@ -70,7 +72,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
       });
       const captureSSOInterest = httpsCallable(getFunctions(), "auth-captureSSOInterest");
 
-      captureSSOInterest({ email })
+      captureSSOInterest({ email, isCompanyEmail: emailType === "BUSINESS" })
         .then(() => {
           Logger.log("SSO interest captured successfully");
         })
@@ -79,7 +81,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
         });
     }
     setIsLoading(false);
-  }, [email, source]);
+  }, [domain, email, emailType, source]);
 
   return (
     <>
