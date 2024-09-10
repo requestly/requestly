@@ -96,7 +96,7 @@ export const SessionStorageLogs = () => {
         dataSource={events.storage.local || []}
         columns={columns}
         pagination={false}
-        scroll={{ y: "auto" }}
+        scroll={{ y: "auto", x: "hidden" }}
       />
     </div>
   );
