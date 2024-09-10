@@ -1,5 +1,6 @@
 import React from "react";
 import { Button as AntDButton, ButtonProps as AntDButtonProps } from "antd";
+import { useHotkeys } from "react-hotkeys-hook";
 import "./Button.scss";
 
 type RQButtonSize = "small" | "default" | "large";
@@ -35,8 +36,15 @@ const CUSTOM_TO_ANTD_PROPS: {
 const BaseButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function BaseButton({ ...props }, ref) {
   const antDProps = { size: CUSTOM_TO_ANTD_PROPS.size[props.size], type: CUSTOM_TO_ANTD_PROPS.type[props.type] };
 
+  return <AntDButton ref={ref} {...props} {...antDProps} className={`rq-custom-btn ${props.className ?? ""}`} />;
+});
+
+const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(function ButtonWithHotkey(props, ref) {
+  // TODO: Fix type - hotkey callback gives keyboard event but button onClick needs mouse event
+  useHotkeys(props.hotKey, (e: any) => props.onClick(e));
+
   let children = props.children;
-  if (props.showHotKeyText && props.hotKey) {
+  if (props.showHotKeyText) {
     children = (
       <>
         {props.children}
@@ -46,19 +54,7 @@ const BaseButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function Bas
   }
 
   // TODO: Remove unrecognised props on button element (see warning console ) eg hotKey
-  return (
-    <AntDButton
-      ref={ref}
-      {...props}
-      {...antDProps}
-      children={children}
-      className={`rq-custom-btn ${props.className ?? ""}`}
-    />
-  );
-});
-
-const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(function ButtonWithHotkey(props, ref) {
-  return <BaseButton {...props} ref={ref} />;
+  return <BaseButton ref={ref} {...props} children={children} />;
 });
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(props, ref) {
