@@ -24,6 +24,7 @@
     }
     .ant-table-body {
       overflow-y: hidden;
+      height: calc(100% - 30px);
     }
   }
   th.ant-table-cell {
