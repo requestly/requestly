@@ -1,38 +1,72 @@
 import React from "react";
-import { Button as AntDButton, ButtonProps } from "antd";
+import { Button as AntDButton, ButtonProps as AntDButtonProps } from "antd";
 import "./Button.scss";
 
-interface ButtonWrapperProps extends ButtonProps {
+type RQButtonSize = "small" | "default" | "large";
+
+type RQButtonType = "primary" | "secondary" | "transparent" | "danger" | "warning";
+
+interface ButtonProps extends Omit<AntDButtonProps, "size" | "type"> {
   hotKey?: string;
+  showHotKeyText?: boolean;
+  size?: RQButtonSize;
+  type?: RQButtonType;
 }
 
-type Size = "default" | "small" | "large";
+const CUSTOM_TO_ANTD_PROPS: {
+  size: { [key in RQButtonSize]: AntDButtonProps["size"] | any };
+  type: { [key in RQButtonType]: AntDButtonProps["type"] | any };
+} = {
+  size: {
+    small: "small",
+    default: "middle",
+    large: "large",
+  },
 
-// const SIZE_NAME_TO_PIXEL: Record<Size, number> = {
-//   small: 11,
-//   default: 13,
-//   large: 15,
-// };
+  type: {
+    primary: "primary",
+    secondary: "default",
+    transparent: "ghost",
+    danger: "danger",
+    warning: "warning",
+  },
+};
 
-const BaseButtonWithForwardRef = React.forwardRef<HTMLButtonElement, ButtonWrapperProps>(
-  function BaseButtonWithForwardRef(props, ref) {
-    return <AntDButton ref={ref} className={`rq-btn custom-btn ${props.className ?? ""}`}></AntDButton>;
+const BaseButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function BaseButton({ ...props }, ref) {
+  const antDProps = { size: CUSTOM_TO_ANTD_PROPS.size[props.size], type: CUSTOM_TO_ANTD_PROPS.type[props.type] };
+
+  let children = props.children;
+  if (props.showHotKeyText && props.hotKey) {
+    children = (
+      <>
+        {props.children} {"  "}
+        {props.hotKey}
+      </>
+    );
   }
-);
 
-const ButtonWithHotkeyForwardRef = React.forwardRef<HTMLButtonElement, ButtonWrapperProps>(
-  // TODO: Check in devtool and refactor
-  function ButtonWithHotkeyForwardRef(props, ref) {
-    return <BaseButtonWithForwardRef ref={ref} />;
-  }
-);
+  // TODO: Remove unrecognised props on button element (see warning console ) eg hotKey
+  return (
+    <AntDButton
+      ref={ref}
+      {...props}
+      {...antDProps}
+      children={children}
+      className={`rq-custom-btn ${props.className ?? ""}`}
+    />
+  );
+});
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonWrapperProps>(function Button(props, ref) {
+const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(function ButtonWithHotkey(props, ref) {
+  return <BaseButton {...props} ref={ref} />;
+});
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(props, ref) {
   if (props.hotKey) {
-    return <ButtonWithHotkeyForwardRef ref={ref} {...props} />;
+    return <ButtonWithHotkey ref={ref} {...props} />;
   }
 
-  return <BaseButtonWithForwardRef ref={ref} {...props} />;
+  return <BaseButton ref={ref} {...props} />;
 });
 
 export { Button };
