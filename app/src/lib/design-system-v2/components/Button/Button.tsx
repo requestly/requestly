@@ -53,7 +53,7 @@ const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(functi
     );
   }
 
-  // TODO: Remove unrecognised props on button element (see warning console ) eg hotKey
+  // TODO: Remove unrecognised props on button element (see warning in console ) eg hotKey
   return <BaseButton ref={ref} {...props} children={children} />;
 });
 
