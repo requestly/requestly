@@ -39,8 +39,8 @@ const BaseButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function Bas
   if (props.showHotKeyText && props.hotKey) {
     children = (
       <>
-        {props.children} {"  "}
-        {props.hotKey}
+        {props.children}
+        <span className="rq-custom-btn-hotkey-text">{props.hotKey}</span>
       </>
     );
   }
