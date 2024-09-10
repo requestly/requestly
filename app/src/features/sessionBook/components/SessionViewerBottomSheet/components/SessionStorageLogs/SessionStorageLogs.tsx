@@ -77,9 +77,11 @@ export const SessionStorageLogs = () => {
         key: "oldValue",
         width: 140,
         render: (_: any, record: RQSessionEvent) => {
+          const value = record.eventType === "initialStorageValue" ? "-" : getDisplayValue(record.oldValue);
           return (
-            <div className="session-storage-log-cell">
-              {record.eventType === "initialStorageValue" ? "-" : getDisplayValue(record.oldValue)}
+            <div className="copy-value-cell session-storage-log-cell">
+              <div className="copy-value-text"> {value}</div>
+              <CopyButton copyText={value} size="small" />
             </div>
           );
         },
