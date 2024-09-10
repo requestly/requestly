@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { getSessionRecordingAttributes, getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import "./sessionStorageLogs.scss";
 import { useCallback, useMemo } from "react";
-import { StorageEventData } from "@requestly/web-sdk";
+import { RQSessionEvent } from "@requestly/web-sdk";
 import { Table } from "antd";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import CopyButton from "components/misc/CopyButton";
@@ -28,7 +28,7 @@ export const SessionStorageLogs = () => {
   };
 
   const getOffset = useCallback(
-    (event: StorageEventData) => {
+    (event: RQSessionEvent) => {
       let offset = (new Date(Number(event.timestamp)).getTime() - attributes?.startTime) / 1000;
       offset = offset >= 0 ? offset : 0; // Sometimes offset comes out negative.
       return offset;
@@ -42,7 +42,7 @@ export const SessionStorageLogs = () => {
         title: `Time`,
         key: "time",
         width: 60,
-        render: (_: any, record: StorageEventData) => {
+        render: (_: any, record: RQSessionEvent) => {
           const offset = Math.floor(getOffset(record));
           return <div className="session-storage-log-cell">{secToMinutesAndSeconds(offset)}</div>;
         },
@@ -51,7 +51,7 @@ export const SessionStorageLogs = () => {
         title: `Key`,
         key: "key",
         width: 140,
-        render: (_: any, record: StorageEventData) => (
+        render: (_: any, record: RQSessionEvent) => (
           <div className="session-storage-log-cell text-bold">{record.key}</div>
         ),
       },
@@ -59,7 +59,7 @@ export const SessionStorageLogs = () => {
         title: `New value`,
         key: "newValue",
         width: 200,
-        render: (_: any, record: StorageEventData) => {
+        render: (_: any, record: RQSessionEvent) => {
           const value =
             record.eventType === "initialStorageValue"
               ? getDisplayValue(record.value)
@@ -76,7 +76,7 @@ export const SessionStorageLogs = () => {
         title: `Old value`,
         key: "oldValue",
         width: 140,
-        render: (_: any, record: StorageEventData) => {
+        render: (_: any, record: RQSessionEvent) => {
           return (
             <div className="session-storage-log-cell">
               {record.eventType === "initialStorageValue" ? "-" : getDisplayValue(record.oldValue)}
@@ -93,7 +93,7 @@ export const SessionStorageLogs = () => {
         className={`session-storage-logs-table ${
           isDraftSession ? "draft-session-storage-logs-table" : "saved-session-storage-logs-table"
         }`}
-        dataSource={events.storage || []}
+        dataSource={events.storage.local || []}
         columns={columns}
         pagination={false}
         scroll={{ y: "auto" }}
