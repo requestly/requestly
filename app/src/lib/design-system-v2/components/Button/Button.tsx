@@ -14,7 +14,7 @@ interface ButtonProps extends Omit<AntDButtonProps, "size" | "type"> {
   type?: RQButtonType;
 }
 
-const CUSTOM_TO_ANTD_PROPS: {
+const RQ_TO_ANTD_PROPS: {
   size: { [key in RQButtonSize]: AntDButtonProps["size"] | any };
   type: { [key in RQButtonType]: AntDButtonProps["type"] | any };
 } = {
@@ -34,9 +34,11 @@ const CUSTOM_TO_ANTD_PROPS: {
 };
 
 const BaseButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function BaseButton({ ...props }, ref) {
-  const antDProps = { size: CUSTOM_TO_ANTD_PROPS.size[props.size], type: CUSTOM_TO_ANTD_PROPS.type[props.type] };
+  const { hotKey, showHotKeyText, ...restProps } = props; // Remove unrecognised props
 
-  return <AntDButton ref={ref} {...props} {...antDProps} className={`rq-custom-btn ${props.className ?? ""}`} />;
+  const antDProps = { size: RQ_TO_ANTD_PROPS.size[props.size], type: RQ_TO_ANTD_PROPS.type[props.type] };
+
+  return <AntDButton ref={ref} {...restProps} {...antDProps} className={`rq-custom-btn ${props.className ?? ""}`} />;
 });
 
 const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(function ButtonWithHotkey(props, ref) {
@@ -53,7 +55,6 @@ const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(functi
     );
   }
 
-  // TODO: Remove unrecognised props on button element (see warning in console ) eg hotKey
   return <BaseButton ref={ref} {...props} children={children} />;
 });
 
