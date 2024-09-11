@@ -95,7 +95,7 @@ export const SessionStorageLogs = () => {
         className={`session-storage-logs-table ${
           isDraftSession ? "draft-session-storage-logs-table" : "saved-session-storage-logs-table"
         }`}
-        dataSource={events.storage.local || []}
+        dataSource={events?.storage?.local || []}
         columns={columns}
         pagination={false}
         scroll={{ y: "auto", x: "hidden" }}
