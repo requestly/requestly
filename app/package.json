@@ -56,6 +56,7 @@
     "@reduxjs/toolkit": "^1.9.0",
     "@requestly/mock-server": "0.1.6",
     "@requestly/requestly-core": "file:..",
+    "@requestly/web-sdk": "^0.15.1",
     "@sentry/react": "^7.54.0",
     "@sentry/tracing": "^7.54.0",
     "@stripe/react-stripe-js": "^2.3.0",
@@ -137,7 +138,6 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@requestly-ui/resource-table": "^0.1.8",
-    "@requestly/web-sdk": "0.15.0",
     "@types/chrome": "^0.0.217",
     "@types/file-saver": "^2.0.5",
     "@types/lodash": "^4.14.185",
