@@ -2,6 +2,7 @@
   padding: 12px 16px;
   background: var(--surface-1);
   border-radius: var(--border-radius-sm);
+  margin-bottom: 1rem;
 }
 
 .session-view-content .title {
@@ -32,7 +33,6 @@
   display: flex;
   align-items: center;
   column-gap: 4px;
-  padding-top: 4px;
 }
 
 .session-view-content .session-replay-security-msg svg {

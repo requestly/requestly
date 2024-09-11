@@ -25,6 +25,8 @@ import {
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import { isExtensionEnabled, isUrlInBlockList } from "../../utils";
 import { globalStateManager } from "./globalStateManager";
+import { applyProxy, isProxyApplied, removeProxy } from "./proxy";
+import { connectToDesktopApp, disconnectWebSocket, getProxyDetails } from "./desktopAppSocketConnection";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
   const appTabs = await getAppTabs();
@@ -150,6 +152,26 @@ export const initMessageHandler = () => {
       case EXTENSION_MESSAGES.CACHE_SHARED_STATE:
         globalStateManager.updateSharedStateInStorage(sender.tab.id, message.sharedState);
         break;
+
+      case "connectToDesktopApp":
+        connectToDesktopApp().then(sendResponse);
+        return true;
+      case "disconnectFromDesktopApp":
+        disconnectWebSocket();
+        break;
+
+      case "applyProxy":
+        getProxyDetails()
+          .then(applyProxy)
+          .then(() => sendResponse(true))
+          .catch(() => sendResponse(false));
+        return true;
+      case "removeProxy":
+        removeProxy();
+        break;
+      case "getProxyStatus":
+        isProxyApplied().then(sendResponse);
+        return true;
     }
 
     return false;

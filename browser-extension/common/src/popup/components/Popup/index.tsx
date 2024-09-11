@@ -8,7 +8,7 @@ import SessionRecordingView from "../SessionRecording/SessionRecordingView";
 import { getExtensionVersion } from "../../utils";
 import "./popup.css";
 import { BlockedExtensionView } from "../BlockedExtensionView/BlockedExtensionView";
-import DesktopAppProxy from "../DesktopAppProxy";
+import DesktopAppProxy from "../DesktopAppProxy/DesktopAppProxy";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);

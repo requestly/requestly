@@ -5,6 +5,7 @@ import { handleInstallUninstall } from "./services/installUninstall";
 import { initMessageHandler } from "./services/messageHandler";
 import { initRulesManager } from "./services/rulesManager";
 import { initWebRequestInterceptor } from "./services/webRequestInterceptor";
+import "./services/desktopAppSocketConnection";
 
 // initialize
 (async () => {
