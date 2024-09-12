@@ -34,7 +34,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
   const columns = useMemo(
     () => [
       {
-        title: `Member (${membersTableSource.length})`,
+        title: `Licensed members (${membersTableSource.length})`,
         key: "id",
         width: "80%",
         render: (_: any, record: Record<string, any>) => (
@@ -69,7 +69,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
         ),
       },
       {
-        title: <div className="text-right">Added on</div>,
+        title: <div className="text-right">Assigned on</div>,
         dataIndex: "joiningDate",
         render: (joiningDate: number) => (
           <div className="text-white text-right">
