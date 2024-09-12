@@ -1,41 +1,59 @@
 .analytics-inspector-container {
-  .vendor-event-details {
-    margin-bottom: 8px;
+  height: 100%;
+  overflow: auto;
 
-    .vendor-event-collapse {
-      margin-bottom: 6px;
+  .empty-container-placeholder {
+    padding: 1rem;
+  }
+
+  .vendor-event-details.ant-collapse {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    background-color: transparent;
+
+    .ant-collapse-header {
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+
+      .ant-collapse-header-text {
+        font-size: 12px;
+
+        .ant-typography {
+          font-size: 11px;
+        }
+      }
     }
-  }
 
-  /* log table */
-  .payload-table {
-    color: #ffffffd9;
-    background-color: #1d1d1d;
-  }
+    .ant-collapse-content {
+      background-color: transparent;
 
-  .payload-table * {
-    border: none !important;
-  }
+      .ant-collapse-content-box {
+        padding: 2px 8px;
+      }
+    }
 
-  .payload-table[class*="Table-table"]:last-child {
-    border: none !important;
-  }
+    .ant-collapse-item {
+      border: none;
+    }
 
-  .payload-table thead tr {
-    background-color: rgb(40, 42, 46);
-  }
+    .vendor-event-collapse.ant-collapse {
+      margin-bottom: 2px;
+      padding: 0;
+      background-color: transparent;
 
-  .payload-table thead tr th [class*="Table-content"] {
-    font-weight: 600;
-    letter-spacing: 0.25px;
-  }
+      .ant-collapse-header {
+        padding: 2px 8px;
 
-  .payload-table tbody tr[class*="Table-row"]:nth-child(odd) {
-    background-color: #242529;
-  }
+        .ant-collapse-header-text {
+          font-size: 12px;
 
-  .payload-table tbody tr[class*="Table-row"]:nth-child(even) {
-    color: inherit;
-    background-color: #2a2a2d;
+          .ant-typography {
+            font-size: 11px;
+          }
+        }
+      }
+    }
   }
 }
