@@ -34,7 +34,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
   const columns = useMemo(
     () => [
       {
-        title: `Member (${membersTableSource.length})`,
+        title: `Licensed members (${membersTableSource.length})`,
         key: "id",
         width: "80%",
         render: (_: any, record: Record<string, any>) => (
@@ -69,7 +69,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
         ),
       },
       {
-        title: <div className="text-right">Added on</div>,
+        title: <div className="text-right">Assigned on</div>,
         dataIndex: "joiningDate",
         render: (joiningDate: number) => (
           <div className="text-white text-right">
@@ -139,7 +139,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
 
               {!hasJoinedAnyTeam && (
                 <Col>
-                  <Tooltip title="On clicking, we'll notify the billing manager and admins to add you to the team plan.">
+                  <Tooltip title="On clicking, we'll notify the billing manager and admins to assign a license to you.">
                     <RQButton
                       className="request-billing-team-btn"
                       type="default"

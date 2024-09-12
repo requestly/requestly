@@ -50,7 +50,7 @@ export const AddMembersTableActions: React.FC<{ member: OrgMember }> = ({ member
           <Col>
             <TbChecks fontSize={14} />
           </Col>
-          <Col>{isUserAdded ? "Added" : "Invitation sent"}</Col>
+          <Col>{isUserAdded ? "Assigned" : "Invitation sent"}</Col>
         </Row>
       ) : (
         <>
@@ -66,7 +66,7 @@ export const AddMembersTableActions: React.FC<{ member: OrgMember }> = ({ member
                   trackBillingTeamActionClicked("add_member");
                 }}
               >
-                Add
+                Assign
               </RQButton>
             </Row>
           )}
