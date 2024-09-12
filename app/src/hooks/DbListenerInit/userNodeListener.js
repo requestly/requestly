@@ -14,7 +14,9 @@ const userNodeListener = (dispatch, uid) => {
           getUser(uid).then((profile) => {
             dispatch(
               actions.updateUserProfile({
-                userProfile: profile ? { ...(userDetails ?? {}), displayName: profile.displayName } : userDetails,
+                userProfile: profile
+                  ? { ...(userDetails ?? {}), displayName: profile.displayName, isEmailVerified: profile.isVerified }
+                  : userDetails,
               })
             );
           });
