@@ -26,7 +26,12 @@ import ruleExecutionHandler from "./ruleExecutionHandler";
 import { isExtensionEnabled, isUrlInBlockList } from "../../utils";
 import { globalStateManager } from "./globalStateManager";
 import { applyProxy, isProxyApplied, removeProxy } from "./proxy";
-import { connectToDesktopApp, disconnectWebSocket, getProxyDetails } from "./desktopAppSocketConnection";
+import {
+  checkIfDesktopAppOpen,
+  connectToDesktopApp,
+  disconnectWebSocket,
+  getProxyDetails,
+} from "./desktopAppSocketConnection";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
   const appTabs = await getAppTabs();
@@ -100,7 +105,7 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS:
-        toggleExtensionStatus().then(sendResponse);
+        toggleExtensionStatus(message.newStatus).then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.WATCH_RECORDING:
@@ -171,6 +176,9 @@ export const initMessageHandler = () => {
         break;
       case "getProxyStatus":
         isProxyApplied().then(sendResponse);
+        return true;
+      case "checkIfDesktopAppOpen":
+        checkIfDesktopAppOpen().then(sendResponse);
         return true;
     }
 

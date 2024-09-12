@@ -42,8 +42,8 @@ const Popup: React.FC = () => {
       ?.then(setIsBlockedOnTab);
   }, [currentTab]);
 
-  const handleToggleExtensionStatus = useCallback(() => {
-    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS }, (updatedStatus) => {
+  const handleToggleExtensionStatus = useCallback((newStatus?: boolean) => {
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS, newStatus }, (updatedStatus) => {
       setIsExtensionEnabled(updatedStatus);
       sendEvent(EVENT.EXTENSION_STATUS_TOGGLED, {
         isEnabled: updatedStatus,
@@ -67,12 +67,15 @@ const Popup: React.FC = () => {
               <div className="popup-content">
                 {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
                 <SessionRecordingView />
-                <DesktopAppProxy handleToggleExtensionStatus={handleToggleExtensionStatus} />
               </div>
             </>
           )}
         </div>
         <div className="popup-footer">
+          <DesktopAppProxy
+            handleToggleExtensionStatus={handleToggleExtensionStatus}
+            isExtensionEnabled={isExtensionEnabled}
+          />
           <div className="extension-version">v{getExtensionVersion()}</div>
         </div>
       </div>

@@ -67,14 +67,20 @@ const handleMessage = (data: any) => {
   const message = JSON.parse(data);
   if (message.id !== chrome.runtime.id || message.source !== "desktop-app") return;
 
-  // Handle messages from desktop app
-  // switch (message.action) {
-  // }
+  switch (message.action) {
+    case "heartbeat":
+      // https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle#chrome_116
+      // Active WebSocket connections extend extension service worker lifetimes
+      break;
+  }
 };
 
 export const disconnectWebSocket = () => {
   if (socket) {
     socket.close();
+  } else {
+    // To be safe, remove proxy if socket is not open and proxy exists
+    removeProxy();
   }
 };
 
@@ -93,4 +99,10 @@ export const getProxyDetails = async (): Promise<ProxyDetails | null> => {
       console.error("!!!Error getting proxy info", error);
       return null;
     });
+};
+
+export const checkIfDesktopAppOpen = async (): Promise<boolean> => {
+  return fetch(`http://127.0.0.1:${DESKTOP_APP_SOCKET_PORT}`)
+    .then(() => true)
+    .catch(() => false);
 };

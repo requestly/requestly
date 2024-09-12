@@ -2,7 +2,6 @@
   padding: 12px 16px;
   background: var(--surface-1);
   border-radius: var(--border-radius-sm);
-  margin-bottom: 1rem;
 }
 
 .session-view-content .title {
