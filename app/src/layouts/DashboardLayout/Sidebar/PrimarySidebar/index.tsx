@@ -66,6 +66,13 @@ export const PrimarySidebar: React.FC = () => {
       },
       {
         id: 2,
+        title: "Network inspector",
+        path: PATHS.NETWORK_INSPECTOR.RELATIVE,
+        icon: <NetworkTrafficIcon />,
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
+      },
+      {
+        id: 3,
         title: "HTTP Rules",
         path: PATHS.RULES.INDEX,
         icon: <HttpRulesIcon />,
@@ -73,7 +80,7 @@ export const PrimarySidebar: React.FC = () => {
         activeColor: "var(--http-rules)",
       },
       {
-        id: 6,
+        id: 4,
         title: "API Security & Testing",
         path: PATHS.API_SECURITY_TESTING.INDEX,
         icon: (
@@ -85,7 +92,7 @@ export const PrimarySidebar: React.FC = () => {
         activeColor: "var(--session-recording)",
       },
       {
-        id: 3,
+        id: 5,
         title: "Sessions",
         path: PATHS.SESSIONS.INDEX,
         icon: (
@@ -104,7 +111,7 @@ export const PrimarySidebar: React.FC = () => {
       },
 
       {
-        id: 4,
+        id: 6,
         title: "Mock server",
         path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
@@ -112,7 +119,7 @@ export const PrimarySidebar: React.FC = () => {
         activeColor: "var(--mock-server)",
       },
       {
-        id: 5,
+        id: 7,
         title: "API client",
         path: PATHS.API_CLIENT.INDEX,
         icon: <ApiOutlined />,
@@ -122,8 +129,8 @@ export const PrimarySidebar: React.FC = () => {
     ];
 
     if (isDesktopSessionsCompatible) {
-      items[3] = {
-        id: 3,
+      items[5] = {
+        id: 5,
         title: "Desktop Sessions",
         path: PATHS.SESSIONS.DESKTOP.INDEX,
         icon: (
