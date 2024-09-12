@@ -90,10 +90,10 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
                 icon={<MdArrowBack className="billing-team-members-drawer-back-btn" />}
                 onClick={() => setIsInviteFormVisible(false)}
               />
-              Invite & add to billing team
+              Invite & assign license
             </div>
           ) : (
-            "Add members in billing team"
+            <>Assign licenses</>
           )}
         </Col>
         <Col>
