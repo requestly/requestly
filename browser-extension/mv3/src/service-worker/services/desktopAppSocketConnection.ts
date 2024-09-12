@@ -1,4 +1,5 @@
 import { ProxyDetails, removeProxy } from "./proxy";
+import { toggleExtensionStatus } from "./utils";
 
 let socket: WebSocket = null;
 
@@ -72,16 +73,25 @@ const handleMessage = (data: any) => {
       // https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle#chrome_116
       // Active WebSocket connections extend extension service worker lifetimes
       break;
+    case "disconnect-extension":
+      disconnectWebSocket();
+      break;
+    default:
+      console.log("Unknown action:", message.action);
   }
 };
 
-export const disconnectWebSocket = () => {
+export const disconnectWebSocket = async () => {
+  await sendMessage({ action: "browser_disconnected", appId: "existing-chrome", appName: "Chrome" });
   if (socket) {
     socket.close();
   } else {
     // To be safe, remove proxy if socket is not open and proxy exists
     removeProxy();
   }
+  toggleExtensionStatus(true);
+  // removeProxy().then(() => {
+  // });
 };
 
 export const getProxyDetails = async (): Promise<ProxyDetails | null> => {

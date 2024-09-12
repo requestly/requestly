@@ -202,6 +202,15 @@ const Sources = ({ isOpen, toggle, ...props }) => {
       // If URL is opened in browser instead of dekstop app
       if (!window.RQ || !window.RQ.DESKTOP) return;
 
+      if (appId.includes("existing")) {
+        window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disconnect-extension", {
+          appId,
+        }).then(() => {
+          setProcessingApps({ ...processingApps, [appId]: false });
+        });
+        return;
+      }
+
       window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("deactivate-app", {
         id: appId,
         options,

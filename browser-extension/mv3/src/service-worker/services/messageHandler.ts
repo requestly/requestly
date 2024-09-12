@@ -25,12 +25,13 @@ import {
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import { isExtensionEnabled, isUrlInBlockList } from "../../utils";
 import { globalStateManager } from "./globalStateManager";
-import { applyProxy, isProxyApplied, removeProxy } from "./proxy";
+import { applyProxy, isProxyApplied } from "./proxy";
 import {
   checkIfDesktopAppOpen,
   connectToDesktopApp,
   disconnectWebSocket,
   getProxyDetails,
+  sendMessage,
 } from "./desktopAppSocketConnection";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
@@ -168,15 +169,15 @@ export const initMessageHandler = () => {
       case "applyProxy":
         getProxyDetails()
           .then(applyProxy)
+          .then(() => sendMessage({ action: "browser_connected", appId: "existing-chrome", appName: "Chrome" }))
           .then(() => sendResponse(true))
           .catch(() => sendResponse(false));
         return true;
-      case "removeProxy":
-        removeProxy();
-        break;
+
       case "getProxyStatus":
         isProxyApplied().then(sendResponse);
         return true;
+
       case "checkIfDesktopAppOpen":
         checkIfDesktopAppOpen().then(sendResponse);
         return true;

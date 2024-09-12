@@ -13,7 +13,11 @@ import {
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // ACTIONS
 import { startBackgroundProcess, invokeAppDetectionInBackground } from "../actions/DesktopActions";
-import { trackAppDetectedEvent, trackAppDisconnectedEvent } from "modules/analytics/events/desktopApp/apps";
+import {
+  trackAppConnectedEvent,
+  trackAppDetectedEvent,
+  trackAppDisconnectedEvent,
+} from "modules/analytics/events/desktopApp/apps";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getAndUpdateInstallationDate, isDesktopMode } from "utils/Misc";
 import firebaseApp from "firebase.js";
@@ -136,6 +140,33 @@ const AppModeInitializer = () => {
                   })
                 );
                 trackProxyReStartedEvent();
+              });
+
+              window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-connected", (payload) => {
+                console.log("!!!debug", "extensionConnected", payload);
+                toast.success(`${payload.appName} browser profile connected`);
+                dispatch(
+                  actions.updateDesktopSpecificAppProperty({
+                    appId: payload.appId,
+                    property: "isActive",
+                    value: true,
+                  })
+                );
+                trackAppConnectedEvent(payload.appId);
+              });
+
+              window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-disconnected", (payload) => {
+                console.log("!!!debug", "extensionDisconnected", payload);
+
+                toast.info(`${payload.appName} browser profile disconnected`);
+                dispatch(
+                  actions.updateDesktopSpecificAppProperty({
+                    appId: payload.appId,
+                    property: "isActive",
+                    value: false,
+                  })
+                );
+                trackAppDisconnectedEvent(payload.appId);
               });
             });
           }

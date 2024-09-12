@@ -61,7 +61,7 @@ const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ handleToggleExtension
         <Row align={"middle"} justify={"space-between"}>
           <div>
             <div>
-              {!isProxyApplied ? (
+              {isProxyApplied ? (
                 <>
                   <CheckCircleOutlined className="connected-icon" /> Connected to Desktop App
                 </>
