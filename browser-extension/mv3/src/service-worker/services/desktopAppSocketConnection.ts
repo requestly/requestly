@@ -1,4 +1,4 @@
-import { ProxyDetails, removeProxy } from "./proxy";
+import { applyProxy, ProxyDetails, removeProxy } from "./proxy";
 import { toggleExtensionStatus } from "./utils";
 
 let socket: WebSocket = null;
@@ -31,13 +31,13 @@ export const connectToDesktopApp = (): Promise<boolean> => {
 
     socket.onclose = function () {
       console.log("WebSocket connection closed");
-      removeProxy();
+      disconnectExtensionAndNotifyApp();
       socket = null;
     };
   });
 };
 
-export const sendMessage = (message: Record<string, any>, awaitResponse = false) => {
+export const sendMessageToDesktopApp = (message: Record<string, any>, awaitResponse = false) => {
   return new Promise((resolve, reject) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.send(JSON.stringify({ ...message, source: "extension", id: chrome.runtime.id }));
@@ -74,15 +74,15 @@ const handleMessage = (data: any) => {
       // Active WebSocket connections extend extension service worker lifetimes
       break;
     case "disconnect-extension":
-      disconnectWebSocket();
+      disconnectExtensionAndNotifyApp();
       break;
     default:
       console.log("Unknown action:", message.action);
   }
 };
 
-export const disconnectWebSocket = async () => {
-  await sendMessage({ action: "browser_disconnected", appId: "existing-chrome", appName: "Chrome" });
+export const disconnectExtensionAndNotifyApp = async () => {
+  await sendMessageToDesktopApp({ action: "browser_disconnected", appId: getConnectedBrowserAppId() });
   if (socket) {
     socket.close();
   } else {
@@ -90,14 +90,11 @@ export const disconnectWebSocket = async () => {
     removeProxy();
   }
   toggleExtensionStatus(true);
-  // removeProxy().then(() => {
-  // });
 };
 
 export const getProxyDetails = async (): Promise<ProxyDetails | null> => {
-  return sendMessage({ action: "get_proxy" }, true)
+  return sendMessageToDesktopApp({ action: "get_proxy" }, true)
     .then((response: any) => {
-      console.log("!!!Received proxy info", response);
       const proxyPort = response.proxyPort;
       return {
         proxyPort: proxyPort,
@@ -115,4 +112,52 @@ export const checkIfDesktopAppOpen = async (): Promise<boolean> => {
   return fetch(`http://127.0.0.1:${DESKTOP_APP_SOCKET_PORT}`)
     .then(() => true)
     .catch(() => false);
+};
+
+const getConnectedBrowserAppId = () => {
+  const userAgent = navigator.userAgent?.toLowerCase();
+  //@ts-ignore
+  const userAgentData = navigator.userAgentData?.brands?.map((brand) => brand.brand);
+
+  if (!userAgent) {
+    return "existing-browser";
+  }
+
+  switch (true) {
+    case userAgent.includes("firefox"):
+      return "existing-firefox";
+    case userAgent.includes("edg/"):
+      return "existing-edge";
+    case userAgent.includes("opr") || userAgent.includes("opera"):
+      return "existing-opera";
+    //@ts-ignore
+    case navigator.brave || userAgent.includes("brave") || userAgentData.includes("Brave"):
+      return "existing-brave";
+    case userAgent.includes("chrome"):
+      if (userAgentData.includes("Google Chrome")) {
+        return "existing-chrome";
+      } else {
+        return "existing-chromium";
+      }
+    default:
+      return "existing-browser";
+  }
+};
+
+export const applyProxyAndNotifyApp = async () => {
+  try {
+    const proxyDetails = await getProxyDetails();
+    if (proxyDetails) {
+      await applyProxy(proxyDetails);
+      sendMessageToDesktopApp({
+        action: "browser_connected",
+        appId: getConnectedBrowserAppId(),
+      });
+      toggleExtensionStatus(false);
+      return true;
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
 };

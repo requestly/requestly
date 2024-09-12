@@ -66,6 +66,8 @@ const AppModeInitializer = () => {
   const hasMessageHandlersBeenSet = useRef(false);
   const hasAuthChanged = useHasChanged(user.loggedIn);
 
+  const getAppName = useCallback((appId) => appsListRef.current[appId]?.name, []);
+
   useEffect(() => {
     appsListRef.current = appsList;
   }, [appsList]);
@@ -143,8 +145,7 @@ const AppModeInitializer = () => {
               });
 
               window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-connected", (payload) => {
-                console.log("!!!debug", "extensionConnected", payload);
-                toast.success(`${payload.appName} browser profile connected`);
+                toast.success(`${getAppName(payload.appId)} profile connected`);
                 dispatch(
                   actions.updateDesktopSpecificAppProperty({
                     appId: payload.appId,
@@ -156,9 +157,7 @@ const AppModeInitializer = () => {
               });
 
               window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-disconnected", (payload) => {
-                console.log("!!!debug", "extensionDisconnected", payload);
-
-                toast.info(`${payload.appName} browser profile disconnected`);
+                toast.info(`${getAppName(payload.appId)} profile disconnected`);
                 dispatch(
                   actions.updateDesktopSpecificAppProperty({
                     appId: payload.appId,
@@ -181,7 +180,7 @@ const AppModeInitializer = () => {
         });
       }
     }
-  }, [appMode, isBackgroundProcessActive, dispatch]);
+  }, [appMode, isBackgroundProcessActive, dispatch, getAppName]);
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {

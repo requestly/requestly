@@ -72,10 +72,7 @@ const Popup: React.FC = () => {
           )}
         </div>
         <div className="popup-footer">
-          <DesktopAppProxy
-            handleToggleExtensionStatus={handleToggleExtensionStatus}
-            isExtensionEnabled={isExtensionEnabled}
-          />
+          <DesktopAppProxy />
           <div className="extension-version">v{getExtensionVersion()}</div>
         </div>
       </div>

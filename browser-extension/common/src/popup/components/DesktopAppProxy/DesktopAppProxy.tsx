@@ -4,12 +4,7 @@ import "./desktopAppProxy.scss";
 import { PrimaryActionButton } from "../common/PrimaryActionButton";
 import { CheckCircleOutlined } from "@ant-design/icons";
 
-interface DesktopAppProxyProps {
-  handleToggleExtensionStatus: (newStatus?: boolean) => void;
-  isExtensionEnabled: boolean;
-}
-
-const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ handleToggleExtensionStatus, isExtensionEnabled }) => {
+const DesktopAppProxy: React.FC = () => {
   const [isProxyApplied, setIsProxyApplied] = useState(false);
   const [isDesktopAppOpen, setIsDesktopAppOpen] = useState(false);
 
@@ -17,7 +12,6 @@ const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ handleToggleExtension
     chrome.runtime
       .sendMessage({ action: "applyProxy" })
       .then(setIsProxyApplied)
-      .then(() => handleToggleExtensionStatus(false))
       .catch(() => setIsProxyApplied(false));
   }, []);
 
@@ -27,7 +21,7 @@ const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ handleToggleExtension
       .then(() => {
         setIsProxyApplied(false);
       })
-      .then(() => handleToggleExtensionStatus(true));
+      .catch(() => setIsProxyApplied(true));
   }, []);
 
   const checkIfProxyApplied = useCallback(() => {

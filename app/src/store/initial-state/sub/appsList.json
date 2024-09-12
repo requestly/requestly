@@ -1,4 +1,16 @@
 {
+  "existing-browser": {
+    "id": "existing-browser",
+    "type": "browser",
+    "name": "Existing Browser",
+    "description": "Existing Profile",
+    "icon": "chrome.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": false
+  },
   "fresh-chrome": {
     "id": "fresh-chrome",
     "type": "browser",
@@ -100,6 +112,18 @@
     "isScanned": false,
     "isAvailable": false,
     "canLaunchWithCustomArgs": true
+  },
+  "existing-chromium": {
+    "id": "fresh-chromium",
+    "type": "browser",
+    "name": "Chromium",
+    "description": "Existing Profile",
+    "icon": "chromium.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": false
   },
   "fresh-chromium-dev": {
     "id": "fresh-chromium-dev",
