@@ -7,9 +7,9 @@ import { ApiOutlined, HomeOutlined } from "@ant-design/icons";
 import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
 import HttpRulesIcon from "assets/icons/http-rules.svg?react";
 import SessionIcon from "assets/icons/session.svg?react";
-import MockServerIcon from "assets/icons/mock-server.svg?react";
 import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
 import { PrimarySidebarLink } from "./components/PrimarySidebarLink/PrimarySidebarLink";
+import MockServerIcon from "assets/icons/mock-server.svg?react";
 import { PrimarySidebarItem } from "../type";
 import InviteButton from "./components/InviteButton/InviteButton";
 import PATHS from "config/constants/sub/paths";
@@ -39,10 +39,9 @@ export const PrimarySidebar: React.FC = () => {
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
-  const isSecondarySidebarToggleAllowed = [
-    APP_CONSTANTS.PATHS.RULES.INDEX,
-    APP_CONSTANTS.PATHS.MOCK_SERVER.INDEX,
-  ].some((path) => pathname.includes(path));
+  const isSecondarySidebarToggleAllowed = [APP_CONSTANTS.PATHS.RULES.INDEX, APP_CONSTANTS.PATHS.MOCK_SERVER.INDEX].some(
+    (path) => pathname.includes(path)
+  );
 
   const sidebarItems: PrimarySidebarItem[] = useMemo(() => {
     const showTooltipForSessionIcon = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isSavingNetworkSession;
@@ -64,6 +63,13 @@ export const PrimarySidebar: React.FC = () => {
       },
       {
         id: 2,
+        title: "Network inspector",
+        path: PATHS.NETWORK_INSPECTOR.RELATIVE,
+        icon: <NetworkTrafficIcon />,
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
+      },
+      {
+        id: 3,
         title: "HTTP Rules",
         path: PATHS.RULES.INDEX,
         icon: <HttpRulesIcon />,
@@ -83,7 +89,7 @@ export const PrimarySidebar: React.FC = () => {
       //   activeColor: "var(--session-recording)",
       // },
       {
-        id: 3,
+        id: 5,
         title: "Sessions",
         path: PATHS.SESSIONS.INDEX,
         icon: (
@@ -102,7 +108,7 @@ export const PrimarySidebar: React.FC = () => {
       },
 
       {
-        id: 4,
+        id: 6,
         title: "Mock server",
         path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
@@ -110,7 +116,7 @@ export const PrimarySidebar: React.FC = () => {
         activeColor: "var(--mock-server)",
       },
       {
-        id: 5,
+        id: 7,
         title: "API client",
         path: PATHS.API_CLIENT.INDEX,
         icon: <ApiOutlined />,
@@ -120,8 +126,8 @@ export const PrimarySidebar: React.FC = () => {
     ];
 
     if (isDesktopSessionsCompatible) {
-      items[3] = {
-        id: 3,
+      items[5] = {
+        id: 5,
         title: "Desktop Sessions",
         path: PATHS.SESSIONS.DESKTOP.INDEX,
         icon: (
