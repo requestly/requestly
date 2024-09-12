@@ -1,0 +1,41 @@
+.analytics-inspector-container {
+  .vendor-event-details {
+    margin-bottom: 8px;
+
+    .vendor-event-collapse {
+      margin-bottom: 6px;
+    }
+  }
+
+  /* log table */
+  .payload-table {
+    color: #ffffffd9;
+    background-color: #1d1d1d;
+  }
+
+  .payload-table * {
+    border: none !important;
+  }
+
+  .payload-table[class*="Table-table"]:last-child {
+    border: none !important;
+  }
+
+  .payload-table thead tr {
+    background-color: rgb(40, 42, 46);
+  }
+
+  .payload-table thead tr th [class*="Table-content"] {
+    font-weight: 600;
+    letter-spacing: 0.25px;
+  }
+
+  .payload-table tbody tr[class*="Table-row"]:nth-child(odd) {
+    background-color: #242529;
+  }
+
+  .payload-table tbody tr[class*="Table-row"]:nth-child(even) {
+    color: inherit;
+    background-color: #2a2a2d;
+  }
+}

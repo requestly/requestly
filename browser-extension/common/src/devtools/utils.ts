@@ -127,3 +127,21 @@ export const isContentBodyEditable = (networkResourceType: NetworkResourceType):
 
   return false;
 };
+
+export const getDecodedBase64Data = (key: string, postData: string) => {
+  const params = new URLSearchParams(postData);
+  const base64Data = params.get(key);
+
+  if (!base64Data) {
+    return null;
+  }
+
+  try {
+    const decodedData = atob(base64Data);
+    const parsedData = JSON.parse(decodedData);
+    return parsedData;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};

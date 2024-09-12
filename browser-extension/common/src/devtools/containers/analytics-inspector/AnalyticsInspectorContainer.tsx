@@ -7,23 +7,86 @@ import { ResourceTypeFilterValue } from "../../components/ResourceTypeFilter";
 //import executionTableColumns, { EXECUTION_TABLE_COLUMN_IDS } from "./columns";
 //import executionDetailsTabs from "./details-tabs";
 // import { getResourceType } from "./utils";
-import { getCurrentColorScheme, matchResourceTypeFilter } from "../../utils";
-// import "./executionsContainer.scss";
+import { getCurrentColorScheme, getDecodedBase64Data, matchResourceTypeFilter } from "../../utils";
+import "./analyticsInspectorContainer.scss";
 
 import getAnalyticsVendorsRegistry from "@requestly/analytics-vendors";
+import { Collapse, Typography } from "antd";
+import { Table } from "@devtools-ds/table";
+import { CaretRightOutlined } from "@ant-design/icons";
+
+const getBlurCoreEventDetails = (event: NetworkEvent) => {
+  const postData = event.request.postData;
+
+  if (!postData) {
+    return null;
+  }
+
+  if (!postData.mimeType.includes("urlencoded")) {
+    return null;
+  }
+
+  const eventDetails = getDecodedBase64Data("data", postData.text);
+  return eventDetails as Record<string, any>;
+};
+
+const VendorEvent: React.FC<{ event: NetworkEvent }> = ({ event }) => {
+  const eventDetails = getBlurCoreEventDetails(event);
+
+  if (!eventDetails) {
+    return <div>No event data found!</div>;
+  }
+
+  return (
+    <Collapse
+      bordered={false}
+      className="vendor-event-collapse"
+      expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+    >
+      <Collapse.Panel key={event.request.url} header={<Typography.Text ellipsis={{ tooltip: true }}>{eventDetails.event}</Typogr>}>
+        <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
+          <Table className="payload-table">
+            <Table.Head>
+              <Table.Row>
+                <Table.HeadCell>Key</Table.HeadCell>
+                <Table.HeadCell>Value</Table.HeadCell>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              {Object.entries(eventDetails.properties).map(([key, value], i) => {
+                return (
+                  <Table.Row key={i}>
+                    <Table.Cell>
+                      <Typography.Text ellipsis={{ tooltip: true }}>{key}</Typography.Text>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Typography.Text ellipsis={{ tooltip: true }}>{JSON.stringify(value)}</Typography.Text>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
+            </Table.Body>
+          </Table>
+        </div>
+      </Collapse.Panel>
+    </Collapse>
+  );
+};
 
 const AnalyticsInspectorContainer: React.FC = () => {
   const analyticsVendorsRegistry = getAnalyticsVendorsRegistry();
 
-  const [vendorEvents, setVendorEvents] = useState<Map<string, NetworkEvent[]>>(new Map());
+  const [vendorEvents, setVendorEvents] = useState<Record<string, NetworkEvent[]>>({});
 
   const [settings, setSettings] = useState<NetworkSettings>({
     preserveLog: false,
   });
   const preserveLogRef = useRef(false);
 
+  console.log("vendorEvents", vendorEvents);
+
   const clearEvents = useCallback(() => {
-    setVendorEvents(new Map());
+    setVendorEvents({});
   }, []);
 
   useEffect(() => {
@@ -33,9 +96,16 @@ const AnalyticsInspectorContainer: React.FC = () => {
       // If there is no matching vendor for this network request, do nothing.
       if (!vendor) return;
 
+      console.log(`${vendor.name} - event:`, networkEvent);
+
       setVendorEvents((prev) => {
-        const existingEvents = prev.get(vendor.name) || [];
-        return new Map(prev).set(vendor.name, [...existingEvents, networkEvent]);
+        const existingEvents = prev[vendor.name] || [];
+
+        if (vendor.name === "BlueCore" && networkEvent.request.method === "POST") {
+          return { ...prev, [vendor.name]: [...existingEvents, networkEvent] };
+        }
+
+        return prev;
       });
     });
 
@@ -76,19 +146,37 @@ const AnalyticsInspectorContainer: React.FC = () => {
     // </div>
 
     <div>
-      <EmptyContainerPlaceholder
-        lines={[
-          "Recording Analytics events...(Only BlueCore event supported, More vendors will be added soon)",
-          "Perform an action that triggers event.",
-        ]}
-      />
+      {Object.keys(vendorEvents).length === 0 ? (
+        <EmptyContainerPlaceholder
+          lines={[
+            "Recording Analytics events...(Only BlueCore event supported, More vendors will be added soon)",
+            "Perform an action that triggers event.",
+          ]}
+        />
+      ) : (
+        <div className="analytics-inspector-container">
+          {Object.keys(vendorEvents).map((vendor) => {
+            return (
+              <Collapse
+                bordered={false}
+                className="vendor-event-details"
+                expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+              >
+                <Collapse.Panel key={vendor} header={vendor}>
+                  {vendorEvents[vendor].map((event) => {
+                    return <VendorEvent event={event} />;
+                  })}
+                </Collapse.Panel>
+              </Collapse>
+            );
+          })}
 
-      <div className="analytics-inspector-container">
-        <span>
-          {analyticsVendorsRegistry.getInstance().getVendorByUrl("api.bluecore.com/api/track/123").name}+ '-' +
-          {vendorEvents.get("BlueCore")?.length}
-        </span>
-      </div>
+          {/* <span>
+            {analyticsVendorsRegistry.getInstance().getVendorByUrl("api.bluecore.app/api/track/123").name}+ '-' +
+            {vendorEvents["BlueCore"]?.length}
+          </span> */}
+        </div>
+      )}
     </div>
   );
 };
