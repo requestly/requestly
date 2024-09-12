@@ -19,8 +19,8 @@ export const NetworkInspectorHomeScreen: React.FC = () => {
         </div>
 
         <img
-          width={600}
-          height={300}
+          width={650}
+          height={360}
           src={networkInspectorGif}
           alt="Network inspector demo gif"
           className="network-inspector-gif"
