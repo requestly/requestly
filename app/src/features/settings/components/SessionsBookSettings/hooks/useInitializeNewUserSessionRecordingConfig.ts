@@ -29,6 +29,7 @@ export const useInitializeNewUserSessionRecordingConfig = () => {
               isActive: true,
               mode: AutoRecordingMode.ALL_PAGES,
             },
+            captureHeaders: false,
           };
 
           StorageService(appMode).saveSessionRecordingPageConfig(newUserRecordingConfig);

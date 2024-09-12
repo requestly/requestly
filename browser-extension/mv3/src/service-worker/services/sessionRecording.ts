@@ -10,11 +10,21 @@ import { isExtensionEnabled } from "../../utils";
 
 const CONFIG_STORAGE_KEY = "sessionRecordingConfig";
 
-const getSessionRecordingConfig = async (url: string): Promise<SessionRecordingConfig> => {
+interface SessionConfig {
+  recordingConfig: Exclude<SessionRecordingConfig, "captureHeaders">;
+  captureHeaders: boolean;
+}
+
+const getSessionRecordingConfig = async (url: string): Promise<SessionConfig> => {
   const sessionRecordingConfig = await getRecord<SessionRecordingConfig>(CONFIG_STORAGE_KEY);
 
+  const config: SessionConfig = {
+    recordingConfig: null,
+    captureHeaders: sessionRecordingConfig?.captureHeaders,
+  };
+
   if (!sessionRecordingConfig) {
-    return null;
+    return config;
   }
 
   let pageSources = sessionRecordingConfig?.pageSources || [];
@@ -22,7 +32,7 @@ const getSessionRecordingConfig = async (url: string): Promise<SessionRecordingC
   if (await isExtensionEnabled()) {
     if ("autoRecording" in sessionRecordingConfig) {
       if (!sessionRecordingConfig?.autoRecording.isActive) {
-        return null;
+        return config;
       } else if (sessionRecordingConfig?.autoRecording.mode === AutoRecordingMode.ALL_PAGES) {
         pageSources = [
           {
@@ -36,11 +46,12 @@ const getSessionRecordingConfig = async (url: string): Promise<SessionRecordingC
     }
 
     if (pageSources.some((pageSource) => matchSourceUrl(pageSource, url))) {
-      return sessionRecordingConfig;
+      config.recordingConfig = sessionRecordingConfig;
+      return config;
     }
   }
 
-  return null;
+  return config;
 };
 
 export const initSessionRecordingSDK = async (tabId: number, frameId: number) => {
@@ -91,8 +102,7 @@ export const stopRecording = (tabId: number, openRecording: boolean) => {
 };
 
 export const startRecordingExplicitly = async (tab: chrome.tabs.Tab, showWidget: boolean = true) => {
-  const sessionRecordingConfig = await getSessionRecordingConfig(tab.url);
-
+  const { recordingConfig: sessionRecordingConfig, captureHeaders } = await getSessionRecordingConfig(tab.url);
   const sessionRecordingDataExist = !!tabService.getData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING);
   // Auto recording is on for current tab if sessionRecordingConfig exist,
   // so forcefully start explicit recording.
@@ -100,7 +110,7 @@ export const startRecordingExplicitly = async (tab: chrome.tabs.Tab, showWidget:
     return;
   }
 
-  const sessionRecordingData = { explicit: true, showWidget };
+  const sessionRecordingData = { explicit: true, showWidget, captureHeaders };
   tabService.setData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
 
   startRecording(tab.id, sessionRecordingData);
@@ -119,11 +129,10 @@ export const launchUrlAndStartRecording = (url: string) => {
 export const handleSessionRecordingOnClientPageLoad = async (tab: chrome.tabs.Tab, frameId: number) => {
   let sessionRecordingData = tabService.getData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING);
 
+  const { recordingConfig: sessionRecordingConfig, captureHeaders } = await getSessionRecordingConfig(tab.url);
   if (!sessionRecordingData) {
-    const sessionRecordingConfig = await getSessionRecordingConfig(tab.url);
-
     if (sessionRecordingConfig) {
-      sessionRecordingData = { config: sessionRecordingConfig, url: tab.url };
+      sessionRecordingData = { config: sessionRecordingConfig, url: tab.url, captureHeaders };
       const recordingMode = sessionRecordingConfig?.autoRecording?.mode;
 
       sessionRecordingData.showWidget = recordingMode === AutoRecordingMode.CUSTOM;
@@ -136,16 +145,17 @@ export const handleSessionRecordingOnClientPageLoad = async (tab: chrome.tabs.Ta
     }
   } else if (!sessionRecordingData.explicit) {
     // stop recording if config was changed to turn off auto-recording for the session URL
-    const sessionRecordingConfig = await getSessionRecordingConfig(sessionRecordingData.url);
+    const { recordingConfig: newSessionRecordingConfig } = await getSessionRecordingConfig(sessionRecordingData.url);
 
-    if (!sessionRecordingConfig) {
+    if (!newSessionRecordingConfig) {
       stopRecording(tab.id, false);
       return;
     }
   }
 
   if (sessionRecordingData) {
-    startRecording(tab.id, sessionRecordingData).then(() => {
+    const config = { ...sessionRecordingData, captureHeaders };
+    startRecording(tab.id, config).then(() => {
       tabService.setData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING, {
         ...sessionRecordingData,
         notify: false,

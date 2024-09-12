@@ -106,6 +106,7 @@ export interface SessionRecordingConfig {
     isActive: boolean;
     mode: AutoRecordingMode;
   };
+  captureHeaders?: boolean;
   notify?: boolean;
   explicit?: boolean;
   showWidget?: boolean;

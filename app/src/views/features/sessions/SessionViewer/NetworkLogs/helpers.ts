@@ -25,9 +25,13 @@ const getRequestObject = (networkLog: NetworkLog) => {
       },
     });
   }
+  const requestHeaders = Object.keys(networkLog.requestHeaders || {}).map((key) => ({
+    name: key,
+    value: networkLog.requestHeaders[key],
+  }));
 
   return {
-    headers: [],
+    headers: requestHeaders,
     queryString,
     url: networkLog.url,
     method: networkLog.method,
@@ -42,11 +46,16 @@ const getRequestObject = (networkLog: NetworkLog) => {
 };
 
 const getResponseObject = (networkLog: NetworkLog) => {
+  const responseHeaders = Object.keys(networkLog.responseHeaders || {}).map((key) => ({
+    name: key,
+    value: networkLog.responseHeaders[key],
+  }));
+
   return {
     status: networkLog.status,
     statusText: networkLog.statusText,
     cookies: [],
-    headers: [],
+    headers: responseHeaders,
     content: {
       mimeType: networkLog.contentType,
       text: networkLog?.errors?.includes(RQNetworkEventErrorCodes.RESPONSE_TOO_LARGE)
