@@ -160,7 +160,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
           key: BillingAction.REMOVE,
           label: (
             <Popconfirm
-              title="Are you sure you want to remove this member?"
+              title="Are you sure you want to revoke this member's license?"
               onConfirm={() => handleRemoveMember(id, email, status, inviteId)}
               okText="Yes"
               cancelText="No"
@@ -350,7 +350,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
       <ActionLoadingModal
         isOpen={isLoadingModalVisible}
         onClose={() => setIsLoadingModalVisible(false)}
-        title="Removing user..."
+        title="Revoking license..."
         message="Pleae wait while we process your request"
       />
     </>
