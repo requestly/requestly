@@ -52,7 +52,7 @@ export const AddMembersTable: React.FC<AddMembersTableProps> = ({
               trackBillingTeamInviteMemberClicked("header");
             }}
           >
-            Invite people
+            Invite & assign license
           </RQButton>,
         ]}
         emptyView={

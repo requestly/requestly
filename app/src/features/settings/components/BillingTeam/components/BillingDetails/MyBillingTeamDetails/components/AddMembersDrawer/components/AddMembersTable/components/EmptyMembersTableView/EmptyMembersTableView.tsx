@@ -32,7 +32,7 @@ export const EmptyMembersTableView: React.FC<EmptyMembersTableViewProps> = ({
           trackBillingTeamInviteMemberClicked("member_not_found");
         }}
       >
-        Invite & add to billing team
+        Invite & assign license
       </RQButton>
     </div>
   );
