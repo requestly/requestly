@@ -7,13 +7,16 @@ import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 import { MdNetworkCheck } from "@react-icons/all-files/md/MdNetworkCheck";
 import { MdConnectedTv } from "@react-icons/all-files/md/MdConnectedTv";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
+import { HiOutlineDatabase } from "@react-icons/all-files/hi/HiOutlineDatabase";
 import { useLocation } from "react-router-dom";
+import { SessionStorageLogs } from "../components/SessionStorageLogs/SessionStorageLogs";
 
 const BOTTOM_SHEET_TAB_KEYS = {
   INFO: "info",
   CONSOLE: "console",
   NETWORK: "network",
   ENVIRONMENT: "environment",
+  STORAGE: "storage",
 };
 
 interface Props {
@@ -56,6 +59,16 @@ export const useSessionBottomSheetTabItems = ({ playerTimeOffset }: Props) => {
           </div>
         ),
         children: <SessionEnvironmentDetails />,
+      },
+      {
+        key: BOTTOM_SHEET_TAB_KEYS.STORAGE,
+        label: (
+          <div className="bottom-sheet-tab">
+            <HiOutlineDatabase />
+            <span>Storage</span>
+          </div>
+        ),
+        children: <SessionStorageLogs />,
       },
     ];
 

@@ -93,6 +93,7 @@ const sendStartRecordingEvent = async (sessionRecordingConfig: SessionRecordingC
     network: true,
     maxDuration: (sessionRecordingConfig.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
     previousSession: !isIFrame ? previousSession : null,
+    localStorage: true,
   });
 
   sessionRecorderState.isExplicitRecording = explicit;
