@@ -1,43 +1,34 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Row } from "antd";
-import "./desktopAppProxy.scss";
 import { PrimaryActionButton } from "../common/PrimaryActionButton";
 import { CheckCircleOutlined } from "@ant-design/icons";
+import "./desktopAppProxy.scss";
+import { EXTENSION_MESSAGES } from "../../../constants";
 
 const DesktopAppProxy: React.FC = () => {
   const [isProxyApplied, setIsProxyApplied] = useState(false);
   const [isDesktopAppOpen, setIsDesktopAppOpen] = useState(false);
 
-  const applyProxy = useCallback(() => {
+  const connectToDesktopApp = useCallback(() => {
     chrome.runtime
-      .sendMessage({ action: "applyProxy" })
+      .sendMessage({ action: EXTENSION_MESSAGES.CONNECT_TO_DESKTOP_APP })
       .then(setIsProxyApplied)
       .catch(() => setIsProxyApplied(false));
   }, []);
 
-  const removeProxy = useCallback(() => {
+  const disconnectFromDesktopApp = useCallback(() => {
     chrome.runtime
-      .sendMessage({ action: "disconnectFromDesktopApp" })
-      .then(() => {
-        setIsProxyApplied(false);
-      })
+      .sendMessage({ action: EXTENSION_MESSAGES.DISCONNECT_FROM_DESKTOP_APP })
+      .then((response) => setIsProxyApplied(!response))
       .catch(() => setIsProxyApplied(true));
   }, []);
 
   const checkIfProxyApplied = useCallback(() => {
-    chrome.runtime.sendMessage({ action: "getProxyStatus" }).then(setIsProxyApplied);
-  }, []);
-
-  const handleDesktopAppConnection = useCallback(() => {
-    chrome.runtime.sendMessage({ action: "connectToDesktopApp" }).then((connected) => {
-      if (connected) {
-        applyProxy();
-      }
-    });
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.IS_PROXY_APPLIED }).then(setIsProxyApplied);
   }, []);
 
   const checkIfDesktopAppOpen = useCallback(() => {
-    chrome.runtime.sendMessage({ action: "checkIfDesktopAppOpen" }).then(setIsDesktopAppOpen);
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_DESKTOP_APP_OPEN }).then(setIsDesktopAppOpen);
   }, []);
 
   useEffect(() => {
@@ -74,7 +65,7 @@ const DesktopAppProxy: React.FC = () => {
               <PrimaryActionButton
                 size="small"
                 onClick={() => {
-                  removeProxy();
+                  disconnectFromDesktopApp();
                 }}
                 className="disconnect-button"
               >
@@ -84,7 +75,7 @@ const DesktopAppProxy: React.FC = () => {
               <PrimaryActionButton
                 size="small"
                 onClick={() => {
-                  handleDesktopAppConnection();
+                  connectToDesktopApp();
                 }}
               >
                 Connect

@@ -325,7 +325,6 @@ const Sources = ({ isOpen, toggle, ...props }) => {
 
   const renderSources = useCallback(
     (type) => {
-      console.log("!!!debug", "applist", appsListArray);
       const sources = appsListArray.filter((app) => type === app.type);
       const renderSourceByType = {
         browser: (source) => (source.isAvailable || source.isActive ? renderSourceCard(source) : null),

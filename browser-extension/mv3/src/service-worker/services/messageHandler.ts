@@ -27,11 +27,10 @@ import { isExtensionEnabled, isUrlInBlockList } from "../../utils";
 import { globalStateManager } from "./globalStateManager";
 import { isProxyApplied } from "./proxy";
 import {
-  applyProxyAndNotifyApp,
+  connectToDesktopAppAndApplyProxy,
   checkIfDesktopAppOpen,
-  connectToDesktopApp,
-  disconnectExtensionAndNotifyApp,
-} from "./desktopAppSocketConnection";
+  disconnectFromDesktopAppAndRemoveProxy,
+} from "./desktopApp";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
   const appTabs = await getAppTabs();
@@ -158,23 +157,23 @@ export const initMessageHandler = () => {
         globalStateManager.updateSharedStateInStorage(sender.tab.id, message.sharedState);
         break;
 
-      case "connectToDesktopApp":
-        connectToDesktopApp().then(sendResponse);
+      case EXTENSION_MESSAGES.CONNECT_TO_DESKTOP_APP:
+        connectToDesktopAppAndApplyProxy()
+          .then(sendResponse)
+          .catch(() => sendResponse(false));
         return true;
 
-      case "disconnectFromDesktopApp":
-        disconnectExtensionAndNotifyApp();
-        break;
-
-      case "applyProxy":
-        applyProxyAndNotifyApp().then(sendResponse);
+      case EXTENSION_MESSAGES.DISCONNECT_FROM_DESKTOP_APP:
+        disconnectFromDesktopAppAndRemoveProxy()
+          .then(sendResponse)
+          .catch(() => sendResponse(false));
         return true;
 
-      case "getProxyStatus":
+      case EXTENSION_MESSAGES.IS_PROXY_APPLIED:
         isProxyApplied().then(sendResponse);
         return true;
 
-      case "checkIfDesktopAppOpen":
+      case EXTENSION_MESSAGES.CHECK_IF_DESKTOP_APP_OPEN:
         checkIfDesktopAppOpen().then(sendResponse);
         return true;
     }
