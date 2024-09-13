@@ -40,7 +40,7 @@ const connectToDesktopApp = (): Promise<boolean> => {
 
 const handleMessage = (data: any) => {
   const message = JSON.parse(data);
-  if (message.id !== chrome.runtime.id || message.source !== "desktop-app") return;
+  if (message.source !== "desktop-app") return;
 
   switch (message.action) {
     case "heartbeat":
@@ -58,16 +58,12 @@ const handleMessage = (data: any) => {
 export const sendMessageToDesktopApp = (message: Record<string, any>, awaitResponse = false) => {
   return new Promise((resolve, reject) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({ ...message, source: "extension", id: chrome.runtime.id }));
+      socket.send(JSON.stringify({ ...message, source: "extension" }));
 
       if (awaitResponse) {
         const handleMessage = (event: MessageEvent) => {
           const response = JSON.parse(event.data);
-          if (
-            response.id === chrome.runtime.id &&
-            response.source === "desktop-app" &&
-            response.action === message.action
-          ) {
+          if (response.source === "desktop-app" && response.action === message.action) {
             resolve(response);
             socket.removeEventListener("message", handleMessage);
           }
