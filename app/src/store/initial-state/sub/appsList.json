@@ -114,7 +114,7 @@
     "canLaunchWithCustomArgs": true
   },
   "existing-chromium": {
-    "id": "fresh-chromium",
+    "id": "existing-chromium",
     "type": "browser",
     "name": "Chromium",
     "description": "Existing Profile",

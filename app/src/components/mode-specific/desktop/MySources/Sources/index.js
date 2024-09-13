@@ -252,7 +252,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
 
   const renderChangeAppStatusBtn = useCallback(
     (appId, isScanned, isActive, isAvailable, canLaunchWithCustomArgs, options = {}) => {
-      if (!isAvailable) {
+      if (!isAvailable && !isActive) {
         return <span className="text-primary cursor-disabled">Couldn't find it on your system</span>;
       } else if (!isActive) {
         return isFeatureCompatible(FEATURES.CUSTOM_LAUNCH_OPTIONS) && canLaunchWithCustomArgs ? (
@@ -325,9 +325,10 @@ const Sources = ({ isOpen, toggle, ...props }) => {
 
   const renderSources = useCallback(
     (type) => {
+      console.log("!!!debug", "applist", appsListArray);
       const sources = appsListArray.filter((app) => type === app.type);
       const renderSourceByType = {
-        browser: (source) => (source.isAvailable ? renderSourceCard(source) : null),
+        browser: (source) => (source.isAvailable || source.isActive ? renderSourceCard(source) : null),
         mobile: (source) => renderSourceCard(source),
         terminal: (source) =>
           isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY) ? renderSourceCard(source) : null,
