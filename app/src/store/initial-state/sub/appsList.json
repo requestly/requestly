@@ -151,6 +151,7 @@
   },
   "existing-edge": {
     "id": "existing-edge",
+    "type": "browser",
     "name": "Microsoft Edge",
     "description": "Existing Profile",
     "icon": "edge.png",
@@ -248,6 +249,17 @@
     "type": "browser",
     "name": "Mozilla Firefox",
     "description": "New Profile",
+    "icon": "firefox.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "existing-firefox": {
+    "id": "existing-firefox",
+    "type": "browser",
+    "name": "Mozilla Firefox",
+    "description": "Existing Profile",
     "icon": "firefox.png",
     "isActive": false,
     "comingSoon": false,

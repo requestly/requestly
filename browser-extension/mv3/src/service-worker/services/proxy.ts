@@ -33,7 +33,7 @@ export const applyProxy = async (proxyDetails: ProxyDetails) => {
       // @ts-ignore
       ?.then(() => {})
       ?.catch((err: unknown) => {
-        console.error("!!!Error applying proxy", err);
+        console.error("Error applying proxy", err);
       })
   );
 };
@@ -49,7 +49,7 @@ export const removeProxy = async () => {
       .clear({ scope: "regular" })
       // @ts-ignore
       ?.catch((err: unknown) => {
-        console.error("!!!Error removing proxy", err);
+        console.error("Error removing proxy", err);
       })
   );
 };
@@ -57,7 +57,6 @@ export const removeProxy = async () => {
 export const isProxyApplied = async (): Promise<boolean> => {
   //@ts-ignore
   return chrome.proxy.settings.get({}).then((config) => {
-    console.log("!!!debug", "proxyConfig", config);
     if (config.levelOfControl === "controlled_by_this_extension" && config.value.mode === "fixed_servers") {
       return true;
     }

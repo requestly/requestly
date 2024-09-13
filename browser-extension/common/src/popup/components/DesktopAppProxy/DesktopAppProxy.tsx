@@ -42,52 +42,46 @@ const DesktopAppProxy: React.FC = () => {
 
   return (
     <div className="desktop-app-container">
-      {isDesktopAppOpen ? (
-        <Row align={"middle"} justify={"space-between"}>
-          <div>
-            <div>
-              {isProxyApplied ? (
-                <>
-                  <CheckCircleOutlined className="connected-icon" /> Connected to Desktop App
-                </>
-              ) : (
-                "Connect to Desktop App"
-              )}
-            </div>
-            <div className="proxy-applied-subtitle">
-              {isProxyApplied
-                ? "All the traffic from this browser profile is being intercepted."
-                : "Connect to intercept all the traffic from this browser profile."}
-            </div>
-          </div>
+      <Row align={"middle"} justify={"space-between"}>
+        <div>
           <div>
             {isProxyApplied ? (
-              <PrimaryActionButton
-                size="small"
-                onClick={() => {
-                  disconnectFromDesktopApp();
-                }}
-                className="disconnect-button"
-              >
-                Disconnect
-              </PrimaryActionButton>
+              <>
+                <CheckCircleOutlined className="connected-icon" /> Connected to Desktop App
+              </>
             ) : (
-              <PrimaryActionButton
-                size="small"
-                onClick={() => {
-                  connectToDesktopApp();
-                }}
-              >
-                Connect
-              </PrimaryActionButton>
+              "Connect to Desktop App"
             )}
           </div>
-        </Row>
-      ) : (
-        <Row align={"middle"} justify={"space-between"}>
-          <div className="title">Please open the desktop app to connect this browser profile</div>
-        </Row>
-      )}
+          <div className="proxy-applied-subtitle">
+            {isProxyApplied
+              ? "All the traffic from this browser profile is being intercepted."
+              : "Connect to intercept all the traffic from this browser profile."}
+          </div>
+        </div>
+        <div>
+          {isProxyApplied ? (
+            <PrimaryActionButton
+              size="small"
+              onClick={() => {
+                disconnectFromDesktopApp();
+              }}
+              className="disconnect-button"
+            >
+              Disconnect
+            </PrimaryActionButton>
+          ) : (
+            <PrimaryActionButton
+              size="small"
+              onClick={() => {
+                connectToDesktopApp();
+              }}
+            >
+              Connect
+            </PrimaryActionButton>
+          )}
+        </div>
+      </Row>
     </div>
   );
 };

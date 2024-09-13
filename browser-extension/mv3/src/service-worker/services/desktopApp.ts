@@ -51,7 +51,7 @@ const handleMessage = (data: any) => {
       disconnectFromDesktopAppAndRemoveProxy();
       break;
     default:
-      console.log("Unknown action:", message.action);
+      console.log("Unknown action extension:", message.action);
   }
 };
 
@@ -98,14 +98,14 @@ export const connectToDesktopAppAndApplyProxy = async () => {
 };
 
 export const disconnectFromDesktopAppAndRemoveProxy = async () => {
-  await sendMessageToDesktopApp({ action: "browser-disconnected", appId: getConnectedBrowserAppId() });
-  if (socket) {
+  try {
+    await sendMessageToDesktopApp({ action: "browser-disconnected", appId: getConnectedBrowserAppId() });
     socket.close();
-  } else {
-    // To be safe, remove proxy if socket is not open and proxy exists
+  } catch (e) {
+    console.log("Error sending message to desktop app socket closed");
     removeProxy();
+    toggleExtensionStatus(true);
   }
-  toggleExtensionStatus(true);
   return true;
 };
 
@@ -116,7 +116,7 @@ export const checkIfDesktopAppOpen = async (): Promise<boolean> => {
 };
 
 const getProxyDetails = async (): Promise<ProxyDetails | null> => {
-  return sendMessageToDesktopApp({ action: "get_proxy" }, true)
+  return sendMessageToDesktopApp({ action: "get-proxy" }, true)
     .then((response: any) => {
       const proxyPort = response.proxyPort;
       return {
@@ -126,7 +126,7 @@ const getProxyDetails = async (): Promise<ProxyDetails | null> => {
       };
     })
     .catch((error) => {
-      console.error("!!!Error getting proxy info", error);
+      console.error("Error getting proxy info", error);
       return null;
     });
 };
