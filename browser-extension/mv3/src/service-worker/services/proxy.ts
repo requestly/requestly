@@ -1,3 +1,5 @@
+import { getBlockedDomains } from "../../utils";
+
 export interface ProxyDetails {
   proxyPort: number;
   proxyIp: string;
@@ -14,6 +16,8 @@ export const applyProxy = async (proxyDetails: ProxyDetails) => {
     return;
   }
 
+  const blockedDomains = await getBlockedDomains();
+
   return (
     chrome.proxy.settings
       .set({
@@ -25,7 +29,7 @@ export const applyProxy = async (proxyDetails: ProxyDetails) => {
               host: proxyDetails.proxyIp,
               port: proxyDetails.proxyPort,
             },
-            bypassList: [], // @TODO
+            bypassList: blockedDomains.map((domain) => `*.${domain}`),
           },
         },
         scope: "regular",
