@@ -151,6 +151,7 @@ const AppModeInitializer = () => {
                     appId: payload.appId,
                     property: "isActive",
                     value: true,
+                    connectedExtensionClientId: payload.connectedExtensionClientId,
                   })
                 );
                 trackAppConnectedEvent(payload.appId);
@@ -163,6 +164,7 @@ const AppModeInitializer = () => {
                     appId: payload.appId,
                     property: "isActive",
                     value: false,
+                    connectedExtensionClientId: null,
                   })
                 );
                 trackAppDisconnectedEvent(payload.appId);

@@ -28,6 +28,7 @@ const connectToDesktopApp = (): Promise<boolean> => {
     socket.onerror = function (error) {
       console.error("WebSocket error: ", error);
       resolve(false);
+      disconnectFromDesktopAppAndRemoveProxy();
     };
 
     socket.onclose = function () {

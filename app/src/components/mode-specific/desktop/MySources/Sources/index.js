@@ -205,6 +205,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
       if (appId.includes("existing")) {
         window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disconnect-extension", {
           appId,
+          clientId: appsListRef.current[appId]?.connectedExtensionClientId,
         }).then(() => {
           setProcessingApps({ ...processingApps, [appId]: false });
         });
