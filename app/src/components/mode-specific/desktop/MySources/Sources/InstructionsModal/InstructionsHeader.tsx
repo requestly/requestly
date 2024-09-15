@@ -1,11 +1,11 @@
+import React from "react";
 import { Avatar, Col, Row, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
-import React from "react";
 
 interface InstructionsHeaderProps {
   icon: string;
   heading: string;
-  description: string;
+  description: React.ReactNode;
   setShowInstructions: (value: boolean) => void;
   ExtraContentOnRight?: React.ReactNode;
 }

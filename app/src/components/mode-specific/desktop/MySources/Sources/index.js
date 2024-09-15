@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Row, Avatar, Tabs, Alert, Button, Space } from "antd";
+import { Col, Row, Avatar, Tabs, Alert, Button } from "antd";
 import { QuestionCircleOutlined, CheckCircleOutlined, DesktopOutlined, InfoCircleFilled } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
@@ -266,7 +266,13 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         ) : (
           <RQButton
             type="default"
-            onClick={() => handleActivateAppOnClick(appId, options)}
+            onClick={() => {
+              if (appId.includes("existing")) {
+                renderInstructionsModal(appId);
+                return;
+              }
+              handleActivateAppOnClick(appId, options);
+            }}
             loading={!isScanned || processingApps[appId]}
             className="launch-button"
           >
@@ -457,7 +463,11 @@ const Sources = ({ isOpen, toggle, ...props }) => {
       >
         <Col className="connected-apps-modal-content">
           {showInstructions ? (
-            <SetupInstructions appId={currentApp} setShowInstructions={setShowInstructions} />
+            <SetupInstructions
+              appId={currentApp}
+              setShowInstructions={setShowInstructions}
+              handleActivateAppOnClick={handleActivateAppOnClick}
+            />
           ) : (
             <>
               <Row className="white header text-bold">Connect apps</Row>
