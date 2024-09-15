@@ -202,7 +202,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
       // If URL is opened in browser instead of dekstop app
       if (!window.RQ || !window.RQ.DESKTOP) return;
 
-      if (appId.includes("existing")) {
+      if (appId.includes("existing") && appsListRef.current[appId]?.connectedExtensionClientId) {
         window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disconnect-extension", {
           appId,
           clientId: appsListRef.current[appId]?.connectedExtensionClientId,
