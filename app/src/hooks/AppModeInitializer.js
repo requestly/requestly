@@ -154,6 +154,13 @@ const AppModeInitializer = () => {
                     connectedExtensionClientId: payload.connectedExtensionClientId,
                   })
                 );
+                dispatch(
+                  actions.updateDesktopSpecificAppProperty({
+                    appId: payload.appId,
+                    property: "connectedExtensionClientId",
+                    value: payload.connectedExtensionClientId,
+                  })
+                );
                 trackAppConnectedEvent(payload.appId);
               });
 
