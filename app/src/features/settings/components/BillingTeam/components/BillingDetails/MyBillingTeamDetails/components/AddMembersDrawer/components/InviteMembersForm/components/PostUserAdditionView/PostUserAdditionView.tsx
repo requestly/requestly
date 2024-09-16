@@ -20,7 +20,7 @@ export const PostUserAdditionView: React.FC<PostUserAdditionViewProps> = ({
       </div>
       <div className="post-user-addition-view-title">All set from your end</div>
       <div className="post-user-addition-view-description">
-        An email notification has been sent to the users that you have added them to the billing team.
+        Users have been notified via email that you have assigned them a license.
       </div>
       <div className="post-user-addition-view-actions">
         <RQButton type="primary" onClick={toggleInviteFormVisibility}>
