@@ -23,26 +23,21 @@ const getSessionRecordingConfig = async (url: string): Promise<SessionConfig> =>
     captureHeaders: sessionRecordingConfig?.captureHeaders,
   };
 
-  if (!sessionRecordingConfig) {
-    return config;
-  }
-
   let pageSources = sessionRecordingConfig?.pageSources || [];
 
   if (await isExtensionEnabled()) {
-    if ("autoRecording" in sessionRecordingConfig) {
-      if (!sessionRecordingConfig?.autoRecording.isActive) {
-        return config;
-      } else if (sessionRecordingConfig?.autoRecording.mode === AutoRecordingMode.ALL_PAGES) {
-        pageSources = [
-          {
-            value: "*",
-            key: SourceKey.URL,
-            isActive: true,
-            operator: SourceOperator.WILDCARD_MATCHES,
-          },
-        ];
-      }
+    if (
+      "autoRecording" in sessionRecordingConfig &&
+      sessionRecordingConfig?.autoRecording.mode === AutoRecordingMode.ALL_PAGES
+    ) {
+      pageSources = [
+        {
+          value: "*",
+          key: SourceKey.URL,
+          isActive: true,
+          operator: SourceOperator.WILDCARD_MATCHES,
+        },
+      ];
     }
 
     if (pageSources.some((pageSource) => matchSourceUrl(pageSource, url))) {

@@ -50,7 +50,9 @@ export const SessionsSettings: React.FC = () => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [config, setConfig] = useState<SessionRecordingConfig>({});
   const [showNewPageSource, setShowNewPageSource] = useState<boolean>(false);
-  const [isCaptureHeadersEnabled, setIsCaptureHeadersEnabled] = useState<boolean>(false);
+  const [isCaptureHeadersEnabled, setIsCaptureHeadersEnabled] = useState<boolean>(
+    defaultSessionRecordingConfig.captureHeaders
+  );
   const { autoRecording } = config;
 
   const getPageSourceLabel = useCallback((source: SessionRecordingPageSource): string => {
