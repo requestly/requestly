@@ -77,6 +77,7 @@ export const ChangeLogCard: React.FC = () => {
             target="_blank"
             to="https://requestly.productlift.dev/"
             onClick={() => trackHomeWhatsNewClicked("view_all_updates")}
+            className="changelog-card-view-all-btn"
           >
             View all updates
           </Link>

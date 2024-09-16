@@ -108,7 +108,7 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
         </div>
         <div className="billing-team-invite-members-form-actions">
           <RQButton loading={isLoading} type="primary" htmlType="submit">
-            Add to billing team
+            Assign license
           </RQButton>
           <RQButton
             disabled={isLoading}
