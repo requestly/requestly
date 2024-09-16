@@ -7,6 +7,7 @@ import { ApiOutlined, HomeOutlined } from "@ant-design/icons";
 import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
 import HttpRulesIcon from "assets/icons/http-rules.svg?react";
 import SessionIcon from "assets/icons/session.svg?react";
+import NetworkTrafficInspectorIcon from "assets/icons/network-traffic-inspector.svg?react";
 import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
 import { PrimarySidebarLink } from "./components/PrimarySidebarLink/PrimarySidebarLink";
 import MockServerIcon from "assets/icons/mock-server.svg?react";
@@ -65,7 +66,7 @@ export const PrimarySidebar: React.FC = () => {
         id: 2,
         title: "Network inspector",
         path: PATHS.NETWORK_INSPECTOR.RELATIVE,
-        icon: <NetworkTrafficIcon />,
+        icon: <NetworkTrafficInspectorIcon />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
       },
       {
