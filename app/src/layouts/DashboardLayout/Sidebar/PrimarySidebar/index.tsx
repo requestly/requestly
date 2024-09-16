@@ -9,6 +9,7 @@ import HttpRulesIcon from "assets/icons/http-rules.svg?react";
 import SessionIcon from "assets/icons/session.svg?react";
 import WolfSafeIcon from "assets/icons/wolfsafe.svg?react";
 import MockServerIcon from "assets/icons/mock-server.svg?react";
+import NetworkTrafficInspectorIcon from "assets/icons/network-traffic-inspector.svg?react";
 import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
 import { PrimarySidebarLink } from "./components/PrimarySidebarLink/PrimarySidebarLink";
 import { RQBadge } from "lib/design-system/components/RQBadge";
@@ -68,7 +69,7 @@ export const PrimarySidebar: React.FC = () => {
         id: 2,
         title: "Network inspector",
         path: PATHS.NETWORK_INSPECTOR.RELATIVE,
-        icon: <NetworkTrafficIcon />,
+        icon: <NetworkTrafficInspectorIcon />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
       },
       {
