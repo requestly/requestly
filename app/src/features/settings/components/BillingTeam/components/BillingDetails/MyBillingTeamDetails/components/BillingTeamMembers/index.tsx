@@ -351,7 +351,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
         isOpen={isLoadingModalVisible}
         onClose={() => setIsLoadingModalVisible(false)}
         title="Revoking license..."
-        message="Pleae wait while we process your request"
+        message="Please wait while we process your request"
       />
     </>
   );
