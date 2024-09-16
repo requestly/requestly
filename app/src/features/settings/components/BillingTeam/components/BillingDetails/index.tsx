@@ -50,7 +50,7 @@ export const BillingTeamDetails = () => {
         <Result
           status="error"
           title="Oops, something went wrong!"
-          subTitle="You are not a part of this billing team or this team does not exist"
+          subTitle="You don't have a license for the billing dashboard you are trying to access"
         />
       </div>
     );

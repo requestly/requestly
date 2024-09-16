@@ -7,6 +7,7 @@ import CertificateTrustInstructions from "./CertificateTrust";
 import { ANDROID_DEVICES } from "./constants";
 import WifiInstructions from "./Wifi";
 import InstructionsHeader from "../InstructionsHeader";
+import ConfigureAndroidApps from "./ConfigureAndroidApps";
 
 const AndroidInstructionModal = ({ setShowInstructions }) => {
   const [selectedDevice, setSelectedDevice] = useState(ANDROID_DEVICES.ONEPLUS);
@@ -56,6 +57,11 @@ const AndroidInstructionModal = ({ setShowInstructions }) => {
         title: "Install and Trust Certificate",
         status: "process",
         description: <CertificateTrustInstructions device_id={selectedDevice} />,
+      },
+      {
+        title: "Ignore SSL pinning",
+        status: "process",
+        description: <ConfigureAndroidApps />,
       },
     ];
   }, [selectedDevice]);

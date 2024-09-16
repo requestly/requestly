@@ -19,6 +19,7 @@
       th,
       th.ant-table-cell {
         padding: 12px;
+        font-size: var(--requestly-font-size-sm, 13px);
 
         .ant-table-column-title {
           flex-grow: 0;

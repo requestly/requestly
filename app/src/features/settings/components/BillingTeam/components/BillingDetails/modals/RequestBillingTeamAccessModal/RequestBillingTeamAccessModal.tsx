@@ -59,17 +59,17 @@ export const RequestBillingTeamAccessModal: React.FC<RequestBillingTeamAccessMod
           <>
             {isRequestSent ? (
               <>
-                <MdCheckCircleOutline className="success" /> Joining request sent successfully
+                <MdCheckCircleOutline className="success" /> License request sent successfully
               </>
             ) : (
               <>
-                <PiWarningDiamondBold className="danger" /> Failed to send joining request
+                <PiWarningDiamondBold className="danger" /> Failed to send license request
               </>
             )}
           </>
         )
       }
-      loadingText="Sending joining request to admins..."
+      loadingText="Sending license request to the admins..."
       result={getPostRequestResult()}
       footer={
         isLoading ? null : (
