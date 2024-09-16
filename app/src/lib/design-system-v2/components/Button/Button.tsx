@@ -1,6 +1,7 @@
 import React from "react";
 import { Button as AntDButton, ButtonProps as AntDButtonProps } from "antd";
 import { useHotkeys } from "react-hotkeys-hook";
+import { capitalize } from "lodash";
 import "./Button.scss";
 
 type RQButtonSize = "small" | "default" | "large";
@@ -45,12 +46,21 @@ const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(functi
   // TODO: Fix type - hotkey callback gives keyboard event but button onClick needs mouse event
   useHotkeys(props.hotKey, (e: any) => props.onClick(e));
 
+  const keys = props.hotKey.split("+");
+
   let children = props.children;
   if (props.showHotKeyText) {
     children = (
       <>
         {props.children}
-        <span className="rq-custom-btn-hotkey-text">{props.hotKey}</span>
+        <span className="rq-custom-btn-hotkey-text">
+          {keys.map((key, index) => (
+            <>
+              <span className="key">{capitalize(key)}</span>
+              {index === keys.length - 1 ? null : <span>+</span>}
+            </>
+          ))}
+        </span>
       </>
     );
   }
