@@ -58,7 +58,9 @@ const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(functi
   return <BaseButton ref={ref} {...props} children={children} />;
 });
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(props, ref) {
+interface RQButton extends React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<HTMLButtonElement>> {}
+
+const Button: RQButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(props, ref) {
   if (props.hotKey) {
     return <ButtonWithHotkey ref={ref} {...props} />;
   }
