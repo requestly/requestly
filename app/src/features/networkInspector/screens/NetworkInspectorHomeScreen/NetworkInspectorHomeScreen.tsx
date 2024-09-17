@@ -27,10 +27,9 @@ export const NetworkInspectorHomeScreen: React.FC = () => {
   );
 
   const handleOnPlay: React.ReactEventHandler<HTMLVideoElement> = (event) => {
-    // @ts-ignore
-    const currentTime = event.target.currentTime;
+    const currentTime = (event.target as HTMLVideoElement).currentTime;
 
-    if (parseInt(currentTime) === 0) {
+    if (parseInt(`${currentTime}`) === 0) {
       setShowDevtoolsShortcut(true);
 
       if (devtoolsShortcutDisplayTimerRef.current) {
