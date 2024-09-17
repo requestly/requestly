@@ -13,9 +13,6 @@ interface RequestBotProps {
 }
 
 export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelType = "app" }) => {
-  // const dispatch = useDispatch();
-  // const paidUser = user.loggedIn && user.details?.isPremium;
-
   return (
     <m.div
       initial={{ opacity: 0, right: -450 }}
