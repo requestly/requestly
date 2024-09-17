@@ -8,9 +8,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 680px;
+    max-width: 680px;
 
-    padding: var(--space-11, 48px) var(--space-0, 0px);
+    padding: var(--space-11, 48px) 1rem;
     gap: var(--space-9, 32px);
 
     .header-container {
@@ -68,7 +68,6 @@
       align-items: center;
       flex-direction: column;
       gap: 20px;
-      width: 650px;
 
       .network-inspector-video {
         position: relative;
@@ -94,8 +93,9 @@
       }
 
       .network-inspector-video-player {
-        width: 680px;
         height: 434px;
+        width: 100%;
+        max-width: 680px;
         max-inline-size: 100%;
         block-size: auto;
         border-radius: 16px;
