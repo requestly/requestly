@@ -32,12 +32,7 @@ const AnalyticsInspectorContainer: React.FC = () => {
 
       setVendorEvents((prev) => {
         const existingEvents = prev[vendor.name] || [];
-
-        if (vendor.name === "BlueCore" && networkEvent.request.method === "POST") {
-          return { ...prev, [vendor.name]: [...existingEvents, networkEvent] };
-        }
-
-        return prev;
+        return { ...prev, [vendor.name]: [...existingEvents, networkEvent] };
       });
     });
 
@@ -53,30 +48,6 @@ const AnalyticsInspectorContainer: React.FC = () => {
   }, [settings]);
 
   return (
-    // <div className="executions-container">
-    //   <PrimaryToolbar clearEvents={clearEvents} settings={settings} onSettingsChange={setSettings} />
-    //   {executionEvents.length > 0 ? (
-    //     <>
-    //       <FiltersToolbar filters={filters} onFiltersChange={setFilters} />
-    //       <ResourceTable
-    //         colorScheme={getCurrentColorScheme()}
-    //         resources={executionEvents}
-    //         columns={executionTableColumns}
-    //         primaryColumnKeys={[EXECUTION_TABLE_COLUMN_IDS.URL]}
-    //         detailsTabs={executionDetailsTabs}
-    //         filter={filterExecutions}
-    //       />
-    //     </>
-    //   ) : (
-    //     <EmptyContainerPlaceholder
-    //       lines={[
-    //         "Recording rule executions...",
-    //         "Perform a request or Reload the page to see network requests intercepted and modified by Requestly.",
-    //       ]}
-    //     />
-    //   )}
-    // </div>
-
     <div className="analytics-inspector-container">
       {Object.keys(vendorEvents).length === 0 ? (
         <EmptyContainerPlaceholder
@@ -90,22 +61,18 @@ const AnalyticsInspectorContainer: React.FC = () => {
           {Object.keys(vendorEvents).map((vendor) => {
             return (
               <Collapse
+                key={vendor}
                 className="vendor-event-details"
                 expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
               >
                 <Collapse.Panel key={vendor} header={vendor}>
-                  {vendorEvents[vendor].map((event) => {
-                    return <VendorEvent event={event} />;
+                  {vendorEvents[vendor].map((event, index) => {
+                    return <VendorEvent key={index} vendorName={vendor} event={event} />;
                   })}
                 </Collapse.Panel>
               </Collapse>
             );
           })}
-
-          {/* <span>
-            {analyticsVendorsRegistry.getInstance().getVendorByUrl("api.bluecore.app/api/track/123").name}+ '-' +
-            {vendorEvents["BlueCore"]?.length}
-          </span> */}
         </div>
       )}
     </div>
