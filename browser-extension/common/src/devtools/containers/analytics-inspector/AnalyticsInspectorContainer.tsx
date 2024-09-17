@@ -59,6 +59,8 @@ const AnalyticsInspectorContainer: React.FC = () => {
       ) : (
         <div>
           {Object.keys(vendorEvents).map((vendor) => {
+            const vendorInstance = analyticsVendorsRegistry.getInstance().getVendorByName(vendor);
+
             return (
               <Collapse
                 key={vendor}
@@ -67,7 +69,9 @@ const AnalyticsInspectorContainer: React.FC = () => {
               >
                 <Collapse.Panel key={vendor} header={vendor}>
                   {vendorEvents[vendor].map((event, index) => {
-                    return <VendorEvent key={index} vendorName={vendor} event={event} />;
+                    const eventDetails = vendorInstance.getEventDetails(event);
+
+                    return <VendorEvent key={index} vendorName={vendor} eventDetails={eventDetails} />;
                   })}
                 </Collapse.Panel>
               </Collapse>

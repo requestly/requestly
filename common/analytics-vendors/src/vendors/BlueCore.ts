@@ -23,7 +23,9 @@ export class BlueCore implements Vendor {
     const params = new URLSearchParams(url);
     const base64Data = params.get("stats_type");
     const eventDetails = getDecodedBase64Data(base64Data);
-    return eventDetails;
+
+    // Match schema with post method payload
+    return { event: eventDetails?.event_type, properties: eventDetails };
   }
 
   getPostMethodPayload(event: NetworkEvent): Record<string, any> | null {

@@ -1,10 +1,8 @@
 import React from "react";
 import { Collapse, Typography } from "antd";
 import { CaretRightOutlined } from "@ant-design/icons";
-import { NetworkEvent } from "src/devtools/types";
 import { getCurrentColorScheme } from "src/devtools/utils";
 import { Column, ResourceTable } from "@requestly-ui/resource-table";
-import getAnalyticsVendorsRegistry from "@requestly/analytics-vendors";
 
 enum EVENT_PROPERTIES_TABLE_COLUMN_IDS {
   KEY = "key",
@@ -28,17 +26,17 @@ const eventPropertiesTableColumns: Column<Record<string, any>>[] = [
   },
 ];
 
-export const VendorEvent: React.FC<{ event: NetworkEvent; vendorName: string }> = ({ event, vendorName }) => {
-  // @ts-ignore
-  const eventDetails = getAnalyticsVendorsRegistry().getInstance().getVendorEventDetailsByName(vendorName, event);
-
+export const VendorEvent: React.FC<{ eventDetails: Record<string, any>; vendorName: string }> = ({
+  eventDetails,
+  vendorName,
+}) => {
   console.log(`${vendorName} - eventDetails`, eventDetails);
 
   if (!eventDetails) {
     return <div>No event data found!</div>;
   }
 
-  const eventProperties = Object.entries(eventDetails.properties).map(([key, value]) => {
+  const eventProperties = Object.entries(eventDetails?.properties ?? {}).map(([key, value]) => {
     return { key, value };
   });
 
@@ -49,7 +47,7 @@ export const VendorEvent: React.FC<{ event: NetworkEvent; vendorName: string }> 
       expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
     >
       <Collapse.Panel
-        key={event.request.url}
+        key={eventDetails.url}
         header={<Typography.Text ellipsis={{ tooltip: true }}>{eventDetails.event}</Typography.Text>}
       >
         <ResourceTable
