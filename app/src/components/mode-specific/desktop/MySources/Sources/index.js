@@ -267,7 +267,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           <RQButton
             type="default"
             onClick={() => {
-              if (appId.includes("existing")) {
+              if (appId.includes("existing") && isFeatureCompatible(FEATURES.CONNECT_EXTENSION)) {
                 renderInstructionsModal(appId);
                 return;
               }
