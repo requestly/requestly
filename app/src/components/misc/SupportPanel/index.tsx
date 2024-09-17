@@ -98,38 +98,13 @@ const SupportPanel = () => {
           key: "4",
           label: (
             <div
-              className={`support-panel-item-style ${!paidUser && "support-panel-item-disabled"}`}
+              className="support-panel-item-style"
               onClick={() => {
-                if (paidUser) {
-                  window?.$crisp?.push(["do", "chat:open"]);
-                  trackSupportOptionClicked("chat_with_us");
-                } else {
-                  dispatch(
-                    // @ts-ignore
-                    actions.toggleActiveModal({
-                      modalName: "pricingModal",
-                      newValue: true,
-                      newProps: { selectedPlan: null, source: "support_option_clicked" },
-                    })
-                  );
-                  trackSupportOptionClicked("upgrade_to_chat_with_us");
-                }
-                paidUser
-                  ? window?.$crisp?.push(["do", "chat:open"])
-                  : dispatch(
-                      // @ts-ignore
-                      actions.toggleActiveModal({
-                        modalName: "pricingModal",
-                        newValue: true,
-                        newProps: { selectedPlan: null, source: "support_option_clicked" },
-                      })
-                    );
+                window?.$crisp?.push(["do", "chat:open"]);
+                trackSupportOptionClicked("chat_with_us");
               }}
             >
-              <span className="support-panel-label-style ">
-                Chat With Us
-                {!paidUser && <span className="support-panel-upgrade-badge-style">Upgrade</span>}
-              </span>
+              <span className="support-panel-label-style">Chat With Us</span>
             </div>
           ),
           icon: <BsFillChatLeftTextFill className="support-panel-icon-style" />,
