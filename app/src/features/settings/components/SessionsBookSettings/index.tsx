@@ -233,11 +233,7 @@ export const SessionsSettings: React.FC = () => {
   const handleCaptureHeadersToggle = useCallback(
     (isChecked: boolean) => {
       handleSaveConfig({ ...config, captureHeaders: isChecked }, true);
-      if (isChecked) {
-        setIsCaptureHeadersEnabled(true);
-      } else {
-        setIsCaptureHeadersEnabled(false);
-      }
+      setIsCaptureHeadersEnabled(isChecked);
     },
     [config, handleSaveConfig]
   );
