@@ -2,23 +2,9 @@ import React from "react";
 import { Collapse, Typography } from "antd";
 import { CaretRightOutlined } from "@ant-design/icons";
 import { NetworkEvent } from "src/devtools/types";
-import { getCurrentColorScheme, getDecodedBase64Data } from "src/devtools/utils";
+import { getCurrentColorScheme } from "src/devtools/utils";
 import { Column, ResourceTable } from "@requestly-ui/resource-table";
-
-const getBlurCoreEventDetails = (event: NetworkEvent) => {
-  const postData = event.request.postData;
-
-  if (!postData) {
-    return null;
-  }
-
-  if (!postData.mimeType.includes("urlencoded")) {
-    return null;
-  }
-
-  const eventDetails = getDecodedBase64Data("data", postData.text);
-  return eventDetails as Record<string, any>;
-};
+import getAnalyticsVendorsRegistry from "@requestly/analytics-vendors";
 
 enum EVENT_PROPERTIES_TABLE_COLUMN_IDS {
   KEY = "key",
@@ -42,8 +28,11 @@ const eventPropertiesTableColumns: Column<Record<string, any>>[] = [
   },
 ];
 
-export const VendorEvent: React.FC<{ event: NetworkEvent }> = ({ event }) => {
-  const eventDetails = getBlurCoreEventDetails(event);
+export const VendorEvent: React.FC<{ event: NetworkEvent; vendorName: string }> = ({ event, vendorName }) => {
+  // @ts-ignore
+  const eventDetails = getAnalyticsVendorsRegistry().getInstance().getVendorEventDetailsByName(vendorName, event);
+
+  console.log(`${vendorName} - eventDetails`, eventDetails);
 
   if (!eventDetails) {
     return <div>No event data found!</div>;

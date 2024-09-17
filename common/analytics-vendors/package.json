@@ -13,5 +13,8 @@
     "ts-loader": "^9.5.1",
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@types/chrome": "^0.0.271"
   }
 }
