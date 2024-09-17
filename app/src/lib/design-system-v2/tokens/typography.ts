@@ -26,7 +26,7 @@ const FONT_SIZE_TOKENS = {
 
 const LINE_HEIGHT_TOKENS = {
   "line-height-2xs": "0.75rem", // 12px
-  "line-height-xs": "0.875rem", // 14px
+  "line-height-xs": "0.938rem", // 15px
   "line-height-sm": "1.25rem", // 20px
   "line-height-md": "1.438rem", // 23px
   "line-height-base": "1.5rem", // 24px
