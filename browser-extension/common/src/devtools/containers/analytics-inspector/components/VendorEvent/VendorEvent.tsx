@@ -51,7 +51,7 @@ export const VendorEvent: React.FC<VendorEventProps> = ({ eventDetails, vendorNa
 
       return {
         key,
-        label: key,
+        label: capitalize(key),
         children: (
           <>
             <ResourceTable
@@ -71,7 +71,7 @@ export const VendorEvent: React.FC<VendorEventProps> = ({ eventDetails, vendorNa
       key: eventDetails.event,
       label: (
         <div className="vendor-event-title">
-          <span className="title">{capitalize(eventDetails.event)}</span>
+          <span className="title">{eventDetails.event}</span>
 
           <div className="actions">
             <Tooltip title={isJsonView ? "View in table" : "View as Json"}>

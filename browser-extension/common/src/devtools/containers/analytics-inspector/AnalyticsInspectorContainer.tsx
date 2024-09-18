@@ -73,15 +73,8 @@ const AnalyticsInspectorContainer: React.FC = () => {
                   key={vendor}
                   header={
                     <div className="vendor-events-collapse-header">
-                      <img
-                        width={30}
-                        height={30}
-                        className="vendor-icon"
-                        src={vendorInstance.icon}
-                        // alt={vendorInstance.name}
-                      />
-
-                      <span>{vendor}</span>
+                      <span className="vendor-icon" dangerouslySetInnerHTML={{ __html: vendorInstance.icon }} />
+                      <span className="vendor-name">{vendor}</span>
                     </div>
                   }
                 >

@@ -20,6 +20,20 @@
       .ant-collapse-header-text {
         font-size: 12px;
 
+        .vendor-events-collapse-header {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          .vendor-icon {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+        }
+
         .ant-typography {
           font-size: 11px;
         }
