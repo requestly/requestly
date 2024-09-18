@@ -18,6 +18,8 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { fetchCurrentEmails, updateVisibility } from "../api";
 import { Visibility } from "../SessionViewer/types";
 import { useSelector } from "react-redux";
+import { StartFromOffsetInput } from "./components/StartFromOffsetInput/StartFromOffsetInput";
+import { getSecondsFromStringifiedMinSec } from "utils/DateTimeUtils";
 import "./shareRecordingModal.scss";
 
 const _ = require("lodash");
@@ -55,7 +57,14 @@ export const getPrettyVisibilityName = (visibility, isWorkspaceMode) => {
   }
 };
 
-const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordingId, onVisibilityChange = null }) => {
+const ShareRecordingModal = ({
+  currentVisibility,
+  isVisible,
+  setVisible,
+  recordingId,
+  onVisibilityChange = null,
+  currentOffset = "0:00",
+}) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
@@ -67,6 +76,7 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
   const [currentEmails, setCurrentEmails] = useState([]);
   const [sessionVisibility, setSessionVisibility] = useState(currentVisibility);
   const [dataLoading, setDataLoading] = useState(true);
+  const [startFromOffset, setStartFromOffset] = useState(null);
   const sentEmails = useRef([]);
 
   const handleCloseModal = () => {
@@ -74,9 +84,10 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
   };
 
   const onCopyHandler = () => {
+    const offset = getSecondsFromStringifiedMinSec(startFromOffset);
     trackSessionRecordingShareLinkCopied("app");
     setIsTextCopied(true);
-    navigator.clipboard.writeText(publicURL); //copy to clipboard
+    navigator.clipboard.writeText(`${publicURL}${offset ? `?t=${offset}` : ""}`);
     setTimeout(() => {
       setIsTextCopied(false);
     }, 700);
@@ -317,6 +328,12 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
                   </Radio.Group>
                   {sessionVisibility === Visibility.CUSTOM && (
                     <div className="share-option-description">{renderRestrictedUsersList()}</div>
+                  )}
+                  {sessionVisibility !== Visibility.ONLY_ME && (
+                    <StartFromOffsetInput
+                      currentOffset={currentOffset}
+                      onOffsetChange={(offset) => setStartFromOffset(offset)}
+                    />
                   )}
                 </Col>
               </Row>

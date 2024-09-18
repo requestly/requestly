@@ -26,7 +26,7 @@ const NetworkContainer: React.FC = () => {
 
   useEffect(() => {
     chrome.devtools.network.onRequestFinished.addListener((networkEvent: NetworkEvent) => {
-      setNetworkEvents((networkEvents) => [...networkEvents, networkEvent]);
+      setNetworkEvents((prev) => [...prev, networkEvent]);
     });
 
     chrome.devtools.network.onNavigated.addListener(() => {
