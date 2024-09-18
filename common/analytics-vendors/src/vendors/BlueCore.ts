@@ -15,7 +15,7 @@ export class BlueCore implements Vendor {
     return this.urlPatterns.some((pattern) => url.includes(pattern));
   }
 
-  getGetMethodPayload(event: NetworkEvent): BlueCoreEvent | null {
+  getGetRequestPayload(event: NetworkEvent): BlueCoreEvent | null {
     // TODO: Each url can have variations for payload, ie for some URL payload key can be different
     const url = event.request.url;
     const params = new URLSearchParams(url);
@@ -26,7 +26,7 @@ export class BlueCore implements Vendor {
     return { event: eventDetails?.event_type, properties: eventDetails };
   }
 
-  getPostMethodPayload(event: NetworkEvent): BlueCoreEvent | null {
+  getPostRequestPayload(event: NetworkEvent): BlueCoreEvent | null {
     const postData = event.request.postData;
 
     if (!postData) {
@@ -47,11 +47,11 @@ export class BlueCore implements Vendor {
   getEventPayloadByMethod(event: NetworkEvent) {
     switch (event.request.method) {
       case "GET": {
-        return this.getGetMethodPayload(event);
+        return this.getGetRequestPayload(event);
       }
 
       case "POST": {
-        return this.getPostMethodPayload(event);
+        return this.getPostRequestPayload(event);
       }
 
       default: {
