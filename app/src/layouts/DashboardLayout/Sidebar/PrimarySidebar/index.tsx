@@ -9,7 +9,6 @@ import HttpRulesIcon from "assets/icons/http-rules.svg?react";
 import SessionIcon from "assets/icons/session.svg?react";
 import WolfSafeIcon from "assets/icons/wolfsafe.svg?react";
 import MockServerIcon from "assets/icons/mock-server.svg?react";
-import NetworkTrafficInspectorIcon from "assets/icons/network-traffic-inspector.svg?react";
 import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
 import { PrimarySidebarLink } from "./components/PrimarySidebarLink/PrimarySidebarLink";
 import { RQBadge } from "lib/design-system/components/RQBadge";
@@ -67,13 +66,6 @@ export const PrimarySidebar: React.FC = () => {
       },
       {
         id: 2,
-        title: "Network inspector",
-        path: PATHS.NETWORK_INSPECTOR.RELATIVE,
-        icon: <NetworkTrafficInspectorIcon />,
-        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
-      },
-      {
-        id: 3,
         title: "HTTP Rules",
         path: PATHS.RULES.INDEX,
         icon: <HttpRulesIcon />,
@@ -81,7 +73,7 @@ export const PrimarySidebar: React.FC = () => {
         activeColor: "var(--http-rules)",
       },
       {
-        id: 4,
+        id: 6,
         title: "API Security & Testing",
         path: PATHS.API_SECURITY_TESTING.INDEX,
         icon: (
@@ -93,7 +85,7 @@ export const PrimarySidebar: React.FC = () => {
         activeColor: "var(--session-recording)",
       },
       {
-        id: 5,
+        id: 3,
         title: "Sessions",
         path: PATHS.SESSIONS.INDEX,
         icon: (
@@ -112,7 +104,7 @@ export const PrimarySidebar: React.FC = () => {
       },
 
       {
-        id: 6,
+        id: 4,
         title: "Mock server",
         path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
@@ -120,7 +112,7 @@ export const PrimarySidebar: React.FC = () => {
         activeColor: "var(--mock-server)",
       },
       {
-        id: 7,
+        id: 5,
         title: "API client",
         path: PATHS.API_CLIENT.INDEX,
         icon: <ApiOutlined />,
@@ -130,8 +122,8 @@ export const PrimarySidebar: React.FC = () => {
     ];
 
     if (isDesktopSessionsCompatible) {
-      items[5] = {
-        id: 5,
+      items[3] = {
+        id: 3,
         title: "Desktop Sessions",
         path: PATHS.SESSIONS.DESKTOP.INDEX,
         icon: (
