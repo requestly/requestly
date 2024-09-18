@@ -202,6 +202,7 @@ const INITIAL_STATE = {
         testThisRule: false,
         upgradeWorkspaceMenu: false,
       },
+      isBillingTeamNudgeClosed: false,
 
       hasConnectedApp: false,
       lastSeenInviteTs: 0,
