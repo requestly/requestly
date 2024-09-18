@@ -25,7 +25,8 @@
     "build:common": "cd ../common && npm run build && cd ../mv3",
     "watch": "rm -rf dist && rollup -cw",
     "pretest": "npm run build",
-    "test": "playwright test"
+    "test": "playwright test",
+    "prebuild": "npm ls"
   },
   "devDependencies": {
     "@playwright/test": "^1.44.1",
