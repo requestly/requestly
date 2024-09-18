@@ -13,7 +13,11 @@ import {
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // ACTIONS
 import { startBackgroundProcess, invokeAppDetectionInBackground } from "../actions/DesktopActions";
-import { trackAppDetectedEvent, trackAppDisconnectedEvent } from "modules/analytics/events/desktopApp/apps";
+import {
+  trackAppConnectedEvent,
+  trackAppDetectedEvent,
+  trackAppDisconnectedEvent,
+} from "modules/analytics/events/desktopApp/apps";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getAndUpdateInstallationDate, isDesktopMode } from "utils/Misc";
 import firebaseApp from "firebase.js";
@@ -61,6 +65,8 @@ const AppModeInitializer = () => {
   const appsListRef = useRef(null);
   const hasMessageHandlersBeenSet = useRef(false);
   const hasAuthChanged = useHasChanged(user.loggedIn);
+
+  const getAppName = useCallback((appId) => appsListRef.current[appId]?.name, []);
 
   useEffect(() => {
     appsListRef.current = appsList;
@@ -137,6 +143,39 @@ const AppModeInitializer = () => {
                 );
                 trackProxyReStartedEvent();
               });
+
+              window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-connected", (payload) => {
+                toast.success(`${getAppName(payload.appId)} profile connected`);
+                dispatch(
+                  actions.updateDesktopSpecificAppProperty({
+                    appId: payload.appId,
+                    property: "isActive",
+                    value: true,
+                    connectedExtensionClientId: payload.connectedExtensionClientId,
+                  })
+                );
+                dispatch(
+                  actions.updateDesktopSpecificAppProperty({
+                    appId: payload.appId,
+                    property: "connectedExtensionClientId",
+                    value: payload.connectedExtensionClientId,
+                  })
+                );
+                trackAppConnectedEvent(payload.appId);
+              });
+
+              window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-disconnected", (payload) => {
+                toast.info(`${getAppName(payload.appId)} profile disconnected`);
+                dispatch(
+                  actions.updateDesktopSpecificAppProperty({
+                    appId: payload.appId,
+                    property: "isActive",
+                    value: false,
+                    connectedExtensionClientId: null,
+                  })
+                );
+                trackAppDisconnectedEvent(payload.appId);
+              });
             });
           }
           window.RQ.DESKTOP.SERVICES.IPC.registerEvent("analytics-event", (payload) => {
@@ -150,7 +189,7 @@ const AppModeInitializer = () => {
         });
       }
     }
-  }, [appMode, isBackgroundProcessActive, dispatch]);
+  }, [appMode, isBackgroundProcessActive, dispatch, getAppName]);
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {

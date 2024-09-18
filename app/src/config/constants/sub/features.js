@@ -84,4 +84,6 @@ FEATURES.COMPRESS_RULE_PAIRS = "compress_rule_pairs";
 FEATURES.OVERRIDE_TEAM_SYNC_STATUS = "override_team_sync_status";
 FEATURES.OVERRIDEN_SYNC_STATUS_VALUE = "overriden_sync_status_value";
 
+FEATURES.CONNECT_EXTENSION = "connect_extension";
+
 export default FEATURES;
