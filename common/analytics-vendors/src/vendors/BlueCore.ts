@@ -128,6 +128,7 @@ export class BlueCore implements Vendor {
       return result;
     }, {} as Record<string, any>);
 
+    // rawEvent for rendering it as a json
     return { event: event.event, properties: result, rawEvent: event };
   }
 
