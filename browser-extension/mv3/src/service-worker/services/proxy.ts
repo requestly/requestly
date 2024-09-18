@@ -6,6 +6,8 @@ export interface ProxyDetails {
   proxyUrl: string;
 }
 
+const RQBypassList = ["meet.google.com", "*.requestly.io"];
+
 export const applyProxy = async (proxyDetails: ProxyDetails) => {
   if (!proxyDetails) {
     return;
@@ -16,7 +18,8 @@ export const applyProxy = async (proxyDetails: ProxyDetails) => {
     return;
   }
 
-  const blockedDomains = await getBlockedDomains();
+  const blockedDomains = (await getBlockedDomains()).map((domain) => `*.${domain}`);
+  const bypassList = [...blockedDomains, ...RQBypassList];
 
   return (
     chrome.proxy.settings
@@ -29,7 +32,7 @@ export const applyProxy = async (proxyDetails: ProxyDetails) => {
               host: proxyDetails.proxyIp,
               port: proxyDetails.proxyPort,
             },
-            bypassList: blockedDomains.map((domain) => `*.${domain}`),
+            bypassList: bypassList,
           },
         },
         scope: "regular",
