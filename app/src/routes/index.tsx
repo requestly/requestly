@@ -22,7 +22,6 @@ import { desktopSessionsRoutes } from "./desktopSessionRoutes";
 import { inviteRoutes } from "./inviteRoutes";
 import MinimalLayout from "layouts/MinimalLayout";
 import { paymentRoutes } from "./paymentRoutes";
-import { networkInspectorRoutes } from "features/networkInspector";
 
 export const routesV2: RouteObject[] = [
   /** Misc **/
@@ -50,7 +49,6 @@ export const routesV2: RouteObject[] = [
           ...settingRoutes,
           ...miscRoutes,
           ...desktopSessionsRoutes,
-          ...networkInspectorRoutes,
         ],
       },
       {
