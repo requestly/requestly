@@ -160,10 +160,10 @@ export const isNonBrowserTab = (tabId: number): boolean => {
   return tabId === chrome.tabs.TAB_ID_NONE;
 };
 
-export const toggleExtensionStatus = async () => {
+export const toggleExtensionStatus = async (newStatus?: boolean) => {
   const extensionEnabledStatus = await isExtensionEnabled();
 
-  const updatedStatus = !extensionEnabledStatus;
+  const updatedStatus = newStatus ?? !extensionEnabledStatus;
   setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
   updateActivationStatus(updatedStatus);
   // FIXME: Memory leak here. onVariableChange sets up a listener on every toggle

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Row, Avatar, Tabs, Alert, Button, Space } from "antd";
+import { Col, Row, Avatar, Tabs, Alert, Button } from "antd";
 import { QuestionCircleOutlined, CheckCircleOutlined, DesktopOutlined, InfoCircleFilled } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
@@ -202,6 +202,16 @@ const Sources = ({ isOpen, toggle, ...props }) => {
       // If URL is opened in browser instead of dekstop app
       if (!window.RQ || !window.RQ.DESKTOP) return;
 
+      if (appId.includes("existing") && appsListRef.current[appId]?.connectedExtensionClientId) {
+        window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disconnect-extension", {
+          appId,
+          clientId: appsListRef.current[appId]?.connectedExtensionClientId,
+        }).then(() => {
+          setProcessingApps({ ...processingApps, [appId]: false });
+        });
+        return;
+      }
+
       window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("deactivate-app", {
         id: appId,
         options,
@@ -243,7 +253,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
 
   const renderChangeAppStatusBtn = useCallback(
     (appId, isScanned, isActive, isAvailable, canLaunchWithCustomArgs, options = {}) => {
-      if (!isAvailable) {
+      if (!isAvailable && !isActive) {
         return <span className="text-primary cursor-disabled">Couldn't find it on your system</span>;
       } else if (!isActive) {
         return isFeatureCompatible(FEATURES.CUSTOM_LAUNCH_OPTIONS) && canLaunchWithCustomArgs ? (
@@ -256,7 +266,13 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         ) : (
           <RQButton
             type="default"
-            onClick={() => handleActivateAppOnClick(appId, options)}
+            onClick={() => {
+              if (appId.includes("existing") && isFeatureCompatible(FEATURES.CONNECT_EXTENSION)) {
+                renderInstructionsModal(appId);
+                return;
+              }
+              handleActivateAppOnClick(appId, options);
+            }}
             loading={!isScanned || processingApps[appId]}
             className="launch-button"
           >
@@ -318,7 +334,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
     (type) => {
       const sources = appsListArray.filter((app) => type === app.type);
       const renderSourceByType = {
-        browser: (source) => (source.isAvailable ? renderSourceCard(source) : null),
+        browser: (source) => (source.isAvailable || source.isActive ? renderSourceCard(source) : null),
         mobile: (source) => renderSourceCard(source),
         terminal: (source) =>
           isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY) ? renderSourceCard(source) : null,
@@ -447,7 +463,11 @@ const Sources = ({ isOpen, toggle, ...props }) => {
       >
         <Col className="connected-apps-modal-content">
           {showInstructions ? (
-            <SetupInstructions appId={currentApp} setShowInstructions={setShowInstructions} />
+            <SetupInstructions
+              appId={currentApp}
+              setShowInstructions={setShowInstructions}
+              handleActivateAppOnClick={handleActivateAppOnClick}
+            />
           ) : (
             <>
               <Row className="white header text-bold">Connect apps</Row>
