@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Collapse, Tooltip, Typography } from "antd";
-import { CaretRightOutlined, CheckCircleFilled, CopyOutlined } from "@ant-design/icons";
+import { CaretRightOutlined, CheckCircleFilled, CopyOutlined, GroupOutlined } from "@ant-design/icons";
 import { getCurrentColorScheme } from "src/devtools/utils";
 import { Column, ResourceTable } from "@requestly-ui/resource-table";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
@@ -74,16 +74,16 @@ export const VendorEvent: React.FC<VendorEventProps> = ({ eventDetails, vendorNa
           <span className="title">{capitalize(eventDetails.event)}</span>
 
           <div className="actions">
-            <Button
-              size="small"
-              type="text"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsJsonView((prev) => !prev);
-              }}
-            >
-              {isJsonView ? "(View in table)" : "(View as JSON)"}
-            </Button>
+            <Tooltip title={isJsonView ? "View in table" : "View as Json"}>
+              <Button
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsJsonView((prev) => !prev);
+                }}
+                icon={isJsonView ? <GroupOutlined /> : <span>{`{}`}</span>}
+              />
+            </Tooltip>
 
             <Tooltip title={copyClicked ? "Copied!" : "Copy"}>
               <Button
