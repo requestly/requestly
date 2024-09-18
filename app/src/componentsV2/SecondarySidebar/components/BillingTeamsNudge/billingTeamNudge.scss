@@ -1,0 +1,40 @@
+.billing-team-nudge {
+  margin: 0 4px;
+  margin-bottom: 2rem;
+  background: var(--requestly-color-surface-0);
+  border-radius: var(--space-2, 4px);
+  border: 1px solid var(--requestly-color-surface-2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.31);
+  padding: 8px;
+  padding-top: 1.5rem;
+  position: relative;
+
+  &:hover {
+    .billing-team-nudge__close-icon {
+      display: block;
+    }
+  }
+
+  &__content {
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+
+    span {
+      color: var(--requestly-color-text-default);
+      font-weight: 500;
+    }
+  }
+
+  &__button {
+    margin-top: 1rem;
+  }
+
+  &__close-icon {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    cursor: pointer;
+    color: var(--requestly-color-text-subtle);
+    display: none;
+  }
+}

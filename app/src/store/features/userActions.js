@@ -212,3 +212,7 @@ export const updateIsSupportChatOpened = (prevState, action) => {
 export const updateIsCodeEditorFullScreenModeOnboardingCompleted = (prevState, action) => {
   prevState.misc.persist.isCodeEditorFullScreenModeOnboardingCompleted = action.payload;
 };
+
+export const updateIsBillingTeamNudgeClosed = (prevState, action) => {
+  prevState.misc.persist.isBillingTeamNudgeClosed = action.payload;
+};
