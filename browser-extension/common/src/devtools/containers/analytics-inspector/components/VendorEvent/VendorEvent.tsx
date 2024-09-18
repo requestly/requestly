@@ -1,8 +1,12 @@
-import React from "react";
-import { Collapse, Typography } from "antd";
-import { CaretRightOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import { Button, Collapse, Tooltip, Typography } from "antd";
+import { CaretRightOutlined, CheckCircleFilled, CopyOutlined } from "@ant-design/icons";
 import { getCurrentColorScheme } from "src/devtools/utils";
 import { Column, ResourceTable } from "@requestly-ui/resource-table";
+import { ObjectInspector } from "@devtools-ds/object-inspector";
+import { CollapseProps } from "antd/lib";
+import { capitalize } from "lodash";
+import "./vendorEvent.scss";
 
 enum EVENT_PROPERTIES_TABLE_COLUMN_IDS {
   KEY = "key",
@@ -26,37 +30,97 @@ const eventPropertiesTableColumns: Column<Record<string, any>>[] = [
   },
 ];
 
-export const VendorEvent: React.FC<{ eventDetails: Record<string, any>; vendorName: string }> = ({
-  eventDetails,
-  vendorName,
-}) => {
-  console.log(`${vendorName} - eventDetails`, eventDetails);
+interface VendorEventProps {
+  vendorName: string;
+  eventDetails: { event: string; properties: Record<string, any>; rawEvent: Record<string, any> };
+}
+
+export const VendorEvent: React.FC<VendorEventProps> = ({ eventDetails, vendorName }) => {
+  const [isJsonView, setIsJsonView] = useState(false);
+  const [copyClicked, setCopyClicked] = useState(false);
 
   if (!eventDetails) {
     return <div>No event data found!</div>;
   }
 
-  const eventProperties = Object.entries(eventDetails?.properties ?? {}).map(([key, value]) => {
-    return { key, value };
-  });
+  const nestedCollapseItems: CollapseProps["items"] = Object.entries(eventDetails?.properties ?? {}).map(
+    ([key, properties]) => {
+      const eventProperties = Object.entries(properties ?? {}).map(([key, value]) => {
+        return { key, value };
+      });
+
+      return {
+        key,
+        label: key,
+        children: (
+          <>
+            <ResourceTable
+              colorScheme={getCurrentColorScheme()}
+              resources={eventProperties}
+              columns={eventPropertiesTableColumns}
+              primaryColumnKeys={[EVENT_PROPERTIES_TABLE_COLUMN_IDS.KEY]}
+            />
+          </>
+        ),
+      };
+    }
+  );
+
+  const collapseItems: CollapseProps["items"] = [
+    {
+      key: eventDetails.event,
+      label: (
+        <div className="vendor-event-title">
+          <span className="title">{capitalize(eventDetails.event)}</span>
+
+          <div className="actions">
+            <Button
+              size="small"
+              type="text"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsJsonView((prev) => !prev);
+              }}
+            >
+              {isJsonView ? "(View in table)" : "(View as JSON)"}
+            </Button>
+
+            <Tooltip title={copyClicked ? "Copied!" : "Copy"}>
+              <Button
+                size="small"
+                icon={copyClicked ? <CheckCircleFilled style={{ color: "green" }} /> : <CopyOutlined />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigator.clipboard
+                    .writeText(JSON.stringify(eventDetails))
+                    .catch((err) => console.error("from copy btn", err));
+                  setCopyClicked(true);
+                  setTimeout(() => setCopyClicked(false), 500);
+                }}
+              />
+            </Tooltip>
+          </div>
+        </div>
+      ),
+      children: isJsonView ? (
+        <ObjectInspector
+          expandLevel={3}
+          data={eventDetails.rawEvent}
+          includePrototypes={false}
+          className="object-inspector vendor-raw-event"
+        />
+      ) : (
+        <Collapse bordered={false} className="nested-event-properties-collapse" items={nestedCollapseItems} />
+      ),
+    },
+  ];
 
   return (
     <Collapse
       bordered={false}
+      items={collapseItems}
       className="vendor-event-collapse"
       expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
-    >
-      <Collapse.Panel
-        key={eventDetails.url}
-        header={<Typography.Text ellipsis={{ tooltip: true }}>{eventDetails.event}</Typography.Text>}
-      >
-        <ResourceTable
-          colorScheme={getCurrentColorScheme()}
-          resources={eventProperties}
-          columns={eventPropertiesTableColumns}
-          primaryColumnKeys={[EVENT_PROPERTIES_TABLE_COLUMN_IDS.KEY]}
-        />
-      </Collapse.Panel>
-    </Collapse>
+    />
   );
 };

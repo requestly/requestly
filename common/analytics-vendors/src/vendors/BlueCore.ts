@@ -3,9 +3,7 @@ import blueCoreIcon from "../../icons/bluecore-icon.svg";
 import { NetworkEvent } from "../types";
 import { getDecodedBase64Data } from "../utils";
 
-enum BlueCoreEventType {}
-
-export type BlueCoreEvent = Record<string, any>;
+export type BlueCoreEvent = { event: string; properties: Record<string, any> };
 
 export class BlueCore implements Vendor {
   name: string = "BlueCore";
@@ -13,11 +11,52 @@ export class BlueCore implements Vendor {
 
   urlPatterns: string[] = ["api.bluecore.app/api/track", "onsitestats.bluecore.com/events"];
 
+  parentGroupMapping: Record<string, { order?: number; properties: Record<string, { label: string }> }> = {
+    products: {
+      properties: { products: { label: "Product" } },
+    },
+    event: { properties: { token: { label: "Token" } } },
+    device: {
+      properties: {
+        os: { label: "OS" },
+        browser: { label: "Browser" },
+        device: { label: "Device" },
+      },
+    },
+    user: {
+      properties: {
+        distinct_id: { label: "Distinct ID" },
+        original_user_type: { label: "Original User Type" },
+        current_user_type: { label: "Type" },
+        session_pvc: { label: "Session PVC" },
+        day_pvc: { label: "Day PVC" },
+      },
+    },
+    source: {
+      properties: {
+        mp_lib: { label: "Library" },
+        url: { label: "URL" },
+        bc_source_detail: { label: "BC Source Detail" },
+        bc_source_medium: { label: "BC Source Medium" },
+        event_source: { label: "Event Source" },
+      },
+    },
+    metadata: { properties: { bc_track_metadata_trigger: { label: "Track Metadata Trigger" } } },
+    miscellaneous: {
+      properties: {
+        bc_track_metadata_product_attributes: { label: "bc_track_metadata_product_attributes" },
+        bc_track_metadata_trigger: { label: "bc_track_metadata_trigger" },
+        integration_version: { label: "integration_version" },
+        session_id_v2: { label: "session_id_v2" },
+      },
+    },
+  };
+
   identify(url: string, method: string): boolean {
     return this.urlPatterns.some((pattern) => url.includes(pattern));
   }
 
-  getGetMethodPayload(event: NetworkEvent): Record<string, any> | null {
+  getGetMethodPayload(event: NetworkEvent): BlueCoreEvent | null {
     // TODO: Each url can have variations for payload, ie for some URL payload key can be different
     const url = event.request.url;
     const params = new URLSearchParams(url);
@@ -28,7 +67,7 @@ export class BlueCore implements Vendor {
     return { event: eventDetails?.event_type, properties: eventDetails };
   }
 
-  getPostMethodPayload(event: NetworkEvent): Record<string, any> | null {
+  getPostMethodPayload(event: NetworkEvent): BlueCoreEvent | null {
     const postData = event.request.postData;
 
     if (!postData) {
@@ -62,20 +101,42 @@ export class BlueCore implements Vendor {
     }
   }
 
-  groupEventProperties(event: Record<string, any>): BlueCoreEvent {
-    // 1. Group the events
-    // 2. return
-    return {};
+  groupEventProperties(event: BlueCoreEvent): Record<string, any> | null {
+    if (!event) {
+      return null;
+    }
+
+    const result = Object.entries(event.properties).reduce((result, [eventKey, eventValue]) => {
+      Object.keys(this.parentGroupMapping).forEach((groupkey) => {
+        const isExist = Object.keys(this.parentGroupMapping[groupkey].properties).find((propertyKey) => {
+          return eventKey === propertyKey;
+        });
+
+        const eventLabel = this.parentGroupMapping[groupkey]?.properties?.[eventKey]?.label ?? eventKey;
+
+        result = isExist
+          ? {
+              ...result,
+              [groupkey]: {
+                ...(result[groupkey] ?? {}),
+                [eventLabel]: eventValue,
+              },
+            }
+          : result;
+      });
+
+      return result;
+    }, {} as Record<string, any>);
+
+    return { event: event.event, properties: result, rawEvent: event };
   }
 
-  getEventDetails(event: NetworkEvent): BlueCoreEvent | null {
+  getEventDetails(event: NetworkEvent): Record<string, any> | null {
     const payload = this.getEventPayloadByMethod(event);
 
     if (!payload) {
       return null;
     }
-
-    return payload;
 
     return this.groupEventProperties(payload);
   }

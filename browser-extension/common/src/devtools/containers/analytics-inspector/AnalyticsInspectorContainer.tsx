@@ -23,6 +23,8 @@ const AnalyticsInspectorContainer: React.FC = () => {
     setVendorEvents({});
   }, []);
 
+  console.log("vendorEvents -------", vendorEvents);
+
   useEffect(() => {
     chrome.devtools.network.onRequestFinished.addListener((networkEvent: NetworkEvent) => {
       const vendor = analyticsVendorsRegistry.getInstance().getVendorByUrl(networkEvent.request.url);
@@ -67,7 +69,22 @@ const AnalyticsInspectorContainer: React.FC = () => {
                 className="vendor-event-details"
                 expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
               >
-                <Collapse.Panel key={vendor} header={vendor}>
+                <Collapse.Panel
+                  key={vendor}
+                  header={
+                    <div className="vendor-events-collapse-header">
+                      <img
+                        width={30}
+                        height={30}
+                        className="vendor-icon"
+                        src={vendorInstance.icon}
+                        // alt={vendorInstance.name}
+                      />
+
+                      <span>{vendor}</span>
+                    </div>
+                  }
+                >
                   {vendorEvents[vendor].map((event, index) => {
                     const eventDetails = vendorInstance.getEventDetails(event);
 

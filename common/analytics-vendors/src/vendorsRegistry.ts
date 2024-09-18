@@ -29,7 +29,7 @@ export class VendorsRegistry {
     return this.vendors.find((vendor) => vendor.identify(url, method));
   }
 
-  public getVendorEventDetailsByName(name: string, event: NetworkEvent): BlueCoreEvent | null {
+  public getVendorEventDetailsByName(name: string, event: NetworkEvent): Record<string, any> | null {
     switch (name) {
       case VendorName.BLUECORE: {
         const vendor = this.getVendorByName(name);
