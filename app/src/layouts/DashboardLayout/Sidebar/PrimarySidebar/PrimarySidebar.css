@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  margin-bottom: 2rem; /*Bottom margin to prevent overlapping from Saturn widget */
 }
 
 .primary-sidebar-container:hover .secondary-sidebar-toggle-btn {
