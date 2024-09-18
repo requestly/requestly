@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 
+echo -e "\n***** Installing common code's dependencies *****"
+cd ../common
+rm -rf node_modules
+npm install
+cd ..
+
+echo -e "\n***** Installing MV3 dependencies *****"
+cd mv3
+rm -rf node_modules
+npm install
+
 BROWSER=chrome ENV=prod npm run config
-npm run build
 
 echo **Playwright test Started**
 npm run test
@@ -14,12 +24,12 @@ fi
 # Continue with the rest of your script if tests pass
 echo "Playwright tests passed. Continuing..."
 
-VERSION=`date +'%-y.%-m.%d'`
+# VERSION=`date +'%-y.%-m.%d'`
 
-npm version $VERSION
+# npm version $VERSION
 
-# Chrome
-BUILD_MODE='production' npm run build && node scripts/createZip
+# # Chrome
+# BUILD_MODE='production' npm run build && node scripts/createZip
 
-# Reset config
-BROWSER=chrome ENV=local npm run config
+# # Reset config
+# BROWSER=chrome ENV=local npm run config
