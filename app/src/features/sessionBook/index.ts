@@ -3,3 +3,4 @@ export { SessionsOnboardingView } from "./screens/SessionsListScreen/components/
 export { SavedSessionScreen } from "./screens/SavedSessionScreen/SavedSessionScreen";
 export { DraftSessionScreen } from "./screens/DraftSessionScreen/DraftSessionScreen";
 export { sessionRoutes } from "./routes";
+export * from "./types";
