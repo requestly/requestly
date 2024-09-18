@@ -24,12 +24,12 @@ fi
 # Continue with the rest of your script if tests pass
 echo "Playwright tests passed. Continuing..."
 
-# VERSION=`date +'%-y.%-m.%d'`
+VERSION=`date +'%-y.%-m.%d'`
 
-# npm version $VERSION
+npm version $VERSION
 
-# # Chrome
-# BUILD_MODE='production' npm run build && node scripts/createZip
+# Chrome
+BUILD_MODE='production' npm run build && node scripts/createZip
 
-# # Reset config
-# BROWSER=chrome ENV=local npm run config
+# Reset config
+BROWSER=chrome ENV=local npm run config
