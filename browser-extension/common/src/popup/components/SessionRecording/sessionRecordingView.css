@@ -32,7 +32,6 @@
   display: flex;
   align-items: center;
   column-gap: 4px;
-  padding-top: 4px;
 }
 
 .session-view-content .session-replay-security-msg svg {

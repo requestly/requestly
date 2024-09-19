@@ -8,6 +8,7 @@ import SessionRecordingView from "../SessionRecording/SessionRecordingView";
 import { getExtensionVersion } from "../../utils";
 import "./popup.css";
 import { BlockedExtensionView } from "../BlockedExtensionView/BlockedExtensionView";
+import DesktopAppProxy from "../DesktopAppProxy/DesktopAppProxy";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
@@ -41,8 +42,8 @@ const Popup: React.FC = () => {
       ?.then(setIsBlockedOnTab);
   }, [currentTab]);
 
-  const handleToggleExtensionStatus = useCallback(() => {
-    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS }, (updatedStatus) => {
+  const handleToggleExtensionStatus = useCallback((newStatus?: boolean) => {
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS, newStatus }, (updatedStatus) => {
       setIsExtensionEnabled(updatedStatus);
       sendEvent(EVENT.EXTENSION_STATUS_TOGGLED, {
         isEnabled: updatedStatus,
@@ -71,6 +72,7 @@ const Popup: React.FC = () => {
           )}
         </div>
         <div className="popup-footer">
+          <DesktopAppProxy />
           <div className="extension-version">v{getExtensionVersion()}</div>
         </div>
       </div>
