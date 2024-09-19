@@ -1,9 +1,16 @@
 .analytics-inspector-container {
   height: 100%;
-  overflow: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 
   .empty-container-placeholder {
     padding: 1rem;
+  }
+
+  .vendor-events-container {
+    height: 100%;
+    overflow: auto;
   }
 
   .vendor-event-details.ant-collapse {

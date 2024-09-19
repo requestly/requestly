@@ -61,7 +61,7 @@ const AnalyticsInspectorContainer: React.FC = () => {
           ]}
         />
       ) : (
-        <div>
+        <div className="vendor-events-container">
           {Object.keys(vendorEvents).map((vendor) => {
             const vendorInstance = analyticsVendorsRegistry.getInstance().getVendorByName(vendor);
 
