@@ -71,6 +71,7 @@ export const NetworkInspectorHomeScreen: React.FC = () => {
 
             <video
               loop
+              muted
               autoPlay
               width={680}
               height={420}
