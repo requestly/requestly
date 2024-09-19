@@ -68,9 +68,24 @@
         justify-content: center;
         align-items: center;
         gap: var(--space-6, 16px);
-        border-top: 1px solid rgba(255, 255, 255, 0);
+        position: relative;
 
-        backdrop-filter: blur(6px);
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 1px;
+          width: 100%;
+
+          background: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0.35),
+            rgba(255, 255, 255, 0)
+          );
+        }
 
         .rq-logo {
           width: 20px;
