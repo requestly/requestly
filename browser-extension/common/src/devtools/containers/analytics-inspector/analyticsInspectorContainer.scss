@@ -6,12 +6,23 @@
 
   .empty-container-placeholder {
     padding: 1rem;
+
+    .add-vendor-link {
+      color: #3ba0ff;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 
   .vendor-events-container {
     height: 100%;
     overflow: auto;
   }
+
+  //
 
   .vendor-event-details.ant-collapse {
     border-radius: 0;

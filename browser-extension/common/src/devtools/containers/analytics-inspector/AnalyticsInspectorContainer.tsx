@@ -57,7 +57,14 @@ const AnalyticsInspectorContainer: React.FC = () => {
           lines={[
             "Recording Analytics events...",
             "Only BlueCore event supported, more vendors will be added soon!",
-            "Perform an action that triggers event.", // TODO: add github issue link
+            <div
+              className="add-vendor-link"
+              onClick={() => {
+                window.open("https://github.com/requestly/requestly/issues/2179", "_blank", "noopener,noreferrer");
+              }}
+            >
+              Request to add yourself as a vendor
+            </div>,
           ]}
         />
       ) : (
