@@ -12,7 +12,7 @@
 - Test Requestly rules.
 - Test extension popup
 - Test session replay.
-- Test if devtools network panel.
+- Test devtools network panel.
 - Upload the build to [Chrome Store](https://chrome.google.com/webstore/developer/dashboard)
 
 ## Post Release
