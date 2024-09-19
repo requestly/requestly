@@ -24,30 +24,28 @@ const SecondarySidebar: React.FC<SecondarySidebarProps> = ({ items }) => {
   return (
     <AnimatePresence>
       {isSecondarySidebarCollapsed ? null : (
-        <>
-          <m.div
-            initial={{ width: "217px" }} // TODO: Change this to 0 once shared and templates use same container
-            animate={{ width: "217px" }}
-            exit={{ width: "0" }}
-            transition={{
-              ease: "easeInOut",
-              duration: 0.2,
-            }}
-            className="secondary-sidebar-container"
-          >
-            <SidebarToggleButton />
-            <ul>
-              {items.map(({ path, title, icon }) => {
-                return (
-                  <li key={title}>
-                    <SecondarySidebarItem icon={icon} path={path} title={title} />
-                  </li>
-                );
-              })}
-            </ul>
-            <BillingTeamNudge />
-          </m.div>
-        </>
+        <m.div
+          initial={{ width: "217px" }} // TODO: Change this to 0 once shared and templates use same container
+          animate={{ width: "217px" }}
+          exit={{ width: "0" }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.2,
+          }}
+          className="secondary-sidebar-container"
+        >
+          <SidebarToggleButton />
+          <ul>
+            {items.map(({ path, title, icon }) => {
+              return (
+                <li key={title}>
+                  <SecondarySidebarItem icon={icon} path={path} title={title} />
+                </li>
+              );
+            })}
+          </ul>
+          <BillingTeamNudge />
+        </m.div>
       )}
     </AnimatePresence>
   );
