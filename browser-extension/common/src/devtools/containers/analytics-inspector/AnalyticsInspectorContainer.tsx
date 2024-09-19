@@ -6,6 +6,7 @@ import { CaretRightOutlined } from "@ant-design/icons";
 // @ts-ignore
 import getAnalyticsVendorsRegistry from "@requestly/analytics-vendors";
 import { VendorEvent } from "./components/VendorEvent/VendorEvent";
+import { PrimaryToolbar } from "./toolbars";
 import "./analyticsInspectorContainer.scss";
 
 const AnalyticsInspectorContainer: React.FC = () => {
@@ -13,17 +14,15 @@ const AnalyticsInspectorContainer: React.FC = () => {
   const analyticsVendorsRegistry = getAnalyticsVendorsRegistry();
 
   const [vendorEvents, setVendorEvents] = useState<Record<string, NetworkEvent[]>>({});
-
   const [settings, setSettings] = useState<NetworkSettings>({
     preserveLog: false,
   });
+
   const preserveLogRef = useRef(false);
 
   const clearEvents = useCallback(() => {
     setVendorEvents({});
   }, []);
-
-  console.log("vendorEvents -------", vendorEvents);
 
   useEffect(() => {
     chrome.devtools.network.onRequestFinished.addListener((networkEvent: NetworkEvent) => {
@@ -40,7 +39,7 @@ const AnalyticsInspectorContainer: React.FC = () => {
 
     chrome.devtools.network.onNavigated.addListener(() => {
       if (!preserveLogRef.current) {
-        //clearEvents();
+        clearEvents();
       }
     });
   }, [clearEvents]);
@@ -51,11 +50,14 @@ const AnalyticsInspectorContainer: React.FC = () => {
 
   return (
     <div className="analytics-inspector-container">
+      <PrimaryToolbar clearEvents={clearEvents} settings={settings} onSettingsChange={setSettings} />
+
       {Object.keys(vendorEvents).length === 0 ? (
         <EmptyContainerPlaceholder
           lines={[
-            "Recording Analytics events...(Only BlueCore event supported, More vendors will be added soon)",
-            "Perform an action that triggers event.",
+            "Recording Analytics events...",
+            "Only BlueCore event supported, more vendors will be added soon!",
+            "Perform an action that triggers event.", // TODO: add github issue link
           ]}
         />
       ) : (
