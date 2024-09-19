@@ -8,19 +8,24 @@ async function sendSlackInvite() {
     className: "slack-connect-toast",
     duration: 0,
   });
+
   const sendSlackInviation = httpsCallable(getFunctions(), "slackConnect-sendSlackInvitation");
   sendSlackInviation()
-    .then((res) => {
-      if (res.data) {
+    .then((res: any) => {
+      if (res.data.success) {
         message.success({
-          content: "Please check your email and accept the Slack invite!",
+          content: "You'll receive the Slack invite in your email shortly!",
           className: "slack-connect-toast",
           duration: 4,
         });
       }
     })
-    .catch((err) => {
-      console.error("Error sending slack invite", err);
+    .catch(() => {
+      message.error({
+        content: "Failed to send Slack invite",
+        className: "slack-connect-toast",
+        duration: 4,
+      });
     })
     .finally(hide);
 }
