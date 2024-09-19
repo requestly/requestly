@@ -30,11 +30,15 @@
           gap: 6px;
 
           .vendor-icon {
-            width: 30px;
-            height: 30px;
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
+            width: 16px;
+            height: 16px;
+            padding: 2px;
+            border-radius: 4px;
+            background: #ffffff;
+            color: #4b5563;
           }
         }
 
