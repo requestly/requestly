@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Collapse, Tooltip, Typography } from "antd";
-import { CaretRightOutlined, CheckCircleFilled, CopyOutlined, GroupOutlined } from "@ant-design/icons";
+import { CaretRightOutlined, GroupOutlined } from "@ant-design/icons";
 import { getCurrentColorScheme } from "src/devtools/utils";
 import { Column, ResourceTable } from "@requestly-ui/resource-table";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
@@ -37,7 +37,6 @@ interface VendorEventProps {
 
 export const VendorEvent: React.FC<VendorEventProps> = ({ eventDetails, vendorName }) => {
   const [isJsonView, setIsJsonView] = useState(false);
-  const [copyClicked, setCopyClicked] = useState(false);
 
   if (!eventDetails) {
     return <div>No event data found!</div>;
@@ -82,21 +81,6 @@ export const VendorEvent: React.FC<VendorEventProps> = ({ eventDetails, vendorNa
                   setIsJsonView((prev) => !prev);
                 }}
                 icon={isJsonView ? <GroupOutlined /> : <span>{`{}`}</span>}
-              />
-            </Tooltip>
-
-            <Tooltip title={copyClicked ? "Copied!" : "Copy"}>
-              <Button
-                size="small"
-                icon={copyClicked ? <CheckCircleFilled style={{ color: "green" }} /> : <CopyOutlined />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigator.clipboard
-                    .writeText(JSON.stringify(eventDetails))
-                    .catch((err) => console.error("from copy btn", err));
-                  setCopyClicked(true);
-                  setTimeout(() => setCopyClicked(false), 500);
-                }}
               />
             </Tooltip>
           </div>
