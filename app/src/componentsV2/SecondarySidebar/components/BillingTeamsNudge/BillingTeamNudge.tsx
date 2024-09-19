@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useDispatch, useSelector } from "react-redux";
-import { getIsBillingTeamNudgeClosed, getUserAuthDetails } from "store/selectors";
+import { getBillingTeamNudgeLastSeenTs, getUserAuthDetails } from "store/selectors";
 import { getCompanyNameFromEmail } from "utils/FormattingHelper";
 import { getAvailableBillingTeams, getBillingTeamMemberById } from "store/features/billing/selectors";
 import PATHS from "config/constants/sub/paths";
@@ -11,6 +11,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { actions } from "store";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
+import { PlanStatus } from "features/settings/components/BillingTeam/types";
 import {
   trackBillingTeamNudgeClosed,
   trackBillingTeamNudgeRequestFailed,
@@ -25,17 +26,26 @@ export const BillingTeamNudge: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeams[0]?.id, billingTeams[0]?.owner));
-  const isBillingTeamNudgeClosed = useSelector(getIsBillingTeamNudgeClosed);
+  const billingTeamNudgeLastSeenTs = useSelector(getBillingTeamNudgeLastSeenTs);
   const [isLoading, setIsLoading] = useState(false);
   const [isRequestSent, setIsRequestSent] = useState(false);
   const [isRequestProcessed, setIsRequestProcessed] = useState(false);
 
   const domain = getCompanyNameFromEmail(user.details?.profile?.email);
 
+  const daysSinceLastSeen = useMemo(() => {
+    const now = new Date();
+    const lastSeen = new Date(billingTeamNudgeLastSeenTs);
+    const diffTime = Math.abs(now.getTime() - lastSeen.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  }, [billingTeamNudgeLastSeenTs]);
+
   const availableBillingTeams = useMemo(
     () =>
       billingTeams.filter(
-        (team) => team.subscriptionDetails.subscriptionStatus === "active" && !team.members[user.details?.profile?.uid]
+        (team) =>
+          team.subscriptionDetails.subscriptionStatus === PlanStatus.ACTIVE && !team.members[user.details?.profile?.uid]
       ),
     [billingTeams, user.details?.profile?.uid]
   );
@@ -74,13 +84,13 @@ export const BillingTeamNudge: React.FC = () => {
 
   const handleCloseBillingTeamNudge = () => {
     // @ts-ignore
-    dispatch(actions.updateIsBillingTeamNudgeClosed(true));
+    dispatch(actions.updateBillingTeamNudgeLastSeenTs(new Date().getTime()));
     trackBillingTeamNudgeClosed();
   };
 
-  if (isBillingTeamNudgeClosed) return null;
+  if (daysSinceLastSeen && daysSinceLastSeen < 15) return null;
 
-  if (user.details?.planDetails?.status === "active") return null;
+  if (user.details?.planDetails?.status === PlanStatus.ACTIVE) return null;
   if (!availableBillingTeams.length) return null;
 
   return (
