@@ -213,6 +213,6 @@ export const updateIsCodeEditorFullScreenModeOnboardingCompleted = (prevState, a
   prevState.misc.persist.isCodeEditorFullScreenModeOnboardingCompleted = action.payload;
 };
 
-export const updateIsBillingTeamNudgeClosed = (prevState, action) => {
-  prevState.misc.persist.isBillingTeamNudgeClosed = action.payload;
+export const updateBillingTeamNudgeLastSeenTs = (prevState, action) => {
+  prevState.misc.persist.BillingTeamNudgeLastSeenTs = action.payload;
 };
