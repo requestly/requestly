@@ -26,7 +26,7 @@ export const NetworkInspectorHomeScreen: React.FC = () => {
     </div>
   );
 
-  const handleOnPlay: React.ReactEventHandler<HTMLVideoElement> = (event) => {
+  const handlePlaying: React.ReactEventHandler<HTMLVideoElement> = (event) => {
     const currentTime = (event.target as HTMLVideoElement).currentTime;
 
     if (parseInt(`${currentTime}`) === 0) {
@@ -43,7 +43,7 @@ export const NetworkInspectorHomeScreen: React.FC = () => {
   };
 
   return (
-    <main className="network-inspector-home-container">
+    <div className="network-inspector-home-container">
       <div className="network-inspector-content">
         <div className="header-container">
           <NetworkInspectorIcon className="network-inspector-icon" />
@@ -65,11 +65,12 @@ export const NetworkInspectorHomeScreen: React.FC = () => {
             {showDevtoolsShortcut ? <div className="devtools-shortcut">Open devtools panel {renderHotKey}</div> : null}
 
             <video
-              onPlay={handleOnPlay}
+              loop
+              autoPlay
               width={680}
               height={434}
-              controls
-              autoPlay
+              controls={false}
+              onPlaying={handlePlaying}
               className="network-inspector-video-player"
             >
               <source src={networkInspectorVideo} type="video/mp4" />
@@ -83,6 +84,6 @@ export const NetworkInspectorHomeScreen: React.FC = () => {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 };
