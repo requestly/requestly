@@ -51,13 +51,18 @@ export const NetworkInspectorHomeScreen: React.FC = () => {
           <div className="heading">Use our Next-Gen Network inspector</div>
 
           <div className="description">
-            👉 Get Started: Open your browser's devtools panel and navigate to the Requestly tab to start capturing and
-            inspecting requests.
+            👉 Open the Requestly tab in your browser's devtools panel to capture & inspect requests.
           </div>
 
           <a target="_blank" rel="noreferrer" className="learn-more-link" href={LINKS.REQUESTLY_NETWORK_INSPECTOR_DOCS}>
             <FiArrowUpRight /> Learn more
           </a>
+
+          <div className="shortcut-keys-container">
+            {renderHotKey}
+            <HiArrowLongRight className="right-arrow" />
+            <RQLogo className="rq-logo" />
+          </div>
         </div>
 
         <div className="video-container">
@@ -68,19 +73,13 @@ export const NetworkInspectorHomeScreen: React.FC = () => {
               loop
               autoPlay
               width={680}
-              height={434}
+              height={420}
               controls={false}
               onPlaying={handlePlaying}
               className="network-inspector-video-player"
             >
               <source src={networkInspectorVideo} type="video/mp4" />
             </video>
-          </div>
-
-          <div className="shortcut-keys-container">
-            {renderHotKey}
-            <HiArrowLongRight className="right-arrow" />
-            <RQLogo className="rq-logo" />
           </div>
         </div>
       </div>
