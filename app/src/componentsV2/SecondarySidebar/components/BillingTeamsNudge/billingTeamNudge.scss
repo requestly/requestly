@@ -37,4 +37,19 @@
     color: var(--requestly-color-text-subtle);
     display: none;
   }
+
+  &__request-status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+    font-weight: 500;
+    margin-top: 1rem;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
 }

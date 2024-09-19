@@ -9,6 +9,14 @@ import { getAvailableBillingTeams, getBillingTeamMemberById } from "store/featur
 import PATHS from "config/constants/sub/paths";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { actions } from "store";
+import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
+import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
+import {
+  trackBillingTeamNudgeClosed,
+  trackBillingTeamNudgeRequestFailed,
+  trackBillingTeamNudgeRequestSent,
+  trackCheckoutBillingTeamNudgeClicked,
+} from "./analytics";
 import "./billingTeamNudge.scss";
 
 export const BillingTeamNudge: React.FC = () => {
@@ -34,6 +42,7 @@ export const BillingTeamNudge: React.FC = () => {
 
   const handleRequestButtonClick = useCallback(() => {
     if (availableBillingTeams.length > 1) {
+      trackCheckoutBillingTeamNudgeClicked();
       navigate(PATHS.SETTINGS.BILLING.RELATIVE);
     } else {
       setIsLoading(true);
@@ -46,12 +55,14 @@ export const BillingTeamNudge: React.FC = () => {
         billingId: availableBillingTeams[0].id,
       })
         .then(() => {
+          trackBillingTeamNudgeRequestSent();
           setIsRequestSent(true);
           setTimeout(() => {
-            toggleBillingTeamNudge();
+            handleCloseBillingTeamNudge();
           }, 4000);
         })
         .catch(() => {
+          trackBillingTeamNudgeRequestFailed();
           setIsRequestSent(false);
         })
         .finally(() => {
@@ -61,9 +72,10 @@ export const BillingTeamNudge: React.FC = () => {
     }
   }, [availableBillingTeams, navigate]);
 
-  const toggleBillingTeamNudge = () => {
+  const handleCloseBillingTeamNudge = () => {
     // @ts-ignore
     dispatch(actions.updateIsBillingTeamNudgeClosed(true));
+    trackBillingTeamNudgeClosed();
   };
 
   if (isBillingTeamNudgeClosed) return null;
@@ -73,7 +85,7 @@ export const BillingTeamNudge: React.FC = () => {
 
   return (
     <div className="billing-team-nudge">
-      <MdClose className="billing-team-nudge__close-icon" onClick={toggleBillingTeamNudge} />
+      <MdClose className="billing-team-nudge__close-icon" onClick={handleCloseBillingTeamNudge} />
       <div className="billing-team-nudge__content">
         {isRequestProcessed ? (
           <>
@@ -81,10 +93,7 @@ export const BillingTeamNudge: React.FC = () => {
               " Billing team admins have been notified. Please get in touch with them for approval and details."
             ) : (
               <>
-                {" "}
-                Unable to send request, contact directly at <span className="caption">
-                  {teamOwnerDetails?.email}
-                </span>{" "}
+                Unable to send request, contact directly at <span className="caption">{teamOwnerDetails?.email}</span>{" "}
                 for futher details.
               </>
             )}
@@ -95,20 +104,30 @@ export const BillingTeamNudge: React.FC = () => {
           </>
         )}
       </div>
-      <Button
-        loading={isLoading}
-        className="billing-team-nudge__button"
-        size="small"
-        disabled={isRequestProcessed}
-        type="secondary"
-        onClick={handleRequestButtonClick}
-      >
-        {availableBillingTeams.length > 1 ? (
-          <>Checkout Billing Teams </>
-        ) : (
-          <>{isRequestSent ? "Request sent" : "Send license request"}</>
-        )}
-      </Button>
+      {isRequestProcessed ? (
+        <div className="billing-team-nudge__request-status">
+          {isRequestSent ? (
+            <>
+              Request sent <MdCheckCircleOutline className="success" />
+            </>
+          ) : (
+            <>
+              Unable to send request <MdErrorOutline className="danger" />
+            </>
+          )}
+        </div>
+      ) : (
+        <Button
+          loading={isLoading}
+          className="billing-team-nudge__button"
+          size="small"
+          disabled={isRequestProcessed}
+          type="secondary"
+          onClick={handleRequestButtonClick}
+        >
+          {availableBillingTeams.length > 1 ? "Checkout Billing Teams" : "Send license request"}
+        </Button>
+      )}
     </div>
   );
 };
