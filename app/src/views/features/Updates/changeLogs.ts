@@ -8,6 +8,10 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.9.18",
+    logs: ["[ENGG-2240] feat: support for connecting existing browser profile to desktop app (#2167)"],
+  },
+  {
     version: "24.9.11",
     logs: [
       "[ENGG-2263] feat: Show Captured localStorage events in session details panel (#2145)",
