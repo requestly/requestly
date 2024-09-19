@@ -23,10 +23,10 @@
     "build": "npm run build:common && npm run build:current",
     "build:current": "rm -rf dist && rollup -c",
     "build:common": "cd ../common && npm run build && cd ../mv3",
-    "watch": "rm -rf dist && rollup -cw",
-    "pretest": "npm run build",
-    "test": "playwright test",
     "prebuild": "npm ls",
+    "watch": "rm -rf dist && rollup -cw",
+    "test": "playwright test",
+    "pretest": "npm run build",
     "release": "sh scripts/release-extension.sh",
     "prerelease": "cd .. && sh ./install.sh"
   },
