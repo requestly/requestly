@@ -53,7 +53,7 @@ export const BillingInvoiceCard: React.FC = () => {
           isRequestSent ? (
             <div className="request-result success">
               {" "}
-              <MdCheckCircleOutline /> Email sent successfully
+              <MdCheckCircleOutline /> Request sent successfully, invoice will be sent shortly.
             </div>
           ) : (
             <div className="request-result error">
