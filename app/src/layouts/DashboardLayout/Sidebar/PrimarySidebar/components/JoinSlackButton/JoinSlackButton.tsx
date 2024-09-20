@@ -7,6 +7,7 @@ import { trackSlackConnectClicked } from "modules/analytics/events/misc/UnifiedS
 import { useDispatch } from "react-redux";
 import { actions } from "store";
 import "./joinSlackButton.scss";
+import Logger from "lib/logger";
 
 const JoinSlackButton = () => {
   const dispatch = useDispatch();
@@ -20,7 +21,9 @@ const JoinSlackButton = () => {
         dispatch(actions.updateIsSlackConnectButtonVisible(false));
         trackSlackConnectClicked("sidebar");
       })
-      .catch(console.error)
+      .catch((err) => {
+        Logger.error("Failed to send Slack invite", err);
+      })
       .finally(() => setIsDisabled(false));
   }, [setIsDisabled]);
 
