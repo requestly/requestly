@@ -3,7 +3,7 @@ import { throttle } from "lodash";
 import { toast } from "utils/Toast";
 
 async function sendSlackInvite() {
-  const hide = toast.loading("Sending Slack Connect Invitation", 0);
+  toast.loading("Sending Slack Connect Invitation", 0);
 
   const sendSlackInviation = httpsCallable(getFunctions(), "slackConnect-sendSlackInvitation");
   sendSlackInviation()
@@ -15,7 +15,7 @@ async function sendSlackInvite() {
     .catch(() => {
       toast.error("Failed to send Slack invite", 4);
     })
-    .finally(() => hide);
+    .finally(() => toast.loading("Sending Slack Connect Invitation", 0));
 }
 
 export default throttle(sendSlackInvite, 5000);
