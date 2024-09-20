@@ -15,7 +15,9 @@ async function sendSlackInvite() {
     .catch(() => {
       toast.error("Failed to send Slack invite", 4);
     })
-    .finally(() => toast.loading("Sending Slack Connect Invitation", 0));
+    .finally(() => {
+      toast.loading("Sending Slack Connect Invitation", 0);
+    });
 }
 
 export default throttle(sendSlackInvite, 5000);
