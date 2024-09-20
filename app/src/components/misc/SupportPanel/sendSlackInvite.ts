@@ -6,7 +6,7 @@ async function sendSlackInvite() {
   toast.loading("Sending Slack Connect Invitation", 0);
 
   const sendSlackInviation = httpsCallable(getFunctions(), "slackConnect-sendSlackInvitation");
-  sendSlackInviation()
+  return sendSlackInviation()
     .then((res: any) => {
       if (res.data.success) {
         toast.success("You'll receive the Slack invite in your email shortly!", 4);
