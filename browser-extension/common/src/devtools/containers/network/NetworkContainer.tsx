@@ -27,11 +27,11 @@ const NetworkContainer: React.FC = () => {
 
   useEffect(() => {
     chrome.devtools.network.onRequestFinished.addListener((networkEvent: NetworkEvent) => {
-      const rqNetworkEvent = {
+      const rqNetworkEvent: RQNetworkEvent = {
         ...networkEvent,
         getContent: networkEvent.getContent,
         metadata: {
-          GQLDetails: getGraphQLDetails(networkEvent),
+          graphQLDetails: getGraphQLDetails(networkEvent),
         },
       };
 

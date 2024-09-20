@@ -35,10 +35,10 @@ export type RQNetworkEvent = NetworkEvent & {
 };
 
 interface Metadata {
-  GQLDetails: GQLDetails | null;
+  graphQLDetails: GraphQLDetails | null;
 }
 
-interface GQLDetails {
+interface GraphQLDetails {
   query: string;
   variables: any; // TBD @nsr
   operationName: string;

@@ -18,8 +18,8 @@ const networkEventTableColumns: Column<RQNetworkEvent>[] = [
     header: "URL",
     render: (networkEvent) => {
       const url = networkEvent.request.url;
-      if (networkEvent?.metadata?.GQLDetails) {
-        const { operationName } = networkEvent.metadata.GQLDetails;
+      if (networkEvent?.metadata?.graphQLDetails) {
+        const { operationName } = networkEvent.metadata.graphQLDetails;
         return (
           <div className="table-cell-url-wrapper">
             <span className="table-cell-url">{url}</span>
