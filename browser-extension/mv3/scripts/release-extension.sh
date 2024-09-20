@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-
 BROWSER=chrome ENV=prod npm run config
-npm run build
 
 echo **Playwright test Started**
 npm run test
