@@ -5,6 +5,11 @@ cd config
 ENV=$1 npm run build
 cd ..
 
+echo -e "\n***** Building analytics vendors *****"
+cd ../common/analytics-vendors
+npm run build
+cd ../../browser-extension
+
 echo -e "\n***** Building common code *****"
 cd common
 npm run build
