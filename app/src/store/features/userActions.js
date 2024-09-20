@@ -214,5 +214,5 @@ export const updateIsCodeEditorFullScreenModeOnboardingCompleted = (prevState, a
 };
 
 export const updateBillingTeamNudgeLastSeenTs = (prevState, action) => {
-  prevState.misc.persist.BillingTeamNudgeLastSeenTs = action.payload;
+  prevState.misc.persist.billingTeamNudgeLastSeenTs = action.payload;
 };

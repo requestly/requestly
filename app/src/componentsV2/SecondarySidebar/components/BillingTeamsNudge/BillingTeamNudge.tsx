@@ -19,6 +19,7 @@ import {
   trackCheckoutBillingTeamNudgeClicked,
 } from "./analytics";
 import "./billingTeamNudge.scss";
+import { getDaysDifference } from "utils/DateTimeUtils";
 
 export const BillingTeamNudge: React.FC = () => {
   const navigate = useNavigate();
@@ -33,13 +34,7 @@ export const BillingTeamNudge: React.FC = () => {
 
   const domain = getCompanyNameFromEmail(user.details?.profile?.email);
 
-  const daysSinceLastSeen = useMemo(() => {
-    const now = new Date();
-    const lastSeen = new Date(billingTeamNudgeLastSeenTs);
-    const diffTime = Math.abs(now.getTime() - lastSeen.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  }, [billingTeamNudgeLastSeenTs]);
+  const daysSinceLastSeen = useMemo(() => getDaysDifference(billingTeamNudgeLastSeenTs), [billingTeamNudgeLastSeenTs]);
 
   const availableBillingTeams = useMemo(
     () =>
@@ -49,6 +44,12 @@ export const BillingTeamNudge: React.FC = () => {
       ),
     [billingTeams, user.details?.profile?.uid]
   );
+
+  const handleCloseBillingTeamNudge = useCallback(() => {
+    // @ts-ignore
+    dispatch(actions.updateBillingTeamNudgeLastSeenTs(new Date().getTime()));
+    trackBillingTeamNudgeClosed();
+  }, [dispatch]);
 
   const handleRequestButtonClick = useCallback(() => {
     if (availableBillingTeams.length > 1) {
@@ -80,13 +81,7 @@ export const BillingTeamNudge: React.FC = () => {
           setIsRequestProcessed(true);
         });
     }
-  }, [availableBillingTeams, navigate]);
-
-  const handleCloseBillingTeamNudge = () => {
-    // @ts-ignore
-    dispatch(actions.updateBillingTeamNudgeLastSeenTs(new Date().getTime()));
-    trackBillingTeamNudgeClosed();
-  };
+  }, [availableBillingTeams, navigate, handleCloseBillingTeamNudge]);
 
   if (daysSinceLastSeen && daysSinceLastSeen < 15) return null;
 

@@ -335,5 +335,5 @@ export const getRequestBot = (state) => {
 };
 
 export const getBillingTeamNudgeLastSeenTs = (state) => {
-  return getGlobalState(state).misc.persist?.BillingTeamNudgeLastSeenTs;
+  return getGlobalState(state).misc.persist?.billingTeamNudgeLastSeenTs;
 };
