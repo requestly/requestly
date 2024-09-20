@@ -20,7 +20,8 @@
   },
   "scripts": {
     "build": "rm -rf dist && rollup -c",
-    "watch": "rm -rf dist && rollup -cw"
+    "watch": "rm -rf dist && rollup -cw",
+    "prebuild": "npm ls"
   },
   "devDependencies": {
     "@requestly-ui/resource-table": "^0.1.8",
