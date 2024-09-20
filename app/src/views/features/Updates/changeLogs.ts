@@ -8,6 +8,19 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.9.18",
+    logs: ["[ENGG-2240] feat: support for connecting existing browser profile to desktop app (#2167)"],
+  },
+  {
+    version: "24.9.11",
+    logs: [
+      "[ENGG-2263] feat: Show Captured localStorage events in session details panel (#2145)",
+      "[ENGG-2198] feat: rule executions tab in extension's network panel (#2118)",
+      "[ENGG-2196] migrated monaco to code mirror in network devtools (#2115)",
+      "fix: sendMessage returns nothing in firefox",
+    ],
+  },
+  {
     version: "24.9.2",
     logs: ["[ENGG-2136] feat: sharedState in extension dynamic request, response rules (#2072)"],
   },

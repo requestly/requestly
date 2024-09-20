@@ -36,6 +36,10 @@ export const EXTENSION_MESSAGES = {
   RULE_SAVE_ERROR: "ruleSaveError",
   IS_EXTENSION_BLOCKED_ON_TAB: "isExtensionBlockedOnTab",
   CACHE_SHARED_STATE: "cacheSharedState",
+  IS_PROXY_APPLIED: "isProxyApplied",
+  CHECK_IF_DESKTOP_APP_OPEN: "checkIfDesktopAppOpen",
+  CONNECT_TO_DESKTOP_APP: "connectToDesktopApp",
+  DISCONNECT_FROM_DESKTOP_APP: "disconnectFromDesktopApp",
 };
 
 export const CLIENT_MESSAGES = {

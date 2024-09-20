@@ -89,11 +89,11 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
     (id: string, email: string) => {
       removeMemberFromBillingTeam(billingId, id)
         .then(() => {
-          toast.success("User removed from the billing team");
+          toast.success("License revoked for the user");
           trackBillingTeamMemberRemoved(email, billingId);
         })
         .catch(() => {
-          toast.error("Error while removing user");
+          toast.error("Error while revoking license for the user");
         })
         .finally(() => {
           setLoadingRows(loadingRows.filter((row) => row !== id));
@@ -152,7 +152,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
           label: (
             <Row align="middle" gutter={8} onClick={() => trackBillingTeamActionClicked("remove_as_admin")}>
               <MdPersonOutline fontSize={16} className="mr-8" />
-              Change role to member
+              Dismiss as admin
             </Row>
           ),
         },
@@ -160,7 +160,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
           key: BillingAction.REMOVE,
           label: (
             <Popconfirm
-              title="Are you sure you want to remove this member?"
+              title="Are you sure you want to revoke this member's license?"
               onConfirm={() => handleRemoveMember(id, email, status, inviteId)}
               okText="Yes"
               cancelText="No"
@@ -168,7 +168,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
             >
               <Row align="middle" gutter={8} onClick={() => trackBillingTeamActionClicked("remove_member")}>
                 <IoMdCloseCircleOutline fontSize={16} className="mr-8" />
-                Remove
+                Revoke license
               </Row>
             </Popconfirm>
           ),
@@ -247,7 +247,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
         ),
       },
       {
-        title: "Added on",
+        title: "Assigned on",
         dataIndex: "joiningDate",
         render: (joiningDate: number, record: any) => (
           <div className={`text-white ${loadingRows.includes(record.id) ? "loading-cell" : ""}`}>
@@ -325,7 +325,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
     <>
       <Col className="billing-teams-primary-card billing-team-members-section">
         <Row className="billing-team-members-section-header w-full" justify="space-between" align="middle">
-          <Col className="billing-team-members-section-header-title">Members in billing team</Col>
+          <Col className="billing-team-members-section-header-title">Licensed members</Col>
           <Col>
             <RQButton
               type="default"
@@ -334,7 +334,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
               onClick={openDrawer}
               disabled={!isUserAdmin}
             >
-              Add members
+              Assign license
             </RQButton>
           </Col>
         </Row>
@@ -350,8 +350,8 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
       <ActionLoadingModal
         isOpen={isLoadingModalVisible}
         onClose={() => setIsLoadingModalVisible(false)}
-        title="Removing user..."
-        message="Pleae wait while we process your request"
+        title="Revoking license..."
+        message="Please wait while we process your request"
       />
     </>
   );
