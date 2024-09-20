@@ -13,7 +13,7 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        use: ["file-loader"],
+        use: ["raw-loader"],
       },
     ],
   },

@@ -1,29 +1,27 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { NetworkEvent, NetworkSettings } from "../../types";
-// import { PrimaryToolbar, FiltersToolbar } from "./toolbars";
 import EmptyContainerPlaceholder from "../../components/EmptyContainerPlaceholder/EmptyContainerPlaceholder";
-import { ResourceTable } from "@requestly-ui/resource-table";
-import { ResourceTypeFilterValue } from "../../components/ResourceTypeFilter";
-//import executionTableColumns, { EXECUTION_TABLE_COLUMN_IDS } from "./columns";
-//import executionDetailsTabs from "./details-tabs";
-// import { getResourceType } from "./utils";
-import { getCurrentColorScheme, matchResourceTypeFilter } from "../../utils";
-// import "./executionsContainer.scss";
-
+import { Collapse } from "antd";
+import { CaretRightOutlined } from "@ant-design/icons";
+// @ts-ignore
 import getAnalyticsVendorsRegistry from "@requestly/analytics-vendors";
+import { VendorEventPanel } from "./components/VendorEventPanel/VendorEventPanel";
+import { PrimaryToolbar } from "./toolbars";
+import "./analyticsInspectorContainer.scss";
 
 const AnalyticsInspectorContainer: React.FC = () => {
+  // @ts-ignore
   const analyticsVendorsRegistry = getAnalyticsVendorsRegistry();
 
-  const [vendorEvents, setVendorEvents] = useState<Map<string, NetworkEvent[]>>(new Map());
-
+  const [vendorEvents, setVendorEvents] = useState<Record<string, NetworkEvent[]>>({});
   const [settings, setSettings] = useState<NetworkSettings>({
     preserveLog: false,
   });
+
   const preserveLogRef = useRef(false);
 
   const clearEvents = useCallback(() => {
-    setVendorEvents(new Map());
+    setVendorEvents({});
   }, []);
 
   useEffect(() => {
@@ -34,14 +32,14 @@ const AnalyticsInspectorContainer: React.FC = () => {
       if (!vendor) return;
 
       setVendorEvents((prev) => {
-        const existingEvents = prev.get(vendor.name) || [];
-        return new Map(prev).set(vendor.name, [...existingEvents, networkEvent]);
+        const existingEvents = prev[vendor.name] || [];
+        return { ...prev, [vendor.name]: [...existingEvents, networkEvent] };
       });
     });
 
     chrome.devtools.network.onNavigated.addListener(() => {
       if (!preserveLogRef.current) {
-        //clearEvents();
+        clearEvents();
       }
     });
   }, [clearEvents]);
@@ -51,44 +49,55 @@ const AnalyticsInspectorContainer: React.FC = () => {
   }, [settings]);
 
   return (
-    // <div className="executions-container">
-    //   <PrimaryToolbar clearEvents={clearEvents} settings={settings} onSettingsChange={setSettings} />
-    //   {executionEvents.length > 0 ? (
-    //     <>
-    //       <FiltersToolbar filters={filters} onFiltersChange={setFilters} />
-    //       <ResourceTable
-    //         colorScheme={getCurrentColorScheme()}
-    //         resources={executionEvents}
-    //         columns={executionTableColumns}
-    //         primaryColumnKeys={[EXECUTION_TABLE_COLUMN_IDS.URL]}
-    //         detailsTabs={executionDetailsTabs}
-    //         filter={filterExecutions}
-    //       />
-    //     </>
-    //   ) : (
-    //     <EmptyContainerPlaceholder
-    //       lines={[
-    //         "Recording rule executions...",
-    //         "Perform a request or Reload the page to see network requests intercepted and modified by Requestly.",
-    //       ]}
-    //     />
-    //   )}
-    // </div>
+    <div className="analytics-inspector-container">
+      <PrimaryToolbar clearEvents={clearEvents} settings={settings} onSettingsChange={setSettings} />
 
-    <div>
-      <EmptyContainerPlaceholder
-        lines={[
-          "Recording Analytics events...(Only BlueCore event supported, More vendors will be added soon)",
-          "Perform an action that triggers event.",
-        ]}
-      />
+      {Object.keys(vendorEvents).length === 0 ? (
+        <EmptyContainerPlaceholder
+          lines={[
+            "Recording Analytics events...",
+            "Only BlueCore event supported, more vendors will be added soon!",
+            <div
+              className="add-vendor-link"
+              onClick={() => {
+                window.open("https://github.com/requestly/requestly/issues/2179", "_blank", "noopener,noreferrer");
+              }}
+            >
+              Request to add yourself as a vendor
+            </div>,
+          ]}
+        />
+      ) : (
+        <div className="vendor-events-container">
+          {Object.keys(vendorEvents).map((vendor) => {
+            const vendorInstance = analyticsVendorsRegistry.getInstance().getVendorByName(vendor);
 
-      <div className="analytics-inspector-container">
-        <span>
-          {analyticsVendorsRegistry.getInstance().getVendorByUrl("api.bluecore.com/api/track/123").name}+ '-' +
-          {vendorEvents.get("BlueCore")?.length}
-        </span>
-      </div>
+            return (
+              <Collapse
+                key={vendor}
+                className="vendor-event-details"
+                expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+              >
+                <Collapse.Panel
+                  key={vendor}
+                  header={
+                    <div className="vendor-events-collapse-header">
+                      <span className="vendor-icon" dangerouslySetInnerHTML={{ __html: vendorInstance.icon }} />
+                      <span className="vendor-name">{vendor}</span>
+                    </div>
+                  }
+                >
+                  {vendorEvents[vendor].map((event, index) => {
+                    const eventDetails = vendorInstance.getEventDetails(event);
+
+                    return <VendorEventPanel key={index} vendorName={vendor} eventDetails={eventDetails} />;
+                  })}
+                </Collapse.Panel>
+              </Collapse>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
