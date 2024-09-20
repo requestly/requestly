@@ -10,13 +10,12 @@ async function sendSlackInvite() {
     .then((res: any) => {
       if (res.data.success) {
         toast.success("You'll receive the Slack invite in your email shortly!", 4);
+      } else {
+        toast.error("Failed to send Slack invite", 4);
       }
     })
     .catch(() => {
       toast.error("Failed to send Slack invite", 4);
-    })
-    .finally(() => {
-      toast.loading("Sending Slack Connect Invitation", 0);
     });
 }
 
