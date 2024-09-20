@@ -3,6 +3,7 @@ import { HTTPSnippet } from "httpsnippet";
 import { v4 as uuidv4 } from "uuid";
 import { getGraphQLDetails } from "./utils";
 import { cloneDeep } from "lodash";
+import Logger from "lib/logger";
 
 const createHarHeaders = (headersObject: HeaderMap) => {
   const headers: HarHeaderEntry[] = [];
@@ -96,7 +97,7 @@ const generateCurlFromHarObject = (requestHarObject: HarRequest) => {
       indent: " ",
     }) as string;
   } catch (err) {
-    console.error(`LoggerMiddleware.generate_curl_from_har Error: ${err}`);
+    Logger.log(`LoggerMiddleware.generate_curl_from_har Error: ${err}`);
   }
   return requestCurl;
 };
