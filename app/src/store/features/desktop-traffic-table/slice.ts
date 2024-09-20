@@ -24,6 +24,7 @@ interface TrafficTableFilters {
   app: string[];
   domain: string[];
   search: SearchFilters;
+  showOnlyModifiedRequests: boolean;
 }
 
 interface DesktopTrafficTableState {
@@ -51,6 +52,7 @@ const initialState: DesktopTrafficTableState = {
       term: "",
       regex: false,
     },
+    showOnlyModifiedRequests: false,
   },
   isInterceptionPaused: false,
 };
@@ -120,6 +122,7 @@ const slice = createSlice({
         method: initialState.filters.method,
         resourceType: initialState.filters.resourceType,
         statusCode: initialState.filters.statusCode,
+        showOnlyModifiedRequests: initialState.filters.showOnlyModifiedRequests,
       };
     },
     toggleIsInterceptionPaused: (state: DesktopTrafficTableState) => {

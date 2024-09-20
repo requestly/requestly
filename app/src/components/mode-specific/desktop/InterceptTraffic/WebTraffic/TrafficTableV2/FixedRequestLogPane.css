@@ -146,6 +146,10 @@
   color: var(--primary);
 }
 
+.ant-checkbox-wrapper.modified-requests-checkbox {
+  margin-bottom: 0.37rem;
+}
+
 .traffic-table-filter-label {
   color: var(--white);
   font-weight: 500;
