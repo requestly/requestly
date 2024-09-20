@@ -6,7 +6,7 @@ import { Column, ResourceTable } from "@requestly-ui/resource-table";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
 import { CollapseProps } from "antd/lib";
 import { capitalize } from "lodash";
-import "./vendorEvent.scss";
+import "./vendorEventPanel.scss";
 
 enum EVENT_PROPERTIES_TABLE_COLUMN_IDS {
   KEY = "key",
@@ -30,12 +30,12 @@ const eventPropertiesTableColumns: Column<Record<string, any>>[] = [
   },
 ];
 
-interface VendorEventProps {
+interface VendorEventPanelProps {
   vendorName: string;
   eventDetails: { event: string; properties: Record<string, any>; rawEvent: Record<string, any> };
 }
 
-export const VendorEvent: React.FC<VendorEventProps> = ({ eventDetails, vendorName }) => {
+export const VendorEventPanel: React.FC<VendorEventPanelProps> = ({ eventDetails, vendorName }) => {
   const [isJsonView, setIsJsonView] = useState(false);
 
   if (!eventDetails) {
@@ -103,7 +103,7 @@ export const VendorEvent: React.FC<VendorEventProps> = ({ eventDetails, vendorNa
     <Collapse
       bordered={false}
       items={collapseItems}
-      className="vendor-event-collapse"
+      className="vendor-event-panel"
       expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
     />
   );

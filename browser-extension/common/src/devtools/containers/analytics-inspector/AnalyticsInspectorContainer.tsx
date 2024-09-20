@@ -5,7 +5,7 @@ import { Collapse } from "antd";
 import { CaretRightOutlined } from "@ant-design/icons";
 // @ts-ignore
 import getAnalyticsVendorsRegistry from "@requestly/analytics-vendors";
-import { VendorEvent } from "./components/VendorEvent/VendorEvent";
+import { VendorEventPanel } from "./components/VendorEventPanel/VendorEventPanel";
 import { PrimaryToolbar } from "./toolbars";
 import "./analyticsInspectorContainer.scss";
 
@@ -90,7 +90,7 @@ const AnalyticsInspectorContainer: React.FC = () => {
                   {vendorEvents[vendor].map((event, index) => {
                     const eventDetails = vendorInstance.getEventDetails(event);
 
-                    return <VendorEvent key={index} vendorName={vendor} eventDetails={eventDetails} />;
+                    return <VendorEventPanel key={index} vendorName={vendor} eventDetails={eventDetails} />;
                   })}
                 </Collapse.Panel>
               </Collapse>
