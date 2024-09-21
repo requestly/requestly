@@ -18,11 +18,8 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "rootDir": "./src",
-    "baseUrl": ".",
-    "paths": {
-      "@requestly/analytics-vendors": ["../../common/analytics-vendors/dist/analytics-vendors.js"]
-    }
+    "baseUrl": "."
   },
   "exclude": ["node_modules", "dist"],
-  "include": ["./src/**/*", "../../common/analytics-vendors/dist/**/*"]
+  "include": ["./src/**/*"]
 }

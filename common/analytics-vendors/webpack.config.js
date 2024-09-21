@@ -4,6 +4,7 @@ module.exports = {
   entry: "./src/index.ts",
   devtool: "inline-source-map",
   target: "node",
+  mode: "production",
   module: {
     rules: [
       {
@@ -22,7 +23,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "analytics-vendors.js",
+    filename: "index.js",
     library: {
       name: "AnalyticsVendorsRegistry",
       type: "umd2",

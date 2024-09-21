@@ -79,7 +79,6 @@ export default [
           },
           { src: "../common/dist/devtools", dest: OUTPUT_DIR },
           { src: "../common/dist/popup", dest: OUTPUT_DIR },
-          { src: "../../common/analytics-vendors/dist/analytics-vendors.js", dest: OUTPUT_DIR },
           { src: "../common/dist/lib/customElements.js", dest: `${OUTPUT_DIR}/libs` },
         ],
       }),

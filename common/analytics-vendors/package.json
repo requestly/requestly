@@ -2,9 +2,10 @@
   "name": "analytics-vendors",
   "version": "1.0.0",
   "description": "\"List of popular analytics vendors, their Identifiers and helps you test, debug and validate the analytics implementation\"",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "webpack",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rm -rf dist && webpack"
   },
   "author": "Requestlers",
   "license": "SEE LICENSE IN LICENSE",
