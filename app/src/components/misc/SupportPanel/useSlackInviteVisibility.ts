@@ -1,27 +1,31 @@
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getIsSlackConnectButtonVisible, getUserAuthDetails } from "store/selectors";
+import { isVerifiedBusinessDomainUser } from "utils/Misc";
 
 export default function useFetchSlackInviteVisibility() {
   const [isVisible, setIsVisible] = useState(false);
   const user = useSelector(getUserAuthDetails);
+  const isSlackConnectButtonVisible = useSelector(getIsSlackConnectButtonVisible);
 
   useEffect(() => {
+    if (!isSlackConnectButtonVisible) {
+      setIsVisible(false);
+      return;
+    }
+
     if (!user.loggedIn) {
       setIsVisible(false);
       return;
     }
-    const showSlackButton = httpsCallable(getFunctions(), "slackConnect-showSlackButton");
-    showSlackButton()
-      .then((res) => {
-        setIsVisible(Boolean(res?.data));
+    isVerifiedBusinessDomainUser(user.details.profile.email, user.details.profile.uid)
+      .then((isBusinessDomainUser) => {
+        setIsVisible(isBusinessDomainUser);
       })
-      .catch((err) => {
-        console.error("Error fetching slack invite visibility", err);
+      .catch(() => {
         setIsVisible(false);
       });
-  }, [user.loggedIn]);
+  }, [user.loggedIn, user.details?.profile?.email, user.details?.profile?.uid, isSlackConnectButtonVisible]);
 
   return isVisible;
 }
