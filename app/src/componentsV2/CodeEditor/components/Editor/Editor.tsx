@@ -93,7 +93,7 @@ const Editor: React.FC<EditorProps> = ({
       case EditorLanguage.CSS:
         return css();
       default:
-        return javascript({ jsx: false });
+        return null;
     }
   }, [language]);
 
@@ -246,7 +246,7 @@ const Editor: React.FC<EditorProps> = ({
             defaultValue={defaultValue}
             onChange={handleEditorBodyChange}
             theme={vscodeDark}
-            extensions={[editorLanguage, EditorView.lineWrapping]}
+            extensions={editorLanguage ? [editorLanguage, EditorView.lineWrapping] : []}
             basicSetup={{
               highlightActiveLine: false,
               bracketMatching: true,
