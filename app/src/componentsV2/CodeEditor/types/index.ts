@@ -15,6 +15,10 @@ export type EditorCustomToolbar = {
 };
 
 export const getEditorLanguageFromContentType = (contentType: string): EditorLanguage => {
+  if (!contentType) {
+    return null;
+  }
+
   if (contentType.includes("application/json")) {
     return EditorLanguage.JSON;
   }
