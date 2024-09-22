@@ -1,3 +1,5 @@
+import { RQNetworkLog } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
+
 const RESOURCE_SUBSTR = {
   html: "html",
   json: "json",
@@ -7,6 +9,7 @@ const RESOURCE_SUBSTR = {
   media: ["video/", "audio/"],
   form: "form",
   font: "font",
+  graphql: "graphql",
   misc: "", // none of the above
 };
 
@@ -38,6 +41,10 @@ export const RESOURCE_FILTER_OPTIONS: FilterOption[] = [
   {
     label: "Images",
     value: "img",
+  },
+  {
+    label: "GraphQL",
+    value: "graphql",
   },
   {
     label: "Media (Audio + Video)",
@@ -78,8 +85,16 @@ function doesFilterMatchContentType(filter: FilterOption["value"], contentType: 
 
 export function doesContentTypeMatchResourceFilter(
   contentTypeHeader: string,
-  selectedFilters: FilterOption["value"][]
+  selectedFilters: FilterOption["value"][],
+  log: RQNetworkLog = null
 ): boolean {
+  if (selectedFilters.includes("graphql") && log) {
+    const GQLDetails = log?.metadata?.GQLDetails;
+    if (GQLDetails && Object.keys(GQLDetails).length > 0) {
+      return true;
+    }
+  }
+
   if (!contentTypeHeader) {
     return selectedFilters.includes(MISC_FILTER_KEY);
   }
