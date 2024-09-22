@@ -296,7 +296,7 @@ const CurrentTrafficTable = ({
       }
       if (
         resourceTypeFilter.length > 0 &&
-        !doesContentTypeMatchResourceFilter(log?.response?.contentType, resourceTypeFilter)
+        !doesContentTypeMatchResourceFilter(log?.response?.contentType, resourceTypeFilter, log)
       ) {
         return false;
       }
