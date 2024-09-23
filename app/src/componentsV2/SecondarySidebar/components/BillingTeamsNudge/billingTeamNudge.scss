@@ -29,7 +29,7 @@
     right: 4px;
     cursor: pointer;
     color: var(--requestly-color-text-subtle);
-    font-size: 13px;
+    font-size: var(--requestly-font-size-sm);
   }
 
   &__request-status {
