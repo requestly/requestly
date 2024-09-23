@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Tooltip, Button } from "antd";
+import { Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
@@ -8,6 +8,7 @@ import { trackRuleEditorHeaderClicked, trackRulePinToggled } from "modules/analy
 import "./PinButton.css";
 import { getModeData } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { StorageService } from "init";
+import { Button } from "lib/design-system-v2/components";
 
 const PinButton = ({ rule, isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
@@ -41,26 +42,39 @@ const PinButton = ({ rule, isRuleEditorModal }) => {
       });
   };
 
+  const commonProps = {
+    type: "secondary",
+    onClick: handlePinRuleClick,
+  };
+
   return (
     <>
       {isRuleEditorModal ? (
-        <Button type="text" onClick={handlePinRuleClick}>
-          {isPinned ? "Unpin rule" : "Pin rule"}
-        </Button>
+        <Button {...commonProps}>{isPinned ? "Unpin rule" : "Pin rule"}</Button>
       ) : (
         <Tooltip title={isPinned ? "Unpin rule" : "Pin rule"} placement="bottom">
-          <RQButton
-            iconOnly
-            type="default"
+          <Button
+            {...commonProps}
             disabled={MODE === "create"}
             icon={
               isPinned ? (
-                <img alt="pin" width="12px" height="14px" src="/assets/icons/pin-filled.svg" />
+                <img
+                  alt="pin"
+                  width="12px"
+                  height="14px"
+                  src="/assets/icons/pin-filled.svg" // TODO: replace icon with react-icon
+                  style={{ width: "12px", height: "14px" }}
+                />
               ) : (
-                <img alt="pin" width="12px" height="14px" src="/assets/icons/pin-outlined.svg" />
+                <img
+                  alt="pin"
+                  width="12px"
+                  height="14px"
+                  src="/assets/icons/pin-outlined.svg" // TODO: replace icon with react-icon
+                  style={{ width: "12px", height: "14px" }}
+                />
               )
             }
-            onClick={handlePinRuleClick}
           />
         </Tooltip>
       )}
