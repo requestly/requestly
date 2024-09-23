@@ -2,14 +2,14 @@ import { CaretRightOutlined, DeleteOutlined, EditOutlined, PlusCircleOutlined } 
 import { Button, Collapse, Typography } from "antd";
 import React, { useCallback } from "react";
 import { SourceKey, SourceOperator } from "../../../../../types";
-import { NetworkEvent, NetworkHeader, RuleEditorUrlFragment } from "../../../../types";
+import { RQNetworkEvent, NetworkHeader, RuleEditorUrlFragment } from "../../../../types";
 import { createRule, generateRuleName } from "../../../../utils";
 import IconButton from "../../../../components/IconButton/IconButton";
 import { PropertyRow } from "@requestly-ui/resource-table";
 import "./headersTabContent.scss";
 
 interface Props {
-  networkEvent: NetworkEvent;
+  networkEvent: RQNetworkEvent;
 }
 
 enum HeaderType {

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { NetworkEvent, RuleEditorUrlFragment } from "../../../../types";
+import { RQNetworkEvent, RuleEditorUrlFragment } from "../../../../types";
 import { createRule, generateRuleName, getBaseUrl, isContentBodyEditable } from "../../../../utils";
 import { Button, Collapse, Tooltip } from "antd";
 import { SourceKey, SourceOperator } from "../../../../../types";
@@ -14,7 +14,7 @@ import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import "./responseTabContent.scss";
 
 interface Props {
-  networkEvent: NetworkEvent;
+  networkEvent: RQNetworkEvent;
 }
 
 const mimeTypeToLangugageMap: { [mimeType: string]: any } = {
