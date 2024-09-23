@@ -8,7 +8,7 @@ type RQButtonSize = "small" | "default" | "large";
 
 type RQButtonType = "primary" | "secondary" | "transparent" | "danger" | "warning";
 
-interface ButtonProps extends Omit<AntDButtonProps, "size" | "type"> {
+export interface ButtonProps extends Omit<AntDButtonProps, "size" | "type"> {
   hotKey?: string;
   showHotKeyText?: boolean;
   size?: RQButtonSize;
@@ -70,12 +70,10 @@ const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(functi
 
 interface RQButton extends React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<HTMLButtonElement>> {}
 
-const Button: RQButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(props, ref) {
+export const Button: RQButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(props, ref) {
   if (props.hotKey) {
     return <ButtonWithHotkey ref={ref} {...props} />;
   }
 
   return <BaseButton ref={ref} {...props} />;
 });
-
-export { Button };
