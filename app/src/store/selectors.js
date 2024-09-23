@@ -334,6 +334,10 @@ export const getRequestBot = (state) => {
   return getGlobalState(state).misc.nonPersist?.requestBot;
 };
 
+export const getBillingTeamNudgeLastSeenTs = (state) => {
+  return getGlobalState(state).misc.persist?.billingTeamNudgeLastSeenTs;
+};
+
 export const getIsSlackConnectButtonVisible = (state) => {
   return getGlobalState(state).misc.persist?.isSlackConnectButtonVisible;
 };

@@ -213,6 +213,10 @@ export const updateIsCodeEditorFullScreenModeOnboardingCompleted = (prevState, a
   prevState.misc.persist.isCodeEditorFullScreenModeOnboardingCompleted = action.payload;
 };
 
+export const updateBillingTeamNudgeLastSeenTs = (prevState, action) => {
+  prevState.misc.persist.billingTeamNudgeLastSeenTs = action.payload;
+};
+
 export const updateIsSlackConnectButtonVisible = (prevState, action) => {
   prevState.misc.persist.isSlackConnectButtonVisible = action.payload;
 };
