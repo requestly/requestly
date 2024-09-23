@@ -10,12 +10,10 @@
   "author": "Requestlers",
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
+    "@types/chrome": "^0.0.271",
     "raw-loader": "^4.0.2",
     "ts-loader": "^9.5.1",
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4"
-  },
-  "dependencies": {
-    "@types/chrome": "^0.0.271"
   }
 }
