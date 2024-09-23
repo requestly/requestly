@@ -4,7 +4,7 @@ import { Button } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useDispatch, useSelector } from "react-redux";
 import { getBillingTeamNudgeLastSeenTs, getUserAuthDetails } from "store/selectors";
-import { getCompanyNameFromEmail } from "utils/FormattingHelper";
+import { getCompanyNameFromEmail, getPrettyPlanName } from "utils/FormattingHelper";
 import { getAvailableBillingTeams, getBillingTeamMemberById } from "store/features/billing/selectors";
 import PATHS from "config/constants/sub/paths";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -21,6 +21,7 @@ import {
 } from "./analytics";
 import "./billingTeamNudge.scss";
 import { getDaysDifference } from "utils/DateTimeUtils";
+import { PRICING } from "features/pricing";
 
 export const BillingTeamNudge: React.FC = () => {
   const navigate = useNavigate();
@@ -45,6 +46,16 @@ export const BillingTeamNudge: React.FC = () => {
       ),
     [billingTeams, user.details?.profile?.uid]
   );
+
+  const planNameToShow = useMemo(() => {
+    const hasProfessionalPlan = availableBillingTeams.some(
+      (team) => team.subscriptionDetails.plan === PRICING.PLAN_NAMES.PROFESSIONAL
+    );
+    if (hasProfessionalPlan) {
+      return getPrettyPlanName(PRICING.PLAN_NAMES.PROFESSIONAL);
+    }
+    return getPrettyPlanName(PRICING.PLAN_NAMES.BASIC_V2);
+  }, [availableBillingTeams]);
 
   const handleCloseBillingTeamNudge = useCallback(() => {
     // @ts-ignore
@@ -117,7 +128,7 @@ export const BillingTeamNudge: React.FC = () => {
           </>
         ) : (
           <>
-            <span>{domain}</span> has Requestly Pro/Basic Team Plan. Unlock all features by joining the team.
+            <span>{domain}</span> has Requestly {planNameToShow} Team Plan. Unlock all features by joining the team.
           </>
         )}
       </div>
