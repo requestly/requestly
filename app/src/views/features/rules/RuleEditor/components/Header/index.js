@@ -129,15 +129,15 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
                 <Tooltip title="This rule won't execute because its parent group is disabled. Enable the group to run this rule.">
                   <WarningOutlined className="icon__wrapper" />
                   Group is disabled.{" "}
-                  <RQButton
-                    type="link"
+                  <Button
+                    type="transparent"
                     size="small"
                     onClick={() =>
                       recordStatusToggleAction(normalizeRecord(allRecordsMap[currentlySelectedRuleData.groupId]))
                     }
                   >
                     Enable now
-                  </RQButton>
+                  </Button>
                 </Tooltip>
               </div>
             )}
