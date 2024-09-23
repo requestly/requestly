@@ -7,11 +7,9 @@ import { ApiOutlined, HomeOutlined } from "@ant-design/icons";
 import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
 import HttpRulesIcon from "assets/icons/http-rules.svg?react";
 import SessionIcon from "assets/icons/session.svg?react";
-import WolfSafeIcon from "assets/icons/wolfsafe.svg?react";
 import MockServerIcon from "assets/icons/mock-server.svg?react";
 import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
 import { PrimarySidebarLink } from "./components/PrimarySidebarLink/PrimarySidebarLink";
-import { RQBadge } from "lib/design-system/components/RQBadge";
 import { PrimarySidebarItem } from "../type";
 import InviteButton from "./components/InviteButton/InviteButton";
 import PATHS from "config/constants/sub/paths";
@@ -72,18 +70,18 @@ export const PrimarySidebar: React.FC = () => {
         display: true,
         activeColor: "var(--http-rules)",
       },
-      {
-        id: 6,
-        title: "API Security & Testing",
-        path: PATHS.API_SECURITY_TESTING.INDEX,
-        icon: (
-          <span className="icon-with-badge">
-            <WolfSafeIcon /> <RQBadge badgeText="NEW" />
-          </span>
-        ),
-        display: true,
-        activeColor: "var(--session-recording)",
-      },
+      // {
+      //   id: 6,
+      //   title: "API Security & Testing",
+      //   path: PATHS.API_SECURITY_TESTING.INDEX,
+      //   icon: (
+      //     <span className="icon-with-badge">
+      //       <WolfSafeIcon /> <RQBadge badgeText="NEW" />
+      //     </span>
+      //   ),
+      //   display: true,
+      //   activeColor: "var(--session-recording)",
+      // },
       {
         id: 3,
         title: "Sessions",

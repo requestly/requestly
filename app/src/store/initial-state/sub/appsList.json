@@ -1,4 +1,16 @@
 {
+  "existing-browser": {
+    "id": "existing-browser",
+    "type": "browser",
+    "name": "Existing Browser",
+    "description": "Existing Profile",
+    "icon": "chrome.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": false
+  },
   "fresh-chrome": {
     "id": "fresh-chrome",
     "type": "browser",
@@ -101,6 +113,18 @@
     "isAvailable": false,
     "canLaunchWithCustomArgs": true
   },
+  "existing-chromium": {
+    "id": "existing-chromium",
+    "type": "browser",
+    "name": "Chromium",
+    "description": "Existing Profile",
+    "icon": "chromium.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": false
+  },
   "fresh-chromium-dev": {
     "id": "fresh-chromium-dev",
     "type": "browser",
@@ -127,6 +151,7 @@
   },
   "existing-edge": {
     "id": "existing-edge",
+    "type": "browser",
     "name": "Microsoft Edge",
     "description": "Existing Profile",
     "icon": "edge.png",
@@ -224,6 +249,17 @@
     "type": "browser",
     "name": "Mozilla Firefox",
     "description": "New Profile",
+    "icon": "firefox.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "existing-firefox": {
+    "id": "existing-firefox",
+    "type": "browser",
+    "name": "Mozilla Firefox",
+    "description": "Existing Profile",
     "icon": "firefox.png",
     "isActive": false,
     "comingSoon": false,

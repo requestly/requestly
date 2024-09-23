@@ -8,7 +8,6 @@ export const convertProxyLogToUILog = (log) => {
   let finalLog = convertHarJsonToRQLogs(log.finalHar)[0];
   finalLog.id = log.id;
   finalLog.actions = log.actions || [];
-  finalLog.requestShellCurl = log.requestShellCurl || "";
   finalLog.requestState = log.requestState || "";
   finalLog.consoleLogs = log.consoleLogs || [];
 
