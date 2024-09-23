@@ -50,7 +50,9 @@ const PinButton = ({ rule, isRuleEditorModal }) => {
   return (
     <>
       {isRuleEditorModal ? (
-        <Button {...commonProps}>{isPinned ? "Unpin rule" : "Pin rule"}</Button>
+        <Button {...commonProps} block>
+          {isPinned ? "Unpin rule" : "Pin rule"}
+        </Button>
       ) : (
         <Tooltip title={isPinned ? "Unpin rule" : "Pin rule"} placement="bottom">
           <Button
