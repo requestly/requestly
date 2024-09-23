@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Row, Col, Layout, Divider, Tooltip, Button } from "antd";
+import { Row, Col, Layout, Divider, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getCurrentlySelectedRuleConfig,
@@ -29,6 +29,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { trackSampleRuleCreateRuleClicked, trackSampleRuleTested } from "features/rules/analytics";
 import { RecordStatus } from "features/rules";
+import { Button } from "lib/design-system-v2/components";
 
 const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleTooltip = false }) => {
   const navigate = useNavigate();
