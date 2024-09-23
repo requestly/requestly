@@ -7,6 +7,7 @@ import { snakeCase } from "lodash";
 import { trackRuleEditorClosed } from "modules/analytics/events/common/rules";
 import { Button } from "lib/design-system-v2/components";
 import { FiArrowLeft } from "@react-icons/all-files/fi/FiArrowLeft";
+import { RULE_KEYBOARD_SHORTCUTS } from "features/rules";
 
 const CloseButton = ({ ruleType, mode }) => {
   const navigate = useNavigate();
@@ -19,8 +20,15 @@ const CloseButton = ({ ruleType, mode }) => {
   }, [dispatch, mode, navigate, ruleType]);
 
   return (
-    <Tooltip title="Back to rules" placement="bottom">
-      <Button size="small" type="secondary" data-dismiss="modal" icon={<FiArrowLeft />} onClick={closeButtonHandler} />
+    <Tooltip title="Back to rules (esc)" placement="bottom">
+      <Button
+        hotKey={RULE_KEYBOARD_SHORTCUTS.EDITOR_BACK.hotKey}
+        size="small"
+        type="secondary"
+        data-dismiss="modal"
+        icon={<FiArrowLeft />}
+        onClick={closeButtonHandler}
+      />
     </Tooltip>
   );
 };
