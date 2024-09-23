@@ -33,7 +33,7 @@ const FiltersToolbar: React.FC<Props> = ({ filters, onFiltersChange }) => {
     <div className="network-toolbar filters">
       <Input
         className="url-filter"
-        placeholder="Filter by URL"
+        placeholder="Filter"
         value={filters.url}
         onChange={(e) => onUrlFilterChange(e.target.value)}
         allowClear

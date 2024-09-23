@@ -5,6 +5,9 @@
   border-right: 1px solid var(--border-dark);
   width: 217px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .secondary-sidebar-container:hover .secondary-sidebar-toggle-btn {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Avatar, Button, Col, Tag, Menu, Row, Tooltip } from "antd";
+import { Avatar, Button, Col, Tag, Menu, Row, Tooltip, Checkbox, Space } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
@@ -92,6 +92,8 @@ const CurrentTrafficTable = ({
   const [methodTypeFilters, setMethodTypeFilters] = useState([]);
   const [resourceTypeFilters, setResourceTypeFilters] = useState([]);
   const [search, setSearch] = useState({ term: "", regex: false });
+  const [showOnlyModifiedRequests, setShowOnlyModifiedRequests] = useState(false);
+
   const mounted = useRef(false);
 
   const selectedRequestResponse =
@@ -254,6 +256,10 @@ const CurrentTrafficTable = ({
       const resourceTypeFilter = persistLogsFilters ? trafficTableFilters.resourceType : resourceTypeFilters;
       const methodFilter = persistLogsFilters ? trafficTableFilters.method : methodTypeFilters;
       const searchFilter = persistLogsFilters ? trafficTableFilters.search : search;
+      const modifiedRequestsFilter = persistLogsFilters
+        ? trafficTableFilters.showOnlyModifiedRequests
+        : showOnlyModifiedRequests;
+
       if (searchFilter.term) {
         const searchTerm = searchFilter.term.toLowerCase();
         const logUrl = log.url.toLowerCase();
@@ -301,6 +307,10 @@ const CurrentTrafficTable = ({
         return false;
       }
       if (methodFilter.length > 0 && !methodFilter.includes(log?.request?.method)) {
+        return false;
+      }
+
+      if (modifiedRequestsFilter && (!log.actions || log.actions === "-" || log.actions?.length === 0)) {
         return false;
       }
 
@@ -353,11 +363,13 @@ const CurrentTrafficTable = ({
       trafficTableFilters.resourceType,
       trafficTableFilters.search,
       trafficTableFilters.statusCode,
+      trafficTableFilters.showOnlyModifiedRequests,
       persistLogsFilters,
       statusCodesFilters,
       methodTypeFilters,
       resourceTypeFilters,
       search,
+      showOnlyModifiedRequests,
     ]
   );
 
@@ -608,6 +620,7 @@ const CurrentTrafficTable = ({
       setStatusCodesFilters([]);
       setMethodTypeFilters([]);
       setResourceTypeFilters([]);
+      setShowOnlyModifiedRequests(false);
     }
   }, [dispatch, persistLogsFilters]);
 
@@ -683,51 +696,73 @@ const CurrentTrafficTable = ({
             {!isFiltersCollapsed && (
               <Row>
                 <section>
-                  <LogFilter
-                    filterId="filter-method"
-                    filterLabel="Method"
-                    filterPlaceholder="Filter by method"
-                    options={METHOD_TYPE_OPTIONS}
-                    value={persistLogsFilters ? trafficTableFilters.method : methodTypeFilters}
-                    handleFilterChange={(options) => {
-                      if (persistLogsFilters) {
-                        dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
-                      } else {
-                        setMethodTypeFilters(options);
+                  <Space align="end" size={12}>
+                    <LogFilter
+                      filterId="filter-method"
+                      filterLabel="Method"
+                      filterPlaceholder="Filter by method"
+                      options={METHOD_TYPE_OPTIONS}
+                      value={persistLogsFilters ? trafficTableFilters.method : methodTypeFilters}
+                      handleFilterChange={(options) => {
+                        if (persistLogsFilters) {
+                          dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
+                        } else {
+                          setMethodTypeFilters(options);
+                        }
+                        trackTrafficTableFilterApplied("method", options, options?.length);
+                      }}
+                    />
+                    <LogFilter
+                      filterId="filter-status-code"
+                      filterLabel="Status code"
+                      filterPlaceholder="Filter by status code"
+                      options={STATUS_CODE_LABEL_ONLY_OPTIONS}
+                      value={persistLogsFilters ? trafficTableFilters.statusCode : statusCodesFilters}
+                      handleFilterChange={(options) => {
+                        if (persistLogsFilters) {
+                          dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
+                        } else {
+                          setStatusCodesFilters(options);
+                        }
+                        trackTrafficTableFilterApplied("status_code", options, options?.length);
+                      }}
+                    />
+                    <LogFilter
+                      filterId="filter-resource-type"
+                      filterLabel="Resource type"
+                      filterPlaceholder="Filter by resource type"
+                      options={RESOURCE_FILTER_OPTIONS}
+                      value={persistLogsFilters ? trafficTableFilters.resourceType : resourceTypeFilters}
+                      handleFilterChange={(options) => {
+                        if (persistLogsFilters) {
+                          dispatch(desktopTrafficTableActions.updateFilters({ resourceType: options }));
+                        } else {
+                          setResourceTypeFilters(options);
+                        }
+                        trackTrafficTableFilterApplied("resource_type", options, options?.length);
+                      }}
+                    />
+                    <Checkbox
+                      checked={
+                        persistLogsFilters ? trafficTableFilters.showOnlyModifiedRequests : showOnlyModifiedRequests
                       }
-                      trackTrafficTableFilterApplied("method", options, options?.length);
-                    }}
-                  />
-                  <LogFilter
-                    filterId="filter-status-code"
-                    filterLabel="Status code"
-                    filterPlaceholder="Filter by status code"
-                    options={STATUS_CODE_LABEL_ONLY_OPTIONS}
-                    value={persistLogsFilters ? trafficTableFilters.statusCode : statusCodesFilters}
-                    handleFilterChange={(options) => {
-                      if (persistLogsFilters) {
-                        dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
-                      } else {
-                        setStatusCodesFilters(options);
-                      }
-                      trackTrafficTableFilterApplied("status_code", options, options?.length);
-                    }}
-                  />
-                  <LogFilter
-                    filterId="filter-resource-type"
-                    filterLabel="Resource type"
-                    filterPlaceholder="Filter by resource type"
-                    options={RESOURCE_FILTER_OPTIONS}
-                    value={persistLogsFilters ? trafficTableFilters.resourceType : resourceTypeFilters}
-                    handleFilterChange={(options) => {
-                      if (persistLogsFilters) {
-                        dispatch(desktopTrafficTableActions.updateFilters({ resourceType: options }));
-                      } else {
-                        setResourceTypeFilters(options);
-                      }
-                      trackTrafficTableFilterApplied("resource_type", options, options?.length);
-                    }}
-                  />
+                      onChange={(e) => {
+                        if (persistLogsFilters) {
+                          dispatch(
+                            desktopTrafficTableActions.updateFilters({
+                              showOnlyModifiedRequests: e.target.checked,
+                            })
+                          );
+                        } else {
+                          setShowOnlyModifiedRequests(e.target.checked);
+                        }
+                        trackTrafficTableFilterApplied("modified_requests", e.target.checked);
+                      }}
+                      className="modified-requests-checkbox"
+                    >
+                      Modified requests
+                    </Checkbox>
+                  </Space>
                 </section>
                 <Button type="link" className="clear-logs-filter-btn" onClick={clearAllFilters}>
                   Clear all

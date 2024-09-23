@@ -1,5 +1,7 @@
+import React from "react";
 import { Column } from "@requestly-ui/resource-table";
-import { NetworkEvent } from "../../types";
+import { RQNetworkEvent } from "../../../types";
+import "./columns.scss";
 
 export enum NETWORK_TABLE_COLUMN_IDS {
   URL = "url",
@@ -10,11 +12,23 @@ export enum NETWORK_TABLE_COLUMN_IDS {
   TIME = "time",
 }
 
-const networkEventTableColumns: Column<NetworkEvent>[] = [
+const networkEventTableColumns: Column<RQNetworkEvent>[] = [
   {
     key: NETWORK_TABLE_COLUMN_IDS.URL,
     header: "URL",
-    render: (networkEvent) => networkEvent.request.url,
+    render: (networkEvent) => {
+      const url = networkEvent.request.url;
+      if (networkEvent?.metadata?.graphQLDetails) {
+        const { operationName } = networkEvent.metadata.graphQLDetails;
+        return (
+          <div className="table-cell-url-wrapper">
+            <span className="table-cell-url">{url}</span>
+            <span className="table-cell-url-graphql-operation-name">{`(${operationName})`}</span>
+          </div>
+        );
+      }
+      return url;
+    },
   },
   {
     key: NETWORK_TABLE_COLUMN_IDS.METHOD,
