@@ -36,19 +36,15 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
 
     const editorLanguage = getEditorLanguageFromContentType(contentTypeHeader);
 
-    if (editorLanguage) {
-      return (
-        <Editor
-          value={responseText}
-          defaultValue={responseText}
-          language={editorLanguage}
-          isReadOnly
-          analyticEventProperties={{ source: "api_client" }}
-        />
-      );
-    }
-
-    return null;
+    return (
+      <Editor
+        value={responseText}
+        defaultValue={responseText}
+        language={editorLanguage}
+        isReadOnly
+        analyticEventProperties={{ source: "api_client" }}
+      />
+    );
   }, [contentTypeHeader, responseText]);
 
   const onResponseModeChange = useCallback((e: RadioChangeEvent) => {

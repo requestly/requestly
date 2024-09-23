@@ -333,3 +333,7 @@ export const getIsSupportChatOpened = (state) => {
 export const getRequestBot = (state) => {
   return getGlobalState(state).misc.nonPersist?.requestBot;
 };
+
+export const getIsSlackConnectButtonVisible = (state) => {
+  return getGlobalState(state).misc.persist?.isSlackConnectButtonVisible;
+};
