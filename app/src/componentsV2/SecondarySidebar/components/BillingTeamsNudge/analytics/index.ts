@@ -1,6 +1,10 @@
 import { trackEvent } from "modules/analytics";
 import { BILLING_TEAM_NUDGE } from "./constants";
 
+export const trackBillingTeamNudgeViewed = () => {
+  trackEvent(BILLING_TEAM_NUDGE.BILLING_TEAM_NUDGE_VIEWED);
+};
+
 export const trackBillingTeamNudgeClosed = () => {
   trackEvent(BILLING_TEAM_NUDGE.BILLING_TEAM_NUDGE_CLOSED);
 };
