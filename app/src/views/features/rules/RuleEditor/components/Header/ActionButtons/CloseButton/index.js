@@ -24,7 +24,7 @@ const CloseButton = ({ ruleType, mode }) => {
       <Button
         hotKey={RULE_KEYBOARD_SHORTCUTS.EDITOR_BACK.hotKey}
         size="small"
-        type="secondary"
+        type="transparent"
         data-dismiss="modal"
         icon={<FiArrowLeft />}
         onClick={closeButtonHandler}
