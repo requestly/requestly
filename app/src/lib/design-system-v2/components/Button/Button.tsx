@@ -39,7 +39,16 @@ const BaseButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function Bas
 
   const antDProps = { size: RQ_TO_ANTD_PROPS.size[props.size], type: RQ_TO_ANTD_PROPS.type[props.type] };
 
-  return <AntDButton ref={ref} {...restProps} {...antDProps} className={`rq-custom-btn ${props.className ?? ""}`} />;
+  const isIconOnly = props.icon && !props.children;
+
+  return (
+    <AntDButton
+      ref={ref}
+      {...restProps}
+      {...antDProps}
+      className={`rq-custom-btn ${isIconOnly ? "icon-only-btn" : ""} ${props.className ?? ""}`}
+    />
+  );
 });
 
 const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(function ButtonWithHotkey(props, ref) {
