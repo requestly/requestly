@@ -6,7 +6,7 @@ import { Column, ResourceTable } from "@requestly-ui/resource-table";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
 import { CollapseProps } from "antd/lib";
 import { capitalize } from "lodash";
-import { VendorEvent } from "@requestly/analytics-vendors/types";
+import { VendorEvent } from "@requestly/analytics-vendors";
 import "./vendorEventPanel.scss";
 
 enum EVENT_PROPERTIES_TABLE_COLUMN_IDS {
