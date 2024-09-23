@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Tooltip } from "antd";
+import { Tooltip } from "antd";
+import { Button } from "lib/design-system-v2/components";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "utils/Toast.js";
-//UTILS
 import {
   getAppMode,
   getCurrentlySelectedRuleData,
@@ -12,14 +12,12 @@ import {
   getUserAuthDetails,
 } from "../../../../../../../../store/selectors";
 import { trackRQLastActivity } from "../../../../../../../../utils/AnalyticsUtils";
-//Actions
 import { saveRule, validateSyntaxInRule } from "../actions";
 import {
   getModeData,
   setIsCurrentlySelectedRuleHasUnsavedChanges,
 } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { validateRule } from "./actions";
-
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../../../../../../../../config/constants";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
@@ -39,7 +37,7 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
 import { IncentivizeEvent } from "features/incentivization/types";
-import { RuleType } from "features/rules";
+import { RULE_KEYBOARD_SHORTCUTS, RuleType } from "features/rules";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import Logger from "../../../../../../../../../../common/logger";
 import { IncentivizationModal } from "store/features/incentivization/types";
@@ -336,22 +334,6 @@ const CreateRuleButton = ({
     }
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const saveFn = (event) => {
-    if ((navigator.platform.match("Mac") ? event.metaKey : event.ctrlKey) && event.key.toLowerCase() === "s") {
-      event.preventDefault();
-      // simulating click on save button when user presses cmd+s or ctrl+s to invoke upgrade popover
-      document.getElementById("rule-editor-save-btn").click();
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("keydown", saveFn);
-    return () => {
-      document.removeEventListener("keydown", saveFn);
-    };
-  }, [saveFn]);
-
   return onboardingVariation === "variant4" && !user?.details?.isLoggedIn ? (
     <AuthConfirmationPopover
       title={<div>You need to sign up to save the rule.</div>}
@@ -362,6 +344,7 @@ const CreateRuleButton = ({
     >
       <Tooltip title={tooltipText} placement="top">
         <Button
+          hotKey={RULE_KEYBOARD_SHORTCUTS.SAVE_RULE.hotKey}
           data-tour-id="rule-editor-create-btn"
           id="rule-editor-save-btn"
           type="primary"
@@ -385,6 +368,7 @@ const CreateRuleButton = ({
       >
         <Tooltip title={tooltipText} placement="top">
           <Button
+            hotKey={RULE_KEYBOARD_SHORTCUTS.SAVE_RULE.hotKey}
             data-tour-id="rule-editor-create-btn"
             id="rule-editor-save-btn"
             type="primary"
