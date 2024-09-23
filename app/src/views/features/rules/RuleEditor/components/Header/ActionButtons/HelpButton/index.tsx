@@ -24,7 +24,6 @@ export const HelpButton = () => {
         />
       </Drawer>
       <Button
-        size="small"
         icon={<AiOutlineQuestionCircle />}
         className="header-rule-help-btn"
         type="transparent"

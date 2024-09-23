@@ -43,7 +43,7 @@ const PinButton = ({ rule, isRuleEditorModal }) => {
   };
 
   const commonProps = {
-    type: "secondary",
+    type: "transparent",
     onClick: handlePinRuleClick,
   };
 
