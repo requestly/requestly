@@ -51,10 +51,8 @@ export const BillingTeamNudge: React.FC = () => {
     const hasProfessionalPlan = availableBillingTeams.some(
       (team) => team.subscriptionDetails.plan === PRICING.PLAN_NAMES.PROFESSIONAL
     );
-    if (hasProfessionalPlan) {
-      return getPrettyPlanName(PRICING.PLAN_NAMES.PROFESSIONAL);
-    }
-    return getPrettyPlanName(PRICING.PLAN_NAMES.BASIC_V2);
+    const plan = hasProfessionalPlan ? PRICING.PLAN_NAMES.PROFESSIONAL : PRICING.PLAN_NAMES.BASIC_V2;
+    return getPrettyPlanName(plan);
   }, [availableBillingTeams]);
 
   const handleCloseBillingTeamNudge = useCallback(() => {
