@@ -1,6 +1,6 @@
 import { DownloadOutlined } from "@ant-design/icons";
 import { RiFolderAddLine } from "@react-icons/all-files/ri/RiFolderAddLine";
-import { Badge, Button, Dropdown, Tooltip } from "antd";
+import { Badge, Dropdown, Tooltip } from "antd";
 import AuthPopoverButton from "components/features/rules/RulesListContainer/RulesTable/AuthPopoverButtons";
 import { ContentListHeader, ContentListHeaderProps, FilterType } from "componentsV2/ContentList";
 import { RecordStatus, StorageRecord } from "features/rules/types/rules";
@@ -18,6 +18,7 @@ import { useRulesActionContext } from "features/rules/context/actions";
 import { MdOutlineToggleOn } from "@react-icons/all-files/md/MdOutlineToggleOn";
 import { RuleSelectionList } from "../RuleSelectionList/RuleSelectionList";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
+import { Button } from "lib/design-system-v2/components";
 
 interface Props {
   searchValue: string;
@@ -36,7 +37,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
 
   const buttonData = [
     {
-      type: "text",
+      type: "transparent",
       isTooltipShown: true,
       tourId: "rule-table-create-group-btn",
       buttonText: "New Group",
