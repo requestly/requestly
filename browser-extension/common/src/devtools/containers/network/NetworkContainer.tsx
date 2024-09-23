@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { NetworkEvent, ResourceFilters, NetworkSettings } from "../../types";
+import { NetworkEvent, ResourceFilters, NetworkSettings, RQNetworkEvent } from "../../types";
 import { PrimaryToolbar, FiltersToolbar } from "./toolbars";
 import EmptyContainerPlaceholder from "../../components/EmptyContainerPlaceholder/EmptyContainerPlaceholder";
 import { ResourceTypeFilterValue } from "../../components/ResourceTypeFilter";
@@ -8,9 +8,10 @@ import networkEventTableColumns, { NETWORK_TABLE_COLUMN_IDS } from "./columns";
 import networkEventDetailsTabs from "./details-tabs";
 import { getCurrentColorScheme, matchResourceTypeFilter } from "../../utils";
 import "./networkContainer.scss";
+import { getGraphQLDetails } from "./networkLogUtils";
 
 const NetworkContainer: React.FC = () => {
-  const [networkEvents, setNetworkEvents] = useState<NetworkEvent[]>([]);
+  const [networkEvents, setNetworkEvents] = useState<RQNetworkEvent[]>([]);
   const [filters, setFilters] = useState<ResourceFilters>({
     url: "",
     resourceType: ResourceTypeFilterValue.ALL,
@@ -26,7 +27,15 @@ const NetworkContainer: React.FC = () => {
 
   useEffect(() => {
     chrome.devtools.network.onRequestFinished.addListener((networkEvent: NetworkEvent) => {
-      setNetworkEvents((prev) => [...prev, networkEvent]);
+      const rqNetworkEvent: RQNetworkEvent = {
+        ...networkEvent,
+        getContent: networkEvent.getContent,
+        metadata: {
+          graphQLDetails: getGraphQLDetails(networkEvent),
+        },
+      };
+
+      setNetworkEvents((prev) => [...prev, rqNetworkEvent]);
     });
 
     chrome.devtools.network.onNavigated.addListener(() => {
@@ -41,9 +50,14 @@ const NetworkContainer: React.FC = () => {
   }, [settings]);
 
   const filterNetworkEvents = useCallback(
-    (networkEvent: NetworkEvent): boolean => {
-      if (filters.url && !networkEvent.request.url.toLowerCase().includes(filters.url.toLowerCase())) {
-        return false;
+    (networkEvent: RQNetworkEvent): boolean => {
+      // TODO: filters.url filters by url and postData text. Not modifying the variable name for now.
+      if (filters.url) {
+        const url = networkEvent.request.url.toLowerCase();
+        const postDataText = networkEvent.request.postData?.text?.toLowerCase();
+        if (!(url.includes(filters.url.toLowerCase()) || postDataText?.includes(filters.url.toLowerCase()))) {
+          return false;
+        }
       }
 
       if (filters.resourceType && !matchResourceTypeFilter(networkEvent._resourceType, filters.resourceType)) {
@@ -55,7 +69,7 @@ const NetworkContainer: React.FC = () => {
     [filters]
   );
 
-  const checkEventFailed = useCallback((networkEvent: NetworkEvent) => {
+  const checkEventFailed = useCallback((networkEvent: RQNetworkEvent) => {
     const status = networkEvent.response.status;
     return !status || (status >= 400 && status <= 599);
   }, []);
