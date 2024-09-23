@@ -49,7 +49,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
   return (
     <>
       {isRuleEditorModal ? (
-        <Button type="transparent">
+        <Button type="transparent" block>
           <Row
             align="middle"
             wrap={false}
