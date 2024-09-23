@@ -1,10 +1,10 @@
 import React from "react";
 
-import { NetworkEvent } from "../../../../../../types";
+import { RQNetworkEvent } from "../../../../../../types";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
 
 interface Props {
-  networkEvent: NetworkEvent;
+  networkEvent: RQNetworkEvent;
   parsed?: Boolean;
 }
 
