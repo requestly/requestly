@@ -271,8 +271,8 @@ const CurrentTrafficTable = ({
         }
 
         if (!includeLog && log?.request?.body) {
-          const body = log.request.body.toLowerCase();
           try {
+            const body = log.request.body.toLowerCase();
             // TODO: @wrongsahil fix this. Special Characters are breaking the UI
             let reg = null;
             if (searchFilter.regex) {
@@ -296,7 +296,7 @@ const CurrentTrafficTable = ({
       }
       if (
         resourceTypeFilter.length > 0 &&
-        !doesContentTypeMatchResourceFilter(log?.response?.contentType, resourceTypeFilter)
+        !doesContentTypeMatchResourceFilter(log?.response?.contentType, resourceTypeFilter, log)
       ) {
         return false;
       }
