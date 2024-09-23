@@ -6,6 +6,7 @@ import { Column, ResourceTable } from "@requestly-ui/resource-table";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
 import { CollapseProps } from "antd/lib";
 import { capitalize } from "lodash";
+import { VendorEvent } from "@requestly/analytics-vendors/types";
 import "./vendorEventPanel.scss";
 
 enum EVENT_PROPERTIES_TABLE_COLUMN_IDS {
@@ -31,8 +32,8 @@ const eventPropertiesTableColumns: Column<Record<string, any>>[] = [
 ];
 
 interface VendorEventPanelProps {
+  eventDetails: VendorEvent;
   vendorName: string;
-  eventDetails: { event: string; properties: Record<string, any>; rawEvent: Record<string, any> };
 }
 
 export const VendorEventPanel: React.FC<VendorEventPanelProps> = ({ eventDetails, vendorName }) => {

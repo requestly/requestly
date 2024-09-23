@@ -1,6 +1,6 @@
 import { Vendor } from "../vendor";
 import blueCoreIcon from "../../icons/bluecore-icon.svg";
-import { NetworkEvent } from "../types";
+import { NetworkEvent, VendorEvent } from "../types";
 import { getDecodedBase64Data } from "../utils";
 
 export type BlueCoreEvent = { event: string; properties: Record<string, any> };
@@ -11,7 +11,8 @@ export class BlueCore implements Vendor {
 
   urlPatterns: string[] = ["api.bluecore.app/api/track", "onsitestats.bluecore.com/events"];
 
-  identify(url: string, method: string): boolean {
+  identify(url: string, method?: string): boolean {
+    // TODO: Identify using url + method
     return this.urlPatterns.some((pattern) => url.includes(pattern));
   }
 
@@ -60,7 +61,7 @@ export class BlueCore implements Vendor {
     }
   }
 
-  groupEventProperties(event: BlueCoreEvent): Record<string, any> | null {
+  groupEventProperties(event: BlueCoreEvent): VendorEvent | null {
     if (!event) {
       return null;
     }
@@ -132,7 +133,7 @@ export class BlueCore implements Vendor {
     return { event: event.event, properties: result, rawEvent: event };
   }
 
-  getEventDetails(event: NetworkEvent): Record<string, any> | null {
+  getEventDetails(event: NetworkEvent): VendorEvent | null {
     const payload = this.getEventPayloadByMethod(event);
 
     if (!payload) {

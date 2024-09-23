@@ -1,6 +1,5 @@
-import { NetworkEvent, VendorName } from "./types";
+import { NetworkEvent, VendorEvent, VendorName } from "./types";
 import { Vendor } from "./vendor";
-import { BlueCoreEvent } from "./vendors/BlueCore";
 
 export class VendorsRegistry {
   private static instance: VendorsRegistry;
@@ -25,11 +24,11 @@ export class VendorsRegistry {
     return this.vendors.find((vendor) => vendor.name === name);
   }
 
-  public getVendorByUrl(url: string, method: string): Vendor | undefined {
+  public getVendorByUrl(url: string, method?: string): Vendor | undefined {
     return this.vendors.find((vendor) => vendor.identify(url, method));
   }
 
-  public getVendorEventDetailsByName(name: string, event: NetworkEvent): Record<string, any> | null {
+  public getVendorEventDetailsByName(name: string, event: NetworkEvent): VendorEvent | null {
     switch (name) {
       case VendorName.BLUECORE: {
         const vendor = this.getVendorByName(name);

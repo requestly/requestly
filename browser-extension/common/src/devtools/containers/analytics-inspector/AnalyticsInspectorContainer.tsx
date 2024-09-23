@@ -9,7 +9,6 @@ import { PrimaryToolbar } from "./toolbars";
 import "./analyticsInspectorContainer.scss";
 
 const AnalyticsInspectorContainer: React.FC = () => {
-  // @ts-ignore
   const analyticsVendorsRegistry = getAnalyticsVendorsRegistry();
 
   const [vendorEvents, setVendorEvents] = useState<Record<string, NetworkEvent[]>>({});
