@@ -7,9 +7,21 @@ export const RULE_IMPORT_TYPE = {
   DUPLICATE: "duplicate",
 };
 
-export const RULE_KEYBOARD_SHORTCUTS = {
+export const RULE_KEYBOARD_SHORTCUTS: Record<
+  string,
+  {
+    hotKey: string;
+    displayText?: string;
+    description: string;
+  }
+> = {
   EDITOR_BACK: {
     hotKey: "esc",
+    displayText: "ESC",
     description: "From editor to rules list",
+  },
+  SAVE_RULE: {
+    hotKey: "meta+s",
+    description: "Save rule",
   },
 };
