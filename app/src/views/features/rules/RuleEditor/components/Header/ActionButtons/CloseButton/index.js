@@ -1,12 +1,12 @@
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-//Actions
-import { RQButton } from "lib/design-system/components";
 import { Tooltip } from "antd";
 import { navigateBack, redirectToRules } from "utils/RedirectionUtils";
 import { snakeCase } from "lodash";
 import { trackRuleEditorClosed } from "modules/analytics/events/common/rules";
+import { Button } from "lib/design-system-v2/components";
+import { FiArrowLeft } from "@react-icons/all-files/fi/FiArrowLeft";
 
 const CloseButton = ({ ruleType, mode }) => {
   const navigate = useNavigate();
@@ -20,13 +20,7 @@ const CloseButton = ({ ruleType, mode }) => {
 
   return (
     <Tooltip title="Back to rules" placement="bottom">
-      <RQButton
-        iconOnly
-        type="default"
-        data-dismiss="modal"
-        icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-        onClick={closeButtonHandler}
-      />
+      <Button size="small" type="secondary" data-dismiss="modal" icon={<FiArrowLeft />} onClick={closeButtonHandler} />
     </Tooltip>
   );
 };
