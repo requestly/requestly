@@ -5,14 +5,14 @@ import RedirectRuleIcon from "../../../../../../resources/icons/rule-icons/redir
 import ReplaceRuleIcon from "../../../../../../resources/icons/rule-icons/replace.svg";
 import CancelRuleIcon from "../../../../../../resources/icons/rule-icons/cancel.svg";
 import DelayRuleIcon from "../../../../../../resources/icons/rule-icons/delay.svg";
-import { NetworkEvent, RuleEditorUrlFragment } from "../../../../types";
+import { RQNetworkEvent, RuleEditorUrlFragment } from "../../../../types";
 import { SourceKey, SourceOperator } from "../../../../../types";
 import { PropertyRow } from "@requestly-ui/resource-table";
 import { createRule, generateRuleName, getBaseUrl, getHostFromUrl } from "../../../../utils";
 import "./generalTabContent.scss";
 
 interface Props {
-  networkEvent: NetworkEvent;
+  networkEvent: RQNetworkEvent;
 }
 
 const GeneralTabContent: React.FC<Props> = ({ networkEvent }) => {
