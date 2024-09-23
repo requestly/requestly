@@ -43,8 +43,17 @@ const BaseButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function Bas
 });
 
 const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(function ButtonWithHotkey(props, ref) {
-  // TODO: Fix type - hotkey callback gives keyboard event but button onClick needs mouse event
-  useHotkeys(props.hotKey, (e: any) => props.onClick(e));
+  useHotkeys(
+    props.hotKey,
+    (event) => {
+      // TODO: Fix type - hotkey callback gives keyboard event but button onClick needs mouse event
+      props.onClick(event as any);
+    },
+    {
+      preventDefault: true,
+      enableOnFormTags: ["input", "INPUT"],
+    }
+  );
 
   const keys = props.hotKey.split("+");
 
