@@ -6,3 +6,10 @@ export const RULE_IMPORT_TYPE = {
   OVERWRITE: "overwrite",
   DUPLICATE: "duplicate",
 };
+
+export const RULE_KEYBOARD_SHORTCUTS = {
+  EDITOR_BACK: {
+    hotKey: "esc",
+    description: "From editor to rules list",
+  },
+};
