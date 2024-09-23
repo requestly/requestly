@@ -157,3 +157,11 @@ export const getSecondsFromStringifiedMinSec = (timestamp) => {
   const parsedSeconds = parseInt(seconds.substring(0, 2), 10);
   return (isNaN(parsedMinutes) ? 0 : parsedMinutes) * 60 + (isNaN(parsedSeconds) ? 0 : parsedSeconds);
 };
+
+export const getDaysDifference = (timestamp) => {
+  const now = new Date();
+  const lastSeen = new Date(timestamp);
+  const diffTime = Math.abs(now.getTime() - lastSeen.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+};

@@ -202,6 +202,7 @@ const INITIAL_STATE = {
         testThisRule: false,
         upgradeWorkspaceMenu: false,
       },
+      billingTeamNudgeLastSeenTs: null,
       isSlackConnectButtonVisible: true,
 
       hasConnectedApp: false,

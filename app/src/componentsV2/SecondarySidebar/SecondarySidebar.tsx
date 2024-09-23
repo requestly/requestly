@@ -7,6 +7,7 @@ import { getIsSecondarySidebarCollapsed } from "store/selectors";
 
 import "./SecondarySidebar.scss";
 import { m, AnimatePresence } from "framer-motion";
+import { BillingTeamNudge } from "./components/BillingTeamsNudge/BillingTeamNudge";
 
 export interface SecondarySidebarProps {
   items: {
@@ -43,6 +44,7 @@ const SecondarySidebar: React.FC<SecondarySidebarProps> = ({ items }) => {
               );
             })}
           </ul>
+          <BillingTeamNudge />
         </m.div>
       )}
     </AnimatePresence>
