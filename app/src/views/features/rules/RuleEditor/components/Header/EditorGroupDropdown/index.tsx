@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
-import { Divider, Input, Button, Row, Menu, Dropdown } from "antd";
+import { Divider, Input, Row, Menu, Dropdown } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllGroups,
@@ -19,6 +19,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackGroupChangedEvent, trackGroupCreatedEvent } from "features/rules/analytics";
 import { Group } from "types/rules";
 import Logger from "lib/logger";
+import { Button } from "lib/design-system-v2/components";
 import "./EditorGroupDropdown.css";
 
 const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
@@ -150,7 +151,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
           <>
             <div>
               <Button
-                type="text"
+                type="transparent"
                 icon={<PlusOutlined />}
                 onClick={() => setShowInput(true)}
                 className="editor-dropdown-add-new-group"
@@ -212,12 +213,20 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
         onOpenChange={handleDropdownVisibleChange}
         className={`editor-group-dropdown-trigger ${showDropdown ? "editor-group-dropdown-active" : ""}`}
       >
-        <span className="text-gray">
-          {currentGroupId === APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
-            ? "Add to group"
-            : "Edit group"}
-          <img width={10} height={6} alt="down arrow" src="/assets/icons/downArrow.svg" />
-        </span>
+        <Button>
+          <span>
+            {currentGroupId === APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
+              ? "Add to group"
+              : "Edit group"}
+            <img
+              style={{ width: "10px", height: "6px" }}
+              width={10}
+              height={6}
+              alt="down arrow"
+              src="/assets/icons/downArrow.svg"
+            />
+          </span>
+        </Button>
       </Dropdown>
     </div>
   );
