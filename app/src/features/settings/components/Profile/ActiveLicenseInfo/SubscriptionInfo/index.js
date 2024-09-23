@@ -48,8 +48,8 @@ const SubscriptionInfo = ({
       end_date: validTill,
       type: type,
     });
-    const requestPlanCancellation = httpsCallable(getFunctions(), "premiumNotifications-requestPlanCancellation");
-    requestPlanCancellation({
+    const cancelSubscription = httpsCallable(getFunctions(), "subscription-cancelSubscription");
+    cancelSubscription({
       currentPlan: planName,
     })
       .catch((err) => {

@@ -25,64 +25,53 @@ export const CancelPlanModal: React.FC<Props> = ({ isOpen, closeModal, subscript
   const endDate = subscription?.endDate;
 
   const handleRequestCancellation = () => {
-    if (isIndividualPlanType) {
-      if (!reason) {
-        toast.warn("Please let us know the reason for cancellation!");
-        return;
-      }
-
-      if (reason.length <= 3) {
-        toast.warn("Please enter a valid reason for cancellation!");
-        return;
-      }
-
-      setIsLoading(true);
-
-      const cancelIndividualSubscription = httpsCallable(getFunctions(), "subscription-cancelIndividualSubscription");
-
-      cancelIndividualSubscription({ reason })
-        .then((res) => {
-          // @ts-ignore
-          if (res?.data?.success) {
-            trackPricingPlanCancelled({
-              reason,
-              type: type,
-              end_date: endDate,
-              current_plan: planName,
-            });
-
-            const formattedEndDate = getLongFormatDateString(new Date(endDate));
-            toast.success(`Plan will automatically get cancelled on ${formattedEndDate}.`);
-          } else {
-            toast.warn(`Plan cancellation failed, please contact support!`);
-          }
-        })
-        .catch((e) => {
-          toast.warn(`Plan cancellation failed, please contact support!`);
-          Logger.log(e);
-        })
-        .finally(() => {
-          setIsLoading(false);
-          closeModal();
-          setReason("");
-        });
-    } else {
-      setIsLoading(true);
-      const requestPlanCancellation = httpsCallable(getFunctions(), "premiumNotifications-requestPlanCancellation");
-      requestPlanCancellation({
-        currentPlan: getPrettyPlanName(subscriptionDetails?.plan),
-      })
-        .then(() => {
-          toast.success("Cancellation request sent successfully, we will get back to you soon.");
-        })
-        .catch((e) => {
-          Logger.log(e);
-        })
-        .finally(() => {
-          setIsLoading(false);
-          closeModal();
-        });
+    if (!reason) {
+      toast.warn("Please let us know the reason for cancellation!");
+      return;
     }
+
+    if (reason.length <= 3) {
+      toast.warn("Please enter a valid reason for cancellation!");
+      return;
+    }
+
+    setIsLoading(true);
+
+    const cancelSubscription = httpsCallable<
+      {
+        reason: string;
+        currentPlan: string;
+      },
+      {
+        success: boolean;
+        message: string;
+      }
+    >(getFunctions(), "subscription-cancelSubscription");
+
+    cancelSubscription({ reason, currentPlan: getPrettyPlanName(subscriptionDetails?.plan) })
+      .then((res) => {
+        if (res.data.success) {
+          trackPricingPlanCancelled({
+            reason,
+            type: type,
+            end_date: endDate,
+            current_plan: planName,
+          });
+
+          toast.success(res.data.message);
+        } else {
+          toast.warn(res.data.message);
+        }
+      })
+      .catch((e) => {
+        toast.warn(`Plan cancellation failed, please contact support!`);
+        Logger.log(e);
+      })
+      .finally(() => {
+        setIsLoading(false);
+        closeModal();
+        setReason("");
+      });
   };
 
   return (
