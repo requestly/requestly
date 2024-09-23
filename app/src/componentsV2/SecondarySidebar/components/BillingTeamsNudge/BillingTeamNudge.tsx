@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
@@ -16,6 +16,7 @@ import {
   trackBillingTeamNudgeClosed,
   trackBillingTeamNudgeRequestFailed,
   trackBillingTeamNudgeRequestSent,
+  trackBillingTeamNudgeViewed,
   trackCheckoutBillingTeamNudgeClicked,
 } from "./analytics";
 import "./billingTeamNudge.scss";
@@ -83,6 +84,17 @@ export const BillingTeamNudge: React.FC = () => {
     }
   }, [availableBillingTeams, navigate, handleCloseBillingTeamNudge]);
 
+  useEffect(() => {
+    if (
+      daysSinceLastSeen &&
+      daysSinceLastSeen >= 15 &&
+      user.details?.planDetails?.status !== PlanStatus.ACTIVE &&
+      availableBillingTeams.length
+    ) {
+      trackBillingTeamNudgeViewed();
+    }
+  }, [daysSinceLastSeen, user.details?.planDetails?.status, availableBillingTeams.length]);
+
   if (daysSinceLastSeen && daysSinceLastSeen < 15) return null;
 
   if (user.details?.planDetails?.status === PlanStatus.ACTIVE) return null;
@@ -105,7 +117,7 @@ export const BillingTeamNudge: React.FC = () => {
           </>
         ) : (
           <>
-            <span>{domain}</span> has acquired licenses for its members. You can request a license for yourself.
+            <span>{domain}</span> has Requestly Pro/Basic Team Plan. Unlock all features by joining the team.
           </>
         )}
       </div>
@@ -130,7 +142,7 @@ export const BillingTeamNudge: React.FC = () => {
           type="secondary"
           onClick={handleRequestButtonClick}
         >
-          {availableBillingTeams.length > 1 ? "Checkout Billing Teams" : "Send license request"}
+          {availableBillingTeams.length > 1 ? "Checkout Billing Teams" : "Send Request"}
         </Button>
       )}
     </div>
