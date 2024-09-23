@@ -1,28 +1,22 @@
-import { message } from "antd";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { throttle } from "lodash";
+import { toast } from "utils/Toast";
 
 async function sendSlackInvite() {
-  const hide = message.loading({
-    content: "Sending Slack Connect Invitation",
-    className: "slack-connect-toast",
-    duration: 0,
-  });
+  toast.loading("Sending Slack Connect Invitation", 0);
+
   const sendSlackInviation = httpsCallable(getFunctions(), "slackConnect-sendSlackInvitation");
-  sendSlackInviation()
-    .then((res) => {
-      if (res.data) {
-        message.success({
-          content: "Please check your email and accept the Slack invite!",
-          className: "slack-connect-toast",
-          duration: 4,
-        });
+  return sendSlackInviation()
+    .then((res: any) => {
+      if (res.data.success) {
+        toast.success("You'll receive the Slack invite in your email shortly!", 4);
+      } else {
+        toast.error("Failed to send Slack invite", 4);
       }
     })
-    .catch((err) => {
-      console.error("Error sending slack invite", err);
-    })
-    .finally(hide);
+    .catch(() => {
+      toast.error("Failed to send Slack invite", 4);
+    });
 }
 
 export default throttle(sendSlackInvite, 5000);

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-import { NetworkEvent, RuleEditorUrlFragment } from "../../../../../../types";
+import { RQNetworkEvent, RuleEditorUrlFragment } from "../../../../../../types";
 import { Button, Collapse, Space, Tooltip } from "antd";
 import { CaretRightOutlined, EditOutlined } from "@ant-design/icons";
 import RequestBody from "./RequestBody";
@@ -14,7 +14,7 @@ import {
 import { SourceKey, SourceOperator } from "../../../../../../../types";
 
 interface Props {
-  networkEvent: NetworkEvent;
+  networkEvent: RQNetworkEvent;
 }
 
 const RequestBodyPanel: React.FC<Props> = ({ networkEvent }) => {

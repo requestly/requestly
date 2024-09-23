@@ -30,6 +30,20 @@ export type NetworkResponse = Response;
 export type NetworkHeader = Header;
 export type NetworkRequestQueryParam = QueryString;
 
+export type RQNetworkEvent = NetworkEvent & {
+  metadata?: Metadata;
+};
+
+interface Metadata {
+  graphQLDetails: GraphQLDetails | null;
+}
+
+interface GraphQLDetails {
+  query: string;
+  variables: any; // TBD @nsr
+  operationName: string;
+}
+
 export enum RuleEditorUrlFragment {
   HEADERS = "Headers",
   REDIRECT = "Redirect",
