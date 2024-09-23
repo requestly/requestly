@@ -1,6 +1,6 @@
 import { Drawer } from "antd";
 import Help from "components/features/rules/RuleBuilder/Help";
-import { RQButton } from "lib/design-system/components";
+import { Button } from "lib/design-system-v2/components";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
@@ -23,20 +23,20 @@ export const HelpButton = () => {
           }}
         />
       </Drawer>
-      <RQButton
+      <Button
+        size="small"
         icon={<AiOutlineQuestionCircle />}
         className="header-rule-help-btn"
-        type="text"
+        type="transparent"
         onClick={() => {
           setIsHelpDrawerOpen((isOpen) => !isOpen);
           if (isHelpDrawerOpen) {
             trackDocsSidebarClosed(currentlySelectedRuleData?.ruleType);
           }
         }}
-        size="small"
       >
         Help
-      </RQButton>
+      </Button>
     </>
   );
 };
