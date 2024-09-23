@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Divider, Dropdown, Menu } from "antd";
+import { Button } from "lib/design-system-v2/components";
 import DuplicateButton from "../ActionButtons/DuplicateButton";
 import DeleteButton from "../ActionButtons/DeleteButton";
 import APP_CONSTANTS from "config/constants";
@@ -55,16 +56,19 @@ const RuleOptions = ({ mode, rule }) => {
       overlay={ruleOptionMenu}
       className={`editor-rule-options-trigger ${isOptionsVisible ? "editor-rule-options-active" : ""}`}
     >
-      <span className="text-gray">
-        More
-        <img
-          width={10}
-          height={6}
-          alt="down arrow"
-          src="/assets/icons/downArrow.svg"
-          className="editor-rule-options-trigger-icon"
-        />
-      </span>
+      <Button>
+        <span className="text-gray">
+          More
+          <img
+            style={{ width: "10px", height: "6px" }}
+            width={10}
+            height={6}
+            alt="down arrow"
+            src="/assets/icons/downArrow.svg" // TODO: replace icon with react-icon
+            className="editor-rule-options-trigger-icon"
+          />
+        </span>
+      </Button>
     </Dropdown>
   );
 };
