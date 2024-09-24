@@ -26,4 +26,10 @@ rm -rf node_modules
 npm install
 cd ../..
 
+echo -e "\n***** Installing analytics-vendors dependencies *****"
+cd common/analytics-vendors
+rm -rf node_modules
+npm install
+cd ../..
+
 echo -e "\n***** Requestly install complete *****"
