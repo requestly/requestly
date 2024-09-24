@@ -1,23 +1,20 @@
 import React from "react";
 import { Button as AntDButton, ButtonProps as AntDButtonProps } from "antd";
-import { useHotkeys } from "react-hotkeys-hook";
-import { capitalize } from "lodash";
+import { withHotKeys } from "../HotKeyWrapper";
 import "./Button.scss";
 
-type RQButtonSize = "small" | "default" | "large";
+type ButtonSize = "small" | "default" | "large";
 
-type RQButtonType = "primary" | "secondary" | "transparent" | "danger" | "warning";
+type ButtonType = "primary" | "secondary" | "transparent" | "danger" | "warning";
 
-export interface ButtonProps extends Omit<AntDButtonProps, "size" | "type"> {
-  hotKey?: string;
-  showHotKeyText?: boolean;
-  size?: RQButtonSize;
-  type?: RQButtonType;
+interface BaseButtonProps extends Omit<AntDButtonProps, "size" | "type"> {
+  size?: ButtonSize;
+  type?: ButtonType;
 }
 
 const RQ_TO_ANTD_PROPS: {
-  size: { [key in RQButtonSize]: AntDButtonProps["size"] | any };
-  type: { [key in RQButtonType]: AntDButtonProps["type"] | any };
+  size: { [key in ButtonSize]: AntDButtonProps["size"] | any };
+  type: { [key in ButtonType]: AntDButtonProps["type"] | any };
 } = {
   size: {
     small: "small",
@@ -34,9 +31,7 @@ const RQ_TO_ANTD_PROPS: {
   },
 };
 
-const BaseButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function BaseButton({ ...props }, ref) {
-  const { hotKey, showHotKeyText, ...restProps } = props; // Remove unrecognised props
-
+const BaseButton = React.forwardRef<HTMLButtonElement, BaseButtonProps>(function BaseButton(props, ref) {
   const antDProps = { size: RQ_TO_ANTD_PROPS.size[props.size], type: RQ_TO_ANTD_PROPS.type[props.type] };
 
   const isIconOnly = props.icon && !props.children;
@@ -44,54 +39,17 @@ const BaseButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function Bas
   return (
     <AntDButton
       ref={ref}
-      {...restProps}
+      {...props}
       {...antDProps}
       className={`rq-custom-btn ${isIconOnly ? "icon-only-btn" : ""} ${props.className ?? ""}`}
     />
   );
 });
 
-const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(function ButtonWithHotkey(props, ref) {
-  useHotkeys(
-    props.hotKey,
-    (event) => {
-      // TODO: Fix type - hotkey callback gives keyboard event but button onClick needs mouse event
-      props.onClick(event as any);
-    },
-    {
-      preventDefault: true,
-      enableOnFormTags: ["input", "INPUT"],
-    }
-  );
+const ButtonWithHotkeys = withHotKeys<BaseButtonProps, HTMLButtonElement>(BaseButton);
 
-  const keys = props.hotKey.split("+");
+type ButtonWithHotkeysType = typeof ButtonWithHotkeys;
 
-  let children = props.children;
-  if (props.showHotKeyText) {
-    children = (
-      <>
-        {props.children}
-        <span className="rq-custom-btn-hotkey-text">
-          {keys.map((key, index) => (
-            <>
-              <span className="key">{capitalize(key)}</span>
-              {index === keys.length - 1 ? null : <span>+</span>}
-            </>
-          ))}
-        </span>
-      </>
-    );
-  }
+interface ButtonProps extends ButtonWithHotkeysType {}
 
-  return <BaseButton ref={ref} {...props} children={children} />;
-});
-
-interface RQButton extends React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<HTMLButtonElement>> {}
-
-export const Button: RQButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(props, ref) {
-  if (props.hotKey) {
-    return <ButtonWithHotkey ref={ref} {...props} />;
-  }
-
-  return <BaseButton ref={ref} {...props} />;
-});
+export const Button: ButtonProps = ButtonWithHotkeys;
