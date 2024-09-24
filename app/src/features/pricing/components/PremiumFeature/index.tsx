@@ -63,11 +63,9 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   );
   const isBreachingLimit = features.some((feat) => checkIfFeatureLimitReached(feat, "reached"));
 
-  const hasCrossedDeadline = useMemo(() => new Date() > new Date("2023-11-30"), []);
-
   const handlePopoverSecondaryAction = useCallback(() => {
-    onUpgradeForFreeClickCallback();
     if (isIncentivizationEnabled) {
+      onUpgradeForFreeClickCallback();
       trackUpgradeOptionClicked("upgrade_for_free");
 
       dispatch(
@@ -83,7 +81,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
     }
     redirectToUrl(LINKS.ACCELERATOR_PROGRAM_FORM_LINK, true);
     trackUpgradeOptionClicked("upgrade_for_6_months");
-  }, [dispatch, hasCrossedDeadline, onContinue, source]);
+  }, [dispatch, source, isIncentivizationEnabled, onUpgradeForFreeClickCallback]);
 
   useEffect(() => {
     return () => {
@@ -105,7 +103,6 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             billingTeams={billingTeams}
             onContinue={onContinue}
             hasReachedLimit={isBreachingLimit}
-            isDeadlineCrossed={hasCrossedDeadline}
             source={source}
             featureName={featureName}
             onUpgradeForFreeClickCallback={onUpgradeForFreeClickCallback}
