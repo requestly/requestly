@@ -12,28 +12,29 @@ import { useParams } from "react-router-dom";
 
 interface Props {
   isOpen: boolean;
-  subscriptionDetails: any;
   closeModal: () => void;
-  isIndividualSubscription: boolean; //TODO:@nafees87n : prop to be removed after type in subscription details is migrated to reflect the correct subscriptions.
+  currentPlanName: string;
+  currentPlanEndDate: string | number;
+  billingTeamQuantity: number; //TODO:@nafees87n : prop to be removed after type in subscription details is migrated to reflect the correct subscriptions.
   // For now derive subscription type from subscription quantity
 }
 
 export const CancelPlanModal: React.FC<Props> = ({
   isOpen,
   closeModal,
-  subscriptionDetails,
-  isIndividualSubscription,
+  billingTeamQuantity,
+  currentPlanName,
+  currentPlanEndDate,
 }) => {
   const { billingId } = useParams();
 
   const [reason, setReason] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { subscription, planName } = subscriptionDetails ?? {};
-  const endDate = subscription?.endDate;
+  const isIndividualBilling = billingTeamQuantity === 1;
 
   const handleRequestCancellation = useCallback(() => {
-    if (isIndividualSubscription) {
+    if (isIndividualBilling) {
       if (!reason) {
         toast.warn("Please let us know the reason for cancellation!");
         return;
@@ -61,16 +62,16 @@ export const CancelPlanModal: React.FC<Props> = ({
 
     cancelSubscription({
       reason,
-      currentPlan: getPrettyPlanName(subscriptionDetails?.planName),
+      currentPlan: getPrettyPlanName(currentPlanName),
       billingId: billingId,
     })
       .then((res) => {
         if (res.data.success) {
           trackPricingPlanCancelled({
             reason,
-            type: isIndividualSubscription ? "individual" : "team", // TODO@nafees87n: type from subscriptionDetails to be used some time.
-            end_date: endDate,
-            current_plan: planName,
+            type: isIndividualBilling ? "individual" : "team", // TODO@nafees87n: type from subscriptionDetails to be used some time.
+            end_date: currentPlanEndDate,
+            current_plan: currentPlanName,
           });
 
           toast.success(res.data.message);
@@ -87,15 +88,15 @@ export const CancelPlanModal: React.FC<Props> = ({
         closeModal();
         setReason("");
       });
-  }, [billingId, closeModal, endDate, planName, reason, subscriptionDetails?.planName, isIndividualSubscription]);
+  }, [isIndividualBilling, reason, currentPlanName, billingId, currentPlanEndDate, closeModal]);
 
   return (
     <Modal
       width={600}
       open={isOpen}
       onCancel={closeModal}
-      closable={!isIndividualSubscription}
-      title={isIndividualSubscription ? "Cancel your plan" : "Send request to cancel your plan"}
+      closable={!isIndividualBilling}
+      title={isIndividualBilling ? "Cancel your plan" : "Send request to cancel your plan"}
       className="cancel-plan-modal"
       footer={
         <Row className="w-full" justify="end" gutter={8} align="middle">
@@ -109,22 +110,21 @@ export const CancelPlanModal: React.FC<Props> = ({
       }
     >
       <Col className="cancel-plan-modal-description">
-        {isIndividualSubscription ? (
+        {isIndividualBilling ? (
           <>
-            Your <span className="text-white">{getPrettyPlanName(subscriptionDetails?.planName)} plan</span> will remain
-            active until {getLongFormatDateString(new Date(endDate))}. You won't be charged for the next billing cycle
-            and will automatically be switched to the Free plan thereafter.
+            Your <span className="text-white">{getPrettyPlanName(currentPlanName)} plan</span> will remain active until{" "}
+            {getLongFormatDateString(new Date(currentPlanEndDate))}. You won't be charged for the next billing cycle and
+            will automatically be switched to the Free plan thereafter.
           </>
         ) : (
           <>
-            Once cancelled, your{" "}
-            <span className="text-white">{getPrettyPlanName(subscriptionDetails?.planName)} plan</span> stays active
-            until {getLongFormatDateString(new Date(endDate))}. After that, all premium features won't be accessible to
-            you.
+            Once cancelled, your <span className="text-white">{getPrettyPlanName(currentPlanName)} plan</span> stays
+            active until {getLongFormatDateString(new Date(currentPlanEndDate))}. After that, all premium features won't
+            be accessible to you.
           </>
         )}
       </Col>
-      {isIndividualSubscription ? (
+      {isIndividualBilling ? (
         <Col className="mt-16">
           <label className="text-bold text-white">Please let us know the reason for plan cancellation</label>
           <Input.TextArea
