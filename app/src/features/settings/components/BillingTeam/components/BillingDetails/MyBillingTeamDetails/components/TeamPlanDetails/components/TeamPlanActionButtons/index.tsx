@@ -19,9 +19,10 @@ import { CancelPlanModal } from "../../../../../modals/common/CancelPlanModal";
 interface Props {
   subscriptionDetails: any;
   isAnnualPlan?: boolean;
+  billingTeamQuantity?: number;
 }
 
-export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, isAnnualPlan }) => {
+export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, isAnnualPlan, billingTeamQuantity }) => {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const redirectedFromCheckout = searchParams.get("redirectedFromCheckout");
@@ -30,15 +31,12 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
   const [isCancelPlanModalOpen, setIsCancelPlanModalOpen] = useState(false);
 
   let planStatus = PlanStatus.ACTIVE;
-  if (
-    !["active", "past_due", "trialing"].includes(subscriptionDetails?.subscriptionStatus) &&
-    !redirectedFromCheckout
-  ) {
+  if (!["active", "past_due", "trialing"].includes(subscriptionDetails?.status) && !redirectedFromCheckout) {
     planStatus = PlanStatus.EXPIRED;
   }
 
   const handleUpgradePlan = useCallback(() => {
-    const planName = getPlanNameFromId(subscriptionDetails?.plan);
+    const planName = subscriptionDetails?.planName;
     if (planStatus === PlanStatus.EXPIRED) {
       dispatch(
         actions.toggleActiveModal({
@@ -94,7 +92,7 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
         );
       }
     }
-  }, [dispatch, isAnnualPlan, planStatus, subscriptionDetails?.plan]);
+  }, [dispatch, isAnnualPlan, planStatus, subscriptionDetails?.planName]);
 
   return (
     <>
@@ -110,10 +108,7 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
           </RQButton>
         )}
 
-        {!(
-          getPlanNameFromId(subscriptionDetails?.plan) === PRICING.PLAN_NAMES.PROFESSIONAL &&
-          planStatus === PlanStatus.ACTIVE
-        ) && (
+        {!(subscriptionDetails?.planName === PRICING.PLAN_NAMES.PROFESSIONAL && planStatus === PlanStatus.ACTIVE) && (
           <RQButton type="primary" onClick={handleUpgradePlan} icon={<img src={upgradeIcon} alt="upgrade" />}>
             {planStatus === PlanStatus.EXPIRED ? "Renew plan" : "Upgrade plan"}
           </RQButton>
@@ -128,6 +123,7 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
         subscriptionDetails={subscriptionDetails}
         isOpen={isCancelPlanModalOpen}
         closeModal={() => setIsCancelPlanModalOpen(false)}
+        isIndividualSubscription={!billingTeamQuantity || billingTeamQuantity === 1}
       />
     </>
   );

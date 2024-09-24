@@ -44,8 +44,9 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
           </Col>
           {isUserManager && (
             <TeamPlanActionButtons
-              subscriptionDetails={billingTeamDetails?.subscriptionDetails}
+              subscriptionDetails={user?.details?.planDetails}
               isAnnualPlan={isAnnualPlan}
+              billingTeamQuantity={billingTeamDetails?.subscriptionDetails?.quantity}
             />
           )}
         </Row>
