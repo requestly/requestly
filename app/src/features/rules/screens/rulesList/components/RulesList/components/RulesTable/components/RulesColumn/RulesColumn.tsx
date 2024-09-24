@@ -67,7 +67,7 @@ const RuleNameColumn: React.FC<{
     return (
       <div className="group-name-container" key={record.id}>
         <div className="group-name">
-          {group.name} {group.isSample ? " [Try Instantly]" : ""}
+          {group.name} {group.isSample && " [Try Instantly]"}
         </div>
 
         {totalRules > 0 ? (
