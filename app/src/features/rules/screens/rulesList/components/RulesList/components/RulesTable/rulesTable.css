@@ -122,7 +122,7 @@
   color: var(--requestly-color-text-placeholder);
 }
 
-.rule-name-ellipsis-tooltip .ant-tooltip-inner {
+.rules-table-ellipsis-tooltip .ant-tooltip-inner {
   font-size: var(--requestly-font-size-sm);
   background: var(--requestly-color-black);
 }
