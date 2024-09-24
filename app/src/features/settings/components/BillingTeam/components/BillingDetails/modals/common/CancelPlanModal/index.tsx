@@ -15,8 +15,7 @@ interface Props {
   closeModal: () => void;
   currentPlanName: string;
   currentPlanEndDate: string | number;
-  billingTeamQuantity: number; //TODO:@nafees87n : prop to be removed after type in subscription details is migrated to reflect the correct subscriptions.
-  // For now derive subscription type from subscription quantity
+  billingTeamQuantity: number;
 }
 
 export const CancelPlanModal: React.FC<Props> = ({
@@ -69,7 +68,7 @@ export const CancelPlanModal: React.FC<Props> = ({
         if (res.data.success) {
           trackPricingPlanCancelled({
             reason,
-            type: isIndividualBilling ? "individual" : "team", // TODO@nafees87n: type from subscriptionDetails to be used some time.
+            type: isIndividualBilling ? "individual" : "team",
             end_date: currentPlanEndDate,
             current_plan: currentPlanName,
           });
