@@ -77,11 +77,11 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           },
         })
       );
-      return;
+    } else {
+      redirectToUrl(LINKS.ACCELERATOR_PROGRAM_FORM_LINK, true);
+      trackUpgradeOptionClicked("upgrade_for_6_months");
     }
-    redirectToUrl(LINKS.ACCELERATOR_PROGRAM_FORM_LINK, true);
-    trackUpgradeOptionClicked("upgrade_for_6_months");
-  }, [dispatch, source, isIncentivizationEnabled, onUpgradeForFreeClickCallback]);
+  }, [dispatch, isIncentivizationEnabled, onUpgradeForFreeClickCallback]);
 
   useEffect(() => {
     return () => {
