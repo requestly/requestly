@@ -36,7 +36,7 @@ export const useMocksTableColumns = ({
   allRecordsMap,
 }: Partial<MocksTableProps> & { allRecordsMap: { [id: string]: RQMockMetadataSchema } }) => {
   const baseEllipsisTooltipConfig: TooltipProps = {
-    overlayClassName: "mocks-table-ellipsis-tooltip",
+    overlayClassName: "content-list-tooltip",
     placement: "right",
     showArrow: false,
   };
