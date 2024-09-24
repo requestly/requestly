@@ -30,11 +30,12 @@
   z-index: 3;
   display: flex;
   justify-content: center;
-  align-items: center;
   cursor: not-allowed;
 }
 
 .sample-rule-overlay .view-only-message {
+  margin-top: 150px;
+  height: fit-content;
   color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-lg);
   background: var(--requestly-color-black);
