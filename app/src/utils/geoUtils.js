@@ -13,24 +13,19 @@ export const filesByCountry = {
   US: 6,
 };
 
-//getting country of user
-export const getCountryFromAPI = async () => {
-  const res = await fetch("https://api.country.is/");
-  if (res.status === 200) {
-    const user = await res.json();
-    return user.country;
-  } else {
-    //showing default logos
-    return null;
-  }
-};
-
-//get country of visitor
-export const getCountryName = async () => {
-  let countryName = localStorage.getItem("country");
-  if (countryName === null) {
-    countryName = await getCountryFromAPI();
-    localStorage.setItem("country", countryName);
-  }
-  return countryName;
+export const fetchUserCountry = async () => {
+  const defaultCountry = "US";
+  const country = await fetch("https://api.country.is/")
+    .then((res) => res.json())
+    .then((location) => {
+      if (location.country) {
+        return location.country;
+      } else {
+        return defaultCountry;
+      }
+    })
+    .catch(() => {
+      return defaultCountry;
+    });
+  return country;
 };
