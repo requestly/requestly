@@ -1,5 +1,5 @@
 .premium-feature-popover {
-  width: 400px;
+  width: 410px;
   border-radius: var(--border-radius-md);
   padding: 0;
   position: relative;
@@ -9,7 +9,9 @@
   }
 
   & .ant-popover-inner {
-    background: var(--black);
+    background: var(--requestly-color-surface-0);
+    box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
+    border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
   }
 
   & .ant-popover-buttons {

@@ -31,7 +31,6 @@ interface RequestFeatureModalProps {
   billingTeams: BillingTeamDetails[];
   hasReachedLimit?: boolean;
   source: string;
-  isDeadlineCrossed: boolean;
   featureName?: string;
   setOpenPopup: (open: boolean) => void;
   onContinue?: () => void;
@@ -44,7 +43,6 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   billingTeams,
   hasReachedLimit,
   source,
-  isDeadlineCrossed,
   setOpenPopup,
   onContinue,
   featureName,
