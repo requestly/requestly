@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { isRule } from "features/rules/utils";
 import { RuleTableRecord } from "../../types";
 import { Link } from "react-router-dom";
-import { Button, Progress, Tooltip, Typography } from "antd";
+import { Button, Progress, Tooltip, TooltipProps, Typography } from "antd";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { RuleSelectionListDrawer } from "../../../RuleSelectionListDrawer/RuleSelectionListDrawer";
 import PATHS from "config/constants/sub/paths";
@@ -17,6 +17,12 @@ import { trackSampleRuleEditorViewed } from "features/rules/analytics";
 const RuleNameColumn: React.FC<{
   record: RuleTableRecord;
 }> = ({ record }) => {
+  const baseEllipsisTooltipConfig: TooltipProps = {
+    overlayClassName: "rules-table-ellipsis-tooltip",
+    placement: "right",
+    showArrow: false,
+  };
+
   const dispatch = useDispatch();
   const theme = useTheme();
 
@@ -46,9 +52,7 @@ const RuleNameColumn: React.FC<{
             ellipsis={{
               tooltip: {
                 title: record.name,
-                overlayClassName: "rule-name-ellipsis-tooltip",
-                placement: "right",
-                showArrow: false,
+                ...baseEllipsisTooltipConfig,
               },
             }}
           >
@@ -79,9 +83,7 @@ const RuleNameColumn: React.FC<{
           ellipsis={{
             tooltip: {
               title: record.name,
-              overlayClassName: "rule-name-ellipsis-tooltip",
-              placement: "right",
-              showArrow: false,
+              ...baseEllipsisTooltipConfig,
             },
           }}
           className="group-name"
