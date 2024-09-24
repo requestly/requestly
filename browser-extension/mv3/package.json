@@ -28,7 +28,7 @@
     "test": "playwright test",
     "pretest": "npm run build",
     "release": "sh scripts/release-extension.sh",
-    "prerelease": "cd .. && sh ./install.sh"
+    "prerelease": "sh ../install.sh"
   },
   "devDependencies": {
     "@playwright/test": "^1.44.1",

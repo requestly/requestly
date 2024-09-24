@@ -125,23 +125,6 @@ export const parseGravatarImage = (urlString) => {
   return url.href;
 };
 
-export const fetchUserCountry = async () => {
-  const defaultCountry = "US";
-  const country = await fetch("https://api.country.is/")
-    .then((res) => res.json())
-    .then((location) => {
-      if (location.country) {
-        return location.country;
-      } else {
-        return defaultCountry;
-      }
-    })
-    .catch(() => {
-      return defaultCountry;
-    });
-  return country;
-};
-
 export const getUserOS = () => {
   let userAgent = window.navigator.userAgent,
     platform = window.navigator.platform,

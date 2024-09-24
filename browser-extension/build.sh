@@ -5,6 +5,11 @@ cd config
 ENV=$1 npm run build
 cd ..
 
+echo -e "\n***** Building analytics vendors *****"
+cd ../common/analytics-vendors
+npm run build
+cd ../../browser-extension
+
 echo -e "\n***** Building common code *****"
 cd common
 npm run build
@@ -12,7 +17,8 @@ cd ..
 
 echo -e "\n***** Building MV2 extension *****"
 cd mv2
-npm run build:current
+# TODO @Sachin: Remove this when creating the pull request
+#npm run build:current
 cd ..
 
 echo -e "\n***** Building MV3 extension *****"
@@ -22,5 +28,5 @@ cd ..
 
 echo -e "\n***** Building SessionBear extension *****"
 cd sessionbear
-npm run build:current
+#npm run build:current
 cd ..

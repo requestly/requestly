@@ -144,6 +144,7 @@ export const BillingTeamNudge: React.FC = () => {
         </div>
       ) : (
         <Button
+          block
           loading={isLoading}
           className="billing-team-nudge__button"
           size="small"
@@ -151,7 +152,7 @@ export const BillingTeamNudge: React.FC = () => {
           type="secondary"
           onClick={handleRequestButtonClick}
         >
-          {availableBillingTeams.length > 1 ? "Checkout Billing Teams" : "Send Request"}
+          {availableBillingTeams.length > 1 ? "View Teams" : "Send Request"}
         </Button>
       )}
     </div>
