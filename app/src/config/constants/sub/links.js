@@ -131,6 +131,8 @@ const LINKS = {
   PRODUCTLIFT_CHANGELOG: "https://requestly.productlift.dev/",
 
   CALENDLY_LINK: "https://calendly.com/requestly/sagar",
+
+  ACCELERATOR_PROGRAM_FORM_LINK: "https://app.formbricks.com/s/cm1ewcpkt0000djs29ct7rpy2",
 };
 
 export default LINKS;
