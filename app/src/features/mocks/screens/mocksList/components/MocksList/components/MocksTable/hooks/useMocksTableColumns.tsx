@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
-import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table } from "antd";
+import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table, TooltipProps } from "antd";
 import { MockType, RQMockCollection, RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -35,6 +35,12 @@ export const useMocksTableColumns = ({
   forceRender,
   allRecordsMap,
 }: Partial<MocksTableProps> & { allRecordsMap: { [id: string]: RQMockMetadataSchema } }) => {
+  const baseEllipsisTooltipConfig: TooltipProps = {
+    overlayClassName: "mocks-table-ellipsis-tooltip",
+    placement: "right",
+    showArrow: false,
+  };
+
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -89,12 +95,28 @@ export const useMocksTableColumns = ({
             <span className="collection-icon">
               <MdOutlineFolder />
             </span>
-            <Typography.Text ellipsis={true} className="mock-collection-name">
-              {record.name}
+            <Typography.Text
+              ellipsis={{
+                tooltip: {
+                  title: record.name,
+                  ...baseEllipsisTooltipConfig,
+                },
+              }}
+              className="mock-collection-name"
+            >
+              PP{record.name}
             </Typography.Text>
 
             {collectionPath ? (
-              <Typography.Text className="collection-path" ellipsis={true}>
+              <Typography.Text
+                className="collection-path"
+                ellipsis={{
+                  tooltip: {
+                    title: `/${collectionPath}`,
+                    ...baseEllipsisTooltipConfig,
+                  },
+                }}
+              >
                 {"/" + collectionPath}
               </Typography.Text>
             ) : null}
@@ -151,7 +173,15 @@ export const useMocksTableColumns = ({
                   {record?.type === MockType.API ? record.method : record.fileType}
                 </span>
 
-                <Typography.Text ellipsis={true} className="primary-cell mock-name">
+                <Typography.Text
+                  ellipsis={{
+                    tooltip: {
+                      title: record.name,
+                      ...baseEllipsisTooltipConfig,
+                    },
+                  }}
+                  className="primary-cell mock-name"
+                >
                   {record.name}
                 </Typography.Text>
 

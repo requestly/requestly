@@ -104,11 +104,27 @@
   font-size: var(--requestly-font-size-sm);
 }
 
+.rule-name-container .rule-name .ant-typography {
+  /* TODO: use theme variables */
+  color: #3ba0ff;
+  transition: color 0.2s ease;
+}
+
+.rule-name-container .rule-name .ant-typography:hover {
+  /* TODO: use theme variables */
+  color: #1f50b1;
+}
+
 .rule-name-container .rule-description-icon {
   display: flex;
   align-items: center;
   font-size: 16px;
   color: var(--requestly-color-text-placeholder);
+}
+
+.rule-name-ellipsis-tooltip .ant-tooltip-inner {
+  font-size: var(--requestly-font-size-sm);
+  background: var(--requestly-color-black);
 }
 
 .group-name-container {
@@ -118,12 +134,13 @@
   gap: 8px;
 }
 
-.group-name-container .group-name {
+.group-name-container .group-name.ant-typography {
   max-width: 262px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--requestly-font-size-sm);
+  color: var(--requestly-color-text-default);
 }
 
 .group-name-container .group-rules-count-details {
