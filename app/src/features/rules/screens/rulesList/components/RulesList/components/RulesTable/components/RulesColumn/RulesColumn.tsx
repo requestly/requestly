@@ -18,7 +18,7 @@ const RuleNameColumn: React.FC<{
   record: RuleTableRecord;
 }> = ({ record }) => {
   const baseEllipsisTooltipConfig: TooltipProps = {
-    overlayClassName: "rules-table-ellipsis-tooltip",
+    overlayClassName: "content-list-tooltip",
     placement: "right",
     showArrow: false,
   };

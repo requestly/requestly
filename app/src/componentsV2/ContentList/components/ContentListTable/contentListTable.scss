@@ -178,6 +178,11 @@
   }
 }
 
+.content-list-tooltip.ant-tooltip .ant-tooltip-inner {
+  background: var(--requestly-color-black);
+  font-size: var(--requestly-font-size-sm);
+}
+
 th.ant-table-cell .ant-table-column-sorters .ant-table-column-title {
   overflow: unset;
 }

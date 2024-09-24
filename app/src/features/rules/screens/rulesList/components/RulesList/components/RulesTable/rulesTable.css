@@ -122,11 +122,6 @@
   color: var(--requestly-color-text-placeholder);
 }
 
-.rules-table-ellipsis-tooltip .ant-tooltip-inner {
-  font-size: var(--requestly-font-size-sm);
-  background: var(--requestly-color-black);
-}
-
 .group-name-container {
   display: flex;
   align-items: center;
