@@ -70,7 +70,12 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
         className={`rule-builder-body ${isSharedListView ? "preview-rule-builder-body" : ""}`}
         id="rule-builder-body"
       >
-        <Col span={24} style={{ minWidth: "300px" }}>
+        {isSampleRule && (
+          <div className="sample-rule-overlay">
+            <div className="view-only-message">Sample rules are view only</div>
+          </div>
+        )}
+        <Col span={24} style={{ minWidth: "300px" }} className={`${isSampleRule ? "sample-rule-card-body" : ""}`}>
           <CardBody>
             {/* Info for some specific rule types */}
             <RuleInfoBanner appMode={appMode} ruleType={currentlySelectedRuleConfig.TYPE} />
