@@ -3,7 +3,7 @@ import { Typography } from "antd";
 import "./emptyContainerPlaceholder.scss";
 
 interface Props {
-  lines: string[];
+  lines: React.ReactNode[];
 }
 
 const EmptyContainerPlaceholder: React.FC<Props> = ({ lines }) => {
