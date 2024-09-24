@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { isRule } from "features/rules/utils";
 import { RuleTableRecord } from "../../types";
 import { Link } from "react-router-dom";
-import { Button, Progress, Tooltip } from "antd";
+import { Button, Progress, Tooltip, Typography } from "antd";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { RuleSelectionListDrawer } from "../../../RuleSelectionListDrawer/RuleSelectionListDrawer";
 import PATHS from "config/constants/sub/paths";
@@ -42,7 +42,18 @@ const RuleNameColumn: React.FC<{
             dispatch(actions.updateSecondarySidebarCollapse(false));
           }}
         >
-          {record.name}
+          <Typography.Text
+            ellipsis={{
+              tooltip: {
+                title: record.name,
+                overlayClassName: "rule-name-ellipsis-tooltip",
+                placement: "right",
+                showArrow: false,
+              },
+            }}
+          >
+            {record.name}
+          </Typography.Text>
         </Link>
 
         {record?.description ? (
@@ -64,7 +75,19 @@ const RuleNameColumn: React.FC<{
 
     return (
       <div className="group-name-container" key={record.id}>
-        <div className="group-name">{group.name}</div>
+        <Typography.Text
+          ellipsis={{
+            tooltip: {
+              title: record.name,
+              overlayClassName: "rule-name-ellipsis-tooltip",
+              placement: "right",
+              showArrow: false,
+            },
+          }}
+          className="group-name"
+        >
+          {group.name}
+        </Typography.Text>
 
         {totalRules > 0 ? (
           <Tooltip
