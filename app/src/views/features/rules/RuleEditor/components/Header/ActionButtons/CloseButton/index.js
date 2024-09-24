@@ -22,7 +22,8 @@ const CloseButton = ({ ruleType, mode }) => {
   return (
     <Tooltip title="Back to rules (esc)" placement="bottom">
       <Button
-        hotKey={RULE_KEYBOARD_SHORTCUTS.EDITOR_BACK.hotKey}
+        hotKeyCombination={RULE_KEYBOARD_SHORTCUTS.EDITOR_BACK.hotKey}
+        hotKeyCallback={closeButtonHandler}
         size="small"
         type="transparent"
         data-dismiss="modal"
