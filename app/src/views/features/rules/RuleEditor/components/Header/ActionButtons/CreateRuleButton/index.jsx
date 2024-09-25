@@ -344,7 +344,8 @@ const CreateRuleButton = ({
     >
       <Tooltip title={tooltipText} placement="top">
         <Button
-          hotKey={RULE_KEYBOARD_SHORTCUTS.SAVE_RULE.hotKey}
+          hotKeyCombination={RULE_KEYBOARD_SHORTCUTS.SAVE_RULE.hotKey}
+          hotKeyCallback={handleBtnOnClick}
           data-tour-id="rule-editor-create-btn"
           id="rule-editor-save-btn"
           type="primary"
@@ -368,7 +369,8 @@ const CreateRuleButton = ({
       >
         <Tooltip title={tooltipText} placement="top">
           <Button
-            hotKey={RULE_KEYBOARD_SHORTCUTS.SAVE_RULE.hotKey}
+            hotKeyCombination={RULE_KEYBOARD_SHORTCUTS.SAVE_RULE.hotKey}
+            hotKeyCallback={handleBtnOnClick}
             data-tour-id="rule-editor-create-btn"
             id="rule-editor-save-btn"
             type="primary"
