@@ -10,8 +10,10 @@ interface HotKeysWrapperProps {
   children?: React.ReactNode;
 }
 
+type WithHotKeysProps<T = {}> = T & HotKeysWrapperProps;
+
 export const withHotKeys = <P extends object, R>(Children: React.ComponentType<P>) => {
-  const ComponentWithHotkeys = (props: P & HotKeysWrapperProps, ref: React.ForwardedRef<R>) => {
+  const ComponentWithHotkeys = (props: WithHotKeysProps<P>, ref: React.ForwardedRef<R>) => {
     const { hotKeyCombination, hotKeyCallback, showHotKeyText, ...restProps } = props; // Remove unrecognised props
 
     useHotkeys(
