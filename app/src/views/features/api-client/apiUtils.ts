@@ -1,10 +1,10 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
-import parseCurlAsJson from "./curl-to-json";
-import { CurlParserResponse, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "./types";
+import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "./types";
 // @ts-ignore
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "./constants";
+import * as curlconverter from "curlconverter";
 
 export const makeRequest = async (
   appMode: string,
@@ -109,24 +109,26 @@ export const filterHeadersToImport = (headers: KeyValuePair[]) => {
 
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
   try {
-    // @ts-ignore
-    const json: CurlParserResponse = parseCurlAsJson(curl);
-    const queryParams = generateKeyValuePairsFromJson(json.queries);
-    const headers = filterHeadersToImport(generateKeyValuePairsFromJson(json.headers));
+    const requestJsonString = curlconverter.toJsonString(curl);
+    const requestJson = JSON.parse(requestJsonString);
+    // console.log("converted", {curl, requestJson});
+
+    const queryParams = generateKeyValuePairsFromJson(requestJson.queries);
+    const headers = filterHeadersToImport(generateKeyValuePairsFromJson(requestJson.headers));
     const contentType = getContentTypeFromRequestHeaders(headers);
     let body: RQAPI.RequestBody;
 
     if (contentType === RequestContentType.JSON) {
-      body = JSON.stringify(json.data);
+      body = JSON.stringify(requestJson.data);
     } else if (contentType === RequestContentType.FORM) {
-      body = generateKeyValuePairsFromJson(json.data);
+      body = generateKeyValuePairsFromJson(requestJson.data);
     } else {
-      body = Object.entries(json.data || {})[0]?.[0] ?? ""; // when body is string, json.data = { "string": "" }
+      body = requestJson.data;
     }
 
     const request: RQAPI.Request = {
-      url: json.url,
-      method: json.method,
+      url: requestJson.url,
+      method: requestJson.method.toUpperCase() as RequestMethod,
       queryParams,
       headers,
       contentType,
