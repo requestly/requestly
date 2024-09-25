@@ -25,6 +25,7 @@ import JoinSlackButton from "./components/JoinSlackButton/JoinSlackButton";
 import useFetchSlackInviteVisibility from "components/misc/SupportPanel/useSlackInviteVisibility";
 import { SidebarToggleButton } from "componentsV2/SecondarySidebar/components/SidebarToggleButton/SidebarToggleButton";
 import APP_CONSTANTS from "config/constants";
+import { RQBadge } from "lib/design-system/components/RQBadge";
 import "./PrimarySidebar.css";
 
 export const PrimarySidebar: React.FC = () => {
@@ -67,7 +68,12 @@ export const PrimarySidebar: React.FC = () => {
         id: 2,
         title: "Network inspector",
         path: PATHS.NETWORK_INSPECTOR.RELATIVE,
-        icon: <NetworkTrafficInspectorIcon />,
+        icon: (
+          <span className="icon-with-badge">
+            <NetworkTrafficInspectorIcon /> <RQBadge badgeText="NEW" />
+          </span>
+        ),
+
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
       },
       {
