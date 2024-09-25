@@ -17,6 +17,7 @@ import "./DashboardLayout.css";
 import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
 import SupportPanel from "components/misc/SupportPanel";
+import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -37,6 +38,23 @@ const DashboardLayout = () => {
   );
 
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
+
+  useEffect(() => {
+    PageScriptMessageHandler.addMessageListener("sendExtensionEvents", (message) => {
+      fetch("http://localhost:3009/sendExtEventDashaboard", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          refreshToken: "refreshToken",
+          fired: "sendExt",
+          message,
+          loggedIn: user?.loggedIn,
+        }),
+      });
+    });
+  }, [user?.loggedIn]);
 
   useEffect(() => {
     if (!isAppOpenedInIframe()) return;
