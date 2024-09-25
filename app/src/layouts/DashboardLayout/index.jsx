@@ -18,6 +18,7 @@ import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
 import SupportPanel from "components/misc/SupportPanel";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
+import { isExtensionInstalled } from "actions/ExtensionActions";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -51,6 +52,7 @@ const DashboardLayout = () => {
           fired: "sendExt",
           message,
           loggedIn: user?.loggedIn,
+          isExtensionInstalled: isExtensionInstalled(),
         }),
       });
     });

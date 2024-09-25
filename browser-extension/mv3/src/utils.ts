@@ -122,3 +122,22 @@ export const onBlockListChange = (callback: () => void) => {
     }
   );
 };
+
+let refreshToken: string = null;
+export const cacheRefreshToken = async () => {
+  refreshToken = await getRecord("refreshToken");
+
+  onRecordChange<string>(
+    {
+      keyFilter: "refreshToken",
+      changeTypes: [ChangeType.MODIFIED],
+    },
+    (changes) => {
+      refreshToken = changes[changes.length - 1].newValue;
+    }
+  );
+};
+
+export const getRefreshToken = () => {
+  return refreshToken;
+};
