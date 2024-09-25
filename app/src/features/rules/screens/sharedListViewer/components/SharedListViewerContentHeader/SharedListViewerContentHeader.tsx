@@ -23,6 +23,7 @@ import { Group, Rule } from "types";
 import { actions } from "store";
 import Logger from "lib/logger";
 import "./sharedListViewerContentHeader.scss";
+import APP_CONSTANTS from "config/constants";
 
 interface ContentHeaderProps {
   searchValue: string;
@@ -57,6 +58,22 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
 
   const handleImportListOnClick = useCallback(() => {
     trackSharedListImportStartedEvent(sharedListId, sharedListRules.length);
+
+    if (!user.loggedIn) {
+      dispatch(
+        // @ts-ignore
+        actions.toggleActiveModal({
+          modalName: "authModal",
+          newValue: true,
+          newProps: {
+            eventPage: "shared_list",
+            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+            warningMessage: "You must sign in to import a Shared List.",
+          },
+        })
+      );
+      return;
+    }
 
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) {
       dispatch(
