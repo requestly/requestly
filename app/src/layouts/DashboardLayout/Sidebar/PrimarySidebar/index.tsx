@@ -91,7 +91,7 @@ export const PrimarySidebar: React.FC = () => {
       //   activeColor: "var(--session-recording)",
       // },
       {
-        id: 5,
+        id: 4,
         title: "Sessions",
         path: PATHS.SESSIONS.INDEX,
         icon: (
@@ -108,9 +108,8 @@ export const PrimarySidebar: React.FC = () => {
         display: true,
         activeColor: "var(--session-recording)",
       },
-
       {
-        id: 6,
+        id: 5,
         title: "Mock server",
         path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
@@ -118,7 +117,7 @@ export const PrimarySidebar: React.FC = () => {
         activeColor: "var(--mock-server)",
       },
       {
-        id: 7,
+        id: 6,
         title: "API client",
         path: PATHS.API_CLIENT.INDEX,
         icon: <ApiOutlined />,
@@ -129,7 +128,7 @@ export const PrimarySidebar: React.FC = () => {
 
     if (isDesktopSessionsCompatible) {
       items[4] = {
-        id: 5,
+        id: 4,
         title: "Desktop Sessions",
         path: PATHS.SESSIONS.DESKTOP.INDEX,
         icon: (
