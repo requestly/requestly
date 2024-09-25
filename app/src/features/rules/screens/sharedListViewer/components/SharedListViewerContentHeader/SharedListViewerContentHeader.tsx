@@ -72,6 +72,7 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
           },
         })
       );
+      trackSharedListImportFailed(sharedListId, sharedListRules.length);
       return;
     }
 
