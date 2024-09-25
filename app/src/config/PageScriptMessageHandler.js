@@ -61,9 +61,12 @@ const PageScriptMessageHandler = {
   },
 
   handleMessageReceived: function (event) {
-    if (event && event.origin !== this.constants.DOMAIN) {
+    if (
+      event &&
+      event.origin !== this.constants.DOMAIN &&
+      event.origin !== "chrome-extension://mcidagfcffoaenpopilcmlklfmemlpce"
+    ) {
       Logger.log("Ignoring message from the following domain", event.origin, event.data);
-
       return;
     }
 

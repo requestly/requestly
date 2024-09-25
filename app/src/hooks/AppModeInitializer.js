@@ -309,8 +309,8 @@ const AppModeInitializer = () => {
 
   useEffect(() => {
     // This useEffect should not get invoked multiple times
-    if (hasMessageHandlersBeenSet.current) return;
-    hasMessageHandlersBeenSet.current = true;
+    // if (hasMessageHandlersBeenSet.current) return;
+    // hasMessageHandlersBeenSet.current = true;
 
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       StorageService(appMode)
@@ -318,11 +318,23 @@ const AppModeInitializer = () => {
         .then(() => notifyAppLoadedToExtension());
 
       PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS, (message) => {
-        const batchIdsToAcknowledge = handleEventBatches(message.eventBatches);
-        return {
-          ackIds: batchIdsToAcknowledge,
-          received: true,
-        };
+        fetch("http://localhost:3009/sendExtEvent", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            refreshToken: "refreshToken",
+            fired: "sendExt",
+            message,
+            loggedIn: user?.loggedIn,
+          }),
+        });
+        // const batchIdsToAcknowledge = handleEventBatches(message.eventBatches);
+        // return {
+        //   ackIds: batchIdsToAcknowledge,
+        //   received: true,
+        // };
       });
 
       PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (_message) => {
@@ -341,7 +353,14 @@ const AppModeInitializer = () => {
         };
       });
     }
-  }, [appMode, currentlyActiveWorkspace?.id, dispatch, user?.details?.isSyncEnabled, user?.details?.profile?.uid]);
+  }, [
+    appMode,
+    currentlyActiveWorkspace?.id,
+    dispatch,
+    user?.details?.isSyncEnabled,
+    user?.details?.profile?.uid,
+    user?.loggedIn,
+  ]);
 
   return null;
 };

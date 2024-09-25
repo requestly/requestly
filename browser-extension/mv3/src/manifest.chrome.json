@@ -57,7 +57,8 @@
     "tabs",
     "unlimitedStorage",
     "webNavigation",
-    "webRequest"
+    "webRequest",
+    "offscreen"
   ],
   "host_permissions": ["<all_urls>"],
   "commands": {}

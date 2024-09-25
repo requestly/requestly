@@ -127,3 +127,10 @@ export function testRuleOnUrl(testOptions) {
     record,
   });
 }
+
+export function sendMessageToIframe(refreshToken) {
+  return sendMessage({
+    action: "iframe_loaded",
+    refreshToken,
+  });
+}

@@ -116,12 +116,16 @@ export const initMessageHandler = () => {
         break;
 
       case EXTENSION_MESSAGES.ON_BEFORE_AJAX_REQUEST:
-        requestProcessor.onBeforeAJAXRequest(sender.tab.id, message.requestDetails).then(sendResponse);
-        return true;
+        if (sender.tab) {
+          requestProcessor.onBeforeAJAXRequest(sender.tab.id, message.requestDetails).then(sendResponse);
+          return true;
+        }
 
       case EXTENSION_MESSAGES.ON_ERROR_OCCURRED:
-        requestProcessor.onErrorOccurred(sender.tab.id, message.requestDetails).then(sendResponse);
-        return true;
+        if (sender.tab) {
+          requestProcessor.onErrorOccurred(sender.tab.id, message.requestDetails).then(sendResponse);
+          return true;
+        }
 
       case EXTENSION_MESSAGES.TEST_RULE_ON_URL:
         launchUrlAndStartRuleTesting(message, sender.tab.id);
@@ -176,6 +180,9 @@ export const initMessageHandler = () => {
       case EXTENSION_MESSAGES.CHECK_IF_DESKTOP_APP_OPEN:
         checkIfDesktopAppOpen().then(sendResponse);
         return true;
+
+      case "iframe_loaded":
+        console.log("!!!debug", "iframe loaded");
     }
 
     return false;
