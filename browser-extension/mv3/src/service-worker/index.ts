@@ -1,4 +1,4 @@
-import { getRecord } from "common/storage";
+import { cacheRefreshToken } from "../utils";
 import { initClientHandler, initClientSideCaching } from "./services/clientHandler";
 import { registerCommands } from "./services/commands";
 import { initContextMenu } from "./services/contextMenu";
@@ -19,20 +19,5 @@ import { initWebRequestInterceptor } from "./services/webRequestInterceptor";
   initContextMenu();
   initWebRequestInterceptor();
   initDevtoolsListener();
-
-  const refreshToken = await getRecord("refreshToken");
-
-  await chrome.offscreen.createDocument({
-    url: chrome.runtime.getURL("/iframe.html"),
-    reasons: [chrome.offscreen.Reason.IFRAME_SCRIPTING],
-    justification: "justification",
-  });
-
-  console.log("!!!debug", "offscreen loaded");
-
-  chrome.runtime.sendMessage({
-    target: "offscreen",
-    refreshToken,
-    action: "iframe",
-  });
+  cacheRefreshToken();
 })();
