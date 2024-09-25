@@ -357,8 +357,8 @@ a {
 }
 
 .test-rule-widget-progress-bar {
-  height: 4px;
-  background: #1e69ff;
+  height: 6px;
+  background: #3c7ff3;
   position: absolute;
   bottom: 0;
   left: 0;
