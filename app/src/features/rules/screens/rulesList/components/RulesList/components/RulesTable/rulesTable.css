@@ -123,6 +123,7 @@
   line-height: var(--line-height-2xs, 13px); /* 130% */
   letter-spacing: 1px;
   text-transform: uppercase;
+  margin-right: 48px;
 }
 
 .rule-name-container .rule-description-icon {
