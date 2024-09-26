@@ -30,6 +30,12 @@ enum BANNER_ACTIONS {
   REDIRECT_TO_ACCELERATOR_FORM = "redirect_to_accelerator_form",
 }
 
+enum BANNER_ID {
+  ACCELERATOR_PROGRAM = "accelerator_program",
+  COMMERCIAL_LICENSE = "commercial_license",
+  REQUEST_TEAM_ACCESS = "request_team_access",
+}
+
 interface Banner {
   id: string;
   short_text?: string; //Banner badge
@@ -87,11 +93,11 @@ export const AppNotificationBanner = () => {
   const renderBannerText = useCallback(
     (bannerId: string, text: string) => {
       switch (bannerId) {
-        case "commercial_license": {
+        case BANNER_ID.COMMERCIAL_LICENSE: {
           const companyName = getCompanyNameFromEmail(user?.details?.profile?.email) || "";
           return `Dear ${companyName} user, ${text}`;
         }
-        case "accelerator_program": {
+        case BANNER_ID.ACCELERATOR_PROGRAM: {
           if (isCompanyEmail(user?.details?.profile?.email)) {
             return `Requestly is offering an exclusive 6-month free access to the entire ${getCompanyNameFromEmail(
               user?.details?.profile?.email
@@ -109,19 +115,19 @@ export const AppNotificationBanner = () => {
   const checkBannerVisibility = useCallback(
     (bannerId: string) => {
       switch (bannerId) {
-        case "commercial_license": {
+        case BANNER_ID.COMMERCIAL_LICENSE: {
           if (!user.details?.isPremium) {
             dispatch(actions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
         }
-        case "request_team_access": {
+        case BANNER_ID.REQUEST_TEAM_ACCESS: {
           if (billingTeams?.length && !billingTeams?.some((team) => user?.details?.profile?.uid in team.members)) {
             dispatch(actions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
         }
-        case "accelerator_program": {
+        case BANNER_ID.ACCELERATOR_PROGRAM: {
           if (!user.details?.isPremium && !billingTeams) {
             dispatch(actions.updateIsAppBannerVisible(true));
             return true;
