@@ -37,6 +37,10 @@ class RuleExecutionHandler {
   };
 
   processTabCachedRulesExecutions = async (tabId: number) => {
+    if (!tabId) {
+      return;
+    }
+
     const rulesExecutionLogs: RulesExecutionLog[] =
       tabService.getData(tabId, TAB_SERVICE_DATA.RULES_EXECUTION_LOGS, []) || [];
 
