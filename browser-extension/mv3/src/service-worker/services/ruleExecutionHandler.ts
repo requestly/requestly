@@ -77,8 +77,10 @@ class RuleExecutionHandler {
     );
 
     eventLogger.logEvent("rule_executed", {
-      ruleId: rule.id,
-      ruleName: rule.name,
+      rule_type: rule.ruleType,
+      rule_id: rule.id,
+      platform: "extension",
+      rule_creator: rule.createdBy,
     });
   };
 }
