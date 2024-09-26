@@ -1,82 +1,75 @@
+import { getRefreshToken } from "../../utils";
 import offscreenHandler from "./offscreen/offscreenHandler";
 
-/* STATE */
-const eventsToSend = [],
-  eventWriterInterval: NodeJS.Timeout = null,
-  batchesWaitingForAck = [],
-  eventsCount = 0,
-  EVENTS_LIMIT = 50000,
-  STORE_EVENTS_KEY = "eventBatches",
-  STORE_EXECUTION_EVENTS_KEY = "executionEventBatches";
-/* UTILITIES */
+interface EventLog {
+  eventName: string;
+  eventParams: Record<string, any>;
+  eventTs: number;
+}
 
-// MV2 - periodically writing to localStorage, now periodic sending to the app
-// If no refresh token present, discard the event then and there, do not cache
+class EventLogger {
+  private eventsQueue: EventLog[] = [];
+  private eventLoggerInterval: NodeJS.Timeout = null;
+  private EVENTS_LIMIT = 5000;
 
-const queueEventToWrite = (event) => {
-  eventsToSend.push(event);
-};
+  private queueEvent(event: EventLog) {
+    const isRefreshTokenExists = !!getRefreshToken();
+    if (!isRefreshTokenExists) {
+      return;
+    }
 
-/* CORE */
+    if (this.eventsQueue.length > this.EVENTS_LIMIT) {
+      this.clearEventsQueue();
+    }
 
-// MAIN SENDING ENGINE
-const sendExtensionEvents = async () => {
-  const useEngine = await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.USE_EVENTS_ENGINE);
+    this.eventsQueue.push(event);
 
-  if (useEngine !== false && BG.isAppOnline) {
-    const eventBatchesPayload = await EventActions.getBatchesToSend();
-    if (eventBatchesPayload?.length === 0) return;
-
-    const extensionEventsMessage = {
-      action: RQ.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS,
-      eventBatches: eventBatchesPayload,
-    };
-
-    const response = await BG.Methods.sendMessageToApp(extensionEventsMessage);
-
-    if (response?.wasMessageSent) {
-      await EventActions.handleAcknowledgements(response.payload.ackIds);
-    } else {
-      eventBatchesPayload.forEach((batch) => {
-        EventActions.stopWaitingForAcknowledgement(batch.id);
-      });
+    if (!this.eventLoggerInterval) {
+      this.startPeriodicEventLogger();
     }
   }
-};
 
-const logEvents = () => {
-  offscreenHandler.sendMessage({
-    action: "log_events",
-    events: eventsToSend,
-  });
-};
+  private logEventsToOffscreen() {
+    if (!this.eventsQueue.length) {
+      return;
+    }
 
-const initEventLogger = async (intervalTime = 10000) => {
-  if (!offscreenHandler.isOffscreenWebappOpen()) {
-    await offscreenHandler.initWebAppOffscreen();
+    if (!offscreenHandler.isOffscreenWebappOpen()) {
+      return;
+    }
+
+    offscreenHandler.sendMessage({
+      action: "log_events",
+      events: this.eventsQueue,
+    });
+
+    this.clearEventsQueue();
   }
 
-  if (!EventActions.eventWriterInterval) {
-    EventActions.eventWriterInterval = setInterval(async () => {
-      await EventActions.writeEventsToLocalStorage();
-    }, intervalTime);
+  private startPeriodicEventLogger(intervalTime = 10000) {
+    if (!offscreenHandler.isOffscreenWebappOpen()) {
+      offscreenHandler.initWebAppOffscreen();
+    }
+
+    if (!this.eventLoggerInterval) {
+      console.log("!!!debug", "started eventLogger");
+      this.eventLoggerInterval = setInterval(() => {
+        this.logEventsToOffscreen();
+      }, intervalTime);
+    }
+
+    return this.eventLoggerInterval;
   }
 
-  return EventActions.eventWriterInterval;
-};
-
-const stopPeriodicEventWriter = () => {
-  if (EventActions.eventWriterInterval) {
-    clearInterval(EventActions.eventWriterInterval);
-    EventActions.eventWriterInterval = null;
+  private clearEventsQueue() {
+    this.eventsQueue = [];
   }
-};
 
-const clearExecutionEvents = async () => {
-  await RQ.StorageService.removeRecord(EventActions.STORE_EXECUTION_EVENTS_KEY);
-};
+  logEvent(eventName: string, eventParams: Record<string, any>) {
+    const eventTs = Date.now();
+    eventParams["log_source"] = "extension";
+    this.queueEvent({ eventName, eventParams, eventTs });
+  }
+}
 
-const clearAllEventBatches = async () => {
-  await RQ.StorageService.removeRecord(EventActions.STORE_EVENTS_KEY);
-  EventActions.clearExecutionEvents();
-};
+export const eventLogger = new EventLogger();

@@ -64,6 +64,7 @@ const PageScriptMessageHandler = {
     if (
       event &&
       event.origin !== this.constants.DOMAIN &&
+      //TODO:@nafees87n fix: update extension ID
       event.origin !== "chrome-extension://mcidagfcffoaenpopilcmlklfmemlpce"
     ) {
       Logger.log("Ignoring message from the following domain", event.origin, event.data);

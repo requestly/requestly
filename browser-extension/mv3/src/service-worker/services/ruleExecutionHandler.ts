@@ -4,6 +4,7 @@ import { DataScope, TAB_SERVICE_DATA, tabService } from "./tabService";
 import rulesStorageService from "../../rulesStorageService";
 import { CLIENT_MESSAGES } from "common/constants";
 import { sendLogToDevtools } from "./devtools";
+import { eventLogger } from "./eventLogger";
 
 interface RulesExecutionLog {
   ruleId: string;
@@ -74,6 +75,11 @@ class RuleExecutionHandler {
       TAB_SERVICE_DATA.RULES_EXECUTION_LOGS,
       rulesExecutionLogs
     );
+
+    eventLogger.logEvent("rule_executed", {
+      ruleId: rule.id,
+      ruleName: rule.name,
+    });
   };
 }
 

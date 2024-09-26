@@ -50,7 +50,9 @@ class OffscreenHandler {
     await this.setupOffscreenDocument();
     this.sendMessage({
       action: "load_webapp",
-      refreshToken,
+      urlParams: {
+        refreshToken,
+      },
     });
   }
 
