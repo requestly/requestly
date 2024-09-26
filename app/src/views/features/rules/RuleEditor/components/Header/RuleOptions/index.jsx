@@ -57,7 +57,7 @@ const RuleOptions = ({ mode, rule }) => {
       className={`editor-rule-options-trigger ${isOptionsVisible ? "editor-rule-options-active" : ""}`}
     >
       <Button>
-        <span className="text-gray">
+        <span>
           More
           <img
             style={{ width: "10px", height: "6px" }}
