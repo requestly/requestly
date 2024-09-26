@@ -42,7 +42,9 @@ const RuleNameColumn: React.FC<{
             dispatch(actions.updateSecondarySidebarCollapse(false));
           }}
         >
-          {record.name}
+          <div className="rule-name-wrapper">
+            {record.name} {record.isSample && <span className="sample-rule-tag">SAMPLE RULE</span>}
+          </div>
         </Link>
 
         {record?.description ? (
@@ -64,7 +66,9 @@ const RuleNameColumn: React.FC<{
 
     return (
       <div className="group-name-container" key={record.id}>
-        <div className="group-name">{group.name}</div>
+        <div className="group-name">
+          {group.name} {group.isSample && " [Try Instantly]"}
+        </div>
 
         {totalRules > 0 ? (
           <Tooltip
