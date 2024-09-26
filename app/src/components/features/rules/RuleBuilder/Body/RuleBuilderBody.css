@@ -21,7 +21,7 @@
 }
 
 .sample-rule-card-body {
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
 .sample-rule-overlay {
@@ -31,10 +31,16 @@
   display: flex;
   justify-content: center;
   cursor: not-allowed;
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.sample-rule-overlay:hover {
+  opacity: 1;
 }
 
 .sample-rule-overlay .view-only-message {
-  margin-top: 150px;
+  margin-top: 100px;
   height: fit-content;
   color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-lg);
