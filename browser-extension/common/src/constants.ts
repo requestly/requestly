@@ -40,18 +40,16 @@ export const EXTENSION_MESSAGES = {
   CHECK_IF_DESKTOP_APP_OPEN: "checkIfDesktopAppOpen",
   CONNECT_TO_DESKTOP_APP: "connectToDesktopApp",
   DISCONNECT_FROM_DESKTOP_APP: "disconnectFromDesktopApp",
+  LOG_EVENT: "logEvent",
 };
 
 export const CLIENT_MESSAGES = {
-  ADD_EVENT: "addEvent",
-  ADD_EXECUTION_EVENT: "addExecutionEvent",
   INIT_SESSION_RECORDING: "initSessionRecording",
   NOTIFY_SESSION_RECORDING_STARTED: "notifySessionRecordingStarted",
   NOTIFY_SESSION_RECORDING_STOPPED: "notifySessionRecordingStopped",
   IS_RECORDING_SESSION: "isRecordingSession",
   GET_TAB_SESSION: "getTabSession",
   GET_APPLIED_RULES: "getAppliedRules",
-  UPDATE_APPLIED_SCRIPT_RULES: "updateAppliedScriptRules",
   START_RECORDING: "startRecording",
   STOP_RECORDING: "stopRecording",
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",

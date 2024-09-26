@@ -29,7 +29,7 @@ import {
   trackProxyServerStartedEvent,
 } from "modules/analytics/events/desktopApp";
 import { StorageService } from "init";
-import { getEventsEngineFlag, handleEventBatches } from "modules/analytics/events/extension";
+import { getEventsEngineFlag, sendEvents } from "modules/analytics/events/extension";
 import PSMH from "../config/PageScriptMessageHandler";
 import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -309,33 +309,17 @@ const AppModeInitializer = () => {
 
   useEffect(() => {
     // This useEffect should not get invoked multiple times
-    // if (hasMessageHandlersBeenSet.current) return;
-    // hasMessageHandlersBeenSet.current = true;
+    if (hasMessageHandlersBeenSet.current) return;
+    hasMessageHandlersBeenSet.current = true;
+
+    PSMH.addMessageListener("log_events", (message) => {
+      sendEvents(message.events);
+    });
 
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       StorageService(appMode)
         .saveRecord(getEventsEngineFlag)
         .then(() => notifyAppLoadedToExtension());
-
-      PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS, (message) => {
-        fetch("http://localhost:3009/sendExtEvent", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            refreshToken: "refreshToken",
-            fired: "sendExt",
-            message,
-            loggedIn: user?.loggedIn,
-          }),
-        });
-        // const batchIdsToAcknowledge = handleEventBatches(message.eventBatches);
-        // return {
-        //   ackIds: batchIdsToAcknowledge,
-        //   received: true,
-        // };
-      });
 
       PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (_message) => {
         window.skipSyncListenerForNextOneTime = false;

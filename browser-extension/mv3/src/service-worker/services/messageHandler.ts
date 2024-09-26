@@ -31,6 +31,7 @@ import {
   checkIfDesktopAppOpen,
   disconnectFromDesktopAppAndRemoveProxy,
 } from "./desktopApp";
+import { eventLogger } from "./eventLogger";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
   const appTabs = await getAppTabs();
@@ -181,8 +182,9 @@ export const initMessageHandler = () => {
         checkIfDesktopAppOpen().then(sendResponse);
         return true;
 
-      case "iframe_loaded":
-        console.log("!!!debug", "iframe loaded");
+      case EXTENSION_MESSAGES.LOG_EVENT:
+        eventLogger.logEvent(message.eventName, message.eventParams);
+        break;
     }
 
     return false;

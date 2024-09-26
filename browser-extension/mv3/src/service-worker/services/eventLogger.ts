@@ -10,7 +10,8 @@ interface EventLog {
 class EventLogger {
   private eventsQueue: EventLog[] = [];
   private eventLoggerInterval: NodeJS.Timeout = null;
-  private EVENTS_LIMIT = 5000;
+  private eventsLimit = 10000;
+  private eventLoggerPeriod = 20000;
 
   private queueEvent(event: EventLog) {
     const isRefreshTokenExists = !!getRefreshToken();
@@ -18,7 +19,7 @@ class EventLogger {
       return;
     }
 
-    if (this.eventsQueue.length > this.EVENTS_LIMIT) {
+    if (this.eventsQueue.length > this.eventsLimit) {
       this.clearEventsQueue();
     }
 
@@ -46,7 +47,7 @@ class EventLogger {
     this.clearEventsQueue();
   }
 
-  private startPeriodicEventLogger(intervalTime = 10000) {
+  private startPeriodicEventLogger() {
     if (!offscreenHandler.isOffscreenWebappOpen()) {
       offscreenHandler.initWebAppOffscreen();
     }
@@ -55,7 +56,7 @@ class EventLogger {
       console.log("!!!debug", "started eventLogger");
       this.eventLoggerInterval = setInterval(() => {
         this.logEventsToOffscreen();
-      }, intervalTime);
+      }, this.eventLoggerPeriod);
     }
 
     return this.eventLoggerInterval;
@@ -73,3 +74,5 @@ class EventLogger {
 }
 
 export const eventLogger = new EventLogger();
+
+// self.eventLogger = eventLogger;
