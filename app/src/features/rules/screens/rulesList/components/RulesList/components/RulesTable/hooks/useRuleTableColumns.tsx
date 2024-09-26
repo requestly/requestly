@@ -96,16 +96,25 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       sortDirections: ["ascend", "descend", "ascend"],
       showSorterTooltip: false,
       sorter: {
-        // Fix. Descend logic sending groups to bottom
-        // Fix: Default/No sort logic. Group should stay at top
+        // Sample group always at the top
         compare: (a, b) => {
+          if (isGroup(a) && a.isSample && (!isGroup(b) || !b.isSample)) {
+            return -1;
+          }
+          if (isGroup(b) && b.isSample && (!isGroup(a) || !a.isSample)) {
+            return 1;
+          }
+
+          // Non-sample groups next
           if (isGroup(a) && !isGroup(b)) {
             return -1;
-          } else if (!isGroup(a) && isGroup(b)) {
-            return 1;
-          } else {
-            return a.name?.toLowerCase()?.localeCompare(b.name?.toLowerCase());
           }
+          if (!isGroup(a) && isGroup(b)) {
+            return 1;
+          }
+
+          // Sort by name for items of the same type
+          return a.name?.toLowerCase()?.localeCompare(b.name?.toLowerCase());
         },
       },
     },

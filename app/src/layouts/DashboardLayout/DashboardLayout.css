@@ -45,6 +45,7 @@
 .app-main-content,
 #dashboardMainContent {
   height: 100%;
+  background-color: var(--requestly-color-background);
 }
 
 .app-layout .ant-layout-footer {
