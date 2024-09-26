@@ -12,7 +12,7 @@ import rehypeRaw from "rehype-raw";
 import { ButtonType } from "antd/lib/button";
 import { capitalize } from "lodash";
 import { redirectToUrl } from "utils/RedirectionUtils";
-import { getCompanyNameFromEmail } from "utils/FormattingHelper";
+import { getCompanyNameFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import LINKS from "config/constants/sub/links";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { trackAppBannerDismissed, trackAppNotificationBannerViewed, trackAppBannerCtaClicked } from "./analytics";
@@ -27,6 +27,7 @@ enum BANNER_ACTIONS {
   UPGRADE = "upgrade",
   CONTACT_US = "contact_us",
   REQUEST_ACCESS = "request_access",
+  REDIRECT_TO_ACCELERATOR_FORM = "redirect_to_accelerator_form",
 }
 
 interface Banner {
@@ -73,6 +74,13 @@ export const AppNotificationBanner = () => {
           setIsRequestAccessModalOpen(true);
         },
       },
+      [BANNER_ACTIONS.REDIRECT_TO_ACCELERATOR_FORM]: {
+        label: "Get started",
+        type: "primary",
+        onClick: () => {
+          redirectToUrl(LINKS.ACCELERATOR_PROGRAM_FORM_LINK, true);
+        },
+      },
     };
   }, [dispatch]);
 
@@ -82,6 +90,14 @@ export const AppNotificationBanner = () => {
         case "commercial_license": {
           const companyName = getCompanyNameFromEmail(user?.details?.profile?.email) || "";
           return `Dear ${companyName} user, ${text}`;
+        }
+        case "accelerator_program": {
+          if (isCompanyEmail(user?.details?.profile?.email)) {
+            return `Requestly is offering an exclusive 6-month free access to the entire ${getCompanyNameFromEmail(
+              user?.details?.profile?.email
+            )} team as a part of its Accelerator Program.`;
+          }
+          return "Requestly has launched its Accelerator program, providing 20 companies with exclusive 6-month Free Access.";
         }
         default:
           return text;
@@ -101,6 +117,12 @@ export const AppNotificationBanner = () => {
         }
         case "request_team_access": {
           if (billingTeams?.length && !billingTeams?.some((team) => user?.details?.profile?.uid in team.members)) {
+            dispatch(actions.updateIsAppBannerVisible(true));
+            return true;
+          } else return false;
+        }
+        case "accelerator_program": {
+          if (!user.details?.isPremium && !billingTeams) {
             dispatch(actions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
