@@ -20,8 +20,6 @@ import { getUser } from "backend/user/getUser";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { StorageService } from "init";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-import PageScriptMessageHandler from "config/PageScriptMessageHandler";
-import { sendMessageToIframe } from "actions/ExtensionActions";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -180,10 +178,8 @@ const AuthHandler: React.FC<{}> = () => {
   );
 
   useEffect(() => {
-    if (queryPrarams.get("refreshToken")) {
+    if (queryPrarams.get("refreshToken") && isAppOpenedInIframe()) {
       const refreshToken = queryPrarams.get("refreshToken");
-      console.log("!!!debug", "refTOken", refreshToken);
-      sendMessageToIframe(refreshToken);
 
       const getCustomToken = httpsCallable(getFunctions(), "auth-generateCustomToken");
       getCustomToken({ refreshToken }).then(
@@ -204,10 +200,10 @@ const AuthHandler: React.FC<{}> = () => {
                 Logger.log("User signed in with custom token", user);
               })
               .catch((error) => {
-                console.log("Error signing in with custom token:", error.message);
+                Logger.log("Error signing in with custom token:", error.message);
               });
           } else {
-            console.log("Error generating custom token:", res.data.result.message);
+            Logger.log("Error generating custom token:", res.data.result.message);
           }
         }
       );
