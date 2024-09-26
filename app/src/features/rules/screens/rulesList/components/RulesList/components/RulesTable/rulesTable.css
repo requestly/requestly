@@ -97,11 +97,33 @@
 }
 
 .rule-name-container .rule-name {
+  width: 100%;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--requestly-font-size-sm);
+}
+
+.rule-name-container .rule-name .rule-name-wrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rule-name-container .rule-name-wrapper .sample-rule-tag {
+  border-radius: var(--space-2, 4px);
+  background: rgba(0, 78, 235, 0.4);
+  padding: var(--space-1, 2px) var(--space-2, 4px);
+  color: var(--requestly-color-primary-100, #cbe2fe);
+  text-align: center;
+  font-size: var(--requestly-font-size-2xs);
+  font-weight: 500;
+  line-height: var(--line-height-2xs, 13px); /* 130% */
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-right: 48px;
 }
 
 .rule-name-container .rule-description-icon {
