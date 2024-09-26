@@ -128,7 +128,7 @@ export const AppNotificationBanner = () => {
           } else return false;
         }
         case BANNER_ID.ACCELERATOR_PROGRAM: {
-          if (!user.details?.isPremium && !billingTeams) {
+          if (!user.details?.isPremium && !billingTeams && user.loggedIn) {
             dispatch(actions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
@@ -139,7 +139,7 @@ export const AppNotificationBanner = () => {
         }
       }
     },
-    [billingTeams, user?.details?.profile?.uid, user.details?.isPremium, dispatch]
+    [billingTeams, user?.details?.profile?.uid, user.details?.isPremium, dispatch, user.loggedIn]
   );
 
   const getBannerClassName = (bannerType: string) => {
