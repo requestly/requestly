@@ -9,14 +9,14 @@ interface Event {
   eventTs: number;
 }
 
-interface EventBatch {
-  id: string;
-  events: Event[];
-  createdTs: number;
-}
+// interface EventBatch {
+//   id: string;
+//   events: Event[];
+//   createdTs: number;
+// }
 
-const sendEventsBatch = (eventBatch: EventBatch): void => {
-  eventBatch.events.forEach((event) => {
+export const sendEvents = (events: Event[]): void => {
+  events.forEach((event) => {
     const eventConfig = { time: event.eventTs };
 
     /* ADDING EXTRA INFO FOR RULE EXECUTION EVENTS */
@@ -40,10 +40,10 @@ const sendEventsBatch = (eventBatch: EventBatch): void => {
  * @param batches event batches
  * @returns processed batch IDs to acknowledge
  */
-export const handleEventBatches = (batches: EventBatch[]): string[] => {
-  batches.forEach(sendEventsBatch);
-  return batches.map((batch) => batch.id);
-};
+// export const handleEventBatches = (batches: EventBatch[]): string[] => {
+//   batches.forEach(sendEventsBatch);
+//   return batches.map((batch) => batch.id);
+// };
 
 /* EXTENSION EVENTS ENGINE FLAG */
 export const getEventsEngineFlag = {
