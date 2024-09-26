@@ -10,6 +10,7 @@ type RQButtonType = "primary" | "secondary" | "transparent" | "danger" | "warnin
 
 export interface ButtonProps extends Omit<AntDButtonProps, "size" | "type"> {
   hotKey?: string;
+  hotKeyText?: string;
   showHotKeyText?: boolean;
   size?: RQButtonSize;
   type?: RQButtonType;

@@ -37,7 +37,7 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
 import { IncentivizeEvent } from "features/incentivization/types";
-import { RULE_KEYBOARD_SHORTCUTS, RuleType } from "features/rules";
+import { RuleType } from "features/rules";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import Logger from "../../../../../../../../../../common/logger";
 import { IncentivizationModal } from "store/features/incentivization/types";
@@ -47,6 +47,7 @@ import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivizat
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { KEYBOARD_SHORTCUTS } from "../../../../../../../../constants/keyboardShortcuts";
 import "../RuleEditorActionButtons.css";
 
 const getEventParams = (rule) => {
@@ -344,7 +345,7 @@ const CreateRuleButton = ({
     >
       <Tooltip title={tooltipText} placement="top">
         <Button
-          hotKey={RULE_KEYBOARD_SHORTCUTS.SAVE_RULE.hotKey}
+          hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
           data-tour-id="rule-editor-create-btn"
           id="rule-editor-save-btn"
           type="primary"
@@ -368,7 +369,7 @@ const CreateRuleButton = ({
       >
         <Tooltip title={tooltipText} placement="top">
           <Button
-            hotKey={RULE_KEYBOARD_SHORTCUTS.SAVE_RULE.hotKey}
+            hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
             data-tour-id="rule-editor-create-btn"
             id="rule-editor-save-btn"
             type="primary"
