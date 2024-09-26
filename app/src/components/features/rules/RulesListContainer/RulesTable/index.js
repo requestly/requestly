@@ -1389,7 +1389,7 @@ const RulesTable = ({
         <DuplicateRuleModal
           isOpen={isDuplicateRuleModalActive}
           close={closeDuplicateRuleModal}
-          rule={ruleToDuplicate}
+          record={ruleToDuplicate}
           onDuplicate={closeDuplicateRuleModal}
           analyticEventSource="rules_list"
         />
