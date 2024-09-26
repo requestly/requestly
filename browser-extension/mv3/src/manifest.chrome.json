@@ -51,14 +51,14 @@
   "permissions": [
     "contextMenus",
     "declarativeNetRequest",
+    "offscreen",
     "proxy",
     "scripting",
     "storage",
     "tabs",
     "unlimitedStorage",
     "webNavigation",
-    "webRequest",
-    "offscreen"
+    "webRequest"
   ],
   "host_permissions": ["<all_urls>"],
   "commands": {}
