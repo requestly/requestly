@@ -1,5 +1,5 @@
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
-import { Button } from "lib/design-system-v2/components";
+import { RQButton } from "lib/design-system-v2/components";
 import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import { useLocation } from "react-router-dom";
@@ -16,7 +16,7 @@ export const TestRuleButton = () => {
 
   if (isFeatureCompatible(FEATURES.TEST_THIS_RULE)) {
     return (
-      <Button
+      <RQButton
         disabled={MODE !== RULE_EDITOR_CONFIG.MODES.EDIT}
         className="header-test-rule-btn"
         type="transparent"
@@ -28,7 +28,7 @@ export const TestRuleButton = () => {
         }}
       >
         Test
-      </Button>
+      </RQButton>
     );
   }
 

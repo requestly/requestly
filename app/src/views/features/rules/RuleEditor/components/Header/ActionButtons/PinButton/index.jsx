@@ -1,14 +1,13 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "antd";
-import { RQButton } from "lib/design-system/components";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import { trackRuleEditorHeaderClicked, trackRulePinToggled } from "modules/analytics/events/common/rules";
 import "./PinButton.css";
 import { getModeData } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { StorageService } from "init";
-import { Button } from "lib/design-system-v2/components";
+import { RQButton } from "lib/design-system-v2/components";
 
 const PinButton = ({ rule, isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
@@ -50,12 +49,12 @@ const PinButton = ({ rule, isRuleEditorModal }) => {
   return (
     <>
       {isRuleEditorModal ? (
-        <Button {...commonProps} block>
+        <RQButton {...commonProps} block>
           {isPinned ? "Unpin rule" : "Pin rule"}
-        </Button>
+        </RQButton>
       ) : (
         <Tooltip title={isPinned ? "Unpin rule" : "Pin rule"} placement="bottom">
-          <Button
+          <RQButton
             {...commonProps}
             disabled={MODE === "create"}
             icon={

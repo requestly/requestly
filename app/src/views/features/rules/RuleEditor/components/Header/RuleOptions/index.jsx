@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Divider, Dropdown, Menu } from "antd";
-import { Button } from "lib/design-system-v2/components";
+import { RQButton } from "lib/design-system-v2/components";
 import DuplicateButton from "../ActionButtons/DuplicateButton";
 import DeleteButton from "../ActionButtons/DeleteButton";
 import APP_CONSTANTS from "config/constants";
@@ -56,7 +56,7 @@ const RuleOptions = ({ mode, rule }) => {
       overlay={ruleOptionMenu}
       className={`editor-rule-options-trigger ${isOptionsVisible ? "editor-rule-options-active" : ""}`}
     >
-      <Button>
+      <RQButton>
         <span>
           More
           <img
@@ -68,7 +68,7 @@ const RuleOptions = ({ mode, rule }) => {
             className="editor-rule-options-trigger-icon"
           />
         </span>
-      </Button>
+      </RQButton>
     </Dropdown>
   );
 };

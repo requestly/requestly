@@ -5,7 +5,7 @@ import { Tooltip } from "antd";
 import { navigateBack, redirectToRules } from "utils/RedirectionUtils";
 import { snakeCase } from "lodash";
 import { trackRuleEditorClosed } from "modules/analytics/events/common/rules";
-import { Button } from "lib/design-system-v2/components";
+import { RQButton } from "lib/design-system-v2/components";
 import { FiArrowLeft } from "@react-icons/all-files/fi/FiArrowLeft";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../constants/keyboardShortcuts";
 
@@ -21,7 +21,7 @@ const CloseButton = ({ ruleType, mode }) => {
 
   return (
     <Tooltip title="Back to rules (esc)" placement="bottom">
-      <Button
+      <RQButton
         hotKey={KEYBOARD_SHORTCUTS.RULES.EDITOR_BACK.hotKey}
         size="small"
         type="transparent"

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "lib/design-system-v2/components";
+import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useDispatch, useSelector } from "react-redux";
 import { getBillingTeamNudgeLastSeenTs, getUserAuthDetails } from "store/selectors";
@@ -143,7 +143,7 @@ export const BillingTeamNudge: React.FC = () => {
           )}
         </div>
       ) : (
-        <Button
+        <RQButton
           block
           loading={isLoading}
           className="billing-team-nudge__button"
@@ -153,7 +153,7 @@ export const BillingTeamNudge: React.FC = () => {
           onClick={handleRequestButtonClick}
         >
           {availableBillingTeams.length > 1 ? "View Teams" : "Send Request"}
-        </Button>
+        </RQButton>
       )}
     </div>
   );

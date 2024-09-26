@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "antd";
-import { Button } from "lib/design-system-v2/components";
+import { RQButton } from "lib/design-system-v2/components";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 import {
@@ -344,7 +344,7 @@ const CreateRuleButton = ({
       placement="bottomLeft"
     >
       <Tooltip title={tooltipText} placement="top">
-        <Button
+        <RQButton
           hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
           data-tour-id="rule-editor-create-btn"
           id="rule-editor-save-btn"
@@ -354,7 +354,7 @@ const CreateRuleButton = ({
         >
           {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
           {`Save rule`}
-        </Button>
+        </RQButton>
       </Tooltip>
     </AuthConfirmationPopover>
   ) : (
@@ -368,7 +368,7 @@ const CreateRuleButton = ({
         source={currentlySelectedRuleData.ruleType}
       >
         <Tooltip title={tooltipText} placement="top">
-          <Button
+          <RQButton
             hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
             data-tour-id="rule-editor-create-btn"
             id="rule-editor-save-btn"
@@ -378,7 +378,7 @@ const CreateRuleButton = ({
           >
             {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
             {`Save rule`}
-          </Button>
+          </RQButton>
         </Tooltip>
       </PremiumFeature>
     </>

@@ -1,6 +1,6 @@
 import { Drawer } from "antd";
 import Help from "components/features/rules/RuleBuilder/Help";
-import { Button } from "lib/design-system-v2/components";
+import { RQButton } from "lib/design-system-v2/components";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
@@ -23,7 +23,7 @@ export const HelpButton = () => {
           }}
         />
       </Drawer>
-      <Button
+      <RQButton
         icon={<AiOutlineQuestionCircle />}
         className="header-rule-help-btn"
         type="transparent"
@@ -35,7 +35,7 @@ export const HelpButton = () => {
         }}
       >
         Help
-      </Button>
+      </RQButton>
     </>
   );
 };

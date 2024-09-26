@@ -8,7 +8,7 @@ import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
-import { Button } from "lib/design-system-v2/components";
+import { RQButton } from "lib/design-system-v2/components";
 
 const ShareRuleButton = ({ isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
@@ -49,7 +49,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
   return (
     <>
       {isRuleEditorModal ? (
-        <Button type="transparent" block>
+        <RQButton type="transparent" block>
           <Row
             align="middle"
             wrap={false}
@@ -65,10 +65,10 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
           >
             Share rule
           </Row>
-        </Button>
+        </RQButton>
       ) : (
         <Tooltip title="Share rule" placement="bottom">
-          <Button
+          <RQButton
             type="primary"
             icon={
               <img

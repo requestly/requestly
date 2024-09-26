@@ -18,7 +18,7 @@ import { useRulesActionContext } from "features/rules/context/actions";
 import { MdOutlineToggleOn } from "@react-icons/all-files/md/MdOutlineToggleOn";
 import { RuleSelectionList } from "../RuleSelectionList/RuleSelectionList";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
-import { Button } from "lib/design-system-v2/components";
+import { RQButton } from "lib/design-system-v2/components";
 
 interface Props {
   searchValue: string;
@@ -102,9 +102,9 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
               className="rule-selection-dropdown-btn"
               overlayStyle={{ zIndex: "1000" }}
             >
-              <Button type="primary" icon={icon} onClick={() => onClickHandler()}>
+              <RQButton type="primary" icon={icon} onClick={() => onClickHandler()}>
                 {buttonText}
-              </Button>
+              </RQButton>
             </Dropdown>
           ) : (
             // @ts-ignore

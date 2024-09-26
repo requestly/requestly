@@ -19,7 +19,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackGroupChangedEvent, trackGroupCreatedEvent } from "features/rules/analytics";
 import { Group } from "types/rules";
 import Logger from "lib/logger";
-import { Button } from "lib/design-system-v2/components";
+import { RQButton } from "lib/design-system-v2/components";
 import "./EditorGroupDropdown.css";
 
 const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
@@ -126,14 +126,14 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
 
             <Row align="middle">
               <div className="ml-auto editor-group-dropdown-actions">
-                <Button
+                <RQButton
                   size="small"
                   onClick={() => setShowDropdown(false)}
                   className="editor-group-dropdown-cancel-btn"
                 >
                   Cancel
-                </Button>
-                <Button
+                </RQButton>
+                <RQButton
                   ghost
                   size="small"
                   type="primary"
@@ -141,7 +141,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
                   disabled={newGroupName.length === 0}
                 >
                   Create
-                </Button>
+                </RQButton>
               </div>
             </Row>
           </div>
@@ -150,14 +150,14 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
         {!showInput && (
           <>
             <div>
-              <Button
+              <RQButton
                 type="transparent"
                 icon={<PlusOutlined />}
                 onClick={() => setShowInput(true)}
                 className="editor-dropdown-add-new-group"
               >
                 New group
-              </Button>
+              </RQButton>
 
               <div>
                 <Divider style={{ margin: "8px 0" }} />
@@ -213,7 +213,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
         onOpenChange={handleDropdownVisibleChange}
         className={`editor-group-dropdown-trigger ${showDropdown ? "editor-group-dropdown-active" : ""}`}
       >
-        <Button>
+        <RQButton>
           <span>
             {currentGroupId === APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
               ? "Add to group"
@@ -226,7 +226,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
               src="/assets/icons/downArrow.svg" // TODO: Use react-icons
             />
           </span>
-        </Button>
+        </RQButton>
       </Dropdown>
     </div>
   );

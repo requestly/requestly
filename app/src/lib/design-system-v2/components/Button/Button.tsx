@@ -8,7 +8,7 @@ type RQButtonSize = "small" | "default" | "large";
 
 type RQButtonType = "primary" | "secondary" | "transparent" | "danger" | "warning";
 
-export interface ButtonProps extends Omit<AntDButtonProps, "size" | "type"> {
+export interface RQButtonProps extends Omit<AntDButtonProps, "size" | "type"> {
   hotKey?: string;
   hotKeyText?: string;
   showHotKeyText?: boolean;
@@ -35,7 +35,7 @@ const RQ_TO_ANTD_PROPS: {
   },
 };
 
-const BaseButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function BaseButton({ ...props }, ref) {
+const BaseButton = React.forwardRef<HTMLButtonElement, RQButtonProps>(function BaseButton({ ...props }, ref) {
   const { hotKey, showHotKeyText, ...restProps } = props; // Remove unrecognised props
 
   const antDProps = { size: RQ_TO_ANTD_PROPS.size[props.size], type: RQ_TO_ANTD_PROPS.type[props.type] };
@@ -52,7 +52,7 @@ const BaseButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function Bas
   );
 });
 
-const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(function ButtonWithHotkey(props, ref) {
+const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, RQButtonProps>(function ButtonWithHotkey(props, ref) {
   useHotkeys(
     props.hotKey,
     (event) => {
@@ -87,9 +87,10 @@ const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(functi
   return <BaseButton ref={ref} {...props} children={children} />;
 });
 
-interface RQButton extends React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<HTMLButtonElement>> {}
+interface RQCustomButton
+  extends React.ForwardRefExoticComponent<RQButtonProps & React.RefAttributes<HTMLButtonElement>> {}
 
-export const Button: RQButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(props, ref) {
+export const RQButton: RQCustomButton = React.forwardRef<HTMLButtonElement, RQButtonProps>(function Button(props, ref) {
   if (props.hotKey) {
     return <ButtonWithHotkey ref={ref} {...props} />;
   }
