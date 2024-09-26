@@ -14,12 +14,17 @@ const handleMessages = async (message: any) => {
 
     case "log_events":
       sendMessageToWebApp(message);
+      break;
   }
 
   return false;
 };
 
 const loadWebapp = (urlParams: Record<string, string>) => {
+  if (!urlParams.refreshToken) {
+    console.log("No refresh token to load iframe");
+  }
+
   const iframe = document.createElement("iframe");
   const urlSearchParams = new URLSearchParams(urlParams);
 
@@ -33,10 +38,14 @@ const loadWebapp = (urlParams: Record<string, string>) => {
 };
 
 const sendMessageToWebApp = (message: Record<string, any>) => {
-  webAppIframe.contentWindow?.postMessage({
-    message,
-    source: "offscreen_document",
-  });
+  webAppIframe.contentWindow?.postMessage(
+    {
+      ...message,
+      source: "offscreen_document",
+      target: "webApp",
+    },
+    "*"
+  );
 };
 
 chrome.runtime.onMessage.addListener(handleMessages);
