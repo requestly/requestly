@@ -337,14 +337,7 @@ const AppModeInitializer = () => {
         };
       });
     }
-  }, [
-    appMode,
-    currentlyActiveWorkspace?.id,
-    dispatch,
-    user?.details?.isSyncEnabled,
-    user?.details?.profile?.uid,
-    user?.loggedIn,
-  ]);
+  }, [appMode, currentlyActiveWorkspace?.id, dispatch, user?.details?.isSyncEnabled, user?.details?.profile?.uid]);
 
   return null;
 };

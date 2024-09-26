@@ -53,7 +53,6 @@ class EventLogger {
     }
 
     if (!this.eventLoggerInterval) {
-      console.log("!!!debug", "started eventLogger");
       this.eventLoggerInterval = setInterval(() => {
         this.logEventsToOffscreen();
       }, this.eventLoggerPeriod);

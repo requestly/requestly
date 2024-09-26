@@ -29,7 +29,7 @@ export const trackEvent = (name, params, config) => {
   newParams.workspaceId = window.currentlyActiveWorkspaceTeamId ? window.currentlyActiveWorkspaceTeamId : null;
   newParams.workspaceMembersCount = window.workspaceMembersCount ?? null;
 
-  console.log(`[analytics.trackEvent] name=${name}`, { params, config });
+  Logger.log(`[analytics.trackEvent] name=${name}`, { params, config });
   posthogIntegration.trackEvent(name, newParams);
 };
 
