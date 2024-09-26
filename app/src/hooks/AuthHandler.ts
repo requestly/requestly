@@ -201,7 +201,7 @@ const AuthHandler: React.FC<{}> = () => {
             signInWithCustomToken(auth, res.data.result.customToken)
               .then((user) => {
                 // Signed in
-                console.log("User signed in with custom token", user);
+                Logger.log("User signed in with custom token", user);
               })
               .catch((error) => {
                 console.log("Error signing in with custom token:", error.message);

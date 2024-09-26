@@ -9,6 +9,10 @@ class RequestProcessor {
   constructor() {}
 
   onBeforeAJAXRequest = async (tabId: number, requestDetails: AJAXRequestDetails): Promise<void> => {
+    if (!tabId) {
+      return;
+    }
+
     const enabledRules = await rulesStorageService.getEnabledRules();
 
     if (enabledRules.length === 0) {
@@ -25,6 +29,10 @@ class RequestProcessor {
   };
 
   onErrorOccurred = async (tabId: number, requestDetails: AJAXRequestDetails): Promise<void> => {
+    if (!tabId) {
+      return;
+    }
+
     const enabledRules = await rulesStorageService.getEnabledRules();
 
     if (enabledRules.length === 0) {

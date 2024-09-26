@@ -44,6 +44,10 @@ const getSessionRecordingConfig = async (url: string): Promise<SessionRecordingC
 };
 
 export const initSessionRecordingSDK = async (tabId: number, frameId: number) => {
+  if (tabId) {
+    return;
+  }
+
   await injectWebAccessibleScript("libs/requestly-web-sdk.js", {
     tabId,
     frameIds: [frameId],
