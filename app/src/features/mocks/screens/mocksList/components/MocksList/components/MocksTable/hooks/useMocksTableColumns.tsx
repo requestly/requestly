@@ -35,6 +35,7 @@ export const useMocksTableColumns = ({
   forceRender,
   allRecordsMap,
 }: Partial<MocksTableProps> & { allRecordsMap: { [id: string]: RQMockMetadataSchema } }) => {
+  // TODO: remove this when tooltip component is added in the design system
   const baseEllipsisTooltipConfig: TooltipProps = {
     overlayClassName: "mocks-table-ellipsis-tooltip",
     placement: "right",
