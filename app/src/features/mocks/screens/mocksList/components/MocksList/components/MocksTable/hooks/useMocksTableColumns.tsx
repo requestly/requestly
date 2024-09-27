@@ -104,7 +104,7 @@ export const useMocksTableColumns = ({
               }}
               className="mock-collection-name"
             >
-              PP{record.name}
+              {record.name}
             </Typography.Text>
 
             {collectionPath ? (
