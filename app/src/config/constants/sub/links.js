@@ -65,6 +65,9 @@ const LINKS = {
   REQUESTLY_HEADERS_RULE_FAQ_LINK:
     "https://docs.requestly.com/general/http-rules-(modify-traffic)/rule-types/modify-headers#faqs",
 
+  REQUESTLY_NETWORK_INSPECTOR_DOCS:
+    "https://docs.requestly.com/guides/inspect-traffic-and-apply-modifications-from-chrome-devtools-using-requestly",
+
   /** LANDING PAGES **/
 
   // Home
@@ -131,6 +134,8 @@ const LINKS = {
   PRODUCTLIFT_CHANGELOG: "https://requestly.productlift.dev/",
 
   CALENDLY_LINK: "https://calendly.com/requestly/sagar",
+
+  ACCELERATOR_PROGRAM_FORM_LINK: "https://app.formbricks.com/s/cm1ewcpkt0000djs29ct7rpy2",
 };
 
 export default LINKS;

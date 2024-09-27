@@ -4,18 +4,20 @@ import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { getUserAuthDetails } from "store/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
-import { Popconfirm, PopconfirmProps, Typography } from "antd";
+import { Popconfirm, PopconfirmProps, Tooltip, Typography } from "antd";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { actions } from "store";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytics";
 import { capitalize } from "lodash";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { isCompanyEmail } from "utils/FormattingHelper";
-import { SOURCE } from "modules/analytics/events/common/constants";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
+import { redirectToUrl } from "utils/RedirectionUtils";
+import LINKS from "config/constants/sub/links";
+import { useTheme } from "styled-components";
 import "./index.scss";
 
 interface PremiumFeatureProps {
@@ -53,21 +55,17 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
   const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
+  const theme = useTheme();
+
   const isExceedingLimits = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
     [features, getFeatureLimitValue, checkIfFeatureLimitReached]
   );
   const isBreachingLimit = features.some((feat) => checkIfFeatureLimitReached(feat, "reached"));
 
-  const hasCrossedDeadline = useMemo(() => new Date() > new Date("2023-11-30"), []);
-
   const handlePopoverSecondaryAction = useCallback(() => {
-    onUpgradeForFreeClickCallback();
-
-    if (!hasCrossedDeadline) {
-      trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
-      onContinue();
-    } else {
+    if (isIncentivizationEnabled) {
+      onUpgradeForFreeClickCallback();
       trackUpgradeOptionClicked("upgrade_for_free");
 
       dispatch(
@@ -79,8 +77,11 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           },
         })
       );
+    } else {
+      redirectToUrl(LINKS.ACCELERATOR_PROGRAM_FORM_LINK, true);
+      trackUpgradeOptionClicked("upgrade_for_6_months");
     }
-  }, [dispatch, hasCrossedDeadline, onContinue, source]);
+  }, [dispatch, isIncentivizationEnabled, onUpgradeForFreeClickCallback]);
 
   useEffect(() => {
     return () => {
@@ -102,7 +103,6 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             billingTeams={billingTeams}
             onContinue={onContinue}
             hasReachedLimit={isBreachingLimit}
-            isDeadlineCrossed={hasCrossedDeadline}
             source={source}
             featureName={featureName}
             onUpgradeForFreeClickCallback={onUpgradeForFreeClickCallback}
@@ -127,7 +127,21 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           showArrow={false}
           placement={popoverPlacement}
           okText="See upgrade plans"
-          cancelText={isIncentivizationEnabled ? "Upgrade for free" : null}
+          cancelText={
+            isIncentivizationEnabled ? (
+              "Upgrade for free"
+            ) : (
+              <Tooltip
+                overlayStyle={{ zIndex: 10011 }}
+                overlayInnerStyle={{ width: 300 }}
+                color={theme?.colors?.black}
+                placement="bottom"
+                title="Requestly is offering 6 months free for teams in its Accelerator program!"
+              >
+                Unlock 6 months free access
+              </Tooltip>
+            )
+          }
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
             dispatch(
@@ -162,7 +176,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           onOpenChange={(open) => {
             if (open) trackUpgradePopoverViewed("default", source);
           }}
-          cancelButtonProps={{ style: { display: isIncentivizationEnabled ? "inline-flex" : "none" } }}
+          // cancelButtonProps={{ style: { display: isIncentivizationEnabled ? "inline-flex" : "none" } }}
         >
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
