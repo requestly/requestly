@@ -10,7 +10,7 @@ import AppLayout from "layouts/AppLayout";
 
 import { ruleRoutes } from "features/rules/routes";
 import { sessionRoutes } from "features/sessionBook";
-import { apiClientRoutes } from "./apiClientRoutes";
+import { apiClientRoutes } from "features/api-client";
 import { accountRoutes } from "./accountRoutes";
 import { authRoutes } from "./authRoutes";
 import { desktopRoutes } from "./desktopRoutes";

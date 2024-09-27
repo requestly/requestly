@@ -1,10 +1,10 @@
 import React, { useCallback } from "react";
-import placeholderImage from "../../../../assets/images/illustrations/empty-sheets-dark.svg";
+import placeholderImage from "../../../../../../assets/images/illustrations/empty-sheets-dark.svg";
 import { Button, Timeline, Typography } from "antd";
-import { RQAPI } from "../types";
+import { RQAPI } from "../../../../types";
 import { ClearOutlined, CodeOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { trackRequestSelectedFromHistory } from "modules/analytics/events/features/apiClient";
-import { REQUEST_METHOD_COLORS } from "../../../../constants/requestMethodColors";
+import { REQUEST_METHOD_COLORS } from "../../../../../../constants/requestMethodColors";
 import "./apiClientSidebar.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";

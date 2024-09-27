@@ -2,7 +2,7 @@ import { Button, Empty, Input, Select, Skeleton, Space, Spin } from "antd";
 import React, { SyntheticEvent, memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import Split from "react-split";
-import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../types";
+import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
 import RequestTabs from "./request/RequestTabs";
 import { getEmptyPair } from "./request/KeyValueForm";
 import ResponseTabs from "./response/ResponseTabs";
@@ -14,7 +14,7 @@ import {
   makeRequest,
   removeEmptyKeys,
   supportsRequestBody,
-} from "../apiUtils";
+} from "../../apiUtils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
   trackAPIRequestCancelled,
@@ -28,7 +28,7 @@ import { useLocation } from "react-router-dom";
 import { actions } from "store";
 import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import Favicon from "components/misc/Favicon";
-import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../constants";
+import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../../../constants";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import "./apiClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
