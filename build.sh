@@ -14,6 +14,11 @@ echo -e "\n***** Cleaning public directory *****"
 rm -r public
 mkdir public
 
+echo -e "\n***** Generating Analytics Vendors Dist Files *****"
+cd common/analytics-vendors/
+sh build.sh
+cd ../..
+
 echo -e "\n***** Generating Rule Processor Dist Files *****"
 cd common/rule-processor/
 sh build.sh

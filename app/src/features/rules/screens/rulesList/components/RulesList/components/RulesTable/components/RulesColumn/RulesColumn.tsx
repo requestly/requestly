@@ -48,16 +48,19 @@ const RuleNameColumn: React.FC<{
             dispatch(actions.updateSecondarySidebarCollapse(false));
           }}
         >
-          <Typography.Text
-            ellipsis={{
-              tooltip: {
-                title: record.name,
-                ...baseEllipsisTooltipConfig,
-              },
-            }}
-          >
-            {record.name}
-          </Typography.Text>
+          <div className="rule-name-wrapper">
+            <Typography.Text
+              ellipsis={{
+                tooltip: {
+                  title: record.name,
+                  ...baseEllipsisTooltipConfig,
+                },
+              }}
+            >
+              {record.name}
+            </Typography.Text>{" "}
+            {record.isSample && <span className="sample-rule-tag">SAMPLE RULE</span>}
+          </div>
         </Link>
 
         {record?.description ? (
@@ -79,17 +82,20 @@ const RuleNameColumn: React.FC<{
 
     return (
       <div className="group-name-container" key={record.id}>
-        <Typography.Text
-          ellipsis={{
-            tooltip: {
-              title: record.name,
-              ...baseEllipsisTooltipConfig,
-            },
-          }}
-          className="group-name"
-        >
-          {group.name}
-        </Typography.Text>
+        <div className="group-name">
+          <Typography.Text
+            ellipsis={{
+              tooltip: {
+                title: record.name,
+                ...baseEllipsisTooltipConfig,
+              },
+            }}
+            className="group-name"
+          >
+            {group.name}
+          </Typography.Text>{" "}
+          {group.isSample && " [Try Instantly]"}
+        </div>
 
         {totalRules > 0 ? (
           <Tooltip

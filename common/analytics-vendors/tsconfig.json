@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "rootDir": "./src",
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es5",
+    "jsx": "react",
+    "allowJs": true,
+    "lib": ["es2015", "dom"],
+    "moduleResolution": "node"
+  },
+  "exclude": ["node_modules", "**/*.spec.ts"],
+  "include": ["src/**/*", "src/custom.d.ts"]
+}
