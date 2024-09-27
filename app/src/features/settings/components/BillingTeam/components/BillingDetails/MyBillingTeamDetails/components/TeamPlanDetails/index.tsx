@@ -40,7 +40,11 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
         <Row className="team-plan-details-card-header" justify="space-between" align="middle">
           <Col className="text-white text-bold display-flex items-center" style={{ gap: "8px" }}>
             Your Plan{" "}
-            <TeamPlanStatus subscriptionStatus={billingTeamDetails?.subscriptionDetails?.subscriptionStatus} />
+            <TeamPlanStatus
+              subscriptionStatus={billingTeamDetails?.subscriptionDetails?.subscriptionStatus}
+              subscriptionEndDate={billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000}
+              cancelAtPeriodEnd={billingTeamDetails?.subscriptionDetails?.cancel_at_period_end}
+            />
           </Col>
           {isUserManager && (
             <TeamPlanActionButtons
