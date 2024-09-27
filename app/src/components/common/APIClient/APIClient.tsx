@@ -2,16 +2,16 @@ import { Modal } from "antd";
 import React, { useMemo } from "react";
 import { APIClientRequest } from "./types";
 import BetaBadge from "components/misc/BetaBadge";
-import { RequestContentType, RequestMethod, RQAPI } from "features/api-client/types";
+import { RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import {
   filterHeadersToImport,
   generateKeyValuePairsFromJson,
   getContentTypeFromRequestHeaders,
   getEmptyAPIEntry,
   parseCurlRequest,
-} from "features/api-client/screens/apiClient/apiUtils";
-import { CONTENT_TYPE_HEADER } from "features/api-client/constants";
-import APIClientView from "features/api-client/screens/apiClient/components/client-view/APIClientView";
+} from "features/apiClient/screens/apiClient/apiUtils";
+import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
+import APIClientView from "features/apiClient/screens/apiClient/components/client-view/APIClientView";
 import "./apiClient.scss";
 
 interface Props {
