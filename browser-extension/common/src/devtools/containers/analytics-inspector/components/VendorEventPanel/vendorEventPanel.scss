@@ -1,0 +1,51 @@
+.analytics-inspector-container {
+  .vendor-event-details.ant-collapse {
+    .vendor-event-panel.ant-collapse {
+      margin-bottom: 2px;
+      padding: 0;
+      background-color: transparent;
+
+      .ant-collapse-header {
+        padding: 2px 8px;
+
+        .ant-collapse-header-text {
+          font-size: 12px;
+
+          .ant-typography {
+            font-size: 11px;
+          }
+        }
+
+        .vendor-event-title {
+          display: flex;
+          align-items: center;
+          flex-wrap: nowrap;
+          gap: 8px;
+
+          .actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+          }
+        }
+      }
+
+      .nested-event-properties-collapse {
+        margin-bottom: 4px;
+        background-color: transparent;
+
+        .ant-collapse-item {
+          background-color: transparent;
+        }
+
+        .ant-collapse-content {
+          margin-bottom: 8px;
+
+          .ant-collapse-content-box {
+            padding: 2px 20px;
+          }
+        }
+      }
+    }
+  }
+}

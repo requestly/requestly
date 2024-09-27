@@ -7,8 +7,13 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { getThemeVariables } from "antd/dist/theme";
 import { theme } from "./src/lib/design-system/theme";
 
-const config = ({ mode }) =>
-  defineConfig({
+// Either this with vite.config.mjs file or non top-level-import like below
+// import { viteStaticCopy } from "vite-plugin-static-copy";
+
+const config = async ({ mode }) => {
+  const { viteStaticCopy } = await import("vite-plugin-static-copy");
+
+  return defineConfig({
     define: {
       global: "window",
       "process.env": loadEnv(mode, process.cwd(), ""),
@@ -34,6 +39,13 @@ const config = ({ mode }) =>
       viteTsconfigPaths(),
       commonjs(),
       svgr(),
+      // To support curlconverter
+      viteStaticCopy({
+        targets: [
+          { src: "node_modules/web-tree-sitter/tree-sitter.wasm", dest: "." },
+          { src: "node_modules/curlconverter/dist/tree-sitter-bash.wasm", dest: "." },
+        ],
+      }),
     ],
     resolve: {
       // { find: '@', replacement: path.resolve(__dirname, 'src') },
@@ -49,6 +61,7 @@ const config = ({ mode }) =>
     optimizeDeps: {
       force: true,
       esbuildOptions: {
+        target: "esnext",
         loader: {
           ".js": "jsx",
         },
@@ -65,6 +78,7 @@ const config = ({ mode }) =>
     },
     build: {
       outDir: "build",
+      target: "esnext",
     },
     server: {
       open: true,
@@ -74,5 +88,6 @@ const config = ({ mode }) =>
       },
     },
   });
+};
 
 export default config;

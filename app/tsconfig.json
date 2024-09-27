@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "outDir": "build",
-    "target": "es5",
+    "target": "ESNext",
     "lib": ["es2021", "dom", "dom.iterable"],
-    "module": "esnext",
+    "module": "ESNext",
     "jsx": "react-jsx",
     "allowJs": true,
     "checkJs": false,
