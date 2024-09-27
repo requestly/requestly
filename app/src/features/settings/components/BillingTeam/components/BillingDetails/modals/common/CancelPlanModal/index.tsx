@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Col, Input, Modal, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import { getPrettyPlanName } from "utils/FormattingHelper";
@@ -9,6 +8,7 @@ import { getLongFormatDateString } from "utils/DateTimeUtils";
 import { trackPricingPlanCancelled } from "modules/analytics/events/misc/business";
 import "./index.scss";
 import { useParams } from "react-router-dom";
+import { cancelSubscription } from "backend/billing";
 
 interface Props {
   isOpen: boolean;
@@ -46,18 +46,6 @@ export const CancelPlanModal: React.FC<Props> = ({
     }
 
     setIsLoading(true);
-
-    const cancelSubscription = httpsCallable<
-      {
-        reason: string;
-        currentPlan: string;
-        billingId: string;
-      },
-      {
-        success: boolean;
-        message: string;
-      }
-    >(getFunctions(), "subscription-cancelSubscription");
 
     cancelSubscription({
       reason,

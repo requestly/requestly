@@ -7,12 +7,12 @@ import { getPrettyPlanName } from "../../../../../../utils/FormattingHelper";
 import { getUserAuthDetails } from "../../../../../../store/selectors";
 import { beautifySubscriptionType } from "../../../../../../utils/PricingUtils";
 import { ChangePlanRequestConfirmationModal } from "features/pricing/components/ChangePlanRequestConfirmationModal";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
 import { trackPricingPlanCancellationRequested } from "modules/analytics/events/misc/business";
 import "./SubscriptionInfo.css";
 import { actions } from "store";
+import { cancelSubscription } from "backend/billing";
 
 const SubscriptionInfo = ({
   isLifeTimeActive = false,
@@ -48,7 +48,7 @@ const SubscriptionInfo = ({
       end_date: validTill,
       type: type,
     });
-    const cancelSubscription = httpsCallable(getFunctions(), "subscription-cancelSubscription");
+
     cancelSubscription({
       currentPlan: planName,
     })
