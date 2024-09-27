@@ -17,6 +17,7 @@ import { trackSampleRuleEditorViewed } from "features/rules/analytics";
 const RuleNameColumn: React.FC<{
   record: RuleTableRecord;
 }> = ({ record }) => {
+  // TODO: remove this when tooltip component is added in the design system
   const baseEllipsisTooltipConfig: TooltipProps = {
     overlayClassName: "rules-table-ellipsis-tooltip",
     placement: "right",
