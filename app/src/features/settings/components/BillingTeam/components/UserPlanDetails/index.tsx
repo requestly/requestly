@@ -144,8 +144,10 @@ export const UserPlanDetails = () => {
     <>
       <CancelPlanModal
         isOpen={isCancelPlanModalOpen}
-        subscriptionDetails={user?.details?.planDetails}
         closeModal={() => setIsCancelPlanModalOpen((prev) => !prev)}
+        billingTeamQuantity={1}
+        currentPlanName={user?.details?.planDetails?.planName}
+        currentPlanEndDate={user?.details?.planDetails?.subscription?.endDate}
       />
 
       <Col
