@@ -2,14 +2,16 @@ import React from "react";
 import { Button as AntDButton, ButtonProps as AntDButtonProps } from "antd";
 import { useHotkeys } from "react-hotkeys-hook";
 import { capitalize } from "lodash";
-import "./Button.scss";
+import { KEY_ICONS } from "../../../../constants";
+import "./RQButton.scss";
 
 type RQButtonSize = "small" | "default" | "large";
 
 type RQButtonType = "primary" | "secondary" | "transparent" | "danger" | "warning";
 
-interface ButtonProps extends Omit<AntDButtonProps, "size" | "type"> {
+export interface RQButtonProps extends Omit<AntDButtonProps, "size" | "type"> {
   hotKey?: string;
+  hotKeyText?: string;
   showHotKeyText?: boolean;
   size?: RQButtonSize;
   type?: RQButtonType;
@@ -34,19 +36,37 @@ const RQ_TO_ANTD_PROPS: {
   },
 };
 
-const BaseButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function BaseButton({ ...props }, ref) {
+const BaseButton = React.forwardRef<HTMLButtonElement, RQButtonProps>(function BaseButton({ ...props }, ref) {
   const { hotKey, showHotKeyText, ...restProps } = props; // Remove unrecognised props
 
   const antDProps = { size: RQ_TO_ANTD_PROPS.size[props.size], type: RQ_TO_ANTD_PROPS.type[props.type] };
 
-  return <AntDButton ref={ref} {...restProps} {...antDProps} className={`rq-custom-btn ${props.className ?? ""}`} />;
+  const isIconOnly = props.icon && !props.children;
+
+  return (
+    <AntDButton
+      ref={ref}
+      {...restProps}
+      {...antDProps}
+      className={`rq-custom-btn ${isIconOnly ? "icon-only-btn" : ""} ${props.className ?? ""}`}
+    />
+  );
 });
 
-const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(function ButtonWithHotkey(props, ref) {
-  // TODO: Fix type - hotkey callback gives keyboard event but button onClick needs mouse event
-  useHotkeys(props.hotKey, (e: any) => props.onClick(e));
+const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, RQButtonProps>(function ButtonWithHotkey(props, ref) {
+  useHotkeys(
+    props.hotKey,
+    (event) => {
+      // TODO: Fix type - hotkey callback gives keyboard event but button onClick needs mouse event
+      props.onClick(event as any);
+    },
+    {
+      preventDefault: true,
+      enableOnFormTags: ["input", "INPUT"],
+    }
+  );
 
-  const keys = props.hotKey.split("+");
+  const keys = props.hotKey.split("+").map((key) => KEY_ICONS[key] ?? key);
 
   let children = props.children;
   if (props.showHotKeyText) {
@@ -68,14 +88,13 @@ const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, ButtonProps>(functi
   return <BaseButton ref={ref} {...props} children={children} />;
 });
 
-interface RQButton extends React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<HTMLButtonElement>> {}
+interface RQCustomButton
+  extends React.ForwardRefExoticComponent<RQButtonProps & React.RefAttributes<HTMLButtonElement>> {}
 
-const Button: RQButton = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(props, ref) {
+export const RQButton: RQCustomButton = React.forwardRef<HTMLButtonElement, RQButtonProps>(function Button(props, ref) {
   if (props.hotKey) {
     return <ButtonWithHotkey ref={ref} {...props} />;
   }
 
   return <BaseButton ref={ref} {...props} />;
 });
-
-export { Button };

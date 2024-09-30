@@ -2,13 +2,13 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { actions } from "store";
 import { getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selectors";
-import { RQButton } from "lib/design-system/components";
-import { Button, Row, Tooltip } from "antd";
+import { Row, Tooltip } from "antd";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
+import { RQButton } from "lib/design-system-v2/components";
 
 const ShareRuleButton = ({ isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
@@ -49,7 +49,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
   return (
     <>
       {isRuleEditorModal ? (
-        <Button type="text">
+        <RQButton type="transparent" block>
           <Row
             align="middle"
             wrap={false}
@@ -65,7 +65,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
           >
             Share rule
           </Row>
-        </Button>
+        </RQButton>
       ) : (
         <Tooltip title="Share rule" placement="bottom">
           <RQButton
