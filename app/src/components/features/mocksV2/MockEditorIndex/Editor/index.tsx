@@ -20,7 +20,7 @@ import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateStatusCod
 import "./index.css";
 import { trackMockEditorOpened, trackTestMockClicked } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { APIClient, APIClientRequest } from "components/common/APIClient";
+import { APIClient, APIClientRequest } from "features/apiClient/components/common/APIClient";
 import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { MOCKSV2 } from "modules/analytics/events/features/constants";

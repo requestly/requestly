@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { RQAPI } from "../../types";
+import { RQAPI } from "../../../../../types";
 import { Button, Popover, Space } from "antd";
 import PropertyRow from "./PropertyRow/PropertyRow";
 import { statusCodes } from "config/constants/sub/statusCode";
