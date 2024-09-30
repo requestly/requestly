@@ -2,7 +2,7 @@ import React from "react";
 import { Button as AntDButton, ButtonProps as AntDButtonProps } from "antd";
 import { useHotkeys } from "react-hotkeys-hook";
 import { capitalize } from "lodash";
-import "./Button.scss";
+import "./RQButton.scss";
 
 type RQButtonSize = "small" | "default" | "large";
 
