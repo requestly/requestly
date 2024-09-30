@@ -85,7 +85,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       width="70%"
       destroyOnClose
     >
-      <APIClientView apiEntry={apiEntry} />
+      <APIClientView apiEntry={apiEntry} openInModal={openInModal} />
     </Modal>
   ) : (
     <APIClientView apiEntry={apiEntry} />
