@@ -79,6 +79,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (apiEntry) {
       clearTimeout(animationTimerRef.current);
       setIsAnimating(true);
+      setApiRecordDetails(null);
       setEntry(apiEntry);
       animationTimerRef.current = setTimeout(() => setIsAnimating(false), 500);
     }
