@@ -186,6 +186,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
           "A minimalistic API Client for front-end developers to test their APIs and fast-track their web development lifecycle. Add custom Headers and Query Params to test your APIs.",
         eventPage: "api_client",
       };
+      // @ts-ignore
       dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
       trackInstallExtensionDialogShown({ src: "api_client" });
       return;

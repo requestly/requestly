@@ -11,7 +11,7 @@ import {
   parseCurlRequest,
 } from "features/apiClient/screens/apiClient/apiUtils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
-import APIClientView from "features/apiClient/screens/apiClient/components/client-view/APIClientView";
+import APIClientView from "../../../screens/apiClient/components/clientView/APIClientView";
 import "./apiClient.scss";
 
 interface Props {

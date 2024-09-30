@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import APIClientSidebar from "./components/sidebar/APIClientSidebar";
-import APIClientView from "./components/client-view/APIClientView";
+import APIClientView from "./components/clientView/APIClientView";
 import { RQAPI } from "../../types";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "./historyStore";
 import { getEmptyAPIEntry } from "./apiUtils";
