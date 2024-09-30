@@ -2,13 +2,16 @@ enum Feature {
   RULES = "RULES",
 }
 
+export const KEY_ICONS: Record<string, string> = {
+  meta: "⌘",
+};
+
 export const KEYBOARD_SHORTCUTS: Record<
   Feature,
   Record<
     string,
     {
       hotKey: string;
-      displayText?: string;
       description: string;
     }
   >
@@ -16,13 +19,11 @@ export const KEYBOARD_SHORTCUTS: Record<
   [Feature.RULES]: {
     EDITOR_BACK: {
       hotKey: "esc",
-      displayText: "ESC",
       description: "From editor to rules list",
     },
     SAVE_RULE: {
-      hotKey: "meta+s",
+      hotKey: navigator.platform.match("Mac") ? "meta+s" : "ctrl+s",
       description: "Save rule",
-      displayText: navigator.platform.match("Mac") ? "⌘+s" : "ctrl+s",
     },
   },
 };

@@ -2,6 +2,7 @@ import React from "react";
 import { Button as AntDButton, ButtonProps as AntDButtonProps } from "antd";
 import { useHotkeys } from "react-hotkeys-hook";
 import { capitalize } from "lodash";
+import { KEY_ICONS } from "../../../../constants";
 import "./RQButton.scss";
 
 type RQButtonSize = "small" | "default" | "large";
@@ -65,7 +66,7 @@ const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, RQButtonProps>(func
     }
   );
 
-  const keys = props.hotKey.split("+");
+  const keys = props.hotKey.split("+").map((key) => KEY_ICONS[key] ?? key);
 
   let children = props.children;
   if (props.showHotKeyText) {
