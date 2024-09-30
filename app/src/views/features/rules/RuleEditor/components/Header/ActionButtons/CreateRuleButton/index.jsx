@@ -343,7 +343,7 @@ const CreateRuleButton = ({
       source={SOURCE.CREATE_NEW_RULE}
       placement="bottomLeft"
     >
-      <Tooltip title={tooltipText} placement="top">
+      <Tooltip title={tooltipText} placement="bottom">
         <RQButton
           showHotKeyText
           hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
@@ -368,7 +368,7 @@ const CreateRuleButton = ({
         disabled={checkIsUpgradePopoverDisabled()}
         source={currentlySelectedRuleData.ruleType}
       >
-        <Tooltip title={tooltipText} placement="top">
+        <Tooltip title={tooltipText} placement="bottom">
           <RQButton
             showHotKeyText
             hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
