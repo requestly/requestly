@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
-import APIClientSidebar from "./sidebar/APIClientSidebar";
-import APIClientView from "./client-view/APIClientView";
-import { RQAPI } from "./types";
+import APIClientSidebar from "./components/sidebar/APIClientSidebar";
+import APIClientView from "./components/clientView/APIClientView";
+import { RQAPI } from "../../types";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "./historyStore";
 import { getEmptyAPIEntry } from "./apiUtils";
 import {
@@ -9,12 +9,12 @@ import {
   trackImportCurlClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
-import ImportRequestModal from "./ImportRequestModal";
-import "./apiClientContainer.scss";
+import ImportRequestModal from "./components/modals/ImportRequestModal";
+import "./apiClient.scss";
 
 interface Props {}
 
-const APIClientContainer: React.FC<Props> = () => {
+export const APIClient: React.FC<Props> = () => {
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
   const [selectedEntry, setSelectedEntry] = useState<RQAPI.Entry>();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -72,5 +72,3 @@ const APIClientContainer: React.FC<Props> = () => {
     </div>
   );
 };
-
-export default APIClientContainer;

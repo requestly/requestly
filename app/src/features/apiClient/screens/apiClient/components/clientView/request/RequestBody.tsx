@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Input, Radio } from "antd";
-import { KeyValuePair, RQAPI, RequestContentType } from "../../types";
+import { KeyValuePair, RQAPI, RequestContentType } from "../../../../../types";
 import KeyValueForm from "./KeyValueForm";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 

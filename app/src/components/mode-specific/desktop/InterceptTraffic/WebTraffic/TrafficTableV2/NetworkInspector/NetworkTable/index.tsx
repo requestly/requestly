@@ -10,7 +10,7 @@ import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import FEATURES from "config/constants/sub/features";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import VirtualTableV2 from "./VirtualTableV2";
-import { APIClient, APIClientRequest } from "components/common/APIClient";
+import { APIClient, APIClientRequest } from "features/apiClient/components/common/APIClient";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
 import { Checkbox, Typography } from "antd";
 import { trackMockResponsesRequestsSelected } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";

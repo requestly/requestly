@@ -1,12 +1,12 @@
 import { Tabs, TabsProps } from "antd";
 import React, { memo, useCallback, useMemo } from "react";
 import ResponseBody from "./ResponseBody";
-import { RQAPI } from "../../types";
+import { RQAPI } from "../../../../../types";
 import ResponseHeaders from "./ResponseHeaders";
 import StatusLine from "./StatusLine";
 import "./responseTabs.scss";
 import { trackResponseHeadersViewed } from "modules/analytics/events/features/apiClient";
-import { getContentTypeFromResponseHeaders } from "../../apiUtils";
+import { getContentTypeFromResponseHeaders } from "../../../apiUtils";
 
 interface Props {
   response: RQAPI.Response;

@@ -1,7 +1,7 @@
 import { DeleteOutlined } from "@ant-design/icons";
 import { AutoComplete, Button, Input } from "antd";
 import React, { memo, useCallback, useEffect } from "react";
-import { KeyValuePair } from "../../types";
+import { KeyValuePair } from "../../../../../types";
 
 interface Props {
   keyValuePairs: KeyValuePair[];
