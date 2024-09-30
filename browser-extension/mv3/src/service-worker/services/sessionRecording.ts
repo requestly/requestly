@@ -44,7 +44,7 @@ const getSessionRecordingConfig = async (url: string): Promise<SessionRecordingC
 };
 
 export const initSessionRecordingSDK = async (tabId: number, frameId: number) => {
-  if (tabId) {
+  if (!tabId) {
     return;
   }
 
