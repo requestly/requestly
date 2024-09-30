@@ -313,6 +313,7 @@ const AppModeInitializer = () => {
     hasMessageHandlersBeenSet.current = true;
 
     PSMH.addMessageListener("log_events", (message) => {
+      console.log("!!!debug", "log_events", message);
       sendEvents(message.events);
     });
 
