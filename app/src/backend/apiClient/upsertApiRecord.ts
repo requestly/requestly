@@ -77,7 +77,6 @@ const updateApiRecord = async (
       return { success: true, data: updatedRecord };
     })
     .catch((err) => {
-      console.log(err);
       Logger.error("Error while updating api record", err);
       return { success: false, data: null };
     });
