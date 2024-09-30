@@ -21,6 +21,11 @@ export interface KeyValuePair {
 }
 
 export namespace RQAPI {
+  export enum RecordType {
+    API = "api",
+    COLLECTION = "collection",
+  }
+
   export type RequestBody = string | KeyValuePair[]; // in case of form data, body will be key-value pairs
 
   export interface Request {
@@ -43,6 +48,34 @@ export namespace RQAPI {
 
   export interface Entry {
     request: Request;
-    response: Response;
+    response?: Response;
   }
+
+  export interface Collection {
+    name: string;
+    description?: string;
+  }
+
+  interface RecordMetadata {
+    id: string;
+    collectionId: string | null;
+    ownerId: string;
+    deleted: boolean;
+    createdBy: string;
+    updatedBy: string;
+    createdTs: number;
+    updatedTs: number;
+  }
+
+  export interface ApiRecord extends RecordMetadata {
+    type: RecordType.API;
+    data: Entry;
+  }
+
+  export interface CollectionRecord extends RecordMetadata {
+    type: RecordType.COLLECTION;
+    data: Collection;
+  }
+
+  export type Record = ApiRecord | CollectionRecord;
 }
