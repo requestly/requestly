@@ -112,6 +112,17 @@
   justify-content: space-between;
 }
 
+.rule-name-container .rule-name .rule-name-wrapper .ant-typography {
+  /* TODO: use theme variables */
+  color: #3ba0ff;
+  transition: color 0.2s ease;
+}
+
+.rule-name-container .rule-name .rule-name-wrapper .ant-typography:hover {
+  /* TODO: use theme variables */
+  color: #1f50b1;
+}
+
 .rule-name-container .rule-name-wrapper .sample-rule-tag {
   border-radius: var(--space-2, 4px);
   background: rgba(0, 78, 235, 0.4);
@@ -133,6 +144,11 @@
   color: var(--requestly-color-text-placeholder);
 }
 
+.rules-table-ellipsis-tooltip .ant-tooltip-inner {
+  font-size: var(--requestly-font-size-sm);
+  background: var(--requestly-color-black);
+}
+
 .group-name-container {
   display: flex;
   align-items: center;
@@ -140,12 +156,13 @@
   gap: 8px;
 }
 
-.group-name-container .group-name {
+.group-name-container .group-name.ant-typography {
   max-width: 262px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--requestly-font-size-sm);
+  color: var(--requestly-color-text-default);
 }
 
 .group-name-container .group-rules-count-details {
