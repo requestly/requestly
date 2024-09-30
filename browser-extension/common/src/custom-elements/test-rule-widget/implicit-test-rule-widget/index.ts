@@ -12,6 +12,7 @@ type AppliedRule = { ruleId: string; ruleName: string; ruleType: RuleType };
 class RQImplicitTestRuleWidget extends RQTestRuleWidget {
   #appliedRules: AppliedRule[] = [];
   #widgetDisplayTimerId: NodeJS.Timeout | null;
+  #progressBar: HTMLElement;
 
   connectedCallback() {
     super.connectedCallback();
@@ -20,8 +21,9 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
     const minimizedStatusBtn = this.shadowRoot.getElementById("test-rule-minimized-btn");
     const widgetContent = `
     <div id="implicit-widget-container">
-      <div id="applied-rules-list-header">Rules applied on this page</div>
-      <div id="applied-rules-list"></div>
+    <div id="applied-rules-list-header">Rules applied on this page</div>
+    <div id="applied-rules-list"></div>
+    <div class="test-rule-widget-progress-bar"/>
     </div>`;
     setInnerHTML(minimizedStatusBtn, `<span class="success">${CheckIcon}</span>`);
     setInnerHTML(contentContainer, widgetContent);
@@ -34,6 +36,8 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
 
     const closeButton = this.shadowRoot.getElementById("close-button");
     closeButton.classList.remove("hidden");
+
+    this.#progressBar = this.shadowRoot.querySelector(".test-rule-widget-progress-bar");
 
     this.addWidgetListeners();
 
@@ -71,9 +75,8 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
 
   show() {
     clearTimeout(this.#widgetDisplayTimerId);
-
     super.show();
-
+    this.startProgressBarAnimation();
     this.#widgetDisplayTimerId = setTimeout(() => {
       super.hide();
     }, IMPLICIT_WIDGET_DISPLAY_TIME);
@@ -82,6 +85,22 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
   hide() {
     clearTimeout(this.#widgetDisplayTimerId);
     super.hide();
+    this.resetProgressBar();
+  }
+
+  private startProgressBarAnimation() {
+    this.#progressBar.style.width = "100%";
+    setTimeout(() => {
+      this.#progressBar.style.width = "0%";
+    }, 50); // Small delay to ensure the transition is visible
+  }
+
+  private resetProgressBar() {
+    this.#progressBar.style.transition = "none";
+    this.#progressBar.style.width = "100%";
+    setTimeout(() => {
+      this.#progressBar.style.transition = "width 5s linear";
+    }, 50);
   }
 
   triggerAppliedRuleClickedEvent(detail: any) {

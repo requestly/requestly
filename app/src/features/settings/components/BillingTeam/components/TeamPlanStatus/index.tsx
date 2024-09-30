@@ -9,7 +9,7 @@ import "./index.scss";
 export const TeamPlanStatus: React.FC<{
   subscriptionStatus: string;
   cancelAtPeriodEnd?: boolean;
-  subscriptionEndDate?: string;
+  subscriptionEndDate?: string | number;
 }> = ({ subscriptionEndDate, subscriptionStatus, cancelAtPeriodEnd = false }) => {
   const [searchParams] = useSearchParams();
   const redirectedFromCheckout = searchParams.get("redirectedFromCheckout");
@@ -32,7 +32,7 @@ export const TeamPlanStatus: React.FC<{
     }
 
     return `Cancelling in ${daysLeft} days`;
-  }, []);
+  }, [subscriptionEndDate]);
 
   let planStatus = PlanStatus.ACTIVE;
   if (!["active", "past_due", "trialing"].includes(subscriptionStatus) && !redirectedFromCheckout) {
