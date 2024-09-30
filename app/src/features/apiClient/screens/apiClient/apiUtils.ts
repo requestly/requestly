@@ -36,6 +36,7 @@ export const makeRequest = async (
   });
 };
 
+// TODO: move this into top level common folder
 export const addUrlSchemeIfMissing = (url: string): string => {
   if (url && !/^([a-z][a-z0-9+\-.]*):\/\//.test(url)) {
     return "https://" + url;
