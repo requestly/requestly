@@ -1,5 +1,5 @@
 import React from "react";
-import { KeyValuePair } from "../../types";
+import { KeyValuePair } from "../../../../../types";
 import PropertyRow from "./PropertyRow/PropertyRow";
 
 interface Props {

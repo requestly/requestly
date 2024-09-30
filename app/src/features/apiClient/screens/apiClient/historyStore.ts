@@ -1,4 +1,4 @@
-import { RQAPI } from "./types";
+import { RQAPI } from "../../types";
 
 const HISTORY_LOCAL_STORE_KEY = "rq-api-history";
 const MAX_LENGTH = 20;
