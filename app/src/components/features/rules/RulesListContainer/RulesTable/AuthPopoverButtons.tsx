@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Button, Row } from "antd";
+import { Row } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { PremiumIcon } from "components/common/PremiumIcon";
+import { RQButton, RQButtonProps } from "lib/design-system-v2/components";
 
 interface Props {
   icon: React.ReactNode;
   shape: any;
-  type?: any;
+  type?: RQButtonProps["type"];
   buttonText: string;
   isTooltipShown: boolean;
   onClickHandler: (e?: unknown) => void;
@@ -43,8 +44,8 @@ const AuthPopoverButton: React.FC<Props> = ({
       callback={onClickHandler}
       source={authSource}
     >
-      <Button
-        type={type || "default"}
+      <RQButton
+        type={type || "secondary"}
         shape={isScreenSmall ? shape : null}
         onClick={() => {
           trackClickEvent();
@@ -74,7 +75,7 @@ const AuthPopoverButton: React.FC<Props> = ({
             </Row>
           </span>
         )}
-      </Button>
+      </RQButton>
     </AuthConfirmationPopover>
   );
 };

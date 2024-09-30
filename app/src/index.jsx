@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import { persistStore } from "redux-persist";
 import { reduxStore } from "./store";
 import { PersistGate } from "redux-persist/integration/react";
+import { HotkeysProvider } from "react-hotkeys-hook";
 
 import "./init";
 import "./assets/less/index.less";
@@ -30,7 +31,9 @@ root.render(
         )}
         showDialog
       >
-        {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? <SessionBearApp /> : <App />}
+        <HotkeysProvider>
+          {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? <SessionBearApp /> : <App />}
+        </HotkeysProvider>
       </Sentry.ErrorBoundary>
     </PersistGate>
   </Provider>

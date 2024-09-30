@@ -1,5 +1,5 @@
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
-import { RQButton } from "lib/design-system/components";
+import { RQButton } from "lib/design-system-v2/components";
 import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import { useLocation } from "react-router-dom";
@@ -19,7 +19,7 @@ export const TestRuleButton = () => {
       <RQButton
         disabled={MODE !== RULE_EDITOR_CONFIG.MODES.EDIT}
         className="header-test-rule-btn"
-        type="text"
+        type="transparent"
         icon={<MdOutlineScience />}
         onClick={() => {
           if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
