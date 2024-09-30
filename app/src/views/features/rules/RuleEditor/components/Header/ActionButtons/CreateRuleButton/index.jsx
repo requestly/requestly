@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Tooltip } from "antd";
+import { Tooltip } from "antd";
+import { RQButton } from "lib/design-system-v2/components";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "utils/Toast.js";
-//UTILS
 import {
   getAppMode,
   getCurrentlySelectedRuleData,
@@ -12,14 +12,12 @@ import {
   getUserAuthDetails,
 } from "../../../../../../../../store/selectors";
 import { trackRQLastActivity } from "../../../../../../../../utils/AnalyticsUtils";
-//Actions
 import { saveRule, validateSyntaxInRule } from "../actions";
 import {
   getModeData,
   setIsCurrentlySelectedRuleHasUnsavedChanges,
 } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { validateRule } from "./actions";
-
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../../../../../../../../config/constants";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
@@ -49,6 +47,7 @@ import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivizat
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { KEYBOARD_SHORTCUTS } from "../../../../../../../../constants/keyboardShortcuts";
 import "../RuleEditorActionButtons.css";
 
 const getEventParams = (rule) => {
@@ -336,22 +335,6 @@ const CreateRuleButton = ({
     }
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const saveFn = (event) => {
-    if ((navigator.platform.match("Mac") ? event.metaKey : event.ctrlKey) && event.key.toLowerCase() === "s") {
-      event.preventDefault();
-      // simulating click on save button when user presses cmd+s or ctrl+s to invoke upgrade popover
-      document.getElementById("rule-editor-save-btn").click();
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("keydown", saveFn);
-    return () => {
-      document.removeEventListener("keydown", saveFn);
-    };
-  }, [saveFn]);
-
   return onboardingVariation === "variant4" && !user?.details?.isLoggedIn ? (
     <AuthConfirmationPopover
       title={<div>You need to sign up to save the rule.</div>}
@@ -360,8 +343,10 @@ const CreateRuleButton = ({
       source={SOURCE.CREATE_NEW_RULE}
       placement="bottomLeft"
     >
-      <Tooltip title={tooltipText} placement="top">
-        <Button
+      <Tooltip title={tooltipText} placement="bottom">
+        <RQButton
+          showHotKeyText
+          hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
           data-tour-id="rule-editor-create-btn"
           id="rule-editor-save-btn"
           type="primary"
@@ -370,7 +355,7 @@ const CreateRuleButton = ({
         >
           {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
           {`Save rule`}
-        </Button>
+        </RQButton>
       </Tooltip>
     </AuthConfirmationPopover>
   ) : (
@@ -383,8 +368,10 @@ const CreateRuleButton = ({
         disabled={checkIsUpgradePopoverDisabled()}
         source={currentlySelectedRuleData.ruleType}
       >
-        <Tooltip title={tooltipText} placement="top">
-          <Button
+        <Tooltip title={tooltipText} placement="bottom">
+          <RQButton
+            showHotKeyText
+            hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
             data-tour-id="rule-editor-create-btn"
             id="rule-editor-save-btn"
             type="primary"
@@ -393,7 +380,7 @@ const CreateRuleButton = ({
           >
             {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
             {`Save rule`}
-          </Button>
+          </RQButton>
         </Tooltip>
       </PremiumFeature>
     </>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Row, Col, Layout, Divider, Tooltip, Button } from "antd";
+import { Row, Col, Layout, Divider, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getCurrentlySelectedRuleConfig,
@@ -24,11 +24,11 @@ import {
 } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/utils/rules";
 import { getAllRecordsMap } from "store/features/rules/selectors";
 import { useRulesActionContext } from "features/rules/context/actions";
-import { RQButton } from "lib/design-system/components";
 import { useLocation, useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { trackSampleRuleCreateRuleClicked, trackSampleRuleTested } from "features/rules/analytics";
 import { RecordStatus } from "features/rules";
+import { RQButton } from "lib/design-system-v2/components";
 
 const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleTooltip = false }) => {
   const navigate = useNavigate();
@@ -90,7 +90,7 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
                   <WarningOutlined className="icon__wrapper" />
                   Group is disabled.{" "}
                   <RQButton
-                    type="link"
+                    type="transparent"
                     size="small"
                     onClick={() =>
                       recordStatusToggleAction(normalizeRecord(allRecordsMap[currentlySelectedRuleData.groupId]))
@@ -104,18 +104,18 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
 
             <Divider type="vertical" />
 
-            <Button
+            <RQButton
               onClick={() => {
                 trackSampleRuleCreateRuleClicked(currentlySelectedRuleData?.name, currentlySelectedRuleData?.ruleType);
                 navigate(`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${currentlySelectedRuleData?.ruleType}`);
               }}
             >
               Create {currentlySelectedRuleConfig.NAME?.toLowerCase()} rule
-            </Button>
+            </RQButton>
 
-            <Button type="primary" onClick={handleSeeLiveRuleDemoClick}>
+            <RQButton type="primary" onClick={handleSeeLiveRuleDemoClick}>
               See live rule demo
-            </Button>
+            </RQButton>
           </div>
         ) : (
           <div className="ml-auto rule-editor-header-actions-container">
@@ -129,7 +129,7 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
                   <WarningOutlined className="icon__wrapper" />
                   Group is disabled.{" "}
                   <RQButton
-                    type="link"
+                    type="transparent"
                     size="small"
                     onClick={() =>
                       recordStatusToggleAction(normalizeRecord(allRecordsMap[currentlySelectedRuleData.groupId]))
