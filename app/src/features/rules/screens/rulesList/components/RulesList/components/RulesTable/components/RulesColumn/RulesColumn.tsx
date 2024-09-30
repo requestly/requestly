@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { isRule } from "features/rules/utils";
 import { RuleTableRecord } from "../../types";
 import { Link } from "react-router-dom";
-import { Button, Progress, Tooltip } from "antd";
+import { Button, Progress, Tooltip, TooltipProps, Typography } from "antd";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { RuleSelectionListDrawer } from "../../../RuleSelectionListDrawer/RuleSelectionListDrawer";
 import PATHS from "config/constants/sub/paths";
@@ -17,6 +17,13 @@ import { trackSampleRuleEditorViewed } from "features/rules/analytics";
 const RuleNameColumn: React.FC<{
   record: RuleTableRecord;
 }> = ({ record }) => {
+  // TODO: remove this when tooltip component is added in the design system
+  const baseEllipsisTooltipConfig: TooltipProps = {
+    overlayClassName: "rules-table-ellipsis-tooltip",
+    placement: "right",
+    showArrow: false,
+  };
+
   const dispatch = useDispatch();
   const theme = useTheme();
 
@@ -42,7 +49,19 @@ const RuleNameColumn: React.FC<{
             dispatch(actions.updateSecondarySidebarCollapse(false));
           }}
         >
-          {record.name}
+          <div className="rule-name-wrapper">
+            <Typography.Text
+              ellipsis={{
+                tooltip: {
+                  title: record.name,
+                  ...baseEllipsisTooltipConfig,
+                },
+              }}
+            >
+              {record.name}
+            </Typography.Text>{" "}
+            {record.isSample && <span className="sample-rule-tag">SAMPLE RULE</span>}
+          </div>
         </Link>
 
         {record?.description ? (
@@ -64,7 +83,20 @@ const RuleNameColumn: React.FC<{
 
     return (
       <div className="group-name-container" key={record.id}>
-        <div className="group-name">{group.name}</div>
+        <div className="group-name">
+          <Typography.Text
+            ellipsis={{
+              tooltip: {
+                title: record.name,
+                ...baseEllipsisTooltipConfig,
+              },
+            }}
+            className="group-name"
+          >
+            {group.name}
+          </Typography.Text>{" "}
+          {group.isSample && " [Try Instantly]"}
+        </div>
 
         {totalRules > 0 ? (
           <Tooltip

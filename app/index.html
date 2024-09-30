@@ -44,15 +44,23 @@
       link.href = faviconPath;
       window.document.head.appendChild(link);
 
-       // Set the page title
-      let pageTitle = 'Requestly - Lightweight Proxy to Intercept & Modify HTTP(s) requests'; // default title
+      // Set the page title
+      let pageTitle = 'Requestly - Best HTTP Interceptor & Mocking Tool for Web & Mobile Apps'; // default title
       if (hostname.includes("sessionbear.com")) {
         pageTitle = 'SessionBear - Capture & Kill bugs in seconds!';
       }
-      
-      window.document.title = pageTitle;
-  </script>
 
+      window.document.title = pageTitle;
+
+      if (window.location.pathname === "/pricing") {
+        
+        const description = "Free at $0, Lite for $8/month, Basic at $15/member/month, and the Professional plan—our best value—at $23/member/month.";
+        const metaTag = document.createElement("meta");
+        metaTag.name = "description";
+        metaTag.content = description;
+        document.querySelector("head").appendChild(metaTag);
+      }
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="theme-color" content="#000000" />
@@ -264,7 +272,6 @@
       }
     </style>
 
-    <title></title>
   </head>
 
   <body class="dark">

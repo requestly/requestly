@@ -175,3 +175,24 @@ export const inviteUsersToBillingTeam = async (billingId: string, userEmails: st
 
   return inviteUsers({ userEmails, billingId });
 };
+
+interface CancellationParams {
+  billingId?: string;
+  currentPlan: string;
+  reason?: string;
+}
+export const cancelSubscription = ({ billingId, currentPlan, reason }: CancellationParams) => {
+  const cancelSubscription = httpsCallable<
+    CancellationParams,
+    {
+      success: boolean;
+      message: string;
+    }
+  >(getFunctions(), "subscription-cancelSubscription");
+
+  return cancelSubscription({
+    reason,
+    currentPlan,
+    billingId,
+  });
+};
