@@ -7,7 +7,7 @@ import { User, getAuth, onAuthStateChanged, signInWithCustomToken } from "fireba
 import { actions } from "store";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getDomainFromEmail, getEmailType, isCompanyEmail } from "utils/FormattingHelper";
-import { getAppMode, getUserAttributes } from "store/selectors";
+import { getAppMode, getUserAttributes, getAppOnboardingDetails } from "store/selectors";
 import { getPlanName, isPremiumUser } from "utils/PremiumUtils";
 import moment from "moment";
 import { getAndUpdateInstallationDate } from "utils/Misc";
@@ -30,6 +30,7 @@ const AuthHandler: React.FC<{}> = () => {
   const location = useLocation();
   const queryPrarams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const userAttributes = useSelector(getUserAttributes);
+  const onboardingDetails = useSelector(getAppOnboardingDetails);
 
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
   const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
@@ -138,6 +139,8 @@ const AuthHandler: React.FC<{}> = () => {
           })
         );
         submitAttrUtil(TRACKING.ATTR.IS_PREMIUM, isUserPremium);
+        const userName = user.displayName !== "User" ? user.displayName : onboardingDetails.fullName;
+        submitAttrUtil(TRACKING.ATTR.USER_NAME, userName);
 
         if (planDetails) {
           submitAttrUtil(TRACKING.ATTR.PAYMENT_MODE, planDetails.type ?? "Missing Value");
@@ -174,7 +177,7 @@ const AuthHandler: React.FC<{}> = () => {
         return false;
       }
     },
-    [appMode, dispatch]
+    [appMode, dispatch, onboardingDetails.fullName]
   );
 
   useEffect(() => {

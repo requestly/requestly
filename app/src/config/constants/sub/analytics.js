@@ -125,6 +125,7 @@ export const GA_EVENTS = {
     COMPANY: "company",
     REF: "ref",
 
+    USER_NAME: "user_name",
     PROFILE: "profile",
 
     NUM_RULES: "NUM_RULES",
