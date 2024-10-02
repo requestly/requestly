@@ -16,12 +16,12 @@ const useEnvironmentVariables = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const variables = useSelector(getAllEnvironmentVariables);
 
-  const ownerId = useMemo(() => `team-${currentlyActiveWorkspace.id}` ?? user?.details?.profile?.uid, [
-    currentlyActiveWorkspace.id,
-    user?.details?.profile?.uid,
-  ]);
-
   const [environment, setEnvironment] = useState<string>("default");
+
+  const ownerId = useMemo(
+    () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
+    [currentlyActiveWorkspace.id, user?.details?.profile?.uid]
+  );
 
   const attachEnvironmentVariableListener = useCallback(() => {
     const db = getFirestore(firebaseApp);
@@ -30,10 +30,16 @@ const useEnvironmentVariables = () => {
 
     return onSnapshot(variableQuery, (doc) => {
       if (doc.exists()) {
-        const variables: Record<string, EnvironmentVariableValue> = doc.data()[environment];
+        const variables: Record<string, string> = doc.data()[environment];
 
         if (variables) {
-          dispatch(environmentVariablesActions.setVariables({ newVariables: variables, environment }));
+          const newVariables = Object.entries(variables).reduce((acc, [key, value]) => {
+            acc[key] = {
+              syncValue: value,
+            };
+            return acc;
+          }, {} as Record<string, EnvironmentVariableValue>);
+          dispatch(environmentVariablesActions.setVariables({ newVariables, environment }));
         }
       }
     });
