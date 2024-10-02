@@ -1,16 +1,53 @@
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEnvironmentVariables } from "store/features/environmentVariables/selectors";
 import { environmentVariablesActions } from "store/features/environmentVariables/slice";
+import { doc, getFirestore, onSnapshot } from "firebase/firestore";
+import firebaseApp from "firebase";
+import { getUserAuthDetails } from "store/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { setEnvironmentVariable } from "..";
 
 const useEnvironmentVariables = () => {
   const dispatch = useDispatch();
+
+  const user = useSelector(getUserAuthDetails);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const variables = useSelector(getAllEnvironmentVariables);
+
+  const ownerId = useMemo(() => `team-${currentlyActiveWorkspace.id}` ?? user?.details?.profile?.uid, [
+    currentlyActiveWorkspace.id,
+    user?.details?.profile?.uid,
+  ]);
 
   const [environment, setEnvironment] = useState<string>("default");
 
-  const setVariable = (key: string, value: EnvironmentVariableValue) => {
+  const attachEnvironmentVariableListener = useCallback(() => {
+    const db = getFirestore(firebaseApp);
+
+    const variableQuery = doc(db, "environmentVariables", ownerId);
+
+    return onSnapshot(variableQuery, (doc) => {
+      if (doc.exists()) {
+        const variables: Record<string, EnvironmentVariableValue> = doc.data()[environment];
+
+        if (variables) {
+          dispatch(environmentVariablesActions.setVariables({ newVariables: variables, environment }));
+        }
+      }
+    });
+  }, [dispatch, environment, ownerId]);
+
+  useEffect(() => {
+    const unsubscribeListener = attachEnvironmentVariableListener();
+
+    return () => {
+      unsubscribeListener();
+    };
+  }, [attachEnvironmentVariableListener, ownerId]);
+
+  const setVariable = async (key: string, value: EnvironmentVariableValue) => {
     const newVariable: Record<string, EnvironmentVariableValue> = {
       [key]: {
         localValue: value.localValue,
@@ -18,7 +55,14 @@ const useEnvironmentVariables = () => {
       },
     };
 
-    dispatch(environmentVariablesActions.setVariable({ newVariable, environment }));
+    dispatch(environmentVariablesActions.setVariables({ newVariables: newVariable, environment }));
+    return setEnvironmentVariable(ownerId, {
+      newVariable: {
+        key,
+        value: value.syncValue,
+      },
+      environment,
+    });
   };
 
   const getVariableValue = (key: string) => {
