@@ -16,14 +16,6 @@ const useEnvironmentVariables = () => {
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const variables = useSelector(getAllEnvironmentVariables);
-  // const variables: Record<string, Record<string, EnvironmentVariableValue>> = {
-  //   default: {
-  //     APP_MODE: {
-  //       localValue: "local",
-  //       syncValue: "local",
-  //     },
-  //   },
-  // };
 
   const [environment, setEnvironment] = useState<string>("default");
 
