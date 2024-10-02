@@ -8,7 +8,7 @@ import firebaseApp from "firebase";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { removeEnvironmentVariable, setEnvironmentVariable } from "..";
-import { renderString } from "../utils";
+import { renderTemplate } from "../utils";
 
 const useEnvironmentVariables = () => {
   const dispatch = useDispatch();
@@ -16,6 +16,14 @@ const useEnvironmentVariables = () => {
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const variables = useSelector(getAllEnvironmentVariables);
+  // const variables: Record<string, Record<string, EnvironmentVariableValue>> = {
+  //   default: {
+  //     APP_MODE: {
+  //       localValue: "local",
+  //       syncValue: "local",
+  //     },
+  //   },
+  // };
 
   const [environment, setEnvironment] = useState<string>("default");
 
@@ -87,7 +95,7 @@ const useEnvironmentVariables = () => {
   };
 
   const renderVariables = (template: string) => {
-    return renderString(template, variables[environment]);
+    return renderTemplate(template, variables[environment]);
   };
 
   return {

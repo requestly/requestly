@@ -11,8 +11,6 @@ export const makeRequest = async (
   request: RQAPI.Request,
   signal?: AbortSignal
 ): Promise<RQAPI.Response> => {
-  // TODO: check if Extension or Desktop App is installed and has the support
-  // TODO: add support in MV3 extension
   return new Promise((resolve, reject) => {
     if (signal) {
       if (signal.aborted) {
