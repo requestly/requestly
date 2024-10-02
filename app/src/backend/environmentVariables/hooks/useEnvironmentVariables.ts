@@ -47,14 +47,6 @@ const useEnvironmentVariables = () => {
     });
   }, [dispatch, environment, ownerId]);
 
-  useEffect(() => {
-    const unsubscribeListener = attachEnvironmentVariableListener();
-
-    return () => {
-      unsubscribeListener();
-    };
-  }, [attachEnvironmentVariableListener, ownerId]);
-
   const setVariable = async (key: string, value: EnvironmentVariableValue) => {
     const newVariable: Record<string, EnvironmentVariableValue> = {
       [key]: {
@@ -89,6 +81,14 @@ const useEnvironmentVariables = () => {
   const renderVariables = (template: string) => {
     return renderTemplate(template, variables[environment]);
   };
+
+  useEffect(() => {
+    const unsubscribeListener = attachEnvironmentVariableListener();
+
+    return () => {
+      unsubscribeListener();
+    };
+  }, [attachEnvironmentVariableListener, ownerId]);
 
   return {
     environment,
