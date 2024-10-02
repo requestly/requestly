@@ -8,6 +8,7 @@ import firebaseApp from "firebase";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { removeEnvironmentVariable, setEnvironmentVariable } from "..";
+import { renderString } from "../utils";
 
 const useEnvironmentVariables = () => {
   const dispatch = useDispatch();
@@ -85,6 +86,10 @@ const useEnvironmentVariables = () => {
     return removeEnvironmentVariable(ownerId, { environment, key });
   };
 
+  const renderVariables = (template: string) => {
+    return renderString(template, variables[environment]);
+  };
+
   return {
     environment,
     setEnvironment,
@@ -92,6 +97,7 @@ const useEnvironmentVariables = () => {
     getVariableValue,
     getAllVariables,
     removeVariable,
+    renderVariables,
   };
 };
 
