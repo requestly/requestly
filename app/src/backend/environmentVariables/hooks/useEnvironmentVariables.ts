@@ -7,7 +7,7 @@ import { doc, getFirestore, onSnapshot } from "firebase/firestore";
 import firebaseApp from "firebase";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { setEnvironmentVariable } from "..";
+import { removeEnvironmentVariable, setEnvironmentVariable } from "..";
 
 const useEnvironmentVariables = () => {
   const dispatch = useDispatch();
@@ -80,12 +80,18 @@ const useEnvironmentVariables = () => {
     return variables[environment];
   };
 
+  const removeVariable = (key: string) => {
+    dispatch(environmentVariablesActions.removeVariable({ environment, key }));
+    return removeEnvironmentVariable(ownerId, { environment, key });
+  };
+
   return {
     environment,
     setEnvironment,
     setVariable,
     getVariableValue,
     getAllVariables,
+    removeVariable,
   };
 };
 
