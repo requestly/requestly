@@ -38,6 +38,15 @@ const slice = createSlice({
         },
       };
     },
+    removeVariable: (
+      state,
+      action: PayloadAction<{
+        environment: string;
+        key: string;
+      }>
+    ) => {
+      delete state.variables[action.payload.environment][action.payload.key];
+    },
   },
 });
 

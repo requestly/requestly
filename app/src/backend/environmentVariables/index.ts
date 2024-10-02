@@ -1,5 +1,10 @@
 import firebaseApp from "firebase";
-import { doc, getFirestore, setDoc } from "firebase/firestore";
+import { deleteField, doc, getFirestore, setDoc, updateDoc } from "firebase/firestore";
+
+const getDocPath = (ownerId: string) => {
+  const db = getFirestore(firebaseApp);
+  return doc(db, "environmentVariables", ownerId);
+};
 
 export const setEnvironmentVariable = async (
   ownerId: string,
@@ -11,11 +16,8 @@ export const setEnvironmentVariable = async (
     environment: string;
   }
 ) => {
-  const db = getFirestore(firebaseApp);
-  console.log("!!!debug", "setenvVar", ownerId, payload);
-
   await setDoc(
-    doc(db, "environmentVariables", ownerId),
+    getDocPath(ownerId),
     {
       [payload.environment]: {
         [payload.newVariable.key]: payload.newVariable.value,
@@ -23,4 +25,16 @@ export const setEnvironmentVariable = async (
     },
     { merge: true }
   );
+};
+
+export const removeEnvironmentVariable = async (
+  ownerId: string,
+  payload: {
+    environment: string;
+    key: string;
+  }
+) => {
+  await updateDoc(getDocPath(ownerId), {
+    [`${payload.environment}.${payload.key}`]: deleteField(),
+  });
 };
