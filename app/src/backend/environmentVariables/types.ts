@@ -1,5 +1,5 @@
 export interface EnvironmentVariableValue {
-  localValue: string | number | boolean;
-  syncValue?: string | number | boolean;
+  localValue?: string | number | boolean;
+  syncValue: string | number | boolean;
   // type: string | number | boolean;
 }

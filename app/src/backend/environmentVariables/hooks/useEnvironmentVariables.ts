@@ -4,21 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllEnvironmentVariables } from "store/features/environmentVariables/selectors";
 import { environmentVariablesActions } from "store/features/environmentVariables/slice";
 
-// Add parser
-
 const useEnvironmentVariables = () => {
   const dispatch = useDispatch();
   const variables = useSelector(getAllEnvironmentVariables);
 
   const [environment, setEnvironment] = useState<string>("default");
 
-  const setVariable = (
-    key: string,
-    value: {
-      localValue: string | number | boolean;
-      syncValue?: string | number | boolean;
-    }
-  ) => {
+  const setVariable = (key: string, value: EnvironmentVariableValue) => {
     const newVariable: Record<string, EnvironmentVariableValue> = {
       [key]: {
         localValue: value.localValue,
