@@ -12,10 +12,10 @@ const slice = createSlice({
   initialState,
   reducers: {
     resetState: () => initialState,
-    setVariable: (
+    setVariables: (
       state,
       action: PayloadAction<{
-        newVariable: Record<string, EnvironmentVariableValue>;
+        newVariables: Record<string, EnvironmentVariableValue>;
         environment: string;
       }>
     ) => {
@@ -23,7 +23,18 @@ const slice = createSlice({
         ...state.variables,
         [action.payload.environment]: {
           ...state.variables[action.payload.environment],
-          ...action.payload.newVariable,
+          ...Object.fromEntries(
+            Object.entries(action.payload.newVariables).map(([key, value]) => {
+              const prevValue = state.variables[action.payload.environment]?.[key];
+              return [
+                key,
+                {
+                  localValue: value.localValue ?? prevValue?.localValue,
+                  syncValue: value.syncValue ?? prevValue?.syncValue,
+                },
+              ];
+            })
+          ),
         },
       };
     },
