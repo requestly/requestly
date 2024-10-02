@@ -83,6 +83,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
 
       const parsedRequest: RQAPI.Request = {
         ...request,
+        url: renderVariables(request.url),
       };
 
       const parsedQueryParams = sanitizedQueryParams.map((queryParamKeyValue) => {
@@ -246,7 +247,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
 
     const sanitizedEntry: RQAPI.Entry = {
       ...entry,
-      request: parseRequestData(entry.request),
+      request: {
+        ...entry.request,
+        headers: removeEmptyKeys(entry.request.headers),
+        queryParams: removeEmptyKeys(entry.request.queryParams),
+      },
       response: null,
     };
 
@@ -256,6 +261,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       sanitizedEntry.request.body = removeEmptyKeys(sanitizedEntry.request.body as KeyValuePair[]);
     }
 
+    const parsedRequest = parseRequestData(sanitizedEntry.request);
+
     abortControllerRef.current = new AbortController();
 
     setEntry(sanitizedEntry);
@@ -263,7 +270,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    makeRequest(appMode, sanitizedEntry.request, abortControllerRef.current.signal)
+    makeRequest(appMode, parsedRequest, abortControllerRef.current.signal)
       .then((response) => {
         const entryWithResponse = { ...sanitizedEntry, response };
         if (response) {
