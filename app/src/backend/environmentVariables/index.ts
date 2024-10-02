@@ -12,9 +12,10 @@ export const setEnvironmentVariable = async (
   }
 ) => {
   const db = getFirestore(firebaseApp);
+  console.log("!!!debug", "setenvVar", ownerId, payload);
 
   await setDoc(
-    doc(db, "evironmentVariables", ownerId),
+    doc(db, "environmentVariables", ownerId),
     {
       [payload.environment]: {
         [payload.newVariable.key]: payload.newVariable.value,

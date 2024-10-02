@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllEnvironmentVariables } from "store/features/environmentVariables/selectors";
-import { environmentVariablesActions } from "store/features/environmentVariables/slice";
+import { getAllEnvironmentVariables } from "store/features/environment/selectors";
+import { environmentVariablesActions } from "store/features/environment/slice";
 import { doc, getFirestore, onSnapshot } from "firebase/firestore";
 import firebaseApp from "firebase";
 import { getUserAuthDetails } from "store/selectors";
@@ -39,6 +39,7 @@ const useEnvironmentVariables = () => {
             };
             return acc;
           }, {} as Record<string, EnvironmentVariableValue>);
+
           dispatch(environmentVariablesActions.setVariables({ newVariables, environment }));
         }
       }
