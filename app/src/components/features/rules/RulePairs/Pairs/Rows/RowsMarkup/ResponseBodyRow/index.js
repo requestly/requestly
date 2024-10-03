@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
-import { Row, Col, Radio, Popover, Popconfirm, Space, Checkbox, Tooltip } from "antd";
+import { useTheme } from "styled-components";
+import { Row, Col, Radio, Popover, Popconfirm, Space, Checkbox, Tooltip, Input } from "antd";
 import { actions } from "store";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import {
@@ -15,7 +16,7 @@ import InfoIcon from "components/misc/InfoIcon";
 import { trackServeResponseWithoutRequestEnabled } from "modules/analytics/events/features/ruleEditor";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { InfoTag } from "components/misc/InfoTag";
-import { RQButton } from "lib/design-system/components";
+import { RQButton } from "lib/design-system-v2/components";
 import LINKS from "config/constants/sub/links";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
@@ -27,7 +28,9 @@ import { RuleType } from "features/rules";
 import "./ResponseBodyRow.css";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
+  const theme = useTheme();
   const dispatch = useDispatch();
+  const [isSelectedFileInputVisible, setIsSelectedFileInputVisible] = useState(false);
 
   const isServeWithoutRequestSupported = useMemo(
     () => isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST),
@@ -106,7 +109,64 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
               >
                 {pair.response.value ? "Change file" : " Select file"}
               </RQButton>
-              <span className="file-path"> {pair.response.value ? pair.response.value : " No file chosen"}</span>{" "}
+              {pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES ||
+              pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES ? (
+                <>
+                  {isSelectedFileInputVisible ? (
+                    <Input
+                      autoFocus
+                      onBlur={() => setIsSelectedFileInputVisible(false)}
+                      style={{
+                        width: 350,
+                      }}
+                      value={pair.response.value}
+                      onChange={(e) => {
+                        dispatch(
+                          actions.updateRulePairAtGivenPath({
+                            pairIndex,
+                            updates: { "response.value": e.target.value },
+                          })
+                        );
+                      }}
+                    />
+                  ) : (
+                    <>
+                      <span className="file-path">{pair.response.value ? pair.response.value : " No file chosen"}</span>
+                      <Tooltip
+                        color={theme?.colors?.black}
+                        placement="top"
+                        title={
+                          <>
+                            You can use the captured group expressions from the request to dynamically set the file
+                            path.
+                            <br />
+                            <a
+                              href="https://docs.requestly.com/general/http-rules/advanced-usage/rule-operators#regex-match-operator"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              click here
+                            </a>{" "}
+                            to learn more.
+                          </>
+                        }
+                      >
+                        <RQButton
+                          size="small"
+                          type="link"
+                          onClick={() => {
+                            setIsSelectedFileInputVisible(true);
+                          }}
+                        >
+                          Add captured group expressions
+                        </RQButton>
+                      </Tooltip>
+                    </>
+                  )}
+                </>
+              ) : (
+                <span className="file-path"> {pair.response.value ? pair.response.value : " No file chosen"}</span>
+              )}
             </Space>
             {pair.response.value && isFeatureCompatible(FEATURES.RESPONSE_MAP_LOCAL) && (
               <HiOutlineExternalLink
