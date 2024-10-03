@@ -249,8 +249,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       ...entry,
       request: {
         ...entry.request,
-        headers: removeEmptyKeys(entry.request.headers),
         queryParams: removeEmptyKeys(entry.request.queryParams),
+        headers: removeEmptyKeys(entry.request.headers),
       },
       response: null,
     };
