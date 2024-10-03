@@ -58,6 +58,7 @@ export namespace RQAPI {
 
   interface RecordMetadata {
     id: string;
+    name: string;
     collectionId: string | null;
     ownerId: string;
     deleted: boolean;
