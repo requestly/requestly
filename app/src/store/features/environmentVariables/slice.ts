@@ -8,7 +8,7 @@ const initialState = {
 };
 
 const slice = createSlice({
-  name: ReducerKeys.ENVIRONMENT,
+  name: ReducerKeys.ENVIRONMENT_VARIABLES,
   initialState,
   reducers: {
     resetState: () => initialState,
@@ -53,6 +53,6 @@ const slice = createSlice({
 const { actions, reducer } = slice;
 
 export const environmentVariablesActions = actions;
-export const environmentVariablesReducer = getReducerWithLocalStorageSync(ReducerKeys.ENVIRONMENT, reducer, [
+export const environmentVariablesReducer = getReducerWithLocalStorageSync(ReducerKeys.ENVIRONMENT_VARIABLES, reducer, [
   "variables",
 ]);
