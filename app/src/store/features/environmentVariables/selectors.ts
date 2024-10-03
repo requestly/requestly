@@ -5,5 +5,5 @@ import { RootState } from "store/types";
 export const getAllEnvironmentVariables = (
   state: RootState
 ): Record<string, Record<string, EnvironmentVariableValue>> => {
-  return state[ReducerKeys.ENVIRONMENT].variables;
+  return state[ReducerKeys.ENVIRONMENT_VARIABLES].variables;
 };
