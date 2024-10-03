@@ -30,6 +30,7 @@ const createApiRecord = async (
 
   const newRecord = {
     collectionId: "",
+    name: "", // TODO: to be used when UI is exposed, till then only showing URL
     type: record.type,
     data: record.data,
     ownerId: ownerId,
