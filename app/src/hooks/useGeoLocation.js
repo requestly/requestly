@@ -11,7 +11,6 @@ const useGeoLocation = () => {
   useEffect(() => {
     getUserGeoDetails()
       .then((details) => {
-        console.log({ details });
         // setCountry(currentCountry);
         dispatch(actions.updateUserCountry(details.loc));
         window.country = details.loc;

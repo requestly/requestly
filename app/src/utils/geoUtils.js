@@ -1,3 +1,5 @@
+import Logger from "lib/logger";
+
 //no of logos for each country for iteration
 export const filesByCountry = {
   AU: 3,
@@ -30,7 +32,6 @@ export const getUserGeoDetails = async () => {
 
     return userDetails;
   } catch (error) {
-    // TEMP
-    console.log("Error in getUserGeoDetails", error);
+    Logger.log("Error in getting user GeoDetails", error);
   }
 };
