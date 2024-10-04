@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Row, Col, Input, Typography, Space, Button, Tooltip, Badge, Divider } from "antd";
+import { Row, Col, Input, Typography, Space, Button, Tooltip, Badge, Divider, Modal } from "antd";
 import {
   SaveOutlined,
   CaretRightOutlined,
@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
 import { getAllFilters, getIsInterceptionPaused } from "store/features/desktop-traffic-table/selectors";
 import {
+  trackSavingTooManyLogsAlertShown,
   trackTrafficInterceptionPaused,
   trackTrafficInterceptionResumed,
   trackTrafficTableFilterClicked,
@@ -37,6 +38,11 @@ import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
 import { useDebounce } from "hooks/useDebounce";
 
 const { Text } = Typography;
+
+const canSaveLogsWithoutCrashing = (logsToSaveAsHar) => {
+  const MAX_ENTRIES = 150; // ESTIMATE
+  return logsToSaveAsHar.log.entries.length <= MAX_ENTRIES;
+};
 
 const ActionHeader = ({
   children,
@@ -167,6 +173,20 @@ const ActionHeader = ({
     trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_FILTER_CLICKED);
   };
 
+  const showFilterLogsAlert = (logsToSave, src) => {
+    trackSavingTooManyLogsAlertShown(logsToSave.log.entries.length ?? undefined, src);
+    Modal.error({
+      title: "Too many logs",
+      content: (
+        <Typography>
+          Trying to save these many logs might lead to unexpected behavior.
+          <br />
+          Please use filters/search to select specific logs that need to be saved.
+        </Typography>
+      ),
+    });
+  };
+
   return (
     <>
       <Row
@@ -267,7 +287,11 @@ const ActionHeader = ({
                   icon={<DownloadOutlined />}
                   disabled={!filteredLogsCount}
                   onClick={() => {
-                    downloadHar(logsToSaveAsHar || {}, "");
+                    if (canSaveLogsWithoutCrashing(logsToSaveAsHar)) {
+                      downloadHar(logsToSaveAsHar || {}, "");
+                    } else {
+                      showFilterLogsAlert(logsToSaveAsHar, "export-har");
+                    }
                     trackDownloadNetworkSessionClicked(ActionSource.TrafficTable);
                     trackRQDesktopLastActivity(SESSION_RECORDING.network.download);
                   }}
@@ -287,7 +311,11 @@ const ActionHeader = ({
                     onClick={() => {
                       trackNetworkSessionSaveClicked();
                       trackRQDesktopLastActivity(SESSION_RECORDING.network.save.btn_clicked);
-                      openSaveModal();
+                      if (canSaveLogsWithoutCrashing(logsToSaveAsHar)) {
+                        openSaveModal();
+                      } else {
+                        showFilterLogsAlert(logsToSaveAsHar, "save-har");
+                      }
                     }}
                   >
                     Save
