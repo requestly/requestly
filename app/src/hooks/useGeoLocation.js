@@ -12,8 +12,8 @@ const useGeoLocation = () => {
     getUserGeoDetails()
       .then((details) => {
         // setCountry(currentCountry);
-        dispatch(actions.updateUserCountry(details.loc));
-        window.country = details.loc;
+        dispatch(actions.updateUserCountry(details?.loc));
+        window.country = details?.loc;
       })
       .catch(() => {
         dispatch(actions.updateUserCountry("US"));
