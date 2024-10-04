@@ -132,35 +132,37 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                   ) : (
                     <>
                       <span className="file-path">{pair.response.value ? pair.response.value : " No file chosen"}</span>
-                      <Tooltip
-                        color={theme?.colors?.black}
-                        placement="top"
-                        title={
-                          <>
-                            You can use the captured group expressions from the request to dynamically set the file
-                            path.
-                            <br />
-                            <a
-                              href="https://docs.requestly.com/general/http-rules/advanced-usage/rule-operators#regex-match-operator"
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              click here
-                            </a>{" "}
-                            to learn more.
-                          </>
-                        }
-                      >
-                        <RQButton
-                          size="small"
-                          type="link"
-                          onClick={() => {
-                            setIsSelectedFileInputVisible(true);
-                          }}
+                      {pair.response.value ? (
+                        <Tooltip
+                          color={theme?.colors?.black}
+                          placement="top"
+                          title={
+                            <>
+                              You can use the captured group expressions from the request to dynamically set the file
+                              path.
+                              <br />
+                              <a
+                                href="https://docs.requestly.com/general/http-rules/advanced-usage/rule-operators#regex-match-operator"
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                click here
+                              </a>{" "}
+                              to learn more.
+                            </>
+                          }
                         >
-                          Add captured group expressions
-                        </RQButton>
-                      </Tooltip>
+                          <RQButton
+                            size="small"
+                            type="link"
+                            onClick={() => {
+                              setIsSelectedFileInputVisible(true);
+                            }}
+                          >
+                            Add captured group expressions
+                          </RQButton>
+                        </Tooltip>
+                      ) : null}
                     </>
                   )}
                 </>
