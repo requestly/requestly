@@ -176,14 +176,15 @@ const ActionHeader = ({
   const showFilterLogsAlert = (logsToSave, src) => {
     trackSavingTooManyLogsAlertShown(logsToSave.log.entries.length ?? undefined, src);
     Modal.error({
-      title: "Too many logs",
+      title: "Log Limit Exceeded",
       content: (
         <Typography>
-          Trying to save these many logs might lead to unexpected behavior.
+          Saving this many logs may lead to unexpected app behaviour.
           <br />
-          Please use filters/search to select specific logs that need to be saved.
+          Please use filters or search to select specific logs for saving.
         </Typography>
       ),
+      width: 520,
     });
   };
 
