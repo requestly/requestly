@@ -32,6 +32,6 @@ export const getUserGeoDetails = async () => {
 
     return userDetails;
   } catch (error) {
-    Logger.log("Error in getting user GeoDetails", error);
+    Logger.log("Error while getting user GeoDetails", error);
   }
 };
