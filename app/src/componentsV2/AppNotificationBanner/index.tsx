@@ -12,7 +12,7 @@ import rehypeRaw from "rehype-raw";
 import { ButtonType } from "antd/lib/button";
 import { capitalize } from "lodash";
 import { redirectToUrl } from "utils/RedirectionUtils";
-import { getCompanyNameFromEmail } from "utils/FormattingHelper";
+import { getCompanyNameFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import LINKS from "config/constants/sub/links";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { trackAppBannerDismissed, trackAppNotificationBannerViewed, trackAppBannerCtaClicked } from "./analytics";
@@ -27,6 +27,13 @@ enum BANNER_ACTIONS {
   UPGRADE = "upgrade",
   CONTACT_US = "contact_us",
   REQUEST_ACCESS = "request_access",
+  REDIRECT_TO_ACCELERATOR_FORM = "redirect_to_accelerator_form",
+}
+
+enum BANNER_ID {
+  ACCELERATOR_PROGRAM = "accelerator_program",
+  COMMERCIAL_LICENSE = "commercial_license",
+  REQUEST_TEAM_ACCESS = "request_team_access",
 }
 
 interface Banner {
@@ -73,15 +80,30 @@ export const AppNotificationBanner = () => {
           setIsRequestAccessModalOpen(true);
         },
       },
+      [BANNER_ACTIONS.REDIRECT_TO_ACCELERATOR_FORM]: {
+        label: "Get started",
+        type: "primary",
+        onClick: () => {
+          redirectToUrl(LINKS.ACCELERATOR_PROGRAM_FORM_LINK, true);
+        },
+      },
     };
   }, [dispatch]);
 
   const renderBannerText = useCallback(
     (bannerId: string, text: string) => {
       switch (bannerId) {
-        case "commercial_license": {
+        case BANNER_ID.COMMERCIAL_LICENSE: {
           const companyName = getCompanyNameFromEmail(user?.details?.profile?.email) || "";
           return `Dear ${companyName} user, ${text}`;
+        }
+        case BANNER_ID.ACCELERATOR_PROGRAM: {
+          if (isCompanyEmail(user?.details?.profile?.email)) {
+            return `Requestly is offering an exclusive 6-month free access to the entire ${getCompanyNameFromEmail(
+              user?.details?.profile?.email
+            )} team as a part of its Accelerator Program.`;
+          }
+          return "Requestly has launched its Accelerator program, providing 20 companies with exclusive 6-month Free Access.";
         }
         default:
           return text;
@@ -93,14 +115,20 @@ export const AppNotificationBanner = () => {
   const checkBannerVisibility = useCallback(
     (bannerId: string) => {
       switch (bannerId) {
-        case "commercial_license": {
+        case BANNER_ID.COMMERCIAL_LICENSE: {
           if (!user.details?.isPremium) {
             dispatch(actions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
         }
-        case "request_team_access": {
+        case BANNER_ID.REQUEST_TEAM_ACCESS: {
           if (billingTeams?.length && !billingTeams?.some((team) => user?.details?.profile?.uid in team.members)) {
+            dispatch(actions.updateIsAppBannerVisible(true));
+            return true;
+          } else return false;
+        }
+        case BANNER_ID.ACCELERATOR_PROGRAM: {
+          if (!user.details?.isPremium && !billingTeams && user.loggedIn) {
             dispatch(actions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
@@ -111,7 +139,7 @@ export const AppNotificationBanner = () => {
         }
       }
     },
-    [billingTeams, user?.details?.profile?.uid, user.details?.isPremium, dispatch]
+    [billingTeams, user?.details?.profile?.uid, user.details?.isPremium, dispatch, user.loggedIn]
   );
 
   const getBannerClassName = (bannerType: string) => {
