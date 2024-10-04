@@ -40,7 +40,7 @@ import { useDebounce } from "hooks/useDebounce";
 const { Text } = Typography;
 
 const canSaveLogsWithoutCrashing = (logsToSaveAsHar) => {
-  const MAX_ENTRIES = 150; // ESTIMATE
+  const MAX_ENTRIES = 1500; // ESTIMATE
   return logsToSaveAsHar.log.entries.length <= MAX_ENTRIES;
 };
 
