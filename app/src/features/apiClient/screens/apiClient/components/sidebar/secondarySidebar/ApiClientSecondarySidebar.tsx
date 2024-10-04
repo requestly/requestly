@@ -1,6 +1,7 @@
 import React from "react";
+import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
+import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
 import "./apiClientSecondarySidebar.scss";
-import { ApiOutlined } from "@ant-design/icons";
 
 export enum SecondarySidebarItemKey {
   COLLECTIONS = "collections",
@@ -17,12 +18,12 @@ export const ApiClientSecondarySidebar: React.FC<Props> = ({ activeTab, onSecond
     {
       key: SecondarySidebarItemKey.COLLECTIONS,
       title: "Collections",
-      icon: <ApiOutlined />,
+      icon: <BsCollection />,
     },
     {
       key: SecondarySidebarItemKey.HISTORY,
       title: "History",
-      icon: <ApiOutlined />,
+      icon: <MdOutlineHistory />,
     },
   ];
 
