@@ -121,7 +121,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
         updateValueAsPromise(["users", user.details?.profile?.uid, "profile"], { displayName: fullName })
           .then((res: any) => {
             resolve(res);
-            submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.USER_NAME, fullName);
+            submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.DISPLAY_NAME, fullName);
             trackAppOnboardingNameUpdated();
           })
           .catch((error) => {

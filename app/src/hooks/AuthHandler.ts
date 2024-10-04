@@ -140,7 +140,7 @@ const AuthHandler: React.FC<{}> = () => {
         );
         submitAttrUtil(TRACKING.ATTR.IS_PREMIUM, isUserPremium);
         const userName = user.displayName !== "User" ? user.displayName : onboardingDetails.fullName;
-        submitAttrUtil(TRACKING.ATTR.USER_NAME, userName);
+        submitAttrUtil(TRACKING.ATTR.DISPLAY_NAME, userName);
 
         if (planDetails) {
           submitAttrUtil(TRACKING.ATTR.PAYMENT_MODE, planDetails.type ?? "Missing Value");
