@@ -39,9 +39,9 @@ import { useDebounce } from "hooks/useDebounce";
 
 const { Text } = Typography;
 
-const canSaveLogsWithoutCrashing = (logsToSaveAsHar) => {
+const canSaveLogsWithoutCrashing = (logsCount) => {
   const MAX_ENTRIES = 1500; // ESTIMATE
-  return logsToSaveAsHar.log.entries.length <= MAX_ENTRIES;
+  return logsCount <= MAX_ENTRIES;
 };
 
 const ActionHeader = ({
@@ -173,8 +173,8 @@ const ActionHeader = ({
     trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_FILTER_CLICKED);
   };
 
-  const showFilterLogsAlert = (logsToSave, src) => {
-    trackSavingTooManyLogsAlertShown(logsToSave.log.entries.length ?? undefined, src);
+  const showExcessLogsAlert = (logsCount, src) => {
+    trackSavingTooManyLogsAlertShown(logsCount, src);
     Modal.error({
       title: "Log Limit Exceeded",
       content: (
@@ -288,10 +288,10 @@ const ActionHeader = ({
                   icon={<DownloadOutlined />}
                   disabled={!filteredLogsCount}
                   onClick={() => {
-                    if (canSaveLogsWithoutCrashing(logsToSaveAsHar)) {
+                    if (canSaveLogsWithoutCrashing(filteredLogsCount)) {
                       downloadHar(logsToSaveAsHar || {}, "");
                     } else {
-                      showFilterLogsAlert(logsToSaveAsHar, "export-har");
+                      showExcessLogsAlert(filteredLogsCount, "export-har");
                     }
                     trackDownloadNetworkSessionClicked(ActionSource.TrafficTable);
                     trackRQDesktopLastActivity(SESSION_RECORDING.network.download);
@@ -312,10 +312,10 @@ const ActionHeader = ({
                     onClick={() => {
                       trackNetworkSessionSaveClicked();
                       trackRQDesktopLastActivity(SESSION_RECORDING.network.save.btn_clicked);
-                      if (canSaveLogsWithoutCrashing(logsToSaveAsHar)) {
+                      if (canSaveLogsWithoutCrashing(filteredLogsCount)) {
                         openSaveModal();
                       } else {
-                        showFilterLogsAlert(logsToSaveAsHar, "save-har");
+                        showExcessLogsAlert(filteredLogsCount, "save-har");
                       }
                     }}
                   >
