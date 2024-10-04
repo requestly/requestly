@@ -13,19 +13,24 @@ export const filesByCountry = {
   US: 6,
 };
 
-export const fetchUserCountry = async () => {
-  const defaultCountry = "US";
-  const country = await fetch("https://api.country.is/")
-    .then((res) => res.json())
-    .then((location) => {
-      if (location.country) {
-        return location.country;
-      } else {
-        return defaultCountry;
-      }
-    })
-    .catch(() => {
-      return defaultCountry;
-    });
-  return country;
+export const getUserGeoDetails = async () => {
+  const endpoints = [
+    "https://www.cloudflare.com/cdn-cgi/trace",
+    "https://cf-ns.com/cdn-cgi/trace", // Cloudflare China Network
+  ];
+
+  try {
+    const promises = endpoints.map((endpoint) => fetch(endpoint));
+    const response = await Promise.any(promises);
+    const userDetailsString = await response.text();
+    const userDetails = userDetailsString?.split("\n")?.reduce((result, pair) => {
+      const [key, value] = pair.split("=");
+      return { ...result, [key]: value };
+    }, {});
+
+    return userDetails;
+  } catch (error) {
+    // TEMP
+    console.log("Error in getUserGeoDetails", error);
+  }
 };
