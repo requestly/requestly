@@ -7,11 +7,10 @@ import { ApiOutlined, HomeOutlined } from "@ant-design/icons";
 import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
 import HttpRulesIcon from "assets/icons/http-rules.svg?react";
 import SessionIcon from "assets/icons/session.svg?react";
-import WolfSafeIcon from "assets/icons/wolfsafe.svg?react";
-import MockServerIcon from "assets/icons/mock-server.svg?react";
+import NetworkTrafficInspectorIcon from "assets/icons/network-traffic-inspector.svg?react";
 import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
 import { PrimarySidebarLink } from "./components/PrimarySidebarLink/PrimarySidebarLink";
-import { RQBadge } from "lib/design-system/components/RQBadge";
+import MockServerIcon from "assets/icons/mock-server.svg?react";
 import { PrimarySidebarItem } from "../type";
 import InviteButton from "./components/InviteButton/InviteButton";
 import PATHS from "config/constants/sub/paths";
@@ -26,6 +25,7 @@ import JoinSlackButton from "./components/JoinSlackButton/JoinSlackButton";
 import useFetchSlackInviteVisibility from "components/misc/SupportPanel/useSlackInviteVisibility";
 import { SidebarToggleButton } from "componentsV2/SecondarySidebar/components/SidebarToggleButton/SidebarToggleButton";
 import APP_CONSTANTS from "config/constants";
+import { RQBadge } from "lib/design-system/components/RQBadge";
 import "./PrimarySidebar.css";
 
 export const PrimarySidebar: React.FC = () => {
@@ -66,26 +66,38 @@ export const PrimarySidebar: React.FC = () => {
       },
       {
         id: 2,
+        title: "Network inspector",
+        path: PATHS.NETWORK_INSPECTOR.RELATIVE,
+        icon: (
+          <span className="icon-with-badge">
+            <NetworkTrafficInspectorIcon /> <RQBadge badgeText="NEW" />
+          </span>
+        ),
+
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
+      },
+      {
+        id: 3,
         title: "HTTP Rules",
         path: PATHS.RULES.INDEX,
         icon: <HttpRulesIcon />,
         display: true,
         activeColor: "var(--http-rules)",
       },
+      // {
+      //   id: 6,
+      //   title: "API Security & Testing",
+      //   path: PATHS.API_SECURITY_TESTING.INDEX,
+      //   icon: (
+      //     <span className="icon-with-badge">
+      //       <WolfSafeIcon /> <RQBadge badgeText="NEW" />
+      //     </span>
+      //   ),
+      //   display: true,
+      //   activeColor: "var(--session-recording)",
+      // },
       {
-        id: 6,
-        title: "API Security & Testing",
-        path: PATHS.API_SECURITY_TESTING.INDEX,
-        icon: (
-          <span className="icon-with-badge">
-            <WolfSafeIcon /> <RQBadge badgeText="NEW" />
-          </span>
-        ),
-        display: true,
-        activeColor: "var(--session-recording)",
-      },
-      {
-        id: 3,
+        id: 4,
         title: "Sessions",
         path: PATHS.SESSIONS.INDEX,
         icon: (
@@ -102,9 +114,8 @@ export const PrimarySidebar: React.FC = () => {
         display: true,
         activeColor: "var(--session-recording)",
       },
-
       {
-        id: 4,
+        id: 5,
         title: "Mock server",
         path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
@@ -112,7 +123,7 @@ export const PrimarySidebar: React.FC = () => {
         activeColor: "var(--mock-server)",
       },
       {
-        id: 5,
+        id: 6,
         title: "API client",
         path: PATHS.API_CLIENT.INDEX,
         icon: <ApiOutlined />,
@@ -122,8 +133,8 @@ export const PrimarySidebar: React.FC = () => {
     ];
 
     if (isDesktopSessionsCompatible) {
-      items[3] = {
-        id: 3,
+      items[4] = {
+        id: 4,
         title: "Desktop Sessions",
         path: PATHS.SESSIONS.DESKTOP.INDEX,
         icon: (

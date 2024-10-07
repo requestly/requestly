@@ -1,15 +1,24 @@
+// Import Libraries
 import React, { useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { ConfigProvider, Tabs, theme } from "antd";
+
+// Import Styles
+import "./index.scss";
 import { ThemeProvider } from "@devtools-ds/themes";
-import NetworkContainer from "./containers/network/NetworkContainer";
-import ExecutionsContainer from "./containers/executions/ExecutionsContainer";
+
+// Import Custom Components
 import { ColorScheme } from "./types";
 import { getCurrentColorScheme, onColorSchemeChange } from "./utils";
 import useLocalStorageState from "./hooks/useLocalStorageState";
-import "./index.scss";
 import { EVENT, sendEvent } from "./events";
 
+// Import All Containers
+import NetworkContainer from "./containers/network/NetworkContainer";
+import ExecutionsContainer from "./containers/executions/ExecutionsContainer";
+import AnalyticsInspectorContainer from "./containers/analytics-inspector/AnalyticsInspectorContainer";
+
+// Todo @Sachin: Remove this after confirming with team that this is not needed
 sendEvent(EVENT.DEVTOOL_OPENED);
 
 const token = {
@@ -20,6 +29,7 @@ const token = {
 enum DevtoolsTabKeys {
   NETWORK = "network",
   EXECUTIONS = "executions",
+  ANALYTICS_INSPECTOR = "analytics-inspector",
 }
 
 const App: React.FC = () => {
@@ -65,6 +75,12 @@ const App: React.FC = () => {
               label: "Rule Executions",
               key: DevtoolsTabKeys.EXECUTIONS,
               children: <ExecutionsContainer />,
+              forceRender: true,
+            },
+            {
+              label: "Analytics Inspector",
+              key: DevtoolsTabKeys.ANALYTICS_INSPECTOR,
+              children: <AnalyticsInspectorContainer />,
               forceRender: true,
             },
           ]}

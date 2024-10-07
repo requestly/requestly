@@ -8,6 +8,17 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.9.25",
+    logs: [
+      "[ENGG-2280] feat: analytics inspector - bluecore",
+      "[ENGG-2281] feat: show graphql operation name in Requestly network panel",
+    ],
+  },
+  {
+    version: "24.9.18",
+    logs: ["[ENGG-2240] feat: support for connecting existing browser profile to desktop app (#2167)"],
+  },
+  {
     version: "24.9.11",
     logs: [
       "[ENGG-2263] feat: Show Captured localStorage events in session details panel (#2145)",

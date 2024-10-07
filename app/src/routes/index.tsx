@@ -10,7 +10,7 @@ import AppLayout from "layouts/AppLayout";
 
 import { ruleRoutes } from "features/rules/routes";
 import { sessionRoutes } from "features/sessionBook";
-import { apiClientRoutes } from "./apiClientRoutes";
+import { apiClientRoutes } from "features/apiClient";
 import { accountRoutes } from "./accountRoutes";
 import { authRoutes } from "./authRoutes";
 import { desktopRoutes } from "./desktopRoutes";
@@ -22,6 +22,7 @@ import { desktopSessionsRoutes } from "./desktopSessionRoutes";
 import { inviteRoutes } from "./inviteRoutes";
 import MinimalLayout from "layouts/MinimalLayout";
 import { paymentRoutes } from "./paymentRoutes";
+import { networkInspectorRoutes } from "features/networkInspector";
 
 export const routesV2: RouteObject[] = [
   /** Misc **/
@@ -49,6 +50,7 @@ export const routesV2: RouteObject[] = [
           ...settingRoutes,
           ...miscRoutes,
           ...desktopSessionsRoutes,
+          ...networkInspectorRoutes,
         ],
       },
       {

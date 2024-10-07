@@ -138,7 +138,7 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
       }
       isLoading={isLoading}
       loadingText={`${
-        requestAction === BillingTeamJoinRequestAction.ACCEPT ? "Accepting" : "Declining"
+        requestAction === BillingTeamJoinRequestAction.ACCEPT ? "Approving" : "Declining"
       } joining request ...`}
       result={reviewResult ? getResultMessage() : null}
     />

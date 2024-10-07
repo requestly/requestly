@@ -2,14 +2,14 @@
 
 npm i -g web-ext
 
-echo -e "\n***** Installing common code's dependencies *****"
-cd common
+echo -e "\n***** Installing analytics vendor's dependencies *****"
+cd ../../common/analytics-vendors
 rm -rf node_modules
 npm install
-cd ..
+cd ../../browser-extension
 
-echo -e "\n***** Installing MV2 dependencies *****"
-cd mv2
+echo -e "\n***** Installing common code's dependencies *****"
+cd common
 rm -rf node_modules
 npm install
 cd ..
@@ -20,8 +20,3 @@ rm -rf node_modules
 npm install
 cd ..
 
-echo -e "\n***** Installing SessionBear dependencies *****"
-cd sessionbear
-rm -rf node_modules
-npm install
-cd ..

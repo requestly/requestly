@@ -2,7 +2,7 @@ import { CaretRightOutlined, DeleteOutlined, EditOutlined, PlusCircleOutlined } 
 import { Button, Collapse, Space, Typography } from "antd";
 import React, { useCallback } from "react";
 import { SourceKey, SourceOperator } from "../../../../../../../types";
-import { NetworkEvent, NetworkRequestQueryParam, RuleEditorUrlFragment } from "../../../../../../types";
+import { RQNetworkEvent, NetworkRequestQueryParam, RuleEditorUrlFragment } from "../../../../../../types";
 import { createRule, generateRuleName, getBaseUrl } from "../../../../../../utils";
 import IconButton from "../../../../../../components/IconButton/IconButton";
 import { PropertyRow } from "@requestly-ui/resource-table";
@@ -14,7 +14,7 @@ enum QueryParamModification {
 }
 
 interface Props {
-  networkEvent: NetworkEvent;
+  networkEvent: RQNetworkEvent;
 }
 
 const QueryParamRow: React.FC<{
