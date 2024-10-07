@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Row, Col, Input, Typography, Space, Button, Tooltip, Badge, Divider } from "antd";
+import { Row, Col, Input, Typography, Space, Button, Tooltip, Badge, Divider, Modal } from "antd";
 import {
   SaveOutlined,
   CaretRightOutlined,
@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
 import { getAllFilters, getIsInterceptionPaused } from "store/features/desktop-traffic-table/selectors";
 import {
+  trackSavingTooManyLogsAlertShown,
   trackTrafficInterceptionPaused,
   trackTrafficInterceptionResumed,
   trackTrafficTableFilterClicked,
@@ -37,6 +38,11 @@ import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
 import { useDebounce } from "hooks/useDebounce";
 
 const { Text } = Typography;
+
+const canSaveLogsWithoutCrashing = (logsCount) => {
+  const MAX_ENTRIES = 1500; // ESTIMATE
+  return logsCount <= MAX_ENTRIES;
+};
 
 const ActionHeader = ({
   children,
@@ -167,6 +173,21 @@ const ActionHeader = ({
     trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_FILTER_CLICKED);
   };
 
+  const showExcessLogsAlert = (logsCount, src) => {
+    trackSavingTooManyLogsAlertShown(logsCount, src);
+    Modal.error({
+      title: "Log Limit Exceeded",
+      content: (
+        <Typography>
+          Saving this many logs may lead to unexpected app behaviour.
+          <br />
+          Please use filters or search to select specific logs for saving.
+        </Typography>
+      ),
+      width: 520,
+    });
+  };
+
   return (
     <>
       <Row
@@ -267,7 +288,11 @@ const ActionHeader = ({
                   icon={<DownloadOutlined />}
                   disabled={!filteredLogsCount}
                   onClick={() => {
-                    downloadHar(logsToSaveAsHar || {}, "");
+                    if (canSaveLogsWithoutCrashing(filteredLogsCount)) {
+                      downloadHar(logsToSaveAsHar || {}, "");
+                    } else {
+                      showExcessLogsAlert(filteredLogsCount, "export-har");
+                    }
                     trackDownloadNetworkSessionClicked(ActionSource.TrafficTable);
                     trackRQDesktopLastActivity(SESSION_RECORDING.network.download);
                   }}
@@ -287,7 +312,11 @@ const ActionHeader = ({
                     onClick={() => {
                       trackNetworkSessionSaveClicked();
                       trackRQDesktopLastActivity(SESSION_RECORDING.network.save.btn_clicked);
-                      openSaveModal();
+                      if (canSaveLogsWithoutCrashing(filteredLogsCount)) {
+                        openSaveModal();
+                      } else {
+                        showExcessLogsAlert(filteredLogsCount, "save-har");
+                      }
                     }}
                   >
                     Save
