@@ -6,6 +6,7 @@ import { environmentVariablesActions } from "store/features/environmentVariables
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { attatchEnvironmentVariableListener, removeEnvironmentVariableFromDB, setEnvironmentVariablesInDB } from "..";
+import Logger from "lib/logger";
 
 const useEnvironmentVariables = () => {
   const dispatch = useDispatch();
@@ -41,11 +42,16 @@ const useEnvironmentVariables = () => {
       },
     };
 
-    dispatch(environmentVariablesActions.setVariables({ newVariables: newVariable, environment }));
     return setEnvironmentVariablesInDB(ownerId, {
       newVariables: newVariable,
       environment,
-    });
+    })
+      .then(() => {
+        dispatch(environmentVariablesActions.setVariables({ newVariables: newVariable, environment }));
+      })
+      .catch((err) => {
+        Logger.error("Error while setting environment variables in db", err);
+      });
   };
 
   const getVariableValue = (key: string) => {
@@ -56,9 +62,14 @@ const useEnvironmentVariables = () => {
     return variables[environment];
   };
 
-  const removeVariable = (key: string) => {
-    dispatch(environmentVariablesActions.removeVariable({ environment, key }));
-    return removeEnvironmentVariableFromDB(ownerId, { environment, key });
+  const removeVariable = async (key: string) => {
+    return removeEnvironmentVariableFromDB(ownerId, { environment, key })
+      .then(() => {
+        dispatch(environmentVariablesActions.removeVariable({ environment, key }));
+      })
+      .catch((err) => {
+        Logger.error("Error while removing environment variables from db", err);
+      });
   };
 
   return {

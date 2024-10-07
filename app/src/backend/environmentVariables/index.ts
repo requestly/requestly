@@ -18,7 +18,7 @@ export const setEnvironmentVariablesInDB = async (
     Object.entries(payload.newVariables).map(([key, { syncValue }]) => [key, { syncValue }])
   );
 
-  await setDoc(
+  return setDoc(
     getDocPath(ownerId),
     {
       [payload.environment]: {
@@ -36,7 +36,7 @@ export const removeEnvironmentVariableFromDB = async (
     key: string;
   }
 ) => {
-  await updateDoc(getDocPath(ownerId), {
+  return updateDoc(getDocPath(ownerId), {
     [`${payload.environment}.${payload.key}`]: deleteField(),
   });
 };
