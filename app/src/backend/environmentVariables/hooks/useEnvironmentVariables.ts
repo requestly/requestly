@@ -8,6 +8,8 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { attatchEnvironmentVariableListener, removeEnvironmentVariableFromDB, setEnvironmentVariablesInDB } from "..";
 import Logger from "lib/logger";
 
+let unsubscribeListener: () => void = null;
+
 const useEnvironmentVariables = () => {
   const dispatch = useDispatch();
 
@@ -23,16 +25,22 @@ const useEnvironmentVariables = () => {
   );
 
   useEffect(() => {
-    const unsubscribeListener = attatchEnvironmentVariableListener(ownerId, environment, (newVariables) => {
-      if (newVariables) {
-        dispatch(environmentVariablesActions.setVariables({ newVariables, environment }));
-      }
+    unsubscribeListener?.();
+    unsubscribeListener = attatchEnvironmentVariableListener(ownerId, environment, (newVariables) => {
+      dispatch(environmentVariablesActions.setVariables({ newVariables, environment }));
     });
 
     return () => {
       unsubscribeListener();
     };
   }, [dispatch, environment, ownerId]);
+
+  useEffect(() => {
+    if (!user.loggedIn) {
+      unsubscribeListener?.();
+      dispatch(environmentVariablesActions.resetState());
+    }
+  }, [dispatch, user.loggedIn]);
 
   const setVariable = async (key: string, value: EnvironmentVariableValue) => {
     const newVariable: EnvironmentVariable = {
