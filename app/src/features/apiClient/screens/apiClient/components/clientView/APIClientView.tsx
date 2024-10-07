@@ -37,6 +37,7 @@ import { isDesktopMode } from "utils/AppUtils";
 import { RQButton } from "lib/design-system-v2/components";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
+import { toast } from "utils/Toast";
 
 interface Props {
   openInModal?: boolean;
@@ -288,6 +289,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished, op
 
     if (result.success) {
       setApiRecordDetails(result.data as RQAPI.ApiRecord);
+      toast.success("Request saved!");
+    } else {
+      toast.error("Something went wrong!");
     }
 
     setIsRequestSaving(false);
