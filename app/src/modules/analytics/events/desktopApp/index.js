@@ -97,3 +97,8 @@ export const trackTrafficTableFilterApplied = (filter_type, filter_value, count)
   };
   trackEvent(TRAFFIC_TABLE.TRAFFIC_TABLE_FILTER_APPLIED, params);
 };
+
+export const trackSavingTooManyLogsAlertShown = (logsCount, src) => {
+  const params = { logsCount, src };
+  trackEvent(TRAFFIC_TABLE.TRAFFIC_TABLE_SAVING_EXCESS_LOGS_ALERT_SHOWN, params);
+};
