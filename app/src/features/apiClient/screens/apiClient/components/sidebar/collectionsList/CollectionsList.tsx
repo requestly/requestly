@@ -11,6 +11,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { NavLink } from "react-router-dom";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { CreateOrUpdateCollectionModal } from "./createOrUpdateCollectionModal/CreateOrUpdateCollectionModal";
+import PATHS from "config/constants/sub/paths";
 import "./collectionsList.scss";
 
 interface Props {}
@@ -107,7 +108,7 @@ export const CollectionsList: React.FC<Props> = () => {
 
                 return (
                   <NavLink
-                    to="#"
+                    to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`}
                     className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
                   >
                     {record.data.request.url}
