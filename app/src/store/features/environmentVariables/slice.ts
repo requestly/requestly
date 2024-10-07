@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { EnvironmentVariableValue } from "backend/environmentVariables/types";
+import { EnvironmentVariable } from "backend/environmentVariables/types";
 import { ReducerKeys } from "store/constants";
 import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
 
 const initialState = {
-  variables: {} as Record<string, Record<string, EnvironmentVariableValue>>,
+  variables: {} as Record<string, EnvironmentVariable>,
 };
 
 const slice = createSlice({
@@ -15,27 +15,24 @@ const slice = createSlice({
     setVariables: (
       state,
       action: PayloadAction<{
-        newVariables: Record<string, EnvironmentVariableValue>;
+        newVariables: EnvironmentVariable;
         environment: string;
       }>
     ) => {
-      state.variables = {
-        ...state.variables,
-        [action.payload.environment]: {
-          ...state.variables[action.payload.environment],
-          ...Object.fromEntries(
-            Object.entries(action.payload.newVariables).map(([key, value]) => {
-              const prevValue = state.variables[action.payload.environment]?.[key];
-              return [
-                key,
-                {
-                  localValue: value.localValue ?? prevValue?.localValue,
-                  syncValue: value.syncValue ?? prevValue?.syncValue,
-                },
-              ];
-            })
-          ),
-        },
+      state.variables[action.payload.environment] = {
+        ...state.variables[action.payload.environment],
+        ...Object.fromEntries(
+          Object.entries(action.payload.newVariables).map(([key, value]) => {
+            const prevValue = state.variables[action.payload.environment]?.[key];
+            return [
+              key,
+              {
+                localValue: value.localValue ?? prevValue?.localValue,
+                syncValue: value.syncValue ?? prevValue?.syncValue,
+              },
+            ];
+          })
+        ),
       };
     },
     removeVariable: (

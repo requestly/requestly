@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { EnvironmentVariableValue } from "../types";
+import { EnvironmentVariable, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEnvironmentVariables } from "store/features/environmentVariables/selectors";
 import { environmentVariablesActions } from "store/features/environmentVariables/slice";
@@ -38,7 +38,7 @@ const useEnvironmentVariables = () => {
               syncValue: value,
             };
             return acc;
-          }, {} as Record<string, EnvironmentVariableValue>);
+          }, {} as EnvironmentVariable);
 
           dispatch(environmentVariablesActions.setVariables({ newVariables, environment }));
         }
@@ -55,7 +55,7 @@ const useEnvironmentVariables = () => {
   }, [attachEnvironmentVariableListener, ownerId]);
 
   const setVariable = async (key: string, value: EnvironmentVariableValue) => {
-    const newVariable: Record<string, EnvironmentVariableValue> = {
+    const newVariable: EnvironmentVariable = {
       [key]: {
         localValue: value.localValue,
         syncValue: value.syncValue,
