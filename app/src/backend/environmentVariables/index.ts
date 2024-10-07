@@ -14,15 +14,13 @@ export const setEnvironmentVariablesInDB = async (
     environment: string;
   }
 ) => {
-  const newVariables = Object.fromEntries(
-    Object.entries(payload.newVariables).map(([key, { syncValue }]) => [key, { syncValue }])
-  );
+  const newVariables = Object.fromEntries(Object.entries(payload.newVariables).map(([key, value]) => [key, value]));
 
   return setDoc(
     getDocPath(ownerId),
     {
       [payload.environment]: {
-        newVariables,
+        ...newVariables,
       },
     },
     { merge: true }
@@ -44,26 +42,23 @@ export const removeEnvironmentVariableFromDB = async (
 export const attatchEnvironmentVariableListener = (
   ownerId: string,
   environment: string,
-  callback: (newVariables: EnvironmentVariable | null) => void
+  callback: (newVariables: EnvironmentVariable) => void
 ) => {
+  if (!ownerId || !environment) {
+    return () => {};
+  }
+
   const db = getFirestore(firebaseApp);
 
   const variableDoc = doc(db, "environmentVariables", ownerId);
 
   const unsubscribe = onSnapshot(variableDoc, (doc) => {
     if (doc.exists()) {
-      const variables: Record<string, string> = doc.data()[environment];
+      const variables: EnvironmentVariable = doc.data()[environment] ?? {};
 
-      if (variables) {
-        const newVariables = Object.entries(variables).reduce((acc, [key, value]) => {
-          acc[key] = {
-            syncValue: value,
-          };
-          return acc;
-        }, {} as EnvironmentVariable);
-
-        callback(newVariables);
-      }
+      callback(variables);
+    } else {
+      callback({});
     }
   });
 
