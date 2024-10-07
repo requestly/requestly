@@ -140,3 +140,11 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     return null;
   }
 };
+
+export const isRequest = (record: RQAPI.Record) => {
+  return record.type === RQAPI.RecordType.API;
+};
+
+export const isApiCollection = (record: RQAPI.Record) => {
+  return record.type === RQAPI.RecordType.COLLECTION;
+};
