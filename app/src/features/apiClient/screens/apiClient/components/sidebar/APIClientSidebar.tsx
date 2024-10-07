@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import placeholderImage from "../../../../../../assets/images/illustrations/empty-sheets-dark.svg";
 import { Button, Timeline, Typography } from "antd";
 import { RQAPI } from "../../../../types";
@@ -8,18 +8,29 @@ import { REQUEST_METHOD_COLORS } from "../../../../../../constants/requestMethod
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { ApiClientSecondarySidebar, SecondarySidebarItemKey } from "./secondarySidebar/ApiClientSecondarySidebar";
+import { CollectionsList } from "./collectionsList/CollectionsList";
 import "./apiClientSidebar.scss";
 
 /**
  * - Create the tabs with active state [DONE]
  * - render history for history tab [DONE]
- * - for collections tab fetch the apis
+ * - for collections tab fetch the apis [DONE]
+ * - add new collection button
+ *  - onclick open new collection modal
  * - list the apis for collections tab
+ *  - onclick should load that request into the client view [Todays]
+ *
+ *
  *  - all collections on top
  *  - then all the apis
  * - add new collection button for creating the collection
  * - add option to move the api into collection
  * - render the single request when clicked from the collections list
+ * - rename collection
+ * - delete collection
+ * - edit collection
+ * - add auth checks
+ * - add extension installed check
  *
  *
  * --------- can be one PR ------------
@@ -27,11 +38,6 @@ import "./apiClientSidebar.scss";
  * - Add rename collection
  * - delete collections
  * - edit collection
- *
- *
- *
- *
- *
  */
 
 interface Props {
@@ -50,14 +56,6 @@ const APIClientSidebar: React.FC<Props> = ({
   onImportClick,
 }) => {
   const [secondarySidebarActiveTab, setSecondarySidebarActiveTab] = useState(SecondarySidebarItemKey.COLLECTIONS);
-
-  useEffect(() => {
-    if (secondarySidebarActiveTab !== SecondarySidebarItemKey.COLLECTIONS) {
-      return;
-    }
-
-    // TODO: fetch apis
-  }, [secondarySidebarActiveTab]);
 
   const onSecondarySidebarTabChange = (updatedTab: SecondarySidebarItemKey) => {
     setSecondarySidebarActiveTab(updatedTab);
@@ -100,12 +98,7 @@ const APIClientSidebar: React.FC<Props> = ({
         />
 
         {secondarySidebarActiveTab === SecondarySidebarItemKey.COLLECTIONS ? (
-          <>
-            <div className="api-client-sidebar-placeholder">
-              <img src={placeholderImage} alt="empty" />
-              <Typography.Text type="secondary">API requests you send will appear here.</Typography.Text>
-            </div>
-          </>
+          <CollectionsList />
         ) : history?.length ? (
           <Timeline reverse className="api-history-list" mode="left">
             <Timeline.Item key="end" color="gray">
