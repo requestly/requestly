@@ -56,8 +56,8 @@
   color: var(--requestly-color-primary-300);
 }
 
-.sample-regex-dropdown-items li.ant-dropdown-menu-item {
-  padding: 12px !important;
+.ant-dropdown-menu.ant-dropdown-menu-root.sample-regex-dropdown-items li.ant-dropdown-menu-item {
+  padding: 12px;
 }
 
 .sample-regex-dropdown-item__title {
