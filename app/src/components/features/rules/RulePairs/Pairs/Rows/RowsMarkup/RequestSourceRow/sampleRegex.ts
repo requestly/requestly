@@ -1,10 +1,10 @@
-interface RegexSample {
+interface SampleRegexItem {
   title: string;
   regex: string;
   url: string;
 }
 
-export const sampleRegex: RegexSample[] = [
+export const sampleRegex: SampleRegexItem[] = [
   {
     title: "Filter URLs that start with https:// only",
     regex: "^https://.*",

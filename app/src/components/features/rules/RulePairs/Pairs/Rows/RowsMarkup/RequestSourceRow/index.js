@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useRef } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
@@ -9,34 +9,32 @@ import APP_CONSTANTS from "config/constants";
 import { DownOutlined } from "@ant-design/icons";
 import { RQDropdown } from "lib/design-system/components";
 import { TestURLModal } from "components/common/TestURLModal";
-import PATHS from "config/constants/sub/paths";
 import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
 import { getModeData, setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 import Filters from "components/features/rules/RulePairs/Filters";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
-import {
-  trackURLConditionModalClosed,
-  trackURLConditionAnimationViewed,
-} from "modules/analytics/events/features/testUrlModal";
+import { trackURLConditionModalClosed } from "modules/analytics/events/features/testUrlModal";
 import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rules/filters";
-import "./RequestSourceRow.css";
+import { trackSampleRegexClicked } from "modules/analytics/events/common/rules";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { RQButton } from "lib/design-system-v2/components";
 import { sampleRegex } from "./sampleRegex";
+import { useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
+import "./RequestSourceRow.css";
 
 const { Text } = Typography;
 
 const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isTestURLModalVisible, setIsTestURLModalVisible] = useState(false);
-  const [isTestURLClicked, setIsTestURLClicked] = useState(false);
   const [ruleFilterActiveWithPairIndex, setRuleFilterActiveWithPairIndex] = useState(false);
   const [testURL, setTestURL] = useState("");
   const [ruleSource, setRuleSource] = useState(pair.source);
-  const hasSeenTestURLAnimation = useRef(false);
   const { MODE } = getModeData(window.location);
 
   const isSourceFilterFormatUpgraded = useCallback((pairIndex, rule) => {
@@ -197,22 +195,6 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
     );
   };
 
-  const shouldStartTestURLRippleEffect = useCallback(() => {
-    if (
-      pair.source.value &&
-      !isTestURLClicked &&
-      window.location.href.includes(PATHS.RULE_EDITOR.CREATE_RULE.RELATIVE) &&
-      (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES ||
-        pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES)
-    ) {
-      if (!hasSeenTestURLAnimation.current) {
-        trackURLConditionAnimationViewed();
-        hasSeenTestURLAnimation.current = true;
-      }
-      return true;
-    }
-  }, [isTestURLClicked, pair.source.value, pair.source.operator]);
-
   const sampleRegexDropdownItems = useMemo(() => {
     return (
       <Menu className="sample-regex-dropdown-items">
@@ -228,6 +210,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
                 });
                 setTestURL(url);
                 setIsTestURLModalVisible(true);
+                trackSampleRegexClicked();
               }}
             >
               <div className="sample-regex-dropdown-item__title">{title}</div>
@@ -339,11 +322,10 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
             >
               <span>
                 <Button
-                  className={`test-url-btn  ${shouldStartTestURLRippleEffect() && "ripple-animation"}`}
+                  className="test-url-btn"
                   iconOnly
                   disabled={!pair.source.value || isInputDisabled}
                   onClick={() => {
-                    setIsTestURLClicked(true);
                     setIsTestURLModalVisible(true);
                   }}
                 >
@@ -398,16 +380,17 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
           </Col>
         ) : null}
       </div>
-      {pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES && (
-        <Col className="sample-regex-dropdown-container">
-          <Dropdown overlay={sampleRegexDropdownItems} trigger={["click"]} className="sample-regex-dropdown">
-            <Space>
-              Try example regex
-              <DownOutlined />
-            </Space>
-          </Dropdown>
-        </Col>
-      )}
+      {pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES &&
+        location.pathname.includes(PATHS.RULE_EDITOR.ABSOLUTE) && (
+          <Col className="sample-regex-dropdown-container">
+            <Dropdown overlay={sampleRegexDropdownItems} trigger={["click"]} className="sample-regex-dropdown">
+              <Space>
+                Try example regex
+                <DownOutlined />
+              </Space>
+            </Dropdown>
+          </Col>
+        )}
     </>
   );
 };

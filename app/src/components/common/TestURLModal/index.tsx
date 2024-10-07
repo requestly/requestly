@@ -109,7 +109,6 @@ export const TestURLModal: React.FC<ModalProps> = ({
   const handleTestURL = useCallback(() => {
     try {
       const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSourceWithExtraInfo(updatedSource, testURL, testURL);
-      console.log("result", result);
       if (result?.destination?.length) {
         setIsCheckPassed(true);
         if (result?.matches?.length) setMatchedGroups(result.matches);
@@ -118,7 +117,6 @@ export const TestURLModal: React.FC<ModalProps> = ({
         setIsCheckPassed(false);
       }
     } catch (error) {
-      console.log("error", error);
       setMatchedGroups([]);
       setIsCheckPassed(false);
     }
@@ -146,7 +144,6 @@ export const TestURLModal: React.FC<ModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      console.log("isOpen", isOpen);
       handleTestURL();
     }
   }, [isOpen, handleTestURL]);
