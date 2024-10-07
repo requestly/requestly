@@ -2,13 +2,12 @@ import React, { useState, useMemo, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
-import { Row, Col, Input, Badge, Menu, Typography, Tooltip } from "antd";
-import { FaFilter } from "@react-icons/all-files/fa/FaFilter";
+import { Row, Col, Input, Badge, Menu, Typography, Tooltip, Button, Dropdown, Space } from "antd";
 import { ExperimentOutlined } from "@ant-design/icons";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { DownOutlined } from "@ant-design/icons";
-import { RQDropdown, RQButton } from "lib/design-system/components";
+import { RQDropdown } from "lib/design-system/components";
 import { TestURLModal } from "components/common/TestURLModal";
 import PATHS from "config/constants/sub/paths";
 import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
@@ -23,6 +22,8 @@ import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rul
 import "./RequestSourceRow.css";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { RQButton } from "lib/design-system-v2/components";
+import { sampleRegex } from "./sampleRegex";
 
 const { Text } = Typography;
 
@@ -33,6 +34,8 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   const [isTestURLModalVisible, setIsTestURLModalVisible] = useState(false);
   const [isTestURLClicked, setIsTestURLClicked] = useState(false);
   const [ruleFilterActiveWithPairIndex, setRuleFilterActiveWithPairIndex] = useState(false);
+  const [testURL, setTestURL] = useState("");
+  const [ruleSource, setRuleSource] = useState(pair.source);
   const hasSeenTestURLAnimation = useRef(false);
   const { MODE } = getModeData(window.location);
 
@@ -210,6 +213,32 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
     }
   }, [isTestURLClicked, pair.source.value, pair.source.operator]);
 
+  const sampleRegexDropdownItems = useMemo(() => {
+    return (
+      <Menu className="sample-regex-dropdown-items">
+        {sampleRegex.map(({ title, regex, url }) => {
+          return (
+            <Menu.Item
+              key={title}
+              onClick={() => {
+                setRuleSource({
+                  ...pair.source,
+                  value: `/${regex}/`,
+                  operator: GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES,
+                });
+                setTestURL(url);
+                setIsTestURLModalVisible(true);
+              }}
+            >
+              <div className="sample-regex-dropdown-item__title">{title}</div>
+              <div className="sample-regex-dropdown-item__regex">{regex}</div>
+            </Menu.Item>
+          );
+        })}
+      </Menu>
+    );
+  }, [pair.source]);
+
   return (
     <>
       {isTestURLModalVisible && (
@@ -219,7 +248,9 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
             setIsTestURLModalVisible(false);
             trackURLConditionModalClosed(operator, { rule_type: currentlySelectedRuleConfig.TYPE });
           }}
-          source={pair.source}
+          source={ruleSource}
+          defaultTestURL={testURL}
+          originalSource={pair.source}
           onSave={updateSourceFromTestURLModal}
           analyticsContext={{ rule_type: currentlySelectedRuleConfig.TYPE }}
         />
@@ -297,26 +328,31 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               data-selectionid="source-value"
             />
           </Col>
-          <Tooltip
-            overlayClassName="rq-tooltip"
-            title={"Enter the source condition first"}
-            placement="left"
-            trigger={isInputDisabled ? ["hover"] : []}
-          >
-            <span>
-              <RQButton
-                className={`test-url-btn  ${shouldStartTestURLRippleEffect() && "ripple-animation"}`}
-                iconOnly
-                icon={<ExperimentOutlined />}
-                type="default"
-                disabled={!pair.source.value || isInputDisabled}
-                onClick={() => {
-                  setIsTestURLClicked(true);
-                  setIsTestURLModalVisible(true);
-                }}
-              />
-            </span>
-          </Tooltip>
+
+          {(pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES ||
+            pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES) && (
+            <Tooltip
+              overlayClassName="rq-tooltip"
+              title={"Enter the source condition first"}
+              placement="left"
+              trigger={isInputDisabled ? ["hover"] : []}
+            >
+              <span>
+                <Button
+                  className={`test-url-btn  ${shouldStartTestURLRippleEffect() && "ripple-animation"}`}
+                  iconOnly
+                  disabled={!pair.source.value || isInputDisabled}
+                  onClick={() => {
+                    setIsTestURLClicked(true);
+                    setIsTestURLModalVisible(true);
+                  }}
+                >
+                  <ExperimentOutlined /> Test{" "}
+                  {pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES ? "regex" : "wildcard"}
+                </Button>
+              </span>
+            </Tooltip>
+          )}
         </Row>
         {shouldShowFilterIcon ? (
           <Col
@@ -347,20 +383,31 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
                 analyticsContext="redirect_source_filter"
                 source={currentlySelectedRuleConfig.TYPE}
               >
-                <span
+                <RQButton
+                  type="transparent"
                   onClick={() => openFilterModal(pairIndex)}
-                  className="cursor-pointer text-gray source-filter-icon-container"
+                  className="cursor-pointer source-filter-icon-container"
                 >
-                  <FaFilter />{" "}
+                  Filters
                   {getFilterCount(pairIndex) !== 0 ? (
                     <Badge style={{ color: "#465967", backgroundColor: "#E5EAEF" }}>{getFilterCount(pairIndex)}</Badge>
                   ) : null}
-                </span>
+                </RQButton>
               </Tooltip>
             )}
           </Col>
         ) : null}
       </div>
+      {pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES && (
+        <Col className="sample-regex-dropdown-container">
+          <Dropdown overlay={sampleRegexDropdownItems} trigger={["click"]} className="sample-regex-dropdown">
+            <Space>
+              Try example regex
+              <DownOutlined />
+            </Space>
+          </Dropdown>
+        </Col>
+      )}
     </>
   );
 };

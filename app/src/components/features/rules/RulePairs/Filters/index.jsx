@@ -11,8 +11,8 @@ import APP_CONSTANTS from "config/constants";
 import deleteObjectAtPath from "./actions/deleteObjectAtPath";
 import getObjectValue from "./actions/getObjectValue";
 import { getReactSelectValue, setReactSelectValue } from "./actions/reactSelect";
-import { CloseCircleOutlined } from "@ant-design/icons";
 import { isDesktopMode } from "utils/AppUtils";
+import { FaUndo } from "@react-icons/all-files/fa/FaUndo";
 import {
   trackPageUrlFilterModifiedEvent,
   trackResourceTypeFilterModifiedEvent,
@@ -25,6 +25,7 @@ import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
 import { ResponseRuleResourceType } from "types/rules";
 import { debounce, snakeCase } from "lodash";
 import { actions } from "store";
+import LINKS from "config/constants/sub/links";
 
 const { Link } = Typography;
 
@@ -116,7 +117,7 @@ const Filters = (props) => {
       }}
       className="cursor-pointer"
     >
-      <CloseCircleOutlined />
+      <FaUndo className="text-sm" />
     </span>
   );
 
@@ -418,15 +419,20 @@ const Filters = (props) => {
         open={pairIndex !== false}
         onCancel={props.closeModal}
         footer={<Button onClick={props.closeModal}>Close</Button>}
-        title="Source Filters"
+        title="Apply advance source filters"
         width={700}
       >
-        <>
-          {renderPageUrlInput()}
-          {renderResourceTypeInput()}
-          {renderHTTPMethodInput()}
-          {renderRequestPayloadInput()}
-        </>
+        <div className="source-filter-modal-description">
+          Advanced source filters lets you set precise conditions, applying rules to specific web pages, domains,
+          request types, methods, or payloads.{" "}
+          <a href={LINKS.ACCELERATOR_PROGRAM_FORM_LINK} rel="noreferrer" target="_blank">
+            Learn more
+          </a>
+        </div>
+        {renderPageUrlInput()}
+        {renderResourceTypeInput()}
+        {renderHTTPMethodInput()}
+        {renderRequestPayloadInput()}
       </Modal>
     </React.Fragment>
   );
