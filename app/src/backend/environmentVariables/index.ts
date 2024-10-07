@@ -14,7 +14,9 @@ export const setEnvironmentVariablesInDB = async (
     environment: string;
   }
 ) => {
-  const newVariables = Object.fromEntries(Object.entries(payload.newVariables).map(([key, value]) => [key, value]));
+  const newVariables = Object.fromEntries(
+    Object.entries(payload.newVariables).map(([key, value]) => [key, { syncValue: value.syncValue }])
+  );
 
   return setDoc(
     getDocPath(ownerId),
