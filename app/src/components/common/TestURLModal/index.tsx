@@ -116,7 +116,7 @@ export const TestURLModal: React.FC<ModalProps> = ({
         setMatchedGroups([]);
         setIsCheckPassed(false);
       }
-    } catch (error) {
+    } catch {
       setMatchedGroups([]);
       setIsCheckPassed(false);
     }

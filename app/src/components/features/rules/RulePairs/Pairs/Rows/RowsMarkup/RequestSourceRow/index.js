@@ -34,7 +34,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   const [isTestURLModalVisible, setIsTestURLModalVisible] = useState(false);
   const [ruleFilterActiveWithPairIndex, setRuleFilterActiveWithPairIndex] = useState(false);
   const [testURL, setTestURL] = useState("");
-  const [ruleSource, setRuleSource] = useState(pair.source);
+  const [sourceConfig, setSourceConfig] = useState(pair.source);
   const { MODE } = getModeData(window.location);
 
   const isSourceFilterFormatUpgraded = useCallback((pairIndex, rule) => {
@@ -203,7 +203,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
             <Menu.Item
               key={title}
               onClick={() => {
-                setRuleSource({
+                setSourceConfig({
                   ...pair.source,
                   value: `/${regex}/`,
                   operator: GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES,
@@ -231,7 +231,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
             setIsTestURLModalVisible(false);
             trackURLConditionModalClosed(operator, { rule_type: currentlySelectedRuleConfig.TYPE });
           }}
-          source={ruleSource}
+          source={sourceConfig}
           defaultTestURL={testURL}
           originalSource={pair.source}
           onSave={updateSourceFromTestURLModal}
