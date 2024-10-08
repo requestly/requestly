@@ -68,18 +68,19 @@ export const APIClient: React.FC<Props> = () => {
       return;
     }
 
+    setSelectedEntry(null);
     setIsLoading(true);
 
     getApiRecord(requestId)
       .then((result) => {
         if (result.success) {
           if (result.data.type === RQAPI.RecordType.API) {
-            setSelectedEntry(result.data.data);
+            setSelectedEntryDetails(result.data);
           }
         }
       })
       .catch((error) => {
-        setSelectedEntry(null);
+        setSelectedEntryDetails(null);
         // TODO: redirect to new empty entry
         Logger.error("Error loading api record", error);
       })
