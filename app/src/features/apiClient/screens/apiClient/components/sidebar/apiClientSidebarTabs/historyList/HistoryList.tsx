@@ -48,15 +48,14 @@ export const HistoryList: React.FC<Props> = ({ history, onSelectionFromHistory, 
           <Timeline.Item key={index} color={REQUEST_METHOD_COLORS[entry.request.method]}>
             <div className={`api-history-row ${entry.request.url ? "clickable" : ""}`}>
               <Typography.Text
-                className="api-method"
                 strong
+                className="api-method"
                 style={{ color: REQUEST_METHOD_COLORS[entry.request.method] }}
               >
                 {entry.request.method}
               </Typography.Text>
               <Typography.Text
                 ellipsis={{ suffix: "...", tooltip: entry.request.url }}
-                type="secondary"
                 className="api-history-url"
                 title={entry.request.url}
                 onClick={() => onHistoryLinkClick(index)}

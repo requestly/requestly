@@ -15,10 +15,10 @@
     overflow: auto;
     height: 100%;
     padding: 8px;
-    padding-top: 8px;
+    padding-top: 0px;
 
     .collections-list-item + .collections-list-item {
-      margin-top: 4px;
+      margin-top: 8px;
     }
 
     .collections-list-item {
@@ -34,8 +34,8 @@
 
       &.api {
         .request-method {
+          flex-shrink: 0;
           font-size: var(--requestly-font-size-2xs);
-          font-weight: var(--requestly-font-weight-medium);
         }
 
         .request-url {
