@@ -10,6 +10,7 @@ export const upsertApiRecord = async (
   teamId?: string
 ): Promise<{ success: boolean; data: RQAPI.Record | null }> => {
   let result;
+
   if (!record.id) {
     result = await createApiRecord(uid, record, teamId);
   } else {
@@ -30,7 +31,7 @@ const createApiRecord = async (
 
   const newRecord = {
     collectionId: "",
-    name: "", // TODO: to be used when UI is exposed, till then only showing URL
+    name: record.name || "",
     type: record.type,
     data: record.data,
     ownerId: ownerId,
