@@ -4,18 +4,20 @@ import { getOwnerId } from "backend/utils";
 import { RQAPI } from "features/apiClient/types";
 import Logger from "lib/logger";
 
-// TODO: To be used when collections tab is displayed on UI
-export const getApiRecords = async (uid: string, teamId?: string): Promise<RQAPI.Record[]> => {
+export const getApiRecords = async (
+  uid: string,
+  teamId?: string
+): Promise<{ success: boolean; data: RQAPI.Record[] }> => {
   if (!uid) {
-    return [];
+    return { success: false, data: [] };
   }
 
   const ownerId = getOwnerId(uid, teamId);
-  const records = await getApiRecordsFromFirebase(ownerId);
-  return records;
+  const result = await getApiRecordsFromFirebase(ownerId);
+  return result;
 };
 
-const getApiRecordsFromFirebase = async (ownerId: string): Promise<RQAPI.Record[]> => {
+const getApiRecordsFromFirebase = async (ownerId: string): Promise<{ success: boolean; data: RQAPI.Record[] }> => {
   const db = getFirestore(firebaseApp);
   const rootApiRecordsRef = collection(db, "apis");
 
@@ -26,16 +28,16 @@ const getApiRecordsFromFirebase = async (ownerId: string): Promise<RQAPI.Record[
     const snapshot = await getDocs(q);
 
     if (snapshot.empty) {
-      return result;
+      return { success: true, data: result };
     }
 
     snapshot.forEach((doc) => {
       result.push({ ...doc.data(), id: doc.id });
     });
 
-    return result;
+    return { success: true, data: result };
   } catch (error) {
     Logger.error("Error fetching api records!", error);
-    return [];
+    throw error;
   }
 };
