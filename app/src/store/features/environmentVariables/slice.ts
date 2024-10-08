@@ -1,53 +1,12 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { EnvironmentVariableValue } from "backend/environmentVariables/types";
+import { createSlice } from "@reduxjs/toolkit";
 import { ReducerKeys } from "store/constants";
 import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
-
-const initialState = {
-  variables: {} as Record<string, Record<string, EnvironmentVariableValue>>,
-};
+import reducerFunctions, { initialState } from "./reducers";
 
 const slice = createSlice({
   name: ReducerKeys.ENVIRONMENT_VARIABLES,
   initialState,
-  reducers: {
-    resetState: () => initialState,
-    setVariables: (
-      state,
-      action: PayloadAction<{
-        newVariables: Record<string, EnvironmentVariableValue>;
-        environment: string;
-      }>
-    ) => {
-      state.variables = {
-        ...state.variables,
-        [action.payload.environment]: {
-          ...state.variables[action.payload.environment],
-          ...Object.fromEntries(
-            Object.entries(action.payload.newVariables).map(([key, value]) => {
-              const prevValue = state.variables[action.payload.environment]?.[key];
-              return [
-                key,
-                {
-                  localValue: value.localValue ?? prevValue?.localValue,
-                  syncValue: value.syncValue ?? prevValue?.syncValue,
-                },
-              ];
-            })
-          ),
-        },
-      };
-    },
-    removeVariable: (
-      state,
-      action: PayloadAction<{
-        environment: string;
-        key: string;
-      }>
-    ) => {
-      delete state.variables[action.payload.environment][action.payload.key];
-    },
-  },
+  reducers: reducerFunctions,
 });
 
 const { actions, reducer } = slice;
