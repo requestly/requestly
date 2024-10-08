@@ -3,6 +3,7 @@
   border-right: 1px solid var(--border-dark);
   display: flex;
   flex-direction: column;
+  height: 100%;
 
   .api-client-sidebar-placeholder {
     height: 100%;
@@ -12,6 +13,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 8px;
   }
 
   .api-client-sidebar-header {
@@ -21,6 +23,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  .api-client-sidebar-content {
+    display: flex;
+    height: 100%;
   }
 
   .api-history-list {
@@ -76,6 +83,7 @@
         word-break: break-all;
         line-height: 18px;
         display: -webkit-box;
+        line-clamp: 2;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
       }

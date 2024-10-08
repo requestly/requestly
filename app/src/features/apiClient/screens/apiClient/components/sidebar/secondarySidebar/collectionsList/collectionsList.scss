@@ -1,0 +1,77 @@
+.collections-list-container {
+  width: 100%;
+
+  .collections-list-header {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+
+    .create-collection-btn {
+      margin-left: auto;
+    }
+  }
+
+  .collections-list-content {
+    overflow: auto;
+    height: 100%;
+    padding: 8px;
+    padding-top: 0;
+
+    .collections-list-item {
+      display: flex;
+      align-items: center;
+
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-sm, 13px);
+
+      &.api:hover {
+        background-color: var(--gray-dark);
+      }
+
+      &.collection.ant-collapse {
+        padding: 0;
+
+        .ant-collapse-item {
+          width: 100%;
+
+          .ant-collapse-header {
+            padding: 2px 4px;
+            border-radius: 4px;
+            user-select: none;
+
+            &:hover {
+              background-color: var(--gray-dark);
+            }
+
+            .ant-collapse-expand-icon {
+              svg {
+                font-size: var(--requestly-font-size-2xs, 10px);
+              }
+            }
+
+            .collection-name-container {
+              display: flex;
+              align-items: center;
+
+              .collection-name {
+                width: 100%;
+                max-width: 178px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              }
+
+              .collection-options {
+                flex-shrink: 0;
+                margin-left: auto;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
