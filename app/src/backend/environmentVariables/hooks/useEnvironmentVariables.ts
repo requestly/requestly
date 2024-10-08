@@ -85,7 +85,7 @@ const useEnvironmentVariables = () => {
       });
   };
 
-  const renderString = (template: string | Record<string, any>) => {
+  const renderString = <T>(template: string | Record<string, any>): T => {
     return renderTemplate(template, variables[environment]);
   };
 

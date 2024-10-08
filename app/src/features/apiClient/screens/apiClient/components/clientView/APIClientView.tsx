@@ -213,7 +213,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       sanitizedEntry.request.body = removeEmptyKeys(sanitizedEntry.request.body as KeyValuePair[]);
     }
 
-    const renderedRequest = renderString(sanitizedEntry.request) as RQAPI.Request;
+    const renderedRequest = renderString<RQAPI.Request>(sanitizedEntry.request);
 
     console.log("!!!debug", "renderedRequest", renderedRequest);
 
