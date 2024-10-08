@@ -27,6 +27,14 @@
       color: var(--requestly-color-text-subtle);
       font-size: var(--requestly-font-size-sm, 13px);
 
+      // &.api {
+      // width: 100%;
+      // max-width: 178px;
+      // overflow: hidden;
+      // white-space: nowrap;
+      // text-overflow: ellipsis;
+      // }
+
       &.api:hover {
         background-color: var(--gray-dark);
       }
