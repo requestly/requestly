@@ -6,6 +6,8 @@ import { toast } from "utils/Toast";
 import { trackCurlImportFailed, trackCurlImported } from "modules/analytics/events/features/apiClient";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
+import { useNavigate } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
 
 interface Props {
   isOpen: boolean;
@@ -45,7 +47,9 @@ const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onCl
     trackCurlImported();
     trackRQLastActivity(API_CLIENT.CURL_IMPORTED);
     trackRQDesktopLastActivity(API_CLIENT.CURL_IMPORTED);
-  }, [curlCommand, handleImportRequest]);
+
+    navigate(PATHS.API_CLIENT.ABSOLUTE);
+  }, [navigate, curlCommand, handleImportRequest]);
 
   return (
     <Modal
