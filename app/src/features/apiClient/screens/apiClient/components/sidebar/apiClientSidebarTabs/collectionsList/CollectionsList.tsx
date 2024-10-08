@@ -62,7 +62,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, onImportClick }) 
           ) : (
             <div className="api-client-sidebar-placeholder">
               <img src={placeholderImage} alt="empty" />
-              <Typography.Text type="secondary">API requests you send will appear here.</Typography.Text>
+              <Typography.Text type="secondary">Saved API requests will appear here.</Typography.Text>
             </div>
           )}
         </div>
