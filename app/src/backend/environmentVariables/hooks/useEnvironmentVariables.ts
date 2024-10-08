@@ -42,11 +42,12 @@ const useEnvironmentVariables = () => {
     }
   }, [dispatch, user.loggedIn]);
 
-  const setVariable = async (key: string, value: EnvironmentVariableValue) => {
+  const setVariable = async (key: string, value: Omit<EnvironmentVariableValue, "type">) => {
     const newVariable: EnvironmentVariable = {
       [key]: {
         localValue: value.localValue,
         syncValue: value.syncValue,
+        type: typeof value.syncValue,
       },
     };
 

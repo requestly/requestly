@@ -28,6 +28,7 @@ const setVariables = (
           {
             localValue: value.localValue ?? prevValue?.localValue,
             syncValue: value.syncValue ?? prevValue?.syncValue,
+            type: value.type,
           },
         ];
       })
