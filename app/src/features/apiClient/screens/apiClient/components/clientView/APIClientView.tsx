@@ -34,6 +34,7 @@ import "./apiClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
+import useEnvironmentVariables from "backend/environmentVariables/hooks/useEnvironmentVariables";
 
 interface Props {
   apiEntry?: RQAPI.Entry;
@@ -48,12 +49,16 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
 const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) => {
   const dispatch = useDispatch();
   const location = useLocation();
+
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
+  const { renderString } = useEnvironmentVariables();
+
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
+
   const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const animationTimerRef = useRef<NodeJS.Timeout>();
@@ -208,6 +213,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       sanitizedEntry.request.body = removeEmptyKeys(sanitizedEntry.request.body as KeyValuePair[]);
     }
 
+    const renderedRequest = renderString<RQAPI.Request>(sanitizedEntry.request);
+
+    console.log("!!!debug", "renderedRequest", renderedRequest);
+
     abortControllerRef.current = new AbortController();
 
     setEntry(sanitizedEntry);
@@ -215,7 +224,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    makeRequest(appMode, sanitizedEntry.request, abortControllerRef.current.signal)
+    makeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
       .then((response) => {
         const entryWithResponse = { ...sanitizedEntry, response };
         if (response) {
@@ -254,7 +263,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     });
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
-  }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished]);
+  }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished, renderString]);
 
   const cancelRequest = useCallback(() => {
     abortControllerRef.current?.abort();
