@@ -1,6 +1,6 @@
 import { Input, Modal } from "antd";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { parseCurlRequest } from "../../apiUtils";
+import { parseCurlRequest } from "../../utils";
 import { RQAPI } from "../../../../types";
 import { toast } from "utils/Toast";
 import { trackCurlImportFailed, trackCurlImported } from "modules/analytics/events/features/apiClient";

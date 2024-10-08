@@ -9,7 +9,7 @@ import {
   getContentTypeFromRequestHeaders,
   getEmptyAPIEntry,
   parseCurlRequest,
-} from "features/apiClient/screens/apiClient/apiUtils";
+} from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import APIClientView from "../../../screens/apiClient/components/clientView/APIClientView";
 import "./apiClient.scss";
