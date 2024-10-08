@@ -3,7 +3,7 @@ import APIClientSidebar from "./components/sidebar/APIClientSidebar";
 import APIClientView from "./components/clientView/APIClientView";
 import { RQAPI } from "../../types";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "./historyStore";
-import { getEmptyAPIEntry } from "./apiUtils";
+import { getEmptyAPIEntry } from "./utils";
 import {
   trackHistoryCleared,
   trackImportCurlClicked,
