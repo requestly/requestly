@@ -20,15 +20,23 @@ const setVariables = (
 ) => {
   const currentEnvironmentVariables = state.variables[action.payload.environment] || ({} as EnvironmentVariable);
 
-  const updatedVariables = Object.entries(action.payload.newVariables).reduce((acc, [key, value]) => {
-    const prevValue = currentEnvironmentVariables[key];
-    acc[key] = {
-      localValue: value.localValue ?? prevValue.localValue,
-      syncValue: value.syncValue ?? prevValue.syncValue,
-      type: value.type,
-    };
-    return acc;
-  }, {} as EnvironmentVariable);
+  const updatedVariables: EnvironmentVariable = Object.fromEntries(
+    Object.entries(action.payload.newVariables).map(([key, value]) => {
+      const prevValue = currentEnvironmentVariables[key];
+      const updatedValue = {
+        localValue: value.localValue ?? prevValue?.localValue,
+        syncValue: value.syncValue ?? prevValue?.syncValue,
+        type: value.type,
+      };
+
+      // Remove localValue if it doesn't exist
+      if (!updatedValue.localValue) {
+        delete updatedValue.localValue;
+      }
+
+      return [key, updatedValue];
+    })
+  );
 
   state.variables[action.payload.environment] = {
     ...currentEnvironmentVariables,

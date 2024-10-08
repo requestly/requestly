@@ -8,6 +8,7 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { renderTemplate } from "../utils";
 import { attatchEnvironmentVariableListener, removeEnvironmentVariableFromDB, setEnvironmentVariablesInDB } from "..";
 import Logger from "lib/logger";
+import { toast } from "utils/Toast";
 
 let unsubscribeListener: () => void = null;
 
@@ -60,6 +61,7 @@ const useEnvironmentVariables = () => {
         dispatch(environmentVariablesActions.setVariables({ newVariables: newVariable, environment }));
       })
       .catch((err) => {
+        toast.error("Error while setting environment variables.");
         Logger.error("Error while setting environment variables in db", err);
       });
   };
@@ -78,6 +80,7 @@ const useEnvironmentVariables = () => {
         dispatch(environmentVariablesActions.removeVariable({ environment, key }));
       })
       .catch((err) => {
+        toast.error("Error while removing environment variables.");
         Logger.error("Error while removing environment variables from db", err);
       });
   };
