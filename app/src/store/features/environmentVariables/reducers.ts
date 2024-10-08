@@ -18,21 +18,21 @@ const setVariables = (
     environment: string;
   }>
 ) => {
+  const currentEnvironmentVariables = state.variables[action.payload.environment] || ({} as EnvironmentVariable);
+
+  const updatedVariables = Object.entries(action.payload.newVariables).reduce((acc, [key, value]) => {
+    const prevValue = currentEnvironmentVariables[key];
+    acc[key] = {
+      localValue: value.localValue ?? prevValue.localValue,
+      syncValue: value.syncValue ?? prevValue.syncValue,
+      type: value.type,
+    };
+    return acc;
+  }, {} as EnvironmentVariable);
+
   state.variables[action.payload.environment] = {
-    ...state.variables[action.payload.environment],
-    ...Object.fromEntries(
-      Object.entries(action.payload.newVariables).map(([key, value]) => {
-        const prevValue = state.variables[action.payload.environment]?.[key];
-        return [
-          key,
-          {
-            localValue: value.localValue ?? prevValue?.localValue,
-            syncValue: value.syncValue ?? prevValue?.syncValue,
-            type: value.type,
-          },
-        ];
-      })
-    ),
+    ...currentEnvironmentVariables,
+    ...updatedVariables,
   };
 };
 
