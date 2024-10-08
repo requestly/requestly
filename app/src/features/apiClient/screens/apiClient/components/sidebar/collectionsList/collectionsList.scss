@@ -51,6 +51,24 @@
                 font-size: var(--requestly-font-size-2xs, 10px);
               }
             }
+
+            .collection-name-container {
+              display: flex;
+              align-items: center;
+
+              .collection-name {
+                width: 100%;
+                max-width: 178px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              }
+
+              .collection-options {
+                flex-shrink: 0;
+                margin-left: auto;
+              }
+            }
           }
         }
       }
