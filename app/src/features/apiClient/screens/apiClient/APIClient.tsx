@@ -63,6 +63,31 @@ export const APIClient: React.FC<Props> = () => {
       });
   }, [requestId]);
 
+  useEffect(() => {
+    if (!requestId) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    getApiRecord(requestId)
+      .then((result) => {
+        if (result.success) {
+          if (result.data.type === RQAPI.RecordType.API) {
+            setSelectedEntry(result.data.data);
+          }
+        }
+      })
+      .catch((error) => {
+        setSelectedEntry(null);
+        // TODO: redirect to new empty entry
+        Logger.error("Error loading api record", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [requestId]);
+
   const addToHistory = useCallback((apiEntry: RQAPI.Entry) => {
     setHistory((history) => [...history, apiEntry]);
     addToHistoryInStore(apiEntry);
