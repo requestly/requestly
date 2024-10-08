@@ -14,7 +14,7 @@ import {
   makeRequest,
   removeEmptyKeys,
   supportsRequestBody,
-} from "../../apiUtils";
+} from "../../utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
   trackAPIRequestCancelled,
