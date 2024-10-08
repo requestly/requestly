@@ -24,7 +24,7 @@ import {
   trackInstallExtensionDialogShown,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { actions } from "store";
 import { getAppMode, getIsExtensionEnabled, getUserAuthDetails } from "store/selectors";
 import Favicon from "components/misc/Favicon";
@@ -38,11 +38,14 @@ import { RQButton } from "lib/design-system-v2/components";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
+import { useApiClientContext } from "features/apiClient/contexts";
+import PATHS from "config/constants/sub/paths";
 
 interface Props {
   openInModal?: boolean;
   apiEntry?: RQAPI.Entry;
   notifyApiRequestFinished?: (apiEntry: RQAPI.Entry) => void;
+  apiEntryDetails?: RQAPI.ApiRecord;
 }
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
@@ -50,9 +53,10 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   label: method,
 }));
 
-const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished, openInModal }) => {
+const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRequestFinished, openInModal }) => {
   const dispatch = useDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
@@ -60,7 +64,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished, op
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
-  const [apiRecordDeatils, setApiRecordDetails] = useState<RQAPI.ApiRecord>(null);
+  const { onSaveRecord } = useApiClientContext();
+
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
@@ -74,7 +79,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished, op
     if (apiEntry) {
       clearTimeout(animationTimerRef.current);
       setIsAnimating(true);
-      setApiRecordDetails(null);
       setEntry(apiEntry);
       animationTimerRef.current = setTimeout(() => setIsAnimating(false), 500);
     }
@@ -280,15 +284,19 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished, op
     setIsRequestSaving(true);
 
     const record: Partial<RQAPI.ApiRecord> = {
-      id: apiRecordDeatils?.id,
       type: RQAPI.RecordType.API,
       data: entry,
     };
 
+    if (apiEntryDetails?.id) {
+      record.id = apiEntryDetails?.id;
+    }
+
     const result = await upsertApiRecord(uid, record, teamId);
 
     if (result.success) {
-      setApiRecordDetails(result.data as RQAPI.ApiRecord);
+      onSaveRecord(result.data);
+      navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`);
       toast.success("Request saved!");
     } else {
       toast.error("Something went wrong!");

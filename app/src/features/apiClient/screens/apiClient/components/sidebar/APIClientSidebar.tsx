@@ -8,7 +8,7 @@ import { REQUEST_METHOD_COLORS } from "../../../../../../constants/requestMethod
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { ApiClientSecondarySidebar, SecondarySidebarItemKey } from "./secondarySidebar/ApiClientSecondarySidebar";
-import { CollectionsList } from "./secondarySidebar/collectionsList/CollectionsList";
+import { CollectionsList } from "./collectionsList/CollectionsList";
 import "./apiClientSidebar.scss";
 
 /**
