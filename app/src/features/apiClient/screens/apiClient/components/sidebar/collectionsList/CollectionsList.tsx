@@ -5,13 +5,15 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import { getApiRecords } from "backend/apiClient";
 import Logger from "lib/logger";
-import { Collapse, Tooltip, Typography } from "antd";
+import { Collapse, Dropdown, MenuProps, Tooltip, Typography } from "antd";
 import placeholderImage from "../../../../../../../assets/images/illustrations/empty-sheets-dark.svg";
 import { RQButton } from "lib/design-system-v2/components";
 import { NavLink } from "react-router-dom";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
+import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { CreateOrUpdateCollectionModal } from "./createOrUpdateCollectionModal/CreateOrUpdateCollectionModal";
 import PATHS from "config/constants/sub/paths";
+import { isRequest } from "../../../utils";
 import "./collectionsList.scss";
 
 interface Props {}
@@ -24,6 +26,7 @@ export const CollectionsList: React.FC<Props> = () => {
   const [isLoadingApiRecords, setIsLoadingApiRecords] = useState(false);
   const [apiRecords, setApiRecords] = useState<RQAPI.Record[]>([]);
   const [isNewCollectionModalOpen, setIsNewCollectionModalOpen] = useState(false);
+  const [collectionToBeUpdate, setCollectionToBeUpdate] = useState<RQAPI.CollectionRecord>();
 
   const onNewRecord = useCallback((apiRecord: RQAPI.Record) => {
     setApiRecords((prev) => [...prev, { ...apiRecord }]);
@@ -37,8 +40,13 @@ export const CollectionsList: React.FC<Props> = () => {
     setApiRecords((prev) => prev.map((record) => (record.id === apiRecord.id ? { ...record, ...apiRecord } : record)));
   }, []);
 
-  const handleNewCollectionModalToggle = () => {
+  const openNewCollectionModal = () => {
     setIsNewCollectionModalOpen(true);
+  };
+
+  const closeNewCollectionModal = () => {
+    setIsNewCollectionModalOpen(false);
+    setCollectionToBeUpdate(null);
   };
 
   useEffect(() => {
@@ -62,16 +70,61 @@ export const CollectionsList: React.FC<Props> = () => {
       });
   }, [uid, teamId]);
 
+  // const prepareRecordsToRender = (records: RQAPI.Record[]) => {
+  //   const requests = [];
+  //   const collections = [];
+
+  //   records.forEach((record) => {
+  //     if (isRequest(record)) {
+  //       requests.push(record);
+  //     } else {
+  //       collections.push(record);
+  //     }
+  //   });
+  // };
+
+  const getCollectionOptions = useCallback((record: RQAPI.CollectionRecord) => {
+    const items: MenuProps["items"] = [
+      {
+        key: "0",
+        label: <div>Add request</div>,
+        onClick: () => {},
+      },
+      {
+        key: "1",
+        label: <div>Rename collection</div>,
+        onClick: (itemInfo) => {
+          itemInfo.domEvent?.stopPropagation?.();
+          openNewCollectionModal();
+          setCollectionToBeUpdate(record);
+        },
+      },
+      {
+        key: "2",
+        label: <div>Delete collection</div>,
+        danger: true,
+        onClick: (itemInfo) => {
+          itemInfo.domEvent?.stopPropagation?.();
+          openNewCollectionModal();
+          setCollectionToBeUpdate(record);
+        },
+      },
+    ];
+
+    return items;
+  }, []);
+
   return (
     <>
-      <CreateOrUpdateCollectionModal
-        onNewRecord={onNewRecord}
-        onUpdateRecord={onUpdateRecord}
-        isOpen={isNewCollectionModalOpen}
-        onClose={() => {
-          setIsNewCollectionModalOpen(false);
-        }}
-      />
+      {isNewCollectionModalOpen ? (
+        <CreateOrUpdateCollectionModal
+          onNewRecord={onNewRecord}
+          onUpdateRecord={onUpdateRecord}
+          isOpen={isNewCollectionModalOpen}
+          collectionToBeUpdate={collectionToBeUpdate}
+          onClose={closeNewCollectionModal}
+        />
+      ) : null}
 
       <div className="collections-list-container">
         <div className="collections-list-header">
@@ -81,7 +134,7 @@ export const CollectionsList: React.FC<Props> = () => {
               size="small"
               type="transparent"
               className="create-collection-btn"
-              onClick={handleNewCollectionModalToggle}
+              onClick={openNewCollectionModal}
             >
               New collection
             </RQButton>
@@ -99,7 +152,31 @@ export const CollectionsList: React.FC<Props> = () => {
                 if (record.type === RQAPI.RecordType.COLLECTION) {
                   return (
                     <Collapse defaultActiveKey={["1"]} ghost className="collections-list-item collection">
-                      <Collapse.Panel header={record.data.name} key={record.id} className="">
+                      <Collapse.Panel
+                        header={
+                          <div className="collection-name-container">
+                            <div className="collection-name">{record.name}</div>
+
+                            <Dropdown
+                              trigger={["click"]}
+                              menu={{ items: getCollectionOptions(record) }}
+                              placement="bottomRight"
+                            >
+                              <RQButton
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                                size="small"
+                                type="transparent"
+                                className="collection-options"
+                                icon={<MdOutlineMoreHoriz />}
+                              />
+                            </Dropdown>
+                          </div>
+                        }
+                        key={record.id}
+                        className=""
+                      >
                         <p>testing.....</p>
                       </Collapse.Panel>
                     </Collapse>

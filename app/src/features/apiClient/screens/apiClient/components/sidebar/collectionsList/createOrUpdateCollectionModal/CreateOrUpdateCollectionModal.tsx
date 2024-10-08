@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { RQModal } from "lib/design-system/components";
@@ -11,23 +11,21 @@ import { RQAPI } from "features/apiClient/types";
 import "./createOrUpdateCollectionModal.scss";
 
 interface Props {
-  id?: string;
-  name?: string;
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
   onNewRecord: (record: RQAPI.Record) => void;
   onUpdateRecord: (record: RQAPI.Record) => void;
+  collectionToBeUpdate?: RQAPI.CollectionRecord;
 }
 
 export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
-  id,
-  name,
   isOpen,
   onClose,
   onSuccess,
   onNewRecord,
   onUpdateRecord,
+  collectionToBeUpdate,
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
@@ -36,6 +34,16 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [collectionName, setCollectionName] = useState("");
+
+  console.log(collectionToBeUpdate);
+
+  useEffect(() => {
+    if (!collectionToBeUpdate?.id) {
+      return;
+    }
+
+    setCollectionName(collectionToBeUpdate?.name);
+  }, [collectionToBeUpdate?.id]);
 
   const handleSaveClick = async () => {
     setIsLoading(true);
@@ -48,15 +56,23 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
     // TODO: handle rename collection
 
     const record: Partial<RQAPI.CollectionRecord> = {
+      name: collectionName,
       type: RQAPI.RecordType.COLLECTION,
-      data: { name: collectionName },
+      data: {},
     };
+
+    if (collectionToBeUpdate?.id) {
+      record.id = collectionToBeUpdate.id;
+    }
 
     const result = await upsertApiRecord(uid, record, teamId);
 
     if (result.success) {
-      console.log({ result });
-      onNewRecord(result.data);
+      if (!collectionToBeUpdate?.id) {
+        onNewRecord(result.data);
+      } else {
+        onUpdateRecord(result.data);
+      }
       toast.success("Collection created!");
     } else {
       toast.error("Something went wrong, create the collection again!");
@@ -70,7 +86,9 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
 
   return (
     <RQModal destroyOnClose open={isOpen} footer={null} onCancel={onClose} className="api-client-collection-modal">
-      <div className="collection-modal-header">{name ? "Update Collection" : "New collection"}</div>
+      <div className="collection-modal-header">
+        {collectionToBeUpdate?.name ? "Update Collection" : "New collection"}
+      </div>
       <div className="collection-modal-content">
         <label className="collection-name-label">
           <span>Collection name</span>
