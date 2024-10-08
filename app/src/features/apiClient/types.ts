@@ -52,13 +52,13 @@ export namespace RQAPI {
   }
 
   export interface Collection {
-    name: string;
-    description?: string;
+    children?: Record; // For now it will be a ApiRecord
   }
 
   interface RecordMetadata {
     id: string;
     name: string;
+    description?: string;
     collectionId: string | null;
     ownerId: string;
     deleted: boolean;
