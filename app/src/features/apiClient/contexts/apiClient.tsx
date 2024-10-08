@@ -80,8 +80,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     (apiClientRecord: RQAPI.Record) => {
       const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
 
-      console.log({ isRecordExist, apiClientRecords });
-
       if (isRecordExist) {
         onUpdateRecord(apiClientRecord);
       } else {
