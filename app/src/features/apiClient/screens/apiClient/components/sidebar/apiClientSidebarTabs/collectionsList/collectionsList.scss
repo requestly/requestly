@@ -15,11 +15,16 @@
     overflow: auto;
     height: 100%;
     padding: 8px;
-    padding-top: 0;
+    padding-top: 8px;
+
+    .collections-list-item + .collections-list-item {
+      margin-top: 4px;
+    }
 
     .collections-list-item {
       display: flex;
       align-items: center;
+      gap: 8px;
 
       cursor: pointer;
       padding: 2px 4px;
@@ -27,13 +32,20 @@
       color: var(--requestly-color-text-subtle);
       font-size: var(--requestly-font-size-sm, 13px);
 
-      // &.api {
-      // width: 100%;
-      // max-width: 178px;
-      // overflow: hidden;
-      // white-space: nowrap;
-      // text-overflow: ellipsis;
-      // }
+      &.api {
+        .request-method {
+          font-size: var(--requestly-font-size-2xs);
+          font-weight: var(--requestly-font-weight-medium);
+        }
+
+        .request-url {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          font-size: var(--requestly-font-size-sm, 13px);
+          color: var(--requestly-color-text-default);
+        }
+      }
 
       &.api:hover {
         background-color: var(--gray-dark);
