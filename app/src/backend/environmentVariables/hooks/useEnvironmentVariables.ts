@@ -1,14 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { EnvironmentVariableValue } from "../types";
+import { useEffect, useMemo, useState } from "react";
+import { EnvironmentVariable, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEnvironmentVariables } from "store/features/environmentVariables/selectors";
 import { environmentVariablesActions } from "store/features/environmentVariables/slice";
-import { doc, getFirestore, onSnapshot } from "firebase/firestore";
-import firebaseApp from "firebase";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { removeEnvironmentVariable, setEnvironmentVariable } from "..";
 import { renderTemplate } from "../utils";
+import { attatchEnvironmentVariableListener, removeEnvironmentVariableFromDB, setEnvironmentVariablesInDB } from "..";
+import Logger from "lib/logger";
+
+let unsubscribeListener: () => void = null;
 
 const useEnvironmentVariables = () => {
   const dispatch = useDispatch();
@@ -24,45 +25,43 @@ const useEnvironmentVariables = () => {
     [currentlyActiveWorkspace.id, user?.details?.profile?.uid]
   );
 
-  const attachEnvironmentVariableListener = useCallback(() => {
-    const db = getFirestore(firebaseApp);
-
-    const variableQuery = doc(db, "environmentVariables", ownerId);
-
-    return onSnapshot(variableQuery, (doc) => {
-      if (doc.exists()) {
-        const variables: Record<string, string> = doc.data()[environment];
-
-        if (variables) {
-          const newVariables = Object.entries(variables).reduce((acc, [key, value]) => {
-            acc[key] = {
-              syncValue: value,
-            };
-            return acc;
-          }, {} as Record<string, EnvironmentVariableValue>);
-
-          dispatch(environmentVariablesActions.setVariables({ newVariables, environment }));
-        }
-      }
+  useEffect(() => {
+    unsubscribeListener?.();
+    unsubscribeListener = attatchEnvironmentVariableListener(ownerId, environment, (newVariables) => {
+      dispatch(environmentVariablesActions.setVariables({ newVariables, environment }));
     });
+
+    return () => {
+      unsubscribeListener();
+    };
   }, [dispatch, environment, ownerId]);
 
-  const setVariable = async (key: string, value: EnvironmentVariableValue) => {
-    const newVariable: Record<string, EnvironmentVariableValue> = {
+  useEffect(() => {
+    if (!user.loggedIn) {
+      unsubscribeListener?.();
+      dispatch(environmentVariablesActions.resetState());
+    }
+  }, [dispatch, user.loggedIn]);
+
+  const setVariable = async (key: string, value: Omit<EnvironmentVariableValue, "type">) => {
+    const newVariable: EnvironmentVariable = {
       [key]: {
         localValue: value.localValue,
         syncValue: value.syncValue,
+        type: typeof value.syncValue,
       },
     };
 
-    dispatch(environmentVariablesActions.setVariables({ newVariables: newVariable, environment }));
-    return setEnvironmentVariable(ownerId, {
-      newVariable: {
-        key,
-        value: value.syncValue,
-      },
+    return setEnvironmentVariablesInDB(ownerId, {
+      newVariables: newVariable,
       environment,
-    });
+    })
+      .then(() => {
+        dispatch(environmentVariablesActions.setVariables({ newVariables: newVariable, environment }));
+      })
+      .catch((err) => {
+        Logger.error("Error while setting environment variables in db", err);
+      });
   };
 
   const getVariableValue = (key: string) => {
@@ -73,22 +72,19 @@ const useEnvironmentVariables = () => {
     return variables[environment];
   };
 
-  const removeVariable = (key: string) => {
-    dispatch(environmentVariablesActions.removeVariable({ environment, key }));
-    return removeEnvironmentVariable(ownerId, { environment, key });
+  const removeVariable = async (key: string) => {
+    return removeEnvironmentVariableFromDB(ownerId, { environment, key })
+      .then(() => {
+        dispatch(environmentVariablesActions.removeVariable({ environment, key }));
+      })
+      .catch((err) => {
+        Logger.error("Error while removing environment variables from db", err);
+      });
   };
 
   const renderVariables = (template: string) => {
     return renderTemplate(template, variables[environment]);
   };
-
-  useEffect(() => {
-    const unsubscribeListener = attachEnvironmentVariableListener();
-
-    return () => {
-      unsubscribeListener();
-    };
-  }, [attachEnvironmentVariableListener, ownerId]);
 
   return {
     environment,
