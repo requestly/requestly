@@ -207,7 +207,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
               />
               <Col span={7}>
                 <Row align="middle" justify="end" wrap={false} className="rule-editor-modal-actions">
-                  <RuleStatusButton isRuleEditorModal={true} />
+                  <RuleStatusButton isRuleEditorModal={true} mode={mode} />
                   {mode === EditorMode.EDIT && (
                     <>
                       <DeleteButton
