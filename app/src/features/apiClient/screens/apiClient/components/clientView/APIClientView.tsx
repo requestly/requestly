@@ -52,7 +52,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
 
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
-  const { renderVariables } = useEnvironmentVariables();
+  const { renderString } = useEnvironmentVariables();
 
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
@@ -75,54 +75,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       clearTimeout(animationTimerRef.current);
     };
   }, [apiEntry]);
-
-  const parseRequestData = useCallback(
-    (request: RQAPI.Request): RQAPI.Request => {
-      const sanitizedQueryParams = removeEmptyKeys(request.queryParams);
-      const sanitizedHeaders = removeEmptyKeys(request.headers);
-
-      const parsedRequest: RQAPI.Request = {
-        ...request,
-        url: renderVariables(request.url),
-      };
-
-      const parsedQueryParams = sanitizedQueryParams.map((queryParamKeyValue) => {
-        return {
-          id: queryParamKeyValue.id,
-          key: renderVariables(queryParamKeyValue.key),
-          value: renderVariables(queryParamKeyValue.value),
-        };
-      });
-      parsedRequest.queryParams = parsedQueryParams;
-
-      const parsedHeaders = sanitizedHeaders.map((headerKeyValue) => {
-        return {
-          id: headerKeyValue.id,
-          key: renderVariables(headerKeyValue.key),
-          value: renderVariables(headerKeyValue.value),
-        };
-      });
-      parsedRequest.headers = parsedHeaders;
-
-      if (request.body) {
-        const parsedBody =
-          typeof request.body === "string"
-            ? renderVariables(request.body)
-            : request.body.map((keyValuePair) => {
-                return {
-                  id: keyValuePair.id,
-                  key: renderVariables(keyValuePair.key),
-                  value: renderVariables(keyValuePair.value),
-                };
-              });
-
-        parsedRequest.body = parsedBody;
-      }
-
-      return parsedRequest;
-    },
-    [renderVariables]
-  );
 
   const setUrl = useCallback((url: string) => {
     setEntry((entry) => ({
@@ -261,7 +213,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       sanitizedEntry.request.body = removeEmptyKeys(sanitizedEntry.request.body as KeyValuePair[]);
     }
 
-    const parsedRequest = parseRequestData(sanitizedEntry.request);
+    const renderedRequest = renderString(sanitizedEntry.request) as RQAPI.Request;
+
+    console.log("!!!debug", "renderedRequest", renderedRequest);
 
     abortControllerRef.current = new AbortController();
 
@@ -270,7 +224,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    makeRequest(appMode, parsedRequest, abortControllerRef.current.signal)
+    makeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
       .then((response) => {
         const entryWithResponse = { ...sanitizedEntry, response };
         if (response) {
@@ -309,7 +263,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     });
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
-  }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished, parseRequestData]);
+  }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished, renderString]);
 
   const cancelRequest = useCallback(() => {
     abortControllerRef.current?.abort();

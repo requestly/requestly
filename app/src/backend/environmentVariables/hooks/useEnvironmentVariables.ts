@@ -82,7 +82,7 @@ const useEnvironmentVariables = () => {
       });
   };
 
-  const renderVariables = (template: string) => {
+  const renderString = (template: string | Record<string, any>) => {
     return renderTemplate(template, variables[environment]);
   };
 
@@ -93,7 +93,7 @@ const useEnvironmentVariables = () => {
     getVariableValue,
     getAllVariables,
     removeVariable,
-    renderVariables,
+    renderString,
   };
 };
 
