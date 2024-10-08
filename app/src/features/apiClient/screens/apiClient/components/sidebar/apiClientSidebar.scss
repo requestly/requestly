@@ -23,6 +23,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 8px;
   }
 
   .api-history-list {
@@ -34,8 +35,11 @@
     padding-top: 16px;
 
     .ant-timeline-item {
-      padding-top: 12px;
-      padding-bottom: 12px;
+      padding-bottom: 18px;
+
+      .ant-timeline-item-head {
+        margin-top: 3px;
+      }
 
       .ant-timeline-item-tail {
         margin-top: 12px;
@@ -51,23 +55,23 @@
       align-items: baseline;
       gap: 10px;
       line-height: 23px;
-      padding: 8px 10px;
+      padding: 4px;
       margin: -8px 10px;
       border-radius: 4px;
 
       &.clickable:hover {
-        background-color: var(--component-background);
         cursor: pointer;
+        background-color: var(--gray-dark);
 
         .api-history-url {
-          color: #fff;
+          color: var(--requestly-color-text-default);
         }
       }
 
       .api-method {
-        font-size: var(--requestly-font-size-xs, 11px);
-        vertical-align: middle;
         flex-shrink: 0;
+        vertical-align: middle;
+        font-size: var(--requestly-font-size-2xs, 11px);
       }
 
       .api-history-url {

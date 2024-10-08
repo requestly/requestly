@@ -47,12 +47,13 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, onImportClick }) 
                     to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`}
                     className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
                   >
-                    <span
+                    <Typography.Text
+                      strong
                       className="request-method"
                       style={{ color: REQUEST_METHOD_COLORS[apiClientRecord.data.request.method] }}
                     >
-                      {apiClientRecord.data.request.method.toUpperCase()}
-                    </span>
+                      {apiClientRecord.data.request.method}
+                    </Typography.Text>
                     <div className="request-url">{apiClientRecord.data.request.url}</div>
                   </NavLink>
                 );
