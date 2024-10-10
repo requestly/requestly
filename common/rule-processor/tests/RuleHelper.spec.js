@@ -1,6 +1,6 @@
 import RuleHelper from "../src/RuleHelper";
 import { URL_SOURCES, KEYWORDS, getRedirectRule, getCancelRule } from "./helpers/MockObjects";
-const CONSTANTS = require("../../constants");
+import CONSTANTS from "../../constants";
 
 describe("RuleHelper: ", function () {
   let redirectRule, cancelRule;
