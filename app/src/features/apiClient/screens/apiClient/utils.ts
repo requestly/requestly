@@ -124,7 +124,7 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     } else if (contentType === RequestContentType.FORM) {
       body = generateKeyValuePairsFromJson(requestJson.data);
     } else {
-      body = requestJson.data;
+      body = requestJson.data ?? null;
     }
 
     const request: RQAPI.Request = {

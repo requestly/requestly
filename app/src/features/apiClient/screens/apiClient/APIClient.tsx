@@ -78,12 +78,9 @@ export const APIClient: React.FC<Props> = () => {
     async (apiEntry: RQAPI.Entry) => {
       setIsLoading(true);
 
-      // Request body can be undefined, causes error while saving
-      const updatedEntry = { ...apiEntry, request: { ...apiEntry.request, body: apiEntry.request.body ?? null } };
-
       const record: Partial<RQAPI.ApiRecord> = {
         type: RQAPI.RecordType.API,
-        data: updatedEntry,
+        data: apiEntry,
       };
 
       const result = await upsertApiRecord(uid, record, teamId);
