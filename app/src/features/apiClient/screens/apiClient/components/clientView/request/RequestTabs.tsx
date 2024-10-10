@@ -3,7 +3,7 @@ import React, { memo, useEffect, useMemo, useState } from "react";
 import { KeyValuePair, RQAPI, RequestContentType } from "../../../../../types";
 import RequestBody from "./RequestBody";
 import KeyValueForm from "./KeyValueForm";
-import { removeEmptyKeys, supportsRequestBody } from "../../../apiUtils";
+import { removeEmptyKeys, supportsRequestBody } from "../../../utils";
 import HEADER_SUGGESTIONS from "config/constants/sub/header-suggestions";
 import "./requestTabs.scss";
 
