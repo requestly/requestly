@@ -46,7 +46,8 @@
           color: var(--requestly-color-text-default);
         }
 
-        &:hover {
+        &:hover,
+        &.active {
           background-color: var(--gray-dark);
         }
       }
