@@ -14,7 +14,7 @@ export const PATTERNS = {
 
 // Generate Random Number
 PREDEFINED_FUNCTIONS.GENERATE_RANDOM_NUMBER = {
-  applicableRuleTypes: [RULE_TYPES.HEADERS],
+  applicableRuleTypes: [RULE_TYPES?.HEADERS],
   name: "rq_rand", // Name of predefined function, mandatory to start with 'rq_'.
   description: "Generate Random Number",
   usage: "rq_rand(4) (Max 8 digits allowed)",
@@ -39,7 +39,7 @@ PREDEFINED_FUNCTIONS.GENERATE_RANDOM_NUMBER = {
 
 // Get Request Origin
 PREDEFINED_FUNCTIONS.GET_REQUEST_ORIGIN = {
-  applicableRuleTypes: [RULE_TYPES.HEADERS],
+  applicableRuleTypes: [RULE_TYPES?.HEADERS],
   name: "rq_request_initiator_origin", // Name of predefined function, mandatory to start with 'rq_'.
   description: "The origin request header",
   usage: "rq_request_initiator_origin()",

@@ -1,4 +1,4 @@
-const CONSTANTS = require("../../../constants");
+import CONSTANTS from "../../../constants";
 
 export const URL_SOURCES = {
   GOOGLE: "http://www.google.com",

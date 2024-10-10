@@ -1,5 +1,5 @@
 import RuleHelper from "../RuleHelper";
-const CONSTANTS = require("../../../constants");
+import CONSTANTS from "../../../constants";
 
 class ModifyResponseRuleProcessor {
   static process({ rule, requestURL, details }) {

@@ -1,4 +1,4 @@
-const CONSTANTS = require("../../constants");
+import CONSTANTS from "../../constants";
 import ReplaceRuleProcessor from "./processors/ReplaceRuleProcessor";
 import RedirectRuleProcessor from "./processors/RedirectRuleProcessor";
 import HeadersRuleProcessor from "./processors/HeadersRuleProcessor";

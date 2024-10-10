@@ -1,12 +1,7 @@
 import QueryParamsRuleProcessor from "../../src/processors/QueryParamsRuleProcessor";
-import {
-  getQueryParamsRule,
-  URL_SOURCES,
-  sourceFilters,
-  requestDetails,
-} from "../helpers/MockObjects";
+import { getQueryParamsRule, URL_SOURCES, sourceFilters, requestDetails } from "../helpers/MockObjects";
 
-const CONSTANTS = require("../../../constants");
+import CONSTANTS from "../../../constants";
 
 describe("QueryParamsRuleProcessor:", function () {
   let queryParamsRule;
@@ -60,8 +55,7 @@ describe("QueryParamsRuleProcessor:", function () {
     });
 
     it("should be able to remove the param", function () {
-      queryParamsRule.pairs[0]["modifications"][0]["type"] =
-        CONSTANTS.MODIFICATION_TYPES.REMOVE;
+      queryParamsRule.pairs[0]["modifications"][0]["type"] = CONSTANTS.MODIFICATION_TYPES.REMOVE;
       expect(
         QueryParamsRuleProcessor.applyQueryParamModifications(
           queryParamsRule.pairs[0]["modifications"],
@@ -79,24 +73,15 @@ describe("QueryParamsRuleProcessor:", function () {
       modifications[1]["type"] = CONSTANTS.MODIFICATION_TYPES.REMOVE;
       modifications[1]["param"] = "a";
 
-      expect(
-        QueryParamsRuleProcessor.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE
-        )
-      ).toBe(URL_SOURCES.EXAMPLE);
-      expect(
-        QueryParamsRuleProcessor.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE + "?b=2"
-        )
-      ).toBe(URL_SOURCES.EXAMPLE + "?b=2");
-      expect(
-        QueryParamsRuleProcessor.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE + "#hash"
-        )
-      ).toBe(URL_SOURCES.EXAMPLE + "#hash");
+      expect(QueryParamsRuleProcessor.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE)).toBe(
+        URL_SOURCES.EXAMPLE
+      );
+      expect(QueryParamsRuleProcessor.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE + "?b=2")).toBe(
+        URL_SOURCES.EXAMPLE + "?b=2"
+      );
+      expect(QueryParamsRuleProcessor.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE + "#hash")).toBe(
+        URL_SOURCES.EXAMPLE + "#hash"
+      );
     });
 
     it("removeAll and add should add only one param", function () {
@@ -108,24 +93,15 @@ describe("QueryParamsRuleProcessor:", function () {
       modifications[1]["param"] = "a";
       modifications[1]["value"] = 1;
 
-      expect(
-        QueryParamsRuleProcessor.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE
-        )
-      ).toBe(URL_SOURCES.EXAMPLE + "?a=1");
-      expect(
-        QueryParamsRuleProcessor.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE + "?b=2"
-        )
-      ).toBe(URL_SOURCES.EXAMPLE + "?a=1");
-      expect(
-        QueryParamsRuleProcessor.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE + "#hash"
-        )
-      ).toBe(URL_SOURCES.EXAMPLE + "?a=1#hash");
+      expect(QueryParamsRuleProcessor.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE)).toBe(
+        URL_SOURCES.EXAMPLE + "?a=1"
+      );
+      expect(QueryParamsRuleProcessor.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE + "?b=2")).toBe(
+        URL_SOURCES.EXAMPLE + "?a=1"
+      );
+      expect(QueryParamsRuleProcessor.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE + "#hash")).toBe(
+        URL_SOURCES.EXAMPLE + "?a=1#hash"
+      );
     });
 
     it("adding multiple modifications with special characters in values", function () {
@@ -139,12 +115,9 @@ describe("QueryParamsRuleProcessor:", function () {
       modifications[1]["param"] = "a";
       modifications[1]["value"] = "1";
 
-      expect(
-        QueryParamsRuleProcessor.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE
-        )
-      ).toBe(URL_SOURCES.EXAMPLE + "?q=@&a=1");
+      expect(QueryParamsRuleProcessor.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE)).toBe(
+        URL_SOURCES.EXAMPLE + "?q=@&a=1"
+      );
     });
   });
 
@@ -156,21 +129,11 @@ describe("QueryParamsRuleProcessor:", function () {
         param: "utm_source",
       };
 
-      expect(
-        QueryParamsRuleProcessor.applyQueryParamModification(modification, url)
-      ).toBe(url);
-      expect(
-        QueryParamsRuleProcessor.applyQueryParamModification(
-          modification,
-          url + "?utm_source=email"
-        )
-      ).toBe(url);
-      expect(
-        QueryParamsRuleProcessor.applyQueryParamModification(
-          modification,
-          url + "?utm_param=facebook"
-        )
-      ).toBe(url + "?utm_param=facebook");
+      expect(QueryParamsRuleProcessor.applyQueryParamModification(modification, url)).toBe(url);
+      expect(QueryParamsRuleProcessor.applyQueryParamModification(modification, url + "?utm_source=email")).toBe(url);
+      expect(QueryParamsRuleProcessor.applyQueryParamModification(modification, url + "?utm_param=facebook")).toBe(
+        url + "?utm_param=facebook"
+      );
     });
   });
 });

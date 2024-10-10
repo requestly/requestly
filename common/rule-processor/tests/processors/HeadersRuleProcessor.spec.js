@@ -1,10 +1,7 @@
 import HeadersRuleProcessor from "../../src/processors/HeadersRuleProcessor";
-const CONSTANTS = require("../../../constants");
-import {
-  getHeadersRuleV1,
-  getHeadersRuleV2,
-  URL_SOURCES,
-} from "../helpers/MockObjects";
+import CONSTANTS from "../../../constants";
+
+import { getHeadersRuleV1, getHeadersRuleV2, URL_SOURCES } from "../helpers/MockObjects";
 
 describe("HeadersRuleProcessor:", function () {
   let headersRule, headersRuleV2;
@@ -104,9 +101,8 @@ describe("HeadersRuleProcessor:", function () {
       { name: "User-Agent", value: "Mozilla/5.0" },
     ];
 
-    headersRuleV2.pairs[0].modifications[CONSTANTS.HEADERS_TARGET.REQUEST][0][
-      "type"
-    ] = CONSTANTS.MODIFICATION_TYPES.REMOVE;
+    headersRuleV2.pairs[0].modifications[CONSTANTS.HEADERS_TARGET.REQUEST][0]["type"] =
+      CONSTANTS.MODIFICATION_TYPES.REMOVE;
 
     var headersRuleResponse = HeadersRuleProcessor.process({
       rule: headersRuleV2,
