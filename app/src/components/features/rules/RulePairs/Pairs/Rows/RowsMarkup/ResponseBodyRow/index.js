@@ -25,6 +25,7 @@ import { PremiumFeature } from "features/pricing";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { RuleType } from "features/rules";
+import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import "./ResponseBodyRow.css";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
@@ -139,7 +140,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                           title={
                             <>
                               You can use the captured group expressions from the request to dynamically set the file
-                              path.
+                              path (using $1, $2, etc).
                               <br />
                               <a
                                 href="https://docs.requestly.com/general/http-rules/advanced-usage/rule-operators#regex-match-operator"
@@ -158,9 +159,8 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                             onClick={() => {
                               setIsSelectedFileInputVisible(true);
                             }}
-                          >
-                            Add captured group expressions
-                          </RQButton>
+                            icon={<MdOutlineEdit />}
+                          />
                         </Tooltip>
                       ) : null}
                     </>

@@ -198,6 +198,11 @@ CONSTANTS.SCRIPT_LIBRARIES = {
   },
 };
 
+CONSTANTS.REQUEST_BODY_TYPES = {
+  STATIC: "static",
+  CODE: "code",
+};
+
 CONSTANTS.RESPONSE_BODY_TYPES = {
   STATIC: "static",
   CODE: "code",
