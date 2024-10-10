@@ -45,10 +45,10 @@
           font-size: var(--requestly-font-size-sm, 13px);
           color: var(--requestly-color-text-default);
         }
-      }
 
-      &.api:hover {
-        background-color: var(--gray-dark);
+        &:hover {
+          background-color: var(--gray-dark);
+        }
       }
 
       &.collection.ant-collapse {
