@@ -61,11 +61,16 @@ const PageScriptMessageHandler = {
   },
 
   handleMessageReceived: function (event) {
-    if (event && event.origin !== this.constants.DOMAIN) {
-      Logger.log("Ignoring message from the following domain", event.origin, event.data);
-
-      return;
-    }
+    //TODO:@nafees87n uncomment before release
+    // if (
+    //   event &&
+    //   event.origin !== this.constants.DOMAIN &&
+    //   //TODO:@nafees87n fix: update extension ID before release
+    //   event.origin !== "chrome-extension://mcidagfcffoaenpopilcmlklfmemlpce"
+    // ) {
+    //   Logger.log("Ignoring message from the following domain", event.origin, event.data);
+    //   return;
+    // }
 
     if (event?.data?.source !== this.constants.SOURCE) {
       Logger.log("Received message:", event.data);
