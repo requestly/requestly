@@ -1,5 +1,5 @@
 import UserAgentRuleProcessor from "../../src/processors/UserAgentRuleProcessor";
-const CONSTANTS = require("../../../constants");
+import CONSTANTS from "../../../constants";
 import { getUserAgentRule, URL_SOURCES } from "../helpers/MockObjects";
 
 describe("UserAgentRuleProcessor:", function () {
