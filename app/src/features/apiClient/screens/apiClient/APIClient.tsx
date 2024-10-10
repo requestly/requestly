@@ -38,7 +38,7 @@ export const APIClient: React.FC<Props> = () => {
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
 
   useEffect(() => {
-    if (!requestId) {
+    if (!requestId || requestId === "new") {
       return;
     }
 
@@ -118,7 +118,7 @@ export const APIClient: React.FC<Props> = () => {
   const onNewClick = useCallback(() => {
     setSelectedEntry(getEmptyAPIEntry());
     setSelectedEntryDetails(null);
-    navigate(PATHS.API_CLIENT.ABSOLUTE);
+    navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/new`);
     trackNewRequestClicked();
   }, []);
 
