@@ -11,9 +11,13 @@ import {
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
 import ImportRequestModal from "./components/modals/ImportRequestModal";
-import { getApiRecord } from "backend/apiClient";
+import { getApiRecord, upsertApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
 import PATHS from "config/constants/sub/paths";
+import { getUserAuthDetails } from "store/selectors";
+import { useSelector } from "react-redux";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { useApiClientContext } from "features/apiClient/contexts";
 import "./apiClient.scss";
 
 interface Props {}
@@ -21,8 +25,13 @@ interface Props {}
 export const APIClient: React.FC<Props> = () => {
   const { requestId } = useParams();
   const navigate = useNavigate();
+  const user = useSelector(getUserAuthDetails);
+  const uid = user?.details?.profile?.uid;
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const teamId = workspace?.id;
+  const { onSaveRecord } = useApiClientContext();
 
-  const [, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
   const [selectedEntry, setSelectedEntry] = useState<RQAPI.Entry>();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -65,10 +74,44 @@ export const APIClient: React.FC<Props> = () => {
     trackHistoryCleared();
   }, [setHistory]);
 
-  const handleImportRequest = useCallback((request: RQAPI.Request) => {
-    setSelectedEntry(getEmptyAPIEntry(request));
-    setIsImportModalOpen(false);
-  }, []);
+  const saveRequest = useCallback(
+    async (apiEntry: RQAPI.Entry) => {
+      setIsLoading(true);
+
+      // Request body can be undefined, causes error while saving
+      const updatedEntry = { ...apiEntry, request: { ...apiEntry.request, body: apiEntry.request.body ?? null } };
+
+      const record: Partial<RQAPI.ApiRecord> = {
+        type: RQAPI.RecordType.API,
+        data: updatedEntry,
+      };
+
+      const result = await upsertApiRecord(uid, record, teamId);
+
+      if (result.success) {
+        onSaveRecord(result.data);
+        navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`);
+      }
+
+      setIsLoading(false);
+    },
+    [uid, teamId, onSaveRecord, navigate]
+  );
+
+  const handleImportRequest = useCallback(
+    async (request: RQAPI.Request) => {
+      const apiEntry = getEmptyAPIEntry(request);
+
+      return saveRequest(apiEntry)
+        .then(() => {
+          setSelectedEntry(apiEntry);
+        })
+        .finally(() => {
+          setIsImportModalOpen(false);
+        });
+    },
+    [saveRequest]
+  );
 
   const onImportClick = useCallback(() => {
     setIsImportModalOpen(true);
@@ -106,6 +149,7 @@ export const APIClient: React.FC<Props> = () => {
           notifyApiRequestFinished={addToHistory}
         />
         <ImportRequestModal
+          isRequestLoading={isLoading}
           isOpen={isImportModalOpen}
           handleImportRequest={handleImportRequest}
           onClose={() => setIsImportModalOpen(false)}

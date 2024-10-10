@@ -6,17 +6,15 @@ import { toast } from "utils/Toast";
 import { trackCurlImportFailed, trackCurlImported } from "modules/analytics/events/features/apiClient";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
-import { useNavigate } from "react-router-dom";
-import PATHS from "config/constants/sub/paths";
 
 interface Props {
   isOpen: boolean;
+  isRequestLoading: boolean;
   handleImportRequest: (request: RQAPI.Request) => void;
   onClose: () => void;
 }
 
-const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onClose }) => {
-  const navigate = useNavigate();
+const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onClose, isRequestLoading }) => {
   const [curlCommand, setCurlCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>();
 
@@ -47,9 +45,7 @@ const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onCl
     trackCurlImported();
     trackRQLastActivity(API_CLIENT.CURL_IMPORTED);
     trackRQDesktopLastActivity(API_CLIENT.CURL_IMPORTED);
-
-    navigate(PATHS.API_CLIENT.ABSOLUTE);
-  }, [navigate, curlCommand, handleImportRequest]);
+  }, [curlCommand, handleImportRequest]);
 
   return (
     <Modal
@@ -59,6 +55,8 @@ const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onCl
       open={isOpen}
       okText="Import"
       onOk={onImportClicked}
+      maskClosable={false}
+      confirmLoading={isRequestLoading}
       onCancel={onClose}
       width="70%"
     >
