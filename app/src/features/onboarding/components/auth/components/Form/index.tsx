@@ -194,14 +194,15 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     if (user.loggedIn && isOnboarding) {
       if (!isNull(isNewUser)) {
         trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
-        if (isNewUser) {
+        // Note: Currently we cannot indentify if the user is new or not in desktop app mode.
+        if (isNewUser || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
           dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
         } else {
           dispatch(actions.updateAppOnboardingCompleted());
         }
       }
     }
-  }, [dispatch, user.loggedIn, isNewUser, isOnboarding]);
+  }, [dispatch, user.loggedIn, isNewUser, isOnboarding, appMode]);
 
   if (authMode === AUTH.ACTION_LABELS.SSO) {
     return <SSOSignInForm email={email} setEmail={setEmail} setAuthMode={setAuthMode} source={source} />;
