@@ -10,6 +10,7 @@ export const URL_SOURCES = {
   DROPBOX: "http://www.dropbox.com",
   EXAMPLE: "http://www.example.com",
   QUORA: "https://www.quora.com",
+  TESTHEADERS: "https://testheaders.com/",
 };
 
 export const KEYWORDS = {
@@ -139,8 +140,7 @@ export function getReplaceRule() {
         },
       },
       {
-        from:
-          "/\\?.+/ig" /* TODO: Figure out why double escaping is needed here but not in rule */,
+        from: "/\\?.+/ig" /* TODO: Figure out why double escaping is needed here but not in rule */,
         to: "",
         source: {
           key: CONSTANTS.RULE_KEYS.URL,
@@ -308,6 +308,33 @@ export function getDelayRequestRule() {
           value: URL_SOURCES.DROPBOX,
         },
         delayType: CONSTANTS.DELAY_REQUEST_CONSTANTS.DELAY_TYPE.CLIENT_SIDE,
+      },
+    ],
+  });
+}
+
+export function getModifyResponseRule() {
+  return getBaseRule({
+    name: "Test Modify Response Rule",
+    ruleType: CONSTANTS.RULE_TYPES.RESPONSE,
+    pairs: [
+      {
+        isCompressed: false,
+        source: {
+          key: CONSTANTS.RULE_KEYS.URL,
+          operator: CONSTANTS.RULE_OPERATORS.EQUALS,
+          value: URL_SOURCES.TESTHEADERS,
+        },
+        response: {
+          resourceType: "restApi",
+          statusCode: "202",
+          type: CONSTANTS.RESPONSE_BODY_TYPES.STATIC,
+          value: `{
+            "name": "John Doe",
+            "age": 30,
+            "email": "john.doe@example.com"
+            }`,
+        },
       },
     ],
   });
