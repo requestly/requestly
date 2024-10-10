@@ -12,10 +12,10 @@ import { API_CLIENT } from "modules/analytics/events/features/constants";
 interface Props {
   history: RQAPI.Entry[];
   onSelectionFromHistory: (index: number) => void;
-  clearHistory: () => void;
+  onClearHistory: () => void;
 }
 
-export const HistoryList: React.FC<Props> = ({ history, onSelectionFromHistory, clearHistory }) => {
+export const HistoryList: React.FC<Props> = ({ history, onSelectionFromHistory, onClearHistory }) => {
   const onHistoryLinkClick = useCallback(
     (index: number) => {
       onSelectionFromHistory(index);
@@ -30,7 +30,7 @@ export const HistoryList: React.FC<Props> = ({ history, onSelectionFromHistory, 
     <>
       <div className="api-client-sidebar-header">
         {history?.length ? (
-          <RQButton type="transparent" size="small" onClick={clearHistory} icon={<ClearOutlined />}>
+          <RQButton type="transparent" size="small" onClick={onClearHistory} icon={<ClearOutlined />}>
             Clear history
           </RQButton>
         ) : null}

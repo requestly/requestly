@@ -45,7 +45,7 @@ export const ApiClientSidebarTabs: React.FC<Props> = ({
         </div>
       ),
       children: (
-        <HistoryList history={history} onSelectionFromHistory={onSelectionFromHistory} clearHistory={clearHistory} />
+        <HistoryList history={history} onSelectionFromHistory={onSelectionFromHistory} onClearHistory={clearHistory} />
       ),
     },
   ];
