@@ -1,5 +1,5 @@
 if (typeof isReactApp === "undefined") {
-  var isReactApp = document.getElementById("root") !== null;
+  var isReactApp = document?.getElementById("root") !== null;
 }
 
 var Logger = {
@@ -44,9 +44,8 @@ if (urlParams.has("debug")) {
 
 window.rq_debug = () => (Logger.enabled = true);
 
-if (isReactApp) {
-  module.exports = Logger;
-} else {
+export default Logger;
+if (!isReactApp) {
   window.RQ = window.RQ || {};
   window.RQ.components = window.RQ.components || {};
   window.RQ.components.logger = Logger;
