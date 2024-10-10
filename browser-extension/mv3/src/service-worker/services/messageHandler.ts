@@ -1,6 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
-import { getAppTabs, toggleExtensionStatus } from "./utils";
+import { getAppTabs, getIsUserLoggedIn, toggleExtensionStatus } from "./utils";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
   cacheRecordedSessionOnClientPageUnload,
@@ -110,6 +110,10 @@ export const initMessageHandler = () => {
       case EXTENSION_MESSAGES.WATCH_RECORDING:
         watchRecording(message.tabId ?? sender.tab?.id);
         break;
+
+      case EXTENSION_MESSAGES.GET_IS_USER_LOGGED_IN:
+        getIsUserLoggedIn().then(sendResponse);
+        return true;
 
       case EXTENSION_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
         cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
