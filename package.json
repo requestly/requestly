@@ -1,6 +1,6 @@
 {
   "name": "@requestly/requestly-core",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Requestly app, extension and other components ",
   "main": "index.js",
   "directories": {
