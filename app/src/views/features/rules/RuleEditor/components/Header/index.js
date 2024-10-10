@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Row, Col, Layout, Divider, Tooltip } from "antd";
+import { useEffect, useMemo } from "react";
+import { Layout, Divider, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getCurrentlySelectedRuleConfig,
@@ -24,16 +24,14 @@ import {
 } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/utils/rules";
 import { getAllRecordsMap } from "store/features/rules/selectors";
 import { useRulesActionContext } from "features/rules/context/actions";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { trackSampleRuleCreateRuleClicked, trackSampleRuleTested } from "features/rules/analytics";
-import { RecordStatus } from "features/rules";
+import { trackSampleRuleCreateRuleClicked } from "features/rules/analytics";
 import { RQButton } from "lib/design-system-v2/components";
 
 const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleTooltip = false }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const location = useLocation();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
@@ -121,7 +119,7 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
           <div className="ml-auto rule-editor-header-actions-container">
             <HelpButton />
 
-            <Status />
+            <Status mode={mode} />
 
             {isRuleGroupDisabled && (
               <div className="rule-editor-header-disabled-group-warning">
