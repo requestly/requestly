@@ -1,10 +1,6 @@
-import { EnvironmentVariable } from "backend/environment/types";
+import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 
 export interface InitialState {
-  currentEnvironment: EnvironmentDetails;
-  variables: EnvironmentVariable;
-}
-
-export interface EnvironmentDetails {
-  name: string;
+  currentEnvironment: EnvironmentData;
+  environments: EnvironmentMap;
 }

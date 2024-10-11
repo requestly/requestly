@@ -4,4 +4,11 @@ export interface EnvironmentVariableValue {
   type: string | number | boolean;
 }
 
-export type EnvironmentVariable = Record<string, EnvironmentVariableValue>;
+export type EnvironmentVariables = Record<string, EnvironmentVariableValue>;
+
+export interface EnvironmentData {
+  name: string;
+  variables: EnvironmentVariables;
+}
+
+export type EnvironmentMap = Record<string, EnvironmentData>;
