@@ -134,34 +134,38 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                     <>
                       <span className="file-path">{pair.response.value ? pair.response.value : " No file chosen"}</span>
                       {pair.response.value ? (
-                        <Tooltip
-                          color={theme?.colors?.black}
-                          placement="top"
-                          title={
-                            <>
-                              You can use the captured group expressions from the request to dynamically set the file
-                              path (using $1, $2, etc).
-                              <br />
-                              <a
-                                href="https://docs.requestly.com/general/http-rules/advanced-usage/rule-operators#regex-match-operator"
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                click here
-                              </a>{" "}
-                              to learn more.
-                            </>
-                          }
-                        >
-                          <RQButton
-                            size="small"
-                            type="link"
-                            onClick={() => {
-                              setIsSelectedFileInputVisible(true);
-                            }}
-                            icon={<MdOutlineEdit />}
-                          />
-                        </Tooltip>
+                        <>
+                          {isFeatureCompatible(FEATURES.EDIT_LOCAL_FILE_PATH) ? (
+                            <Tooltip
+                              color={theme?.colors?.black}
+                              placement="top"
+                              title={
+                                <>
+                                  You can use the captured group expressions from the request to dynamically set the
+                                  file path (using $1, $2, etc).
+                                  <br />
+                                  <a
+                                    href="https://docs.requestly.com/general/http-rules/advanced-usage/rule-operators#regex-match-operator"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    click here
+                                  </a>{" "}
+                                  to learn more.
+                                </>
+                              }
+                            >
+                              <RQButton
+                                size="small"
+                                type="link"
+                                onClick={() => {
+                                  setIsSelectedFileInputVisible(true);
+                                }}
+                                icon={<MdOutlineEdit />}
+                              />
+                            </Tooltip>
+                          ) : null}
+                        </>
                       ) : null}
                     </>
                   )}
