@@ -34,7 +34,7 @@ import "./apiClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
-import useEnvironmentVariables from "backend/environmentVariables/hooks/useEnvironmentVariables";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 
 interface Props {
   apiEntry?: RQAPI.Entry;
@@ -52,7 +52,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
 
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
-  const { renderString } = useEnvironmentVariables();
+  const { renderString } = useEnvironmentManager();
 
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
