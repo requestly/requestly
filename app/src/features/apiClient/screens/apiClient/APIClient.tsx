@@ -76,6 +76,10 @@ export const APIClient: React.FC<Props> = () => {
 
   const saveRequest = useCallback(
     async (apiEntry: RQAPI.Entry) => {
+      if (!user?.loggedIn) {
+        return;
+      }
+
       setIsLoading(true);
 
       const record: Partial<RQAPI.ApiRecord> = {
@@ -92,7 +96,7 @@ export const APIClient: React.FC<Props> = () => {
 
       setIsLoading(false);
     },
-    [uid, teamId, onSaveRecord, navigate]
+    [uid, user?.loggedIn, teamId, onSaveRecord, navigate]
   );
 
   const handleImportRequest = useCallback(
