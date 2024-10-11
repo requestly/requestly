@@ -108,18 +108,32 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       };
 
       if (ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
-        const requestBody = ruleData.request.body ? JSON.parse(ruleData.request.body) : undefined;
         // Handling prefill for graphql resource type response rule
-        if (ruleData.request.path.indexOf("/graphql") !== -1 && requestBody[0] && requestBody[0].operationName) {
-          const pair = prefilledRule.pairs[0];
-          const sourceFilters = pair.source.filters;
+        const { GQLDetails } = ruleData.metadata || {};
+        const pair = prefilledRule.pairs[0];
+        const sourceFilters = pair.source.filters;
+        if (GQLDetails?.operationName) {
           pair.response.resourceType = ResponseRuleResourceType.GRAPHQL_API;
           pair.source.filters = [
             ...sourceFilters,
             {
               requestPayload: {
-                key: "0.operationName",
-                value: requestBody[0].operationName,
+                key: "operationName",
+                operator: GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS,
+                value: GQLDetails.operationName,
+              },
+            },
+          ];
+          prefilledRule.pairs[0] = pair;
+        } else if (GQLDetails?.query) {
+          pair.response.resourceType = ResponseRuleResourceType.GRAPHQL_API;
+          pair.source.filters = [
+            ...sourceFilters,
+            {
+              requestPayload: {
+                key: "query",
+                operator: GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS,
+                value: GQLDetails.query,
               },
             },
           ];
