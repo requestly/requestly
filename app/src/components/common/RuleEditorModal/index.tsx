@@ -107,22 +107,24 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
         status: Status.ACTIVE,
       };
 
-      // Handling prefill for graphql resource type response rule
-      if (ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE && ruleData.request.path.indexOf("/graphql") !== -1) {
-        const requestBody = JSON.parse(ruleData.request.body);
-        const pair = prefilledRule.pairs[0];
-        const sourceFilters = pair.source.filters;
-        pair.response.resourceType = ResponseRuleResourceType.GRAPHQL_API;
-        pair.source.filters = [
-          ...sourceFilters,
-          {
-            requestPayload: {
-              key: "0.operationName",
-              value: requestBody[0].operationName,
+      if (ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
+        const requestBody = ruleData.request.body ? JSON.parse(ruleData.request.body) : undefined;
+        // Handling prefill for graphql resource type response rule
+        if (ruleData.request.path.indexOf("/graphql") !== -1 && requestBody[0] && requestBody[0].operationName) {
+          const pair = prefilledRule.pairs[0];
+          const sourceFilters = pair.source.filters;
+          pair.response.resourceType = ResponseRuleResourceType.GRAPHQL_API;
+          pair.source.filters = [
+            ...sourceFilters,
+            {
+              requestPayload: {
+                key: "0.operationName",
+                value: requestBody[0].operationName,
+              },
             },
-          },
-        ];
-        prefilledRule.pairs[0] = pair;
+          ];
+          prefilledRule.pairs[0] = pair;
+        }
       }
 
       setCurrentlySelectedRule(dispatch, prefilledRule);
