@@ -22,7 +22,7 @@ const useEnvironmentManager = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const { name: currentEnvironmentName } = useSelector(getCurrentEnvironmentDetails);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
-  const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentName].variables;
+  const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentName]?.variables ?? {};
 
   const ownerId = useMemo(
     () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
