@@ -1,24 +1,32 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { EnvironmentVariable } from "backend/environmentVariables/types";
-
-interface InitialState {
-  variables: Record<string, EnvironmentVariable>;
-}
+import { EnvironmentVariable } from "backend/environment/types";
+import { InitialState } from "./types";
 
 const initialState = {
+  currentEnvironment: {
+    name: "default",
+  },
   variables: {},
 };
 
 const resetState = (): InitialState => initialState;
 
+const setEnvironment = (
+  state: InitialState,
+  action: PayloadAction<{
+    environmentName: string;
+  }>
+) => {
+  state.currentEnvironment.name = action.payload.environmentName;
+};
+
 const setVariables = (
   state: InitialState,
   action: PayloadAction<{
     newVariables: EnvironmentVariable;
-    environment: string;
   }>
 ) => {
-  const currentEnvironmentVariables = state.variables[action.payload.environment] || ({} as EnvironmentVariable);
+  const currentEnvironmentVariables = state.variables;
 
   const updatedVariables: EnvironmentVariable = Object.fromEntries(
     Object.entries(action.payload.newVariables).map(([key, value]) => {
@@ -38,7 +46,7 @@ const setVariables = (
     })
   );
 
-  state.variables[action.payload.environment] = {
+  state.variables = {
     ...currentEnvironmentVariables,
     ...updatedVariables,
   };
@@ -47,17 +55,17 @@ const setVariables = (
 const removeVariable = (
   state: InitialState,
   action: PayloadAction<{
-    environment: string;
     key: string;
   }>
 ) => {
-  delete state.variables[action.payload.environment][action.payload.key];
+  delete state.variables[action.payload.key];
 };
 
 const environmentVariablesReducerFunctions = {
   resetState,
   setVariables,
   removeVariable,
+  setEnvironment,
 };
 
 export { initialState };
