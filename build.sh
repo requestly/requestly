@@ -24,6 +24,9 @@ cd common/rule-processor/
 sh build.sh
 cd ../..
 
+echo -e "\n***** Generating requestly-core Dist Files *****"
+npm run build
+
 echo -e "\n***** Building New React App *****"
 cd app
 bash build.sh ${env}
