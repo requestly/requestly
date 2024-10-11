@@ -3,7 +3,7 @@
  * Right now the imports are defined using require, once changed to ES6 module we can move to import module
  */
 if (typeof isReactApp === "undefined") {
-  var isReactApp = document.getElementById("root") !== null;
+  var isReactApp = document?.getElementById("root") !== null;
 }
 const CONSTANTS = {};
 
@@ -228,9 +228,8 @@ CONSTANTS.REQUEST_STATE = {
   COMPLETE: "COMPLETE",
 };
 
-if (isReactApp) {
-  module.exports = CONSTANTS;
-} else {
+export default CONSTANTS;
+if (!isReactApp) {
   /** For legacy apps- browser extension */
   Object.assign(window.RQ, CONSTANTS);
 }
