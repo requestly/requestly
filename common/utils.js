@@ -1,4 +1,4 @@
-const CONSTANTS = require("./constants");
+import CONSTANTS from "./constants";
 
 export const regexFormat = "^/(.+)/(|i|g|ig|gi)$";
 
@@ -94,12 +94,12 @@ export function removeLastPart(str, separater) {
 }
 
 export function setCookie(name, value, maxAge) {
-  document.cookie = name + "=" + value + "; path=/" + "; max-age=" + maxAge;
+  if (document) document.cookie = name + "=" + value + "; path=/" + "; max-age=" + maxAge;
 }
 
 export function readCookie(name) {
   var nameEQ = name + "=";
-  var ca = document.cookie.split(";");
+  var ca = document?.cookie.split(";");
   for (var i = 0; i < ca.length; i++) {
     var c = ca[i];
     while (c.charAt(0) === " ") c = c.substring(1, c.length);
