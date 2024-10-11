@@ -196,30 +196,27 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   };
 
   const sampleRegexDropdownItems = useMemo(() => {
-    return (
-      <Menu className="sample-regex-dropdown-items">
-        {sampleRegex.map(({ title, regex, url }) => {
-          return (
-            <Menu.Item
-              key={title}
-              onClick={() => {
-                setSourceConfig({
-                  ...pair.source,
-                  value: `/${regex}/`,
-                  operator: GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES,
-                });
-                setTestURL(url);
-                setIsTestURLModalVisible(true);
-                trackSampleRegexClicked();
-              }}
-            >
-              <div className="sample-regex-dropdown-item__title">{title}</div>
-              <div className="sample-regex-dropdown-item__regex">{regex}</div>
-            </Menu.Item>
-          );
-        })}
-      </Menu>
-    );
+    return sampleRegex.map(({ title, regex, url }, index) => {
+      return {
+        key: index,
+        onClick: () => {
+          setSourceConfig({
+            ...pair.source,
+            value: `/${regex}/`,
+            operator: GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES,
+          });
+          setTestURL(url);
+          setIsTestURLModalVisible(true);
+          trackSampleRegexClicked();
+        },
+        label: (
+          <>
+            <div className="sample-regex-dropdown-item__title">{title}</div>
+            <div className="sample-regex-dropdown-item__regex">{regex}</div>
+          </>
+        ),
+      };
+    });
   }, [pair.source]);
 
   const handleResetTestSourceConfig = () => {
@@ -389,7 +386,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
       {pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES &&
         location.pathname.includes(PATHS.RULE_EDITOR.ABSOLUTE) && (
           <Col className="sample-regex-dropdown-container">
-            <Dropdown overlay={sampleRegexDropdownItems} trigger={["click"]} className="sample-regex-dropdown">
+            <Dropdown menu={{ items: sampleRegexDropdownItems }} trigger={["click"]} className="sample-regex-dropdown">
               <Space>
                 Try example regex
                 <DownOutlined />
