@@ -2,6 +2,7 @@
   .api-client-sidebar-tabs {
     flex-shrink: 0;
     height: 100%;
+    overflow: hidden;
     background-color: var(--body-background);
 
     .ant-tabs-nav {
@@ -48,8 +49,11 @@
     }
 
     .ant-tabs-content {
+      height: 100%;
+
       .ant-tabs-tabpane {
         padding: 0;
+        height: 100%;
       }
     }
 
