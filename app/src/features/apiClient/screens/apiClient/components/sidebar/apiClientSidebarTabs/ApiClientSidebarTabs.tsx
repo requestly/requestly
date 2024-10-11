@@ -1,7 +1,7 @@
 import React from "react";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
-import { Tabs, TabsProps } from "antd";
+import { Tabs, TabsProps, Tooltip } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { CollectionsList } from "./collectionsList/CollectionsList";
 import { HistoryList } from "./historyList/HistoryList";
@@ -31,18 +31,22 @@ export const ApiClientSidebarTabs: React.FC<Props> = ({
     {
       key: ApiClientSidebarTabKey.COLLECTIONS,
       label: (
-        <div className="api-client-tab-label">
-          <BsCollection /> Collections
-        </div>
+        <Tooltip title="Collections" placement="right">
+          <div className="api-client-tab-label">
+            <BsCollection />
+          </div>
+        </Tooltip>
       ),
       children: <CollectionsList onNewClick={onNewClick} onImportClick={onImportClick} />,
     },
     {
       key: ApiClientSidebarTabKey.HISTORY,
       label: (
-        <div className="api-client-tab-label">
-          <MdOutlineHistory /> History
-        </div>
+        <Tooltip title="History" placement="right">
+          <div className="api-client-tab-label">
+            <MdOutlineHistory />
+          </div>
+        </Tooltip>
       ),
       children: (
         <HistoryList history={history} onSelectionFromHistory={onSelectionFromHistory} onClearHistory={clearHistory} />
@@ -50,5 +54,5 @@ export const ApiClientSidebarTabs: React.FC<Props> = ({
     },
   ];
 
-  return <Tabs size="small" className="api-client-sidebar-tabs" items={items} />;
+  return <Tabs tabPosition="left" size="small" className="api-client-sidebar-tabs" items={items} />;
 };
