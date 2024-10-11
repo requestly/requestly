@@ -34,14 +34,18 @@ interface ModalProps {
 
 export const TestURLModal: React.FC<ModalProps> = ({
   isOpen,
+  /*
+  originalSource is the source config in redux at the time of opening the modal
+  source is the config passed explicitly for sample regex
+  */
   source,
-  analyticsContext,
   originalSource,
+  analyticsContext,
   defaultTestURL = "",
   onClose,
   onSave,
 }) => {
-  const [updatedSource, setUpdatedSource] = useState<Source>(source);
+  const [updatedSource, setUpdatedSource] = useState<Source>(source || originalSource);
   const [testURL, setTestURL] = useState<string>(defaultTestURL);
   const [isCheckPassed, setIsCheckPassed] = useState<boolean>(false);
   const [matchedGroups, setMatchedGroups] = useState<string[]>([]);
@@ -217,7 +221,7 @@ export const TestURLModal: React.FC<ModalProps> = ({
                 trackURLConditionSourceModificationSaved(updatedSource.operator, analyticsContext);
               }}
             >
-              Save and close
+              Use condition
             </RQButton>
           )}
         </Row>

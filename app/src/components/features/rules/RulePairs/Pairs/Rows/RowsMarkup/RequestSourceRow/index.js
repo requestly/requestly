@@ -222,16 +222,22 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
     );
   }, [pair.source]);
 
+  const handleResetTestSourceConfig = () => {
+    setSourceConfig(null);
+    setTestURL("");
+  };
+
   return (
     <>
       {isTestURLModalVisible && (
         <TestURLModal
           isOpen={isTestURLModalVisible}
           onClose={(operator) => {
+            handleResetTestSourceConfig();
             setIsTestURLModalVisible(false);
             trackURLConditionModalClosed(operator, { rule_type: currentlySelectedRuleConfig.TYPE });
           }}
-          source={sourceConfig}
+          source={sourceConfig || pair.source}
           defaultTestURL={testURL}
           originalSource={pair.source}
           onSave={updateSourceFromTestURLModal}
