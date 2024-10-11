@@ -27,11 +27,11 @@ const setAllEnvironmentData = (
     environmentMap: EnvironmentMap;
   }>
 ) => {
+  let updatedEnvironments: EnvironmentMap = {};
+
   if (Object.keys(state.environments).length === 0) {
-    state.environments = action.payload.environmentMap;
-    state.currentEnvironment = action.payload.environmentMap[state.currentEnvironment.name];
+    updatedEnvironments = action.payload.environmentMap;
   } else {
-    const updatedEnvironments: EnvironmentMap = {};
     Object.keys(action.payload.environmentMap).forEach((key) => {
       updatedEnvironments[key] = {
         ...state.environments[key],
@@ -41,9 +41,8 @@ const setAllEnvironmentData = (
         ),
       };
     });
-
-    state.environments = updatedEnvironments;
   }
+  state.environments = updatedEnvironments;
 };
 
 const setVariablesInEnvironment = (
