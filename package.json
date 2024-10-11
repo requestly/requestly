@@ -1,6 +1,6 @@
 {
   "name": "@requestly/requestly-core",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Requestly app, extension and other components",
   "main": "dist/requestly-core.cjs.js",
   "module": "dist/requestly-core.esm.js",
