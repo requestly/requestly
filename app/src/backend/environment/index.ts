@@ -1,10 +1,10 @@
 import firebaseApp from "firebase";
-import { deleteField, doc, getFirestore, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
-import { EnvironmentVariable } from "./types";
+import { collection, deleteField, doc, getFirestore, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import { EnvironmentData, EnvironmentMap, EnvironmentVariables } from "./types";
 
 const getDocPath = (ownerId: string, environment: string) => {
   const db = getFirestore(firebaseApp);
-  return doc(db, "environmentVariables", ownerId, "environments", environment);
+  return doc(db, "environmentConfigs", ownerId, "environments", environment);
 };
 
 export const setEnvironmentInDB = async (ownerId: string, environment: string) => {
@@ -12,6 +12,7 @@ export const setEnvironmentInDB = async (ownerId: string, environment: string) =
     getDocPath(ownerId, environment),
     {
       name: environment,
+      variables: {},
     },
     { merge: true }
   );
@@ -20,7 +21,7 @@ export const setEnvironmentInDB = async (ownerId: string, environment: string) =
 export const setEnvironmentVariablesInDB = async (
   ownerId: string,
   payload: {
-    newVariables: EnvironmentVariable;
+    newVariables: EnvironmentVariables;
     environment: string;
   }
 ) => {
@@ -52,22 +53,26 @@ export const removeEnvironmentVariableFromDB = async (
 
 export const attatchEnvironmentVariableListener = (
   ownerId: string,
-  environment: string,
-  callback: (newVariables: EnvironmentVariable) => void
+  callback: (newVariables: EnvironmentMap) => void
 ) => {
-  if (!ownerId || !environment) {
+  if (!ownerId) {
     return () => {};
   }
 
-  const variableDoc = getDocPath(ownerId, environment);
+  const db = getFirestore(firebaseApp);
+  const variableDoc = collection(db, "environmentConfigs", ownerId, "environments");
 
-  const unsubscribe = onSnapshot(variableDoc, (doc) => {
-    if (doc.exists()) {
-      const variables: EnvironmentVariable = doc.data()?.variables ?? {};
-
-      callback(variables);
-    } else {
+  const unsubscribe = onSnapshot(variableDoc, (snapshot) => {
+    if (!snapshot) {
       callback({});
+    } else {
+      const environmentDetails: EnvironmentMap = {};
+
+      snapshot.forEach((doc) => {
+        environmentDetails[doc.id] = doc.data() as EnvironmentData;
+      });
+
+      callback(environmentDetails);
     }
   });
 

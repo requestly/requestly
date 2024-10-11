@@ -13,5 +13,6 @@ const { actions, reducer } = slice;
 
 export const environmentVariablesActions = actions;
 export const environmentVariablesReducer = getReducerWithLocalStorageSync(ReducerKeys.ENVIRONMENT, reducer, [
-  "variables",
+  "currentEnvironment",
+  "environments",
 ]);
