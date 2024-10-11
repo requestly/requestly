@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { EnvironmentVariables, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentEnvironmentDetails } from "store/features/environment/selectors";
+import { getAllEnvironmentData, getCurrentEnvironmentDetails } from "store/features/environment/selectors";
 import { environmentVariablesActions } from "store/features/environment/slice";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -20,9 +20,9 @@ const useEnvironmentManager = () => {
 
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const { name: currentEnvironmentName, variables: currentEnvironmentVariables } = useSelector(
-    getCurrentEnvironmentDetails
-  );
+  const { name: currentEnvironmentName } = useSelector(getCurrentEnvironmentDetails);
+  const allEnvironmentData = useSelector(getAllEnvironmentData);
+  const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentName].variables;
 
   const ownerId = useMemo(
     () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),

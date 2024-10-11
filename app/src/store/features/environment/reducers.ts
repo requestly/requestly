@@ -6,7 +6,6 @@ import { mergeLocalAndSyncVariables } from "./utils";
 const initialState = {
   currentEnvironment: {
     name: "default",
-    variables: {},
   },
   environments: {},
 };
@@ -44,7 +43,6 @@ const setAllEnvironmentData = (
     });
 
     state.environments = updatedEnvironments;
-    state.currentEnvironment = updatedEnvironments[state.currentEnvironment.name];
   }
 };
 
@@ -60,7 +58,6 @@ const setVariablesInEnvironment = (
   const updatedVariables = mergeLocalAndSyncVariables(currentEnvironmentVariables, action.payload.newVariables);
 
   state.environments[action.payload.environment].variables = updatedVariables;
-  state.currentEnvironment = state.environments[action.payload.environment];
 };
 
 const removeVariableFromEnvironment = (
@@ -71,7 +68,6 @@ const removeVariableFromEnvironment = (
   }>
 ) => {
   delete state.environments[action.payload.environment].variables[action.payload.key];
-  state.currentEnvironment = state.environments[action.payload.environment];
 };
 
 const environmentVariablesReducerFunctions = {
