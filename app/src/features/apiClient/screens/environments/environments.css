@@ -1,0 +1,11 @@
+.environments-view-container {
+  width: 100%;
+  height: 100%;
+  background: var(--requestly-color-background);
+  display: flex;
+}
+
+.variable-list-view {
+  padding: 8px var(--space-6, 16px);
+  flex: 1;
+}

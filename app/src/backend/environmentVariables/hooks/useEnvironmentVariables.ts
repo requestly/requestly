@@ -20,6 +20,7 @@ const useEnvironmentVariables = () => {
   const variables = useSelector(getAllEnvironmentVariables);
 
   const [environment, setEnvironment] = useState<string>("default");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const ownerId = useMemo(
     () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
@@ -27,9 +28,11 @@ const useEnvironmentVariables = () => {
   );
 
   useEffect(() => {
+    setIsLoading(true);
     unsubscribeListener?.();
     unsubscribeListener = attatchEnvironmentVariableListener(ownerId, environment, (newVariables) => {
       dispatch(environmentVariablesActions.setVariables({ newVariables, environment }));
+      setIsLoading(false);
     });
 
     return () => {
@@ -62,7 +65,7 @@ const useEnvironmentVariables = () => {
       })
       .catch((err) => {
         toast.error("Error while setting environment variables.");
-        Logger.error("Error while setting environment variables in db", err);
+        console.error("Error while setting environment variables in db", err);
       });
   };
 
@@ -97,6 +100,7 @@ const useEnvironmentVariables = () => {
     getAllVariables,
     removeVariable,
     renderString,
+    isVariablesLoading: isLoading,
   };
 };
 
