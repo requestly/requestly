@@ -2,9 +2,19 @@ import firebaseApp from "firebase";
 import { deleteField, doc, getFirestore, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import { EnvironmentVariable } from "./types";
 
-const getDocPath = (ownerId: string) => {
+const getDocPath = (ownerId: string, environment: string) => {
   const db = getFirestore(firebaseApp);
-  return doc(db, "environmentVariables", ownerId);
+  return doc(db, "environmentVariables", ownerId, "environments", environment);
+};
+
+export const setEnvironmentInDB = async (ownerId: string, environment: string) => {
+  return setDoc(
+    getDocPath(ownerId, environment),
+    {
+      name: environment,
+    },
+    { merge: true }
+  );
 };
 
 export const setEnvironmentVariablesInDB = async (
@@ -19,11 +29,9 @@ export const setEnvironmentVariablesInDB = async (
   );
 
   return setDoc(
-    getDocPath(ownerId),
+    getDocPath(ownerId, payload.environment),
     {
-      [payload.environment]: {
-        ...newVariables,
-      },
+      variables: newVariables,
     },
     { merge: true }
   );
@@ -36,8 +44,8 @@ export const removeEnvironmentVariableFromDB = async (
     key: string;
   }
 ) => {
-  return updateDoc(getDocPath(ownerId), {
-    [`${payload.environment}.${payload.key}`]: deleteField(),
+  return updateDoc(getDocPath(ownerId, payload.environment), {
+    [`variables.${payload.key}`]: deleteField(),
   });
 };
 
@@ -50,13 +58,11 @@ export const attatchEnvironmentVariableListener = (
     return () => {};
   }
 
-  const db = getFirestore(firebaseApp);
-
-  const variableDoc = doc(db, "environmentVariables", ownerId);
+  const variableDoc = getDocPath(ownerId, environment);
 
   const unsubscribe = onSnapshot(variableDoc, (doc) => {
     if (doc.exists()) {
-      const variables: EnvironmentVariable = doc.data()[environment] ?? {};
+      const variables: EnvironmentVariable = doc.data()?.variables ?? {};
 
       callback(variables);
     } else {
