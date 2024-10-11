@@ -31,6 +31,7 @@ export const setEnvironmentVariablesInDB = async (
   return setDoc(
     getDocPath(ownerId, payload.environment),
     {
+      name: payload.environment,
       variables: newVariables,
     },
     { merge: true }
