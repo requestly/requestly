@@ -146,6 +146,7 @@
   }
 
   &.ant-btn-ghost {
+    color: var(--requestly-color-text-default, #fff);
     background: transparent;
     border: none;
 
@@ -159,6 +160,7 @@
   }
 
   &.ant-btn-danger {
+    color: var(--requestly-color-text-default, #fff);
     background: var(--requestly-color-error, #e43434);
     border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
 
