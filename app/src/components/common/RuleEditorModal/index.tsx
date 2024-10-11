@@ -31,10 +31,11 @@ import { prefillRuleData } from "./prefill";
 import { generateRuleDescription, getEventObject } from "./utils";
 import { getRuleConfigInEditMode } from "utils/rules/misc";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
-import { Rule, Status } from "types";
+import { ResponseRuleResourceType, Rule, Status } from "types";
 import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
-import "./RuleEditorModal.css";
 import ShareRuleButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/ShareRuleButton";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import "./RuleEditorModal.css";
 
 enum EditorMode {
   EDIT = "edit",
@@ -93,9 +94,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
     };
   }, [mode, appMode, ruleId, dispatch, navigate]);
 
-  useEffect(() => {
-    if (mode === EditorMode.EDIT) return;
-
+  const initializeEditorWithPrefilledData = useCallback(() => {
     const ruleConfig = RULE_TYPES_CONFIG[ruleType];
     const newRule = initiateBlankCurrentlySelectedRule(dispatch, ruleConfig, ruleType, setCurrentlySelectedRule);
     setCurrentlySelectedRuleConfig(dispatch, ruleConfig, navigate);
@@ -108,13 +107,52 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
         status: Status.ACTIVE,
       };
 
+      if (ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
+        // Handling prefill for graphql resource type response rule
+        const { GQLDetails } = ruleData.metadata || {};
+        const pair = prefilledRule.pairs[0];
+        const sourceFilters = pair.source.filters;
+        if (GQLDetails?.operationName) {
+          pair.response.resourceType = ResponseRuleResourceType.GRAPHQL_API;
+          pair.source.filters = [
+            ...sourceFilters,
+            {
+              requestPayload: {
+                key: "operationName",
+                operator: GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS,
+                value: GQLDetails.operationName,
+              },
+            },
+          ];
+          prefilledRule.pairs[0] = pair;
+        } else if (GQLDetails?.query) {
+          pair.response.resourceType = ResponseRuleResourceType.GRAPHQL_API;
+          pair.source.filters = [
+            ...sourceFilters,
+            {
+              requestPayload: {
+                key: "query",
+                operator: GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS,
+                value: GQLDetails.query,
+              },
+            },
+          ];
+          prefilledRule.pairs[0] = pair;
+        }
+      }
+
       setCurrentlySelectedRule(dispatch, prefilledRule);
     }
+  }, [ruleData, ruleType, dispatch, navigate]);
+
+  useEffect(() => {
+    if (mode === EditorMode.EDIT) return;
+    initializeEditorWithPrefilledData();
 
     return () => {
       dispatch(actions.clearCurrentlySelectedRuleAndConfig());
     };
-  }, [mode, dispatch, ruleData, ruleType, navigate]);
+  }, [mode, initializeEditorWithPrefilledData, dispatch]);
 
   useEffect(() => {
     if (mode === EditorMode.EDIT) return;
