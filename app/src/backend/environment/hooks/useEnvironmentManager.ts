@@ -1,25 +1,29 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { EnvironmentVariable, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllEnvironmentVariables } from "store/features/environmentVariables/selectors";
-import { environmentVariablesActions } from "store/features/environmentVariables/slice";
+import { getAllEnvironmentVariables, getCurrentEnvironmentDetails } from "store/features/environment/selectors";
+import { environmentVariablesActions } from "store/features/environment/slice";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { renderTemplate } from "../utils";
-import { attatchEnvironmentVariableListener, removeEnvironmentVariableFromDB, setEnvironmentVariablesInDB } from "..";
+import {
+  attatchEnvironmentVariableListener,
+  removeEnvironmentVariableFromDB,
+  setEnvironmentInDB,
+  setEnvironmentVariablesInDB,
+} from "..";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 
 let unsubscribeListener: () => void = null;
 
-const useEnvironmentVariables = () => {
+const useEnvironmentManager = () => {
   const dispatch = useDispatch();
 
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const variables = useSelector(getAllEnvironmentVariables);
-
-  const [environment, setEnvironment] = useState<string>("default");
+  const { name: currentEnvironmentName } = useSelector(getCurrentEnvironmentDetails);
 
   const ownerId = useMemo(
     () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
@@ -28,14 +32,14 @@ const useEnvironmentVariables = () => {
 
   useEffect(() => {
     unsubscribeListener?.();
-    unsubscribeListener = attatchEnvironmentVariableListener(ownerId, environment, (newVariables) => {
-      dispatch(environmentVariablesActions.setVariables({ newVariables, environment }));
+    unsubscribeListener = attatchEnvironmentVariableListener(ownerId, currentEnvironmentName, (newVariables) => {
+      dispatch(environmentVariablesActions.setVariables({ newVariables }));
     });
 
     return () => {
       unsubscribeListener();
     };
-  }, [dispatch, environment, ownerId]);
+  }, [dispatch, currentEnvironmentName, ownerId]);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -43,6 +47,20 @@ const useEnvironmentVariables = () => {
       dispatch(environmentVariablesActions.resetState());
     }
   }, [dispatch, user.loggedIn]);
+
+  const getCurrentEnvironmentName = () => {
+    return currentEnvironmentName;
+  };
+
+  const addNewEnvironment = async (newEnvironment: string) => {
+    return setEnvironmentInDB(ownerId, newEnvironment).catch((err) => {
+      console.error("Error while setting environment in db", err);
+    });
+  };
+
+  const setCurrentEnvironment = (newEnvironment: string) => {
+    dispatch(environmentVariablesActions.setEnvironment({ environmentName: newEnvironment }));
+  };
 
   const setVariable = async (key: string, value: Omit<EnvironmentVariableValue, "type">) => {
     const newVariable: EnvironmentVariable = {
@@ -55,43 +73,46 @@ const useEnvironmentVariables = () => {
 
     return setEnvironmentVariablesInDB(ownerId, {
       newVariables: newVariable,
-      environment,
+      environment: currentEnvironmentName,
     })
       .then(() => {
-        dispatch(environmentVariablesActions.setVariables({ newVariables: newVariable, environment }));
+        dispatch(environmentVariablesActions.setVariables({ newVariables: newVariable }));
       })
       .catch((err) => {
         toast.error("Error while setting environment variables.");
         Logger.error("Error while setting environment variables in db", err);
+        console.error("Error while setting environment variables in db", err);
       });
   };
 
   const getVariableValue = (key: string) => {
-    return variables[environment]?.[key];
+    return variables?.[key];
   };
 
   const getAllVariables = () => {
-    return variables[environment];
+    return variables;
   };
 
   const removeVariable = async (key: string) => {
-    return removeEnvironmentVariableFromDB(ownerId, { environment, key })
+    return removeEnvironmentVariableFromDB(ownerId, { environment: currentEnvironmentName, key })
       .then(() => {
-        dispatch(environmentVariablesActions.removeVariable({ environment, key }));
+        dispatch(environmentVariablesActions.removeVariable({ key }));
       })
       .catch((err) => {
         toast.error("Error while removing environment variables.");
         Logger.error("Error while removing environment variables from db", err);
+        console.error("Error while removing environment variables from db", err);
       });
   };
 
   const renderString = <T>(template: string | Record<string, any>): T => {
-    return renderTemplate(template, variables[environment]);
+    return renderTemplate(template, variables);
   };
 
   return {
-    environment,
-    setEnvironment,
+    setCurrentEnvironment,
+    addNewEnvironment,
+    getCurrentEnvironmentName,
     setVariable,
     getVariableValue,
     getAllVariables,
@@ -100,4 +121,4 @@ const useEnvironmentVariables = () => {
   };
 };
 
-export default useEnvironmentVariables;
+export default useEnvironmentManager;

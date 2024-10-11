@@ -21,7 +21,7 @@ import { desktopTrafficTableReducer } from "./features/desktop-traffic-table/sli
 import { recordsReducer } from "./features/rules/slice";
 import { billingReducer } from "./features/billing/slice";
 import { harPreviewReducer } from "./features/network-sessions/slice";
-import { environmentVariablesActions, environmentVariablesReducer } from "./features/environmentVariables/slice";
+import { environmentVariablesActions, environmentVariablesReducer } from "./features/environment/slice";
 
 const globalSlice = createSlice({
   name: ReducerKeys.GLOBAL,
@@ -69,7 +69,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.RULES]: recordsReducer, // SLICE ALSO CONTAINS GROUP RECORDS
     [ReducerKeys.BILLING]: billingReducer,
     [ReducerKeys.INCENTIVIZATION]: incentivizationReducer,
-    [ReducerKeys.ENVIRONMENT_VARIABLES]: environmentVariablesReducer,
+    [ReducerKeys.ENVIRONMENT]: environmentVariablesReducer,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will
