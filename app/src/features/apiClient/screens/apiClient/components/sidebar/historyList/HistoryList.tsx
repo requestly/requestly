@@ -25,7 +25,7 @@ export const HistoryList: React.FC<Props> = ({ history, onSelectionFromHistory }
 
   return history?.length ? (
     <>
-      <Timeline reverse className="api-history-list" mode="left">
+      <Timeline reverse className="api-history-list-container" mode="left">
         <Timeline.Item key="end" color="gray">
           <div className="api-history-row">
             <Typography.Text type="secondary" italic className="api-history-start-marker">

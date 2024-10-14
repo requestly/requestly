@@ -1,7 +1,9 @@
 .collections-list-container {
   width: 100%;
   height: 100%;
-  padding-bottom: 50px;
+  overflow: auto;
+  padding-right: 8px;
+  flex: auto;
 
   .collections-list-header {
     display: flex;
@@ -14,9 +16,6 @@
   }
 
   .collections-list-content {
-    overflow: auto;
-    height: 100%;
-
     .collections-list-item + .collections-list-item {
       margin-top: 8px;
     }

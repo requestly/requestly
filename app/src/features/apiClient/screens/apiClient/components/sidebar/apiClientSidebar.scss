@@ -1,19 +1,21 @@
 .api-client-sidebar {
   flex: 0 0 auto;
-  border-right: 1px solid var(--border-dark);
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: hidden;
+  border-right: 1px solid var(--border-dark);
   background-color: var(--body-background);
+  padding-bottom: 32px;
 
   .api-client-sidebar-header {
     flex: 0 0 auto;
-    border-bottom: 1px solid var(--border-dark);
-    padding: 4px;
+    padding: 3px 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: var(--body-background);
+    border-bottom: 1px solid var(--border-dark);
   }
 
   .api-client-sidebar-tabs {
@@ -37,10 +39,11 @@
       }
     }
 
-    .api-history-list {
+    .api-history-list-container {
       width: 100%;
       height: 100%;
       flex: auto;
+      padding-right: 8px;
       overflow: auto;
       padding-left: 16px;
       padding-top: 16px;
@@ -160,6 +163,7 @@
 
       .ant-tabs-tabpane {
         padding: 8px;
+        padding-right: 0px;
         height: 100%;
       }
     }
