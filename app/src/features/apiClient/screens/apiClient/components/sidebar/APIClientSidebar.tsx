@@ -1,13 +1,14 @@
-import React, { useCallback } from "react";
-import placeholderImage from "../../../../../../assets/images/illustrations/empty-sheets-dark.svg";
-import { Button, Timeline, Typography } from "antd";
+import React, { useEffect, useState } from "react";
 import { RQAPI } from "../../../../types";
-import { ClearOutlined, CodeOutlined, PlusCircleOutlined } from "@ant-design/icons";
-import { trackRequestSelectedFromHistory } from "modules/analytics/events/features/apiClient";
-import { REQUEST_METHOD_COLORS } from "../../../../../../constants/requestMethodColors";
+import { NavLink, useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
+import { Tabs, TabsProps, Tooltip } from "antd";
+import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
+import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
+import { CollectionsList } from "./collectionsList/CollectionsList";
+import { HistoryList } from "./historyList/HistoryList";
+import { ApiClientSidebarHeader } from "./apiClientSidebarHeader/ApiClientSidebarHeader";
 import "./apiClientSidebar.scss";
-import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
-import { API_CLIENT } from "modules/analytics/events/features/constants";
 
 interface Props {
   history: RQAPI.Entry[];
@@ -17,6 +18,11 @@ interface Props {
   onImportClick: () => void;
 }
 
+export enum ApiClientSidebarTabKey {
+  HISTORY = "history",
+  COLLECTIONS = "collections",
+}
+
 const APIClientSidebar: React.FC<Props> = ({
   history,
   onSelectionFromHistory,
@@ -24,72 +30,79 @@ const APIClientSidebar: React.FC<Props> = ({
   onNewClick,
   onImportClick,
 }) => {
-  const onHistoryLinkClick = useCallback(
-    (index: number) => {
-      onSelectionFromHistory(index);
-      trackRequestSelectedFromHistory();
-      trackRQLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
-      trackRQDesktopLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
+  const location = useLocation();
+  const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
+
+  useEffect(() => {
+    switch (location.pathname) {
+      case PATHS.API_CLIENT.ABSOLUTE: {
+        setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
+        return;
+      }
+      case PATHS.API_CLIENT.HISTORY.ABSOLUTE: {
+        setActiveKey(ApiClientSidebarTabKey.HISTORY);
+        return;
+      }
+      default: {
+        setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
+        return;
+      }
+    }
+  }, [location.pathname]);
+
+  const items: TabsProps["items"] = [
+    {
+      key: ApiClientSidebarTabKey.COLLECTIONS,
+      label: (
+        <Tooltip title="Collections" placement="right">
+          <NavLink
+            to={PATHS.API_CLIENT.ABSOLUTE}
+            className={({ isActive }) => `${isActive ? "active" : ""} api-client-tab-link`}
+          >
+            <BsCollection />
+          </NavLink>
+        </Tooltip>
+      ),
+      children: <CollectionsList />,
     },
-    [onSelectionFromHistory]
-  );
+    {
+      key: ApiClientSidebarTabKey.HISTORY,
+      label: (
+        <Tooltip title="History" placement="right">
+          <NavLink
+            to={PATHS.API_CLIENT.HISTORY.ABSOLUTE}
+            className={({ isActive }) => `${isActive ? "active" : ""} api-client-tab-link`}
+          >
+            <MdOutlineHistory />
+          </NavLink>
+        </Tooltip>
+      ),
+      children: <HistoryList history={history} onSelectionFromHistory={onSelectionFromHistory} />,
+    },
+  ];
+
+  const handleActiveTabChange = (activeKey: ApiClientSidebarTabKey) => {
+    setActiveKey(activeKey);
+  };
 
   return (
     <div className="api-client-sidebar">
-      <div className="api-client-sidebar-header">
-        <div>
-          <Button type="text" size="small" onClick={onNewClick} icon={<PlusCircleOutlined />}>
-            New
-          </Button>
-          <Button type="text" size="small" onClick={onImportClick} icon={<CodeOutlined />}>
-            Import
-          </Button>
-        </div>
-        <div>
-          {history?.length ? (
-            <Button type="text" size="small" onClick={clearHistory} icon={<ClearOutlined />}>
-              Clear history
-            </Button>
-          ) : null}
-        </div>
-      </div>
-      {history?.length ? (
-        <Timeline reverse className="api-history-list" mode="left">
-          <Timeline.Item key="end" color="gray">
-            <div className="api-history-row">
-              <Typography.Text type="secondary" italic className="api-history-start-marker">
-                Start
-              </Typography.Text>
-            </div>
-          </Timeline.Item>
-          {history.map((entry, index) => (
-            <Timeline.Item key={index} color={REQUEST_METHOD_COLORS[entry.request.method]}>
-              <div className={`api-history-row ${entry.request.url ? "clickable" : ""}`}>
-                <Typography.Text
-                  className="api-method"
-                  strong
-                  style={{ color: REQUEST_METHOD_COLORS[entry.request.method] }}
-                >
-                  {entry.request.method}
-                </Typography.Text>
-                <Typography.Text
-                  type="secondary"
-                  className="api-history-url"
-                  title={entry.request.url}
-                  onClick={() => onHistoryLinkClick(index)}
-                >
-                  {entry.request.url}
-                </Typography.Text>
-              </div>
-            </Timeline.Item>
-          ))}
-        </Timeline>
-      ) : (
-        <div className="api-client-sidebar-placeholder">
-          <img src={placeholderImage} alt="empty" />
-          <Typography.Text type="secondary">API requests you send will appear here.</Typography.Text>
-        </div>
-      )}
+      <ApiClientSidebarHeader
+        activeTab={activeKey}
+        history={history}
+        onClearHistory={clearHistory}
+        onNewClick={onNewClick}
+        onImportClick={onImportClick}
+      />
+
+      <Tabs
+        items={items}
+        size="small"
+        tabPosition="left"
+        className="api-client-sidebar-tabs"
+        activeKey={activeKey}
+        onChange={handleActiveTabChange}
+      />
     </div>
   );
 };

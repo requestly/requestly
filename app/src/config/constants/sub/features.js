@@ -85,5 +85,6 @@ FEATURES.OVERRIDE_TEAM_SYNC_STATUS = "override_team_sync_status";
 FEATURES.OVERRIDEN_SYNC_STATUS_VALUE = "overriden_sync_status_value";
 
 FEATURES.CONNECT_EXTENSION = "connect_extension";
+FEATURES.EDIT_LOCAL_FILE_PATH = "edit_local_file_path";
 
 export default FEATURES;

@@ -2,7 +2,7 @@ import DelayRequestRuleProcessor from "../../src/processors/DelayRequestRuleProc
 import { getDelayRequestRule, URL_SOURCES } from "../helpers/MockObjects";
 /* CONSTANTS */
 import LOCAL_CONSTANTS from "../../src/constants";
-const CONSTANTS = require("../../../constants");
+import CONSTANTS from "../../../constants";
 
 describe("DelayRequestRuleProcessor:", function () {
   let delayRequestRule;
