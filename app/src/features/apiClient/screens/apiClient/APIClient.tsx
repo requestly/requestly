@@ -145,6 +145,7 @@ export const APIClient: React.FC<Props> = () => {
         />
         <APIClientView
           key={requestId}
+          // TODO: Fix - "apiEntry" is used for history, remove this prop and derive everything from "apiEntryDetails"
           apiEntry={selectedEntry ?? selectedEntryDetails?.data}
           apiEntryDetails={selectedEntryDetails}
           notifyApiRequestFinished={addToHistory}
