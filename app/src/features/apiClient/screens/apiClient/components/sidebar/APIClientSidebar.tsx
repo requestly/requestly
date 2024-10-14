@@ -63,7 +63,7 @@ const APIClientSidebar: React.FC<Props> = ({
           </NavLink>
         </Tooltip>
       ),
-      children: <CollectionsList onNewClick={onNewClick} onImportClick={onImportClick} />,
+      children: <CollectionsList />,
     },
     {
       key: ApiClientSidebarTabKey.HISTORY,

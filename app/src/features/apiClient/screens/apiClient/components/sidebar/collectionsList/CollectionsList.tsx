@@ -8,12 +8,9 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../constants";
 import "./collectionsList.scss";
 
-interface Props {
-  onNewClick: () => void;
-  onImportClick: () => void;
-}
+interface Props {}
 
-export const CollectionsList: React.FC<Props> = ({ onNewClick, onImportClick }) => {
+export const CollectionsList: React.FC<Props> = () => {
   const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
 
   return (
