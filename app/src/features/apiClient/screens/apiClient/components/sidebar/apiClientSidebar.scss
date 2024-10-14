@@ -97,3 +97,22 @@
     }
   }
 }
+
+.api-client-new-btn-dropdown-overlay {
+  .new-btn-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--requestly-color-text-default);
+
+    svg {
+      width: 16px;
+      height: 16px;
+      color: var(--requestly-color-text-subtle);
+    }
+  }
+
+  .ant-dropdown-menu-item.ant-dropdown-menu-item-disabled {
+    opacity: 0.6;
+  }
+}
