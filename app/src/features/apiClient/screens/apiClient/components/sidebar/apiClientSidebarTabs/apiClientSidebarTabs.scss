@@ -18,11 +18,8 @@
 
       .ant-tabs-tab {
         margin: 0;
-        width: 32px;
-        height: 32px;
-        padding: 0 8px;
+        padding: 0;
         border-radius: 4px;
-        color: var(--requestly-color-text-subtle);
 
         &:hover,
         &.ant-tabs-tab-active {
@@ -34,15 +31,25 @@
           color: var(--requestly-color-text-subtle);
         }
 
-        .api-client-tab-label {
+        .api-client-tab-link {
+          width: 32px;
+          height: 32px;
+          padding: 0 8px;
+          border-radius: 4px;
+
           display: flex;
           align-items: center;
           gap: 4px;
           font-size: var(--requestly-font-size-sm);
+          color: inherit;
 
           svg {
             width: 16px;
             height: 16px;
+          }
+
+          &:hover {
+            background-color: var(--requestly-color-surface-1);
           }
         }
       }
@@ -59,31 +66,6 @@
 
     .ant-tabs-ink-bar {
       display: none;
-    }
-
-    .sidebar-item {
-      line-height: 15.92px;
-      text-align: center;
-      font-weight: var(--requestly-font-weight-medium);
-      font-size: var(--requestly-font-size-2xs);
-      cursor: pointer;
-
-      padding: 4px 8px;
-      min-height: 70px;
-      margin-bottom: 2px;
-      display: flex;
-      align-items: center;
-      flex-direction: column;
-      justify-content: center;
-      row-gap: 8px;
-      color: var(--text-dark-gray); // TODO: update the variable
-
-      &:hover,
-      &.active {
-        color: var(--requestly-color-text-default);
-        background-color: var(--gray-dark);
-        border: none !important;
-      }
     }
   }
 }
