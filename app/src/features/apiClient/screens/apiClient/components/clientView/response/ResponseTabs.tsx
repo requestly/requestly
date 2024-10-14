@@ -6,7 +6,7 @@ import ResponseHeaders from "./ResponseHeaders";
 import StatusLine from "./StatusLine";
 import "./responseTabs.scss";
 import { trackResponseHeadersViewed } from "modules/analytics/events/features/apiClient";
-import { getContentTypeFromResponseHeaders } from "../../../apiUtils";
+import { getContentTypeFromResponseHeaders } from "../../../utils";
 
 interface Props {
   response: RQAPI.Response;
