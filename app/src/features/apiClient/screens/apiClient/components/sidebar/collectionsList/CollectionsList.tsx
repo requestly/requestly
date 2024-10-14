@@ -38,7 +38,7 @@ export const CollectionsList: React.FC<Props> = () => {
                     >
                       {apiClientRecord.data.request.method}
                     </Typography.Text>
-                    <div className="request-url">{apiClientRecord.data.request.url}</div>
+                    <div className="request-url">{apiClientRecord.data.request.url || "echo"}</div>
                   </NavLink>
                 );
               })}
