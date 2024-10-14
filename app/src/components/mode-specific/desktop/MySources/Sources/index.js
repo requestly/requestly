@@ -77,7 +77,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         const updatedAppsList = { ...desktopSpecificDetails.appsList };
         devices.forEach((device) => {
           if (!desktopSpecificDetails.appsList[device.id]) {
-            console.log("Adding Device", device.id);
+            console.log("Adding Device", device);
             updatedAppsList[device.id] = {
               id: "android-adb",
               type: "mobile",

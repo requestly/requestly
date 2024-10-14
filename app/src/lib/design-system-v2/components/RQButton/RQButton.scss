@@ -30,6 +30,7 @@
   justify-content: center;
   align-items: center;
   flex-shrink: 0;
+  gap: 6px;
 
   text-align: center;
   color: var(--requestly-color-text-default, #fff);
@@ -45,6 +46,11 @@
 
   border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
   background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+
+  & > .anticon + span,
+  & > span + .anticon {
+    margin-left: 0;
+  }
 
   &:disabled {
     color: var(--requestly-color-text-subtle, #bbb);
@@ -110,6 +116,7 @@
     padding: var(--space-0, 0px) var(--space-6, 16px);
     font-size: var(--requestly-font-size-md, 15px);
     line-height: var(--requestly-font-line-height-md, 23px);
+    gap: 8px;
 
     & > span {
       gap: 8px;
@@ -146,9 +153,9 @@
   }
 
   &.ant-btn-ghost {
-    color: var(--requestly-color-text-default, #fff);
-    background: transparent;
     border: none;
+    background: transparent;
+    color: var(--requestly-color-text-default, #fff);
 
     &:hover {
       background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
