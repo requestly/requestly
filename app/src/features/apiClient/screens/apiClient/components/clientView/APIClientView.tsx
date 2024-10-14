@@ -1,4 +1,4 @@
-import { Button, Empty, Input, Select, Skeleton, Space, Spin } from "antd";
+import { Empty, Input, Select, Skeleton, Space, Spin } from "antd";
 import React, { SyntheticEvent, memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import Split from "react-split";
@@ -14,7 +14,7 @@ import {
   makeRequest,
   removeEmptyKeys,
   supportsRequestBody,
-} from "../../apiUtils";
+} from "../../utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
   trackAPIRequestCancelled,
@@ -24,9 +24,9 @@ import {
   trackInstallExtensionDialogShown,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { actions } from "store";
-import { getAppMode, getIsExtensionEnabled } from "store/selectors";
+import { getAppMode, getIsExtensionEnabled, getUserAuthDetails } from "store/selectors";
 import Favicon from "components/misc/Favicon";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../../../constants";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
@@ -35,10 +35,18 @@ import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/Analytics
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { RQButton } from "lib/design-system-v2/components";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { upsertApiRecord } from "backend/apiClient";
+import { toast } from "utils/Toast";
+import { useApiClientContext } from "features/apiClient/contexts";
+import PATHS from "config/constants/sub/paths";
 
 interface Props {
+  openInModal?: boolean;
   apiEntry?: RQAPI.Entry;
   notifyApiRequestFinished?: (apiEntry: RQAPI.Entry) => void;
+  apiEntryDetails?: RQAPI.ApiRecord;
 }
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
@@ -46,16 +54,23 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   label: method,
 }));
 
-const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) => {
+const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRequestFinished, openInModal }) => {
   const dispatch = useDispatch();
   const location = useLocation();
-
+  const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
+  const user = useSelector(getUserAuthDetails);
+  const uid = user?.details?.profile?.uid;
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const teamId = workspace?.id;
+
+  const { onSaveRecord } = useApiClientContext();
   const { renderString } = useEnvironmentManager();
 
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
+  const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
 
@@ -178,6 +193,25 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     }
   }, [entry.request.url, setUrl]);
 
+  const sanitizeEntry = (entry: RQAPI.Entry) => {
+    const sanitizedEntry: RQAPI.Entry = {
+      ...entry,
+      request: {
+        ...entry.request,
+        queryParams: removeEmptyKeys(entry.request.queryParams),
+        headers: removeEmptyKeys(entry.request.headers),
+      },
+    };
+
+    if (!supportsRequestBody(entry.request.method)) {
+      sanitizedEntry.request.body = null;
+    } else if (entry.request.contentType === RequestContentType.FORM) {
+      sanitizedEntry.request.body = removeEmptyKeys(sanitizedEntry.request.body as KeyValuePair[]);
+    }
+
+    return sanitizedEntry;
+  };
+
   const onSendButtonClick = useCallback(() => {
     if (!entry.request.url) {
       return;
@@ -197,21 +231,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       return;
     }
 
-    const sanitizedEntry: RQAPI.Entry = {
-      ...entry,
-      request: {
-        ...entry.request,
-        queryParams: removeEmptyKeys(entry.request.queryParams),
-        headers: removeEmptyKeys(entry.request.headers),
-      },
-      response: null,
-    };
-
-    if (!supportsRequestBody(entry.request.method)) {
-      sanitizedEntry.request.body = null;
-    } else if (entry.request.contentType === RequestContentType.FORM) {
-      sanitizedEntry.request.body = removeEmptyKeys(sanitizedEntry.request.body as KeyValuePair[]);
-    }
+    const sanitizedEntry = sanitizeEntry(entry);
+    sanitizedEntry.response = null;
 
     const renderedRequest = renderString<RQAPI.Request>(sanitizedEntry.request);
 
@@ -226,6 +247,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
 
     makeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
       .then((response) => {
+        // TODO: Add an entry in history
         const entryWithResponse = { ...sanitizedEntry, response };
         if (response) {
           setEntry(entryWithResponse);
@@ -265,6 +287,35 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished, renderString]);
 
+  const onSaveButtonClick = async () => {
+    setIsRequestSaving(true);
+
+    const record: Partial<RQAPI.ApiRecord> = {
+      type: RQAPI.RecordType.API,
+      data: { ...entry },
+    };
+
+    if (apiEntryDetails?.id) {
+      record.id = apiEntryDetails?.id;
+    }
+
+    const result = await upsertApiRecord(uid, record, teamId);
+
+    if (result.success && result.data.type === RQAPI.RecordType.API) {
+      onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
+
+      if (location.pathname.includes("history")) {
+        navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`);
+      }
+
+      toast.success("Request saved!");
+    } else {
+      toast.error("Something went wrong!");
+    }
+
+    setIsRequestSaving(false);
+  };
+
   const cancelRequest = useCallback(() => {
     abortControllerRef.current?.abort();
     trackAPIRequestCancelled();
@@ -295,9 +346,19 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
               prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
             />
           </Space.Compact>
-          <Button type="primary" onClick={onSendButtonClick} loading={isLoadingResponse} disabled={!entry.request.url}>
+          <RQButton
+            type="primary"
+            onClick={onSendButtonClick}
+            loading={isLoadingResponse}
+            disabled={!entry.request.url}
+          >
             Send
-          </Button>
+          </RQButton>
+          {user.loggedIn && !openInModal ? (
+            <RQButton onClick={onSaveButtonClick} loading={isRequestSaving}>
+              Save
+            </RQButton>
+          ) : null}
         </div>
         <Split
           className="api-client-body"
@@ -324,9 +385,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
                 {isLoadingResponse ? (
                   <>
                     <Spin size="large" tip="Request in progress..." />
-                    <Button onClick={cancelRequest} style={{ marginTop: 10 }}>
+                    <RQButton onClick={cancelRequest} style={{ marginTop: 10 }}>
                       Cancel request
-                    </Button>
+                    </RQButton>
                   </>
                 ) : isFailed ? (
                   <Space>
