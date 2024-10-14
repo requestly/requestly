@@ -11,10 +11,15 @@ export const upsertApiRecord = async (
 ): Promise<{ success: boolean; data: RQAPI.Record | null }> => {
   let result;
 
+  const sanitizedRecord = { ...record };
+  if (sanitizedRecord.type === RQAPI.RecordType.API) {
+    delete sanitizedRecord.data.response;
+  }
+
   if (!record.id) {
-    result = await createApiRecord(uid, record, teamId);
+    result = await createApiRecord(uid, sanitizedRecord, teamId);
   } else {
-    result = await updateApiRecord(uid, record, teamId);
+    result = await updateApiRecord(uid, sanitizedRecord, teamId);
   }
 
   return result;

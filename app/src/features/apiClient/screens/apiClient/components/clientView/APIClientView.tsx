@@ -285,7 +285,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
-      data: entry,
+      data: { ...entry },
     };
 
     if (apiEntryDetails?.id) {
@@ -294,9 +294,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     const result = await upsertApiRecord(uid, record, teamId);
 
-    if (result.success) {
-      onSaveRecord(result.data);
-      navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`);
+    if (result.success && result.data.type === RQAPI.RecordType.API) {
+      onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
+
+      if (location.pathname.includes("history")) {
+        navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`);
+      }
+
       toast.success("Request saved!");
     } else {
       toast.error("Something went wrong!");
