@@ -176,6 +176,11 @@ export const redirectToNetworkSession = (navigate, id, isDesktopSessionsCompatib
   }
 };
 
+/* FEATURE - API client */
+export const redirectToRequest = (navigate, requestId = "new") => {
+  navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}`);
+};
+
 /* Settings */
 export const redirectToSettings = (navigate, redirectUrl, source) => {
   navigate(PATHS.SETTINGS.ABSOLUTE, { state: { redirectUrl, source } });
