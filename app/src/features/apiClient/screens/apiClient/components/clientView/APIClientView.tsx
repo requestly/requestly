@@ -35,6 +35,7 @@ import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/Analytics
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { RQInput } from "lib/design-system-v2/components";
 
 interface Props {
   apiEntry?: RQAPI.Entry;
@@ -274,6 +275,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     (evt.target as HTMLInputElement).blur();
   }, []);
 
+  const { setVariables, removeVariable } = useEnvironmentManager();
+
   return isExtensionEnabled ? (
     <div className="api-client-view">
       <Skeleton loading={isAnimating} active>
@@ -285,7 +288,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
               value={entry.request.method}
               onChange={setMethod}
             />
-            <Input
+            {/* <Input
               className="api-request-url"
               placeholder="https://example.com"
               value={entry.request.url}
@@ -293,10 +296,36 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
               onPressEnter={onUrlInputEnterPressed}
               onBlur={onUrlInputBlur}
               prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
+            /> */}
+            <RQInput
+              className="api-request-url"
+              placeholder="https://example.com"
+              value={entry.request.url}
+              onChange={(evt) => setUrl(evt.target.value)}
+              onPressEnter={onUrlInputEnterPressed}
+              onBlur={onUrlInputBlur}
+              // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
+              highlightVariables={true}
             />
           </Space.Compact>
           <Button type="primary" onClick={onSendButtonClick} loading={isLoadingResponse} disabled={!entry.request.url}>
             Send
+          </Button>
+          <Button
+            type="primary"
+            onClick={() => {
+              setVariables({ testNum: { localValue: 12, syncValue: 12 } });
+            }}
+          >
+            Set var
+          </Button>
+          <Button
+            type="primary"
+            onClick={() => {
+              removeVariable("test");
+            }}
+          >
+            Remove var
           </Button>
         </div>
         <Split
