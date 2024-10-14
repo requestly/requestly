@@ -1,12 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { EnvironmentVariable } from "backend/environment/types";
+import { EnvironmentMap, EnvironmentVariables } from "backend/environment/types";
 import { InitialState } from "./types";
+import { mergeLocalAndSyncVariables } from "./utils";
 
 const initialState = {
   currentEnvironment: {
     name: "default",
   },
-  variables: {},
+  environments: {},
 };
 
 const resetState = (): InitialState => initialState;
@@ -17,54 +18,62 @@ const setEnvironment = (
     environmentName: string;
   }>
 ) => {
-  state.currentEnvironment.name = action.payload.environmentName;
+  state.currentEnvironment = state.environments[action.payload.environmentName];
 };
 
-const setVariables = (
+const setAllEnvironmentData = (
   state: InitialState,
   action: PayloadAction<{
-    newVariables: EnvironmentVariable;
+    environmentMap: EnvironmentMap;
   }>
 ) => {
-  const currentEnvironmentVariables = state.variables;
+  let updatedEnvironments: EnvironmentMap = {};
 
-  const updatedVariables: EnvironmentVariable = Object.fromEntries(
-    Object.entries(action.payload.newVariables).map(([key, value]) => {
-      const prevValue = currentEnvironmentVariables[key];
-      const updatedValue = {
-        localValue: value.localValue ?? prevValue?.localValue,
-        syncValue: value.syncValue ?? prevValue?.syncValue,
-        type: value.type,
+  if (Object.keys(state.environments).length === 0) {
+    updatedEnvironments = action.payload.environmentMap;
+  } else {
+    Object.keys(action.payload.environmentMap).forEach((key) => {
+      updatedEnvironments[key] = {
+        ...state.environments[key],
+        variables: mergeLocalAndSyncVariables(
+          state.environments[key].variables,
+          action.payload.environmentMap[key].variables
+        ),
       };
-
-      // Remove localValue if it doesn't exist
-      if (!updatedValue.localValue) {
-        delete updatedValue.localValue;
-      }
-
-      return [key, updatedValue];
-    })
-  );
-
-  state.variables = {
-    ...currentEnvironmentVariables,
-    ...updatedVariables,
-  };
+    });
+  }
+  state.environments = updatedEnvironments;
 };
 
-const removeVariable = (
+const setVariablesInEnvironment = (
+  state: InitialState,
+  action: PayloadAction<{
+    newVariables: EnvironmentVariables;
+    environment: string;
+  }>
+) => {
+  const currentEnvironmentVariables = state.environments[action.payload.environment].variables;
+
+  const updatedVariables = mergeLocalAndSyncVariables(currentEnvironmentVariables, action.payload.newVariables);
+
+  state.environments[action.payload.environment].variables = updatedVariables;
+};
+
+const removeVariableFromEnvironment = (
   state: InitialState,
   action: PayloadAction<{
     key: string;
+    environment: string;
   }>
 ) => {
-  delete state.variables[action.payload.key];
+  delete state.environments[action.payload.environment].variables[action.payload.key];
 };
 
 const environmentVariablesReducerFunctions = {
   resetState,
-  setVariables,
-  removeVariable,
+  setAllEnvironmentData,
+  setVariablesInEnvironment,
+  removeVariableFromEnvironment,
   setEnvironment,
 };
 
