@@ -17,6 +17,10 @@ export const apiClientRoutes: RouteObject[] = [
         path: PATHS.API_CLIENT.REQUEST.INDEX,
         element: <ProtectedRoute component={APIClient} />,
       },
+      {
+        path: PATHS.API_CLIENT.HISTORY.INDEX,
+        element: <APIClient />,
+      },
     ],
   },
 ];
