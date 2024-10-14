@@ -20,7 +20,13 @@ import { trackSampleRuleToggled } from "features/rules/analytics";
 import RULE_EDITOR_CONFIG from "config/constants/sub/rule-editor";
 import { SOURCE } from "modules/analytics/events/common/constants";
 
-const Status = ({ isDisabled = false, isRuleEditorModal, isSampleRule = false, showEnableRuleTooltip = false }) => {
+const Status = ({
+  mode,
+  isDisabled = false,
+  isRuleEditorModal,
+  isSampleRule = false,
+  showEnableRuleTooltip = false,
+}) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -40,7 +46,7 @@ const Status = ({ isDisabled = false, isRuleEditorModal, isSampleRule = false, s
       status: newValue,
     };
 
-    const isCreateMode = location.pathname.indexOf(RULE_EDITOR_CONFIG.MODES.CREATE) !== -1;
+    const isCreateMode = mode === RULE_EDITOR_CONFIG.MODES.CREATE;
 
     if (ruleData.isSample && !isCreateMode) {
       setCurrentlySelectedRule(dispatch, ruleData);
@@ -76,12 +82,7 @@ const Status = ({ isDisabled = false, isRuleEditorModal, isSampleRule = false, s
         .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false));
   };
 
-  const stableChangeRuleStatus = useCallback(changeRuleStatus, [
-    appMode,
-    currentlySelectedRuleData,
-    dispatch,
-    location.pathname,
-  ]);
+  const stableChangeRuleStatus = useCallback(changeRuleStatus, [appMode, currentlySelectedRuleData, dispatch, mode]);
 
   const toggleRuleStatus = (event) => {
     // event.preventDefault();
