@@ -1,16 +1,11 @@
 import React from "react";
 import { RQAPI } from "features/apiClient/types";
-import { Dropdown, DropdownProps, Tooltip, Typography } from "antd";
-import placeholderImage from "../../../../../../../../assets/images/illustrations/empty-sheets-dark.svg";
+import { Typography } from "antd";
+import placeholderImage from "../../../../../../../assets/images/illustrations/empty-sheets-dark.svg";
 import { NavLink } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { RQButton } from "lib/design-system-v2/components";
-import { CodeOutlined } from "@ant-design/icons";
-import { REQUEST_METHOD_COLORS } from "../../../../../../../../constants";
-import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
-import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
-import { MdAdd } from "@react-icons/all-files/md/MdAdd";
+import { REQUEST_METHOD_COLORS } from "../../../../../../../constants";
 import "./collectionsList.scss";
 
 interface Props {
@@ -18,61 +13,12 @@ interface Props {
   onImportClick: () => void;
 }
 
-enum DropdownOption {
-  COLLECTION = "collection",
-  REQUEST = "request",
-}
-
 export const CollectionsList: React.FC<Props> = ({ onNewClick, onImportClick }) => {
   const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
-
-  const items: DropdownProps["menu"]["items"] = [
-    {
-      key: DropdownOption.REQUEST,
-      onClick: onNewClick,
-      label: (
-        <div className="new-btn-option">
-          <MdOutlineSyncAlt />
-          <span>Request</span>
-        </div>
-      ),
-    },
-    {
-      disabled: true,
-      key: DropdownOption.COLLECTION,
-      label: (
-        <Tooltip title="Coming soon!" placement="right">
-          <div className="new-btn-option">
-            <BsCollection />
-            <span>Collection</span>
-          </div>
-        </Tooltip>
-      ),
-    },
-  ];
 
   return (
     <>
       <div className="collections-list-container">
-        <div className="api-client-sidebar-header">
-          <div>
-            <Dropdown
-              menu={{ items }}
-              trigger={["click"]}
-              className="api-client-new-btn-dropdown"
-              overlayClassName="api-client-new-btn-dropdown-overlay"
-            >
-              <RQButton type="transparent" size="small" icon={<MdAdd />}>
-                New
-              </RQButton>
-            </Dropdown>
-
-            <RQButton type="transparent" size="small" onClick={onImportClick} icon={<CodeOutlined />}>
-              Import
-            </RQButton>
-          </div>
-        </div>
-
         <div className="collections-list-content">
           {isLoadingApiClientRecords ? (
             <div className="api-client-sidebar-placeholder">
