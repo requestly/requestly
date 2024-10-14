@@ -124,7 +124,7 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     } else if (contentType === RequestContentType.FORM) {
       body = generateKeyValuePairsFromJson(requestJson.data);
     } else {
-      body = requestJson.data ?? null;
+      body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
     }
 
     const request: RQAPI.Request = {
