@@ -1,88 +1,194 @@
 .api-client-sidebar {
   flex: 0 0 auto;
-  border-right: 1px solid var(--border-dark);
   display: flex;
   flex-direction: column;
-
-  .api-client-sidebar-placeholder {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    gap: 10px;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
+  height: 100%;
+  overflow: hidden;
+  border-right: 1px solid var(--border-dark);
+  background-color: var(--body-background);
+  padding-bottom: 32px;
 
   .api-client-sidebar-header {
     flex: 0 0 auto;
-    border-bottom: 1px solid var(--border-dark);
-    padding: 8px 5px;
+    padding: 3px 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color: var(--body-background);
+    border-bottom: 1px solid var(--border-dark);
   }
 
-  .api-history-list {
-    width: 100%;
+  .api-client-sidebar-tabs {
+    flex-shrink: 0;
     height: 100%;
-    flex: auto;
-    overflow: auto;
-    padding-left: 16px;
-    padding-top: 16px;
+    overflow: hidden;
+    background-color: var(--body-background);
 
-    .ant-timeline-item {
-      padding-top: 12px;
-      padding-bottom: 12px;
+    .api-client-sidebar-placeholder {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 8px;
 
-      .ant-timeline-item-tail {
-        margin-top: 12px;
-      }
-
-      .ant-timeline-item-content {
-        margin-left: 10px;
+      .ant-typography {
+        text-align: center;
       }
     }
 
-    .api-history-row {
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
-      line-height: 23px;
-      padding: 8px 10px;
-      margin: -8px 10px;
-      border-radius: 4px;
+    .api-history-list-container {
+      width: 100%;
+      height: 100%;
+      flex: auto;
+      padding-right: 8px;
+      overflow: auto;
+      padding-left: 16px;
+      padding-top: 16px;
 
-      &.clickable:hover {
-        background-color: var(--component-background);
-        cursor: pointer;
+      .ant-timeline-item {
+        padding-bottom: 18px;
 
-        .api-history-url {
-          color: #fff;
+        .ant-timeline-item-head {
+          margin-top: 3px;
+        }
+
+        .ant-timeline-item-tail {
+          margin-top: 12px;
+        }
+
+        .ant-timeline-item-content {
+          margin-left: 10px;
         }
       }
 
-      .api-method {
-        font-size: var(--requestly-font-size-xs, 11px);
-        vertical-align: middle;
-        flex-shrink: 0;
-      }
+      .api-history-row {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        line-height: 23px;
+        padding: 4px;
+        margin: -8px 10px;
+        border-radius: 4px;
 
-      .api-history-url {
-        font-size: var(--requestly-font-size-sm, 13px);
-        width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        word-break: break-all;
-        line-height: 18px;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-      }
+        &.clickable:hover {
+          cursor: pointer;
+          background-color: var(--gray-dark);
 
-      .api-history-start-marker {
-        font-size: var(--requestly-font-size-sm, 13px);
+          .api-history-url {
+            color: var(--requestly-color-text-default);
+          }
+        }
+
+        .api-method {
+          flex-shrink: 0;
+          vertical-align: middle;
+          font-size: var(--requestly-font-size-2xs, 11px);
+        }
+
+        .api-history-url {
+          font-size: var(--requestly-font-size-sm, 13px);
+          width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          word-break: break-all;
+          line-height: 18px;
+          display: -webkit-box;
+          line-clamp: 2;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+        }
+
+        .api-history-start-marker {
+          font-size: var(--requestly-font-size-sm, 13px);
+        }
       }
     }
+
+    .ant-tabs-nav {
+      margin-bottom: 0;
+      padding: 0;
+      min-width: 40px;
+
+      .ant-tabs-nav-list {
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .ant-tabs-tab {
+        margin: 0;
+        padding: 0;
+        border-radius: 4px;
+
+        &:hover,
+        &.ant-tabs-tab-active {
+          background-color: var(--requestly-color-surface-1);
+        }
+
+        .ant-tabs-tab-btn,
+        .ant-tabs-tab-btn:active {
+          color: var(--requestly-color-text-subtle);
+        }
+
+        .api-client-tab-link {
+          width: 32px;
+          height: 32px;
+          padding: 0 8px;
+          border-radius: 4px;
+
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: var(--requestly-font-size-sm);
+          color: inherit;
+
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+
+          &:hover {
+            background-color: var(--requestly-color-surface-1);
+          }
+        }
+      }
+    }
+
+    .ant-tabs-content {
+      height: 100%;
+
+      .ant-tabs-tabpane {
+        padding: 8px;
+        padding-right: 0px;
+        height: 100%;
+      }
+    }
+
+    .ant-tabs-ink-bar {
+      display: none;
+    }
+  }
+}
+
+.api-client-new-btn-dropdown-overlay {
+  .new-btn-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--requestly-color-text-default);
+
+    svg {
+      width: 16px;
+      height: 16px;
+      color: var(--requestly-color-text-subtle);
+    }
+  }
+
+  .ant-dropdown-menu-item.ant-dropdown-menu-item-disabled {
+    opacity: 0.6;
   }
 }
