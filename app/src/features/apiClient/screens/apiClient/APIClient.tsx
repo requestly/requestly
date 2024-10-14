@@ -13,11 +13,11 @@ import {
 import ImportRequestModal from "./components/modals/ImportRequestModal";
 import { getApiRecord, upsertApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
-import PATHS from "config/constants/sub/paths";
 import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
+import { redirectToRequest } from "utils/RedirectionUtils";
 import "./apiClient.scss";
 
 interface Props {}
@@ -91,7 +91,7 @@ export const APIClient: React.FC<Props> = () => {
 
       if (result.success) {
         onSaveRecord(result.data);
-        navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`);
+        redirectToRequest(navigate, result.data.id);
       }
 
       setIsLoading(false);
@@ -122,7 +122,7 @@ export const APIClient: React.FC<Props> = () => {
   const onNewClick = useCallback(() => {
     setSelectedEntry(getEmptyAPIEntry());
     setSelectedEntryDetails(null);
-    navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/new`);
+    redirectToRequest(navigate);
     trackNewRequestClicked();
   }, []);
 
