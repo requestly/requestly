@@ -4,6 +4,14 @@
     cursor: pointer;
   }
 
+  .cm-editor {
+    margin-top: -2px;
+  }
+
+  .cm-content {
+    caret-color: inherit;
+  }
+
   .cm-focused {
     outline: none;
   }

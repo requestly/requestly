@@ -1,39 +1,80 @@
 import React, { useRef, useEffect, useState } from "react";
-import { EditorView } from "@codemirror/view";
+import { EditorView, placeholder as cmPlaceHolder } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import "./SingleLineEditor.scss";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { Popover, Row } from "antd";
 import { RQButton } from "../RQButton/RQButton";
 
-export const RQInput: React.FC<{}> = () => {
+interface RQSingleLineEditorProps {
+  className?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  onPressEnter?: () => void;
+  onBlur?: () => void;
+}
+
+export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
+  className,
+  value,
+  onChange,
+  placeholder,
+  onPressEnter,
+  onBlur,
+}) => {
   const editorRef = useRef(null);
+  const editorViewRef = useRef(null);
 
   const [hoveredVariable, setHoveredVariable] = useState(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    new EditorView({
+    if (editorViewRef.current) {
+      return;
+    }
+
+    editorViewRef.current = new EditorView({
       parent: editorRef.current,
-      extensions: [
-        EditorView.lineWrapping, // Keep the editor single line
-        EditorState.transactionFilter.of((tr) => {
-          return tr.newDoc.lines > 1 ? [] : [tr]; // Prevent new lines
-        }),
-        highlightVariablesPlugin({
-          setHoveredVariable: (str) => {
-            // console.log("!!!debug", "setHoveredVariable", str);
-            setHoveredVariable(str);
-          },
-          setPopupPosition: (position) => {
-            // console.log("!!!debug", "setPopup", position);F
-            setPopupPosition(position);
-          },
-        }),
-        // highlightVariables,
-      ],
+      state: EditorState.create({
+        doc: value ?? "",
+        extensions: [
+          EditorView.lineWrapping, // Keep the editor single line
+          EditorState.transactionFilter.of((tr) => {
+            return tr.newDoc.lines > 1 ? [] : [tr]; // Prevent new lines
+          }),
+          EditorView.updateListener.of((update) => {
+            if (update.docChanged) {
+              onChange?.(update.state.doc.toString());
+            }
+          }),
+          highlightVariablesPlugin({
+            setHoveredVariable,
+            setPopupPosition,
+          }),
+          cmPlaceHolder(placeholder ?? "Input here"),
+        ],
+      }),
     });
-  }, []);
+
+    return () => {
+      editorViewRef.current?.destroy();
+    };
+    //Need to disable to implement the onChange handler
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placeholder]);
+
+  useEffect(() => {
+    if (value && editorViewRef.current) {
+      editorViewRef.current?.dispatch({
+        changes: {
+          from: 0,
+          to: editorViewRef.current.state.doc.length,
+          insert: value,
+        },
+      });
+    }
+  }, [value]);
 
   return (
     <>

@@ -34,7 +34,6 @@ export const highlightVariablesPlugin = (setters: VariableSetters) => {
         const regex = /{{.*?}}/g;
         const text = view.state.doc.toString(); // Get the document text as a string
         let match;
-
         // Use regex to find {{variable}} patterns and apply decorations
         while ((match = regex.exec(text)) !== null) {
           const startIndex = match.index;
