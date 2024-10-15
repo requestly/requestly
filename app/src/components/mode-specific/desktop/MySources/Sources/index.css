@@ -34,7 +34,7 @@
   padding: 11px 16px;
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr auto 0.5fr;
+  grid-template-columns: 1fr minmax(auto, 1fr) 0.5fr;
   align-items: center;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
