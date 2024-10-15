@@ -1,5 +1,5 @@
 import React from "react";
-import { Dropdown, Tooltip } from "antd";
+import { Dropdown } from "antd";
 import { DropdownProps } from "reactstrap";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -11,7 +11,7 @@ import { RQAPI } from "features/apiClient/types";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
-  onNewClick: () => void;
+  onNewClick: (recordType: RQAPI.RecordType) => void;
   onImportClick: () => void;
   history: RQAPI.Entry[];
   onClearHistory: () => void;
@@ -31,25 +31,23 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
 }) => {
   const items: DropdownProps["menu"]["items"] = [
     {
+      onClick: () => onNewClick(RQAPI.RecordType.COLLECTION),
+      key: DropdownOption.COLLECTION,
+      label: (
+        <div className="new-btn-option">
+          <BsCollection />
+          <span>Collection</span>
+        </div>
+      ),
+    },
+    {
       key: DropdownOption.REQUEST,
-      onClick: onNewClick,
+      onClick: () => onNewClick(RQAPI.RecordType.API),
       label: (
         <div className="new-btn-option">
           <MdOutlineSyncAlt />
           <span>Request</span>
         </div>
-      ),
-    },
-    {
-      disabled: true,
-      key: DropdownOption.COLLECTION,
-      label: (
-        <Tooltip title="Coming soon!" placement="right">
-          <div className="new-btn-option">
-            <BsCollection />
-            <span>Collection</span>
-          </div>
-        </Tooltip>
       ),
     },
   ];

@@ -32,6 +32,26 @@ const APIClientSidebar: React.FC<Props> = ({
 }) => {
   const location = useLocation();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
+  const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
+  const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
+
+  const showNewRecordNameInput = () => {
+    setIsNewRecordNameInputVisible(true);
+  };
+
+  const hideNewRecordNameInput = () => {
+    setIsNewRecordNameInputVisible(false);
+    setRecordTypeToBeCreated(null);
+  };
+
+  const handleNewRecordClick = (recordType: RQAPI.RecordType) => {
+    showNewRecordNameInput();
+    setRecordTypeToBeCreated(recordType);
+
+    if (recordType === RQAPI.RecordType.API) {
+      onNewClick();
+    }
+  };
 
   useEffect(() => {
     switch (location.pathname) {
@@ -63,7 +83,13 @@ const APIClientSidebar: React.FC<Props> = ({
           </NavLink>
         </Tooltip>
       ),
-      children: <CollectionsList />,
+      children: (
+        <CollectionsList
+          recordTypeToBeCreated={recordTypeToBeCreated}
+          isNewRecordNameInputVisible={isNewRecordNameInputVisible}
+          hideNewRecordNameInput={hideNewRecordNameInput}
+        />
+      ),
     },
     {
       key: ApiClientSidebarTabKey.HISTORY,
@@ -91,8 +117,8 @@ const APIClientSidebar: React.FC<Props> = ({
         activeTab={activeKey}
         history={history}
         onClearHistory={clearHistory}
-        onNewClick={onNewClick}
         onImportClick={onImportClick}
+        onNewClick={handleNewRecordClick}
       />
 
       <Tabs
