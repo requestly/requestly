@@ -12,3 +12,9 @@ export interface EnvironmentData {
 }
 
 export type EnvironmentMap = Record<string, EnvironmentData>;
+
+export enum VariableType {
+  String = "string",
+  Number = "number",
+  Boolean = "boolean",
+}

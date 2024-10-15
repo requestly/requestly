@@ -2,13 +2,6 @@
   height: 100%;
   display: flex;
 
-  .api-client-sidebar {
-    width: 320px;
-    flex: 0 0 auto;
-    border-right: 1px solid var(--border-dark);
-    background-color: var(--component-background);
-  }
-
   .api-client-view {
     flex: auto;
     width: 100%;

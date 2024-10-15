@@ -124,7 +124,7 @@ export const APIClient: React.FC<Props> = () => {
     setSelectedEntryDetails(null);
     redirectToRequest(navigate);
     trackNewRequestClicked();
-  }, []);
+  }, [navigate]);
 
   const onSelectionFromHistory = useCallback(
     (index: number) => {
