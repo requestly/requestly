@@ -12,7 +12,7 @@ interface EditableCellProps {
   children: React.ReactNode;
   dataIndex: keyof EnvironmentVariableTableRow;
   record: EnvironmentVariableTableRow;
-  handleSaveVariables: (record: EnvironmentVariableTableRow) => void;
+  handleSaveVariable: (record: EnvironmentVariableTableRow) => void;
   inputType: "text" | "select";
   options?: string[];
 }
@@ -33,7 +33,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   children,
   dataIndex,
   record,
-  handleSaveVariables,
+  handleSaveVariable,
   inputType,
   options,
   ...restProps
@@ -60,11 +60,11 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       updatedRecord.syncValue = convertValueByType(updatedRecord.syncValue, updatedRecord.type);
       updatedRecord.localValue = convertValueByType(updatedRecord.localValue, updatedRecord.type);
 
-      handleSaveVariables(updatedRecord);
+      handleSaveVariable(updatedRecord);
     } catch (errInfo) {
       Logger.log("Save failed:", errInfo);
     }
-  }, [form, record, handleSaveVariables, convertValueByType]);
+  }, [form, record, handleSaveVariable, convertValueByType]);
 
   const getPlaceholderText = () => {
     if (dataIndex === "key") {
@@ -75,6 +75,10 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
   const validateValue = useCallback(
     (rule: unknown, value: any) => {
+      if (value === "" || value === undefined) {
+        return Promise.resolve();
+      }
+
       if (dataIndex === "syncValue" || dataIndex === "localValue") {
         switch (record.type) {
           case VariableType.Number:
@@ -107,7 +111,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         rules={[{ validator: validateValue }]}
       >
         {inputType === "select" ? (
-          <Select style={{ width: "100%" }} onChange={handleSaveCellValue} defaultValue={VariableType.String}>
+          <Select className="w-full" onChange={handleSaveCellValue} defaultValue={VariableType.String}>
             {options?.map((option) => (
               <Select.Option key={option} value={option}>
                 {option}
