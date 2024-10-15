@@ -1,5 +1,9 @@
 .collections-list-container {
   width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding-right: 8px;
+  flex: auto;
 
   .collections-list-header {
     display: flex;
@@ -12,14 +16,14 @@
   }
 
   .collections-list-content {
-    overflow: auto;
-    height: 100%;
-    padding: 8px;
-    padding-top: 0;
+    .collections-list-item + .collections-list-item {
+      margin-top: 8px;
+    }
 
     .collections-list-item {
       display: flex;
       align-items: center;
+      gap: 8px;
 
       cursor: pointer;
       padding: 2px 4px;
@@ -27,8 +31,24 @@
       color: var(--requestly-color-text-subtle);
       font-size: var(--requestly-font-size-sm, 13px);
 
-      &.api:hover {
-        background-color: var(--gray-dark);
+      &.api {
+        .request-method {
+          flex-shrink: 0;
+          font-size: var(--requestly-font-size-2xs);
+        }
+
+        .request-url {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          font-size: var(--requestly-font-size-sm, 13px);
+          color: var(--requestly-color-text-default);
+        }
+
+        &:hover,
+        &.active {
+          background-color: var(--gray-dark);
+        }
       }
 
       &.collection.ant-collapse {

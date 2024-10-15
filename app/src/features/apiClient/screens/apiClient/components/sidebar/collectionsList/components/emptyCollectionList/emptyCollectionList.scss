@@ -1,0 +1,11 @@
+.collections-list-container {
+  .empty-collection-list-container {
+    display: flex;
+    padding: var(--space-6, 16px);
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border-radius: var(--space-4, 8px);
+    background: var(--requestly-color-surface-0, #212121);
+  }
+}
