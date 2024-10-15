@@ -534,6 +534,10 @@ export const redirectToFileMocksList = (navigate) => {
   navigate(PATHS.FILE_SERVER_V2.ABSOLUTE);
 };
 
+export const redirectToEnvironment = (navigate, environment) => {
+  navigate(`${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environment}`);
+};
+
 export const redirectToUrl = (url, newTab = false) => {
   if (newTab) {
     return window.open(url, "_blank");

@@ -8,6 +8,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { ApiClientSidebarTabKey } from "../APIClientSidebar";
 import { RQAPI } from "features/apiClient/types";
+import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -89,6 +90,8 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           New
         </RQButton>
       ) : null}
+
+      <EnvironmentSwitcher />
     </div>
   );
 };
