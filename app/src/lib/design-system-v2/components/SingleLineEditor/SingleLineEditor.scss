@@ -20,3 +20,54 @@ div.n-popup {
   z-index: 10;
   pointer-events: none; /* Prevent interaction with the popup */
 }
+
+.variable-info-popover {
+  .variable-info-body {
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 2px;
+
+    .variable-info-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .variable-info-header {
+      font-size: var(--requestly-font-size-sm);
+      line-height: var(--requestly-font-line-height-sm);
+      color: var(--requestly-color-text-default);
+      font-weight: var(--requestly-font-weight-medium);
+    }
+
+    .variable-info-title {
+      font-size: var(--requestly-font-size-xs);
+      line-height: var(--requestly-font-line-height-xs);
+      color: var(--requestly-color-text-subtle);
+    }
+
+    .variable-info-value {
+      font-size: var(--requestly-font-size-xs);
+      line-height: var(--requestly-font-line-height-xs);
+      color: var(--requestly-color-text-default);
+      font-weight: var(--requestly-font-weight-medium);
+    }
+
+    .add-new-variable-info-content {
+      width: 280px;
+      font-size: var(--requestly-font-size-xs);
+      line-height: var(--requestly-font-line-height-xs);
+      color: var(--requestly-color-text-subtle);
+    }
+
+    .add-new-variable-btn.rq-custom-btn.ant-btn.ant-btn-block {
+      border-radius: 4px;
+    }
+
+    // .ant-popover-arrow {
+    //   // display: none;
+    // }
+  }
+}

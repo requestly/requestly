@@ -3,8 +3,8 @@ import { EditorView } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import "./SingleLineEditor.scss";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
-import { Popover } from "antd";
-import { createPortal } from "react-dom";
+import { Popover, Row } from "antd";
+import { RQButton } from "../RQButton/RQButton";
 
 export const RQInput: React.FC<{}> = () => {
   const editorRef = useRef(null);
@@ -38,25 +38,60 @@ export const RQInput: React.FC<{}> = () => {
   return (
     <>
       <div ref={editorRef} className="single-line-editor-container ant-input"></div>
-      {hoveredVariable &&
-        createPortal(
-          <Popover
-            content={`Info about ${hoveredVariable}`}
-            title="Variable Info"
-            open={true}
-            destroyTooltipOnHide
-            placement="bottom"
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: popupPosition?.y,
-                left: popupPosition?.x,
-              }}
-            ></div>
-          </Popover>,
-          document.body // Render in the portal
-        )}
+      {hoveredVariable && (
+        <Popover
+          content={
+            <div className="variable-info-body">
+              <AddNewVariable />
+            </div>
+          }
+          open={!!hoveredVariable}
+          destroyTooltipOnHide
+          placement="bottom"
+          arrowContent={null}
+          arrowPointAtCenter={null}
+          overlayClassName="variable-info-popover"
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: popupPosition?.y,
+              left: popupPosition?.x,
+            }}
+            className="variable-info-div"
+          ></div>
+        </Popover>
+      )}
+    </>
+  );
+};
+
+const VariableInfo = () => {
+  return (
+    <>
+      <Row className="variable-info-header">{"db_connection_string"}</Row>
+      <div className="variable-info-content">
+        <div className="variable-info-title">Type</div>
+        <div className="variable-info-value">{"<Type>"}</div>
+        <div className="variable-info-title">Initial Value</div>
+        <div className="variable-info-value">{"<Intitial Value>"}</div>
+        <div className="variable-info-title">Current Value</div>
+        <div className="variable-info-value">{"<Current Value>"}</div>
+      </div>
+    </>
+  );
+};
+
+const AddNewVariable = () => {
+  return (
+    <>
+      <Row className="variable-info-header">{"Variable is not defined or resolved"}</Row>
+      <Row className="add-new-variable-info-content">
+        {"Make sure that the variable is defined in the globals or any of the active environments."}
+      </Row>
+      <RQButton block type="primary" className="add-new-variable-btn">
+        {"Add as a new variable"}
+      </RQButton>
     </>
   );
 };
