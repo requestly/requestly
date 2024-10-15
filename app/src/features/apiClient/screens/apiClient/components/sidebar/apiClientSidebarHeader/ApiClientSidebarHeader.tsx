@@ -84,6 +84,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           Clear history
         </RQButton>
       ) : activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
+        // TEMPORARY
         <RQButton type="transparent" size="small" icon={<MdAdd />}>
           New
         </RQButton>

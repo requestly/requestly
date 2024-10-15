@@ -4,13 +4,13 @@ import { RQButton } from "lib/design-system-v2/components";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 
 interface Props {
-  handleSaveVariables: (record: EnvironmentVariableTableRow) => void;
+  handleSaveVariable: (record: EnvironmentVariableTableRow) => void;
   handleDeleteVariable: (key: string) => void;
 }
 
 type ColumnTypes = Exclude<TableProps<EnvironmentVariableTableRow>["columns"], undefined>;
 
-export const useVariablesListColumns = ({ handleSaveVariables, handleDeleteVariable }: Props) => {
+export const useVariablesListColumns = ({ handleSaveVariable, handleDeleteVariable }: Props) => {
   const columns: (ColumnTypes[number] & { editable: boolean })[] = [
     {
       title: "Key",
@@ -20,7 +20,7 @@ export const useVariablesListColumns = ({ handleSaveVariables, handleDeleteVaria
         editable: true,
         dataIndex: "key",
         title: "Key",
-        handleSaveVariables,
+        handleSaveVariable,
         inputType: "text",
       }),
     },
@@ -33,7 +33,7 @@ export const useVariablesListColumns = ({ handleSaveVariables, handleDeleteVaria
         editable: true,
         dataIndex: "type",
         title: "Type",
-        handleSaveVariables,
+        handleSaveVariable,
         inputType: "select",
         options: ["string", "number", "boolean"],
       }),
@@ -56,7 +56,7 @@ export const useVariablesListColumns = ({ handleSaveVariables, handleDeleteVaria
         editable: true,
         dataIndex: "syncValue",
         title: "Sync Value",
-        handleSaveVariables,
+        handleSaveVariable,
         inputType: "text",
       }),
     },
@@ -78,7 +78,7 @@ export const useVariablesListColumns = ({ handleSaveVariables, handleDeleteVaria
         editable: true,
         dataIndex: "localValue",
         title: "Local Value",
-        handleSaveVariables,
+        handleSaveVariable,
         inputType: "text",
       }),
     },

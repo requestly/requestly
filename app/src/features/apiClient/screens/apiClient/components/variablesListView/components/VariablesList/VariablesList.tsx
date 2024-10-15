@@ -16,6 +16,7 @@ export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: stri
 
 export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => {
   const { getCurrentEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
+  //   TODO: REMOVE THIS AFTER ADDING LOADING STATE IN VIEWER COMPONENT
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [dataSource, setDataSource] = useState([]);
 
@@ -24,25 +25,27 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
     [dataSource, searchValue]
   );
 
-  const handleSaveVariables = (row: EnvironmentVariableTableRow) => {
-    const newData = [...dataSource];
-    const index = newData.findIndex((item) => row.id === item.id);
-    const item = newData[index];
-    newData.splice(index, 1, { ...item, ...row });
-    setDataSource(newData);
+  const handleSaveVariable = useCallback(
+    (row: EnvironmentVariableTableRow) => {
+      const variableRows = [...dataSource];
+      const index = variableRows.findIndex((variable) => row.id === variable.id);
+      const item = variableRows[index];
+      variableRows.splice(index, 1, { ...item, ...row });
+      setDataSource(variableRows);
 
-    if (row.key) {
-      const variableToSave = {
-        [row.key]: {
-          type: row.type,
-          syncValue: row.syncValue,
-          localValue: row.localValue,
-        },
-      };
-      console.log("variableToSave", variableToSave);
-      setVariables(variableToSave);
-    }
-  };
+      if (row.key) {
+        const variableToSave = {
+          [row.key]: {
+            type: row.type,
+            syncValue: row.syncValue,
+            localValue: row.localValue,
+          },
+        };
+        setVariables(variableToSave);
+      }
+    },
+    [dataSource, setVariables]
+  );
 
   const handleAddNewRow = useCallback((dataSource: EnvironmentVariableTableRow[]) => {
     const newData = {
@@ -69,7 +72,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
     [dataSource, removeVariable, handleAddNewRow]
   );
 
-  const columns = useVariablesListColumns({ handleSaveVariables, handleDeleteVariable });
+  const columns = useVariablesListColumns({ handleSaveVariable, handleDeleteVariable });
 
   useEffect(() => {
     if (!isTableLoaded) {
