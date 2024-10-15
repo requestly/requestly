@@ -115,6 +115,14 @@ const useEnvironmentManager = () => {
     return currentEnvironmentVariables;
   };
 
+  const getAllEnvironments = () => {
+    return Object.keys(allEnvironmentData);
+  };
+
+  const getEnvironmentVariables = (environment: string) => {
+    return allEnvironmentData[environment]?.variables;
+  };
+
   return {
     setCurrentEnvironment,
     addNewEnvironment,
@@ -124,6 +132,8 @@ const useEnvironmentManager = () => {
     renderString,
     getVariableValue,
     getCurrentEnvironmentVariables,
+    getAllEnvironments,
+    getEnvironmentVariables,
   };
 };
 

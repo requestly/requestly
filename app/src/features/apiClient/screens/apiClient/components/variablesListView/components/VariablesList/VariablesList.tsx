@@ -10,12 +10,13 @@ import "./variablesList.scss";
 
 interface VariablesListProps {
   searchValue: string;
+  currentEnvironment: string;
 }
 
 export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string; id: number };
 
-export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => {
-  const { getCurrentEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
+export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, currentEnvironment }) => {
+  const { getEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
   //   TODO: REMOVE THIS AFTER ADDING LOADING STATE IN VIEWER COMPONENT
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [dataSource, setDataSource] = useState([]);
@@ -75,9 +76,13 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
   const columns = useVariablesListColumns({ handleSaveVariable, handleDeleteVariable });
 
   useEffect(() => {
+    setIsTableLoaded(false);
+  }, [currentEnvironment]);
+
+  useEffect(() => {
     if (!isTableLoaded) {
       setIsTableLoaded(true);
-      const variables = getCurrentEnvironmentVariables();
+      const variables = getEnvironmentVariables(currentEnvironment);
       const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(
         ([key, value], index) => ({
           id: index,
@@ -98,7 +103,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
       }
       setDataSource(formattedDataSource);
     }
-  }, [getCurrentEnvironmentVariables, isTableLoaded]);
+  }, [getEnvironmentVariables, isTableLoaded, currentEnvironment]);
 
   return (
     <ContentListTable
