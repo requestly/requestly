@@ -35,10 +35,10 @@ const createApiRecord = async (
   const ownerId = getOwnerId(uid, teamId);
 
   const newRecord = {
-    collectionId: "",
     name: record.name || "",
     type: record.type,
     data: record.data,
+    collectionId: record.collectionId || "",
     ownerId: ownerId,
     deleted: false,
     createdBy: uid,
