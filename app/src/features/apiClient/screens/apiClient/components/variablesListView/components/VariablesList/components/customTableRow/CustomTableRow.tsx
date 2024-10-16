@@ -1,7 +1,8 @@
 import { Form, FormInstance, Input, Select } from "antd";
-import React, { useCallback, useContext } from "react";
+import React, { useCallback, useContext, useMemo } from "react";
 import { EnvironmentVariableTableRow } from "../../VariablesList";
 import { VariableType } from "backend/environment/types";
+import debounce from "lodash/debounce";
 import Logger from "lib/logger";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
@@ -27,6 +28,7 @@ export const EditableRow = ({ index, ...props }: { index: number }) => {
     </Form>
   );
 };
+
 export const EditableCell: React.FC<EditableCellProps> = ({
   title,
   editable,
@@ -65,6 +67,16 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       Logger.log("Save failed:", errInfo);
     }
   }, [form, record, handleSaveVariable, convertValueByType]);
+
+  const debouncedSave = useMemo(() => debounce(handleSaveCellValue, 2000), [handleSaveCellValue]);
+
+  const handleChange = useCallback(
+    (value: string) => {
+      form.setFieldsValue({ [dataIndex]: value });
+      debouncedSave();
+    },
+    [form, dataIndex, debouncedSave]
+  );
 
   const getPlaceholderText = () => {
     if (dataIndex === "key") {
@@ -119,7 +131,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             ))}
           </Select>
         ) : (
-          <Input onBlur={handleSaveCellValue} onPressEnter={handleSaveCellValue} placeholder={getPlaceholderText()} />
+          <Input onChange={(e) => handleChange(e.target.value)} placeholder={getPlaceholderText()} />
         )}
       </Form.Item>
     </td>
