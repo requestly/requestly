@@ -16,6 +16,10 @@ export const upsertApiRecord = async (
     delete sanitizedRecord.data.response;
   }
 
+  if (sanitizedRecord.type === RQAPI.RecordType.COLLECTION) {
+    delete sanitizedRecord.data.children;
+  }
+
   if (!record.id) {
     result = await createApiRecord(uid, sanitizedRecord, teamId);
   } else {
