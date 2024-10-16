@@ -61,8 +61,8 @@ const useEnvironmentManager = () => {
     });
   };
 
-  const setCurrentEnvironment = (newEnvironment: string) => {
-    dispatch(environmentVariablesActions.setEnvironment({ environmentName: newEnvironment }));
+  const setCurrentEnvironment = (environmentId: string) => {
+    dispatch(environmentVariablesActions.setEnvironment({ environmentId }));
   };
 
   const setVariables = async (
