@@ -7,6 +7,7 @@ import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { RequestRow } from "../requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
+import { useApiClientContext } from "features/apiClient/contexts";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -16,6 +17,7 @@ interface Props {
 export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isCreateNewRequest, setIsCreateNewRequest] = useState(false);
+  const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
 
   const getCollectionOptions = useCallback((record: RQAPI.CollectionRecord) => {
     const items: MenuProps["items"] = [
@@ -38,8 +40,8 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
         danger: true,
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
-          // openNewCollectionModal();
-          // setCollectionToBeUpdate(record);
+          updateRecordToBeDeleted(record);
+          setIsDeleteModalOpen(true);
         },
       },
     ];

@@ -10,7 +10,7 @@ import {
   trackImportCurlClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
-import { ImportRequestModal } from "./components/modals";
+import { DeleteApiRecordModal, ImportRequestModal } from "./components/modals";
 import { getApiRecord, upsertApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
 import { getUserAuthDetails } from "store/selectors";
@@ -29,7 +29,8 @@ export const APIClient: React.FC<Props> = () => {
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
-  const { onSaveRecord } = useApiClientContext();
+
+  const { onSaveRecord, recordToBeDeleted, isDeleteModalOpen, onDeleteModalClose } = useApiClientContext();
 
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
@@ -182,6 +183,8 @@ export const APIClient: React.FC<Props> = () => {
           handleImportRequest={handleImportRequest}
           onClose={() => setIsImportModalOpen(false)}
         />
+
+        <DeleteApiRecordModal open={isDeleteModalOpen} record={recordToBeDeleted} onClose={onDeleteModalClose} />
       </>
     </div>
   );

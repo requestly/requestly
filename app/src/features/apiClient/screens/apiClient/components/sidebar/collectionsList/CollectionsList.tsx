@@ -67,10 +67,10 @@ export const CollectionsList: React.FC<Props> = ({
             <div className="collections-list">
               {updatedRecords.map((record) => {
                 if (record.type === RQAPI.RecordType.COLLECTION) {
-                  return <CollectionRow record={record} onNewClick={onNewClick} />;
+                  return <CollectionRow key={record.id} record={record} onNewClick={onNewClick} />;
                 }
 
-                return <RequestRow record={record} />;
+                return <RequestRow key={record.id} record={record} />;
               })}
             </div>
           ) : (

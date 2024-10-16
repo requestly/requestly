@@ -45,27 +45,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     setRecordName(updatedName);
   }, [recordToBeEdited?.name, recordType, defaultRecordName]);
 
-  /**
-   * TODO:
-   *
-   * - make the network request and create or update the collection
-   * - update the local state
-   * - remove the collection and request row into seperate component [DONE]
-   * - update collection icon
-   * - open newly created collection in expanded form
-   * - remove reusable function to create an empty request and saved in DB
-   *
-   * [NOWWWWWW]
-   * - rename error [DONE]
-   * - render the collections and requests in nested way [DONE]
-   * - delete the collections
-   * - add plus button on collection row to add a request
-   *
-   * - create request inside the collection
-   * - delete bulk records
-   *
-   */
-
   const saveNewRecord = useCallback(async () => {
     setIsLoading(true);
 
