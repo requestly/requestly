@@ -1,9 +1,9 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
 import { redirectToEnvironment } from "utils/RedirectionUtils";
 import "./environmentsList.scss";
-import { useState } from "react";
 
 export const EnvironmentsList = () => {
   const navigate = useNavigate();
