@@ -34,6 +34,7 @@ import "./apiClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQButton } from "lib/design-system-v2/components";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
@@ -65,12 +66,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const teamId = workspace?.id;
 
   const { onSaveRecord } = useApiClientContext();
+  const { renderString } = useEnvironmentManager();
 
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
+
   const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const animationTimerRef = useRef<NodeJS.Timeout>();
@@ -231,6 +234,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     const sanitizedEntry = sanitizeEntry(entry);
     sanitizedEntry.response = null;
 
+    const renderedRequest = renderString<RQAPI.Request>(sanitizedEntry.request);
+
+    console.log("!!!debug", "renderedRequest", renderedRequest);
+
     abortControllerRef.current = new AbortController();
 
     setEntry(sanitizedEntry);
@@ -238,7 +245,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    makeRequest(appMode, sanitizedEntry.request, abortControllerRef.current.signal)
+    makeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
       .then((response) => {
         // TODO: Add an entry in history
         const entryWithResponse = { ...sanitizedEntry, response };
@@ -278,7 +285,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
-  }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished]);
+  }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished, renderString]);
 
   const onSaveButtonClick = async () => {
     setIsRequestSaving(true);
