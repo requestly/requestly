@@ -22,9 +22,8 @@ const useEnvironmentManager = () => {
 
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const { name: currentEnvironmentName } = useSelector(getCurrentEnvironmentDetails);
+  const { name: currentEnvironmentName, id: currentEnvironmentId } = useSelector(getCurrentEnvironmentDetails);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
-  const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentName]?.variables ?? {};
 
   const ownerId = useMemo(
     () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
@@ -40,7 +39,7 @@ const useEnvironmentManager = () => {
     return () => {
       unsubscribeListener();
     };
-  }, [dispatch, currentEnvironmentName, ownerId]);
+  }, [dispatch, ownerId]);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -49,8 +48,11 @@ const useEnvironmentManager = () => {
     }
   }, [dispatch, user.loggedIn]);
 
-  const getCurrentEnvironmentName = () => {
-    return currentEnvironmentName;
+  const getCurrentEnvironment = () => {
+    return {
+      currentEnvironmentName: currentEnvironmentName || "default",
+      currentEnvironmentId,
+    };
   };
 
   const addNewEnvironment = async (newEnvironment: string) => {
@@ -63,7 +65,10 @@ const useEnvironmentManager = () => {
     dispatch(environmentVariablesActions.setEnvironment({ environmentName: newEnvironment }));
   };
 
-  const setVariables = async (variables: Record<string, Omit<EnvironmentVariableValue, "type">>) => {
+  const setVariables = async (
+    environmentId: string,
+    variables: Record<string, Omit<EnvironmentVariableValue, "type">>
+  ) => {
     const newVariables: EnvironmentVariables = Object.fromEntries(
       Object.entries(variables).map(([key, value]) => {
         return [key, { localValue: value.localValue, syncValue: value.syncValue, type: typeof value.syncValue }];
@@ -72,13 +77,13 @@ const useEnvironmentManager = () => {
 
     return setEnvironmentVariablesInDB(ownerId, {
       newVariables,
-      environment: currentEnvironmentName,
+      environmentId,
     })
       .then(() => {
         dispatch(
           environmentVariablesActions.setVariablesInEnvironment({
             newVariables,
-            environment: currentEnvironmentName,
+            environmentId,
           })
         );
       })
@@ -89,12 +94,10 @@ const useEnvironmentManager = () => {
       });
   };
 
-  const removeVariable = async (key: string) => {
-    return removeEnvironmentVariableFromDB(ownerId, { environment: currentEnvironmentName, key })
+  const removeVariable = async (environmentId: string, key: string) => {
+    return removeEnvironmentVariableFromDB(ownerId, { environmentId, key })
       .then(() => {
-        dispatch(
-          environmentVariablesActions.removeVariableFromEnvironment({ key, environment: currentEnvironmentName })
-        );
+        dispatch(environmentVariablesActions.removeVariableFromEnvironment({ key, environmentId }));
       })
       .catch((err) => {
         toast.error("Error while removing environment variables.");
@@ -104,25 +107,26 @@ const useEnvironmentManager = () => {
   };
 
   const renderString = <T>(template: string | Record<string, any>): T => {
+    const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId].variables;
     return renderTemplate(template, currentEnvironmentVariables);
   };
 
-  const getVariableValue = (key: string) => {
-    return currentEnvironmentVariables?.[key];
+  const getEnvironmentVariables = (environmentId: string) => {
+    return allEnvironmentData[environmentId]?.variables ?? {};
   };
 
   const getCurrentEnvironmentVariables = () => {
-    return currentEnvironmentVariables;
+    return allEnvironmentData[currentEnvironmentId]?.variables ?? {};
   };
 
   return {
     setCurrentEnvironment,
     addNewEnvironment,
-    getCurrentEnvironmentName,
+    getCurrentEnvironment,
     setVariables,
     removeVariable,
     renderString,
-    getVariableValue,
+    getEnvironmentVariables,
     getCurrentEnvironmentVariables,
   };
 };
