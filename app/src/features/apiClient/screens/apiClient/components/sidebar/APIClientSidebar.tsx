@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { RQAPI } from "../../../../types";
 import { NavLink, useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
@@ -35,23 +35,22 @@ const APIClientSidebar: React.FC<Props> = ({
   const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
 
-  const showNewRecordNameInput = () => {
-    setIsNewRecordNameInputVisible(true);
-  };
-
   const hideNewRecordNameInput = () => {
     setIsNewRecordNameInputVisible(false);
     setRecordTypeToBeCreated(null);
   };
 
-  const handleNewRecordClick = (recordType: RQAPI.RecordType) => {
-    showNewRecordNameInput();
-    setRecordTypeToBeCreated(recordType);
+  const handleNewRecordClick = useCallback(
+    (recordType: RQAPI.RecordType, collectionId?: string) => {
+      setIsNewRecordNameInputVisible(true);
+      setRecordTypeToBeCreated(recordType);
 
-    if (recordType === RQAPI.RecordType.API) {
-      onNewClick();
-    }
-  };
+      if (recordType === RQAPI.RecordType.API) {
+        onNewClick();
+      }
+    },
+    [onNewClick]
+  );
 
   useEffect(() => {
     switch (location.pathname) {
@@ -85,6 +84,7 @@ const APIClientSidebar: React.FC<Props> = ({
       ),
       children: (
         <CollectionsList
+          onNewClick={onNewClick}
           recordTypeToBeCreated={recordTypeToBeCreated}
           isNewRecordNameInputVisible={isNewRecordNameInputVisible}
           hideNewRecordNameInput={hideNewRecordNameInput}
