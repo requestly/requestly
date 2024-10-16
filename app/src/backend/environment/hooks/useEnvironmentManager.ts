@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import { EnvironmentVariables, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEnvironmentData, getCurrentEnvironmentDetails } from "store/features/environment/selectors";
@@ -30,16 +30,43 @@ const useEnvironmentManager = () => {
     [currentlyActiveWorkspace.id, user?.details?.profile?.uid]
   );
 
+  const addNewEnvironment = useCallback(
+    async (newEnvironment: string) => {
+      return setEnvironmentInDB(ownerId, newEnvironment)
+        .then((res) => res)
+        .catch((err) => {
+          Logger.error("Error while setting environment in db", err);
+        });
+    },
+    [ownerId]
+  );
+
+  const setCurrentEnvironment = useCallback(
+    (newEnvironment: string) => {
+      dispatch(environmentVariablesActions.setEnvironment({ environmentName: newEnvironment }));
+    },
+    [dispatch]
+  );
+
   useEffect(() => {
     unsubscribeListener?.();
     unsubscribeListener = attatchEnvironmentVariableListener(ownerId, (environmentMap) => {
       dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
+
+      // Check if no environments exist, create a default one
+      if (Object.keys(environmentMap).length === 0) {
+        addNewEnvironment("default").then((defaultEnv) => {
+          if (defaultEnv) {
+            setCurrentEnvironment(defaultEnv.id);
+          }
+        });
+      }
     });
 
     return () => {
       unsubscribeListener();
     };
-  }, [dispatch, ownerId]);
+  }, [dispatch, ownerId, addNewEnvironment, setCurrentEnvironment]);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -53,16 +80,6 @@ const useEnvironmentManager = () => {
       currentEnvironmentName: currentEnvironmentName || "default",
       currentEnvironmentId,
     };
-  };
-
-  const addNewEnvironment = async (newEnvironment: string) => {
-    return setEnvironmentInDB(ownerId, newEnvironment).catch((err) => {
-      console.error("Error while setting environment in db", err);
-    });
-  };
-
-  const setCurrentEnvironment = (newEnvironment: string) => {
-    dispatch(environmentVariablesActions.setEnvironment({ environmentName: newEnvironment }));
   };
 
   const setVariables = async (
