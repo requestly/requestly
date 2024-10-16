@@ -60,13 +60,16 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
 
   const handleDeleteVariable = useCallback(
     async (key: string) => {
+      const newData = key ? dataSource.filter((item) => item.key !== key) : dataSource.slice(0, -1);
+
       if (key) {
-        const newData = dataSource.filter((item) => item.key !== key);
         await removeVariable(key);
-        setDataSource(newData);
-        if (newData.length === 0) {
-          handleAddNewRow([]);
-        }
+      }
+
+      setDataSource(newData);
+
+      if (newData.length === 0) {
+        handleAddNewRow([]);
       }
     },
     [dataSource, removeVariable, handleAddNewRow]
