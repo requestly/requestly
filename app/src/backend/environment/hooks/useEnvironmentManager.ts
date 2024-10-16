@@ -1,16 +1,17 @@
 import { useEffect, useMemo } from "react";
 import { EnvironmentVariables, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllEnvironmentData, getCurrentEnvironmentDetails } from "store/features/environment/selectors";
+import { getAllEnvironmentData, getCurrentEnvironmentId } from "store/features/environment/selectors";
 import { environmentVariablesActions } from "store/features/environment/slice";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { renderTemplate } from "../utils";
 import {
-  attatchEnvironmentVariableListener,
+  attachEnvironmentVariableListener,
   removeEnvironmentVariableFromDB,
-  setEnvironmentInDB,
-  setEnvironmentVariablesInDB,
+  upsertEnvironmentInDB,
+  updateEnvironmentVariablesInDB,
+  fetchAllEnvironmentDetails,
 } from "..";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
@@ -22,7 +23,7 @@ const useEnvironmentManager = () => {
 
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const { name: currentEnvironmentName, id: currentEnvironmentId } = useSelector(getCurrentEnvironmentDetails);
+  const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
 
   const ownerId = useMemo(
@@ -31,15 +32,33 @@ const useEnvironmentManager = () => {
   );
 
   useEffect(() => {
+    fetchAllEnvironmentDetails(ownerId)
+      .then((environmentMap) => {
+        dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
+      })
+      .catch((err) => {
+        Logger.error("Error while fetching all environment variables", err);
+        dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: {} }));
+      });
+  });
+
+  useEffect(() => {
     unsubscribeListener?.();
-    unsubscribeListener = attatchEnvironmentVariableListener(ownerId, (environmentMap) => {
-      dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
-    });
+    if (ownerId && currentEnvironmentId) {
+      unsubscribeListener = attachEnvironmentVariableListener(ownerId, currentEnvironmentId, (environmentData) => {
+        dispatch(
+          environmentVariablesActions.setVariablesInEnvironment({
+            newVariables: environmentData.variables,
+            environmentId: environmentData.id,
+          })
+        );
+      });
+    }
 
     return () => {
       unsubscribeListener();
     };
-  }, [dispatch, ownerId]);
+  }, [currentEnvironmentId, dispatch, ownerId]);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -50,19 +69,19 @@ const useEnvironmentManager = () => {
 
   const getCurrentEnvironment = () => {
     return {
-      currentEnvironmentName,
+      currentEnvironmentName: allEnvironmentData[currentEnvironmentId]?.name,
       currentEnvironmentId,
     };
   };
 
   const addNewEnvironment = async (newEnvironment: string) => {
-    return setEnvironmentInDB(ownerId, newEnvironment).catch((err) => {
+    return upsertEnvironmentInDB(ownerId, newEnvironment).catch((err) => {
       console.error("Error while setting environment in db", err);
     });
   };
 
   const setCurrentEnvironment = (environmentId: string) => {
-    dispatch(environmentVariablesActions.setEnvironment({ environmentId }));
+    dispatch(environmentVariablesActions.setCurrentEnvironment({ environmentId }));
   };
 
   const setVariables = async (
@@ -75,10 +94,7 @@ const useEnvironmentManager = () => {
       })
     );
 
-    return setEnvironmentVariablesInDB(ownerId, {
-      newVariables,
-      environmentId,
-    })
+    return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariables)
       .then(() => {
         dispatch(
           environmentVariablesActions.setVariablesInEnvironment({
@@ -106,7 +122,7 @@ const useEnvironmentManager = () => {
       });
   };
 
-  const renderString = <T>(template: string | Record<string, any>): T => {
+  const renderVariables = <T>(template: string | Record<string, any>): T => {
     const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId].variables;
     return renderTemplate(template, currentEnvironmentVariables);
   };
@@ -121,7 +137,7 @@ const useEnvironmentManager = () => {
     getCurrentEnvironment,
     setVariables,
     removeVariable,
-    renderString,
+    renderVariables,
     getEnvironmentVariables,
   };
 };

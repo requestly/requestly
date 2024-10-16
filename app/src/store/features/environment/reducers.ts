@@ -4,25 +4,19 @@ import { InitialState } from "./types";
 import { mergeLocalAndSyncVariables } from "./utils";
 
 const initialState = {
-  currentEnvironment: {
-    name: "",
-    id: "",
-  },
+  currentEnvironment: "",
   environments: {},
 };
 
 const resetState = (): InitialState => initialState;
 
-const setEnvironment = (
+const setCurrentEnvironment = (
   state: InitialState,
   action: PayloadAction<{
     environmentId: string;
   }>
 ) => {
-  state.currentEnvironment = {
-    name: state.environments[action.payload.environmentId].name,
-    id: state.environments[action.payload.environmentId].id,
-  };
+  state.currentEnvironment = action.payload.environmentId;
 };
 
 const setAllEnvironmentData = (
@@ -82,7 +76,7 @@ const environmentVariablesReducerFunctions = {
   setAllEnvironmentData,
   setVariablesInEnvironment,
   removeVariableFromEnvironment,
-  setEnvironment,
+  setCurrentEnvironment,
 };
 
 export { initialState };

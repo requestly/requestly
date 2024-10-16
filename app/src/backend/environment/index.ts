@@ -1,15 +1,15 @@
 import firebaseApp from "firebase";
-import { addDoc, collection, deleteField, doc, getFirestore, onSnapshot, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteField, doc, getDocs, getFirestore, onSnapshot, updateDoc } from "firebase/firestore";
 import { EnvironmentData, EnvironmentMap, EnvironmentVariables } from "./types";
 
 const db = getFirestore(firebaseApp);
 
 const getDocPath = (ownerId: string, environmentId: string) => {
-  return doc(db, "environmentConfigs", ownerId, "environments", environmentId);
+  return doc(db, "environments", ownerId, "environments", environmentId);
 };
 
-export const setEnvironmentInDB = async (ownerId: string, environmentName: string) => {
-  return addDoc(collection(db, "environmentConfigs", ownerId, "environments"), {
+export const upsertEnvironmentInDB = async (ownerId: string, environmentName: string) => {
+  return addDoc(collection(db, "environments", ownerId, "environments"), {
     name: environmentName,
     variables: {},
   }).then((doc) => {
@@ -20,18 +20,16 @@ export const setEnvironmentInDB = async (ownerId: string, environmentName: strin
   });
 };
 
-export const setEnvironmentVariablesInDB = async (
+export const updateEnvironmentVariablesInDB = async (
   ownerId: string,
-  payload: {
-    newVariables: EnvironmentVariables;
-    environmentId: string;
-  }
+  environmentId: string,
+  variables: EnvironmentVariables
 ) => {
   const newVariables = Object.fromEntries(
-    Object.entries(payload.newVariables).map(([key, value]) => [key, { syncValue: value.syncValue, type: value.type }])
+    Object.entries(variables).map(([key, value]) => [key, { syncValue: value.syncValue, type: value.type }])
   );
 
-  return updateDoc(getDocPath(ownerId, payload.environmentId), {
+  return updateDoc(getDocPath(ownerId, environmentId), {
     variables: newVariables,
   });
 };
@@ -48,29 +46,52 @@ export const removeEnvironmentVariableFromDB = async (
   });
 };
 
-export const attatchEnvironmentVariableListener = (
+export const attachEnvironmentVariableListener = (
   ownerId: string,
-  callback: (newVariables: EnvironmentMap) => void
+  environmentId: string,
+  callback: (newVariables: EnvironmentData) => void
 ) => {
   if (!ownerId) {
     return () => {};
   }
 
-  const variableDoc = collection(db, "environmentConfigs", ownerId, "environments");
+  const variableDoc = doc(db, "environments", ownerId, "environments", environmentId);
 
   const unsubscribe = onSnapshot(variableDoc, (snapshot) => {
     if (!snapshot) {
-      callback({});
-    } else {
-      const environmentDetails: EnvironmentMap = {};
-
-      snapshot.forEach((doc) => {
-        environmentDetails[doc.id] = { id: doc.id, ...doc.data() } as EnvironmentData;
+      callback({
+        id: environmentId,
+        name: "",
+        variables: {},
       });
+    } else {
+      const environmentData = { id: environmentId, ...snapshot.data() } as EnvironmentData;
 
-      callback(environmentDetails);
+      callback(environmentData);
     }
   });
 
   return unsubscribe;
+};
+
+export const fetchAllEnvironmentDetails = async (ownerId: string) => {
+  if (!ownerId) {
+    return {};
+  }
+
+  const environmentDoc = collection(db, "environments", ownerId, "environments");
+
+  const snapshot = await getDocs(environmentDoc);
+
+  if (snapshot.empty) {
+    return {};
+  }
+
+  const environmentDetails: EnvironmentMap = {};
+
+  snapshot.forEach((doc) => {
+    environmentDetails[doc.id] = { id: doc.id, ...doc.data() } as EnvironmentData;
+  });
+
+  return environmentDetails;
 };
