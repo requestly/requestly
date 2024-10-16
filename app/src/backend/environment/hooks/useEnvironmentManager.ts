@@ -17,7 +17,7 @@ import { toast } from "utils/Toast";
 
 let unsubscribeListener: () => void = null;
 
-const useEnvironmentManager = () => {
+const useEnvironmentManager = (initListener: boolean = false) => {
   const dispatch = useDispatch();
 
   const user = useSelector(getUserAuthDetails);
@@ -49,24 +49,29 @@ const useEnvironmentManager = () => {
   );
 
   useEffect(() => {
-    unsubscribeListener?.();
-    unsubscribeListener = attatchEnvironmentVariableListener(ownerId, (environmentMap) => {
-      dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
+    if (initListener) {
+      unsubscribeListener?.();
+      unsubscribeListener = attatchEnvironmentVariableListener(ownerId, (environmentMap) => {
+        dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
 
-      // Check if no environments exist, create a default one
-      if (Object.keys(environmentMap).length === 0) {
-        addNewEnvironment("default").then((defaultEnv) => {
-          if (defaultEnv) {
-            setCurrentEnvironment(defaultEnv.id);
-          }
-        });
-      }
-    });
+        // Check if no environments exist, create a default one
+        if (Object.keys(environmentMap).length === 0) {
+          addNewEnvironment("default").then((defaultEnv) => {
+            if (defaultEnv) {
+              setCurrentEnvironment(defaultEnv.id);
+            }
+          });
+        } else {
+          const defaultEnvironment = Object.keys(environmentMap)[0];
+          setCurrentEnvironment(defaultEnvironment);
+        }
+      });
+    }
 
     return () => {
       unsubscribeListener();
     };
-  }, [dispatch, ownerId, addNewEnvironment, setCurrentEnvironment]);
+  }, [dispatch, ownerId, addNewEnvironment, setCurrentEnvironment, initListener]);
 
   useEffect(() => {
     if (!user.loggedIn) {
