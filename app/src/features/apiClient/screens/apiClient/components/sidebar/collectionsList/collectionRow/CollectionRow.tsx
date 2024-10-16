@@ -16,18 +16,14 @@ interface Props {
 
 export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
   const [isEditMode, setIsEditMode] = useState(false);
+  const [activeKey, setActiveKey] = useState(record.id); // TODO: Persist collapse active keys for all rows
   const [isCreateNewRequest, setIsCreateNewRequest] = useState(false);
   const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
 
   const getCollectionOptions = useCallback((record: RQAPI.CollectionRecord) => {
     const items: MenuProps["items"] = [
-      // {
-      //   key: "0",
-      //   label: <div>Add request</div>,
-      //   onClick: () => {},
-      // },
       {
-        key: "1",
+        key: "0",
         label: <div>Rename</div>,
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
@@ -35,7 +31,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
         },
       },
       {
-        key: "2",
+        key: "1",
         label: <div>Delete</div>,
         danger: true,
         onClick: (itemInfo) => {
@@ -60,7 +56,15 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
           }}
         />
       ) : (
-        <Collapse defaultActiveKey={[record.id]} ghost className="collections-list-item collection">
+        <Collapse
+          activeKey={activeKey}
+          onChange={(keys) => {
+            setActiveKey(keys[0]);
+          }}
+          defaultActiveKey={[record.id]}
+          ghost
+          className="collections-list-item collection"
+        >
           <Collapse.Panel
             key={record.id}
             header={
@@ -74,6 +78,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
                     icon={<MdAdd />}
                     onClick={(e) => {
                       e.stopPropagation();
+                      setActiveKey(record.id);
                       setIsCreateNewRequest(true);
                     }}
                   />
@@ -112,7 +117,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
             ) : (
               record.data.children.map((apiRecord) => {
                 if (apiRecord.type === RQAPI.RecordType.API) {
-                  // For now there will only be requests inside collections
+                  // For now there will only be requests inside collection
                   return <RequestRow record={apiRecord} />;
                 }
               })
