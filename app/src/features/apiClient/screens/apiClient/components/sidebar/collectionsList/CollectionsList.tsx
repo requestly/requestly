@@ -1,29 +1,59 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { EmptyState } from "../emptyState/EmptyState";
 import { NewRecordNameInput } from "./newRecordNameInput/NewRecordNameInput";
 import { CollectionRow } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
+import { isApiCollection, isApiRequest } from "../../../utils";
+import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import "./collectionsList.scss";
 
 interface Props {
-  newRecordCollectionId: string;
-  isNewRecordNameInputVisible: boolean;
+  onNewClick: () => void;
   recordTypeToBeCreated: RQAPI.RecordType;
+  isNewRecordNameInputVisible: boolean;
   hideNewRecordNameInput: () => void;
-  handleNewRecordClick: (recordType: RQAPI.RecordType) => void;
 }
 
 export const CollectionsList: React.FC<Props> = ({
-  newRecordCollectionId,
+  onNewClick,
   recordTypeToBeCreated,
   isNewRecordNameInputVisible,
   hideNewRecordNameInput,
-  handleNewRecordClick,
 }) => {
   const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
+
+  const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
+    const collections: Record<RQAPI.CollectionRecord["id"], RQAPI.CollectionRecord> = {};
+    const requests: RQAPI.ApiRecord[] = [];
+
+    records.forEach((record) => {
+      if (isApiCollection(record)) {
+        collections[record.id] = { ...record, data: { ...record.data, children: [] } };
+      }
+    });
+
+    records.forEach((record) => {
+      if (isApiRequest(record)) {
+        if (record.collectionId) {
+          collections[record.collectionId].data.children.push(record);
+        } else {
+          requests.push(record);
+        }
+      }
+    });
+
+    const updatedRecords = [...Object.values(collections), ...requests];
+    updatedRecords.sort((recordA, recordB) => recordA.createdTs - recordB.createdTs);
+
+    return updatedRecords;
+  }, []);
+
+  const updatedRecords = useMemo(() => prepareRecordsToRender(apiClientRecords), [
+    apiClientRecords,
+    prepareRecordsToRender,
+  ]);
 
   return (
     <>
@@ -33,30 +63,28 @@ export const CollectionsList: React.FC<Props> = ({
             <div className="api-client-sidebar-placeholder">
               <Typography.Text type="secondary">Loading...</Typography.Text>
             </div>
-          ) : apiClientRecords.length > 0 ? (
+          ) : updatedRecords.length > 0 ? (
             <div className="collections-list">
-              {apiClientRecords.map((record) => {
+              {updatedRecords.map((record) => {
                 if (record.type === RQAPI.RecordType.COLLECTION) {
-                  return <CollectionRow record={record} createNewRecord={handleNewRecordClick} />;
+                  return <CollectionRow record={record} onNewClick={onNewClick} />;
                 }
 
                 return <RequestRow record={record} />;
               })}
             </div>
           ) : (
-            <EmptyState
+            <ApiRecordEmptyState
+              recordType={RQAPI.RecordType.COLLECTION}
               message="No collections created yet"
               newRecordBtnText="New collection"
-              onNewRecordClick={() => {
-                handleNewRecordClick(RQAPI.RecordType.COLLECTION);
-              }}
+              onNewRecordClick={onNewClick}
             />
           )}
         </div>
 
         {isNewRecordNameInputVisible ? (
           <NewRecordNameInput
-            newRecordCollectionId={newRecordCollectionId}
             recordType={recordTypeToBeCreated}
             onSuccess={() => {
               hideNewRecordNameInput();

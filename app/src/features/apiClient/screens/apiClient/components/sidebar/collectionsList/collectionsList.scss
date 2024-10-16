@@ -41,7 +41,7 @@
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
-          font-size: var(--requestly-font-size-sm, 13px);
+          font-size: var(--requestly-font-size-xs);
           color: var(--requestly-color-text-default);
         }
 
@@ -53,6 +53,10 @@
 
       &.collection.ant-collapse {
         padding: 0;
+
+        &:hover .ant-collapse-item .ant-collapse-header .collection-name-container .collection-options {
+          visibility: visible;
+        }
 
         .ant-collapse-item {
           width: 100%;
@@ -77,18 +81,33 @@
               align-items: center;
 
               .collection-name {
-                width: 100%;
-                max-width: 178px;
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
+                font-size: var(--requestly-font-size-xs);
+                color: var(--requestly-color-text-default);
+                font-style: normal;
+                font-weight: var(--requestly-font-weight-medium);
+                line-height: var(--line-height-xs, 15px);
               }
 
               .collection-options {
                 flex-shrink: 0;
                 margin-left: auto;
+                visibility: hidden;
+                display: flex;
+                align-items: center;
+                gap: var(--space-1, 2px);
+
+                svg {
+                  color: var(--requestly-color-text-subtle);
+                }
               }
             }
+          }
+
+          .ant-collapse-content-box {
+            padding: 4px 20px;
           }
         }
       }
