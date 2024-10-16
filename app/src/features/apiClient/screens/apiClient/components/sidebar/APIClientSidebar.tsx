@@ -35,8 +35,8 @@ const APIClientSidebar: React.FC<Props> = ({
 }) => {
   const location = useLocation();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
-  const { getCurrentEnvironmentName } = useEnvironmentManager();
-  const currentEnvironmentName = getCurrentEnvironmentName();
+  const { getCurrentEnvironment } = useEnvironmentManager();
+  const { currentEnvironmentName } = getCurrentEnvironment();
 
   useEffect(() => {
     if (location.pathname.includes(PATHS.API_CLIENT.HISTORY.ABSOLUTE)) {

@@ -12,7 +12,8 @@ interface VariablesListHeaderProps {
 }
 
 export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({ searchValue, onSearchValueChange }) => {
-  const { getCurrentEnvironmentName } = useEnvironmentManager();
+  const { getCurrentEnvironment } = useEnvironmentManager();
+  const { currentEnvironmentName } = getCurrentEnvironment();
 
   return (
     <div className="variables-list-header">
@@ -24,7 +25,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({ search
         <span className="variables-list-breadcrumb-1">
           Environments <MdOutlineChevronRight />
         </span>
-        <span className="variables-list-breadcrumb-2">{getCurrentEnvironmentName()}</span>
+        <span className="variables-list-breadcrumb-2">{currentEnvironmentName}</span>
       </div>
       <div className="variables-list-action-container">
         <Input

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import { EnvironmentVariables, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEnvironmentData, getCurrentEnvironmentDetails } from "store/features/environment/selectors";
@@ -22,25 +22,51 @@ const useEnvironmentManager = () => {
 
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const { name: currentEnvironmentName } = useSelector(getCurrentEnvironmentDetails);
+  const { name: currentEnvironmentName, id: currentEnvironmentId } = useSelector(getCurrentEnvironmentDetails);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
-  const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentName]?.variables ?? {};
 
   const ownerId = useMemo(
     () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
     [currentlyActiveWorkspace.id, user?.details?.profile?.uid]
   );
 
+  const addNewEnvironment = useCallback(
+    async (newEnvironment: string) => {
+      return setEnvironmentInDB(ownerId, newEnvironment)
+        .then((res) => res)
+        .catch((err) => {
+          Logger.error("Error while setting environment in db", err);
+        });
+    },
+    [ownerId]
+  );
+
+  const setCurrentEnvironment = useCallback(
+    (newEnvironment: string) => {
+      dispatch(environmentVariablesActions.setEnvironment({ environmentName: newEnvironment }));
+    },
+    [dispatch]
+  );
+
   useEffect(() => {
     unsubscribeListener?.();
     unsubscribeListener = attatchEnvironmentVariableListener(ownerId, (environmentMap) => {
       dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
+
+      // Check if no environments exist, create a default one
+      if (Object.keys(environmentMap).length === 0) {
+        addNewEnvironment("default").then((defaultEnv) => {
+          if (defaultEnv) {
+            setCurrentEnvironment(defaultEnv.id);
+          }
+        });
+      }
     });
 
     return () => {
       unsubscribeListener();
     };
-  }, [dispatch, currentEnvironmentName, ownerId]);
+  }, [dispatch, ownerId, addNewEnvironment, setCurrentEnvironment]);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -49,21 +75,17 @@ const useEnvironmentManager = () => {
     }
   }, [dispatch, user.loggedIn]);
 
-  const getCurrentEnvironmentName = () => {
-    return currentEnvironmentName;
+  const getCurrentEnvironment = () => {
+    return {
+      currentEnvironmentName: currentEnvironmentName || "default",
+      currentEnvironmentId,
+    };
   };
 
-  const addNewEnvironment = async (newEnvironment: string) => {
-    return setEnvironmentInDB(ownerId, newEnvironment).catch((err) => {
-      console.error("Error while setting environment in db", err);
-    });
-  };
-
-  const setCurrentEnvironment = (newEnvironment: string) => {
-    dispatch(environmentVariablesActions.setEnvironment({ environmentName: newEnvironment }));
-  };
-
-  const setVariables = async (variables: Record<string, Omit<EnvironmentVariableValue, "type">>) => {
+  const setVariables = async (
+    environmentId: string,
+    variables: Record<string, Omit<EnvironmentVariableValue, "type">>
+  ) => {
     const newVariables: EnvironmentVariables = Object.fromEntries(
       Object.entries(variables).map(([key, value]) => {
         return [key, { localValue: value.localValue, syncValue: value.syncValue, type: typeof value.syncValue }];
@@ -72,13 +94,13 @@ const useEnvironmentManager = () => {
 
     return setEnvironmentVariablesInDB(ownerId, {
       newVariables,
-      environment: currentEnvironmentName,
+      environmentId,
     })
       .then(() => {
         dispatch(
           environmentVariablesActions.setVariablesInEnvironment({
             newVariables,
-            environment: currentEnvironmentName,
+            environmentId,
           })
         );
       })
@@ -89,12 +111,10 @@ const useEnvironmentManager = () => {
       });
   };
 
-  const removeVariable = async (key: string) => {
-    return removeEnvironmentVariableFromDB(ownerId, { environment: currentEnvironmentName, key })
+  const removeVariable = async (environmentId: string, key: string) => {
+    return removeEnvironmentVariableFromDB(ownerId, { environmentId, key })
       .then(() => {
-        dispatch(
-          environmentVariablesActions.removeVariableFromEnvironment({ key, environment: currentEnvironmentName })
-        );
+        dispatch(environmentVariablesActions.removeVariableFromEnvironment({ key, environmentId }));
       })
       .catch((err) => {
         toast.error("Error while removing environment variables.");
@@ -104,19 +124,21 @@ const useEnvironmentManager = () => {
   };
 
   const renderString = <T>(template: string | Record<string, any>): T => {
+    const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId].variables;
     return renderTemplate(template, currentEnvironmentVariables);
   };
 
-  const getVariableValue = (key: string) => {
-    return currentEnvironmentVariables?.[key];
-  };
-
   const getCurrentEnvironmentVariables = () => {
-    return currentEnvironmentVariables;
+    return allEnvironmentData[currentEnvironmentId]?.variables ?? {};
   };
 
   const getAllEnvironments = () => {
-    return Object.keys(allEnvironmentData);
+    return Object.keys(allEnvironmentData).map((key) => {
+      return {
+        id: key,
+        name: allEnvironmentData[key].name,
+      };
+    });
   };
 
   const getEnvironmentVariables = (environment: string) => {
@@ -126,14 +148,13 @@ const useEnvironmentManager = () => {
   return {
     setCurrentEnvironment,
     addNewEnvironment,
-    getCurrentEnvironmentName,
+    getCurrentEnvironment,
     setVariables,
     removeVariable,
     renderString,
-    getVariableValue,
+    getEnvironmentVariables,
     getCurrentEnvironmentVariables,
     getAllEnvironments,
-    getEnvironmentVariables,
   };
 };
 
