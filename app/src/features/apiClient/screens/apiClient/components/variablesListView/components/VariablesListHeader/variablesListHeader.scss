@@ -23,10 +23,12 @@
     margin-top: 8px;
     width: 200px;
     padding: 0 12px;
+    background: transparent;
 
     input.ant-input {
       padding: 6px 2px;
       font-size: var(--requestly-font-size-xs, 11px);
+      background: transparent;
     }
   }
 }
