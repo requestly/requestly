@@ -5,13 +5,15 @@ import { getAllEnvironmentData, getCurrentEnvironmentDetails } from "store/featu
 import { environmentVariablesActions } from "store/features/environment/slice";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { renderTemplate } from "../utils";
 import {
   attatchEnvironmentVariableListener,
   removeEnvironmentVariableFromDB,
   setEnvironmentInDB,
   setEnvironmentVariablesInDB,
 } from "..";
-// import Logger from "lib/logger";
+import Logger from "lib/logger";
+import { toast } from "utils/Toast";
 
 let unsubscribeListener: () => void = null;
 
@@ -81,6 +83,8 @@ const useEnvironmentManager = () => {
         );
       })
       .catch((err) => {
+        toast.error("Error while setting environment variables.");
+        Logger.error("Error while setting environment variables in db", err);
         console.error("Error while setting environment variables in db", err);
       });
   };
@@ -93,8 +97,14 @@ const useEnvironmentManager = () => {
         );
       })
       .catch((err) => {
+        toast.error("Error while removing environment variables.");
+        Logger.error("Error while removing environment variables from db", err);
         console.error("Error while removing environment variables from db", err);
       });
+  };
+
+  const renderString = <T>(template: string | Record<string, any>): T => {
+    return renderTemplate(template, currentEnvironmentVariables);
   };
 
   const getVariableValue = (key: string) => {
@@ -111,6 +121,7 @@ const useEnvironmentManager = () => {
     getCurrentEnvironmentName,
     setVariables,
     removeVariable,
+    renderString,
     getVariableValue,
     getCurrentEnvironmentVariables,
   };
