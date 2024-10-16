@@ -35,7 +35,7 @@ import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/Analytics
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { RQInput } from "lib/design-system-v2/components";
+import { RQSingleLineEditor } from "lib/design-system-v2/components";
 
 interface Props {
   apiEntry?: RQAPI.Entry;
@@ -297,11 +297,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
               onBlur={onUrlInputBlur}
               prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
             /> */}
-            <RQInput
+            <RQSingleLineEditor
               className="api-request-url"
               placeholder="https://example.com"
-              value={entry.request.url}
-              onChange={(evt) => setUrl(evt.target.value)}
+              value={"https://app.requestly.io/echo"}
+              onChange={(text) => setUrl(text)}
               onPressEnter={onUrlInputEnterPressed}
               onBlur={onUrlInputBlur}
               // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
