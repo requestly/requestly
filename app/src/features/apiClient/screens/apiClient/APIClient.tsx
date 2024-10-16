@@ -10,7 +10,7 @@ import {
   trackImportCurlClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
-import ImportRequestModal from "./components/modals/ImportRequestModal";
+import { ImportRequestModal } from "./components/modals";
 import { getApiRecord, upsertApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
 import { getUserAuthDetails } from "store/selectors";
