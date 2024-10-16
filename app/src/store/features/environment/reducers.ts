@@ -16,10 +16,13 @@ const resetState = (): InitialState => initialState;
 const setEnvironment = (
   state: InitialState,
   action: PayloadAction<{
-    environmentName: string;
+    environmentId: string;
   }>
 ) => {
-  state.currentEnvironment = state.environments[action.payload.environmentName];
+  state.currentEnvironment = {
+    name: state.environments[action.payload.environmentId].name,
+    id: state.environments[action.payload.environmentId].id,
+  };
 };
 
 const setAllEnvironmentData = (
