@@ -15,10 +15,16 @@ interface VariablesListProps {
 export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string; id: number };
 
 export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => {
-  const { getCurrentEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
+  const {
+    getCurrentEnvironmentVariables,
+    setVariables,
+    removeVariable,
+    getCurrentEnvironment,
+  } = useEnvironmentManager();
   //   TODO: REMOVE THIS AFTER ADDING LOADING STATE IN VIEWER COMPONENT
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [dataSource, setDataSource] = useState([]);
+  const { currentEnvironmentId } = getCurrentEnvironment();
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
@@ -41,10 +47,11 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
             localValue: row.localValue,
           },
         };
-        setVariables(variableToSave);
+        console.log("variableToSave", variableToSave, row);
+        setVariables(currentEnvironmentId, variableToSave);
       }
     },
-    [dataSource, setVariables]
+    [dataSource, setVariables, currentEnvironmentId]
   );
 
   const handleAddNewRow = useCallback((dataSource: EnvironmentVariableTableRow[]) => {
@@ -63,7 +70,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
       const newData = key ? dataSource.filter((item) => item.key !== key) : dataSource.slice(0, -1);
 
       if (key) {
-        await removeVariable(key);
+        await removeVariable(currentEnvironmentId, key);
       }
 
       setDataSource(newData);
@@ -72,7 +79,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
         handleAddNewRow([]);
       }
     },
-    [dataSource, removeVariable, handleAddNewRow]
+    [dataSource, removeVariable, handleAddNewRow, currentEnvironmentId]
   );
 
   const columns = useVariablesListColumns({ handleSaveVariable, handleDeleteVariable });

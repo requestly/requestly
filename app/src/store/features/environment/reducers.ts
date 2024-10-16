@@ -5,7 +5,8 @@ import { mergeLocalAndSyncVariables } from "./utils";
 
 const initialState = {
   currentEnvironment: {
-    name: "default",
+    name: "",
+    id: "",
   },
   environments: {},
 };
@@ -27,6 +28,7 @@ const setAllEnvironmentData = (
     environmentMap: EnvironmentMap;
   }>
 ) => {
+  console.log("!!!debug", "setAllEnvironmentData", action.payload.environmentMap);
   let updatedEnvironments: EnvironmentMap = {};
 
   if (Object.keys(state.environments).length === 0) {
@@ -42,6 +44,9 @@ const setAllEnvironmentData = (
       };
     });
   }
+
+  console.log("!!!debug", "updatedEnvironments", updatedEnvironments);
+
   state.environments = updatedEnvironments;
 };
 
@@ -49,24 +54,24 @@ const setVariablesInEnvironment = (
   state: InitialState,
   action: PayloadAction<{
     newVariables: EnvironmentVariables;
-    environment: string;
+    environmentId: string;
   }>
 ) => {
-  const currentEnvironmentVariables = state.environments[action.payload.environment].variables;
+  const currentEnvironmentVariables = state.environments[action.payload.environmentId].variables;
 
   const updatedVariables = mergeLocalAndSyncVariables(currentEnvironmentVariables, action.payload.newVariables);
 
-  state.environments[action.payload.environment].variables = updatedVariables;
+  state.environments[action.payload.environmentId].variables = updatedVariables;
 };
 
 const removeVariableFromEnvironment = (
   state: InitialState,
   action: PayloadAction<{
     key: string;
-    environment: string;
+    environmentId: string;
   }>
 ) => {
-  delete state.environments[action.payload.environment].variables[action.payload.key];
+  delete state.environments[action.payload.environmentId].variables[action.payload.key];
 };
 
 const environmentVariablesReducerFunctions = {
