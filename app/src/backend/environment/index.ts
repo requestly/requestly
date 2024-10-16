@@ -1,52 +1,49 @@
 import firebaseApp from "firebase";
-import { collection, deleteField, doc, getFirestore, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteField, doc, getFirestore, onSnapshot, updateDoc } from "firebase/firestore";
 import { EnvironmentData, EnvironmentMap, EnvironmentVariables } from "./types";
 
-const getDocPath = (ownerId: string, environment: string) => {
-  const db = getFirestore(firebaseApp);
-  return doc(db, "environmentConfigs", ownerId, "environments", environment);
+const db = getFirestore(firebaseApp);
+
+const getDocPath = (ownerId: string, environmentId: string) => {
+  return doc(db, "environmentConfigs", ownerId, "environments", environmentId);
 };
 
-export const setEnvironmentInDB = async (ownerId: string, environment: string) => {
-  return setDoc(
-    getDocPath(ownerId, environment),
-    {
-      name: environment,
-      variables: {},
-    },
-    { merge: true }
-  );
+export const setEnvironmentInDB = async (ownerId: string, environmentName: string) => {
+  return addDoc(collection(db, "environmentConfigs", ownerId, "environments"), {
+    name: environmentName,
+    variables: {},
+  }).then((doc) => {
+    return {
+      id: doc.id,
+      name: environmentName,
+    };
+  });
 };
 
 export const setEnvironmentVariablesInDB = async (
   ownerId: string,
   payload: {
     newVariables: EnvironmentVariables;
-    environment: string;
+    environmentId: string;
   }
 ) => {
   const newVariables = Object.fromEntries(
     Object.entries(payload.newVariables).map(([key, value]) => [key, { syncValue: value.syncValue, type: value.type }])
   );
 
-  return setDoc(
-    getDocPath(ownerId, payload.environment),
-    {
-      name: payload.environment,
-      variables: newVariables,
-    },
-    { merge: true }
-  );
+  return updateDoc(getDocPath(ownerId, payload.environmentId), {
+    variables: newVariables,
+  });
 };
 
 export const removeEnvironmentVariableFromDB = async (
   ownerId: string,
   payload: {
-    environment: string;
+    environmentId: string;
     key: string;
   }
 ) => {
-  return updateDoc(getDocPath(ownerId, payload.environment), {
+  return updateDoc(getDocPath(ownerId, payload.environmentId), {
     [`variables.${payload.key}`]: deleteField(),
   });
 };
@@ -59,7 +56,6 @@ export const attatchEnvironmentVariableListener = (
     return () => {};
   }
 
-  const db = getFirestore(firebaseApp);
   const variableDoc = collection(db, "environmentConfigs", ownerId, "environments");
 
   const unsubscribe = onSnapshot(variableDoc, (snapshot) => {
@@ -69,7 +65,7 @@ export const attatchEnvironmentVariableListener = (
       const environmentDetails: EnvironmentMap = {};
 
       snapshot.forEach((doc) => {
-        environmentDetails[doc.id] = doc.data() as EnvironmentData;
+        environmentDetails[doc.id] = { id: doc.id, ...doc.data() } as EnvironmentData;
       });
 
       callback(environmentDetails);
