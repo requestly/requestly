@@ -22,7 +22,7 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
       >
         {record.data.request.method}
       </Typography.Text>
-      <div className="request-url">{record.name || "echo"}</div>
+      <div className="request-url">{record.data.request.url || "echo"}</div>
     </NavLink>
   );
 };

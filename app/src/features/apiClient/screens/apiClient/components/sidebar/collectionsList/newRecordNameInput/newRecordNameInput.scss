@@ -21,6 +21,12 @@
       color: var(--requestly-color-text-subtle);
       background: var(--requestly-color-surface-1);
 
+      .record-name {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
       .anticon {
         margin-left: auto;
       }

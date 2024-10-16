@@ -81,6 +81,7 @@
               align-items: center;
 
               .collection-name {
+                max-width: 138px;
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;

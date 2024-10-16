@@ -138,7 +138,8 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     <div className="new-record-input-container">
       {isLoading ? (
         <div className="new-record-input-placeholder">
-          {recordName || defaultRecordName} <LoadingOutlined />
+          <div className="record-name">{recordName || defaultRecordName}</div>
+          <LoadingOutlined />
         </div>
       ) : (
         <Input
