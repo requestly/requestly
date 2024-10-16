@@ -54,6 +54,8 @@ const useEnvironmentManager = (initListener: boolean = false) => {
       unsubscribeListener = attatchEnvironmentVariableListener(ownerId, (environmentMap) => {
         dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
 
+        console.log("environmentMap", environmentMap);
+
         // Check if no environments exist, create a default one
         if (Object.keys(environmentMap).length === 0) {
           addNewEnvironment("default").then((defaultEnv) => {

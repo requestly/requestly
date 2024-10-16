@@ -9,8 +9,9 @@ import { CollectionsList } from "./collectionsList/CollectionsList";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { HistoryList } from "./historyList/HistoryList";
 import { ApiClientSidebarHeader } from "./apiClientSidebarHeader/ApiClientSidebarHeader";
-import "./apiClientSidebar.scss";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { EnvironmentsList } from "./components/environmentsList/EnvironmentsList";
+import "./apiClientSidebar.scss";
 
 interface Props {
   history?: RQAPI.Entry[];
@@ -75,7 +76,7 @@ const APIClientSidebar: React.FC<Props> = ({
           </NavLink>
         </Tooltip>
       ),
-      children: <div>Environments list here</div>,
+      children: <EnvironmentsList />,
     },
     {
       key: ApiClientSidebarTabKey.HISTORY,
