@@ -24,12 +24,12 @@ const deleteApiRecordsFromFirebase = async (
 ): Promise<{ success: boolean; data: unknown }> => {
   try {
     const db = getFirestore(firebaseApp);
-    const apisRecordsbatch = writeBatch(db);
+    const batch = writeBatch(db);
 
     recordIds.forEach((record) => {
       const recordRef = doc(db, "apis", record);
 
-      apisRecordsbatch.set(
+      batch.set(
         recordRef,
         {
           deleted: true,
@@ -41,7 +41,7 @@ const deleteApiRecordsFromFirebase = async (
       );
     });
 
-    await apisRecordsbatch.commit();
+    await batch.commit();
 
     return { success: true, data: null };
   } catch (error) {
