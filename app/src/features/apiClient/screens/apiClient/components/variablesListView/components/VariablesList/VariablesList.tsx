@@ -47,7 +47,6 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
             localValue: row.localValue,
           },
         };
-        console.log("variableToSave", variableToSave, row);
         setVariables(currentEnvironmentId, variableToSave);
       }
     },
