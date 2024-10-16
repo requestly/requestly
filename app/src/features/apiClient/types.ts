@@ -52,7 +52,7 @@ export namespace RQAPI {
   }
 
   export interface Collection {
-    children?: Record; // For now it will be a ApiRecord
+    children?: Record[];
   }
 
   interface RecordMetadata {
