@@ -13,7 +13,7 @@ import { getEmptyAPIEntry } from "features/apiClient/screens/apiClient/utils";
 import { redirectToRequest } from "utils/RedirectionUtils";
 import "./newRecordNameInput.scss";
 import {
-  trackCollectionCreated,
+  trackCollectionSaved,
   trackCollectionRenamed,
   trackRequestSaved,
 } from "modules/analytics/events/features/apiClient";
@@ -84,7 +84,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
         trackRequestSaved(analyticEventSource);
         redirectToRequest(navigate, result.data.id);
       } else {
-        trackCollectionCreated(analyticEventSource);
+        trackCollectionSaved(analyticEventSource);
       }
 
       const toastSuccessMessage = recordType === RQAPI.RecordType.API ? "Request created!" : "Collection Created!";

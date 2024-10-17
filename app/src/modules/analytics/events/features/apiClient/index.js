@@ -67,9 +67,9 @@ export const trackNewCollectionClicked = (src) => {
   trackEvent(API_CLIENT.NEW_COLLECTION_CLICKED, params);
 };
 
-export const trackCollectionCreated = (src) => {
+export const trackCollectionSaved = (src) => {
   const params = { src };
-  trackEvent(API_CLIENT.COLLECTION_CREATED, params);
+  trackEvent(API_CLIENT.COLLECTION_SAVED, params);
 };
 
 export const trackCollectionRenamed = () => {
