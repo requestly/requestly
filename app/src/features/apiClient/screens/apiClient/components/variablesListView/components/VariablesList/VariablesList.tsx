@@ -11,21 +11,15 @@ import "./variablesList.scss";
 
 interface VariablesListProps {
   searchValue: string;
+  currentEnvironmentId: string;
 }
 
 export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string; id: number };
 
-export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => {
-  const {
-    getCurrentEnvironmentVariables,
-    setVariables,
-    removeVariable,
-    getCurrentEnvironment,
-  } = useEnvironmentManager();
-  //   TODO: REMOVE THIS AFTER ADDING LOADING STATE IN VIEWER COMPONENT
-  const [isTableLoaded, setIsTableLoaded] = useState(false);
+export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, currentEnvironmentId }) => {
+  const { getEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
   const [dataSource, setDataSource] = useState([]);
-  const { currentEnvironmentId } = getCurrentEnvironment();
+  const [isTableLoaded, setIsTableLoaded] = useState(false);
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
@@ -99,9 +93,14 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
   const columns = useVariablesListColumns({ handleSaveVariable, handleDeleteVariable });
 
   useEffect(() => {
+    setIsTableLoaded(false);
+  }, [currentEnvironmentId]);
+
+  useEffect(() => {
     if (!isTableLoaded) {
+      console.log("isTableLoaded", isTableLoaded);
       setIsTableLoaded(true);
-      const variables = getCurrentEnvironmentVariables();
+      const variables = getEnvironmentVariables(currentEnvironmentId);
       const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(
         ([key, value], index) => ({
           id: index,
@@ -122,7 +121,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
       }
       setDataSource(formattedDataSource);
     }
-  }, [getCurrentEnvironmentVariables, isTableLoaded]);
+  }, [getEnvironmentVariables, currentEnvironmentId, isTableLoaded]);
 
   return (
     <ContentListTable
