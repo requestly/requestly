@@ -47,7 +47,7 @@
 
         &:hover,
         &.active {
-          background-color: var(--gray-dark);
+          background: var(--requestly-color-surface-1);
         }
       }
 
@@ -57,59 +57,72 @@
         &:hover .ant-collapse-item .ant-collapse-header .collection-name-container .collection-options {
           visibility: visible;
         }
+      }
 
-        .ant-collapse-item {
-          width: 100%;
+      .ant-collapse-item {
+        width: 100%;
 
+        &.ant-collapse-item-active {
           .ant-collapse-header {
-            padding: 2px 4px;
-            border-radius: 4px;
-            user-select: none;
+            color: var(--requestly-color-text-default);
+          }
+        }
 
-            &:hover {
-              background-color: var(--gray-dark);
-            }
+        .ant-collapse-header {
+          padding: 2px 4px;
+          border-radius: 4px;
+          user-select: none;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--requestly-color-text-subtle);
 
-            .ant-collapse-expand-icon {
-              svg {
-                font-size: var(--requestly-font-size-2xs, 10px);
-              }
-            }
+          &:hover {
+            background: var(--requestly-color-surface-1);
+          }
 
-            .collection-name-container {
-              display: flex;
-              align-items: center;
-
-              .collection-name {
-                max-width: 178px;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                font-size: var(--requestly-font-size-xs);
-                color: var(--requestly-color-text-default);
-                font-style: normal;
-                font-weight: var(--requestly-font-weight-medium);
-                line-height: var(--line-height-xs, 15px);
-              }
-
-              .collection-options {
-                flex-shrink: 0;
-                margin-left: auto;
-                visibility: hidden;
-                display: flex;
-                align-items: center;
-                gap: var(--space-1, 2px);
-
-                svg {
-                  color: var(--requestly-color-text-subtle);
-                }
-              }
+          .ant-collapse-expand-icon {
+            svg {
+              width: 12px;
+              height: 12px;
+              color: inherit;
+              margin: 0;
             }
           }
 
-          .ant-collapse-content-box {
-            padding: 4px 20px;
+          .collection-name-container {
+            display: flex;
+            align-items: center;
           }
+
+          .collection-name {
+            max-width: 180px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-style: normal;
+            font-size: var(--requestly-font-size-xs);
+            font-weight: var(--requestly-font-weight-medium);
+            font-weight: var(--requestly-font-weight-normal);
+            line-height: var(--line-height-xs, 15px);
+          }
+
+          .collection-options {
+            flex-shrink: 0;
+            margin-left: auto;
+            visibility: hidden;
+            display: flex;
+            align-items: center;
+            gap: var(--space-1, 2px);
+
+            svg {
+              color: var(--requestly-color-text-subtle);
+            }
+          }
+        }
+
+        .ant-collapse-content-box {
+          padding: 4px 20px;
         }
       }
     }

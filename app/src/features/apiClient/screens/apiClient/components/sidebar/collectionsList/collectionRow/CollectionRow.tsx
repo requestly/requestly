@@ -8,6 +8,8 @@ import { RequestRow } from "../requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useApiClientContext } from "features/apiClient/contexts";
+import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
+import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -64,6 +66,9 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
           defaultActiveKey={[record.id]}
           ghost
           className="collections-list-item collection"
+          expandIcon={({ isActive }) => {
+            return isActive ? <PiFolderOpen /> : <MdOutlineFolder />;
+          }}
         >
           <Collapse.Panel
             key={record.id}
