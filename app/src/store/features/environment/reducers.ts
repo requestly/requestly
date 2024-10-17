@@ -68,11 +68,7 @@ const setVariablesInEnvironment = (
     environmentId: string;
   }>
 ) => {
-  const currentEnvironmentVariables = state.environments[action.payload.environmentId]?.variables ?? {};
-
-  const updatedVariables = mergeLocalAndSyncVariables(currentEnvironmentVariables, action.payload.newVariables);
-
-  state.environments[action.payload.environmentId].variables = updatedVariables;
+  state.environments[action.payload.environmentId].variables = action.payload.newVariables;
 };
 
 const removeVariableFromEnvironment = (
