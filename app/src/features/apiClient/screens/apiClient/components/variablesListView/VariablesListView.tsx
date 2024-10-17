@@ -8,19 +8,18 @@ import { VariablesListHeader } from "./components/VariablesListHeader/VariablesL
 import "./variablesListView.scss";
 
 export const VariablesListView = () => {
-  const { getCurrentEnvironment } = useEnvironmentManager();
-  const { currentEnvironmentId } = getCurrentEnvironment();
+  const { isEnvironmentsLoading } = useEnvironmentManager();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
   const { envName } = useParams();
 
   useEffect(() => {
-    if (!currentEnvironmentId) {
+    if (isEnvironmentsLoading) {
       setIsLoading(true);
     } else {
       setIsLoading(false);
     }
-  }, [currentEnvironmentId]);
+  }, [isEnvironmentsLoading]);
 
   if (isLoading) {
     return <Skeleton active />;
