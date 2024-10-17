@@ -10,6 +10,7 @@ import { RQAPI } from "features/apiClient/types";
 import { isApiCollection } from "../../../utils";
 import { deleteApiRecords } from "backend/apiClient";
 import { useApiClientContext } from "features/apiClient/contexts";
+import { trackCollectionDeleted } from "modules/analytics/events/features/apiClient";
 import "./deleteApiRecordModal.scss";
 
 interface DeleteApiRecordModalProps {
@@ -47,6 +48,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
     onDeleteRecords(recordIds);
 
     if (result.success) {
+      trackCollectionDeleted();
       toast.success("Collection deleted!");
       onClose();
       onSuccess?.();

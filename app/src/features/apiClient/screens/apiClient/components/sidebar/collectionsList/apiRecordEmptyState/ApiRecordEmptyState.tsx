@@ -12,6 +12,7 @@ export const ApiRecordEmptyState: React.FC<Props> = ({
   recordToBeEdited,
   recordType,
   newRecordCollectionId,
+  analyticEventSource,
 }) => {
   const [isCreateNewRecord, setIsCreateNewRecord] = useState(false);
 
@@ -35,6 +36,7 @@ export const ApiRecordEmptyState: React.FC<Props> = ({
           onSuccess={handleOnSuccess}
           recordToBeEdited={recordToBeEdited}
           newRecordCollectionId={newRecordCollectionId}
+          analyticEventSource={analyticEventSource}
         />
       ) : (
         <EmptyState message={message} newRecordBtnText={newRecordBtnText} onNewRecordClick={handleNewRecordClick} />

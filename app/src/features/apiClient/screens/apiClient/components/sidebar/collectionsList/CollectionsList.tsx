@@ -10,7 +10,7 @@ import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import "./collectionsList.scss";
 
 interface Props {
-  onNewClick: () => void;
+  onNewClick: (src: RQAPI.AnalyticsEventSource) => void;
   recordTypeToBeCreated: RQAPI.RecordType;
   isNewRecordNameInputVisible: boolean;
   hideNewRecordNameInput: () => void;
@@ -75,16 +75,18 @@ export const CollectionsList: React.FC<Props> = ({
             </div>
           ) : (
             <ApiRecordEmptyState
-              recordType={RQAPI.RecordType.COLLECTION}
-              message="No collections created yet"
               newRecordBtnText="New collection"
-              onNewRecordClick={onNewClick}
+              message="No collections created yet"
+              onNewRecordClick={() => onNewClick("collection_list_empty_state")}
+              recordType={RQAPI.RecordType.COLLECTION}
+              analyticEventSource="collection_list_empty_state"
             />
           )}
         </div>
 
         {isNewRecordNameInputVisible ? (
           <NewRecordNameInput
+            analyticEventSource="api_client_sidebar_header"
             recordType={recordTypeToBeCreated}
             onSuccess={() => {
               hideNewRecordNameInput();

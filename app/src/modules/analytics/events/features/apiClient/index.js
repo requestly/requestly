@@ -25,8 +25,9 @@ export const trackCurlImportFailed = () => {
   trackEvent(API_CLIENT.CURL_IMPORT_FAILED);
 };
 
-export const trackNewRequestClicked = () => {
-  trackEvent(API_CLIENT.NEW_REQUEST_CLICKED);
+export const trackNewRequestClicked = (src) => {
+  const params = { src };
+  trackEvent(API_CLIENT.NEW_REQUEST_CLICKED, params);
 };
 
 export const trackRequestSelectedFromHistory = () => {
@@ -55,3 +56,26 @@ export const trackResponseHeadersViewed = () => {
 
 export const trackInstallExtensionDialogShown = (params) =>
   trackEvent(API_CLIENT.INSTALL_EXTENSION_DIALOG_SHOWN, params);
+
+export const trackRequestSaved = (src) => {
+  const params = { src };
+  trackEvent(API_CLIENT.REQUEST_SAVED, src);
+};
+
+export const trackNewCollectionClicked = (src) => {
+  const params = { src };
+  trackEvent(API_CLIENT.NEW_COLLECTION_CLICKED, params);
+};
+
+export const trackCollectionCreated = (src) => {
+  const params = { src };
+  trackEvent(API_CLIENT.COLLECTION_CREATED, params);
+};
+
+export const trackCollectionRenamed = () => {
+  trackEvent(API_CLIENT.COLLECTION_RENAMED);
+};
+
+export const trackCollectionDeleted = () => {
+  trackEvent(API_CLIENT.COLLECTION_DELETED);
+};

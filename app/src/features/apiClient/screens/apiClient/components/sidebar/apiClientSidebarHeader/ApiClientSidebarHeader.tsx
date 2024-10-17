@@ -8,6 +8,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { ApiClientSidebarTabKey } from "../APIClientSidebar";
 import { RQAPI } from "features/apiClient/types";
+import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -31,7 +32,10 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
 }) => {
   const items: DropdownProps["menu"]["items"] = [
     {
-      onClick: () => onNewClick(RQAPI.RecordType.COLLECTION),
+      onClick: () => {
+        trackNewCollectionClicked("api_client_sidebar_header");
+        onNewClick(RQAPI.RecordType.COLLECTION);
+      },
       key: DropdownOption.COLLECTION,
       label: (
         <div className="new-btn-option">
@@ -42,7 +46,10 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
     },
     {
       key: DropdownOption.REQUEST,
-      onClick: () => onNewClick(RQAPI.RecordType.API),
+      onClick: () => {
+        trackNewRequestClicked("api_client_sidebar_header");
+        onNewClick(RQAPI.RecordType.API);
+      },
       label: (
         <div className="new-btn-option">
           <MdOutlineSyncAlt />

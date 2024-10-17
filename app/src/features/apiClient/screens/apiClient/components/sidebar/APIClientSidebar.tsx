@@ -14,7 +14,7 @@ interface Props {
   history: RQAPI.Entry[];
   onSelectionFromHistory: (index: number) => void;
   clearHistory: () => void;
-  onNewClick: () => void;
+  onNewClick: (src: RQAPI.AnalyticsEventSource) => void;
   onImportClick: () => void;
 }
 
@@ -41,12 +41,12 @@ const APIClientSidebar: React.FC<Props> = ({
   };
 
   const handleNewRecordClick = useCallback(
-    (recordType: RQAPI.RecordType, collectionId?: string) => {
+    (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
       setIsNewRecordNameInputVisible(true);
       setRecordTypeToBeCreated(recordType);
 
       if (recordType === RQAPI.RecordType.API) {
-        onNewClick();
+        onNewClick(analyticEventSource);
       }
     },
     [onNewClick]
@@ -118,7 +118,7 @@ const APIClientSidebar: React.FC<Props> = ({
         history={history}
         onClearHistory={clearHistory}
         onImportClick={onImportClick}
-        onNewClick={handleNewRecordClick}
+        onNewClick={(recordType) => handleNewRecordClick(recordType, "api_client_sidebar_header")}
       />
 
       <Tabs

@@ -146,11 +146,11 @@ export const APIClient: React.FC<Props> = () => {
     trackImportCurlClicked();
   }, []);
 
-  const onNewClick = useCallback(() => {
+  const onNewClick = useCallback((analyticEventSource: RQAPI.AnalyticsEventSource) => {
     setSelectedEntry(getEmptyAPIEntry());
     setSelectedEntryDetails(null);
     redirectToRequest(navigate);
-    trackNewRequestClicked();
+    trackNewRequestClicked(analyticEventSource);
   }, []);
 
   const onSelectionFromHistory = useCallback(

@@ -10,10 +10,11 @@ import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
+import { trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 
 interface Props {
   record: RQAPI.CollectionRecord;
-  onNewClick: () => void;
+  onNewClick: (src: RQAPI.AnalyticsEventSource) => void;
 }
 
 export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
@@ -51,6 +52,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
     <>
       {isEditMode ? (
         <NewRecordNameInput
+          analyticEventSource="collection_row"
           recordType={RQAPI.RecordType.COLLECTION}
           recordToBeEdited={record}
           onSuccess={() => {
@@ -85,6 +87,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
                       e.stopPropagation();
                       setActiveKey(record.id);
                       setIsCreateNewRequest(true);
+                      trackNewRequestClicked("collection_row");
                     }}
                   />
 
@@ -113,11 +116,12 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
           >
             {record.data.children?.length === 0 ? (
               <ApiRecordEmptyState
+                analyticEventSource="collection_row"
                 recordType={RQAPI.RecordType.API}
                 newRecordCollectionId={record.id}
                 message="No requests created yet"
                 newRecordBtnText="New request"
-                onNewRecordClick={onNewClick}
+                onNewRecordClick={() => onNewClick("collection_row")}
               />
             ) : (
               record.data.children.map((apiRecord) => {
@@ -130,6 +134,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
 
             {isCreateNewRequest ? (
               <NewRecordNameInput
+                analyticEventSource="collection_row"
                 recordType={RQAPI.RecordType.API}
                 newRecordCollectionId={record.id}
                 onSuccess={() => {

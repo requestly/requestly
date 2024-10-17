@@ -12,12 +12,18 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { getEmptyAPIEntry } from "features/apiClient/screens/apiClient/utils";
 import { redirectToRequest } from "utils/RedirectionUtils";
 import "./newRecordNameInput.scss";
+import {
+  trackCollectionCreated,
+  trackCollectionRenamed,
+  trackRequestSaved,
+} from "modules/analytics/events/features/apiClient";
 
 export interface NewRecordNameInputProps {
   recordToBeEdited?: RQAPI.Record;
   newRecordCollectionId?: string;
   recordType: RQAPI.RecordType;
   onSuccess: () => void;
+  analyticEventSource: RQAPI.AnalyticsEventSource;
 }
 
 export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
@@ -25,6 +31,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
   recordType,
   onSuccess,
   newRecordCollectionId,
+  analyticEventSource = "",
 }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
@@ -74,7 +81,10 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       onSaveRecord(result.data);
 
       if (recordType === RQAPI.RecordType.API) {
+        trackRequestSaved(analyticEventSource);
         redirectToRequest(navigate, result.data.id);
+      } else {
+        trackCollectionCreated(analyticEventSource);
       }
 
       const toastSuccessMessage = recordType === RQAPI.RecordType.API ? "Request created!" : "Collection Created!";
@@ -120,6 +130,8 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
       if (recordType === RQAPI.RecordType.API) {
         redirectToRequest(navigate, result.data.id);
+      } else {
+        trackCollectionRenamed();
       }
 
       const toastSuccessMessage = recordType === RQAPI.RecordType.API ? "Request updated!" : "Collection updated!";
