@@ -1,5 +1,5 @@
 import { Form, FormInstance, Input, Select } from "antd";
-import React, { useCallback, useContext, useMemo } from "react";
+import React, { useCallback, useContext, useMemo, useRef, useEffect, useState } from "react";
 import { EnvironmentVariableTableRow } from "../../VariablesList";
 import { VariableType } from "backend/environment/types";
 import debounce from "lodash/debounce";
@@ -41,6 +41,9 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   ...restProps
 }) => {
   const form = useContext(EditableContext)!;
+  const inputRef = useRef(null);
+  // To Maintain the focus state gof the cell being edited after table re-renders
+  const [editing, setEditing] = useState(false);
 
   const convertValueByType = useCallback((value: any, type: VariableType) => {
     switch (type) {
@@ -73,10 +76,17 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   const handleChange = useCallback(
     (value: string) => {
       form.setFieldsValue({ [dataIndex]: value });
+      setEditing(true);
       debouncedSave();
     },
     [form, dataIndex, debouncedSave]
   );
+
+  useEffect(() => {
+    if (editing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [editing]);
 
   const getPlaceholderText = () => {
     if (dataIndex === "key") {
@@ -131,7 +141,13 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             ))}
           </Select>
         ) : (
-          <Input onChange={(e) => handleChange(e.target.value)} placeholder={getPlaceholderText()} />
+          <Input
+            ref={inputRef}
+            onChange={(e) => handleChange(e.target.value)}
+            onBlur={() => setEditing(false)}
+            placeholder={getPlaceholderText()}
+            autoFocus={editing}
+          />
         )}
       </Form.Item>
     </td>

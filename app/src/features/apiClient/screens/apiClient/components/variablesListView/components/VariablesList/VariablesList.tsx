@@ -33,14 +33,18 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
       setDataSource(variableRows);
 
       if (row.key) {
-        const variableToSave = {
-          [row.key]: {
-            type: row.type,
-            syncValue: row.syncValue,
-            localValue: row.localValue,
-          },
-        };
-        setVariables(currentEnvironmentId, variableToSave);
+        const variablesToSave = variableRows.reduce((acc, variable) => {
+          if (variable.key) {
+            acc[variable.key] = {
+              type: variable.type,
+              syncValue: variable.syncValue,
+              localValue: variable.localValue,
+            };
+          }
+          return acc;
+        }, {});
+
+        setVariables(currentEnvironmentId, variablesToSave);
       }
     },
     [dataSource, setVariables, currentEnvironmentId]
