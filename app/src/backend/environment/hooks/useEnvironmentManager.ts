@@ -41,11 +41,19 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
 
   const addNewEnvironment = useCallback(
     async (newEnvironment: string) => {
-      return upsertEnvironmentInDB(ownerId, newEnvironment).catch((err) => {
-        console.error("Error while setting environment in db", err);
-      });
+      return upsertEnvironmentInDB(ownerId, newEnvironment)
+        .then(({ id, name }) => {
+          dispatch(environmentVariablesActions.addNewEnvironment({ id, name }));
+          return {
+            id,
+            name,
+          };
+        })
+        .catch((err) => {
+          console.error("Error while setting environment in db", err);
+        });
     },
-    [ownerId]
+    [ownerId, dispatch]
   );
 
   useEffect(() => {
@@ -54,7 +62,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       fetchAllEnvironmentDetails(ownerId)
         .then((environmentMap) => {
           dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
-
+          console.log("!!!debug", "env data", environmentMap);
           if (Object.keys(environmentMap).length === 0) {
             addNewEnvironment("Default").then((defaultEnv) => {
               if (defaultEnv) {
