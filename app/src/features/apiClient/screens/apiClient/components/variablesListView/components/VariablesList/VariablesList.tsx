@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { EnvironmentVariableValue, VariableType } from "backend/environment/types";
+import { EnvironmentVariableValue, EnvironmentVariableType } from "backend/environment/types";
 import { useVariablesListColumns } from "./hooks/useVariablesListColumns";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { EditableCell, EditableRow } from "./components/customTableRow/CustomTableRow";
+import { toast } from "utils/Toast";
 import "./variablesList.scss";
 
 interface VariablesListProps {
@@ -18,6 +19,7 @@ export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: stri
 export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, currentEnvironmentId }) => {
   const { getEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
   const [dataSource, setDataSource] = useState([]);
+  const [isTableLoaded, setIsTableLoaded] = useState(false);
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
@@ -29,10 +31,20 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
       const variableRows = [...dataSource];
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
-      variableRows.splice(index, 1, { ...item, ...row });
-      setDataSource(variableRows);
 
       if (row.key) {
+        // Check if the new key already exists (excluding the current row)
+        const isDuplicate = variableRows.some(
+          (variable, idx) => idx !== index && variable.key.toLowerCase() === row.key.toLowerCase()
+        );
+
+        if (isDuplicate) {
+          toast.error(`Variable with name "${row.key}" already exists`);
+          console.error(`Variable with name "${row.key}" already exists`);
+          return;
+        }
+
+        variableRows.splice(index, 1, { ...item, ...row });
         const variablesToSave = variableRows.reduce((acc, variable) => {
           if (variable.key) {
             acc[variable.key] = {
@@ -54,7 +66,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
     const newData = {
       id: dataSource.length + 1,
       key: "",
-      type: VariableType.String,
+      type: EnvironmentVariableType.String,
       localValue: "",
       syncValue: "",
     };
@@ -81,25 +93,35 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   const columns = useVariablesListColumns({ handleSaveVariable, handleDeleteVariable });
 
   useEffect(() => {
-    const variables = getEnvironmentVariables(currentEnvironmentId);
-    const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(([key, value], index) => ({
-      id: index,
-      key,
-      type: value.type,
-      localValue: value.localValue,
-      syncValue: value.syncValue,
-    }));
-    if (formattedDataSource.length === 0) {
-      formattedDataSource.push({
-        id: 0,
-        key: "",
-        type: VariableType.String,
-        localValue: "",
-        syncValue: "",
-      });
+    setIsTableLoaded(false);
+  }, [currentEnvironmentId]);
+
+  useEffect(() => {
+    if (!isTableLoaded) {
+      console.log("isTableLoaded", isTableLoaded);
+      setIsTableLoaded(true);
+      const variables = getEnvironmentVariables(currentEnvironmentId);
+      const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(
+        ([key, value], index) => ({
+          id: index,
+          key,
+          type: value.type,
+          localValue: value.localValue,
+          syncValue: value.syncValue,
+        })
+      );
+      if (formattedDataSource.length === 0) {
+        formattedDataSource.push({
+          id: 0,
+          key: "",
+          type: EnvironmentVariableType.String,
+          localValue: "",
+          syncValue: "",
+        });
+      }
+      setDataSource(formattedDataSource);
     }
-    setDataSource(formattedDataSource);
-  }, [getEnvironmentVariables, currentEnvironmentId]);
+  }, [getEnvironmentVariables, currentEnvironmentId, isTableLoaded]);
 
   return (
     <ContentListTable
