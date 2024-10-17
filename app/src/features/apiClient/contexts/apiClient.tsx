@@ -50,6 +50,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
 
+  useEffect(() => {
+    if (!user.loggedIn) {
+      setApiClientRecords([]);
+    }
+  }, [user.loggedIn]);
+
   // TODO: Create modal context
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 

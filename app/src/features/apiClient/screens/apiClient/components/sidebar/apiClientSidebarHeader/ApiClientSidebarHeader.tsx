@@ -9,6 +9,10 @@ import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { ApiClientSidebarTabKey } from "../APIClientSidebar";
 import { RQAPI } from "features/apiClient/types";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
+import { useDispatch, useSelector } from "react-redux";
+import { actions } from "store";
+import APP_CONSTANTS from "config/constants";
+import { getUserAuthDetails } from "store/selectors";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -30,9 +34,29 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   history,
   onClearHistory,
 }) => {
+  const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
+
   const items: DropdownProps["menu"]["items"] = [
     {
       onClick: () => {
+        if (!user.loggedIn) {
+          dispatch(
+            // @ts-ignore
+            actions.toggleActiveModal({
+              modalName: "authModal",
+              newValue: true,
+              newProps: {
+                src: APP_CONSTANTS.FEATURES.API_CLIENT,
+                authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                eventSource: "api_client_sidebar_header",
+              },
+            })
+          );
+
+          return;
+        }
+
         trackNewCollectionClicked("api_client_sidebar_header");
         onNewClick(RQAPI.RecordType.COLLECTION);
       },
@@ -47,6 +71,23 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
     {
       key: DropdownOption.REQUEST,
       onClick: () => {
+        if (!user.loggedIn) {
+          dispatch(
+            // @ts-ignore
+            actions.toggleActiveModal({
+              modalName: "authModal",
+              newValue: true,
+              newProps: {
+                src: APP_CONSTANTS.FEATURES.API_CLIENT,
+                authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                eventSource: "api_client_sidebar_header",
+              },
+            })
+          );
+
+          return;
+        }
+
         trackNewRequestClicked("api_client_sidebar_header");
         onNewClick(RQAPI.RecordType.API);
       },
