@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { EnvironmentVariableValue, VariableType } from "backend/environment/types";
+import { EnvironmentVariableValue, EnvironmentVariableType } from "backend/environment/types";
 import { useVariablesListColumns } from "./hooks/useVariablesListColumns";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { EditableCell, EditableRow } from "./components/customTableRow/CustomTableRow";
+import { toast } from "utils/Toast";
 import "./variablesList.scss";
 
 interface VariablesListProps {
@@ -36,9 +37,20 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
       const variableRows = [...dataSource];
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
-      variableRows.splice(index, 1, { ...item, ...row });
 
       if (row.key) {
+        // Check if the new key already exists (excluding the current row)
+        const isDuplicate = variableRows.some(
+          (variable, idx) => idx !== index && variable.key.toLowerCase() === row.key.toLowerCase()
+        );
+
+        if (isDuplicate) {
+          toast.error(`Variable with name "${row.key}" already exists`);
+          console.error(`Variable with name "${row.key}" already exists`);
+          return;
+        }
+
+        variableRows.splice(index, 1, { ...item, ...row });
         const variablesToSave = variableRows.reduce((acc, variable) => {
           if (variable.key) {
             acc[variable.key] = {
@@ -60,7 +72,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
     const newData = {
       id: dataSource.length + 1,
       key: "",
-      type: VariableType.String,
+      type: EnvironmentVariableType.String,
       localValue: "",
       syncValue: "",
     };
@@ -103,7 +115,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
         formattedDataSource.push({
           id: 0,
           key: "",
-          type: VariableType.String,
+          type: EnvironmentVariableType.String,
           localValue: "",
           syncValue: "",
         });

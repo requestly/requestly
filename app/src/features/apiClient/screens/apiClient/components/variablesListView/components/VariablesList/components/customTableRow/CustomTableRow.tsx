@@ -1,7 +1,7 @@
 import { Form, FormInstance, Input, Select } from "antd";
 import React, { useCallback, useContext, useMemo, useRef, useEffect, useState } from "react";
 import { EnvironmentVariableTableRow } from "../../VariablesList";
-import { VariableType } from "backend/environment/types";
+import { EnvironmentVariableType } from "backend/environment/types";
 import debounce from "lodash/debounce";
 import Logger from "lib/logger";
 
@@ -45,13 +45,13 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   // To Maintain the focus state of the cell being edited after table re-renders
   const [editing, setEditing] = useState(false);
 
-  const convertValueByType = useCallback((value: any, type: VariableType) => {
+  const convertValueByType = useCallback((value: any, type: EnvironmentVariableType) => {
     switch (type) {
-      case VariableType.Number:
+      case EnvironmentVariableType.Number:
         return Number(value);
-      case VariableType.Boolean:
+      case EnvironmentVariableType.Boolean:
         return Boolean(value);
-      case VariableType.String:
+      case EnvironmentVariableType.String:
       default:
         return String(value);
     }
@@ -103,12 +103,12 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
       if (dataIndex === "syncValue" || dataIndex === "localValue") {
         switch (record.type) {
-          case VariableType.Number:
+          case EnvironmentVariableType.Number:
             if (isNaN(Number(value))) {
               return Promise.reject();
             }
             break;
-          case VariableType.Boolean:
+          case EnvironmentVariableType.Boolean:
             if (value.toLowerCase() !== "true" && value.toLowerCase() !== "false") {
               return Promise.reject();
             }
@@ -133,7 +133,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         rules={[{ validator: validateValue }]}
       >
         {inputType === "select" ? (
-          <Select className="w-full" onChange={handleSaveCellValue} defaultValue={VariableType.String}>
+          <Select className="w-full" onChange={handleSaveCellValue} defaultValue={EnvironmentVariableType.String}>
             {options?.map((option) => (
               <Select.Option key={option} value={option}>
                 {option}
