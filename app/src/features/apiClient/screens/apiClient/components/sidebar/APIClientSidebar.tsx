@@ -37,7 +37,7 @@ const APIClientSidebar: React.FC<Props> = ({
   const location = useLocation();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const { getCurrentEnvironment } = useEnvironmentManager();
-  const { currentEnvironmentName } = getCurrentEnvironment();
+  const { currentEnvironmentId } = getCurrentEnvironment();
 
   useEffect(() => {
     if (location.pathname.includes(PATHS.API_CLIENT.HISTORY.ABSOLUTE)) {
@@ -69,7 +69,7 @@ const APIClientSidebar: React.FC<Props> = ({
       label: (
         <Tooltip title="Environments" placement="right">
           <NavLink
-            to={PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE + `/${currentEnvironmentName}`}
+            to={PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE + `/${currentEnvironmentId}`}
             className={({ isActive }) => `${isActive ? "active" : ""} api-client-tab-link`}
           >
             <MdHorizontalSplit />

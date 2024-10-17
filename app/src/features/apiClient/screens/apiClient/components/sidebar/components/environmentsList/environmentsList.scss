@@ -10,8 +10,12 @@
       background-color: var(--requestly-color-white-t-10);
     }
 
-    &:not(:last-child) {
+    &:not(:first-child) {
       margin-top: var(--space-4, 8px);
+    }
+
+    &.active {
+      background-color: var(--requestly-color-white-t-10);
     }
   }
 }
