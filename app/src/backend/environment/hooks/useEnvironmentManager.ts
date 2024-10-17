@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import { EnvironmentVariables, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEnvironmentData, getCurrentEnvironmentId } from "store/features/environment/selectors";
@@ -18,8 +18,9 @@ import { toast } from "utils/Toast";
 
 let unsubscribeListener: () => void = null;
 
-const useEnvironmentManager = () => {
+const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
 
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -31,20 +32,62 @@ const useEnvironmentManager = () => {
     [currentlyActiveWorkspace.id, user?.details?.profile?.uid]
   );
 
+  const setCurrentEnvironment = useCallback(
+    (environmentId: string) => {
+      dispatch(environmentVariablesActions.setCurrentEnvironment({ environmentId }));
+    },
+    [dispatch]
+  );
+
+  const addNewEnvironment = useCallback(
+    async (newEnvironment: string) => {
+      return upsertEnvironmentInDB(ownerId, newEnvironment)
+        .then(({ id, name }) => {
+          dispatch(environmentVariablesActions.addNewEnvironment({ id, name }));
+          return {
+            id,
+            name,
+          };
+        })
+        .catch((err) => {
+          console.error("Error while setting environment in db", err);
+        });
+    },
+    [ownerId, dispatch]
+  );
+
   useEffect(() => {
-    fetchAllEnvironmentDetails(ownerId)
-      .then((environmentMap) => {
-        dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
-      })
-      .catch((err) => {
-        Logger.error("Error while fetching all environment variables", err);
-        dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: {} }));
-      });
-  });
+    if (initListenerAndFetcher) {
+      setIsLoading(true);
+      fetchAllEnvironmentDetails(ownerId)
+        .then((environmentMap) => {
+          dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
+          console.log("!!!debug", "env data", environmentMap);
+          if (Object.keys(environmentMap).length === 0) {
+            addNewEnvironment("Default").then((defaultEnv) => {
+              if (defaultEnv) {
+                setCurrentEnvironment(defaultEnv.id);
+              }
+            });
+          } else {
+            const defaultEnvironment = Object.keys(environmentMap)[0];
+            setCurrentEnvironment(defaultEnvironment);
+          }
+        })
+        .catch((err) => {
+          console.log("Error while fetching all environment variables", err);
+          Logger.error("Error while fetching all environment variables", err);
+          dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: {} }));
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [ownerId, dispatch, addNewEnvironment, setCurrentEnvironment, initListenerAndFetcher]);
 
   useEffect(() => {
     unsubscribeListener?.();
-    if (ownerId && currentEnvironmentId) {
+    if (ownerId && currentEnvironmentId && initListenerAndFetcher) {
       unsubscribeListener = attachEnvironmentVariableListener(ownerId, currentEnvironmentId, (environmentData) => {
         dispatch(
           environmentVariablesActions.setVariablesInEnvironment({
@@ -56,9 +99,9 @@ const useEnvironmentManager = () => {
     }
 
     return () => {
-      unsubscribeListener();
+      unsubscribeListener?.();
     };
-  }, [currentEnvironmentId, dispatch, ownerId]);
+  }, [currentEnvironmentId, dispatch, ownerId, initListenerAndFetcher]);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -72,16 +115,6 @@ const useEnvironmentManager = () => {
       currentEnvironmentName: allEnvironmentData[currentEnvironmentId]?.name,
       currentEnvironmentId,
     };
-  };
-
-  const addNewEnvironment = async (newEnvironment: string) => {
-    return upsertEnvironmentInDB(ownerId, newEnvironment).catch((err) => {
-      console.error("Error while setting environment in db", err);
-    });
-  };
-
-  const setCurrentEnvironment = (environmentId: string) => {
-    dispatch(environmentVariablesActions.setCurrentEnvironment({ environmentId }));
   };
 
   const setVariables = async (
@@ -131,6 +164,10 @@ const useEnvironmentManager = () => {
     return allEnvironmentData[environmentId]?.variables ?? {};
   };
 
+  const getCurrentEnvironmentVariables = () => {
+    return allEnvironmentData[currentEnvironmentId]?.variables ?? {};
+  };
+
   return {
     setCurrentEnvironment,
     addNewEnvironment,
@@ -139,6 +176,8 @@ const useEnvironmentManager = () => {
     removeVariable,
     renderVariables,
     getEnvironmentVariables,
+    getCurrentEnvironmentVariables,
+    isEnvironmentsLoading: isLoading,
   };
 };
 

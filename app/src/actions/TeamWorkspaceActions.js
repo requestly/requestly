@@ -16,6 +16,7 @@ import { getValueAsPromise } from "./FirebaseActions";
 import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUtils";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
+import { environmentVariablesActions } from "store/features/environment/slice";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -81,6 +82,8 @@ export const switchWorkspace = async (
   // Don't clear when appMode is Extension but user has not installed it!
   /* CAN BE REPLACED WITH isLocalStoragePresent */
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) skipStorageClearing = true;
+
+  dispatch(environmentVariablesActions.resetState());
 
   if (!skipStorageClearing) {
     Logger.log("Clearing storage in switchWorkspace");
