@@ -152,6 +152,10 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     return renderTemplate(template, currentEnvironmentVariables);
   };
 
+  const getEnvironmentVariables = (environmentId: string) => {
+    return allEnvironmentData[environmentId]?.variables ?? {};
+  };
+
   const getCurrentEnvironmentVariables = () => {
     return allEnvironmentData[currentEnvironmentId]?.variables ?? {};
   };
@@ -163,10 +167,6 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
         name: allEnvironmentData[key].name,
       };
     });
-  };
-
-  const getEnvironmentVariables = (environment: string) => {
-    return allEnvironmentData[environment]?.variables;
   };
 
   return {
