@@ -37,7 +37,6 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
       variableRows.splice(index, 1, { ...item, ...row });
-      setDataSource(variableRows);
 
       if (row.key) {
         const variablesToSave = variableRows.reduce((acc, variable) => {
