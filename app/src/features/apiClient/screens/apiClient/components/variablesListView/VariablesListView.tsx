@@ -11,7 +11,7 @@ export const VariablesListView = () => {
   const { isEnvironmentsLoading } = useEnvironmentManager();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
-  const { envName } = useParams();
+  const { envId } = useParams();
 
   useEffect(() => {
     if (isEnvironmentsLoading) {
@@ -30,7 +30,7 @@ export const VariablesListView = () => {
       <APIClientSidebar />
       <div className="variables-list-view">
         <VariablesListHeader searchValue={searchValue} onSearchValueChange={setSearchValue} />
-        <VariablesList searchValue={searchValue} currentEnvironment={envName} />
+        <VariablesList searchValue={searchValue} currentEnvironmentId={envId} />
       </div>
     </div>
   );
