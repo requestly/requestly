@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Input } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
 import { redirectToEnvironment } from "utils/RedirectionUtils";
@@ -11,18 +12,43 @@ export const EnvironmentsList = () => {
   const environments = getAllEnvironments();
   const { currentEnvironmentId } = getCurrentEnvironment();
   const [searchValue, setSearchValue] = useState("");
+  const [isNewEnvironmentInputVisible, setIsNewEnvironmentInputVisible] = useState(false);
+  const [newEnvironmentValue, setNewEnvironmentValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
   };
 
-  const handleAddEnvironment = (environmentName: string) => {
-    addNewEnvironment(environmentName);
+  const handleAddEnvironmentClick = () => {
+    setIsNewEnvironmentInputVisible(true);
+  };
+
+  const handleAddNewEnvironment = async () => {
+    if (newEnvironmentValue) {
+      setIsLoading(true);
+      await addNewEnvironment(newEnvironmentValue);
+      setIsLoading(false);
+    }
+    setIsNewEnvironmentInputVisible(false);
+    setNewEnvironmentValue("");
   };
 
   return (
-    <div>
-      <SidebarListHeader onAdd={handleAddEnvironment} onSearch={handleSearch} />
+    <div style={{ height: "inherit" }}>
+      <SidebarListHeader onAddRecordClick={handleAddEnvironmentClick} onSearch={handleSearch} />
+      {isNewEnvironmentInputVisible && (
+        <Input
+          autoFocus
+          className="new-environment-input"
+          size="small"
+          placeholder="New Environment name"
+          disabled={isLoading}
+          onChange={(e) => setNewEnvironmentValue(e.target.value)}
+          onPressEnter={handleAddNewEnvironment}
+          onBlur={handleAddNewEnvironment}
+        />
+      )}
       <div className="environments-list">
         {environments.map((environment) =>
           environment.name.toLowerCase().includes(searchValue.toLowerCase()) ? (
@@ -39,7 +65,7 @@ export const EnvironmentsList = () => {
           ) : null
         )}
       </div>
-      {/* TODO: use emoy state compnenet from collections support PR */}
+      {/* TODO: use empty state component from collections support PR */}
     </div>
   );
 };

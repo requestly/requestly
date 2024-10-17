@@ -4,6 +4,7 @@
     padding: var(--space-2, 4px) var(--space-4, 8px);
     border-radius: 4px;
     transition: background-color 0.2s ease-in-out;
+    font-size: var(--requestly-font-size-sm);
     cursor: pointer;
 
     &:hover {
@@ -18,4 +19,14 @@
       background-color: var(--requestly-color-white-t-10);
     }
   }
+  height: calc(100% - 50px);
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.new-environment-input {
+  width: 220px;
+  margin-bottom: 8px;
+  font-size: var(--requestly-font-size-sm);
+  padding: var(--space-2, 4px) var(--space-4, 8px);
 }
