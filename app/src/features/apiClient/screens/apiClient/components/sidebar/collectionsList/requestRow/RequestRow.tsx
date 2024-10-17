@@ -12,6 +12,7 @@ interface Props {
 export const RequestRow: React.FC<Props> = ({ record }) => {
   return (
     <NavLink
+      title={record.data.request.url || "echo"}
       to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`}
       className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
     >

@@ -76,7 +76,9 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
             key={record.id}
             header={
               <div className="collection-name-container">
-                <div className="collection-name">{record.name}</div>
+                <div className="collection-name" title={record.name}>
+                  {record.name}
+                </div>
 
                 <div className="collection-options">
                   <RQButton
