@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { EmptyState, EmptyStateProps } from "../../emptyState/EmptyState";
 import { NewRecordNameInput, NewRecordNameInputProps } from "../newRecordNameInput/NewRecordNameInput";
+import { RQAPI } from "features/apiClient/types";
 
 interface Props extends EmptyStateProps, Omit<NewRecordNameInputProps, "onSuccess"> {}
 
@@ -16,7 +17,10 @@ export const ApiRecordEmptyState: React.FC<Props> = ({
 
   const handleNewRecordClick = () => {
     setIsCreateNewRecord(true);
-    onNewRecordClick?.();
+
+    if (recordType === RQAPI.RecordType.API) {
+      onNewRecordClick?.();
+    }
   };
 
   const handleOnSuccess = () => {

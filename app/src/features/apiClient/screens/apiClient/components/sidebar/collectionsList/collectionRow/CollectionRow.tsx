@@ -123,7 +123,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
               record.data.children.map((apiRecord) => {
                 if (apiRecord.type === RQAPI.RecordType.API) {
                   // For now there will only be requests inside collection
-                  return <RequestRow record={apiRecord} />;
+                  return <RequestRow key={apiRecord.id} record={apiRecord} />;
                 }
               })
             )}
