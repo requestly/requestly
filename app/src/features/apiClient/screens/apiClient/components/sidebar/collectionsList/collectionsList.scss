@@ -26,7 +26,7 @@
       gap: 8px;
 
       cursor: pointer;
-      padding: 2px 4px;
+      padding: 4px 8px;
       border-radius: 4px;
       color: var(--requestly-color-text-subtle);
       font-size: var(--requestly-font-size-sm, 13px);
@@ -122,7 +122,9 @@
         }
 
         .ant-collapse-content-box {
-          padding: 4px 20px;
+          margin-left: 6px;
+          padding: 2px 0px 0px 6px;
+          border-left: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
         }
       }
     }
