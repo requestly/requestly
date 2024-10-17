@@ -48,8 +48,6 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     [ownerId]
   );
 
-  console.log("isLoading", isLoading);
-
   useEffect(() => {
     if (initListenerAndFetcher) {
       setIsLoading(true);
@@ -57,10 +55,8 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
         .then((environmentMap) => {
           dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
 
-          console.log("Adding new environment", environmentMap);
           if (Object.keys(environmentMap).length === 0) {
             addNewEnvironment("Default").then((defaultEnv) => {
-              console.log("defaultEnv", defaultEnv);
               if (defaultEnv) {
                 setCurrentEnvironment(defaultEnv.id);
               }
