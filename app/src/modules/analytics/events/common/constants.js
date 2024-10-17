@@ -154,6 +154,7 @@ export const RULES = {
   RULE_SIMULATOR_TRIED: "rule_simulator_tried",
   RULE_RESOURCE_TYPE_SELECTED: "rule_resource_type_selected",
   DESKTOP_RULE_VIEWED_ON_EXTENSION: "desktop_rule_viewed_on_extension",
+  SAMPLE_REGEX_CLICKED: "sample_regex_clicked",
 
   // rule details panel
   RULE_DETAILS_PANEL_VIEWED: "rule_details_panel_viewed",
