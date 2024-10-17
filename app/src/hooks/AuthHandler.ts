@@ -183,6 +183,7 @@ const AuthHandler: React.FC<{}> = () => {
   useEffect(() => {
     if (queryPrarams.get("refreshToken") && isAppOpenedInIframe()) {
       const refreshToken = queryPrarams.get("refreshToken");
+
       const getCustomToken = httpsCallable(getFunctions(), "auth-generateCustomToken");
       getCustomToken({ refreshToken }).then(
         (res: {
