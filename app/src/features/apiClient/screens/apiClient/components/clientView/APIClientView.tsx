@@ -66,7 +66,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const teamId = workspace?.id;
 
   const { onSaveRecord } = useApiClientContext();
-  const { renderString } = useEnvironmentManager();
+  const { renderVariables } = useEnvironmentManager();
 
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
@@ -234,7 +234,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     const sanitizedEntry = sanitizeEntry(entry);
     sanitizedEntry.response = null;
 
-    const renderedRequest = renderString<RQAPI.Request>(sanitizedEntry.request);
+    const renderedRequest = renderVariables<RQAPI.Request>(sanitizedEntry.request);
 
     console.log("!!!debug", "renderedRequest", renderedRequest);
 
@@ -285,7 +285,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
-  }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished, renderString]);
+  }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished, renderVariables]);
 
   const onSaveButtonClick = async () => {
     setIsRequestSaving(true);

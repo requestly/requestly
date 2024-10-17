@@ -10,17 +10,14 @@ import "./variablesList.scss";
 
 interface VariablesListProps {
   searchValue: string;
-  currentEnvironment: string;
+  currentEnvironmentId: string;
 }
 
 export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string; id: number };
 
-export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => {
-  const { getEnvironmentVariables, setVariables, removeVariable, getCurrentEnvironment } = useEnvironmentManager();
-  //   TODO: REMOVE THIS AFTER ADDING LOADING STATE IN VIEWER COMPONENT
-  const [isTableLoaded, setIsTableLoaded] = useState(false);
+export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, currentEnvironmentId }) => {
+  const { getEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
   const [dataSource, setDataSource] = useState([]);
-  const { currentEnvironmentId } = getCurrentEnvironment();
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
@@ -36,14 +33,18 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
       setDataSource(variableRows);
 
       if (row.key) {
-        const variableToSave = {
-          [row.key]: {
-            type: row.type,
-            syncValue: row.syncValue,
-            localValue: row.localValue,
-          },
-        };
-        setVariables(currentEnvironmentId, variableToSave);
+        const variablesToSave = variableRows.reduce((acc, variable) => {
+          if (variable.key) {
+            acc[variable.key] = {
+              type: variable.type,
+              syncValue: variable.syncValue,
+              localValue: variable.localValue,
+            };
+          }
+          return acc;
+        }, {});
+
+        setVariables(currentEnvironmentId, variablesToSave);
       }
     },
     [dataSource, setVariables, currentEnvironmentId]
@@ -80,30 +81,25 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
   const columns = useVariablesListColumns({ handleSaveVariable, handleDeleteVariable });
 
   useEffect(() => {
-    if (!isTableLoaded) {
-      setIsTableLoaded(true);
-      const variables = getEnvironmentVariables(currentEnvironmentId);
-      const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(
-        ([key, value], index) => ({
-          id: index,
-          key,
-          type: value.type,
-          localValue: value.localValue,
-          syncValue: value.syncValue,
-        })
-      );
-      if (formattedDataSource.length === 0) {
-        formattedDataSource.push({
-          id: 0,
-          key: "",
-          type: VariableType.String,
-          localValue: "",
-          syncValue: "",
-        });
-      }
-      setDataSource(formattedDataSource);
+    const variables = getEnvironmentVariables(currentEnvironmentId);
+    const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(([key, value], index) => ({
+      id: index,
+      key,
+      type: value.type,
+      localValue: value.localValue,
+      syncValue: value.syncValue,
+    }));
+    if (formattedDataSource.length === 0) {
+      formattedDataSource.push({
+        id: 0,
+        key: "",
+        type: VariableType.String,
+        localValue: "",
+        syncValue: "",
+      });
     }
-  }, [getEnvironmentVariables, isTableLoaded, currentEnvironmentId]);
+    setDataSource(formattedDataSource);
+  }, [getEnvironmentVariables, currentEnvironmentId]);
 
   return (
     <ContentListTable
