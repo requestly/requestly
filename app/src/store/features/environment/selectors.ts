@@ -6,6 +6,6 @@ export const getAllEnvironmentData = (state: RootState): InitialState["environme
   return state[ReducerKeys.ENVIRONMENT].environments;
 };
 
-export const getCurrentEnvironmentDetails = (state: RootState): InitialState["currentEnvironment"] => {
+export const getCurrentEnvironmentId = (state: RootState): InitialState["currentEnvironment"] => {
   return state[ReducerKeys.ENVIRONMENT].currentEnvironment;
 };
