@@ -37,6 +37,7 @@ export const EnvironmentsList = () => {
   return (
     <div style={{ height: "inherit" }}>
       <SidebarListHeader onAddRecordClick={handleAddEnvironmentClick} onSearch={handleSearch} />
+      {/* TODO: Use input component from collections support PR */}
       {isNewEnvironmentInputVisible && (
         <Input
           autoFocus
