@@ -179,6 +179,10 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     });
   };
 
+  const getEnvironmentName = (environmentId: string) => {
+    return allEnvironmentData[environmentId]?.name;
+  };
+
   return {
     setCurrentEnvironment,
     addNewEnvironment,
@@ -189,6 +193,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     getEnvironmentVariables,
     getCurrentEnvironmentVariables,
     getAllEnvironments,
+    getEnvironmentName,
     isEnvironmentsLoading: isLoading,
   };
 };
