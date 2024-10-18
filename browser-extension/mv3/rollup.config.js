@@ -80,9 +80,18 @@ export default [
           { src: "../common/dist/devtools", dest: OUTPUT_DIR },
           { src: "../common/dist/popup", dest: OUTPUT_DIR },
           { src: "../common/dist/lib/customElements.js", dest: `${OUTPUT_DIR}/libs` },
+          { src: "./src/service-worker/services/offscreen/offscreen.html", dest: OUTPUT_DIR },
         ],
       }),
     ],
+  },
+  {
+    input: "src/service-worker/services/offscreen/offscreen.ts",
+    output: {
+      file: `${OUTPUT_DIR}/offscreen.js`,
+      format: "cjs",
+    },
+    plugins: [nodeResolve(), ...commonPlugins],
   },
   {
     input: "src/content-scripts/app/index.ts",

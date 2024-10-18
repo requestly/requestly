@@ -31,6 +31,7 @@ import {
   checkIfDesktopAppOpen,
   disconnectFromDesktopAppAndRemoveProxy,
 } from "./desktopApp";
+import { eventLogger } from "./eventLogger";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
   const appTabs = await getAppTabs();
@@ -50,21 +51,21 @@ export const initMessageHandler = () => {
         break;
 
       case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:
-        ruleExecutionHandler.processTabCachedRulesExecutions(sender.tab.id);
+        ruleExecutionHandler.processTabCachedRulesExecutions(sender.tab?.id);
         handleTestRuleOnClientPageLoad(sender.tab);
         handleSessionRecordingOnClientPageLoad(sender.tab, sender.frameId);
         break;
 
       case EXTENSION_MESSAGES.INIT_SESSION_RECORDER:
-        initSessionRecordingSDK(sender.tab.id, sender.frameId).then(() => sendResponse());
+        initSessionRecordingSDK(sender.tab?.id, sender.frameId).then(() => sendResponse());
         return true;
 
       case CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:
-        onSessionRecordingStartedNotification(sender.tab.id, message.payload.markRecordingIcon);
+        onSessionRecordingStartedNotification(sender.tab?.id, message.payload.markRecordingIcon);
         break;
 
       case CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED:
-        onSessionRecordingStoppedNotification(sender.tab.id);
+        onSessionRecordingStoppedNotification(sender.tab?.id);
         break;
 
       case EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
@@ -76,7 +77,7 @@ export const initMessageHandler = () => {
         break;
 
       case EXTENSION_MESSAGES.STOP_RECORDING:
-        stopRecording(message.tabId ?? sender.tab.id, message.openRecording);
+        stopRecording(message.tabId ?? sender.tab?.id, message.openRecording);
         break;
 
       case EXTENSION_MESSAGES.GET_TAB_SESSION:
@@ -92,7 +93,7 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.GET_EXECUTED_RULES:
-        ruleExecutionHandler.getExecutedRules(message.tabId ?? sender.tab.id).then(sendResponse);
+        ruleExecutionHandler.getExecutedRules(message.tabId ?? sender.tab?.id).then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.CHECK_IF_NO_RULES_PRESENT:
@@ -112,19 +113,19 @@ export const initMessageHandler = () => {
         break;
 
       case EXTENSION_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
-        cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
+        cacheRecordedSessionOnClientPageUnload(sender.tab?.id, message.payload);
         break;
 
       case EXTENSION_MESSAGES.ON_BEFORE_AJAX_REQUEST:
-        requestProcessor.onBeforeAJAXRequest(sender.tab.id, message.requestDetails).then(sendResponse);
+        requestProcessor.onBeforeAJAXRequest(sender.tab?.id, message.requestDetails).then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.ON_ERROR_OCCURRED:
-        requestProcessor.onErrorOccurred(sender.tab.id, message.requestDetails).then(sendResponse);
+        requestProcessor.onErrorOccurred(sender.tab?.id, message.requestDetails).then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.TEST_RULE_ON_URL:
-        launchUrlAndStartRuleTesting(message, sender.tab.id);
+        launchUrlAndStartRuleTesting(message, sender.tab?.id);
         break;
 
       case EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT:
@@ -154,7 +155,7 @@ export const initMessageHandler = () => {
         break;
 
       case EXTENSION_MESSAGES.CACHE_SHARED_STATE:
-        globalStateManager.updateSharedStateInStorage(sender.tab.id, message.sharedState);
+        globalStateManager.updateSharedStateInStorage(sender.tab?.id, message.sharedState);
         break;
 
       case EXTENSION_MESSAGES.CONNECT_TO_DESKTOP_APP:
@@ -176,6 +177,10 @@ export const initMessageHandler = () => {
       case EXTENSION_MESSAGES.CHECK_IF_DESKTOP_APP_OPEN:
         checkIfDesktopAppOpen().then(sendResponse);
         return true;
+
+      case EXTENSION_MESSAGES.LOG_EVENT:
+        eventLogger.logEvent(message.eventName, message.eventParams);
+        break;
     }
 
     return false;
