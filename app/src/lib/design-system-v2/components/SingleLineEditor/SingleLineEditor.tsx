@@ -1,10 +1,12 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useMemo } from "react";
 import { EditorView, placeholder as cmPlaceHolder } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import "./SingleLineEditor.scss";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { Popover, Row } from "antd";
 import { RQButton } from "../RQButton/RQButton";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { EnvironmentVariables, EnvironmentVariableValue } from "backend/environment/types";
 
 interface RQSingleLineEditorProps {
   className?: string;
@@ -28,6 +30,12 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
 
   const [hoveredVariable, setHoveredVariable] = useState(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const { getCurrentEnvironmentVariables, setVariables, getCurrentEnvironment } = useEnvironmentManager();
+  const { currentEnvironmentId } = getCurrentEnvironment();
+
+  const currentEnvironmentVariables = useMemo(() => {
+    return getCurrentEnvironmentVariables();
+  }, [getCurrentEnvironmentVariables]);
 
   useEffect(() => {
     if (editorViewRef.current) {
@@ -45,7 +53,6 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
           }),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
-              console.log("!!!debug", "doc changed", update.state.doc.toString());
               onChange?.(update.state.doc.toString());
             }
           }),
@@ -90,6 +97,13 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
     }
   }, [value]);
 
+  const addNewVariable = (newVariable: EnvironmentVariables) => {
+    setVariables(currentEnvironmentId, {
+      ...currentEnvironmentVariables,
+      ...newVariable,
+    });
+  };
+
   return (
     <>
       <div ref={editorRef} className="single-line-editor-container ant-input"></div>
@@ -97,7 +111,16 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
         <Popover
           content={
             <div className="variable-info-body">
-              <AddNewVariable />
+              {currentEnvironmentVariables[hoveredVariable] ? (
+                <VariableInfo
+                  variable={{
+                    name: hoveredVariable,
+                    ...currentEnvironmentVariables[hoveredVariable],
+                  }}
+                />
+              ) : (
+                <AddNewVariable variableName={hoveredVariable} addNewVariable={addNewVariable} />
+              )}
             </div>
           }
           open={!!hoveredVariable}
@@ -121,30 +144,49 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   );
 };
 
-const VariableInfo = () => {
+const VariableInfo: React.FC<{
+  variable: { name: string } & EnvironmentVariableValue;
+}> = ({ variable }) => {
   return (
     <>
-      <Row className="variable-info-header">{"db_connection_string"}</Row>
+      <Row className="variable-info-header">{variable.name}</Row>
       <div className="variable-info-content">
         <div className="variable-info-title">Type</div>
-        <div className="variable-info-value">{"<Type>"}</div>
+        <div className="variable-info-value">{variable.type}</div>
         <div className="variable-info-title">Initial Value</div>
-        <div className="variable-info-value">{"<Intitial Value>"}</div>
+        <div className="variable-info-value">{variable.syncValue}</div>
         <div className="variable-info-title">Current Value</div>
-        <div className="variable-info-value">{"<Current Value>"}</div>
+        <div className="variable-info-value">{variable.localValue}</div>
       </div>
     </>
   );
 };
 
-const AddNewVariable = () => {
+const AddNewVariable: React.FC<{
+  addNewVariable: (environmentVariables: EnvironmentVariables) => void;
+  variableName: string;
+}> = ({ addNewVariable, variableName }) => {
   return (
     <>
       <Row className="variable-info-header">{"Variable is not defined or resolved"}</Row>
       <Row className="add-new-variable-info-content">
         {"Make sure that the variable is defined in the globals or any of the active environments."}
       </Row>
-      <RQButton block type="primary" className="add-new-variable-btn">
+      <RQButton
+        block
+        type="primary"
+        className="add-new-variable-btn"
+        onClick={() => {
+          //TODO: Fix this to add new Variables
+          addNewVariable({
+            [variableName]: {
+              syncValue: "",
+              localValue: "",
+              type: "string",
+            },
+          });
+        }}
+      >
         {"Add as a new variable"}
       </RQButton>
     </>
