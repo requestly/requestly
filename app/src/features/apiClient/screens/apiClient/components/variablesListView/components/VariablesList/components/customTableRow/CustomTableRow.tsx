@@ -40,7 +40,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 }) => {
   const form = useContext(EditableContext)!;
   const inputRef = useRef(null);
-  // To Maintain the focus state of the cell being edited after table re-renders
+  // To Maintain the focus state gof the cell being edited after table re-renders
   const [editing, setEditing] = useState(false);
 
   const convertValueByType = useCallback((value: any, type: EnvironmentVariableType) => {

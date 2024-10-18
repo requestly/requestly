@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Skeleton } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import APIClientSidebar from "../sidebar/APIClientSidebar";
@@ -10,6 +11,7 @@ export const VariablesListView = () => {
   const { isEnvironmentsLoading } = useEnvironmentManager();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
+  const { envId } = useParams();
 
   useEffect(() => {
     if (isEnvironmentsLoading) {
@@ -28,7 +30,7 @@ export const VariablesListView = () => {
       <APIClientSidebar />
       <div className="variables-list-view">
         <VariablesListHeader searchValue={searchValue} onSearchValueChange={setSearchValue} />
-        <VariablesList searchValue={searchValue} />
+        <VariablesList searchValue={searchValue} currentEnvironmentId={envId} />
       </div>
     </div>
   );

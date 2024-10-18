@@ -62,14 +62,16 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       fetchAllEnvironmentDetails(ownerId)
         .then((environmentMap) => {
           dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
-          console.log("!!!debug", "env data", environmentMap);
+
+          // if there are no environments, create a default one
           if (Object.keys(environmentMap).length === 0) {
             addNewEnvironment("Default").then((defaultEnv) => {
               if (defaultEnv) {
                 setCurrentEnvironment(defaultEnv.id);
               }
             });
-          } else {
+          } else if (!currentEnvironmentId) {
+            // if there is no active environment, set the first environment as the active environment
             const defaultEnvironment = Object.keys(environmentMap)[0];
             setCurrentEnvironment(defaultEnvironment);
           }
@@ -83,7 +85,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
           setIsLoading(false);
         });
     }
-  }, [ownerId, dispatch, addNewEnvironment, setCurrentEnvironment, initListenerAndFetcher]);
+  }, [ownerId, dispatch, addNewEnvironment, setCurrentEnvironment, initListenerAndFetcher, currentEnvironmentId]);
 
   useEffect(() => {
     unsubscribeListener?.();
@@ -168,6 +170,15 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     return allEnvironmentData[currentEnvironmentId]?.variables ?? {};
   };
 
+  const getAllEnvironments = () => {
+    return Object.keys(allEnvironmentData).map((key) => {
+      return {
+        id: key,
+        name: allEnvironmentData[key].name,
+      };
+    });
+  };
+
   return {
     setCurrentEnvironment,
     addNewEnvironment,
@@ -177,6 +188,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     renderVariables,
     getEnvironmentVariables,
     getCurrentEnvironmentVariables,
+    getAllEnvironments,
     isEnvironmentsLoading: isLoading,
   };
 };
