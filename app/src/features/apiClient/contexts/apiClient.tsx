@@ -13,6 +13,12 @@ interface ApiClientContextInterface {
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => void;
   onSaveRecord: (apiClientRecord: RQAPI.Record) => void;
+  onDeleteRecords: (ids: RQAPI.Record["id"][]) => void;
+  recordToBeDeleted: RQAPI.Record;
+  updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => void;
+  isDeleteModalOpen: boolean;
+  setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onDeleteModalClose: () => void;
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
@@ -22,6 +28,12 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => {},
   onSaveRecord: (apiClientRecord: RQAPI.Record) => {},
+  onDeleteRecords: (ids: RQAPI.Record["id"][]) => {},
+  recordToBeDeleted: null,
+  updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => {},
+  isDeleteModalOpen: false,
+  setIsDeleteModalOpen: () => {},
+  onDeleteModalClose: () => {},
 });
 
 interface ApiClientProviderProps {
@@ -36,6 +48,16 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(false);
   const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
+  const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
+
+  useEffect(() => {
+    if (!user.loggedIn) {
+      setApiClientRecords([]);
+    }
+  }, [user.loggedIn]);
+
+  // TODO: Create modal context
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     if (!uid) {
@@ -76,6 +98,14 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     });
   }, []);
 
+  const onDeleteRecords = useCallback((recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
+    setApiClientRecords((prev) => {
+      return prev.filter((record) => {
+        return !recordIdsToBeDeleted.includes(record.id);
+      });
+    });
+  }, []);
+
   const onSaveRecord = useCallback(
     (apiClientRecord: RQAPI.Record) => {
       const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
@@ -89,6 +119,15 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     [apiClientRecords, onUpdateRecord, onNewRecord]
   );
 
+  const updateRecordToBeDeleted = useCallback((record: RQAPI.Record) => {
+    setRecordToBeDeleted(record);
+  }, []);
+
+  const onDeleteModalClose = useCallback(() => {
+    setIsDeleteModalOpen(false);
+    setRecordToBeDeleted(null);
+  }, []);
+
   const value = {
     apiClientRecords,
     isLoadingApiClientRecords,
@@ -96,6 +135,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     onRemoveRecord,
     onUpdateRecord,
     onSaveRecord,
+    onDeleteRecords,
+    recordToBeDeleted,
+    updateRecordToBeDeleted,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    onDeleteModalClose,
   };
 
   return <ApiClientContext.Provider value={value}>{children}</ApiClientContext.Provider>;
