@@ -78,6 +78,7 @@
     "firebase": "^10.8.1",
     "framer-motion": "^10.16.16",
     "fuzzysort": "^2.0.4",
+    "handlebars": "^4.7.8",
     "html-validate": "^8.9.1",
     "httpsnippet": "^3.0.1",
     "is-empty": "^1.2.0",
