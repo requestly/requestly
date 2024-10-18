@@ -60,10 +60,7 @@ export const EnvironmentsList = () => {
           disabled={isLoading}
           onChange={(e) => setNewEnvironmentValue(e.target.value)}
           onPressEnter={handleAddNewEnvironment}
-          onBlur={() => {
-            setIsNewEnvironmentInputVisible(false);
-            setNewEnvironmentValue("");
-          }}
+          onBlur={handleAddNewEnvironment}
         />
       )}
       <div className="environments-list">
