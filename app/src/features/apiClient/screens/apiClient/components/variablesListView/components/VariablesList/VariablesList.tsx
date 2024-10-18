@@ -32,7 +32,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
 
-      if (row.key || isVariableTypeChanged) {
+      if ((row.key && row.syncValue) || isVariableTypeChanged) {
         // Check if the new key already exists (excluding the current row)
         const isDuplicate = variableRows.some(
           (variable, idx) => idx !== index && variable.key.toLowerCase() === row.key.toLowerCase()
@@ -52,7 +52,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
           setDataSource(variableRows);
         }
 
-        if (row.key) {
+        if (row.key && row.syncValue) {
           const variablesToSave = variableRows.reduce((acc, variable) => {
             if (variable.key) {
               acc[variable.key] = {
@@ -63,6 +63,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
             }
             return acc;
           }, {});
+
           setVariables(currentEnvironmentId, variablesToSave);
         }
       }
