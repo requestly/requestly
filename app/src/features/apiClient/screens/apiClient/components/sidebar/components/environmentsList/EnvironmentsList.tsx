@@ -1,13 +1,15 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Input } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
-import { redirectToEnvironment } from "utils/RedirectionUtils";
+import { redirectToEnvironment, redirectToNewEnvironment } from "utils/RedirectionUtils";
+import PATHS from "config/constants/sub/paths";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { getAllEnvironments, getCurrentEnvironment, addNewEnvironment } = useEnvironmentManager();
   const environments = getAllEnvironments();
   const { currentEnvironmentId } = getCurrentEnvironment();
@@ -21,18 +23,29 @@ export const EnvironmentsList = () => {
   };
 
   const handleAddEnvironmentClick = () => {
-    setIsNewEnvironmentInputVisible(true);
+    redirectToNewEnvironment(navigate);
   };
 
   const handleAddNewEnvironment = async () => {
     if (newEnvironmentValue) {
       setIsLoading(true);
-      await addNewEnvironment(newEnvironmentValue);
+      const newEnvironment = await addNewEnvironment(newEnvironmentValue);
+      if (newEnvironment) {
+        redirectToEnvironment(navigate, newEnvironment.id);
+      }
       setIsLoading(false);
+    } else {
+      navigate(-1);
     }
     setIsNewEnvironmentInputVisible(false);
     setNewEnvironmentValue("");
   };
+
+  useEffect(() => {
+    if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE)) {
+      setIsNewEnvironmentInputVisible(true);
+    }
+  }, [location.pathname]);
 
   return (
     <div style={{ height: "inherit" }}>
@@ -47,7 +60,10 @@ export const EnvironmentsList = () => {
           disabled={isLoading}
           onChange={(e) => setNewEnvironmentValue(e.target.value)}
           onPressEnter={handleAddNewEnvironment}
-          onBlur={handleAddNewEnvironment}
+          onBlur={() => {
+            setIsNewEnvironmentInputVisible(false);
+            setNewEnvironmentValue("");
+          }}
         />
       )}
       <div className="environments-list">

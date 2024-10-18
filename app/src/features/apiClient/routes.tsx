@@ -26,6 +26,10 @@ export const apiClientRoutes: RouteObject[] = [
         path: PATHS.API_CLIENT.ENVIRONMENTS.INDEX + "/:envId",
         element: <ProtectedRoute component={VariablesListView} />,
       },
+      {
+        path: PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE,
+        element: <ProtectedRoute component={VariablesListView} />,
+      },
     ],
   },
 ];
