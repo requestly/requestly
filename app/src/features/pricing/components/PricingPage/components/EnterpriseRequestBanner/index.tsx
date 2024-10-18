@@ -59,7 +59,7 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
       user?.details?.isLoggedIn &&
       !user?.details?.isPremium
     )
-      trackTeamPlanCardShown(billingTeams[0].ownerDomain);
+      trackTeamPlanCardShown(billingTeams[0].ownerDomains);
   }, [
     user?.details?.isLoggedIn,
     user?.details?.isPremium,

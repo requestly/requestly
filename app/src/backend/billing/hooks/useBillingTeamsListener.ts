@@ -51,7 +51,10 @@ export const useBillingTeamsListener = () => {
       });
 
       if (isCompanyEmail(user?.details?.profile?.email)) {
-        const domainBillingTeamsQuery = query(collection(db, "billing"), where("ownerDomain", "==", domain));
+        const domainBillingTeamsQuery = query(
+          collection(db, "billing"),
+          where("ownerDomains", "array-contains", domain)
+        );
         await getDocs(domainBillingTeamsQuery)
           .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
