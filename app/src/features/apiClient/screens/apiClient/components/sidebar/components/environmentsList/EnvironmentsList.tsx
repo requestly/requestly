@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Input } from "antd";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Input, Tooltip } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
 import { redirectToEnvironment, redirectToNewEnvironment } from "utils/RedirectionUtils";
+import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import PATHS from "config/constants/sub/paths";
 import "./environmentsList.scss";
 
@@ -17,6 +18,7 @@ export const EnvironmentsList = () => {
   const [isNewEnvironmentInputVisible, setIsNewEnvironmentInputVisible] = useState(false);
   const [newEnvironmentValue, setNewEnvironmentValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { envId } = useParams();
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
@@ -68,13 +70,20 @@ export const EnvironmentsList = () => {
           environment.name.toLowerCase().includes(searchValue.toLowerCase()) ? (
             <div
               key={environment.id}
-              className={`environments-list-item ${environment.id === currentEnvironmentId ? "active" : ""}`}
+              className={`environments-list-item ${environment.id === envId ? "active" : ""}`}
               onClick={() => {
                 redirectToEnvironment(navigate, environment.id);
               }}
             >
-              {/* TODO: ADD ACTIVE BADGE */}
-              {environment.name}
+              <span>{environment.name}</span>
+              <Tooltip
+                overlayClassName="active-environment-tooltip"
+                title="Active Environment"
+                placement="top"
+                showArrow={false}
+              >
+                <span>{environment.id === currentEnvironmentId ? <MdOutlineCheckCircle /> : ""}</span>
+              </Tooltip>
             </div>
           ) : null
         )}
