@@ -23,16 +23,29 @@
     padding: var(--space-3, 6px) var(--space-5, 8px);
     border-color: var(--requestly-color-white-t-10) !important;
 
-    .ant-input {
+    .ant-input,
+    .ant-input-number,
+    .ant-input-number-input {
+      width: 100%;
       background: transparent;
       border: 1px solid transparent;
       padding: 2px 4px;
       color: var(--requestly-color-text-default, #fff);
       font-size: var(--font-size-sm, 13px);
+      height: 26px;
 
       &:focus {
         box-shadow: none;
         border: 1px solid var(--requestly-color-primary-500);
+      }
+    }
+
+    .ant-input-number {
+      padding: 0;
+      border: none;
+
+      &:focus {
+        box-shadow: none;
       }
     }
   }
