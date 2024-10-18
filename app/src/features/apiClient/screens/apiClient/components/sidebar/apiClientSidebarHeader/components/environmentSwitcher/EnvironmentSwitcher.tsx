@@ -20,7 +20,7 @@ export const EnvironmentSwitcher = () => {
 
   const dropdownItems = useMemo(() => {
     return environments.map((environment) => ({
-      key: environment,
+      key: environment.id,
       label: (
         <div className={`${environment.id === currentEnvironmentId ? "active-env-item" : ""} env-item`}>
           {environment.name} {environment.id === currentEnvironmentId ? <MdOutlineCheckCircleOutline /> : null}

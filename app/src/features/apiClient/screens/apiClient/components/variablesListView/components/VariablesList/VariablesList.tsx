@@ -27,36 +27,44 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   );
 
   const handleSaveVariable = useCallback(
-    (row: EnvironmentVariableTableRow) => {
+    (row: EnvironmentVariableTableRow, isVariableTypeChanged: boolean = false) => {
       const variableRows = [...dataSource];
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
 
-      if (row.key) {
+      if (row.key || isVariableTypeChanged) {
         // Check if the new key already exists (excluding the current row)
         const isDuplicate = variableRows.some(
           (variable, idx) => idx !== index && variable.key.toLowerCase() === row.key.toLowerCase()
         );
 
-        if (isDuplicate) {
+        if (isDuplicate && row.key) {
           toast.error(`Variable with name "${row.key}" already exists`);
           console.error(`Variable with name "${row.key}" already exists`);
           return;
         }
 
-        variableRows.splice(index, 1, { ...item, ...row });
-        const variablesToSave = variableRows.reduce((acc, variable) => {
-          if (variable.key) {
-            acc[variable.key] = {
-              type: variable.type,
-              syncValue: variable.syncValue,
-              localValue: variable.localValue,
-            };
-          }
-          return acc;
-        }, {});
+        const updatedRow = { ...item, ...row };
+        variableRows.splice(index, 1, updatedRow);
 
-        setVariables(currentEnvironmentId, variablesToSave);
+        if (isVariableTypeChanged) {
+          // updating the dataSource state only when variable type is changed because state update makes the table inputs lose focus
+          setDataSource(variableRows);
+        }
+
+        if (row.key) {
+          const variablesToSave = variableRows.reduce((acc, variable) => {
+            if (variable.key) {
+              acc[variable.key] = {
+                type: variable.type,
+                syncValue: variable.syncValue,
+                localValue: variable.localValue,
+              };
+            }
+            return acc;
+          }, {});
+          setVariables(currentEnvironmentId, variablesToSave);
+        }
       }
     },
     [dataSource, setVariables, currentEnvironmentId]

@@ -21,7 +21,6 @@ export const useVariablesListColumns = ({ handleSaveVariable, handleDeleteVariab
         dataIndex: "key",
         title: "Key",
         handleSaveVariable,
-        inputType: "text",
       }),
     },
     {
@@ -34,7 +33,6 @@ export const useVariablesListColumns = ({ handleSaveVariable, handleDeleteVariab
         dataIndex: "type",
         title: "Type",
         handleSaveVariable,
-        inputType: "select",
         options: ["string", "number", "boolean"],
       }),
     },
@@ -57,7 +55,6 @@ export const useVariablesListColumns = ({ handleSaveVariable, handleDeleteVariab
         dataIndex: "syncValue",
         title: "Sync Value",
         handleSaveVariable,
-        inputType: "text",
       }),
     },
     {
@@ -79,7 +76,6 @@ export const useVariablesListColumns = ({ handleSaveVariable, handleDeleteVariab
         dataIndex: "localValue",
         title: "Local Value",
         handleSaveVariable,
-        inputType: "text",
       }),
     },
     {
