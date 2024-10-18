@@ -1,5 +1,5 @@
-import { Button, Empty, Input, Select, Skeleton, Space, Spin } from "antd";
-import React, { SyntheticEvent, memo, useCallback, useEffect, useRef, useState } from "react";
+import { Empty, Select, Skeleton, Space, Spin } from "antd";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import Split from "react-split";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
@@ -93,6 +93,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, [apiEntry]);
 
   const setUrl = useCallback((url: string) => {
+    console.log("!!!debug", "setURL", url);
     setEntry((entry) => ({
       ...entry,
       request: {
@@ -185,14 +186,17 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const onUrlInputBlur = useCallback(() => {
-    if (entry.request.url) {
-      const urlWithUrlScheme = addUrlSchemeIfMissing(entry.request.url);
-      if (urlWithUrlScheme !== entry.request.url) {
-        setUrl(urlWithUrlScheme);
+  const onUrlInputBlur = useCallback(
+    (text: string) => {
+      if (text) {
+        const urlWithUrlScheme = addUrlSchemeIfMissing(text);
+        if (urlWithUrlScheme !== text) {
+          setUrl(urlWithUrlScheme);
+        }
       }
-    }
-  }, [entry.request.url, setUrl]);
+    },
+    [setUrl]
+  );
 
   const sanitizeEntry = (entry: RQAPI.Entry) => {
     const sanitizedEntry: RQAPI.Entry = {
@@ -322,11 +326,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackAPIRequestCancelled();
   }, []);
 
-  const onUrlInputEnterPressed = useCallback((evt: SyntheticEvent<HTMLInputElement>) => {
+  const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
     (evt.target as HTMLInputElement).blur();
   }, []);
-
-  const { setVariables, removeVariable } = useEnvironmentManager();
 
   return isExtensionEnabled ? (
     <div className="api-client-view">
@@ -351,12 +353,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             <RQSingleLineEditor
               className="api-request-url"
               placeholder="https://example.com"
-              value={"https://app.requestly.io/echo"}
+              value={entry.request.url}
               onChange={(text) => setUrl(text)}
               onPressEnter={onUrlInputEnterPressed}
               onBlur={onUrlInputBlur}
               // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
-              highlightVariables={true}
             />
           </Space.Compact>
           <RQButton

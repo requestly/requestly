@@ -11,8 +11,8 @@ interface RQSingleLineEditorProps {
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
-  onPressEnter?: () => void;
-  onBlur?: () => void;
+  onPressEnter?: (event: KeyboardEvent, text: string) => void;
+  onBlur?: (text: string) => void;
 }
 
 export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
@@ -45,8 +45,19 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
           }),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
+              console.log("!!!debug", "doc changed", update.state.doc.toString());
               onChange?.(update.state.doc.toString());
             }
+          }),
+          EditorView.domEventHandlers({
+            blur: (_, view) => {
+              onBlur?.(view.state.doc.toString());
+            },
+            keypress: (event, view) => {
+              if (event.key === "Enter") {
+                onPressEnter?.(event, view.state.doc.toString());
+              }
+            },
           }),
           highlightVariablesPlugin({
             setHoveredVariable,
@@ -60,12 +71,15 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
     return () => {
       editorViewRef.current?.destroy();
     };
+
     //Need to disable to implement the onChange handler
+    // Shouldn't be recreated every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placeholder]);
 
   useEffect(() => {
     if (value && editorViewRef.current) {
+      console.log("!!!debug", "before dispatch", value);
       editorViewRef.current?.dispatch({
         changes: {
           from: 0,
