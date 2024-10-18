@@ -1,0 +1,34 @@
+.variables-list-header {
+  .variables-list-breadcrumb {
+    display: flex;
+    gap: 4px;
+    font-size: var(--requestly-font-size-xs, 11px);
+
+    svg {
+      font-size: 12px;
+      position: relative;
+      top: 2px;
+      color: var(--requestly-color-text-subtle);
+    }
+
+    .variables-list-breadcrumb-1 {
+      color: var(--requestly-color-text-subtle);
+    }
+    .variables-list-breadcrumb-2 {
+      color: var(--requestly-color-text-default);
+      font-weight: 500;
+    }
+  }
+  .variables-list-search-input {
+    margin-top: 8px;
+    width: 200px;
+    padding: 0 12px;
+    background: transparent;
+
+    input.ant-input {
+      padding: 6px 2px;
+      font-size: var(--requestly-font-size-xs, 11px);
+      background: transparent;
+    }
+  }
+}

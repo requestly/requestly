@@ -367,22 +367,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           >
             Send
           </RQButton>
-          <Button
-            type="primary"
-            onClick={() => {
-              setVariables({ testNum: { localValue: 12, syncValue: 12 } });
-            }}
-          >
-            Set var
-          </Button>
-          <Button
-            type="primary"
-            onClick={() => {
-              removeVariable("test");
-            }}
-          >
-            Remove var
-          </Button>
           {user.loggedIn && !openInModal ? (
             <RQButton onClick={onSaveButtonClick} loading={isRequestSaving}>
               Save
