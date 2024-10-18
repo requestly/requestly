@@ -150,7 +150,6 @@ export const APIClient: React.FC<Props> = () => {
     setSelectedEntry(getEmptyAPIEntry());
     setSelectedEntryDetails(null);
     trackNewRequestClicked(analyticEventSource);
-    setTimeout(() => redirectToRequest(navigate), 0);
   }, []);
 
   const onSelectionFromHistory = useCallback(
