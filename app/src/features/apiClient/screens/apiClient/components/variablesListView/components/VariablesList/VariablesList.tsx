@@ -22,7 +22,6 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
     removeVariable,
     getCurrentEnvironment,
   } = useEnvironmentManager();
-  //   TODO: REMOVE THIS AFTER ADDING LOADING STATE IN VIEWER COMPONENT
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [dataSource, setDataSource] = useState([]);
   const { currentEnvironmentId } = getCurrentEnvironment();
@@ -38,7 +37,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
 
-      if (row.key || isVariableTypeChanged) {
+      if ((row.key && row.syncValue) || isVariableTypeChanged) {
         // Check if the new key already exists (excluding the current row)
         const isDuplicate = variableRows.some(
           (variable, idx) => idx !== index && variable.key.toLowerCase() === row.key.toLowerCase()
@@ -58,7 +57,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
           setDataSource(variableRows);
         }
 
-        if (row.key) {
+        if (row.key && row.syncValue) {
           const variablesToSave = variableRows.reduce((acc, variable) => {
             if (variable.key) {
               acc[variable.key] = {
@@ -69,6 +68,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue }) => 
             }
             return acc;
           }, {});
+
           setVariables(currentEnvironmentId, variablesToSave);
         }
       }
