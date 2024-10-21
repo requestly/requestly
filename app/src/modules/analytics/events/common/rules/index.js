@@ -303,3 +303,7 @@ export const trackRulesEmptyStateClicked = (action) => {
   const params = { action };
   trackEvent(RULES.RULES_EMPTY_STATE_CLICKED, params);
 };
+
+export const trackSampleRegexClicked = () => {
+  trackEvent(RULES.SAMPLE_REGEX_CLICKED);
+};
