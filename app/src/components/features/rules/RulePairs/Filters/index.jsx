@@ -425,7 +425,7 @@ const Filters = (props) => {
         <div className="source-filter-modal-description">
           Advanced source filters lets you set precise conditions, applying rules to specific web pages, domains,
           request types, methods, or payloads.{" "}
-          <a href={LINKS.ACCELERATOR_PROGRAM_FORM_LINK} rel="noreferrer" target="_blank">
+          <a href={LINKS.REQUESTLY_DOCS_SOURCE_FILTERS} rel="noreferrer" target="_blank">
             Learn more
           </a>
         </div>
