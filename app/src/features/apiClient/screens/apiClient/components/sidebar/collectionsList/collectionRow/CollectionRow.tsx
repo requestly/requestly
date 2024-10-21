@@ -96,16 +96,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
                     }}
                   />
 
-                  <Dropdown
-                    onOpenChange={(open) => {
-                      if (!open) {
-                        setIsEditMode(false);
-                      }
-                    }}
-                    trigger={["click"]}
-                    menu={{ items: getCollectionOptions(record) }}
-                    placement="bottomRight"
-                  >
+                  <Dropdown trigger={["click"]} menu={{ items: getCollectionOptions(record) }} placement="bottomRight">
                     <RQButton
                       onClick={(e) => {
                         e.stopPropagation();
