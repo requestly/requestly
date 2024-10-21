@@ -28,8 +28,8 @@ export const trackWorkspaceDeleted = () => {
   trackEvent(TEAMS.WORKSPACE_DELETED);
 };
 
-export const trackTeamPlanCardShown = (domain) => {
-  const params = { domain };
+export const trackTeamPlanCardShown = (domains) => {
+  const params = { domains };
   trackEvent(TEAMS.REQUEST_TEAM_PLAN_CARD_SHOWN, params);
 };
 
