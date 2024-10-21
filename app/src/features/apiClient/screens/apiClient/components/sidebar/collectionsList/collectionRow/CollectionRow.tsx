@@ -23,30 +23,33 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
   const [isCreateNewRequest, setIsCreateNewRequest] = useState(false);
   const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
 
-  const getCollectionOptions = useCallback((record: RQAPI.CollectionRecord) => {
-    const items: MenuProps["items"] = [
-      {
-        key: "0",
-        label: <div>Rename</div>,
-        onClick: (itemInfo) => {
-          itemInfo.domEvent?.stopPropagation?.();
-          setIsEditMode(true);
+  const getCollectionOptions = useCallback(
+    (record: RQAPI.CollectionRecord) => {
+      const items: MenuProps["items"] = [
+        {
+          key: "0",
+          label: <div>Rename</div>,
+          onClick: (itemInfo) => {
+            itemInfo.domEvent?.stopPropagation?.();
+            setIsEditMode(true);
+          },
         },
-      },
-      {
-        key: "1",
-        label: <div>Delete</div>,
-        danger: true,
-        onClick: (itemInfo) => {
-          itemInfo.domEvent?.stopPropagation?.();
-          updateRecordToBeDeleted(record);
-          setIsDeleteModalOpen(true);
+        {
+          key: "1",
+          label: <div>Delete</div>,
+          danger: true,
+          onClick: (itemInfo) => {
+            itemInfo.domEvent?.stopPropagation?.();
+            updateRecordToBeDeleted(record);
+            setIsDeleteModalOpen(true);
+          },
         },
-      },
-    ];
+      ];
 
-    return items;
-  }, []);
+      return items;
+    },
+    [setIsDeleteModalOpen, updateRecordToBeDeleted]
+  );
 
   return (
     <>
@@ -131,6 +134,8 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
                   // For now there will only be requests inside collection
                   return <RequestRow key={apiRecord.id} record={apiRecord} />;
                 }
+
+                return null; // Just to avoid warning, this case wont happen!
               })
             )}
 
