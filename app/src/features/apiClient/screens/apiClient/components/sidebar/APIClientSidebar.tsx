@@ -10,7 +10,7 @@ import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { HistoryList } from "./historyList/HistoryList";
 import { ApiClientSidebarHeader } from "./apiClientSidebarHeader/ApiClientSidebarHeader";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { EnvironmentsList } from "./components/environmentsList/EnvironmentsList";
+import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
 import "./apiClientSidebar.scss";
 
 interface Props {

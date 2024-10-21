@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Skeleton } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import APIClientSidebar from "../sidebar/APIClientSidebar";
+import APIClientSidebar from "../apiClient/components/sidebar/APIClientSidebar";
 import { VariablesList } from "./components/VariablesList/VariablesList";
 import { VariablesListHeader } from "./components/VariablesListHeader/VariablesListHeader";
-import "./variablesListView.scss";
+import "./environmentView.scss";
 
-export const VariablesListView = () => {
+export const EnvironmentView = () => {
   const { isEnvironmentsLoading, getEnvironmentName } = useEnvironmentManager();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
