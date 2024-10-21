@@ -48,7 +48,7 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
 
       setIsLoading(true);
       const hasExternalDomainUser = emails.some(
-        (email) => getDomainFromEmail(email) !== billingTeamDetails?.ownerDomain
+        (email) => !billingTeamDetails?.ownerDomains.includes(getDomainFromEmail(email))
       );
 
       inviteUsersToBillingTeam(billingId, emails)
@@ -65,17 +65,17 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
           setIsLoading(false);
         });
     },
-    [billingId, emails, billingTeamDetails?.ownerDomain]
+    [billingId, emails, billingTeamDetails?.ownerDomains]
   );
 
   const handleEmailsChange = useCallback(
     (emails: string[]) => {
       setEmails(emails);
-      const billingTeamDomain = billingTeamDetails?.ownerDomain;
-      const externalDomainEmails = emails.filter((email) => !email.includes(billingTeamDomain));
+      const billingTeamDomains = billingTeamDetails?.ownerDomains;
+      const externalDomainEmails = emails.filter((email) => !billingTeamDomains.includes(getDomainFromEmail(email)));
       setExternalDomainEmails(externalDomainEmails);
     },
-    [billingTeamDetails?.ownerDomain]
+    [billingTeamDetails?.ownerDomains]
   );
 
   if (isPostUserAdditionViewVisible) {
