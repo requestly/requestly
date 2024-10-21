@@ -45,7 +45,16 @@ export const CollectionsList: React.FC<Props> = ({
     });
 
     const updatedRecords = [...Object.values(collections), ...requests];
-    updatedRecords.sort((recordA, recordB) => recordA.createdTs - recordB.createdTs);
+
+    updatedRecords.sort((recordA, recordB) => {
+      // If different type, then keep collection first
+      if (recordA.type !== recordB.type) {
+        return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
+      }
+
+      // If types are the same, sort by creation date
+      return recordA.createdTs - recordB.createdTs;
+    });
 
     return updatedRecords;
   }, []);
