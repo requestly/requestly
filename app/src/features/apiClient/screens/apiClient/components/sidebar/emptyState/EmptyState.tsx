@@ -5,15 +5,22 @@ import APP_CONSTANTS from "config/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
+import { RQAPI } from "features/apiClient/types";
 import "./emptyState.scss";
 
 export interface EmptyStateProps {
+  analyticEventSource: RQAPI.AnalyticsEventSource;
   message: string;
   newRecordBtnText: string;
   onNewRecordClick: () => void;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ message, newRecordBtnText, onNewRecordClick }) => {
+export const EmptyState: React.FC<EmptyStateProps> = ({
+  message,
+  newRecordBtnText,
+  onNewRecordClick,
+  analyticEventSource = "collections_empty_state",
+}) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
@@ -27,7 +34,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ message, newRecordBtnTex
           newProps: {
             src: APP_CONSTANTS.FEATURES.API_CLIENT,
             authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-            eventSource: "collections_empty_state",
+            eventSource: analyticEventSource,
           },
         })
       );
