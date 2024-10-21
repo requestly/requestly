@@ -50,11 +50,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       <img className="empty-card-image" width={40} height={40} src={emptyCardImage} alt="Empty collection list" />
       <div className="empty-message">{message}</div>
 
-      {onNewRecordClick ? (
-        <RQButton size="small" className="new-record-btn" onClick={handleOnClick}>
-          {newRecordBtnText}
-        </RQButton>
-      ) : null}
+      <RQButton size="small" className="new-record-btn" onClick={handleOnClick}>
+        {newRecordBtnText}
+      </RQButton>
     </div>
   );
 };
