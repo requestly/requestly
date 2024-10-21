@@ -19,6 +19,7 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { redirectToRequest } from "utils/RedirectionUtils";
 import "./apiClient.scss";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 
 interface Props {}
 
@@ -30,6 +31,7 @@ export const APIClient: React.FC<Props> = () => {
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
   const { onSaveRecord } = useApiClientContext();
+  const { renderVariables } = useEnvironmentManager();
 
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
@@ -63,10 +65,17 @@ export const APIClient: React.FC<Props> = () => {
       });
   }, [requestId]);
 
-  const addToHistory = useCallback((apiEntry: RQAPI.Entry) => {
-    setHistory((history) => [...history, apiEntry]);
-    addToHistoryInStore(apiEntry);
-  }, []);
+  const addToHistory = useCallback(
+    (apiEntry: RQAPI.Entry) => {
+      const renderedEntry = {
+        ...apiEntry,
+        request: renderVariables<RQAPI.Entry["request"]>(apiEntry.request),
+      };
+      setHistory((history) => [...history, renderedEntry]);
+      addToHistoryInStore(renderedEntry);
+    },
+    [renderVariables]
+  );
 
   const clearHistory = useCallback(() => {
     setHistory([]);
