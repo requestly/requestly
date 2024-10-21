@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { getUserAuthDetails } from "store/selectors";
+import { useDispatch, useSelector } from "react-redux";
 import { Input, Tooltip } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../../../apiClient/components/sidebar/components/sidebarListHeader/SidebarListHeader";
@@ -7,11 +9,15 @@ import { redirectToEnvironment, redirectToNewEnvironment } from "utils/Redirecti
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import PATHS from "config/constants/sub/paths";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
+import { actions } from "store";
+import APP_CONSTANTS from "config/constants";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const user = useSelector(getUserAuthDetails);
   const { getAllEnvironments, getCurrentEnvironment, addNewEnvironment } = useEnvironmentManager();
   const environments = getAllEnvironments();
   const { currentEnvironmentId } = getCurrentEnvironment();
@@ -21,12 +27,26 @@ export const EnvironmentsList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { envId } = useParams();
 
-  const handleAddEnvironmentClick = () => {
+  const handleAddEnvironmentClick = useCallback(() => {
+    if (!user.loggedIn) {
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "authModal",
+          newValue: true,
+          newProps: {
+            eventSource: "environments_list",
+            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+            warningMessage: "Please log in to create a new environment",
+          },
+        })
+      );
+      return;
+    }
     trackCreateEnvironmentClicked("environments_list");
     redirectToNewEnvironment(navigate);
-  };
+  }, [user.loggedIn, dispatch, navigate]);
 
-  const handleAddNewEnvironment = async () => {
+  const handleAddNewEnvironment = useCallback(async () => {
     if (newEnvironmentValue) {
       setIsLoading(true);
       const newEnvironment = await addNewEnvironment(newEnvironmentValue);
@@ -40,13 +60,13 @@ export const EnvironmentsList = () => {
     }
     setIsNewEnvironmentInputVisible(false);
     setNewEnvironmentValue("");
-  };
+  }, [addNewEnvironment, navigate, environments.length, newEnvironmentValue]);
 
   useEffect(() => {
-    if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE)) {
+    if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE && user.loggedIn)) {
       setIsNewEnvironmentInputVisible(true);
     }
-  }, [location.pathname]);
+  }, [location.pathname, user.loggedIn]);
 
   return (
     <div style={{ height: "inherit" }}>
