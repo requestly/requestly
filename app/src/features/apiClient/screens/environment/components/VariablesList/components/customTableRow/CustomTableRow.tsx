@@ -113,6 +113,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       case EnvironmentVariableType.Number:
         return (
           <InputNumber
+            type="number"
             controls={false}
             ref={inputRef}
             onChange={(value) => handleChange(value)}

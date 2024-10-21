@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useDebounce } from "hooks/useDebounce";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { SourceConditionInput } from "../SourceUrl";
-import { LearnMoreLink } from "../LearnMoreLink";
 import { Typography, Divider, Row, Input } from "antd";
 import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { isValidRegex } from "utils/rules/misc";
@@ -27,13 +26,27 @@ interface ModalProps {
   isOpen: boolean;
   source: Source;
   analyticsContext: Record<string, string>;
+  originalSource: Source;
+  defaultTestURL?: string;
   onClose: (operator: SourceOperator) => void;
   onSave: (newSource: Source) => void;
 }
 
-export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsContext, onClose, onSave }) => {
-  const [updatedSource, setUpdatedSource] = useState<Source>(source);
-  const [testURL, setTestURL] = useState<string>("");
+export const TestURLModal: React.FC<ModalProps> = ({
+  isOpen,
+  /*
+  originalSource is the source config in redux at the time of opening the modal
+  source is the config passed explicitly for sample regex
+  */
+  source,
+  originalSource,
+  analyticsContext,
+  defaultTestURL = "",
+  onClose,
+  onSave,
+}) => {
+  const [updatedSource, setUpdatedSource] = useState<Source>(source || originalSource);
+  const [testURL, setTestURL] = useState<string>(defaultTestURL);
   const [isCheckPassed, setIsCheckPassed] = useState<boolean>(false);
   const [matchedGroups, setMatchedGroups] = useState<string[]>([]);
   const [isSourceModified, setIsSourceModified] = useState<boolean>(false);
@@ -97,7 +110,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
     );
   }, [testURL, isCheckPassed, updatedSource.value, updatedSource.operator]);
 
-  const handleTestURL = () => {
+  const handleTestURL = useCallback(() => {
     try {
       const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSourceWithExtraInfo(updatedSource, testURL, testURL);
       if (result?.destination?.length) {
@@ -111,7 +124,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
       setMatchedGroups([]);
       setIsCheckPassed(false);
     }
-  };
+  }, [updatedSource, testURL]);
 
   const debouncedHandleTestURL = useDebounce(handleTestURL);
 
@@ -134,6 +147,12 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
   };
 
   useEffect(() => {
+    if (isOpen) {
+      handleTestURL();
+    }
+  }, [isOpen, handleTestURL]);
+
+  useEffect(() => {
     trackURLConditionModalViewed(source.operator, analyticsContext);
   }, [analyticsContext, source.operator]);
 
@@ -147,9 +166,14 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
       onCancel={() => onClose(updatedSource.operator)}
     >
       <div className="test-url-modal-header">
-        <Typography.Title level={4}>Test URL condition</Typography.Title>
+        <Typography.Title level={4}>
+          Test and apply {updatedSource.operator === SourceOperator.MATCHES ? "Regex" : "Wildcard"} condition
+        </Typography.Title>
         <Typography.Text className="text-gray">
-          Check if your request URL matches the rule condition you specified.
+          Check if your request URL matches the rule condition you specified.{" "}
+          <a href={LINKS.REQUESTLY_DOCS_TEST_URL_CONDITION} target="_blank" rel="noreferrer">
+            Learn more
+          </a>
         </Typography.Text>
       </div>
       <Divider />
@@ -182,13 +206,8 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
       </div>
       <div className="rq-modal-footer test-url-modal-footer">
         <Row className="w-full" justify="space-between">
-          <Row align="middle">
-            <LearnMoreLink
-              linkText="Learn more about source condition matching"
-              href={LINKS.REQUESTLY_DOCS_TEST_URL_CONDITION}
-            />
-          </Row>
-          {isEqual(source, updatedSource) ? (
+          <Row />
+          {isEqual(originalSource, updatedSource) ? (
             <RQButton type="default" onClick={() => onClose(updatedSource.operator)}>
               Close
             </RQButton>
@@ -202,7 +221,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
                 trackURLConditionSourceModificationSaved(updatedSource.operator, analyticsContext);
               }}
             >
-              Save and close
+              Use condition
             </RQButton>
           )}
         </Row>
