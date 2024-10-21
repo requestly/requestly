@@ -44,7 +44,7 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
     const externalDomainMembers =
       Object.values(billingTeamMembers)
         .filter((member) => {
-          return !billingTeamDetails?.ownerDomains.includes(getDomainFromEmail(member.email));
+          return !billingTeamDetails?.ownerDomains?.includes(getDomainFromEmail(member.email));
         })
         .map((member) => {
           return {
