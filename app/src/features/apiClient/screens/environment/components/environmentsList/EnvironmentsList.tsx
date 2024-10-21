@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Input, Tooltip } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
+import { SidebarListHeader } from "../../../apiClient/components/sidebar/components/sidebarListHeader/SidebarListHeader";
 import { redirectToEnvironment, redirectToNewEnvironment } from "utils/RedirectionUtils";
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import PATHS from "config/constants/sub/paths";
