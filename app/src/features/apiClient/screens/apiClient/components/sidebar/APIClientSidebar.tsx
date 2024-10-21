@@ -69,7 +69,7 @@ const APIClientSidebar: React.FC<Props> = ({
       label: (
         <Tooltip title="Environments" placement="right">
           <NavLink
-            to={PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE + `/${currentEnvironmentId}`}
+            to={PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE + `/${currentEnvironmentId || "new"}`}
             className={({ isActive }) => `${isActive ? "active" : ""} api-client-tab-link`}
           >
             <MdHorizontalSplit />

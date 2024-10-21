@@ -11,6 +11,10 @@ import { ApiClientSidebarTabKey } from "../APIClientSidebar";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import { redirectToNewEnvironment } from "utils/RedirectionUtils";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
+import APP_CONSTANTS from "config/constants";
+import { actions } from "store";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -32,6 +36,8 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   history,
   onClearHistory,
 }) => {
+  const user = useSelector(getUserAuthDetails);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const items: DropdownProps["menu"]["items"] = [
     {
@@ -88,12 +94,30 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           Clear history
         </RQButton>
       ) : activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
-        <RQButton type="transparent" size="small" icon={<MdAdd />} onClick={() => redirectToNewEnvironment(navigate)}>
+        <RQButton
+          type="transparent"
+          size="small"
+          icon={<MdAdd />}
+          onClick={() => {
+            dispatch(
+              actions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  eventSource: "environments_list",
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                  warningMessage: "Please log in to create a new environment",
+                },
+              })
+            );
+            redirectToNewEnvironment(navigate);
+          }}
+        >
           New
         </RQButton>
       ) : null}
 
-      <EnvironmentSwitcher />
+      {user.loggedIn && <EnvironmentSwitcher />}
     </div>
   );
 };
