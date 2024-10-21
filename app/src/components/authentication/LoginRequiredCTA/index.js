@@ -7,7 +7,7 @@ import AuthButtons from "./AuthButtons";
 const LoginRequiredCTA = ({ src, hardRedirect }) => {
   return (
     <React.Fragment>
-      <ProCard className="primary-card github-like-border">
+      <ProCard className="primary-card github-like-border login-required-view">
         <Row style={{ textAlign: "center" }} align="center">
           <Col span={24}>
             <Jumbotron style={{ background: "transparent" }} className="text-center">
