@@ -63,7 +63,7 @@ export const EnvironmentsList = () => {
   }, [addNewEnvironment, navigate, environments.length, newEnvironmentValue]);
 
   useEffect(() => {
-    if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE && user.loggedIn)) {
+    if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE) && user.loggedIn) {
       setIsNewEnvironmentInputVisible(true);
     }
   }, [location.pathname, user.loggedIn]);
