@@ -7,6 +7,8 @@ import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { EditableCell, EditableRow } from "./components/customTableRow/CustomTableRow";
 import { toast } from "utils/Toast";
+import { EnvironmentAnalyticsContext } from "../../types";
+import { trackAddVariableClicked, trackVariableValueUpdated } from "../../analytics";
 import "./variablesList.scss";
 
 interface VariablesListProps {
@@ -27,12 +29,12 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   );
 
   const handleSaveVariable = useCallback(
-    (row: EnvironmentVariableTableRow, isVariableTypeChanged: boolean = false) => {
+    (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
       const variableRows = [...dataSource];
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
 
-      if ((row.key && row.syncValue) || isVariableTypeChanged) {
+      if ((row.key && row.syncValue) || fieldChanged === "type") {
         // Check if the new key already exists (excluding the current row)
         const isDuplicate = variableRows.some(
           (variable, idx) => idx !== index && variable.key.toLowerCase() === row.key.toLowerCase()
@@ -47,7 +49,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
         const updatedRow = { ...item, ...row };
         variableRows.splice(index, 1, updatedRow);
 
-        if (isVariableTypeChanged) {
+        if (fieldChanged === "type") {
           // updating the dataSource state only when variable type is changed because state update makes the table inputs lose focus
           setDataSource(variableRows);
         }
@@ -65,6 +67,9 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
           }, {});
 
           setVariables(currentEnvironmentId, variablesToSave);
+          if (fieldChanged === "syncValue" || fieldChanged === "localValue") {
+            trackVariableValueUpdated(fieldChanged, EnvironmentAnalyticsContext.API_CLIENT, variableRows.length);
+          }
         }
       }
     },
@@ -107,7 +112,6 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
 
   useEffect(() => {
     if (!isTableLoaded) {
-      console.log("isTableLoaded", isTableLoaded);
       setIsTableLoaded(true);
       const variables = getEnvironmentVariables(currentEnvironmentId);
       const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(
@@ -149,7 +153,14 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
       scroll={{ y: "calc(100vh - 240px)" }}
       footer={() => (
         <div className="variables-list-footer">
-          <RQButton icon={<MdAdd />} size="small" onClick={() => handleAddNewRow(dataSource)}>
+          <RQButton
+            icon={<MdAdd />}
+            size="small"
+            onClick={() => {
+              trackAddVariableClicked(EnvironmentAnalyticsContext.API_CLIENT, "listing");
+              handleAddNewRow(dataSource);
+            }}
+          >
             Add More
           </RQButton>
         </div>
