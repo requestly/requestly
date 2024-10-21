@@ -22,10 +22,12 @@ export const EnvironmentsList = () => {
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
+    // TODO: ADD ANALYTICS
   };
 
   const handleAddEnvironmentClick = () => {
     redirectToNewEnvironment(navigate);
+    // TODO: ADD ANALYTICS
   };
 
   const handleAddNewEnvironment = async () => {
@@ -41,6 +43,7 @@ export const EnvironmentsList = () => {
     }
     setIsNewEnvironmentInputVisible(false);
     setNewEnvironmentValue("");
+    // TODO: ADD ANALYTICS
   };
 
   useEffect(() => {
