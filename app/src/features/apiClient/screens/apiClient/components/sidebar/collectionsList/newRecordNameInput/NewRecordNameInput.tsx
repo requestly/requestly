@@ -95,7 +95,18 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
     setIsLoading(false);
     onSuccess?.();
-  }, [recordType, recordName, uid, teamId, onSaveRecord, defaultRecordName]);
+  }, [
+    recordType,
+    recordName,
+    uid,
+    teamId,
+    onSaveRecord,
+    defaultRecordName,
+    analyticEventSource,
+    navigate,
+    newRecordCollectionId,
+    onSuccess,
+  ]);
 
   useEffect(() => {
     if (isEditMode) {
@@ -142,7 +153,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
     setIsLoading(false);
     onSuccess?.();
-  }, [recordType, recordToBeEdited, recordName, uid, teamId, onSaveRecord]);
+  }, [recordType, recordToBeEdited, recordName, uid, teamId, onSaveRecord, navigate, onSuccess]);
 
   const onBlur = isEditMode ? updateRecord : saveNewRecord;
 
