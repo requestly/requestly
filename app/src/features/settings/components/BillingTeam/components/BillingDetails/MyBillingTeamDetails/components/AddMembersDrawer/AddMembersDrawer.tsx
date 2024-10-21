@@ -34,7 +34,7 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
   };
 
   const tableRecords = useMemo(() => {
-    /* 
+    /*
       Add members drawer table consists records from 3 sources:
       1. External domain members
       2. Organization members
@@ -44,7 +44,7 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
     const externalDomainMembers =
       Object.values(billingTeamMembers)
         .filter((member) => {
-          return getDomainFromEmail(member.email) !== billingTeamDetails?.ownerDomain;
+          return !billingTeamDetails?.ownerDomains.includes(getDomainFromEmail(member.email));
         })
         .map((member) => {
           return {
@@ -68,7 +68,7 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
     }
 
     return newRecords;
-  }, [billingTeamDetails?.pendingMembers, organizationMembers, billingTeamMembers, billingTeamDetails?.ownerDomain]);
+  }, [billingTeamDetails?.pendingMembers, organizationMembers, billingTeamMembers, billingTeamDetails?.ownerDomains]);
 
   return (
     <Drawer

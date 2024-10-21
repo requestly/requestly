@@ -1,6 +1,7 @@
 import { compile } from "handlebars";
 import { EnvironmentVariableValue } from "./types";
 import Logger from "lib/logger";
+import { isEmpty } from "lodash";
 
 type Variables = Record<string, string | number | boolean>;
 
@@ -9,7 +10,7 @@ export const renderTemplate = (
   variables: Record<string, EnvironmentVariableValue> = {}
 ): any => {
   const parsedVariables = Object.entries(variables).reduce((envVars, [key, value]) => {
-    envVars[key] = value.localValue ?? value.syncValue;
+    envVars[key] = isEmpty(value.localValue) ? value.syncValue : value.localValue;
     return envVars;
   }, {} as Variables);
 
