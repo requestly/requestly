@@ -40,17 +40,10 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
   const teamId = workspace?.id;
   const { onSaveRecord } = useApiClientContext();
 
-  const [recordName, setRecordName] = useState("");
+  const defaultRecordName = recordType === RQAPI.RecordType.API ? "Untitled request" : "New collection";
+  const [recordName, setRecordName] = useState(recordToBeEdited?.name || defaultRecordName);
   const [isLoading, setIsLoading] = useState(false);
   const isEditMode = !!recordToBeEdited;
-
-  const defaultRecordName = recordType === RQAPI.RecordType.API ? "Untitled request" : "New collection";
-
-  useEffect(() => {
-    const updatedName = recordToBeEdited?.name || defaultRecordName;
-
-    setRecordName(updatedName);
-  }, [recordToBeEdited?.name, recordType, defaultRecordName]);
 
   const saveNewRecord = useCallback(async () => {
     setIsLoading(true);
