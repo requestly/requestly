@@ -6,10 +6,11 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { MdOutlineCheckCircleOutline } from "@react-icons/all-files/md/MdOutlineCheckCircleOutline";
-import "./environmentSwitcher.scss";
 import { toast } from "utils/Toast";
 import { redirectToEnvironment } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
+import { trackEnvironmentSwitched } from "features/apiClient/screens/environment/analytics";
+import "./environmentSwitcher.scss";
 
 export const EnvironmentSwitcher = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ export const EnvironmentSwitcher = () => {
       onClick: () => {
         setCurrentEnvironment(environment.id);
         if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
+          trackEnvironmentSwitched(environments.length);
           redirectToEnvironment(navigate, environment.id);
         }
         toast.success(`Switched to ${environment.name} environment`);

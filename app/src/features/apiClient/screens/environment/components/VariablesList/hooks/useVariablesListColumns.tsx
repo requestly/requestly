@@ -4,7 +4,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 
 interface Props {
-  handleSaveVariable: (record: EnvironmentVariableTableRow) => void;
+  handleSaveVariable: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
   handleDeleteVariable: (key: string) => void;
 }
 

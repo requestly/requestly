@@ -6,6 +6,7 @@ import { SidebarListHeader } from "../../../apiClient/components/sidebar/compone
 import { redirectToEnvironment, redirectToNewEnvironment } from "utils/RedirectionUtils";
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import PATHS from "config/constants/sub/paths";
+import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
@@ -20,14 +21,9 @@ export const EnvironmentsList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { envId } = useParams();
 
-  const handleSearch = (value: string) => {
-    setSearchValue(value);
-    // TODO: ADD ANALYTICS
-  };
-
   const handleAddEnvironmentClick = () => {
+    trackCreateEnvironmentClicked("environments_list");
     redirectToNewEnvironment(navigate);
-    // TODO: ADD ANALYTICS
   };
 
   const handleAddNewEnvironment = async () => {
@@ -36,6 +32,7 @@ export const EnvironmentsList = () => {
       const newEnvironment = await addNewEnvironment(newEnvironmentValue);
       if (newEnvironment) {
         redirectToEnvironment(navigate, newEnvironment.id);
+        trackEnvironmentCreated(environments.length, "environments_list");
       }
       setIsLoading(false);
     } else {
@@ -43,7 +40,6 @@ export const EnvironmentsList = () => {
     }
     setIsNewEnvironmentInputVisible(false);
     setNewEnvironmentValue("");
-    // TODO: ADD ANALYTICS
   };
 
   useEffect(() => {
@@ -54,7 +50,7 @@ export const EnvironmentsList = () => {
 
   return (
     <div style={{ height: "inherit" }}>
-      <SidebarListHeader onAddRecordClick={handleAddEnvironmentClick} onSearch={handleSearch} />
+      <SidebarListHeader onAddRecordClick={handleAddEnvironmentClick} onSearch={(value) => setSearchValue(value)} />
       {/* TODO: Use input component from collections support PR */}
       {isNewEnvironmentInputVisible && (
         <Input
