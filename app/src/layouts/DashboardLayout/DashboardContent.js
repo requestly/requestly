@@ -6,8 +6,6 @@ import { actions } from "store";
 //UTILS
 import {
   getActiveModals,
-  getUserPersonaSurveyDetails,
-  getUserAuthDetails,
   getAppMode,
   getAppOnboardingDetails,
   getIsWorkspaceOnboardingCompleted,
@@ -16,7 +14,6 @@ import {
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
-import { PersonaSurvey } from "components/misc/PersonaSurvey";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
@@ -45,11 +42,9 @@ const DashboardContent = () => {
   const [searchParams] = useSearchParams();
   //Global state
   const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const incentiveActiveModals = useSelector(getIncentivizationActiveModals);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
@@ -154,9 +149,6 @@ const DashboardContent = () => {
               {...activeModals.connectedAppsModal.props}
             />
           ) : null}
-          {!userPersona.isSurveyCompleted && !user?.loggedIn && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
-            <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
-          ) : null}
           {activeModals.createWorkspaceModal.isActive ? (
             <CreateWorkspaceModal
               isOpen={activeModals.createWorkspaceModal.isActive}
@@ -217,7 +209,6 @@ const DashboardContent = () => {
 
           {onboardingVariation !== "variant1" &&
             shouldShowOnboarding() &&
-            appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
             !appOnboardingDetails.isOnboardingCompleted && (
               <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
             )}

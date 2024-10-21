@@ -313,6 +313,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
               ]}
               onChange={handlePlayerSpeedChange}
               placement="topRight"
+              getPopupContainer={() => playerContainerRef.current}
             />
           </div>
           <div className="session-player-skip-controller">

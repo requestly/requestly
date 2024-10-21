@@ -38,14 +38,14 @@ const LINKS = {
   REQUESTLY_DOCS_HTTP_MODIFICATIONS: "https://docs.requestly.io/browser-extension/chrome/http-modifications/overview",
 
   // Docs - Source Filters
-  REQUESTLY_DOCS_SOURCE_FILTERS:
-    "https://docs.requestly.com/general/http-rules-(modify-traffic)/advanced-usage/advance-targeting",
+  REQUESTLY_DOCS_SOURCE_FILTERS: "https://docs.requestly.com/general/http-rules/advanced-usage/advance-targeting",
 
   // Docs - Import rules from charles proxy
   REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES: "https://developers.requestly.com/http-rules/import-from-charles/",
 
   // Docs - Test URL condition
-  REQUESTLY_DOCS_TEST_URL_CONDITION: "https://developers.requestly.io/http-rules/test-url-condition",
+  REQUESTLY_DOCS_TEST_URL_CONDITION:
+    "https://docs.requestly.com/general/http-rules/others/http-rules-testing/test-url-condition",
 
   REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE: "https://developers.requestly.io/sessions/architecture/",
 
