@@ -18,15 +18,15 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
 }) => {
   return (
     <div className="variables-list-header">
-      <div className="variables-list-breadcrumb">
+      <div className="env-view-breadcrumb">
         <MdDisplaySettings />
-        <span className="variables-list-breadcrumb-1">
+        <span className="env-view-breadcrumb-1">
           API Client <MdOutlineChevronRight />
         </span>
-        <span className="variables-list-breadcrumb-1">
+        <span className="env-view-breadcrumb-1">
           Environments <MdOutlineChevronRight />
         </span>
-        <span className="variables-list-breadcrumb-2">{currentEnvironmentName}</span>
+        <span className="env-view-breadcrumb-2">{currentEnvironmentName}</span>
       </div>
       <div className="variables-list-action-container">
         <Input

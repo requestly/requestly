@@ -12,13 +12,19 @@ import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../an
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import "./environmentsList.scss";
+import { EmptyState } from "./components/emptyState/EmptyState";
 
 export const EnvironmentsList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const user = useSelector(getUserAuthDetails);
-  const { getAllEnvironments, getCurrentEnvironment, addNewEnvironment } = useEnvironmentManager();
+  const {
+    getAllEnvironments,
+    getCurrentEnvironment,
+    addNewEnvironment,
+    setCurrentEnvironment,
+  } = useEnvironmentManager();
   const { currentEnvironmentId } = getCurrentEnvironment();
   const [searchValue, setSearchValue] = useState("");
   const [isNewEnvironmentInputVisible, setIsNewEnvironmentInputVisible] = useState(false);
@@ -52,6 +58,9 @@ export const EnvironmentsList = () => {
       setIsLoading(true);
       const newEnvironment = await addNewEnvironment(newEnvironmentValue);
       if (newEnvironment) {
+        if (environments.length === 0) {
+          setCurrentEnvironment(newEnvironment.id);
+        }
         redirectToEnvironment(navigate, newEnvironment.id);
         trackEnvironmentCreated(environments.length, "environments_list");
       }
@@ -61,13 +70,40 @@ export const EnvironmentsList = () => {
     }
     setIsNewEnvironmentInputVisible(false);
     setNewEnvironmentValue("");
-  }, [addNewEnvironment, navigate, environments.length, newEnvironmentValue]);
+  }, [addNewEnvironment, navigate, environments.length, newEnvironmentValue, setCurrentEnvironment]);
 
   useEffect(() => {
     if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE) && user.loggedIn) {
       setIsNewEnvironmentInputVisible(true);
     }
   }, [location.pathname, user.loggedIn]);
+
+  if (environments?.length === 0) {
+    if (isNewEnvironmentInputVisible) {
+      return (
+        <div className="mt-16">
+          <Input
+            autoFocus
+            className="new-environment-input"
+            size="small"
+            placeholder="New Environment name"
+            disabled={isLoading}
+            onChange={(e) => setNewEnvironmentValue(e.target.value)}
+            onPressEnter={handleAddNewEnvironment}
+            onBlur={handleAddNewEnvironment}
+          />
+        </div>
+      );
+    }
+    return (
+      <EmptyState
+        onNewRecordClick={() => redirectToNewEnvironment(navigate)}
+        message="No environment created yet"
+        newRecordBtnText="Create new environment"
+        analyticEventSource="environments_list"
+      />
+    );
+  }
 
   return (
     <div style={{ height: "inherit" }}>
