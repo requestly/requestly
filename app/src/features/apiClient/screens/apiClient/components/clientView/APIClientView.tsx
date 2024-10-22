@@ -22,6 +22,7 @@ import {
   trackRequestFailed,
   trackResponseLoaded,
   trackInstallExtensionDialogShown,
+  trackRequestSaved,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -297,6 +298,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
 
+      trackRequestSaved("api_client_view");
       if (location.pathname.includes("history")) {
         navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`);
       }

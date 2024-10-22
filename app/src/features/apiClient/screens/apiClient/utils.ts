@@ -146,5 +146,5 @@ export const isApiRequest = (record: RQAPI.Record) => {
 };
 
 export const isApiCollection = (record: RQAPI.Record) => {
-  return record.type === RQAPI.RecordType.COLLECTION;
+  return record?.type === RQAPI.RecordType.COLLECTION;
 };

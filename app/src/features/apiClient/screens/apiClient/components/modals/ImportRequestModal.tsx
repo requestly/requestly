@@ -14,7 +14,7 @@ interface Props {
   onClose: () => void;
 }
 
-const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onClose, isRequestLoading }) => {
+export const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onClose, isRequestLoading }) => {
   const [curlCommand, setCurlCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>();
 
@@ -70,5 +70,3 @@ const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onCl
     </Modal>
   );
 };
-
-export default ImportRequestModal;

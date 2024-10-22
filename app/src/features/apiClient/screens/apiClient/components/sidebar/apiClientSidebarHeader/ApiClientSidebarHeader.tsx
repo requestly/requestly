@@ -1,5 +1,5 @@
 import React from "react";
-import { Dropdown, Tooltip } from "antd";
+import { Dropdown } from "antd";
 import { DropdownProps } from "reactstrap";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -8,10 +8,15 @@ import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { ApiClientSidebarTabKey } from "../APIClientSidebar";
 import { RQAPI } from "features/apiClient/types";
+import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
+import { useDispatch, useSelector } from "react-redux";
+import { actions } from "store";
+import APP_CONSTANTS from "config/constants";
+import { getUserAuthDetails } from "store/selectors";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
-  onNewClick: () => void;
+  onNewClick: (recordType: RQAPI.RecordType) => void;
   onImportClick: () => void;
   history: RQAPI.Entry[];
   onClearHistory: () => void;
@@ -29,27 +34,68 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   history,
   onClearHistory,
 }) => {
+  const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
+
   const items: DropdownProps["menu"]["items"] = [
     {
+      onClick: () => {
+        if (!user.loggedIn) {
+          dispatch(
+            // @ts-ignore
+            actions.toggleActiveModal({
+              modalName: "authModal",
+              newValue: true,
+              newProps: {
+                src: APP_CONSTANTS.FEATURES.API_CLIENT,
+                authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                eventSource: "api_client_sidebar_header",
+              },
+            })
+          );
+
+          return;
+        }
+
+        trackNewCollectionClicked("api_client_sidebar_header");
+        onNewClick(RQAPI.RecordType.COLLECTION);
+      },
+      key: DropdownOption.COLLECTION,
+      label: (
+        <div className="new-btn-option">
+          <BsCollection />
+          <span>Collection</span>
+        </div>
+      ),
+    },
+    {
       key: DropdownOption.REQUEST,
-      onClick: onNewClick,
+      onClick: () => {
+        if (!user.loggedIn) {
+          dispatch(
+            // @ts-ignore
+            actions.toggleActiveModal({
+              modalName: "authModal",
+              newValue: true,
+              newProps: {
+                src: APP_CONSTANTS.FEATURES.API_CLIENT,
+                authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                eventSource: "api_client_sidebar_header",
+              },
+            })
+          );
+
+          return;
+        }
+
+        trackNewRequestClicked("api_client_sidebar_header");
+        onNewClick(RQAPI.RecordType.API);
+      },
       label: (
         <div className="new-btn-option">
           <MdOutlineSyncAlt />
           <span>Request</span>
         </div>
-      ),
-    },
-    {
-      disabled: true,
-      key: DropdownOption.COLLECTION,
-      label: (
-        <Tooltip title="Coming soon!" placement="right">
-          <div className="new-btn-option">
-            <BsCollection />
-            <span>Collection</span>
-          </div>
-        </Tooltip>
       ),
     },
   ];
