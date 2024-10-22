@@ -132,6 +132,10 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
     }
   }, [getEnvironmentVariables, currentEnvironmentId, isTableLoaded]);
 
+  if (!isTableLoaded) {
+    return null;
+  }
+
   return (
     <ContentListTable
       id="variables-list"
