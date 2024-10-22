@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { RQAPI } from "../../../../types";
 import { NavLink, useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
@@ -14,7 +14,7 @@ interface Props {
   history: RQAPI.Entry[];
   onSelectionFromHistory: (index: number) => void;
   clearHistory: () => void;
-  onNewClick: () => void;
+  onNewClick: (src: RQAPI.AnalyticsEventSource) => void;
   onImportClick: () => void;
 }
 
@@ -32,6 +32,25 @@ const APIClientSidebar: React.FC<Props> = ({
 }) => {
   const location = useLocation();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
+  const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
+  const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
+
+  const hideNewRecordNameInput = () => {
+    setIsNewRecordNameInputVisible(false);
+    setRecordTypeToBeCreated(null);
+  };
+
+  const handleNewRecordClick = useCallback(
+    (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
+      setIsNewRecordNameInputVisible(true);
+      setRecordTypeToBeCreated(recordType);
+
+      if (recordType === RQAPI.RecordType.API) {
+        onNewClick(analyticEventSource);
+      }
+    },
+    [onNewClick]
+  );
 
   useEffect(() => {
     switch (location.pathname) {
@@ -63,7 +82,14 @@ const APIClientSidebar: React.FC<Props> = ({
           </NavLink>
         </Tooltip>
       ),
-      children: <CollectionsList />,
+      children: (
+        <CollectionsList
+          onNewClick={onNewClick}
+          recordTypeToBeCreated={recordTypeToBeCreated}
+          isNewRecordNameInputVisible={isNewRecordNameInputVisible}
+          hideNewRecordNameInput={hideNewRecordNameInput}
+        />
+      ),
     },
     {
       key: ApiClientSidebarTabKey.HISTORY,
@@ -91,8 +117,8 @@ const APIClientSidebar: React.FC<Props> = ({
         activeTab={activeKey}
         history={history}
         onClearHistory={clearHistory}
-        onNewClick={onNewClick}
         onImportClick={onImportClick}
+        onNewClick={(recordType) => handleNewRecordClick(recordType, "api_client_sidebar_header")}
       />
 
       <Tabs
