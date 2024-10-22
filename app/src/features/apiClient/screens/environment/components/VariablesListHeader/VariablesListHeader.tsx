@@ -1,6 +1,5 @@
 import React from "react";
 import { MdDisplaySettings } from "@react-icons/all-files/md/MdDisplaySettings";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { Input } from "antd";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
@@ -8,13 +7,15 @@ import "./variablesListHeader.scss";
 
 interface VariablesListHeaderProps {
   searchValue: string;
+  currentEnvironmentName: string;
   onSearchValueChange: (value: string) => void;
 }
 
-export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({ searchValue, onSearchValueChange }) => {
-  const { getCurrentEnvironment } = useEnvironmentManager();
-  const { currentEnvironmentName } = getCurrentEnvironment();
-
+export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
+  searchValue,
+  onSearchValueChange,
+  currentEnvironmentName = "New",
+}) => {
   return (
     <div className="variables-list-header">
       <div className="variables-list-breadcrumb">

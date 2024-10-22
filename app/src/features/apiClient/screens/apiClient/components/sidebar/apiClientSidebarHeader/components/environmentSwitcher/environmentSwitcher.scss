@@ -2,6 +2,12 @@
   font-weight: 500;
   color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-xs, 11px);
+  max-width: 120px;
+
+  & > span {
+    display: unset;
+    flex-shrink: unset;
+  }
 
   svg {
     color: var(--requestly-color-success);
@@ -15,8 +21,12 @@
     border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.16);
 
-    .ant-dropdown-menu-item {
+    li.ant-dropdown-menu-item {
       padding: 0;
+
+      .ant-dropdown-menu-title-content {
+        width: 100%;
+      }
 
       .env-item {
         display: flex;
@@ -26,9 +36,11 @@
         color: var(--requestly-color-text-default);
         border-radius: 4px;
         font-size: 14px;
+        max-height: 26px;
 
         svg {
           font-size: 1rem;
+          flex-shrink: 0;
         }
       }
 
