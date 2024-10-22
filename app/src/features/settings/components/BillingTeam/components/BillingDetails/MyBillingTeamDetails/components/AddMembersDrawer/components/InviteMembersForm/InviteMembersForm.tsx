@@ -48,7 +48,7 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
 
       setIsLoading(true);
       const hasExternalDomainUser = emails.some(
-        (email) => !billingTeamDetails?.ownerDomains.includes(getDomainFromEmail(email))
+        (email) => !billingTeamDetails?.ownerDomains?.includes(getDomainFromEmail(email))
       );
 
       inviteUsersToBillingTeam(billingId, emails)
