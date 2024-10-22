@@ -39,7 +39,8 @@
         max-height: 26px;
 
         svg {
-          font-size: 2rem;
+          font-size: 1rem;
+          flex-shrink: 0;
         }
       }
 
