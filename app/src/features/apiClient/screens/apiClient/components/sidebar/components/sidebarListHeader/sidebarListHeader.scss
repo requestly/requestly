@@ -1,0 +1,16 @@
+.sidebar-list-header {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 0;
+
+  &-button {
+    padding: 4px 8px;
+  }
+
+  &-search {
+    width: 200px;
+    padding: 4px 6px;
+    font-size: var(--requestly-font-size-xs);
+  }
+}
