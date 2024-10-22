@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Dropdown } from "antd";
+import { Dropdown, Typography } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
@@ -23,7 +23,17 @@ export const EnvironmentSwitcher = () => {
       key: environment.id,
       label: (
         <div className={`${environment.id === currentEnvironmentId ? "active-env-item" : ""} env-item`}>
-          {environment.name} {environment.id === currentEnvironmentId ? <MdOutlineCheckCircleOutline /> : null}
+          <Typography.Text
+            ellipsis={{
+              tooltip: {
+                title: environment.name,
+                placement: "right",
+              },
+            }}
+          >
+            {environment.name}
+          </Typography.Text>{" "}
+          {environment.id === currentEnvironmentId ? <MdOutlineCheckCircleOutline /> : null}
         </div>
       ),
       onClick: () => {
@@ -48,7 +58,16 @@ export const EnvironmentSwitcher = () => {
     <Dropdown overlayClassName="environment-switcher-dropdown" trigger={["click"]} menu={{ items: dropdownItems }}>
       <RQButton className="environment-switcher-button" size="small">
         <MdOutlineSyncAlt />
-        {currentEnvironmentName}
+        <Typography.Text
+          ellipsis={{
+            tooltip: {
+              title: currentEnvironmentName,
+              placement: "right",
+            },
+          }}
+        >
+          {currentEnvironmentName}
+        </Typography.Text>
       </RQButton>
     </Dropdown>
   );
