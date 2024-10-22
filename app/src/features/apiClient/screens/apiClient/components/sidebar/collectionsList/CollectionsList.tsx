@@ -45,7 +45,8 @@ export const CollectionsList: React.FC<Props> = ({
       }
     });
 
-    const updatedRecords = [...Object.values(collections), ...requests];
+    const collectionRecords = Object.values(collections);
+    const updatedRecords = [...collectionRecords, ...requests];
 
     updatedRecords.sort((recordA, recordB) => {
       // If different type, then keep collection first
@@ -57,7 +58,11 @@ export const CollectionsList: React.FC<Props> = ({
       return recordA.createdTs - recordB.createdTs;
     });
 
-    return updatedRecords;
+    return {
+      count: updatedRecords.length,
+      collections: updatedRecords.slice(0, collectionRecords.length) as RQAPI.CollectionRecord[],
+      requests: updatedRecords.slice(collectionRecords.length) as RQAPI.ApiRecord[],
+    };
   }, []);
 
   const updatedRecords = useMemo(() => prepareRecordsToRender(apiClientRecords), [
@@ -73,15 +78,31 @@ export const CollectionsList: React.FC<Props> = ({
             <div className="api-client-sidebar-placeholder">
               <Typography.Text type="secondary">Loading...</Typography.Text>
             </div>
-          ) : updatedRecords.length > 0 ? (
+          ) : updatedRecords.count > 0 || isNewRecordNameInputVisible ? (
             <div className="collections-list">
-              {updatedRecords.map((record) => {
-                if (record.type === RQAPI.RecordType.COLLECTION) {
-                  return <CollectionRow key={record.id} record={record} onNewClick={onNewClick} />;
-                }
+              {updatedRecords.collections.map((record) => {
+                return <CollectionRow key={record.id} record={record} onNewClick={onNewClick} />;
+              })}
 
+              {isNewRecordNameInputVisible && recordTypeToBeCreated === RQAPI.RecordType.COLLECTION ? (
+                <NewRecordNameInput
+                  recordType={recordTypeToBeCreated}
+                  analyticEventSource="api_client_sidebar_header"
+                  onSuccess={() => hideNewRecordNameInput()}
+                />
+              ) : null}
+
+              {updatedRecords.requests.map((record) => {
                 return <RequestRow key={record.id} record={record} />;
               })}
+
+              {isNewRecordNameInputVisible && recordTypeToBeCreated === RQAPI.RecordType.API ? (
+                <NewRecordNameInput
+                  recordType={recordTypeToBeCreated}
+                  analyticEventSource="api_client_sidebar_header"
+                  onSuccess={() => hideNewRecordNameInput()}
+                />
+              ) : null}
             </div>
           ) : (
             <ApiRecordEmptyState
@@ -93,16 +114,6 @@ export const CollectionsList: React.FC<Props> = ({
             />
           )}
         </div>
-
-        {isNewRecordNameInputVisible ? (
-          <NewRecordNameInput
-            analyticEventSource="api_client_sidebar_header"
-            recordType={recordTypeToBeCreated}
-            onSuccess={() => {
-              hideNewRecordNameInput();
-            }}
-          />
-        ) : null}
       </div>
     </>
   );
