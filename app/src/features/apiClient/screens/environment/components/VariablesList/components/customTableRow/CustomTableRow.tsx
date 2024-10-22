@@ -4,6 +4,8 @@ import { EnvironmentVariableTableRow } from "../../VariablesList";
 import { EnvironmentVariableType } from "backend/environment/types";
 import debounce from "lodash/debounce";
 import Logger from "lib/logger";
+import { useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -38,6 +40,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   options,
   ...restProps
 }) => {
+  const location = useLocation();
   const form = useContext(EditableContext)!;
   const inputRef = useRef(null);
 
@@ -84,10 +87,16 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
   useEffect(() => {
     // automatically focus on the "key" input for newest row
-    if (dataIndex === "key" && record?.key === "" && inputRef.current) {
+    // don't focus on key input for table in /new route
+    if (
+      dataIndex === "key" &&
+      record?.key === "" &&
+      inputRef.current &&
+      !location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE)
+    ) {
       inputRef.current.focus();
     }
-  }, [dataIndex, record?.key]);
+  }, [dataIndex, record?.key, location.pathname]);
 
   const getPlaceholderText = useCallback((dataIndex: string) => {
     if (dataIndex === "key") {

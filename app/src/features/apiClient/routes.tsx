@@ -4,6 +4,7 @@ import ApiClientFeatureContainer from "./container";
 import { APIClient } from "./screens/apiClient/APIClient";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { EnvironmentView } from "./screens/environment/environmentView";
+import { EmptyEnvironmentView } from "./screens/environment/components/emptyEnvironmentView/EmptyEnvironmentView";
 
 export const apiClientRoutes: RouteObject[] = [
   {
@@ -21,6 +22,10 @@ export const apiClientRoutes: RouteObject[] = [
       {
         path: PATHS.API_CLIENT.HISTORY.INDEX,
         element: <APIClient />,
+      },
+      {
+        path: PATHS.API_CLIENT.ENVIRONMENTS.INDEX,
+        element: <EmptyEnvironmentView />,
       },
       {
         path: PATHS.API_CLIENT.ENVIRONMENTS.INDEX + "/:envId",

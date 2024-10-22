@@ -62,22 +62,13 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       fetchAllEnvironmentDetails(ownerId)
         .then((environmentMap) => {
           dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
-
-          // if there are no environments, create a default one
-          if (Object.keys(environmentMap).length === 0) {
-            addNewEnvironment("Default").then((defaultEnv) => {
-              if (defaultEnv) {
-                setCurrentEnvironment(defaultEnv.id);
-              }
-            });
-          } else if (!currentEnvironmentId) {
+          if (!currentEnvironmentId && Object.keys(environmentMap).length > 0) {
             // if there is no active environment, set the first environment as the active environment
             const defaultEnvironment = Object.keys(environmentMap)[0];
             setCurrentEnvironment(defaultEnvironment);
           }
         })
         .catch((err) => {
-          console.log("Error while fetching all environment variables", err);
           Logger.error("Error while fetching all environment variables", err);
           dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: {} }));
         })

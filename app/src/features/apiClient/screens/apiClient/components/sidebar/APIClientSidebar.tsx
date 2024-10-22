@@ -11,6 +11,8 @@ import { HistoryList } from "./historyList/HistoryList";
 import { ApiClientSidebarHeader } from "./apiClientSidebarHeader/ApiClientSidebarHeader";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import "./apiClientSidebar.scss";
 
 interface Props {
@@ -35,6 +37,7 @@ const APIClientSidebar: React.FC<Props> = ({
   onImportClick,
 }) => {
   const location = useLocation();
+  const user = useSelector(getUserAuthDetails);
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const { getCurrentEnvironment } = useEnvironmentManager();
   const { currentEnvironmentId } = getCurrentEnvironment();
@@ -69,7 +72,7 @@ const APIClientSidebar: React.FC<Props> = ({
       label: (
         <Tooltip title="Environments" placement="right">
           <NavLink
-            to={PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE + `/${currentEnvironmentId || "new"}`}
+            to={PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE + `${user.loggedIn ? `/${currentEnvironmentId}` : ""}`}
             className={({ isActive }) => `${isActive ? "active" : ""} api-client-tab-link`}
           >
             <MdHorizontalSplit />

@@ -1,5 +1,5 @@
 .variables-list-header {
-  .variables-list-breadcrumb {
+  .env-view-breadcrumb {
     display: flex;
     gap: 4px;
     font-size: var(--requestly-font-size-xs, 11px);
@@ -11,14 +11,15 @@
       color: var(--requestly-color-text-subtle);
     }
 
-    .variables-list-breadcrumb-1 {
+    .env-view-breadcrumb-1 {
       color: var(--requestly-color-text-subtle);
     }
-    .variables-list-breadcrumb-2 {
+    .env-view-breadcrumb-2 {
       color: var(--requestly-color-text-default);
       font-weight: 500;
     }
   }
+
   .variables-list-search-input {
     margin-top: 8px;
     width: 200px;

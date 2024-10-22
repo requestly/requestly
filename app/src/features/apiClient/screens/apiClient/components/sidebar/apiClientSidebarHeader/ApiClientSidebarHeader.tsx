@@ -1,5 +1,4 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import { Dropdown, Tooltip } from "antd";
 import { DropdownProps } from "reactstrap";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
@@ -10,7 +9,6 @@ import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { ApiClientSidebarTabKey } from "../APIClientSidebar";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
-import { getUserAuthDetails } from "store/selectors";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -32,7 +30,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   history,
   onClearHistory,
 }) => {
-  const user = useSelector(getUserAuthDetails);
   const items: DropdownProps["menu"]["items"] = [
     {
       key: DropdownOption.REQUEST,
@@ -93,7 +90,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         </RQButton>
       ) : null}
 
-      {user.loggedIn && <EnvironmentSwitcher />}
+      <EnvironmentSwitcher />
     </div>
   );
 };
