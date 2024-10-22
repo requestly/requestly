@@ -112,76 +112,88 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     }
   }, [dispatch, user.loggedIn]);
 
-  const getCurrentEnvironment = () => {
+  const getCurrentEnvironment = useCallback(() => {
     return {
       currentEnvironmentName: allEnvironmentData[currentEnvironmentId]?.name,
       currentEnvironmentId,
     };
-  };
+  }, [allEnvironmentData, currentEnvironmentId]);
 
-  const setVariables = async (
-    environmentId: string,
-    variables: Record<string, Omit<EnvironmentVariableValue, "type">>
-  ) => {
-    const newVariables: EnvironmentVariables = Object.fromEntries(
-      Object.entries(variables).map(([key, value]) => {
-        return [key, { localValue: value.localValue, syncValue: value.syncValue, type: typeof value.syncValue }];
-      })
-    );
+  const setVariables = useCallback(
+    async (environmentId: string, variables: Record<string, Omit<EnvironmentVariableValue, "type">>) => {
+      const newVariables: EnvironmentVariables = Object.fromEntries(
+        Object.entries(variables).map(([key, value]) => {
+          return [key, { localValue: value.localValue, syncValue: value.syncValue, type: typeof value.syncValue }];
+        })
+      );
 
-    return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariables)
-      .then(() => {
-        dispatch(
-          environmentVariablesActions.setVariablesInEnvironment({
-            newVariables,
-            environmentId,
-          })
-        );
-      })
-      .catch((err) => {
-        toast.error("Error while setting environment variables.");
-        Logger.error("Error while setting environment variables in db", err);
-        console.error("Error while setting environment variables in db", err);
-      });
-  };
+      return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariables)
+        .then(() => {
+          dispatch(
+            environmentVariablesActions.setVariablesInEnvironment({
+              newVariables,
+              environmentId,
+            })
+          );
+        })
+        .catch((err) => {
+          toast.error("Error while setting environment variables.");
+          Logger.error("Error while setting environment variables in db", err);
+          console.error("Error while setting environment variables in db", err);
+        });
+    },
+    [ownerId, dispatch]
+  );
 
-  const removeVariable = async (environmentId: string, key: string) => {
-    return removeEnvironmentVariableFromDB(ownerId, { environmentId, key })
-      .then(() => {
-        dispatch(environmentVariablesActions.removeVariableFromEnvironment({ key, environmentId }));
-      })
-      .catch((err) => {
-        toast.error("Error while removing environment variables.");
-        Logger.error("Error while removing environment variables from db", err);
-        console.error("Error while removing environment variables from db", err);
-      });
-  };
+  const removeVariable = useCallback(
+    async (environmentId: string, key: string) => {
+      return removeEnvironmentVariableFromDB(ownerId, { environmentId, key })
+        .then(() => {
+          dispatch(environmentVariablesActions.removeVariableFromEnvironment({ key, environmentId }));
+        })
+        .catch((err) => {
+          toast.error("Error while removing environment variables.");
+          Logger.error("Error while removing environment variables from db", err);
+          console.error("Error while removing environment variables from db", err);
+        });
+    },
+    [ownerId, dispatch]
+  );
 
-  const renderVariables = <T>(template: string | Record<string, any>): T => {
-    const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId].variables;
-    return renderTemplate(template, currentEnvironmentVariables);
-  };
+  const renderVariables = useCallback(
+    <T>(template: string | Record<string, any>): T => {
+      const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId].variables;
+      return renderTemplate(template, currentEnvironmentVariables);
+    },
+    [allEnvironmentData, currentEnvironmentId]
+  );
 
-  const getEnvironmentVariables = (environmentId: string) => {
-    return allEnvironmentData[environmentId]?.variables ?? {};
-  };
+  const getEnvironmentVariables = useCallback(
+    (environmentId: string) => {
+      return allEnvironmentData[environmentId]?.variables ?? {};
+    },
+    [allEnvironmentData]
+  );
 
-  const getCurrentEnvironmentVariables = () => {
+  const getCurrentEnvironmentVariables = useCallback(() => {
     return allEnvironmentData[currentEnvironmentId]?.variables ?? {};
-  };
+  }, [allEnvironmentData, currentEnvironmentId]);
 
-  const getAllEnvironments = () => {
+  const getAllEnvironments = useCallback(() => {
     return Object.keys(allEnvironmentData).map((key) => {
       return {
         id: key,
         name: allEnvironmentData[key].name,
       };
     });
-  };
+  }, [allEnvironmentData]);
 
-  const getEnvironmentName = (environmentId: string) => {
-    return allEnvironmentData[environmentId]?.name;
-  };
+  const getEnvironmentName = useCallback(
+    (environmentId: string) => {
+      return allEnvironmentData[environmentId]?.name;
+    },
+    [allEnvironmentData]
+  );
 
   return {
     setCurrentEnvironment,

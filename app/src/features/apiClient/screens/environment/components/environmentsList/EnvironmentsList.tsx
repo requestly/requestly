@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import { Input, Tooltip } from "antd";
+import { Input, Tooltip, Typography } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../../../apiClient/components/sidebar/components/sidebarListHeader/SidebarListHeader";
 import { redirectToEnvironment, redirectToNewEnvironment } from "utils/RedirectionUtils";
@@ -19,13 +19,14 @@ export const EnvironmentsList = () => {
   const location = useLocation();
   const user = useSelector(getUserAuthDetails);
   const { getAllEnvironments, getCurrentEnvironment, addNewEnvironment } = useEnvironmentManager();
-  const environments = getAllEnvironments();
   const { currentEnvironmentId } = getCurrentEnvironment();
   const [searchValue, setSearchValue] = useState("");
   const [isNewEnvironmentInputVisible, setIsNewEnvironmentInputVisible] = useState(false);
   const [newEnvironmentValue, setNewEnvironmentValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { envId } = useParams();
+
+  const environments = useMemo(() => getAllEnvironments(), [getAllEnvironments]);
 
   const handleAddEnvironmentClick = useCallback(() => {
     if (!user.loggedIn) {
@@ -94,7 +95,13 @@ export const EnvironmentsList = () => {
                 redirectToEnvironment(navigate, environment.id);
               }}
             >
-              <span>{environment.name}</span>
+              <Typography.Text
+                ellipsis={{
+                  tooltip: environment.name,
+                }}
+              >
+                {environment.name}
+              </Typography.Text>
               <Tooltip
                 overlayClassName="active-environment-tooltip"
                 title="Active Environment"
