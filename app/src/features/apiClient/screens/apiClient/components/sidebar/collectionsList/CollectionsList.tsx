@@ -28,6 +28,7 @@ export const CollectionsList: React.FC<Props> = ({
     const collections: Record<RQAPI.CollectionRecord["id"], RQAPI.CollectionRecord> = {};
     const requests: RQAPI.ApiRecord[] = [];
 
+    // TODO: improve logic
     records.forEach((record) => {
       if (isApiCollection(record)) {
         collections[record.id] = { ...record, data: { ...record.data, children: [] } };
