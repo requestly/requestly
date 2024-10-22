@@ -33,7 +33,6 @@ const deleteApiRecordsFromFirebase = async (
         recordRef,
         {
           deleted: true,
-          collectionId: "",
           updatedBy: uid,
           updatedTs: Timestamp.now().toMillis(),
         },
