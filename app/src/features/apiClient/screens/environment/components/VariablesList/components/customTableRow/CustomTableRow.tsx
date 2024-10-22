@@ -1,5 +1,5 @@
 import { Form, FormInstance, Input, InputNumber, Select } from "antd";
-import React, { useCallback, useContext, useMemo, useRef, useEffect, useState } from "react";
+import React, { useCallback, useContext, useMemo, useRef, useEffect } from "react";
 import { EnvironmentVariableTableRow } from "../../VariablesList";
 import { EnvironmentVariableType } from "backend/environment/types";
 import debounce from "lodash/debounce";
@@ -40,8 +40,6 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 }) => {
   const form = useContext(EditableContext)!;
   const inputRef = useRef(null);
-  // To Maintain the focus state gof the cell being edited after table re-renders
-  const [editing, setEditing] = useState(false);
 
   const convertValueByType = useCallback((value: any, type: EnvironmentVariableType) => {
     switch (type) {
@@ -74,7 +72,6 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   const handleChange = useCallback(
     (value: string | number | boolean) => {
       form.setFieldsValue({ [dataIndex]: value });
-      setEditing(true);
       if (dataIndex === "type") {
         handleSaveVariable({ ...record, [dataIndex]: value, syncValue: "", localValue: "" }, dataIndex);
         form.setFieldsValue({ syncValue: "", localValue: "" });
@@ -86,10 +83,11 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   );
 
   useEffect(() => {
-    if (editing && inputRef.current) {
+    // automatically focus on the "key" input for newest row
+    if (dataIndex === "key" && record?.key === "" && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [editing]);
+  }, [dataIndex, record?.key]);
 
   const getPlaceholderText = useCallback((dataIndex: string) => {
     if (dataIndex === "key") {
@@ -105,9 +103,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           <Input
             ref={inputRef}
             onChange={(e) => handleChange(e.target.value)}
-            onBlur={() => setEditing(false)}
             placeholder={getPlaceholderText(dataIndex)}
-            autoFocus={editing}
           />
         );
       case EnvironmentVariableType.Number:
@@ -117,9 +113,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             controls={false}
             ref={inputRef}
             onChange={(value) => handleChange(value)}
-            onBlur={() => setEditing(false)}
             placeholder={getPlaceholderText(dataIndex)}
-            autoFocus={editing}
           />
         );
       case EnvironmentVariableType.Boolean:
@@ -130,7 +124,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           </Select>
         );
     }
-  }, [record, handleChange, editing, dataIndex, getPlaceholderText]);
+  }, [record, handleChange, dataIndex, getPlaceholderText]);
 
   if (!editable) {
     return <td {...restProps}>{children}</td>;
@@ -155,9 +149,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           <Input
             ref={inputRef}
             onChange={(e) => handleChange(e.target.value)}
-            onBlur={() => setEditing(false)}
             placeholder={getPlaceholderText(dataIndex)}
-            autoFocus={editing}
           />
         ) : (
           renderValueInputByType()
