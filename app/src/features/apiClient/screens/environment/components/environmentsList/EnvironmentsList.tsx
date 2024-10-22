@@ -59,6 +59,7 @@ export const EnvironmentsList = () => {
       const newEnvironment = await addNewEnvironment(newEnvironmentValue);
       if (newEnvironment) {
         if (environments.length === 0) {
+          // if there are no environments, set the new environment as the active environment
           setCurrentEnvironment(newEnvironment.id);
         }
         redirectToEnvironment(navigate, newEnvironment.id);
