@@ -142,6 +142,13 @@ For **payment/billing related issues**, feel free to contact us at [contact@requ
 
 Our mission is to help developers ship web and mobile apps faster and with confidence by giving them the tools to debug & resolve issues without external dependency.
 
+## 🎓 Student Program
+
+We're excited to support the next generation of developers by offering Requestly completely free for students. Whether you're just starting out or refining your skills, you'll have full access to all our tools at no cost.
+* **Easy sign-up**: Simply register with your student email. If you don't see your student email domain on our list, add your college domain as a PR in our open-source github repo
+* **Unlimited access**: Enjoy every feature of Requestly without any fees.
+* **No expiration**: Stay free for as long as you're a student.
+
 ## Contributors
 
 [![All Contributors](https://img.shields.io/github/all-contributors/requestly/requestly?color=ee8449&style=flat-square)](#contributors)
