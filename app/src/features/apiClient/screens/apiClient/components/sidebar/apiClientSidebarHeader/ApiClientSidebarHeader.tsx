@@ -142,7 +142,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         </RQButton>
       ) : null}
 
-      {user.loggedIn && <EnvironmentSwitcher />}
+      <EnvironmentSwitcher />
     </div>
   );
 };
