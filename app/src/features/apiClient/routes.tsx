@@ -3,6 +3,7 @@ import PATHS from "config/constants/sub/paths";
 import ApiClientFeatureContainer from "./container";
 import { APIClient } from "./screens/apiClient/APIClient";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
+import { EnvironmentView } from "./screens/environment/environmentView";
 
 export const apiClientRoutes: RouteObject[] = [
   {
@@ -20,6 +21,14 @@ export const apiClientRoutes: RouteObject[] = [
       {
         path: PATHS.API_CLIENT.HISTORY.INDEX,
         element: <APIClient />,
+      },
+      {
+        path: PATHS.API_CLIENT.ENVIRONMENTS.INDEX + "/:envId",
+        element: <ProtectedRoute component={EnvironmentView} />,
+      },
+      {
+        path: PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE,
+        element: <ProtectedRoute component={EnvironmentView} />,
       },
     ],
   },

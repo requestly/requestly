@@ -1,0 +1,17 @@
+.variables-list-view-container {
+  height: 100%;
+  display: flex;
+  flex: 0 0 auto;
+  background-color: var(--requestly-color-background);
+
+  .variables-list-view {
+    flex: auto;
+    width: 100%;
+    min-width: 0;
+    padding: 8px 16px;
+  }
+
+  .rq-content-list-table-container {
+    padding: 0;
+  }
+}

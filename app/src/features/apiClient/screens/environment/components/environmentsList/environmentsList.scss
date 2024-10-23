@@ -1,0 +1,49 @@
+.environments-list {
+  &-item {
+    color: var(--requestly-color-text-default);
+    padding: var(--space-2, 4px) var(--space-4, 8px);
+    border-radius: 4px;
+    transition: background-color 0.2s ease-in-out;
+    font-size: var(--requestly-font-size-xs);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+
+    svg {
+      position: relative;
+      top: 2px;
+      font-size: var(--requestly-font-size-sm);
+      color: var(--requestly-color-success);
+    }
+
+    &:hover {
+      background-color: var(--requestly-color-white-t-10);
+    }
+
+    &:not(:first-child) {
+      margin-top: var(--space-4, 8px);
+    }
+
+    &.active {
+      background-color: var(--requestly-color-white-t-10);
+    }
+  }
+
+  height: calc(100% - 50px);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.new-environment-input {
+  width: 220px;
+  margin-bottom: 8px;
+  font-size: var(--requestly-font-size-xs);
+  padding: var(--space-2, 4px) var(--space-4, 8px);
+}
+
+.active-environment-tooltip {
+  .ant-tooltip-inner {
+    background-color: var(--requestly-color-black);
+  }
+}

@@ -10,6 +10,20 @@ const initialState = {
 
 const resetState = (): InitialState => initialState;
 
+const addNewEnvironment = (
+  state: InitialState,
+  action: PayloadAction<{
+    id: string;
+    name: string;
+  }>
+) => {
+  state.environments[action.payload.id] = {
+    id: action.payload.id,
+    variables: {},
+    name: action.payload.name,
+  };
+};
+
 const setCurrentEnvironment = (
   state: InitialState,
   action: PayloadAction<{
@@ -41,6 +55,8 @@ const setAllEnvironmentData = (
     });
   }
 
+  console.log("!!!debug", "updatedEnvironments", updatedEnvironments, state);
+
   state.environments = updatedEnvironments;
 };
 
@@ -51,11 +67,7 @@ const setVariablesInEnvironment = (
     environmentId: string;
   }>
 ) => {
-  const currentEnvironmentVariables = state.environments[action.payload.environmentId].variables;
-
-  const updatedVariables = mergeLocalAndSyncVariables(currentEnvironmentVariables, action.payload.newVariables);
-
-  state.environments[action.payload.environmentId].variables = updatedVariables;
+  state.environments[action.payload.environmentId].variables = action.payload.newVariables;
 };
 
 const removeVariableFromEnvironment = (
@@ -69,11 +81,12 @@ const removeVariableFromEnvironment = (
 };
 
 const environmentVariablesReducerFunctions = {
+  addNewEnvironment,
   resetState,
-  setAllEnvironmentData,
-  setVariablesInEnvironment,
   removeVariableFromEnvironment,
+  setAllEnvironmentData,
   setCurrentEnvironment,
+  setVariablesInEnvironment,
 };
 
 export { initialState };
