@@ -40,7 +40,7 @@ const useEnvironmentManager = () => {
         Logger.error("Error while fetching all environment variables", err);
         dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: {} }));
       });
-  });
+  }, [dispatch, ownerId]);
 
   useEffect(() => {
     unsubscribeListener?.();
@@ -56,7 +56,7 @@ const useEnvironmentManager = () => {
     }
 
     return () => {
-      unsubscribeListener();
+      unsubscribeListener?.();
     };
   }, [currentEnvironmentId, dispatch, ownerId]);
 
@@ -123,7 +123,7 @@ const useEnvironmentManager = () => {
   };
 
   const renderVariables = <T>(template: string | Record<string, any>): T => {
-    const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId].variables;
+    const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId]?.variables;
     return renderTemplate(template, currentEnvironmentVariables);
   };
 
