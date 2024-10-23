@@ -70,7 +70,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     }
   }, [form, record, handleSaveVariable, convertValueByType, dataIndex]);
 
-  const debouncedSave = useMemo(() => debounce(handleSaveCellValue, 2000), [handleSaveCellValue]);
+  const debouncedSave = useMemo(() => debounce(handleSaveCellValue, 1000), [handleSaveCellValue]);
 
   const handleChange = useCallback(
     (value: string | number | boolean) => {

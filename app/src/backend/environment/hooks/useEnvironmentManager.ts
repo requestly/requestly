@@ -61,12 +61,11 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       setIsLoading(true);
       fetchAllEnvironmentDetails(ownerId)
         .then((environmentMap) => {
-          dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
-          if (!currentEnvironmentId && Object.keys(environmentMap).length > 0) {
-            // if there is no active environment, set the first environment as the active environment
-            const defaultEnvironment = Object.keys(environmentMap)[0];
-            setCurrentEnvironment(defaultEnvironment);
+          if (Object.keys(environmentMap).length > 0 && !environmentMap[currentEnvironmentId]) {
+            // setting the first environment as the current environment if the current environment is not found in environmentMap
+            setCurrentEnvironment(Object.keys(environmentMap)[0]);
           }
+          dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
         })
         .catch((err) => {
           Logger.error("Error while fetching all environment variables", err);

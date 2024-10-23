@@ -12,14 +12,14 @@ import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
 import { MdDisplaySettings } from "@react-icons/all-files/md/MdDisplaySettings";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
-import { EnvironmentsSidebar } from "../environmentsSidebar/EnvironmentsSidebar";
+import { Skeleton } from "antd";
 import "./emptyEnvironmentView.scss";
 
 export const EmptyEnvironmentView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const { getAllEnvironments } = useEnvironmentManager();
+  const { getAllEnvironments, isEnvironmentsLoading } = useEnvironmentManager();
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const environments = getAllEnvironments();
 
@@ -52,25 +52,28 @@ export const EmptyEnvironmentView = () => {
   }, [environments, currentEnvironmentId, navigate]);
 
   return (
-    <div className="empty-environment-view-container">
-      <EnvironmentsSidebar />
-      <div className="empty-environment-view">
-        <div className="env-view-breadcrumb">
-          <MdDisplaySettings />
-          <span className="env-view-breadcrumb-1">
-            API Client <MdOutlineChevronRight />
-          </span>
-          <span className="env-view-breadcrumb-1">Environments</span>
-        </div>
-        <div className="empty-environment-view-content">
-          <img src={emptyEnvironmentViewImage} alt="empty environment" />
-          <div className="empty-environment-view-title">No environment created yet</div>
-          <p>You haven't set up an environment yet. Once you create one, it'll appear here.</p>
-          <RQButton type="primary" onClick={handleCreateNewEnvironment}>
-            Create new environment
-          </RQButton>
-        </div>
-      </div>
+    <div className="empty-environment-view">
+      {isEnvironmentsLoading ? (
+        <Skeleton active />
+      ) : (
+        <>
+          <div className="env-view-breadcrumb">
+            <MdDisplaySettings />
+            <span className="env-view-breadcrumb-1">
+              API Client <MdOutlineChevronRight />
+            </span>
+            <span className="env-view-breadcrumb-1">Environments</span>
+          </div>
+          <div className="empty-environment-view-content">
+            <img src={emptyEnvironmentViewImage} alt="empty environment" />
+            <div className="empty-environment-view-title">No environment created yet</div>
+            <p>You haven't set up an environment yet. Once you create one, it'll appear here.</p>
+            <RQButton type="primary" onClick={handleCreateNewEnvironment}>
+              Create new environment
+            </RQButton>
+          </div>
+        </>
+      )}
     </div>
   );
 };

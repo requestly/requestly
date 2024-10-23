@@ -122,6 +122,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
 
   useEffect(() => {
     if (!isTableLoaded) {
+      setDataSource([]);
       setIsTableLoaded(true);
       const variables = getEnvironmentVariables(currentEnvironmentId);
       const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(

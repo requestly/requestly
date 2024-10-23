@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Skeleton } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { VariablesList } from "./components/VariablesList/VariablesList";
-import { VariablesListHeader } from "./components/VariablesListHeader/VariablesListHeader";
-import { EnvironmentsSidebar } from "./components/environmentsSidebar/EnvironmentsSidebar";
+import { VariablesList } from "../VariablesList/VariablesList";
+import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
 import PATHS from "config/constants/sub/paths";
 import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
@@ -15,18 +14,9 @@ export const EnvironmentView = () => {
   const location = useLocation();
   const { isEnvironmentsLoading, getEnvironmentName, getAllEnvironments } = useEnvironmentManager();
   const user = useSelector(getUserAuthDetails);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
   const { envId } = useParams();
   const environmentName = getEnvironmentName(envId);
-
-  useEffect(() => {
-    if (isEnvironmentsLoading) {
-      setIsLoading(true);
-    } else {
-      setIsLoading(false);
-    }
-  }, [isEnvironmentsLoading]);
 
   useEffect(() => {
     if (!isEnvironmentsLoading) {
@@ -41,20 +31,21 @@ export const EnvironmentView = () => {
     }
   }, [getAllEnvironments, navigate, isEnvironmentsLoading, user.loggedIn, envId, location.pathname]);
 
-  if (isLoading) {
-    return <Skeleton active />;
-  }
-
   return (
     <div className="variables-list-view-container">
-      <EnvironmentsSidebar />
       <div className="variables-list-view">
-        <VariablesListHeader
-          searchValue={searchValue}
-          onSearchValueChange={setSearchValue}
-          currentEnvironmentName={environmentName}
-        />
-        <VariablesList searchValue={searchValue} currentEnvironmentId={envId} />
+        {isEnvironmentsLoading ? (
+          <Skeleton active />
+        ) : (
+          <>
+            <VariablesListHeader
+              searchValue={searchValue}
+              onSearchValueChange={setSearchValue}
+              currentEnvironmentName={environmentName}
+            />
+            <VariablesList searchValue={searchValue} currentEnvironmentId={envId} />
+          </>
+        )}
       </div>
     </div>
   );

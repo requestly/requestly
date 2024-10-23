@@ -3,8 +3,9 @@ import PATHS from "config/constants/sub/paths";
 import ApiClientFeatureContainer from "./container";
 import { APIClient } from "./screens/apiClient/APIClient";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
-import { EnvironmentView } from "./screens/environment/environmentView";
+import { EnvironmentView } from "./screens/environment/components/environmentView/EnvironmentView";
 import { EmptyEnvironmentView } from "./screens/environment/components/emptyEnvironmentView/EmptyEnvironmentView";
+import { EnvironmentContainer } from "./screens/environment/container";
 
 export const apiClientRoutes: RouteObject[] = [
   {
@@ -25,15 +26,21 @@ export const apiClientRoutes: RouteObject[] = [
       },
       {
         path: PATHS.API_CLIENT.ENVIRONMENTS.INDEX,
-        element: <EmptyEnvironmentView />,
-      },
-      {
-        path: PATHS.API_CLIENT.ENVIRONMENTS.INDEX + "/:envId",
-        element: <EnvironmentView />,
-      },
-      {
-        path: PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE,
-        element: <EnvironmentView />,
+        element: <EnvironmentContainer />,
+        children: [
+          {
+            index: true,
+            element: <EmptyEnvironmentView />,
+          },
+          {
+            path: PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE + "/:envId",
+            element: <EnvironmentView />,
+          },
+          {
+            path: PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE,
+            element: <EnvironmentView />,
+          },
+        ],
       },
     ],
   },
