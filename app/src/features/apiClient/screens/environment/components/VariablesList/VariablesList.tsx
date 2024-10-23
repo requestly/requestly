@@ -165,6 +165,9 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
       handleAddNewRow(dataSource);
     }
   };
+  if (!isTableLoaded) {
+    return null;
+  }
 
   return (
     <ContentListTable
