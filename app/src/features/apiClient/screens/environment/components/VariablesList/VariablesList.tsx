@@ -35,7 +35,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   );
 
   const handleSaveVariable = useCallback(
-    (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
+    async (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
       if (!user.loggedIn) {
         return;
       }
@@ -76,7 +76,8 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
             return acc;
           }, {});
 
-          setVariables(currentEnvironmentId, variablesToSave);
+          await setVariables(currentEnvironmentId, variablesToSave);
+          setDataSource(variableRows);
           if (fieldChanged === "syncValue" || fieldChanged === "localValue") {
             trackVariableValueUpdated(fieldChanged, EnvironmentAnalyticsContext.API_CLIENT, variableRows.length);
           }
@@ -122,7 +123,6 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
 
   useEffect(() => {
     if (!isTableLoaded) {
-      setDataSource([]);
       setIsTableLoaded(true);
       const variables = getEnvironmentVariables(currentEnvironmentId);
       const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(
