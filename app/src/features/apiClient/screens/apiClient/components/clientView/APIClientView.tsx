@@ -248,7 +248,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     makeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
       .then((response) => {
         // TODO: Add an entry in history
-        const entryWithResponse = { ...renderedEntry, response };
+        const entryWithResponse = { ...sanitizedEntry, response };
+        const renderedEntryWithResponse = { ...renderedEntry, response };
+
         if (response) {
           setEntry(entryWithResponse);
           trackResponseLoaded({
@@ -263,7 +265,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
           trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
         }
-        notifyApiRequestFinished?.(entryWithResponse);
+        notifyApiRequestFinished?.(renderedEntryWithResponse);
       })
       .catch(() => {
         if (abortControllerRef.current?.signal.aborted) {
