@@ -38,7 +38,7 @@ const APIClientSidebar: React.FC<Props> = ({
 }) => {
   const location = useLocation();
   const user = useSelector(getUserAuthDetails);
-  const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
+  const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(null);
   const { getCurrentEnvironment } = useEnvironmentManager();
   const { currentEnvironmentId } = getCurrentEnvironment();
 

@@ -11,8 +11,8 @@ import PATHS from "config/constants/sub/paths";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
-import "./environmentsList.scss";
 import { EmptyState } from "./components/emptyState/EmptyState";
+import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
   const dispatch = useDispatch();
@@ -79,79 +79,78 @@ export const EnvironmentsList = () => {
     }
   }, [location.pathname, user.loggedIn]);
 
-  if (environments?.length === 0) {
-    if (isNewEnvironmentInputVisible) {
-      return (
-        <div className="mt-16">
-          <Input
-            autoFocus
-            className="new-environment-input"
-            size="small"
-            placeholder="New Environment name"
-            disabled={isLoading}
-            onChange={(e) => setNewEnvironmentValue(e.target.value)}
-            onPressEnter={handleAddNewEnvironment}
-            onBlur={handleAddNewEnvironment}
-          />
-        </div>
-      );
-    }
-    return (
-      <EmptyState
-        onNewRecordClick={() => redirectToNewEnvironment(navigate)}
-        message="No environment created yet"
-        newRecordBtnText="Create new environment"
-        analyticEventSource="environments_list"
-      />
-    );
-  }
-
   return (
     <div style={{ height: "inherit" }}>
-      <SidebarListHeader onAddRecordClick={handleAddEnvironmentClick} onSearch={(value) => setSearchValue(value)} />
-      {/* TODO: Use input component from collections support PR */}
-      {isNewEnvironmentInputVisible && (
-        <Input
-          autoFocus
-          className="new-environment-input"
-          size="small"
-          placeholder="New Environment name"
-          disabled={isLoading}
-          onChange={(e) => setNewEnvironmentValue(e.target.value)}
-          onPressEnter={handleAddNewEnvironment}
-          onBlur={handleAddNewEnvironment}
-        />
+      {environments?.length === 0 ? (
+        isNewEnvironmentInputVisible ? (
+          <div className="mt-16">
+            <Input
+              autoFocus
+              className="new-environment-input"
+              size="small"
+              placeholder="New Environment name"
+              disabled={isLoading}
+              onChange={(e) => setNewEnvironmentValue(e.target.value)}
+              onPressEnter={handleAddNewEnvironment}
+              onBlur={handleAddNewEnvironment}
+            />
+          </div>
+        ) : (
+          <EmptyState
+            onNewRecordClick={() => redirectToNewEnvironment(navigate)}
+            message="No environment created yet"
+            newRecordBtnText="Create new environment"
+            analyticEventSource="environments_list"
+          />
+        )
+      ) : (
+        <>
+          <SidebarListHeader onAddRecordClick={handleAddEnvironmentClick} onSearch={(value) => setSearchValue(value)} />
+          {/* TODO: Use input component from collections support PR */}
+          {isNewEnvironmentInputVisible && (
+            <Input
+              autoFocus
+              className="new-environment-input"
+              size="small"
+              placeholder="New Environment name"
+              disabled={isLoading}
+              onChange={(e) => setNewEnvironmentValue(e.target.value)}
+              onPressEnter={handleAddNewEnvironment}
+              onBlur={handleAddNewEnvironment}
+            />
+          )}
+          <div className="environments-list">
+            {environments.map((environment) =>
+              environment.name.toLowerCase().includes(searchValue.toLowerCase()) ? (
+                <div
+                  key={environment.id}
+                  className={`environments-list-item ${environment.id === envId ? "active" : ""}`}
+                  onClick={() => {
+                    redirectToEnvironment(navigate, environment.id);
+                  }}
+                >
+                  <Typography.Text
+                    ellipsis={{
+                      tooltip: environment.name,
+                    }}
+                  >
+                    {environment.name}
+                  </Typography.Text>
+                  <Tooltip
+                    overlayClassName="active-environment-tooltip"
+                    title="Active Environment"
+                    placement="top"
+                    showArrow={false}
+                  >
+                    <span>{environment.id === currentEnvironmentId ? <MdOutlineCheckCircle /> : ""}</span>
+                  </Tooltip>
+                </div>
+              ) : null
+            )}
+          </div>
+          {/* TODO: use empty state component from collections support PR */}
+        </>
       )}
-      <div className="environments-list">
-        {environments.map((environment) =>
-          environment.name.toLowerCase().includes(searchValue.toLowerCase()) ? (
-            <div
-              key={environment.id}
-              className={`environments-list-item ${environment.id === envId ? "active" : ""}`}
-              onClick={() => {
-                redirectToEnvironment(navigate, environment.id);
-              }}
-            >
-              <Typography.Text
-                ellipsis={{
-                  tooltip: environment.name,
-                }}
-              >
-                {environment.name}
-              </Typography.Text>
-              <Tooltip
-                overlayClassName="active-environment-tooltip"
-                title="Active Environment"
-                placement="top"
-                showArrow={false}
-              >
-                <span>{environment.id === currentEnvironmentId ? <MdOutlineCheckCircle /> : ""}</span>
-              </Tooltip>
-            </div>
-          ) : null
-        )}
-      </div>
-      {/* TODO: use empty state component from collections support PR */}
     </div>
   );
 };
