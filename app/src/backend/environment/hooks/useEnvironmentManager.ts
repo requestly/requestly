@@ -152,7 +152,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
 
   const renderVariables = useCallback(
     <T>(template: string | Record<string, any>): T => {
-      const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId].variables;
+      const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId]?.variables;
       return renderTemplate(template, currentEnvironmentVariables);
     },
     [allEnvironmentData, currentEnvironmentId]
