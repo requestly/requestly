@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { RQAPI } from "../../../../types";
 import { NavLink, useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
@@ -19,7 +19,7 @@ interface Props {
   history?: RQAPI.Entry[];
   onSelectionFromHistory?: (index: number) => void;
   clearHistory?: () => void;
-  onNewClick?: () => void;
+  onNewClick?: (src: RQAPI.AnalyticsEventSource) => void;
   onImportClick?: () => void;
 }
 
@@ -41,6 +41,25 @@ const APIClientSidebar: React.FC<Props> = ({
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(null);
   const { getCurrentEnvironment } = useEnvironmentManager();
   const { currentEnvironmentId } = getCurrentEnvironment();
+  const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
+  const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
+
+  const hideNewRecordNameInput = () => {
+    setIsNewRecordNameInputVisible(false);
+    setRecordTypeToBeCreated(null);
+  };
+
+  const handleNewRecordClick = useCallback(
+    (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
+      setIsNewRecordNameInputVisible(true);
+      setRecordTypeToBeCreated(recordType);
+
+      if (recordType === RQAPI.RecordType.API) {
+        onNewClick(analyticEventSource);
+      }
+    },
+    [onNewClick]
+  );
 
   useEffect(() => {
     if (location.pathname.includes(PATHS.API_CLIENT.HISTORY.ABSOLUTE)) {
@@ -65,7 +84,14 @@ const APIClientSidebar: React.FC<Props> = ({
           </NavLink>
         </Tooltip>
       ),
-      children: <CollectionsList />,
+      children: (
+        <CollectionsList
+          onNewClick={onNewClick}
+          recordTypeToBeCreated={recordTypeToBeCreated}
+          isNewRecordNameInputVisible={isNewRecordNameInputVisible}
+          hideNewRecordNameInput={hideNewRecordNameInput}
+        />
+      ),
     },
     {
       key: ApiClientSidebarTabKey.ENVIRONMENTS,
@@ -107,8 +133,8 @@ const APIClientSidebar: React.FC<Props> = ({
         activeTab={activeKey}
         history={history}
         onClearHistory={clearHistory}
-        onNewClick={onNewClick}
         onImportClick={onImportClick}
+        onNewClick={(recordType) => handleNewRecordClick(recordType, "api_client_sidebar_header")}
       />
 
       <Tabs

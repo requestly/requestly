@@ -21,9 +21,12 @@ export interface KeyValuePair {
 }
 
 export namespace RQAPI {
+  export type AnalyticsEventSource = "collection_row" | "collection_list_empty_state" | "api_client_sidebar_header";
+
   export enum RecordType {
     API = "api",
     COLLECTION = "collection",
+    ENVIRONMENT = "environment",
   }
 
   export type RequestBody = string | KeyValuePair[]; // in case of form data, body will be key-value pairs
@@ -52,7 +55,7 @@ export namespace RQAPI {
   }
 
   export interface Collection {
-    children?: Record; // For now it will be a ApiRecord
+    children?: Record[];
   }
 
   interface RecordMetadata {
