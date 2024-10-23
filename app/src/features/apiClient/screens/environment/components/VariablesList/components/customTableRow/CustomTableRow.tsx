@@ -13,7 +13,7 @@ interface EditableCellProps {
   children: React.ReactNode;
   dataIndex: keyof EnvironmentVariableTableRow;
   record: EnvironmentVariableTableRow;
-  handleSaveVariable: (record: EnvironmentVariableTableRow, isVariableTypeChanged?: boolean) => void;
+  handleSaveVariable: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
   options?: string[];
 }
 
@@ -61,11 +61,11 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       updatedRecord.syncValue = convertValueByType(updatedRecord.syncValue, updatedRecord.type);
       updatedRecord.localValue = convertValueByType(updatedRecord.localValue, updatedRecord.type);
 
-      handleSaveVariable(updatedRecord);
+      handleSaveVariable(updatedRecord, dataIndex);
     } catch (errInfo) {
       Logger.log("Save failed:", errInfo);
     }
-  }, [form, record, handleSaveVariable, convertValueByType]);
+  }, [form, record, handleSaveVariable, convertValueByType, dataIndex]);
 
   const debouncedSave = useMemo(() => debounce(handleSaveCellValue, 2000), [handleSaveCellValue]);
 
@@ -73,7 +73,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     (value: string | number | boolean) => {
       form.setFieldsValue({ [dataIndex]: value });
       if (dataIndex === "type") {
-        handleSaveVariable({ ...record, [dataIndex]: value, syncValue: "", localValue: "" }, true);
+        handleSaveVariable({ ...record, [dataIndex]: value, syncValue: "", localValue: "" }, dataIndex);
         form.setFieldsValue({ syncValue: "", localValue: "" });
       } else {
         debouncedSave();
