@@ -5,12 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { actions } from "store";
 import { getUserAuthDetails } from "store/selectors";
 import { redirectToNewEnvironment } from "utils/RedirectionUtils";
+import { trackCreateEnvironmentClicked } from "../../analytics";
+import { RQAPI } from "features/apiClient/types";
 
 export const EnvironmentsSidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const handleNewEnvironmentClick = () => {
+  const handleNewEnvironmentClick = (source: RQAPI.AnalyticsEventSource) => {
     if (!user.loggedIn) {
       dispatch(
         actions.toggleActiveModal({
@@ -25,6 +27,7 @@ export const EnvironmentsSidebar = () => {
       );
     } else {
       redirectToNewEnvironment(navigate);
+      trackCreateEnvironmentClicked(source);
     }
   };
 

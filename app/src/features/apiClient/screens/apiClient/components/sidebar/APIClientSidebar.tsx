@@ -54,7 +54,7 @@ const APIClientSidebar: React.FC<Props> = ({
       setIsNewRecordNameInputVisible(true);
       setRecordTypeToBeCreated(recordType);
 
-      if (recordType === RQAPI.RecordType.API) {
+      if (recordType === RQAPI.RecordType.API || recordType === RQAPI.RecordType.ENVIRONMENT) {
         onNewClick(analyticEventSource);
       }
     },
