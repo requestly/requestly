@@ -22,6 +22,7 @@ import {
   trackRequestFailed,
   trackResponseLoaded,
   trackInstallExtensionDialogShown,
+  trackRequestSaved,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -235,8 +236,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     sanitizedEntry.response = null;
 
     const renderedRequest = renderVariables<RQAPI.Request>(sanitizedEntry.request);
-
-    console.log("!!!debug", "renderedRequest", renderedRequest);
+    const renderedEntry = { ...sanitizedEntry, request: renderedRequest };
 
     abortControllerRef.current = new AbortController();
 
@@ -248,7 +248,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     makeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
       .then((response) => {
         // TODO: Add an entry in history
-        const entryWithResponse = { ...sanitizedEntry, response };
+        const entryWithResponse = { ...renderedEntry, response };
         if (response) {
           setEntry(entryWithResponse);
           trackResponseLoaded({
@@ -276,11 +276,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       });
 
     trackAPIRequestSent({
-      method: sanitizedEntry.request.method,
-      queryParamsCount: sanitizedEntry.request.queryParams.length,
-      headersCount: sanitizedEntry.request.headers.length,
-      requestContentType: sanitizedEntry.request.contentType,
-      isDemoURL: sanitizedEntry.request.url === DEMO_API_URL,
+      method: renderedEntry.request.method,
+      queryParamsCount: renderedEntry.request.queryParams.length,
+      headersCount: renderedEntry.request.headers.length,
+      requestContentType: renderedEntry.request.contentType,
+      isDemoURL: renderedEntry.request.url === DEMO_API_URL,
       path: location.pathname,
     });
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
@@ -304,6 +304,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
 
+      trackRequestSaved("api_client_view");
       if (location.pathname.includes("history")) {
         navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`);
       }

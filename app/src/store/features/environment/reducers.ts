@@ -39,7 +39,6 @@ const setAllEnvironmentData = (
     environmentMap: EnvironmentMap;
   }>
 ) => {
-  console.log("!!!debug", "setAllEnvironmentData", action.payload.environmentMap);
   let updatedEnvironments: EnvironmentMap = {};
 
   if (Object.keys(state.environments).length === 0) {
