@@ -124,6 +124,7 @@ export const GA_EVENTS = {
     LICENSE: "licensekey",
     COMPANY: "company",
     REF: "ref",
+    COUNTRY: "country",
 
     DISPLAY_NAME: "display_name",
     PROFILE: "profile",

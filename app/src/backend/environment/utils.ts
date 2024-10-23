@@ -9,6 +9,10 @@ export const renderTemplate = (
   template: string | Record<string, any>,
   variables: Record<string, EnvironmentVariableValue> = {}
 ): any => {
+  if (!variables || Object.keys(variables).length === 0) {
+    return template;
+  }
+
   const parsedVariables = Object.entries(variables).reduce((envVars, [key, value]) => {
     envVars[key] = isEmpty(value.localValue) ? value.syncValue : value.localValue;
     return envVars;

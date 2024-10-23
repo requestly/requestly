@@ -98,6 +98,32 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     PRICING_QUANTITY_CHANGED: "pricing_quantity_changed",
   };
 
+  function debounce(func: Function, delay: number) {
+    let timer: NodeJS.Timeout;
+    return function debouncedFunction(...args: any[]) {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        func(...args);
+      }, delay);
+    };
+  }
+
+  const sendNotification = useCallback(
+    debounce((value: number) => {
+      if (user.loggedIn) {
+        const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
+        try {
+          salesInboundNotification({
+            notificationText: `${EVENTS.PRICING_QUANTITY_CHANGED} triggered with quantity ${value} for plan ${planName} and source ${source}`,
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }, 4000),
+    [planName, source, user.loggedIn]
+  );
+
   const handleQuantityChange = useCallback(
     (value: number) => {
       if (value < 1 || value > 1000) {
@@ -112,16 +138,10 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         });
         hasFiddledWithQuantity.current = true;
       }
-      const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
-      try {
-        salesInboundNotification({
-          notificationText: `${EVENTS.PRICING_QUANTITY_CHANGED} trigged with quantity ${value} for plan ${planName} and source ${source}`,
-        });
-      } catch (error) {
-        console.error(error);
-      }
+
+      sendNotification(value);
     },
-    [planName, source, user.loggedIn]
+    [sendNotification, planName, source, user.loggedIn]
   );
 
   return (
