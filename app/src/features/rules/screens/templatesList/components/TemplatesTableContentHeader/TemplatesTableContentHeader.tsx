@@ -1,5 +1,6 @@
 import React from "react";
 import { ContentListHeader } from "componentsV2/ContentList";
+import { RQBreadcrumb } from "lib/design-system-v2/components";
 import "./templatesTableContentHeader.scss";
 
 interface TemplatesTableContentHeaderProps {
@@ -13,11 +14,7 @@ export const TemplatesTableContentHeader: React.FC<TemplatesTableContentHeaderPr
 }) => {
   return (
     <>
-      <div className="templates-table-breadcrumb">
-        <div>
-          <span className="breadcrumb-1">Rules</span> {" > "} <span className="breadcrumb-2">Templates</span>
-        </div>
-      </div>
+      <RQBreadcrumb />
       <ContentListHeader searchValue={searchValue} setSearchValue={handleSearchValueUpdate} />
     </>
   );
