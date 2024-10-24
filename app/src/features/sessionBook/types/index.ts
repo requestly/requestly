@@ -84,6 +84,7 @@ export type SessionRecordingConfig = {
     isActive: boolean;
     mode: AutoRecordingMode;
   };
+  captureHeaders?: boolean;
 };
 
 export type SessionRecording = {
