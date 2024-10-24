@@ -19,7 +19,6 @@ export const highlightVariablesPlugin = (setters: VariableSetters) => {
         this.view = view;
         this.mousemove = (event: MouseEvent) => this.handleMousemove(event);
         view.dom.addEventListener("mousemove", this.mousemove);
-        view.dom.addEventListener("mouseleave", () => setters.setHoveredVariable(null));
       }
 
       update(update: ViewUpdate) {
@@ -56,9 +55,9 @@ export const highlightVariablesPlugin = (setters: VariableSetters) => {
 
       handleMousemove(event: MouseEvent) {
         const { clientX, clientY } = event;
-        const pos = this.view.posAtCoords({ x: clientX, y: clientY });
+        const pos = this.view.posAtCoords({ x: clientX, y: clientY }, false);
 
-        if (pos !== null) {
+        if (pos > 0 && pos < this.view.state.doc.toString().length) {
           const doc = this.view.state.doc;
 
           // Check if cursor is over any stored variable positions
@@ -67,7 +66,7 @@ export const highlightVariablesPlugin = (setters: VariableSetters) => {
           if (hoveredVar) {
             // If hovering over a variable, show popup
             const token = doc.sliceString(hoveredVar.start, hoveredVar.end);
-            const coords = this.view.coordsAtPos((hoveredVar.start + hoveredVar.end) / 2);
+            const coords = this.view.coordsAtPos(hoveredVar.start);
 
             const variable = token.slice(2, -2);
             setters.setHoveredVariable(variable);
@@ -78,6 +77,8 @@ export const highlightVariablesPlugin = (setters: VariableSetters) => {
           } else {
             setters.setHoveredVariable(null); // Hide popup if not hovering over a variable
           }
+        } else {
+          setters.setHoveredVariable(null);
         }
       }
 

@@ -356,7 +356,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             <RQSingleLineEditor
               className="api-request-url"
               placeholder="https://example.com"
-              value={entry.request.url}
+              // value={entry.request.url}
+              defaultValue={entry.request.url}
               onChange={(text) => setUrl(text)}
               onPressEnter={onUrlInputEnterPressed}
               onBlur={onUrlInputBlur}

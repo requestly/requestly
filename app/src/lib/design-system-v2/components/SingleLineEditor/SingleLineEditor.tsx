@@ -10,7 +10,7 @@ import { EnvironmentVariables, EnvironmentVariableValue } from "backend/environm
 
 interface RQSingleLineEditorProps {
   className?: string;
-  value?: string;
+  defaultValue?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
   onPressEnter?: (event: KeyboardEvent, text: string) => void;
@@ -19,7 +19,7 @@ interface RQSingleLineEditorProps {
 
 export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   className,
-  value,
+  defaultValue,
   onChange,
   placeholder,
   onPressEnter,
@@ -45,9 +45,8 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
     editorViewRef.current = new EditorView({
       parent: editorRef.current,
       state: EditorState.create({
-        doc: value ?? "",
+        doc: defaultValue ?? "",
         extensions: [
-          EditorView.lineWrapping, // Keep the editor single line
           EditorState.transactionFilter.of((tr) => {
             return tr.newDoc.lines > 1 ? [] : [tr]; // Prevent new lines
           }),
@@ -84,18 +83,18 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placeholder]);
 
-  useEffect(() => {
-    if (value && editorViewRef.current) {
-      console.log("!!!debug", "before dispatch", value);
-      editorViewRef.current?.dispatch({
-        changes: {
-          from: 0,
-          to: editorViewRef.current.state.doc.length,
-          insert: value,
-        },
-      });
-    }
-  }, [value]);
+  // useEffect(() => {
+  //   // if (value && editorViewRef.current) {
+  //   //   console.log("!!!debug", "before dispatch", value);
+  //   //   editorViewRef.current?.dispatch({
+  //   //     changes: {
+  //   //       from: 0,
+  //   //       to: editorViewRef.current.state.doc.length,
+  //   //       insert: value,
+  //   //     },
+  //   //   });
+  //   // }
+  // }, [value]);
 
   const addNewVariable = (newVariable: EnvironmentVariables) => {
     setVariables(currentEnvironmentId, {
