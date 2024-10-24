@@ -10,7 +10,7 @@ import {
   trackImportCurlClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
-import ImportRequestModal from "./components/modals/ImportRequestModal";
+import { DeleteApiRecordModal, ImportRequestModal } from "./components/modals";
 import { getApiRecord, upsertApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
 import { getUserAuthDetails } from "store/selectors";
@@ -29,7 +29,8 @@ export const APIClient: React.FC<Props> = () => {
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
-  const { onSaveRecord } = useApiClientContext();
+
+  const { onSaveRecord, recordToBeDeleted, isDeleteModalOpen, onDeleteModalClose } = useApiClientContext();
 
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
@@ -39,6 +40,32 @@ export const APIClient: React.FC<Props> = () => {
 
   useEffect(() => {
     if (!requestId || requestId === "new") {
+      return;
+    }
+
+    setSelectedEntry(null);
+    setIsLoading(true);
+
+    getApiRecord(requestId)
+      .then((result) => {
+        if (result.success) {
+          if (result.data.type === RQAPI.RecordType.API) {
+            setSelectedEntryDetails(result.data);
+          }
+        }
+      })
+      .catch((error) => {
+        setSelectedEntryDetails(null);
+        // TODO: redirect to new empty entry
+        Logger.error("Error loading api record", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [requestId]);
+
+  useEffect(() => {
+    if (!requestId) {
       return;
     }
 
@@ -119,12 +146,11 @@ export const APIClient: React.FC<Props> = () => {
     trackImportCurlClicked();
   }, []);
 
-  const onNewClick = useCallback(() => {
+  const onNewClick = useCallback((analyticEventSource: RQAPI.AnalyticsEventSource) => {
     setSelectedEntry(getEmptyAPIEntry());
     setSelectedEntryDetails(null);
-    redirectToRequest(navigate);
-    trackNewRequestClicked();
-  }, [navigate]);
+    trackNewRequestClicked(analyticEventSource);
+  }, []);
 
   const onSelectionFromHistory = useCallback(
     (index: number) => {
@@ -156,6 +182,8 @@ export const APIClient: React.FC<Props> = () => {
           handleImportRequest={handleImportRequest}
           onClose={() => setIsImportModalOpen(false)}
         />
+
+        <DeleteApiRecordModal open={isDeleteModalOpen} record={recordToBeDeleted} onClose={onDeleteModalClose} />
       </>
     </div>
   );

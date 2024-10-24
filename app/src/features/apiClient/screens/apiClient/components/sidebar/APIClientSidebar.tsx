@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { RQAPI } from "../../../../types";
 import { NavLink, useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
@@ -9,14 +9,17 @@ import { CollectionsList } from "./collectionsList/CollectionsList";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { HistoryList } from "./historyList/HistoryList";
 import { ApiClientSidebarHeader } from "./apiClientSidebarHeader/ApiClientSidebarHeader";
-import "./apiClientSidebar.scss";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
+import "./apiClientSidebar.scss";
 
 interface Props {
   history?: RQAPI.Entry[];
   onSelectionFromHistory?: (index: number) => void;
   clearHistory?: () => void;
-  onNewClick?: () => void;
+  onNewClick?: (src: RQAPI.AnalyticsEventSource) => void;
   onImportClick?: () => void;
 }
 
@@ -34,9 +37,29 @@ const APIClientSidebar: React.FC<Props> = ({
   onImportClick,
 }) => {
   const location = useLocation();
-  const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
+  const user = useSelector(getUserAuthDetails);
+  const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(null);
   const { getCurrentEnvironment } = useEnvironmentManager();
   const { currentEnvironmentId } = getCurrentEnvironment();
+  const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
+  const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
+
+  const hideNewRecordNameInput = () => {
+    setIsNewRecordNameInputVisible(false);
+    setRecordTypeToBeCreated(null);
+  };
+
+  const handleNewRecordClick = useCallback(
+    (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
+      setIsNewRecordNameInputVisible(true);
+      setRecordTypeToBeCreated(recordType);
+
+      if (recordType === RQAPI.RecordType.API || recordType === RQAPI.RecordType.ENVIRONMENT) {
+        onNewClick(analyticEventSource);
+      }
+    },
+    [onNewClick]
+  );
 
   useEffect(() => {
     if (location.pathname.includes(PATHS.API_CLIENT.HISTORY.ABSOLUTE)) {
@@ -61,21 +84,28 @@ const APIClientSidebar: React.FC<Props> = ({
           </NavLink>
         </Tooltip>
       ),
-      children: <CollectionsList />,
+      children: (
+        <CollectionsList
+          onNewClick={onNewClick}
+          recordTypeToBeCreated={recordTypeToBeCreated}
+          isNewRecordNameInputVisible={isNewRecordNameInputVisible}
+          hideNewRecordNameInput={hideNewRecordNameInput}
+        />
+      ),
     },
     {
       key: ApiClientSidebarTabKey.ENVIRONMENTS,
       label: (
         <Tooltip title="Environments" placement="right">
           <NavLink
-            to={PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE + `/${currentEnvironmentId}`}
+            to={PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE + `${user.loggedIn ? `/${currentEnvironmentId}` : ""}`}
             className={({ isActive }) => `${isActive ? "active" : ""} api-client-tab-link`}
           >
             <MdHorizontalSplit />
           </NavLink>
         </Tooltip>
       ),
-      children: <div>Environments list here</div>,
+      children: <EnvironmentsList />,
     },
     {
       key: ApiClientSidebarTabKey.HISTORY,
@@ -103,8 +133,8 @@ const APIClientSidebar: React.FC<Props> = ({
         activeTab={activeKey}
         history={history}
         onClearHistory={clearHistory}
-        onNewClick={onNewClick}
         onImportClick={onImportClick}
+        onNewClick={(recordType) => handleNewRecordClick(recordType, "api_client_sidebar_header")}
       />
 
       <Tabs
