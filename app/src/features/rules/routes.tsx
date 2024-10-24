@@ -50,35 +50,79 @@ export const ruleRoutes: RouteObject[] = [
   {
     path: `${PATHS.RULES.INDEX}`,
     element: <RulesContainerV2 />,
+    handle: {
+      breadcrumb: {
+        label: "Rules",
+        navigateTo: PATHS.RULES.INDEX,
+      },
+    },
     children: [
       {
         index: true,
         element: <Navigate to={PATHS.RULES.MY_RULES.RELATIVE} />,
+        handle: {
+          breadcrumb: {
+            label: "All",
+          },
+        },
       },
       {
         path: `${PATHS.RULES.MY_RULES.RELATIVE}`,
         element: <RulesListScreen />,
+        handle: {
+          breadcrumb: {
+            label: "All",
+          },
+        },
       },
       // TODO:  VV Needs Refractoring below this VV
       {
         path: joinPaths(PATHS.RULE_EDITOR.RELATIVE, PATHS.ANY),
         element: <RuleEditor />,
+        handle: {
+          breadcrumb: {
+            label: "Editor",
+            isEditable: true,
+          },
+        },
       },
       {
         path: joinPaths(PATHS.RULE_EDITOR.CREATE_RULE.RELATIVE, "/:ruleType"),
         element: <RuleEditor />,
+        handle: {
+          breadcrumb: {
+            label: "Create rule",
+          },
+        },
       },
       {
         path: PATHS.SHARED_LISTS.RELATIVE,
         element: <SharedListsScreen />,
+        handle: {
+          breadcrumb: {
+            label: "Shared lists",
+            navigateTo: PATHS.SHARED_LISTS.ABSOLUTE,
+          },
+        },
       },
       {
         path: joinPaths(PATHS.SHARED_LISTS.VIEWER.RELATIVE, PATHS.ANY),
         element: <SharedListViewerScreen />,
+        handle: {
+          breadcrumb: {
+            label: "Shared list viewer",
+          },
+        },
       },
       {
         path: PATHS.RULES.TEMPLATES.RELATIVE,
         element: <TemplatesList />,
+        handle: {
+          breadcrumb: {
+            label: "Templates",
+            navigateTo: PATHS.RULES.TEMPLATES.ABSOLUTE,
+          },
+        },
       },
     ],
   },
