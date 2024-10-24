@@ -6,15 +6,17 @@ import { HttpsRuleOptions } from "../HttpsRuleOptions";
 import { EVENT, sendEvent } from "../../events";
 import SessionRecordingView from "../SessionRecording/SessionRecordingView";
 import { getExtensionVersion } from "../../utils";
-import "./popup.css";
 import { BlockedExtensionView } from "../BlockedExtensionView/BlockedExtensionView";
 import DesktopAppProxy from "../DesktopAppProxy/DesktopAppProxy";
+import { ConnectedToDesktopView } from "../DesktopAppProxy/components/ConnectedToDesktopView/ConnectedToDesktopView";
+import "./popup.css";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
   const [isExtensionEnabled, setIsExtensionEnabled] = useState<boolean>(true);
   const [isBlockedOnTab, setIsBlockedOnTab] = useState<boolean>(false);
   const [currentTab, setCurrentTab] = useState<chrome.tabs.Tab>(null);
+  const [isProxyApplied, setIsProxyApplied] = useState<boolean>(false);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([activeTab]) => {
@@ -54,24 +56,31 @@ const Popup: React.FC = () => {
   return (
     <>
       <div className="popup">
-        <PopupHeader
-          isExtensionEnabled={isExtensionEnabled}
-          handleToggleExtensionStatus={handleToggleExtensionStatus}
-        />
-        <div className="popup-body">
-          {isBlockedOnTab ? (
-            <BlockedExtensionView />
-          ) : (
-            <>
-              {!isExtensionEnabled && <div className="extension-paused-overlay"></div>}
-              <div className="popup-content">
-                {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
-                <SessionRecordingView />
-                <DesktopAppProxy />
-              </div>
-            </>
-          )}
-        </div>
+        {isProxyApplied ? (
+          <ConnectedToDesktopView onDisconnect={() => setIsProxyApplied(false)} />
+        ) : (
+          <>
+            <PopupHeader
+              isExtensionEnabled={isExtensionEnabled}
+              handleToggleExtensionStatus={handleToggleExtensionStatus}
+            />
+            <div className="popup-body">
+              {isBlockedOnTab ? (
+                <BlockedExtensionView />
+              ) : (
+                <>
+                  {!isExtensionEnabled && <div className="extension-paused-overlay"></div>}
+                  <div className="popup-content">
+                    {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
+                    <SessionRecordingView />
+                    <DesktopAppProxy isProxyApplied={isProxyApplied} proxyAppliedChangeCallback={setIsProxyApplied} />
+                  </div>
+                </>
+              )}
+            </div>
+          </>
+        )}
+
         <div className="popup-footer">
           <div className="extension-version">v{getExtensionVersion()}</div>
         </div>

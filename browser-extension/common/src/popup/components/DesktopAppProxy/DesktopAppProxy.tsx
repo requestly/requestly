@@ -6,26 +6,23 @@ import { EXTENSION_MESSAGES } from "../../../constants";
 import ConnectToDesktopIcon from "../../../../resources/icons/connectToDesktop.svg";
 import "./desktopAppProxy.scss";
 
-const DesktopAppProxy: React.FC = () => {
-  const [isProxyApplied, setIsProxyApplied] = useState(false);
+interface DesktopAppProxyProps {
+  isProxyApplied: boolean;
+  proxyAppliedChangeCallback: (newStatus: boolean) => void;
+}
+
+const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ isProxyApplied, proxyAppliedChangeCallback }) => {
   const [isDesktopAppOpen, setIsDesktopAppOpen] = useState(false);
 
   const connectToDesktopApp = useCallback(() => {
     chrome.runtime
       .sendMessage({ action: EXTENSION_MESSAGES.CONNECT_TO_DESKTOP_APP })
-      .then(setIsProxyApplied)
-      .catch(() => setIsProxyApplied(false));
-  }, []);
-
-  const disconnectFromDesktopApp = useCallback(() => {
-    chrome.runtime
-      .sendMessage({ action: EXTENSION_MESSAGES.DISCONNECT_FROM_DESKTOP_APP })
-      .then((response) => setIsProxyApplied(!response))
-      .catch(() => setIsProxyApplied(true));
+      .then(proxyAppliedChangeCallback)
+      .catch(() => proxyAppliedChangeCallback(false));
   }, []);
 
   const checkIfProxyApplied = useCallback(() => {
-    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.IS_PROXY_APPLIED }).then(setIsProxyApplied);
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.IS_PROXY_APPLIED }).then(proxyAppliedChangeCallback);
   }, []);
 
   const checkIfDesktopAppOpen = useCallback(() => {
@@ -61,28 +58,14 @@ const DesktopAppProxy: React.FC = () => {
               : "Connect to intercept all the traffic from this browser profile."}
           </div>
         </div>
-        <div>
-          {isProxyApplied ? (
-            <PrimaryActionButton
-              size="small"
-              onClick={() => {
-                disconnectFromDesktopApp();
-              }}
-              className="disconnect-button"
-            >
-              Disconnect
-            </PrimaryActionButton>
-          ) : (
-            <PrimaryActionButton
-              size="small"
-              onClick={() => {
-                connectToDesktopApp();
-              }}
-            >
-              Connect
-            </PrimaryActionButton>
-          )}
-        </div>
+        <PrimaryActionButton
+          size="small"
+          onClick={() => {
+            connectToDesktopApp();
+          }}
+        >
+          Connect
+        </PrimaryActionButton>
       </Row>
     </div>
   );
