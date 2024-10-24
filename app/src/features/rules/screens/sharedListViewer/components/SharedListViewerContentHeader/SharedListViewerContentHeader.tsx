@@ -24,6 +24,7 @@ import { actions } from "store";
 import Logger from "lib/logger";
 import "./sharedListViewerContentHeader.scss";
 import APP_CONSTANTS from "config/constants";
+import { RQBreadcrumb } from "lib/design-system-v2/components";
 
 interface ContentHeaderProps {
   searchValue: string;
@@ -145,10 +146,7 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
 
   return (
     <div className="sharedlist-viewer-table-header">
-      <div className="sharedlist-viewer-table-breadcrumb">
-        <span className="breadcrumb-1">Rules</span> {" > "} <span className="breadcrumb-2">Shared lists</span> {" > "}
-        <span className="breadcrumb-2">Viewer</span>
-      </div>
+      <RQBreadcrumb />
       <ContentListHeader
         searchValue={searchValue}
         setSearchValue={handleSearchValueUpdate}
