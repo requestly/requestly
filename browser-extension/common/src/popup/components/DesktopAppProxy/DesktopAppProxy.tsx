@@ -2,8 +2,9 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Row } from "antd";
 import { PrimaryActionButton } from "../common/PrimaryActionButton";
 import { CheckCircleOutlined } from "@ant-design/icons";
-import "./desktopAppProxy.scss";
 import { EXTENSION_MESSAGES } from "../../../constants";
+import ConnectToDesktopIcon from "../../../../resources/icons/connectToDesktop.svg";
+import "./desktopAppProxy.scss";
 
 const DesktopAppProxy: React.FC = () => {
   const [isProxyApplied, setIsProxyApplied] = useState(false);
@@ -41,8 +42,9 @@ const DesktopAppProxy: React.FC = () => {
   }
 
   return (
-    <div className="desktop-app-container">
+    <div className="desktop-app-container popup-body-card">
       <Row align={"middle"} justify={"space-between"}>
+        <ConnectToDesktopIcon className="connect-to-desktop-icon" />
         <div>
           <div>
             {isProxyApplied ? (

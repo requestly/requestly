@@ -67,12 +67,12 @@ const Popup: React.FC = () => {
               <div className="popup-content">
                 {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
                 <SessionRecordingView />
+                <DesktopAppProxy />
               </div>
             </>
           )}
         </div>
         <div className="popup-footer">
-          <DesktopAppProxy />
           <div className="extension-version">v{getExtensionVersion()}</div>
         </div>
       </div>

@@ -172,7 +172,7 @@ const PopupTabs: React.FC = () => {
   );
 
   return (
-    <Col className="popup-tabs-wrapper">
+    <Col className="popup-tabs-wrapper popup-body-card">
       <Row justify="space-between" align="middle" className="tabs-header">
         <Typography.Text strong>HTTP rules</Typography.Text>
         <Dropdown
