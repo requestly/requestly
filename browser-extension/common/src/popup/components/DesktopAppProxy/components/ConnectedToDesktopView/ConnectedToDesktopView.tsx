@@ -5,17 +5,15 @@ import "./connectedToDesktopView.scss";
 import { EXTENSION_MESSAGES } from "src/constants";
 
 interface ConnectedToDesktopViewProps {
-  onDisconnect: () => void;
+  onDisconnectClick: () => void;
 }
 
-export const ConnectedToDesktopView = ({ onDisconnect }: ConnectedToDesktopViewProps) => {
+export const ConnectedToDesktopView = ({ onDisconnectClick }: ConnectedToDesktopViewProps) => {
   const handleDisconnectFromDesktopApp = useCallback(() => {
     chrome.runtime
       .sendMessage({ action: EXTENSION_MESSAGES.DISCONNECT_FROM_DESKTOP_APP })
-      .then(() => {
-        onDisconnect();
-      })
-      .catch(onDisconnect);
+      .then(onDisconnectClick)
+      .catch(onDisconnectClick);
   }, []);
   return (
     <div className="desktop-app-connected-view">

@@ -57,7 +57,7 @@ const Popup: React.FC = () => {
     <>
       <div className="popup">
         {isProxyApplied ? (
-          <ConnectedToDesktopView onDisconnect={() => setIsProxyApplied(false)} />
+          <ConnectedToDesktopView onDisconnectClick={() => setIsProxyApplied(false)} />
         ) : (
           <>
             <PopupHeader
@@ -73,7 +73,7 @@ const Popup: React.FC = () => {
                   <div className="popup-content">
                     {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
                     <SessionRecordingView />
-                    <DesktopAppProxy isProxyApplied={isProxyApplied} proxyAppliedChangeCallback={setIsProxyApplied} />
+                    <DesktopAppProxy isProxyApplied={isProxyApplied} onProxyStatusChange={setIsProxyApplied} />
                   </div>
                 </>
               )}

@@ -8,21 +8,21 @@ import "./desktopAppProxy.scss";
 
 interface DesktopAppProxyProps {
   isProxyApplied: boolean;
-  proxyAppliedChangeCallback: (newStatus: boolean) => void;
+  onProxyStatusChange: (newStatus: boolean) => void;
 }
 
-const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ isProxyApplied, proxyAppliedChangeCallback }) => {
+const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ isProxyApplied, onProxyStatusChange }) => {
   const [isDesktopAppOpen, setIsDesktopAppOpen] = useState(false);
 
   const connectToDesktopApp = useCallback(() => {
     chrome.runtime
       .sendMessage({ action: EXTENSION_MESSAGES.CONNECT_TO_DESKTOP_APP })
-      .then(proxyAppliedChangeCallback)
-      .catch(() => proxyAppliedChangeCallback(false));
+      .then(onProxyStatusChange)
+      .catch(() => onProxyStatusChange(false));
   }, []);
 
   const checkIfProxyApplied = useCallback(() => {
-    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.IS_PROXY_APPLIED }).then(proxyAppliedChangeCallback);
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.IS_PROXY_APPLIED }).then(onProxyStatusChange);
   }, []);
 
   const checkIfDesktopAppOpen = useCallback(() => {
