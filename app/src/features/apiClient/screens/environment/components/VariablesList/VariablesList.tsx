@@ -9,11 +9,11 @@ import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { EditableCell, EditableRow } from "./components/customTableRow/CustomTableRow";
 import { toast } from "utils/Toast";
-import { EnvironmentAnalyticsContext } from "../../types";
+import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../types";
 import { trackAddVariableClicked, trackVariableValueUpdated } from "../../analytics";
-import "./variablesList.scss";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
+import "./variablesList.scss";
 
 interface VariablesListProps {
   searchValue: string;
@@ -156,13 +156,13 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
           newValue: true,
           newProps: {
             authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-            eventSource: "listing",
+            eventSource: EnvironmentAnalyticsSource.VARIABLES_LIST,
             warningMessage: "Please log in to add a new variable",
           },
         })
       );
     } else {
-      trackAddVariableClicked(EnvironmentAnalyticsContext.API_CLIENT, "listing");
+      trackAddVariableClicked(EnvironmentAnalyticsContext.API_CLIENT, EnvironmentAnalyticsSource.VARIABLES_LIST);
       handleAddNewRow(dataSource);
     }
   };
