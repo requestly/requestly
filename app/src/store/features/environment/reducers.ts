@@ -1,7 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { EnvironmentMap, EnvironmentVariables } from "backend/environment/types";
 import { InitialState } from "./types";
-import { mergeLocalAndSyncVariables } from "./utils";
 
 const initialState = {
   currentEnvironment: "",
@@ -39,25 +38,7 @@ const setAllEnvironmentData = (
     environmentMap: EnvironmentMap;
   }>
 ) => {
-  let updatedEnvironments: EnvironmentMap = {};
-
-  if (Object.keys(state.environments).length === 0) {
-    updatedEnvironments = action.payload.environmentMap;
-  } else {
-    Object.keys(action.payload.environmentMap).forEach((key) => {
-      updatedEnvironments[key] = {
-        ...state.environments[key],
-        variables: mergeLocalAndSyncVariables(
-          state.environments[key].variables,
-          action.payload.environmentMap[key].variables
-        ),
-      };
-    });
-  }
-
-  console.log("!!!debug", "updatedEnvironments", updatedEnvironments, state);
-
-  state.environments = updatedEnvironments;
+  state.environments = action.payload.environmentMap;
 };
 
 const setVariablesInEnvironment = (
