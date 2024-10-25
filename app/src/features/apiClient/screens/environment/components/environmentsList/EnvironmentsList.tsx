@@ -11,8 +11,9 @@ import PATHS from "config/constants/sub/paths";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
-import { EmptyState } from "./components/emptyState/EmptyState";
+import { EmptyState } from "features/apiClient/screens/apiClient/components/sidebar/emptyState/EmptyState";
 import { ListEmptySearchView } from "features/apiClient/screens/apiClient/components/sidebar/components/listEmptySearchView/ListEmptySearchView";
+import { EnvironmentAnalyticsSource } from "../../types";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
@@ -46,7 +47,7 @@ export const EnvironmentsList = () => {
           modalName: "authModal",
           newValue: true,
           newProps: {
-            eventSource: "environments_list",
+            eventSource: EnvironmentAnalyticsSource.ENVIRONMENTS_LIST,
             authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
             warningMessage: "Please log in to create a new environment",
           },
@@ -54,7 +55,7 @@ export const EnvironmentsList = () => {
       );
       return;
     }
-    trackCreateEnvironmentClicked("environments_list");
+    trackCreateEnvironmentClicked(EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
     redirectToNewEnvironment(navigate);
   }, [user.loggedIn, dispatch, navigate]);
 
@@ -68,7 +69,7 @@ export const EnvironmentsList = () => {
           setCurrentEnvironment(newEnvironment.id);
         }
         redirectToEnvironment(navigate, newEnvironment.id);
-        trackEnvironmentCreated(environments.length, "environments_list");
+        trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
       }
       setIsLoading(false);
     } else {
@@ -89,7 +90,7 @@ export const EnvironmentsList = () => {
     <div style={{ height: "inherit" }}>
       {environments?.length === 0 ? (
         isNewEnvironmentInputVisible ? (
-          <div className="mt-16">
+          <div className="mt-8">
             <Input
               autoFocus
               className="new-environment-input"
@@ -102,12 +103,14 @@ export const EnvironmentsList = () => {
             />
           </div>
         ) : (
-          <EmptyState
-            onNewRecordClick={() => redirectToNewEnvironment(navigate)}
-            message="No environment created yet"
-            newRecordBtnText="Create new environment"
-            analyticEventSource="environments_list"
-          />
+          <div className="mt-8">
+            <EmptyState
+              onNewRecordClick={() => redirectToNewEnvironment(navigate)}
+              message="No environment created yet"
+              newRecordBtnText="Create new environment"
+              analyticEventSource={EnvironmentAnalyticsSource.ENVIRONMENTS_LIST}
+            />
+          </div>
         )
       ) : (
         <>
@@ -160,7 +163,6 @@ export const EnvironmentsList = () => {
               </>
             )}
           </div>
-          {/* TODO: use empty state component from collections support PR */}
         </>
       )}
     </div>
