@@ -23,9 +23,14 @@ export const EnvironmentView = () => {
       if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE)) {
         return;
       }
+      if (!user.loggedIn) {
+        navigate(PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE);
+        return;
+      }
+
       const environments = getAllEnvironments();
       const hasAccessToEnvironment = environments?.some((env) => env.id === envId);
-      if (environments?.length === 0 || !user.loggedIn || !hasAccessToEnvironment) {
+      if (environments?.length === 0 || !hasAccessToEnvironment) {
         navigate(PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE);
       }
     }

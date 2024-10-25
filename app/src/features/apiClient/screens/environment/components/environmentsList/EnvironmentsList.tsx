@@ -11,8 +11,9 @@ import PATHS from "config/constants/sub/paths";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
-import { EmptyState } from "./components/emptyState/EmptyState";
+import { EmptyState } from "features/apiClient/screens/apiClient/components/sidebar/emptyState/EmptyState";
 import { ListEmptySearchView } from "features/apiClient/screens/apiClient/components/sidebar/components/listEmptySearchView/ListEmptySearchView";
+import { EnvironmentAnalyticsContext } from "../../types";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
@@ -106,7 +107,7 @@ export const EnvironmentsList = () => {
             onNewRecordClick={() => redirectToNewEnvironment(navigate)}
             message="No environment created yet"
             newRecordBtnText="Create new environment"
-            analyticEventSource="environments_list"
+            analyticEventSource={EnvironmentAnalyticsContext.ENVIRONMENTS_LIST}
           />
         )
       ) : (
