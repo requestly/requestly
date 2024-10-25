@@ -76,11 +76,12 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
             return acc;
           }, {});
 
-          await setVariables(currentEnvironmentId, variablesToSave);
-          setDataSource(variableRows);
-          if (fieldChanged === "syncValue" || fieldChanged === "localValue") {
-            trackVariableValueUpdated(fieldChanged, EnvironmentAnalyticsContext.API_CLIENT, variableRows.length);
-          }
+          setVariables(currentEnvironmentId, variablesToSave).then(() => {
+            setDataSource(variableRows);
+            if (fieldChanged === "syncValue" || fieldChanged === "localValue") {
+              trackVariableValueUpdated(fieldChanged, EnvironmentAnalyticsContext.API_CLIENT, variableRows.length);
+            }
+          });
         }
       }
     },

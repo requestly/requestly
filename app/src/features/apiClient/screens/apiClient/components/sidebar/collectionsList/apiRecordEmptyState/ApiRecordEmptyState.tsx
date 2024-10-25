@@ -39,12 +39,14 @@ export const ApiRecordEmptyState: React.FC<Props> = ({
           analyticEventSource={analyticEventSource}
         />
       ) : (
-        <EmptyState
-          message={message}
-          newRecordBtnText={newRecordBtnText}
-          onNewRecordClick={handleNewRecordClick}
-          analyticEventSource={analyticEventSource}
-        />
+        <div className="mt-8">
+          <EmptyState
+            message={message}
+            newRecordBtnText={newRecordBtnText}
+            onNewRecordClick={handleNewRecordClick}
+            analyticEventSource={analyticEventSource}
+          />
+        </div>
       )}
     </div>
   );
