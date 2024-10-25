@@ -133,13 +133,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
                 >
                   Cancel
                 </RQButton>
-                <RQButton
-                  ghost
-                  size="small"
-                  type="primary"
-                  onClick={handleAddNewGroup}
-                  disabled={newGroupName.length === 0}
-                >
+                <RQButton size="small" type="primary" onClick={handleAddNewGroup} disabled={newGroupName.length === 0}>
                   Create
                 </RQButton>
               </div>
