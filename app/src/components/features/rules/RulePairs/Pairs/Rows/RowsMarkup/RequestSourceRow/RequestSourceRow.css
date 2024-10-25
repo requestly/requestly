@@ -56,7 +56,7 @@
   color: var(--requestly-color-primary-300);
 }
 
-.ant-dropdown-menu.ant-dropdown-menu-root li.ant-dropdown-menu-item {
+.sample-regex-dropdown .ant-dropdown-menu.ant-dropdown-menu-root li.ant-dropdown-menu-item {
   padding: 12px;
 }
 

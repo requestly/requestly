@@ -386,7 +386,11 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
       {pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES &&
         location.pathname.includes(PATHS.RULE_EDITOR.ABSOLUTE) && (
           <Col className="sample-regex-dropdown-container">
-            <Dropdown menu={{ items: sampleRegexDropdownItems }} trigger={["click"]} className="sample-regex-dropdown">
+            <Dropdown
+              menu={{ items: sampleRegexDropdownItems }}
+              trigger={["click"]}
+              overlayClassName="sample-regex-dropdown"
+            >
               <Space>
                 Try example regex
                 <DownOutlined />
