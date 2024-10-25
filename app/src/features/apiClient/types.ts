@@ -26,6 +26,7 @@ export namespace RQAPI {
   export enum RecordType {
     API = "api",
     COLLECTION = "collection",
+    ENVIRONMENT = "environment",
   }
 
   export type RequestBody = string | KeyValuePair[]; // in case of form data, body will be key-value pairs

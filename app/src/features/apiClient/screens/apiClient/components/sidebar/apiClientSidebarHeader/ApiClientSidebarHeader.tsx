@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { Dropdown } from "antd";
 import { DropdownProps } from "reactstrap";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
@@ -10,7 +9,6 @@ import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { ApiClientSidebarTabKey } from "../APIClientSidebar";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
-import { redirectToNewEnvironment } from "utils/RedirectionUtils";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
@@ -19,6 +17,7 @@ import { getUserAuthDetails } from "store/selectors";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
+  // TODO: FIX THIS
   onNewClick: (recordType: RQAPI.RecordType) => void;
   onImportClick: () => void;
   history: RQAPI.Entry[];
@@ -37,7 +36,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   history,
   onClearHistory,
 }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
@@ -134,12 +132,17 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           Clear history
         </RQButton>
       ) : activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
-        <RQButton type="transparent" size="small" icon={<MdAdd />} onClick={() => redirectToNewEnvironment(navigate)}>
+        <RQButton
+          type="transparent"
+          size="small"
+          icon={<MdAdd />}
+          onClick={() => onNewClick(RQAPI.RecordType.ENVIRONMENT)}
+        >
           New
         </RQButton>
       ) : null}
 
-      <EnvironmentSwitcher />
+      {user.loggedIn && <EnvironmentSwitcher />}
     </div>
   );
 };
