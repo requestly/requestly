@@ -1,0 +1,26 @@
+.desktop-app-connected-view {
+  width: 100vw;
+  display: flex;
+  padding: 28px;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8, 24px);
+  background: var(--requestly-color-background);
+  padding: var(--space-15, 80px) var(--space-9, 32px) var(--space-9, 32px) var(--space-9, 32px);
+
+  .connected-icon {
+    width: 64px;
+  }
+
+  .connected-title {
+    font-size: var(--font-size-lg, 20px);
+    font-weight: 500;
+  }
+
+  .connected-description {
+    color: var(--alias-tokens-color-text-subtle, #bbb);
+    text-align: center;
+    font-size: var(--font-size-sm, 13px);
+    width: 570px;
+  }
+}

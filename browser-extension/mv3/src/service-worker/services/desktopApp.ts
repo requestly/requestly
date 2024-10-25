@@ -1,3 +1,5 @@
+import { EXTENSION_MESSAGES } from "common/constants";
+import { sendMessageToApp } from "./messageHandler";
 import { applyProxy, ProxyDetails, removeProxy } from "./proxy";
 import { toggleExtensionStatus } from "./utils";
 
@@ -89,6 +91,11 @@ export const connectToDesktopAppAndApplyProxy = async () => {
   const proxyDetails = await getProxyDetails();
   await applyProxy(proxyDetails);
 
+  sendMessageToApp({
+    action: EXTENSION_MESSAGES.DESKTOP_APP_CONNECTION_STATUS_UPDATED,
+    payload: true,
+  });
+
   sendMessageToDesktopApp({
     action: "browser-connected",
     appId: getConnectedBrowserAppId(),
@@ -101,6 +108,10 @@ export const connectToDesktopAppAndApplyProxy = async () => {
 export const disconnectFromDesktopAppAndRemoveProxy = async () => {
   try {
     await sendMessageToDesktopApp({ action: "browser-disconnected", appId: getConnectedBrowserAppId() });
+    sendMessageToApp({
+      action: EXTENSION_MESSAGES.DESKTOP_APP_CONNECTION_STATUS_UPDATED,
+      payload: false,
+    });
     socket.close();
   } catch (e) {
     console.log("Error sending message to desktop app socket closed");
