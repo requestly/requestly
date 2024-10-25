@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -295,36 +295,42 @@ const WorkspaceSelector = () => {
     [redirects, pathname]
   );
 
-  const confirmWorkspaceSwitch = (callback = () => {}) => {
-    const handleCallback = () => {
-      callback();
+  const confirmWorkspaceSwitch = useCallback(
+    (callback = () => {}) => {
+      const handleCallback = () => {
+        dispatch(actions.updateIsWorkspaceSwitchConfirmationActive(false));
+        callback();
 
-      if (path) {
-        navigate(redirects[path]);
+        if (path) {
+          navigate(redirects[path]);
+        }
+      };
+
+      if (!isCurrentlySelectedRuleHasUnsavedChanges || pathname.includes(PATHS.ACCOUNT.TEAMS.ABSOLUTE)) {
+        handleCallback();
+        return;
       }
-    };
 
-    if (!isCurrentlySelectedRuleHasUnsavedChanges || pathname.includes(PATHS.ACCOUNT.TEAMS.ABSOLUTE)) {
-      handleCallback();
-      return;
-    }
+      dispatch(actions.updateIsWorkspaceSwitchConfirmationActive(true));
+      Modal.confirm({
+        title: "Discard changes?",
+        icon: <ExclamationCircleFilled />,
+        content: "Changes you made on a rule may not be saved.",
+        okText: "Switch",
+        onOk: handleCallback,
+        afterClose: () => dispatch(actions.updateIsWorkspaceSwitchConfirmationActive(false)),
+      });
+    },
+    [isCurrentlySelectedRuleHasUnsavedChanges, navigate, path, pathname, redirects, dispatch]
+  );
 
-    Modal.confirm({
-      title: "Discard changes?",
-      icon: <ExclamationCircleFilled />,
-      content: "Changes you made on a rule may not be saved.",
-      okText: "Switch",
-      onOk: handleCallback,
-    });
-  };
-
-  const handleSwitchToPrivateWorkspace = async () => {
+  const handleSwitchToPrivateWorkspace = useCallback(async () => {
     setIsModalOpen(true);
     return clearCurrentlyActiveWorkspace(dispatch, appMode).then(() => {
       setIsModalOpen(false);
       showSwitchWorkspaceSuccessToast();
     });
-  };
+  }, [appMode, dispatch]);
 
   const handleWorkspaceSwitch = async (team) => {
     setIsModalOpen(true);
