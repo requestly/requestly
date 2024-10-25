@@ -72,7 +72,7 @@ export const highlightVariablesPlugin = (setters: VariableSetters) => {
             setters.setHoveredVariable(variable);
             setters.setPopupPosition({
               x: coords.left,
-              y: coords.bottom,
+              y: coords.top,
             });
           } else {
             setters.setHoveredVariable(null); // Hide popup if not hovering over a variable
