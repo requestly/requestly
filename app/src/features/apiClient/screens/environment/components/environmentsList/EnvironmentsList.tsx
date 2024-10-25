@@ -90,7 +90,7 @@ export const EnvironmentsList = () => {
     <div style={{ height: "inherit" }}>
       {environments?.length === 0 ? (
         isNewEnvironmentInputVisible ? (
-          <div className="mt-16">
+          <div className="mt-8">
             <Input
               autoFocus
               className="new-environment-input"
@@ -103,12 +103,14 @@ export const EnvironmentsList = () => {
             />
           </div>
         ) : (
-          <EmptyState
-            onNewRecordClick={() => redirectToNewEnvironment(navigate)}
-            message="No environment created yet"
-            newRecordBtnText="Create new environment"
-            analyticEventSource={EnvironmentAnalyticsContext.ENVIRONMENTS_LIST}
-          />
+          <div className="mt-8">
+            <EmptyState
+              onNewRecordClick={() => redirectToNewEnvironment(navigate)}
+              message="No environment created yet"
+              newRecordBtnText="Create new environment"
+              analyticEventSource={EnvironmentAnalyticsContext.ENVIRONMENTS_LIST}
+            />
+          </div>
         )
       ) : (
         <>
@@ -161,7 +163,6 @@ export const EnvironmentsList = () => {
               </>
             )}
           </div>
-          {/* TODO: use empty state component from collections support PR */}
         </>
       )}
     </div>
