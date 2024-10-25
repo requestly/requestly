@@ -13,7 +13,7 @@ import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { EmptyState } from "features/apiClient/screens/apiClient/components/sidebar/emptyState/EmptyState";
 import { ListEmptySearchView } from "features/apiClient/screens/apiClient/components/sidebar/components/listEmptySearchView/ListEmptySearchView";
-import { EnvironmentAnalyticsContext } from "../../types";
+import { EnvironmentAnalyticsSource } from "../../types";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
@@ -47,7 +47,7 @@ export const EnvironmentsList = () => {
           modalName: "authModal",
           newValue: true,
           newProps: {
-            eventSource: "environments_list",
+            eventSource: EnvironmentAnalyticsSource.ENVIRONMENTS_LIST,
             authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
             warningMessage: "Please log in to create a new environment",
           },
@@ -55,7 +55,7 @@ export const EnvironmentsList = () => {
       );
       return;
     }
-    trackCreateEnvironmentClicked("environments_list");
+    trackCreateEnvironmentClicked(EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
     redirectToNewEnvironment(navigate);
   }, [user.loggedIn, dispatch, navigate]);
 
@@ -69,7 +69,7 @@ export const EnvironmentsList = () => {
           setCurrentEnvironment(newEnvironment.id);
         }
         redirectToEnvironment(navigate, newEnvironment.id);
-        trackEnvironmentCreated(environments.length, "environments_list");
+        trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
       }
       setIsLoading(false);
     } else {
@@ -108,7 +108,7 @@ export const EnvironmentsList = () => {
               onNewRecordClick={() => redirectToNewEnvironment(navigate)}
               message="No environment created yet"
               newRecordBtnText="Create new environment"
-              analyticEventSource={EnvironmentAnalyticsContext.ENVIRONMENTS_LIST}
+              analyticEventSource={EnvironmentAnalyticsSource.ENVIRONMENTS_LIST}
             />
           </div>
         )

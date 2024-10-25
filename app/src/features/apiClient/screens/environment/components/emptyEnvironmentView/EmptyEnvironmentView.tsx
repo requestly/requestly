@@ -13,6 +13,7 @@ import { actions } from "store";
 import { MdDisplaySettings } from "@react-icons/all-files/md/MdDisplaySettings";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import { Skeleton } from "antd";
+import { EnvironmentAnalyticsSource } from "../../types";
 import "./emptyEnvironmentView.scss";
 
 export const EmptyEnvironmentView = () => {
@@ -30,7 +31,7 @@ export const EmptyEnvironmentView = () => {
           modalName: "authModal",
           newValue: true,
           newProps: {
-            eventSource: "empty_environment_view",
+            eventSource: EnvironmentAnalyticsSource.EMPTY_ENVIRONMENT_VIEW,
             authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
             warningMessage: "Please log in to create a new environment.",
           },
