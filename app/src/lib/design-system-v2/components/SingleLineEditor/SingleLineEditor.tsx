@@ -104,7 +104,11 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
 
   return (
     <>
-      <div ref={editorRef} className="single-line-editor-container ant-input">
+      <div
+        ref={editorRef}
+        className="single-line-editor-container ant-input"
+        onMouseLeave={() => setHoveredVariable(null)}
+      >
         {hoveredVariable && (
           <Popover
             content={
