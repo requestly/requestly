@@ -36,7 +36,7 @@ import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/Analytics
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { RQButton } from "lib/design-system-v2/components";
+import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
@@ -335,6 +335,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   return isExtensionEnabled ? (
     <div className="api-client-view">
+      {user.loggedIn && !openInModal ? <RQBreadcrumb placeholder="New Request" /> : null}
+
       <Skeleton loading={isAnimating} active>
         <div className="api-client-header">
           <Space.Compact className="api-client-url-container">
