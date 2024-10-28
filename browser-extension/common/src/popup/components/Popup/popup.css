@@ -2,13 +2,14 @@
 .popup {
   width: 560px;
   min-height: 412px;
-  max-height: 596px;
+  max-height: 600px;
   font-size: 14px;
   line-height: 20px;
   letter-spacing: 0.25px;
   color: var(--text-default);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .popup-header {
@@ -125,11 +126,11 @@
 }
 
 .popup-content {
-  padding: 16px;
+  padding: 10px;
   padding-bottom: 8px;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 10px;
 }
 
 .header-content-separator {
