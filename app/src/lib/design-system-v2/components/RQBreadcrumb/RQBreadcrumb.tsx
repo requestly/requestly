@@ -72,7 +72,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
     setIsEditRecord(true);
   };
 
-  return (
+  return breadcrumbs.length > 0 ? (
     <ol className="rq-breadcrumb">
       {breadcrumbs.map(({ label, isEditable, pathname, disabled: isPathDisabled }, index) => {
         return (
@@ -81,7 +81,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
               isEditRecord ? (
                 <Input
                   autoFocus
-                  value={name}
+                  value={name || placeholder}
                   onChange={handleOnChange}
                   placeholder={placeholder}
                   className={`rq-breadcrumb-input`}
@@ -123,5 +123,5 @@ export const RQBreadcrumb: React.FC<Props> = ({
         );
       })}
     </ol>
-  );
+  ) : null;
 };
