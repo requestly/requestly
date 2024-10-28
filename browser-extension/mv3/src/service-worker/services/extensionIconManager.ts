@@ -10,6 +10,7 @@ interface ExtensionIconConfig {
 
 class ExtensionIconManager {
   #isExtensionDisabled = false;
+  #connectedToDesktopApp = false;
 
   #icons = {
     DEFAULT: "/resources/images/48x48.png",
@@ -46,7 +47,7 @@ class ExtensionIconManager {
   }
 
   #getIcon(config: ExtensionIconConfig) {
-    if (config.isConnectedToDesktopApp) {
+    if (this.#connectedToDesktopApp) {
       return this.#icons.CONNECTED_TO_DESKTOP_APP;
     }
 
@@ -90,6 +91,10 @@ class ExtensionIconManager {
   }
 
   #setExtensionIcon(path: string, tabId?: number) {
+    console.log("!!!debug", "setExtIcon", {
+      path,
+      tabId,
+    });
     if (tabId === undefined) {
       chrome.action.setIcon({ path });
     } else {
@@ -126,6 +131,7 @@ class ExtensionIconManager {
   }
 
   markConnectedToDesktopApp() {
+    this.#connectedToDesktopApp = true;
     this.#setExtensionIcon(this.#icons.CONNECTED_TO_DESKTOP_APP);
     this.#updateIconStateForAllTabs();
   }
