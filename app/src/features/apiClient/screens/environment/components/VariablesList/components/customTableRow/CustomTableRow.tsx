@@ -135,6 +135,13 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     }
   }, [record, handleChange, dataIndex, getPlaceholderText]);
 
+  useEffect(() => {
+    // Update form fields when record changes non-user actions like syncing variables from listener
+    if (editable && record) {
+      form.setFieldsValue({ [dataIndex]: record[dataIndex] });
+    }
+  }, [form, record, dataIndex, editable]);
+
   if (!editable) {
     return <td {...restProps}>{children}</td>;
   }

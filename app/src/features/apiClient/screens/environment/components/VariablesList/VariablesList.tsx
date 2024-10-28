@@ -27,7 +27,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   const user = useSelector(getUserAuthDetails);
   const { getEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
   const [dataSource, setDataSource] = useState([]);
-  const [isTableLoaded, setIsTableLoaded] = useState(false);
+  const variables = getEnvironmentVariables(currentEnvironmentId);
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
@@ -119,13 +119,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   const columns = useVariablesListColumns({ handleSaveVariable, handleDeleteVariable });
 
   useEffect(() => {
-    setIsTableLoaded(false);
-  }, [currentEnvironmentId]);
-
-  useEffect(() => {
-    if (!isTableLoaded) {
-      setIsTableLoaded(true);
-      const variables = getEnvironmentVariables(currentEnvironmentId);
+    if (variables) {
       const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(
         ([key, value], index) => ({
           id: index,
@@ -146,7 +140,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
       }
       setDataSource(formattedDataSource);
     }
-  }, [getEnvironmentVariables, currentEnvironmentId, isTableLoaded]);
+  }, [variables]);
 
   const handleAddVariable = () => {
     if (!user.loggedIn) {
@@ -166,9 +160,6 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
       handleAddNewRow(dataSource);
     }
   };
-  if (!isTableLoaded) {
-    return null;
-  }
 
   return (
     <ContentListTable
