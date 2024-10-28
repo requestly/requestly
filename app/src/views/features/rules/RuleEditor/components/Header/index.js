@@ -87,6 +87,7 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
             {/* {getRuleTitle(currentlySelectedRuleConfig.NAME, mode)} */}
 
             <RQBreadcrumb
+              disabled={isSampleRule}
               placeholder="Enter rule name"
               recordName={currentlySelectedRuleData?.name}
               onRecordNameUpdate={handleRuleNameChange}

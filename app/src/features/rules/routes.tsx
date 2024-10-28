@@ -63,6 +63,7 @@ export const ruleRoutes: RouteObject[] = [
         handle: {
           breadcrumb: {
             label: "All",
+            disabled: true, // Will not navigate
           },
         },
       },
@@ -72,6 +73,7 @@ export const ruleRoutes: RouteObject[] = [
         handle: {
           breadcrumb: {
             label: "All",
+            disabled: true,
           },
         },
       },
@@ -83,6 +85,7 @@ export const ruleRoutes: RouteObject[] = [
           breadcrumb: {
             label: "Editor",
             isEditable: true,
+            disabled: false,
           },
         },
       },
@@ -92,6 +95,7 @@ export const ruleRoutes: RouteObject[] = [
         handle: {
           breadcrumb: {
             label: "Create rule",
+            disabled: true,
           },
         },
       },
@@ -101,7 +105,6 @@ export const ruleRoutes: RouteObject[] = [
         handle: {
           breadcrumb: {
             label: "Shared lists",
-            navigateTo: PATHS.SHARED_LISTS.ABSOLUTE,
           },
         },
       },
@@ -111,6 +114,7 @@ export const ruleRoutes: RouteObject[] = [
         handle: {
           breadcrumb: {
             label: "Shared list viewer",
+            disabled: true,
           },
         },
       },
@@ -120,7 +124,6 @@ export const ruleRoutes: RouteObject[] = [
         handle: {
           breadcrumb: {
             label: "Templates",
-            navigateTo: PATHS.RULES.TEMPLATES.ABSOLUTE,
           },
         },
       },

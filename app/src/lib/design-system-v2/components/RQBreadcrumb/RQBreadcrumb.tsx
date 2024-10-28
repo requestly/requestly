@@ -21,7 +21,7 @@ interface MatchedRoute {
   handle?: {
     breadcrumb?: {
       label: string;
-      navigateTo?: string;
+      disabled?: boolean;
       isEditable?: boolean;
     };
   };
@@ -42,9 +42,11 @@ export const RQBreadcrumb: React.FC<Props> = ({
     setName(recordName);
   }, [recordName]);
 
-  const breadcrumbs = matchedRoutes.reduce((result, route) => {
-    return route.handle?.breadcrumb ? [...result, route.handle.breadcrumb] : result;
-  }, [] as MatchedRoute["handle"]["breadcrumb"][]);
+  const breadcrumbs: ({
+    pathname: MatchedRoute["pathname"];
+  } & MatchedRoute["handle"]["breadcrumb"])[] = matchedRoutes.reduce((result, route) => {
+    return route.handle?.breadcrumb ? [...result, { ...route.handle.breadcrumb, pathname: route.pathname }] : result;
+  }, []);
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const updatedValue = e.target.value;
@@ -62,9 +64,17 @@ export const RQBreadcrumb: React.FC<Props> = ({
     onBlur?.();
   };
 
+  const handleRecordNameEditClick = () => {
+    if (disabled) {
+      return;
+    }
+
+    setIsEditRecord(true);
+  };
+
   return (
     <ol className="rq-breadcrumb">
-      {breadcrumbs.map(({ label, navigateTo, isEditable }, index) => {
+      {breadcrumbs.map(({ label, isEditable, pathname, disabled: isPathDisabled }, index) => {
         return (
           <>
             {isEditable ? (
@@ -84,32 +94,22 @@ export const RQBreadcrumb: React.FC<Props> = ({
                 />
               ) : (
                 <div className="rq-breadcrumb-record-name">
-                  <Typography.Text
-                    className="record-name"
-                    ellipsis={true}
-                    onClick={() => {
-                      if (disabled) {
-                        return;
-                      }
-
-                      setIsEditRecord(true);
-                    }}
-                  >
+                  <Typography.Text className="record-name" ellipsis={true} onClick={handleRecordNameEditClick}>
                     {recordName || placeholder}
                   </Typography.Text>
-                  {disabled ? null : <MdOutlineEdit className="edit-icon" onClick={() => setIsEditRecord(true)} />}
+                  {disabled ? null : <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />}
                 </div>
               )
             ) : (
               <>
-                {navigateTo ? (
-                  <Link key={index} to={navigateTo} className="rq-breadcrumb-item">
-                    {label}
-                  </Link>
-                ) : (
+                {isPathDisabled ? (
                   <li key={index} className="rq-breadcrumb-item">
                     {label}
                   </li>
+                ) : (
+                  <Link key={index} to={pathname} className="rq-breadcrumb-item">
+                    {label}
+                  </Link>
                 )}
               </>
             )}
