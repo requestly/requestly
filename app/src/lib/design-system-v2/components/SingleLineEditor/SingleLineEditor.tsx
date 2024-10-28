@@ -6,6 +6,7 @@ import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { Popover, Row } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { EnvironmentVariables, EnvironmentVariableValue } from "backend/environment/types";
+import { capitalize } from "lodash";
 
 interface RQSingleLineEditorProps {
   className?: string;
@@ -125,6 +126,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
                 )}
               </div>
             }
+            showArrow={false}
             open={!!hoveredVariable}
             destroyTooltipOnHide
             placement="bottom"
@@ -156,7 +158,7 @@ const VariableInfo: React.FC<{
       <Row className="variable-info-header">{variable.name}</Row>
       <div className="variable-info-content">
         <div className="variable-info-title">Type</div>
-        <div className="variable-info-value">{variable.type}</div>
+        <div className="variable-info-value">{capitalize(variable.type as string)}</div>
         <div className="variable-info-title">Initial Value</div>
         <div className="variable-info-value">{variable.syncValue}</div>
         <div className="variable-info-title">Current Value</div>
