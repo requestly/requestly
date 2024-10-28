@@ -28,6 +28,7 @@ export interface BillingTeamDetails {
       inviteId: string;
     };
   };
+  isAcceleratorTeam?: boolean;
 }
 
 export enum BillingTeamRoles {
