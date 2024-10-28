@@ -17,6 +17,7 @@ import MonitorMountedTime from "components/common/SentryMonitoring/MonitorMounte
 import { getFilteredRecords } from "./utils";
 import RulesListContentHeader from "./components/RulesListContentHeader/RulesListContentHeader";
 import { useSearchParams } from "react-router-dom";
+import { RQBreadcrumb } from "lib/design-system-v2/components";
 import "./rulesList.scss";
 
 interface Props {}
@@ -70,13 +71,7 @@ const RulesList: React.FC<Props> = () => {
             <div className="rq-rules-list-container">
               {isFeatureLimiterOn && user.isLimitReached ? <FeatureLimiterBanner /> : null}
 
-              {/* TODO: Temp Breadcrumb */}
-              <div className="rq-rules-table-breadcrumb">
-                {/* TODO: this is temp fix */}
-                <div>
-                  <span className="breadcrumb-1">Rules</span> {" > "} <span className="breadcrumb-2">All</span>
-                </div>
-              </div>
+              <RQBreadcrumb />
 
               <RulesListContentHeader
                 searchValue={searchValue}
