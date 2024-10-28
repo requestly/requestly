@@ -91,10 +91,6 @@ class ExtensionIconManager {
   }
 
   #setExtensionIcon(path: string, tabId?: number) {
-    console.log("!!!debug", "setExtIcon", {
-      path,
-      tabId,
-    });
     if (tabId === undefined) {
       chrome.action.setIcon({ path });
     } else {
@@ -137,6 +133,7 @@ class ExtensionIconManager {
   }
 
   markDisconnectedFromDesktopApp() {
+    this.#connectedToDesktopApp = false;
     this.#setExtensionIcon(this.#icons.DEFAULT);
     this.#updateIconStateForAllTabs();
   }
