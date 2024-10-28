@@ -42,7 +42,7 @@ export const useVariablesListColumns = ({ handleSaveVariable, handleDeleteVariab
           Initial Value{" "}
           <Tooltip
             color="#000"
-            title="Initial values will be synced across the workspace. These default values will be used if no user-defined value is set for the variable."
+            title="Initial values will be synced across the workspace. These values will be used by default if no user-defined Current value is set for the variable."
           >
             <span className="synced-tag">SYNCED</span>
           </Tooltip>
@@ -63,7 +63,7 @@ export const useVariablesListColumns = ({ handleSaveVariable, handleDeleteVariab
           Current Value{" "}
           <Tooltip
             color="#000"
-            title="Current values are specific to the user and are not synced across the workspace. These values can be overridden by user-defined values for the variable."
+            title="Current values are user-defined entries that are not synced across the workspace. These values will override the defined Initial values."
           >
             <span className="local-tag">LOCAL</span>
           </Tooltip>
