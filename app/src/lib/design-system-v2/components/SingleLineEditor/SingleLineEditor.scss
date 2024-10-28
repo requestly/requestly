@@ -61,6 +61,7 @@ div.n-popup {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
+      column-gap: 1rem;
     }
 
     .variable-info-header {
