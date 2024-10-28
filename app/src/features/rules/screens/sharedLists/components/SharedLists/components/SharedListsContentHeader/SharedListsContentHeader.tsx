@@ -1,5 +1,6 @@
 import React from "react";
 import { ContentListHeader } from "componentsV2/ContentList";
+import { RQBreadcrumb } from "lib/design-system-v2/components";
 import "./sharedListsContentHeader.scss";
 
 interface SharedListsContentHeaderProps {
@@ -13,11 +14,7 @@ export const SharedListsContentHeader: React.FC<SharedListsContentHeaderProps> =
 }) => {
   return (
     <div className="sharedlist-table-header">
-      <div className="sharedlist-table-breadcrumb">
-        <div>
-          <span className="breadcrumb-1">Rules</span> {" > "} <span className="breadcrumb-2">Shared lists</span>
-        </div>
-      </div>
+      <RQBreadcrumb />
       <ContentListHeader searchValue={searchValue} setSearchValue={handleSearchValueUpdate} />
     </div>
   );
