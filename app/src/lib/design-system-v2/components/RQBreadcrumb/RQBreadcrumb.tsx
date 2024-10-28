@@ -7,10 +7,10 @@ import "./RQBreadcrumb.scss";
 
 interface Props {
   disabled?: boolean;
-  onBlur?: () => void;
+  onBlur?: (updatedRecordName: string) => void;
   recordName?: string;
   placeholder?: string;
-  onRecordNameUpdate?: (s: string) => void;
+  onRecordNameUpdate?: (updatedRecordName: string) => void;
 }
 
 interface MatchedRoute {
@@ -61,7 +61,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
 
   const handleOnBlur = () => {
     setIsEditRecord(false);
-    onBlur?.();
+    onBlur?.(name);
   };
 
   const handleRecordNameEditClick = () => {
@@ -81,7 +81,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
               isEditRecord ? (
                 <Input
                   autoFocus
-                  value={name || placeholder}
+                  value={name}
                   onChange={handleOnChange}
                   placeholder={placeholder}
                   className={`rq-breadcrumb-input`}
@@ -95,7 +95,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
               ) : (
                 <div className="rq-breadcrumb-record-name">
                   <Typography.Text className="record-name" ellipsis={true} onClick={handleRecordNameEditClick}>
-                    {recordName || placeholder}
+                    {name || placeholder}
                   </Typography.Text>
                   {disabled ? null : <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />}
                 </div>
