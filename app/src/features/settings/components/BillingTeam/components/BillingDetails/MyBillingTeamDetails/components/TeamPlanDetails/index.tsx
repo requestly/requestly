@@ -109,11 +109,15 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
             <Col className="team-plan-details-section__team-name">{billingTeamDetails.name}</Col>
             <div className="team-plan-details-section__team-details">
               <Col>
-                <div className="team-plan-details-section-label">Billing manager</div>
+                <div className="team-plan-details-section-label">
+                  {billingTeamDetails?.isAcceleratorTeam ? "Admin" : "Billing manager"}
+                </div>
                 <div className="text-white">{teamOwnerDetails?.displayName ?? "User"}</div>
               </Col>
               <Col>
-                <div className="team-plan-details-section-label">Billing email</div>
+                <div className="team-plan-details-section-label">
+                  {billingTeamDetails?.isAcceleratorTeam ? "Admin" : "Billing"} email
+                </div>
                 <div className="text-white">{teamOwnerDetails?.email}</div>
               </Col>
               {billingTeamDetails.description ? (
