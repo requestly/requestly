@@ -1,17 +1,13 @@
-.variables-list-view-container {
-  height: 100%;
+.environment-container {
   display: flex;
-  flex: 0 0 auto;
+  height: 100%;
+  width: 100%;
   background-color: var(--requestly-color-background);
 
-  .variables-list-view {
+  .environment-container-content {
     flex: auto;
     width: 100%;
     min-width: 0;
     padding: 8px 16px;
-  }
-
-  .rq-content-list-table-container {
-    padding: 0;
   }
 }

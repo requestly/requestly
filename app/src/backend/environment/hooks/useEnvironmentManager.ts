@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useCallback, useState } from "react";
-import { EnvironmentVariables, EnvironmentVariableValue } from "../types";
+import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEnvironmentData, getCurrentEnvironmentId } from "store/features/environment/selectors";
 import { environmentVariablesActions } from "store/features/environment/slice";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { renderTemplate } from "../utils";
+import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
 import {
   attachEnvironmentVariableListener,
   removeEnvironmentVariableFromDB,
@@ -61,23 +61,22 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       setIsLoading(true);
       fetchAllEnvironmentDetails(ownerId)
         .then((environmentMap) => {
-          dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
-
-          // if there are no environments, create a default one
-          if (Object.keys(environmentMap).length === 0) {
-            addNewEnvironment("Default").then((defaultEnv) => {
-              if (defaultEnv) {
-                setCurrentEnvironment(defaultEnv.id);
-              }
-            });
-          } else if (!currentEnvironmentId) {
-            // if there is no active environment, set the first environment as the active environment
-            const defaultEnvironment = Object.keys(environmentMap)[0];
-            setCurrentEnvironment(defaultEnvironment);
+          if (Object.keys(environmentMap).length > 0 && !environmentMap[currentEnvironmentId]) {
+            // setting the first environment as the current environment if the current environment is not found in environmentMap
+            setCurrentEnvironment(Object.keys(environmentMap)[0]);
           }
+
+          const updatedEnvironmentMap: EnvironmentMap = {};
+          Object.keys(environmentMap).forEach((key) => {
+            updatedEnvironmentMap[key] = {
+              ...allEnvironmentData[key],
+              variables: mergeLocalAndSyncVariables(allEnvironmentData[key].variables, environmentMap[key].variables),
+            };
+          });
+
+          dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: updatedEnvironmentMap }));
         })
         .catch((err) => {
-          console.log("Error while fetching all environment variables", err);
           Logger.error("Error while fetching all environment variables", err);
           dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: {} }));
         })
@@ -85,15 +84,21 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
           setIsLoading(false);
         });
     }
+    // Disabled otherwise infinite loop if allEnvironmentData is included here, allEnvironmentData should be fetched only once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ownerId, dispatch, addNewEnvironment, setCurrentEnvironment, initListenerAndFetcher, currentEnvironmentId]);
 
   useEffect(() => {
-    unsubscribeListener?.();
     if (ownerId && currentEnvironmentId && initListenerAndFetcher) {
+      unsubscribeListener?.();
       unsubscribeListener = attachEnvironmentVariableListener(ownerId, currentEnvironmentId, (environmentData) => {
+        const mergedVariables = mergeLocalAndSyncVariables(
+          allEnvironmentData[environmentData.id].variables,
+          environmentData.variables
+        );
         dispatch(
           environmentVariablesActions.setVariablesInEnvironment({
-            newVariables: environmentData.variables,
+            newVariables: mergedVariables,
             environmentId: environmentData.id,
           })
         );
@@ -103,7 +108,10 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     return () => {
       unsubscribeListener?.();
     };
-  }, [currentEnvironmentId, dispatch, ownerId, initListenerAndFetcher]);
+
+    // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentEnvironmentId, dispatch, initListenerAndFetcher, ownerId]);
 
   useEffect(() => {
     if (!user.loggedIn) {

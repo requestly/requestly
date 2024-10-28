@@ -1,7 +1,7 @@
 .sidebar-list-header {
   display: flex;
-  gap: 6px;
   align-items: center;
+  gap: 6px;
   padding: 8px 0;
 
   &-button {
@@ -9,7 +9,7 @@
   }
 
   &-search {
-    width: 200px;
+    flex: 1;
     padding: 4px 6px;
     font-size: var(--requestly-font-size-xs);
   }

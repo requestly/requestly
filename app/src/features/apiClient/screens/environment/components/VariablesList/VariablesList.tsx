@@ -9,11 +9,11 @@ import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { EditableCell, EditableRow } from "./components/customTableRow/CustomTableRow";
 import { toast } from "utils/Toast";
-import { EnvironmentAnalyticsContext } from "../../types";
+import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../types";
 import { trackAddVariableClicked, trackVariableValueUpdated } from "../../analytics";
-import "./variablesList.scss";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
+import "./variablesList.scss";
 
 interface VariablesListProps {
   searchValue: string;
@@ -27,7 +27,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   const user = useSelector(getUserAuthDetails);
   const { getEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
   const [dataSource, setDataSource] = useState([]);
-  const [isTableLoaded, setIsTableLoaded] = useState(false);
+  const variables = getEnvironmentVariables(currentEnvironmentId);
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
@@ -35,7 +35,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   );
 
   const handleSaveVariable = useCallback(
-    (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
+    async (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
       if (!user.loggedIn) {
         return;
       }
@@ -76,10 +76,12 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
             return acc;
           }, {});
 
-          setVariables(currentEnvironmentId, variablesToSave);
-          if (fieldChanged === "syncValue" || fieldChanged === "localValue") {
-            trackVariableValueUpdated(fieldChanged, EnvironmentAnalyticsContext.API_CLIENT, variableRows.length);
-          }
+          setVariables(currentEnvironmentId, variablesToSave).then(() => {
+            setDataSource(variableRows);
+            if (fieldChanged === "syncValue" || fieldChanged === "localValue") {
+              trackVariableValueUpdated(fieldChanged, EnvironmentAnalyticsContext.API_CLIENT, variableRows.length);
+            }
+          });
         }
       }
     },
@@ -117,13 +119,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   const columns = useVariablesListColumns({ handleSaveVariable, handleDeleteVariable });
 
   useEffect(() => {
-    setIsTableLoaded(false);
-  }, [currentEnvironmentId]);
-
-  useEffect(() => {
-    if (!isTableLoaded) {
-      setIsTableLoaded(true);
-      const variables = getEnvironmentVariables(currentEnvironmentId);
+    if (variables) {
       const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(
         ([key, value], index) => ({
           id: index,
@@ -144,7 +140,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
       }
       setDataSource(formattedDataSource);
     }
-  }, [getEnvironmentVariables, currentEnvironmentId, isTableLoaded]);
+  }, [variables]);
 
   const handleAddVariable = () => {
     if (!user.loggedIn) {
@@ -154,19 +150,16 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
           newValue: true,
           newProps: {
             authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-            eventSource: "listing",
+            eventSource: EnvironmentAnalyticsSource.VARIABLES_LIST,
             warningMessage: "Please log in to add a new variable",
           },
         })
       );
     } else {
-      trackAddVariableClicked(EnvironmentAnalyticsContext.API_CLIENT, "listing");
+      trackAddVariableClicked(EnvironmentAnalyticsContext.API_CLIENT, EnvironmentAnalyticsSource.VARIABLES_LIST);
       handleAddNewRow(dataSource);
     }
   };
-  if (!isTableLoaded) {
-    return null;
-  }
 
   return (
     <ContentListTable
