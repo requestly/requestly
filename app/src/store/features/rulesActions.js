@@ -81,6 +81,10 @@ export const updateCurrentlySelectedRuleHasUnsavedChanges = (prevState, action) 
   prevState.rules.currentlySelectedRule.hasUnsavedChanges = action.payload;
 };
 
+export const updateIsWorkspaceSwitchConfirmationActive = (prevState, action) => {
+  prevState.rules.currentlySelectedRule.isWorkspaceSwitchConfirmationActive = action.payload;
+};
+
 export const updateCurrentlySelectedRuleErrors = (prevState, action) => {
   prevState.rules.currentlySelectedRule.errors = action.payload;
 };

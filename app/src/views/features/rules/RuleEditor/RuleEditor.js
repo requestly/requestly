@@ -9,6 +9,7 @@ import {
   getCurrentlySelectedRuleData,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
   getIsExtensionEnabled,
+  getIsWorkspaceSwitchConfirmationActive,
 } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
@@ -29,6 +30,7 @@ const RuleEditor = (props) => {
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+  const isWorkspaceSwitchConfirmationActive = useSelector(getIsWorkspaceSwitchConfirmationActive);
   const [isNewRuleCreated, setIsNewRuleCreated] = useState(false);
   const [showEnableRuleTooltip, setShowEnableRuleTooltip] = useState(false);
   const tryThisRuleTooltipTimerRef = useRef(null);
@@ -76,7 +78,7 @@ const RuleEditor = (props) => {
 
   unstable_usePrompt({
     message: "Discard changes? Changes you made may not be saved.",
-    when: isCurrentlySelectedRuleHasUnsavedChanges,
+    when: isCurrentlySelectedRuleHasUnsavedChanges && !isWorkspaceSwitchConfirmationActive,
   });
 
   useEffect(() => {
@@ -103,7 +105,7 @@ const RuleEditor = (props) => {
   }, [state?.source, MODE]);
 
   useEffect(() => {
-    /* 
+    /*
     HOTIFIX FOR INFINITE RERENDER:
     This is a temporary fix to handle the case where bottom sheet should not be visible for sample rules
     TODO: REMOVE THIS WHEN REFACTORING RULE EDITOR
