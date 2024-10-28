@@ -178,6 +178,31 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
     [handleRemoveMember]
   );
 
+  const getMemberRoleTag = useCallback(
+    (role: BillingTeamRoles) => {
+      if (
+        (billingTeamDetails?.isAcceleratorTeam && role === BillingTeamRoles.Manager) ||
+        role === BillingTeamRoles.Admin
+      ) {
+        return (
+          <Row className="icon__wrapper warning" align="middle">
+            <MdOutlineAdminPanelSettings style={{ marginRight: "2px" }} />
+            <span className="caption">Admin</span>
+          </Row>
+        );
+      } else if (role === BillingTeamRoles.Manager) {
+        return (
+          <Row className="icon__wrapper success" align="middle">
+            <MdOutlinePaid style={{ marginRight: "2px" }} />
+            <span className="caption">Billing manager</span>
+          </Row>
+        );
+      }
+      return null;
+    },
+    [billingTeamDetails?.isAcceleratorTeam]
+  );
+
   const columns = useMemo(
     () => [
       {
@@ -202,19 +227,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
                     <span className="text-bold text-white">{`${record.displayName ?? "User"}`}</span>
                   )}
                 </Col>
-                <Col>
-                  {record.role === BillingTeamRoles.Manager ? (
-                    <Row className="icon__wrapper success" align="middle">
-                      <MdOutlinePaid style={{ marginRight: "2px" }} />
-                      <span className="caption">Billing manager</span>
-                    </Row>
-                  ) : record.role === BillingTeamRoles.Admin ? (
-                    <Row className="icon__wrapper warning" align="middle">
-                      <MdOutlineAdminPanelSettings style={{ marginRight: "2px" }} />
-                      <span className="caption">Admin</span>
-                    </Row>
-                  ) : null}
-                </Col>
+                <Col>{getMemberRoleTag(record.role)}</Col>
                 {billingTeamDetails?.billingExclude?.includes(record.id) && (
                   <Col>
                     <Row className="icon__wrapper" align="middle">
@@ -318,6 +331,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
       getMemberDropdownItems,
       handleRoleChange,
       checkIsPendingMember,
+      getMemberRoleTag,
     ]
   );
 
