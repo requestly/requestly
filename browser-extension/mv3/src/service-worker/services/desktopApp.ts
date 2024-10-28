@@ -2,6 +2,7 @@ import { EXTENSION_MESSAGES } from "common/constants";
 import { sendMessageToApp } from "./messageHandler";
 import { applyProxy, ProxyDetails, removeProxy } from "./proxy";
 import { toggleExtensionStatus } from "./utils";
+import extensionIconManager from "./extensionIconManager";
 
 let socket: WebSocket = null;
 
@@ -96,12 +97,14 @@ export const connectToDesktopAppAndApplyProxy = async () => {
     payload: true,
   });
 
+  toggleExtensionStatus(false);
+  extensionIconManager.markConnectedToDesktopApp();
+
   sendMessageToDesktopApp({
     action: "browser-connected",
     appId: getConnectedBrowserAppId(),
   });
 
-  toggleExtensionStatus(false);
   return true;
 };
 
@@ -112,6 +115,8 @@ export const disconnectFromDesktopAppAndRemoveProxy = async () => {
       action: EXTENSION_MESSAGES.DESKTOP_APP_CONNECTION_STATUS_UPDATED,
       payload: false,
     });
+    extensionIconManager.markDisconnectedFromDesktopApp();
+    toggleExtensionStatus(true);
     socket.close();
   } catch (e) {
     console.log("Error sending message to desktop app socket closed");
