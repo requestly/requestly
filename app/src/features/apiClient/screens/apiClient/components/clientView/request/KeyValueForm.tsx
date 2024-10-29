@@ -2,8 +2,8 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { AutoComplete, Button } from "antd";
 import React, { memo, useCallback, useEffect } from "react";
 import { KeyValuePair } from "../../../../../types";
-import { RQSingleLineEditor } from "lib/design-system-v2/components";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 
 interface Props {
   keyValuePairs: KeyValuePair[];
