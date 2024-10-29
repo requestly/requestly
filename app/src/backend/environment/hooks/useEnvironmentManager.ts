@@ -15,6 +15,7 @@ import {
 } from "..";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
+import { isEmpty } from "lodash";
 
 let unsubscribeListener: () => void = null;
 
@@ -67,12 +68,15 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
           }
 
           const updatedEnvironmentMap: EnvironmentMap = {};
-          Object.keys(environmentMap).forEach((key) => {
-            updatedEnvironmentMap[key] = {
-              ...allEnvironmentData[key],
-              variables: mergeLocalAndSyncVariables(allEnvironmentData[key].variables, environmentMap[key].variables),
-            };
-          });
+
+          if (!isEmpty(environmentMap)) {
+            Object.keys(environmentMap).forEach((key) => {
+              updatedEnvironmentMap[key] = {
+                ...allEnvironmentData[key],
+                variables: mergeLocalAndSyncVariables(allEnvironmentData[key].variables, environmentMap[key].variables),
+              };
+            });
+          }
 
           dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: updatedEnvironmentMap }));
         })
