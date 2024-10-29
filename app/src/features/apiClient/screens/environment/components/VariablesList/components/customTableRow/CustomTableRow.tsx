@@ -45,6 +45,9 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   const inputRef = useRef(null);
 
   const convertValueByType = useCallback((value: any, type: EnvironmentVariableType) => {
+    if (value === undefined) {
+      return "";
+    }
     switch (type) {
       case EnvironmentVariableType.Number:
         return Number(value);
