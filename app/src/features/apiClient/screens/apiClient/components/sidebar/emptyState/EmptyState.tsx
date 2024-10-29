@@ -6,10 +6,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import { RQAPI } from "features/apiClient/types";
+import { EnvironmentAnalyticsSource } from "features/apiClient/screens/environment/types";
 import "./emptyState.scss";
 
 export interface EmptyStateProps {
-  analyticEventSource: RQAPI.AnalyticsEventSource;
+  analyticEventSource: RQAPI.AnalyticsEventSource | EnvironmentAnalyticsSource;
   message: string;
   newRecordBtnText: string;
   onNewRecordClick: () => void;

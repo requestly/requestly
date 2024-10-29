@@ -8,6 +8,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { ApiClientSidebarTabKey } from "../APIClientSidebar";
 import { RQAPI } from "features/apiClient/types";
+import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
@@ -16,6 +17,7 @@ import { getUserAuthDetails } from "store/selectors";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
+  // TODO: FIX THIS
   onNewClick: (recordType: RQAPI.RecordType) => void;
   onImportClick: () => void;
   history: RQAPI.Entry[];
@@ -129,7 +131,18 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         >
           Clear history
         </RQButton>
+      ) : activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
+        <RQButton
+          type="transparent"
+          size="small"
+          icon={<MdAdd />}
+          onClick={() => onNewClick(RQAPI.RecordType.ENVIRONMENT)}
+        >
+          New
+        </RQButton>
       ) : null}
+
+      {user.loggedIn && <EnvironmentSwitcher />}
     </div>
   );
 };

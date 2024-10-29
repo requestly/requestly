@@ -16,6 +16,7 @@ import { getValueAsPromise } from "./FirebaseActions";
 import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUtils";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
+import { environmentVariablesActions } from "store/features/environment/slice";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -86,6 +87,8 @@ export const switchWorkspace = async (
     Logger.log("Clearing storage in switchWorkspace");
     await StorageService(appMode).clearDB();
   }
+
+  dispatch(environmentVariablesActions.resetState());
 
   // Just in case
   window.skipSyncListenerForNextOneTime = false;
