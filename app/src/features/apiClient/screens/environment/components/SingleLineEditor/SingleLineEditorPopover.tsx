@@ -1,6 +1,5 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Popover, Row } from "antd";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { capitalize } from "lodash";
 
@@ -8,26 +7,24 @@ interface SingleLineEditorPopoverProps {
   hoveredVariable: string;
   popupPosition: { x: number; y: number };
   editorRef: React.RefObject<HTMLDivElement>;
+  variables: Record<string, any>;
 }
 
 export const SingleLineEditorPopover: React.FC<SingleLineEditorPopoverProps> = ({
   hoveredVariable,
   editorRef,
   popupPosition,
+  variables = {},
 }) => {
-  const { getCurrentEnvironmentVariables } = useEnvironmentManager();
-
-  const currentEnvironmentVariables = useMemo(() => getCurrentEnvironmentVariables(), [getCurrentEnvironmentVariables]);
-
   return (
     <Popover
       content={
         <div className="variable-info-body">
-          {currentEnvironmentVariables[hoveredVariable] ? (
+          {variables[hoveredVariable] ? (
             <VariableInfo
               variable={{
                 name: hoveredVariable,
-                ...currentEnvironmentVariables[hoveredVariable],
+                ...variables[hoveredVariable],
               }}
             />
           ) : (

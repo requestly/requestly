@@ -7,7 +7,7 @@ interface VariableSetters {
 
 export const highlightVariablesPlugin = (
   setters: VariableSetters,
-  currentEnvironmentVariables: Record<string, any>
+  currentEnvironmentVariables: Record<string, any> = {}
 ) => {
   return ViewPlugin.fromClass(
     class {

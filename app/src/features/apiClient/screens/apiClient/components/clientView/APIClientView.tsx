@@ -68,7 +68,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const teamId = workspace?.id;
 
   const { onSaveRecord } = useApiClientContext();
-  const { renderVariables } = useEnvironmentManager();
+  const { renderVariables, getCurrentEnvironmentVariables } = useEnvironmentManager();
+  const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
@@ -361,6 +362,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               onChange={(text) => setUrl(text)}
               onPressEnter={onUrlInputEnterPressed}
               onBlur={onUrlInputBlur}
+              variables={currentEnvironmentVariables}
               // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
             />
           </Space.Compact>

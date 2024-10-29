@@ -1,10 +1,9 @@
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { EditorView, placeholder as cmPlaceHolder } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import "./SingleLineEditor.scss";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { SingleLineEditorPopover } from "./SingleLineEditorPopover";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 
 interface RQSingleLineEditorProps {
   defaultValue?: string;
@@ -13,6 +12,7 @@ interface RQSingleLineEditorProps {
   placeholder?: string;
   onPressEnter?: (event: KeyboardEvent, text: string) => void;
   onBlur?: (text: string) => void;
+  variables?: Record<string, any>;
 }
 
 export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
@@ -22,16 +22,13 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   placeholder,
   onPressEnter,
   onBlur,
+  variables,
 }) => {
   const editorRef = useRef(null);
   const editorViewRef = useRef(null);
 
   const [hoveredVariable, setHoveredVariable] = useState(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
-
-  const { getCurrentEnvironmentVariables } = useEnvironmentManager();
-
-  const currentEnvironmentVariables = useMemo(() => getCurrentEnvironmentVariables(), [getCurrentEnvironmentVariables]);
 
   useEffect(() => {
     if (editorViewRef.current) {
@@ -66,7 +63,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
               setHoveredVariable,
               setPopupPosition,
             },
-            currentEnvironmentVariables
+            variables
           ),
           cmPlaceHolder(placeholder ?? "Input here"),
         ],
@@ -94,6 +91,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
             editorRef={editorRef}
             hoveredVariable={hoveredVariable}
             popupPosition={popupPosition}
+            variables={variables}
           />
         )}
       </div>
