@@ -69,16 +69,15 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
 
           const updatedEnvironmentMap: EnvironmentMap = {};
 
-          if (!isEmpty(environmentMap)) {
+          if (!isEmpty(allEnvironmentData)) {
             Object.keys(environmentMap).forEach((key) => {
               updatedEnvironmentMap[key] = {
                 ...allEnvironmentData[key],
                 variables: mergeLocalAndSyncVariables(allEnvironmentData[key].variables, environmentMap[key].variables),
               };
             });
-          }
-
-          dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: updatedEnvironmentMap }));
+            dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: updatedEnvironmentMap }));
+          } else dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
         })
         .catch((err) => {
           Logger.error("Error while fetching all environment variables", err);
