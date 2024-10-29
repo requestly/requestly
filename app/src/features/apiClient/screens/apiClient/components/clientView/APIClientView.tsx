@@ -95,7 +95,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, [apiEntry]);
 
   const setUrl = useCallback((url: string) => {
-    console.log("!!!debug", "setURL", url);
     setEntry((entry) => ({
       ...entry,
       request: {
