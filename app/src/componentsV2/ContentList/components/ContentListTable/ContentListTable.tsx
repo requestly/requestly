@@ -109,6 +109,9 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   dragAndDrop = false,
   onRowDropped = () => {},
   defaultExpandedRowKeys = [],
+  components,
+  footer,
+  bordered = false,
 }: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
@@ -158,12 +161,6 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
       setExpandedRowsKeys(currentListTableExpandedRows);
     }
   }, [id]);
-
-  const components = {
-    body: {
-      row: DraggableBodyRow,
-    },
-  };
 
   const onRowDrop = useCallback(
     (sourceRecord: DataType, targetRecord: DataType) => {
@@ -218,6 +215,9 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
           </span>
         ) : null,
     },
+    components: components,
+    footer: footer,
+    bordered: bordered,
   };
 
   return (
@@ -227,7 +227,11 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
         <DndProvider backend={HTML5Backend}>
           <Table
             {...commonProps}
-            components={components}
+            components={{
+              body: {
+                row: DraggableBodyRow,
+              },
+            }}
             onRow={(record, index) => {
               const onRowAttr = onRowCallback(record);
 
