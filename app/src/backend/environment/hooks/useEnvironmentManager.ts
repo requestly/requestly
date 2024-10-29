@@ -73,7 +73,10 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
             Object.keys(environmentMap).forEach((key) => {
               updatedEnvironmentMap[key] = {
                 ...allEnvironmentData[key],
-                variables: mergeLocalAndSyncVariables(allEnvironmentData[key].variables, environmentMap[key].variables),
+                variables: mergeLocalAndSyncVariables(
+                  allEnvironmentData[key]?.variables ?? {},
+                  environmentMap[key].variables
+                ),
               };
             });
             dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: updatedEnvironmentMap }));
@@ -96,7 +99,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       unsubscribeListener?.();
       unsubscribeListener = attachEnvironmentVariableListener(ownerId, currentEnvironmentId, (environmentData) => {
         const mergedVariables = mergeLocalAndSyncVariables(
-          allEnvironmentData[environmentData.id].variables,
+          allEnvironmentData[environmentData.id]?.variables ?? {},
           environmentData.variables
         );
         dispatch(

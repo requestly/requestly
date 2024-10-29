@@ -84,7 +84,6 @@ export const mergeLocalAndSyncVariables = (
   );
 
   return {
-    ...currentVariables,
     ...updatedVariables,
   };
 };
