@@ -17,9 +17,7 @@ export const SingleLineEditorPopover: React.FC<SingleLineEditorPopoverProps> = (
 }) => {
   const { getCurrentEnvironmentVariables } = useEnvironmentManager();
 
-  const currentEnvironmentVariables = useMemo(() => {
-    return getCurrentEnvironmentVariables();
-  }, [getCurrentEnvironmentVariables]);
+  const currentEnvironmentVariables = useMemo(() => getCurrentEnvironmentVariables(), [getCurrentEnvironmentVariables]);
 
   return (
     <Popover

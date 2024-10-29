@@ -5,7 +5,10 @@ interface VariableSetters {
   setPopupPosition: (position: { x: number; y: number }) => void;
 }
 
-export const highlightVariablesPlugin = (setters: VariableSetters) => {
+export const highlightVariablesPlugin = (
+  setters: VariableSetters,
+  currentEnvironmentVariables: Record<string, any>
+) => {
   return ViewPlugin.fromClass(
     class {
       decorations: DecorationSet;
@@ -38,15 +41,17 @@ export const highlightVariablesPlugin = (setters: VariableSetters) => {
           const startIndex = match.index;
           const endIndex = match.index + match[0].length;
 
+          const variable = match[0].slice(2, -2); // Extract the variable name
+
           this.variablePositions.push({
             start: startIndex,
             end: endIndex,
-            variable: match[0].slice(2, -2), // Extract the variable name
+            variable,
           });
 
           decorations.push(
             Decoration.mark({
-              class: "highlight-variable",
+              class: `highlight-${variable in currentEnvironmentVariables ? "defined" : "undefined"}-variable`,
             }).range(match.index, match.index + match[0].length)
           );
         }
