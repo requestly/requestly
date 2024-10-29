@@ -23,10 +23,18 @@
   flex-shrink: 0;
 }
 
+.rule-editor-header.ant-layout-header .rule-editor-row .rule-editor-title-info .rq-breadcrumb {
+  padding-left: 0;
+}
+
 .rule-editor-header-title {
   flex-shrink: 0;
   margin-left: 4px;
   font-size: var(--requestly-font-size-xs);
+}
+
+.rule-editor-header-title .rq-breadcrumb {
+  margin-left: 0;
 }
 
 .rule-editor-header-actions {
