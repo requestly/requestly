@@ -1,7 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { EnvironmentMap, EnvironmentVariables } from "backend/environment/types";
 import { InitialState } from "./types";
-import { mergeLocalAndSyncVariables } from "./utils";
 
 const initialState = {
   currentEnvironment: "",
@@ -9,6 +8,20 @@ const initialState = {
 };
 
 const resetState = (): InitialState => initialState;
+
+const addNewEnvironment = (
+  state: InitialState,
+  action: PayloadAction<{
+    id: string;
+    name: string;
+  }>
+) => {
+  state.environments[action.payload.id] = {
+    id: action.payload.id,
+    variables: {},
+    name: action.payload.name,
+  };
+};
 
 const setCurrentEnvironment = (
   state: InitialState,
@@ -25,23 +38,7 @@ const setAllEnvironmentData = (
     environmentMap: EnvironmentMap;
   }>
 ) => {
-  let updatedEnvironments: EnvironmentMap = {};
-
-  if (Object.keys(state.environments).length === 0) {
-    updatedEnvironments = action.payload.environmentMap;
-  } else {
-    Object.keys(action.payload.environmentMap).forEach((key) => {
-      updatedEnvironments[key] = {
-        ...state.environments[key],
-        variables: mergeLocalAndSyncVariables(
-          state.environments[key].variables,
-          action.payload.environmentMap[key].variables
-        ),
-      };
-    });
-  }
-
-  state.environments = updatedEnvironments;
+  state.environments = action.payload.environmentMap;
 };
 
 const setVariablesInEnvironment = (
@@ -51,11 +48,7 @@ const setVariablesInEnvironment = (
     environmentId: string;
   }>
 ) => {
-  const currentEnvironmentVariables = state.environments[action.payload.environmentId].variables;
-
-  const updatedVariables = mergeLocalAndSyncVariables(currentEnvironmentVariables, action.payload.newVariables);
-
-  state.environments[action.payload.environmentId].variables = updatedVariables;
+  state.environments[action.payload.environmentId].variables = action.payload.newVariables;
 };
 
 const removeVariableFromEnvironment = (
@@ -69,11 +62,12 @@ const removeVariableFromEnvironment = (
 };
 
 const environmentVariablesReducerFunctions = {
+  addNewEnvironment,
   resetState,
-  setAllEnvironmentData,
-  setVariablesInEnvironment,
   removeVariableFromEnvironment,
+  setAllEnvironmentData,
   setCurrentEnvironment,
+  setVariablesInEnvironment,
 };
 
 export { initialState };
