@@ -35,6 +35,7 @@ import "./apiClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQButton } from "lib/design-system-v2/components";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
@@ -66,12 +67,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const teamId = workspace?.id;
 
   const { onSaveRecord } = useApiClientContext();
+  const { renderVariables } = useEnvironmentManager();
 
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
+
   const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const animationTimerRef = useRef<NodeJS.Timeout>();
@@ -232,6 +235,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     const sanitizedEntry = sanitizeEntry(entry);
     sanitizedEntry.response = null;
 
+    const renderedRequest = renderVariables<RQAPI.Request>(sanitizedEntry.request);
+    const renderedEntry = { ...sanitizedEntry, request: renderedRequest };
+
     abortControllerRef.current = new AbortController();
 
     setEntry(sanitizedEntry);
@@ -239,10 +245,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    makeRequest(appMode, sanitizedEntry.request, abortControllerRef.current.signal)
+    makeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
       .then((response) => {
         // TODO: Add an entry in history
         const entryWithResponse = { ...sanitizedEntry, response };
+        const renderedEntryWithResponse = { ...renderedEntry, response };
+
         if (response) {
           setEntry(entryWithResponse);
           trackResponseLoaded({
@@ -257,7 +265,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
           trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
         }
-        notifyApiRequestFinished?.(entryWithResponse);
+        notifyApiRequestFinished?.(renderedEntryWithResponse);
       })
       .catch(() => {
         if (abortControllerRef.current?.signal.aborted) {
@@ -270,16 +278,16 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       });
 
     trackAPIRequestSent({
-      method: sanitizedEntry.request.method,
-      queryParamsCount: sanitizedEntry.request.queryParams.length,
-      headersCount: sanitizedEntry.request.headers.length,
-      requestContentType: sanitizedEntry.request.contentType,
-      isDemoURL: sanitizedEntry.request.url === DEMO_API_URL,
+      method: renderedEntry.request.method,
+      queryParamsCount: renderedEntry.request.queryParams.length,
+      headersCount: renderedEntry.request.headers.length,
+      requestContentType: renderedEntry.request.contentType,
+      isDemoURL: renderedEntry.request.url === DEMO_API_URL,
       path: location.pathname,
     });
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
-  }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished]);
+  }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished, renderVariables]);
 
   const onSaveButtonClick = async () => {
     setIsRequestSaving(true);
