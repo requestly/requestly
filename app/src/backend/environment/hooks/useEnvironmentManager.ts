@@ -83,7 +83,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
           } else dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
         })
         .catch((err) => {
-          console.error("Error while fetching all environment variables", err);
+          Logger.error("Error while fetching all environment variables", err);
           dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: {} }));
         })
         .finally(() => {
