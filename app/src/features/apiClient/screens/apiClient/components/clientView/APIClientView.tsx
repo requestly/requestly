@@ -1,5 +1,5 @@
-import { Empty, Input, Select, Skeleton, Space, Spin } from "antd";
-import React, { SyntheticEvent, memo, useCallback, useEffect, useRef, useState } from "react";
+import { Empty, Select, Skeleton, Space, Spin } from "antd";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import Split from "react-split";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
@@ -42,6 +42,7 @@ import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
 import PATHS from "config/constants/sub/paths";
+import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 
 interface Props {
   openInModal?: boolean;
@@ -67,7 +68,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const teamId = workspace?.id;
 
   const { onSaveRecord } = useApiClientContext();
-  const { renderVariables } = useEnvironmentManager();
+  const { renderVariables, getCurrentEnvironmentVariables } = useEnvironmentManager();
+  const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
@@ -185,14 +187,17 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const onUrlInputBlur = useCallback(() => {
-    if (entry.request.url) {
-      const urlWithUrlScheme = addUrlSchemeIfMissing(entry.request.url);
-      if (urlWithUrlScheme !== entry.request.url) {
-        setUrl(urlWithUrlScheme);
+  const onUrlInputBlur = useCallback(
+    (text: string) => {
+      if (text) {
+        const urlWithUrlScheme = addUrlSchemeIfMissing(text);
+        if (urlWithUrlScheme !== text) {
+          setUrl(urlWithUrlScheme);
+        }
       }
-    }
-  }, [entry.request.url, setUrl]);
+    },
+    [setUrl]
+  );
 
   const sanitizeEntry = (entry: RQAPI.Entry) => {
     const sanitizedEntry: RQAPI.Entry = {
@@ -324,7 +329,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackAPIRequestCancelled();
   }, []);
 
-  const onUrlInputEnterPressed = useCallback((evt: SyntheticEvent<HTMLInputElement>) => {
+  const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
     (evt.target as HTMLInputElement).blur();
   }, []);
 
@@ -339,7 +344,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               value={entry.request.method}
               onChange={setMethod}
             />
-            <Input
+            {/* <Input
               className="api-request-url"
               placeholder="https://example.com"
               value={entry.request.url}
@@ -347,6 +352,17 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               onPressEnter={onUrlInputEnterPressed}
               onBlur={onUrlInputBlur}
               prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
+            /> */}
+            <RQSingleLineEditor
+              className="api-request-url"
+              placeholder="https://example.com"
+              // value={entry.request.url}
+              defaultValue={entry.request.url}
+              onChange={(text) => setUrl(text)}
+              onPressEnter={onUrlInputEnterPressed}
+              onBlur={onUrlInputBlur}
+              variables={currentEnvironmentVariables}
+              // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
             />
           </Space.Compact>
           <RQButton
