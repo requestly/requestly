@@ -4,6 +4,7 @@ import { DataScope, TAB_SERVICE_DATA, tabService } from "./tabService";
 import rulesStorageService from "../../rulesStorageService";
 import { CLIENT_MESSAGES } from "common/constants";
 import { sendLogToDevtools } from "./devtools";
+import { eventLogger } from "./eventLogger";
 
 interface RulesExecutionLog {
   ruleId: string;
@@ -36,6 +37,10 @@ class RuleExecutionHandler {
   };
 
   processTabCachedRulesExecutions = async (tabId: number) => {
+    if (!tabId) {
+      return;
+    }
+
     const rulesExecutionLogs: RulesExecutionLog[] =
       tabService.getData(tabId, TAB_SERVICE_DATA.RULES_EXECUTION_LOGS, []) || [];
 
@@ -74,6 +79,13 @@ class RuleExecutionHandler {
       TAB_SERVICE_DATA.RULES_EXECUTION_LOGS,
       rulesExecutionLogs
     );
+
+    eventLogger.logEvent("rule_executed", {
+      rule_type: rule.ruleType,
+      rule_id: rule.id,
+      platform: "extension",
+      rule_creator: rule.createdBy,
+    });
   };
 }
 

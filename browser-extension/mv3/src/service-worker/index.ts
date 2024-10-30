@@ -1,3 +1,4 @@
+import { cacheRefreshToken } from "../utils";
 import { initClientHandler, initClientSideCaching } from "./services/clientHandler";
 import { registerCommands } from "./services/commands";
 import { initContextMenu } from "./services/contextMenu";
@@ -18,4 +19,5 @@ import { initWebRequestInterceptor } from "./services/webRequestInterceptor";
   initContextMenu();
   initWebRequestInterceptor();
   initDevtoolsListener();
+  cacheRefreshToken();
 })();

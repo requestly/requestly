@@ -51,6 +51,7 @@
   "permissions": [
     "contextMenus",
     "declarativeNetRequest",
+    "offscreen",
     "proxy",
     "scripting",
     "storage",
