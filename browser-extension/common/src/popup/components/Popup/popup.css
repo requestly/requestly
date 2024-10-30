@@ -2,11 +2,14 @@
 .popup {
   width: 560px;
   min-height: 412px;
-  max-height: 596px;
+  max-height: 600px;
   font-size: 14px;
   line-height: 20px;
   letter-spacing: 0.25px;
   color: var(--text-default);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .popup-header {
@@ -123,8 +126,11 @@
 }
 
 .popup-content {
-  padding: 16px;
+  padding: 10px;
   padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .header-content-separator {
@@ -303,4 +309,10 @@
 .popup-footer .extension-version {
   font-size: 11px;
   color: var(--neutrals-gray-400);
+}
+
+.popup-body-card {
+  border-radius: var(--space-4, 8px);
+  border: 1px solid var(--alias-tokens-color-white-t-10, rgba(255, 255, 255, 0.06));
+  background: var(--alias-tokens-color-surface-1, #282828);
 }

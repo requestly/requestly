@@ -127,3 +127,15 @@ export function testRuleOnUrl(testOptions) {
     record,
   });
 }
+
+export function checkIsProxyApplied() {
+  return sendMessage({
+    action: GLOBAL_CONSTANTS.EXTENSION_MESSAGES.IS_PROXY_APPLIED,
+  });
+}
+
+export function disconnectFromDesktopApp() {
+  return sendMessage({
+    action: GLOBAL_CONSTANTS.EXTENSION_MESSAGES.DISCONNECT_FROM_DESKTOP_APP,
+  });
+}

@@ -13,10 +13,12 @@ import { isAppOpenedInIframe } from "utils/AppUtils";
 import { AppNotificationBanner } from "../../componentsV2/AppNotificationBanner";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { actions } from "store";
-import "./DashboardLayout.css";
 import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
 import SupportPanel from "components/misc/SupportPanel";
+import { useDesktopAppConnection } from "hooks/useDesktopAppConnection";
+import "./DashboardLayout.css";
+import { ConnectedToDesktopView } from "./ConnectedToDesktopView/ConnectedToDesktopView";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -24,6 +26,7 @@ const DashboardLayout = () => {
   const { pathname } = location;
   const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
   const user = useSelector(getUserAuthDetails);
+  const { isDesktopAppConnected } = useDesktopAppConnection();
 
   initializeOneTap();
 
@@ -70,15 +73,21 @@ const DashboardLayout = () => {
           <MenuHeader />
         </div>
 
-        <div className="app-sidebar">{isSidebarVisible && <Sidebar />}</div>
-
-        <div className="app-main-content">
-          <DashboardContent />
-        </div>
-        <SupportPanel />
-        <div className="app-footer">
-          <Footer />
-        </div>
+        {isDesktopAppConnected ? (
+          <ConnectedToDesktopView />
+        ) : (
+          <>
+            {" "}
+            <div className="app-sidebar">{isSidebarVisible && <Sidebar />}</div>
+            <div className="app-main-content">
+              <DashboardContent />
+            </div>
+            <SupportPanel />
+            <div className="app-footer">
+              <Footer />
+            </div>
+          </>
+        )}
       </div>
     </>
   );
