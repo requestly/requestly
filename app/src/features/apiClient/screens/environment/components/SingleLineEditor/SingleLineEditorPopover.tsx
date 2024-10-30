@@ -35,8 +35,7 @@ export const SingleLineEditorPopover: React.FC<SingleLineEditorPopoverProps> = (
       open={!!hoveredVariable}
       destroyTooltipOnHide
       placement="bottom"
-      arrowContent={null}
-      arrowPointAtCenter={null}
+      showArrow={false}
       overlayClassName="variable-info-popover"
     >
       <div
