@@ -75,7 +75,7 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
           <KeyValueForm
             keyValuePairs={request.headers}
             setKeyValuePairs={setRequestHeaders}
-            keyOptions={HEADER_SUGGESTIONS.Request}
+            // keyOptions={HEADER_SUGGESTIONS.Request}
           />
         ),
       },
