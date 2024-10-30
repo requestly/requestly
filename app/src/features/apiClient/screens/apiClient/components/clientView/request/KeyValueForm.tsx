@@ -1,7 +1,9 @@
 import { DeleteOutlined } from "@ant-design/icons";
-import { AutoComplete, Button, Input } from "antd";
+import { AutoComplete, Button } from "antd";
 import React, { memo, useCallback, useEffect } from "react";
 import { KeyValuePair } from "../../../../../types";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 
 interface Props {
   keyValuePairs: KeyValuePair[];
@@ -12,6 +14,9 @@ interface Props {
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "" });
 
 const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOptions }) => {
+  const { getCurrentEnvironmentVariables } = useEnvironmentManager();
+  const currentEnvironmentVariables = getCurrentEnvironmentVariables();
+
   const addEmptyPair = useCallback(() => {
     setKeyValuePairs([...keyValuePairs, getEmptyPair()]);
   }, [keyValuePairs, setKeyValuePairs]);
@@ -68,14 +73,26 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
                   placeholder="key"
                 />
               ) : (
-                <Input placeholder="key" value={param.key} onChange={(evt) => onKeyChange(evt.target.value, index)} />
+                // <Input placeholder="key" value={param.key} onChange={(evt) => onKeyChange(evt.target.value, index)} />
+                <RQSingleLineEditor
+                  placeholder="key"
+                  defaultValue={param.key}
+                  onChange={(val) => onKeyChange(val, index)}
+                  variables={currentEnvironmentVariables}
+                />
               )}
             </td>
             <td className="value">
-              <Input
+              {/* <Input
                 placeholder="value"
                 value={param.value}
                 onChange={(evt) => onValueChange(evt.target.value, index)}
+              /> */}
+              <RQSingleLineEditor
+                placeholder="value"
+                defaultValue={param.value}
+                onChange={(value) => onValueChange(value, index)}
+                variables={currentEnvironmentVariables}
               />
             </td>
             <td>
