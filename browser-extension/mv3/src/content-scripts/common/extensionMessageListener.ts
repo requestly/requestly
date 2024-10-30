@@ -11,6 +11,7 @@ export const initExtensionMessageListener = () => {
       case EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED:
       case CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED:
       case EXTENSION_MESSAGES.RULE_SAVE_ERROR:
+      case EXTENSION_MESSAGES.DESKTOP_APP_CONNECTION_STATUS_UPDATED:
         sendExtensionMessage(message);
         break;
     }
