@@ -121,6 +121,12 @@ export const disconnectFromDesktopAppAndRemoveProxy = async () => {
   } catch (e) {
     console.log("Error sending message to desktop app socket closed");
     removeProxy();
+    // Sending disconnect message as control enters catch when desktop app is closed as socket is closed
+    sendMessageToApp({
+      action: EXTENSION_MESSAGES.DESKTOP_APP_CONNECTION_STATUS_UPDATED,
+      payload: false,
+    });
+    extensionIconManager.markDisconnectedFromDesktopApp();
     toggleExtensionStatus(true);
   }
   return true;
