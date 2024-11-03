@@ -2,29 +2,27 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Row } from "antd";
 import { PrimaryActionButton } from "../common/PrimaryActionButton";
 import { CheckCircleOutlined } from "@ant-design/icons";
-import "./desktopAppProxy.scss";
 import { EXTENSION_MESSAGES } from "../../../constants";
+import ConnectToDesktopIcon from "../../../../resources/icons/connectToDesktop.svg";
+import "./desktopAppProxy.scss";
 
-const DesktopAppProxy: React.FC = () => {
-  const [isProxyApplied, setIsProxyApplied] = useState(false);
+interface DesktopAppProxyProps {
+  isProxyApplied: boolean;
+  onProxyStatusChange: (newStatus: boolean) => void;
+}
+
+const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ isProxyApplied, onProxyStatusChange }) => {
   const [isDesktopAppOpen, setIsDesktopAppOpen] = useState(false);
 
   const connectToDesktopApp = useCallback(() => {
     chrome.runtime
       .sendMessage({ action: EXTENSION_MESSAGES.CONNECT_TO_DESKTOP_APP })
-      .then(setIsProxyApplied)
-      .catch(() => setIsProxyApplied(false));
-  }, []);
-
-  const disconnectFromDesktopApp = useCallback(() => {
-    chrome.runtime
-      .sendMessage({ action: EXTENSION_MESSAGES.DISCONNECT_FROM_DESKTOP_APP })
-      .then((response) => setIsProxyApplied(!response))
-      .catch(() => setIsProxyApplied(true));
+      .then(onProxyStatusChange)
+      .catch(() => onProxyStatusChange(false));
   }, []);
 
   const checkIfProxyApplied = useCallback(() => {
-    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.IS_PROXY_APPLIED }).then(setIsProxyApplied);
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.IS_PROXY_APPLIED }).then(onProxyStatusChange);
   }, []);
 
   const checkIfDesktopAppOpen = useCallback(() => {
@@ -41,8 +39,9 @@ const DesktopAppProxy: React.FC = () => {
   }
 
   return (
-    <div className="desktop-app-container">
+    <div className="desktop-app-container popup-body-card">
       <Row align={"middle"} justify={"space-between"}>
+        <ConnectToDesktopIcon className="connect-to-desktop-icon" />
         <div>
           <div>
             {isProxyApplied ? (
@@ -59,28 +58,14 @@ const DesktopAppProxy: React.FC = () => {
               : "Connect to intercept all the traffic from this browser profile."}
           </div>
         </div>
-        <div>
-          {isProxyApplied ? (
-            <PrimaryActionButton
-              size="small"
-              onClick={() => {
-                disconnectFromDesktopApp();
-              }}
-              className="disconnect-button"
-            >
-              Disconnect
-            </PrimaryActionButton>
-          ) : (
-            <PrimaryActionButton
-              size="small"
-              onClick={() => {
-                connectToDesktopApp();
-              }}
-            >
-              Connect
-            </PrimaryActionButton>
-          )}
-        </div>
+        <PrimaryActionButton
+          size="small"
+          onClick={() => {
+            connectToDesktopApp();
+          }}
+        >
+          Connect
+        </PrimaryActionButton>
       </Row>
     </div>
   );

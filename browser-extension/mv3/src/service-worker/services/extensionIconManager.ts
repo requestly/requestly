@@ -5,10 +5,12 @@ interface ExtensionIconConfig {
   ruleExecuted?: boolean;
   isRecording?: boolean;
   isBlocked?: boolean;
+  isConnectedToDesktopApp?: boolean;
 }
 
 class ExtensionIconManager {
   #isExtensionDisabled = false;
+  #connectedToDesktopApp = false;
 
   #icons = {
     DEFAULT: "/resources/images/48x48.png",
@@ -17,6 +19,7 @@ class ExtensionIconManager {
     RULE_EXECUTED: "/resources/images/48x48_green.png",
     DEFAULT_WITH_REC: "/resources/images/48x48_rec.png",
     RULE_EXECUTED_WITH_REC: "/resources/images/48x48_green_rec.png",
+    CONNECTED_TO_DESKTOP_APP: "/resources/images/48x48_desktop.png",
   };
 
   #CONSTANTS = {
@@ -44,6 +47,10 @@ class ExtensionIconManager {
   }
 
   #getIcon(config: ExtensionIconConfig) {
+    if (this.#connectedToDesktopApp) {
+      return this.#icons.CONNECTED_TO_DESKTOP_APP;
+    }
+
     if (this.#isExtensionDisabled) {
       return this.#icons.DISABLED;
     }
@@ -117,6 +124,18 @@ class ExtensionIconManager {
 
   markExtensionBlocked(tabId: number) {
     this.#updateIconState(tabId, "isBlocked", true);
+  }
+
+  markConnectedToDesktopApp() {
+    this.#connectedToDesktopApp = true;
+    this.#setExtensionIcon(this.#icons.CONNECTED_TO_DESKTOP_APP);
+    this.#updateIconStateForAllTabs();
+  }
+
+  markDisconnectedFromDesktopApp() {
+    this.#connectedToDesktopApp = false;
+    this.#setExtensionIcon(this.#icons.DEFAULT);
+    this.#updateIconStateForAllTabs();
   }
 }
 
