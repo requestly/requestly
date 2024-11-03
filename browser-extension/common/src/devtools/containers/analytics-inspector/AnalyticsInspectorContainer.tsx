@@ -54,14 +54,14 @@ const AnalyticsInspectorContainer: React.FC = () => {
         <EmptyContainerPlaceholder
           lines={[
             "Recording Analytics events...",
-            "We only support a few vendors right now. More vendors will be added soon.",
+            "We only support a few analytics providers right now. More providers will be added soon.",
             <div
               className="add-vendor-link"
               onClick={() => {
                 window.open("https://github.com/requestly/requestly/issues/2179", "_blank", "noopener,noreferrer");
               }}
             >
-              Request to add yourself as a vendor
+              Is you platform missing? Request to add your analytics provider.
             </div>,
           ]}
         />
