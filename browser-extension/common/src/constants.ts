@@ -40,6 +40,7 @@ export const EXTENSION_MESSAGES = {
   CHECK_IF_DESKTOP_APP_OPEN: "checkIfDesktopAppOpen",
   CONNECT_TO_DESKTOP_APP: "connectToDesktopApp",
   DISCONNECT_FROM_DESKTOP_APP: "disconnectFromDesktopApp",
+  DESKTOP_APP_CONNECTION_STATUS_UPDATED: "desktopAppConnectionStatusUpdated",
 };
 
 export const CLIENT_MESSAGES = {

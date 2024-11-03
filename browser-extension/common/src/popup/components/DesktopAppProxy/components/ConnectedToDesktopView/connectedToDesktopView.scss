@@ -1,0 +1,24 @@
+.desktop-app-connected-view {
+  display: flex;
+  padding: 28px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-8, 24px);
+  flex: 1;
+
+  .connected-icon {
+    width: 64px;
+  }
+
+  .connected-title {
+    font-size: var(--font-size-lg, 20px);
+    font-weight: 500;
+  }
+
+  .connected-description {
+    color: var(--alias-tokens-color-text-subtle, #bbb);
+    text-align: center;
+    font-size: var(--font-size-sm, 13px);
+  }
+}
