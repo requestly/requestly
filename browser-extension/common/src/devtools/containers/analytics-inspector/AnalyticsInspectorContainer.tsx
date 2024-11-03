@@ -61,7 +61,7 @@ const AnalyticsInspectorContainer: React.FC = () => {
                 window.open("https://github.com/requestly/requestly/issues/2179", "_blank", "noopener,noreferrer");
               }}
             >
-              Is you platform missing? Request to add your analytics provider.
+              Is your platform missing? Request to add your analytics provider.
             </div>,
           ]}
         />
