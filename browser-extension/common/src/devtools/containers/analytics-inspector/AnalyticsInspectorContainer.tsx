@@ -54,7 +54,7 @@ const AnalyticsInspectorContainer: React.FC = () => {
         <EmptyContainerPlaceholder
           lines={[
             "Recording Analytics events...",
-            "Only BlueCore event supported, more vendors will be added soon!",
+            "We only support a few vendors right now. More vendors will be added soon.",
             <div
               className="add-vendor-link"
               onClick={() => {
