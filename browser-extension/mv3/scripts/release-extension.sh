@@ -2,7 +2,7 @@
 BROWSER=chrome ENV=prod npm run config
 
 echo **Playwright test Started**
-# npm run test
+npm run test
 # Check if the tests failed
 if [ $? -ne 0 ]; then
   echo "Playwright tests failed. Aborting release."
