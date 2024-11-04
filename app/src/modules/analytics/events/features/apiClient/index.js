@@ -59,7 +59,12 @@ export const trackInstallExtensionDialogShown = (params) =>
 
 export const trackRequestSaved = (src) => {
   const params = { src };
-  trackEvent(API_CLIENT.REQUEST_SAVED, src);
+  trackEvent(API_CLIENT.REQUEST_SAVED, params);
+};
+
+export const trackRequestRenamed = (src) => {
+  const params = { src };
+  trackEvent(API_CLIENT.REQUEST_RENAMED, params);
 };
 
 export const trackNewCollectionClicked = (src) => {
