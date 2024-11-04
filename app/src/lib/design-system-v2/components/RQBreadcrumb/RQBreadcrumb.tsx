@@ -62,6 +62,10 @@ export const RQBreadcrumb: React.FC<Props> = ({
   const handleOnBlur = () => {
     setIsEditRecord(false);
     onBlur?.(name);
+
+    if (!name) {
+      setName(recordName);
+    }
   };
 
   const handleRecordNameEditClick = () => {
