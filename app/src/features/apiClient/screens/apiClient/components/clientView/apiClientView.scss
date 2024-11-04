@@ -7,6 +7,10 @@
   box-sizing: border-box;
   background-color: var(--body-background);
 
+  .rq-breadcrumb {
+    margin: 0 10px;
+  }
+
   .api-client-header {
     flex: 0;
     display: flex;
