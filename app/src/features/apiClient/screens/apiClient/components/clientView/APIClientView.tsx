@@ -189,18 +189,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const onUrlInputBlur = useCallback(
-    (text: string) => {
-      if (text) {
-        const urlWithUrlScheme = addUrlSchemeIfMissing(text);
-        if (urlWithUrlScheme !== text) {
-          setUrl(urlWithUrlScheme);
-        }
-      }
-    },
-    [setUrl]
-  );
-
   const sanitizeEntry = (entry: RQAPI.Entry) => {
     const sanitizedEntry: RQAPI.Entry = {
       ...entry,
@@ -243,6 +231,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     sanitizedEntry.response = null;
 
     const renderedRequest = renderVariables<RQAPI.Request>(sanitizedEntry.request);
+    renderedRequest.url = addUrlSchemeIfMissing(renderedRequest.url);
+
     const renderedEntry = { ...sanitizedEntry, request: renderedRequest };
 
     abortControllerRef.current = new AbortController();
@@ -399,7 +389,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               defaultValue={entry.request.url}
               onChange={(text) => setUrl(text)}
               onPressEnter={onUrlInputEnterPressed}
-              onBlur={onUrlInputBlur}
               variables={currentEnvironmentVariables}
               // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
             />
