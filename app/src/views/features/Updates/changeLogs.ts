@@ -8,6 +8,16 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.11.4",
+    logs: [
+      "fix: copy in analytics inspector",
+      "[ENGG-2329] improve connect to desktop app experience",
+      "chore: bump version of requestly-core to v1.1.0",
+      "chore: fix vulnerable packages in extension code",
+      "ENGG-2252: Add progress bar in implicit test this rule widget",
+    ],
+  },
+  {
     version: "24.9.25",
     logs: [
       "[ENGG-2280] feat: analytics inspector - bluecore",
