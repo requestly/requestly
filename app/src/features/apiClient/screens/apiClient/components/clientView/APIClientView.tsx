@@ -23,12 +23,12 @@ import {
   trackResponseLoaded,
   trackInstallExtensionDialogShown,
   trackRequestSaved,
+  trackRequestRenamed,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { actions } from "store";
 import { getAppMode, getIsExtensionEnabled, getUserAuthDetails } from "store/selectors";
-import Favicon from "components/misc/Favicon";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../../../constants";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import "./apiClientView.scss";
@@ -36,7 +36,7 @@ import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/Analytics
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { RQButton } from "lib/design-system-v2/components";
+import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
@@ -71,6 +71,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const { renderVariables, getCurrentEnvironmentVariables } = useEnvironmentManager();
   const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
+  const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
@@ -86,6 +87,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       clearTimeout(animationTimerRef.current);
       setIsAnimating(true);
       setEntry(apiEntry);
+      setRequestName("");
       animationTimerRef.current = setTimeout(() => setIsAnimating(false), 500);
     }
 
@@ -294,6 +296,34 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished, renderVariables]);
 
+  const handleRecordNameUpdate = async () => {
+    if (!requestName || requestName === apiEntryDetails?.name) {
+      return;
+    }
+
+    const record: Partial<RQAPI.ApiRecord> = {
+      type: RQAPI.RecordType.API,
+      data: { ...entry },
+    };
+
+    if (apiEntryDetails?.id) {
+      record.id = apiEntryDetails?.id;
+      record.name = requestName;
+    }
+
+    const result = await upsertApiRecord(uid, record, teamId);
+
+    if (result.success && result.data.type === RQAPI.RecordType.API) {
+      onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
+      trackRequestRenamed("breadcrumb");
+      setRequestName("");
+
+      toast.success("Request name updated!");
+    } else {
+      toast.error("Something went wrong!");
+    }
+  };
+
   const onSaveButtonClick = async () => {
     setIsRequestSaving(true);
 
@@ -335,6 +365,15 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   return isExtensionEnabled ? (
     <div className="api-client-view">
+      {user.loggedIn && !openInModal ? (
+        <RQBreadcrumb
+          placeholder="New Request"
+          recordName={apiEntryDetails?.name}
+          onRecordNameUpdate={setRequestName}
+          onBlur={handleRecordNameUpdate}
+        />
+      ) : null}
+
       <Skeleton loading={isAnimating} active>
         <div className="api-client-header">
           <Space.Compact className="api-client-url-container">
