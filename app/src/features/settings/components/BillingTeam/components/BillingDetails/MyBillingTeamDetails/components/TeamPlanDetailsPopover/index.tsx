@@ -1,13 +1,11 @@
 import React, { useMemo } from "react";
 import { Col, Row } from "antd";
-import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getPlanNameFromId } from "utils/PremiumUtils";
-import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import { PricingFeatures } from "features/pricing";
 import { PRICING } from "features/pricing";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
-import { PricingPlans } from "features/pricing";
+// import { PricingPlans } from "features/pricing";
 
 interface Props {
   planDetails: Record<string, any>;
@@ -20,12 +18,12 @@ export const TeamPlanDetailsPopover: React.FC<Props> = ({ planDetails, closePopo
     return getPlanNameFromId(planDetails.plan) === "basic-v2" ? "basic" : getPlanNameFromId(planDetails.plan);
   }, [planDetails.plan]);
 
-  const planPrice =
-    PricingPlans[planName]?.plans[isAnnualPlan ? PRICING.DURATION.ANNUALLY : PRICING.DURATION.MONTHLY]?.usd?.price;
+  // const planPrice =
+  //   PricingPlans[planName]?.plans[isAnnualPlan ? PRICING.DURATION.ANNUALLY : PRICING.DURATION.MONTHLY]?.usd?.price;
 
   return (
     <>
-      <Col className="team-plan-popover-header">
+      {/* <Col className="team-plan-popover-header">
         <IoMdClose className="team-plan-popover-close-icon" onClick={closePopover} />
         <Col className="text-bold text-white" style={{ display: "inline-block" }}>
           {getPrettyPlanName(getPlanNameFromId(planDetails.plan))} team plan
@@ -35,7 +33,7 @@ export const TeamPlanDetailsPopover: React.FC<Props> = ({ planDetails, closePopo
           <Col className="text-white caption">per member/ per month</Col>
         </Row>
         <Col className="mt-16">Billed {isAnnualPlan ? "annually" : "monthly"}</Col>
-      </Col>
+      </Col> */}
       <Col className="team-plan-popover-body">
         <Col className="text-white text-bold">What's included in your plan</Col>
         <Col>
