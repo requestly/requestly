@@ -11,6 +11,11 @@ export const apiClientRoutes: RouteObject[] = [
   {
     path: PATHS.API_CLIENT.RELATIVE,
     element: <ApiClientFeatureContainer />,
+    handle: {
+      breadcrumb: {
+        label: "API Client",
+      },
+    },
     children: [
       {
         index: true,
@@ -19,10 +24,21 @@ export const apiClientRoutes: RouteObject[] = [
       {
         path: PATHS.API_CLIENT.REQUEST.INDEX,
         element: <ProtectedRoute component={APIClient} />,
+        handle: {
+          breadcrumb: {
+            label: "Request",
+            isEditable: true,
+          },
+        },
       },
       {
         path: PATHS.API_CLIENT.HISTORY.INDEX,
         element: <APIClient />,
+        handle: {
+          breadcrumb: {
+            label: "History",
+          },
+        },
       },
       {
         path: PATHS.API_CLIENT.ENVIRONMENTS.INDEX,
