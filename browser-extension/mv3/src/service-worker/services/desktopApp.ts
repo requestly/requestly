@@ -4,60 +4,11 @@ import { applyProxy, ProxyDetails, removeProxy } from "./proxy";
 import { toggleExtensionStatus } from "./utils";
 import extensionIconManager from "./extensionIconManager";
 
+const DEFAULT_DESKTOP_APP_SOCKET_SERVER_PORT = 59763;
+const BASE_IP = "127.0.0.1";
+
 let socket: WebSocket = null;
-
-const DESKTOP_APP_SOCKET_SERVER_PORT = 59763;
-const DESKTOP_APP_SOCKET_URL = `ws://127.0.0.1:${DESKTOP_APP_SOCKET_SERVER_PORT}`;
-const DESKTOP_APP_SERVER_URL = `http://127.0.0.1:${DESKTOP_APP_SOCKET_SERVER_PORT}`;
-
-const connectToDesktopApp = (): Promise<boolean> => {
-  return new Promise((resolve, reject) => {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      resolve(true);
-      return;
-    }
-
-    socket = new WebSocket(DESKTOP_APP_SOCKET_URL);
-
-    socket.onopen = function () {
-      console.log("WebSocket connection opened");
-      resolve(true);
-    };
-
-    socket.onmessage = function (event) {
-      handleMessage(event.data);
-    };
-
-    socket.onerror = function (error) {
-      console.error("WebSocket error: ", error);
-      resolve(false);
-      disconnectFromDesktopAppAndRemoveProxy();
-    };
-
-    socket.onclose = function () {
-      console.log("WebSocket connection closed");
-      disconnectFromDesktopAppAndRemoveProxy();
-      socket = null;
-    };
-  });
-};
-
-const handleMessage = (data: any) => {
-  const message = JSON.parse(data);
-  if (message.source !== "desktop-app") return;
-
-  switch (message.action) {
-    case "heartbeat":
-      // https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle#chrome_116
-      // Active WebSocket connections extend extension service worker lifetimes
-      break;
-    case "disconnect-extension":
-      disconnectFromDesktopAppAndRemoveProxy();
-      break;
-    default:
-      console.log("Unknown action extension:", message.action);
-  }
-};
+let activePort: number = null;
 
 export const sendMessageToDesktopApp = (message: Record<string, any>, awaitResponse = false) => {
   return new Promise((resolve, reject) => {
@@ -129,13 +80,69 @@ export const disconnectFromDesktopAppAndRemoveProxy = async () => {
     extensionIconManager.markDisconnectedFromDesktopApp();
     toggleExtensionStatus(true);
   }
-  return true;
 };
 
 export const checkIfDesktopAppOpen = async (): Promise<boolean> => {
-  return fetch(DESKTOP_APP_SERVER_URL)
+  if (!activePort) {
+    await findActivePort();
+  }
+
+  return fetch(`http://${BASE_IP}:${activePort}`)
     .then(() => true)
     .catch(() => false);
+};
+
+const connectToDesktopApp = (): Promise<boolean> => {
+  return new Promise(async (resolve, reject) => {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      resolve(true);
+      return;
+    }
+
+    if (!activePort) {
+      await findActivePort();
+    }
+
+    socket = new WebSocket(`ws://${BASE_IP}:${activePort}`);
+
+    socket.onopen = function () {
+      console.log("WebSocket connection opened");
+      resolve(true);
+    };
+
+    socket.onmessage = function (event) {
+      handleMessage(event.data);
+    };
+
+    socket.onerror = function (error) {
+      console.error("WebSocket error: ", error);
+      resolve(false);
+      socket.close();
+    };
+
+    socket.onclose = function () {
+      console.log("WebSocket connection closed");
+      disconnectFromDesktopAppAndRemoveProxy();
+      socket = null;
+    };
+  });
+};
+
+const handleMessage = (data: any) => {
+  const message = JSON.parse(data);
+  if (message.source !== "desktop-app") return;
+
+  switch (message.action) {
+    case "heartbeat":
+      // https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle#chrome_116
+      // Active WebSocket connections extend extension service worker lifetimes
+      break;
+    case "disconnect-extension":
+      disconnectFromDesktopAppAndRemoveProxy();
+      break;
+    default:
+      console.log("Unknown action extension:", message.action);
+  }
 };
 
 const getProxyDetails = async (): Promise<ProxyDetails | null> => {
@@ -183,3 +190,80 @@ const getConnectedBrowserAppId = () => {
       return "existing-browser";
   }
 };
+
+const findActivePort = async () => {
+  const startPort = DEFAULT_DESKTOP_APP_SOCKET_SERVER_PORT;
+  const endPort = DEFAULT_DESKTOP_APP_SOCKET_SERVER_PORT + 4;
+
+  try {
+    const isStartPortActive = await checkPort(startPort);
+    if (isStartPortActive) {
+      console.log(`Server found on default port ${startPort}`);
+      activePort = startPort;
+      return;
+    }
+  } catch (err) {
+    console.log(`Default port ${startPort} not available`);
+  }
+
+  // Scan port range for active server
+  for (let port = startPort; port <= endPort; port++) {
+    try {
+      const isPortActive = await checkPort(port);
+      if (isPortActive) {
+        console.log(`Server found on port ${port}`);
+        activePort = port;
+        return;
+      }
+    } catch (err) {
+      continue; // Try next port
+    }
+  }
+
+  activePort = DEFAULT_DESKTOP_APP_SOCKET_SERVER_PORT;
+};
+
+async function checkPort(port: number) {
+  return new Promise((resolve, reject) => {
+    const ws = new WebSocket(`ws://${BASE_IP}:${port}`);
+
+    // Set timeout to avoid hanging on inactive ports
+    const timeout = setTimeout(() => {
+      ws.close();
+      reject(new Error("Connection timeout"));
+    }, 1000);
+
+    ws.onopen = () => {
+      clearTimeout(timeout);
+
+      // Verify it's your desktop app by sending a handshake
+      ws.send(JSON.stringify({ type: "handshake" }));
+
+      // Wait briefly for handshake response
+      setTimeout(() => {
+        ws.close();
+      }, 100);
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        // Verify this is your desktop app's response
+        if (data.type === "handshakeResponse") {
+          clearTimeout(timeout);
+          ws.close();
+          resolve(true);
+        }
+      } catch (err) {
+        ws.close();
+        reject(new Error("Invalid handshake response"));
+      }
+    };
+
+    ws.onerror = () => {
+      clearTimeout(timeout);
+      ws.close();
+      reject(new Error("Connection failed"));
+    };
+  });
+}
