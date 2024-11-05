@@ -9,8 +9,9 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
+    gap: 4px;
 
-    svg {
+    svg.active-env-icon {
       position: relative;
       top: 2px;
       font-size: var(--requestly-font-size-sm);
@@ -46,4 +47,10 @@
   .ant-tooltip-inner {
     background-color: var(--requestly-color-black);
   }
+}
+
+.environment-list-item-dropdown-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

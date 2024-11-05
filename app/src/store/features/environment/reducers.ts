@@ -41,14 +41,18 @@ const setAllEnvironmentData = (
   state.environments = action.payload.environmentMap;
 };
 
-const setVariablesInEnvironment = (
+const updateEnvironmentData = (
   state: InitialState,
   action: PayloadAction<{
     newVariables: EnvironmentVariables;
     environmentId: string;
+    environmentName?: string;
   }>
 ) => {
   state.environments[action.payload.environmentId].variables = action.payload.newVariables;
+  if (action.payload.environmentName) {
+    state.environments[action.payload.environmentId].name = action.payload.environmentName;
+  }
 };
 
 const removeVariableFromEnvironment = (
@@ -67,7 +71,7 @@ const environmentVariablesReducerFunctions = {
   removeVariableFromEnvironment,
   setAllEnvironmentData,
   setCurrentEnvironment,
-  setVariablesInEnvironment,
+  updateEnvironmentData,
 };
 
 export { initialState };

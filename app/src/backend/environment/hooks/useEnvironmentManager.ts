@@ -12,6 +12,7 @@ import {
   upsertEnvironmentInDB,
   updateEnvironmentVariablesInDB,
   fetchAllEnvironmentDetails,
+  updateEnvironmentNameInDB,
 } from "..";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
@@ -19,7 +20,7 @@ import { isEmpty } from "lodash";
 
 let unsubscribeListener: () => void = null;
 
-const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
+const useEnvironmentManager = (initListenerAndFetcher: boolean = true) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -62,6 +63,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       setIsLoading(true);
       fetchAllEnvironmentDetails(ownerId)
         .then((environmentMap) => {
+          console.log("environmentMap", environmentMap);
           if (Object.keys(environmentMap).length > 0 && !environmentMap[currentEnvironmentId]) {
             // setting the first environment as the current environment if the current environment is not found in environmentMap
             setCurrentEnvironment(Object.keys(environmentMap)[0]);
@@ -98,14 +100,16 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     if (ownerId && currentEnvironmentId && initListenerAndFetcher) {
       unsubscribeListener?.();
       unsubscribeListener = attachEnvironmentVariableListener(ownerId, currentEnvironmentId, (environmentData) => {
+        console.log("environmentData", environmentData);
         const mergedVariables = mergeLocalAndSyncVariables(
           allEnvironmentData[environmentData.id]?.variables ?? {},
           environmentData.variables
         );
         dispatch(
-          environmentVariablesActions.setVariablesInEnvironment({
+          environmentVariablesActions.updateEnvironmentData({
             newVariables: mergedVariables,
             environmentId: environmentData.id,
+            environmentName: environmentData.name,
           })
         );
       });
@@ -144,7 +148,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariables)
         .then(() => {
           dispatch(
-            environmentVariablesActions.setVariablesInEnvironment({
+            environmentVariablesActions.updateEnvironmentData({
               newVariables,
               environmentId,
             })
@@ -209,6 +213,13 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     [allEnvironmentData]
   );
 
+  const renameEnvironment = useCallback(
+    async (environmentId: string, newName: string) => {
+      return updateEnvironmentNameInDB(ownerId, environmentId, newName);
+    },
+    [ownerId]
+  );
+
   return {
     setCurrentEnvironment,
     addNewEnvironment,
@@ -220,6 +231,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     getCurrentEnvironmentVariables,
     getAllEnvironments,
     getEnvironmentName,
+    renameEnvironment,
     isEnvironmentsLoading: isLoading,
   };
 };
