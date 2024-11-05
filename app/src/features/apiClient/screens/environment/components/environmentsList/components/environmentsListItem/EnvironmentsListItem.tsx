@@ -86,7 +86,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
   if (isRenameInputVisible) {
     return (
       <Input
-        className="environment-rename-input"
+        className="environment-input"
         autoFocus
         value={newEnvironmentName}
         onChange={(e) => setNewEnvironmentName(e.target.value)}
