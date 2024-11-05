@@ -13,6 +13,10 @@ export class WebSocketManager {
   private activePort: number | null = null;
 
   private async init() {
+    if (this.isConnected()) {
+      this.cleanup();
+    }
+
     if (!this.activePort) {
       await this.findActivePort();
     }
