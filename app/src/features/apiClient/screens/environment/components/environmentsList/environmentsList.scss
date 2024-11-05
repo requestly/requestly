@@ -36,11 +36,11 @@
   padding-right: 2px;
 }
 
-.new-environment-input {
+.environment-input.ant-input {
   width: 220px;
   margin-bottom: 8px;
   font-size: var(--requestly-font-size-xs);
-  padding: var(--space-2, 4px) var(--space-4, 8px);
+  padding: var(--space-2, 4px) var(--space-4, 8px) !important;
 }
 
 .active-environment-tooltip {

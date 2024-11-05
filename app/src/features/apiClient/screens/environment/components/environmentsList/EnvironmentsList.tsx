@@ -86,7 +86,7 @@ export const EnvironmentsList = () => {
           <div className="mt-8">
             <Input
               autoFocus
-              className="new-environment-input"
+              className="environment-input"
               size="small"
               placeholder="New Environment name"
               disabled={isLoading}
@@ -112,7 +112,7 @@ export const EnvironmentsList = () => {
           {isNewEnvironmentInputVisible && (
             <Input
               autoFocus
-              className="new-environment-input"
+              className="environment-input"
               size="small"
               placeholder="New Environment name"
               disabled={isLoading}
