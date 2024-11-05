@@ -24,7 +24,7 @@ export enum EnvironmentMenuKey {
 export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ environment }) => {
   const navigate = useNavigate();
   const { envId } = useParams();
-  const { getCurrentEnvironment, renameEnvironment } = useEnvironmentManager();
+  const { getCurrentEnvironment, renameEnvironment, duplicateEnvironment } = useEnvironmentManager();
   const { currentEnvironmentId } = getCurrentEnvironment();
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
@@ -37,7 +37,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
         label: "Rename",
         onClick: () => setIsRenameInputVisible(true),
       },
-      { key: EnvironmentMenuKey.DUPLICATE, label: "Duplicate" },
+      { key: EnvironmentMenuKey.DUPLICATE, label: "Duplicate", onClick: () => handleEnvironmentDuplicate() },
       { key: EnvironmentMenuKey.DELETE, label: "Delete" },
     ];
   }, []);
@@ -48,11 +48,29 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
       return;
     }
     setIsRenaming(true);
-    await renameEnvironment(environment.id, newEnvironmentName);
-    toast.success("Environment renamed successfully");
-    setIsRenaming(false);
-    setIsRenameInputVisible(false);
+    renameEnvironment(environment.id, newEnvironmentName)
+      .then(() => {
+        toast.success("Environment renamed successfully");
+      })
+      .catch(() => {
+        toast.error("Failed to rename environment");
+      })
+      .finally(() => {
+        setIsRenaming(false);
+        setIsRenameInputVisible(false);
+      });
   }, [newEnvironmentName, environment]);
+
+  const handleEnvironmentDuplicate = useCallback(async () => {
+    toast.loading("Duplicating environment...");
+    duplicateEnvironment(environment.id)
+      .then(() => {
+        toast.success("Environment duplicated successfully");
+      })
+      .catch(() => {
+        toast.error("Failed to duplicate environment");
+      });
+  }, [environment]);
 
   if (isRenameInputVisible) {
     return (

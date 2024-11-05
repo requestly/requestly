@@ -13,6 +13,7 @@ import {
   updateEnvironmentVariablesInDB,
   fetchAllEnvironmentDetails,
   updateEnvironmentNameInDB,
+  duplicateEnvironmentInDB,
 } from "..";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
@@ -63,7 +64,6 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = true) => {
       setIsLoading(true);
       fetchAllEnvironmentDetails(ownerId)
         .then((environmentMap) => {
-          console.log("environmentMap", environmentMap);
           if (Object.keys(environmentMap).length > 0 && !environmentMap[currentEnvironmentId]) {
             // setting the first environment as the current environment if the current environment is not found in environmentMap
             setCurrentEnvironment(Object.keys(environmentMap)[0]);
@@ -100,7 +100,6 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = true) => {
     if (ownerId && currentEnvironmentId && initListenerAndFetcher) {
       unsubscribeListener?.();
       unsubscribeListener = attachEnvironmentVariableListener(ownerId, currentEnvironmentId, (environmentData) => {
-        console.log("environmentData", environmentData);
         const mergedVariables = mergeLocalAndSyncVariables(
           allEnvironmentData[environmentData.id]?.variables ?? {},
           environmentData.variables
@@ -220,6 +219,12 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = true) => {
     [ownerId]
   );
 
+  const duplicateEnvironment = useCallback(async (environmentId: string) => {
+    return duplicateEnvironmentInDB(ownerId, environmentId, allEnvironmentData).then((newEnvironment) => {
+      dispatch(environmentVariablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name }));
+    });
+  }, []);
+
   return {
     setCurrentEnvironment,
     addNewEnvironment,
@@ -232,6 +237,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = true) => {
     getAllEnvironments,
     getEnvironmentName,
     renameEnvironment,
+    duplicateEnvironment,
     isEnvironmentsLoading: isLoading,
   };
 };
