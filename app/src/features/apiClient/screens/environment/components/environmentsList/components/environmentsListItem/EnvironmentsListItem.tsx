@@ -24,7 +24,7 @@ export enum EnvironmentMenuKey {
 export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ environment }) => {
   const navigate = useNavigate();
   const { envId } = useParams();
-  const { getCurrentEnvironment, renameEnvironment, duplicateEnvironment } = useEnvironmentManager();
+  const { getCurrentEnvironment, renameEnvironment, duplicateEnvironment, deleteEnvironment } = useEnvironmentManager();
   const { currentEnvironmentId } = getCurrentEnvironment();
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
@@ -38,7 +38,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
         onClick: () => setIsRenameInputVisible(true),
       },
       { key: EnvironmentMenuKey.DUPLICATE, label: "Duplicate", onClick: () => handleEnvironmentDuplicate() },
-      { key: EnvironmentMenuKey.DELETE, label: "Delete" },
+      { key: EnvironmentMenuKey.DELETE, label: "Delete", danger: true, onClick: () => handleEnvironmentDelete() },
     ];
   }, []);
 
@@ -59,7 +59,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
         setIsRenaming(false);
         setIsRenameInputVisible(false);
       });
-  }, [newEnvironmentName, environment]);
+  }, [newEnvironmentName, environment.id]);
 
   const handleEnvironmentDuplicate = useCallback(async () => {
     toast.loading("Duplicating environment...");
@@ -70,7 +70,18 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
       .catch(() => {
         toast.error("Failed to duplicate environment");
       });
-  }, [environment]);
+  }, [environment.id]);
+
+  const handleEnvironmentDelete = useCallback(() => {
+    toast.loading("Deleting environment...");
+    deleteEnvironment(environment.id)
+      .then(() => {
+        toast.success("Environment deleted successfully");
+      })
+      .catch(() => {
+        toast.error("Failed to delete environment");
+      });
+  }, [environment.id]);
 
   if (isRenameInputVisible) {
     return (
