@@ -95,3 +95,9 @@ export const fetchAllEnvironmentDetails = async (ownerId: string) => {
 
   return environmentDetails;
 };
+
+export const updateEnvironmentNameInDB = async (ownerId: string, environmentId: string, newName: string) => {
+  return updateDoc(getDocPath(ownerId, environmentId), {
+    name: newName,
+  });
+};
