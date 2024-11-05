@@ -14,6 +14,7 @@ import {
   fetchAllEnvironmentDetails,
   updateEnvironmentNameInDB,
   duplicateEnvironmentInDB,
+  deleteEnvironmentFromDB,
 } from "..";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
@@ -225,6 +226,16 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = true) => {
     });
   }, []);
 
+  const deleteEnvironment = useCallback(async (environmentId: string) => {
+    const isActiveEnvironmentBeingDeleted = currentEnvironmentId === environmentId;
+    return deleteEnvironmentFromDB(ownerId, environmentId).then(() => {
+      dispatch(environmentVariablesActions.removeEnvironment({ environmentId }));
+      if (isActiveEnvironmentBeingDeleted && Object.keys(allEnvironmentData).length > 0) {
+        setCurrentEnvironment(Object.keys(allEnvironmentData)[0]);
+      }
+    });
+  }, []);
+
   return {
     setCurrentEnvironment,
     addNewEnvironment,
@@ -238,6 +249,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = true) => {
     getEnvironmentName,
     renameEnvironment,
     duplicateEnvironment,
+    deleteEnvironment,
     isEnvironmentsLoading: isLoading,
   };
 };

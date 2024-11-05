@@ -65,6 +65,10 @@ const removeVariableFromEnvironment = (
   delete state.environments[action.payload.environmentId].variables[action.payload.key];
 };
 
+const removeEnvironment = (state: InitialState, action: PayloadAction<{ environmentId: string }>) => {
+  delete state.environments[action.payload.environmentId];
+};
+
 const environmentVariablesReducerFunctions = {
   addNewEnvironment,
   resetState,
@@ -72,6 +76,7 @@ const environmentVariablesReducerFunctions = {
   setAllEnvironmentData,
   setCurrentEnvironment,
   updateEnvironmentData,
+  removeEnvironment,
 };
 
 export { initialState };

@@ -1,5 +1,15 @@
 import firebaseApp from "firebase";
-import { addDoc, collection, deleteField, doc, getDocs, getFirestore, onSnapshot, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  deleteField,
+  doc,
+  getDocs,
+  getFirestore,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
 import { EnvironmentData, EnvironmentMap, EnvironmentVariables } from "./types";
 
 const db = getFirestore(firebaseApp);
@@ -116,4 +126,8 @@ export const duplicateEnvironmentInDB = async (
   return updateEnvironmentVariablesInDB(ownerId, newEnvironment.id, environmentToDuplicate.variables).then(() => {
     return newEnvironment;
   });
+};
+
+export const deleteEnvironmentFromDB = async (ownerId: string, environmentId: string) => {
+  return deleteDoc(getDocPath(ownerId, environmentId));
 };
