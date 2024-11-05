@@ -101,3 +101,19 @@ export const updateEnvironmentNameInDB = async (ownerId: string, environmentId: 
     name: newName,
   });
 };
+
+export const duplicateEnvironmentInDB = async (
+  ownerId: string,
+  environmentId: string,
+  allEnvironmentData: EnvironmentMap
+) => {
+  const environmentToDuplicate = allEnvironmentData[environmentId];
+  if (!environmentToDuplicate) {
+    return;
+  }
+
+  const newEnvironment = await upsertEnvironmentInDB(ownerId, `${environmentToDuplicate.name} Copy`);
+  return updateEnvironmentVariablesInDB(ownerId, newEnvironment.id, environmentToDuplicate.variables).then(() => {
+    return newEnvironment;
+  });
+};
