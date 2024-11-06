@@ -105,7 +105,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
         redirectToEnvironment(navigate, environment.id);
       }}
     >
-      <div style={{ flex: 1, display: "flex", justifyContent: "space-between" }}>
+      <div className="environments-list-item__label">
         <Typography.Text
           ellipsis={{
             tooltip: environment.name,
