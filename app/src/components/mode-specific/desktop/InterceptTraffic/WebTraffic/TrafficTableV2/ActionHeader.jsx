@@ -193,9 +193,8 @@ const ActionHeader = ({
       <Row
         align="middle"
         style={{
-          padding: 3,
           paddingLeft: "24px",
-          paddingRight: "12px",
+          paddingRight: "24px",
         }}
       >
         <Space size={12}>
