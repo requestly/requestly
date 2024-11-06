@@ -796,13 +796,12 @@ const CurrentTrafficTable = ({
                 </ProCard>
               </Row>
 
-              <Row className="request-log-pane-container" style={{ overflow: "auto", height: "100%" }}>
+              <Row className="request-log-pane-container" style={{ overflow: "hidden", height: "100%" }}>
                 <ProCard
-                  className="primary-card github-like-border"
+                  className="primary-card github-like-border h-full"
                   style={{
                     boxShadow: "none",
                     borderRadius: "0",
-                    // borderTop: "2px solid #f5f5f5",
                   }}
                   bodyStyle={{ padding: "0px 20px" }}
                 >

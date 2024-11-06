@@ -1,5 +1,6 @@
 .request-log-main-wrapper {
   position: relative;
+  height: 100%;
 }
 
 .request-log-pane-header {
@@ -16,6 +17,8 @@
   background-color: transparent;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
+  height: 100%;
+  overflow: hidden;
 }
 
 .request-log-pane div[class*="Navigation-controls"] {
@@ -36,6 +39,15 @@
 .request-log-pane div[class*="Navigation-controls"] button[class*="Navigation-button"]:hover,
 .request-log-pane div[class*="Navigation-controls"] button[class*="Navigation-button"][class*="Navigation-selected"] {
   background-color: #3e404497;
+}
+.request-log-pane div[data-reach-tabs] {
+  height: 100%;
+  overflow: hidden;
+}
+
+.request-log-pane div[data-reach-tab-panels] {
+  overflow-y: auto;
+  height: calc(100% - 46px);
 }
 
 /* log table */
