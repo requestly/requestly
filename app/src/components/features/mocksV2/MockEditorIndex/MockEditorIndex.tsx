@@ -106,7 +106,7 @@ const MockEditorIndex: React.FC<Props> = ({
 
     const finalMockData = editorDataToMockDataConverter(data);
     if (isNew) {
-      return createMock(uid, { ...finalMockData, collectionId }, teamId).then((mockId) => {
+      return createMock(uid, { ...finalMockData, collectionId }, teamId, collectionId).then((mockId) => {
         setSavingInProgress(false);
         if (mockId) {
           toast.success("Mock Created Successfully");
