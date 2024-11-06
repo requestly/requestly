@@ -47,7 +47,11 @@
 
 .request-log-pane div[data-reach-tab-panels] {
   overflow-y: auto;
-  height: calc(100% - 46px);
+  height: calc(100% - 45px);
+}
+
+.request-log-pane div[data-reach-tab-panel] {
+  height: 100%;
 }
 
 /* log table */
@@ -176,4 +180,8 @@
   overflow-y: auto;
   height: 100%;
   padding: 12px;
+}
+
+.navigation-panel-wrapper .react-resizable {
+  height: calc(100% - 35px) !important;
 }
