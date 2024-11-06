@@ -1,6 +1,6 @@
-import { RQMockSchema } from "components/features/mocksV2/types";
+import { RQMockCollection, RQMockSchema } from "components/features/mocksV2/types";
 import firebaseApp from "../../firebase";
-import { collection, doc, deleteField, getFirestore, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, deleteField, getFirestore, setDoc, updateDoc, getDoc } from "firebase/firestore";
 import { createFile } from "services/firebaseStorageService";
 import { createResponseBodyFilepath } from "./utils";
 
@@ -8,8 +8,7 @@ export const updateUserMockSelectorsMap = async (
   ownerId: string,
   mockId: string,
   mockData: RQMockSchema,
-  collectionId?: string,
-  collectionPath?: string
+  collectionId?: string
 ) => {
   const db = getFirestore(firebaseApp);
 
@@ -19,8 +18,15 @@ export const updateUserMockSelectorsMap = async (
   };
 
   if (collectionId) {
-    selectorData.collectionId = collectionId;
-    selectorData.collectionPath = collectionPath || "";
+    const collectionRef = doc(db, "mocks", collectionId);
+    const collectionDoc = await getDoc(collectionRef);
+
+    if (collectionDoc.exists()) {
+      const collectionData = collectionDoc.data() as RQMockCollection;
+
+      selectorData.collectionId = collectionId;
+      selectorData.collectionPath = collectionData.path || "";
+    }
   }
 
   const rootUserMocksMetadataRef = collection(db, "user-mocks-metadata");
