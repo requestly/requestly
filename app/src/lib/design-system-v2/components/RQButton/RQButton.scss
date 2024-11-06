@@ -7,6 +7,11 @@
     gap: 6px;
   }
 
+  &:disabled {
+    color: var(--requestly-color-text-subtle) !important;
+    background: var(--requestly-color-white-t-10) !important;
+  }
+
   .rq-custom-btn-hotkey-text {
     display: inline-flex;
     height: 20px;
