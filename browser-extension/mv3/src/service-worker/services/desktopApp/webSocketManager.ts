@@ -13,10 +13,6 @@ export class WebSocketManager {
   private activePort: number | null = null;
 
   private async init() {
-    if (this.isConnected()) {
-      this.cleanup();
-    }
-
     if (!this.activePort) {
       await this.findActivePort();
     }
@@ -37,7 +33,7 @@ export class WebSocketManager {
     }
 
     const fullMessage = { ...message, source: "extension" };
-    this.socket!.send(JSON.stringify(fullMessage));
+    this.socket.send(JSON.stringify(fullMessage));
 
     if (!awaitResponse) {
       return null;
@@ -119,6 +115,7 @@ export class WebSocketManager {
       switch (message.action) {
         case "heartbeat":
           // Keep service worker alive
+          this.sendMessage({ action: "heartbeat" });
           break;
         case "disconnect-extension":
           this.disconnect();
