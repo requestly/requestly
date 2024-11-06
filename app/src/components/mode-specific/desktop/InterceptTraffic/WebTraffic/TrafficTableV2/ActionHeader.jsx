@@ -194,7 +194,7 @@ const ActionHeader = ({
         align="middle"
         style={{
           paddingLeft: "24px",
-          paddingRight: "24px",
+          paddingRight: "12px",
         }}
       >
         <Space size={12}>
@@ -278,7 +278,7 @@ const ActionHeader = ({
           )}
         </Space>
       </Row>
-      <Row className="ml-auto" align="middle" justify="end">
+      <Row className="ml-auto" align="middle" justify="end" style={{ paddingRight: "24px" }}>
         {isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions ? (
           <>
             {!isStaticPreview && (
