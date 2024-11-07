@@ -2,18 +2,15 @@ import React from "react";
 import { Popover, Row } from "antd";
 import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
 import { capitalize } from "lodash";
+import "./variablePopover.scss";
 
-interface SingleLineEditorPopoverProps {
+interface VariablePopoverProps {
   hoveredVariable: string;
   popupPosition: { x: number; y: number };
   variables: Record<string, any>;
 }
 
-export const SingleLineEditorPopover: React.FC<SingleLineEditorPopoverProps> = ({
-  hoveredVariable,
-  popupPosition,
-  variables = {},
-}) => {
+export const VariablePopover: React.FC<VariablePopoverProps> = ({ hoveredVariable, popupPosition, variables = {} }) => {
   return (
     <Popover
       content={

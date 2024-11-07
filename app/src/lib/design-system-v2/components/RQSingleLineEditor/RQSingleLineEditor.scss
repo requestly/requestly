@@ -1,0 +1,42 @@
+.single-line-editor-container {
+  .highlight-defined-variable {
+    color: var(--requestly-color-primary-text);
+    cursor: pointer;
+  }
+
+  .highlight-undefined-variable {
+    color: var(--requestly-color-error-text);
+    cursor: pointer;
+  }
+
+  .cm-editor {
+    margin-top: -4px;
+  }
+
+  .cm-content {
+    caret-color: inherit;
+  }
+
+  .cm-focused {
+    outline: none;
+  }
+
+  .cm-scroller {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    overflow: hidden;
+  }
+}
+
+div.n-popup {
+  position: absolute;
+  background-color: #333;
+  color: white;
+  padding: 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  font-size: 12px;
+  z-index: 10;
+  pointer-events: none; /* Prevent interaction with the popup */
+}

@@ -36,13 +36,13 @@ import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/Analytics
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
+import { RQBreadcrumb, RQButton, RQSingleLineEditor } from "lib/design-system-v2/components";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
 import PATHS from "config/constants/sub/paths";
-import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
+import { VariablePopover } from "features/apiClient/screens/environment/components/variablePopover/VariablePopover";
 
 interface Props {
   openInModal?: boolean;
@@ -385,12 +385,19 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             <RQSingleLineEditor
               className="api-request-url"
               placeholder="https://example.com"
-              // value={entry.request.url}
               defaultValue={entry.request.url}
               onChange={(text) => setUrl(text)}
               onPressEnter={onUrlInputEnterPressed}
               variables={currentEnvironmentVariables}
-              // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
+              highlightConfig={{
+                definedVariableClass: "highlight-defined-variable",
+                undefinedVariableClass: "highlight-undefined-variable",
+                pattern: /{{.*?}}/g,
+                extractVariable: (match: string) => match.slice(2, -2),
+              }}
+              renderPopover={({ variable, position, variables }) => (
+                <VariablePopover hoveredVariable={variable} popupPosition={position} variables={variables} />
+              )}
             />
           </Space.Compact>
           <RQButton
