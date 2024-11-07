@@ -2,15 +2,32 @@ import { TableProps, Tooltip } from "antd";
 import { EnvironmentVariableTableRow } from "../VariablesList";
 import { RQButton } from "lib/design-system-v2/components";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
+import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
+import { RiEyeOffLine } from "@react-icons/all-files/ri/RiEyeOffLine";
+import { useCallback } from "react";
 
 interface Props {
   handleSaveVariable: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
   handleDeleteVariable: (key: string) => void;
+  visibleSecretsRowIds: number[];
+  updateVisibleSecretsRowIds: (id: number) => void;
 }
 
 type ColumnTypes = Exclude<TableProps<EnvironmentVariableTableRow>["columns"], undefined>;
 
-export const useVariablesListColumns = ({ handleSaveVariable, handleDeleteVariable }: Props) => {
+export const useVariablesListColumns = ({
+  handleSaveVariable,
+  handleDeleteVariable,
+  visibleSecretsRowIds,
+  updateVisibleSecretsRowIds,
+}: Props) => {
+  const checkIsSecretHidden = useCallback(
+    (recordId: number) => {
+      return !visibleSecretsRowIds.includes(recordId);
+    },
+    [visibleSecretsRowIds]
+  );
+
   const columns: (ColumnTypes[number] & { editable: boolean })[] = [
     {
       title: "Key",
@@ -33,7 +50,7 @@ export const useVariablesListColumns = ({ handleSaveVariable, handleDeleteVariab
         dataIndex: "type",
         title: "Type",
         handleSaveVariable,
-        options: ["string", "number", "boolean"],
+        options: ["string", "number", "boolean", "secret"],
       }),
     },
     {
@@ -55,6 +72,7 @@ export const useVariablesListColumns = ({ handleSaveVariable, handleDeleteVariab
         dataIndex: "syncValue",
         title: "Sync Value",
         handleSaveVariable,
+        isSecret: checkIsSecretHidden(record.id),
       }),
     },
     {
@@ -76,21 +94,33 @@ export const useVariablesListColumns = ({ handleSaveVariable, handleDeleteVariab
         dataIndex: "localValue",
         title: "Local Value",
         handleSaveVariable,
+        isSecret: checkIsSecretHidden(record.id),
       }),
     },
     {
       title: "",
       editable: false,
-      width: "50px",
-      render: (_: any, record) => {
+      width: "100px",
+      render: (_: any, record: EnvironmentVariableTableRow) => {
         return (
-          <RQButton
-            icon={<RiDeleteBin6Line />}
-            type="transparent"
-            size="small"
-            className="delete-variable-btn"
-            onClick={() => handleDeleteVariable(record.key)}
-          />
+          <div className="variable-row-actions">
+            {record.type === "secret" && (
+              <RQButton
+                icon={checkIsSecretHidden(record.id) ? <RiEyeOffLine /> : <RiEyeLine />}
+                type="transparent"
+                size="small"
+                onClick={() => updateVisibleSecretsRowIds(record.id)}
+                className="secret-variable-toggle-btn"
+              />
+            )}
+            <RQButton
+              icon={<RiDeleteBin6Line />}
+              type="transparent"
+              size="small"
+              className="delete-variable-btn"
+              onClick={() => handleDeleteVariable(record.key)}
+            />
+          </div>
         );
       },
     },
