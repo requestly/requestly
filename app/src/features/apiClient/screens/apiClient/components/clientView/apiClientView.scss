@@ -7,17 +7,24 @@
   box-sizing: border-box;
   background-color: var(--body-background);
 
+  .rq-breadcrumb {
+    margin: 0 10px;
+  }
+
   .api-client-header {
     flex: 0;
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 0 10px;
+    flex-wrap: wrap;
 
     .api-client-url-container {
       display: flex;
       flex: auto;
       height: 32px;
+      width: 100%;
+      max-width: 86%;
 
       .api-request-method-selector {
         width: 120px;

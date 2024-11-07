@@ -184,6 +184,7 @@ export const API_CLIENT = {
   RESPONSE_HEADERS_VIEWED: "api_client_response_headers_viewed",
   INSTALL_EXTENSION_DIALOG_SHOWN: "api_client_install_extension_dialog_shown",
   REQUEST_SAVED: "api_client_request_saved",
+  REQUEST_RENAMED: "api_client_request_renamed",
   NEW_COLLECTION_CLICKED: "api_client_new_collection_clicked",
   COLLECTION_SAVED: "api_client_collection_saved",
   COLLECTION_RENAMED: "api_client_collection_renamed",

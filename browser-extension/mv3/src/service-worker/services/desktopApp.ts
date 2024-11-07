@@ -1,5 +1,8 @@
+import { EXTENSION_MESSAGES } from "common/constants";
+import { sendMessageToApp } from "./messageHandler";
 import { applyProxy, ProxyDetails, removeProxy } from "./proxy";
 import { toggleExtensionStatus } from "./utils";
+import extensionIconManager from "./extensionIconManager";
 
 let socket: WebSocket = null;
 
@@ -89,22 +92,41 @@ export const connectToDesktopAppAndApplyProxy = async () => {
   const proxyDetails = await getProxyDetails();
   await applyProxy(proxyDetails);
 
+  sendMessageToApp({
+    action: EXTENSION_MESSAGES.DESKTOP_APP_CONNECTION_STATUS_UPDATED,
+    payload: true,
+  });
+
+  toggleExtensionStatus(false);
+  extensionIconManager.markConnectedToDesktopApp();
+
   sendMessageToDesktopApp({
     action: "browser-connected",
     appId: getConnectedBrowserAppId(),
   });
 
-  toggleExtensionStatus(false);
   return true;
 };
 
 export const disconnectFromDesktopAppAndRemoveProxy = async () => {
   try {
     await sendMessageToDesktopApp({ action: "browser-disconnected", appId: getConnectedBrowserAppId() });
+    sendMessageToApp({
+      action: EXTENSION_MESSAGES.DESKTOP_APP_CONNECTION_STATUS_UPDATED,
+      payload: false,
+    });
+    extensionIconManager.markDisconnectedFromDesktopApp();
+    toggleExtensionStatus(true);
     socket.close();
   } catch (e) {
     console.log("Error sending message to desktop app socket closed");
     removeProxy();
+    // Sending disconnect message as control enters catch when desktop app is closed as socket is closed
+    sendMessageToApp({
+      action: EXTENSION_MESSAGES.DESKTOP_APP_CONNECTION_STATUS_UPDATED,
+      payload: false,
+    });
+    extensionIconManager.markDisconnectedFromDesktopApp();
     toggleExtensionStatus(true);
   }
   return true;

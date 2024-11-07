@@ -12,7 +12,7 @@ interface Props {
 export const RequestRow: React.FC<Props> = ({ record }) => {
   return (
     <NavLink
-      title={record.data.request.url || "echo"}
+      title={record.name || record.data.request.url}
       to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`}
       className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
     >
@@ -23,7 +23,7 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
       >
         {record.data.request.method}
       </Typography.Text>
-      <div className="request-url">{record.data.request.url || "echo"}</div>
+      <div className="request-url">{record.name || record.data.request.url}</div>
     </NavLink>
   );
 };

@@ -7,10 +7,10 @@ import "./RQBreadcrumb.scss";
 
 interface Props {
   disabled?: boolean;
-  onBlur?: () => void;
+  onBlur?: (updatedRecordName: string) => void;
   recordName?: string;
   placeholder?: string;
-  onRecordNameUpdate?: (s: string) => void;
+  onRecordNameUpdate?: (updatedRecordName: string) => void;
 }
 
 interface MatchedRoute {
@@ -61,7 +61,11 @@ export const RQBreadcrumb: React.FC<Props> = ({
 
   const handleOnBlur = () => {
     setIsEditRecord(false);
-    onBlur?.();
+    onBlur?.(name);
+
+    if (!name) {
+      setName(recordName);
+    }
   };
 
   const handleRecordNameEditClick = () => {
@@ -72,7 +76,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
     setIsEditRecord(true);
   };
 
-  return (
+  return breadcrumbs.length > 0 ? (
     <ol className="rq-breadcrumb">
       {breadcrumbs.map(({ label, isEditable, pathname, disabled: isPathDisabled }, index) => {
         return (
@@ -95,7 +99,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
               ) : (
                 <div className="rq-breadcrumb-record-name">
                   <Typography.Text className="record-name" ellipsis={true} onClick={handleRecordNameEditClick}>
-                    {recordName || placeholder}
+                    {name || placeholder}
                   </Typography.Text>
                   {disabled ? null : <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />}
                 </div>
@@ -123,5 +127,5 @@ export const RQBreadcrumb: React.FC<Props> = ({
         );
       })}
     </ol>
-  );
+  ) : null;
 };

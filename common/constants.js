@@ -162,6 +162,9 @@ CONSTANTS.EXTENSION_MESSAGES = {
   TEST_RULE_ON_URL: "testRuleOnUrl",
   SAVE_TEST_RULE_RESULT: "saveTestRuleResult",
   NOTIFY_TEST_RULE_REPORT_UPDATED: "notifyTestRuleReportUpdated",
+  IS_PROXY_APPLIED: "isProxyApplied",
+  DISCONNECT_FROM_DESKTOP_APP: "disconnectFromDesktopApp",
+  DESKTOP_APP_CONNECTION_STATUS_UPDATED: "desktopAppConnectionStatusUpdated",
 };
 
 CONSTANTS.HEADERS_TARGET = {

@@ -11,8 +11,6 @@ export const makeRequest = async (
   request: RQAPI.Request,
   signal?: AbortSignal
 ): Promise<RQAPI.Response> => {
-  // TODO: check if Extension or Desktop App is installed and has the support
-  // TODO: add support in MV3 extension
   return new Promise((resolve, reject) => {
     if (signal) {
       if (signal.aborted) {
@@ -39,7 +37,7 @@ export const makeRequest = async (
 // TODO: move this into top level common folder
 export const addUrlSchemeIfMissing = (url: string): string => {
   if (url && !/^([a-z][a-z0-9+\-.]*):\/\//.test(url)) {
-    return "https://" + url;
+    return "http://" + url;
   }
 
   return url;

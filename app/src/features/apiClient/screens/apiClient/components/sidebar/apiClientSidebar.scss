@@ -1,5 +1,8 @@
 .api-client-sidebar {
+  width: 320px;
   flex: 0 0 auto;
+  border-right: 1px solid var(--border-dark);
+  background-color: var(--component-background);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -162,8 +165,7 @@
       height: 100%;
 
       .ant-tabs-tabpane {
-        padding: 8px;
-        padding-right: 0px;
+        padding: 0 8px;
         height: 100%;
       }
     }
