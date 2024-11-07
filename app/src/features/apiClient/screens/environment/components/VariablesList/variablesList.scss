@@ -102,15 +102,22 @@
   .delete-variable-btn.ant-btn.rq-custom-btn.ant-btn-sm.icon-only-btn {
     color: var(--requestly-color-text-subtle, #bbb);
     width: 30px;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
 
     &:hover {
       color: var(--requestly-color-text-default, #fff);
     }
   }
 
-  tr:hover .delete-variable-btn.ant-btn.rq-custom-btn.ant-btn-sm.icon-only-btn {
+  .variable-row-actions {
+    transition: opacity 0.2s ease-in-out;
+    opacity: 1;
+
+    .ant-btn.ant-btn-icon-only {
+      width: 30px !important;
+    }
+  }
+
+  tr:hover .variable-row-actions {
     opacity: 1;
   }
 
@@ -120,5 +127,12 @@
 
   .ant-form-item-explain-error {
     display: none;
+  }
+
+  .variable-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
   }
 }

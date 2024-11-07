@@ -28,6 +28,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   const { getEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
   const [dataSource, setDataSource] = useState([]);
   const variables = getEnvironmentVariables(currentEnvironmentId);
+  const [visibleSecretsRowIds, setVisibleSecrets] = useState([]);
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
@@ -116,7 +117,23 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
     [dataSource, removeVariable, handleAddNewRow, currentEnvironmentId]
   );
 
-  const columns = useVariablesListColumns({ handleSaveVariable, handleDeleteVariable });
+  const handleUpdateVisibleSecretsRowIds = useCallback(
+    (id: number) => {
+      if (visibleSecretsRowIds.includes(id)) {
+        setVisibleSecrets(visibleSecretsRowIds.filter((secretRowId) => secretRowId !== id));
+      } else {
+        setVisibleSecrets([...visibleSecretsRowIds, id]);
+      }
+    },
+    [visibleSecretsRowIds]
+  );
+
+  const columns = useVariablesListColumns({
+    handleSaveVariable,
+    handleDeleteVariable,
+    visibleSecretsRowIds,
+    updateVisibleSecretsRowIds: handleUpdateVisibleSecretsRowIds,
+  });
 
   useEffect(() => {
     if (variables) {
