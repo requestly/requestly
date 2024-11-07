@@ -5,6 +5,7 @@ import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
 import { RiEyeOffLine } from "@react-icons/all-files/ri/RiEyeOffLine";
 import { useCallback } from "react";
+import { EnvironmentVariableType } from "backend/environment/types";
 
 interface Props {
   handleSaveVariable: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
@@ -104,7 +105,7 @@ export const useVariablesListColumns = ({
       render: (_: any, record: EnvironmentVariableTableRow) => {
         return (
           <div className="variable-row-actions">
-            {record.type === "secret" && (
+            {record.type === EnvironmentVariableType.Secret && (
               <RQButton
                 icon={checkIsSecretHidden(record.id) ? <RiEyeOffLine /> : <RiEyeLine />}
                 type="transparent"
