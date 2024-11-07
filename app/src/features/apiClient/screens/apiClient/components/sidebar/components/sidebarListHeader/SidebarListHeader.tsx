@@ -1,7 +1,11 @@
 import React from "react";
 import { Input, Dropdown } from "antd";
 import type { MenuProps } from "antd";
-import { PlusOutlined, SearchOutlined, MoreOutlined } from "@ant-design/icons";
+import {
+  // PlusOutlined,
+  SearchOutlined,
+  MoreOutlined,
+} from "@ant-design/icons";
 import { RQButton } from "lib/design-system-v2/components";
 import "./sidebarListHeader.scss";
 
@@ -14,13 +18,13 @@ interface ListHeaderProps {
 export const SidebarListHeader: React.FC<ListHeaderProps> = ({ onAddRecordClick, onSearch, menuItems }) => {
   return (
     <div className="sidebar-list-header">
-      <RQButton
+      {/* <RQButton
         size="small"
         type="transparent"
         icon={<PlusOutlined />}
         onClick={onAddRecordClick}
         className="sidebar-list-header-button"
-      />
+      /> */}
       <Input
         size="small"
         prefix={<SearchOutlined />}
