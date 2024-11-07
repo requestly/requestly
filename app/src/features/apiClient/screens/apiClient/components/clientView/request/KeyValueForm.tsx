@@ -3,7 +3,8 @@ import { AutoComplete, Button } from "antd";
 import React, { memo, useCallback, useEffect } from "react";
 import { KeyValuePair } from "../../../../../types";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
+import { SingleLineEditorPopover } from "componentsV2/SingleLineEditor/SingleLineEditorPopover";
+import { RQSingleLineEditor } from "componentsV2/SingleLineEditor/SingleLineEditor";
 
 interface Props {
   keyValuePairs: KeyValuePair[];
@@ -79,6 +80,21 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
                   defaultValue={param.key}
                   onChange={(val) => onKeyChange(val, index)}
                   variables={currentEnvironmentVariables}
+                  highlightConfig={{
+                    definedVariableClass: "highlight-defined-variable",
+                    undefinedVariableClass: "highlight-undefined-variable",
+                    pattern: /{{.*?}}/g,
+                    extractVariable: (matchedVariable: string) => matchedVariable.slice(2, -2),
+                  }}
+                  renderPopover={({ variable, position, variables }) => {
+                    return (
+                      <SingleLineEditorPopover
+                        hoveredVariable={variable}
+                        popupPosition={position}
+                        variables={variables}
+                      />
+                    );
+                  }}
                 />
               )}
             </td>
@@ -93,6 +109,21 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
                 defaultValue={param.value}
                 onChange={(value) => onValueChange(value, index)}
                 variables={currentEnvironmentVariables}
+                highlightConfig={{
+                  definedVariableClass: "highlight-defined-variable",
+                  undefinedVariableClass: "highlight-undefined-variable",
+                  pattern: /{{.*?}}/g,
+                  extractVariable: (match: string) => match.slice(2, -2),
+                }}
+                renderPopover={({ variable, position, variables }) => {
+                  return (
+                    <SingleLineEditorPopover
+                      hoveredVariable={variable}
+                      popupPosition={position}
+                      variables={variables}
+                    />
+                  );
+                }}
               />
             </td>
             <td>
