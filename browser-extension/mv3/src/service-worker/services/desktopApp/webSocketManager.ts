@@ -58,10 +58,10 @@ export class WebSocketManager {
           action: "browser-disconnected",
           appId: getConnectedBrowserAppId(),
         });
-        this.cleanup();
       }
     } catch (error) {
       console.error("Disconnect error:", error);
+    } finally {
       this.cleanup();
     }
   }
