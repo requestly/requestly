@@ -3,8 +3,8 @@ import { AutoComplete, Button } from "antd";
 import React, { memo, useCallback, useEffect } from "react";
 import { KeyValuePair } from "../../../../../types";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { SingleLineEditorPopover } from "componentsV2/SingleLineEditor/SingleLineEditorPopover";
-import { RQSingleLineEditor } from "componentsV2/SingleLineEditor/SingleLineEditor";
+import { RQSingleLineEditor } from "lib/design-system-v2/components";
+import { VariablePopover } from "features/apiClient/screens/environment/components/variablePopover/VariablePopover";
 
 interface Props {
   keyValuePairs: KeyValuePair[];
@@ -88,11 +88,7 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
                   }}
                   renderPopover={({ variable, position, variables }) => {
                     return (
-                      <SingleLineEditorPopover
-                        hoveredVariable={variable}
-                        popupPosition={position}
-                        variables={variables}
-                      />
+                      <VariablePopover hoveredVariable={variable} popupPosition={position} variables={variables} />
                     );
                   }}
                 />
@@ -116,13 +112,7 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
                   extractVariable: (match: string) => match.slice(2, -2),
                 }}
                 renderPopover={({ variable, position, variables }) => {
-                  return (
-                    <SingleLineEditorPopover
-                      hoveredVariable={variable}
-                      popupPosition={position}
-                      variables={variables}
-                    />
-                  );
+                  return <VariablePopover hoveredVariable={variable} popupPosition={position} variables={variables} />;
                 }}
               />
             </td>

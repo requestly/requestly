@@ -3,7 +3,7 @@ import { EditorView, placeholder as cmPlaceHolder } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import { Position, RQSingleLineEditorProps } from "./types";
 import { createHighlightPlugin } from "./plugins/highlightVariables";
-import "./SingleLineEditor.scss";
+import "./RQSingleLineEditor.scss";
 
 export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   editorRef: externalEditorRef,
@@ -28,7 +28,6 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
     if (editorViewRef.current) {
       return;
     }
-    console.log("!!!debug", "highlightConfig", highlightConfig);
 
     const extensions = [
       EditorState.transactionFilter.of((tr) => {
