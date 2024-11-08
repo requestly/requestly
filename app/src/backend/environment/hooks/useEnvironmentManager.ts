@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useCallback, useState } from "react";
-import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableValue } from "../types";
+import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEnvironmentData, getCurrentEnvironmentId } from "store/features/environment/selectors";
 import { environmentVariablesActions } from "store/features/environment/slice";
@@ -134,10 +134,12 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   }, [allEnvironmentData, currentEnvironmentId]);
 
   const setVariables = useCallback(
-    async (environmentId: string, variables: Record<string, Omit<EnvironmentVariableValue, "type">>) => {
+    async (environmentId: string, variables: Record<string, EnvironmentVariableValue>) => {
       const newVariables: EnvironmentVariables = Object.fromEntries(
         Object.entries(variables).map(([key, value]) => {
-          return [key, { localValue: value.localValue, syncValue: value.syncValue, type: typeof value.syncValue }];
+          const typeToSaveInDB =
+            value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
+          return [key, { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB }];
         })
       );
 
