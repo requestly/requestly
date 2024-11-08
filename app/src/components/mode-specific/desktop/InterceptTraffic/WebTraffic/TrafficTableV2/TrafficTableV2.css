@@ -116,7 +116,6 @@
 
 .traffic-table-content {
   padding-top: 24px;
-  padding-right: 24px;
 }
 
 .hide-traffic-table-split-gutter .traffic-table-split-container .gutter.gutter-vertical {
@@ -125,12 +124,12 @@
 }
 
 .traffic-table-split-container {
-  height: calc(100vh - 140px);
+  height: calc(100vh - 157px);
 }
 
-.traffic-table-split-container .gutter-vertical,
 .traffic-table-split-container .ant-row.request-log-pane-container {
-  margin-left: 1.25rem;
+  overflow: hidden;
+  height: 100%;
 }
 
 /* table */
@@ -141,6 +140,7 @@
 .network-table-wrapper-override {
   height: 100%;
   border-style: none !important;
+  padding-right: 24px;
 }
 .network-table-wrapper-override .ant-pro-card-body {
   padding-right: 0;
@@ -154,6 +154,7 @@
   display: flex;
   max-height: 100%;
   overflow: hidden;
+  padding-bottom: 3.5rem;
 }
 
 .previewData .rdt_TableRow {
