@@ -77,7 +77,7 @@ const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, RQButtonProps>(func
           {keys.map((key, index) => (
             <>
               <span className="key">{capitalize(key)}</span>
-              {index === keys.length - 1 ? null : <span>+</span>}
+              {/* {index === keys.length - 1 ? null : <span>+</span>} */}
             </>
           ))}
         </span>
