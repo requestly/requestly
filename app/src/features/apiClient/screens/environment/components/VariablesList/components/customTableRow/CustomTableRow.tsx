@@ -84,10 +84,19 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
   const handleChange = useCallback(
     (value: string | number | boolean) => {
-      form.setFieldsValue({ [dataIndex]: value });
       if (dataIndex === "type") {
-        handleSaveVariable({ ...record, [dataIndex]: value, syncValue: "", localValue: "" }, dataIndex);
-        form.setFieldsValue({ syncValue: "", localValue: "" });
+        const defaultValues = {
+          syncValue: record.syncValue,
+          localValue: record.localValue,
+        };
+        if (value === EnvironmentVariableType.Boolean) {
+          defaultValues.syncValue = true;
+          defaultValues.localValue = true;
+        } else if (value === EnvironmentVariableType.Number) {
+          defaultValues.syncValue = 0;
+          defaultValues.localValue = 0;
+        }
+        handleSaveVariable({ ...record, [dataIndex]: value, ...defaultValues }, dataIndex);
       } else {
         debouncedSave();
       }
