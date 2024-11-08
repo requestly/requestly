@@ -124,16 +124,18 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
           </span>
         </Tooltip>
       </div>
-
-      <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
-        <RQButton
-          size="small"
-          type="transparent"
-          icon={<MoreOutlined />}
-          className="environment-list-item-dropdown-button"
-          onClick={(e) => e.stopPropagation()}
-        />
-      </Dropdown>
+      {/* wrapping dropdown in a div to prevent it from triggering click events on parent div element*/}
+      <div onClick={(e) => e.stopPropagation()}>
+        <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
+          <RQButton
+            size="small"
+            type="transparent"
+            icon={<MoreOutlined />}
+            className="environment-list-item-dropdown-button"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </Dropdown>
+      </div>
     </div>
   );
 };

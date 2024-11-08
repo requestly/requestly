@@ -69,6 +69,13 @@ const removeEnvironment = (state: InitialState, action: PayloadAction<{ environm
   delete state.environments[action.payload.environmentId];
 };
 
+const updateEnvironmentName = (
+  state: InitialState,
+  action: PayloadAction<{ environmentId: string; newName: string }>
+) => {
+  state.environments[action.payload.environmentId].name = action.payload.newName;
+};
+
 const environmentVariablesReducerFunctions = {
   addNewEnvironment,
   resetState,
@@ -77,6 +84,7 @@ const environmentVariablesReducerFunctions = {
   setCurrentEnvironment,
   updateEnvironmentData,
   removeEnvironment,
+  updateEnvironmentName,
 };
 
 export { initialState };
