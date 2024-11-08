@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Input, Radio, Popconfirm } from "antd";
+import { Row, Col, Input, Radio, Popconfirm, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { getCurrentlySelectedRuleConfig } from "store/selectors";
-import { RQButton } from "lib/design-system/components";
+import { RQButton } from "lib/design-system-v2/components";
 import { InfoTag } from "components/misc/InfoTag";
 import { MoreInfo } from "components/misc/MoreInfo";
 import { RedirectDestinationType } from "types/rules";
@@ -27,6 +27,8 @@ import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import LINKS from "config/constants/sub/links";
 import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
 import { MockPickerModal } from "features/mocks/modals";
+import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.css";
 
 const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
@@ -34,6 +36,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
   const [destinationType, setDestinationType] = useState(pair.destinationType);
   const [destinationTypePopupVisible, setDestinationTypePopupVisible] = useState(false);
   const [destinationPopupSelection, setDestinationPopupSelection] = useState(null);
+  const [isSelectedFileInputVisible, setIsSelectedFileInputVisible] = useState(false);
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
 
@@ -209,8 +212,70 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           } destination-file-path`}
         >
           {" "}
-          {pair.destination.length ? pair.destination : " No file chosen"}
         </span>{" "}
+        {pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES ||
+        pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES ? (
+          <>
+            {isSelectedFileInputVisible ? (
+              <Input
+                autoFocus
+                onBlur={() => setIsSelectedFileInputVisible(false)}
+                style={{
+                  width: 350,
+                }}
+                value={pair.destination}
+                onChange={(e) => {
+                  dispatch(
+                    actions.updateRulePairAtGivenPath({
+                      pairIndex,
+                      updates: { destination: e.target.value },
+                    })
+                  );
+                }}
+              />
+            ) : (
+              <>
+                <span className="file-path">{pair.destination.length ? pair.destination : " No file chosen"}</span>
+                {pair.destination ? (
+                  <>
+                    {isFeatureCompatible(FEATURES.EDIT_LOCAL_FILE_PATH) ? (
+                      <Tooltip
+                        color={"#000"}
+                        placement="top"
+                        title={
+                          <>
+                            You can use the captured group expressions from the request to dynamically set the file path
+                            (using $1, $2, etc).
+                            <br />
+                            <a
+                              href="https://docs.requestly.com/general/http-rules/advanced-usage/rule-operators#regex-match-operator"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              click here
+                            </a>{" "}
+                            to learn more.
+                          </>
+                        }
+                      >
+                        <RQButton
+                          size="small"
+                          type="link"
+                          onClick={() => {
+                            setIsSelectedFileInputVisible(true);
+                          }}
+                          icon={<MdOutlineEdit />}
+                        />
+                      </Tooltip>
+                    ) : null}
+                  </>
+                ) : null}
+              </>
+            )}
+          </>
+        ) : (
+          <span className="file-path"> {pair.destination.length ? pair.destination : " No file chosen"}</span>
+        )}
         {pair.destination && isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && (
           <HiOutlineExternalLink
             className="external-link-icon"

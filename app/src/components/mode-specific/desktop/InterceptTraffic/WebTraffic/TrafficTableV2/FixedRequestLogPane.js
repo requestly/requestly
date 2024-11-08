@@ -107,7 +107,7 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
         </Navigation.Tab>
       ),
       body: (
-        <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
+        <div style={{ overflowY: "auto", padding: "0.8rem" }}>
           <Table className="log-table">
             <Table.Head>
               <Table.Row>
