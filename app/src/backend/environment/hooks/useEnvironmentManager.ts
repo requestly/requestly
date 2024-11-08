@@ -22,7 +22,7 @@ import { isEmpty } from "lodash";
 
 let unsubscribeListener: () => void = null;
 
-const useEnvironmentManager = (initListenerAndFetcher: boolean = true) => {
+const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -217,9 +217,11 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = true) => {
 
   const renameEnvironment = useCallback(
     async (environmentId: string, newName: string) => {
-      return updateEnvironmentNameInDB(ownerId, environmentId, newName);
+      return updateEnvironmentNameInDB(ownerId, environmentId, newName).then(() => {
+        dispatch(environmentVariablesActions.updateEnvironmentName({ environmentId, newName }));
+      });
     },
-    [ownerId]
+    [ownerId, dispatch]
   );
 
   const duplicateEnvironment = useCallback(async (environmentId: string) => {
