@@ -1,6 +1,6 @@
 import React from "react";
 import { Popover, Row } from "antd";
-import { EnvironmentVariableValue } from "backend/environment/types";
+import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
 import { capitalize } from "lodash";
 
 interface SingleLineEditorPopoverProps {
@@ -66,7 +66,13 @@ const VariableInfo: React.FC<{
         {infoFields.map(({ label, value }) => (
           <React.Fragment key={label}>
             <div className="variable-info-title">{label}</div>
-            <div className="variable-info-value">{value}</div>
+            <div className="variable-info-value">
+              {label === "Type"
+                ? value
+                : variable.type === EnvironmentVariableType.Secret
+                ? "•".repeat(String(value || "").length)
+                : value}
+            </div>
           </React.Fragment>
         ))}
       </div>

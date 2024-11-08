@@ -9,6 +9,11 @@ import PATHS from "config/constants/sub/paths";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
+export enum CellType {
+  Input = "input",
+  TOGGLE_SECRET = "toggle_secret",
+}
+
 interface EditableCellProps {
   title: React.ReactNode;
   editable: boolean;
@@ -16,6 +21,7 @@ interface EditableCellProps {
   dataIndex: keyof EnvironmentVariableTableRow;
   record: EnvironmentVariableTableRow;
   handleSaveVariable: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
+  isSecret?: boolean;
   options?: string[];
 }
 
@@ -38,6 +44,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   record,
   handleSaveVariable,
   options,
+  isSecret,
   ...restProps
 }) => {
   const location = useLocation();
@@ -77,10 +84,19 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
   const handleChange = useCallback(
     (value: string | number | boolean) => {
-      form.setFieldsValue({ [dataIndex]: value });
       if (dataIndex === "type") {
-        handleSaveVariable({ ...record, [dataIndex]: value, syncValue: "", localValue: "" }, dataIndex);
-        form.setFieldsValue({ syncValue: "", localValue: "" });
+        const defaultValues = {
+          syncValue: record.syncValue,
+          localValue: record.localValue,
+        };
+        if (value === EnvironmentVariableType.Boolean) {
+          defaultValues.syncValue = true;
+          defaultValues.localValue = true;
+        } else if (value === EnvironmentVariableType.Number) {
+          defaultValues.syncValue = 0;
+          defaultValues.localValue = 0;
+        }
+        handleSaveVariable({ ...record, [dataIndex]: value, ...defaultValues }, dataIndex);
       } else {
         debouncedSave();
       }
@@ -118,6 +134,17 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             placeholder={getPlaceholderText(dataIndex)}
           />
         );
+
+      case EnvironmentVariableType.Secret:
+        return (
+          <Input
+            type={isSecret ? "password" : "text"}
+            ref={inputRef}
+            onChange={(e) => handleChange(e.target.value)}
+            placeholder={getPlaceholderText(dataIndex)}
+          />
+        );
+
       case EnvironmentVariableType.Number:
         return (
           <InputNumber
@@ -136,7 +163,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           </Select>
         );
     }
-  }, [record, handleChange, dataIndex, getPlaceholderText]);
+  }, [record, handleChange, dataIndex, getPlaceholderText, isSecret]);
 
   useEffect(() => {
     // Update form fields when record changes non-user actions like syncing variables from listener
