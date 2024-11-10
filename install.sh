@@ -6,6 +6,7 @@ set -e
 
 rm -rf node_modules
 npm install
+npm run build
 
 echo -e "\n***** Installing React app dependencies *****"
 # Install dependencies for react app
