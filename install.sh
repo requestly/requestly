@@ -14,12 +14,6 @@ rm -rf node_modules
 npm install
 cd ..
 
-echo -e "\n***** Installing Browser Extension dependencies *****"
-# Install dependencies for browser-extension/config
-cd browser-extension
-bash install.sh
-cd ..
-
 echo -e "\n***** Installing rule-processor dependencies *****"
 cd common/rule-processor
 rm -rf node_modules
@@ -31,5 +25,12 @@ cd common/analytics-vendors
 rm -rf node_modules
 npm install
 cd ../..
+
+echo -e "\n***** Installing Browser Extension dependencies *****"
+# Install dependencies for browser-extension/config
+cd browser-extension
+bash install.sh
+cd ..
+
 
 echo -e "\n***** Requestly install complete *****"
