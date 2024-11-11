@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { Input } from "antd";
@@ -45,10 +45,13 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const isEditMode = !!recordToBeEdited;
 
+  // TODO: Refactor and merge save and update handler
   const saveNewRecord = useCallback(async () => {
     setIsLoading(true);
 
     if (!uid || !recordName) {
+      setIsLoading(false);
+      onSuccess?.();
       return;
     }
 
@@ -100,14 +103,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     newRecordCollectionId,
     onSuccess,
   ]);
-
-  useEffect(() => {
-    if (isEditMode) {
-      return;
-    }
-
-    saveNewRecord();
-  }, [saveNewRecord, isEditMode]);
 
   const updateRecord = useCallback(async () => {
     setIsLoading(true);
