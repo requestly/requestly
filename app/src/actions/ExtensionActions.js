@@ -105,6 +105,7 @@ export function notifyAppLoadedToExtension() {
 }
 
 export function getAPIResponse(apiRequest) {
+  console.log("!!!debug", "getgetAPIResponse called from app", { apiRequest });
   return sendMessage({
     action: GLOBAL_CONSTANTS.EXTENSION_MESSAGES.GET_API_RESPONSE,
     apiRequest,

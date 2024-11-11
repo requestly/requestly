@@ -86,6 +86,13 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response> {
     finalRequestBody = urlSearchParams;
   }
 
+  console.log("!!!debug", "API client request details", {
+    method,
+    url,
+    headers,
+    body,
+  });
+
   try {
     const requestStartTime = performance.now();
     const response = await fetch(url, {
@@ -95,6 +102,12 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response> {
       credentials: "omit" as RequestCredentials,
     });
     const responseTime = performance.now() - requestStartTime;
+
+    console.log("!!!debug", "API Client Response", {
+      responseTime,
+      status: response.status,
+      headers: response.headers,
+    });
 
     const responseHeaders: KeyValuePair[] = [];
     for (const [key, value] of response.headers.entries()) {
@@ -118,6 +131,7 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response> {
     } else {
       responseBody = await responseBlob.text();
     }
+
     return {
       body: responseBody,
       time: responseTime,
@@ -127,6 +141,7 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response> {
       redirectedUrl: response.url !== url ? response.url : "",
     };
   } catch (e) {
+    console.log("!!!debug", "API client fetch error", e);
     return null;
   }
 }
