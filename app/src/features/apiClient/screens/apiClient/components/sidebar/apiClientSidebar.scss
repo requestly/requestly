@@ -48,15 +48,16 @@
       flex: auto;
       padding-right: 8px;
       overflow: auto;
-      padding-left: 16px;
+      padding-left: 8px;
       padding-top: 16px;
+      margin-top: 8px;
 
       .ant-timeline-item {
         padding-bottom: 18px;
 
-        .ant-timeline-item-head {
-          margin-top: 3px;
-        }
+        // .ant-timeline-item-head {
+        //   margin-top: 3px;
+        // }
 
         .ant-timeline-item-tail {
           margin-top: 12px;
@@ -64,6 +65,7 @@
 
         .ant-timeline-item-content {
           margin-left: 10px;
+          margin-bottom: 8px;
         }
       }
 
@@ -72,7 +74,7 @@
         align-items: baseline;
         gap: 10px;
         line-height: 23px;
-        padding: 4px;
+        padding: 0 4px;
         margin: -8px 10px;
         border-radius: 4px;
 
@@ -92,16 +94,16 @@
         }
 
         .api-history-url {
-          font-size: var(--requestly-font-size-sm, 13px);
+          font-size: var(--requestly-font-size-xs, 11px);
           width: 100%;
           overflow: hidden;
           text-overflow: ellipsis;
           word-break: break-all;
           line-height: 18px;
           display: -webkit-box;
-          line-clamp: 2;
+          line-clamp: 1;
           -webkit-box-orient: vertical;
-          -webkit-line-clamp: 2;
+          -webkit-line-clamp: 1;
         }
 
         .api-history-start-marker {
