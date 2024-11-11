@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Dropdown } from "antd";
 import { DropdownProps } from "reactstrap";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/selectors";
+import { ImportCollectionsModal } from "../../modals/importCollectionsModal/ImportCollectionsModal";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -38,6 +39,20 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const [isImportCollectionsModalOpen, setIsImportCollectionsModalOpen] = useState(false);
+
+  const importItems: DropdownProps["menu"]["items"] = [
+    {
+      key: "1",
+      label: "Collection",
+      onClick: () => setIsImportCollectionsModalOpen(true),
+    },
+    {
+      key: "2",
+      label: "cURL",
+      onClick: onImportClick,
+    },
+  ];
 
   const items: DropdownProps["menu"]["items"] = [
     {
@@ -103,46 +118,62 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   ];
 
   return (
-    <div className="api-client-sidebar-header">
-      {activeTab === ApiClientSidebarTabKey.COLLECTIONS ? (
-        <div>
-          <Dropdown
-            menu={{ items }}
-            trigger={["click"]}
-            className="api-client-new-btn-dropdown"
-            overlayClassName="api-client-new-btn-dropdown-overlay"
-          >
-            <RQButton type="transparent" size="small" icon={<MdAdd />}>
-              New
-            </RQButton>
-          </Dropdown>
+    <>
+      <div className="api-client-sidebar-header">
+        {activeTab === ApiClientSidebarTabKey.COLLECTIONS ? (
+          <div>
+            <Dropdown
+              menu={{ items }}
+              trigger={["click"]}
+              className="api-client-new-btn-dropdown"
+              overlayClassName="api-client-new-btn-dropdown-overlay"
+            >
+              <RQButton type="transparent" size="small" icon={<MdAdd />}>
+                New
+              </RQButton>
+            </Dropdown>
 
-          <RQButton type="transparent" size="small" onClick={onImportClick} icon={<CodeOutlined />}>
+            {/* <RQButton type="transparent" size="small" onClick={onImportClick} icon={<CodeOutlined />}>
             Import
+          </RQButton> */}
+            <Dropdown
+              menu={{ items: importItems }}
+              trigger={["click"]}
+              className="api-client-new-btn-dropdown"
+              overlayClassName="api-client-new-btn-dropdown-overlay"
+            >
+              <RQButton type="transparent" size="small" icon={<CodeOutlined />}>
+                Import
+              </RQButton>
+            </Dropdown>
+          </div>
+        ) : activeTab === ApiClientSidebarTabKey.HISTORY ? (
+          <RQButton
+            disabled={!history?.length}
+            type="transparent"
+            size="small"
+            onClick={onClearHistory}
+            icon={<ClearOutlined />}
+          >
+            Clear history
           </RQButton>
-        </div>
-      ) : activeTab === ApiClientSidebarTabKey.HISTORY ? (
-        <RQButton
-          disabled={!history?.length}
-          type="transparent"
-          size="small"
-          onClick={onClearHistory}
-          icon={<ClearOutlined />}
-        >
-          Clear history
-        </RQButton>
-      ) : activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
-        <RQButton
-          type="transparent"
-          size="small"
-          icon={<MdAdd />}
-          onClick={() => onNewClick(RQAPI.RecordType.ENVIRONMENT)}
-        >
-          New
-        </RQButton>
-      ) : null}
+        ) : activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
+          <RQButton
+            type="transparent"
+            size="small"
+            icon={<MdAdd />}
+            onClick={() => onNewClick(RQAPI.RecordType.ENVIRONMENT)}
+          >
+            New
+          </RQButton>
+        ) : null}
 
-      {user.loggedIn && <EnvironmentSwitcher />}
-    </div>
+        {user.loggedIn && <EnvironmentSwitcher />}
+      </div>
+      <ImportCollectionsModal
+        isOpen={isImportCollectionsModalOpen}
+        onClose={() => setIsImportCollectionsModalOpen(false)}
+      />
+    </>
   );
 };

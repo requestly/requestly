@@ -16,12 +16,12 @@ interface Props {
 // TODO: fix this
 interface ExportData {
   variables: any[];
-  collections: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[];
+  records: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[];
 }
 
 export const ExportCollectionsModal: React.FC<Props> = ({ isOpen, onClose, collections }) => {
   const [isCollectionsProcessed, setIsCollectionsProcessed] = useState(false);
-  const [exportData, setExportData] = useState<ExportData>({ variables: [], collections: [] });
+  const [exportData, setExportData] = useState<ExportData>({ variables: [], records: [] });
   const [isExportVariablesChecked, setIsExportVariablesChecked] = useState(true);
   const { getVariableData } = useEnvironmentManager();
 
@@ -81,7 +81,7 @@ export const ExportCollectionsModal: React.FC<Props> = ({ isOpen, onClose, colle
         });
       });
 
-      setExportData({ variables: extractedVariables, collections: processedCollections });
+      setExportData({ variables: extractedVariables, records: processedCollections });
       setIsCollectionsProcessed(true);
     }
   }, [isOpen, collections, extractVariablesFromAPIRecord, isCollectionsProcessed]);
