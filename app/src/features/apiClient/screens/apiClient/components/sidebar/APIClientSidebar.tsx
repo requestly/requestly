@@ -11,11 +11,9 @@ import { HistoryList } from "./historyList/HistoryList";
 import { ApiClientSidebarHeader } from "./apiClientSidebarHeader/ApiClientSidebarHeader";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { redirectToApiClientCollection, redirectToNewEnvironment, redirectToRequest } from "utils/RedirectionUtils";
-import { actions } from "store";
-import APP_CONSTANTS from "config/constants";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import "./apiClientSidebar.scss";
 
@@ -41,7 +39,6 @@ const APIClientSidebar: React.FC<Props> = ({
   onNewClick = () => {},
 }) => {
   const { requestId, collectionId } = useParams();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const user = useSelector(getUserAuthDetails);
@@ -58,22 +55,6 @@ const APIClientSidebar: React.FC<Props> = ({
 
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
-      if (!user.loggedIn) {
-        dispatch(
-          actions.toggleActiveModal({
-            modalName: "authModal",
-            newValue: true,
-            newProps: {
-              eventSource: "api_client_sidebar",
-              authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-              warningMessage: `Please log in to create a new ${recordType.toLowerCase()}`,
-            },
-          })
-        );
-
-        return;
-      }
-
       setIsNewRecordNameInputVisible(true);
       setRecordTypeToBeCreated(recordType);
 
@@ -98,7 +79,7 @@ const APIClientSidebar: React.FC<Props> = ({
           return;
       }
     },
-    [onNewClick, navigate, dispatch, user?.loggedIn]
+    [onNewClick, navigate]
   );
 
   useEffect(() => {
@@ -109,7 +90,7 @@ const APIClientSidebar: React.FC<Props> = ({
       setIsNewRecordNameInputVisible(true);
       setRecordTypeToBeCreated(RQAPI.RecordType.COLLECTION);
     }
-  }, [requestId, collectionId, handleNewRecordClick]);
+  }, [requestId, collectionId]);
 
   useEffect(() => {
     if (location.pathname.includes(PATHS.API_CLIENT.HISTORY.ABSOLUTE)) {
