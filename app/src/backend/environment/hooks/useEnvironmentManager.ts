@@ -211,6 +211,19 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     [allEnvironmentData]
   );
 
+  const getVariableData = useCallback(
+    (variableName: string) => {
+      const variableData = Object.values(allEnvironmentData).find((environment) => {
+        return environment.variables[variableName];
+      })?.variables[variableName];
+      return {
+        ...variableData,
+        name: variableName,
+      };
+    },
+    [allEnvironmentData]
+  );
+
   return {
     setCurrentEnvironment,
     addNewEnvironment,
@@ -222,6 +235,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     getCurrentEnvironmentVariables,
     getAllEnvironments,
     getEnvironmentName,
+    getVariableData,
     isEnvironmentsLoading: isLoading,
   };
 };

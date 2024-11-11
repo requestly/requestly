@@ -1,0 +1,43 @@
+.export-collections-modal {
+  .export-collections-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+
+    svg {
+      font-size: 1.2rem;
+    }
+  }
+  .export-details-card {
+    border-radius: 4px;
+    padding: 6px 12px;
+    background: var(--requestly-color-surface-1);
+    border: 1px solid var(--requestly-color-surface-2);
+    color: var(--requestly-color-text-default);
+    font-size: var(--requestly-font-size-sm);
+
+    .export-name {
+      font-weight: 500;
+    }
+
+    .export-details {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .export-details-item {
+      display: flex;
+      gap: 4px;
+      font-size: var(--requestly-font-size-xs);
+      color: var(--requestly-color-text-subtle);
+    }
+  }
+  .export-var-checkbox-container {
+    margin-top: 1rem;
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+  }
+}
