@@ -28,6 +28,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   const { getEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
   const [dataSource, setDataSource] = useState([]);
   const variables = getEnvironmentVariables(currentEnvironmentId);
+  const [visibleSecretsRowIds, setVisibleSecrets] = useState([]);
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
@@ -44,7 +45,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
 
-      if ((row.key && row.syncValue) || fieldChanged === "type") {
+      if ((row.key && row.syncValue) || fieldChanged === "type" || fieldChanged === "key") {
         // Check if the new key already exists (excluding the current row)
         const isDuplicate = variableRows.some(
           (variable, idx) => idx !== index && variable.key.toLowerCase() === row.key.toLowerCase()
@@ -55,12 +56,11 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
           console.error(`Variable with name "${row.key}" already exists`);
           return;
         }
-
         const updatedRow = { ...item, ...row };
         variableRows.splice(index, 1, updatedRow);
 
-        if (fieldChanged === "type") {
-          // updating the dataSource state only when variable type is changed because state update makes the table inputs lose focus
+        if (fieldChanged === "type" || fieldChanged === "key") {
+          // updating the dataSource state only when variable type or key is changed because state update makes the table inputs lose focus
           setDataSource(variableRows);
         }
 
@@ -116,7 +116,23 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
     [dataSource, removeVariable, handleAddNewRow, currentEnvironmentId]
   );
 
-  const columns = useVariablesListColumns({ handleSaveVariable, handleDeleteVariable });
+  const handleUpdateVisibleSecretsRowIds = useCallback(
+    (id: number) => {
+      if (visibleSecretsRowIds.includes(id)) {
+        setVisibleSecrets(visibleSecretsRowIds.filter((secretRowId) => secretRowId !== id));
+      } else {
+        setVisibleSecrets([...visibleSecretsRowIds, id]);
+      }
+    },
+    [visibleSecretsRowIds]
+  );
+
+  const columns = useVariablesListColumns({
+    handleSaveVariable,
+    handleDeleteVariable,
+    visibleSecretsRowIds,
+    updateVisibleSecretsRowIds: handleUpdateVisibleSecretsRowIds,
+  });
 
   useEffect(() => {
     if (variables) {
@@ -166,6 +182,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
       id="variables-list"
       className="variables-list-table"
       bordered
+      rowKey="id"
       columns={columns}
       data={filteredDataSource}
       locale={{ emptyText: "No variables found" }}
