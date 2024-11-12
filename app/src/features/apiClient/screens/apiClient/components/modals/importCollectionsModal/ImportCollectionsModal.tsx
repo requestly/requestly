@@ -104,7 +104,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
     try {
       const collectionsPromises: Promise<{ oldId: string; newId: string }>[] = [];
       apiRecordsToImport.collections.forEach((collection: RQAPI.CollectionRecord) => {
-        const collectionToImport = collection;
+        const collectionToImport = { ...collection };
         delete collectionToImport.id;
         const promise = upsertApiRecord(user?.details?.profile?.uid, collectionToImport, workspace?.id)
           .then((newCollection) => {
@@ -131,7 +131,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
 
       const apisPromises: Promise<unknown>[] = [];
       apiRecordsToImport.apis.forEach((api: RQAPI.ApiRecord) => {
-        const apiToImport = api;
+        const apiToImport = { ...api };
         delete apiToImport.id;
         const newCollectionId = oldToNewCollectionDetails[api.collectionId]?.newId;
         if (!newCollectionId) {
@@ -151,16 +151,16 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
 
       await Promise.all(apisPromises);
       toast.success("Collections and APIs imported successfully");
-      trackImportApiCollectionsSuccessful(apiRecordsToImport.count);
+      trackImportApiCollectionsSuccessful(apiRecordsToImport?.count);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to import collections and APIs");
-      trackImportApiCollectionsFailed(apiRecordsToImport.count);
+      trackImportApiCollectionsFailed(apiRecordsToImport?.count);
       throw error;
     }
-  }, [apiRecordsToImport, onSaveRecord, user.details?.profile?.uid, workspace?.id, apiRecordsToImport.count]);
+  }, [apiRecordsToImport, onSaveRecord, user.details?.profile?.uid, workspace?.id, apiRecordsToImport?.count]);
 
   const handleImport = useCallback(async () => {
-    trackImportApiCollectionsStarted(apiRecordsToImport.count);
+    trackImportApiCollectionsStarted(apiRecordsToImport?.count);
     setIsImporting(true);
     setValidationError(null);
 
@@ -174,7 +174,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
     } finally {
       setIsImporting(false);
     }
-  }, [handleImportVariables, handleImportCollectionsAndApis, onClose, apiRecordsToImport.count]);
+  }, [handleImportVariables, handleImportCollectionsAndApis, onClose, apiRecordsToImport?.count]);
 
   return (
     <Modal

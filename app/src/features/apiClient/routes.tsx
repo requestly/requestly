@@ -32,6 +32,16 @@ export const apiClientRoutes: RouteObject[] = [
         },
       },
       {
+        path: PATHS.API_CLIENT.COLLECTION.INDEX,
+        element: <ProtectedRoute component={APIClient} />,
+        handle: {
+          breadcrumb: {
+            label: "Request", // TODO: Fix, change it to collection, when collection view is added
+            isEditable: false,
+          },
+        },
+      },
+      {
         path: PATHS.API_CLIENT.HISTORY.INDEX,
         element: <APIClient />,
         handle: {

@@ -103,7 +103,7 @@ export const CollectionsList: React.FC<Props> = ({
 
               {isNewRecordNameInputVisible && recordTypeToBeCreated === RQAPI.RecordType.COLLECTION ? (
                 <NewRecordNameInput
-                  recordType={recordTypeToBeCreated}
+                  recordType={RQAPI.RecordType.COLLECTION}
                   analyticEventSource="api_client_sidebar_header"
                   onSuccess={() => hideNewRecordNameInput()}
                 />
@@ -115,7 +115,7 @@ export const CollectionsList: React.FC<Props> = ({
 
               {isNewRecordNameInputVisible && recordTypeToBeCreated === RQAPI.RecordType.API ? (
                 <NewRecordNameInput
-                  recordType={recordTypeToBeCreated}
+                  recordType={RQAPI.RecordType.API}
                   analyticEventSource="api_client_sidebar_header"
                   onSuccess={() => hideNewRecordNameInput()}
                 />
