@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Dropdown, DropdownProps } from "antd";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -47,21 +47,38 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const [isImportCollectionsModalOpen, setIsImportCollectionsModalOpen] = useState(false);
 
-  const importItems: DropdownProps["menu"]["items"] = [
-    {
-      key: "1",
-      label: "Collection",
-      onClick: () => {
-        trackImportApiCollectionsClicked();
-        setIsImportCollectionsModalOpen(true);
+  const importItems: DropdownProps["menu"]["items"] = useMemo(
+    () => [
+      {
+        key: "1",
+        label: "Collection",
+        onClick: () => {
+          if (!user.loggedIn) {
+            dispatch(
+              actions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  eventSource: "api_client_sidebar",
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                  warningMessage: `Please log in to import collections`,
+                },
+              })
+            );
+          } else {
+            trackImportApiCollectionsClicked();
+            setIsImportCollectionsModalOpen(true);
+          }
+        },
       },
-    },
-    {
-      key: "2",
-      label: "cURL",
-      onClick: onImportClick,
-    },
-  ];
+      {
+        key: "2",
+        label: "cURL",
+        onClick: onImportClick,
+      },
+    ],
+    [user.loggedIn, dispatch]
+  );
 
   const items: DropdownProps["menu"]["items"] = [
     {
