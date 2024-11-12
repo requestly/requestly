@@ -2,10 +2,7 @@ import { RQAPI } from "features/apiClient/types";
 import { isApiCollection, isApiRequest } from "../../../utils";
 import { EnvironmentVariableValue, VariableExport } from "backend/environment/types";
 
-export const processCollectionsAndAPIsToImport = (
-  records: RQAPI.ApiRecord[] | RQAPI.CollectionRecord[],
-  uid: string
-) => {
+export const processApiRecordsToImport = (records: RQAPI.ApiRecord[] | RQAPI.CollectionRecord[], uid: string) => {
   const apis: RQAPI.ApiRecord[] = [];
   const collections: RQAPI.CollectionRecord[] = [];
 
@@ -14,8 +11,6 @@ export const processCollectionsAndAPIsToImport = (
       record.createdBy = uid || null;
       record.updatedBy = uid || null;
       record.ownerId = uid || null;
-      record.updatedTs = Date.now();
-      record.createdTs = Date.now();
       apis.push(record);
     } else if (isApiCollection(record)) {
       record.createdBy = uid || null;
@@ -36,9 +31,7 @@ export const processVariablesToImport = (
   variables: VariableExport[],
   existingVariables: Record<string, EnvironmentVariableValue>
 ) => {
-  const updatedVariables = { ...existingVariables };
-
-  const newVariables = variables.reduce((acc: Record<string, EnvironmentVariableValue>, variableData: any) => {
+  const newVariables = variables.reduce((acc: Record<string, EnvironmentVariableValue>, variableData) => {
     acc[variableData.name] = {
       syncValue: variableData.syncValue,
       type: variableData.type,
@@ -48,7 +41,7 @@ export const processVariablesToImport = (
   }, {});
 
   return {
-    ...updatedVariables,
+    ...existingVariables,
     ...newVariables,
   };
 };

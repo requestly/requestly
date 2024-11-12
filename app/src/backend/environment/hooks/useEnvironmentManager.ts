@@ -213,13 +213,21 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
 
   const getVariableData = useCallback(
     (variableName: string) => {
-      const variableData = Object.values(allEnvironmentData).find((environment) => {
-        return environment.variables[variableName];
-      })?.variables[variableName];
-      return {
-        ...variableData,
-        name: variableName,
-      };
+      if (allEnvironmentData[currentEnvironmentId].variables[variableName]) {
+        return {
+          ...allEnvironmentData[currentEnvironmentId].variables[variableName],
+          name: variableName,
+        };
+      } else {
+        // returns the variable data from the first environment where it is present
+        const variableData = Object.values(allEnvironmentData).find((environment) => {
+          return environment.variables[variableName];
+        })?.variables[variableName];
+        return {
+          ...variableData,
+          name: variableName,
+        };
+      }
     },
     [allEnvironmentData]
   );

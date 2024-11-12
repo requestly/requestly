@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import { Modal } from "antd";
@@ -6,7 +6,7 @@ import { FilePicker } from "components/common/FilePicker";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
-import { processCollectionsAndAPIsToImport, processVariablesToImport } from "./utils";
+import { processApiRecordsToImport, processVariablesToImport } from "./utils";
 import { getCurrentEnvironmentId } from "store/features/environment/selectors";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQAPI } from "features/apiClient/types";
@@ -15,6 +15,7 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
 import "./importCollectionsModal.scss";
+import Logger from "lib/logger";
 
 interface Props {
   isOpen: boolean;
@@ -25,16 +26,18 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
   const user = useSelector(getUserAuthDetails);
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const { setVariables, getCurrentEnvironmentVariables } = useEnvironmentManager();
+  const { setVariables, getCurrentEnvironmentVariables, getAllEnvironments } = useEnvironmentManager();
   const { onSaveRecord } = useApiClientContext();
 
   const [isDataProcessing, setIsDataProcessing] = useState(false);
   const [isParseComplete, setIsParseComplete] = useState(false);
   const [validationError, setValidationError] = useState(null);
-  const [collectionsDataToImport, setCollectionsDataToImport] = useState(null);
+  const [apiRecordsToImport, setApiRecordsToImport] = useState(null);
   const [variablesToImport, setVariablesToImport] = useState(null);
   const [isImporting, setIsImporting] = useState(false);
-  const existingVariables = getCurrentEnvironmentVariables();
+
+  const existingVariables = useMemo(() => getCurrentEnvironmentVariables(), [getCurrentEnvironmentVariables]);
+  const allEnvironments = useMemo(() => getAllEnvironments(), [getAllEnvironments]);
 
   const onFilesDrop = useCallback(
     async (files: File[]) => {
@@ -42,7 +45,12 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
       const reader = new FileReader();
 
       reader.onabort = () => {
-        setValidationError("File reading was aborted");
+        setValidationError("Failed to import the selected file.");
+        return;
+      };
+
+      reader.onerror = () => {
+        setValidationError("Failed to import the selected file.");
         return;
       };
 
@@ -52,15 +60,15 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
 
         if (!file.type.includes("json")) {
           setIsDataProcessing(false);
-          setValidationError("Invalid file format. Please select a valid exported collections JSON file.");
+          setValidationError("Invalid file format. Please select a valid exported JSON file.");
           return;
         }
 
         let parsedResult;
         try {
           parsedResult = JSON.parse(fileContent as string);
-          const result = processCollectionsAndAPIsToImport(parsedResult.records, user?.details?.profile?.uid);
-          setCollectionsDataToImport(result);
+          const result = processApiRecordsToImport(parsedResult.records, user.details?.profile?.uid);
+          setApiRecordsToImport(result);
           const processedVariables = processVariablesToImport(parsedResult.variables, existingVariables);
           setVariablesToImport(processedVariables);
           setIsParseComplete(true);
@@ -74,31 +82,24 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
       };
       reader.readAsText(file);
     },
-    [existingVariables]
+    [existingVariables, user.details?.profile?.uid]
   );
 
   const handleImportVariables = useCallback(async () => {
-    if (!variablesToImport) return;
-
-    try {
-      await setVariables(currentEnvironmentId, variablesToImport);
-      toast.success("Variables imported successfully");
-    } catch (error) {
-      toast.error("Failed to import variables");
-      throw error;
-    }
-  }, [variablesToImport, currentEnvironmentId]);
+    if (!variablesToImport || allEnvironments.length === 0) return;
+    await setVariables(currentEnvironmentId, variablesToImport);
+  }, [variablesToImport, currentEnvironmentId, setVariables, allEnvironments]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
-    if (!collectionsDataToImport) {
+    if (!apiRecordsToImport) {
       setValidationError("No collections or APIs to import");
       throw new Error("No collections or APIs to import");
     }
 
     try {
       const collectionsPromises: Promise<{ oldId: string; newId: string }>[] = [];
-      collectionsDataToImport.collections.forEach((collection: RQAPI.CollectionRecord) => {
-        const collectionToImport = { ...collection };
+      apiRecordsToImport.collections.forEach((collection: RQAPI.CollectionRecord) => {
+        const collectionToImport = collection;
         delete collectionToImport.id;
         const promise = upsertApiRecord(user?.details?.profile?.uid, collectionToImport, workspace?.id)
           .then((newCollection) => {
@@ -124,8 +125,8 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
       );
 
       const apisPromises: Promise<unknown>[] = [];
-      collectionsDataToImport.apis.forEach((api: RQAPI.ApiRecord) => {
-        const apiToImport = { ...api };
+      apiRecordsToImport.apis.forEach((api: RQAPI.ApiRecord) => {
+        const apiToImport = api;
         delete apiToImport.id;
         const newCollectionId = oldToNewCollectionDetails[api.collectionId]?.newId;
         if (!newCollectionId) {
@@ -133,7 +134,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
         }
 
         const updatedApi = { ...apiToImport, collectionId: newCollectionId };
-        const promise = upsertApiRecord(user?.details?.profile?.uid, updatedApi, workspace?.id)
+        const promise = upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id)
           .then((newApi) => {
             onSaveRecord(newApi.data);
           })
@@ -149,7 +150,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
       toast.error(error instanceof Error ? error.message : "Failed to import collections and APIs");
       throw error;
     }
-  }, [collectionsDataToImport, onSaveRecord]);
+  }, [apiRecordsToImport, onSaveRecord, user.details?.profile?.uid, workspace?.id]);
 
   const handleImport = useCallback(async () => {
     setIsImporting(true);
@@ -160,7 +161,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
       await handleImportCollectionsAndApis();
       onClose();
     } catch (error) {
-      console.error("Import failed:", error);
+      Logger.error("Import failed:", error);
     } finally {
       setIsImporting(false);
     }
@@ -175,7 +176,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
         setValidationError(null);
         setIsParseComplete(false);
       }}
-      title="Import collection"
+      title="Import collections"
       footer={null}
     >
       {validationError ? (

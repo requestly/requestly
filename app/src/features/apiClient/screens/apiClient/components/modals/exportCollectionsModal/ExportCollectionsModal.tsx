@@ -9,7 +9,7 @@ import { isArray } from "lodash";
 import { VariableExport } from "backend/environment/types";
 import "./exportCollectionsModal.scss";
 
-interface Props {
+interface ExportCollectionsModalProps {
   collections: RQAPI.CollectionRecord[];
   isOpen: boolean;
   onClose: () => void;
@@ -20,13 +20,13 @@ export interface ExportData {
   records: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[];
 }
 
-export const ExportCollectionsModal: React.FC<Props> = ({ isOpen, onClose, collections }) => {
-  const [isCollectionsProcessed, setIsCollectionsProcessed] = useState(false);
+export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ isOpen, onClose, collections }) => {
+  const [isApiRecordsProcessed, setIsApiRecordsProcessed] = useState(false);
   const [exportData, setExportData] = useState<ExportData>({ variables: [], records: [] });
   const [isExportVariablesChecked, setIsExportVariablesChecked] = useState(true);
   const { getVariableData } = useEnvironmentManager();
 
-  const handleExport = () => {
+  const handleExport = useCallback(() => {
     const dataToExport = exportData;
     if (!isExportVariablesChecked) {
       dataToExport.variables = [];
@@ -38,7 +38,7 @@ export const ExportCollectionsModal: React.FC<Props> = ({ isOpen, onClose, colle
     a.href = url;
     a.download = `RQ-${collections.length === 1 ? "collection" : "collections"}-${getFormattedDate("DD_MM_YYYY")}.json`;
     a.click();
-  };
+  }, [exportData, isExportVariablesChecked, collections]);
 
   const extractVariablesFromAPIRecord = useCallback(
     (api: RQAPI.ApiRecord) => {
@@ -76,24 +76,24 @@ export const ExportCollectionsModal: React.FC<Props> = ({ isOpen, onClose, colle
   );
 
   useEffect(() => {
-    if (isOpen && !isCollectionsProcessed) {
+    if (isOpen && !isApiRecordsProcessed) {
       const extractedVariables: VariableExport[] = [];
-      const processedCollections: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[] = [];
+      const processedApiRecords: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[] = [];
 
       collections.forEach((collection) => {
         const collectionToExport = { ...collection, data: {} };
-        processedCollections.push(collectionToExport);
+        processedApiRecords.push(collectionToExport);
 
         collection.data.children.forEach((api) => {
-          processedCollections.push(api);
+          processedApiRecords.push(api);
           extractedVariables.push(...extractVariablesFromAPIRecord(api as RQAPI.ApiRecord));
         });
       });
 
-      setExportData({ variables: extractedVariables, records: processedCollections });
-      setIsCollectionsProcessed(true);
+      setExportData({ variables: extractedVariables, records: processedApiRecords });
+      setIsApiRecordsProcessed(true);
     }
-  }, [isOpen, collections, extractVariablesFromAPIRecord, isCollectionsProcessed]);
+  }, [isOpen, collections, extractVariablesFromAPIRecord, isApiRecordsProcessed]);
 
   return (
     <Modal
@@ -132,7 +132,8 @@ export const ExportCollectionsModal: React.FC<Props> = ({ isOpen, onClose, colle
               checked={isExportVariablesChecked}
               onChange={(e) => setIsExportVariablesChecked(e.target.checked)}
             />{" "}
-            Export the variables used in the collection
+            Export the variables used in the APIs of{" "}
+            {collections.length === 1 ? "this collection" : "these collections"}
           </div>
         )}
       </div>
