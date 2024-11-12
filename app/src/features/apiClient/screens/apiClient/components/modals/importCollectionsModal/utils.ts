@@ -1,6 +1,6 @@
 import { RQAPI } from "features/apiClient/types";
 import { isApiCollection, isApiRequest } from "../../../utils";
-import { EnvironmentVariableValue } from "backend/environment/types";
+import { EnvironmentVariableValue, VariableExport } from "backend/environment/types";
 
 export const processCollectionsAndAPIsToImport = (
   records: RQAPI.ApiRecord[] | RQAPI.CollectionRecord[],
@@ -33,7 +33,7 @@ export const processCollectionsAndAPIsToImport = (
 };
 
 export const processVariablesToImport = (
-  variables: any,
+  variables: VariableExport[],
   existingVariables: Record<string, EnvironmentVariableValue>
 ) => {
   const updatedVariables = { ...existingVariables };

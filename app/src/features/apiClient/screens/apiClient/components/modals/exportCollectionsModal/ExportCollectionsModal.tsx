@@ -5,6 +5,8 @@ import { extractVariableNameFromStringIfExists } from "backend/environment/utils
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { getFormattedDate } from "utils/DateTimeUtils";
+import { isArray } from "lodash";
+import { VariableExport } from "backend/environment/types";
 import "./exportCollectionsModal.scss";
 
 interface Props {
@@ -13,9 +15,8 @@ interface Props {
   onClose: () => void;
 }
 
-// TODO: fix this
-interface ExportData {
-  variables: any[];
+export interface ExportData {
+  variables: VariableExport[];
   records: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[];
 }
 
@@ -61,6 +62,14 @@ export const ExportCollectionsModal: React.FC<Props> = ({ isOpen, onClose, colle
 
       checkAndAddVariable(apiRequest.url);
 
+      if (isArray(apiRequest.body)) {
+        apiRequest.body.forEach((body) => {
+          checkAndAddVariable(body.value);
+        });
+      } else {
+        checkAndAddVariable(apiRequest.body || "");
+      }
+
       return Array.from(variables).map(getVariableData);
     },
     [getVariableData]
@@ -68,7 +77,7 @@ export const ExportCollectionsModal: React.FC<Props> = ({ isOpen, onClose, colle
 
   useEffect(() => {
     if (isOpen && !isCollectionsProcessed) {
-      const extractedVariables: any[] = [];
+      const extractedVariables: VariableExport[] = [];
       const processedCollections: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[] = [];
 
       collections.forEach((collection) => {

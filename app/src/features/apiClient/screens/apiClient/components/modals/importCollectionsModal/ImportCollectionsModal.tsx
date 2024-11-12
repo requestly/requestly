@@ -28,12 +28,12 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
   const { setVariables, getCurrentEnvironmentVariables } = useEnvironmentManager();
   const { onSaveRecord } = useApiClientContext();
 
-  const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
-  const [isParseComplete, setIsParseComplete] = useState<boolean>(false);
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const [isDataProcessing, setIsDataProcessing] = useState(false);
+  const [isParseComplete, setIsParseComplete] = useState(false);
+  const [validationError, setValidationError] = useState(null);
   const [collectionsDataToImport, setCollectionsDataToImport] = useState(null);
   const [variablesToImport, setVariablesToImport] = useState(null);
-  const [isImporting, setIsImporting] = useState<boolean>(false);
+  const [isImporting, setIsImporting] = useState(false);
   const existingVariables = getCurrentEnvironmentVariables();
 
   const onFilesDrop = useCallback(
@@ -102,7 +102,6 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
         delete collectionToImport.id;
         const promise = upsertApiRecord(user?.details?.profile?.uid, collectionToImport, workspace?.id)
           .then((newCollection) => {
-            console.log("NEW COLLECTIONN", newCollection, collection.id);
             onSaveRecord(newCollection.data);
             return {
               oldId: collection.id,
