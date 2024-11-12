@@ -1,5 +1,15 @@
 import firebaseApp from "firebase";
-import { addDoc, collection, deleteField, doc, getDocs, getFirestore, onSnapshot, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  deleteField,
+  doc,
+  getDocs,
+  getFirestore,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
 import { EnvironmentData, EnvironmentMap, EnvironmentVariables } from "./types";
 
 const db = getFirestore(firebaseApp);
@@ -94,4 +104,30 @@ export const fetchAllEnvironmentDetails = async (ownerId: string) => {
   });
 
   return environmentDetails;
+};
+
+export const updateEnvironmentNameInDB = async (ownerId: string, environmentId: string, newName: string) => {
+  return updateDoc(getDocPath(ownerId, environmentId), {
+    name: newName,
+  });
+};
+
+export const duplicateEnvironmentInDB = async (
+  ownerId: string,
+  environmentId: string,
+  allEnvironmentData: EnvironmentMap
+) => {
+  const environmentToDuplicate = allEnvironmentData[environmentId];
+  if (!environmentToDuplicate) {
+    return;
+  }
+
+  const newEnvironment = await upsertEnvironmentInDB(ownerId, `${environmentToDuplicate.name} Copy`);
+  return updateEnvironmentVariablesInDB(ownerId, newEnvironment.id, environmentToDuplicate.variables).then(() => {
+    return { ...newEnvironment, variables: environmentToDuplicate.variables };
+  });
+};
+
+export const deleteEnvironmentFromDB = async (ownerId: string, environmentId: string) => {
+  return deleteDoc(getDocPath(ownerId, environmentId));
 };
