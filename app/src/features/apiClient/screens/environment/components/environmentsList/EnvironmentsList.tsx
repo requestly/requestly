@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useState, useMemo } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import { Input, Tooltip, Typography } from "antd";
+import { Input } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../../../apiClient/components/sidebar/components/sidebarListHeader/SidebarListHeader";
 import { redirectToEnvironment, redirectToNewEnvironment } from "utils/RedirectionUtils";
-import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import PATHS from "config/constants/sub/paths";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
 import { actions } from "store";
@@ -14,6 +13,7 @@ import APP_CONSTANTS from "config/constants";
 import { EmptyState } from "features/apiClient/screens/apiClient/components/sidebar/emptyState/EmptyState";
 import { ListEmptySearchView } from "features/apiClient/screens/apiClient/components/sidebar/components/listEmptySearchView/ListEmptySearchView";
 import { EnvironmentAnalyticsSource } from "../../types";
+import { EnvironmentsListItem } from "./components/environmentsListItem/EnvironmentsListItem";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
@@ -21,18 +21,11 @@ export const EnvironmentsList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const user = useSelector(getUserAuthDetails);
-  const {
-    getAllEnvironments,
-    getCurrentEnvironment,
-    addNewEnvironment,
-    setCurrentEnvironment,
-  } = useEnvironmentManager();
-  const { currentEnvironmentId } = getCurrentEnvironment();
+  const { getAllEnvironments, addNewEnvironment, setCurrentEnvironment } = useEnvironmentManager();
   const [searchValue, setSearchValue] = useState("");
   const [isNewEnvironmentInputVisible, setIsNewEnvironmentInputVisible] = useState(false);
   const [newEnvironmentValue, setNewEnvironmentValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { envId } = useParams();
 
   const environments = useMemo(() => getAllEnvironments(), [getAllEnvironments]);
   const filteredEnvironments = useMemo(
@@ -93,7 +86,7 @@ export const EnvironmentsList = () => {
           <div className="mt-8">
             <Input
               autoFocus
-              className="new-environment-input"
+              className="environment-input"
               size="small"
               placeholder="New Environment name"
               disabled={isLoading}
@@ -119,7 +112,7 @@ export const EnvironmentsList = () => {
           {isNewEnvironmentInputVisible && (
             <Input
               autoFocus
-              className="new-environment-input"
+              className="environment-input"
               size="small"
               placeholder="New Environment name"
               disabled={isLoading}
@@ -135,29 +128,7 @@ export const EnvironmentsList = () => {
               <>
                 {filteredEnvironments.map((environment) =>
                   environment.name.toLowerCase().includes(searchValue.toLowerCase()) ? (
-                    <div
-                      key={environment.id}
-                      className={`environments-list-item ${environment.id === envId ? "active" : ""}`}
-                      onClick={() => {
-                        redirectToEnvironment(navigate, environment.id);
-                      }}
-                    >
-                      <Typography.Text
-                        ellipsis={{
-                          tooltip: environment.name,
-                        }}
-                      >
-                        {environment.name}
-                      </Typography.Text>
-                      <Tooltip
-                        overlayClassName="active-environment-tooltip"
-                        title="Active Environment"
-                        placement="top"
-                        showArrow={false}
-                      >
-                        <span>{environment.id === currentEnvironmentId ? <MdOutlineCheckCircle /> : ""}</span>
-                      </Tooltip>
-                    </div>
+                    <EnvironmentsListItem environment={environment} />
                   ) : null
                 )}
               </>
