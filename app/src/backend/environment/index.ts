@@ -124,7 +124,7 @@ export const duplicateEnvironmentInDB = async (
 
   const newEnvironment = await upsertEnvironmentInDB(ownerId, `${environmentToDuplicate.name} Copy`);
   return updateEnvironmentVariablesInDB(ownerId, newEnvironment.id, environmentToDuplicate.variables).then(() => {
-    return newEnvironment;
+    return { ...newEnvironment, variables: environmentToDuplicate.variables };
   });
 };
 

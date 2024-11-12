@@ -227,15 +227,25 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const duplicateEnvironment = useCallback(async (environmentId: string) => {
     return duplicateEnvironmentInDB(ownerId, environmentId, allEnvironmentData).then((newEnvironment) => {
       dispatch(environmentVariablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name }));
+      dispatch(
+        environmentVariablesActions.updateEnvironmentData({
+          newVariables: newEnvironment.variables,
+          environmentId: newEnvironment.id,
+        })
+      );
     });
   }, []);
 
   const deleteEnvironment = useCallback(async (environmentId: string) => {
+    const allEnvironmentsMap = { ...allEnvironmentData };
     const isActiveEnvironmentBeingDeleted = currentEnvironmentId === environmentId;
     return deleteEnvironmentFromDB(ownerId, environmentId).then(() => {
       dispatch(environmentVariablesActions.removeEnvironment({ environmentId }));
-      if (isActiveEnvironmentBeingDeleted && Object.keys(allEnvironmentData).length > 0) {
-        setCurrentEnvironment(Object.keys(allEnvironmentData)[0]);
+      delete allEnvironmentsMap[environmentId];
+      if (isActiveEnvironmentBeingDeleted && Object.keys(allEnvironmentsMap).length > 0) {
+        setCurrentEnvironment(Object.keys(allEnvironmentsMap)[0]);
+      } else {
+        dispatch(environmentVariablesActions.resetState());
       }
     });
   }, []);
