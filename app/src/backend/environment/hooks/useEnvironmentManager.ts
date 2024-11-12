@@ -12,6 +12,9 @@ import {
   upsertEnvironmentInDB,
   updateEnvironmentVariablesInDB,
   fetchAllEnvironmentDetails,
+  updateEnvironmentNameInDB,
+  duplicateEnvironmentInDB,
+  deleteEnvironmentFromDB,
 } from "..";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
@@ -103,9 +106,10 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
           environmentData.variables
         );
         dispatch(
-          environmentVariablesActions.setVariablesInEnvironment({
+          environmentVariablesActions.updateEnvironmentData({
             newVariables: mergedVariables,
             environmentId: environmentData.id,
+            environmentName: environmentData.name,
           })
         );
       });
@@ -146,7 +150,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariables)
         .then(() => {
           dispatch(
-            environmentVariablesActions.setVariablesInEnvironment({
+            environmentVariablesActions.updateEnvironmentData({
               newVariables,
               environmentId,
             })
@@ -211,6 +215,41 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     [allEnvironmentData]
   );
 
+  const renameEnvironment = useCallback(
+    async (environmentId: string, newName: string) => {
+      return updateEnvironmentNameInDB(ownerId, environmentId, newName).then(() => {
+        dispatch(environmentVariablesActions.updateEnvironmentName({ environmentId, newName }));
+      });
+    },
+    [ownerId, dispatch]
+  );
+
+  const duplicateEnvironment = useCallback(async (environmentId: string) => {
+    return duplicateEnvironmentInDB(ownerId, environmentId, allEnvironmentData).then((newEnvironment) => {
+      dispatch(environmentVariablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name }));
+      dispatch(
+        environmentVariablesActions.updateEnvironmentData({
+          newVariables: newEnvironment.variables,
+          environmentId: newEnvironment.id,
+        })
+      );
+    });
+  }, []);
+
+  const deleteEnvironment = useCallback(async (environmentId: string) => {
+    const allEnvironmentsMap = { ...allEnvironmentData };
+    const isActiveEnvironmentBeingDeleted = currentEnvironmentId === environmentId;
+    return deleteEnvironmentFromDB(ownerId, environmentId).then(() => {
+      dispatch(environmentVariablesActions.removeEnvironment({ environmentId }));
+      delete allEnvironmentsMap[environmentId];
+      if (isActiveEnvironmentBeingDeleted && Object.keys(allEnvironmentsMap).length > 0) {
+        setCurrentEnvironment(Object.keys(allEnvironmentsMap)[0]);
+      } else {
+        dispatch(environmentVariablesActions.resetState());
+      }
+    });
+  }, []);
+
   return {
     setCurrentEnvironment,
     addNewEnvironment,
@@ -222,6 +261,9 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     getCurrentEnvironmentVariables,
     getAllEnvironments,
     getEnvironmentName,
+    renameEnvironment,
+    duplicateEnvironment,
+    deleteEnvironment,
     isEnvironmentsLoading: isLoading,
   };
 };
