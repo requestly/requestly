@@ -24,6 +24,7 @@ export const processApiRecordsToImport = (records: RQAPI.ApiRecord[] | RQAPI.Col
     parsedRecords: records,
     apis,
     collections,
+    count: collections.length + apis.length,
   };
 };
 

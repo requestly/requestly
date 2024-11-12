@@ -190,6 +190,14 @@ export const API_CLIENT = {
   COLLECTION_RENAMED: "api_client_collection_renamed",
   COLLECTION_DELETED: "api_client_collection_deleted",
   REQUEST_CREATED_IN_COLLECTION: "api_client_request_created_collection",
+  EXPORT_COLLECTIONS_CLICKED: "api_client_export_collections_clicked",
+  EXPORT_COLLECTIONS_FAILED: "api_client_export_collections_failed",
+  EXPORT_COLLECTIONS_SUCCESSFUL: "api_client_export_collections_successful",
+  EXPORT_COLLECTIONS_STARTED: "api_client_export_collections_started",
+  IMPORT_COLLECTIONS_CLICKED: "api_client_import_collections_clicked",
+  IMPORT_COLLECTIONS_FAILED: "api_client_import_collections_failed",
+  IMPORT_COLLECTIONS_SUCCESSFUL: "api_client_import_collections_successful",
+  IMPORT_COLLECTIONS_STARTED: "api_client_import_collections_started",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {

@@ -9,7 +9,11 @@ import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { ApiClientSidebarTabKey } from "../APIClientSidebar";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
-import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
+import {
+  trackImportApiCollectionsClicked,
+  trackNewCollectionClicked,
+  trackNewRequestClicked,
+} from "modules/analytics/events/features/apiClient";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
@@ -45,7 +49,10 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
     {
       key: "1",
       label: "Collection",
-      onClick: () => setIsImportCollectionsModalOpen(true),
+      onClick: () => {
+        trackImportApiCollectionsClicked();
+        setIsImportCollectionsModalOpen(true);
+      },
     },
     {
       key: "2",

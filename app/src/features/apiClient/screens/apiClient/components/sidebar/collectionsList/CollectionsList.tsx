@@ -8,6 +8,7 @@ import { RequestRow } from "./requestRow/RequestRow";
 import { isApiCollection, isApiRequest } from "../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { ExportCollectionsModal } from "../../modals/exportCollectionsModal/ExportCollectionsModal";
+import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
 import "./collectionsList.scss";
 
 interface Props {
@@ -75,6 +76,7 @@ export const CollectionsList: React.FC<Props> = ({
 
   const handleExportCollection = useCallback((collection: RQAPI.CollectionRecord) => {
     setCollectionsToExport((prev) => [...prev, collection]);
+    trackExportCollectionsClicked();
     setIsExportModalOpen(true);
   }, []);
 

@@ -7,6 +7,11 @@ import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDo
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { isArray } from "lodash";
 import { VariableExport } from "backend/environment/types";
+import {
+  trackExportApiCollectionsFailed,
+  trackExportApiCollectionsStarted,
+  trackExportApiCollectionsSuccessful,
+} from "modules/analytics/events/features/apiClient";
 import "./exportCollectionsModal.scss";
 
 interface ExportCollectionsModalProps {
@@ -31,13 +36,21 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
     if (!isExportVariablesChecked) {
       dataToExport.variables = [];
     }
-    const jsonString = JSON.stringify(dataToExport, null, 2);
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `RQ-${collections.length === 1 ? "collection" : "collections"}-${getFormattedDate("DD_MM_YYYY")}.json`;
-    a.click();
+    trackExportApiCollectionsStarted(dataToExport.records.length);
+    try {
+      const jsonString = JSON.stringify(dataToExport, null, 2);
+      const blob = new Blob([jsonString], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `RQ-${collections.length === 1 ? "collection" : "collections"}-${getFormattedDate(
+        "DD_MM_YYYY"
+      )}.json`;
+      a.click();
+      trackExportApiCollectionsSuccessful(dataToExport.records.length);
+    } catch (error) {
+      trackExportApiCollectionsFailed(dataToExport.records.length);
+    }
   }, [exportData, isExportVariablesChecked, collections]);
 
   const extractVariablesFromAPIRecord = useCallback(

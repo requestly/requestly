@@ -14,8 +14,13 @@ import { upsertApiRecord } from "backend/apiClient";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
-import "./importCollectionsModal.scss";
+import {
+  trackImportApiCollectionsFailed,
+  trackImportApiCollectionsStarted,
+  trackImportApiCollectionsSuccessful,
+} from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
+import "./importCollectionsModal.scss";
 
 interface Props {
   isOpen: boolean;
@@ -146,26 +151,30 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
 
       await Promise.all(apisPromises);
       toast.success("Collections and APIs imported successfully");
+      trackImportApiCollectionsSuccessful(apiRecordsToImport.count);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to import collections and APIs");
+      trackImportApiCollectionsFailed(apiRecordsToImport.count);
       throw error;
     }
-  }, [apiRecordsToImport, onSaveRecord, user.details?.profile?.uid, workspace?.id]);
+  }, [apiRecordsToImport, onSaveRecord, user.details?.profile?.uid, workspace?.id, apiRecordsToImport.count]);
 
   const handleImport = useCallback(async () => {
+    trackImportApiCollectionsStarted(apiRecordsToImport.count);
     setIsImporting(true);
     setValidationError(null);
 
     try {
       await handleImportVariables();
       await handleImportCollectionsAndApis();
+
       onClose();
     } catch (error) {
       Logger.error("Import failed:", error);
     } finally {
       setIsImporting(false);
     }
-  }, [handleImportVariables, handleImportCollectionsAndApis, onClose]);
+  }, [handleImportVariables, handleImportCollectionsAndApis, onClose, apiRecordsToImport.count]);
 
   return (
     <Modal
