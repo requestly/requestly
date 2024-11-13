@@ -75,6 +75,7 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
               ) : (
                 // <Input placeholder="key" value={param.key} onChange={(evt) => onKeyChange(evt.target.value, index)} />
                 <RQSingleLineEditor
+                  key={index}
                   placeholder="key"
                   defaultValue={param.key}
                   onChange={(val) => onKeyChange(val, index)}
@@ -89,6 +90,7 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
                 onChange={(evt) => onValueChange(evt.target.value, index)}
               /> */}
               <RQSingleLineEditor
+                key={index}
                 placeholder="value"
                 defaultValue={param.value}
                 onChange={(value) => onValueChange(value, index)}
