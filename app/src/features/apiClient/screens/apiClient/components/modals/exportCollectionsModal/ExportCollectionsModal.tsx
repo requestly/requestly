@@ -47,11 +47,12 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
         "DD_MM_YYYY"
       )}.json`;
       a.click();
+      onClose();
       trackExportApiCollectionsSuccessful(dataToExport.records.length);
     } catch (error) {
       trackExportApiCollectionsFailed(dataToExport.records.length);
     }
-  }, [exportData, isExportVariablesChecked, collections]);
+  }, [exportData, isExportVariablesChecked, collections, onClose]);
 
   const extractVariablesFromAPIRecord = useCallback(
     (api: RQAPI.ApiRecord) => {
