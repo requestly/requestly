@@ -72,6 +72,12 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
         let parsedResult;
         try {
           parsedResult = JSON.parse(fileContent as string);
+          if (!parsedResult.variables || !parsedResult.records) {
+            setValidationError(
+              "Failed to process the selected file. Please select a valid exported collections JSON file."
+            );
+            return;
+          }
           const result = processApiRecordsToImport(parsedResult.records, user.details?.profile?.uid);
           setApiRecordsToImport(result);
           const processedVariables = processVariablesToImport(parsedResult.variables, existingVariables);
@@ -79,7 +85,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
           setIsParseComplete(true);
         } catch (e) {
           setValidationError(
-            "Failed to parse the selected file. Please select a valid exported collections JSON file."
+            "Failed to process the selected file. Please select a valid exported collections JSON file."
           );
         } finally {
           setIsDataProcessing(false);

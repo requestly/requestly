@@ -121,6 +121,7 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
       onCancel={onClose}
       className="custom-rq-modal export-collections-modal"
       onOk={handleExport}
+      okText="Export"
     >
       <div className="export-collections-modal-content">
         <div className="export-details-card">

@@ -1,4 +1,8 @@
 .export-collections-modal {
+  .ant-modal-header {
+    border-bottom: none;
+  }
+
   .export-collections-modal-title {
     display: flex;
     align-items: center;
