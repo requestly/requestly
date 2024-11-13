@@ -2,20 +2,15 @@ import React from "react";
 import { Popover, Row } from "antd";
 import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
 import { capitalize } from "lodash";
+import "./variablePopover.scss";
 
-interface SingleLineEditorPopoverProps {
+interface VariablePopoverProps {
   hoveredVariable: string;
   popupPosition: { x: number; y: number };
-  editorRef: React.RefObject<HTMLDivElement>;
   variables: Record<string, any>;
 }
 
-export const SingleLineEditorPopover: React.FC<SingleLineEditorPopoverProps> = ({
-  hoveredVariable,
-  editorRef,
-  popupPosition,
-  variables = {},
-}) => {
+export const VariablePopover: React.FC<VariablePopoverProps> = ({ hoveredVariable, popupPosition, variables = {} }) => {
   return (
     <Popover
       content={
@@ -41,8 +36,8 @@ export const SingleLineEditorPopover: React.FC<SingleLineEditorPopoverProps> = (
       <div
         style={{
           position: "absolute",
-          top: popupPosition?.y - editorRef.current.getBoundingClientRect().top + 10,
-          left: popupPosition?.x - editorRef.current.getBoundingClientRect().left + 10,
+          top: popupPosition?.y,
+          left: popupPosition?.x,
           zIndex: 1000,
         }}
         className="variable-info-div"
