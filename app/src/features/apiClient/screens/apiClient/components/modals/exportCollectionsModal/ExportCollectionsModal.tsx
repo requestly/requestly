@@ -13,6 +13,7 @@ import {
   trackExportApiCollectionsSuccessful,
 } from "modules/analytics/events/features/apiClient";
 import "./exportCollectionsModal.scss";
+import fileDownload from "js-file-download";
 
 interface ExportCollectionsModalProps {
   collections: RQAPI.CollectionRecord[];
@@ -38,15 +39,11 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
     }
     trackExportApiCollectionsStarted(dataToExport.records.length);
     try {
-      const jsonString = JSON.stringify(dataToExport, null, 2);
-      const blob = new Blob([jsonString], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `RQ-${collections.length === 1 ? "collection" : "collections"}-${getFormattedDate(
+      const fileContent = JSON.stringify(dataToExport, null, 2);
+      const fileName = `RQ-${collections.length === 1 ? "collection" : "collections"}-export-${getFormattedDate(
         "DD_MM_YYYY"
       )}.json`;
-      a.click();
+      fileDownload(fileContent, fileName, "application/json");
       onClose();
       trackExportApiCollectionsSuccessful(dataToExport.records.length);
     } catch (error) {

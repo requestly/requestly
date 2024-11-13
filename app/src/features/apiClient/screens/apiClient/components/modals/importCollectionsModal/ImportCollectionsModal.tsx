@@ -65,7 +65,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
 
         if (!file.type.includes("json")) {
           setIsDataProcessing(false);
-          setValidationError("Invalid file format. Please select a valid exported JSON file.");
+          setValidationError("Invalid file format. Please select a valid JSON export file.");
           return;
         }
 
@@ -74,7 +74,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
           parsedResult = JSON.parse(fileContent as string);
           if (!parsedResult.variables || !parsedResult.records) {
             setValidationError(
-              "Failed to process the selected file. Please select a valid exported collections JSON file."
+              "Failed to process the selected file. Please select a valid API collections JSON export file."
             );
             return;
           }
@@ -85,7 +85,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
           setIsParseComplete(true);
         } catch (e) {
           setValidationError(
-            "Failed to process the selected file. Please select a valid exported collections JSON file."
+            "Failed to process the selected file. Please select a valid API collections JSON export file."
           );
         } finally {
           setIsDataProcessing(false);
@@ -197,7 +197,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
       {validationError ? (
         <div className="collections-parsed-container">
           <MdErrorOutline className="collections-parse-result-icon error" />
-          <div className="validation-error-text">{validationError}</div>
+          <div className="collections-import-error-text">{validationError}</div>
           <RQButton
             type="primary"
             onClick={() => {
@@ -222,7 +222,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
             onFilesDrop(files);
           }}
           isProcessing={isDataProcessing}
-          title="Click to browse or drag and drop your collections JSON file"
+          title="Browse or drop your API collections JSON file here"
           subtitle="Accepted file formats: JSON"
           selectorButtonTitle={isParseComplete || validationError ? "Try another file" : "Select file"}
         />
