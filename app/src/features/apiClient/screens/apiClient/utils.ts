@@ -58,14 +58,13 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
   };
 };
 
-export const sanitizeKeyValuePairs = (keyValuePairs: KeyValuePair[]): KeyValuePair[] => {
-  const newKeyValuePairs = keyValuePairs.map((pair) => {
-    if (pair.isEnabled === undefined) {
-      return { ...pair, isEnabled: true };
-    }
-    return pair;
-  });
-  return newKeyValuePairs.filter((pair) => pair.key.length && pair.isEnabled);
+export const sanitizeKeyValuePairs = (keyValuePairs: KeyValuePair[], removeDisabledKeys = true): KeyValuePair[] => {
+  return keyValuePairs
+    .map((pair) => ({
+      ...pair,
+      isEnabled: pair.isEnabled ?? true,
+    }))
+    .filter((pair) => pair.key.length > 0 && (!removeDisabledKeys || pair.isEnabled));
 };
 
 export const supportsRequestBody = (method: RequestMethod): boolean => {
