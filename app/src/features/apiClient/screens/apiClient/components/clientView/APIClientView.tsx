@@ -12,7 +12,7 @@ import {
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
   makeRequest,
-  removeEmptyKeys,
+  sanitizeKeyValuePairs,
   supportsRequestBody,
 } from "../../utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
@@ -194,15 +194,15 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       ...entry,
       request: {
         ...entry.request,
-        queryParams: removeEmptyKeys(entry.request.queryParams),
-        headers: removeEmptyKeys(entry.request.headers),
+        queryParams: sanitizeKeyValuePairs(entry.request.queryParams),
+        headers: sanitizeKeyValuePairs(entry.request.headers),
       },
     };
 
     if (!supportsRequestBody(entry.request.method)) {
       sanitizedEntry.request.body = null;
     } else if (entry.request.contentType === RequestContentType.FORM) {
-      sanitizedEntry.request.body = removeEmptyKeys(sanitizedEntry.request.body as KeyValuePair[]);
+      sanitizedEntry.request.body = sanitizeKeyValuePairs(sanitizedEntry.request.body as KeyValuePair[]);
     }
 
     return sanitizedEntry;
@@ -233,6 +233,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     const renderedRequest = renderVariables<RQAPI.Request>(sanitizedEntry.request);
     renderedRequest.url = addUrlSchemeIfMissing(renderedRequest.url);
 
+    console.log("renderedRequest", renderedRequest);
     const renderedEntry = { ...sanitizedEntry, request: renderedRequest };
 
     abortControllerRef.current = new AbortController();
@@ -319,7 +320,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
-      data: { ...entry },
+      data: { ...sanitizeEntry(entry) },
     };
 
     if (apiEntryDetails?.id) {

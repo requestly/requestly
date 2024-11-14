@@ -18,6 +18,7 @@ export interface KeyValuePair {
   id: number;
   key: string;
   value: string;
+  isEnabled: boolean;
 }
 
 export namespace RQAPI {

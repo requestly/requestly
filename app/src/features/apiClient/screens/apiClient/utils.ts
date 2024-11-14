@@ -58,8 +58,14 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
   };
 };
 
-export const removeEmptyKeys = (keyValuePairs: KeyValuePair[]): KeyValuePair[] => {
-  return keyValuePairs.filter((pair) => pair.key.length);
+export const sanitizeKeyValuePairs = (keyValuePairs: KeyValuePair[]): KeyValuePair[] => {
+  const newKeyValuePairs = keyValuePairs.map((pair) => {
+    if (pair.isEnabled === undefined) {
+      return { ...pair, isEnabled: true };
+    }
+    return pair;
+  });
+  return newKeyValuePairs.filter((pair) => pair.key.length && pair.isEnabled);
 };
 
 export const supportsRequestBody = (method: RequestMethod): boolean => {
@@ -67,11 +73,12 @@ export const supportsRequestBody = (method: RequestMethod): boolean => {
 };
 
 export const generateKeyValuePairsFromJson = (json: Record<string, string> = {}): KeyValuePair[] => {
-  return Object.entries(json || {}).map(([key, value]) => {
+  return Object.entries(json || {}).map(([key, value, isEnabled = true]) => {
     return {
       key,
       value,
       id: Math.random(),
+      isEnabled,
     };
   });
 };

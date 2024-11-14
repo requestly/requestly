@@ -3,8 +3,7 @@ import React, { memo, useEffect, useMemo, useState } from "react";
 import { KeyValuePair, RQAPI, RequestContentType } from "../../../../../types";
 import RequestBody from "./RequestBody";
 import KeyValueForm from "./KeyValueForm";
-import { removeEmptyKeys, supportsRequestBody } from "../../../utils";
-import HEADER_SUGGESTIONS from "config/constants/sub/header-suggestions";
+import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../utils";
 import "./requestTabs.scss";
 
 enum Tab {
@@ -52,7 +51,7 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
     return [
       {
         key: Tab.QUERY_PARAMS,
-        label: <LabelWithCount label="Query Params" count={removeEmptyKeys(request.queryParams).length} />,
+        label: <LabelWithCount label="Query Params" count={sanitizeKeyValuePairs(request.queryParams).length} />,
         children: <KeyValueForm keyValuePairs={request.queryParams} setKeyValuePairs={setQueryParams} />,
       },
       {
@@ -70,7 +69,7 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
       },
       {
         key: Tab.HEADERS,
-        label: <LabelWithCount label="Headers" count={removeEmptyKeys(request.headers).length} />,
+        label: <LabelWithCount label="Headers" count={sanitizeKeyValuePairs(request.headers).length} />,
         children: (
           <KeyValueForm
             keyValuePairs={request.headers}
