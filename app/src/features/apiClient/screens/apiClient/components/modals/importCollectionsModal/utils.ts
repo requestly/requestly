@@ -31,7 +31,7 @@ export const processVariablesToImport = (
   existingVariables: Record<string, EnvironmentVariableValue>
 ) => {
   const newVariables = variables.reduce((acc: Record<string, EnvironmentVariableValue>, variableData) => {
-    acc[variableData.name] = {
+    acc[variableData.key] = {
       syncValue: variableData.syncValue,
       type: variableData.type,
       localValue: variableData.localValue || "",

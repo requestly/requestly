@@ -216,11 +216,11 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   );
 
   const getVariableData = useCallback(
-    (variableName: string) => {
-      if (allEnvironmentData[currentEnvironmentId].variables[variableName]) {
+    (variableKey: string) => {
+      if (allEnvironmentData[currentEnvironmentId].variables[variableKey]) {
         return {
-          ...allEnvironmentData[currentEnvironmentId].variables[variableName],
-          name: variableName,
+          ...allEnvironmentData[currentEnvironmentId].variables[variableKey],
+          key: variableKey,
         };
       }
       return null;

@@ -22,5 +22,5 @@ export enum EnvironmentVariableType {
 }
 
 export type VariableExport = EnvironmentVariableValue & {
-  name: string;
+  key: string;
 };
