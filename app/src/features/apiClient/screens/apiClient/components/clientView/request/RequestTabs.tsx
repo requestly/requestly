@@ -1,6 +1,6 @@
 import { Badge, Tabs, TabsProps, Tag } from "antd";
 import React, { memo, useEffect, useMemo, useState } from "react";
-import { KeyValuePair, RQAPI, RequestContentType } from "../../../../../types";
+import { KeyValuePair, RQAPI, RequestContentType, KeyValueFormType } from "../../../../../types";
 import RequestBody from "./RequestBody";
 import KeyValueForm from "./KeyValueForm";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../utils";
@@ -52,7 +52,13 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
       {
         key: Tab.QUERY_PARAMS,
         label: <LabelWithCount label="Query Params" count={sanitizeKeyValuePairs(request.queryParams).length} />,
-        children: <KeyValueForm keyValuePairs={request.queryParams} setKeyValuePairs={setQueryParams} />,
+        children: (
+          <KeyValueForm
+            formType={KeyValueFormType.QUERY_PARAMS}
+            keyValuePairs={request.queryParams}
+            setKeyValuePairs={setQueryParams}
+          />
+        ),
       },
       {
         key: Tab.BODY,
@@ -72,6 +78,7 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
         label: <LabelWithCount label="Headers" count={sanitizeKeyValuePairs(request.headers).length} />,
         children: (
           <KeyValueForm
+            formType={KeyValueFormType.HEADERS}
             keyValuePairs={request.headers}
             setKeyValuePairs={setRequestHeaders}
             // keyOptions={HEADER_SUGGESTIONS.Request}
