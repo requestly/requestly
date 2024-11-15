@@ -89,7 +89,7 @@ export const mergeLocalAndSyncVariables = (
 };
 
 export const extractVariableNameFromStringIfExists = (string: string) => {
-  const regex = /{{([^}]+)}}/;
-  const match = string.match(regex);
-  return match ? match[1] : null;
+  const regex = /{{([^}]+)}}/g;
+  const matches = Array.from(string.matchAll(regex));
+  return matches.length > 0 ? matches.map((match) => match[1]) : null;
 };

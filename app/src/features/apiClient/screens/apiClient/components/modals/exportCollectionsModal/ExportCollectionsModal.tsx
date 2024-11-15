@@ -59,8 +59,10 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
       const apiRequest = api.data.request;
 
       const checkAndAddVariable = (value: string) => {
-        const variable = extractVariableNameFromStringIfExists(value);
-        if (variable) variables.add(variable);
+        const variableNames = extractVariableNameFromStringIfExists(value);
+        if (variableNames) {
+          variableNames.forEach((variable) => variables.add(variable));
+        }
       };
 
       apiRequest.headers?.forEach(({ key, value }) => {
