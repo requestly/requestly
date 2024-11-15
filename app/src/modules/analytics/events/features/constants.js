@@ -198,6 +198,7 @@ export const API_CLIENT = {
   IMPORT_COLLECTIONS_FAILED: "api_client_import_collections_failed",
   IMPORT_COLLECTIONS_SUCCESSFUL: "api_client_import_collections_successful",
   IMPORT_COLLECTIONS_STARTED: "api_client_import_collections_started",
+  ENABLE_KEY_VALUE_TOGGLED: "api_client_enable_key_value_toggled",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {

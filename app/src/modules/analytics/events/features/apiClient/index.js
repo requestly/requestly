@@ -116,3 +116,7 @@ export const trackImportApiCollectionsFailed = (num_records, num_variables) => {
 export const trackImportApiCollectionsSuccessful = (num_records, num_variables) => {
   trackEvent(API_CLIENT.IMPORT_COLLECTIONS_SUCCESSFUL, { num_records, num_variables });
 };
+
+export const trackEnableKeyValueToggled = (is_active, type) => {
+  trackEvent(API_CLIENT.ENABLE_KEY_VALUE_TOGGLED, { is_active, type });
+};
