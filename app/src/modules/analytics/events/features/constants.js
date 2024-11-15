@@ -190,6 +190,7 @@ export const API_CLIENT = {
   COLLECTION_RENAMED: "api_client_collection_renamed",
   COLLECTION_DELETED: "api_client_collection_deleted",
   REQUEST_CREATED_IN_COLLECTION: "api_client_request_created_collection",
+  ENABLE_KEY_VALUE_TOGGLED: "api_client_enable_key_value_toggled",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {

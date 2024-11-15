@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Input, Radio } from "antd";
-import { KeyValuePair, RQAPI, RequestContentType } from "../../../../../types";
+import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../types";
 import KeyValueForm from "./KeyValueForm";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 
@@ -28,7 +28,13 @@ const RequestBody: React.FC<Props> = ({ body, contentType, setBody, setContentTy
         );
 
       case RequestContentType.FORM:
-        return <KeyValueForm keyValuePairs={body as KeyValuePair[]} setKeyValuePairs={setBody} />;
+        return (
+          <KeyValueForm
+            formType={KeyValueFormType.FORM}
+            keyValuePairs={body as KeyValuePair[]}
+            setKeyValuePairs={setBody}
+          />
+        );
 
       default:
         return (

@@ -18,6 +18,13 @@ export interface KeyValuePair {
   id: number;
   key: string;
   value: string;
+  isEnabled: boolean;
+}
+
+export enum KeyValueFormType {
+  HEADERS = "headers",
+  QUERY_PARAMS = "queryParams",
+  FORM = "form",
 }
 
 export namespace RQAPI {
