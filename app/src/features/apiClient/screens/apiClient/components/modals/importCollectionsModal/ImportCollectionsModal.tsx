@@ -110,7 +110,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
     try {
       const collectionsPromises: Promise<{ oldId: string; newId: string }>[] = [];
       apiRecordsToImport.collections.forEach((collection: RQAPI.CollectionRecord) => {
-        const collectionToImport = { ...collection, name: `${collection.name} (Imported)` };
+        const collectionToImport = { ...collection, name: `(Imported) ${collection.name}` };
         delete collectionToImport.id;
         const promise = upsertApiRecord(user?.details?.profile?.uid, collectionToImport, workspace?.id)
           .then((newCollection) => {
