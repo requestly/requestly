@@ -15,9 +15,10 @@ import { trackNewRequestClicked } from "modules/analytics/events/features/apiCli
 interface Props {
   record: RQAPI.CollectionRecord;
   onNewClick: (src: RQAPI.AnalyticsEventSource) => void;
+  onExportClick: (collection: RQAPI.CollectionRecord) => void;
 }
 
-export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
+export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportClick }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeKey, setActiveKey] = useState(record.id); // TODO: Persist collapse active keys for all rows
   const [isCreateNewRequest, setIsCreateNewRequest] = useState(false);
@@ -36,6 +37,14 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
         },
         {
           key: "1",
+          label: <div>Export</div>,
+          onClick: (itemInfo) => {
+            itemInfo.domEvent?.stopPropagation?.();
+            onExportClick(record);
+          },
+        },
+        {
+          key: "2",
           label: <div>Delete</div>,
           danger: true,
           onClick: (itemInfo) => {
@@ -48,7 +57,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick }) => {
 
       return items;
     },
-    [setIsDeleteModalOpen, updateRecordToBeDeleted]
+    [setIsDeleteModalOpen, updateRecordToBeDeleted, onExportClick]
   );
 
   return (
