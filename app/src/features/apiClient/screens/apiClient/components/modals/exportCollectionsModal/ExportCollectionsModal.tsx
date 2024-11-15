@@ -39,7 +39,7 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
     if (!isExportVariablesChecked) {
       dataToExport.variables = [];
     }
-    trackExportApiCollectionsStarted(dataToExport.records.length);
+    trackExportApiCollectionsStarted(dataToExport.records.length, dataToExport.variables.length);
     try {
       const fileContent = JSON.stringify(dataToExport, null, 2);
       const fileName = `RQ-${collections.length === 1 ? "collection" : "collections"}-export-${getFormattedDate(
@@ -47,9 +47,9 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
       )}.json`;
       fileDownload(fileContent, fileName, "application/json");
       onClose();
-      trackExportApiCollectionsSuccessful(dataToExport.records.length);
+      trackExportApiCollectionsSuccessful(dataToExport.records.length, dataToExport.variables.length);
     } catch (error) {
-      trackExportApiCollectionsFailed(dataToExport.records.length);
+      trackExportApiCollectionsFailed(dataToExport.records.length, dataToExport.variables.length);
     }
   }, [exportData, isExportVariablesChecked, collections, onClose]);
 

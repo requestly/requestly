@@ -157,16 +157,16 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
 
       await Promise.all(apisPromises);
       toast.success("Collections and APIs imported successfully");
-      trackImportApiCollectionsSuccessful(apiRecordsToImport?.count);
+      trackImportApiCollectionsSuccessful(apiRecordsToImport?.count, Object.keys(variablesToImport || {}).length);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to import collections and APIs");
-      trackImportApiCollectionsFailed(apiRecordsToImport?.count);
+      trackImportApiCollectionsFailed(apiRecordsToImport?.count, Object.keys(variablesToImport || {}).length);
       throw error;
     }
   }, [apiRecordsToImport, onSaveRecord, user.details?.profile?.uid, workspace?.id, apiRecordsToImport?.count]);
 
   const handleImport = useCallback(async () => {
-    trackImportApiCollectionsStarted(apiRecordsToImport?.count);
+    trackImportApiCollectionsStarted(apiRecordsToImport?.count, Object.keys(variablesToImport || {}).length);
     setIsImporting(true);
     setValidationError(null);
 
