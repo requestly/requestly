@@ -20,3 +20,7 @@ export enum EnvironmentVariableType {
   Boolean = "boolean",
   Secret = "secret",
 }
+
+export type VariableExport = EnvironmentVariableValue & {
+  key: string;
+};

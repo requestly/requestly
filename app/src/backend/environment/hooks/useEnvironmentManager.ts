@@ -215,6 +215,19 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     [allEnvironmentData]
   );
 
+  const getVariableData = useCallback(
+    (variableKey: string) => {
+      if (allEnvironmentData[currentEnvironmentId].variables[variableKey]) {
+        return {
+          ...allEnvironmentData[currentEnvironmentId].variables[variableKey],
+          key: variableKey,
+        };
+      }
+      return null;
+    },
+    [allEnvironmentData]
+  );
+
   const renameEnvironment = useCallback(
     async (environmentId: string, newName: string) => {
       return updateEnvironmentNameInDB(ownerId, environmentId, newName).then(() => {
@@ -261,6 +274,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     getCurrentEnvironmentVariables,
     getAllEnvironments,
     getEnvironmentName,
+    getVariableData,
     renameEnvironment,
     duplicateEnvironment,
     deleteEnvironment,

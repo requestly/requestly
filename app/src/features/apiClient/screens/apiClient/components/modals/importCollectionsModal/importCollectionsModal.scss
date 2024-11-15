@@ -1,0 +1,35 @@
+.import-collections-modal {
+  .ant-modal-header {
+    border-bottom: none;
+  }
+
+  .ant-modal-body {
+    padding: 1rem;
+    padding-top: 0;
+  }
+
+  .collections-parse-result-icon {
+    font-size: 32px;
+
+    &.success {
+      color: var(--requestly-color-success);
+    }
+
+    &.error {
+      color: var(--requestly-color-error);
+    }
+  }
+
+  .collections-import-error-text {
+    text-align: center;
+    max-width: 450px;
+    white-space: pre-line;
+  }
+
+  .collections-parsed-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+}
