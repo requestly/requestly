@@ -1,19 +1,21 @@
 import { DeleteOutlined } from "@ant-design/icons";
 import { AutoComplete, Button, Checkbox } from "antd";
 import React, { memo, useCallback, useEffect } from "react";
-import { KeyValuePair } from "../../../../../types";
+import { KeyValueFormType, KeyValuePair } from "../../../../../types";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
+import { trackEnableKeyValueToggled } from "modules/analytics/events/features/apiClient";
 
 interface Props {
   keyValuePairs: KeyValuePair[];
   setKeyValuePairs: (keyValuePairs: KeyValuePair[]) => void;
   keyOptions?: { value: string }[];
+  formType: KeyValueFormType;
 }
 
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
 
-const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOptions }) => {
+const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOptions, formType }) => {
   const { getCurrentEnvironmentVariables } = useEnvironmentManager();
   const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
@@ -72,7 +74,10 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
               {param.key.length ? (
                 <Checkbox
                   checked={param.isEnabled || param.isEnabled === undefined}
-                  onChange={(evt) => onEnableKeyChange(evt.target.checked, index)}
+                  onChange={(evt) => {
+                    onEnableKeyChange(evt.target.checked, index);
+                    trackEnableKeyValueToggled(evt.target.checked, formType);
+                  }}
                 />
               ) : null}
             </td>

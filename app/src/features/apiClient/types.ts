@@ -21,6 +21,12 @@ export interface KeyValuePair {
   isEnabled: boolean;
 }
 
+export enum KeyValueFormType {
+  HEADERS = "headers",
+  QUERY_PARAMS = "queryParams",
+  FORM = "form",
+}
+
 export namespace RQAPI {
   export type AnalyticsEventSource = "collection_row" | "collection_list_empty_state" | "api_client_sidebar_header";
 
