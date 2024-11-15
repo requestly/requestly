@@ -12,7 +12,7 @@ import {
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
   makeRequest,
-  removeEmptyKeys,
+  sanitizeKeyValuePairs,
   supportsRequestBody,
 } from "../../utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
@@ -189,20 +189,23 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const sanitizeEntry = (entry: RQAPI.Entry) => {
+  const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => {
     const sanitizedEntry: RQAPI.Entry = {
       ...entry,
       request: {
         ...entry.request,
-        queryParams: removeEmptyKeys(entry.request.queryParams),
-        headers: removeEmptyKeys(entry.request.headers),
+        queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys),
+        headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys),
       },
     };
 
     if (!supportsRequestBody(entry.request.method)) {
       sanitizedEntry.request.body = null;
     } else if (entry.request.contentType === RequestContentType.FORM) {
-      sanitizedEntry.request.body = removeEmptyKeys(sanitizedEntry.request.body as KeyValuePair[]);
+      sanitizedEntry.request.body = sanitizeKeyValuePairs(
+        sanitizedEntry.request.body as KeyValuePair[],
+        removeDisabledKeys
+      );
     }
 
     return sanitizedEntry;
@@ -237,7 +240,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     abortControllerRef.current = new AbortController();
 
-    setEntry(sanitizedEntry);
     setIsFailed(false);
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
@@ -245,7 +247,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     makeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
       .then((response) => {
         // TODO: Add an entry in history
-        const entryWithResponse = { ...sanitizedEntry, response };
+        const entryWithResponse = { ...entry, response };
         const renderedEntryWithResponse = { ...renderedEntry, response };
 
         if (response) {
@@ -319,7 +321,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
-      data: { ...entry },
+      data: { ...sanitizeEntry(entry, false) },
     };
 
     if (apiEntryDetails?.id) {
