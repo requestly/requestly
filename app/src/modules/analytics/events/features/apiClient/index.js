@@ -84,3 +84,7 @@ export const trackCollectionRenamed = () => {
 export const trackCollectionDeleted = () => {
   trackEvent(API_CLIENT.COLLECTION_DELETED);
 };
+
+export const trackEnableKeyValueToggled = (is_active, type) => {
+  trackEvent(API_CLIENT.ENABLE_KEY_VALUE_TOGGLED, { is_active, type });
+};

@@ -1,19 +1,21 @@
 import { DeleteOutlined } from "@ant-design/icons";
-import { AutoComplete, Button } from "antd";
+import { AutoComplete, Button, Checkbox } from "antd";
 import React, { memo, useCallback, useEffect } from "react";
-import { KeyValuePair } from "../../../../../types";
+import { KeyValueFormType, KeyValuePair } from "../../../../../types";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
+import { trackEnableKeyValueToggled } from "modules/analytics/events/features/apiClient";
 
 interface Props {
   keyValuePairs: KeyValuePair[];
   setKeyValuePairs: (keyValuePairs: KeyValuePair[]) => void;
   keyOptions?: { value: string }[];
+  formType: KeyValueFormType;
 }
 
-export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "" });
+export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
 
-const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOptions }) => {
+const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOptions, formType }) => {
   const { getCurrentEnvironmentVariables } = useEnvironmentManager();
   const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
@@ -54,12 +56,32 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
     [keyValuePairs, setKeyValuePairs]
   );
 
+  const onEnableKeyChange = useCallback(
+    (isEnabled: boolean, index: number) => {
+      const newKeyValuePairs = [...keyValuePairs];
+      newKeyValuePairs[index].isEnabled = isEnabled;
+      setKeyValuePairs(newKeyValuePairs);
+    },
+    [keyValuePairs, setKeyValuePairs]
+  );
+
   return (
     <table className="key-value-pairs-table">
       <tbody>
         {keyValuePairs?.map((param, index) => (
           <tr key={param.id}>
-            <td className="key">
+            <td>
+              {param.key.length ? (
+                <Checkbox
+                  checked={param.isEnabled || param.isEnabled === undefined}
+                  onChange={(evt) => {
+                    onEnableKeyChange(evt.target.checked, index);
+                    trackEnableKeyValueToggled(evt.target.checked, formType);
+                  }}
+                />
+              ) : null}
+            </td>
+            <td className={`key ${param.isEnabled === false ? "disabled-pair" : ""}`}>
               {keyOptions ? (
                 <AutoComplete
                   options={keyOptions}
@@ -83,7 +105,7 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
                 />
               )}
             </td>
-            <td className="value">
+            <td className={`value ${param.isEnabled === false ? "disabled-pair" : ""}`}>
               {/* <Input
                 placeholder="value"
                 value={param.value}

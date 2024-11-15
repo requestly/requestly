@@ -57,6 +57,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
           key: CONTENT_TYPE_HEADER,
           value: RequestContentType.FORM,
           id: Math.random(),
+          isEnabled: true,
         });
 
         const formDataObj: Record<string, string> = {};
