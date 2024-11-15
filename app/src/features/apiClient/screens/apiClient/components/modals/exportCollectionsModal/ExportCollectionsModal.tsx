@@ -26,6 +26,8 @@ export interface ExportData {
   records: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[];
 }
 
+const COLLECTIONS_SCHEMA_VERSION = "1.0.0";
+
 export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ isOpen, onClose, collections }) => {
   const [isApiRecordsProcessed, setIsApiRecordsProcessed] = useState(false);
   const [exportData, setExportData] = useState<ExportData>({ variables: [], records: [] });
@@ -33,7 +35,7 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
   const { getVariableData } = useEnvironmentManager();
 
   const handleExport = useCallback(() => {
-    const dataToExport = exportData;
+    const dataToExport = { schema_version: COLLECTIONS_SCHEMA_VERSION, ...exportData };
     if (!isExportVariablesChecked) {
       dataToExport.variables = [];
     }
@@ -86,25 +88,43 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
     [getVariableData]
   );
 
-  useEffect(() => {
-    if (isOpen && !isApiRecordsProcessed) {
-      const extractedVariables: VariableExport[] = [];
-      const processedApiRecords: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[] = [];
-
-      collections.forEach((collection) => {
-        const collectionToExport = { ...collection, data: {} };
-        processedApiRecords.push(collectionToExport);
-
-        collection.data.children.forEach((api) => {
-          processedApiRecords.push(api);
-          extractedVariables.push(...extractVariablesFromAPIRecord(api as RQAPI.ApiRecord));
-        });
+  const sanitizeApiRecords = useCallback((collection: RQAPI.CollectionRecord) => {
+    const sanitizeRecord = (record: any) => {
+      const sanitizedRecord = { ...record };
+      ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"].forEach((field) => {
+        delete sanitizedRecord[field];
       });
+      return sanitizedRecord;
+    };
 
-      setExportData({ variables: extractedVariables, records: processedApiRecords });
-      setIsApiRecordsProcessed(true);
-    }
-  }, [isOpen, collections, extractVariablesFromAPIRecord, isApiRecordsProcessed]);
+    const collectionToExport = sanitizeRecord({ ...collection, data: {} });
+    const apis = collection.data.children.map((api) => sanitizeRecord(api));
+
+    return {
+      collection: collectionToExport,
+      apis,
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen || isApiRecordsProcessed) return;
+
+    const extractedVariables: VariableExport[] = [];
+    const processedApiRecords: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[] = [];
+
+    collections.forEach((collection) => {
+      const { collection: processedCollection, apis } = sanitizeApiRecords(collection);
+      processedApiRecords.push(processedCollection);
+
+      apis.forEach((api) => {
+        processedApiRecords.push(api);
+        extractedVariables.push(...extractVariablesFromAPIRecord(api as RQAPI.ApiRecord));
+      });
+    });
+
+    setExportData({ variables: extractedVariables, records: processedApiRecords });
+    setIsApiRecordsProcessed(true);
+  }, [isOpen, collections, extractVariablesFromAPIRecord, isApiRecordsProcessed, sanitizeApiRecords]);
 
   return (
     <Modal

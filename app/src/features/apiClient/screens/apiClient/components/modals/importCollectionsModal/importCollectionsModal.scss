@@ -3,6 +3,11 @@
     border-bottom: none;
   }
 
+  .ant-modal-body {
+    padding: 1rem;
+    padding-top: 0;
+  }
+
   .collections-parse-result-icon {
     font-size: 32px;
 
@@ -18,6 +23,7 @@
   .collections-import-error-text {
     text-align: center;
     max-width: 450px;
+    white-space: pre-line;
   }
 
   .collections-parsed-container {

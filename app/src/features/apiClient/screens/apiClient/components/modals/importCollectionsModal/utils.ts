@@ -7,15 +7,13 @@ export const processApiRecordsToImport = (records: RQAPI.ApiRecord[] | RQAPI.Col
   const collections: RQAPI.CollectionRecord[] = [];
 
   records.forEach((record: RQAPI.ApiRecord | RQAPI.CollectionRecord) => {
+    record.createdBy = uid || null;
+    record.updatedBy = uid || null;
+    record.ownerId = uid || null;
+
     if (isApiRequest(record)) {
-      record.createdBy = uid || null;
-      record.updatedBy = uid || null;
-      record.ownerId = uid || null;
       apis.push(record);
     } else if (isApiCollection(record)) {
-      record.createdBy = uid || null;
-      record.updatedBy = uid || null;
-      record.ownerId = uid || null;
       collections.push(record);
     }
   });

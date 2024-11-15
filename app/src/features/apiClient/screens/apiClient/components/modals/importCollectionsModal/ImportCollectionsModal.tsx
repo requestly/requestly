@@ -74,7 +74,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
           parsedResult = JSON.parse(fileContent as string);
           if (!parsedResult.variables || !parsedResult.records) {
             setValidationError(
-              "Failed to process the selected file. Please select a valid API collections JSON export file."
+              "Failed to process the selected file.\nPlease select a valid API collections JSON export file."
             );
             return;
           }
@@ -110,7 +110,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
     try {
       const collectionsPromises: Promise<{ oldId: string; newId: string }>[] = [];
       apiRecordsToImport.collections.forEach((collection: RQAPI.CollectionRecord) => {
-        const collectionToImport = { ...collection };
+        const collectionToImport = { ...collection, name: `${collection.name} (Imported)` };
         delete collectionToImport.id;
         const promise = upsertApiRecord(user?.details?.profile?.uid, collectionToImport, workspace?.id)
           .then((newCollection) => {

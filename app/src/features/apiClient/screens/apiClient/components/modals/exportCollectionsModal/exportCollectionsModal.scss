@@ -3,14 +3,19 @@
     border-bottom: none;
   }
 
+  .ant-modal-body {
+    padding: 1rem;
+    padding-top: 0;
+  }
+
   .export-collections-modal-title {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 1rem;
+    font-size: var(--requestly-font-size-base);
 
     svg {
-      font-size: 1.2rem;
+      font-size: var(--requestly-font-size-lg);
     }
   }
   .export-details-card {
@@ -22,7 +27,7 @@
     font-size: var(--requestly-font-size-sm);
 
     .export-name {
-      font-weight: 500;
+      font-weight: var(--requestly-font-weight-medium);
     }
 
     .export-details {

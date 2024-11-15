@@ -90,15 +90,15 @@ export const trackExportCollectionsClicked = () => {
 };
 
 export const trackExportApiCollectionsStarted = (num_records, num_variables) => {
-  trackEvent(API_CLIENT.EXPORT_COLLECTIONS_STARTED, { num_records });
+  trackEvent(API_CLIENT.EXPORT_COLLECTIONS_STARTED, { num_records, num_variables });
 };
 
 export const trackExportApiCollectionsFailed = (num_records, num_variables) => {
-  trackEvent(API_CLIENT.EXPORT_COLLECTIONS_FAILED, { num_records });
+  trackEvent(API_CLIENT.EXPORT_COLLECTIONS_FAILED, { num_records, num_variables });
 };
 
 export const trackExportApiCollectionsSuccessful = (num_records, num_variables) => {
-  trackEvent(API_CLIENT.EXPORT_COLLECTIONS_SUCCESSFUL, { num_records });
+  trackEvent(API_CLIENT.EXPORT_COLLECTIONS_SUCCESSFUL, { num_records, num_variables });
 };
 
 export const trackImportApiCollectionsClicked = () => {
@@ -106,13 +106,13 @@ export const trackImportApiCollectionsClicked = () => {
 };
 
 export const trackImportApiCollectionsStarted = (num_records, num_variables) => {
-  trackEvent(API_CLIENT.IMPORT_COLLECTIONS_STARTED, { num_records });
+  trackEvent(API_CLIENT.IMPORT_COLLECTIONS_STARTED, { num_records, num_variables });
 };
 
 export const trackImportApiCollectionsFailed = (num_records, num_variables) => {
-  trackEvent(API_CLIENT.IMPORT_COLLECTIONS_FAILED, { num_records });
+  trackEvent(API_CLIENT.IMPORT_COLLECTIONS_FAILED, { num_records, num_variables });
 };
 
 export const trackImportApiCollectionsSuccessful = (num_records, num_variables) => {
-  trackEvent(API_CLIENT.IMPORT_COLLECTIONS_SUCCESSFUL, { num_records });
+  trackEvent(API_CLIENT.IMPORT_COLLECTIONS_SUCCESSFUL, { num_records, num_variables });
 };
