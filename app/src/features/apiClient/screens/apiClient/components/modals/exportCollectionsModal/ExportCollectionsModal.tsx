@@ -111,7 +111,7 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
   useEffect(() => {
     if (!isOpen || isApiRecordsProcessed) return;
 
-    const extractedVariables: VariableExport[] = [];
+    const extractedVariablesSet = new Set();
     const processedApiRecords: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[] = [];
 
     collections.forEach((collection) => {
@@ -120,12 +120,14 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
 
       apis.forEach((api) => {
         processedApiRecords.push(api);
-        extractedVariables.push(...extractVariablesFromAPIRecord(api as RQAPI.ApiRecord));
+        const variables: VariableExport[] = extractVariablesFromAPIRecord(api as RQAPI.ApiRecord);
+        variables.forEach((variable) => extractedVariablesSet.add(JSON.stringify(variable)));
       });
     });
 
-    console.log("extractedVariables", extractedVariables);
-
+    const extractedVariables = Array.from(extractedVariablesSet).map((variable: string) =>
+      JSON.parse(variable)
+    ) as VariableExport[];
     setExportData({ variables: extractedVariables, records: processedApiRecords });
     setIsApiRecordsProcessed(true);
   }, [isOpen, collections, extractVariablesFromAPIRecord, isApiRecordsProcessed, sanitizeApiRecords]);
