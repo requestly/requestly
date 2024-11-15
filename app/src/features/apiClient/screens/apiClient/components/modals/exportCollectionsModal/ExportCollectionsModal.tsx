@@ -85,7 +85,7 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
         checkAndAddVariable(apiRequest.body || "");
       }
 
-      return Array.from(variables).map(getVariableData);
+      return Array.from(variables).map(getVariableData).filter(Boolean);
     },
     [getVariableData]
   );
@@ -123,6 +123,8 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
         extractedVariables.push(...extractVariablesFromAPIRecord(api as RQAPI.ApiRecord));
       });
     });
+
+    console.log("extractedVariables", extractedVariables);
 
     setExportData({ variables: extractedVariables, records: processedApiRecords });
     setIsApiRecordsProcessed(true);

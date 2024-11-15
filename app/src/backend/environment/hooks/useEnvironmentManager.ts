@@ -222,16 +222,8 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
           ...allEnvironmentData[currentEnvironmentId].variables[variableName],
           name: variableName,
         };
-      } else {
-        // returns the variable data from the first environment where it is present
-        const variableData = Object.values(allEnvironmentData).find((environment) => {
-          return environment.variables[variableName];
-        })?.variables[variableName];
-        return {
-          ...variableData,
-          name: variableName,
-        };
       }
+      return null;
     },
     [allEnvironmentData]
   );
