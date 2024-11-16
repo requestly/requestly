@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { RQAPI } from "../../../../types";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { Tabs, TabsProps, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
@@ -13,13 +13,15 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
+import { redirectToApiClientCollection, redirectToNewEnvironment, redirectToRequest } from "utils/RedirectionUtils";
+import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import "./apiClientSidebar.scss";
 
 interface Props {
   history?: RQAPI.Entry[];
   onSelectionFromHistory?: (index: number) => void;
   clearHistory?: () => void;
-  onNewClick?: (src: RQAPI.AnalyticsEventSource) => void;
+  onNewClick?: (src: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => void;
   onImportClick?: () => void;
 }
 
@@ -33,9 +35,11 @@ const APIClientSidebar: React.FC<Props> = ({
   history,
   onSelectionFromHistory,
   clearHistory,
-  onNewClick,
   onImportClick,
+  onNewClick = () => {},
 }) => {
+  const { requestId, collectionId } = useParams();
+  const navigate = useNavigate();
   const location = useLocation();
   const user = useSelector(getUserAuthDetails);
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(null);
@@ -54,12 +58,39 @@ const APIClientSidebar: React.FC<Props> = ({
       setIsNewRecordNameInputVisible(true);
       setRecordTypeToBeCreated(recordType);
 
-      if (recordType === RQAPI.RecordType.API || recordType === RQAPI.RecordType.ENVIRONMENT) {
-        onNewClick(analyticEventSource);
+      switch (recordType) {
+        case RQAPI.RecordType.API: {
+          onNewClick(analyticEventSource, RQAPI.RecordType.API);
+          redirectToRequest(navigate);
+          return;
+        }
+
+        case RQAPI.RecordType.COLLECTION: {
+          onNewClick(analyticEventSource, RQAPI.RecordType.COLLECTION);
+          redirectToApiClientCollection(navigate);
+          return;
+        }
+        case RQAPI.RecordType.ENVIRONMENT: {
+          redirectToNewEnvironment(navigate);
+          trackCreateEnvironmentClicked(analyticEventSource);
+          return;
+        }
+        default:
+          return;
       }
     },
-    [onNewClick]
+    [onNewClick, navigate]
   );
+
+  useEffect(() => {
+    if (requestId === "new") {
+      setIsNewRecordNameInputVisible(true);
+      setRecordTypeToBeCreated(RQAPI.RecordType.API);
+    } else if (collectionId === "new") {
+      setIsNewRecordNameInputVisible(true);
+      setRecordTypeToBeCreated(RQAPI.RecordType.COLLECTION);
+    }
+  }, [requestId, collectionId]);
 
   useEffect(() => {
     if (location.pathname.includes(PATHS.API_CLIENT.HISTORY.ABSOLUTE)) {

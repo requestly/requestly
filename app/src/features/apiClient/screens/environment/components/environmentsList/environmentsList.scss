@@ -9,8 +9,9 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
+    gap: 4px;
 
-    svg {
+    svg.active-env-icon {
       position: relative;
       top: 2px;
       font-size: var(--requestly-font-size-sm);
@@ -28,6 +29,12 @@
     &.active {
       background-color: var(--requestly-color-white-t-10);
     }
+
+    &__label {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+    }
   }
 
   height: calc(100% - 50px);
@@ -35,15 +42,21 @@
   padding-right: 2px;
 }
 
-.new-environment-input {
+.environment-input.ant-input {
   width: 220px;
-  margin-bottom: 8px;
+  margin: 8px 0;
   font-size: var(--requestly-font-size-xs);
-  padding: var(--space-2, 4px) var(--space-4, 8px);
+  padding: var(--space-2, 4px) var(--space-4, 8px) !important;
 }
 
 .active-environment-tooltip {
   .ant-tooltip-inner {
     background-color: var(--requestly-color-black);
   }
+}
+
+.environment-list-item-dropdown-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -7,6 +7,8 @@ import { CollectionRow } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
 import { isApiCollection, isApiRequest } from "../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
+import { ExportCollectionsModal } from "../../modals/exportCollectionsModal/ExportCollectionsModal";
+import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
 import "./collectionsList.scss";
 
 interface Props {
@@ -23,6 +25,8 @@ export const CollectionsList: React.FC<Props> = ({
   hideNewRecordNameInput,
 }) => {
   const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
+  const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const collections: Record<RQAPI.CollectionRecord["id"], RQAPI.CollectionRecord> = {};
@@ -70,6 +74,12 @@ export const CollectionsList: React.FC<Props> = ({
     prepareRecordsToRender,
   ]);
 
+  const handleExportCollection = useCallback((collection: RQAPI.CollectionRecord) => {
+    setCollectionsToExport((prev) => [...prev, collection]);
+    trackExportCollectionsClicked();
+    setIsExportModalOpen(true);
+  }, []);
+
   return (
     <>
       <div className="collections-list-container">
@@ -81,12 +91,19 @@ export const CollectionsList: React.FC<Props> = ({
           ) : updatedRecords.count > 0 || isNewRecordNameInputVisible ? (
             <div className="collections-list">
               {updatedRecords.collections.map((record) => {
-                return <CollectionRow key={record.id} record={record} onNewClick={onNewClick} />;
+                return (
+                  <CollectionRow
+                    key={record.id}
+                    record={record}
+                    onNewClick={onNewClick}
+                    onExportClick={handleExportCollection}
+                  />
+                );
               })}
 
               {isNewRecordNameInputVisible && recordTypeToBeCreated === RQAPI.RecordType.COLLECTION ? (
                 <NewRecordNameInput
-                  recordType={recordTypeToBeCreated}
+                  recordType={RQAPI.RecordType.COLLECTION}
                   analyticEventSource="api_client_sidebar_header"
                   onSuccess={() => hideNewRecordNameInput()}
                 />
@@ -98,7 +115,7 @@ export const CollectionsList: React.FC<Props> = ({
 
               {isNewRecordNameInputVisible && recordTypeToBeCreated === RQAPI.RecordType.API ? (
                 <NewRecordNameInput
-                  recordType={recordTypeToBeCreated}
+                  recordType={RQAPI.RecordType.API}
                   analyticEventSource="api_client_sidebar_header"
                   onSuccess={() => hideNewRecordNameInput()}
                 />
@@ -115,6 +132,16 @@ export const CollectionsList: React.FC<Props> = ({
           )}
         </div>
       </div>
+      {isExportModalOpen && (
+        <ExportCollectionsModal
+          collections={collectionsToExport}
+          isOpen={isExportModalOpen}
+          onClose={() => {
+            setCollectionsToExport([]);
+            setIsExportModalOpen(false);
+          }}
+        />
+      )}
     </>
   );
 };
