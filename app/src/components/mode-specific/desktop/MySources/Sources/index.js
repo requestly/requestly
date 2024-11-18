@@ -1,7 +1,13 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Row, Avatar, Tabs, Alert, Button } from "antd";
-import { QuestionCircleOutlined, CheckCircleOutlined, DesktopOutlined, InfoCircleFilled } from "@ant-design/icons";
+import { Col, Row, Avatar, Tabs, Alert, Button, Modal, Space } from "antd";
+import {
+  QuestionCircleOutlined,
+  CheckCircleOutlined,
+  DesktopOutlined,
+  InfoCircleFilled,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 // SUB COMPONENTS
@@ -32,8 +38,9 @@ import PATHS from "config/constants/sub/paths";
 import { getConnectedAppsCount } from "utils/Misc";
 import { trackConnectAppsCategorySwitched } from "modules/analytics/events/desktopApp/apps";
 import LaunchButtonDropdown from "./LaunchButtonDropDown";
-import { getAndroidDevices } from "./utils";
+import { getAndroidDevices } from "./deviceFetchers";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
+import IosLaunchButton from "./iosSimBtn";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
@@ -307,7 +314,41 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             {app.description}
           </Col>
           <>
-            {app.type !== "browser" && app.id !== "android-adb" ? (
+            {app.id === "ios-simulator" ? (
+              isFeatureCompatible(FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT) ? (
+                <IosLaunchButton
+                  connectHandler={() => {
+                    handleActivateAppOnClick("ios-simulator", { deviceIds: app.metadata.devices?.map((d) => d.udid) });
+                  }}
+                  disconnectHandler={() => {
+                    handleDisconnectAppOnClick("ios-simulator", {
+                      deviceIds: app.metadata.devices?.map((d) => d.udid),
+                    });
+                  }}
+                />
+              ) : (
+                <Space.Compact>
+                  <RQButton type="default" disabled>
+                    Coming Soon
+                  </RQButton>
+                  <RQButton
+                    type="default"
+                    icon={<InfoCircleOutlined />}
+                    onClick={() => {
+                      Modal.info({
+                        content: "Available exclusively on macOS with Requestly Desktop v1.7.7 or later.",
+                        centered: true,
+                        maskClosable: true,
+                        icon: null,
+                        okText: "Got it",
+                        className: "modal-no-footer-style",
+                        footer: null,
+                      });
+                    }}
+                  />
+                </Space.Compact>
+              )
+            ) : app.type !== "browser" && app.id !== "android-adb" && app.id !== "ios-simulator" ? (
               <RQButton type="default" onClick={() => renderInstructionsModal(app.id)}>
                 Setup Instructions
               </RQButton>
