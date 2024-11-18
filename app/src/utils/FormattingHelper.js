@@ -27,7 +27,7 @@ export const getPrettyPlanName = (planName) => {
   if (!planName) return "Free";
   if (planName === PRICING.PLAN_NAMES.BRONZE) return "Free";
   if (planName === PRICING.PLAN_NAMES.GOLD) return "Professional";
-  if (planName === PRICING.PLAN_NAMES.ENTERPRISE) return "Professional";
+  if (planName === PRICING.PLAN_NAMES.ENTERPRISE) return "Enterprise";
   if (planName === PRICING.PLAN_NAMES.BASIC_V2) return "Basic";
   if (planName === PRICING.PLAN_NAMES.LITE) return "Lite";
 
