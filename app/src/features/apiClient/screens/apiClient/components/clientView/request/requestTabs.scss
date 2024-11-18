@@ -45,7 +45,12 @@
 
   .key-value-pairs-table {
     td {
+      padding: 2px 0;
       padding-right: 5px;
+    }
+
+    .disabled-pair {
+      opacity: 0.5;
     }
 
     .key,

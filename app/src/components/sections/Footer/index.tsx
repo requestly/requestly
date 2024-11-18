@@ -9,6 +9,7 @@ import { Footer } from "antd/lib/layout/layout";
 import { trackFooterClicked } from "modules/analytics/events/common/onboarding/footer";
 import { getExtensionVersion, isExtensionInstalled } from "actions/ExtensionActions";
 import "./Footer.css";
+import { getAppVersion, isAppInstalled } from "actions/DesktopActions";
 
 const { Text } = Typography;
 const { PATHS } = APP_CONSTANTS;
@@ -77,6 +78,7 @@ const AppFooter: React.FC = () => {
         <Row align="middle" justify="space-between" className="w-full">
           <div className="display-flex items-center">
             {isExtensionInstalled() && <span className="extension-version">v{getExtensionVersion()}</span>}
+            {isAppInstalled() && <span className="extension-version">v{getAppVersion()}</span>}
           </div>
 
           <Col className="ml-auto">{SHOW_YC_BRANDING ? renderYCBranding() : renderFooterLinks()}</Col>

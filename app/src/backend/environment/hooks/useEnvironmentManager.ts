@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useCallback, useState } from "react";
-import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableValue } from "../types";
+import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEnvironmentData, getCurrentEnvironmentId } from "store/features/environment/selectors";
 import { environmentVariablesActions } from "store/features/environment/slice";
@@ -12,6 +12,9 @@ import {
   upsertEnvironmentInDB,
   updateEnvironmentVariablesInDB,
   fetchAllEnvironmentDetails,
+  updateEnvironmentNameInDB,
+  duplicateEnvironmentInDB,
+  deleteEnvironmentFromDB,
 } from "..";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
@@ -103,9 +106,10 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
           environmentData.variables
         );
         dispatch(
-          environmentVariablesActions.setVariablesInEnvironment({
+          environmentVariablesActions.updateEnvironmentData({
             newVariables: mergedVariables,
             environmentId: environmentData.id,
+            environmentName: environmentData.name,
           })
         );
       });
@@ -134,17 +138,19 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   }, [allEnvironmentData, currentEnvironmentId]);
 
   const setVariables = useCallback(
-    async (environmentId: string, variables: Record<string, Omit<EnvironmentVariableValue, "type">>) => {
+    async (environmentId: string, variables: Record<string, EnvironmentVariableValue>) => {
       const newVariables: EnvironmentVariables = Object.fromEntries(
         Object.entries(variables).map(([key, value]) => {
-          return [key, { localValue: value.localValue, syncValue: value.syncValue, type: typeof value.syncValue }];
+          const typeToSaveInDB =
+            value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
+          return [key, { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB }];
         })
       );
 
       return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariables)
         .then(() => {
           dispatch(
-            environmentVariablesActions.setVariablesInEnvironment({
+            environmentVariablesActions.updateEnvironmentData({
               newVariables,
               environmentId,
             })
@@ -209,6 +215,54 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     [allEnvironmentData]
   );
 
+  const getVariableData = useCallback(
+    (variableKey: string) => {
+      if (allEnvironmentData[currentEnvironmentId].variables[variableKey]) {
+        return {
+          ...allEnvironmentData[currentEnvironmentId].variables[variableKey],
+          key: variableKey,
+        };
+      }
+      return null;
+    },
+    [allEnvironmentData]
+  );
+
+  const renameEnvironment = useCallback(
+    async (environmentId: string, newName: string) => {
+      return updateEnvironmentNameInDB(ownerId, environmentId, newName).then(() => {
+        dispatch(environmentVariablesActions.updateEnvironmentName({ environmentId, newName }));
+      });
+    },
+    [ownerId, dispatch]
+  );
+
+  const duplicateEnvironment = useCallback(async (environmentId: string) => {
+    return duplicateEnvironmentInDB(ownerId, environmentId, allEnvironmentData).then((newEnvironment) => {
+      dispatch(environmentVariablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name }));
+      dispatch(
+        environmentVariablesActions.updateEnvironmentData({
+          newVariables: newEnvironment.variables,
+          environmentId: newEnvironment.id,
+        })
+      );
+    });
+  }, []);
+
+  const deleteEnvironment = useCallback(async (environmentId: string) => {
+    const allEnvironmentsMap = { ...allEnvironmentData };
+    const isActiveEnvironmentBeingDeleted = currentEnvironmentId === environmentId;
+    return deleteEnvironmentFromDB(ownerId, environmentId).then(() => {
+      dispatch(environmentVariablesActions.removeEnvironment({ environmentId }));
+      delete allEnvironmentsMap[environmentId];
+      if (isActiveEnvironmentBeingDeleted && Object.keys(allEnvironmentsMap).length > 0) {
+        setCurrentEnvironment(Object.keys(allEnvironmentsMap)[0]);
+      } else {
+        dispatch(environmentVariablesActions.resetState());
+      }
+    });
+  }, []);
+
   return {
     setCurrentEnvironment,
     addNewEnvironment,
@@ -220,6 +274,10 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     getCurrentEnvironmentVariables,
     getAllEnvironments,
     getEnvironmentName,
+    getVariableData,
+    renameEnvironment,
+    duplicateEnvironment,
+    deleteEnvironment,
     isEnvironmentsLoading: isLoading,
   };
 };
