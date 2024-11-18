@@ -5,12 +5,14 @@ import { getIosSimulators } from "./deviceFetchers";
 import { useDispatch, useSelector } from "react-redux";
 import { getDesktopSpecificDetails } from "store/selectors";
 import { actions } from "store";
-import { RQButton } from "lib/design-system-v2/components";
+import { RQButton } from "lib/design-system/components";
+import { toast } from "utils/Toast";
 
 export default function IosLaunchButton({ connectHandler, disconnectHandler }) {
   const dispatch = useDispatch();
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
   const simulators = desktopSpecificDetails.appsList["ios-simulator"].metadata.devices;
+  const scannedDevicesSuccessfullyOnce = desktopSpecificDetails.appsList["ios-simulator"].metadata.scannedDevicesSuccessfullyOnce;
   const isActive = desktopSpecificDetails.appsList["ios-simulator"].isActive;
   const [isFetching, setIsFetching] = useState(false);
 
@@ -25,9 +27,22 @@ export default function IosLaunchButton({ connectHandler, disconnectHandler }) {
             ...updatedAppsList["ios-simulator"],
             metadata: {
               devices: runningSimulators ?? {},
+              scannedDevicesSuccessfullyOnce: updatedAppsList["ios-simulator"].metadata.scannedDevicesSuccessfullyOnce || !!Object.keys(runningSimulators).length,
             },
           };
           dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
+          
+          const numSimulators = Object.keys(runningSimulators).length;
+          if(!numSimulators) {
+            // toast.warn("No running simulators found. Please start a simulator and scan again.");
+            toast.warn("No simulators found. Boot one and retry.");
+          } else {
+            if(numSimulators === 1) {
+              toast.info(`Found 1 running simulator`);
+            } else {
+              toast.info(`${numSimulators} Simulators found`);
+            }
+          }
         }
       })
       .finally(() => {
@@ -41,7 +56,7 @@ export default function IosLaunchButton({ connectHandler, disconnectHandler }) {
     if (Object.keys(simulators).length) {
       Object.values(simulators).forEach((simulator) => {
         items.push(
-          <Menu.Item key={simulator.udid} disabled>
+          <Menu.Item key={simulator.udid}>
             {simulator.name}
           </Menu.Item>
         );
@@ -50,7 +65,7 @@ export default function IosLaunchButton({ connectHandler, disconnectHandler }) {
       items.push(
         <Menu.Item key="no-simulators" disabled>
           <div className="no-simulators-message">
-            No running simulators found. Please start a simulator and click refresh.
+            No simulators found. Boot one and retry
           </div>
         </Menu.Item>
       );
@@ -66,8 +81,8 @@ export default function IosLaunchButton({ connectHandler, disconnectHandler }) {
     return <Menu>{items}</Menu>;
   }, [simulators, handleReloadClicked, isFetching, isActive]);
 
-  return Object.keys(simulators).length ? (
-    <Space.Compact>
+  return Object.keys(simulators).length || scannedDevicesSuccessfullyOnce ? (
+    <Space.Compact className="mobile-connect-btn">
       {isActive ? (
         <RQButton type="default" className="danger-btn" onClick={disconnectHandler}>
           Disconnect All
@@ -82,8 +97,8 @@ export default function IosLaunchButton({ connectHandler, disconnectHandler }) {
       </Dropdown>
     </Space.Compact>
   ) : (
-    <RQButton type="default" onClick={handleReloadClicked} disabled={isFetching}>
-      {isFetching ? "Loading..." : "Scan Simulators"}
+    <RQButton type="default" onClick={handleReloadClicked} disabled={isFetching} className="mobile-connect-btn">
+      {isFetching ? "Scanning..." : "Scan Simulators"}
     </RQButton>
   );
 }

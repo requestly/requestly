@@ -163,6 +163,15 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                   value: true,
                 })
               );
+            } else if (appId === "ios-simulator") {
+              toast.success(`iOS simulator(s) connected successfully`);
+              dispatch(
+                actions.updateDesktopSpecificAppProperty({
+                  appId: appId,
+                  property: "isActive",
+                  value: true,
+                })
+              );
             } else {
               toast.success(`Connected ${getAppName(appId)}`);
               dispatch(
@@ -198,7 +207,12 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             }
           }
         })
-        .catch(Logger.log);
+        .catch((err) => {
+          if(appId === "ios-simulator")  {
+            toast.error(`Error connecting to simulators. Please re-scan list of devices and try again.`);
+          }
+          Logger.log(err)
+        });
     },
     [dispatch, getAppCount, navigate, processingApps, renderInstructionsModal, toggle]
   );
@@ -315,7 +329,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           </Col>
           <>
             {app.id === "ios-simulator" ? (
-              isFeatureCompatible(FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT) ? (
+              isFeatureCompatible(FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT) || true ? (
                 <IosLaunchButton
                   connectHandler={() => {
                     handleActivateAppOnClick("ios-simulator", { deviceIds: app.metadata.devices?.map((d) => d.udid) });
@@ -327,7 +341,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                   }}
                 />
               ) : (
-                <Space.Compact>
+                <Space.Compact className="mobile-connect-btn">
                   <RQButton type="default" disabled>
                     Coming Soon
                   </RQButton>
@@ -349,7 +363,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                 </Space.Compact>
               )
             ) : app.type !== "browser" && app.id !== "android-adb" && app.id !== "ios-simulator" ? (
-              <RQButton type="default" onClick={() => renderInstructionsModal(app.id)}>
+              <RQButton type="default" onClick={() => renderInstructionsModal(app.id)} className="mobile-connect-btn">
                 Setup Instructions
               </RQButton>
             ) : (
