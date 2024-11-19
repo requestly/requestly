@@ -53,9 +53,15 @@ class RuleExecutionHandler {
     tabService.removeData(tabId, TAB_SERVICE_DATA.RULES_EXECUTION_LOGS);
   };
 
-  onRuleExecuted = (rule: Rule, requestDetails: chrome.webRequest.WebRequestDetails, isMainFrameRequest?: boolean) => {
-    const tabDataScope = isMainFrameRequest ? DataScope.TAB : DataScope.PAGE;
-
+  onRuleExecuted = (
+    rule: Rule,
+    requestDetails: chrome.webRequest.WebRequestDetails,
+    isMainFrameOrPrerenderedRequest?: boolean
+  ) => {
+    const tabDataScope = isMainFrameOrPrerenderedRequest ? DataScope.TAB : DataScope.PAGE;
+    console.log("!!!debug", "rule Executed", {
+      scope: tabDataScope,
+    });
     extensionIconManager.markRuleExecuted(requestDetails.tabId);
 
     chrome.tabs.sendMessage(requestDetails.tabId, {

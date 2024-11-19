@@ -7,11 +7,13 @@ import { Variable, onVariableChange } from "../variable";
 
 const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails) => {
   // @ts-ignore
-  if (details?.documentLifecycle !== "active") {
+  if (details?.documentLifecycle !== "active" && details?.documentLifecycle !== "prerender") {
     return;
   }
 
-  let isMainFrameRequest = details.type === "main_frame" ? true : false;
+  let isMainFrameOrPrerenderedRequest =
+    //@ts-ignore
+    details.type === "main_frame" || details.documentLifecycle === "prerender" ? true : false;
 
   if ((await isUrlInBlockList(details.initiator)) || (await isUrlInBlockList(details.url))) {
     return;
@@ -32,7 +34,7 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
             initiator: details.initiator,
           });
           if (isApplied) {
-            ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameRequest);
+            ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameOrPrerenderedRequest);
           }
           break;
         default:
@@ -43,7 +45,8 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
 };
 
 const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersDetails) => {
-  let isMainFrameRequest = details.type === "main_frame" ? true : false;
+  let isMainFrameOrPrerenderedRequest =
+    details.type === "main_frame" || details.documentLifecycle === "prerender" ? true : false;
 
   if ((await isUrlInBlockList(details.initiator)) || (await isUrlInBlockList(details.url))) {
     return;
@@ -62,7 +65,7 @@ const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersD
             initiator: details.initiator,
           });
           if (isApplied && matchedPair.modifications?.Request && matchedPair.modifications?.Request?.length > 0) {
-            ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameRequest);
+            ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameOrPrerenderedRequest);
           }
           break;
         default:
@@ -74,7 +77,9 @@ const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersD
 };
 
 const onHeadersReceived = async (details: chrome.webRequest.WebResponseHeadersDetails) => {
-  let isMainFrameRequest = details.type === "main_frame" ? true : false;
+  let isMainFrameOrPrerenderedRequest =
+    //@ts-ignore
+    details.type === "main_frame" || details.documentLifecycle === "prerender" ? true : false;
 
   if ((await isUrlInBlockList(details.initiator)) || (await isUrlInBlockList(details.url))) {
     return;
@@ -92,7 +97,7 @@ const onHeadersReceived = async (details: chrome.webRequest.WebResponseHeadersDe
             initiator: details.initiator,
           });
           if (isApplied && matchedPair.modifications?.Response && matchedPair.modifications?.Response?.length > 0) {
-            ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameRequest);
+            ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameOrPrerenderedRequest);
           }
           break;
         default:
