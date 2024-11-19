@@ -6,7 +6,7 @@ interface PostmanCollectionExport {
   info: {
     name: string;
     schema: string;
-    _collectionLink: string;
+    _collection_link: string;
   };
   item: any[];
   variable: any[];
@@ -24,7 +24,7 @@ interface PostmanEnvironmentExport {
 }
 
 export const getUploadedPostmanFileType = (fileContent: PostmanCollectionExport | PostmanEnvironmentExport) => {
-  if ("info" in fileContent && fileContent.info?.schema && fileContent.info?._collectionLink) {
+  if ("info" in fileContent && fileContent.info?.schema && fileContent.info?._collection_link) {
     return "collection";
   }
   if ("_postman_variable_scope" in fileContent && fileContent._postman_variable_scope) {
