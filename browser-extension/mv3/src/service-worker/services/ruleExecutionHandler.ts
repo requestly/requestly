@@ -59,9 +59,7 @@ class RuleExecutionHandler {
     isMainFrameOrPrerenderedRequest?: boolean
   ) => {
     const tabDataScope = isMainFrameOrPrerenderedRequest ? DataScope.TAB : DataScope.PAGE;
-    console.log("!!!debug", "rule Executed", {
-      scope: tabDataScope,
-    });
+
     extensionIconManager.markRuleExecuted(requestDetails.tabId);
 
     chrome.tabs.sendMessage(requestDetails.tabId, {
