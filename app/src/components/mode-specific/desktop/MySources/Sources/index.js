@@ -41,6 +41,7 @@ import LaunchButtonDropdown from "./LaunchButtonDropDown";
 import { getAndroidDevices } from "./deviceFetchers";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
 import IosLaunchButton from "./iosSimBtn";
+import { trackFailedToConnectToSimulator } from "./iosSimBtn/analytics";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
@@ -208,10 +209,11 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           }
         })
         .catch((err) => {
-          if(appId === "ios-simulator")  {
+          if (appId === "ios-simulator") {
+            trackFailedToConnectToSimulator();
             toast.error(`Error connecting to simulators. Please re-scan list of devices and try again.`);
           }
-          Logger.log(err)
+          Logger.log(err);
         });
     },
     [dispatch, getAppCount, navigate, processingApps, renderInstructionsModal, toggle]
@@ -329,7 +331,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           </Col>
           <>
             {app.id === "ios-simulator" ? (
-              isFeatureCompatible(FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT) || true ? (
+              isFeatureCompatible(FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT) ? (
                 <IosLaunchButton
                   connectHandler={() => {
                     handleActivateAppOnClick("ios-simulator", { deviceIds: app.metadata.devices?.map((d) => d.udid) });
