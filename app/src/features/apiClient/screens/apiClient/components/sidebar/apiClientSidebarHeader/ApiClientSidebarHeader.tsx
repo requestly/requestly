@@ -10,6 +10,7 @@ import { RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import {
   trackImportApiCollectionsClicked,
+  trackImportFromPostmanClicked,
   trackNewCollectionClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
@@ -103,6 +104,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </div>
         ),
         onClick: () => {
+          trackImportFromPostmanClicked();
           setIsPostmanImporterModalOpen(true);
         },
       },

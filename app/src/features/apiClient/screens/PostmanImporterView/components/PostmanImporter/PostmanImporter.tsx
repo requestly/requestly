@@ -20,6 +20,13 @@ import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { Row } from "antd";
+import {
+  trackImportFromPostmanCompleted,
+  trackImportFromPostmanDataProcessed,
+  trackImportFromPostmanFailed,
+  trackImportFromPostmanStarted,
+} from "modules/analytics/events/features/apiClient";
+import Logger from "lib/logger";
 import "./postmanImporter.scss";
 
 type ProcessedData = {
@@ -68,7 +75,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
             const fileContent = JSON.parse(reader.result as string);
 
             if (!file.type.includes("json")) {
-              throw new Error("Failed to process Postman collection or environment file.");
+              throw new Error("Invalid file. Please upload valid Postman export files.");
             }
 
             const fileType = getUploadedPostmanFileType(fileContent);
@@ -81,7 +88,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
               resolve({ type: fileType, data: processedData });
             } else {
               const processedApiRecords = processPostmanCollectionData(fileContent);
-              console.log({ processedApiRecords });
               const processedVariables = processPostmanVariablesData(fileContent);
               resolve({
                 type: fileType,
@@ -127,6 +133,8 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
           }
         });
 
+        trackImportFromPostmanDataProcessed(collectionsCount.current, processed.environments.length);
+
         setProcessedData(processed);
         setIsDataProcessed(true);
       })
@@ -140,24 +148,28 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
       });
   }, []);
 
-  const handleImportEnvironment = useCallback(async () => {
+  const handleImportEnvironments = useCallback(async () => {
     try {
       const importPromises = processedFiles.environments.map(async (env) => {
         const newEnvironment = await addNewEnvironment(`(Imported) ${env.name}`);
         if (newEnvironment) {
-          return setVariables(newEnvironment.id, env.variables);
+          await setVariables(newEnvironment.id, env.variables);
+          return true;
         }
-        return Promise.resolve();
+        return false;
       });
 
-      return Promise.all(importPromises);
+      const results = await Promise.all(importPromises);
+      return results.filter(Boolean).length;
     } catch (error) {
-      console.error("Import failed:", error);
+      Logger.error("Import failed:", error);
       throw error;
     }
   }, [addNewEnvironment, setVariables, processedFiles.environments]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
+    let importedCollectionsCount = 0;
+
     const collections = processedFiles.apiRecords.filter((record) => record.type === RQAPI.RecordType.COLLECTION);
     const apis = processedFiles.apiRecords.filter((record) => record.type === RQAPI.RecordType.API);
 
@@ -171,6 +183,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
 
       const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToImport, workspace?.id);
       onSaveRecord?.(newCollection.data);
+      importedCollectionsCount++;
       return {
         oldId: collection.id,
         newId: newCollection.data.id,
@@ -202,6 +215,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
     });
 
     await Promise.all(apisPromises);
+    return importedCollectionsCount;
   }, [processedFiles.apiRecords, user?.details?.profile?.uid, workspace?.id, onSaveRecord]);
 
   const handleImportVariables = useCallback(async () => {
@@ -216,19 +230,33 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
   }, [processedFiles.variables, setVariables, addNewEnvironment]);
 
   const handleImportPostmanData = useCallback(() => {
+    trackImportFromPostmanStarted(collectionsCount.current, processedFiles.environments.length);
     setIsImporting(true);
-    Promise.allSettled([handleImportEnvironment(), handleImportCollectionsAndApis(), handleImportVariables()])
-      .then(() => {
+    Promise.allSettled([handleImportEnvironments(), handleImportCollectionsAndApis(), handleImportVariables()])
+      .then((results) => {
+        const [environmentsResult, collectionsResult] = results;
+        const importedEnvironments = environmentsResult.status === "fulfilled" ? environmentsResult.value : 0;
+        const importedCollections = collectionsResult.status === "fulfilled" ? collectionsResult.value : 0;
+
         toast.success("Postman data imported successfully");
         onImportComplete?.();
+        trackImportFromPostmanCompleted(importedCollections, importedEnvironments);
       })
       .catch((error) => {
         setImportError("Something went wrong!, Couldn't import Postman data");
+        trackImportFromPostmanFailed(collectionsCount.current, processedFiles.environments.length);
       })
       .finally(() => {
         setIsImporting(false);
       });
-  }, [navigate, handleImportEnvironment, handleImportCollectionsAndApis, handleImportVariables, onImportComplete]);
+  }, [
+    navigate,
+    handleImportEnvironments,
+    handleImportCollectionsAndApis,
+    handleImportVariables,
+    onImportComplete,
+    processedFiles.environments.length,
+  ]);
 
   const handleResetImport = () => {
     setIsDataProcessed(false);
