@@ -62,7 +62,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         label: (
           <div className="new-btn-option">
             <MdOutlineTerminal />
-            Request
+            cURL
           </div>
         ),
         onClick: onImportClick,
@@ -73,7 +73,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         label: (
           <div className="new-btn-option">
             <BsCollection />
-            Collection
+            Requestly Collection
           </div>
         ),
         disabled: location.pathname !== PATHS.API_CLIENT.ABSOLUTE,
