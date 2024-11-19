@@ -138,6 +138,5 @@ export const trackImportFromPostmanDataProcessed = (num_collections, num_environ
 };
 
 export const trackImportFromPostmanStarted = (num_collections, num_environments) => {
-  console.log("trackImportFromPostmanStarted", { num_collections, num_environments });
   trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_STARTED, { num_collections, num_environments });
 };
