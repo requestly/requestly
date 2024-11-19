@@ -6,6 +6,7 @@ import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { EnvironmentView } from "./screens/environment/components/environmentView/EnvironmentView";
 import { EmptyEnvironmentView } from "./screens/environment/components/emptyEnvironmentView/EmptyEnvironmentView";
 import { EnvironmentContainer } from "./screens/environment/container";
+import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImporterView";
 
 export const apiClientRoutes: RouteObject[] = [
   {
@@ -67,6 +68,10 @@ export const apiClientRoutes: RouteObject[] = [
             element: <EnvironmentView />,
           },
         ],
+      },
+      {
+        path: PATHS.API_CLIENT.IMPORT_FROM_POSTMAN.RELATIVE,
+        element: <PostmanImporterView />,
       },
     ],
   },
