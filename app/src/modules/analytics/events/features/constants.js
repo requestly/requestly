@@ -199,6 +199,10 @@ export const API_CLIENT = {
   IMPORT_COLLECTIONS_SUCCESSFUL: "api_client_import_collections_successful",
   IMPORT_COLLECTIONS_STARTED: "api_client_import_collections_started",
   ENABLE_KEY_VALUE_TOGGLED: "api_client_enable_key_value_toggled",
+  IMPORT_FROM_POSTMAN_CLICKED: "api_client_import_from_postman_clicked",
+  IMPORT_FROM_POSTMAN_COMPLETED: "api_client_import_from_postman_completed",
+  IMPORT_FROM_POSTMAN_FAILED: "api_client_import_from_postman_failed",
+  IMPORT_FROM_POSTMAN_STARTED: "api_client_import_from_postman_started",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {
