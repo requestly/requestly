@@ -2,17 +2,38 @@ import { EnvironmentVariableValue } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 import { v4 as uuidv4 } from "uuid";
 
-export const getUploadedPostmanFileType = (fileContent: any) => {
-  if (fileContent?.info?.schema && fileContent?.info?._collection_link) {
+interface PostmanCollectionExport {
+  info: {
+    name: string;
+    schema: string;
+    _collectionLink: string;
+  };
+  item: any[];
+  variable: any[];
+}
+
+interface PostmanEnvironmentExport {
+  name: string;
+  values: Array<{
+    key: string;
+    value: string;
+    type: string;
+    enabled: boolean;
+  }>;
+  _postman_variable_scope: string;
+}
+
+export const getUploadedPostmanFileType = (fileContent: PostmanCollectionExport | PostmanEnvironmentExport) => {
+  if ("info" in fileContent && fileContent.info?.schema && fileContent.info?._collectionLink) {
     return "collection";
   }
-  if (fileContent?._postman_variable_scope) {
+  if ("_postman_variable_scope" in fileContent && fileContent._postman_variable_scope) {
     return "environment";
   }
   return null;
 };
 
-export const processPostmanEnvironmentData = (fileContent: any) => {
+export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExport) => {
   if (!fileContent.values.length) {
     throw new Error("No variables found in the environment file");
   }
@@ -118,7 +139,9 @@ export const processPostmanCollectionData = (
   };
 };
 
-export const processPostmanVariablesData = (fileContent: any): Record<string, EnvironmentVariableValue> | null => {
+export const processPostmanVariablesData = (
+  fileContent: PostmanCollectionExport
+): Record<string, EnvironmentVariableValue> | null => {
   if (!fileContent?.variable?.length) {
     return null;
   }

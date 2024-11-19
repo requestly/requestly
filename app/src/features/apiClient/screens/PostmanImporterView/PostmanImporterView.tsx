@@ -8,7 +8,7 @@ export const PostmanImporterView = () => {
   return (
     <div className="postman-importer-view">
       <div className="postman-importer-view_content">
-        <PostmanImporter onImportComplete={() => redirectToApiClient(navigate)} />
+        <PostmanImporter onSuccess={() => redirectToApiClient(navigate)} />
       </div>
     </div>
   );
