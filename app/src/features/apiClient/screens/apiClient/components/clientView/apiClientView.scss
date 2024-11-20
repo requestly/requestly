@@ -3,9 +3,18 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 20px 10px;
   box-sizing: border-box;
-  background-color: var(--body-background);
+  background-color: var(--requestly-color-background);
+
+  .api-client-header-container {
+    padding: 20px 10px;
+    padding-bottom: 0;
+  }
+
+  .api-client-body {
+    padding: 0 10px;
+    overflow: hidden;
+  }
 
   .rq-breadcrumb {
     margin: 0 10px;
@@ -17,7 +26,6 @@
     align-items: center;
     gap: 10px;
     padding: 0 10px;
-    flex-wrap: wrap;
 
     .api-client-url-container {
       display: flex;
@@ -34,6 +42,7 @@
         padding: 4px 8px;
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
+        background: transparent;
       }
     }
   }
@@ -49,8 +58,19 @@
   }
 
   .api-request-tabs {
-    height: 100%;
     padding: 0 10px;
+    height: calc(100% - 35px);
+    overflow: hidden;
+    margin-top: 8px;
+
+    .ant-tabs-content-holder {
+      height: inherit;
+
+      .ant-tabs-content-top {
+        height: 100%;
+        overflow: auto;
+      }
+    }
   }
 
   .api-response-view {
@@ -99,6 +119,34 @@
         line-height: 14px;
         margin-left: 5px;
         margin-right: 0;
+      }
+    }
+  }
+
+  .bottom-sheet-container.ant-col {
+    .ant-tabs {
+      /*
+      HACKY HEIGHT OVERFLOW FIX: CODEMIRROR EDITOR OVERFLOWING ON SMALL HEIGHTS
+      TODO: Fix this properly
+      */
+      // height: calc(100% - px) !important;
+      height: 100%;
+    }
+  }
+
+  .empty-api-response-view-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  // TEMPORARY: MOVE THIS STYLES WHEN NEW TABLE COMPONENT IS IMPLEMENTED FOR PARAMS AND HEADERS
+  .key-value-pairs-table {
+    td {
+      .ant-input {
+        background: transparent;
       }
     }
   }

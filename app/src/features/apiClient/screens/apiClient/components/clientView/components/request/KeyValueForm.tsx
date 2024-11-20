@@ -1,7 +1,7 @@
 import { DeleteOutlined } from "@ant-design/icons";
 import { AutoComplete, Button, Checkbox } from "antd";
 import React, { memo, useCallback, useEffect } from "react";
-import { KeyValueFormType, KeyValuePair } from "../../../../../types";
+import { KeyValueFormType, KeyValuePair } from "../../../../../../types";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 import { trackEnableKeyValueToggled } from "modules/analytics/events/features/apiClient";
@@ -70,7 +70,7 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
       <tbody>
         {keyValuePairs?.map((param, index) => (
           <tr key={param.id}>
-            <td>
+            <td style={{ width: 10 }}>
               {param.key.length ? (
                 <Checkbox
                   checked={param.isEnabled || param.isEnabled === undefined}

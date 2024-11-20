@@ -47,7 +47,6 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({ items, defaultActiveKe
         data-tour-id={tourId}
         defaultActiveKey={defaultActiveKey}
         items={items}
-        type="card"
         onTabClick={() => toggleBottomSheet(true)}
       />
     </>

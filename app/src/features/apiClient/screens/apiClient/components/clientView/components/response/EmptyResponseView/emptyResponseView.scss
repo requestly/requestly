@@ -1,0 +1,24 @@
+.api-client-empty-response-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+
+  img {
+    width: 80px;
+  }
+
+  &__title {
+    font-weight: var(--requestly-font-weight-medium);
+    font-size: var(--requestly-font-size-md);
+    color: var(--requestly-color-text-default);
+    margin-top: 1rem;
+  }
+
+  &__description {
+    margin-top: 8px;
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+  }
+}
