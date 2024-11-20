@@ -15,20 +15,19 @@
 
 .bottom-sheet-container.ant-col,
 .bottom-sheet-panel-container.ant-col {
-  border-top: 1px solid var(--surface-1);
-  background: var(--surface-0_5);
+  border-top: 1px solid var(--requestly-color-white-t-10);
+  background: var(--requestly-color-surface-0);
 
   & .ant-tabs-nav {
-    padding: 8px 1rem;
+    padding: 8px;
     margin-bottom: 0;
   }
 
   & .ant-tabs-nav-list .ant-tabs-tab {
-    border-radius: 4px;
     padding: 4px 8px;
     background: none;
-    border: none;
     transition: all 0.2s ease-out;
+    font-size: var(--requestly-font-size-xs);
 
     &:hover,
     &:focus,
@@ -38,15 +37,14 @@
   }
 
   & .ant-tabs-tab.ant-tabs-tab-active {
-    background: var(--surface-2) !important;
-
     & .ant-tabs-tab-btn {
       color: var(--text-default);
     }
   }
 
   & .ant-tabs-content-holder {
-    padding: 8px 1rem;
+    padding: 8px;
+    overflow: hidden;
   }
 
   & .ant-tabs-content {

@@ -1,9 +1,9 @@
 import { Badge, Tabs, TabsProps, Tag } from "antd";
 import React, { memo, useEffect, useMemo, useState } from "react";
-import { KeyValuePair, RQAPI, RequestContentType, KeyValueFormType } from "../../../../../types";
+import { KeyValuePair, RQAPI, RequestContentType, KeyValueFormType } from "../../../../../../types";
 import RequestBody from "./RequestBody";
 import KeyValueForm from "./KeyValueForm";
-import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../utils";
+import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../utils";
 import "./requestTabs.scss";
 
 enum Tab {

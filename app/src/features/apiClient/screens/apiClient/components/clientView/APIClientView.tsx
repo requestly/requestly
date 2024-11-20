@@ -1,12 +1,9 @@
-import { Empty, Select, Skeleton, Space, Spin } from "antd";
+import { Select, Skeleton, Space } from "antd";
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import Split from "react-split";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
-import RequestTabs from "./request/RequestTabs";
-import { getEmptyPair } from "./request/KeyValueForm";
-import ResponseTabs from "./response/ResponseTabs";
-import { CloseCircleFilled } from "@ant-design/icons";
+import RequestTabs from "./components/request/RequestTabs";
+import { getEmptyPair } from "./components/request/KeyValueForm";
 import {
   addUrlSchemeIfMissing,
   getContentTypeFromResponseHeaders,
@@ -43,6 +40,9 @@ import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
 import PATHS from "config/constants/sub/paths";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
+import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import { SheetLayout } from "componentsV2/BottomSheet/types";
+import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 
 interface Props {
   openInModal?: boolean;
@@ -357,25 +357,42 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   return isExtensionEnabled ? (
     <div className="api-client-view">
-      {user.loggedIn && !openInModal ? (
-        <RQBreadcrumb
-          placeholder="New Request"
-          recordName={apiEntryDetails?.name}
-          onRecordNameUpdate={setRequestName}
-          onBlur={handleRecordNameUpdate}
-        />
-      ) : null}
+      <div className="api-client-header-container">
+        {user.loggedIn && !openInModal ? (
+          <RQBreadcrumb
+            placeholder="New Request"
+            recordName={apiEntryDetails?.name}
+            onRecordNameUpdate={setRequestName}
+            onBlur={handleRecordNameUpdate}
+          />
+        ) : null}
+      </div>
 
-      <Skeleton loading={isAnimating} active>
-        <div className="api-client-header">
-          <Space.Compact className="api-client-url-container">
-            <Select
-              className="api-request-method-selector"
-              options={requestMethodOptions}
-              value={entry.request.method}
-              onChange={setMethod}
+      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+        <BottomSheetLayout
+          layout={SheetLayout.SPLIT}
+          bottomSheet={
+            <ApiClientBottomSheet
+              response={entry.response}
+              isLoading={isLoadingResponse}
+              isFailed={isFailed}
+              isRequestCancelled={isRequestCancelled}
+              onCancelRequest={cancelRequest}
             />
-            {/* <Input
+          }
+          minSize={200}
+        >
+          <div className="api-client-body">
+            <Skeleton loading={isAnimating} active>
+              <div className="api-client-header">
+                <Space.Compact className="api-client-url-container">
+                  <Select
+                    className="api-request-method-selector"
+                    options={requestMethodOptions}
+                    value={entry.request.method}
+                    onChange={setMethod}
+                  />
+                  {/* <Input
               className="api-request-url"
               placeholder="https://example.com"
               value={entry.request.url}
@@ -384,78 +401,42 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               onBlur={onUrlInputBlur}
               prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
             /> */}
-            <RQSingleLineEditor
-              className="api-request-url"
-              placeholder="https://example.com"
-              // value={entry.request.url}
-              defaultValue={entry.request.url}
-              onChange={(text) => setUrl(text)}
-              onPressEnter={onUrlInputEnterPressed}
-              variables={currentEnvironmentVariables}
-              // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
-            />
-          </Space.Compact>
-          <RQButton
-            type="primary"
-            onClick={onSendButtonClick}
-            loading={isLoadingResponse}
-            disabled={!entry.request.url}
-          >
-            Send
-          </RQButton>
-          {user.loggedIn && !openInModal ? (
-            <RQButton onClick={onSaveButtonClick} loading={isRequestSaving}>
-              Save
-            </RQButton>
-          ) : null}
-        </div>
-        <Split
-          className="api-client-body"
-          direction="vertical"
-          cursor="row-resize"
-          sizes={entry.request.contentType === RequestContentType.JSON ? [60, 40] : [40, 60]}
-          minSize={200}
-          gutterSize={6}
-          gutterAlign="center"
-          snapOffset={30}
-        >
-          <RequestTabs
-            request={entry.request}
-            setQueryParams={setQueryParams}
-            setBody={setBody}
-            setRequestHeaders={setRequestHeaders}
-            setContentType={setContentType}
-          />
-          <div className="api-response-view">
-            {entry.response ? (
-              <ResponseTabs response={entry.response} />
-            ) : (
-              <div className="api-response-empty-placeholder">
-                {isLoadingResponse ? (
-                  <>
-                    <Spin size="large" tip="Request in progress..." />
-                    <RQButton onClick={cancelRequest} style={{ marginTop: 10 }}>
-                      Cancel request
-                    </RQButton>
-                  </>
-                ) : isFailed ? (
-                  <Space>
-                    <CloseCircleFilled style={{ color: "#ff4d4f" }} />
-                    Failed to send the request. Please check if the URL is valid.
-                  </Space>
-                ) : isRequestCancelled ? (
-                  <Space>
-                    <CloseCircleFilled style={{ color: "#ff4d4f" }} />
-                    You have cancelled the request.
-                  </Space>
-                ) : (
-                  <Empty description="No request sent." />
-                )}
+                  <RQSingleLineEditor
+                    className="api-request-url"
+                    placeholder="https://example.com"
+                    // value={entry.request.url}
+                    defaultValue={entry.request.url}
+                    onChange={(text) => setUrl(text)}
+                    onPressEnter={onUrlInputEnterPressed}
+                    variables={currentEnvironmentVariables}
+                    // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
+                  />
+                </Space.Compact>
+                <RQButton
+                  type="primary"
+                  onClick={onSendButtonClick}
+                  loading={isLoadingResponse}
+                  disabled={!entry.request.url}
+                >
+                  Send
+                </RQButton>
+                {user.loggedIn && !openInModal ? (
+                  <RQButton onClick={onSaveButtonClick} loading={isRequestSaving}>
+                    Save
+                  </RQButton>
+                ) : null}
               </div>
-            )}
+              <RequestTabs
+                request={entry.request}
+                setQueryParams={setQueryParams}
+                setBody={setBody}
+                setRequestHeaders={setRequestHeaders}
+                setContentType={setContentType}
+              />
+            </Skeleton>
           </div>
-        </Split>
-      </Skeleton>
+        </BottomSheetLayout>
+      </BottomSheetProvider>
     </div>
   ) : (
     <div className="w-full">
