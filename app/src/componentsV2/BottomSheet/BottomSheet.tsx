@@ -23,6 +23,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({ items, defaultActiveKe
       <div className="bottom-sheet-action-buttons">
         {isSheetPlacedAtBottom && (
           <RQButton
+            size="small"
             iconOnly
             type="default"
             icon={isBottomSheetOpen ? <MdExpandMore /> : <MdExpandLess />}
@@ -35,6 +36,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({ items, defaultActiveKe
         )}
         {!disableDocking && (
           <RQButton
+            size="small"
             iconOnly
             type="default"
             onClick={() => toggleSheetPlacement()}
