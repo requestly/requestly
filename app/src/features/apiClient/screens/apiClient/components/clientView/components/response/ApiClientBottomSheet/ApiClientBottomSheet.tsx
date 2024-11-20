@@ -4,6 +4,7 @@ import ResponseHeaders from "../ResponseHeaders/ResponseHeaders";
 import { getContentTypeFromResponseHeaders } from "features/apiClient/screens/apiClient/utils";
 import ResponseBody from "../ResponseBody/ResponseBody";
 import { BottomSheet } from "componentsV2/BottomSheet";
+import StatusLine from "../StatusLine";
 
 interface Props {
   response: RQAPI.Response;
@@ -59,5 +60,5 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
     ];
   }, [BOTTOM_SHEET_TAB_KEYS.RESPONSE, response, isLoading, isFailed, onCancelRequest]);
 
-  return <BottomSheet items={bottomSheetTabItems} disableDocking />;
+  return <BottomSheet items={bottomSheetTabItems} disableDocking utilities={<StatusLine response={response} />} />;
 };
