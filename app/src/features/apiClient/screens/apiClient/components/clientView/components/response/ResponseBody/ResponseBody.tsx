@@ -4,7 +4,7 @@ import { trackRawResponseViewed } from "modules/analytics/events/features/apiCli
 import Editor from "componentsV2/CodeEditor/components/Editor/Editor";
 import { getEditorLanguageFromContentType } from "componentsV2/CodeEditor";
 import "./responseBody.scss";
-import { EmptyResponsePlaceholder } from "../EmptyResponseView/emptyResponseView";
+import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
 import { RQButton } from "lib/design-system-v2/components";
 import { IoMdCopy } from "@react-icons/all-files/io/IoMdCopy";
 

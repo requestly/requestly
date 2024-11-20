@@ -1,7 +1,7 @@
 import React from "react";
 import { KeyValuePair } from "../../../../../../../types";
 import { PropertiesGrid } from "componentsV2/PropertiesGrid/PropertiesGrid";
-import { EmptyResponsePlaceholder } from "../EmptyResponseView/emptyResponseView";
+import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
 import "./responseHeaders.scss";
 
 interface Props {
