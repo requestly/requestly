@@ -1,7 +1,7 @@
 import React from "react";
 import { Space, Spin } from "antd";
 import emptyResponseIcon from "../../../../../../../assets/empty-card.svg";
-import "./emptyResponseView.scss";
+import "./emptyResponsePlaceholder.scss";
 import { CloseCircleFilled } from "@ant-design/icons";
 import { RQButton } from "lib/design-system-v2/components";
 
