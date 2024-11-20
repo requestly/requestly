@@ -21,10 +21,11 @@
   & .ant-tabs-nav {
     padding: 8px;
     margin-bottom: 0;
+    padding-bottom: 0;
   }
 
   & .ant-tabs-nav-list .ant-tabs-tab {
-    padding: 4px 8px;
+    padding: 4px 0;
     background: none;
     transition: all 0.2s ease-out;
     font-size: var(--requestly-font-size-xs);
@@ -63,7 +64,7 @@
 
 .bottom-sheet-action-buttons {
   position: absolute;
-  top: 10px;
+  top: 5px;
   right: 10px;
   display: flex;
   gap: 4px;
