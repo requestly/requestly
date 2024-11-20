@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Tabs, TabsProps } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useBottomSheetContext } from "./context";
@@ -12,15 +12,23 @@ import "./BottomSheet.scss";
 interface BottomSheetProps extends TabsProps {
   tourId?: string;
   disableDocking?: boolean;
+  utilities?: ReactNode;
 }
 
-export const BottomSheet: React.FC<BottomSheetProps> = ({ items, defaultActiveKey, tourId = "", disableDocking }) => {
+export const BottomSheet: React.FC<BottomSheetProps> = ({
+  items,
+  defaultActiveKey,
+  tourId = "",
+  disableDocking,
+  utilities,
+}) => {
   const { isBottomSheetOpen, sheetPlacement, toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
 
   return (
     <>
-      <div className="bottom-sheet-action-buttons">
+      <div className="bottom-sheet-utilites">
+        {utilities}
         {isSheetPlacedAtBottom && (
           <RQButton
             size="small"
