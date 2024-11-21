@@ -43,6 +43,7 @@ import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
 import PATHS from "config/constants/sub/paths";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
+import { ResponseScriptParser } from "../../parseResponseScript";
 
 interface Props {
   openInModal?: boolean;
@@ -68,7 +69,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const teamId = workspace?.id;
 
   const { onSaveRecord } = useApiClientContext();
-  const { renderVariables, getCurrentEnvironmentVariables } = useEnvironmentManager();
+  const environmentManager = useEnvironmentManager();
+  const { renderVariables, getCurrentEnvironmentVariables } = environmentManager;
+
   const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
@@ -249,6 +252,17 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         // TODO: Add an entry in history
         const entryWithResponse = { ...entry, response };
         const renderedEntryWithResponse = { ...renderedEntry, response };
+
+        const script = `
+          const a=window.localStorage.getItem('install_date');
+          console.log("!!!debug item",a);
+          console.log("!!!debug",rq.response);
+          rq.environment.set("testKeyBoolean",true);
+        `;
+
+        const parser = new ResponseScriptParser(script, renderedEntryWithResponse.response.body, environmentManager);
+        console.log("!!!debug", "before parsing", response.body);
+        parser.parse();
 
         if (response) {
           setEntry(entryWithResponse);
