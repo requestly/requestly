@@ -15,7 +15,11 @@ const userNodeListener = (dispatch, uid) => {
             dispatch(
               actions.updateUserProfile({
                 userProfile: profile
-                  ? { ...(userDetails ?? {}), displayName: profile.displayName, isEmailVerified: profile.isVerified }
+                  ? {
+                      ...(userDetails ?? {}),
+                      displayName: profile.displayName,
+                      isEmailVerified: profile.isVerified || userDetails.isEmailVerified,
+                    }
                   : userDetails,
               })
             );

@@ -14,7 +14,7 @@ export interface BillingTeamDetails {
   name: string;
   description: string;
   owner: string;
-  ownerDomain?: string;
+  ownerDomains?: string[];
   subscriptionDetails: Record<string, any>;
   members: Record<string, BillingTeamMember>;
   billingExclude?: string[];
@@ -28,6 +28,7 @@ export interface BillingTeamDetails {
       inviteId: string;
     };
   };
+  isAcceleratorTeam?: boolean;
 }
 
 export enum BillingTeamRoles {

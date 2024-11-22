@@ -34,7 +34,7 @@
   padding: 11px 16px;
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr 0.5fr;
+  grid-template-columns: 1fr minmax(auto, 1fr) 0.5fr;
   align-items: center;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
@@ -50,6 +50,7 @@
 }
 .connected-apps-modal .source-grid .source-item .source-description {
   padding-left: 10px;
+  word-break: break-word;
 }
 .connected-apps-modal .source-grid .source-item .danger-btn,
 .connected-apps-modal .rq-modal-footer .danger-btn {

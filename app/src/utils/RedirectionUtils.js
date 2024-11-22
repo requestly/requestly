@@ -176,6 +176,19 @@ export const redirectToNetworkSession = (navigate, id, isDesktopSessionsCompatib
   }
 };
 
+/* FEATURE - API client */
+export const redirectToApiClient = (navigate) => {
+  navigate(`${PATHS.API_CLIENT.ABSOLUTE}`);
+};
+
+export const redirectToRequest = (navigate, requestId = "new") => {
+  navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}`);
+};
+
+export const redirectToApiClientCollection = (navigate, collectionId = "new") => {
+  navigate(`${PATHS.API_CLIENT.ABSOLUTE}/collection/${collectionId}`);
+};
+
 /* Settings */
 export const redirectToSettings = (navigate, redirectUrl, source) => {
   navigate(PATHS.SETTINGS.ABSOLUTE, { state: { redirectUrl, source } });
@@ -527,6 +540,14 @@ export const redirectToMocksList = (navigate, newTab = false) => {
 
 export const redirectToFileMocksList = (navigate) => {
   navigate(PATHS.FILE_SERVER_V2.ABSOLUTE);
+};
+
+export const redirectToEnvironment = (navigate, environment) => {
+  navigate(`${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environment}`);
+};
+
+export const redirectToNewEnvironment = (navigate) => {
+  navigate(PATHS.API_CLIENT.ENVIRONMENTS.NEW.ABSOLUTE);
 };
 
 export const redirectToUrl = (url, newTab = false) => {

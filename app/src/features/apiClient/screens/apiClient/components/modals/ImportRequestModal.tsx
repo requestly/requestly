@@ -1,6 +1,6 @@
 import { Input, Modal } from "antd";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { parseCurlRequest } from "../../apiUtils";
+import { parseCurlRequest } from "../../utils";
 import { RQAPI } from "../../../../types";
 import { toast } from "utils/Toast";
 import { trackCurlImportFailed, trackCurlImported } from "modules/analytics/events/features/apiClient";
@@ -9,11 +9,12 @@ import { API_CLIENT } from "modules/analytics/events/features/constants";
 
 interface Props {
   isOpen: boolean;
+  isRequestLoading: boolean;
   handleImportRequest: (request: RQAPI.Request) => void;
   onClose: () => void;
 }
 
-const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onClose }) => {
+export const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onClose, isRequestLoading }) => {
   const [curlCommand, setCurlCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>();
 
@@ -54,6 +55,8 @@ const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onCl
       open={isOpen}
       okText="Import"
       onOk={onImportClicked}
+      maskClosable={false}
+      confirmLoading={isRequestLoading}
       onCancel={onClose}
       width="70%"
     >
@@ -67,5 +70,3 @@ const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onCl
     </Modal>
   );
 };
-
-export default ImportRequestModal;

@@ -81,7 +81,7 @@ export const AppNotificationBanner = () => {
         },
       },
       [BANNER_ACTIONS.REDIRECT_TO_ACCELERATOR_FORM]: {
-        label: "Get started",
+        label: "Get access",
         type: "primary",
         onClick: () => {
           redirectToUrl(LINKS.ACCELERATOR_PROGRAM_FORM_LINK, true);
@@ -103,7 +103,7 @@ export const AppNotificationBanner = () => {
               user?.details?.profile?.email
             )} team as a part of its Accelerator Program.`;
           }
-          return "Requestly has launched its Accelerator program, providing 20 companies with exclusive 6-month Free Access.";
+          return "Requestly is offering six months of free access to its Professional Plan through the Accelerator program, limited to 20 companies.";
         }
         default:
           return text;
@@ -128,7 +128,7 @@ export const AppNotificationBanner = () => {
           } else return false;
         }
         case BANNER_ID.ACCELERATOR_PROGRAM: {
-          if (!user.details?.isPremium && !billingTeams && user.loggedIn) {
+          if (!user.details?.isPremium && !billingTeams?.length && user.loggedIn) {
             dispatch(actions.updateIsAppBannerVisible(true));
             return true;
           } else return false;

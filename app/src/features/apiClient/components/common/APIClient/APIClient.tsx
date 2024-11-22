@@ -9,7 +9,7 @@ import {
   getContentTypeFromRequestHeaders,
   getEmptyAPIEntry,
   parseCurlRequest,
-} from "features/apiClient/screens/apiClient/apiUtils";
+} from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import APIClientView from "../../../screens/apiClient/components/clientView/APIClientView";
 import "./apiClient.scss";
@@ -57,6 +57,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
           key: CONTENT_TYPE_HEADER,
           value: RequestContentType.FORM,
           id: Math.random(),
+          isEnabled: true,
         });
 
         const formDataObj: Record<string, string> = {};
@@ -85,7 +86,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       width="70%"
       destroyOnClose
     >
-      <APIClientView apiEntry={apiEntry} />
+      <APIClientView apiEntry={apiEntry} openInModal={openInModal} />
     </Modal>
   ) : (
     <APIClientView apiEntry={apiEntry} />

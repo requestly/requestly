@@ -183,6 +183,22 @@ export const API_CLIENT = {
   RAW_RESPONSE_VIEWED: "api_client_raw_response_viewed",
   RESPONSE_HEADERS_VIEWED: "api_client_response_headers_viewed",
   INSTALL_EXTENSION_DIALOG_SHOWN: "api_client_install_extension_dialog_shown",
+  REQUEST_SAVED: "api_client_request_saved",
+  REQUEST_RENAMED: "api_client_request_renamed",
+  NEW_COLLECTION_CLICKED: "api_client_new_collection_clicked",
+  COLLECTION_SAVED: "api_client_collection_saved",
+  COLLECTION_RENAMED: "api_client_collection_renamed",
+  COLLECTION_DELETED: "api_client_collection_deleted",
+  REQUEST_CREATED_IN_COLLECTION: "api_client_request_created_collection",
+  EXPORT_COLLECTIONS_CLICKED: "api_client_export_collections_clicked",
+  EXPORT_COLLECTIONS_FAILED: "api_client_export_collections_failed",
+  EXPORT_COLLECTIONS_SUCCESSFUL: "api_client_export_collections_successful",
+  EXPORT_COLLECTIONS_STARTED: "api_client_export_collections_started",
+  IMPORT_COLLECTIONS_CLICKED: "api_client_import_collections_clicked",
+  IMPORT_COLLECTIONS_FAILED: "api_client_import_collections_failed",
+  IMPORT_COLLECTIONS_SUCCESSFUL: "api_client_import_collections_successful",
+  IMPORT_COLLECTIONS_STARTED: "api_client_import_collections_started",
+  ENABLE_KEY_VALUE_TOGGLED: "api_client_enable_key_value_toggled",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {

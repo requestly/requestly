@@ -1,39 +1,40 @@
-import React, { useState, useMemo, useCallback, useRef } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
-import { Row, Col, Input, Badge, Menu, Typography, Tooltip } from "antd";
-import { FaFilter } from "@react-icons/all-files/fa/FaFilter";
+import { Row, Col, Input, Badge, Menu, Typography, Tooltip, Button, Dropdown, Space } from "antd";
 import { ExperimentOutlined } from "@ant-design/icons";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { DownOutlined } from "@ant-design/icons";
-import { RQDropdown, RQButton } from "lib/design-system/components";
+import { RQDropdown } from "lib/design-system/components";
 import { TestURLModal } from "components/common/TestURLModal";
-import PATHS from "config/constants/sub/paths";
 import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
 import { getModeData, setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 import Filters from "components/features/rules/RulePairs/Filters";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
-import {
-  trackURLConditionModalClosed,
-  trackURLConditionAnimationViewed,
-} from "modules/analytics/events/features/testUrlModal";
+import { trackURLConditionModalClosed } from "modules/analytics/events/features/testUrlModal";
 import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rules/filters";
-import "./RequestSourceRow.css";
+import { trackSampleRegexClicked } from "modules/analytics/events/common/rules";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { RQButton } from "lib/design-system-v2/components";
+import { sampleRegex } from "./sampleRegex";
+import { useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
+import "./RequestSourceRow.css";
 
 const { Text } = Typography;
 
 const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isTestURLModalVisible, setIsTestURLModalVisible] = useState(false);
-  const [isTestURLClicked, setIsTestURLClicked] = useState(false);
   const [ruleFilterActiveWithPairIndex, setRuleFilterActiveWithPairIndex] = useState(false);
-  const hasSeenTestURLAnimation = useRef(false);
+  const [testURL, setTestURL] = useState("");
+  const [sourceConfig, setSourceConfig] = useState(pair.source);
   const { MODE } = getModeData(window.location);
 
   const isSourceFilterFormatUpgraded = useCallback((pairIndex, rule) => {
@@ -194,21 +195,34 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
     );
   };
 
-  const shouldStartTestURLRippleEffect = useCallback(() => {
-    if (
-      pair.source.value &&
-      !isTestURLClicked &&
-      window.location.href.includes(PATHS.RULE_EDITOR.CREATE_RULE.RELATIVE) &&
-      (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES ||
-        pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES)
-    ) {
-      if (!hasSeenTestURLAnimation.current) {
-        trackURLConditionAnimationViewed();
-        hasSeenTestURLAnimation.current = true;
-      }
-      return true;
-    }
-  }, [isTestURLClicked, pair.source.value, pair.source.operator]);
+  const sampleRegexDropdownItems = useMemo(() => {
+    return sampleRegex.map(({ title, regex, url }, index) => {
+      return {
+        key: index,
+        onClick: () => {
+          setSourceConfig({
+            ...pair.source,
+            value: `/${regex}/`,
+            operator: GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES,
+          });
+          setTestURL(url);
+          setIsTestURLModalVisible(true);
+          trackSampleRegexClicked();
+        },
+        label: (
+          <>
+            <div className="sample-regex-dropdown-item__title">{title}</div>
+            <div className="sample-regex-dropdown-item__regex">{regex}</div>
+          </>
+        ),
+      };
+    });
+  }, [pair.source]);
+
+  const handleResetTestSourceConfig = () => {
+    setSourceConfig(null);
+    setTestURL("");
+  };
 
   return (
     <>
@@ -216,10 +230,13 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
         <TestURLModal
           isOpen={isTestURLModalVisible}
           onClose={(operator) => {
+            handleResetTestSourceConfig();
             setIsTestURLModalVisible(false);
             trackURLConditionModalClosed(operator, { rule_type: currentlySelectedRuleConfig.TYPE });
           }}
-          source={pair.source}
+          source={sourceConfig || pair.source}
+          defaultTestURL={testURL}
+          originalSource={pair.source}
           onSave={updateSourceFromTestURLModal}
           analyticsContext={{ rule_type: currentlySelectedRuleConfig.TYPE }}
         />
@@ -297,26 +314,30 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               data-selectionid="source-value"
             />
           </Col>
-          <Tooltip
-            overlayClassName="rq-tooltip"
-            title={"Enter the source condition first"}
-            placement="left"
-            trigger={isInputDisabled ? ["hover"] : []}
-          >
-            <span>
-              <RQButton
-                className={`test-url-btn  ${shouldStartTestURLRippleEffect() && "ripple-animation"}`}
-                iconOnly
-                icon={<ExperimentOutlined />}
-                type="default"
-                disabled={!pair.source.value || isInputDisabled}
-                onClick={() => {
-                  setIsTestURLClicked(true);
-                  setIsTestURLModalVisible(true);
-                }}
-              />
-            </span>
-          </Tooltip>
+
+          {(pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES ||
+            pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES) && (
+            <Tooltip
+              overlayClassName="rq-tooltip"
+              title={"Enter the source condition first"}
+              placement="left"
+              trigger={isInputDisabled ? ["hover"] : []}
+            >
+              <span>
+                <Button
+                  className="test-url-btn"
+                  iconOnly
+                  disabled={!pair.source.value || isInputDisabled}
+                  onClick={() => {
+                    setIsTestURLModalVisible(true);
+                  }}
+                >
+                  <ExperimentOutlined /> Test{" "}
+                  {pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES ? "regex" : "wildcard"}
+                </Button>
+              </span>
+            </Tooltip>
+          )}
         </Row>
         {shouldShowFilterIcon ? (
           <Col
@@ -347,20 +368,36 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
                 analyticsContext="redirect_source_filter"
                 source={currentlySelectedRuleConfig.TYPE}
               >
-                <span
+                <RQButton
+                  type="transparent"
                   onClick={() => openFilterModal(pairIndex)}
-                  className="cursor-pointer text-gray source-filter-icon-container"
+                  className="cursor-pointer source-filter-icon-container"
                 >
-                  <FaFilter />{" "}
+                  Filters
                   {getFilterCount(pairIndex) !== 0 ? (
                     <Badge style={{ color: "#465967", backgroundColor: "#E5EAEF" }}>{getFilterCount(pairIndex)}</Badge>
                   ) : null}
-                </span>
+                </RQButton>
               </Tooltip>
             )}
           </Col>
         ) : null}
       </div>
+      {pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES &&
+        location.pathname.includes(PATHS.RULE_EDITOR.ABSOLUTE) && (
+          <Col className="sample-regex-dropdown-container">
+            <Dropdown
+              menu={{ items: sampleRegexDropdownItems }}
+              trigger={["click"]}
+              overlayClassName="sample-regex-dropdown"
+            >
+              <Space>
+                Try example regex
+                <DownOutlined />
+              </Space>
+            </Dropdown>
+          </Col>
+        )}
     </>
   );
 };

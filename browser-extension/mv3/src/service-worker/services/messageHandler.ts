@@ -28,9 +28,9 @@ import { globalStateManager } from "./globalStateManager";
 import { isProxyApplied } from "./proxy";
 import {
   connectToDesktopAppAndApplyProxy,
-  checkIfDesktopAppOpen,
   disconnectFromDesktopAppAndRemoveProxy,
-} from "./desktopApp";
+  checkIfDesktopAppOpen,
+} from "./desktopApp/index";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
   const appTabs = await getAppTabs();

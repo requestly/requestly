@@ -11,8 +11,6 @@ export const makeRequest = async (
   request: RQAPI.Request,
   signal?: AbortSignal
 ): Promise<RQAPI.Response> => {
-  // TODO: check if Extension or Desktop App is installed and has the support
-  // TODO: add support in MV3 extension
   return new Promise((resolve, reject) => {
     if (signal) {
       if (signal.aborted) {
@@ -39,7 +37,7 @@ export const makeRequest = async (
 // TODO: move this into top level common folder
 export const addUrlSchemeIfMissing = (url: string): string => {
   if (url && !/^([a-z][a-z0-9+\-.]*):\/\//.test(url)) {
-    return "https://" + url;
+    return "http://" + url;
   }
 
   return url;
@@ -60,8 +58,13 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
   };
 };
 
-export const removeEmptyKeys = (keyValuePairs: KeyValuePair[]): KeyValuePair[] => {
-  return keyValuePairs.filter((pair) => pair.key.length);
+export const sanitizeKeyValuePairs = (keyValuePairs: KeyValuePair[], removeDisabledKeys = true): KeyValuePair[] => {
+  return keyValuePairs
+    .map((pair) => ({
+      ...pair,
+      isEnabled: pair.isEnabled ?? true,
+    }))
+    .filter((pair) => pair.key.length > 0 && (!removeDisabledKeys || pair.isEnabled));
 };
 
 export const supportsRequestBody = (method: RequestMethod): boolean => {
@@ -69,11 +72,12 @@ export const supportsRequestBody = (method: RequestMethod): boolean => {
 };
 
 export const generateKeyValuePairsFromJson = (json: Record<string, string> = {}): KeyValuePair[] => {
-  return Object.entries(json || {}).map(([key, value]) => {
+  return Object.entries(json || {}).map(([key, value, isEnabled = true]) => {
     return {
       key,
       value,
       id: Math.random(),
+      isEnabled,
     };
   });
 };
@@ -124,7 +128,7 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     } else if (contentType === RequestContentType.FORM) {
       body = generateKeyValuePairsFromJson(requestJson.data);
     } else {
-      body = requestJson.data;
+      body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
     }
 
     const request: RQAPI.Request = {
@@ -139,4 +143,12 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
   } catch (e) {
     return null;
   }
+};
+
+export const isApiRequest = (record: RQAPI.Record) => {
+  return record.type === RQAPI.RecordType.API;
+};
+
+export const isApiCollection = (record: RQAPI.Record) => {
+  return record?.type === RQAPI.RecordType.COLLECTION;
 };

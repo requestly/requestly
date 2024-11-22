@@ -77,6 +77,11 @@ export const getIsCurrentlySelectedRuleHasUnsavedChanges = (state) => {
   return currentlySelectedRule["hasUnsavedChanges"];
 };
 
+export const getIsWorkspaceSwitchConfirmationActive = (state) => {
+  const currentlySelectedRule = getCurrentlySelectedRule(state);
+  return currentlySelectedRule["isWorkspaceSwitchConfirmationActive"];
+};
+
 export const getCurrentlySelectedRuleErrors = (state) => {
   const currentlySelectedRule = getCurrentlySelectedRule(state);
   return currentlySelectedRule["errors"];

@@ -35,7 +35,7 @@ export const createMock = async (
   const mockId = await createMockFromFirebase(uid, mockData, teamId);
 
   if (mockId) {
-    await updateUserMockSelectorsMap(ownerId, mockId, mockData, collectionId, collectionPath);
+    await updateUserMockSelectorsMap(ownerId, mockId, mockData, collectionId);
     if (BODY_IN_BUCKET_ENABLED) {
       await uploadResponseBodyFiles(responsesWithBody, uid, mockId, teamId);
       mockData.id = mockId;

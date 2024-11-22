@@ -1,17 +1,24 @@
 import { DeleteOutlined } from "@ant-design/icons";
-import { AutoComplete, Button, Input } from "antd";
+import { AutoComplete, Button, Checkbox } from "antd";
 import React, { memo, useCallback, useEffect } from "react";
-import { KeyValuePair } from "../../../../../types";
+import { KeyValueFormType, KeyValuePair } from "../../../../../types";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
+import { trackEnableKeyValueToggled } from "modules/analytics/events/features/apiClient";
 
 interface Props {
   keyValuePairs: KeyValuePair[];
   setKeyValuePairs: (keyValuePairs: KeyValuePair[]) => void;
   keyOptions?: { value: string }[];
+  formType: KeyValueFormType;
 }
 
-export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "" });
+export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
 
-const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOptions }) => {
+const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOptions, formType }) => {
+  const { getCurrentEnvironmentVariables } = useEnvironmentManager();
+  const currentEnvironmentVariables = getCurrentEnvironmentVariables();
+
   const addEmptyPair = useCallback(() => {
     setKeyValuePairs([...keyValuePairs, getEmptyPair()]);
   }, [keyValuePairs, setKeyValuePairs]);
@@ -49,12 +56,32 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
     [keyValuePairs, setKeyValuePairs]
   );
 
+  const onEnableKeyChange = useCallback(
+    (isEnabled: boolean, index: number) => {
+      const newKeyValuePairs = [...keyValuePairs];
+      newKeyValuePairs[index].isEnabled = isEnabled;
+      setKeyValuePairs(newKeyValuePairs);
+    },
+    [keyValuePairs, setKeyValuePairs]
+  );
+
   return (
     <table className="key-value-pairs-table">
       <tbody>
         {keyValuePairs?.map((param, index) => (
           <tr key={param.id}>
-            <td className="key">
+            <td>
+              {param.key.length ? (
+                <Checkbox
+                  checked={param.isEnabled || param.isEnabled === undefined}
+                  onChange={(evt) => {
+                    onEnableKeyChange(evt.target.checked, index);
+                    trackEnableKeyValueToggled(evt.target.checked, formType);
+                  }}
+                />
+              ) : null}
+            </td>
+            <td className={`key ${param.isEnabled === false ? "disabled-pair" : ""}`}>
               {keyOptions ? (
                 <AutoComplete
                   options={keyOptions}
@@ -68,14 +95,28 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
                   placeholder="key"
                 />
               ) : (
-                <Input placeholder="key" value={param.key} onChange={(evt) => onKeyChange(evt.target.value, index)} />
+                // <Input placeholder="key" value={param.key} onChange={(evt) => onKeyChange(evt.target.value, index)} />
+                <RQSingleLineEditor
+                  key={index}
+                  placeholder="key"
+                  defaultValue={param.key}
+                  onChange={(val) => onKeyChange(val, index)}
+                  variables={currentEnvironmentVariables}
+                />
               )}
             </td>
-            <td className="value">
-              <Input
+            <td className={`value ${param.isEnabled === false ? "disabled-pair" : ""}`}>
+              {/* <Input
                 placeholder="value"
                 value={param.value}
                 onChange={(evt) => onValueChange(evt.target.value, index)}
+              /> */}
+              <RQSingleLineEditor
+                key={index}
+                placeholder="value"
+                defaultValue={param.value}
+                onChange={(value) => onValueChange(value, index)}
+                variables={currentEnvironmentVariables}
               />
             </td>
             <td>

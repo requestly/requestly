@@ -1,95 +1,181 @@
-import React, { useCallback } from "react";
-import placeholderImage from "../../../../../../assets/images/illustrations/empty-sheets-dark.svg";
-import { Button, Timeline, Typography } from "antd";
+import React, { useCallback, useEffect, useState } from "react";
 import { RQAPI } from "../../../../types";
-import { ClearOutlined, CodeOutlined, PlusCircleOutlined } from "@ant-design/icons";
-import { trackRequestSelectedFromHistory } from "modules/analytics/events/features/apiClient";
-import { REQUEST_METHOD_COLORS } from "../../../../../../constants/requestMethodColors";
+import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
+import { Tabs, TabsProps, Tooltip } from "antd";
+import { CgStack } from "@react-icons/all-files/cg/CgStack";
+import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
+import { CollectionsList } from "./collectionsList/CollectionsList";
+import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
+import { HistoryList } from "./historyList/HistoryList";
+import { ApiClientSidebarHeader } from "./apiClientSidebarHeader/ApiClientSidebarHeader";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
+import { redirectToApiClientCollection, redirectToNewEnvironment, redirectToRequest } from "utils/RedirectionUtils";
+import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import "./apiClientSidebar.scss";
-import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
-import { API_CLIENT } from "modules/analytics/events/features/constants";
 
 interface Props {
-  history: RQAPI.Entry[];
-  onSelectionFromHistory: (index: number) => void;
-  clearHistory: () => void;
-  onNewClick: () => void;
-  onImportClick: () => void;
+  history?: RQAPI.Entry[];
+  onSelectionFromHistory?: (index: number) => void;
+  clearHistory?: () => void;
+  onNewClick?: (src: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => void;
+  onImportClick?: () => void;
+}
+
+export enum ApiClientSidebarTabKey {
+  HISTORY = "history",
+  COLLECTIONS = "collections",
+  ENVIRONMENTS = "environments",
 }
 
 const APIClientSidebar: React.FC<Props> = ({
   history,
   onSelectionFromHistory,
   clearHistory,
-  onNewClick,
   onImportClick,
+  onNewClick = () => {},
 }) => {
-  const onHistoryLinkClick = useCallback(
-    (index: number) => {
-      onSelectionFromHistory(index);
-      trackRequestSelectedFromHistory();
-      trackRQLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
-      trackRQDesktopLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
+  const { requestId, collectionId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const user = useSelector(getUserAuthDetails);
+  const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(null);
+  const { getCurrentEnvironment } = useEnvironmentManager();
+  const { currentEnvironmentId } = getCurrentEnvironment();
+  const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
+  const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
+
+  const hideNewRecordNameInput = () => {
+    setIsNewRecordNameInputVisible(false);
+    setRecordTypeToBeCreated(null);
+  };
+
+  const handleNewRecordClick = useCallback(
+    (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
+      setIsNewRecordNameInputVisible(true);
+      setRecordTypeToBeCreated(recordType);
+
+      switch (recordType) {
+        case RQAPI.RecordType.API: {
+          onNewClick(analyticEventSource, RQAPI.RecordType.API);
+          redirectToRequest(navigate);
+          return;
+        }
+
+        case RQAPI.RecordType.COLLECTION: {
+          onNewClick(analyticEventSource, RQAPI.RecordType.COLLECTION);
+          redirectToApiClientCollection(navigate);
+          return;
+        }
+        case RQAPI.RecordType.ENVIRONMENT: {
+          redirectToNewEnvironment(navigate);
+          trackCreateEnvironmentClicked(analyticEventSource);
+          return;
+        }
+        default:
+          return;
+      }
     },
-    [onSelectionFromHistory]
+    [onNewClick, navigate]
   );
+
+  useEffect(() => {
+    if (requestId === "new") {
+      setIsNewRecordNameInputVisible(true);
+      setRecordTypeToBeCreated(RQAPI.RecordType.API);
+    } else if (collectionId === "new") {
+      setIsNewRecordNameInputVisible(true);
+      setRecordTypeToBeCreated(RQAPI.RecordType.COLLECTION);
+    }
+  }, [requestId, collectionId]);
+
+  useEffect(() => {
+    if (location.pathname.includes(PATHS.API_CLIENT.HISTORY.ABSOLUTE)) {
+      setActiveKey(ApiClientSidebarTabKey.HISTORY);
+    } else if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.INDEX)) {
+      setActiveKey(ApiClientSidebarTabKey.ENVIRONMENTS);
+    } else {
+      setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
+    }
+  }, [location.pathname]);
+
+  const items: TabsProps["items"] = [
+    {
+      key: ApiClientSidebarTabKey.COLLECTIONS,
+      label: (
+        <Tooltip title="Collections" placement="right">
+          <NavLink
+            to={PATHS.API_CLIENT.ABSOLUTE}
+            className={({ isActive }) => `${isActive ? "active" : ""} api-client-tab-link`}
+          >
+            <CgStack />
+          </NavLink>
+        </Tooltip>
+      ),
+      children: (
+        <CollectionsList
+          onNewClick={onNewClick}
+          recordTypeToBeCreated={recordTypeToBeCreated}
+          isNewRecordNameInputVisible={isNewRecordNameInputVisible}
+          hideNewRecordNameInput={hideNewRecordNameInput}
+        />
+      ),
+    },
+    {
+      key: ApiClientSidebarTabKey.ENVIRONMENTS,
+      label: (
+        <Tooltip title="Environments" placement="right">
+          <NavLink
+            to={PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE + `${user.loggedIn ? `/${currentEnvironmentId}` : ""}`}
+            className={({ isActive }) => `${isActive ? "active" : ""} api-client-tab-link`}
+          >
+            <MdHorizontalSplit />
+          </NavLink>
+        </Tooltip>
+      ),
+      children: <EnvironmentsList />,
+    },
+    {
+      key: ApiClientSidebarTabKey.HISTORY,
+      label: (
+        <Tooltip title="History" placement="right">
+          <NavLink
+            to={PATHS.API_CLIENT.HISTORY.ABSOLUTE}
+            className={({ isActive }) => `${isActive ? "active" : ""} api-client-tab-link`}
+          >
+            <MdOutlineHistory />
+          </NavLink>
+        </Tooltip>
+      ),
+      children: <HistoryList history={history} onSelectionFromHistory={onSelectionFromHistory} />,
+    },
+  ];
+
+  const handleActiveTabChange = (activeKey: ApiClientSidebarTabKey) => {
+    setActiveKey(activeKey);
+  };
 
   return (
     <div className="api-client-sidebar">
-      <div className="api-client-sidebar-header">
-        <div>
-          <Button type="text" size="small" onClick={onNewClick} icon={<PlusCircleOutlined />}>
-            New
-          </Button>
-          <Button type="text" size="small" onClick={onImportClick} icon={<CodeOutlined />}>
-            Import
-          </Button>
-        </div>
-        <div>
-          {history?.length ? (
-            <Button type="text" size="small" onClick={clearHistory} icon={<ClearOutlined />}>
-              Clear history
-            </Button>
-          ) : null}
-        </div>
-      </div>
-      {history?.length ? (
-        <Timeline reverse className="api-history-list" mode="left">
-          <Timeline.Item key="end" color="gray">
-            <div className="api-history-row">
-              <Typography.Text type="secondary" italic className="api-history-start-marker">
-                Start
-              </Typography.Text>
-            </div>
-          </Timeline.Item>
-          {history.map((entry, index) => (
-            <Timeline.Item key={index} color={REQUEST_METHOD_COLORS[entry.request.method]}>
-              <div className={`api-history-row ${entry.request.url ? "clickable" : ""}`}>
-                <Typography.Text
-                  className="api-method"
-                  strong
-                  style={{ color: REQUEST_METHOD_COLORS[entry.request.method] }}
-                >
-                  {entry.request.method}
-                </Typography.Text>
-                <Typography.Text
-                  type="secondary"
-                  className="api-history-url"
-                  title={entry.request.url}
-                  onClick={() => onHistoryLinkClick(index)}
-                >
-                  {entry.request.url}
-                </Typography.Text>
-              </div>
-            </Timeline.Item>
-          ))}
-        </Timeline>
-      ) : (
-        <div className="api-client-sidebar-placeholder">
-          <img src={placeholderImage} alt="empty" />
-          <Typography.Text type="secondary">API requests you send will appear here.</Typography.Text>
-        </div>
-      )}
+      <ApiClientSidebarHeader
+        activeTab={activeKey}
+        history={history}
+        onClearHistory={clearHistory}
+        onImportClick={onImportClick}
+        onNewClick={(recordType) => handleNewRecordClick(recordType, "api_client_sidebar_header")}
+      />
+
+      <Tabs
+        items={items}
+        size="small"
+        tabPosition="left"
+        className="api-client-sidebar-tabs"
+        activeKey={activeKey}
+        onChange={handleActiveTabChange}
+      />
     </div>
   );
 };
