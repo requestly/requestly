@@ -1,9 +1,3 @@
-// interface TestResult {
-//   name: string;
-//   passed: boolean;
-//   error?: string;
-// }
-
 export class ResponseScriptParser {
   private script: string;
   private responseBody: any;
