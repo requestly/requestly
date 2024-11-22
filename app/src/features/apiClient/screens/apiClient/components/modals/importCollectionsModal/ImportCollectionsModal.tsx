@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import { Modal } from "antd";
 import { FilePicker } from "components/common/FilePicker";

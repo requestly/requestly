@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Col } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { groupSvg } from "features/onboarding";

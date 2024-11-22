@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { Spin } from "antd";
 import { CreateWorkspaceView } from "./components/CreateWorkspaceView";

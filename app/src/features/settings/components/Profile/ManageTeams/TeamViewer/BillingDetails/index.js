@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import "./BillingDetails.css";
 import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "backend/billing";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import { redirectToBillingTeam, redirectToUrl } from "utils/RedirectionUtils";
 import SettingsItem from "features/settings/components/GlobalSettings/components/SettingsItem";

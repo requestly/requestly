@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { getIsAppBannerVisible, getUserAuthDetails } from "store/selectors";
+import { getIsAppBannerVisible } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Empty } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import DeleteSharedListModal from "../../modals/DeleteSharedListModal";

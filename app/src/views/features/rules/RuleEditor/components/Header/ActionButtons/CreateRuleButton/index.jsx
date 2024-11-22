@@ -9,8 +9,8 @@ import {
   getCurrentlySelectedRuleData,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
   getUserAttributes,
-  getUserAuthDetails,
 } from "../../../../../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { trackRQLastActivity } from "../../../../../../../../utils/AnalyticsUtils";
 import { saveRule, validateSyntaxInRule } from "../actions";
 import {

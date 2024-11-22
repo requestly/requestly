@@ -1,5 +1,5 @@
 import { ReducerKeys } from "store/constants";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { TeamRole } from "types";
 
 export const getTeamsState = (state) => {

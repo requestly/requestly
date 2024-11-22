@@ -103,10 +103,6 @@ export const getLastBackupTimeStamp = (state) => {
   return rulesNode["lastBackupTimeStamp"];
 };
 
-export const getUserAuthDetails = (state) => {
-  return getGlobalState(state)["user"];
-};
-
 export const getSearch = (state) => {
   return getGlobalState(state)["search"];
 };

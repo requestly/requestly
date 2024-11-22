@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Col } from "antd";
 import invoiceIcon from "../../../../../assets/invoice.svg";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQButton } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
