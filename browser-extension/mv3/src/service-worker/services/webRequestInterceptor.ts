@@ -11,7 +11,7 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
     return;
   }
 
-  let isMainFrameOrPrerenderedRequest =
+  let isMainOrPrerenderedFrame =
     //@ts-ignore
     details.type === "main_frame" || details.documentLifecycle === "prerender" ? true : false;
 
@@ -34,7 +34,7 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
             initiator: details.initiator,
           });
           if (isApplied) {
-            ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameOrPrerenderedRequest);
+            ruleExecutionHandler.onRuleExecuted(rule, details, isMainOrPrerenderedFrame);
           }
           break;
         default:
@@ -45,7 +45,7 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
 };
 
 const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersDetails) => {
-  let isMainFrameOrPrerenderedRequest =
+  let isMainOrPrerenderedFrame =
     details.type === "main_frame" || details.documentLifecycle === "prerender" ? true : false;
 
   if ((await isUrlInBlockList(details.initiator)) || (await isUrlInBlockList(details.url))) {
@@ -65,7 +65,7 @@ const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersD
             initiator: details.initiator,
           });
           if (isApplied && matchedPair.modifications?.Request && matchedPair.modifications?.Request?.length > 0) {
-            ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameOrPrerenderedRequest);
+            ruleExecutionHandler.onRuleExecuted(rule, details, isMainOrPrerenderedFrame);
           }
           break;
         default:
@@ -77,7 +77,7 @@ const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersD
 };
 
 const onHeadersReceived = async (details: chrome.webRequest.WebResponseHeadersDetails) => {
-  let isMainFrameOrPrerenderedRequest =
+  let isMainOrPrerenderedFrame =
     //@ts-ignore
     details.type === "main_frame" || details.documentLifecycle === "prerender" ? true : false;
 
@@ -97,7 +97,7 @@ const onHeadersReceived = async (details: chrome.webRequest.WebResponseHeadersDe
             initiator: details.initiator,
           });
           if (isApplied && matchedPair.modifications?.Response && matchedPair.modifications?.Response?.length > 0) {
-            ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameOrPrerenderedRequest);
+            ruleExecutionHandler.onRuleExecuted(rule, details, isMainOrPrerenderedFrame);
           }
           break;
         default:

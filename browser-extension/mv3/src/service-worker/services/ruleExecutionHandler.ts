@@ -56,9 +56,9 @@ class RuleExecutionHandler {
   onRuleExecuted = (
     rule: Rule,
     requestDetails: chrome.webRequest.WebRequestDetails,
-    isMainFrameOrPrerenderedRequest?: boolean
+    isMainOrPrerenderedFrame?: boolean
   ) => {
-    const tabDataScope = isMainFrameOrPrerenderedRequest ? DataScope.TAB : DataScope.PAGE;
+    const tabDataScope = isMainOrPrerenderedFrame ? DataScope.TAB : DataScope.PAGE;
 
     extensionIconManager.markRuleExecuted(requestDetails.tabId);
 
