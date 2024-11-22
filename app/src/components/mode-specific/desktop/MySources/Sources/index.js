@@ -1,13 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Row, Avatar, Tabs, Alert, Button, Modal, Space } from "antd";
-import {
-  QuestionCircleOutlined,
-  CheckCircleOutlined,
-  DesktopOutlined,
-  InfoCircleFilled,
-  InfoCircleOutlined,
-} from "@ant-design/icons";
+import { Col, Row, Avatar, Tabs, Alert, Button } from "antd";
+import { QuestionCircleOutlined, CheckCircleOutlined, DesktopOutlined, InfoCircleFilled } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 // SUB COMPONENTS
@@ -38,9 +32,8 @@ import PATHS from "config/constants/sub/paths";
 import { getConnectedAppsCount } from "utils/Misc";
 import { trackConnectAppsCategorySwitched } from "modules/analytics/events/desktopApp/apps";
 import LaunchButtonDropdown from "./LaunchButtonDropDown";
-import { getAndroidDevices } from "./deviceFetchers";
+import { getAndroidDevices, getIosSimulators } from "./deviceFetchers";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
-import IosLaunchButton from "./iosSimBtn";
 import { trackFailedToConnectToSimulator } from "./iosSimBtn/analytics";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
@@ -77,39 +70,105 @@ const Sources = ({ isOpen, toggle, ...props }) => {
     setAppsListArray(Object.values(appsList));
   }, [appsList]);
 
-  const fetchAndUpdateAndroidDevices = useCallback(() => {
-    setFetchingDevices(true);
-    getAndroidDevices().then((devices) => {
-      if (devices) {
-        console.log("Devices", devices, desktopSpecificDetails.appsList);
-        const updatedAppsList = { ...desktopSpecificDetails.appsList };
-        devices.forEach((device) => {
-          if (!desktopSpecificDetails.appsList[device.id]) {
-            console.log("Adding Device", device);
-            updatedAppsList[device.id] = {
-              id: "android-adb",
-              type: "mobile",
-              name: device.id,
-              description: device?.product,
-              icon: "android.png",
-              isActive: false,
-              isScanned: true,
-              comingSoon: false,
-              isAvailable: true,
-              metadata: { deviceId: device.id },
-            };
+  const fetchAndUpdateDevices = useCallback(
+    async (showPopup = true) => {
+      let deviceCount = 0;
+      setFetchingDevices(true);
+      const promises = [
+        getAndroidDevices().then((devices) => {
+          if (devices) {
+            deviceCount += devices.length;
+            console.log("Devices", devices, desktopSpecificDetails.appsList);
+            const updatedAppsList = { ...desktopSpecificDetails.appsList };
+            devices.forEach((device) => {
+              if (!desktopSpecificDetails.appsList[device.id]) {
+                console.log("Adding Device", device);
+                updatedAppsList[device.id] = {
+                  id: "android-adb",
+                  type: "mobile",
+                  name: device.id,
+                  description: device?.product,
+                  icon: "android.png",
+                  isActive: false,
+                  isScanned: true,
+                  comingSoon: false,
+                  isAvailable: true,
+                  metadata: { deviceId: device.id },
+                };
+              }
+            });
+            console.log("Updated Apps List", updatedAppsList);
+            dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
           }
+        }),
+        isFeatureCompatible(FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT)
+          ? getIosSimulators().then((simulators) => {
+              const simulatorsFound =
+                simulators && simulators?.activeDevices && Object.keys(simulators.activeDevices).length > 0;
+              const updatedAppsList = { ...desktopSpecificDetails.appsList };
+              if (simulatorsFound) {
+                deviceCount += Object.keys(simulators.activeDevices).length;
+                console.log("Simulators", simulators, desktopSpecificDetails.appsList);
+                updatedAppsList["ios-simulator"] = {
+                  ...updatedAppsList["ios-simulator"],
+                  metadata: {
+                    devices: simulators.activeDevices ?? {},
+                    scannedDevicesSuccessfullyOnce:
+                      updatedAppsList["ios-simulator"].metadata.scannedDevicesSuccessfullyOnce,
+                  },
+                  type: "mobile", // "hack to make it visible"
+                };
+                dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
+              } else {
+                if (updatedAppsList["ios-simulator"].isActive) {
+                  handleDisconnectAppOnClick("ios-simulator");
+                }
+                updatedAppsList["ios-simulator"] = {
+                  ...updatedAppsList["ios-simulator"],
+                  metadata: {
+                    devices: {},
+                    scannedDevicesSuccessfullyOnce:
+                      updatedAppsList["ios-simulator"].metadata.scannedDevicesSuccessfullyOnce,
+                  },
+                  isActive: false,
+                  type: "hack to not show the option in the app manager",
+                };
+                dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
+              }
+            })
+          : null,
+      ];
+
+      await Promise.allSettled(promises)
+        .then(() => {
+          if (!showPopup) return;
+          if (deviceCount === 0) {
+            const isIosSupported = isFeatureCompatible(FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT);
+            const message = isIosSupported
+              ? "No devices found. Please boot an android or ios simulator and scan again."
+              : "No devices found. Please boot an android emulator and scan again.";
+            toast.warn(message);
+          } else {
+            if (deviceCount === 1) {
+              toast.info(`Found 1 device`);
+            } else {
+              toast.info(`${deviceCount} Devices found`);
+            }
+          }
+        })
+        .catch((err) => {
+          console.log("Error fetching devices", err);
+        })
+        .finally(() => {
+          setFetchingDevices(false);
         });
-        console.log("Updated Apps List", updatedAppsList);
-        dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
-      }
-      setFetchingDevices(false);
-    });
-  }, [dispatch]); // Don't add appsList as dependency
+    },
+    [dispatch]
+  ); // Don't add appsList as dependency
 
   useEffect(() => {
-    fetchAndUpdateAndroidDevices();
-  }, [fetchAndUpdateAndroidDevices]);
+    fetchAndUpdateDevices(false);
+  }, [fetchAndUpdateDevices]);
 
   const toggleCloseConfirmModal = () => {
     if (isCloseConfirmModalActive) {
@@ -299,7 +358,11 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             loading={!isScanned || processingApps[appId]}
             className="launch-button"
           >
-            {appId === "android-adb" ? "Connect" : appId.includes("existing") ? "Open" : "Launch"}
+            {["android-adb", "ios-simulator"].includes(appId)
+              ? "Connect"
+              : appId.includes("existing")
+              ? "Open"
+              : "Launch"}
           </RQButton>
         );
       } else {
@@ -330,41 +393,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             {app.description}
           </Col>
           <>
-            {app.id === "ios-simulator" ? (
-              isFeatureCompatible(FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT) ? (
-                <IosLaunchButton
-                  connectHandler={() => {
-                    handleActivateAppOnClick("ios-simulator", { deviceIds: app.metadata.devices?.map((d) => d.udid) });
-                  }}
-                  disconnectHandler={() => {
-                    handleDisconnectAppOnClick("ios-simulator", {
-                      deviceIds: app.metadata.devices?.map((d) => d.udid),
-                    });
-                  }}
-                />
-              ) : (
-                <Space.Compact className="mobile-connect-btn">
-                  <RQButton type="default" disabled>
-                    Coming Soon
-                  </RQButton>
-                  <RQButton
-                    type="default"
-                    icon={<InfoCircleOutlined />}
-                    onClick={() => {
-                      Modal.info({
-                        content: "Available exclusively on macOS with Requestly Desktop v1.7.7 or later.",
-                        centered: true,
-                        maskClosable: true,
-                        icon: null,
-                        okText: "Got it",
-                        className: "modal-no-footer-style",
-                        footer: null,
-                      });
-                    }}
-                  />
-                </Space.Compact>
-              )
-            ) : app.type !== "browser" && app.id !== "android-adb" && app.id !== "ios-simulator" ? (
+            {app.type !== "browser" && app.id !== "android-adb" && app.id !== "ios-simulator" ? (
               <RQButton type="default" onClick={() => renderInstructionsModal(app.id)} className="mobile-connect-btn">
                 Setup Instructions
               </RQButton>
@@ -418,7 +447,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                       >
                         Need Help
                       </Button>
-                      <Button icon={<IoMdRefresh />} disabled={fetchingDevices} onClick={fetchAndUpdateAndroidDevices}>
+                      <Button icon={<IoMdRefresh />} disabled={fetchingDevices} onClick={fetchAndUpdateDevices}>
                         &nbsp;Refresh Devices
                       </Button>
                       {/* <Button danger>Disconnect All</Button> */}
@@ -439,7 +468,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         </>
       );
     },
-    [appsListArray, renderSourceCard]
+    [appsListArray, renderSourceCard, fetchAndUpdateDevices, fetchingDevices]
   );
 
   const sourceTabs = useMemo(

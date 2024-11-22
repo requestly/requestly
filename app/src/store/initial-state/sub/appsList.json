@@ -334,7 +334,7 @@
   },
   "ios-simulator": {
     "id": "ios-simulator",
-    "type": "mobile",
+    "type": "hack to not show it automatically",
     "name": "Simulator",
     "description": "iOS",
     "icon": "ios-simulator.png",
