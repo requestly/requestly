@@ -74,12 +74,12 @@ const Sources = ({ isOpen, toggle, ...props }) => {
     async (showPopup = true) => {
       let deviceCount = 0;
       setFetchingDevices(true);
+      const updatedAppsList = { ...desktopSpecificDetails.appsList };
       const promises = [
         getAndroidDevices().then((devices) => {
           if (devices) {
             deviceCount += devices.length;
             console.log("Devices", devices, desktopSpecificDetails.appsList);
-            const updatedAppsList = { ...desktopSpecificDetails.appsList };
             devices.forEach((device) => {
               if (!desktopSpecificDetails.appsList[device.id]) {
                 console.log("Adding Device", device);
@@ -98,14 +98,12 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               }
             });
             console.log("Updated Apps List", updatedAppsList);
-            dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
           }
         }),
         isFeatureCompatible(FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT)
           ? getIosSimulators().then((simulators) => {
               const simulatorsFound =
                 simulators && simulators?.activeDevices && Object.keys(simulators.activeDevices).length > 0;
-              const updatedAppsList = { ...desktopSpecificDetails.appsList };
               if (simulatorsFound) {
                 deviceCount += Object.keys(simulators.activeDevices).length;
                 console.log("Simulators", simulators, desktopSpecificDetails.appsList);
@@ -118,7 +116,6 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                   },
                   type: "mobile", // "hack to make it visible"
                 };
-                dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
               } else {
                 if (updatedAppsList["ios-simulator"].isActive) {
                   handleDisconnectAppOnClick("ios-simulator");
@@ -160,6 +157,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           console.log("Error fetching devices", err);
         })
         .finally(() => {
+          dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
           setFetchingDevices(false);
         });
     },
