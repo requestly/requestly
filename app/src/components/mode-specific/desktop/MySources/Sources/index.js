@@ -22,6 +22,7 @@ import {
   trackAppSetupInstructionsViewed,
   trackConnectAppsModalClosed,
   trackConnectAppsViewed,
+  trackFailedToConnectToSimulator,
 } from "modules/analytics/events/desktopApp/apps";
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
@@ -34,7 +35,6 @@ import { trackConnectAppsCategorySwitched } from "modules/analytics/events/deskt
 import LaunchButtonDropdown from "./LaunchButtonDropDown";
 import { getAndroidDevices, getIosSimulators } from "./deviceFetchers";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
-import { trackFailedToConnectToSimulator } from "./iosSimBtn/analytics";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
