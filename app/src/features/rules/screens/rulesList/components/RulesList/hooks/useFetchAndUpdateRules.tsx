@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getIsHardRefreshRulesPending, getIsRefreshRulesPending } from "store/selectors";
 import { useHasChanged } from "hooks";
@@ -15,6 +15,8 @@ import { trackRulesListLoaded } from "features/rules/analytics";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { migrateAllRulesToMV3 } from "modules/extension/utils";
 import { sendIndividualRuleTypesCountAttributes } from "../utils";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { RuleStorageModel, syncEngine } from "requestly-sync-engine";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -28,10 +30,45 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
   const isRulesListHardRefreshPending = useSelector(getIsHardRefreshRulesPending);
   const activeWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
+  const userAuthDetails = useSelector(getUserAuthDetails);
+  const userId = userAuthDetails.loggedIn && userAuthDetails.details?.profile?.uid;
+  const [ruleStorageModels, setRuleStorageModels] = useState<RuleStorageModel[]>([]);
+
   const hasIsRulesListRefreshPendingChanged = useHasChanged(isRulesListRefreshPending);
   const hasIsRulesListHardRefreshPendingChanged = useHasChanged(isRulesListHardRefreshPending);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const workspaceId = activeWorkspace.id || userId;
+    // let subscription: any;
+    async function initRulesListener() {
+      console.log("initRulesListener");
+      // TODO: This is a temporary solution to wait for the sync engine to initialize
+      if (!syncEngine.initialized) {
+        setTimeout(() => {
+          initRulesListener();
+        }, 1000);
+        return;
+      }
+      console.log("subscribe RuleStorageModels", workspaceId);
+      unsubscribe = await RuleStorageModel.subscribe((ruleStorageModels: RuleStorageModel[]) => {
+        console.log("!!!debug", { ruleStorageModels });
+        setRuleStorageModels(ruleStorageModels);
+      });
+    }
+
+    let unsubscribe: (() => void) | undefined;
+    console.log("workspace changed", workspaceId, userId);
+    setRuleStorageModels([]);
+    initRulesListener();
+
+    // Cleanup subscription on component unmount
+    return () => {
+      console.log("[Debug] Unsubbing explicit subscribers");
+      unsubscribe?.();
+    };
+  }, [userId, activeWorkspace?.id]);
 
   useEffect(() => {
     Logger.log(
@@ -47,9 +84,14 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
     const rulesPromise = StorageService(appMode).getRecords(RecordType.RULE);
     Promise.all([groupsPromise, rulesPromise])
       .then(async (data) => {
-        let groups = data[0] as Group[];
-        let rules = data[1] as Rule[];
+        // let groups = data[0] as Group[];
+        // let rules = data[1] as Rule[];
+        let groups = [] as Group[];
+        let rules = ruleStorageModels.map((ruleStorageModel) => {
+          return ruleStorageModel.data;
+        });
 
+        console.log("!!!debug", { groups, rules });
         //@ts-ignore
         rules = migrateAllRulesToMV3(rules, activeWorkspace.id);
 
@@ -106,6 +148,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
     hasIsRulesListRefreshPendingChanged,
     hasIsRulesListHardRefreshPendingChanged,
     activeWorkspace.id,
+    ruleStorageModels,
   ]);
 };
 

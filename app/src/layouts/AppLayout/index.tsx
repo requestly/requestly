@@ -31,6 +31,7 @@ import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useSyncEngine } from "hooks/useSyncEngine";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -40,6 +41,7 @@ const App: React.FC = () => {
     growthbook.loadFeatures({ autoRefresh: true });
   }, []);
 
+  useSyncEngine();
   usePreLoadRemover();
   useGeoLocation();
   useIsExtensionEnabled();

@@ -6,6 +6,7 @@ import { getStorageHelper } from "../engines";
 import { processRecordsArrayIntoObject } from "./syncing/syncDataUtils";
 import { doSyncRecords } from "./syncing/SyncUtils";
 import { generateObjectId } from "./FormattingHelper";
+import { RuleStorageModel } from "requestly-sync-engine";
 
 class StorageServiceWrapper {
   constructor(options) {
@@ -100,6 +101,9 @@ class StorageServiceWrapper {
    * @returns a promise on save of the rule or group
    */
   async saveRuleOrGroup(ruleOrGroup, options = {}) {
+    const workspaceId = window.currentlyActiveWorkspaceTeamId || ruleOrGroup.currentOwner;
+    console.log("!!!debug create", { workspaceId, ruleOrGroup });
+    await RuleStorageModel.create(ruleOrGroup, workspaceId);
     const formattedObject = {
       [ruleOrGroup.id]: {
         ...ruleOrGroup,
