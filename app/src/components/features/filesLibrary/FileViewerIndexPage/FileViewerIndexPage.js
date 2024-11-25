@@ -11,7 +11,7 @@ import { getFileIdFromURL, getMockDetailsFromDatabase } from "./actions";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { fetchUserMocks } from "../FilesLibraryIndexPage/actions";
 //UTILS
-import { getUserAuthDetails } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import * as FilesService from "../../../../utils/files/FilesService";
 import { redirectTo403, redirectTo404, redirectToFileViewer } from "../../../../utils/RedirectionUtils";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";

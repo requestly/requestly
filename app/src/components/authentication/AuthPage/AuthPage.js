@@ -6,7 +6,7 @@ import { Col, Row } from "antd";
 //SUB COMPONENTS
 import AuthForm from "../AuthForm";
 //UTILS
-import { getUserAuthDetails } from "../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToRules } from "../../../utils/RedirectionUtils";
 //CONSTANTS
 import APP_CONSTANTS from "../../../config/constants";

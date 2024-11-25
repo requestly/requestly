@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import InviteIcon from "assets/icons/invite.svg?react";
 import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";

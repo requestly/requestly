@@ -13,7 +13,7 @@ import SpinnerColumn from "../../misc/SpinnerColumn";
 import { getFunctions, httpsCallable } from "firebase/functions";
 // UTILS
 import { redirectTo404, redirectToTeam, redirectToPersonalSubscription } from "../../../utils/RedirectionUtils";
-import { getUserAuthDetails } from "../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import ProCard from "@ant-design/pro-card";
