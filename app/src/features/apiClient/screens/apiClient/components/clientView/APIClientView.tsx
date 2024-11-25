@@ -11,7 +11,6 @@ import {
   addUrlSchemeIfMissing,
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
-  makeRequest,
   sanitizeKeyValuePairs,
   supportsRequestBody,
 } from "../../utils";
@@ -43,7 +42,7 @@ import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
 import PATHS from "config/constants/sub/paths";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
-import { ResponseScriptParser } from "../../parseResponseScript";
+import { APIClientManager } from "features/apiClient/APIClientManager/APIClientManager";
 
 interface Props {
   openInModal?: boolean;
@@ -247,22 +246,23 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    makeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
+    const apiManager = new APIClientManager(environmentManager);
+
+    const script = `
+    // const body=JSON.parse(rq.response.body);
+    // console.log("!!!debug",body);
+    console.log("!!!debug",rq.response.response);
+    rq.environment.set("testKeyBool",true);
+  `;
+
+    apiManager.setPostResponseScript(script);
+
+    apiManager
+      .executeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
       .then((response) => {
         // TODO: Add an entry in history
         const entryWithResponse = { ...entry, response };
         const renderedEntryWithResponse = { ...renderedEntry, response };
-
-        const script = `
-          const a=window.localStorage.getItem('install_date');
-          console.log("!!!debug item",a);
-          console.log("!!!debug",rq.response);
-          rq.environment.set("testKeyBoolean",true);
-        `;
-
-        const parser = new ResponseScriptParser(script, renderedEntryWithResponse.response.body, environmentManager);
-        console.log("!!!debug", "before parsing", response.body);
-        parser.parse();
 
         if (response) {
           setEntry(entryWithResponse);
@@ -300,7 +300,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
-  }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished, renderVariables]);
+  }, [entry, renderVariables, environmentManager, appMode, location.pathname, dispatch, notifyApiRequestFinished]);
 
   const handleRecordNameUpdate = async () => {
     if (!requestName || requestName === apiEntryDetails?.name) {
