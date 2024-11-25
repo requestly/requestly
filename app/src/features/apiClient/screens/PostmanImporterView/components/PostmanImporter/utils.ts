@@ -1,12 +1,11 @@
 import { EnvironmentVariableValue } from "backend/environment/types";
-import { RQAPI } from "features/apiClient/types";
+import { RequestMethod, RQAPI } from "features/apiClient/types";
 import { v4 as uuidv4 } from "uuid";
 
 interface PostmanCollectionExport {
   info: {
     name: string;
     schema: string;
-    _collection_link: string;
   };
   item: any[];
   variable: any[];
@@ -14,17 +13,17 @@ interface PostmanCollectionExport {
 
 interface PostmanEnvironmentExport {
   name: string;
-  values: Array<{
+  values: {
     key: string;
     value: string;
     type: string;
     enabled: boolean;
-  }>;
+  }[];
   _postman_variable_scope: string;
 }
 
 export const getUploadedPostmanFileType = (fileContent: PostmanCollectionExport | PostmanEnvironmentExport) => {
-  if ("info" in fileContent && fileContent.info?.schema && fileContent.info?._collection_link) {
+  if ("info" in fileContent && fileContent.info?.schema) {
     return "collection";
   }
   if ("_postman_variable_scope" in fileContent && fileContent._postman_variable_scope) {
@@ -80,8 +79,8 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
     deleted: false,
     data: {
       request: {
-        url: request.url?.raw,
-        method: request.method,
+        url: request.url?.raw || "",
+        method: request.method || RequestMethod.GET,
         queryParams,
         headers,
         body: request.body?.raw ?? null,
