@@ -66,7 +66,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </div>
         ),
         onClick: onImportClick,
-        disabled: location.pathname !== PATHS.API_CLIENT.ABSOLUTE,
+        disabled: location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.INDEX),
       },
       {
         key: "2",
@@ -76,7 +76,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             Requestly Collection
           </div>
         ),
-        disabled: location.pathname !== PATHS.API_CLIENT.ABSOLUTE,
+        disabled: location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.INDEX),
         onClick: () => {
           if (!user.loggedIn) {
             dispatch(

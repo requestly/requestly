@@ -1,5 +1,4 @@
 import React, { useCallback, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { FilePicker } from "components/common/FilePicker";
 import {
@@ -36,14 +35,12 @@ type ProcessedData = {
 };
 
 interface PostmanImporterProps {
-  isOpenedInModal?: boolean;
   onSuccess?: () => void;
 }
 
 type ProcessingStatus = "idle" | "processing" | "processed";
 
-export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModal = false, onSuccess }) => {
-  const navigate = useNavigate();
+export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) => {
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState(null);
@@ -61,95 +58,98 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
 
   const collectionsCount = useRef(0);
 
-  const handleFileDrop = useCallback((files: File[]) => {
-    setProcessingStatus("processing");
-    setImportError(null);
+  const handleFileDrop = useCallback(
+    (files: File[]) => {
+      setProcessingStatus("processing");
+      setImportError(null);
 
-    const processFiles = files.map((file) => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
+      const processFiles = files.map((file) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
 
-        reader.onerror = () => reject(new Error("Could not process the selected file!"));
+          reader.onerror = () => reject(new Error("Could not process the selected file!"));
 
-        reader.onload = () => {
-          try {
-            const fileContent = JSON.parse(reader.result as string);
+          reader.onload = () => {
+            try {
+              const fileContent = JSON.parse(reader.result as string);
 
-            if (!file.type.includes("json")) {
-              throw new Error("Invalid file. Please upload valid Postman export files.");
-            }
+              if (!file.type.includes("json")) {
+                throw new Error("Invalid file. Please upload valid Postman export files.");
+              }
 
-            const fileType = getUploadedPostmanFileType(fileContent);
-            if (!fileType) {
-              throw new Error("Invalid file. Please upload valid Postman export files.");
-            }
+              const fileType = getUploadedPostmanFileType(fileContent);
+              if (!fileType) {
+                throw new Error("Invalid file. Please upload valid Postman export files.");
+              }
 
-            if (fileType === "environment") {
-              const processedData = processPostmanEnvironmentData(fileContent);
-              resolve({ type: fileType, data: processedData });
-            } else {
-              const processedApiRecords = processPostmanCollectionData(fileContent);
-              const processedVariables = processPostmanVariablesData(fileContent);
-              resolve({
-                type: fileType,
-                data: {
+              if (fileType === "environment") {
+                const processedData = processPostmanEnvironmentData(fileContent);
+                resolve({ type: fileType, data: processedData });
+              } else {
+                const processedApiRecords = processPostmanCollectionData(fileContent);
+                const processedVariables = processPostmanVariablesData(fileContent);
+                resolve({
                   type: fileType,
-                  apiRecords: processedApiRecords,
-                  variables: processedVariables,
-                },
-              });
+                  data: {
+                    type: fileType,
+                    apiRecords: processedApiRecords,
+                    variables: processedVariables,
+                  },
+                });
+              }
+            } catch (error) {
+              reject(error);
             }
-          } catch (error) {
-            reject(error);
-          }
-        };
-        reader.readAsText(file);
+          };
+          reader.readAsText(file);
+        });
       });
-    });
 
-    Promise.allSettled(processFiles)
-      .then((results) => {
-        const hasErrors = results.every((result) => result.status === "rejected");
-        if (hasErrors) {
-          throw new Error(
-            "Could not process the selected files!, Please check if the files are valid Postman export files."
-          );
-        }
+      Promise.allSettled(processFiles)
+        .then((results) => {
+          const hasErrors = results.every((result) => result.status === "rejected");
+          if (hasErrors) {
+            throw new Error(
+              "Could not process the selected files!, Please check if the files are valid Postman export files."
+            );
+          }
 
-        const processedRecords: ProcessedData = {
-          environments: [],
-          apiRecords: [],
-          variables: {},
-        };
+          const processedRecords: ProcessedData = {
+            environments: [],
+            apiRecords: [],
+            variables: {},
+          };
 
-        results.forEach((result: any) => {
-          if (result.status === "fulfilled") {
-            if (result.value.type === "environment") {
-              processedRecords.environments.push(result.value.data);
-            } else {
-              const { collections, apis } = result.value.data.apiRecords;
-              processedRecords.variables = { ...processedRecords.variables, ...result.value.data.variables };
-              processedRecords.apiRecords.push(...collections, ...apis);
-              collectionsCount.current += collections.length;
+          results.forEach((result: any) => {
+            if (result.status === "fulfilled") {
+              if (result.value.type === "environment") {
+                processedRecords.environments.push(result.value.data);
+              } else {
+                const { collections, apis } = result.value.data.apiRecords;
+                processedRecords.variables = { ...processedRecords.variables, ...result.value.data.variables };
+                processedRecords.apiRecords.push(...collections, ...apis);
+                collectionsCount.current += collections.length;
+              }
             }
+          });
+
+          trackImportFromPostmanDataProcessed(collectionsCount.current, processedRecords.environments.length);
+
+          setProcessedFileData(processedRecords);
+          setProcessingStatus("processed");
+        })
+        .catch((error) => {
+          setImportError(error.message);
+          setProcessingStatus("idle");
+        })
+        .finally(() => {
+          if (importError) {
+            setProcessingStatus("idle");
           }
         });
-
-        trackImportFromPostmanDataProcessed(collectionsCount.current, processedRecords.environments.length);
-
-        setProcessedFileData(processedRecords);
-        setProcessingStatus("processed");
-      })
-      .catch((error) => {
-        setImportError(error.message);
-        setProcessingStatus("idle");
-      })
-      .finally(() => {
-        if (importError) {
-          setProcessingStatus("idle");
-        }
-      });
-  }, []);
+    },
+    [importError]
+  );
 
   const handleImportEnvironments = useCallback(async () => {
     try {
@@ -173,7 +173,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
     let failedCollectionsCount = 0;
-    let failedApisCount = 0;
 
     const collections = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.COLLECTION);
     const apis = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.API);
@@ -221,30 +220,23 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
 
         const newCollectionId = oldToNewCollectionIds[api.collectionId]?.newId;
         if (!newCollectionId) {
-          failedApisCount++;
           throw new Error(`Failed to find new collection ID for API: ${api.name || api.id}`);
         }
 
-        try {
-          const updatedApi = { ...apiToImport, collectionId: newCollectionId };
-          const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id);
-          onSaveRecord?.(newApi.data);
-        } catch (error) {
-          failedApisCount++;
-          throw error;
-        }
+        const updatedApi = { ...apiToImport, collectionId: newCollectionId };
+        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id);
+        onSaveRecord?.(newApi.data);
       })
     );
 
-    if (failedCollectionsCount > 0 || failedApisCount > 0) {
-      const failureMessage = [
-        failedCollectionsCount > 0 ? `${failedCollectionsCount} collection(s) failed` : "",
-        failedApisCount > 0 ? `${failedApisCount} API(s) failed` : "",
-      ]
-        .filter(Boolean)
-        .join(" and ");
-
-      toast.warn(`Some imports failed: ${failureMessage}, Please contact support if the issue persists.`);
+    if (failedCollectionsCount > 0) {
+      const failureMessage =
+        failedCollectionsCount > 0
+          ? `${failedCollectionsCount} ${failedCollectionsCount > 1 ? "collections" : "collection"} failed`
+          : "";
+      if (failureMessage.length) {
+        toast.warn(`Some imports failed: ${failureMessage}, Please contact support if the issue persists.`);
+      }
     }
 
     return importedCollectionsCount;
@@ -270,7 +262,40 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
         const importedEnvironments = environmentsResult.status === "fulfilled" ? environmentsResult.value : 0;
         const importedCollections = collectionsResult.status === "fulfilled" ? collectionsResult.value : 0;
 
-        toast.success("Postman data imported successfully");
+        const failedEnvironments = processedFileData.environments.length - importedEnvironments;
+        const failedCollections = collectionsCount.current - importedCollections;
+
+        if (!importedEnvironments && !importedCollections) {
+          toast.error("Failed to import Postman data");
+          return;
+        }
+
+        const hasFailures = failedEnvironments > 0 || failedCollections > 0;
+        const hasSuccesses = importedEnvironments > 0 || importedCollections > 0;
+
+        if (hasFailures && hasSuccesses) {
+          const failureMessage = [
+            failedCollections > 0 ? `${failedCollections} collection${failedCollections !== 1 ? "s" : ""}` : "",
+            failedEnvironments > 0 ? `${failedEnvironments} environment${failedEnvironments !== 1 ? "s" : ""}` : "",
+          ]
+            .filter(Boolean)
+            .join(" and ");
+
+          toast.warn(`Partial import success. Failed to import: ${failureMessage}`);
+          return;
+        }
+
+        toast.success(
+          `Successfully imported ${[
+            importedCollections > 0 ? `${importedCollections} collection${importedCollections !== 1 ? "s" : ""}` : "",
+            importedEnvironments > 0
+              ? `${importedEnvironments} environment${importedEnvironments !== 1 ? "s" : ""}`
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" and ")}`
+        );
+
         onSuccess?.();
         trackImportFromPostmanCompleted(importedCollections, importedEnvironments);
       })
@@ -283,7 +308,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
         setIsImporting(false);
       });
   }, [
-    navigate,
     handleImportEnvironments,
     handleImportCollectionsAndApis,
     handleImportVariables,
