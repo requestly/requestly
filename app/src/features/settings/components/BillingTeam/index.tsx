@@ -4,7 +4,7 @@ import { Outlet, useSearchParams } from "react-router-dom";
 import { Result, Spin } from "antd";
 import { getAvailableBillingTeams, getIsBillingTeamsLoading } from "store/features/billing/selectors";
 import APP_CONSTANTS from "config/constants";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQButton } from "lib/design-system/components";
 import { actions } from "store";
 import { SOURCE } from "modules/analytics/events/common/constants";

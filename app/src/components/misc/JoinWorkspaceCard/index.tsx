@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Row, Avatar, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { CloseOutlined } from "@ant-design/icons";

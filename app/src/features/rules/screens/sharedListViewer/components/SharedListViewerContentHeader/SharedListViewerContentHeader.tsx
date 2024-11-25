@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllRules, getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAllRules, getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { useFeatureValue } from "@growthbook/growthbook-react";

@@ -4,7 +4,7 @@ import { Button as AntButton } from "antd";
 //SUB COMPONENTS
 import UserInfo from "./UserInfo";
 //UTILS
-import { getUserAuthDetails } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToDeleteAccount, redirectToSignDPA } from "../../../../utils/RedirectionUtils";
 // ACTIONS
 import { handleForgotPasswordButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";

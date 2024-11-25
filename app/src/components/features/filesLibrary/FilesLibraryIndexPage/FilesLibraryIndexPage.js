@@ -8,7 +8,7 @@ import GetStartedWithFiles from "../GetStartedWithFiles";
 //ACTIONS
 import { fetchUserMocks, fetchFiles, checkMigrationDone, migrateAndUpdate } from "./actions";
 //UTILS
-import { getUserAuthDetails } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 // import DataStoreUtils from "../../../../utils/DataStoreUtils";
 
 const FilesLibraryIndexPage = () => {

@@ -6,7 +6,7 @@ import { BillingInvoiceCard } from "./components/BillingInvoiceCard";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getAvailableBillingTeams, getBillingTeamById } from "store/features/billing/selectors";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { BillingTeamRoles } from "../../../types";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import { trackBillingTeamViewed } from "features/settings/analytics";

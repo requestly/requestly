@@ -9,7 +9,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import SpinnerColumn from "../../../../../../../../components/misc/SpinnerColumn";
 import { toast } from "utils/Toast.js";
 import { redirectToWorkspaceSettings } from "../../../../../../../../utils/RedirectionUtils";
-import { getUserAuthDetails } from "../../../../../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import RemoveUserModal from "./RemoveUserModal";
 import ContactUsModal from "./ContactUsModal";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";

@@ -5,7 +5,7 @@ import { CgDanger } from "@react-icons/all-files/cg/CgDanger";
 import { IoMdNotificationsOutline } from "@react-icons/all-files/io/IoMdNotificationsOutline";
 import moment from "moment";
 import { groupBy } from "lodash";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { isEmailVerified, resendVerificationEmailHandler } from "utils/AuthUtils";
 import Logger from "lib/logger";
 const direction = "ltr";

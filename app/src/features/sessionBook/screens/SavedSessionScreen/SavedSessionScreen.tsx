@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { getAuthInitialization, getUserAuthDetails } from "store/selectors";
+import { getAuthInitialization } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getRecording } from "backend/sessionRecording/getRecording";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { RQSessionEvents } from "@requestly/web-sdk";

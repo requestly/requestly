@@ -7,7 +7,7 @@ import { API_SECURITY_TESTING } from "modules/analytics/events/features/constant
 import { redirectToRules } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { GreenVerifiedCheck } from "views/features/sessions/SessionsIndexPageContainer/SessionsIndexPage/OnboardingView";
 import { getFunctions, httpsCallable } from "firebase/functions";
 

@@ -4,7 +4,7 @@ import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { toast } from "utils/Toast.js";
 import { Row, Col, Checkbox, Typography } from "antd";
 import { getAvailableTeams, getCurrentlyActiveWorkspace, getUserTeamRole } from "store/features/teams/selectors";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import isEmail from "validator/lib/isEmail";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton, RQInput, RQModal } from "lib/design-system/components";

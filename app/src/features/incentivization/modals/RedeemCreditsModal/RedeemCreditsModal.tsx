@@ -8,7 +8,7 @@ import { getTotalCredits } from "features/incentivization/utils";
 import { getIncentivizationMilestones } from "store/features/incentivization/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { toast } from "utils/Toast";
 import { MdClose } from "@react-icons/all-files/md/MdClose";

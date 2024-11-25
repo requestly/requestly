@@ -6,9 +6,9 @@ import {
   getAppMode,
   getDesktopSpecificDetails,
   getHasConnectedApp,
-  getUserAuthDetails,
   getUserPersonaSurveyDetails,
 } from "../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // ACTIONS

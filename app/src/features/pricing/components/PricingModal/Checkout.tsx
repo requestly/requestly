@@ -9,7 +9,7 @@ import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
 import { trackPricingModalStripeWindowOpened } from "features/pricing/analytics";
 import { redirectToAccountDetails } from "utils/RedirectionUtils";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getBillingTeamRedirectURL } from "backend/billing";
 import "./index.scss";
 import PATHS from "config/constants/sub/paths";

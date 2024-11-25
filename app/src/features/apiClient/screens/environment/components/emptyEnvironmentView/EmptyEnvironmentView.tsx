@@ -7,7 +7,7 @@ import PATHS from "config/constants/sub/paths";
 import { getCurrentEnvironmentId } from "store/features/environment/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { redirectToNewEnvironment } from "utils/RedirectionUtils";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
 import { MdDisplaySettings } from "@react-icons/all-files/md/MdDisplaySettings";

@@ -6,7 +6,8 @@ import { Command } from "cmdk";
 import fuzzysort from "fuzzysort";
 import { BreadCrumb } from "./BreadCrumb";
 import { Footer } from "./Footer";
-import { getUserAuthDetails, getAppMode, getUserAttributes, getIsCommandBarOpen } from "store/selectors";
+import { getAppMode, getUserAttributes, getIsCommandBarOpen } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAllRules } from "store/features/rules/selectors";
 import { actions } from "store";
 import {

@@ -12,7 +12,7 @@ import {
 } from "modules/analytics/events/misc/business/checkout";
 import { useState } from "react";
 import { actions } from "store";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import { ChangePlanRequestConfirmationModal } from "../ChangePlanRequestConfirmationModal";
 import { getPrettyPlanName } from "utils/FormattingHelper";

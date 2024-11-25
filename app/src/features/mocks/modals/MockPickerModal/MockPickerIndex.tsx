@@ -6,7 +6,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { AiOutlineCloudUpload } from "@react-icons/all-files/ai/AiOutlineCloudUpload";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { Space, Typography } from "antd";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import { FileType, MockListSource, MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { MocksListContentHeader, MocksTable } from "features/mocks/screens/mocksList/components/MocksList/components";
