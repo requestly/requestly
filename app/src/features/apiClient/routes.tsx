@@ -71,7 +71,7 @@ export const apiClientRoutes: RouteObject[] = [
       },
       {
         path: PATHS.API_CLIENT.IMPORT_FROM_POSTMAN.RELATIVE,
-        element: <PostmanImporterView />,
+        element: <ProtectedRoute component={PostmanImporterView} />,
       },
     ],
   },

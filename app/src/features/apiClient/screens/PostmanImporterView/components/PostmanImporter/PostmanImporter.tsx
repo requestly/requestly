@@ -30,7 +30,7 @@ import Logger from "lib/logger";
 import "./postmanImporter.scss";
 
 type ProcessedData = {
-  environments: Array<{ name: string; variables: Record<string, EnvironmentVariableValue> }>;
+  environments: { name: string; variables: Record<string, EnvironmentVariableValue> }[];
   apiRecords: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[];
   variables: Record<string, EnvironmentVariableValue>;
 };
@@ -40,10 +40,11 @@ interface PostmanImporterProps {
   onSuccess?: () => void;
 }
 
+type ProcessingStatus = "idle" | "processing" | "processed";
+
 export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModal = false, onSuccess }) => {
   const navigate = useNavigate();
-  const [isDataProcessing, setIsDataProcessing] = useState(false);
-  const [isDataProcessed, setIsDataProcessed] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState(null);
   const [processedFileData, setProcessedFileData] = useState<ProcessedData>({
@@ -61,7 +62,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
   const collectionsCount = useRef(0);
 
   const handleFileDrop = useCallback((files: File[]) => {
-    setIsDataProcessing(true);
+    setProcessingStatus("processing");
     setImportError(null);
 
     const processFiles = files.map((file) => {
@@ -137,14 +138,16 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
         trackImportFromPostmanDataProcessed(collectionsCount.current, processedRecords.environments.length);
 
         setProcessedFileData(processedRecords);
-        setIsDataProcessed(true);
+        setProcessingStatus("processed");
       })
       .catch((error) => {
         setImportError(error.message);
-        setIsDataProcessed(false);
+        setProcessingStatus("idle");
       })
       .finally(() => {
-        setIsDataProcessing(false);
+        if (importError) {
+          setProcessingStatus("idle");
+        }
       });
   }, []);
 
@@ -159,8 +162,8 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
         return false;
       });
 
-      const results = await Promise.all(importPromises);
-      return results.filter(Boolean).length;
+      const results = await Promise.allSettled(importPromises);
+      return results.filter((result) => result.status === "fulfilled").length;
     } catch (error) {
       Logger.error("Postman data import failed:", error);
       throw error;
@@ -169,6 +172,8 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
+    let failedCollectionsCount = 0;
+    let failedApisCount = 0;
 
     const collections = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.COLLECTION);
     const apis = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.API);
@@ -179,41 +184,69 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
         name: `(Imported) ${collection.name}`,
       };
       delete collectionToImport.id;
-
-      const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToImport, workspace?.id);
-      onSaveRecord(newCollection.data);
-      importedCollectionsCount++;
-      return {
-        oldId: collection.id,
-        newId: newCollection.data.id,
-      };
+      try {
+        const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToImport, workspace?.id);
+        onSaveRecord(newCollection.data);
+        importedCollectionsCount++;
+        return {
+          oldId: collection.id,
+          newId: newCollection.data.id,
+        };
+      } catch (error) {
+        failedCollectionsCount++;
+        Logger.error("Error importing collection:", error);
+        return {
+          oldId: collection.id,
+          newId: null,
+        };
+      }
     });
 
-    const collectionsResult = await Promise.all(collectionsPromises);
-    const oldToNewCollectionIds: Record<string, { newId: string }> = collectionsResult.reduce(
-      (result, details) => ({
-        ...result,
-        [details.oldId]: { newId: details.newId },
-      }),
-      {}
-    );
+    const collectionsResult = await Promise.allSettled(collectionsPromises);
+    const oldToNewCollectionIds: Record<string, { newId: string }> = collectionsResult.reduce((result, details) => {
+      if (details.status === "fulfilled") {
+        return {
+          ...result,
+          [details.value.oldId]: { newId: details.value.newId },
+        };
+      }
+      return result;
+    }, {});
 
     // Import APIs with updated collection IDs
-    const apisPromises = apis.map(async (api) => {
-      const apiToImport = { ...api };
-      delete apiToImport.id;
+    await Promise.allSettled(
+      apis.map(async (api) => {
+        const apiToImport = { ...api };
+        delete apiToImport.id;
 
-      const newCollectionId = oldToNewCollectionIds[api.collectionId]?.newId;
-      if (!newCollectionId) {
-        throw new Error(`Failed to find new collection ID for API: ${api.name || api.id}`);
-      }
+        const newCollectionId = oldToNewCollectionIds[api.collectionId]?.newId;
+        if (!newCollectionId) {
+          failedApisCount++;
+          throw new Error(`Failed to find new collection ID for API: ${api.name || api.id}`);
+        }
 
-      const updatedApi = { ...apiToImport, collectionId: newCollectionId };
-      const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id);
-      onSaveRecord?.(newApi.data);
-    });
+        try {
+          const updatedApi = { ...apiToImport, collectionId: newCollectionId };
+          const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id);
+          onSaveRecord?.(newApi.data);
+        } catch (error) {
+          failedApisCount++;
+          throw error;
+        }
+      })
+    );
 
-    await Promise.all(apisPromises);
+    if (failedCollectionsCount > 0 || failedApisCount > 0) {
+      const failureMessage = [
+        failedCollectionsCount > 0 ? `${failedCollectionsCount} collection(s) failed` : "",
+        failedApisCount > 0 ? `${failedApisCount} API(s) failed` : "",
+      ]
+        .filter(Boolean)
+        .join(" and ");
+
+      toast.warn(`Some imports failed: ${failureMessage}, Please contact support if the issue persists.`);
+    }
+
     return importedCollectionsCount;
   }, [processedFileData.apiRecords, user?.details?.profile?.uid, workspace?.id, onSaveRecord]);
 
@@ -259,8 +292,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
   ]);
 
   const handleResetImport = () => {
-    setIsDataProcessed(false);
-    setIsDataProcessing(false);
+    setProcessingStatus("idle");
     setIsImporting(false);
     setImportError(null);
     setProcessedFileData({
@@ -296,7 +328,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
             </RQButton>
           </Row>
         </div>
-      ) : isDataProcessed ? (
+      ) : processingStatus === "processed" ? (
         <div className="postman-importer__post-parse-view postman-importer__post-parse-view--success">
           <MdCheckCircleOutline />
           <div>
@@ -317,7 +349,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ isOpenedInModa
         <FilePicker
           maxFiles={5}
           onFilesDrop={handleFileDrop}
-          isProcessing={isDataProcessing}
+          isProcessing={processingStatus === "processing"}
           title="Drop your Postman collections or environments export files here"
           subtitle="Accepted file formats: Postman v2 or v2.1 JSON file"
           selectorButtonTitle="Select file"
