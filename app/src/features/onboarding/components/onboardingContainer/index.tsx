@@ -57,15 +57,17 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
   useEffect(() => {
     getAndUpdateInstallationDate(appMode, false, false)
       .then((install_date) => {
-        if (new Date(install_date) >= new Date("2024-10-18")) {
-          dispatch(
-            actions.toggleActiveModal({
-              modalName: "appOnboardingModal",
-              newValue: true,
-            })
-          );
-        } else {
-          dispatch(actions.updateAppOnboardingCompleted());
+        if (install_date) {
+          if (new Date(install_date) >= new Date("2024-10-18")) {
+            dispatch(
+              actions.toggleActiveModal({
+                modalName: "appOnboardingModal",
+                newValue: true,
+              })
+            );
+          } else {
+            dispatch(actions.updateAppOnboardingCompleted());
+          }
         }
       })
       .catch((err) => {
