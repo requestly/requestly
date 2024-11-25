@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
-import { getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getUserAttributes } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { featureLimits } from "./featureLimitTypes";
 import { useDispatch } from "react-redux";
 import { actions } from "store";

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Modal } from "antd";
-import { getUserAuthDetails } from "../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { AuthScreen } from "features/onboarding";
 import closeIcon from "../../../assets/images/modal/close.svg";
 import APP_CONSTANTS from "../../../config/constants";

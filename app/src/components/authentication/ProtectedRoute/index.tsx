@@ -1,7 +1,7 @@
 import React, { useState, useEffect, ComponentType } from "react";
 import { useSelector } from "react-redux";
 // UTILS
-import { getUserAuthDetails } from "../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 // SUB COMPONENTS
 import LoginRequiredCTA from "../LoginRequiredCTA";
 import PremiumRequiredCTA from "../../payments/PremiumRequiredCTA";
