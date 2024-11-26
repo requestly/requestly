@@ -152,3 +152,5 @@ export const isApiRequest = (record: RQAPI.Record) => {
 export const isApiCollection = (record: RQAPI.Record) => {
   return record?.type === RQAPI.RecordType.COLLECTION;
 };
+
+export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
