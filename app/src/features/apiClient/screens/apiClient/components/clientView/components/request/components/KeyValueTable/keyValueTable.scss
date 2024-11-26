@@ -1,12 +1,22 @@
 .api-key-value-table {
-  tr:hover {
-    .key-value-table-checkbox {
-      opacity: 1;
+  tr {
+    td.ant-table-cell:nth-last-child(2) {
+      border-right: none !important;
     }
 
-    td.ant-table-cell {
-      .key-value-delete-btn.ant-btn.ant-btn-icon-only {
+    &:hover {
+      .key-value-table-checkbox {
         opacity: 1;
+      }
+
+      td.ant-table-cell {
+        .key-value-delete-btn.ant-btn.ant-btn-icon-only {
+          opacity: 1;
+        }
+      }
+
+      td.ant-table-cell:nth-last-child(2) {
+        border-right: 1px solid #303030 !important;
       }
     }
   }
