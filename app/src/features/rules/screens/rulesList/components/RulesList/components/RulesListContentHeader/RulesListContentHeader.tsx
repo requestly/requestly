@@ -10,7 +10,7 @@ import { isRule } from "features/rules/utils";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import { useDebounce } from "hooks/useDebounce";
 import { trackRulesListFilterApplied, trackRulesListSearched } from "features/rules/analytics";

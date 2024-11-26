@@ -6,7 +6,8 @@ import SpinnerCard from "../../../misc/SpinnerCard";
 import TrashTableContainer from "../TrashTableContainer";
 import TrashInfo from "../TrashInfo";
 //UTILS
-import { getAppMode, getIsExtensionEnabled, getUserAuthDetails } from "../../../../store/selectors";
+import { getAppMode, getIsExtensionEnabled } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getAllRecordsFromTrash } from "utils/trash/TrashUtils";

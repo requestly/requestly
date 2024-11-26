@@ -31,9 +31,9 @@ import {
   getRulesSelection,
   getGroupsSelection,
   getRulesToPopulate,
-  getUserAuthDetails,
   getUserAttributes,
 } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Typography, Tag } from "antd";
 import Text from "antd/lib/typography/Text";

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Col, Row } from "antd";
 import { SharedListsContentHeader } from "./components/SharedListViewerContentHeader/SharedListViewerContentHeader";
 import { useFetchSharedListData } from "./hooks/useFetchSharedListData";

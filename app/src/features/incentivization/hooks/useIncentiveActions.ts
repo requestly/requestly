@@ -5,7 +5,7 @@ import {
 import { UserIncentiveEvent } from "../types";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { useIsIncentivizationEnabled } from "./useIsIncentivizationEnabled";
 import { HttpsCallableResult } from "firebase/functions";

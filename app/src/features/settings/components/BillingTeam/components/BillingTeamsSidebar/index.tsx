@@ -6,7 +6,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { trackBillingTeamNavigated } from "features/settings/analytics";
 import { BillingTeamDetails } from "../../types";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import APP_CONSTANTS from "config/constants";
 import { PRICING } from "features/pricing";
 

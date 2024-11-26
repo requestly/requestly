@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
+import { getIsPlanExpiredBannerClosed } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQButton } from "lib/design-system/components";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { actions } from "store";

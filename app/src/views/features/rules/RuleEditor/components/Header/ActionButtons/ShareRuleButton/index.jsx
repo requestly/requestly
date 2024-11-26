@@ -1,7 +1,8 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { actions } from "store";
-import { getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selectors";
+import { getCurrentlySelectedRuleData } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Row, Tooltip } from "antd";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";

@@ -16,7 +16,8 @@ import { defaultCssEditorMock, defaultEditorMock, defaultHtmlEditorMock, default
 import { FileType, MockType, RQMockCollection } from "../types";
 import { getMock } from "backend/mocks/getMock";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getUserAttributes } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { updateMock } from "backend/mocks/updateMock";
 import { createMock } from "backend/mocks/createMock";
 import { trackCreateMockEvent, trackUpdateMockEvent } from "modules/analytics/events/features/mocksV2";

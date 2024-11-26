@@ -4,7 +4,7 @@ import { Row, Col, Card } from "reactstrap";
 import { Col as AntCol, Row as AntRow, Descriptions, Badge, Popconfirm } from "antd";
 // UTILS
 import { getPrettyPlanName } from "../../../../../../utils/FormattingHelper";
-import { getUserAuthDetails } from "../../../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { beautifySubscriptionType } from "../../../../../../utils/PricingUtils";
 import { ChangePlanRequestConfirmationModal } from "features/pricing/components/ChangePlanRequestConfirmationModal";
 import { toast } from "utils/Toast";

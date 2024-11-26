@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { without } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getDomainFromEmail, isCompanyEmail, isEmailValid } from "utils/FormattingHelper";
 import CreatableSelect from "react-select/creatable";
 import { MultiValue } from "react-select";
