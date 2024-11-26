@@ -249,14 +249,23 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     const apiManager = new APIClientManager(environmentManager);
 
-    const script = `
+    const responseScript = `
     // const body=JSON.parse(rq.response.body);
     // console.log("!!!debug",body);
-    console.log("!!!debug",rq.response.response);
-    rq.environment.set("testKeyBool",true);
+    console.log("!!!debug response",rq.response);
+    const testKeyResponse = rq.environment.get("testKeyRequest");
+    console.log("!!!testResponse",testKeyResponse);
   `;
 
-    apiManager.setPostResponseScript(script);
+    const requestScript = `
+    // const body=JSON.parse(rq.response.body);
+    // console.log("!!!debug",body);
+    console.log("!!!debug request",rq.request);
+    rq.environment.set("testKeyRequest",true);
+  `;
+
+    apiManager.setPreRequestScript(requestScript);
+    apiManager.setPostResponseScript(responseScript);
 
     apiManager
       .executeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
