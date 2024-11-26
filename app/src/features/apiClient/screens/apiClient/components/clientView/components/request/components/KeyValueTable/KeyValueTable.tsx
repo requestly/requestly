@@ -1,10 +1,11 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import type { TableProps } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { RQButton } from "lib/design-system-v2/components";
 import { EditableRow, EditableCell } from "./KeyValueTableRow";
 import { KeyValueFormType, KeyValuePair } from "features/apiClient/types";
+import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import "./keyValueTable.scss";
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
@@ -45,55 +46,80 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
     setKeyValuePairs([...data, newPair]);
   }, [data, setKeyValuePairs, createEmptyPair]);
 
-  React.useEffect(() => {
+  const handleDeletePair = useCallback(
+    (id: number) => {
+      const newData = data.filter((item) => item.id !== id);
+      setKeyValuePairs(newData);
+    },
+    [data, setKeyValuePairs]
+  );
+
+  useEffect(() => {
     if (data.length === 0) {
       handleAddPair();
     }
-  }, []);
+  }, [data, handleAddPair]);
 
-  const columns = [
-    {
-      title: "isEnabled",
-      dataIndex: "isEnabled",
-      width: "50px",
-      editable: false,
-      onCell: (record: KeyValuePair) => ({
-        record,
-        editable: false,
-        dataIndex: "isEnabled",
+  const columns = useMemo(() => {
+    return [
+      {
         title: "isEnabled",
-        pairtype,
-        handleUpdatePair,
-      }),
-    },
-    {
-      title: "key",
-      dataIndex: "key",
-      width: "45%",
-      editable: true,
-      onCell: (record: KeyValuePair) => ({
-        record,
+        dataIndex: "isEnabled",
+        width: "50px",
         editable: true,
-        dataIndex: "key",
+        onCell: (record: KeyValuePair) => ({
+          record,
+          editable: true,
+          dataIndex: "isEnabled",
+          title: "isEnabled",
+          pairtype,
+          handleUpdatePair,
+        }),
+      },
+      {
         title: "key",
-        pairtype,
-        handleUpdatePair,
-      }),
-    },
-    {
-      title: "value",
-      dataIndex: "value",
-      editable: true,
-      onCell: (record: KeyValuePair) => ({
-        record,
+        dataIndex: "key",
+        width: "45%",
         editable: true,
-        dataIndex: "value",
+        onCell: (record: KeyValuePair) => ({
+          record,
+          editable: true,
+          dataIndex: "key",
+          title: "key",
+          pairtype,
+          handleUpdatePair,
+        }),
+      },
+      {
         title: "value",
-        pairtype,
-        handleUpdatePair,
-      }),
-    },
-  ];
+        dataIndex: "value",
+        editable: true,
+        onCell: (record: KeyValuePair) => ({
+          record,
+          editable: true,
+          dataIndex: "value",
+          title: "value",
+          pairtype,
+          handleUpdatePair,
+        }),
+      },
+      {
+        title: "",
+        width: "50px",
+        render: (_: any, record: KeyValuePair) => {
+          return (
+            <RQButton
+              className="key-value-delete-btn"
+              icon={<RiDeleteBin6Line />}
+              type="transparent"
+              size="small"
+              onClick={() => handleDeletePair(record.id)}
+            />
+          );
+        },
+      },
+    ];
+  }, [pairtype, handleUpdatePair]);
 
   return (
     <ContentListTable
@@ -104,7 +130,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
       rowKey="id"
       columns={columns as ColumnTypes}
       data={data}
-      locale={{ emptyText: "No variables found" }}
+      locale={{ emptyText: `No ${pairtype} found` }}
       components={{
         body: {
           row: EditableRow,

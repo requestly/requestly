@@ -3,11 +3,11 @@ import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
 import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
-import { getEmptyPair } from "./components/request/KeyValueForm";
 import {
   addUrlSchemeIfMissing,
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
+  getEmptyPair,
   makeRequest,
   sanitizeKeyValuePairs,
   supportsRequestBody,

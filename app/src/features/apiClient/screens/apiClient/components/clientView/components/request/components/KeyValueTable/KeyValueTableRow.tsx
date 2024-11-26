@@ -56,6 +56,10 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
     }
   };
 
+  if (!editable) {
+    return <td {...restProps}>{children}</td>;
+  }
+
   return (
     <td {...restProps}>
       <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={record?.[dataIndex]}>
@@ -69,7 +73,12 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
             }}
           />
         ) : (
-          <Input className="key-value-table-input" ref={inputRef} onBlur={save} onChange={save} />
+          <Input
+            className={`key-value-table-input ${!record.isEnabled ? "key-value-table-input-disabled" : ""}`}
+            ref={inputRef}
+            onBlur={save}
+            onChange={save}
+          />
         )}
       </Form.Item>
     </td>

@@ -3,10 +3,21 @@
     .key-value-table-checkbox {
       opacity: 1;
     }
+
+    td.ant-table-cell {
+      .key-value-delete-btn.ant-btn.ant-btn-icon-only {
+        opacity: 1;
+      }
+    }
   }
 
   td.ant-table-cell {
     padding: 4px 12px !important;
+
+    .key-value-delete-btn.ant-btn.ant-btn-icon-only {
+      width: 30px;
+      opacity: 0;
+    }
   }
 
   .key-value-table-input {
@@ -23,6 +34,10 @@
 
     &:focus {
       border: 1px solid var(--requestly-color-primary-500);
+    }
+
+    &-disabled {
+      opacity: 0.5;
     }
   }
 
