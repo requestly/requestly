@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { StorageService } from "init";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getFeatureUsage } from "utils/rules/getFeatureUsage";
 import { trackRuleFeatureUsageEvent } from "modules/analytics/events/common/rules";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";

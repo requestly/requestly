@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import moment from "moment";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table, TooltipProps } from "antd";
 import { MockType, RQMockCollection, RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";

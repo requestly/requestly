@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { EnvironmentVariableValue, EnvironmentVariableType } from "backend/environment/types";

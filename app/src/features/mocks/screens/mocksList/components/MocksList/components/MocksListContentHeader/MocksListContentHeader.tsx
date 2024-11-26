@@ -12,7 +12,7 @@ import {
 } from "components/features/mocksV2/types";
 import { RQButton } from "lib/design-system/components";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { MdOutlineCreateNewFolder } from "@react-icons/all-files/md/MdOutlineCreateNewFolder";
 import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOutline";
 import { LuImport } from "@react-icons/all-files/lu/LuImport";

@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";

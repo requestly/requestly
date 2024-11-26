@@ -3,7 +3,8 @@ import { useSelector } from "react-redux";
 import RulesTable from "./components/RulesTable/RulesTable";
 import { getAllRecordsMap, getAllRecords } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
-import { getAppMode, getIsExtensionEnabled, getIsRulesListLoading, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsExtensionEnabled, getIsRulesListLoading } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { GettingStarted } from "./components";

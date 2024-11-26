@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useFetchSessions } from "./hooks/useFetchSessions";
 import PageLoader from "components/misc/PageLoader";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { SessionsOnboardingView } from "../OnboardingView/SessionsOnboardingView";
 import { SessionsListContentHeader } from "./components/SessionsListContentHeader/SessionsListContentHeader";
 import { SessionsTable } from "./components/SessionsTable/SessionsTable";

@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useHasChanged } from "hooks";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableBillingTeams, getBillingTeamById, getBillingTeamMembers } from "store/features/billing/selectors";
 import { TeamPlanStatus } from "../../TeamPlanStatus";
 import { TeamDetailsPopover } from "./components/TeamDetailsPopover";

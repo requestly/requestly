@@ -8,7 +8,8 @@ import {
 import { useRulesModalsContext } from "./modals";
 import { isGroup, isRule } from "../utils";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
-import { getAppMode, getIsRefreshRulesPending, getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsRefreshRulesPending, getUserAttributes } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { recordsActions } from "store/features/rules/slice";
 import { StorageService } from "init";
