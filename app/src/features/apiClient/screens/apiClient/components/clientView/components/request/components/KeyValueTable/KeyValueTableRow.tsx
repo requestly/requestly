@@ -1,8 +1,10 @@
-import React, { useContext, useRef } from "react";
-import { Checkbox, Form, FormInstance, Input, InputRef } from "antd";
+import React, { useContext } from "react";
+import { Checkbox, Form, FormInstance } from "antd";
 import { KeyValueFormType, KeyValuePair } from "features/apiClient/types";
 import { trackEnableKeyValueToggled } from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -40,8 +42,10 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
   handleUpdatePair,
   ...restProps
 }) => {
-  const inputRef = useRef<InputRef>(null);
-  const form = useContext(EditableContext)!;
+  const form = useContext(EditableContext);
+  const { getCurrentEnvironmentVariables } = useEnvironmentManager();
+
+  const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
   // const toggleEdit = () => {
   //   form.setFieldsValue({ [dataIndex]: record[dataIndex] });
@@ -73,11 +77,12 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
             }}
           />
         ) : (
-          <Input
+          <RQSingleLineEditor
             className={`key-value-table-input ${!record.isEnabled ? "key-value-table-input-disabled" : ""}`}
-            ref={inputRef}
-            onBlur={save}
+            placeholder=""
+            defaultValue={record?.[dataIndex] as string}
             onChange={save}
+            variables={currentEnvironmentVariables}
           />
         )}
       </Form.Item>

@@ -5,10 +5,6 @@
     }
 
     &:hover {
-      .key-value-table-checkbox {
-        opacity: 1;
-      }
-
       td.ant-table-cell {
         .key-value-delete-btn.ant-btn.ant-btn-icon-only {
           opacity: 1;
@@ -39,20 +35,16 @@
     width: 100%;
 
     &:hover {
-      border-color: transparent;
-    }
-
-    &:focus {
-      border: 1px solid var(--requestly-color-primary-500);
+      border: 1px solid transparent;
     }
 
     &-disabled {
       opacity: 0.5;
     }
-  }
 
-  .key-value-table-checkbox {
-    opacity: 0;
+    .cm-editor {
+      margin-top: -7px;
+    }
   }
 
   .ant-table-footer {
