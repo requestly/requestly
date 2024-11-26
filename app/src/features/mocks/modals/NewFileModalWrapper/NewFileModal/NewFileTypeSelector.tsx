@@ -4,7 +4,7 @@ import { Button, Card, Col, Row, Typography } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToFileMockEditorCreateMock, redirectToMocksList } from "utils/RedirectionUtils";
 import { IoLogoCss3 } from "@react-icons/all-files/io5/IoLogoCss3";
 import { IoLogoHtml5 } from "@react-icons/all-files/io5/IoLogoHtml5";

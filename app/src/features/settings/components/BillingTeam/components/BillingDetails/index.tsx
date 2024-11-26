@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useCheckCurrentTeamAccess } from "../../hooks/useCheckCurrentTeamAccess";
 import { getAvailableBillingTeams, getBillingTeamMemberById } from "store/features/billing/selectors";

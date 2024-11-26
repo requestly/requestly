@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useFeatureValue } from "@growthbook/growthbook-react";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Modal, Col } from "antd";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";

@@ -5,7 +5,7 @@ import { SettingOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { getUserAuthDetails } from "../../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import firebaseApp from "../../../../../firebase";
 import {
   getFirestore,

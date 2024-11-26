@@ -3,7 +3,6 @@ import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType, Environm
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEnvironmentData, getCurrentEnvironmentId } from "store/features/environment/selectors";
 import { environmentVariablesActions } from "store/features/environment/slice";
-import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
 import {
@@ -19,6 +18,7 @@ import {
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import { isEmpty } from "lodash";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 let unsubscribeListener: () => void = null;
 

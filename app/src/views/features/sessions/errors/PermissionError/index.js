@@ -5,7 +5,8 @@ import { Button, Col, Row } from "antd";
 import AuthButtons from "components/authentication/LoginRequiredCTA/AuthButtons";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import img from "../../../../../assets/images/pages/error/403.svg";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 

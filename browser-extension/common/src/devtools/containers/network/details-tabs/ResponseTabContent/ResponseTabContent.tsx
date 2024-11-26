@@ -71,6 +71,24 @@ const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
           resourceType: "restApi",
           statusCode: "",
         };
+
+        if (networkEvent?.metadata?.graphQLDetails) {
+          const { operationName } = networkEvent.metadata.graphQLDetails;
+
+          rule.pairs[0].source.filters = [
+            // @ts-ignore
+            {
+              requestPayload: {
+                key: "operationName",
+                value: operationName,
+              },
+            },
+          ];
+
+          // @ts-ignore
+          rule.pairs[0].response.resourceType = "graphqlApi";
+        }
+
         rule.name = generateRuleName("Modify Response Body");
         rule.description = `Modify Response Body of ${baseUrl}`;
       },

@@ -3,7 +3,7 @@ import { RQModal } from "lib/design-system/components";
 import { RQMockCollection } from "components/features/mocksV2/types";
 import { Button } from "antd";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { updateCollections } from "backend/mocks/updateCollections";
 import deleteIcon from "../../assets/delete.svg";
