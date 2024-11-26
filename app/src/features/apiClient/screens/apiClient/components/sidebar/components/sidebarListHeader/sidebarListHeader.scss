@@ -12,5 +12,10 @@
     flex: 1;
     padding: 4px 6px;
     font-size: var(--requestly-font-size-xs);
+    background: transparent;
+
+    .ant-input {
+      background: transparent;
+    }
   }
 }
