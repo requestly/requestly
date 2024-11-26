@@ -339,7 +339,6 @@
     "description": "iOS",
     "icon": "ios-simulator.png",
     "metadata": {
-      "scannedDevicesSuccessfullyOnce": false,
       "devices": {}
     },
     "isActive": false,

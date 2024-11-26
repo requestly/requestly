@@ -10,7 +10,7 @@ import { RQButton, RQModal } from "lib/design-system/components";
 // CONSTANTS
 import { actions } from "../../../../../store";
 // UTILS
-import { getDesktopSpecificDetails } from "../../../../../store/selectors";
+import { getDesktopSpecificAppDetails, getDesktopSpecificDetails } from "../../../../../store/selectors";
 import SetupInstructions from "./InstructionsModal";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -35,6 +35,7 @@ import { trackConnectAppsCategorySwitched } from "modules/analytics/events/deskt
 import LaunchButtonDropdown from "./LaunchButtonDropDown";
 import { getAndroidDevices, getIosSimulators } from "./deviceFetchers";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
+import IosBtn from "./iosBtn";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   // Global State
   const dispatch = useDispatch();
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
+  const iosAppDetails = useSelector((state) => getDesktopSpecificAppDetails(state, "ios-simulator"));
 
   // Component State
   const [processingApps, setProcessingApps] = useState({});
@@ -52,6 +54,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   const [activeSourceTab, setActiveSourceTab] = useState("browser");
   const [currentApp, setCurrentApp] = useState(props.appId ?? null);
   const [fetchingDevices, setFetchingDevices] = useState(false);
+  const [fetchedDevicesOnce, setFetchedDevicesOnce] = useState(false);
 
   const { appsList } = desktopSpecificDetails;
   const systemWideSource = appsList["system-wide"];
@@ -70,103 +73,34 @@ const Sources = ({ isOpen, toggle, ...props }) => {
     setAppsListArray(Object.values(appsList));
   }, [appsList]);
 
-  const fetchAndUpdateDevices = useCallback(
-    async (showPopup = true) => {
-      let deviceCount = 0;
-      setFetchingDevices(true);
-      const updatedAppsList = { ...desktopSpecificDetails.appsList };
-      const promises = [
-        getAndroidDevices().then((devices) => {
-          if (devices) {
-            deviceCount += devices.length;
-            console.log("Devices", devices, desktopSpecificDetails.appsList);
-            devices.forEach((device) => {
-              if (!desktopSpecificDetails.appsList[device.id]) {
-                console.log("Adding Device", device);
-                updatedAppsList[device.id] = {
-                  id: "android-adb",
-                  type: "mobile",
-                  name: device.id,
-                  description: device?.product,
-                  icon: "android.png",
-                  isActive: false,
-                  isScanned: true,
-                  comingSoon: false,
-                  isAvailable: true,
-                  metadata: { deviceId: device.id },
-                };
-              }
-            });
-            console.log("Updated Apps List", updatedAppsList);
+  const fetchAndUpdateAndroidDevices = useCallback(() => {
+    getAndroidDevices().then((devices) => {
+      if (devices) {
+        console.log("Devices", devices, desktopSpecificDetails.appsList);
+        const updatedAppsList = { ...desktopSpecificDetails.appsList };
+        devices.forEach((device) => {
+          if (!desktopSpecificDetails.appsList[device.id]) {
+            console.log("Adding Device", device);
+            updatedAppsList[device.id] = {
+              id: "android-adb",
+              type: "mobile",
+              name: device.id,
+              description: device?.product,
+              icon: "android.png",
+              isActive: false,
+              isScanned: true,
+              comingSoon: false,
+              isAvailable: true,
+              metadata: { deviceId: device.id },
+            };
           }
-        }),
-        isFeatureCompatible(FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT)
-          ? getIosSimulators().then((simulators) => {
-              const simulatorsFound =
-                simulators && simulators?.activeDevices && Object.keys(simulators.activeDevices).length > 0;
-              if (simulatorsFound) {
-                deviceCount += Object.keys(simulators.activeDevices).length;
-                console.log("Simulators", simulators, desktopSpecificDetails.appsList);
-                updatedAppsList["ios-simulator"] = {
-                  ...updatedAppsList["ios-simulator"],
-                  metadata: {
-                    devices: simulators.activeDevices ?? {},
-                    scannedDevicesSuccessfullyOnce:
-                      updatedAppsList["ios-simulator"].metadata.scannedDevicesSuccessfullyOnce,
-                  },
-                  type: "mobile", // "hack to make it visible"
-                };
-              } else {
-                if (updatedAppsList["ios-simulator"].isActive) {
-                  handleDisconnectAppOnClick("ios-simulator");
-                }
-                updatedAppsList["ios-simulator"] = {
-                  ...updatedAppsList["ios-simulator"],
-                  metadata: {
-                    devices: {},
-                    scannedDevicesSuccessfullyOnce:
-                      updatedAppsList["ios-simulator"].metadata.scannedDevicesSuccessfullyOnce,
-                  },
-                  isActive: false,
-                  type: "hack to not show the option in the app manager",
-                };
-                dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
-              }
-            })
-          : null,
-      ];
-
-      await Promise.allSettled(promises)
-        .then(() => {
-          if (!showPopup) return;
-          if (deviceCount === 0) {
-            const isIosSupported = isFeatureCompatible(FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT);
-            const message = isIosSupported
-              ? "No devices found. Please boot an android or ios simulator and scan again."
-              : "No devices found. Please boot an android emulator and scan again.";
-            toast.warn(message);
-          } else {
-            if (deviceCount === 1) {
-              toast.info(`Found 1 device`);
-            } else {
-              toast.info(`${deviceCount} Devices found`);
-            }
-          }
-        })
-        .catch((err) => {
-          console.log("Error fetching devices", err);
-        })
-        .finally(() => {
-          dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
-          setFetchingDevices(false);
         });
-    },
-    [dispatch]
-  ); // Don't add appsList as dependency
-
-  useEffect(() => {
-    fetchAndUpdateDevices(false);
-  }, [fetchAndUpdateDevices]);
+        console.log("Updated Apps List", updatedAppsList);
+        dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
+      }
+      setFetchingDevices(false);
+    });
+  }, [dispatch]); // Don't add appsList as dependency
 
   const toggleCloseConfirmModal = () => {
     if (isCloseConfirmModalActive) {
@@ -331,6 +265,73 @@ const Sources = ({ isOpen, toggle, ...props }) => {
     [dispatch, processingApps]
   );
 
+  const fetchAndUpdateIosDevices = useCallback(
+    async (shouldShowPopup) => {
+      if (!isFeatureCompatible(FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT)) return;
+      let deviceCount = 0;
+      let newIosDetails = { ...iosAppDetails };
+      getIosSimulators()
+        .then((simulators) => {
+          const simulatorsFound =
+            simulators && simulators?.activeDevices && Object.keys(simulators.activeDevices).length > 0;
+          if (simulatorsFound) {
+            deviceCount += Object.keys(simulators.activeDevices).length;
+            newIosDetails = {
+              ...newIosDetails,
+              metadata: {
+                devices: simulators.activeDevices ?? {},
+              },
+              type: "mobile", // "hack to make it visible"
+            };
+          } else {
+            if (newIosDetails.isActive) {
+              handleDisconnectAppOnClick("ios-simulator");
+            }
+            newIosDetails = {
+              ...newIosDetails,
+              metadata: {
+                devices: {},
+              },
+              isActive: false,
+              type: "hack to not show the option in the app manager",
+            };
+          }
+        })
+        .finally(() => {
+          dispatch(actions.updateDesktopSpecificAppDetails({ appId: "ios-simulator", appDetails: newIosDetails }));
+          setFetchingDevices(false);
+          if (shouldShowPopup) {
+            if (deviceCount === 0) {
+              toast.warn("No simulators found. Please boot an ios simulator and scan again.");
+            } else {
+              if (deviceCount === 1) {
+                toast.info(`Found 1 simulator`);
+              } else {
+                toast.info(`${deviceCount} simulators found`);
+              }
+            }
+          }
+        });
+    },
+    [iosAppDetails, handleDisconnectAppOnClick, dispatch]
+  );
+
+  const fetchAndUpdateDevices = useCallback(
+    async (showPopup = true) => {
+      setFetchingDevices(true);
+      fetchAndUpdateAndroidDevices(showPopup);
+      fetchAndUpdateIosDevices(showPopup);
+    },
+    [fetchAndUpdateAndroidDevices, fetchAndUpdateIosDevices]
+  );
+
+  useEffect(() => {
+    if (!fetchedDevicesOnce) {
+      fetchAndUpdateDevices(false);
+      setFetchedDevicesOnce(true);
+    }
+  }, [fetchAndUpdateDevices, fetchedDevicesOnce]);
+
   const renderChangeAppStatusBtn = useCallback(
     (appId, isScanned, isActive, isAvailable, canLaunchWithCustomArgs, options = {}) => {
       if (!isAvailable && !isActive) {
@@ -356,11 +357,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             loading={!isScanned || processingApps[appId]}
             className="launch-button"
           >
-            {["android-adb", "ios-simulator"].includes(appId)
-              ? "Connect"
-              : appId.includes("existing")
-              ? "Open"
-              : "Launch"}
+            {appId === "android-adb" ? "Connect" : appId.includes("existing") ? "Open" : "Launch"}
           </RQButton>
         );
       } else {
@@ -391,7 +388,9 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             {app.description}
           </Col>
           <>
-            {app.type !== "browser" && app.id !== "android-adb" && app.id !== "ios-simulator" ? (
+            {app.id === "ios-simulator" ? (
+              <IosBtn handleActivate={handleActivateAppOnClick} handleDeactivate={handleDisconnectAppOnClick} />
+            ) : app.type !== "browser" && app.id !== "android-adb" ? (
               <RQButton type="default" onClick={() => renderInstructionsModal(app.id)} className="mobile-connect-btn">
                 Setup Instructions
               </RQButton>
@@ -411,7 +410,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         </Row>
       );
     },
-    [renderChangeAppStatusBtn, renderInstructionsModal]
+    [handleActivateAppOnClick, handleDisconnectAppOnClick, renderChangeAppStatusBtn, renderInstructionsModal]
   );
 
   const renderSources = useCallback(
