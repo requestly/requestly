@@ -1,0 +1,105 @@
+.api-client-response-body {
+  height: 100%;
+
+  .api-response-body-editor-container {
+    border-radius: 8px;
+    border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+    background: #282828;
+    box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.16);
+    height: 100%;
+
+    .react-resizable {
+      height: calc(100% - 46px) !important;
+      min-height: 20px !important;
+
+      .code-editor {
+        border-radius: 0 0 8px 8px;
+      }
+    }
+  }
+
+  .api-response-body-raw-content {
+    height: 100%;
+    overflow-y: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+    background: var(--requestly-color-background);
+    box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.16);
+    font-size: var(--requestly-font-size-sm);
+
+    &__header {
+      background: var(--requestly-color-surface-1);
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--requestly-color-white-t-10);
+      padding: 0 4px;
+
+      .api-response-body-mode-selector {
+        margin: 0;
+      }
+      .ant-btn .copy-raw-response-icon {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    &__body {
+      padding: 8px;
+      height: calc(100% - 36px);
+      overflow-y: auto;
+    }
+  }
+
+  .api-response-body-content {
+    height: calc(100% - 35px); //deduct footer height
+
+    pre {
+      overflow: hidden;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    .html-response-preview {
+      height: 100%;
+      width: 100%;
+      background-color: #fff;
+      pointer-events: none;
+    }
+  }
+
+  .api-response-body-mode-selector {
+    margin-left: 4px;
+    margin-bottom: 8px;
+
+    &__btn.ant-radio-button-wrapper {
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-xs);
+      border: none;
+      border-radius: 4px !important;
+
+      &::before {
+        display: none;
+      }
+      &:hover {
+        color: var(--requestly-color-text-default);
+      }
+      &:focus,
+      &:active {
+        border: none;
+      }
+
+      &.ant-radio-button-wrapper-checked {
+        border: none;
+        background: var(--requestly-color-white-t-10);
+        color: var(--requestly-color-text-default);
+        font-weight: var(--requestly-font-weight-medium) !important;
+      }
+    }
+
+    span {
+      bottom: 0 !important;
+    }
+  }
+}
