@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Button, Col, Row, Radio, Tag, Typography, Modal } from "antd";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import { BsBuilding } from "@react-icons/all-files/bs/BsBuilding";

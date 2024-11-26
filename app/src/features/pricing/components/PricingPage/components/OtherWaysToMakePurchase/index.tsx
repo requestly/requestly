@@ -13,7 +13,7 @@ import { PurchaseOption } from "./PurchaseOption";
 import Logger from "lib/logger";
 import BuyAdditionalSeatsModal from "./BuyAdditionalSeatsModal";
 import "./OtherWaysToMakePurchase.scss";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 
 const OtherWaysToMakePurchase: React.FC = () => {

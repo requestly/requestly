@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { Avatar, Col, Dropdown, Popconfirm, Row, Table, Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { getBillingTeamMembers, getBillingTeamById } from "store/features/billing/selectors";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { BillingTeamMemberStatus, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 import { BillingAction } from "./types";
 import { removeMemberFromBillingTeam, revokeBillingTeamInvite, updateBillingTeamMemberRole } from "backend/billing";

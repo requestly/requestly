@@ -11,7 +11,7 @@ import { actions } from "store";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization/analytics/constants";
 import { trackCreditsAssignedModalClicked, trackCreditsAssignedModalViewed } from "features/incentivization/analytics";
 import "./incentiveTaskCompletedModal.scss";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import APP_CONSTANTS from "config/constants";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";

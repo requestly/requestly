@@ -10,7 +10,8 @@ import { ImportRulesModal } from "../../../../../../modals/ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { getUserAuthDetails, getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
+import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import PersonaRecommendation from "./PersonaRecommendation";
 import { shouldShowRecommendationScreen } from "features/personaSurvey/utils";
 import {

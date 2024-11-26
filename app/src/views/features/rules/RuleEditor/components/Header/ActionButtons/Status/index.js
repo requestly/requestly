@@ -5,7 +5,8 @@ import {
   setIsCurrentlySelectedRuleHasUnsavedChanges,
 } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getAppMode, getCurrentlySelectedRuleData, getUserAuthDetails } from "../../../../../../../../store/selectors";
+import { getAppMode, getCurrentlySelectedRuleData } from "../../../../../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Switch, Tooltip } from "antd";
 import { toast } from "utils/Toast.js";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";

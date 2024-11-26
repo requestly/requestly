@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useNavigate, useParams } from "react-router-dom";
-import { getAppMode, getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsMiscTourCompleted, getUserAttributes } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getTabSession } from "actions/ExtensionActions";
 import { Input, Modal, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";

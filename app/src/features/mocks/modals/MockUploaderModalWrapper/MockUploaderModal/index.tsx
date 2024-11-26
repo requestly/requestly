@@ -8,7 +8,7 @@ import {
 import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToFileMockEditorEditMock, redirectToMockEditorEditMock } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";

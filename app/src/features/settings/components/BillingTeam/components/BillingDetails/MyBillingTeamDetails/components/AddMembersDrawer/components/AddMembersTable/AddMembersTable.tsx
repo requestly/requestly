@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { OrgMembersTable } from "features/settings/components/OrgMembers/components/OrgMembersTable/OrgMembersTable";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { OrgMember } from "features/settings/components/OrgMembers/types";
 import { EmptyMembersTableView } from "./components/EmptyMembersTableView/EmptyMembersTableView";
 import { RQButton } from "lib/design-system/components";

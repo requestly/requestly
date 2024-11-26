@@ -5,7 +5,8 @@ import { isWorkspacesFeatureEnabled } from "layouts/DashboardLayout/MenuHeader/W
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 const SwitchWorkspaceButton = ({ teamName, selectedTeamId, teamMembersCount, isTeamArchived = false }) => {
   const dispatch = useDispatch();
