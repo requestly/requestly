@@ -2,7 +2,7 @@ import { Select, Skeleton, Space } from "antd";
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
-import RequestTabs from "./components/request/RequestTabs";
+import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
 import { getEmptyPair } from "./components/request/KeyValueForm";
 import {
   addUrlSchemeIfMissing,
