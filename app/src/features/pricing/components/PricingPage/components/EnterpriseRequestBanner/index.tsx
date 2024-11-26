@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getAvailableBillingTeams, getBillingTeamMemberById } from "store/features/billing/selectors";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Row, Col, Alert } from "antd";
 import { toast } from "utils/Toast.js";
 import { getFunctions, httpsCallable } from "firebase/functions";

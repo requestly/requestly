@@ -13,7 +13,7 @@ import {
 import { DeleteApiRecordModal, ImportRequestModal } from "./components/modals";
 import { getApiRecord, upsertApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";

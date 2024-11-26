@@ -12,13 +12,8 @@ import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
 import { MdOutlineToggleOn } from "@react-icons/all-files/md/MdOutlineToggleOn";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
-import {
-  getAppMode,
-  getIsAppBannerVisible,
-  getIsSampleRulesImported,
-  getIsRefreshRulesPending,
-  getUserAuthDetails,
-} from "store/selectors";
+import { getAppMode, getIsAppBannerVisible, getIsSampleRulesImported, getIsRefreshRulesPending } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import {
   trackRulesListBulkActionPerformed,

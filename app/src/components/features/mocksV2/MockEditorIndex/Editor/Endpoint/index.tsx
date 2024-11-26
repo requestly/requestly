@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 import { ValidationErrors } from "../../types";
 import { MockType } from "components/features/mocksV2/types";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { generateFinalUrlParts } from "components/features/mocksV2/utils";
 import CopyButton from "components/misc/CopyButton";

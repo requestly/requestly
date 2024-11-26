@@ -4,7 +4,8 @@ import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getUserAttributes } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import {
   getSessionRecordingAttributes,

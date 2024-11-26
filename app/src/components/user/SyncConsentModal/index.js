@@ -3,7 +3,7 @@ import { Button, Modal } from "antd";
 //STORE
 // import { store } from "store";
 // import { updateRefreshPendingStatus } from "store/action-objects";
-// import { getUserAuthDetails } from "store/selectors";
+// import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 // import { toast } from "../../../utils/Toast";
 

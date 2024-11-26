@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { getAppOnboardingDetails, getUserAuthDetails } from "store/selectors";
+import { getAppOnboardingDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Col, Row, Typography } from "antd";
 import { PersonaInput } from "../PersonaInput";
 import { RQButton, RQInput } from "lib/design-system/components";

@@ -7,7 +7,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { addRulesAndGroupsToStorage, processDataToImport } from "../../rules/ImportRulesModal/actions";
 //UTILS
 import { redirectToRules } from "../../../../utils/RedirectionUtils";
-import { getAppMode, getUserAuthDetails } from "../../../../store/selectors";
+import { getAppMode } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAllRules } from "store/features/rules/selectors";
 import { isExtensionInstalled } from "../../../../actions/ExtensionActions";
 //CONSTANTS

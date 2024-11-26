@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { useSelector } from "react-redux";
 import { Button, Modal } from "antd";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { DeleteOutlined } from "@ant-design/icons";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";

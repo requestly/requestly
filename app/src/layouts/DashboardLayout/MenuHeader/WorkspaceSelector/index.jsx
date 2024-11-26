@@ -24,12 +24,8 @@ import {
   trackCreateNewTeamClicked,
 } from "modules/analytics/events/common/teams";
 import { getCurrentlyActiveWorkspace, getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
-import {
-  getAppMode,
-  getIsCurrentlySelectedRuleHasUnsavedChanges,
-  getUserAuthDetails,
-  getLastSeenInviteTs,
-} from "store/selectors";
+import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getLastSeenInviteTs } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToTeam, redirectToWorkspaceSettings } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
 import { actions } from "store";
