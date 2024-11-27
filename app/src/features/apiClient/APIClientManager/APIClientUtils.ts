@@ -63,7 +63,7 @@ const messageHandler = async (worker: Worker, environmentManager: any, event: Me
   }
 };
 
-export const parseRequestScript = (script: string, request: RQAPI.Request, environmentManager: any) => {
+export const executePrerequestScript = (script: string, request: RQAPI.Request, environmentManager: any) => {
   let worker: Worker | null = null;
 
   try {
@@ -94,7 +94,7 @@ export const parseRequestScript = (script: string, request: RQAPI.Request, envir
   }
 };
 
-export const parseResponseScript = (script: string, responseBody: any, environmentManager: any) => {
+export const executePostresponseScript = (script: string, responseBody: any, environmentManager: any) => {
   let worker: Worker | null = null;
 
   try {

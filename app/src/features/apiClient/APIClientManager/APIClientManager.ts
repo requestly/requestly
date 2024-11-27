@@ -1,6 +1,6 @@
 import { makeRequest } from "../screens/apiClient/utils";
 import { RQAPI } from "../types";
-import { parseRequestScript, parseResponseScript } from "./scriptParser";
+import { executePrerequestScript, executePostresponseScript } from "./APIClientUtils";
 
 export const executeAPIRequest = async (
   appMode: string,
@@ -11,17 +11,15 @@ export const executeAPIRequest = async (
   // Process request configuration with environment variables
   const processedRequestConfig = environmentManager.renderVariables(request);
 
-  // Execute pre-request script if present
   if (request.preRequestScript) {
-    parseRequestScript(request.preRequestScript, processedRequestConfig, environmentManager);
+    executePrerequestScript(request.preRequestScript, processedRequestConfig, environmentManager);
   }
 
   // Make the actual API request
   const response = await makeRequest(appMode, processedRequestConfig, signal);
 
-  // Execute post-response script if present
   if (request.postResponseScript) {
-    parseResponseScript(request.postResponseScript, { response }, environmentManager);
+    executePostresponseScript(request.postResponseScript, { response }, environmentManager);
   }
 
   return response;
