@@ -473,7 +473,7 @@ const CurrentTrafficTable = ({
       const isSelected = trafficTableFilters[key].includes(logName);
 
       return (
-        <Tooltip mouseEnterDelay={0.3} placement="right" title={logName.length >= 15 ? logName : ""} color="#000000">
+        <Tooltip mouseEnterDelay={0.3} placement="right" title={logName.length >= 20 ? logName : ""} color="#000000">
           <Avatar size={18} src={avatarUrl} style={{ display: "inline-block", marginRight: "4px" }} />
           <span className="log-name">{`  ${logName}`}</span>
           {isSelected && (
@@ -653,7 +653,7 @@ const CurrentTrafficTable = ({
       <Row wrap={false} className="traffic-table-container-row">
         {isStaticPreview ? null : (
           <Col
-            flex="197px"
+            flex="224px"
             style={getGroupFiltersLength() > 0 ? { paddingTop: "8px" } : {}}
             className="traffic-table-sidebar"
           >
