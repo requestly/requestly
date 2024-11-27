@@ -137,6 +137,14 @@
   background-color: #1e69ffdb;
 }
 
+.traffic-table-split-container table[class*="Table-chrome"] tbody tr[aria-selected="false"][data-modified="true"] {
+  background-color: var(--requestly-color-success-800);
+  color: var(--requestly-color-success-200);
+}
+.traffic-table-split-container table[class*="Table-chrome"] tbody tr[aria-selected="true"][data-modified="true"] {
+  background-color: var(--requestly-color-primary-700);
+}
+
 .network-table-wrapper-override {
   height: 100%;
   border-style: none !important;
