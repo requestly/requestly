@@ -5,6 +5,7 @@ import RequestBody from "../../RequestBody";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
 import { KeyValueTable } from "../KeyValueTable/KeyValueTable";
 import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEditor";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./requestTabs.scss";
 
 enum Tab {
@@ -48,6 +49,7 @@ const RequestTabs: React.FC<Props> = ({
   setScripts,
 }) => {
   const [selectedTab, setSelectedTab] = useState(Tab.QUERY_PARAMS);
+  const isApiClientScripts = useFeatureIsOn("api-client-scripts");
 
   useEffect(() => {
     if (selectedTab === Tab.BODY && !supportsRequestBody(requestEntry.request.method)) {
@@ -57,8 +59,9 @@ const RequestTabs: React.FC<Props> = ({
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     const isRequestBodySupported = supportsRequestBody(requestEntry.request.method);
+    const isScriptsSupported = isApiClientScripts;
 
-    return [
+    const items = [
       {
         key: Tab.QUERY_PARAMS,
         label: (
@@ -98,18 +101,23 @@ const RequestTabs: React.FC<Props> = ({
           />
         ),
       },
-      {
-        key: Tab.SCRIPTS,
-        label: <LabelWithCount label="Scripts" count={0} />,
-        children: <ScriptEditor setScripts={setScripts} scripts={requestEntry.scripts} />,
-      },
       // {
       //   key: Tab.AUTHORIZATION,
       //   label: "Authorization",
       //   children: <div></div>,
       // },
     ];
-  }, [requestEntry, setQueryParams, setBody, setRequestHeaders, setContentType, setScripts]);
+
+    if (isScriptsSupported) {
+      items.push({
+        key: Tab.SCRIPTS,
+        label: <LabelWithCount label="Scripts" count={0} />,
+        children: <ScriptEditor setScripts={setScripts} scripts={requestEntry.scripts} />,
+      });
+    }
+
+    return items;
+  }, [requestEntry, setQueryParams, setBody, setRequestHeaders, setContentType, setScripts, isApiClientScripts]);
 
   return (
     <Tabs
