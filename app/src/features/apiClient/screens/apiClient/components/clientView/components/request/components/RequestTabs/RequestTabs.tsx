@@ -3,14 +3,16 @@ import React, { memo, useEffect, useMemo, useState } from "react";
 import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../../../../types";
 import RequestBody from "../../RequestBody";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
-import "./requestTabs.scss";
 import { KeyValueTable } from "../KeyValueTable/KeyValueTable";
+import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEditor";
+import "./requestTabs.scss";
 
 enum Tab {
   QUERY_PARAMS = "query_params",
   BODY = "body",
   HEADERS = "headers",
   AUTHORIZATION = "authorization",
+  SCRIPTS = "scripts",
 }
 
 const LabelWithCount: React.FC<{ label: string; count: number; showDot?: boolean }> = ({ label, count, showDot }) => {
@@ -29,32 +31,42 @@ const LabelWithCount: React.FC<{ label: string; count: number; showDot?: boolean
 };
 
 interface Props {
-  request: RQAPI.Request;
+  requestEntry: RQAPI.Entry;
   setQueryParams: (queryParams: KeyValuePair[]) => void;
   setBody: (body: RQAPI.RequestBody) => void;
   setContentType: (contentType: RequestContentType) => void;
   setRequestHeaders: (headers: KeyValuePair[]) => void;
+  setScripts: (type: RQAPI.ScriptType, script: string) => void;
 }
 
-const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setRequestHeaders, setContentType }) => {
+const RequestTabs: React.FC<Props> = ({
+  requestEntry,
+  setQueryParams,
+  setBody,
+  setRequestHeaders,
+  setContentType,
+  setScripts,
+}) => {
   const [selectedTab, setSelectedTab] = useState(Tab.QUERY_PARAMS);
 
   useEffect(() => {
-    if (selectedTab === Tab.BODY && !supportsRequestBody(request.method)) {
+    if (selectedTab === Tab.BODY && !supportsRequestBody(requestEntry.request.method)) {
       setSelectedTab(Tab.QUERY_PARAMS);
     }
-  }, [request.method, selectedTab]);
+  }, [requestEntry.request.method, selectedTab]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
-    const isRequestBodySupported = supportsRequestBody(request.method);
+    const isRequestBodySupported = supportsRequestBody(requestEntry.request.method);
 
     return [
       {
         key: Tab.QUERY_PARAMS,
-        label: <LabelWithCount label="Query Params" count={sanitizeKeyValuePairs(request.queryParams).length} />,
+        label: (
+          <LabelWithCount label="Query Params" count={sanitizeKeyValuePairs(requestEntry.request.queryParams).length} />
+        ),
         children: (
           <KeyValueTable
-            data={request.queryParams}
+            data={requestEntry.request.queryParams}
             setKeyValuePairs={setQueryParams}
             pairtype={KeyValueFormType.QUERY_PARAMS}
           />
@@ -62,11 +74,13 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
       },
       {
         key: Tab.BODY,
-        label: <LabelWithCount label="Body" count={request.body ? 1 : 0} showDot={isRequestBodySupported} />,
+        label: (
+          <LabelWithCount label="Body" count={requestEntry.request.body ? 1 : 0} showDot={isRequestBodySupported} />
+        ),
         children: (
           <RequestBody
-            body={request.body}
-            contentType={request.contentType}
+            body={requestEntry.request.body}
+            contentType={requestEntry.request.contentType}
             setBody={setBody}
             setContentType={setContentType}
           />
@@ -75,14 +89,19 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
       },
       {
         key: Tab.HEADERS,
-        label: <LabelWithCount label="Headers" count={sanitizeKeyValuePairs(request.headers).length} />,
+        label: <LabelWithCount label="Headers" count={sanitizeKeyValuePairs(requestEntry.request.headers).length} />,
         children: (
           <KeyValueTable
-            data={request.headers}
+            data={requestEntry.request.headers}
             setKeyValuePairs={setRequestHeaders}
             pairtype={KeyValueFormType.HEADERS}
           />
         ),
+      },
+      {
+        key: Tab.SCRIPTS,
+        label: <LabelWithCount label="Scripts" count={0} />,
+        children: <ScriptEditor setScripts={setScripts} scripts={requestEntry.scripts} />,
       },
       // {
       //   key: Tab.AUTHORIZATION,
@@ -90,7 +109,7 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
       //   children: <div></div>,
       // },
     ];
-  }, [request, setQueryParams, setBody, setRequestHeaders, setContentType]);
+  }, [requestEntry, setQueryParams, setBody, setRequestHeaders, setContentType, setScripts]);
 
   return (
     <Tabs
