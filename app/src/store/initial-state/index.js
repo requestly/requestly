@@ -10,6 +10,8 @@ const INITIAL_STATE = {
     details: null,
   },
 
+  syncingV2: false,
+
   userPersona: {
     page: "getting_started",
     persona: "",

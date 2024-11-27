@@ -101,32 +101,51 @@ class StorageServiceWrapper {
    * @returns a promise on save of the rule or group
    */
   async saveRuleOrGroup(ruleOrGroup, options = {}) {
-    const workspaceId = window.currentlyActiveWorkspaceTeamId || ruleOrGroup.currentOwner;
-    console.log("!!!debug create", { workspaceId, ruleOrGroup });
-    await RuleStorageModel.create(ruleOrGroup, workspaceId);
-    const formattedObject = {
-      [ruleOrGroup.id]: {
-        ...ruleOrGroup,
-        modificationDate: options.silentUpdate ? ruleOrGroup?.modificationDate : new Date().getTime(),
-      },
-    };
-    const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
-      workspaceId: options.workspaceId,
-    }).then(() => this.saveRecord(formattedObject));
-    this.trackPromise(promise);
-    return promise;
+    if (window.syncingV2) {
+      console.log("[SyncingV2][debug]saveRuleOrGroup", ruleOrGroup);
+      let workspaceId = null;
+      if (window.uid) {
+        workspaceId = window.currentlyActiveWorkspaceTeamId
+          ? `workspace-${window.currentlyActiveWorkspaceTeamId}`
+          : ruleOrGroup.currentOwner;
+      } else {
+        workspaceId = "local";
+      }
+      return await RuleStorageModel.create(ruleOrGroup, workspaceId);
+    } else {
+      const formattedObject = {
+        [ruleOrGroup.id]: {
+          ...ruleOrGroup,
+          modificationDate: options.silentUpdate ? ruleOrGroup?.modificationDate : new Date().getTime(),
+        },
+      };
+      const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
+        workspaceId: options.workspaceId,
+      }).then(() => this.saveRecord(formattedObject));
+      this.trackPromise(promise);
+      return promise;
+    }
   }
 
   async saveMultipleRulesOrGroups(array, options = {}) {
-    const formattedObject = {};
-    array.forEach((object) => {
-      if (object && object.id) formattedObject[object.id] = object;
-    });
-    const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
-      workspaceId: options.workspaceId,
-    }).then(() => this.saveRecord(formattedObject));
-    this.trackPromise(promise);
-    return promise;
+    if (window.syncingV2) {
+      console.log("[SyncingV2][debug]saveMultipleRulesOrGroups");
+      // TODO-Syncing: [P1] Support bulk updates to RuleStorageModel.
+      const promises = array.map((ruleOrGroup) => {
+        return this.saveRuleOrGroup(ruleOrGroup);
+      });
+      return Promise.all(promises);
+    } else {
+      const formattedObject = {};
+      array.forEach((object) => {
+        if (object && object.id) formattedObject[object.id] = object;
+      });
+      const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
+        workspaceId: options.workspaceId,
+      }).then(() => this.saveRecord(formattedObject));
+      this.trackPromise(promise);
+      return promise;
+    }
   }
 
   saveRulesOrGroupsWithoutSyncing(array) {
