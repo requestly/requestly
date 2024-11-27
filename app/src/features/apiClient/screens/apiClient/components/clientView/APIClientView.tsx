@@ -155,6 +155,16 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }));
   }, []);
 
+  const setScripts = useCallback((type: RQAPI.ScriptType, script: string) => {
+    setEntry((entry) => ({
+      ...entry,
+      scripts: {
+        ...entry.scripts,
+        [type]: script,
+      },
+    }));
+  }, []);
+
   const setContentType = useCallback((contentType: RequestContentType) => {
     setEntry((entry) => {
       const newEntry: RQAPI.Entry = {
@@ -196,6 +206,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         ...entry.request,
         queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys),
         headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys),
+      },
+      scripts: {
+        preRequest: entry.scripts?.preRequest || "",
+        postResponse: entry.scripts?.postResponse || "",
       },
     };
 
@@ -427,11 +441,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                 ) : null}
               </div>
               <RequestTabs
-                request={entry.request}
+                requestEntry={entry}
                 setQueryParams={setQueryParams}
                 setBody={setBody}
                 setRequestHeaders={setRequestHeaders}
                 setContentType={setContentType}
+                setScripts={setScripts}
               />
             </Skeleton>
           </div>
