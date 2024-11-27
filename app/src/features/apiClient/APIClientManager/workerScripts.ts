@@ -1,101 +1,99 @@
-export const responseWorkerCode = `
-self.onmessage = function(e) {
+/* eslint-disable no-new-func */
+
+export const responseWorkerFunction = function (e: MessageEvent) {
   const { script, response, currentVars, currentEnvironmentId } = e.data;
 
   const sandbox = {
     rq: {
-      response: {...response},
+      response,
       environment: {
-        set: (key, value) => {
-          self.postMessage({
-            type: 'SET_ENVIRONMENT',
-            payload: { key, value, currentEnvironmentId }
+        set: (key: string, value: any) => {
+          this.postMessage({
+            type: "SET_ENVIRONMENT",
+            payload: { key, value, currentEnvironmentId },
           });
         },
-        get: (key) => {
+        get: (key: string) => {
           const variable = currentVars[key];
           return variable?.localValue || variable?.syncValue;
-        }
-      }
-    }
+        },
+      },
+    },
   };
 
   try {
     const scriptFunction = new Function(
-      'rq',
-      \`
+      "rq",
+      `
       "use strict";
       try {
-        \${script}
+        ${script}
       } catch (error) {
         console.error('Script error:', error);
         throw error;
       }
-      \`
+      `
     );
 
     scriptFunction(sandbox.rq);
-    self.postMessage({ type: 'COMPLETE' });
+    this.postMessage({ type: "COMPLETE" });
   } catch (error) {
-    self.postMessage({
-      type: 'ERROR',
+    this.postMessage({
+      type: "ERROR",
       payload: {
-        name: 'Script Execution',
+        name: "Script Execution",
         passed: false,
-        error: error.message
-      }
+        error: error.message,
+      },
     });
   }
 };
-`;
 
-export const requestWorkerCode = `
-self.onmessage = function(e) {
+export const requestWorkerFunction = function (e: MessageEvent) {
   const { script, request, currentVars, currentEnvironmentId } = e.data;
 
   const sandbox = {
     rq: {
-      request: {...request},
+      request,
       environment: {
-        set: (key, value) => {
-          self.postMessage({
-            type: 'SET_ENVIRONMENT',
-            payload: { key, value, currentEnvironmentId }
+        set: (key: string, value: any) => {
+          this.postMessage({
+            type: "SET_ENVIRONMENT",
+            payload: { key, value, currentEnvironmentId },
           });
         },
-        get: (key) => {
+        get: (key: string) => {
           const variable = currentVars[key];
           return variable?.localValue || variable?.syncValue;
-        }
-      }
-    }
+        },
+      },
+    },
   };
 
   try {
     const scriptFunction = new Function(
-      'rq',
-      \`
+      "rq",
+      `
       "use strict";
       try {
-        \${script}
+        ${script}
       } catch (error) {
         console.error('Script error:', error);
         throw error;
       }
-      \`
+      `
     );
 
     scriptFunction(sandbox.rq);
-    self.postMessage({ type: 'COMPLETE' });
+    this.postMessage({ type: "COMPLETE" });
   } catch (error) {
-    self.postMessage({
-      type: 'ERROR',
+    this.postMessage({
+      type: "ERROR",
       payload: {
-        name: 'Script Execution',
+        name: "Script Execution",
         passed: false,
-        error: error.message
-      }
+        error: error.message,
+      },
     });
   }
 };
-`;

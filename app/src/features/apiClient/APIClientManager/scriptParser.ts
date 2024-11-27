@@ -1,5 +1,5 @@
 import { RQAPI } from "../types";
-import { requestWorkerCode, responseWorkerCode } from "./workerScripts";
+import { requestWorkerFunction, responseWorkerFunction } from "./workerScripts";
 
 interface EnvironmentPayload {
   key: string;
@@ -12,7 +12,14 @@ interface WorkerMessage {
   payload?: any;
 }
 
-const createWorker = (workerCode: string) => {
+const createWorkerCode = (fn: Function) => {
+  return `
+    self.onmessage = ${fn.toString()};
+  `;
+};
+
+const createWorker = (workerFn: Function) => {
+  const workerCode = createWorkerCode(workerFn);
   const blob = new Blob([workerCode], { type: "application/javascript" });
   return new Worker(URL.createObjectURL(blob));
 };
@@ -60,7 +67,7 @@ export const parseRequestScript = (script: string, request: RQAPI.Request, envir
   let worker: Worker | null = null;
 
   try {
-    worker = createWorker(requestWorkerCode);
+    worker = createWorker(requestWorkerFunction);
 
     worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event);
 
@@ -91,7 +98,7 @@ export const parseResponseScript = (script: string, responseBody: any, environme
   let worker: Worker | null = null;
 
   try {
-    worker = createWorker(responseWorkerCode);
+    worker = createWorker(responseWorkerFunction);
 
     worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event);
 

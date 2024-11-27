@@ -40,7 +40,7 @@ import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
 import PATHS from "config/constants/sub/paths";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
-import { APIClientManager } from "features/apiClient/APIClientManager/APIClientManager";
+import { executeAPIRequest } from "features/apiClient/APIClientManager/APIClientManager";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
@@ -247,28 +247,31 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    const apiManager = new APIClientManager(environmentManager);
-
+    //Examples
+    //TODO to be removed
     const responseScript = `
     // const body=JSON.parse(rq.response.body);
     // console.log("!!!debug",body);
     console.log("!!!debug response",rq.response);
     const testKeyResponse = rq.environment.get("testKeyRequest");
-    console.log("!!!testResponse",testKeyResponse);
+    console.log("!!!testResponse",testKeyResponse,typeof testKeyResponse);
+    const testString=rq.environment.get("testKeyRequestString");
+    console.log("!!!testString",testString,typeof testString);
   `;
-
     const requestScript = `
     // const body=JSON.parse(rq.response.body);
     // console.log("!!!debug",body);
     console.log("!!!debug request",rq.request);
     rq.environment.set("testKeyRequest",true);
+    rq.environment.set("testKeyRequestString","testValue");
   `;
 
-    apiManager.setPreRequestScript(requestScript);
-    apiManager.setPostResponseScript(responseScript);
-
-    apiManager
-      .executeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
+    executeAPIRequest(
+      appMode,
+      { ...renderedRequest, preRequestScript: requestScript, postResponseScript: responseScript },
+      environmentManager,
+      abortControllerRef.current.signal
+    )
       .then((response) => {
         // TODO: Add an entry in history
         const entryWithResponse = { ...entry, response };

@@ -2,40 +2,27 @@ import { makeRequest } from "../screens/apiClient/utils";
 import { RQAPI } from "../types";
 import { parseRequestScript, parseResponseScript } from "./scriptParser";
 
-export class APIClientManager {
-  private environmentManager: any;
-  private preRequestScript: string = "";
-  private postResponseScript: string = "";
+export const executeAPIRequest = async (
+  appMode: string,
+  request: any, //TODO: to be added with correct type
+  environmentManager: any,
+  signal?: AbortSignal
+): Promise<RQAPI.Response> => {
+  // Process request configuration with environment variables
+  const processedRequestConfig = environmentManager.renderVariables(request);
 
-  constructor(environmentManager: any) {
-    this.environmentManager = environmentManager;
+  // Execute pre-request script if present
+  if (request.preRequestScript) {
+    parseRequestScript(request.preRequestScript, processedRequestConfig, environmentManager);
   }
 
-  setPreRequestScript(script: string) {
-    this.preRequestScript = script;
+  // Make the actual API request
+  const response = await makeRequest(appMode, processedRequestConfig, signal);
+
+  // Execute post-response script if present
+  if (request.postResponseScript) {
+    parseResponseScript(request.postResponseScript, { response }, environmentManager);
   }
 
-  setPostResponseScript(script: string) {
-    this.postResponseScript = script;
-  }
-
-  async executeRequest(appMode: string, request: RQAPI.Request, signal?: AbortSignal): Promise<RQAPI.Response> {
-    // Process request configuration with environment variables
-    const processedRequestConfig = this.environmentManager.renderVariables(request);
-
-    // Execute pre-request script
-    if (this.preRequestScript) {
-      parseRequestScript(this.preRequestScript, processedRequestConfig, this.environmentManager);
-    }
-
-    // Make the actual API request
-    const response = await makeRequest(appMode, processedRequestConfig, signal);
-
-    // Execute post-response script
-    if (this.postResponseScript) {
-      parseResponseScript(this.postResponseScript, { response: response }, this.environmentManager);
-    }
-
-    return response;
-  }
-}
+  return response;
+};
