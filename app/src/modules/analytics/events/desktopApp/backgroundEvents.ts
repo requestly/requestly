@@ -6,6 +6,6 @@ export function trackDesktopMainEvent(name: string, param: Record<any, any> = {}
 }
 
 export function trackDesktopBGEvent(name: string, param: Record<any, any> = {}) {
-  param["source"] = "desktop_main";
+  param["source"] = "background_renderer";
   trackEvent(name, param);
 }

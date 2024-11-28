@@ -161,8 +161,16 @@ export const getSignupDate = async (uid) => {
   return await getValueAsPromise(["customProfile", uid, "signup", "signup_date"]);
 };
 
+const getConnectedApps = (appsListArray) => {
+  return appsListArray?.filter((app) => app.isActive);
+};
+
+export const getConnectedAppNames = (appsListArray) => {
+  return getConnectedApps(appsListArray).map((app) => app.name);
+};
+
 export const getConnectedAppsCount = (appsListArray) => {
-  return appsListArray?.filter((app) => app.isActive).length;
+  return getConnectedApps(appsListArray).length;
 };
 
 export const isVerifiedBusinessDomainUser = async (email, uid) => {
