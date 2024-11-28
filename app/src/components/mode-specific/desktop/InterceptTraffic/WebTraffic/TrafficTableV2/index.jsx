@@ -212,6 +212,8 @@ const CurrentTrafficTable = ({
         if (rqLog?.app) {
           updateAppList(rqLog.app);
         }
+        // @wrongsahil: Disabling this for now as this is leading to rerendering of this component which is degrading the perfomance
+        // printLogsToConsole(rqLog);
 
         trackIfFirstLog(rqLog);
         saveLogInRedux(rqLog);
