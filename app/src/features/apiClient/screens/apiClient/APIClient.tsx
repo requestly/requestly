@@ -21,7 +21,7 @@ export const APIClient: React.FC<Props> = () => {
   } = useApiClientContext();
 
   return (
-    <div>
+    <div className="api-client-container-content">
       <APIClientView
         // TODO: Fix - "apiEntry" is used for history, remove this prop and derive everything from "apiEntryDetails"
         apiEntry={selectedEntry ?? selectedEntryDetails?.data}
