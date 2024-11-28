@@ -45,7 +45,7 @@ const cleanupWorker = (worker: Worker | null) => {
   }
 };
 
-const messageHandler = async (worker: Worker, environmentManager: any, event: MessageEvent) => {
+const messageHandler = async (worker: Worker, environmentManager: any, event: MessageEvent, resolve: any) => {
   const { type, payload } = event.data as WorkerMessage;
 
   switch (type) {
@@ -55,6 +55,7 @@ const messageHandler = async (worker: Worker, environmentManager: any, event: Me
 
     case "COMPLETE":
       cleanupWorker(worker);
+      resolve();
       break;
 
     case "ERROR":
@@ -66,19 +67,20 @@ const messageHandler = async (worker: Worker, environmentManager: any, event: Me
 export const executePrerequestScript = (script: string, request: RQAPI.Request, environmentManager: any) => {
   let worker: Worker | null = null;
 
-  try {
+  return new Promise((resolve, reject) => {
     worker = createWorker(requestWorkerFunction);
 
-    worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event);
+    worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event, resolve);
 
     worker.onerror = (error) => {
       cleanupWorker(worker);
       console.error("Request Worker error:", error);
+      reject();
     };
 
     const { currentEnvironmentId } = environmentManager.getCurrentEnvironment();
     const currentVars = environmentManager.getCurrentEnvironmentVariables();
-    console.log("!!!debug", "req", request);
+
     worker.postMessage({
       script,
       request: request,
@@ -89,27 +91,26 @@ export const executePrerequestScript = (script: string, request: RQAPI.Request, 
     setTimeout(() => {
       cleanupWorker(worker);
     }, 5000);
-  } catch (error) {
-    cleanupWorker(worker);
-  }
+  });
 };
 
 export const executePostresponseScript = (script: string, responseBody: any, environmentManager: any) => {
   let worker: Worker | null = null;
 
-  try {
+  return new Promise((resolve, reject) => {
     worker = createWorker(responseWorkerFunction);
 
-    worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event);
+    worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event, resolve);
 
     worker.onerror = (error) => {
       console.error("Response Worker error:", error);
       cleanupWorker(worker);
+      reject();
     };
 
     const { currentEnvironmentId } = environmentManager.getCurrentEnvironment();
     const currentVars = environmentManager.getCurrentEnvironmentVariables();
-    console.log("!!!debug", "resp", responseBody);
+
     worker.postMessage({
       script,
       response: responseBody.response,
@@ -120,7 +121,5 @@ export const executePostresponseScript = (script: string, responseBody: any, env
     setTimeout(() => {
       cleanupWorker(worker);
     }, 5000);
-  } catch (error) {
-    cleanupWorker(worker);
-  }
+  });
 };

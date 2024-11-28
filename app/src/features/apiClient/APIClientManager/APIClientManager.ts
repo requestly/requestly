@@ -7,20 +7,24 @@ export const executeAPIRequest = async (
   request: any, //TODO: to be added with correct type
   environmentManager: any,
   signal?: AbortSignal
-): Promise<RQAPI.Response> => {
-  // Process request configuration with environment variables
-  const processedRequestConfig = environmentManager.renderVariables(request);
+): Promise<RQAPI.Response | null> => {
+  try {
+    // Process request configuration with environment variables
+    const processedRequestConfig = environmentManager.renderVariables(request);
 
-  if (request.preRequestScript) {
-    executePrerequestScript(request.preRequestScript, processedRequestConfig, environmentManager);
+    if (request.preRequestScript) {
+      await executePrerequestScript(request.preRequestScript, processedRequestConfig, environmentManager);
+    }
+
+    // Make the actual API request
+    const response = await makeRequest(appMode, processedRequestConfig, signal);
+
+    if (request.postResponseScript) {
+      await executePostresponseScript(request.postResponseScript, { response }, environmentManager);
+    }
+
+    return response;
+  } catch (error) {
+    return null;
   }
-
-  // Make the actual API request
-  const response = await makeRequest(appMode, processedRequestConfig, signal);
-
-  if (request.postResponseScript) {
-    executePostresponseScript(request.postResponseScript, { response }, environmentManager);
-  }
-
-  return response;
 };
