@@ -1,34 +1,69 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import type { TableProps } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { RQButton } from "lib/design-system-v2/components";
 import { EditableRow, EditableCell } from "./KeyValueTableRow";
-import { KeyValueFormType, KeyValuePair } from "features/apiClient/types";
+import { KeyValueFormType, KeyValuePair, RQAPI } from "features/apiClient/types";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
+import { isArray } from "lodash";
 import "./keyValueTable.scss";
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
 
 interface KeyValueTableProps {
   data: KeyValuePair[];
-  pairtype: KeyValueFormType;
-  setKeyValuePairs: (keyValuePairs: KeyValuePair[]) => void;
+  pairType: KeyValueFormType;
+  setKeyValuePairs: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
 }
 
-export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValuePairs, pairtype }) => {
+// TODO: REFACTOR TYPES
+
+export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValuePairs, pairType }) => {
+  const [tableData, setTableData] = useState<KeyValuePair[]>(data);
+
+  const handleUpdateRequestPairs = useCallback(
+    (prev: RQAPI.Entry, pairType: KeyValueFormType, action: "add" | "update" | "delete", pair?: KeyValuePair) => {
+      const updatedRequest = { ...prev.request };
+      const pairTypeToUpdate = pairType === KeyValueFormType.FORM ? "body" : pairType;
+      let keyValuePairs = updatedRequest[pairTypeToUpdate] as KeyValuePair[];
+      if (!isArray(keyValuePairs)) keyValuePairs = [];
+
+      switch (action) {
+        case "add":
+          if (pair) keyValuePairs.push(pair);
+          break;
+        case "update":
+          if (pair) {
+            const index = keyValuePairs.findIndex((item: KeyValuePair) => item.id === pair.id);
+            if (index !== -1) {
+              keyValuePairs.splice(index, 1, {
+                ...keyValuePairs[index],
+                ...pair,
+              });
+            }
+            setTableData(() => [...keyValuePairs]);
+          }
+          break;
+        case "delete":
+          return {
+            ...prev,
+            request: {
+              ...updatedRequest,
+              [pairTypeToUpdate]: keyValuePairs.filter((item: KeyValuePair) => item.id !== pair?.id),
+            },
+          };
+      }
+      return { ...prev, request: updatedRequest };
+    },
+    []
+  );
+
   const handleUpdatePair = useCallback(
     (pair: KeyValuePair) => {
-      const newData = [...data];
-      const index = newData.findIndex((item) => pair.id === item.id);
-      const item = newData[index];
-      newData.splice(index, 1, {
-        ...item,
-        ...pair,
-      });
-      setKeyValuePairs(newData);
+      setKeyValuePairs((prev) => handleUpdateRequestPairs(prev, pairType, "update", pair));
     },
-    [data, setKeyValuePairs]
+    [setKeyValuePairs, pairType, handleUpdateRequestPairs]
   );
 
   const createEmptyPair = useCallback(
@@ -43,22 +78,24 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
 
   const handleAddPair = useCallback(() => {
     const newPair = createEmptyPair();
-    setKeyValuePairs([...data, newPair]);
-  }, [data, setKeyValuePairs, createEmptyPair]);
+    setTableData((prev) => [...prev, newPair]);
+    setKeyValuePairs((prev) => handleUpdateRequestPairs(prev, pairType, "add", newPair));
+  }, [setKeyValuePairs, createEmptyPair, pairType, handleUpdateRequestPairs]);
 
   const handleDeletePair = useCallback(
-    (id: number) => {
-      const newData = data.filter((item) => item.id !== id);
-      setKeyValuePairs(newData);
+    (pair: KeyValuePair) => {
+      const newData = tableData.filter((item) => item.id !== pair.id);
+      setTableData(newData);
+      setKeyValuePairs((prev) => handleUpdateRequestPairs(prev, pairType, "delete", pair));
     },
-    [data, setKeyValuePairs]
+    [setKeyValuePairs, pairType, tableData, handleUpdateRequestPairs]
   );
 
   useEffect(() => {
-    if (data.length === 0) {
+    if (tableData.length === 0) {
       handleAddPair();
     }
-  }, [data, handleAddPair]);
+  }, [tableData, handleAddPair]);
 
   const columns = useMemo(() => {
     return [
@@ -72,7 +109,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
           editable: true,
           dataIndex: "isEnabled",
           title: "isEnabled",
-          pairtype,
+          pairType,
           handleUpdatePair,
         }),
       },
@@ -86,7 +123,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
           editable: true,
           dataIndex: "key",
           title: "key",
-          pairtype,
+          pairType,
           handleUpdatePair,
         }),
       },
@@ -99,7 +136,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
           editable: true,
           dataIndex: "value",
           title: "value",
-          pairtype,
+          pairType,
           handleUpdatePair,
         }),
       },
@@ -113,13 +150,13 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
               icon={<RiDeleteBin6Line />}
               type="transparent"
               size="small"
-              onClick={() => handleDeletePair(record.id)}
+              onClick={() => handleDeletePair(record)}
             />
           );
         },
       },
     ];
-  }, [pairtype, handleUpdatePair]);
+  }, [pairType, handleUpdatePair, handleDeletePair]);
 
   return (
     <ContentListTable
@@ -129,14 +166,15 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
       showHeader={false}
       rowKey="id"
       columns={columns as ColumnTypes}
-      data={data}
-      locale={{ emptyText: `No ${pairtype} found` }}
+      data={tableData}
+      locale={{ emptyText: `No ${pairType} found` }}
       components={{
         body: {
           row: EditableRow,
           cell: EditableCell,
         },
       }}
+      scroll={{ x: true }}
       footer={() => (
         <div className="api-key-value-table-footer">
           <RQButton icon={<MdAdd />} size="small" onClick={handleAddPair}>

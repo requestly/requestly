@@ -8,7 +8,7 @@ import "./scriptEditor.scss";
 
 interface ScriptEditorProps {
   scripts: RQAPI.Entry["scripts"];
-  setScripts: (type: RQAPI.ScriptType, script: string) => void;
+  setScripts: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
 }
 
 const DEFAULT_SCRIPT_VALUES = {
@@ -41,7 +41,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts 
     <div className="api-client-script-editor-container">
       <Editor
         value={scripts?.[scriptType] || ""}
-        handleChange={(value) => setScripts(scriptType, value)}
+        handleChange={(value) => setScripts((prev) => ({ ...prev, scripts: { ...prev.scripts, [scriptType]: value } }))}
         defaultValue={DEFAULT_SCRIPT_VALUES[scriptType]}
         language={EditorLanguage.JAVASCRIPT}
         toolbarOptions={{

@@ -1,6 +1,6 @@
 import { Badge, Tabs, TabsProps, Tag } from "antd";
 import React, { memo, useEffect, useMemo, useState } from "react";
-import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../../../../types";
+import { KeyValueFormType, RQAPI, RequestContentType } from "../../../../../../../../types";
 import RequestBody from "../../RequestBody";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
 import { KeyValueTable } from "../KeyValueTable/KeyValueTable";
@@ -33,21 +33,11 @@ const LabelWithCount: React.FC<{ label: string; count: number; showDot?: boolean
 
 interface Props {
   requestEntry: RQAPI.Entry;
-  setQueryParams: (queryParams: KeyValuePair[]) => void;
-  setBody: (body: RQAPI.RequestBody) => void;
+  setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
-  setRequestHeaders: (headers: KeyValuePair[]) => void;
-  setScripts: (type: RQAPI.ScriptType, script: string) => void;
 }
 
-const RequestTabs: React.FC<Props> = ({
-  requestEntry,
-  setQueryParams,
-  setBody,
-  setRequestHeaders,
-  setContentType,
-  setScripts,
-}) => {
+const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setContentType }) => {
   const [selectedTab, setSelectedTab] = useState(Tab.QUERY_PARAMS);
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
 
@@ -70,8 +60,8 @@ const RequestTabs: React.FC<Props> = ({
         children: (
           <KeyValueTable
             data={requestEntry.request.queryParams}
-            setKeyValuePairs={setQueryParams}
-            pairtype={KeyValueFormType.QUERY_PARAMS}
+            setKeyValuePairs={setRequestEntry}
+            pairType={KeyValueFormType.QUERY_PARAMS}
           />
         ),
       },
@@ -84,7 +74,7 @@ const RequestTabs: React.FC<Props> = ({
           <RequestBody
             body={requestEntry.request.body}
             contentType={requestEntry.request.contentType}
-            setBody={setBody}
+            setRequestEntry={setRequestEntry}
             setContentType={setContentType}
           />
         ),
@@ -96,8 +86,8 @@ const RequestTabs: React.FC<Props> = ({
         children: (
           <KeyValueTable
             data={requestEntry.request.headers}
-            setKeyValuePairs={setRequestHeaders}
-            pairtype={KeyValueFormType.HEADERS}
+            setKeyValuePairs={setRequestEntry}
+            pairType={KeyValueFormType.HEADERS}
           />
         ),
       },
@@ -112,12 +102,12 @@ const RequestTabs: React.FC<Props> = ({
       items.push({
         key: Tab.SCRIPTS,
         label: <LabelWithCount label="Scripts" count={0} />,
-        children: <ScriptEditor setScripts={setScripts} scripts={requestEntry.scripts} />,
+        children: <ScriptEditor setScripts={setRequestEntry} scripts={requestEntry.scripts} />,
       });
     }
 
     return items;
-  }, [requestEntry, setQueryParams, setBody, setRequestHeaders, setContentType, setScripts, isApiClientScripts]);
+  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts]);
 
   return (
     <Tabs

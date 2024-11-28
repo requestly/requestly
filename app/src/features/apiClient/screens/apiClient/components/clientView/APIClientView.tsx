@@ -125,45 +125,19 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const setQueryParams = useCallback((queryParams: KeyValuePair[]) => {
-    setEntry((entry) => ({
-      ...entry,
-      request: {
-        ...entry.request,
-        queryParams,
-      },
-    }));
+  const setRequestEntry = useCallback((updater: (prev: RQAPI.Entry) => RQAPI.Entry) => {
+    setEntry((prev) => updater(prev));
   }, []);
 
-  const setBody = useCallback((body: string) => {
-    setEntry((entry) => ({
-      ...entry,
-      request: {
-        ...entry.request,
-        body,
-      },
-    }));
-  }, []);
-
-  const setRequestHeaders = useCallback((headers: KeyValuePair[]) => {
-    setEntry((entry) => ({
-      ...entry,
-      request: {
-        ...entry.request,
-        headers,
-      },
-    }));
-  }, []);
-
-  const setScripts = useCallback((type: RQAPI.ScriptType, script: string) => {
-    setEntry((entry) => ({
-      ...entry,
-      scripts: {
-        ...entry.scripts,
-        [type]: script,
-      },
-    }));
-  }, []);
+  // const setScripts = useCallback((type: RQAPI.ScriptType, script: string) => {
+  //   setEntry((entry) => ({
+  //     ...entry,
+  //     scripts: {
+  //       ...entry.scripts,
+  //       [type]: script,
+  //     },
+  //   }));
+  // }, []);
 
   const setContentType = useCallback((contentType: RequestContentType) => {
     setEntry((entry) => {
@@ -171,6 +145,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         ...entry,
         request: {
           ...entry.request,
+          body: contentType === RequestContentType.FORM ? [] : "",
           contentType,
         },
       };
@@ -440,14 +415,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   </RQButton>
                 ) : null}
               </div>
-              <RequestTabs
-                requestEntry={entry}
-                setQueryParams={setQueryParams}
-                setBody={setBody}
-                setRequestHeaders={setRequestHeaders}
-                setContentType={setContentType}
-                setScripts={setScripts}
-              />
+              <RequestTabs requestEntry={entry} setRequestEntry={setRequestEntry} setContentType={setContentType} />
             </Skeleton>
           </div>
         </BottomSheetLayout>
