@@ -330,8 +330,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     (evt.target as HTMLInputElement).blur();
   }, []);
 
-  console.log("entry", entry);
-
   return isExtensionEnabled ? (
     <div className="api-client-view">
       <div className="api-client-header-container">

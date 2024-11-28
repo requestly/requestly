@@ -58,10 +58,6 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
     []
   );
 
-  useEffect(() => {
-    setTableData(data);
-  }, [data]);
-
   const handleUpdatePair = useCallback(
     (pair: KeyValuePair) => {
       setKeyValuePairs((prev) => handleUpdateRequestPairs(prev, pairType, "update", pair));
