@@ -44,12 +44,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
 }) => {
   const form = useContext(EditableContext);
   const { getCurrentEnvironmentVariables } = useEnvironmentManager();
-
   const currentEnvironmentVariables = getCurrentEnvironmentVariables();
-
-  // const toggleEdit = () => {
-  //   form.setFieldsValue({ [dataIndex]: record[dataIndex] });
-  // };
 
   const save = async () => {
     try {
@@ -64,6 +59,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
     return <td {...restProps}>{children}</td>;
   }
 
+  console.log("record", record);
   return (
     <td {...restProps}>
       <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={record?.[dataIndex]}>
@@ -72,16 +68,20 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
             className="key-value-table-checkbox"
             checked={record?.isEnabled}
             onChange={(e) => {
-              handleUpdatePair({ ...record, isEnabled: e.target.checked });
+              form.setFieldsValue({ [dataIndex]: e.target.checked });
+              save();
               trackEnableKeyValueToggled(e.target.checked, pairtype);
             }}
           />
         ) : (
           <RQSingleLineEditor
             className={`key-value-table-input ${!record.isEnabled ? "key-value-table-input-disabled" : ""}`}
-            placeholder=""
+            placeholder={dataIndex === "key" ? "Key" : "Value"}
             defaultValue={record?.[dataIndex] as string}
-            onChange={save}
+            onChange={(value) => {
+              form.setFieldsValue({ [dataIndex]: value });
+              save();
+            }}
             variables={currentEnvironmentVariables}
           />
         )}
