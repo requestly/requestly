@@ -17,14 +17,14 @@ const DEFAULT_SCRIPT_VALUES = {
 };
 
 export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts }) => {
-  const [scriptMode, setScriptMode] = useState<RQAPI.ScriptType>(RQAPI.ScriptType.PRE_REQUEST);
+  const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(RQAPI.ScriptType.PRE_REQUEST);
 
-  const scriptModeOptions = useMemo(() => {
+  const scriptTypeOptions = useMemo(() => {
     return (
       <Radio.Group
         className="api-client-script-type-selector"
-        value={scriptMode}
-        onChange={(e) => setScriptMode(e.target.value)}
+        value={scriptType}
+        onChange={(e) => setScriptType(e.target.value)}
         size="small"
       >
         <Radio.Button className="api-client-script-type-selector__btn" value={RQAPI.ScriptType.PRE_REQUEST}>
@@ -35,18 +35,18 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts 
         </Radio.Button>
       </Radio.Group>
     );
-  }, [scriptMode]);
+  }, [scriptType]);
 
   return (
     <div className="api-client-script-editor-container">
       <Editor
-        value={scripts?.[scriptMode] || ""}
-        handleChange={(value) => setScripts(scriptMode, value)}
-        defaultValue={DEFAULT_SCRIPT_VALUES[scriptMode]}
+        value={scripts?.[scriptType] || ""}
+        handleChange={(value) => setScripts(scriptType, value)}
+        defaultValue={DEFAULT_SCRIPT_VALUES[scriptType]}
         language={EditorLanguage.JAVASCRIPT}
         toolbarOptions={{
           title: "",
-          options: [scriptModeOptions],
+          options: [scriptTypeOptions],
         }}
         analyticEventProperties={{ source: "api_client_script_editor" }}
       />
