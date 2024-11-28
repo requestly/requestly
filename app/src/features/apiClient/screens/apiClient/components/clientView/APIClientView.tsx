@@ -2,12 +2,12 @@ import { Select, Skeleton, Space } from "antd";
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
-import RequestTabs from "./components/request/RequestTabs";
-import { getEmptyPair } from "./components/request/KeyValueForm";
+import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
 import {
   addUrlSchemeIfMissing,
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
+  getEmptyPair,
   sanitizeKeyValuePairs,
   supportsRequestBody,
 } from "../../utils";
@@ -128,35 +128,19 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const setQueryParams = useCallback((queryParams: KeyValuePair[]) => {
-    setEntry((entry) => ({
-      ...entry,
-      request: {
-        ...entry.request,
-        queryParams,
-      },
-    }));
+  const setRequestEntry = useCallback((updater: (prev: RQAPI.Entry) => RQAPI.Entry) => {
+    setEntry((prev) => updater(prev));
   }, []);
 
-  const setBody = useCallback((body: string) => {
-    setEntry((entry) => ({
-      ...entry,
-      request: {
-        ...entry.request,
-        body,
-      },
-    }));
-  }, []);
-
-  const setRequestHeaders = useCallback((headers: KeyValuePair[]) => {
-    setEntry((entry) => ({
-      ...entry,
-      request: {
-        ...entry.request,
-        headers,
-      },
-    }));
-  }, []);
+  // const setScripts = useCallback((type: RQAPI.ScriptType, script: string) => {
+  //   setEntry((entry) => ({
+  //     ...entry,
+  //     scripts: {
+  //       ...entry.scripts,
+  //       [type]: script,
+  //     },
+  //   }));
+  // }, []);
 
   const setContentType = useCallback((contentType: RequestContentType) => {
     setEntry((entry) => {
@@ -164,6 +148,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         ...entry,
         request: {
           ...entry.request,
+          body: contentType === RequestContentType.FORM ? [] : "",
           contentType,
         },
       };
@@ -199,6 +184,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         ...entry.request,
         queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys),
         headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys),
+      },
+      scripts: {
+        preRequest: entry.scripts?.preRequest || "",
+        postResponse: entry.scripts?.postResponse || "",
       },
     };
 
@@ -453,13 +442,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   </RQButton>
                 ) : null}
               </div>
-              <RequestTabs
-                request={entry.request}
-                setQueryParams={setQueryParams}
-                setBody={setBody}
-                setRequestHeaders={setRequestHeaders}
-                setContentType={setContentType}
-              />
+              <RequestTabs requestEntry={entry} setRequestEntry={setRequestEntry} setContentType={setContentType} />
             </Skeleton>
           </div>
         </BottomSheetLayout>
