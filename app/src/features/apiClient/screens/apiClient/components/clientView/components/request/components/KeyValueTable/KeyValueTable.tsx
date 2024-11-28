@@ -25,22 +25,23 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
   const handleUpdateRequestPairs = useCallback(
     (prev: RQAPI.Entry, pairType: KeyValueFormType, action: "add" | "update" | "delete", pair?: KeyValuePair) => {
       const updatedRequest = { ...prev.request };
-      let requestPair = updatedRequest[pairType as keyof RQAPI.Entry["request"]] as KeyValuePair[];
-      if (!isArray(requestPair)) requestPair = [];
+      let keyValuePairs = updatedRequest[pairType as keyof RQAPI.Entry["request"]] as KeyValuePair[];
+      if (!isArray(keyValuePairs)) keyValuePairs = [];
 
       switch (action) {
         case "add":
-          if (pair) requestPair.push(pair);
+          if (pair) keyValuePairs.push(pair);
           break;
         case "update":
           if (pair) {
-            const index = requestPair.findIndex((item: KeyValuePair) => item.id === pair.id);
+            const index = keyValuePairs.findIndex((item: KeyValuePair) => item.id === pair.id);
             if (index !== -1) {
-              requestPair.splice(index, 1, {
-                ...requestPair[index],
+              keyValuePairs.splice(index, 1, {
+                ...keyValuePairs[index],
                 ...pair,
               });
             }
+            setTableData(() => [...keyValuePairs]);
           }
           break;
         case "delete":
@@ -48,11 +49,10 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
             ...prev,
             request: {
               ...updatedRequest,
-              [pairType]: requestPair.filter((item: KeyValuePair) => item.id !== pair?.id),
+              [pairType]: keyValuePairs.filter((item: KeyValuePair) => item.id !== pair?.id),
             },
           };
       }
-
       return { ...prev, request: updatedRequest };
     },
     []

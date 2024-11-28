@@ -44,7 +44,6 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
 }) => {
   const form = useContext(EditableContext);
   const { getCurrentEnvironmentVariables } = useEnvironmentManager();
-
   const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
   const save = async () => {
@@ -60,13 +59,14 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
     return <td {...restProps}>{children}</td>;
   }
 
+  console.log("record", record);
   return (
     <td {...restProps}>
       <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={record?.[dataIndex]}>
         {dataIndex === "isEnabled" ? (
           <Checkbox
             className="key-value-table-checkbox"
-            checked={record?.[dataIndex]}
+            checked={record?.isEnabled}
             onChange={(e) => {
               form.setFieldsValue({ [dataIndex]: e.target.checked });
               save();
