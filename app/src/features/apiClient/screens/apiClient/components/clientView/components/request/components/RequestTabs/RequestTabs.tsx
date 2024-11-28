@@ -1,6 +1,6 @@
 import { Badge, Tabs, TabsProps, Tag } from "antd";
 import React, { memo, useEffect, useMemo, useState } from "react";
-import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../../../../types";
+import { KeyValueFormType, RQAPI, RequestContentType } from "../../../../../../../../types";
 import RequestBody from "../../RequestBody";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
 import "./requestTabs.scss";
@@ -30,13 +30,11 @@ const LabelWithCount: React.FC<{ label: string; count: number; showDot?: boolean
 
 interface Props {
   request: RQAPI.Request;
-  setQueryParams: (queryParams: KeyValuePair[]) => void;
-  setBody: (body: RQAPI.RequestBody) => void;
+  setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
-  setRequestHeaders: (headers: KeyValuePair[]) => void;
 }
 
-const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setRequestHeaders, setContentType }) => {
+const RequestTabs: React.FC<Props> = ({ request, setRequestEntry, setContentType }) => {
   const [selectedTab, setSelectedTab] = useState(Tab.QUERY_PARAMS);
 
   useEffect(() => {
@@ -55,8 +53,8 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
         children: (
           <KeyValueTable
             data={request.queryParams}
-            setKeyValuePairs={setQueryParams}
-            pairtype={KeyValueFormType.QUERY_PARAMS}
+            setKeyValuePairs={setRequestEntry}
+            pairType={KeyValueFormType.QUERY_PARAMS}
           />
         ),
       },
@@ -67,7 +65,7 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
           <RequestBody
             body={request.body}
             contentType={request.contentType}
-            setBody={setBody}
+            setRequestEntry={setRequestEntry}
             setContentType={setContentType}
           />
         ),
@@ -79,8 +77,8 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
         children: (
           <KeyValueTable
             data={request.headers}
-            setKeyValuePairs={setRequestHeaders}
-            pairtype={KeyValueFormType.HEADERS}
+            setKeyValuePairs={setRequestEntry}
+            pairType={KeyValueFormType.HEADERS}
           />
         ),
       },
@@ -90,7 +88,7 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
       //   children: <div></div>,
       // },
     ];
-  }, [request, setQueryParams, setBody, setRequestHeaders, setContentType]);
+  }, [request, setRequestEntry, setContentType]);
 
   return (
     <Tabs

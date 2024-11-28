@@ -125,34 +125,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const setQueryParams = useCallback((queryParams: KeyValuePair[]) => {
-    setEntry((entry) => ({
-      ...entry,
-      request: {
-        ...entry.request,
-        queryParams,
-      },
-    }));
-  }, []);
-
-  const setBody = useCallback((body: string) => {
-    setEntry((entry) => ({
-      ...entry,
-      request: {
-        ...entry.request,
-        body,
-      },
-    }));
-  }, []);
-
-  const setRequestHeaders = useCallback((headers: KeyValuePair[]) => {
-    setEntry((entry) => ({
-      ...entry,
-      request: {
-        ...entry.request,
-        headers,
-      },
-    }));
+  const setRequestEntry = useCallback((updater: (prev: RQAPI.Entry) => RQAPI.Entry) => {
+    setEntry((prev) => updater(prev));
   }, []);
 
   const setContentType = useCallback((contentType: RequestContentType) => {
@@ -161,6 +135,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         ...entry,
         request: {
           ...entry.request,
+          body: contentType === RequestContentType.FORM ? [] : "",
           contentType,
         },
       };
@@ -355,6 +330,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     (evt.target as HTMLInputElement).blur();
   }, []);
 
+  console.log("entry", entry);
+
   return isExtensionEnabled ? (
     <div className="api-client-view">
       <div className="api-client-header-container">
@@ -426,13 +403,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   </RQButton>
                 ) : null}
               </div>
-              <RequestTabs
-                request={entry.request}
-                setQueryParams={setQueryParams}
-                setBody={setBody}
-                setRequestHeaders={setRequestHeaders}
-                setContentType={setContentType}
-              />
+              <RequestTabs request={entry.request} setRequestEntry={setRequestEntry} setContentType={setContentType} />
             </Skeleton>
           </div>
         </BottomSheetLayout>
