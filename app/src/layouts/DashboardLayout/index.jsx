@@ -73,7 +73,7 @@ const DashboardLayout = () => {
           <MenuHeader />
         </div>
 
-        {isDesktopAppConnected ? (
+        {false ? (
           <ConnectedToDesktopView />
         ) : (
           <>

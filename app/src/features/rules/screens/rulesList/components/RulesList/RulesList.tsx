@@ -25,7 +25,7 @@ interface Props {}
 
 const RulesList: React.FC<Props> = () => {
   const user = useSelector(getUserAuthDetails);
-  const isRuleListLoading = useSelector(getIsRulesListLoading);
+  // const isRuleListLoading = useSelector(getIsRulesListLoading);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
@@ -62,7 +62,7 @@ const RulesList: React.FC<Props> = () => {
     }
     return (
       <>
-        {isLoading || isRuleListLoading ? (
+        {isLoading ? (
           <>
             <MonitorMountedTime transactionName="new-rules-list-loading" />
             <br /> <SpinnerColumn message="Getting your rules ready" skeletonType="list" />
@@ -84,7 +84,7 @@ const RulesList: React.FC<Props> = () => {
                 <RulesTable
                   allRecordsMap={allRecordsMap}
                   records={filteredRecords}
-                  loading={isLoading || isRuleListLoading}
+                  loading={isLoading}
                   searchValue={searchValue}
                 />
               </div>

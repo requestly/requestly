@@ -4,7 +4,7 @@ import { SYNC_CONSTANTS } from "./syncing/syncConstants";
 //UTILS
 import { getStorageHelper } from "../engines";
 import { processRecordsArrayIntoObject } from "./syncing/syncDataUtils";
-import { doSyncRecords } from "./syncing/SyncUtils";
+// import { doSyncRecords } from "./syncing/SyncUtils";
 import { generateObjectId } from "./FormattingHelper";
 import { RuleStorageModel } from "requestly-sync-engine";
 
@@ -101,7 +101,7 @@ class StorageServiceWrapper {
    * @returns a promise on save of the rule or group
    */
   async saveRuleOrGroup(ruleOrGroup, options = {}) {
-    if (window.syncingV2) {
+    // if (window.syncingV2) {
       console.log("[SyncingV2][debug]saveRuleOrGroup", ruleOrGroup);
       let workspaceId = null;
       if (window.uid) {
@@ -111,41 +111,42 @@ class StorageServiceWrapper {
       } else {
         workspaceId = "local";
       }
+      console.log({ruleOrGroup, workspaceId});
       return await RuleStorageModel.create(ruleOrGroup, workspaceId);
-    } else {
-      const formattedObject = {
-        [ruleOrGroup.id]: {
-          ...ruleOrGroup,
-          modificationDate: options.silentUpdate ? ruleOrGroup?.modificationDate : new Date().getTime(),
-        },
-      };
-      const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
-        workspaceId: options.workspaceId,
-      }).then(() => this.saveRecord(formattedObject));
-      this.trackPromise(promise);
-      return promise;
-    }
+    // } else {
+    //   const formattedObject = {
+    //     [ruleOrGroup.id]: {
+    //       ...ruleOrGroup,
+    //       modificationDate: options.silentUpdate ? ruleOrGroup?.modificationDate : new Date().getTime(),
+    //     },
+    //   };
+    //   const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
+    //     workspaceId: options.workspaceId,
+    //   }).then(() => this.saveRecord(formattedObject));
+    //   this.trackPromise(promise);
+    //   return promise;
+    // }
   }
 
   async saveMultipleRulesOrGroups(array, options = {}) {
-    if (window.syncingV2) {
+    // if (window.syncingV2) {
       console.log("[SyncingV2][debug]saveMultipleRulesOrGroups");
       // TODO-Syncing: [P1] Support bulk updates to RuleStorageModel.
       const promises = array.map((ruleOrGroup) => {
         return this.saveRuleOrGroup(ruleOrGroup);
       });
       return Promise.all(promises);
-    } else {
-      const formattedObject = {};
-      array.forEach((object) => {
-        if (object && object.id) formattedObject[object.id] = object;
-      });
-      const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
-        workspaceId: options.workspaceId,
-      }).then(() => this.saveRecord(formattedObject));
-      this.trackPromise(promise);
-      return promise;
-    }
+    // } else {
+    //   const formattedObject = {};
+    //   array.forEach((object) => {
+    //     if (object && object.id) formattedObject[object.id] = object;
+    //   });
+    //   const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
+    //     workspaceId: options.workspaceId,
+    //   }).then(() => this.saveRecord(formattedObject));
+    //   this.trackPromise(promise);
+    //   return promise;
+    // }
   }
 
   saveRulesOrGroupsWithoutSyncing(array) {
@@ -154,7 +155,7 @@ class StorageServiceWrapper {
   }
 
   async saveSessionRecordingPageConfig(config) {
-    await doSyncRecords(config, SYNC_CONSTANTS.SYNC_TYPES.SESSION_RECORDING_PAGE_CONFIG, this.appMode);
+    // await doSyncRecords(config, SYNC_CONSTANTS.SYNC_TYPES.SESSION_RECORDING_PAGE_CONFIG, this.appMode);
     return this.saveRecord({ sessionRecordingConfig: config });
   }
 
@@ -173,9 +174,9 @@ class StorageServiceWrapper {
 
   async removeRecord(key) {
     try {
-      const syncResult = await doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
+      // const syncResult = await doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
       await this.StorageHelper.removeStorageObject(key);
-      this.trackPromise(Promise.resolve(syncResult));
+      // this.trackPromise(Promise.resolve(syncResult));
     } catch (error) {
       console.error("Error removing record:", error);
     }
@@ -183,9 +184,9 @@ class StorageServiceWrapper {
 
   async removeRecords(array) {
     try {
-      await doSyncRecords(array, SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
+      // await doSyncRecords(array, SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
       const removalResult = await this.StorageHelper.removeStorageObjects(array);
-      this.trackPromise(Promise.resolve(removalResult));
+      // this.trackPromise(Promise.resolve(removalResult));
       return removalResult;
     } catch (error) {
       console.error("Error removing record:", error);

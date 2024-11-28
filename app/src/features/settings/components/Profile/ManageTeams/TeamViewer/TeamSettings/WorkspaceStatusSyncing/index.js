@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { toast } from "utils/Toast";
-import { doSyncThrottled } from "hooks/DbListenerInit/syncingNodeListener";
+// import { doSyncThrottled } from "hooks/DbListenerInit/syncingNodeListener";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { get } from "firebase/database";
 import { getNodeRef } from "actions/FirebaseActions";
-import { getRecordsSyncPath, getSyncRuleStatus } from "utils/syncing/syncDataUtils";
+// import { getRecordsSyncPath, getSyncRuleStatus } from "utils/syncing/syncDataUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import SettingsItem from "features/settings/components/GlobalSettings/components/SettingsItem";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
@@ -21,7 +21,7 @@ const WorkspaceStatusSyncing = () => {
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   // Component State
-  const [syncRuleStatus, setSyncRuleStatus] = useState(getSyncRuleStatus());
+  // const [syncRuleStatus, setSyncRuleStatus] = useState(getSyncRuleStatus());
   const isWorkspaceSyncOverriden = useFeatureValue(FEATURES.OVERRIDE_TEAM_SYNC_STATUS, false);
   const overridenSyncValue = useFeatureValue(FEATURES.OVERRIDEN_SYNC_STATUS_VALUE, true);
 
@@ -32,20 +32,20 @@ const WorkspaceStatusSyncing = () => {
       return;
     }
     const triggerSync = async () => {
-      const syncNodeRef = getNodeRef(
-        getRecordsSyncPath("teamSync", user.details.profile.uid, currentlyActiveWorkspace.id)
-      );
+      // const syncNodeRef = getNodeRef(
+      //   getRecordsSyncPath("teamSync", user.details.profile.uid, currentlyActiveWorkspace.id)
+      // );
 
-      const syncNodeRefNode = await get(syncNodeRef);
+      // const syncNodeRefNode = await get(syncNodeRef);
 
-      doSyncThrottled(
-        user.details.profile.uid,
-        appMode,
-        dispatch,
-        decompressRecords(syncNodeRefNode.val()),
-        "teamSync",
-        user.details.profile.uid
-      );
+      // doSyncThrottled(
+      //   user.details.profile.uid,
+      //   appMode,
+      //   dispatch,
+      //   decompressRecords(syncNodeRefNode.val()),
+      //   "teamSync",
+      //   user.details.profile.uid
+      // );
     };
 
     if (syncRuleStatus) {

@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RuleStorageModel, syncEngine } from "requestly-sync-engine";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getAppMode, getIsSyncingV2 } from "store/selectors";
 import { LocalStorageService } from "services/localStorageService";
-import { actions } from "store";
 
 export const useSyncEngine = () => {
   const [isSyncEngineInitialized, setIsSyncEngineInitialized] = useState(false);
@@ -16,12 +15,6 @@ export const useSyncEngine = () => {
 
   const userId = userAuthDetails.details?.profile?.uid;
   const isSyncingV2 = useSelector(getIsSyncingV2);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    window.syncingV2 = true;
-    dispatch(actions.setIsSyncingV2(true));
-  }, []);
 
   useEffect(() => {
     const workspaceId = activeWorkspace?.id ? `workspace-${activeWorkspace?.id}` : userId || `local`;
@@ -36,9 +29,7 @@ export const useSyncEngine = () => {
       });
     }
 
-    if (isSyncingV2) {
-      initSyncEngine();
-    }
+    initSyncEngine();
 
     return () => {
       console.log("!!!debug Disconnect Workspace", { workspaceId });
