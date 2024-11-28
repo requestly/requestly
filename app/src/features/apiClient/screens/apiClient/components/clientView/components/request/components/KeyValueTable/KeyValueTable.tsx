@@ -25,7 +25,8 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
   const handleUpdateRequestPairs = useCallback(
     (prev: RQAPI.Entry, pairType: KeyValueFormType, action: "add" | "update" | "delete", pair?: KeyValuePair) => {
       const updatedRequest = { ...prev.request };
-      let keyValuePairs = updatedRequest[pairType as keyof RQAPI.Entry["request"]] as KeyValuePair[];
+      const pairTypeToUpdate = pairType === KeyValueFormType.FORM ? "body" : pairType;
+      let keyValuePairs = updatedRequest[pairTypeToUpdate] as KeyValuePair[];
       if (!isArray(keyValuePairs)) keyValuePairs = [];
 
       switch (action) {
@@ -49,7 +50,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
             ...prev,
             request: {
               ...updatedRequest,
-              [pairType]: keyValuePairs.filter((item: KeyValuePair) => item.id !== pair?.id),
+              [pairTypeToUpdate]: keyValuePairs.filter((item: KeyValuePair) => item.id !== pair?.id),
             },
           };
       }
