@@ -186,6 +186,16 @@ const AppModeInitializer = () => {
               trackDesktopBGEvent(payload?.name, payload?.params);
             }
           });
+          window.RQ.DESKTOP.SERVICES.IPC.registerEvent("helper-server-hit", () => {
+            dispatch(
+              actions.updateDesktopSpecificAppProperty({
+                appId: "existing-terminal",
+                property: "isActive",
+                value: true,
+              })
+            );
+            trackDesktopBGEvent("helper-server-hit");
+          });
         });
       }
     }
