@@ -59,7 +59,6 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
     return <td {...restProps}>{children}</td>;
   }
 
-  console.log("record", record);
   return (
     <td {...restProps}>
       <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={record?.[dataIndex]}>
