@@ -26,7 +26,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { actions } from "store";
 import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../../../constants";
+import { CONTENT_TYPE_HEADER } from "../../../../constants";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import "./apiClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
@@ -70,7 +70,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   const { onSaveRecord } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
-  const { renderVariables, getCurrentEnvironmentVariables } = environmentManager;
+  const { getCurrentEnvironmentVariables } = environmentManager;
 
   const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
@@ -225,10 +225,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     const sanitizedEntry = sanitizeEntry(entry);
     sanitizedEntry.response = null;
 
-    const renderedRequest = renderVariables<RQAPI.Request>(sanitizedEntry.request);
-    renderedRequest.url = addUrlSchemeIfMissing(renderedRequest.url);
-
-    const renderedEntry = { ...sanitizedEntry, request: renderedRequest };
+    sanitizedEntry.request.url = addUrlSchemeIfMissing(sanitizedEntry.request.url);
 
     abortControllerRef.current = new AbortController();
 
@@ -236,35 +233,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    //Examples
-    //TODO to be removed
-    const responseScript = `
-    // const body=JSON.parse(rq.response.body);
-    // console.log("!!!debug",body);
-    console.log("!!!debug response",rq.response);
-    const testKeyResponse = rq.environment.get("testKeyRequest");
-    console.log("!!!testResponse",testKeyResponse,typeof testKeyResponse);
-    const testString=rq.environment.get("testKeyRequestString");
-    console.log("!!!testString",testString,typeof testString);
-  `;
-    const requestScript = `
-    // const body=JSON.parse(rq.response.body);
-    // console.log("!!!debug",body);
-    console.log("!!!debug request",rq.request);
-    rq.environment.set("testKeyRequest",true);
-    rq.environment.set("testKeyRequestString","testValue");
-  `;
-
-    executeAPIRequest(
-      appMode,
-      { ...renderedRequest, preRequestScript: requestScript, postResponseScript: responseScript },
-      environmentManager,
-      abortControllerRef.current.signal
-    )
-      .then((response) => {
+    executeAPIRequest(appMode, sanitizedEntry, environmentManager, abortControllerRef.current.signal)
+      .then((entry) => {
+        const response = entry.response;
         // TODO: Add an entry in history
-        const entryWithResponse = { ...entry, response };
-        const renderedEntryWithResponse = { ...renderedEntry, response };
+        const entryWithResponse = { ...sanitizedEntry, response };
+        const renderedEntryWithResponse = { ...entry, response };
 
         if (response) {
           setEntry(entryWithResponse);
@@ -292,17 +266,17 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         setIsLoadingResponse(false);
       });
 
-    trackAPIRequestSent({
-      method: renderedEntry.request.method,
-      queryParamsCount: renderedEntry.request.queryParams.length,
-      headersCount: renderedEntry.request.headers.length,
-      requestContentType: renderedEntry.request.contentType,
-      isDemoURL: renderedEntry.request.url === DEMO_API_URL,
-      path: location.pathname,
-    });
+    // trackAPIRequestSent({
+    //   method: renderedEntry.request.method,
+    //   queryParamsCount: renderedEntry.request.queryParams.length,
+    //   headersCount: renderedEntry.request.headers.length,
+    //   requestContentType: renderedEntry.request.contentType,
+    //   isDemoURL: renderedEntry.request.url === DEMO_API_URL,
+    //   path: location.pathname,
+    // });
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
-  }, [entry, renderVariables, environmentManager, appMode, location.pathname, dispatch, notifyApiRequestFinished]);
+  }, [entry, environmentManager, appMode, dispatch, notifyApiRequestFinished]);
 
   const handleRecordNameUpdate = async () => {
     if (!requestName || requestName === apiEntryDetails?.name) {

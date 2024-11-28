@@ -4,26 +4,30 @@ import { executePrerequestScript, executePostresponseScript } from "./APIClientU
 
 export const executeAPIRequest = async (
   appMode: string,
-  request: any, //TODO: to be added with correct type
+  entry: RQAPI.Entry,
   environmentManager: any,
   signal?: AbortSignal
-): Promise<RQAPI.Response | null> => {
+): Promise<RQAPI.Entry | null> => {
   try {
     // Process request configuration with environment variables
-    const processedRequestConfig = environmentManager.renderVariables(request);
+    const renderedRequest = environmentManager.renderVariables(entry.request);
 
-    if (request.preRequestScript) {
-      await executePrerequestScript(request.preRequestScript, processedRequestConfig, environmentManager);
+    if (entry.scripts.preRequest) {
+      await executePrerequestScript(entry.scripts.preRequest, renderedRequest, environmentManager);
     }
 
     // Make the actual API request
-    const response = await makeRequest(appMode, processedRequestConfig, signal);
+    const response = await makeRequest(appMode, renderedRequest, signal);
 
-    if (request.postResponseScript) {
-      await executePostresponseScript(request.postResponseScript, { response }, environmentManager);
+    if (entry.scripts.postResponse) {
+      await executePostresponseScript(entry.scripts.postResponse, { response }, environmentManager);
     }
 
-    return response;
+    return {
+      ...entry,
+      response,
+      request: renderedRequest,
+    };
   } catch (error) {
     return null;
   }
