@@ -185,3 +185,32 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 };
 
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
+
+export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
+  const collections: Record<string, RQAPI.Record> = {};
+  const requests: RQAPI.Record[] = [];
+
+  records.forEach((record) => {
+    if (isApiCollection(record)) {
+      collections[record.id] = {
+        ...record,
+        data: { ...record.data, ...(isApiCollection(record) && { children: [] }) },
+      };
+    } else if (isApiRequest(record)) {
+      collections[record.id] = record;
+    }
+  });
+
+  records.forEach((record) => {
+    if (record.collectionId) {
+      const parentNode = collections[record.collectionId] as RQAPI.CollectionRecord;
+      if (parentNode) {
+        parentNode.data.children.push(collections[record.id]);
+      }
+    } else {
+      requests.push(collections[record.id]);
+    }
+  });
+
+  return requests;
+};
