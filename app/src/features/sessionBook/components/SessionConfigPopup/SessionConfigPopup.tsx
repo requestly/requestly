@@ -16,7 +16,8 @@ import {
   getSessionRecordingAttributes,
 } from "store/features/session-recording/selectors";
 import { toast } from "utils/Toast";
-import { getUserAttributes, getAppMode, getUserAuthDetails } from "store/selectors";
+import { getUserAttributes, getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { trackDraftSessionSaved } from "features/sessionBook/analytics";

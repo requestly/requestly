@@ -10,13 +10,8 @@ import { StorageService } from "../../../../init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //REDUCER ACTIONS
 import { actions } from "../../../../store";
-import {
-  getAllGroups,
-  getAppMode,
-  getCurrentlySelectedRuleData,
-  getIsRefreshRulesPending,
-  getUserAuthDetails,
-} from "store/selectors";
+import { getAllGroups, getAppMode, getCurrentlySelectedRuleData, getIsRefreshRulesPending } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 //ACTIONS
 import { updateGroupOfSelectedRules, createNewGroup } from "./actions";
 // import { unselectAllRecords } from "../actions";

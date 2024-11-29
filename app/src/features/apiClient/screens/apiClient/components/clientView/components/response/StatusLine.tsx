@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { RQAPI } from "../../../../../types";
+import { RQAPI } from "../../../../../../types";
 import { Button, Popover, Space } from "antd";
 import PropertyRow from "./PropertyRow/PropertyRow";
 import { statusCodes } from "config/constants/sub/statusCode";
@@ -12,7 +12,7 @@ interface Props {
 
 const StatusLine: React.FC<Props> = ({ response }) => {
   const formattedTime = useMemo(() => {
-    if (response.time) {
+    if (response?.time) {
       const ms = Math.ceil(response.time);
 
       if (ms < 1000) {
@@ -23,12 +23,16 @@ const StatusLine: React.FC<Props> = ({ response }) => {
     }
 
     return "";
-  }, [response.time]);
+  }, [response?.time]);
 
   const formattedStatusText = useMemo(() => {
     // @ts-ignore
-    return response.statusText || statusCodes[response.status];
-  }, [response.status, response.statusText]);
+    return response?.statusText || statusCodes[response?.status];
+  }, [response?.status, response?.statusText]);
+
+  if (!response) {
+    return null;
+  }
 
   return (
     <Space className="api-response-status-line">

@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Empty } from "antd";
 import APP_CONSTANTS from "config/constants";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import {

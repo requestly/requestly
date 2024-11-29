@@ -5,7 +5,7 @@ import InviteNotFound from "./InviteNotFound";
 import BadLoginInvite from "./BadLoginInvite";
 import AcceptedInvite from "./AcceptedInvite";
 import ExpiredInvite from "./ExpiredInvite";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import SpinnerCard from "../SpinnerCard";
 import { trackWorkspaceInviteScreenError } from "modules/analytics/events/features/teams";

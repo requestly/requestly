@@ -10,7 +10,7 @@ import {
   getIsIncentivizationDetailsLoading,
 } from "store/features/incentivization/selectors";
 import { getTotalCredits } from "features/incentivization/utils";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import "./creditsProgessbar.scss";
 import APP_CONSTANTS from "config/constants";

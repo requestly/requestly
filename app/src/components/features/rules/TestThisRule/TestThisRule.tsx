@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getAppMode, getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Col } from "antd";
 import { TestReportsTable } from "./components/TestReportsTable";
 import { getTabSession } from "actions/ExtensionActions";

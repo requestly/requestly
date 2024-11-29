@@ -17,7 +17,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { ImportCollectionsModal } from "../../modals/importCollectionsModal/ImportCollectionsModal";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";

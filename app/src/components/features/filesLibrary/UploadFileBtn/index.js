@@ -7,7 +7,7 @@ import { handleFileInput } from "./actions";
 import { actions } from "store";
 
 //UTILS
-import { getUserAuthDetails } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 //CONSTANTS
 import APP_CONSTANTS from "config/constants";

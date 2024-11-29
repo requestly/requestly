@@ -6,7 +6,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
 import CopyButton from "components/misc/CopyButton";
 import { toast } from "utils/Toast";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./index.css";
 import {
   trackWorkspaceInviteLinkGenerated,

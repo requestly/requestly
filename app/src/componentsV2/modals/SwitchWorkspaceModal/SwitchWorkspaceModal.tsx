@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { Avatar, Button, Col, Row } from "antd";
 import { RQModal } from "lib/design-system/components";

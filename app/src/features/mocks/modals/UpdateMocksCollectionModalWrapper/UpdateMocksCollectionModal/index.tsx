@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { MockType, RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import { RQModal } from "lib/design-system/components";
 import { Button, Select, SelectProps, message } from "antd";
