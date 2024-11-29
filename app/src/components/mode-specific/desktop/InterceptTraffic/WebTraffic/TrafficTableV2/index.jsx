@@ -46,6 +46,7 @@ import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
 import { doesStatusCodeMatchLabels, getGraphQLOperationValues } from "./utils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
+import { RQTooltip } from "lib/design-system-v2/components/RQTooltip/RQTooltip";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -473,7 +474,7 @@ const CurrentTrafficTable = ({
       const isSelected = trafficTableFilters[key].includes(logName);
 
       return (
-        <Tooltip mouseEnterDelay={0.3} placement="right" title={logName.length >= 20 ? logName : ""} color="#000000">
+        <RQTooltip mouseEnterDelay={0.3} placement="right" title={logName.length >= 20 ? logName : ""}>
           <Avatar size={18} src={avatarUrl} style={{ display: "inline-block", marginRight: "4px" }} />
           <span className="log-name">{`  ${logName}`}</span>
           {isSelected && (
@@ -487,7 +488,7 @@ const CurrentTrafficTable = ({
               />
             </Tooltip>
           )}
-        </Tooltip>
+        </RQTooltip>
       );
     },
     [handleClearFilter, trafficTableFilters]
