@@ -169,13 +169,14 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
   });
 
   records.forEach((record) => {
+    const recordState = collections[record.id];
     if (record.collectionId) {
       const parentNode = collections[record.collectionId] as RQAPI.CollectionRecord;
       if (parentNode) {
-        parentNode.data.children.push(collections[record.id]);
+        parentNode.data.children.push(recordState);
       }
     } else {
-      requests.push(collections[record.id]);
+      requests.push(recordState);
     }
   });
 
