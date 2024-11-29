@@ -35,14 +35,14 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
             setIsEditMode(true);
           },
         },
-        {
-          key: "1",
-          label: <div>Export</div>,
-          onClick: (itemInfo) => {
-            itemInfo.domEvent?.stopPropagation?.();
-            onExportClick(record);
-          },
-        },
+        // {
+        //   key: "1",
+        //   label: <div>Export</div>,
+        //   onClick: (itemInfo) => {
+        //     itemInfo.domEvent?.stopPropagation?.();
+        //     onExportClick(record);
+        //   },
+        // },
         {
           key: "2",
           label: <div>Delete</div>,
@@ -133,6 +133,15 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                 if (apiRecord.type === RQAPI.RecordType.API) {
                   // For now there will only be requests inside collection
                   return <RequestRow key={apiRecord.id} record={apiRecord} />;
+                } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
+                  return (
+                    <CollectionRow
+                      key={apiRecord.id}
+                      record={apiRecord}
+                      onNewClick={onNewClick}
+                      onExportClick={onExportClick}
+                    />
+                  );
                 }
 
                 return null; // Just to avoid warning, this case wont happen!
