@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Typography, Tooltip, Space, Button } from "antd";
 //UTILS
-import { getUserAuthDetails, getAppMode, getRulesSelection } from "../../../../store/selectors";
+import { getAppMode, getRulesSelection } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 //CONSTANTS

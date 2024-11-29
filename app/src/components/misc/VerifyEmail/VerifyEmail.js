@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 // SUB COMPONENT
 import LoginRequiredCTA from "../../authentication/LoginRequiredCTA";
 //UTILS
-import { getAppMode, getUserAuthDetails } from "../../../store/selectors";
+import { getAppMode } from "../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToRules } from "utils/RedirectionUtils";
 import {
   setEmailVerified,

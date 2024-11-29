@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { Input } from "antd";
 import { upsertApiRecord } from "backend/apiClient";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";

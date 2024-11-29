@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { actions } from "store";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { capitalize } from "lodash";

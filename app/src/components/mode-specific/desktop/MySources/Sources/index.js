@@ -26,7 +26,6 @@ import {
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
 import "./index.css";
-import { trackTrafficInterceptionStarted } from "modules/analytics/events/desktopApp";
 import TroubleshootLink from "./InstructionsModal/common/InstructionsTroubleshootButton";
 import PATHS from "config/constants/sub/paths";
 import { getConnectedAppsCount } from "utils/Misc";
@@ -173,7 +172,6 @@ const Sources = ({ isOpen, toggle, ...props }) => {
 
             // navigate to traffic table
             redirectToTraffic(navigate);
-            trackTrafficInterceptionStarted(getAppName(appId));
           } else if (res.metadata && res.metadata.closeConfirmRequired) {
             setAppIdToCloseConfirm(appId);
             setIsCloseConfirmModalActive(true);

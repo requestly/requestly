@@ -2,7 +2,7 @@ import { trackBillingTeamNoMemberFound } from "features/settings/analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { OrgMember } from "../types";
 import Logger from "../../../../../../../common/logger";

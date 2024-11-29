@@ -41,7 +41,7 @@ import { RuleType } from "types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import PATHS from "config/constants/sub/paths";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
 import { useIsNewUserForIncentivization } from "features/incentivization/hooks/useIsNewUserForIncentivization";

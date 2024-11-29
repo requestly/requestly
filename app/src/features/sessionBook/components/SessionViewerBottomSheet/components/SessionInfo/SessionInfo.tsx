@@ -15,7 +15,7 @@ import {
 import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { updateSessionDescription, updateSessionName } from "../../../../screens/SavedSessionScreen/components/utils";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./sessionInfo.scss";
 

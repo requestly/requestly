@@ -1,7 +1,8 @@
 import { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { StorageService } from "init";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import firebaseApp from "../firebase";
 import { submitAttrUtil } from "utils/AnalyticsUtils";

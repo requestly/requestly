@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useScript } from "./useScript";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails, getAppMode } from "store/selectors";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { handleOnetapSignIn } from "actions/FirebaseActions";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 //@ts-ignore

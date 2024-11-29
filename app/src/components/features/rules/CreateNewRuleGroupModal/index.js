@@ -9,7 +9,8 @@ import { StorageService } from "../../../../init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // REDUCER ACTIONS
 import { actions } from "../../../../store";
-import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 //FUNCTIONS
 import { generateObjectId } from "../../../../utils/FormattingHelper";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
