@@ -154,30 +154,32 @@ export const isApiCollection = (record: RQAPI.Record) => {
 };
 
 export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
-  const collections: Record<string, RQAPI.Record> = {};
-  const requests: RQAPI.Record[] = [];
+  const recordsCopy = [...records];
+  const recordsMap: Record<string, RQAPI.Record> = {};
+  const updatedRecords: RQAPI.Record[] = [];
 
-  records.forEach((record) => {
+  recordsCopy.forEach((record) => {
     if (isApiCollection(record)) {
-      collections[record.id] = {
+      recordsMap[record.id] = {
         ...record,
-        data: { ...record.data, ...(isApiCollection(record) && { children: [] }) },
+        data: { ...record.data, children: [] },
       };
     } else if (isApiRequest(record)) {
-      collections[record.id] = record;
+      recordsMap[record.id] = record;
     }
   });
 
-  records.forEach((record) => {
+  recordsCopy.forEach((record) => {
+    const recordState = recordsMap[record.id];
     if (record.collectionId) {
-      const parentNode = collections[record.collectionId] as RQAPI.CollectionRecord;
+      const parentNode = recordsMap[record.collectionId] as RQAPI.CollectionRecord;
       if (parentNode) {
-        parentNode.data.children.push(collections[record.id]);
+        parentNode.data.children.push(recordState);
       }
     } else {
-      requests.push(collections[record.id]);
+      updatedRecords.push(recordState);
     }
   });
 
-  return requests;
+  return updatedRecords;
 };
