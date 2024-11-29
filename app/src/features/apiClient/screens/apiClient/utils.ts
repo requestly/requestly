@@ -154,31 +154,32 @@ export const isApiCollection = (record: RQAPI.Record) => {
 };
 
 export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
-  const collections: Record<string, RQAPI.Record> = {};
-  const requests: RQAPI.Record[] = [];
+  const recordsCopy = [...records];
+  const recordMap: Record<string, RQAPI.Record> = {};
+  const updatedRecords: RQAPI.Record[] = [];
 
-  records.forEach((record) => {
+  recordsCopy.forEach((record) => {
     if (isApiCollection(record)) {
-      collections[record.id] = {
+      recordMap[record.id] = {
         ...record,
         data: { ...record.data, children: [] },
       };
     } else if (isApiRequest(record)) {
-      collections[record.id] = record;
+      recordMap[record.id] = record;
     }
   });
 
-  records.forEach((record) => {
-    const recordState = collections[record.id];
+  recordsCopy.forEach((record) => {
+    const recordState = recordMap[record.id];
     if (record.collectionId) {
-      const parentNode = collections[record.collectionId] as RQAPI.CollectionRecord;
+      const parentNode = recordMap[record.collectionId] as RQAPI.CollectionRecord;
       if (parentNode) {
         parentNode.data.children.push(recordState);
       }
     } else {
-      requests.push(recordState);
+      updatedRecords.push(recordState);
     }
   });
 
-  return requests;
+  return updatedRecords;
 };
