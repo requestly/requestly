@@ -15,7 +15,7 @@ import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOut
 import { RQAPI } from "features/apiClient/types";
 import { upsertApiRecord } from "backend/apiClient";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { Row } from "antd";
@@ -174,10 +174,19 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     let importedCollectionsCount = 0;
     let failedCollectionsCount = 0;
 
-    const collections = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.COLLECTION);
+    // Filter root collections and sub-collections
+    const rootCollections = processedFileData.apiRecords.filter(
+      (record) => record.type === RQAPI.RecordType.COLLECTION && record.collectionId === ""
+    );
+    const subCollections = processedFileData.apiRecords.filter(
+      (record) => record.type === RQAPI.RecordType.COLLECTION && record.collectionId !== ""
+    );
     const apis = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.API);
 
-    const collectionsPromises = collections.map(async (collection) => {
+    let oldToNewCollectionIds: Record<string, { newId: string }> = {};
+
+    // Import root collections first
+    const rootCollectionsPromises = rootCollections.map(async (collection) => {
       const collectionToImport = {
         ...collection,
         name: `(Imported) ${collection.name}`,
@@ -193,7 +202,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         };
       } catch (error) {
         failedCollectionsCount++;
-        Logger.error("Error importing collection:", error);
+        Logger.error("Error importing root collection:", error);
         return {
           oldId: collection.id,
           newId: null,
@@ -201,8 +210,8 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       }
     });
 
-    const collectionsResult = await Promise.allSettled(collectionsPromises);
-    const oldToNewCollectionIds: Record<string, { newId: string }> = collectionsResult.reduce((result, details) => {
+    const rootCollectionsResult = await Promise.allSettled(rootCollectionsPromises);
+    oldToNewCollectionIds = rootCollectionsResult.reduce((result, details) => {
       if (details.status === "fulfilled") {
         return {
           ...result,
@@ -211,6 +220,47 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       }
       return result;
     }, {});
+
+    // Import sub-collections with updated parent collection IDs
+    const subCollectionsPromises = subCollections.map(async (subCollection) => {
+      const newCollectionId = oldToNewCollectionIds[subCollection.collectionId]?.newId;
+      if (!newCollectionId) {
+        Logger.error(`Failed to find new collection ID for sub-collection: ${subCollection.name || subCollection.id}`);
+        failedCollectionsCount++;
+        return { oldId: subCollection.id, newId: null };
+      }
+
+      const subCollectionToImport = {
+        ...subCollection,
+        name: `(Imported) ${subCollection.name}`,
+        collectionId: newCollectionId, // Update to new parent collection ID
+      };
+      delete subCollectionToImport.id;
+      try {
+        const newSubCollection = await upsertApiRecord(
+          user?.details?.profile?.uid,
+          subCollectionToImport,
+          workspace?.id
+        );
+        onSaveRecord(newSubCollection.data);
+        importedCollectionsCount++;
+        // Update the mapping for sub-collections as well for requests
+        oldToNewCollectionIds[subCollection.id] = { newId: newSubCollection.data.id };
+        return {
+          oldId: subCollection.id,
+          newId: newSubCollection.data.id,
+        };
+      } catch (error) {
+        failedCollectionsCount++;
+        Logger.error("Error importing sub-collection:", error);
+        return {
+          oldId: subCollection.id,
+          newId: null,
+        };
+      }
+    });
+
+    await Promise.allSettled(subCollectionsPromises);
 
     // Import APIs with updated collection IDs
     await Promise.allSettled(
