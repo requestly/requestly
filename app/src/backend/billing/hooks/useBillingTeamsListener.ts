@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 import firebaseApp from "../../../firebase";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { collection, getDocs, getFirestore, onSnapshot, query, where } from "firebase/firestore";
 import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
 import { getAuth } from "firebase/auth";

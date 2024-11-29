@@ -5,7 +5,7 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { VariablesList } from "../VariablesList/VariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
 import PATHS from "config/constants/sub/paths";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import "./environmentView.scss";
 

@@ -17,7 +17,7 @@ import {
 // Sub Components
 import SpinnerColumn from "../../../../../../../../components/misc/SpinnerColumn";
 // UTILS
-import { getUserAuthDetails } from "../../../../../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { filterUniqueObjects } from "../../../../../../../../utils/FormattingHelper";
 import InvoiceStatus from "./InvoiceStatus";
 import ProTable from "@ant-design/pro-table";

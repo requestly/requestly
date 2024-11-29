@@ -51,8 +51,8 @@ export const trackProxyPortChangeRequested = () => {
   trackEvent(PROXY_PORT_CHANGE_REQUESTED, params);
 };
 
-export const trackTrafficInterceptionStarted = (app_name) => {
-  const params = { app_name };
+export const trackTrafficInterceptionStarted = (connectedApps) => {
+  const params = { connectedApps };
   trackEvent(TRAFFIC_TABLE.TRAFFIC_INTERCEPTION_STARTED, params);
 };
 

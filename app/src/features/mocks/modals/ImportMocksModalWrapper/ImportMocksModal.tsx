@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useNavigate } from "react-router-dom";
 import Logger from "lib/logger";
 import { FilePicker } from "components/common/FilePicker";

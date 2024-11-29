@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Alert, Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { TbInfoTriangle } from "@react-icons/all-files/tb/TbInfoTriangle";

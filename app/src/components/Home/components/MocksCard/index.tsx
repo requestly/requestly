@@ -5,7 +5,7 @@ import { Col, Row, Spin } from "antd";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { RQButton } from "lib/design-system/components";
 import { getMocks } from "backend/mocks/getMocks";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { MockRecordType, MockType, RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { HomepageEmptyCard } from "../EmptyCard";
 import { m, AnimatePresence } from "framer-motion";

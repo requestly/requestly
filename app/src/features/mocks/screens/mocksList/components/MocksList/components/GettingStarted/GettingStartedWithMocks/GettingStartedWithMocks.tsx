@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Row, Col } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { AiOutlineCloudUpload } from "@react-icons/all-files/ai/AiOutlineCloudUpload";
 import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";

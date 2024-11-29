@@ -8,7 +8,8 @@ import { TbMailForward } from "@react-icons/all-files/tb/TbMailForward";
 
 import "./supportPanel.scss";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getIsSupportChatOpened, getUserAuthDetails } from "store/selectors";
+import { getIsSupportChatOpened } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { RequestBot } from "features/requestBot";

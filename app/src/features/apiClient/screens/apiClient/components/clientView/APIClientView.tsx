@@ -25,7 +25,8 @@ import {
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { actions } from "store";
-import { getAppMode, getIsExtensionEnabled, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsExtensionEnabled } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../../../constants";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import "./apiClientView.scss";

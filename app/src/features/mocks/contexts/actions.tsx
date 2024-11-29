@@ -10,7 +10,7 @@ import {
   RQMockSchema,
 } from "components/features/mocksV2/types";
 import { updateMock } from "backend/mocks/updateMock";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import {

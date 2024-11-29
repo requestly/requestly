@@ -3,8 +3,8 @@ import React, { memo, useEffect, useMemo, useState } from "react";
 import { KeyValueFormType, RQAPI, RequestContentType } from "../../../../../../../../types";
 import RequestBody from "../../RequestBody";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
-import "./requestTabs.scss";
 import { KeyValueTable } from "../KeyValueTable/KeyValueTable";
+import "./requestTabs.scss";
 
 enum Tab {
   QUERY_PARAMS = "query_params",

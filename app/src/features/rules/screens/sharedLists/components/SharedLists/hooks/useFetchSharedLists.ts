@@ -1,7 +1,8 @@
 import { fetchSharedLists } from "backend/sharedList/fetchSharedLists";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getIsExtensionEnabled, getIsRefreshSharesListsPending, getUserAuthDetails } from "store/selectors";
+import { getIsExtensionEnabled, getIsRefreshSharesListsPending } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
