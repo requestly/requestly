@@ -161,7 +161,7 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
     if (isApiCollection(record)) {
       collections[record.id] = {
         ...record,
-        data: { ...record.data, ...(isApiCollection(record) && { children: [] }) },
+        data: { ...record.data, children: [] },
       };
     } else if (isApiRequest(record)) {
       collections[record.id] = record;
