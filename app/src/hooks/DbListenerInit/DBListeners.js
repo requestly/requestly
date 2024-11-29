@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace, getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
-import { getAppMode, getAuthInitialization, getUserAuthDetails } from "../../store/selectors";
+import { getAppMode, getAuthInitialization } from "../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import availableTeamsListener from "./availableTeamsListener";
 import syncingNodeListener from "./syncingNodeListener";
 import userNodeListener from "./userNodeListener";

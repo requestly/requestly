@@ -6,7 +6,8 @@ import { toast } from "utils/Toast.js";
 import SpinnerColumn from "../../../misc/SpinnerColumn";
 //SERVICES
 import { StorageService } from "../../../../init";
-import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "../../../../store/selectors";
+import { getAppMode, getIsRefreshRulesPending } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { actions } from "../../../../store";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";

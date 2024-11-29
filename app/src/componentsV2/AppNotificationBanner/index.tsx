@@ -5,7 +5,8 @@ import { useDispatch } from "react-redux";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useSelector } from "react-redux";
-import { getAppNotificationBannerDismissTs, getUserAuthDetails } from "store/selectors";
+import { getAppNotificationBannerDismissTs } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { OrgNotificationBanner } from "./OrgNotificationBanner";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
@@ -25,6 +26,7 @@ enum BANNER_TYPE {
 
 enum BANNER_ACTIONS {
   UPGRADE = "upgrade",
+  CLAIM_NOW = "claim_now",
   CONTACT_US = "contact_us",
   REQUEST_ACCESS = "request_access",
   REDIRECT_TO_ACCELERATOR_FORM = "redirect_to_accelerator_form",
@@ -61,6 +63,13 @@ export const AppNotificationBanner = () => {
     return {
       [BANNER_ACTIONS.UPGRADE]: {
         label: "upgrade",
+        type: "primary",
+        onClick: () => {
+          dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
+        },
+      },
+      [BANNER_ACTIONS.CLAIM_NOW]: {
+        label: "Claim now!",
         type: "primary",
         onClick: () => {
           dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));

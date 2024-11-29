@@ -6,9 +6,9 @@ import {
   getAppMode,
   getDesktopSpecificDetails,
   getHasConnectedApp,
-  getUserAuthDetails,
   getUserPersonaSurveyDetails,
 } from "../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // ACTIONS
@@ -185,6 +185,16 @@ const AppModeInitializer = () => {
               // todo: need to setup relay for BG renderer events
               trackDesktopBGEvent(payload?.name, payload?.params);
             }
+          });
+          window.RQ.DESKTOP.SERVICES.IPC.registerEvent("helper-server-hit", () => {
+            dispatch(
+              actions.updateDesktopSpecificAppProperty({
+                appId: "existing-terminal",
+                property: "isActive",
+                value: true,
+              })
+            );
+            trackDesktopBGEvent("helper-server-hit");
           });
         });
       }

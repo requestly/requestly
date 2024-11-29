@@ -8,6 +8,15 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.11.25",
+    logs: [
+      "[ENGG-2394] [ENGG-2366] [ENGG-2367] fix: socket connection breaking between desktop app and extension",
+      "chore: run npm audit fix",
+      "[ENGG-2436] fix: response rule creation from devtools for graphql request",
+      "[ENGG-2421] handled prerendered requests in rule execution",
+    ],
+  },
+  {
     version: "24.11.4",
     logs: [
       "fix: copy in analytics inspector",
