@@ -113,10 +113,11 @@ export const processPostmanCollectionData = (
     items.forEach((item) => {
       if (item.item?.length) {
         // This is a sub-collection
-        const collectionId = uuidv4();
-        result.collections.push(createCollectionRecord(item.name, collectionId));
+        const subCollection = createCollectionRecord(item.name, uuidv4());
+        subCollection.collectionId = parentCollectionId;
+        result.collections.push(subCollection);
 
-        const subItems = processItems(item.item, collectionId);
+        const subItems = processItems(item.item, subCollection.id);
         result.collections.push(...subItems.collections);
         result.apis.push(...subItems.apis);
       } else if (item.request) {
@@ -130,6 +131,7 @@ export const processPostmanCollectionData = (
 
   const rootCollectionId = uuidv4();
   const rootCollection = createCollectionRecord(fileContent.info.name, rootCollectionId);
+  rootCollection.collectionId = "";
   const processedItems = processItems(fileContent.item, rootCollectionId);
 
   return {
