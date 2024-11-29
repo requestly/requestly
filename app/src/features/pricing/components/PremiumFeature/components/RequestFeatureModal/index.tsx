@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import Modal from "antd/lib/modal/Modal";
 import { Col, Row, Space, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";

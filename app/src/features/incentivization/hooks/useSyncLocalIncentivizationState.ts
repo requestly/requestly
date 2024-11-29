@@ -4,7 +4,7 @@ import {
   getIncentivizationMilestones,
   getLocalIncentivizationEventsState,
 } from "store/features/incentivization/selectors";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { UserMilestoneAndRewardDetails } from "../types";
 import { HttpsCallableResult } from "firebase/functions";
 import { incentivizationActions } from "store/features/incentivization/slice";

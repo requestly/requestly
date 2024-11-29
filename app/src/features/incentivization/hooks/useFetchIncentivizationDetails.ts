@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { IncentivizeEvent, Milestones, UserMilestoneAndRewardDetails } from "../types";
 import { incentivizationActions } from "store/features/incentivization/slice";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSyncLocalIncentivizationState } from "./useSyncLocalIncentivizationState";
 import { useIsNewUserForIncentivization } from "./useIsNewUserForIncentivization";
 import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "../constants";

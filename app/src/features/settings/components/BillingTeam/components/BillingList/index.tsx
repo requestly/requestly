@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { useSelector } from "react-redux";
 import APP_CONSTANTS from "config/constants";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { PRICING } from "features/pricing";
 import { UserPlanDetails } from "../UserPlanDetails";
 

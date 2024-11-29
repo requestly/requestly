@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails, getAppMode, getIsJoinWorkspaceCardVisible } from "store/selectors";
+import { getAppMode, getIsJoinWorkspaceCardVisible } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Avatar, Button, Col, Row } from "antd";

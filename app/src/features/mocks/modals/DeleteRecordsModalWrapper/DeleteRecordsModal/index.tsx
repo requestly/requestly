@@ -11,7 +11,7 @@ import { trackDeleteMockEvent } from "modules/analytics/events/features/mocksV2"
 import { deleteMock } from "backend/mocks/deleteMock";
 import Logger from "../../../../../../../common/logger";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import "./deleteRecordsModal.scss";
 

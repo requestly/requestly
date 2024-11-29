@@ -12,7 +12,7 @@ import { ApiClientSidebarHeader } from "./apiClientSidebarHeader/ApiClientSideba
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToApiClientCollection, redirectToNewEnvironment, redirectToRequest } from "utils/RedirectionUtils";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import "./apiClientSidebar.scss";

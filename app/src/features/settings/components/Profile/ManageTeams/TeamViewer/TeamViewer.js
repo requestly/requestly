@@ -12,7 +12,7 @@ import { trackWorkspaceSettingToggled } from "modules/analytics/events/common/te
 import SwitchWorkspaceButton from "./SwitchWorkspaceButton";
 import { useIsTeamAdmin } from "./hooks/useIsTeamAdmin";
 import "./TeamViewer.css";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 const TeamViewer = () => {
   const { teamId } = useParams();

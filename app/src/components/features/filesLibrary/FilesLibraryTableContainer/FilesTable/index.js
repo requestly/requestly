@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import ProTable from "@ant-design/pro-table";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useNavigate } from "react-router-dom";
 import APP_CONSTANTS from "config/constants";
 import { redirectToFileViewer } from "utils/RedirectionUtils";

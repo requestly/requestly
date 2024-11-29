@@ -2,13 +2,8 @@ import React, { useEffect, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { Divider, Input, Row, Menu, Dropdown } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getAllGroups,
-  getAppMode,
-  getCurrentlySelectedRuleData,
-  getIsRefreshRulesPending,
-  getUserAuthDetails,
-} from "store/selectors";
+import { getAllGroups, getAppMode, getCurrentlySelectedRuleData, getIsRefreshRulesPending } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { createNewGroup, updateGroupOfSelectedRules } from "components/features/rules/ChangeRuleGroupModal/actions";
 import { actions } from "store";
 import { StorageService } from "init";

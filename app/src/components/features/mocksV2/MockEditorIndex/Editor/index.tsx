@@ -9,7 +9,7 @@ import { Tabs } from "antd";
 import APP_CONSTANTS from "config/constants";
 import React, { ReactNode, useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import { FileType, MockType, RQMockCollection } from "../../types";
 import type { TabsProps } from "antd";

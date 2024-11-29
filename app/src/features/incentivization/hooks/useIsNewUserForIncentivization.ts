@@ -1,12 +1,8 @@
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import {
-  getDaysSinceSignup,
-  getExtensionInstallDate,
-  getExtensionSignupDate,
-  getUserAuthDetails,
-} from "store/selectors";
+import { getDaysSinceSignup, getExtensionInstallDate, getExtensionSignupDate } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 /**
  * @param {string} date - release date

@@ -5,7 +5,7 @@ import { Button, Typography } from "antd";
 import { toast } from "utils/Toast.js";
 // UTILS
 import DataStoreUtils from "../../../../../utils/DataStoreUtils";
-import { getUserAuthDetails } from "../../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 // ACTIONS
 import { updateUserProfile } from "./actions";
 // CONSTANTS

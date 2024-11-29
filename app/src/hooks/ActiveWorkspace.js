@@ -3,7 +3,7 @@ import { isEmpty } from "lodash";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import {
   getTeamUserRuleAllConfigsPath,
   getTeamUserRuleConfigPath,

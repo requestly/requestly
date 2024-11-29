@@ -44,12 +44,16 @@ export const applyScriptRules = async (tabId: number, frameId: number, url: stri
   if (appliedScriptRules.length > 0) {
     // FIXME: Performance can be improved
     appliedScriptRules.forEach((rule) => {
-      ruleExecutionHandler.onRuleExecuted(rule, {
-        url: url,
-        tabId: tabId,
-        method: "GET",
-        type: frameId === 0 ? ResourceType.MainDocument : ResourceType.IFrameDocument,
-      } as chrome.webRequest.WebRequestDetails);
+      ruleExecutionHandler.onRuleExecuted(
+        rule,
+        {
+          url: url,
+          tabId: tabId,
+          method: "GET",
+          type: frameId === 0 ? ResourceType.MainDocument : ResourceType.IFrameDocument,
+        } as chrome.webRequest.WebRequestDetails,
+        true
+      );
     });
   }
 };

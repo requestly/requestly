@@ -4,7 +4,7 @@ import { Avatar, Button, Col, Tag, Menu, Row, Tooltip, Checkbox, Space } from "a
 import { CloseOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
-import { makeOriginalLog } from "capture-console-logs";
+// import { makeOriginalLog } from "capture-console-logs";
 import { getActiveModals, getDesktopSpecificDetails } from "store/selectors";
 import { actions } from "store";
 import FixedRequestLogPane from "./FixedRequestLogPane";
@@ -24,9 +24,10 @@ import {
   getLogResponseById,
 } from "store/features/desktop-traffic-table/selectors";
 import Logger from "lib/logger";
-import { getConnectedAppsCount } from "utils/Misc";
+import { getConnectedAppNames, getConnectedAppsCount } from "utils/Misc";
 import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
 import {
+  trackTrafficInterceptionStarted,
   trackTrafficTableFilterApplied,
   trackTrafficTableLogsCleared,
   trackTrafficTableRequestClicked,
@@ -82,7 +83,7 @@ const CurrentTrafficTable = ({
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
 
-  const [consoleLogsShown, setConsoleLogsShown] = useState([]);
+  // const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
 
@@ -138,15 +139,15 @@ const CurrentTrafficTable = ({
     handlePreviewVisibility(false);
   };
 
-  const printLogsToConsole = useCallback(
-    (log) => {
-      if (log.consoleLogs && !consoleLogsShown.includes(log.id)) {
-        log.consoleLogs.forEach((consoleLog) => [makeOriginalLog(consoleLog)]);
-        setConsoleLogsShown((c) => [...c, log.id]);
-      }
-    },
-    [consoleLogsShown]
-  );
+  // const printLogsToConsole = useCallback(
+  //   (log) => {
+  //     if (log.consoleLogs && !consoleLogsShown.includes(log.id)) {
+  //       log.consoleLogs.forEach((consoleLog) => [makeOriginalLog(consoleLog)]);
+  //       setConsoleLogsShown((c) => [...c, log.id]);
+  //     }
+  //   },
+  //   [consoleLogsShown]
+  // );
 
   const clearLogs = () => {
     // New Logs Clear
@@ -191,8 +192,18 @@ const CurrentTrafficTable = ({
     [setAppList]
   );
 
-  useEffect(() => {
-    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
+  const trackIfFirstLog = useCallback(
+    (rqLog) => {
+      if (rqLog && newLogs.length === 0) {
+        const currentlyConnectedApps = getConnectedAppNames(Object.values(desktopSpecificDetails.appsList));
+        trackTrafficInterceptionStarted(currentlyConnectedApps);
+      }
+    },
+    [newLogs.length, desktopSpecificDetails.appsList]
+  );
+
+  const handleLogNetworkRequest = useCallback(
+    (payload) => {
       if (isInterceptingTraffic) {
         const rqLog = convertProxyLogToUILog(payload);
         if (rqLog?.domain) {
@@ -201,20 +212,27 @@ const CurrentTrafficTable = ({
         if (rqLog?.app) {
           updateAppList(rqLog.app);
         }
-
         // @wrongsahil: Disabling this for now as this is leading to rerendering of this component which is degrading the perfomance
         // printLogsToConsole(rqLog);
 
+        trackIfFirstLog(rqLog);
         saveLogInRedux(rqLog);
       }
-    });
+    },
+    [isInterceptingTraffic, updateDomainList, updateAppList, trackIfFirstLog, saveLogInRedux]
+  );
+
+  useEffect(() => {
+    if (window?.RQ?.DESKTOP?.SERVICES?.IPC) {
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", handleLogNetworkRequest);
+    }
 
     return () => {
-      if (window.RQ?.DESKTOP) {
-        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
+      if (window.RQ?.DESKTOP?.SERVICES?.IPC) {
+        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2", handleLogNetworkRequest);
       }
     };
-  }, [printLogsToConsole, saveLogInRedux, isInterceptingTraffic, updateDomainList, updateAppList]);
+  }, [handleLogNetworkRequest]);
 
   useEffect(() => {
     if (window.RQ?.DESKTOP && !isStaticPreview) {

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Col } from "antd";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { OrgMembersTable } from "./components/OrgMembersTable/OrgMembersTable";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { capitalize } from "lodash";

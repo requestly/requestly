@@ -3,7 +3,7 @@ import emptyCardImage from "../../../../../assets/empty-card.svg";
 import { RQButton } from "lib/design-system-v2/components";
 import APP_CONSTANTS from "config/constants";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { actions } from "store";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentAnalyticsSource } from "features/apiClient/screens/environment/types";
