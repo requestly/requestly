@@ -4,7 +4,7 @@ import { Button, Modal } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import isEmpty from "is-empty";
 //UTILS
-import { getUserAuthDetails } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 //ACTIONS
 import { fetchFiles, fetchUserMocks } from "../FilesLibraryIndexPage/actions";
 //SUB COMPONENTS

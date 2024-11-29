@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Col, Row } from "antd";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQButton } from "lib/design-system/components";
 import { TbChecks } from "@react-icons/all-files/tb/TbChecks";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";

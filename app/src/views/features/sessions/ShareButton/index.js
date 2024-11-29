@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getSessionRecordingVisibility } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 const ShareButton = ({ recordingId, showShareModal }) => {
   const dispatch = useDispatch();

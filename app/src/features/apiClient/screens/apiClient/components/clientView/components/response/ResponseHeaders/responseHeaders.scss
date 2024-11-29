@@ -1,0 +1,9 @@
+.api-client-response-headers {
+  height: calc(100% - 46px);
+  overflow: hidden;
+
+  .properties-grid-container {
+    height: 100%;
+    overflow-y: auto;
+  }
+}

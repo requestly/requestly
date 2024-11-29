@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Col, Row } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import CopyButton from "components/misc/CopyButton";
 import { RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { redirectToMockEditorEditMock } from "utils/RedirectionUtils";

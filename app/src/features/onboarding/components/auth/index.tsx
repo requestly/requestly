@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { AuthForm } from "./components/Form";
 import { OnboardingAuthBanner } from "./components/Banner";
 import AUTH from "config/constants/sub/auth";

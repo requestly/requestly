@@ -6,7 +6,7 @@ import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { MockEditorHeader } from "./Header";
 import CopyToClipboard from "react-copy-to-clipboard";
 //UTILS
-import { getUserAuthDetails } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToFiles, redirectToMocks } from "../../../../utils/RedirectionUtils";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../config/constants";

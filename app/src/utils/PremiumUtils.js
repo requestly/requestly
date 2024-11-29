@@ -16,6 +16,8 @@ export const getPlanNameFromId = (planId) => {
       return PRICING.PLAN_NAMES.LITE;
     case PRICING.PLAN_NAMES.BASIC_V2:
       return PRICING.PLAN_NAMES.BASIC_V2;
+    case PRICING.PLAN_NAMES.ENTERPRISE:
+      return PRICING.PLAN_NAMES.ENTERPRISE;
     default:
       return PRICING.PLAN_NAMES.PROFESSIONAL;
   }

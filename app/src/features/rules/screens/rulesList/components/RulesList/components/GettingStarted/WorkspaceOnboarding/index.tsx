@@ -2,12 +2,12 @@ import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Modal } from "antd";
 import {
-  getUserAuthDetails,
   getWorkspaceOnboardingStep,
   getAppMode,
   getWorkspaceOnboardingTeamDetails,
   getUserPersonaSurveyDetails,
 } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { FullPageHeader } from "components/common/FullPageHeader";

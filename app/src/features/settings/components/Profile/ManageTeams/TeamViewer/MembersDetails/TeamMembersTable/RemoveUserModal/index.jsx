@@ -5,7 +5,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQModal } from "lib/design-system/components";
 import "./RemoveUserModal.css";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 const RemoveUserModal = ({ isOpen, toggleModal, userId, teamId, callbackOnSuccess }) => {
   const [showLoader, setShowLoader] = useState(false);

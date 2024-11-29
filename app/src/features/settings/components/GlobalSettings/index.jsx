@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import InstallExtensionCTA from "../../../../components/misc/InstallExtensionCTA";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import APP_CONSTANTS from "../../../../config/constants";
