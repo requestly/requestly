@@ -42,9 +42,9 @@ export const CollectionsList: React.FC<Props> = ({
     });
 
     return {
-      count: updatedRecords.length,
-      collections: updatedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
-      requests: updatedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
+      count: updatedRecords?.length,
+      collections: updatedRecords?.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
+      requests: updatedRecords?.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
     };
   }, []);
 

@@ -174,26 +174,21 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     let importedCollectionsCount = 0;
     let failedCollectionsCount = 0;
 
-    // Filter root collections and sub-collections
-    const rootCollections = processedFileData.apiRecords.filter(
-      (record) => record.type === RQAPI.RecordType.COLLECTION && record.collectionId === ""
-    );
-    const subCollections = processedFileData.apiRecords.filter(
-      (record) => record.type === RQAPI.RecordType.COLLECTION && record.collectionId !== ""
-    );
+    const collections = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.COLLECTION);
     const apis = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.API);
 
-    let oldToNewCollectionIds: Record<string, { newId: string }> = {};
-
-    // Import root collections first
-    const rootCollectionsPromises = rootCollections.map(async (collection) => {
+    const collectionsPromises = collections.map(async (collection) => {
       const collectionToImport = {
         ...collection,
         name: `(Imported) ${collection.name}`,
       };
-      delete collectionToImport.id;
       try {
-        const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToImport, workspace?.id);
+        const newCollection = await upsertApiRecord(
+          user?.details?.profile?.uid,
+          collectionToImport,
+          workspace?.id,
+          collectionToImport.id
+        );
         onSaveRecord(newCollection.data);
         importedCollectionsCount++;
         return {
@@ -202,7 +197,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         };
       } catch (error) {
         failedCollectionsCount++;
-        Logger.error("Error importing root collection:", error);
+        Logger.error("Error importing collection:", error);
         return {
           oldId: collection.id,
           newId: null,
@@ -210,8 +205,8 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       }
     });
 
-    const rootCollectionsResult = await Promise.allSettled(rootCollectionsPromises);
-    oldToNewCollectionIds = rootCollectionsResult.reduce((result, details) => {
+    const collectionsResult = await Promise.allSettled(collectionsPromises);
+    const oldToNewCollectionIds: Record<string, { newId: string }> = collectionsResult.reduce((result, details) => {
       if (details.status === "fulfilled") {
         return {
           ...result,
@@ -221,60 +216,17 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       return result;
     }, {});
 
-    // Import sub-collections with updated parent collection IDs
-    const subCollectionsPromises = subCollections.map(async (subCollection) => {
-      const newCollectionId = oldToNewCollectionIds[subCollection.collectionId]?.newId;
-      if (!newCollectionId) {
-        Logger.error(`Failed to find new collection ID for sub-collection: ${subCollection.name || subCollection.id}`);
-        failedCollectionsCount++;
-        return { oldId: subCollection.id, newId: null };
-      }
-
-      const subCollectionToImport = {
-        ...subCollection,
-        name: `(Imported) ${subCollection.name}`,
-        collectionId: newCollectionId, // Update to new parent collection ID
-      };
-      delete subCollectionToImport.id;
-      try {
-        const newSubCollection = await upsertApiRecord(
-          user?.details?.profile?.uid,
-          subCollectionToImport,
-          workspace?.id
-        );
-        onSaveRecord(newSubCollection.data);
-        importedCollectionsCount++;
-        // Update the mapping for sub-collections as well for requests
-        oldToNewCollectionIds[subCollection.id] = { newId: newSubCollection.data.id };
-        return {
-          oldId: subCollection.id,
-          newId: newSubCollection.data.id,
-        };
-      } catch (error) {
-        failedCollectionsCount++;
-        Logger.error("Error importing sub-collection:", error);
-        return {
-          oldId: subCollection.id,
-          newId: null,
-        };
-      }
-    });
-
-    await Promise.allSettled(subCollectionsPromises);
-
     // Import APIs with updated collection IDs
     await Promise.allSettled(
       apis.map(async (api) => {
         const apiToImport = { ...api };
-        delete apiToImport.id;
-
         const newCollectionId = oldToNewCollectionIds[api.collectionId]?.newId;
         if (!newCollectionId) {
           throw new Error(`Failed to find new collection ID for API: ${api.name || api.id}`);
         }
 
         const updatedApi = { ...apiToImport, collectionId: newCollectionId };
-        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id);
+        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
         onSaveRecord?.(newApi.data);
       })
     );

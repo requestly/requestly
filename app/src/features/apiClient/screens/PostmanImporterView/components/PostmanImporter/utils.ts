@@ -1,6 +1,6 @@
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { RequestMethod, RQAPI } from "features/apiClient/types";
-import { v4 as uuidv4 } from "uuid";
+import { generateDocumentId } from "backend/utils";
 
 interface PostmanCollectionExport {
   info: {
@@ -72,7 +72,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
     })) ?? [];
 
   return {
-    id: uuidv4(),
+    id: generateDocumentId("apis"),
     collectionId: parentCollectionId,
     name: item.name,
     type: RQAPI.RecordType.API,
@@ -89,7 +89,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
   };
 };
 
-const createCollectionRecord = (name: string, id = uuidv4()): Partial<RQAPI.CollectionRecord> => ({
+const createCollectionRecord = (name: string, id = generateDocumentId("apis")): Partial<RQAPI.CollectionRecord> => ({
   id,
   name,
   deleted: false,
@@ -113,7 +113,7 @@ export const processPostmanCollectionData = (
     items.forEach((item) => {
       if (item.item?.length) {
         // This is a sub-collection
-        const subCollection = createCollectionRecord(item.name, uuidv4());
+        const subCollection = createCollectionRecord(item.name, generateDocumentId("apis"));
         subCollection.collectionId = parentCollectionId;
         result.collections.push(subCollection);
 
@@ -129,7 +129,7 @@ export const processPostmanCollectionData = (
     return result;
   };
 
-  const rootCollectionId = uuidv4();
+  const rootCollectionId = generateDocumentId("apis");
   const rootCollection = createCollectionRecord(fileContent.info.name, rootCollectionId);
   rootCollection.collectionId = "";
   const processedItems = processItems(fileContent.item, rootCollectionId);
