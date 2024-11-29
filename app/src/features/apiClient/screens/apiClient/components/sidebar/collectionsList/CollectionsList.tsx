@@ -30,7 +30,6 @@ export const CollectionsList: React.FC<Props> = ({
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const updatedRecords = convertFlatRecordsToNestedRecords(records);
-    console.log(records, "records");
 
     updatedRecords.sort((recordA, recordB) => {
       // If different type, then keep collection first
