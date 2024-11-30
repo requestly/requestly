@@ -1,12 +1,12 @@
-.Sale-banner-container {
+.sale-banner-container {
   justify-content: center;
-  margin: 1rem;
-  margin-bottom: 0;
+  margin-top: 0.8rem;
+  margin-bottom: -16px;
 }
-.Sale-text-banner {
+.sale-text-banner {
   padding: 8px 24px;
   color: #000000;
-  background-color: rgba(246, 192, 64, 0.8);
-  border: 1px dashed rgba(var(--danger-rgb), 0.6);
+  background-color: var(--requestly-color-warning-300);
+  // border: 1px dashed rgba(var(--danger-rgb), 0.6);
   border-radius: var(--border-radius-sm);
 }
