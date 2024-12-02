@@ -153,4 +153,35 @@ export const isApiCollection = (record: RQAPI.Record) => {
   return record?.type === RQAPI.RecordType.COLLECTION;
 };
 
+export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
+  const recordsCopy = [...records];
+  const recordsMap: Record<string, RQAPI.Record> = {};
+  const updatedRecords: RQAPI.Record[] = [];
+
+  recordsCopy.forEach((record) => {
+    if (isApiCollection(record)) {
+      recordsMap[record.id] = {
+        ...record,
+        data: { ...record.data, children: [] },
+      };
+    } else if (isApiRequest(record)) {
+      recordsMap[record.id] = record;
+    }
+  });
+
+  recordsCopy.forEach((record) => {
+    const recordState = recordsMap[record.id];
+    if (record.collectionId) {
+      const parentNode = recordsMap[record.collectionId] as RQAPI.CollectionRecord;
+      if (parentNode) {
+        parentNode.data.children.push(recordState);
+      }
+    } else {
+      updatedRecords.push(recordState);
+    }
+  });
+
+  return updatedRecords;
+};
+
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
