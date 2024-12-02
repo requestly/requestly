@@ -59,13 +59,17 @@ const globalReducer = getReducerWithLocalStorageSync("root", globalSlice.reducer
   "rules.isSampleRulesImported",
 ]);
 
+const persistedDesktopReducer = getReducerWithLocalStorageSync("desktopTrafficTable", desktopTrafficTableReducer, [
+  "filters",
+]);
+
 export const reduxStore = configureStore({
   reducer: {
     [ReducerKeys.GLOBAL]: globalReducer,
     [ReducerKeys.SESSION_RECORDING]: sessionRecordingReducer,
     [ReducerKeys.HAR_PREVIEW]: harPreviewReducer,
     [ReducerKeys.TEAMS]: teamsReducer,
-    [ReducerKeys.DESKTOP_TRAFFIC_TABLE]: desktopTrafficTableReducer,
+    [ReducerKeys.DESKTOP_TRAFFIC_TABLE]: persistedDesktopReducer,
     [ReducerKeys.RULES]: recordsReducer, // SLICE ALSO CONTAINS GROUP RECORDS
     [ReducerKeys.BILLING]: billingReducer,
     [ReducerKeys.INCENTIVIZATION]: incentivizationReducer,
