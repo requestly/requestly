@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { Typography, Dropdown, MenuProps } from "antd";
 import PATHS from "config/constants/sub/paths";
-import { REQUEST_METHOD_COLORS } from "../../../../../../../../constants";
+import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RQAPI } from "features/apiClient/types";
 import { NavLink } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";

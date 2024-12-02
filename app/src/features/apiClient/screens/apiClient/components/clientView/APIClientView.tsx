@@ -173,6 +173,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys),
         headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys),
       },
+      scripts: {
+        preRequest: entry.scripts?.preRequest || "",
+        postResponse: entry.scripts?.postResponse || "",
+      },
     };
 
     if (!supportsRequestBody(entry.request.method)) {
@@ -402,7 +406,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   </RQButton>
                 ) : null}
               </div>
-              <RequestTabs request={entry.request} setRequestEntry={setRequestEntry} setContentType={setContentType} />
+              <RequestTabs requestEntry={entry} setRequestEntry={setRequestEntry} setContentType={setContentType} />
             </Skeleton>
           </div>
         </BottomSheetLayout>

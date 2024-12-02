@@ -5,9 +5,9 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { NewRecordNameInput } from "./newRecordNameInput/NewRecordNameInput";
 import { CollectionRow } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
-import { isApiCollection, isApiRequest } from "../../../utils";
+import { convertFlatRecordsToNestedRecords, isApiCollection, isApiRequest } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
-import { ExportCollectionsModal } from "../../modals/exportCollectionsModal/ExportCollectionsModal";
+import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/ExportCollectionsModal";
 import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
 import "./collectionsList.scss";
 
@@ -29,28 +29,7 @@ export const CollectionsList: React.FC<Props> = ({
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
-    const collections: Record<RQAPI.CollectionRecord["id"], RQAPI.CollectionRecord> = {};
-    const requests: RQAPI.ApiRecord[] = [];
-
-    // TODO: improve logic
-    records.forEach((record) => {
-      if (isApiCollection(record)) {
-        collections[record.id] = { ...record, data: { ...record.data, children: [] } };
-      }
-    });
-
-    records.forEach((record) => {
-      if (isApiRequest(record)) {
-        if (record.collectionId) {
-          collections[record.collectionId].data.children.push(record);
-        } else {
-          requests.push(record);
-        }
-      }
-    });
-
-    const collectionRecords = Object.values(collections);
-    const updatedRecords = [...collectionRecords, ...requests];
+    const updatedRecords = convertFlatRecordsToNestedRecords(records);
 
     updatedRecords.sort((recordA, recordB) => {
       // If different type, then keep collection first
@@ -64,8 +43,8 @@ export const CollectionsList: React.FC<Props> = ({
 
     return {
       count: updatedRecords.length,
-      collections: updatedRecords.slice(0, collectionRecords.length) as RQAPI.CollectionRecord[],
-      requests: updatedRecords.slice(collectionRecords.length) as RQAPI.ApiRecord[],
+      collections: updatedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
+      requests: updatedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
     };
   }, []);
 
