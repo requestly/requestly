@@ -5,25 +5,20 @@ import PATHS from "config/constants/sub/paths";
 import { Tabs, TabsProps, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
-import { CollectionsList } from "./collectionsList/CollectionsList";
+import { CollectionsList } from "./components/collectionsList/CollectionsList";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
-import { HistoryList } from "./historyList/HistoryList";
-import { ApiClientSidebarHeader } from "./apiClientSidebarHeader/ApiClientSidebarHeader";
+import { HistoryList } from "./components/historyList/HistoryList";
+import { ApiClientSidebarHeader } from "./components/apiClientSidebarHeader/ApiClientSidebarHeader";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToApiClientCollection, redirectToNewEnvironment, redirectToRequest } from "utils/RedirectionUtils";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
+import { useApiClientContext } from "features/apiClient/contexts";
 import "./apiClientSidebar.scss";
 
-interface Props {
-  history?: RQAPI.Entry[];
-  onSelectionFromHistory?: (index: number) => void;
-  clearHistory?: () => void;
-  onNewClick?: (src: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => void;
-  onImportClick?: () => void;
-}
+interface Props {}
 
 export enum ApiClientSidebarTabKey {
   HISTORY = "history",
@@ -31,13 +26,7 @@ export enum ApiClientSidebarTabKey {
   ENVIRONMENTS = "environments",
 }
 
-const APIClientSidebar: React.FC<Props> = ({
-  history,
-  onSelectionFromHistory,
-  clearHistory,
-  onImportClick,
-  onNewClick = () => {},
-}) => {
+const APIClientSidebar: React.FC<Props> = () => {
   const { requestId, collectionId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -47,6 +36,8 @@ const APIClientSidebar: React.FC<Props> = ({
   const { currentEnvironmentId } = getCurrentEnvironment();
   const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
+
+  const { history, clearHistory, onNewClick, onImportClick, onSelectionFromHistory } = useApiClientContext();
 
   const hideNewRecordNameInput = () => {
     setIsNewRecordNameInputVisible(false);
