@@ -7,12 +7,11 @@
   background-color: var(--requestly-color-background);
 
   .api-client-header-container {
-    padding: 20px 10px;
-    padding-bottom: 0;
+    padding: 8px 16px 0 6px;
   }
 
   .api-client-body {
-    padding: 0 10px;
+    padding: 0 16px;
     overflow: hidden;
   }
 
@@ -25,7 +24,6 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0 10px;
 
     .api-client-url-container {
       display: flex;
@@ -58,7 +56,6 @@
   }
 
   .api-request-tabs {
-    padding: 0 10px;
     height: calc(100% - 35px);
     overflow: hidden;
     margin-top: 8px;
@@ -142,14 +139,6 @@
     justify-content: center;
   }
 
-  // TODO: MOVE THIS STYLES WHEN NEW TABLE COMPONENT IS IMPLEMENTED FOR PARAMS AND HEADERS
-  .key-value-pairs-table {
-    td {
-      .ant-input {
-        background: transparent;
-      }
-    }
-  }
   .api-response-status-line {
     font-size: var(--requestly-font-size-xs);
   }
