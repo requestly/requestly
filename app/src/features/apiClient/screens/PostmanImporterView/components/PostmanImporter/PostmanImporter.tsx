@@ -40,6 +40,8 @@ interface PostmanImporterProps {
 
 type ProcessingStatus = "idle" | "processing" | "processed";
 
+const BATCH_SIZE = 25;
+
 export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) => {
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
   const [isImporting, setIsImporting] = useState(false);
@@ -57,6 +59,16 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   const { onSaveRecord } = useApiClientContext();
 
   const collectionsCount = useRef(0);
+
+  const batchWrite = useCallback(async (items: any[], writeFunction: (item: any) => Promise<any>) => {
+    const results = [];
+    for (let i = 0; i < items.length; i += BATCH_SIZE) {
+      const batch = items.slice(i, i + BATCH_SIZE);
+      const batchResults = await Promise.allSettled(batch.map(writeFunction));
+      results.push(...batchResults);
+    }
+    return results;
+  }, []);
 
   const handleFileDrop = useCallback(
     (files: File[]) => {
@@ -154,7 +166,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   const handleImportEnvironments = useCallback(async () => {
     try {
       const importPromises = processedFileData.environments.map(async (env) => {
-        const newEnvironment = await addNewEnvironment(`(Imported) ${env.name}`);
+        const newEnvironment = await addNewEnvironment(env.name);
         if (newEnvironment) {
           await setVariables(newEnvironment.id, env.variables);
           return true;
@@ -177,64 +189,48 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     const collections = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.COLLECTION);
     const apis = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.API);
 
-    const collectionsPromises = collections.map(async (collection) => {
-      const collectionToImport = {
-        ...collection,
-        name: `(Imported) ${collection.name}`,
-      };
+    const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
         const newCollection = await upsertApiRecord(
           user?.details?.profile?.uid,
-          collectionToImport,
+          collection,
           workspace?.id,
-          collectionToImport.id
+          collection.id
         );
         onSaveRecord(newCollection.data);
         importedCollectionsCount++;
-        return {
-          oldId: collection.id,
-          newId: newCollection.data.id,
-        };
+        return newCollection.data.id;
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing collection:", error);
-        return {
-          oldId: collection.id,
-          newId: null,
-        };
+        return null;
       }
-    });
+    };
 
-    const collectionsResult = await Promise.allSettled(collectionsPromises);
-    const oldToNewCollectionIds: Record<string, { newId: string }> = collectionsResult.reduce((result, details) => {
-      if (details.status === "fulfilled") {
-        return {
-          ...result,
-          [details.value.oldId]: { newId: details.value.newId },
-        };
+    const handleApiWrites = async (api: RQAPI.ApiRecord) => {
+      const newCollectionId = collections.find((collection) => collection.id === api.collectionId)?.id;
+      if (!newCollectionId) {
+        throw new Error(`Failed to find new collection ID for API: ${api.name || api.id}`);
       }
-      return result;
-    }, {});
 
-    // Import APIs with updated collection IDs
-    await Promise.allSettled(
-      apis.map(async (api) => {
-        const apiToImport = { ...api };
-        const newCollectionId = oldToNewCollectionIds[api.collectionId]?.newId;
-        if (!newCollectionId) {
-          throw new Error(`Failed to find new collection ID for API: ${api.name || api.id}`);
-        }
-
-        const updatedApi = { ...apiToImport, collectionId: newCollectionId };
+      const updatedApi = { ...api, collectionId: newCollectionId };
+      try {
         const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
         onSaveRecord?.(newApi.data);
-      })
-    );
+      } catch (error) {
+        failedCollectionsCount++;
+        Logger.error("Error importing API:", error);
+      }
+    };
+
+    await Promise.all([batchWrite(collections, handleCollectionWrites), batchWrite(apis, handleApiWrites)]);
 
     if (failedCollectionsCount > 0) {
       const failureMessage =
         failedCollectionsCount > 0
-          ? `${failedCollectionsCount} ${failedCollectionsCount > 1 ? "collections" : "collection"} failed`
+          ? `${failedCollectionsCount} ${
+              failedCollectionsCount > 1 ? "collections and APIs" : "collection or API"
+            } failed`
           : "";
       if (failureMessage.length) {
         toast.warn(`Some imports failed: ${failureMessage}, Please contact support if the issue persists.`);
@@ -242,13 +238,13 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     }
 
     return importedCollectionsCount;
-  }, [processedFileData.apiRecords, user?.details?.profile?.uid, workspace?.id, onSaveRecord]);
+  }, [processedFileData.apiRecords, user?.details?.profile?.uid, workspace?.id, onSaveRecord, batchWrite]);
 
   const handleImportVariables = useCallback(async () => {
     if (Object.keys(processedFileData.variables).length === 0) {
       return Promise.resolve();
     }
-    const newEnvironment = await addNewEnvironment("(Imported) New Environment");
+    const newEnvironment = await addNewEnvironment("New Environment");
     if (newEnvironment) {
       return setVariables(newEnvironment.id, processedFileData.variables);
     }
