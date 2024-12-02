@@ -90,7 +90,7 @@ export const executePrerequestScript = (script: string, request: RQAPI.Request, 
 
     setTimeout(() => {
       cleanupWorker(worker);
-    }, 5000);
+    }, 35000);
   });
 };
 
@@ -120,6 +120,6 @@ export const executePostresponseScript = (script: string, responseBody: any, env
 
     setTimeout(() => {
       cleanupWorker(worker);
-    }, 5000);
+    }, 35000);
   });
 };
