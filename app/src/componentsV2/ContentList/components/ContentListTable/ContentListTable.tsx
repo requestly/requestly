@@ -112,6 +112,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   components,
   footer,
   bordered = false,
+  showHeader = true,
 }: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
@@ -218,6 +219,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     components: components,
     footer: footer,
     bordered: bordered,
+    showHeader,
   };
 
   return (
