@@ -116,7 +116,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
             ) : (
               <>
                 {isPathDisabled ? (
-                  <li key={index} className="rq-breadcrumb-item">
+                  <li key={index} className="rq-breadcrumb-item disabled">
                     {label}
                   </li>
                 ) : (

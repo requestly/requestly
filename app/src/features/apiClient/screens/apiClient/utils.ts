@@ -5,7 +5,6 @@ import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../ty
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
-import { isEmpty } from "lodash";
 
 export const makeRequest = async (
   appMode: string,
@@ -202,23 +201,22 @@ export const getBreadCrumbOptions = (
     isEditable?: boolean;
   }
 ) => {
-  if (!isEmpty(record)) {
-    let formattedOptions = [prefixOption];
-    const options = record.breadcrumbOptions || [];
-    formattedOptions = [
-      ...formattedOptions,
-      ...options.map((option) => ({
-        pathname: `${prefixOption.pathname}/${option.type}/${option.id}`,
-        label: option.name,
-        disabled: option.type === RQAPI.RecordType.COLLECTION,
-      })),
-    ];
+  let formattedOptions = [prefixOption];
+  const options = record?.breadcrumbOptions || [];
+  formattedOptions = [
+    ...formattedOptions,
+    ...options.map((option) => ({
+      pathname: `${prefixOption.pathname}/${option.type}/${option.id}`,
+      label: option.name,
+      disabled: option.type === RQAPI.RecordType.COLLECTION,
+    })),
+  ];
 
-    formattedOptions.push({
-      pathname: `${prefixOption.pathname}/${record.type}/${record.id}`,
-      label: record.name,
-      isEditable: true,
-    });
-    return formattedOptions;
-  }
+  formattedOptions.push({
+    pathname: `${prefixOption.pathname}/${record?.type}/${record?.id}`,
+    label: record?.name,
+    isEditable: true,
+  });
+
+  return formattedOptions;
 };
