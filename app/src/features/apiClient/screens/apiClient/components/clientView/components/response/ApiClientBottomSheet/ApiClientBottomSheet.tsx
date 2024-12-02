@@ -58,7 +58,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         ),
       },
     ];
-  }, [response, isLoading, isFailed, onCancelRequest, contentTypeHeader]);
+  }, [BOTTOM_SHEET_TAB_KEYS.RESPONSE, response, isLoading, isFailed, onCancelRequest]);
 
   return <BottomSheet items={bottomSheetTabItems} disableDocking utilities={<StatusLine response={response} />} />;
 };

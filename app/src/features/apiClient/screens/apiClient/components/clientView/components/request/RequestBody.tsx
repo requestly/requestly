@@ -1,24 +1,17 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Input, Radio } from "antd";
 import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../../types";
+import KeyValueForm from "./KeyValueForm";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
-import { KeyValueTable } from "./components/KeyValueTable/KeyValueTable";
 
 interface Props {
   body: RQAPI.RequestBody;
   contentType: RequestContentType;
-  setRequestEntry: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
+  setBody: (body: RQAPI.RequestBody) => void;
   setContentType: (contentType: RequestContentType) => void;
 }
 
-const RequestBody: React.FC<Props> = ({ body, contentType, setRequestEntry, setContentType }) => {
-  const handleBodyChange = useCallback(
-    (body: string) => {
-      setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body } }));
-    },
-    [setRequestEntry]
-  );
-
+const RequestBody: React.FC<Props> = ({ body, contentType, setBody, setContentType }) => {
   const bodyEditor = useMemo(() => {
     switch (contentType) {
       case RequestContentType.JSON:
@@ -27,7 +20,7 @@ const RequestBody: React.FC<Props> = ({ body, contentType, setRequestEntry, setC
           <CodeEditor
             language={EditorLanguage.JSON}
             value={body as string}
-            handleChange={handleBodyChange}
+            handleChange={setBody}
             isResizable={false}
             hideCharacterCount
             analyticEventProperties={{ source: "api_client" }}
@@ -36,10 +29,10 @@ const RequestBody: React.FC<Props> = ({ body, contentType, setRequestEntry, setC
 
       case RequestContentType.FORM:
         return (
-          <KeyValueTable
-            pairType={KeyValueFormType.FORM}
-            data={body as KeyValuePair[]}
-            setKeyValuePairs={setRequestEntry}
+          <KeyValueForm
+            formType={KeyValueFormType.FORM}
+            keyValuePairs={body as KeyValuePair[]}
+            setKeyValuePairs={setBody}
           />
         );
 
@@ -49,11 +42,11 @@ const RequestBody: React.FC<Props> = ({ body, contentType, setRequestEntry, setC
             className="api-request-body-raw"
             placeholder="Enter text here..."
             value={body as string}
-            onChange={(e) => handleBodyChange(e.target.value)}
+            onChange={(e) => setBody(e.target.value)}
           />
         );
     }
-  }, [body, contentType, setRequestEntry, handleBodyChange]);
+  }, [body, contentType, setBody]);
 
   return (
     <div className="api-request-body">
