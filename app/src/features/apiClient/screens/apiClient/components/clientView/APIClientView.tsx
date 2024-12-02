@@ -2,12 +2,12 @@ import { Select, Skeleton, Space } from "antd";
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
-import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
+import RequestTabs from "./components/request/RequestTabs";
+import { getEmptyPair } from "./components/request/KeyValueForm";
 import {
   addUrlSchemeIfMissing,
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
-  getEmptyPair,
   makeRequest,
   sanitizeKeyValuePairs,
   supportsRequestBody,
@@ -126,8 +126,34 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const setRequestEntry = useCallback((updater: (prev: RQAPI.Entry) => RQAPI.Entry) => {
-    setEntry((prev) => updater(prev));
+  const setQueryParams = useCallback((queryParams: KeyValuePair[]) => {
+    setEntry((entry) => ({
+      ...entry,
+      request: {
+        ...entry.request,
+        queryParams,
+      },
+    }));
+  }, []);
+
+  const setBody = useCallback((body: string) => {
+    setEntry((entry) => ({
+      ...entry,
+      request: {
+        ...entry.request,
+        body,
+      },
+    }));
+  }, []);
+
+  const setRequestHeaders = useCallback((headers: KeyValuePair[]) => {
+    setEntry((entry) => ({
+      ...entry,
+      request: {
+        ...entry.request,
+        headers,
+      },
+    }));
   }, []);
 
   const setContentType = useCallback((contentType: RequestContentType) => {
@@ -136,7 +162,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         ...entry,
         request: {
           ...entry.request,
-          body: contentType === RequestContentType.FORM ? [] : "",
           contentType,
         },
       };
@@ -402,7 +427,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   </RQButton>
                 ) : null}
               </div>
-              <RequestTabs request={entry.request} setRequestEntry={setRequestEntry} setContentType={setContentType} />
+              <RequestTabs
+                request={entry.request}
+                setQueryParams={setQueryParams}
+                setBody={setBody}
+                setRequestHeaders={setRequestHeaders}
+                setContentType={setContentType}
+              />
             </Skeleton>
           </div>
         </BottomSheetLayout>

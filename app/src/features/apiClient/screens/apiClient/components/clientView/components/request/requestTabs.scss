@@ -2,18 +2,6 @@
   display: flex;
   flex-direction: column;
 
-  .ant-tabs-tab {
-    span:first-child {
-      font-size: var(--requestly-font-size-xs);
-      color: var(--requestly-color-text-subtle);
-    }
-    &.ant-tabs-tab-active {
-      span:first-child {
-        color: var(--requestly-color-text-default);
-      }
-    }
-  }
-
   .ant-tabs-content-holder {
     overflow: auto;
     margin-bottom: 16px;
@@ -55,7 +43,32 @@
     }
   }
 
-  .rq-content-list-table-container {
-    padding: 0 0 1rem 0;
+  .key-value-pairs-table {
+    td {
+      padding: 2px 0;
+      padding-right: 5px;
+    }
+
+    .disabled-pair {
+      opacity: 0.5;
+    }
+
+    .key,
+    .name {
+      width: 250px;
+    }
+
+    .value {
+      width: 400px;
+    }
+
+    input {
+      width: 100%;
+      padding: 4px 8px;
+    }
+
+    .ant-select {
+      width: 100%;
+    }
   }
 }
