@@ -142,14 +142,6 @@
     justify-content: center;
   }
 
-  // TODO: MOVE THIS STYLES WHEN NEW TABLE COMPONENT IS IMPLEMENTED FOR PARAMS AND HEADERS
-  .key-value-pairs-table {
-    td {
-      .ant-input {
-        background: transparent;
-      }
-    }
-  }
   .api-response-status-line {
     font-size: var(--requestly-font-size-xs);
   }
