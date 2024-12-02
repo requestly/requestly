@@ -5,9 +5,9 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { NewRecordNameInput } from "./newRecordNameInput/NewRecordNameInput";
 import { CollectionRow } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
-import { isApiCollection, isApiRequest } from "../../../utils";
+import { isApiCollection, isApiRequest } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
-import { ExportCollectionsModal } from "../../modals/exportCollectionsModal/ExportCollectionsModal";
+import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/ExportCollectionsModal";
 import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
 import "./collectionsList.scss";
 
