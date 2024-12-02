@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { Collapse, Dropdown, MenuProps } from "antd";
+import { Collapse, Dropdown, MenuProps, Tooltip } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
@@ -98,28 +98,32 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                 </div>
 
                 <div className={`collection-options ${hoveredId === record.id ? "visible" : " "}`}>
-                  <RQButton
-                    size="small"
-                    type="transparent"
-                    icon={<FileAddOutlined />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveKey(record.id);
-                      setCreateNewField(RQAPI.RecordType.API);
-                      trackNewRequestClicked("collection_row");
-                    }}
-                  />
-                  <RQButton
-                    size="small"
-                    type="transparent"
-                    icon={<FolderAddOutlined />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveKey(record.id);
-                      setCreateNewField(RQAPI.RecordType.COLLECTION);
-                      trackNewCollectionClicked("collection_row");
-                    }}
-                  />
+                  <Tooltip title={"Add Request"}>
+                    <RQButton
+                      size="small"
+                      type="transparent"
+                      icon={<FileAddOutlined />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveKey(record.id);
+                        setCreateNewField(RQAPI.RecordType.API);
+                        trackNewRequestClicked("collection_row");
+                      }}
+                    />
+                  </Tooltip>
+                  <Tooltip title={"Add Folder"}>
+                    <RQButton
+                      size="small"
+                      type="transparent"
+                      icon={<FolderAddOutlined />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveKey(record.id);
+                        setCreateNewField(RQAPI.RecordType.COLLECTION);
+                        trackNewCollectionClicked("collection_row");
+                      }}
+                    />
+                  </Tooltip>
 
                   <Dropdown trigger={["click"]} menu={{ items: getCollectionOptions(record) }} placement="bottomRight">
                     <RQButton
