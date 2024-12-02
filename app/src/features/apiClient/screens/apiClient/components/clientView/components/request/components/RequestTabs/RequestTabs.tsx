@@ -1,4 +1,4 @@
-import { Badge, Tabs, TabsProps, Tag } from "antd";
+import { Tabs, TabsProps, Tag } from "antd";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import { KeyValueFormType, RQAPI, RequestContentType } from "../../../../../../../../types";
 import RequestBody from "../../RequestBody";
@@ -18,16 +18,10 @@ enum Tab {
 
 const LabelWithCount: React.FC<{ label: string; count: number; showDot?: boolean }> = ({ label, count, showDot }) => {
   return (
-    <>
+    <div className="request-tab-label">
       <span>{label}</span>
-      {count ? (
-        showDot ? (
-          <Badge className="dot" size="small" dot={true} />
-        ) : (
-          <Tag className="count">{count}</Tag>
-        )
-      ) : null}
-    </>
+      {count ? showDot ? <span className="request-tab-dot" /> : <Tag className="count">{count}</Tag> : null}
+    </div>
   );
 };
 
@@ -101,7 +95,13 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setConten
     if (isScriptsSupported) {
       items.push({
         key: Tab.SCRIPTS,
-        label: <LabelWithCount label="Scripts" count={0} />,
+        label: (
+          <LabelWithCount
+            label="Scripts"
+            showDot={true}
+            count={requestEntry.scripts?.postResponse?.length || requestEntry.scripts?.preRequest?.length}
+          />
+        ),
         children: <ScriptEditor setScripts={setRequestEntry} scripts={requestEntry.scripts} />,
       });
     }
