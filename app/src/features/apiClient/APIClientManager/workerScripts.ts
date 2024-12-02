@@ -75,17 +75,21 @@ export const requestWorkerFunction = function (e: MessageEvent) {
       "rq",
       `
       "use strict";
+      return (async () => {
       try {
+        console.log('Executing script');
         ${script}
       } catch (error) {
         console.error('Script error:', error);
         throw error;
       }
+      })();
       `
     );
 
-    scriptFunction(sandbox.rq);
-    this.postMessage({ type: "COMPLETE" });
+    scriptFunction(sandbox.rq).then(() => {
+      this.postMessage({ type: "COMPLETE" });
+    });
   } catch (error) {
     this.postMessage({
       type: "ERROR",
