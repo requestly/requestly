@@ -36,7 +36,6 @@ enum BANNER_ID {
   ACCELERATOR_PROGRAM = "accelerator_program",
   COMMERCIAL_LICENSE = "commercial_license",
   REQUEST_TEAM_ACCESS = "request_team_access",
-  BLACK_FRIDAY = "black_friday",
 }
 
 interface Banner {
@@ -139,12 +138,6 @@ export const AppNotificationBanner = () => {
         }
         case BANNER_ID.ACCELERATOR_PROGRAM: {
           if (!user.details?.isPremium && !billingTeams?.length && user.loggedIn) {
-            dispatch(actions.updateIsAppBannerVisible(true));
-            return true;
-          } else return false;
-        }
-        case BANNER_ID.BLACK_FRIDAY: {
-          if (!user.details?.isPremium) {
             dispatch(actions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
