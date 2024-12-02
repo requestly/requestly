@@ -22,6 +22,7 @@ import { recordsReducer } from "./features/rules/slice";
 import { billingReducer } from "./features/billing/slice";
 import { harPreviewReducer } from "./features/network-sessions/slice";
 import { environmentVariablesActions, environmentVariablesReducer } from "./features/environment/slice";
+import { workspaceReducerWithLocal } from "./slices/workspaces/slice";
 
 const globalSlice = createSlice({
   name: ReducerKeys.GLOBAL,
@@ -70,6 +71,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.BILLING]: billingReducer,
     [ReducerKeys.INCENTIVIZATION]: incentivizationReducer,
     [ReducerKeys.ENVIRONMENT]: environmentVariablesReducer,
+    [ReducerKeys.WORKSPACE]: workspaceReducerWithLocal,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will

@@ -15,6 +15,7 @@ import { migrateAllRulesToMV3 } from "modules/extension/utils";
 import { sendIndividualRuleTypesCountAttributes } from "../utils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RuleStorageModel, syncEngine } from "requestly-sync-engine";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -28,6 +29,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
 
   const userAuthDetails = useSelector(getUserAuthDetails);
   const userId = userAuthDetails.loggedIn && userAuthDetails.details?.profile?.uid;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const dispatch = useDispatch();
 
@@ -83,7 +85,6 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
   );
 
   useEffect(() => {
-    const workspaceId = activeWorkspace.id || userId;
     // let subscription: any;
     async function initRulesListener() {
       console.log("initRulesListener");
@@ -94,7 +95,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
         }, 1000);
         return;
       }
-      console.log("subscribe RuleStorageModels", workspaceId);
+      console.log("subscribe RuleStorageModels", activeWorkspaceId);
       unsubscribe = await RuleStorageModel.subscribe((ruleStorageModels: RuleStorageModel[]) => {
         console.log("!!!debug", { ruleStorageModels });
 
@@ -108,7 +109,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
     }
 
     let unsubscribe: (() => void) | undefined;
-    console.log("workspace changed", workspaceId, userId);
+    console.log("workspace changed", activeWorkspaceId, userId);
     initRulesListener();
 
     // Cleanup subscription on component unmount
@@ -116,7 +117,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
       console.log("[Debug] Unsubbing explicit subscribers");
       unsubscribe?.();
     };
-  }, [userId, activeWorkspace.id, updateRulesAndGroups]);
+  }, [userId, activeWorkspaceId, updateRulesAndGroups]);
 };
 
 export default useFetchAndUpdateRules;

@@ -102,17 +102,10 @@ class StorageServiceWrapper {
    */
   async saveRuleOrGroup(ruleOrGroup, options = {}) {
     // if (window.syncingV2) {
-      console.log("[SyncingV2][debug]saveRuleOrGroup", ruleOrGroup);
-      let workspaceId = null;
-      if (window.uid) {
-        workspaceId = window.currentlyActiveWorkspaceTeamId
-          ? `workspace-${window.currentlyActiveWorkspaceTeamId}`
-          : ruleOrGroup.currentOwner;
-      } else {
-        workspaceId = "local";
-      }
-      console.log({ruleOrGroup, workspaceId});
-      return await RuleStorageModel.create(ruleOrGroup, workspaceId);
+    console.log("[SyncingV2][debug]saveRuleOrGroup", ruleOrGroup);
+    let workspaceId = window.activeWorkspaceId;
+    console.log({ ruleOrGroup, workspaceId });
+    return await RuleStorageModel.create(ruleOrGroup, workspaceId);
     // } else {
     //   const formattedObject = {
     //     [ruleOrGroup.id]: {
@@ -130,12 +123,12 @@ class StorageServiceWrapper {
 
   async saveMultipleRulesOrGroups(array, options = {}) {
     // if (window.syncingV2) {
-      console.log("[SyncingV2][debug]saveMultipleRulesOrGroups");
-      // TODO-Syncing: [P1] Support bulk updates to RuleStorageModel.
-      const promises = array.map((ruleOrGroup) => {
-        return this.saveRuleOrGroup(ruleOrGroup);
-      });
-      return Promise.all(promises);
+    console.log("[SyncingV2][debug]saveMultipleRulesOrGroups");
+    // TODO-Syncing: [P1] Support bulk updates to RuleStorageModel.
+    const promises = array.map((ruleOrGroup) => {
+      return this.saveRuleOrGroup(ruleOrGroup);
+    });
+    return Promise.all(promises);
     // } else {
     //   const formattedObject = {};
     //   array.forEach((object) => {
