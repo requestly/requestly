@@ -49,7 +49,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
 
     if (result.success) {
       trackCollectionDeleted();
-      toast.success("Collection deleted!");
+      toast.success(record.type === "api" ? "API request deleted" : "Collection deleted");
       onClose();
       onSuccess?.();
 
@@ -58,6 +58,12 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
 
     setIsDeleting(false);
   };
+
+  const header = record.type === "api" ? "Delete API Request" : "Delete Collection";
+  const description =
+    record.type === "api"
+      ? `This action will permanently delete this API request. Are you sure you want to continue?`
+      : `This action will permanently delete the entire collection and its ${apiRequestCount} requests. Are you sure you want to continue?`;
 
   return (
     <RQModal
@@ -68,20 +74,16 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
       destroyOnClose={true}
       className="delete-api-record-modal"
     >
-      <img width={32} height={32} src={deleteIcon} alt="Delete collection" className="icon" />
-      <div className="header">Delete collection</div>
-      <div className="description">
-        This action will permanently delete the entire <br /> collection and its {apiRequestCount} requests. Are you
-        sure <br />
-        you want to continue?
-      </div>
+      <img width={32} height={32} src={deleteIcon} alt="Delete" className="icon" />
+      <div className="header">{header}</div>
+      <div className="description">{description}</div>
 
       <div className="actions">
         <RQButton block onClick={onClose}>
           Cancel
         </RQButton>
         <RQButton block type="danger" loading={isDeleting} onClick={handleDeleteApiRecord}>
-          Delete collection
+          {record.type === "api" ? "Delete API" : "Delete collection"}
         </RQButton>
       </div>
     </RQModal>

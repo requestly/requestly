@@ -49,6 +49,9 @@
         &.active {
           background: var(--requestly-color-surface-1);
         }
+        .request-options {
+          margin-left: auto;
+        }
       }
 
       &.collection.ant-collapse {
