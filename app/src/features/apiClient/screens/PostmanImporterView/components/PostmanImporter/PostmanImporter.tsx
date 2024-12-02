@@ -373,7 +373,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         </div>
       ) : (
         <FilePicker
-          maxFiles={5}
+          maxFiles={1000}
           onFilesDrop={handleFileDrop}
           isProcessing={processingStatus === "processing"}
           title="Drop your Postman collections or environments export files here"
