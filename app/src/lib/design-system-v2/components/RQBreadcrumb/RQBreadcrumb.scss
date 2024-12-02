@@ -15,14 +15,21 @@
     color: var(--requestly-color-text-subtle);
     line-height: var(--requestly-font-line-height-xs, 15px);
     font-size: var(--requestly-font-size-xs, 11px);
-  }
 
-  .rq-breadcrumb-item:hover {
-    text-decoration: underline;
-  }
+    &:hover {
+      text-decoration: underline;
+    }
 
-  .rq-breadcrumb-item:last-child {
-    color: var(--requestly-color-text-default);
+    &:last-child {
+      color: var(--requestly-color-text-default);
+    }
+
+    &.disabled {
+      cursor: default;
+      &:hover {
+        text-decoration: none;
+      }
+    }
   }
 
   .rq-breadcrumb-separator {
