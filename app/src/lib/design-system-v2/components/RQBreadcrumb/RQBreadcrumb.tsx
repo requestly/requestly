@@ -3,6 +3,7 @@ import { Link, Params, useMatches } from "react-router-dom";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import { Input, Typography } from "antd";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
+import { isEmpty } from "lodash";
 import "./RQBreadcrumb.scss";
 
 interface Props {
@@ -11,6 +12,9 @@ interface Props {
   recordName?: string;
   placeholder?: string;
   onRecordNameUpdate?: (updatedRecordName: string) => void;
+  breadcrumbOptions?: ({
+    pathname: MatchedRoute["pathname"];
+  } & MatchedRoute["handle"]["breadcrumb"])[];
 }
 
 interface MatchedRoute {
@@ -33,6 +37,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
   recordName,
   placeholder,
   onRecordNameUpdate,
+  breadcrumbOptions = [],
 }) => {
   const [name, setName] = useState(recordName || "");
   const [isEditRecord, setIsEditRecord] = useState(false);
@@ -44,9 +49,13 @@ export const RQBreadcrumb: React.FC<Props> = ({
 
   const breadcrumbs: ({
     pathname: MatchedRoute["pathname"];
-  } & MatchedRoute["handle"]["breadcrumb"])[] = matchedRoutes.reduce((result, route) => {
-    return route.handle?.breadcrumb ? [...result, { ...route.handle.breadcrumb, pathname: route.pathname }] : result;
-  }, []);
+  } & MatchedRoute["handle"]["breadcrumb"])[] = !isEmpty(breadcrumbOptions)
+    ? breadcrumbOptions
+    : matchedRoutes.reduce((result, route) => {
+        return route.handle?.breadcrumb
+          ? [...result, { ...route.handle.breadcrumb, pathname: route.pathname }]
+          : result;
+      }, []);
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const updatedValue = e.target.value;

@@ -5,6 +5,7 @@ import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../..
 import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
 import {
   addUrlSchemeIfMissing,
+  getBreadCrumbOptions,
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
   getEmptyPair,
@@ -68,7 +69,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
-  const { onSaveRecord } = useApiClientContext();
+  const { onSaveRecord, recordsMap } = useApiClientContext();
   const { renderVariables, getCurrentEnvironmentVariables } = useEnvironmentManager();
   const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
@@ -340,6 +341,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             recordName={apiEntryDetails?.name}
             onRecordNameUpdate={setRequestName}
             onBlur={handleRecordNameUpdate}
+            breadcrumbOptions={getBreadCrumbOptions(recordsMap[apiEntryDetails?.id], {
+              pathname: "/api-client",
+              label: "API Client",
+            })}
           />
         ) : null}
       </div>

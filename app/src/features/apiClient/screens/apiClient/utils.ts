@@ -5,6 +5,7 @@ import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../ty
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
+import { isEmpty } from "lodash";
 
 export const makeRequest = async (
   appMode: string,
@@ -163,9 +164,10 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
       recordsMap[record.id] = {
         ...record,
         data: { ...record.data, children: [] },
+        breadcrumbOptions: [],
       };
     } else if (isApiRequest(record)) {
-      recordsMap[record.id] = record;
+      recordsMap[record.id] = { ...record, breadcrumbOptions: [] };
     }
   });
 
@@ -175,13 +177,48 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
       const parentNode = recordsMap[record.collectionId] as RQAPI.CollectionRecord;
       if (parentNode) {
         parentNode.data.children.push(recordState);
+        const getBreadCrumbOptions = recordsMap[parentNode.id].breadcrumbOptions || [];
+        recordState.breadcrumbOptions = [
+          ...getBreadCrumbOptions,
+          { id: parentNode.id, name: parentNode.name, type: parentNode.type },
+        ];
       }
     } else {
       updatedRecords.push(recordState);
     }
   });
 
-  return updatedRecords;
+  return { updatedRecords, recordsMap };
 };
 
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
+
+export const getBreadCrumbOptions = (
+  record: RQAPI.Record,
+  prefixOption: {
+    pathname: string;
+    label: string;
+    disabled?: boolean;
+    isEditable?: boolean;
+  }
+) => {
+  if (!isEmpty(record)) {
+    let formattedOptions = [prefixOption];
+    const options = record.breadcrumbOptions || [];
+    formattedOptions = [
+      ...formattedOptions,
+      ...options.map((option) => ({
+        pathname: `${prefixOption.pathname}/${option.type}/${option.id}`,
+        label: option.name,
+        disabled: option.type === RQAPI.RecordType.COLLECTION,
+      })),
+    ];
+
+    formattedOptions.push({
+      pathname: `${prefixOption.pathname}/${record.type}/${record.id}`,
+      label: record.name,
+      isEditable: true,
+    });
+    return formattedOptions;
+  }
+};
