@@ -13,7 +13,7 @@ interface Props {
 
 const ResponseHeaders: React.FC<Props> = ({ headers, isLoading, isFailed, onCancelRequest }) => {
   const transformedHeaders = useMemo(() => {
-    return headers?.map((header) => ({
+    return headers.map((header) => ({
       key: header.key,
       value: header.value,
     }));
