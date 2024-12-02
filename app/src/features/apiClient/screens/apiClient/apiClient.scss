@@ -1,8 +1,6 @@
 .api-client-container {
-  height: 100%;
-  display: flex;
-
-  .api-client-view {
+  .api-client-view,
+  .api-client-container-content {
     flex: auto;
     width: 100%;
     min-width: 0;

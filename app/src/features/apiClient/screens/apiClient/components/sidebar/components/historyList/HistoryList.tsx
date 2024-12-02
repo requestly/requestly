@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
-import placeholderImage from "../../../../../../../assets/images/illustrations/empty-sheets-dark.svg";
+import placeholderImage from "../../../../../../../../assets/images/illustrations/empty-sheets-dark.svg";
 import { RQAPI } from "features/apiClient/types";
 import { Timeline, Typography } from "antd";
-import { REQUEST_METHOD_COLORS } from "../../../../../../../constants";
+import { REQUEST_METHOD_COLORS } from "../../../../../../../../constants";
 import { trackRequestSelectedFromHistory } from "modules/analytics/events/features/apiClient";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
