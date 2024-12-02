@@ -36,6 +36,11 @@ export namespace RQAPI {
     ENVIRONMENT = "environment",
   }
 
+  export enum ScriptType {
+    PRE_REQUEST = "preRequest",
+    POST_RESPONSE = "postResponse",
+  }
+
   export type RequestBody = string | KeyValuePair[]; // in case of form data, body will be key-value pairs
 
   export interface Request {
@@ -59,10 +64,18 @@ export namespace RQAPI {
   export interface Entry {
     request: Request;
     response?: Response;
+    scripts?: {
+      preRequest: string;
+      postResponse: string;
+    };
   }
 
   export interface Collection {
     children?: Record[];
+    scripts?: {
+      preRequest: string;
+      postResponse: string;
+    };
   }
 
   export interface BreadcrumbOptions {
