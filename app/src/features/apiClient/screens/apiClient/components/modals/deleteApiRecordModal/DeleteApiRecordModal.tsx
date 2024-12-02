@@ -29,6 +29,9 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
 
   const [isDeleting, setIsDeleting] = useState(false);
 
+  if (record) {
+    return null;
+  }
   // TODO: handle single api request deletion - update the modal message too
   let apiRequestCount = isApiCollection(record) ? record.data.children.length : 1;
 
