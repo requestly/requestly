@@ -79,7 +79,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
     deleted: false,
     data: {
       request: {
-        url: request.url?.raw || "",
+        url: typeof request.url === "string" ? request.url : request.url.raw,
         method: request.method || RequestMethod.GET,
         queryParams,
         headers,
