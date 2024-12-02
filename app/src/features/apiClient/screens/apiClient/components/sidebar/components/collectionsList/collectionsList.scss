@@ -55,7 +55,7 @@
       &.collection.ant-collapse {
         padding: 0;
 
-        &:hover .ant-collapse-item .ant-collapse-header .collection-name-container .collection-options {
+        &:hover .ant-collapse-item .ant-collapse-header .collection-name-container .visible {
           visibility: visible;
         }
       }
@@ -102,7 +102,7 @@
           }
 
           .collection-name {
-            max-width: 70%;
+            max-width: 140px;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -116,9 +116,11 @@
           .collection-options {
             flex-shrink: 0;
             visibility: hidden;
+            margin-left: auto;
             display: flex;
             align-items: center;
             gap: var(--space-1, 2px);
+            visibility: hidden;
 
             svg {
               color: var(--requestly-color-text-subtle);
