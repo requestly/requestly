@@ -45,6 +45,7 @@ import { RQSingleLineEditor } from "features/apiClient/screens/environment/compo
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
+import { startCase } from "lodash";
 
 interface Props {
   openInModal?: boolean;
@@ -346,8 +347,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             onRecordNameUpdate={setRequestName}
             onBlur={handleRecordNameUpdate}
             breadcrumbOptions={getBreadCrumbOptions(recordsMap[apiEntryDetails?.id], {
-              pathname: "/api-client",
-              label: "API Client",
+              pathname: PATHS.API_CLIENT.INDEX,
+              label: startCase(PATHS.API_CLIENT.INDEX.split("/")[1]),
             })}
           />
         ) : null}
