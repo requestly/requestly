@@ -1,5 +1,5 @@
 import React from "react";
-import emptyCardImage from "../../../../../../assets/empty-card.svg";
+import emptyCardImage from "../../../../../assets/empty-card.svg";
 import { RQButton } from "lib/design-system-v2/components";
 import APP_CONSTANTS from "config/constants";
 import { useDispatch, useSelector } from "react-redux";

@@ -5,7 +5,7 @@ import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
-import { ApiClientSidebarTabKey } from "../../APIClientSidebar";
+import { ApiClientSidebarTabKey } from "../APIClientSidebar";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import {
@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { ImportCollectionsModal } from "../../../modals/importCollectionsModal/ImportCollectionsModal";
+import { ImportCollectionsModal } from "../../modals/importCollectionsModal/ImportCollectionsModal";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 
@@ -77,7 +77,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         onClick: onImportClick,
       },
     ],
-    [user.loggedIn, dispatch, onImportClick]
+    [user.loggedIn, dispatch]
   );
 
   const items: DropdownProps["menu"]["items"] = [
