@@ -132,16 +132,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setEntry((prev) => updater(prev));
   }, []);
 
-  // const setScripts = useCallback((type: RQAPI.ScriptType, script: string) => {
-  //   setEntry((entry) => ({
-  //     ...entry,
-  //     scripts: {
-  //       ...entry.scripts,
-  //       [type]: script,
-  //     },
-  //   }));
-  // }, []);
-
   const setContentType = useCallback((contentType: RequestContentType) => {
     setEntry((entry) => {
       const newEntry: RQAPI.Entry = {
