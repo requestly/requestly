@@ -1,14 +1,9 @@
+import { EnvironmentVariables } from "backend/environment/types";
 import { RQAPI } from "../types";
 import { requestWorkerFunction, responseWorkerFunction } from "./workerScripts";
 
-interface EnvironmentPayload {
-  key: string;
-  value: any;
-  currentEnvironmentId: string;
-}
-
 interface WorkerMessage {
-  type: "SET_ENVIRONMENT" | "COMPLETE" | "ERROR";
+  type: "HANDLE_ENVIRONMENT_CHANGES" | "COMPLETE" | "ERROR";
   payload?: any;
 }
 
@@ -24,19 +19,30 @@ const createWorker = (workerFn: Function) => {
   return new Worker(URL.createObjectURL(blob));
 };
 
-const handleSetEnvironment = async (
+const handleEnvironmentChanges = async (
   environmentManager: any,
-  { key, value, currentEnvironmentId }: EnvironmentPayload
+  payload: {
+    variablesToSet: EnvironmentVariables;
+    variablesToRemove: string[];
+    currentVariables: EnvironmentVariables;
+  }
 ) => {
-  const currentVars = environmentManager.getCurrentEnvironmentVariables();
-  const newVars = {
+  const currentVars = payload.currentVariables;
+  const currentEnvironmentId = environmentManager.getCurrentEnvironment().currentEnvironmentId;
+
+  const variablesToSet = {
     ...currentVars,
-    [key]: {
-      syncValue: value,
-      localValue: value,
-    },
+    ...payload.variablesToSet,
   };
-  await environmentManager.setVariables(currentEnvironmentId, newVars);
+
+  payload.variablesToRemove.forEach((key) => {
+    delete variablesToSet[key];
+  });
+
+  await environmentManager.setVariables(currentEnvironmentId, variablesToSet);
+  return {
+    updatedVariables: variablesToSet,
+  };
 };
 
 const cleanupWorker = (worker: Worker | null) => {
@@ -49,22 +55,26 @@ const messageHandler = async (worker: Worker, environmentManager: any, event: Me
   const { type, payload } = event.data as WorkerMessage;
 
   switch (type) {
-    case "SET_ENVIRONMENT":
-      await handleSetEnvironment(environmentManager, payload);
-      break;
-
-    case "COMPLETE":
+    case "HANDLE_ENVIRONMENT_CHANGES": {
+      const updatedVariables = await handleEnvironmentChanges(environmentManager, payload);
       cleanupWorker(worker);
-      resolve();
+      resolve(updatedVariables);
       break;
+    }
 
-    case "ERROR":
+    case "ERROR": {
       cleanupWorker(worker);
+      resolve(null);
       break;
+    }
   }
 };
 
-export const executePrerequestScript = (script: string, request: RQAPI.Request, environmentManager: any) => {
+export const executePrerequestScript = (
+  script: string,
+  request: RQAPI.Request,
+  environmentManager: any
+): Promise<EnvironmentVariables | null> => {
   let worker: Worker | null = null;
 
   return new Promise((resolve, reject) => {
@@ -78,14 +88,12 @@ export const executePrerequestScript = (script: string, request: RQAPI.Request, 
       reject();
     };
 
-    const { currentEnvironmentId } = environmentManager.getCurrentEnvironment();
     const currentVars = environmentManager.getCurrentEnvironmentVariables();
 
     worker.postMessage({
       script,
       request: request,
-      currentVars,
-      currentEnvironmentId,
+      currentVariables: currentVars,
     });
 
     setTimeout(() => {
@@ -94,7 +102,12 @@ export const executePrerequestScript = (script: string, request: RQAPI.Request, 
   });
 };
 
-export const executePostresponseScript = (script: string, responseBody: any, environmentManager: any) => {
+export const executePostresponseScript = (
+  script: string,
+  responseBody: any,
+  environmentManager: any,
+  currentEnvironmentVariables: EnvironmentVariables
+) => {
   let worker: Worker | null = null;
 
   return new Promise((resolve, reject) => {
@@ -108,14 +121,10 @@ export const executePostresponseScript = (script: string, responseBody: any, env
       reject();
     };
 
-    const { currentEnvironmentId } = environmentManager.getCurrentEnvironment();
-    const currentVars = environmentManager.getCurrentEnvironmentVariables();
-
     worker.postMessage({
       script,
       response: responseBody.response,
-      currentVars,
-      currentEnvironmentId,
+      currentVariables: currentEnvironmentVariables,
     });
 
     setTimeout(() => {

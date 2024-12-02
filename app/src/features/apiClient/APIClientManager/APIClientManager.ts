@@ -11,16 +11,28 @@ export const executeAPIRequest = async (
   try {
     // Process request configuration with environment variables
     const renderedRequest = environmentManager.renderVariables(entry.request);
+    let currentEnvironmentVariables = environmentManager.getCurrentEnvironmentVariables();
 
     if (entry.scripts.preRequest) {
-      await executePrerequestScript(entry.scripts.preRequest, renderedRequest, environmentManager);
+      const { updatedVariables } = await executePrerequestScript(
+        entry.scripts.preRequest,
+        renderedRequest,
+        environmentManager
+      );
+
+      currentEnvironmentVariables = updatedVariables;
     }
 
     // Make the actual API request
     const response = await makeRequest(appMode, renderedRequest, signal);
 
     if (entry.scripts.postResponse) {
-      await executePostresponseScript(entry.scripts.postResponse, { response }, environmentManager);
+      await executePostresponseScript(
+        entry.scripts.postResponse,
+        { response },
+        environmentManager,
+        currentEnvironmentVariables
+      );
     }
 
     return {
