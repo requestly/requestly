@@ -124,7 +124,6 @@ const Editor: React.FC<EditorProps> = ({
 
   const handleEditorClose = useCallback(
     (id: string) => {
-      // @ts-expect-error
       dispatch(actions.removeToastForEditor({ id }));
     },
     [dispatch]
@@ -183,7 +182,7 @@ const Editor: React.FC<EditorProps> = ({
             defaultValue={defaultValue}
             onChange={handleEditorBodyChange}
             theme={vscodeDark}
-            extensions={[editorLanguage, EditorView.lineWrapping]}
+            extensions={[editorLanguage, EditorView.lineWrapping].filter(Boolean)}
             basicSetup={{
               highlightActiveLine: false,
               bracketMatching: true,
