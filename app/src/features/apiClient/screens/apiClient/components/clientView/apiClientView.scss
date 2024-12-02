@@ -7,11 +7,12 @@
   background-color: var(--requestly-color-background);
 
   .api-client-header-container {
-    padding: 8px 16px 0 6px;
+    padding: 20px 10px;
+    padding-bottom: 0;
   }
 
   .api-client-body {
-    padding: 0 16px;
+    padding: 0 10px;
     overflow: hidden;
   }
 
@@ -24,6 +25,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 0 10px;
 
     .api-client-url-container {
       display: flex;
@@ -56,6 +58,7 @@
   }
 
   .api-request-tabs {
+    padding: 0 10px;
     height: calc(100% - 35px);
     overflow: hidden;
     margin-top: 8px;
