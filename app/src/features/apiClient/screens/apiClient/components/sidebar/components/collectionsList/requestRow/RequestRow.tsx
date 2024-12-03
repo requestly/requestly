@@ -8,6 +8,11 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
+import { upsertApiRecord } from "backend/apiClient";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { toast } from "utils/Toast";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -15,7 +20,25 @@ interface Props {
 
 export const RequestRow: React.FC<Props> = ({ record }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
+  const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
+  const user = useSelector(getUserAuthDetails);
+  const teamId = useSelector(getCurrentlyActiveWorkspace);
+
+  const handleDuplicateRequest = useCallback(
+    async (record: RQAPI.ApiRecord) => {
+      const newRecord = {
+        ...record,
+        name: `${record.name} (Copy)`,
+      };
+      delete newRecord.id;
+      const result = await upsertApiRecord(user?.details?.profile?.uid, newRecord, teamId);
+      if (result.success) {
+        onSaveRecord(result.data);
+        toast.success("Request duplicated successfully");
+      }
+    },
+    [teamId, user?.details?.profile?.uid, onSaveRecord]
+  );
 
   const getRequestOptions = useCallback((): MenuProps["items"] => {
     return [
@@ -29,6 +52,14 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
       },
       {
         key: "1",
+        label: <div>Duplicate</div>,
+        onClick: (itemInfo) => {
+          itemInfo.domEvent?.stopPropagation?.();
+          handleDuplicateRequest(record);
+        },
+      },
+      {
+        key: "2",
         label: <div>Delete</div>,
         danger: true,
         onClick: (itemInfo) => {
@@ -38,7 +69,7 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
         },
       },
     ];
-  }, [record, updateRecordToBeDeleted, setIsDeleteModalOpen]);
+  }, [record, updateRecordToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest]);
 
   return (
     <>
