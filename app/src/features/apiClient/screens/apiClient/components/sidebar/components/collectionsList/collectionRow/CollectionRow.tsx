@@ -11,6 +11,8 @@ import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
+import { redirectToApiClient } from "utils/RedirectionUtils";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -24,6 +26,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
+  const navigate = useNavigate();
 
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {
@@ -52,6 +55,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
             itemInfo.domEvent?.stopPropagation?.();
             updateRecordToBeDeleted(record);
             setIsDeleteModalOpen(true);
+            redirectToApiClient(navigate);
           },
         },
       ];

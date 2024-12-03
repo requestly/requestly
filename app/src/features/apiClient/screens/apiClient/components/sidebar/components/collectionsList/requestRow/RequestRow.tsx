@@ -3,11 +3,12 @@ import { Typography, Dropdown, MenuProps } from "antd";
 import PATHS from "config/constants/sub/paths";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RQAPI } from "features/apiClient/types";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
+import { redirectToApiClient } from "utils/RedirectionUtils";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -16,6 +17,7 @@ interface Props {
 export const RequestRow: React.FC<Props> = ({ record }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
+  const navigate = useNavigate();
 
   const getRequestOptions = useCallback((): MenuProps["items"] => {
     return [
@@ -35,6 +37,7 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
           itemInfo.domEvent?.stopPropagation?.();
           updateRecordToBeDeleted(record);
           setIsDeleteModalOpen(true);
+          redirectToApiClient(navigate);
         },
       },
     ];
