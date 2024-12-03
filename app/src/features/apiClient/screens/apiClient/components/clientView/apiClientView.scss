@@ -13,6 +13,14 @@
   .api-client-body {
     padding: 0 16px;
     overflow: hidden;
+
+    .ant-tabs {
+      .ant-tabs-nav-wrap {
+        .ant-tabs-tab {
+          padding: 6px 4px;
+        }
+      }
+    }
   }
 
   .rq-breadcrumb {
