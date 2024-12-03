@@ -1,14 +1,6 @@
 import React, { createContext, useCallback, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TabsLayout } from "../types";
-
-export interface TabsLayoutContextInterface {
-  tabs: TabsLayout.Tab[];
-  activeTab: TabsLayout.Tab;
-  closeTab: (tabId: TabsLayout.Tab["id"]) => void;
-  openTab: (tabId: TabsLayout.Tab["id"], tabDetails?: Partial<TabsLayout.Tab>) => void;
-  updateTab: (tabId: TabsLayout.Tab["id"], updatedTabData?: Partial<TabsLayout.Tab>) => void;
-}
+import { TabsLayout, TabsLayoutContextInterface } from "../types";
 
 const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
   tabs: [],
