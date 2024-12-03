@@ -40,10 +40,10 @@ import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
 import PATHS from "config/constants/sub/paths";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
-import { executeAPIRequest } from "features/apiClient/APIClientManager/APIClientManager";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
+import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 
 interface Props {
   openInModal?: boolean;

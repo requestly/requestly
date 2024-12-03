@@ -1,6 +1,6 @@
-import { makeRequest } from "../screens/apiClient/utils";
-import { RQAPI } from "../types";
-import { executePrerequestScript, executePostresponseScript } from "./APIClientUtils";
+import { makeRequest } from "../../screens/apiClient/utils";
+import { RQAPI } from "../../types";
+import { executePrerequestScript, executePostresponseScript } from "./modules/scripts/utils";
 
 export const executeAPIRequest = async (
   appMode: string,

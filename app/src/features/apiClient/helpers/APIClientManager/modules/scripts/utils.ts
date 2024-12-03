@@ -1,9 +1,10 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { RQAPI } from "../types";
+import { RQAPI } from "../../../../types";
 import { requestWorkerFunction, responseWorkerFunction } from "./workerScripts";
+import { ScriptExecutedPayload } from "./types";
 
 interface WorkerMessage {
-  type: "HANDLE_ENVIRONMENT_CHANGES" | "COMPLETE" | "ERROR";
+  type: "SCRIPT_EXECUTED" | "COMPLETE" | "ERROR";
   payload?: any;
 }
 
@@ -22,8 +23,7 @@ const createWorker = (workerFn: Function) => {
 const handleEnvironmentChanges = async (
   environmentManager: any,
   payload: {
-    variablesToSet: EnvironmentVariables;
-    variablesToRemove: string[];
+    mutations: ScriptExecutedPayload["mutations"];
     currentVariables: EnvironmentVariables;
   }
 ) => {
@@ -32,10 +32,18 @@ const handleEnvironmentChanges = async (
 
   const variablesToSet = {
     ...currentVars,
-    ...payload.variablesToSet,
+    ...Object.fromEntries(
+      Object.entries(payload.mutations.environment.$set).map(([key, value]) => [
+        key,
+        {
+          syncValue: value,
+          localValue: value,
+        },
+      ])
+    ),
   };
 
-  payload.variablesToRemove.forEach((key) => {
+  Object.keys(payload.mutations.environment.$unset).forEach((key) => {
     delete variablesToSet[key];
   });
 
@@ -55,7 +63,7 @@ const messageHandler = async (worker: Worker, environmentManager: any, event: Me
   const { type, payload } = event.data as WorkerMessage;
 
   switch (type) {
-    case "HANDLE_ENVIRONMENT_CHANGES": {
+    case "SCRIPT_EXECUTED": {
       const updatedVariables = await handleEnvironmentChanges(environmentManager, payload);
       cleanupWorker(worker);
       resolve(updatedVariables);
@@ -64,8 +72,7 @@ const messageHandler = async (worker: Worker, environmentManager: any, event: Me
 
     case "ERROR": {
       cleanupWorker(worker);
-      resolve(null);
-      break;
+      throw new Error(payload);
     }
   }
 };

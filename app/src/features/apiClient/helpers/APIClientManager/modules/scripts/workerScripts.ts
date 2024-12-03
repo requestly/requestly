@@ -1,30 +1,30 @@
 /* eslint-disable no-new-func */
 
-import { EnvironmentVariables } from "backend/environment/types";
+import { ScriptExecutedPayload } from "./types";
 
 export const requestWorkerFunction = function (e: MessageEvent) {
   const { script, request, currentVariables } = e.data;
 
-  const variableSaverQueue: EnvironmentVariables = {};
-  const variableRemoverQueue: string[] = [];
+  const mutations: ScriptExecutedPayload["mutations"] = {
+    environment: {
+      $set: {},
+      $unset: {},
+    },
+  };
 
   const sandbox = {
     rq: {
       request,
       environment: {
         set: (key: string, value: any) => {
-          variableSaverQueue[key] = {
-            localValue: value,
-            syncValue: value,
-            type: typeof value,
-          };
+          mutations.environment.$set[key] = value;
         },
         get: (key: string) => {
           const variable = currentVariables[key];
           return variable?.localValue || variable?.syncValue;
         },
         remove: (key: string) => {
-          variableRemoverQueue.push(key);
+          mutations.environment.$unset[key] = "";
         },
       },
     },
@@ -49,11 +49,10 @@ export const requestWorkerFunction = function (e: MessageEvent) {
 
     scriptFunction(sandbox.rq).then(() => {
       this.postMessage({
-        type: "HANDLE_ENVIRONMENT_CHANGES",
+        type: "SCRIPT_EXECUTED",
         payload: {
           currentVariables,
-          variablesToSet: variableSaverQueue,
-          variablesToRemove: variableRemoverQueue,
+          mutations,
         },
       });
     });
@@ -72,8 +71,12 @@ export const requestWorkerFunction = function (e: MessageEvent) {
 export const responseWorkerFunction = function (e: MessageEvent) {
   const { script, request, response, currentVariables } = e.data;
 
-  const variableSaverQueue: EnvironmentVariables = {};
-  const variableRemoverQueue: string[] = [];
+  const mutations: ScriptExecutedPayload["mutations"] = {
+    environment: {
+      $set: {},
+      $unset: {},
+    },
+  };
 
   const sandbox = {
     rq: {
@@ -81,18 +84,14 @@ export const responseWorkerFunction = function (e: MessageEvent) {
       response,
       environment: {
         set: (key: string, value: any) => {
-          variableSaverQueue[key] = {
-            localValue: value,
-            syncValue: value,
-            type: typeof value,
-          };
+          mutations.environment.$set[key] = value;
         },
         get: (key: string) => {
           const variable = currentVariables[key];
           return variable?.localValue || variable?.syncValue;
         },
         remove: (key: string) => {
-          variableRemoverQueue.push(key);
+          mutations.environment.$unset[key] = "";
         },
       },
     },
@@ -117,11 +116,10 @@ export const responseWorkerFunction = function (e: MessageEvent) {
 
     scriptFunction(sandbox.rq).then(() => {
       this.postMessage({
-        type: "HANDLE_ENVIRONMENT_CHANGES",
+        type: "SCRIPT_EXECUTED",
         payload: {
           currentVariables,
-          variablesToSet: variableSaverQueue,
-          variablesToRemove: variableRemoverQueue,
+          mutations,
         },
       });
     });
