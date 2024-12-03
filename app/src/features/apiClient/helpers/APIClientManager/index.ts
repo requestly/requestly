@@ -27,16 +27,11 @@ export const executeAPIRequest = async (
     const response = await makeRequest(appMode, renderedRequest, signal);
 
     if (entry.scripts.postResponse) {
-      const processedCurrentEnvironmentVariables = Object.keys(currentEnvironmentVariables).reduce((acc, key) => {
-        acc[key] = currentEnvironmentVariables[key].localValue || currentEnvironmentVariables[key].syncValue;
-        return acc;
-      }, {} as Record<string, string | number | boolean>);
-
       await executePostresponseScript(
         entry.scripts.postResponse,
         { response, request: renderedRequest },
         environmentManager,
-        processedCurrentEnvironmentVariables
+        currentEnvironmentVariables
       );
     }
 
