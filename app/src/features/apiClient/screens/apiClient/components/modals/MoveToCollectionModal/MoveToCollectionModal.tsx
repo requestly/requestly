@@ -14,12 +14,12 @@ import { useNavigate } from "react-router-dom";
 import "./moveToCollectionModal.scss";
 
 interface Props {
-  requestToMove: RQAPI.Record;
+  recordToMove: RQAPI.Record;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, requestToMove }) => {
+export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordToMove }) => {
   const navigate = useNavigate();
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
   const [selectedCollection, setSelectedCollection] = useState(null);
@@ -51,7 +51,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, reques
       const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToBeCreated, teamId);
       if (newCollection.success) {
         onSaveRecord(newCollection.data);
-        const updatedRequest = { ...requestToMove, collectionId: newCollection.data.id };
+        const updatedRequest = { ...recordToMove, collectionId: newCollection.data.id };
         const result = await upsertApiRecord(user?.details?.profile?.uid, updatedRequest, teamId);
         if (result.success) {
           toast.success("Request moved to collection successfully");
@@ -67,7 +67,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, reques
       onClose();
     } else {
       //move request to existing collection
-      const updatedRequest = { ...requestToMove, collectionId: selectedCollection.value };
+      const updatedRequest = { ...recordToMove, collectionId: selectedCollection.value };
       const result = await upsertApiRecord(user.details?.profile?.uid, updatedRequest, teamId);
       setIsLoading(false);
       if (result.success) {
@@ -79,7 +79,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, reques
       }
       onClose();
     }
-  }, [user?.details?.profile?.uid, teamId, onSaveRecord, requestToMove, selectedCollection, onClose, navigate]);
+  }, [user?.details?.profile?.uid, teamId, onSaveRecord, recordToMove, selectedCollection, onClose, navigate]);
 
   return (
     <Modal

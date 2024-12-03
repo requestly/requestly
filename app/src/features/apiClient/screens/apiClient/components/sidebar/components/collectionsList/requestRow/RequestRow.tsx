@@ -87,7 +87,7 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
     <>
       {isMoveToCollectionModalOpen && (
         <MoveToCollectionModal
-          requestToMove={requestToMove}
+          recordToMove={requestToMove}
           isOpen={isMoveToCollectionModalOpen}
           onClose={() => {
             setIsMoveToCollectionModalOpen(false);
