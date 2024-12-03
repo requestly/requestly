@@ -1,1 +1,1 @@
-export { TabsLayoutProvider, useTabsLayoutContext } from "./tabsContext";
+export { TabsLayoutProvider, useTabsLayoutContext } from "./tabsLayoutContext";
