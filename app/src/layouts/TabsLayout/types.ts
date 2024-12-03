@@ -1,4 +1,5 @@
 export namespace TabsLayout {
+  // TODO: add icon type or record type?
   export interface Tab {
     id: string;
 
