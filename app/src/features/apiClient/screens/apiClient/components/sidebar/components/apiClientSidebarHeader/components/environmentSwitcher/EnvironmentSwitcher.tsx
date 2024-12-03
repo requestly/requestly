@@ -59,7 +59,7 @@ export const EnvironmentSwitcher = () => {
   return (
     <Dropdown overlayClassName="environment-switcher-dropdown" trigger={["click"]} menu={{ items: dropdownItems }}>
       <RQButton className="environment-switcher-button" size="small">
-        <MdOutlineSyncAlt />
+        {currentEnvironmentName && <MdOutlineSyncAlt />}
         <Typography.Text
           ellipsis={{
             tooltip: {
@@ -68,7 +68,7 @@ export const EnvironmentSwitcher = () => {
             },
           }}
         >
-          {currentEnvironmentName}
+          {currentEnvironmentName || "No environment"}
         </Typography.Text>
       </RQButton>
     </Dropdown>
