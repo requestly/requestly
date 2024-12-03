@@ -38,7 +38,8 @@ export const apiClientRoutes: RouteObject[] = [
         ),
         handle: {
           breadcrumb: {
-            isEditable: false,
+            label: "Request",
+            isEditable: true,
           },
         },
       },
