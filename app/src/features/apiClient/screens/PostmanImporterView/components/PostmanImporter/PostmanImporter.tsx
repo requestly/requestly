@@ -110,6 +110,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 });
               }
             } catch (error) {
+              Logger.error("Error processing postman file:", error);
               reject(error);
             }
           };
