@@ -1,4 +1,10 @@
 .api-client-script-editor-container {
+  height: inherit;
+
+  .react-resizable {
+    height: calc(100% - 35px) !important;
+  }
+
   .code-editor-custom-options-row {
     margin-top: 0;
     margin-left: 4px;
