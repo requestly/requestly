@@ -1,4 +1,4 @@
-import { Tabs } from "antd";
+import { Result, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { useCallback, useMemo } from "react";
@@ -10,6 +10,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import { EnvironmentVariables } from "backend/environment/types";
+import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
 import "./collectionView.scss";
 
 const TAB_KEYS = {
@@ -48,7 +49,7 @@ export const CollectionView = () => {
       {
         label: "Overview",
         key: TAB_KEYS.OVERVIEW,
-        children: <div>OVERVIEW HERE</div>,
+        children: <CollectionOverview collection={collection} />,
       },
       {
         label: "Variables",
@@ -63,18 +64,25 @@ export const CollectionView = () => {
         ),
       },
     ];
-  }, [collection?.data.variables, handleRemoveVariable, handleSetVariables]);
-
-  if (!collection) {
-    return <div>Collection not found</div>;
-  }
+  }, [collection, handleRemoveVariable, handleSetVariables]);
 
   return (
     <div className="collection-view-container">
-      <RQBreadcrumb recordName={collection.name} disabled={true} />
-      <div className="collection-view-content">
-        <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} />
-      </div>
+      {!collection ? (
+        <Result
+          status="error"
+          title="Collection not found"
+          subTitle="Oops! Looks like this collection doesn't exist."
+        />
+      ) : (
+        <>
+          {" "}
+          <RQBreadcrumb recordName={collection.name} disabled={true} />
+          <div className="collection-view-content">
+            <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} />
+          </div>
+        </>
+      )}
     </div>
   );
 };
