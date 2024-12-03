@@ -116,7 +116,7 @@ export const executePostresponseScript = (
     response: RQAPI.Response;
   },
   environmentManager: any,
-  currentEnvironmentVariables: EnvironmentVariables
+  currentEnvironmentVariables: Record<string, string | number | boolean>
 ) => {
   let worker: Worker | null = null;
 
