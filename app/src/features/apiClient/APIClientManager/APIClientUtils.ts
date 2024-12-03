@@ -104,7 +104,10 @@ export const executePrerequestScript = (
 
 export const executePostresponseScript = (
   script: string,
-  responseBody: any,
+  APIDetails: {
+    request: RQAPI.Request;
+    response: RQAPI.Response;
+  },
   environmentManager: any,
   currentEnvironmentVariables: EnvironmentVariables
 ) => {
@@ -123,7 +126,8 @@ export const executePostresponseScript = (
 
     worker.postMessage({
       script,
-      response: responseBody.response,
+      request: APIDetails.request,
+      response: APIDetails.response,
       currentVariables: currentEnvironmentVariables,
     });
 

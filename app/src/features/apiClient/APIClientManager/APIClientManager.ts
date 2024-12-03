@@ -29,7 +29,7 @@ export const executeAPIRequest = async (
     if (entry.scripts.postResponse) {
       await executePostresponseScript(
         entry.scripts.postResponse,
-        { response },
+        { response, request: renderedRequest },
         environmentManager,
         currentEnvironmentVariables
       );

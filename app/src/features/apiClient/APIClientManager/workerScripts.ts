@@ -70,13 +70,14 @@ export const requestWorkerFunction = function (e: MessageEvent) {
 };
 
 export const responseWorkerFunction = function (e: MessageEvent) {
-  const { script, response, currentVariables } = e.data;
+  const { script, request, response, currentVariables } = e.data;
 
   const variableSaverQueue: EnvironmentVariables = {};
   const variableRemoverQueue: string[] = [];
 
   const sandbox = {
     rq: {
+      request,
       response,
       environment: {
         set: (key: string, value: any) => {
