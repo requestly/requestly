@@ -81,6 +81,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
           onChange={(keys) => {
             setActiveKey(keys[0]);
           }}
+          // TODO: HANDLE COLUMN COLLAPSE ON CLICK
           // collapsible={activeKey === record.id? "icon":"header"}
           defaultActiveKey={[record.id]}
           ghost
