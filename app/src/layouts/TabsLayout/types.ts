@@ -1,20 +1,17 @@
-export interface Tab {
-  id: string;
+export namespace TabsLayout {
+  export interface Tab {
+    id: string;
 
-  /**
-   * Page Url
-   */
-  url: string;
+    /**
+     * Page Url
+     */
+    url: string;
 
-  /**
-   * Tab title
-   */
-  title: string;
-
-  /**
-   * If changes for this tab is saved once, then persist this tab between reloads
-   */
-  isSaved: boolean;
-  hasUnsavedChanges: boolean;
-  timeStamp: number;
+    /**
+     * Tab title
+     */
+    title: string;
+    hasUnsavedChanges: boolean;
+    timeStamp: number;
+  }
 }
