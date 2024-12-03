@@ -9,6 +9,7 @@ import { convertFlatRecordsToNestedRecords, isApiCollection, isApiRequest } from
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/ExportCollectionsModal";
 import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./collectionsList.scss";
 
 interface Props {
@@ -25,6 +26,7 @@ export const CollectionsList: React.FC<Props> = ({
   hideNewRecordNameInput,
 }) => {
   const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
+  const { openTab } = useTabsLayoutContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
@@ -72,6 +74,7 @@ export const CollectionsList: React.FC<Props> = ({
               {updatedRecords.collections.map((record) => {
                 return (
                   <CollectionRow
+                    openTab={openTab}
                     key={record.id}
                     record={record}
                     onNewClick={onNewClick}
@@ -89,7 +92,7 @@ export const CollectionsList: React.FC<Props> = ({
               ) : null}
 
               {updatedRecords.requests.map((record) => {
-                return <RequestRow key={record.id} record={record} />;
+                return <RequestRow key={record.id} record={record} openTab={openTab} />;
               })}
 
               {isNewRecordNameInputVisible && recordTypeToBeCreated === RQAPI.RecordType.API ? (
