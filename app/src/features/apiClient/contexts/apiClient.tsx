@@ -28,6 +28,7 @@ interface ApiClientContextInterface {
   isDeleteModalOpen: boolean;
   setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onDeleteModalClose: () => void;
+
   history: RQAPI.Entry[];
   addToHistory: (apiEntry: RQAPI.Entry) => void;
   clearHistory: () => void;
@@ -287,6 +288,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     onDeleteModalClose,
+
     history,
     addToHistory,
     clearHistory,
