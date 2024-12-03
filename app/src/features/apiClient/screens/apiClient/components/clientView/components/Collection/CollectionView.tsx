@@ -29,9 +29,9 @@ export const CollectionView = () => {
   const handleSetVariables = useCallback(
     async (variables: EnvironmentVariables) => {
       const record = { ...collection, data: { ...collection?.data, variables } };
-      return upsertApiRecord(user.details.profile.uid, record, teamId);
+      return upsertApiRecord(user.details?.profile?.uid, record, teamId);
     },
-    [collection, teamId, user.details.profile.uid]
+    [collection, teamId, user.details?.profile?.uid]
   );
 
   const handleRemoveVariable = useCallback(
@@ -39,9 +39,9 @@ export const CollectionView = () => {
       const updatedVariables = { ...collection?.data.variables };
       delete updatedVariables[key];
       const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
-      return upsertApiRecord(user.details.profile.uid, record, teamId);
+      return upsertApiRecord(user.details?.profile?.uid, record, teamId);
     },
-    [collection, teamId, user.details.profile.uid]
+    [collection, teamId, user.details?.profile?.uid]
   );
 
   const tabItems = useMemo(() => {
@@ -56,7 +56,6 @@ export const CollectionView = () => {
         key: TAB_KEYS.VARIABLES,
         children: (
           <VariablesList
-            searchValue=""
             variables={collection?.data.variables || {}}
             setVariables={handleSetVariables}
             removeVariable={handleRemoveVariable}
@@ -76,7 +75,6 @@ export const CollectionView = () => {
         />
       ) : (
         <>
-          {" "}
           <RQBreadcrumb recordName={collection.name} disabled={true} />
           <div className="collection-view-content">
             <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} />

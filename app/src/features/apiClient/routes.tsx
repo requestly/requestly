@@ -27,7 +27,8 @@ export const apiClientRoutes: RouteObject[] = [
         element: <ProtectedRoute component={APIClient} />,
         handle: {
           breadcrumb: {
-            isEditable: false,
+            label: "Request",
+            isEditable: true,
           },
         },
       },

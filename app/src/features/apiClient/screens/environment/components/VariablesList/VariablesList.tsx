@@ -16,7 +16,7 @@ import "./variablesList.scss";
 
 interface VariablesListProps {
   variables: EnvironmentVariables;
-  searchValue: string;
+  searchValue?: string;
   setVariables: (variables: EnvironmentVariables) => Promise<unknown>;
   removeVariable: (key: string) => Promise<unknown>;
 }
@@ -24,7 +24,7 @@ interface VariablesListProps {
 export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string; id: number };
 
 export const VariablesList: React.FC<VariablesListProps> = ({
-  searchValue,
+  searchValue = "",
   variables,
   setVariables,
   removeVariable,

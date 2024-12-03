@@ -81,13 +81,16 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
           onChange={(keys) => {
             setActiveKey(keys[0]);
           }}
-          // TODO: HANDLE COLUMN COLLAPSE ON CLICK
-          // collapsible={activeKey === record.id? "icon":"header"}
+          collapsible={activeKey === record.id ? "icon" : "header"}
           defaultActiveKey={[record.id]}
           ghost
           className="collections-list-item collection"
           expandIcon={({ isActive }) => {
-            return isActive ? <PiFolderOpen /> : <MdOutlineFolder />;
+            return isActive ? (
+              <PiFolderOpen className="collection-expand-icon" />
+            ) : (
+              <MdOutlineFolder className="collection-expand-icon" />
+            );
           }}
         >
           <Collapse.Panel
