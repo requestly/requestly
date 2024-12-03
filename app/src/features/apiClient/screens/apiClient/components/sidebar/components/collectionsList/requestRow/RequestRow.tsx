@@ -21,12 +21,14 @@ import {
   trackMoveRequestToCollectionClicked,
 } from "modules/analytics/events/features/apiClient";
 import { redirectToRequest } from "utils/RedirectionUtils";
+import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 
 interface Props {
   record: RQAPI.ApiRecord;
+  openTab: TabsLayoutContextInterface["openTab"];
 }
 
-export const RequestRow: React.FC<Props> = ({ record }) => {
+export const RequestRow: React.FC<Props> = ({ record, openTab }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
   const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
@@ -126,6 +128,12 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
           title={record.name || record.data.request.url}
           to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`}
           className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
+          onClick={() => {
+            openTab(record.id, {
+              title: record.name,
+              url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`,
+            });
+          }}
         >
           <Typography.Text
             strong
