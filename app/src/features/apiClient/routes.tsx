@@ -20,59 +20,53 @@ export const apiClientRoutes: RouteObject[] = [
     },
     children: [
       {
-        path: "",
-        element: <TabsLayoutContainer />,
+        index: true,
+        element: <APIClient />,
+      },
+      {
+        path: PATHS.API_CLIENT.REQUEST.INDEX,
+        element: <ProtectedRoute component={APIClient} />,
+        handle: {
+          breadcrumb: {
+            label: "Request",
+            isEditable: true,
+          },
+        },
+      },
+      {
+        path: PATHS.API_CLIENT.COLLECTION.INDEX,
+        element: <ProtectedRoute component={APIClient} />,
+        handle: {
+          breadcrumb: {
+            label: "Request", // TODO: Fix, change it to collection, when collection view is added
+            isEditable: false,
+          },
+        },
+      },
+      {
+        path: PATHS.API_CLIENT.HISTORY.INDEX,
+        element: <APIClient />,
+        handle: {
+          breadcrumb: {
+            label: "History",
+          },
+        },
+      },
+      {
+        path: PATHS.API_CLIENT.ENVIRONMENTS.INDEX,
+        element: <EnvironmentContainer />,
         children: [
           {
             index: true,
-            element: <APIClient />,
+            element: <EmptyEnvironmentView />,
           },
           {
-            path: PATHS.API_CLIENT.REQUEST.INDEX,
-            element: <ProtectedRoute component={APIClient} />,
-            handle: {
-              breadcrumb: {
-                label: "Request",
-                isEditable: true,
-              },
-            },
+            path: PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE + "/:envId",
+            element: <EnvironmentView />,
           },
           {
-            path: PATHS.API_CLIENT.COLLECTION.INDEX,
-            element: <ProtectedRoute component={APIClient} />,
-            handle: {
-              breadcrumb: {
-                label: "Request", // TODO: Fix, change it to collection, when collection view is added
-                isEditable: false,
-              },
-            },
-          },
-          {
-            path: PATHS.API_CLIENT.HISTORY.INDEX,
-            element: <APIClient />,
-            handle: {
-              breadcrumb: {
-                label: "History",
-              },
-            },
-          },
-          {
-            path: PATHS.API_CLIENT.ENVIRONMENTS.INDEX,
-            element: <EnvironmentContainer />,
-            children: [
-              {
-                index: true,
-                element: <EmptyEnvironmentView />,
-              },
-              {
-                path: PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE + "/:envId",
-                element: <EnvironmentView />,
-              },
-              {
-                path: PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE,
-                element: <EnvironmentView />,
-              },
-            ],
+            path: PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE,
+            element: <EnvironmentView />,
           },
         ],
       },
