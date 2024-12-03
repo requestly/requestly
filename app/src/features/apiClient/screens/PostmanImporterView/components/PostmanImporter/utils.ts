@@ -51,6 +51,31 @@ export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExp
   };
 };
 
+const processScripts = (item: any) => {
+  const scripts = {
+    preRequest: "",
+    postResponse: "",
+  };
+
+  const migratePostmanScripts = (postmanScript: string) => {
+    return postmanScript.replace(/pm\./g, "rq."); // Replace all occurrences of 'pm.' with 'rq.'
+  };
+
+  if (!item.event?.length) {
+    return scripts;
+  }
+
+  item.event.forEach((event: any) => {
+    if (event.listen === "prerequest") {
+      scripts.preRequest = migratePostmanScripts(event.script.exec.join("\n"));
+    } else if (event.listen === "test") {
+      scripts.postResponse = migratePostmanScripts(event.script.exec.join("\n"));
+    }
+  });
+
+  return scripts;
+};
+
 const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.ApiRecord> => {
   const { request } = item;
   if (!request) throw new Error(`Invalid API item: ${item.name}`);
@@ -79,12 +104,13 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
     deleted: false,
     data: {
       request: {
-        url: typeof request.url === "string" ? request.url : request.url.raw,
+        url: typeof request.url === "string" ? request.url : request.url?.raw ?? "",
         method: request.method || RequestMethod.GET,
         queryParams,
         headers,
         body: request.body?.raw ?? null,
       },
+      scripts: processScripts(item),
     },
   };
 };
