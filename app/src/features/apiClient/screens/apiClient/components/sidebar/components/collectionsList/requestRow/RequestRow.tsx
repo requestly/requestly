@@ -14,27 +14,27 @@ interface Props {
 }
 
 export const RequestRow: React.FC<Props> = ({ record }) => {
-  const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
   const [isEditMode, setIsEditMode] = useState(false);
+  const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
 
   const getRequestOptions = useCallback((): MenuProps["items"] => {
     return [
       {
         key: "0",
+        label: <div>Rename</div>,
+        onClick: (itemInfo) => {
+          itemInfo.domEvent?.stopPropagation?.();
+          setIsEditMode(true);
+        },
+      },
+      {
+        key: "1",
         label: <div>Delete</div>,
         danger: true,
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           updateRecordToBeDeleted(record);
           setIsDeleteModalOpen(true);
-        },
-      },
-      {
-        key: "1",
-        label: <div>Rename</div>,
-        onClick: (itemInfo) => {
-          itemInfo.domEvent?.stopPropagation?.();
-          setIsEditMode(true);
         },
       },
     ];

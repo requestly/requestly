@@ -13,6 +13,10 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { trackCollectionDeleted } from "modules/analytics/events/features/apiClient";
 import "./deleteApiRecordModal.scss";
 
+enum RecordType {
+  API = "api",
+  COLLECTION = "collection",
+}
 interface DeleteApiRecordModalProps {
   open: boolean;
   record: RQAPI.Record;
@@ -52,7 +56,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
 
     if (result.success) {
       trackCollectionDeleted();
-      toast.success(record.type === "api" ? "API request deleted" : "Collection deleted");
+      toast.success(record.type === RecordType.API ? "API request deleted" : "Collection deleted");
       onClose();
       onSuccess?.();
 
@@ -62,9 +66,9 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
     setIsDeleting(false);
   };
 
-  const header = record.type === "api" ? "Delete API Request" : "Delete Collection";
+  const header = record.type === RecordType.API ? "Delete API Request" : "Delete Collection";
   const description =
-    record.type === "api"
+    record.type === RecordType.API
       ? `This action will permanently delete this API request. Are you sure you want to continue?`
       : `This action will permanently delete the entire collection and its ${apiRequestCount} requests. Are you sure you want to continue?`;
 
@@ -86,7 +90,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
           Cancel
         </RQButton>
         <RQButton block type="danger" loading={isDeleting} onClick={handleDeleteApiRecord}>
-          {record.type === "api" ? "Delete API" : "Delete collection"}
+          {record.type === RecordType.API ? "Delete API" : "Delete collection"}
         </RQButton>
       </div>
     </RQModal>
