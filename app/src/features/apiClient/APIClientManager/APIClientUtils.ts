@@ -133,6 +133,6 @@ export const executePostresponseScript = (
 
     setTimeout(() => {
       cleanupWorker(worker);
-    }, 35000);
+    }, 50000);
   });
 };
