@@ -1,5 +1,5 @@
 import { Select, Skeleton, Space } from "antd";
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
 import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
@@ -76,7 +76,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
-  const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
+  const [entry, setEntry] = useState<RQAPI.Entry>(apiEntry ?? getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.RequestErrorEntry["error"]>(null);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
@@ -90,7 +90,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   useEffect(() => {
     if (apiEntry) {
       clearTimeout(animationTimerRef.current);
-      setIsAnimating(true);
+      // setIsAnimating(true);
       setEntry(apiEntry);
       setRequestName("");
       animationTimerRef.current = setTimeout(() => setIsAnimating(false), 500);
@@ -316,6 +316,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
+      setEntry({ ...result.data.data });
+      // updateTab(requestDetails.id, { hasUnsavedChanges: false, data: requestDetails });
 
       trackRequestSaved("api_client_view");
       if (location.pathname.includes("history")) {
@@ -374,7 +376,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   <Select
                     className="api-request-method-selector"
                     options={requestMethodOptions}
-                    value={entry.request.method}
+                    value={entry.request?.method}
                     onChange={setMethod}
                   />
                   {/* <Input
@@ -390,7 +392,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                     className="api-request-url"
                     placeholder="https://example.com"
                     // value={entry.request.url}
-                    defaultValue={entry.request.url}
+                    defaultValue={entry.request?.url}
                     onChange={(text) => setUrl(text)}
                     onPressEnter={onUrlInputEnterPressed}
                     variables={currentEnvironmentVariables}
@@ -403,7 +405,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
                   type="primary"
                   className="text-bold"
-                  disabled={!entry.request.url}
+                  disabled={!entry.request?.url}
+                  loading={isLoadingResponse}
                 >
                   Send
                 </RQButton>
@@ -431,4 +434,4 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   );
 };
 
-export default memo(APIClientView);
+export default React.memo(APIClientView);
