@@ -44,6 +44,17 @@
           font-size: var(--requestly-font-size-xs);
           color: var(--requestly-color-text-default);
         }
+        .request-options {
+          margin-left: auto;
+          visibility: hidden;
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        &:hover .request-options {
+          visibility: visible;
+          opacity: 1;
+        }
 
         &:hover,
         &.active {
