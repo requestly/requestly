@@ -8,7 +8,6 @@ export const GlobalModals = () => {
   const activeModals = useSelector(getActiveModals);
 
   const toggleAuthModal = () => {
-    // @ts-ignore
     dispatch(globalActions.toggleActiveModal({ modalName: "authModal" }));
   };
 
