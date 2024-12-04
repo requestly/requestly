@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { getActiveModals } from "store/selectors";
+import { getActiveModals } from "store/slices/global/modals/selectors";
 import AuthModal from "components/authentication/AuthModal";
 import { globalActions } from "store/slices/global/slice";
 

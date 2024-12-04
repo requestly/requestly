@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Empty, Typography, Row } from "antd";
 import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
 import { globalActions } from "store/slices/global/slice";
-import { getActiveModals } from "store/selectors";
+import { getActiveModals } from "store/slices/global/modals/selectors";
 import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
 import { RQNetworkTable, RQNetworkTableProps } from "lib/design-system/components/RQNetworkTable";
 import { APIClient, APIClientRequest } from "features/apiClient/components/common/APIClient";

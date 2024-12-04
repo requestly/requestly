@@ -4,13 +4,8 @@ import { useLocation, useSearchParams, Outlet } from "react-router-dom";
 import SpinnerModal from "components/misc/SpinnerModal";
 import { globalActions } from "store/slices/global/slice";
 //UTILS
-import {
-  getActiveModals,
-  getAppMode,
-  getAppOnboardingDetails,
-  getIsWorkspaceOnboardingCompleted,
-  getRequestBot,
-} from "store/selectors";
+import { getAppMode, getAppOnboardingDetails, getIsWorkspaceOnboardingCompleted, getRequestBot } from "store/selectors";
+import { getActiveModals } from "store/slices/global/modals/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";

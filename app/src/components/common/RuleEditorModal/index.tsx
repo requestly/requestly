@@ -3,12 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Col, Row, message, Dropdown, Menu, Typography } from "antd";
 import { MoreOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import {
-  getActiveModals,
-  getAppMode,
-  getCurrentlySelectedRuleConfig,
-  getCurrentlySelectedRuleData,
-} from "store/selectors";
+import { getAppMode, getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
+import { getActiveModals } from "store/slices/global/modals/selectors";
 import { RQButton, RQEditorTitle, RQModal } from "lib/design-system/components";
 import RulePairs from "components/features/rules/RulePairs";
 import AddPairButton from "components/features/rules/RuleBuilder/Body/Columns/AddPairButton";

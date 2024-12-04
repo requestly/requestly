@@ -9,7 +9,8 @@ import DeleteRulesModal from "../DeleteRulesModal";
 import ImportRulesModal from "../ImportRulesModal";
 import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import RenameGroupModal from "../RenameGroupModal";
-import { getRulesSelection, getAllRules, getActiveModals, getGroupsSelection } from "../../../../store/selectors";
+import { getRulesSelection, getAllRules, getGroupsSelection } from "../../../../store/selectors";
+import { getActiveModals } from "store/slices/global/modals/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { submitAttrUtil, trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 //ACTIONS

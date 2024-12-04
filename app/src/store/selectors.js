@@ -160,10 +160,6 @@ export const getSelectedSharedLists = (state) => {
   return sharedListsNode["selectedLists"];
 };
 
-export const getActiveModals = (state) => {
-  return getGlobalState(state)["activeModals"];
-};
-
 export const getHasConnectedApp = (state) => {
   return getGlobalState(state).misc?.persist?.hasConnectedApp;
 };
