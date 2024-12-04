@@ -19,12 +19,15 @@ import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import { isEmpty } from "lodash";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { useApiClientContext } from "features/apiClient/contexts";
+import { RQAPI } from "features/apiClient/types";
 
 let unsubscribeListener: () => void = null;
 
 const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const { apiClientRecords } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -180,12 +183,53 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     [ownerId, dispatch]
   );
 
-  const renderVariables = useCallback(
-    <T>(template: string | Record<string, any>): T => {
+  const getVariablesWithPrecedence = useCallback(
+    (currentCollectionId: string): Record<string, EnvironmentVariableValue> => {
+      const allVariables: Record<string, EnvironmentVariableValue> = {};
+
+      // Function to get all parent collection variables recursively
+      const getParentVariables = (collectionId: string) => {
+        const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+        if (!collection) return;
+
+        // Add current collection's variables
+        Object.entries(collection.data.variables || {}).forEach(([key, value]) => {
+          // Only add if not already present (maintain precedence)
+          if (!(key in allVariables)) {
+            allVariables[key] = value;
+          }
+        });
+
+        // Recursively get parent variables
+        if (collection.collectionId) {
+          getParentVariables(collection.collectionId);
+        }
+      };
+
       const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId]?.variables;
-      return renderTemplate(template, currentEnvironmentVariables);
+      // Start with environment variables (highest precedence)
+      Object.entries(currentEnvironmentVariables || {}).forEach(([key, value]) => {
+        allVariables[key] = value;
+      });
+
+      // Get collection hierarchy variables
+      getParentVariables(currentCollectionId);
+
+      return allVariables;
     },
-    [allEnvironmentData, currentEnvironmentId]
+    [allEnvironmentData, apiClientRecords, currentEnvironmentId]
+  );
+
+  const renderVariables = useCallback(
+    <T>(template: string | Record<string, any>, requestCollectionId?: string): T => {
+      const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId || "");
+      console.log("!!!debug", "renderVariables", {
+        variablesWithPrecedence,
+        requestCollectionId,
+      });
+      return renderTemplate(template, variablesWithPrecedence);
+    },
+    [getVariablesWithPrecedence]
   );
 
   const getEnvironmentVariables = useCallback(

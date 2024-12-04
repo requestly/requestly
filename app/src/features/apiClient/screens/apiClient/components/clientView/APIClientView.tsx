@@ -213,7 +213,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     const sanitizedEntry = sanitizeEntry(entry);
     sanitizedEntry.response = null;
 
-    const renderedRequest = renderVariables<RQAPI.Request>(sanitizedEntry.request);
+    const renderedRequest = renderVariables<RQAPI.Request>(sanitizedEntry.request, apiEntryDetails.collectionId);
     renderedRequest.url = addUrlSchemeIfMissing(renderedRequest.url);
 
     const renderedEntry = { ...sanitizedEntry, request: renderedRequest };
@@ -223,6 +223,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsFailed(false);
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
+
+    console.log("!!!debug", "before sending", apiEntry, apiEntryDetails);
 
     makeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
       .then((response) => {
