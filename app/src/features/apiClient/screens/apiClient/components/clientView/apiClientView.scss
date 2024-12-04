@@ -141,4 +141,17 @@
   .api-response-status-line {
     font-size: var(--requestly-font-size-xs);
   }
+
+  .api-client-response__loading-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--requestly-color-background);
+    z-index: 2;
+  }
 }
