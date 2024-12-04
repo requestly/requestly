@@ -13,3 +13,7 @@ export const getCurrentEnvironmentId = (state: RootState): InitialState["current
 export const getCollectionVariables = (state: RootState): InitialState["api_collections"] => {
   return state[ReducerKeys.VARIABLES].api_collections;
 };
+
+export const getCollectionVariables = (state: RootState): InitialState["api_collections"] => {
+  return state[ReducerKeys.ENVIRONMENT].api_collections;
+};
