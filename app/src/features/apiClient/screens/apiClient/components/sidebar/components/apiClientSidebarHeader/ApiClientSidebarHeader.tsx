@@ -5,11 +5,12 @@ import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
-import { ApiClientSidebarTabKey } from "../APIClientSidebar";
+import { ApiClientSidebarTabKey } from "../../APIClientSidebar";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import {
   trackImportApiCollectionsClicked,
+  trackImportFromPostmanClicked,
   trackNewCollectionClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
@@ -17,9 +18,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { ImportCollectionsModal } from "../../modals/importCollectionsModal/ImportCollectionsModal";
+import { ImportCollectionsModal } from "../../../modals/importCollectionsModal/ImportCollectionsModal";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
+import { SiPostman } from "@react-icons/all-files/si/SiPostman";
+import { PostmanImporterModal } from "../../../modals/postmanImporterModal/PostmanImporterModal";
+import { useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
+import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -44,14 +50,33 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   onClearHistory,
 }) => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const user = useSelector(getUserAuthDetails);
   const [isImportCollectionsModalOpen, setIsImportCollectionsModalOpen] = useState(false);
+  const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
 
   const importItems: DropdownProps["menu"]["items"] = useMemo(
     () => [
       {
         key: "1",
-        label: "Collection",
+        label: (
+          <div className="new-btn-option">
+            <MdOutlineTerminal />
+            cURL
+          </div>
+        ),
+        onClick: onImportClick,
+        disabled: location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.INDEX),
+      },
+      {
+        key: "2",
+        label: (
+          <div className="new-btn-option">
+            <BsCollection />
+            Requestly Collection
+          </div>
+        ),
+        disabled: location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.INDEX),
         onClick: () => {
           if (!user.loggedIn) {
             dispatch(
@@ -72,12 +97,19 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         },
       },
       {
-        key: "2",
-        label: "cURL",
-        onClick: onImportClick,
+        key: "3",
+        label: (
+          <div className="new-btn-option">
+            <SiPostman /> Postman
+          </div>
+        ),
+        onClick: () => {
+          trackImportFromPostmanClicked();
+          setIsPostmanImporterModalOpen(true);
+        },
       },
     ],
-    [user.loggedIn, dispatch]
+    [user.loggedIn, dispatch, location.pathname, onImportClick]
   );
 
   const items: DropdownProps["menu"]["items"] = [
@@ -177,7 +209,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   return (
     <>
       <div className="api-client-sidebar-header">
-        {activeTab === ApiClientSidebarTabKey.COLLECTIONS ? (
+        {activeTab === ApiClientSidebarTabKey.COLLECTIONS || activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
           <div>
             <Dropdown
               menu={{ items }}
@@ -210,17 +242,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           >
             Clear history
           </RQButton>
-        ) : activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
-          <Dropdown
-            menu={{ items }}
-            trigger={["click"]}
-            className="api-client-new-btn-dropdown"
-            overlayClassName="api-client-new-btn-dropdown-overlay"
-          >
-            <RQButton type="transparent" size="small" icon={<MdAdd />}>
-              New
-            </RQButton>
-          </Dropdown>
         ) : null}
 
         {user.loggedIn && <EnvironmentSwitcher />}
@@ -230,6 +251,12 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         <ImportCollectionsModal
           isOpen={isImportCollectionsModalOpen}
           onClose={() => setIsImportCollectionsModalOpen(false)}
+        />
+      )}
+      {isPostmanImporterModalOpen && (
+        <PostmanImporterModal
+          isOpen={isPostmanImporterModalOpen}
+          onClose={() => setIsPostmanImporterModalOpen(false)}
         />
       )}
     </>

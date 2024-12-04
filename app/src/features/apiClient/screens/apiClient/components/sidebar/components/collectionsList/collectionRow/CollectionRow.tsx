@@ -1,16 +1,16 @@
 import React, { useCallback, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { Collapse, Dropdown, MenuProps } from "antd";
+import { Collapse, Dropdown, MenuProps, Tooltip } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { RequestRow } from "../requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState";
-import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
-import { trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
+import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
+import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -21,7 +21,8 @@ interface Props {
 export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportClick }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeKey, setActiveKey] = useState(record.id); // TODO: Persist collapse active keys for all rows
-  const [isCreateNewRequest, setIsCreateNewRequest] = useState(false);
+  const [createNewField, setCreateNewField] = useState(null);
+  const [hoveredId, setHoveredId] = useState("");
   const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
 
   const getCollectionOptions = useCallback(
@@ -35,14 +36,14 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
             setIsEditMode(true);
           },
         },
-        {
-          key: "1",
-          label: <div>Export</div>,
-          onClick: (itemInfo) => {
-            itemInfo.domEvent?.stopPropagation?.();
-            onExportClick(record);
-          },
-        },
+        // {
+        //   key: "1",
+        //   label: <div>Export</div>,
+        //   onClick: (itemInfo) => {
+        //     itemInfo.domEvent?.stopPropagation?.();
+        //     onExportClick(record);
+        //   },
+        // },
         {
           key: "2",
           label: <div>Delete</div>,
@@ -57,7 +58,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
 
       return items;
     },
-    [setIsDeleteModalOpen, updateRecordToBeDeleted, onExportClick]
+    [setIsDeleteModalOpen, updateRecordToBeDeleted]
   );
 
   return (
@@ -87,23 +88,42 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
           <Collapse.Panel
             key={record.id}
             header={
-              <div className="collection-name-container">
+              <div
+                className="collection-name-container"
+                onMouseEnter={setHoveredId.bind(this, record.id)}
+                onMouseLeave={setHoveredId.bind(this, "")}
+              >
                 <div className="collection-name" title={record.name}>
                   {record.name}
                 </div>
 
-                <div className="collection-options">
-                  <RQButton
-                    size="small"
-                    type="transparent"
-                    icon={<MdAdd />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveKey(record.id);
-                      setIsCreateNewRequest(true);
-                      trackNewRequestClicked("collection_row");
-                    }}
-                  />
+                <div className={`collection-options ${hoveredId === record.id ? "visible" : " "}`}>
+                  <Tooltip title={"Add Request"}>
+                    <RQButton
+                      size="small"
+                      type="transparent"
+                      icon={<FileAddOutlined />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveKey(record.id);
+                        setCreateNewField(RQAPI.RecordType.API);
+                        trackNewRequestClicked("collection_row");
+                      }}
+                    />
+                  </Tooltip>
+                  <Tooltip title={"Add Folder"}>
+                    <RQButton
+                      size="small"
+                      type="transparent"
+                      icon={<FolderAddOutlined />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveKey(record.id);
+                        setCreateNewField(RQAPI.RecordType.COLLECTION);
+                        trackNewCollectionClicked("collection_row");
+                      }}
+                    />
+                  </Tooltip>
 
                   <Dropdown trigger={["click"]} menu={{ items: getCollectionOptions(record) }} placement="bottomRight">
                     <RQButton
@@ -131,21 +151,31 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
             ) : (
               record.data.children.map((apiRecord) => {
                 if (apiRecord.type === RQAPI.RecordType.API) {
-                  // For now there will only be requests inside collection
                   return <RequestRow key={apiRecord.id} record={apiRecord} />;
+                } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
+                  return (
+                    <CollectionRow
+                      key={apiRecord.id}
+                      record={apiRecord}
+                      onNewClick={onNewClick}
+                      onExportClick={onExportClick}
+                    />
+                  );
                 }
 
-                return null; // Just to avoid warning, this case wont happen!
+                return null;
               })
             )}
 
-            {isCreateNewRequest ? (
+            {createNewField ? (
               <NewRecordNameInput
                 analyticEventSource="collection_row"
-                recordType={RQAPI.RecordType.API}
+                recordType={
+                  createNewField === RQAPI.RecordType.API ? RQAPI.RecordType.API : RQAPI.RecordType.COLLECTION
+                }
                 newRecordCollectionId={record.id}
                 onSuccess={() => {
-                  setIsCreateNewRequest(false);
+                  setCreateNewField("");
                 }}
               />
             ) : null}

@@ -9,32 +9,39 @@ export enum EditorLanguage {
   CSS = "css",
 }
 
+const contentTypeToLanguageMap: { regex: RegExp; language: EditorLanguage }[] = [
+  // HTML
+  { regex: /^text\/html(\+.*)?$/, language: EditorLanguage.HTML },
+  { regex: /^application\/xhtml\+xml$/, language: EditorLanguage.HTML },
+
+  // JavaScript
+  { regex: /^application\/javascript$/, language: EditorLanguage.JAVASCRIPT },
+  { regex: /^text\/javascript$/, language: EditorLanguage.JAVASCRIPT },
+  { regex: /^application\/ecmascript$/, language: EditorLanguage.JAVASCRIPT },
+  { regex: /^text\/ecmascript$/, language: EditorLanguage.JAVASCRIPT },
+
+  // CSS
+  { regex: /^text\/css$/, language: EditorLanguage.CSS },
+
+  // JSON
+  { regex: /^application\/json$/, language: EditorLanguage.JSON },
+  { regex: /^application\/manifest\+json$/, language: EditorLanguage.JSON },
+  { regex: /^application\/ld\+json$/, language: EditorLanguage.JSON },
+  { regex: /^text\/json$/, language: EditorLanguage.JSON },
+];
+
 export type EditorCustomToolbar = {
   title: string;
   options: ReactNode[];
 };
 
-export const getEditorLanguageFromContentType = (contentType: string): EditorLanguage => {
-  if (!contentType) {
-    return null;
-  }
+export function getEditorLanguageFromContentType(contentType: string) {
+  if (!contentType || typeof contentType !== "string") return null;
 
-  if (contentType.includes("application/json")) {
-    return EditorLanguage.JSON;
-  }
+  const sanitizedContentType = contentType.split(";")[0].trim().toLowerCase();
 
-  if (contentType.includes("text/html")) {
-    return EditorLanguage.HTML;
-  }
-
-  if (contentType.includes("application/javascript")) {
-    return EditorLanguage.JAVASCRIPT;
-  }
-
-  if (contentType.includes("text/css")) {
-    return EditorLanguage.CSS;
-  }
-};
+  return contentTypeToLanguageMap.find((mapping) => mapping.regex.test(sanitizedContentType))?.language;
+}
 
 export type AnalyticEventProperties =
   | {

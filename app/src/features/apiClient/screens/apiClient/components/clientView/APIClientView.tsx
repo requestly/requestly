@@ -44,6 +44,7 @@ import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "co
 import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
+import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 
 interface Props {
   openInModal?: boolean;
@@ -393,15 +394,22 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   />
                 </Space.Compact>
                 <RQButton
-                  type="primary"
+                  showHotKeyText
                   onClick={onSendButtonClick}
-                  loading={isLoadingResponse}
+                  hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
+                  type="primary"
+                  className="text-bold"
                   disabled={!entry.request.url}
                 >
                   Send
                 </RQButton>
                 {user.loggedIn && !openInModal ? (
-                  <RQButton onClick={onSaveButtonClick} loading={isRequestSaving}>
+                  <RQButton
+                    showHotKeyText
+                    hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
+                    onClick={onSaveButtonClick}
+                    loading={isRequestSaving}
+                  >
                     Save
                   </RQButton>
                 ) : null}

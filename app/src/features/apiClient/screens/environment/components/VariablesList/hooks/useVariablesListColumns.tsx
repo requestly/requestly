@@ -12,6 +12,7 @@ interface Props {
   handleDeleteVariable: (key: string) => void;
   visibleSecretsRowIds: number[];
   updateVisibleSecretsRowIds: (id: number) => void;
+  recordsCount: number;
 }
 
 type ColumnTypes = Exclude<TableProps<EnvironmentVariableTableRow>["columns"], undefined>;
@@ -21,6 +22,7 @@ export const useVariablesListColumns = ({
   handleDeleteVariable,
   visibleSecretsRowIds,
   updateVisibleSecretsRowIds,
+  recordsCount,
 }: Props) => {
   const checkIsSecretHidden = useCallback(
     (recordId: number) => {
@@ -114,13 +116,16 @@ export const useVariablesListColumns = ({
                 className="secret-variable-toggle-btn"
               />
             )}
-            <RQButton
-              icon={<RiDeleteBin6Line />}
-              type="transparent"
-              size="small"
-              className="delete-variable-btn"
-              onClick={() => handleDeleteVariable(record.key)}
-            />
+            {(recordsCount > 1 ||
+              (recordsCount === 1 && (record.key !== "" || record.syncValue !== "" || record.localValue !== ""))) && (
+              <RQButton
+                icon={<RiDeleteBin6Line />}
+                type="transparent"
+                size="small"
+                className="delete-variable-btn"
+                onClick={() => handleDeleteVariable(record.key)}
+              />
+            )}
           </div>
         );
       },
