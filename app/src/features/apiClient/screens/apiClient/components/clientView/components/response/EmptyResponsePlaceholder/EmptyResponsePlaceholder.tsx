@@ -1,33 +1,18 @@
 import React from "react";
-import { Space, Spin } from "antd";
+import { Space } from "antd";
 import emptyResponseIcon from "../../../../../../../assets/empty-card.svg";
 import "./emptyResponsePlaceholder.scss";
 import { CloseCircleFilled } from "@ant-design/icons";
-import { RQButton } from "lib/design-system-v2/components";
 
 interface EmptyResponseViewProps {
-  isLoading: boolean;
   isFailed: boolean;
-  onCancelRequest: () => void;
   emptyDescription: string;
 }
-export const EmptyResponsePlaceholder: React.FC<EmptyResponseViewProps> = ({
-  isLoading,
-  isFailed,
-  onCancelRequest,
-  emptyDescription,
-}) => {
+export const EmptyResponsePlaceholder: React.FC<EmptyResponseViewProps> = ({ isFailed, emptyDescription }) => {
   return (
     <>
       <div className="api-client-empty-response-view">
-        {isLoading ? (
-          <>
-            <Spin size="large" tip="Request in progress..." />
-            <RQButton onClick={onCancelRequest} className="mt-16">
-              Cancel request
-            </RQButton>
-          </>
-        ) : isFailed ? (
+        {isFailed ? (
           <Space>
             <CloseCircleFilled style={{ color: "#ff4d4f" }} />
             Failed to send the request. Please check if the URL is valid.
