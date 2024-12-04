@@ -14,7 +14,7 @@ import * as editorToastActions from "../../features/editorToastActions";
 import * as requestBotActions from "../../features/requestBotActions";
 
 // Refractored
-import * as modalsCaseReducers from "./modals/case-reducers";
+import modalsCaseReducers from "./modals/case-reducers";
 
 const globalSlice = createSlice({
   name: ReducerKeys.GLOBAL,

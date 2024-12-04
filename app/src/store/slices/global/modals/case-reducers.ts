@@ -3,7 +3,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { GlobalModals, GlobalModalState } from "./types";
 import { GlobalSliceState } from "../types";
 
-export const toggleActiveModal = (
+const toggleActiveModal = (
   prevState: GlobalSliceState,
   action: PayloadAction<{
     modalName: keyof GlobalModals;
@@ -17,3 +17,10 @@ export const toggleActiveModal = (
 
   prevState.activeModals[modalName].props = action.payload.newProps ?? prevState.activeModals[modalName].props;
 };
+
+// Exporting like this because reference don't work if exported directly
+// https://github.com/microsoft/TypeScript/issues/59134
+const caseReducers = {
+  toggleActiveModal,
+};
+export default caseReducers;
