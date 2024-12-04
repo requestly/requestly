@@ -45,6 +45,7 @@ export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
           hideAdd
           activeKey={activeTab?.id}
           destroyInactiveTabPane={false}
+          className="tabs-layout-tabs-container"
           popupClassName="tabs-layout-more-dropdown"
           items={items}
           onChange={(activeTabId) => {
