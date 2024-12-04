@@ -29,10 +29,12 @@
     }
 
     .ant-tabs-tab {
-      padding: 8px 4px;
+      padding: 0 4px;
+      width: 144px;
       max-width: 144px;
 
       .ant-tabs-tab-btn {
+        width: 100%;
         overflow: hidden;
       }
     }
@@ -51,17 +53,19 @@
   .tab-title-container {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     flex-wrap: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 
     .tab-title {
+      text-align: center;
       flex-shrink: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      max-width: 136px;
+      width: 106px;
+      padding: 8px 0;
 
       color: var(--requestly-color-text-subtle, #bbb);
 
@@ -71,8 +75,12 @@
       line-height: var(--requestly-font-line-height-xs, 15px);
     }
 
-    .unsaved-changes-indicator {
+    .tab-actions {
       flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    .unsaved-changes-indicator {
       border-radius: 50%;
       width: 6px;
       height: 6px;
