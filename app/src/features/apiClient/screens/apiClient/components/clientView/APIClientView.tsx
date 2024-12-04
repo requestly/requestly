@@ -69,8 +69,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const teamId = workspace?.id;
 
   const { onSaveRecord } = useApiClientContext();
-  const { renderVariables, getCurrentEnvironmentVariables } = useEnvironmentManager();
-  const currentEnvironmentVariables = getCurrentEnvironmentVariables();
+  const { renderVariables, getVariablesWithPrecedence } = useEnvironmentManager();
+  const currentEnvironmentVariables = getVariablesWithPrecedence(apiEntryDetails?.collectionId);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
@@ -266,7 +266,15 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
-  }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished, renderVariables]);
+  }, [
+    entry,
+    appMode,
+    location.pathname,
+    dispatch,
+    notifyApiRequestFinished,
+    renderVariables,
+    apiEntryDetails?.collectionId,
+  ]);
 
   const handleRecordNameUpdate = async () => {
     if (!requestName || requestName === apiEntryDetails?.name) {
@@ -406,7 +414,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   </RQButton>
                 ) : null}
               </div>
-              <RequestTabs requestEntry={entry} setRequestEntry={setRequestEntry} setContentType={setContentType} />
+              <RequestTabs
+                collectionId={apiEntryDetails?.collectionId}
+                requestEntry={entry}
+                setRequestEntry={setRequestEntry}
+                setContentType={setContentType}
+              />
             </Skeleton>
           </div>
         </BottomSheetLayout>

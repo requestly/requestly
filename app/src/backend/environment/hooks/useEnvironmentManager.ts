@@ -222,7 +222,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
         if (!collection) return;
 
         // Add current collection's variables
-        Object.entries(collection.data.variables || {}).forEach(([key, value]) => {
+        Object.entries(collectionVariables[collection.id]?.variables || {}).forEach(([key, value]) => {
           // Only add if not already present (maintain precedence)
           if (!(key in allVariables)) {
             allVariables[key] = value;
@@ -246,12 +246,13 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
 
       return allVariables;
     },
-    [allEnvironmentData, apiClientRecords, currentEnvironmentId]
+    [allEnvironmentData, apiClientRecords, currentEnvironmentId, collectionVariables]
   );
 
   const renderVariables = useCallback(
     <T>(template: string | Record<string, any>, requestCollectionId: string = ""): T => {
       const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
+      console.log("DBG variablesWithPrecedence", variablesWithPrecedence);
       return renderTemplate(template, variablesWithPrecedence);
     },
     [getVariablesWithPrecedence]
@@ -353,6 +354,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     renameEnvironment,
     duplicateEnvironment,
     deleteEnvironment,
+    getVariablesWithPrecedence,
     isEnvironmentsLoading: isLoading,
   };
 };
