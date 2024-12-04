@@ -1,5 +1,5 @@
 import React, { ReactElement, memo, useCallback, useMemo, useState } from "react";
-import { Radio, RadioChangeEvent, Tooltip } from "antd";
+import { Radio, RadioChangeEvent, Spin, Tooltip } from "antd";
 import { trackRawResponseViewed } from "modules/analytics/events/features/apiClient";
 import Editor from "componentsV2/CodeEditor/components/Editor/Editor";
 import { getEditorLanguageFromContentType } from "componentsV2/CodeEditor";
@@ -98,6 +98,14 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader, isLoad
 
   return (
     <div className="api-client-response-body">
+      {isLoading ? (
+        <div className="api-client-response__loading-overlay">
+          <Spin size="large" tip="Request in progress..." />
+          <RQButton onClick={onCancelRequest} className="mt-16">
+            Cancel request
+          </RQButton>
+        </div>
+      ) : null}
       {responseText ? (
         <div className="api-response-body-content">
           {preview && responseMode === ResponseMode.PREVIEW ? (
@@ -122,12 +130,7 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader, isLoad
           )}
         </div>
       ) : (
-        <EmptyResponsePlaceholder
-          isLoading={isLoading}
-          isFailed={isFailed}
-          onCancelRequest={onCancelRequest}
-          emptyDescription="Please run a request to see the response"
-        />
+        <EmptyResponsePlaceholder isFailed={isFailed} emptyDescription="Please run a request to see the response" />
       )}
     </div>
   );
