@@ -1,3 +1,4 @@
+import { notification } from "antd";
 import { makeRequest } from "../../screens/apiClient/utils";
 import { RQAPI } from "../../types";
 import { executePrerequestScript, executePostresponseScript } from "./modules/scripts/utils";
@@ -58,16 +59,12 @@ export const executeAPIRequest = async (
         currentEnvironmentVariables
       );
     } catch (error) {
-      console.log("!!!debug", "postResponse error", error);
-      // return {
-      //   request: entry.request,
-      //   response: null,
-      //   error: {
-      //     source: "Postresponse script",
-      //     message: error.message,
-      //     name: error.name,
-      //   },
-      // };
+      console.error("Post Response script error", error);
+      notification.error({
+        message: "Something went wrong in postResponse script!",
+        description: `${error.name}: ${error.message}`,
+        placement: "bottomRight",
+      });
     }
   }
 
