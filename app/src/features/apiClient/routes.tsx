@@ -64,10 +64,6 @@ export const apiClientRoutes: RouteObject[] = [
             path: PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE + "/:envId",
             element: <EnvironmentView />,
           },
-          {
-            path: PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE,
-            element: <EnvironmentView />,
-          },
         ],
       },
       {
