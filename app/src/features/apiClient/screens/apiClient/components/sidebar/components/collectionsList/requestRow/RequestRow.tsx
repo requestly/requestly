@@ -16,6 +16,8 @@ import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import {
   trackDuplicateRequestClicked,
+  trackDuplicateRequestFailed,
+  trackDuplicateRequestSuccessful,
   trackMoveRequestToCollectionClicked,
 } from "modules/analytics/events/features/apiClient";
 import { redirectToRequest } from "utils/RedirectionUtils";
@@ -47,10 +49,12 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
           onSaveRecord(result.data);
           redirectToRequest(navigate, result.data.id);
           toast.success("Request duplicated successfully");
+          trackDuplicateRequestSuccessful();
         })
         .catch((error) => {
           console.error("Error duplicating request:", error);
           toast.error(error.message || "Unexpected error. Please contact support.");
+          trackDuplicateRequestFailed();
         });
     },
     [team?.id, user?.details?.profile?.uid, onSaveRecord, navigate]
