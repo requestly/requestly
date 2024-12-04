@@ -27,6 +27,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
 import "./postmanImporter.scss";
+import { batchWrite } from "backend/utils";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableValue> }[];
@@ -60,16 +61,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
   const collectionsCount = useRef(0);
 
-  const batchWrite = useCallback(async (items: any[], writeFunction: (item: any) => Promise<any>) => {
-    const results = [];
-    for (let i = 0; i < items.length; i += BATCH_SIZE) {
-      const batch = items.slice(i, i + BATCH_SIZE);
-      const batchResults = await Promise.allSettled(batch.map(writeFunction));
-      results.push(...batchResults);
-    }
-    return results;
-  }, []);
-
   const handleFileDrop = useCallback(
     (files: File[]) => {
       setProcessingStatus("processing");
@@ -83,27 +74,26 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
           reader.onload = () => {
             try {
-              const fileContent = JSON.parse(reader.result as string);
-
               if (!file.type.includes("json")) {
                 throw new Error("Invalid file. Please upload valid Postman export files.");
               }
 
-              const fileType = getUploadedPostmanFileType(fileContent);
-              if (!fileType) {
+              const fileContent = JSON.parse(reader.result as string);
+              const postmanFileType = getUploadedPostmanFileType(fileContent);
+              if (!postmanFileType) {
                 throw new Error("Invalid file. Please upload valid Postman export files.");
               }
 
-              if (fileType === "environment") {
+              if (postmanFileType === "environment") {
                 const processedData = processPostmanEnvironmentData(fileContent);
-                resolve({ type: fileType, data: processedData });
+                resolve({ type: postmanFileType, data: processedData });
               } else {
                 const processedApiRecords = processPostmanCollectionData(fileContent);
                 const processedVariables = processPostmanVariablesData(fileContent);
                 resolve({
-                  type: fileType,
+                  type: postmanFileType,
                   data: {
-                    type: fileType,
+                    type: postmanFileType,
                     apiRecords: processedApiRecords,
                     variables: processedVariables,
                   },
@@ -120,8 +110,8 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
       Promise.allSettled(processFiles)
         .then((results) => {
-          const hasErrors = results.every((result) => result.status === "rejected");
-          if (hasErrors) {
+          const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
+          if (hasProcessingAllFilesFailed) {
             throw new Error(
               "Could not process the selected files!, Please check if the files are valid Postman export files."
             );
@@ -143,6 +133,8 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 processedRecords.apiRecords.push(...collections, ...apis);
                 collectionsCount.current += collections.length;
               }
+            } else {
+              console.error("Error processing postman file:", result.reason);
             }
           });
 
@@ -153,7 +145,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         })
         .catch((error) => {
           setImportError(error.message);
-          setProcessingStatus("idle");
         })
         .finally(() => {
           if (importError) {
@@ -217,21 +208,22 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
         const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
-        onSaveRecord?.(newApi.data);
+        onSaveRecord(newApi.data);
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing API:", error);
       }
     };
 
-    await Promise.all([batchWrite(collections, handleCollectionWrites), batchWrite(apis, handleApiWrites)]);
+    await Promise.all([
+      batchWrite(BATCH_SIZE, collections, handleCollectionWrites),
+      batchWrite(BATCH_SIZE, apis, handleApiWrites),
+    ]);
 
     if (failedCollectionsCount > 0) {
       const failureMessage =
         failedCollectionsCount > 0
-          ? `${failedCollectionsCount} ${
-              failedCollectionsCount > 1 ? "collections and APIs" : "collection or API"
-            } failed`
+          ? `${failedCollectionsCount} ${failedCollectionsCount > 1 ? "collections" : "collection"} failed`
           : "";
       if (failureMessage.length) {
         toast.warn(`Some imports failed: ${failureMessage}, Please contact support if the issue persists.`);
@@ -239,7 +231,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     }
 
     return importedCollectionsCount;
-  }, [processedFileData.apiRecords, user?.details?.profile?.uid, workspace?.id, onSaveRecord, batchWrite]);
+  }, [processedFileData.apiRecords, user?.details?.profile?.uid, workspace?.id, onSaveRecord]);
 
   const handleImportVariables = useCallback(async () => {
     if (Object.keys(processedFileData.variables).length === 0) {
