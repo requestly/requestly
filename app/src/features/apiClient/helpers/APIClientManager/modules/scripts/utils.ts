@@ -47,6 +47,10 @@ const handleEnvironmentChanges = async (
     delete variablesToSet[key];
   });
 
+  if (!currentEnvironmentId) {
+    throw new Error("No environment available to access the variables.Please select an environment.");
+  }
+
   await environmentManager.setVariables(currentEnvironmentId, variablesToSet);
   return {
     updatedVariables: variablesToSet,
@@ -70,9 +74,16 @@ const messageHandler = async (
 
   switch (type) {
     case "SCRIPT_EXECUTED": {
-      const updatedVariables = await handleEnvironmentChanges(environmentManager, payload);
-      cleanupWorker(worker);
-      resolve(updatedVariables);
+      handleEnvironmentChanges(environmentManager, payload)
+        .then((updatedVariables) => {
+          resolve(updatedVariables);
+        })
+        .catch((e) => {
+          reject(e);
+        })
+        .finally(() => {
+          cleanupWorker(worker);
+        });
       break;
     }
 

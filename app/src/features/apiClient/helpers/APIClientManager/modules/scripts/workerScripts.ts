@@ -57,7 +57,6 @@ export const requestWorkerFunction = function (e: MessageEvent) {
       });
     })
     .catch((err: unknown) => {
-      console.log("!!!debug", "promise catch", err);
       this.postMessage({
         type: "ERROR",
         payload: {

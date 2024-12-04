@@ -41,6 +41,7 @@ export const executeAPIRequest = async (
       request: renderedRequest,
     };
   } catch (error) {
+    console.error("Error while making API request:", error.message);
     return {
       ...entry,
       response: null,
