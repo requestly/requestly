@@ -12,9 +12,23 @@ export const requestWorkerFunction = function (e: MessageEvent) {
     },
   };
 
-  const logDummyErrorMessage = () => {
-    console.log("This Method is not supported.");
-    return undefined;
+  const createInfiniteChainable = (methodName: string) => {
+    let hasLogged = false;
+
+    const handler = {
+      get: () => {
+        if (!hasLogged) {
+          console.log(`Using unsupported method: ${methodName}`);
+          hasLogged = true;
+        }
+        return new Proxy(() => {}, handler);
+      },
+      apply: () => {
+        return new Proxy(() => {}, handler);
+      },
+    };
+
+    return new Proxy(() => {}, handler);
   };
 
   const sandbox = {
@@ -32,35 +46,19 @@ export const requestWorkerFunction = function (e: MessageEvent) {
           mutations.environment.$unset[key] = "";
         },
       },
-      variables: new Proxy(
-        {},
-        {
-          get: () => logDummyErrorMessage,
-        }
-      ),
-
-      globals: new Proxy(
-        {},
-        {
-          get: () => logDummyErrorMessage,
-        }
-      ),
-
-      collectionVariables: new Proxy(
-        {},
-        {
-          get: () => logDummyErrorMessage,
-        }
-      ),
-
-      test: () => logDummyErrorMessage,
-      expect: () =>
-        new Proxy(
-          {},
-          {
-            get: () => logDummyErrorMessage,
-          }
-        ),
+      collectionVariables: createInfiniteChainable("collectionVariables"),
+      cookies: createInfiniteChainable("cookie"),
+      execution: createInfiniteChainable("execution"),
+      expect: createInfiniteChainable("expect"),
+      globals: createInfiniteChainable("globals"),
+      info: createInfiniteChainable("info"),
+      iterationData: createInfiniteChainable("iterationData"),
+      require: createInfiniteChainable("require"),
+      sendRequest: createInfiniteChainable("sendRequest"),
+      test: createInfiniteChainable("test"),
+      variables: createInfiniteChainable("variables"),
+      vault: createInfiniteChainable("vault"),
+      visualizer: createInfiniteChainable("visualizer"),
     },
   };
 
@@ -112,6 +110,25 @@ export const responseWorkerFunction = function (e: MessageEvent) {
     },
   };
 
+  const createInfiniteChainable = (methodName: string) => {
+    let hasLogged = false;
+
+    const handler = {
+      get: () => {
+        if (!hasLogged) {
+          console.log(`Using unsupported method: ${methodName}`);
+          hasLogged = true;
+        }
+        return new Proxy(() => {}, handler);
+      },
+      apply: () => {
+        return new Proxy(() => {}, handler);
+      },
+    };
+
+    return new Proxy(() => {}, handler);
+  };
+
   const sandbox = {
     rq: {
       request,
@@ -128,6 +145,19 @@ export const responseWorkerFunction = function (e: MessageEvent) {
           mutations.environment.$unset[key] = "";
         },
       },
+      collectionVariables: createInfiniteChainable("collectionVariables"),
+      cookies: createInfiniteChainable("cookie"),
+      execution: createInfiniteChainable("execution"),
+      expect: createInfiniteChainable("expect"),
+      globals: createInfiniteChainable("globals"),
+      info: createInfiniteChainable("info"),
+      iterationData: createInfiniteChainable("iterationData"),
+      require: createInfiniteChainable("require"),
+      sendRequest: createInfiniteChainable("sendRequest"),
+      test: createInfiniteChainable("test"),
+      variables: createInfiniteChainable("variables"),
+      vault: createInfiniteChainable("vault"),
+      visualizer: createInfiniteChainable("visualizer"),
     },
   };
 
