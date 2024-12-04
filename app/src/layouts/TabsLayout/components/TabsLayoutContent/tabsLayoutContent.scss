@@ -76,8 +76,20 @@
       border-radius: 50%;
       width: 6px;
       height: 6px;
-      flex-shrink: 0;
       background-color: var(--requestly-color-primary-soft);
+    }
+
+    .tab-close-button {
+      transform: scale(0);
+      display: none;
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      .tab-close-button {
+        transform: scale(1);
+        display: flex;
+      }
     }
   }
 }
