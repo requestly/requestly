@@ -7,8 +7,8 @@ export const toggleActiveModal = (
   prevState: GlobalSliceState,
   action: PayloadAction<{
     modalName: keyof GlobalModals;
-    newValue: GlobalModalState["isActive"];
-    newProps: GlobalModalState["props"];
+    newValue?: GlobalModalState["isActive"];
+    newProps?: GlobalModalState["props"];
   }>
 ) => {
   const modalName = action.payload.modalName;

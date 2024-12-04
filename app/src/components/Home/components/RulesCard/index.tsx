@@ -167,7 +167,6 @@ export const RulesCard: React.FC = () => {
                     if (isExtensionInstalled()) {
                       setIsRulesDrawerOpen(true);
                     } else {
-                      // @ts-ignore
                       dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
                     }
                   }}

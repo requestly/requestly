@@ -42,7 +42,6 @@ export const AuthConfirmationPopover: React.FC<Props> = ({
 
   const openAuthModal = () => {
     dispatch(
-      // @ts-ignore
       globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,

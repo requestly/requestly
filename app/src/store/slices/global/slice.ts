@@ -7,7 +7,6 @@ import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync
 import * as userActions from "../../features/userActions";
 import * as appModeAndThemeActions from "../../features/appModeAndThemeActions";
 import * as searchActions from "../../features/searchActions";
-import * as modalActions from "../../features/modalActions";
 import * as sharedListActions from "../../features/sharedListActions";
 import * as rulesActions from "../../features/rulesActions";
 import * as appModeSpecificActions from "../../features/appModeSpecificActions";
@@ -15,19 +14,18 @@ import * as editorToastActions from "../../features/editorToastActions";
 import * as requestBotActions from "../../features/requestBotActions";
 
 // Refractored
-import * as globalCaseReducers from "./case-reducers";
+import * as modalsCaseReducers from "./modals/case-reducers";
 
 const globalSlice = createSlice({
   name: ReducerKeys.GLOBAL,
   initialState: INITIAL_GLOBAL_SLICE_STATE,
   reducers: {
-    ...globalCaseReducers,
+    ...modalsCaseReducers,
 
-    // FIXME: These are actually reducer functions
+    // FIXME: These are actually case reducer functions
     ...userActions,
     ...appModeAndThemeActions,
     ...searchActions,
-    ...modalActions,
     ...sharedListActions,
     ...rulesActions,
     ...appModeSpecificActions,
