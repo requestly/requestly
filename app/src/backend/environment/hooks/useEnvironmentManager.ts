@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useCallback, useState } from "react";
 import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllEnvironmentData, getCurrentEnvironmentId } from "store/features/environment/selectors";
+import {
+  getAllEnvironmentData,
+  getCollectionVariables,
+  getCurrentEnvironmentId,
+} from "store/features/environment/selectors";
 import { environmentVariablesActions } from "store/features/environment/slice";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
@@ -14,6 +18,7 @@ import {
   updateEnvironmentNameInDB,
   duplicateEnvironmentInDB,
   deleteEnvironmentFromDB,
+  attachCollectionVariableListener,
 } from "..";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
@@ -23,6 +28,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 
 let unsubscribeListener: () => void = null;
+let unsubscribeCollectionListener: () => void = null;
 
 const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const dispatch = useDispatch();
@@ -33,6 +39,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
+  const collectionVariables = useSelector(getCollectionVariables);
 
   const ownerId = useMemo(
     () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
@@ -125,6 +132,28 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentEnvironmentId, dispatch, initListenerAndFetcher, ownerId]);
+
+  useEffect(() => {
+    if (ownerId) {
+      unsubscribeCollectionListener?.();
+      unsubscribeCollectionListener = attachCollectionVariableListener(ownerId, (collectionDetails) => {
+        console.log("collectionDetails", collectionDetails);
+        Object.keys(collectionDetails).forEach((collectionId) => {
+          const mergedCollectionVariables = mergeLocalAndSyncVariables(
+            collectionVariables[collectionId]?.variables ?? {},
+            collectionDetails[collectionId].variables ?? {}
+          );
+          dispatch(
+            environmentVariablesActions.setCollectionVariables({ collectionId, variables: mergedCollectionVariables })
+          );
+        });
+      });
+    }
+
+    return () => {
+      unsubscribeCollectionListener?.();
+    };
+  }, [ownerId, dispatch]);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -265,7 +294,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       }
       return null;
     },
-    [allEnvironmentData]
+    [allEnvironmentData, currentEnvironmentId]
   );
 
   const renameEnvironment = useCallback(
@@ -277,31 +306,37 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     [ownerId, dispatch]
   );
 
-  const duplicateEnvironment = useCallback(async (environmentId: string) => {
-    return duplicateEnvironmentInDB(ownerId, environmentId, allEnvironmentData).then((newEnvironment) => {
-      dispatch(environmentVariablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name }));
-      dispatch(
-        environmentVariablesActions.updateEnvironmentData({
-          newVariables: newEnvironment.variables,
-          environmentId: newEnvironment.id,
-        })
-      );
-    });
-  }, []);
+  const duplicateEnvironment = useCallback(
+    async (environmentId: string) => {
+      return duplicateEnvironmentInDB(ownerId, environmentId, allEnvironmentData).then((newEnvironment) => {
+        dispatch(environmentVariablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name }));
+        dispatch(
+          environmentVariablesActions.updateEnvironmentData({
+            newVariables: newEnvironment.variables,
+            environmentId: newEnvironment.id,
+          })
+        );
+      });
+    },
+    [allEnvironmentData, dispatch, ownerId]
+  );
 
-  const deleteEnvironment = useCallback(async (environmentId: string) => {
-    const allEnvironmentsMap = { ...allEnvironmentData };
-    const isActiveEnvironmentBeingDeleted = currentEnvironmentId === environmentId;
-    return deleteEnvironmentFromDB(ownerId, environmentId).then(() => {
-      dispatch(environmentVariablesActions.removeEnvironment({ environmentId }));
-      delete allEnvironmentsMap[environmentId];
-      if (isActiveEnvironmentBeingDeleted && Object.keys(allEnvironmentsMap).length > 0) {
-        setCurrentEnvironment(Object.keys(allEnvironmentsMap)[0]);
-      } else {
-        dispatch(environmentVariablesActions.resetState());
-      }
-    });
-  }, []);
+  const deleteEnvironment = useCallback(
+    async (environmentId: string) => {
+      const allEnvironmentsMap = { ...allEnvironmentData };
+      const isActiveEnvironmentBeingDeleted = currentEnvironmentId === environmentId;
+      return deleteEnvironmentFromDB(ownerId, environmentId).then(() => {
+        dispatch(environmentVariablesActions.removeEnvironment({ environmentId }));
+        delete allEnvironmentsMap[environmentId];
+        if (isActiveEnvironmentBeingDeleted && Object.keys(allEnvironmentsMap).length > 0) {
+          setCurrentEnvironment(Object.keys(allEnvironmentsMap)[0]);
+        } else {
+          dispatch(environmentVariablesActions.resetState());
+        }
+      });
+    },
+    [allEnvironmentData, dispatch, currentEnvironmentId, ownerId, setCurrentEnvironment]
+  );
 
   return {
     setCurrentEnvironment,

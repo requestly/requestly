@@ -29,6 +29,8 @@ export enum KeyValueFormType {
   FORM = "form",
 }
 
+export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
+
 export namespace RQAPI {
   export type AnalyticsEventSource = "collection_row" | "collection_list_empty_state" | "api_client_sidebar_header";
 
@@ -78,7 +80,7 @@ export namespace RQAPI {
       preRequest: string;
       postResponse: string;
     };
-    variables: EnvironmentVariables;
+    variables: Omit<EnvironmentVariables, "localValue">;
   }
 
   interface RecordMetadata {
