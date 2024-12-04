@@ -144,6 +144,10 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
         title: "",
         width: "50px",
         render: (_: any, record: KeyValuePair) => {
+          if (record.key === "" && record.value === "" && tableData.length === 1) {
+            return null;
+          }
+
           return (
             <RQButton
               className="key-value-delete-btn"
@@ -156,7 +160,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
         },
       },
     ];
-  }, [pairType, handleUpdatePair, handleDeletePair]);
+  }, [pairType, handleUpdatePair, handleDeletePair, tableData.length]);
 
   return (
     <ContentListTable
