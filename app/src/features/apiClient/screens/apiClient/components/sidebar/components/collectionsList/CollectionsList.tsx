@@ -25,8 +25,8 @@ export const CollectionsList: React.FC<Props> = ({
   isNewRecordNameInputVisible,
   hideNewRecordNameInput,
 }) => {
-  const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
   const { openTab } = useTabsLayoutContext();
+  const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
