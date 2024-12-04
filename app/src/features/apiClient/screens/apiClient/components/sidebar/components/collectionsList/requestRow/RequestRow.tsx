@@ -3,11 +3,24 @@ import { Typography, Dropdown, MenuProps } from "antd";
 import PATHS from "config/constants/sub/paths";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RQAPI } from "features/apiClient/types";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
+import { upsertApiRecord } from "backend/apiClient";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { toast } from "utils/Toast";
+import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/MoveToCollectionModal";
+import {
+  trackDuplicateRequestClicked,
+  trackDuplicateRequestFailed,
+  trackDuplicateRequestSuccessful,
+  trackMoveRequestToCollectionClicked,
+} from "modules/analytics/events/features/apiClient";
+import { redirectToRequest } from "utils/RedirectionUtils";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -15,7 +28,37 @@ interface Props {
 
 export const RequestRow: React.FC<Props> = ({ record }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
+  const [recordToMove, setRecordToMove] = useState(null);
+  const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
+  const user = useSelector(getUserAuthDetails);
+  const team = useSelector(getCurrentlyActiveWorkspace);
+  const navigate = useNavigate();
+
+  const handleDuplicateRequest = useCallback(
+    async (record: RQAPI.ApiRecord) => {
+      const newRecord = {
+        ...record,
+        name: `(Copy) ${record.name || record.data.request.url}`,
+      };
+      delete newRecord.id;
+      return upsertApiRecord(user?.details?.profile?.uid, newRecord, team?.id)
+        .then((result) => {
+          if (!result.success) {
+            throw new Error("Failed to duplicate request");
+          }
+          onSaveRecord(result.data);
+          redirectToRequest(navigate, result.data.id);
+          toast.success("Request duplicated successfully");
+          trackDuplicateRequestSuccessful();
+        })
+        .catch((error) => {
+          console.error("Error duplicating request:", error);
+          toast.error(error.message || "Unexpected error. Please contact support.");
+          trackDuplicateRequestFailed();
+        });
+    },
+    [team?.id, user?.details?.profile?.uid, onSaveRecord, navigate]
+  );
 
   const getRequestOptions = useCallback((): MenuProps["items"] => {
     return [
@@ -29,6 +72,24 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
       },
       {
         key: "1",
+        label: <div>Duplicate</div>,
+        onClick: (itemInfo) => {
+          itemInfo.domEvent?.stopPropagation?.();
+          handleDuplicateRequest(record);
+          trackDuplicateRequestClicked();
+        },
+      },
+      {
+        key: "2",
+        label: <div>Move to Collection</div>,
+        onClick: (itemInfo) => {
+          itemInfo.domEvent?.stopPropagation?.();
+          setRecordToMove(record);
+          trackMoveRequestToCollectionClicked();
+        },
+      },
+      {
+        key: "3",
         label: <div>Delete</div>,
         danger: true,
         onClick: (itemInfo) => {
@@ -38,10 +99,19 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
         },
       },
     ];
-  }, [record, updateRecordToBeDeleted, setIsDeleteModalOpen]);
+  }, [record, updateRecordToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest]);
 
   return (
     <>
+      {recordToMove && (
+        <MoveToCollectionModal
+          recordToMove={recordToMove}
+          isOpen={recordToMove}
+          onClose={() => {
+            setRecordToMove(null);
+          }}
+        />
+      )}
       {isEditMode ? (
         <NewRecordNameInput
           analyticEventSource="collection_row"

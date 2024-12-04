@@ -58,7 +58,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
 
       return items;
     },
-    [setIsDeleteModalOpen, updateRecordToBeDeleted, onExportClick]
+    [setIsDeleteModalOpen, updateRecordToBeDeleted]
   );
 
   return (

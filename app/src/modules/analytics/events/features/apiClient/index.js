@@ -120,3 +120,27 @@ export const trackImportApiCollectionsSuccessful = (num_records, num_variables) 
 export const trackEnableKeyValueToggled = (is_active, type) => {
   trackEvent(API_CLIENT.ENABLE_KEY_VALUE_TOGGLED, { is_active, type });
 };
+
+export const trackDuplicateRequestClicked = () => {
+  trackEvent(API_CLIENT.DUPLICATE_REQUEST_CLICKED);
+};
+
+export const trackDuplicateRequestSuccessful = () => {
+  trackEvent(API_CLIENT.DUPLICATE_REQUEST_SUCCESSFUL);
+};
+
+export const trackDuplicateRequestFailed = () => {
+  trackEvent(API_CLIENT.DUPLICATE_REQUEST_FAILED);
+};
+
+export const trackMoveRequestToCollectionClicked = () => {
+  trackEvent(API_CLIENT.MOVE_REQUEST_TO_COLLECTION_CLICKED);
+};
+
+export const trackMoveRequestToCollectionSuccessful = (destination) => {
+  trackEvent(API_CLIENT.MOVE_REQUEST_TO_COLLECTION_SUCCESSFUL, { destination });
+};
+
+export const trackMoveRequestToCollectionFailed = (destination) => {
+  trackEvent(API_CLIENT.MOVE_REQUEST_TO_COLLECTION_FAILED, { destination });
+};
