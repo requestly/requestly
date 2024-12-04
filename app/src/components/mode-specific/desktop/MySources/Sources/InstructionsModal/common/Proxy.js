@@ -7,7 +7,7 @@ import proxyStepsGif from "assets/img/screenshots/proxy_steps.gif";
 import winProxyStepsGif from "assets/img/screenshots/win_proxy_steps.gif";
 import UAParser from "ua-parser-js";
 import Logger from "lib/logger";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 const { TabPane } = Tabs;
 
@@ -35,7 +35,7 @@ const ProxyInstructions = () => {
       .then((_res) => {
         fetchProxyStatus();
         dispatch(
-          actions.updateDesktopSpecificAppProperty({
+          globalActions.updateDesktopSpecificAppProperty({
             appId: "system-wide",
             property: "isActive",
             value: true,

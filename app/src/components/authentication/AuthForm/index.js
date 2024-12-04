@@ -42,7 +42,7 @@ import { AuthFormHero } from "./AuthFormHero";
 import "./AuthForm.css";
 import GenerateLoginLinkBtn from "./GenerateLoginLinkButton";
 import { useDispatch } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS, METHODS: AUTH_METHODS } = APP_CONSTANTS.AUTH;
 
@@ -99,7 +99,7 @@ const AuthForm = ({
   useEffect(() => {
     if (timeToResendEmailLogin !== 0) {
       if (lastEmailInputHandled !== email) {
-        dispatch(actions.updateTimeToResendEmailLogin(0));
+        dispatch(globalActions.updateTimeToResendEmailLogin(0));
       }
     }
   }, [dispatch, email, lastEmailInputHandled, timeToResendEmailLogin]);
@@ -433,7 +433,7 @@ const AuthForm = ({
     SET_POPOVER(true);
     setEmail("");
     setPassword("");
-    dispatch(actions.updateTimeToResendEmailLogin(0));
+    dispatch(globalActions.updateTimeToResendEmailLogin(0));
   }, [SET_MODE, SET_POPOVER, dispatch]);
 
   const onCreateAccountClick = useCallback(() => {
@@ -441,7 +441,7 @@ const AuthForm = ({
     SET_POPOVER(true);
     setEmail("");
     setPassword("");
-    dispatch(actions.updateTimeToResendEmailLogin(0));
+    dispatch(globalActions.updateTimeToResendEmailLogin(0));
   }, [SET_MODE, SET_POPOVER, dispatch]);
 
   return (

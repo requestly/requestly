@@ -6,7 +6,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Col, Row, Typography } from "antd";
 import { PersonaInput } from "../PersonaInput";
 import { RQButton, RQInput } from "lib/design-system/components";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import Logger from "lib/logger";
@@ -50,21 +50,21 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
     const appFlavour = getAppFlavour();
 
     if (appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR) {
-      dispatch(actions.updateAppOnboardingCompleted());
+      dispatch(globalActions.updateAppOnboardingCompleted());
       return;
     }
 
     if (user?.loggedIn && isCompanyEmail(user?.details?.profile?.email) && user?.details?.profile?.isEmailVerified) {
-      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.TEAMS));
+      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.TEAMS));
     } else {
-      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
     }
   }, [dispatch, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified, user?.loggedIn]);
 
   const handleSetPersona = useCallback(() => {
     if (persona) {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, persona);
-      dispatch(actions.updateAppOnboardingPersona(persona));
+      dispatch(globalActions.updateAppOnboardingPersona(persona));
       if (!user.loggedIn) {
         trackAppOnboardingPersonaUpdated(persona);
         return Promise.resolve();
@@ -93,7 +93,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
     submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.INDUSTRY, industry);
 
     // @ts-ignore
-    dispatch(actions.updateAppOnboardingIndustry(industry));
+    dispatch(globalActions.updateAppOnboardingIndustry(industry));
 
     if (!user.loggedIn) {
       trackAppOnboardingIndustryUpdated(industry);
@@ -117,7 +117,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
 
   const handleSetFullName = useCallback(() => {
     if (fullName) {
-      dispatch(actions.updateAppOnboardingFullName(fullName));
+      dispatch(globalActions.updateAppOnboardingFullName(fullName));
       return new Promise((resolve, reject) => {
         updateValueAsPromise(["users", user.details?.profile?.uid, "profile"], { displayName: fullName })
           .then((res: any) => {

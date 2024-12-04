@@ -5,7 +5,7 @@ import PATHS from "config/constants/sub/paths";
 import { IoDocumentTextOutline } from "@react-icons/all-files/io5/IoDocumentTextOutline";
 import { MdOutlineUploadFile } from "@react-icons/all-files/md/MdOutlineUploadFile";
 import { SecondarySidebar } from "componentsV2/SecondarySidebar";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 const mocksSidebarItems = [
   {
@@ -27,10 +27,10 @@ export const MocksSidebar: React.FC = () => {
   useEffect(() => {
     if (location.pathname.includes("editor")) {
       // @ts-ignore
-      dispatch(actions.updateSecondarySidebarCollapse(true));
+      dispatch(globalActions.updateSecondarySidebarCollapse(true));
     } else {
       // @ts-ignore
-      dispatch(actions.updateSecondarySidebarCollapse(false));
+      dispatch(globalActions.updateSecondarySidebarCollapse(false));
     }
   }, [dispatch, location]);
 

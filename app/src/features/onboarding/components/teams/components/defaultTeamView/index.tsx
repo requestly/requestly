@@ -3,7 +3,7 @@ import { getAppOnboardingDetails } from "store/selectors";
 import { useNavigate } from "react-router-dom";
 import { Col, Divider, Row, Space, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
 import groupIcon from "../../../../assets/group.svg";
@@ -36,7 +36,7 @@ export const DefaultTeamView = () => {
                 className="getting-started-invite-team-members-btn"
                 onClick={() => {
                   dispatch(
-                    actions.toggleActiveModal({
+                    globalActions.toggleActiveModal({
                       modalName: "inviteMembersModal",
                       newValue: true,
                       newProps: {
@@ -55,9 +55,9 @@ export const DefaultTeamView = () => {
               type="text"
               className="getting-started-manage-workspace-btn"
               onClick={() => {
-                dispatch(actions.updateAppOnboardingCompleted());
+                dispatch(globalActions.updateAppOnboardingCompleted());
                 dispatch(
-                  actions.toggleActiveModal({
+                  globalActions.toggleActiveModal({
                     modalName: "appOnboardingModal",
                     newValue: false,
                   })

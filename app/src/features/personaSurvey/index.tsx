@@ -2,7 +2,7 @@ import React, { useMemo, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getUserPersonaSurveyDetails, getAppMode } from "store/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { SurveyModalFooter } from "./ModalFooter";
 import { SurveyConfig, OptionsConfig } from "./config";
 import { getSurveyPage, shouldShowOnboarding, shuffleOptions } from "./utils";
@@ -35,11 +35,11 @@ const SkipButton = () => {
         onClick={() => {
           trackPersonaSurveySignInClicked();
           dispatch(
-            actions.toggleActiveModal({
+            globalActions.toggleActiveModal({
               modalName: "authModal",
               newProps: {
                 callback: () => {
-                  dispatch(actions.updateIsPersonaSurveyCompleted(true));
+                  dispatch(globalActions.updateIsPersonaSurveyCompleted(true));
                 },
                 authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
                 eventSource: SOURCE.PERSONA_SURVEY,
@@ -125,7 +125,7 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
     if (isSurveyModal) {
       shouldShowOnboarding(appMode).then((result) => {
         if (result) {
-          dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: true }));
+          dispatch(globalActions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: true }));
         }
       });
     }
@@ -144,8 +144,9 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
   useEffect(() => {
     if (!(currentPage in SurveyConfig)) {
       if (isSurveyModal) {
-        if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) dispatch(actions.updateIsPersonaSurveyCompleted(true));
-        else dispatch(actions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
+        if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP)
+          dispatch(globalActions.updateIsPersonaSurveyCompleted(true));
+        else dispatch(globalActions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
       } else callback?.();
     }
   }, [currentPage, dispatch, callback, isSurveyModal, appMode]);

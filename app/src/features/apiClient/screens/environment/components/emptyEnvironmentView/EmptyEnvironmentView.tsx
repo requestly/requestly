@@ -9,7 +9,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { redirectToNewEnvironment } from "utils/RedirectionUtils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import APP_CONSTANTS from "config/constants";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { MdDisplaySettings } from "@react-icons/all-files/md/MdDisplaySettings";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import { Skeleton } from "antd";
@@ -27,7 +27,7 @@ export const EmptyEnvironmentView = () => {
   const handleCreateNewEnvironment = () => {
     if (!user.loggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {

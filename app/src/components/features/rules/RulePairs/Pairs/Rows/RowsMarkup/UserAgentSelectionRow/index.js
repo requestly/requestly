@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Input, Dropdown, Typography, Menu, Select } from "antd";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getAvailableUserAgents } from "./actions";
 import { DownOutlined } from "@ant-design/icons";
 
@@ -13,7 +13,7 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
 
   const userAgentSelectorOnChangeHandler = (itemSet) => {
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           env: itemSet.value.env,
@@ -32,7 +32,7 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
       }
 
       dispatch(
-        actions.updateRulePairAtGivenPath({
+        globalActions.updateRulePairAtGivenPath({
           pairIndex,
           updates: {
             envType: newValue,
@@ -117,7 +117,7 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
             disabled={isInputDisabled}
             onChange={(event) =>
               dispatch(
-                actions.updateRulePairAtGivenPath({
+                globalActions.updateRulePairAtGivenPath({
                   pairIndex,
                   updates: {
                     userAgent: event?.target?.value,

@@ -8,7 +8,7 @@ import { SidebarListHeader } from "../../../apiClient/components/sidebar/compone
 import { redirectToNewEnvironment } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { EmptyState } from "features/apiClient/screens/apiClient/components/sidebar/components/emptyState/EmptyState";
 import { ListEmptySearchView } from "features/apiClient/screens/apiClient/components/sidebar/components/listEmptySearchView/ListEmptySearchView";
@@ -72,7 +72,7 @@ export const EnvironmentsList = () => {
   const handleAddEnvironmentClick = useCallback(() => {
     if (!user.loggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {

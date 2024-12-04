@@ -14,7 +14,7 @@ import {
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
   trackAPIRequestCancelled,
-  trackAPIRequestSent,
+  // trackAPIRequestSent,
   trackRequestFailed,
   trackResponseLoaded,
   trackInstallExtensionDialogShown,
@@ -23,7 +23,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation, useNavigate } from "react-router-dom";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { CONTENT_TYPE_HEADER } from "../../../../constants";
@@ -88,10 +88,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [isAnimating, setIsAnimating] = useState(false);
   const animationTimerRef = useRef<NodeJS.Timeout>();
 
-  unstable_usePrompt({
-    when: hasUnsavedChanges,
-    message: "You have unsaved changes. Are you sure you want to leave?",
-  });
+  // unstable_usePrompt({
+  //   when: hasUnsavedChanges,
+  //   message: "You have unsaved changes. Are you sure you want to leave?",
+  // });
 
   useEffect(() => {
     if (apiEntry) {
@@ -143,7 +143,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     // Added isInit to avoid setting hasUnsavedChanges to true when an empty key value pair is added in params and headers
     setEntry((prev) => updater(prev));
     if (!isInit) {
-      setHasUnsavedChanges(true);
+      // setHasUnsavedChanges(true);
     }
   }, []);
 
@@ -222,8 +222,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           "A minimalistic API Client for front-end developers to test their APIs and fast-track their web development lifecycle. Add custom Headers and Query Params to test your APIs.",
         eventPage: "api_client",
       };
-      // @ts-ignore
-      dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
+      dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
       trackInstallExtensionDialogShown({ src: "api_client" });
       return;
     }
@@ -329,6 +328,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
       setHasUnsavedChanges(false);
+      setEntry({ ...result.data.data });
+      // updateTab(requestDetails.id, { hasUnsavedChanges: false, data: requestDetails });
+
       trackRequestSaved("api_client_view");
       if (location.pathname.includes("history")) {
         navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`);
@@ -426,7 +428,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                     onClick={onSaveButtonClick}
                     loading={isRequestSaving}
                   >
-                    Save {hasUnsavedChanges ? "*" : ""}
+                    {/* Save {hasUnsavedChanges ? "*" : ""} */}
+                    Save
                   </RQButton>
                 ) : null}
               </div>

@@ -1,52 +1,54 @@
 import React from "react";
 import { useTabsLayoutContext } from "layouts/TabsLayout/contexts";
-import { Outlet, OutletProps } from "react-router-dom";
 import { Tabs, TabsProps } from "antd";
+import { MdClose } from "@react-icons/all-files/md/MdClose";
+import { RQButton } from "lib/design-system-v2/components";
 import "./tabsLayoutContent.scss";
-// import { RQButton } from "lib/design-system-v2/components";
 
-export const TabsLayoutContent: React.FC = () => {
-  const { tabs, activeTab, openTab } = useTabsLayoutContext();
+interface Props {
+  Outlet: (props: any) => React.ReactElement;
+}
 
-  /**
-   * - Do the processing here for rendering the current tabs and all the multiple tabs
-   */
-  const context: OutletProps["context"] = {};
+export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
+  const { tabs, activeTab, openTab, closeTab } = useTabsLayoutContext();
 
-  // Test performance, data loss, lag???
-  const items: TabsProps["items"] = tabs.map((tabDetails) => {
-    const clonedOutlet = React.cloneElement(<Outlet />, { context });
-
+  const items: TabsProps["items"] = tabs.map((tab) => {
     return {
-      key: tabDetails.id,
+      key: tab.id,
       label: (
-        <div>
-          {tabDetails.title}{" "}
-          {/* <RQButton
-            size="small"
-            onClick={() => {
-              closeTab();
-            }}
-          >
-            x
-          </RQButton> */}
+        <div title={tab.title} className="tab-title-container">
+          <div className="tab-title">{tab.title}</div>
+
+          <div className="tab-actions">
+            <RQButton
+              size="small"
+              type="transparent"
+              // className="tab-close-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                closeTab(tab.id);
+              }}
+              icon={<MdClose />}
+            />
+            {tab.hasUnsavedChanges ? <div className="unsaved-changes-indicator" /> : null}
+          </div>
         </div>
       ),
-      children: clonedOutlet,
+      children: <Outlet key={tab.id} />,
     };
   });
-
-  // return <Outlet />;
 
   return (
     <div className="tabs-layout-container">
       {tabs.length ? (
         <Tabs
+          hideAdd
           activeKey={activeTab?.id}
-          // destroyInactiveTabPane={false}
+          destroyInactiveTabPane={false}
+          popupClassName="tabs-layout-more-dropdown"
           items={items}
-          onChange={(activeTab) => {
-            openTab(activeTab);
+          onChange={(activeTabId) => {
+            openTab(activeTabId);
           }}
         />
       ) : (
