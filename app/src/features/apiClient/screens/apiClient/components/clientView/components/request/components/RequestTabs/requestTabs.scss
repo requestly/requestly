@@ -57,5 +57,19 @@
 
   .rq-content-list-table-container {
     padding: 0 0 1rem 0;
+    max-width: unset;
+  }
+
+  .request-tab-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .request-tab-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--requestly-color-primary);
+    }
   }
 }
