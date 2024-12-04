@@ -1,4 +1,4 @@
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { OtherOption, QuestionnaireType, SurveyPage } from "./types";
 import { SurveyConfig } from "./config";
 import { trackPersonaQ1Completed } from "modules/analytics/events/misc/onboarding";
@@ -9,7 +9,7 @@ import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 export const setUserPersona = (dispatch: any, value: string | OtherOption, clear: boolean, key: string) => {
-  dispatch(actions.updateUserPersona({ value: clear ? "" : value, key }));
+  dispatch(globalActions.updateUserPersona({ value: clear ? "" : value, key }));
 };
 
 export const handleSurveyNavigation = (
@@ -36,21 +36,21 @@ export const handleSurveyNavigation = (
   if (isSurveyModal || index !== surveyLength - 1) {
     switch (currentPage) {
       case SurveyPage.GETTING_STARTED:
-        dispatch(actions.updatePersonaSurveyPage(SurveyPage.PERSONA));
+        dispatch(globalActions.updatePersonaSurveyPage(SurveyPage.PERSONA));
         break;
 
       case SurveyPage.PERSONA:
-        dispatch(actions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
+        dispatch(globalActions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
         break;
     }
 
     if (isSurveyModal && index === surveyLength - 1) {
       if (isSharedListUser || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
         //don’t show recommendation screen for shared list users or desktop users
-        dispatch(actions.updateIsPersonaSurveyCompleted(true));
+        dispatch(globalActions.updateIsPersonaSurveyCompleted(true));
         return;
       }
-      dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: false }));
+      dispatch(globalActions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: false }));
     }
   } else {
     callback?.();

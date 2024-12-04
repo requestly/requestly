@@ -11,7 +11,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getIsSupportChatOpened } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { RequestBot } from "features/requestBot";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import useFetchSlackInviteVisibility from "./useSlackInviteVisibility";
@@ -162,7 +162,7 @@ const SupportPanel = () => {
               trackSupportOptionOpened();
               dispatch(
                 // @ts-ignore
-                actions.updateIsSupportChatOpened(true)
+                globalActions.updateIsSupportChatOpened(true)
               );
             }}
           />

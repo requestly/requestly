@@ -4,7 +4,7 @@ import { Button, Space } from "antd";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { actions } from "../../../../store";
+import { globalActions } from "store/slices/global/slice";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 
@@ -22,7 +22,7 @@ const AuthButtons = ({ src, hardRedirect = false, autoPrompt = true }) => {
       return;
     }
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {
@@ -41,7 +41,7 @@ const AuthButtons = ({ src, hardRedirect = false, autoPrompt = true }) => {
       return;
     }
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {

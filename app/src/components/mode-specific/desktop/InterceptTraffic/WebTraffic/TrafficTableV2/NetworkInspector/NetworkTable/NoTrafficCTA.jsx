@@ -11,7 +11,7 @@ import {
   trackSystemWideConnected,
 } from "modules/analytics/events/desktopApp/apps";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getAllFilters } from "store/features/desktop-traffic-table/selectors";
 import { getDesktopSpecificDetails } from "store/selectors";
 import { getConnectedAppsCount } from "utils/Misc";
@@ -36,7 +36,7 @@ const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
   const openConnectedAppsModal = useCallback(
     (props = {}) => {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "connectedAppsModal",
           newValue: true,
           newProps: { ...props, source: "traffic_table" },
@@ -57,7 +57,7 @@ const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
         if (res.success) {
           toast.success(`Connected ${systemWideSource.name}`);
           dispatch(
-            actions.updateDesktopSpecificAppProperty({
+            globalActions.updateDesktopSpecificAppProperty({
               appId: systemWideSource.id,
               property: "isActive",
               value: true,
@@ -89,7 +89,7 @@ const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
           toast.info(`Disconnected ${systemWideSource.name}`);
 
           dispatch(
-            actions.updateDesktopSpecificAppProperty({
+            globalActions.updateDesktopSpecificAppProperty({
               appId: systemWideSource.id,
               property: "isActive",
               value: false,

@@ -8,7 +8,7 @@ import { EditOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { redirectToTraffic } from "../../../../../../../utils/RedirectionUtils";
 import { isDesktopMode } from "../../../../../../../utils/AppUtils";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import LINKS from "config/constants/sub/links";
 import "./HeadersRulePairV2.css";
 
@@ -31,7 +31,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
 
   const addEmptyModification = (modificationType, type) => {
     dispatch(
-      actions.addValueInRulePairArray({
+      globalActions.addValueInRulePairArray({
         pairIndex,
         arrayPath: ["modifications", modificationType],
         value: stableGetEmptyModification(type),

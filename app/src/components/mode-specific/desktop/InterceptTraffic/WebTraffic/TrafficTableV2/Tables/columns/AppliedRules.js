@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { Tooltip } from "antd";
-import { actions as storeActions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 
 const { RULE_TYPES_CONFIG, RULE_EDITOR_CONFIG } = APP_CONSTANTS;
@@ -26,7 +26,7 @@ const AppliedRules = ({ actions }) => {
       e.stopPropagation();
 
       dispatch(
-        storeActions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           newValue: true,
           modalName: "ruleEditorModal",
           newProps: { ruleId, mode: RULE_EDITOR_CONFIG.MODES.EDIT },

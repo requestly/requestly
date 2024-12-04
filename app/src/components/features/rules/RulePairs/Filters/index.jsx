@@ -24,7 +24,7 @@ import {
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
 import { ResponseRuleResourceType } from "types/rules";
 import { debounce, snakeCase } from "lodash";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import LINKS from "config/constants/sub/links";
 
 const { Link } = Typography;
@@ -152,7 +152,7 @@ const Filters = (props) => {
   const updateSourceRequestPayload = useCallback(
     (event, path) => {
       dispatch(
-        actions.updateRulePairAtGivenPath({
+        globalActions.updateRulePairAtGivenPath({
           pairIndex,
           updates: {
             [path]: event?.target?.value,
@@ -327,7 +327,7 @@ const Filters = (props) => {
                   );
                 } else {
                   dispatch(
-                    actions.updateRulePairAtGivenPath({
+                    globalActions.updateRulePairAtGivenPath({
                       pairIndex,
                       updates: {
                         [APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_DOMAINS]: [e.target.value],

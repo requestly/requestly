@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { recordsActions } from "store/features/rules/slice";
 import { StorageService } from "init";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import {
@@ -163,8 +163,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         const ruleIds = rulesToShare.map((rule) => rule.id);
 
         dispatch(
-          // @ts-ignore
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "sharingModal",
             newValue: true,
             newProps: {
@@ -175,8 +174,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         );
       } else {
         dispatch(
-          // @ts-ignore
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,
             newProps: {
@@ -350,7 +348,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         trackGroupChangedEvent("rules_list_drag_and_drop");
         onSuccess();
         // @ts-ignore
-        dispatch(actions.updateRefreshPendingStatus({ type: "rules", newValue: !isRulesListRefreshPending }));
+        dispatch(globalActions.updateRefreshPendingStatus({ type: "rules", newValue: !isRulesListRefreshPending }));
       });
     },
     [appMode, user, isRulesListRefreshPending]
@@ -364,8 +362,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         const ruleIds = groupRules.map((rule: Rule) => rule.id);
 
         dispatch(
-          // @ts-ignore
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "sharingModal",
             newValue: true,
             newProps: {
@@ -376,8 +373,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         );
       } else {
         dispatch(
-          // @ts-ignore
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,
             newProps: {

@@ -1,15 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
-import { getActiveModals } from "store/selectors";
+import { getActiveModals } from "store/slices/global/modals/selectors";
 import AuthModal from "components/authentication/AuthModal";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 export const GlobalModals = () => {
   const dispatch = useDispatch();
   const activeModals = useSelector(getActiveModals);
 
   const toggleAuthModal = () => {
-    // @ts-ignore
-    dispatch(actions.toggleActiveModal({ modalName: "authModal" }));
+    dispatch(globalActions.toggleActiveModal({ modalName: "authModal" }));
   };
 
   return (

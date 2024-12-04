@@ -1,5 +1,5 @@
 import isEmpty from "is-empty";
-import { actions } from "../../../../../../../../../store";
+import { globalActions } from "store/slices/global/slice";
 //UTILS
 import { isValidUrl } from "../../../../../../../../../utils/FormattingHelper";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -134,7 +134,7 @@ export const validateRule = (rule, dispatch, appMode) => {
   let output;
   if (isEmpty(rule.name)) {
     dispatch(
-      actions.updateCurrentlySelectedRuleErrors({
+      globalActions.updateCurrentlySelectedRuleErrors({
         name: "Rule name is required",
       })
     );

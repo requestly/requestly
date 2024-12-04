@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "antd";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackRuleEditorHeaderClicked, trackRulePinToggled } from "modules/analytics/events/common/rules";
 import "./PinButton.css";
 import { getModeData } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
@@ -27,7 +27,7 @@ const PinButton = ({ rule, isRuleEditorModal }) => {
       isFavourite: updateValue,
     };
 
-    dispatch(actions.updateCurrentlySelectedRuleData(updatedRule));
+    dispatch(globalActions.updateCurrentlySelectedRuleData(updatedRule));
 
     StorageService(appMode)
       .saveRuleOrGroup(updatedRule, { silentUpdate: true })

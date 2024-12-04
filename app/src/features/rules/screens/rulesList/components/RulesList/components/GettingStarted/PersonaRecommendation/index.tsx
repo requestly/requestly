@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Button, Row } from "antd";
 import { CloudUploadOutlined } from "@ant-design/icons";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { personaRecommendationData } from "./personaRecommendationData";
 import { RQButton } from "lib/design-system/components";
 import { FeatureCard } from "./FeatureCard";
@@ -28,8 +28,8 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
 
   const handleSkipClick = (e: React.MouseEvent<HTMLElement>) => {
     trackPersonaRecommendationSkipped();
-    dispatch(actions.updateIsWorkspaceOnboardingCompleted());
-    dispatch(actions.updateIsPersonaSurveyCompleted(true));
+    dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
+    dispatch(globalActions.updateIsPersonaSurveyCompleted(true));
     navigate(PATHS.ROOT, { replace: true });
   };
 
@@ -64,8 +64,8 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
             title="You need to sign up to upload rules"
             callback={() => {
               handleUploadRulesClick();
-              dispatch(actions.updateIsWorkspaceOnboardingCompleted());
-              dispatch(actions.updateIsPersonaSurveyCompleted(true));
+              dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
+              dispatch(globalActions.updateIsPersonaSurveyCompleted(true));
             }}
             source={SOURCE.UPLOAD_RULES}
           >

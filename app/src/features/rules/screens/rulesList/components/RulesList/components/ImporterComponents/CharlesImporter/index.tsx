@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Col, Modal, Row, Space } from "antd";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
 import {
   ArrowLeftOutlined,
@@ -210,7 +210,7 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
       .then(() => {
         dispatch(
           //@ts-ignore
-          actions.updateRefreshPendingStatus({
+          globalActions.updateRefreshPendingStatus({
             type: "rules",
             newValue: !isRulesListRefreshPending,
           })

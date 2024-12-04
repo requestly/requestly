@@ -11,7 +11,7 @@ import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
 import { trackPricingPlanCancellationRequested } from "modules/analytics/events/misc/business";
 import "./SubscriptionInfo.css";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { cancelSubscription } from "backend/billing";
 
 const SubscriptionInfo = ({
@@ -32,7 +32,7 @@ const SubscriptionInfo = ({
   const handleRenewOnClick = (e) => {
     e.preventDefault();
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "pricingModal",
         newValue: true,
         newProps: { selectedPlan: null, source: "renew_link" },

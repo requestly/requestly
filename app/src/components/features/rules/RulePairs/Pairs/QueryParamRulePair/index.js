@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import QueryParamModificationRow from "../Rows/RowsMarkup/QueryParamModificationRow";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import AddQueryParamModificationRow from "../Rows/RowsMarkup/AddQueryParamModificationRow";
@@ -19,7 +19,7 @@ const QueryParamRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) =
       event?.preventDefault?.();
 
       dispatch(
-        actions.addValueInRulePairArray({
+        globalActions.addValueInRulePairArray({
           pairIndex,
           arrayPath: "modifications",
           value: getEmptyModification(),

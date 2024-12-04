@@ -6,7 +6,7 @@ import { TeamsListItem } from "./components/TeamsListItem";
 import { m, AnimatePresence } from "framer-motion";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { Invite, Team } from "types";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
 import { SOURCE } from "modules/analytics/events/common/constants";
@@ -72,7 +72,7 @@ export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subhea
           onClick={() => {
             trackHomeWorkspaceActionClicked("create_new_workspace");
             dispatch(
-              actions.toggleActiveModal({
+              globalActions.toggleActiveModal({
                 modalName: "createWorkspaceModal",
                 newValue: true,
                 newProps: {

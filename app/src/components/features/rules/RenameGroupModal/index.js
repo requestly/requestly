@@ -8,7 +8,7 @@ import SpinnerColumn from "../../../misc/SpinnerColumn";
 import { StorageService } from "../../../../init";
 import { getAppMode, getIsRefreshRulesPending } from "../../../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { actions } from "../../../../store";
+import { globalActions } from "store/slices/global/slice";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";
 import { trackGroupRenamed } from "features/rules/analytics";
@@ -93,7 +93,7 @@ const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
         trackGroupRenamed();
         //Refresh List
         dispatch(
-          actions.updateRefreshPendingStatus({
+          globalActions.updateRefreshPendingStatus({
             type: "rules",
             newValue: !isRulesListRefreshPending,
           })

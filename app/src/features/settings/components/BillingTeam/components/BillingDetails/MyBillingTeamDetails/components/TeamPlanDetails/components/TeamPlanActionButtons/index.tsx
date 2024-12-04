@@ -5,7 +5,7 @@ import { getPlanNameFromId } from "utils/PremiumUtils";
 import { MdOutlineCancel } from "@react-icons/all-files/md/MdOutlineCancel";
 import upgradeIcon from "../../../../../../../assets/upgrade.svg";
 import { PRICING } from "features/pricing";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { PlanStatus } from "features/settings/components/BillingTeam/types";
@@ -41,7 +41,7 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
     const planName = getPlanNameFromId(subscriptionDetails?.plan);
     if (planStatus === PlanStatus.EXPIRED) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "pricingModal",
           newValue: true,
           newProps: { selectedPlan: null, source: "billing_team" },
@@ -86,7 +86,7 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
         });
       } else {
         dispatch(
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "pricingModal",
             newValue: true,
             newProps: { selectedPlan: null, source: "billing_team" },

@@ -2,7 +2,7 @@ import { generateObjectId } from "../../../../../utils/FormattingHelper";
 //UTILS
 import { redirectToRoot } from "../../../../../utils/RedirectionUtils";
 //REDUCER ACTIONS
-import { actions } from "../../../../../store";
+import { globalActions } from "store/slices/global/slice";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -13,13 +13,13 @@ import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
 
 export const setIsCurrentlySelectedRuleHasUnsavedChanges = (dispatch, hasUnsavedChanges) => {
-  dispatch(actions.updateCurrentlySelectedRuleHasUnsavedChanges(hasUnsavedChanges));
+  dispatch(globalActions.updateCurrentlySelectedRuleHasUnsavedChanges(hasUnsavedChanges));
 };
 
 export const setCurrentlySelectedRule = (dispatch, newRule, warnForUnsavedChanges = false) => {
   setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, warnForUnsavedChanges);
 
-  dispatch(actions.updateCurrentlySelectedRuleData(newRule));
+  dispatch(globalActions.updateCurrentlySelectedRuleData(newRule));
 };
 
 export const getEmptyPair = (currentlySelectedRuleConfig) => {
@@ -125,12 +125,12 @@ export const setCurrentlySelectedRuleConfig = (dispatch, config, navigate) => {
   if (config === undefined) {
     redirectToRoot(navigate);
   } else {
-    dispatch(actions.updateCurrentlySelectedRuleConfig(config));
+    dispatch(globalActions.updateCurrentlySelectedRuleConfig(config));
   }
 };
 
 export const cleanup = (dispatch) => {
-  dispatch(actions.clearCurrentlySelectedRuleAndConfig());
+  dispatch(globalActions.clearCurrentlySelectedRuleAndConfig());
 };
 
 export const getModeData = (location, isSharedListViewRule) => {

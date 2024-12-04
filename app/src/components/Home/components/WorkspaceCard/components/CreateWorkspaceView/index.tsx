@@ -5,7 +5,7 @@ import { Col } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { groupSvg } from "features/onboarding";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import "./index.scss";
@@ -17,7 +17,7 @@ export const CreateWorkspaceView: React.FC = () => {
   const handleCreateWorkspace = () => {
     trackHomeWorkspaceActionClicked("create_new_workspace");
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "createWorkspaceModal",
         newValue: true,
         newProps: {

@@ -2,7 +2,7 @@ import { Dispatch } from "redux";
 import { DataSnapshot, DatabaseReference } from "firebase/database";
 import { onValue, get } from "firebase/database";
 import { getNodeRef } from "../../actions/FirebaseActions";
-import { actions } from "../../store";
+import { globalActions } from "store/slices/global/slice";
 import { isLocalStoragePresent } from "utils/AppUtils";
 import { throttle } from "lodash";
 import Logger from "lib/logger";
@@ -189,8 +189,8 @@ export const doSync = async (
   window.isFirstSyncComplete = true;
 
   // Refresh Rules
-  dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
-  dispatch(actions.updateIsRulesListLoading(false));
+  dispatch(globalActions.updateRefreshPendingStatus({ type: "rules" }));
+  dispatch(globalActions.updateIsRulesListLoading(false));
 
   // Fetch Session Recording
   if (appMode === "EXTENSION") {
@@ -205,7 +205,7 @@ export const doSync = async (
 
     // Refresh Session Recording Config
     dispatch(
-      actions.updateRefreshPendingStatus({
+      globalActions.updateRefreshPendingStatus({
         type: "sessionRecordingConfig",
       })
     );
@@ -260,7 +260,7 @@ export const invokeSyncingIfRequired = async ({
   if (window.skipSyncListenerForNextOneTime) {
     window.skipSyncListenerForNextOneTime = false;
     window.isFirstSyncComplete = true; // Just in case!
-    dispatch(actions.updateIsRulesListLoading(false));
+    dispatch(globalActions.updateIsRulesListLoading(false));
     return;
   }
 
@@ -272,9 +272,9 @@ export const invokeSyncingIfRequired = async ({
 
   if (!isLocalStoragePresent(appMode)) {
     // Just refresh the rules table in this case
-    dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
+    dispatch(globalActions.updateRefreshPendingStatus({ type: "rules" }));
     window.isFirstSyncComplete = true;
-    dispatch(actions.updateIsRulesListLoading(false));
+    dispatch(globalActions.updateIsRulesListLoading(false));
     return;
   }
 

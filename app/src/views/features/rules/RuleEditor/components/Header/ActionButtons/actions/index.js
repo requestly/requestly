@@ -10,7 +10,7 @@ import { migrateRuleToMV3 } from "modules/extension/utils";
 import { runMinorFixesOnRule } from "utils/rules/misc";
 import { transformAndValidateRuleFields } from "../CreateRuleButton/actions";
 import { HTML_ERRORS } from "../CreateRuleButton/actions/insertScriptValidators";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { ToastType } from "componentsV2/CodeEditor/components/EditorToast/types";
 import { toast } from "utils/Toast";
 
@@ -77,7 +77,7 @@ export const validateSyntaxInRule = async (dispatch, ruleToSave) => {
       case HTML_ERRORS.MULTIPLE_TAGS:
       case HTML_ERRORS.NO_TAGS:
         dispatch(
-          actions.triggerToastForEditor({
+          globalActions.triggerToastForEditor({
             id: validationError.id,
             message: validationError.message,
             type: ToastType.ERROR,

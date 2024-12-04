@@ -6,7 +6,7 @@ import {
   getCurrentlySelectedRuleData,
   getGroupwiseRulesToPopulate,
 } from "store/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import Status from "./ActionButtons/Status";
 import ActionButtons from "./ActionButtons";
 import PinButton from "./ActionButtons/PinButton";
@@ -67,7 +67,7 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
       },
     };
 
-    dispatch(actions.updateGroupwiseRulesToPopulate(groupwiseRule));
+    dispatch(globalActions.updateGroupwiseRulesToPopulate(groupwiseRule));
   }, [dispatch, currentlySelectedRuleData, groupwiseRulesToPopulate]);
 
   const handleRuleNameChange = useCallback(

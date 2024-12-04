@@ -8,7 +8,7 @@ import { getIsRefreshRulesPending, getAppMode } from "../../../../store/selector
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAllRules } from "store/features/rules/selectors";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
-import { actions } from "../../../../store";
+import { globalActions } from "store/slices/global/slice";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -143,7 +143,7 @@ const ImportRulesModal = (props) => {
     addRulesAndGroupsToStorage(appMode, dataToImport)
       .then(async () => {
         dispatch(
-          actions.updateRefreshPendingStatus({
+          globalActions.updateRefreshPendingStatus({
             type: "rules",
             newValue: !isRulesListRefreshPending,
           })

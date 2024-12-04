@@ -3,7 +3,7 @@ import { Avatar, Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useDispatch, useSelector } from "react-redux";
 import { getUniqueColorForWorkspace } from "utils/teams";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import "./index.css";
 import APP_CONSTANTS from "config/constants";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
@@ -25,7 +25,7 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
   const openAuthModal = () => {
     handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch).then(() => {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newProps: {
             redirectURL: window.location.href,
@@ -37,7 +37,7 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
         })
       );
       dispatch(
-        actions.updateHardRefreshPendingStatus({
+        globalActions.updateHardRefreshPendingStatus({
           type: "rules",
         })
       );

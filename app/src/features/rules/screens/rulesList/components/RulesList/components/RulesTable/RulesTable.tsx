@@ -30,7 +30,7 @@ import {
 } from "componentsV2/ContentList";
 import { enhanceRecords, importSampleRules, normalizeRecords } from "./utils/rules";
 import { useRulesActionContext } from "features/rules/context/actions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import "./rulesTable.css";
 
@@ -97,11 +97,11 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       trackSampleRulesImported();
 
       // @ts-ignore
-      dispatch(actions.updateIsSampleRulesImported(true));
+      dispatch(globalActions.updateIsSampleRulesImported(true));
 
       dispatch(
         // @ts-ignore
-        actions.updateRefreshPendingStatus({
+        globalActions.updateRefreshPendingStatus({
           type: "rules",
           newValue: !isRulesListRefreshPending,
         })

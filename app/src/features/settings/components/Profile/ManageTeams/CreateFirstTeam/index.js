@@ -3,7 +3,7 @@ import { Button, Row, Col, Space } from "antd";
 import ProCard from "@ant-design/pro-card";
 import APP_CONSTANTS from "../../../../../../config/constants";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
 
 const CreateFirstTeam = () => {
@@ -24,7 +24,7 @@ const CreateFirstTeam = () => {
                 type="primary"
                 onClick={() => {
                   dispatch(
-                    actions.toggleActiveModal({
+                    globalActions.toggleActiveModal({
                       modalName: "createWorkspaceModal",
                       newValue: true,
                       newProps: { source: "my_teams" },
