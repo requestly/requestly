@@ -79,6 +79,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
+  // TODO: Remove this once tabs view is implemented
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const abortControllerRef = useRef<AbortController>(null);
