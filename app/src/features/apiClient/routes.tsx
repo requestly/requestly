@@ -7,7 +7,6 @@ import { EnvironmentView } from "./screens/environment/components/environmentVie
 import { EmptyEnvironmentView } from "./screens/environment/components/emptyEnvironmentView/EmptyEnvironmentView";
 import { EnvironmentContainer } from "./screens/environment/container";
 import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImporterView";
-import { TabsLayoutContainer } from "layouts/TabsLayout";
 
 export const apiClientRoutes: RouteObject[] = [
   {
