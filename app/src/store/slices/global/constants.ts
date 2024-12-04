@@ -1,14 +1,19 @@
 import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-// SUB
-const appListJson = require("./sub/appsList.json");
+import { GlobalSliceState } from "./types";
 
-const INITIAL_STATE = {
+import appListJson from "../../initial-state/sub/appsList.json";
+
+console.log(appListJson);
+
+const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   /* User */
   user: {
     loggedIn: false,
     details: null,
   },
+
+  syncingV2: false,
 
   userPersona: {
     page: "getting_started",
@@ -223,4 +228,4 @@ const INITIAL_STATE = {
   },
 };
 
-export default INITIAL_STATE;
+export default INITIAL_GLOBAL_SLICE_STATE;
