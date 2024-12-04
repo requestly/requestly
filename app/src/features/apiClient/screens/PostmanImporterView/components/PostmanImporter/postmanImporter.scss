@@ -1,0 +1,55 @@
+.postman-importer {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+    font-weight: var(--requestly-font-weight-medium);
+    font-size: var(--requestly-font-size-base);
+  }
+
+  &__post-parse-view {
+    background: var(--requestly-color-surface-1);
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: var(--requestly-font-size-md);
+
+    svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    &--success {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      svg {
+        color: var(--requestly-color-success);
+      }
+    }
+
+    &--error {
+      svg {
+        color: var(--requestly-color-error);
+      }
+
+      &-text {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        &-steps {
+          margin-top: 4px;
+          font-size: var(--requestly-font-size-sm);
+        }
+      }
+    }
+  }
+}

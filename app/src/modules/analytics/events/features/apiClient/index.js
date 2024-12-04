@@ -121,6 +121,26 @@ export const trackEnableKeyValueToggled = (is_active, type) => {
   trackEvent(API_CLIENT.ENABLE_KEY_VALUE_TOGGLED, { is_active, type });
 };
 
+export const trackImportFromPostmanClicked = () => {
+  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_CLICKED);
+};
+
+export const trackImportFromPostmanCompleted = (num_collections, num_environments) => {
+  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_COMPLETED, { num_collections, num_environments });
+};
+
+export const trackImportFromPostmanFailed = (num_collections, num_environments) => {
+  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_FAILED, { num_collections, num_environments });
+};
+
+export const trackImportFromPostmanDataProcessed = (num_collections, num_environments) => {
+  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_DATA_PROCESSED, { num_collections, num_environments });
+};
+
+export const trackImportFromPostmanStarted = (num_collections, num_environments) => {
+  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_STARTED, { num_collections, num_environments });
+};
+
 export const trackDuplicateRequestClicked = () => {
   trackEvent(API_CLIENT.DUPLICATE_REQUEST_CLICKED);
 };
