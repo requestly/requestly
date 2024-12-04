@@ -224,8 +224,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    console.log("!!!debug", "before sending", apiEntry, apiEntryDetails);
-
     makeRequest(appMode, renderedRequest, abortControllerRef.current.signal)
       .then((response) => {
         // TODO: Add an entry in history

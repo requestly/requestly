@@ -207,7 +207,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       };
 
       const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId]?.variables;
-      // Start with environment variables (highest precedence)
+      // environment variables (highest precedence)
       Object.entries(currentEnvironmentVariables || {}).forEach(([key, value]) => {
         allVariables[key] = value;
       });
@@ -221,12 +221,8 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   );
 
   const renderVariables = useCallback(
-    <T>(template: string | Record<string, any>, requestCollectionId?: string): T => {
-      const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId || "");
-      console.log("!!!debug", "renderVariables", {
-        variablesWithPrecedence,
-        requestCollectionId,
-      });
+    <T>(template: string | Record<string, any>, requestCollectionId: string = ""): T => {
+      const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
       return renderTemplate(template, variablesWithPrecedence);
     },
     [getVariablesWithPrecedence]
