@@ -20,7 +20,7 @@ import { toast } from "utils/Toast";
 import { getUserAttributes, getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackDraftSessionSaved } from "modules/analytics/events/features/sessionRecording";
@@ -104,7 +104,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       if (!user?.loggedIn) {
         dispatch(
           // @ts-ignore
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,
             newProps: {

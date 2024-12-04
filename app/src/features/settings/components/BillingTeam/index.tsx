@@ -6,7 +6,7 @@ import { getAvailableBillingTeams, getIsBillingTeamsLoading } from "store/featur
 import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQButton } from "lib/design-system/components";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { toast } from "utils/Toast";
 import { BillingTeamsSidebar } from "./components/BillingTeamsSidebar";
@@ -40,7 +40,7 @@ export const BillingTeamContainer: React.FC = () => {
       );
       dispatch(
         // @ts-ignore
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
@@ -69,7 +69,7 @@ export const BillingTeamContainer: React.FC = () => {
               onClick={() => {
                 dispatch(
                   // @ts-ignore
-                  actions.toggleActiveModal({
+                  globalActions.toggleActiveModal({
                     modalName: "authModal",
                     newValue: true,
                     newProps: {

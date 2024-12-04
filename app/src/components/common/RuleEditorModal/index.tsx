@@ -19,7 +19,7 @@ import RuleStatusButton from "views/features/rules/RuleEditor/components/Header/
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import {
   setCurrentlySelectedRule,
   setCurrentlySelectedRuleConfig,
@@ -90,13 +90,13 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       .finally(() => setIsLoading(false));
 
     return () => {
-      dispatch(actions.clearCurrentlySelectedRuleAndConfig());
+      dispatch(globalActions.clearCurrentlySelectedRuleAndConfig());
     };
   }, [mode, appMode, ruleId, dispatch, navigate]);
 
   const initializeEditorWithPrefilledData = useCallback(() => {
     const ruleConfig = RULE_TYPES_CONFIG[ruleType];
-    const newRule = initiateBlankCurrentlySelectedRule(dispatch, ruleConfig, ruleType, setCurrentlySelectedRule);
+    const newRule: any = initiateBlankCurrentlySelectedRule(dispatch, ruleConfig, ruleType, setCurrentlySelectedRule);
     setCurrentlySelectedRuleConfig(dispatch, ruleConfig, navigate);
 
     if (newRule) {
@@ -150,7 +150,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
     initializeEditorWithPrefilledData();
 
     return () => {
-      dispatch(actions.clearCurrentlySelectedRuleAndConfig());
+      dispatch(globalActions.clearCurrentlySelectedRuleAndConfig());
     };
   }, [mode, initializeEditorWithPrefilledData, dispatch]);
 

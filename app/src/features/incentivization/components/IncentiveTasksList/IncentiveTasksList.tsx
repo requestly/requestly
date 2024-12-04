@@ -20,7 +20,7 @@ import {
   redirectToRules,
   redirectToSessionRecordingHome,
 } from "utils/RedirectionUtils";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { IncentiveTaskListItem } from "./types";
 import {
@@ -190,7 +190,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
                 } else {
                   dispatch(
                     // @ts-ignore
-                    actions.toggleActiveModal({
+                    globalActions.toggleActiveModal({
                       modalName: "extensionModal",
                       newValue: true,
                       newProps: {
@@ -235,7 +235,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
                 } else {
                   dispatch(
                     // @ts-ignore
-                    actions.toggleActiveModal({
+                    globalActions.toggleActiveModal({
                       modalName: "extensionModal",
                       newValue: true,
                       newProps: {
@@ -275,13 +275,13 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
                 postActionClickCallback(IncentivizeEvent.TEAM_WORKSPACE_CREATED);
                 dispatch(
                   // @ts-ignore
-                  actions.toggleActiveModal({
+                  globalActions.toggleActiveModal({
                     modalName: "createWorkspaceModal",
                     newValue: true,
                     newProps: {
                       callback: () => {
                         // @ts-ignore
-                        dispatch(actions.updateJoinWorkspaceCardVisible(false));
+                        dispatch(globalActions.updateJoinWorkspaceCardVisible(false));
                       },
                       source: "incentivization_task_list",
                     },

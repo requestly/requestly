@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getAppMode } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { Avatar } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { PlusOutlined } from "@ant-design/icons";
@@ -65,7 +65,7 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
           }
         }
         setIsJoining(false);
-        dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+        dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
       })
       .catch((err) => {
         toast.error("Error while accepting invitation. Please contact workspace admin");
@@ -123,7 +123,7 @@ export const JoinWorkspace: React.FC<{
           type="text"
           onClick={() => {
             trackOnboardingWorkspaceSkip(OnboardingSteps.CREATE_JOIN_WORKSPACE);
-            dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+            dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
           }}
         >
           Skip for now

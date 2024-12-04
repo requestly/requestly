@@ -18,7 +18,7 @@ import {
 import { toast } from "utils/Toast";
 import { getUserAttributes, getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { trackDraftSessionSaved } from "features/sessionBook/analytics";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
@@ -96,7 +96,7 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
       if (!user?.loggedIn) {
         dispatch(
           // @ts-ignore
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,
             newProps: {

@@ -55,4 +55,5 @@ const globalReducersWithLocal = getReducerWithLocalStorageSync("root", reducer, 
   "rules.isSampleRulesImported",
 ]);
 
-export { actions as globalActions, globalReducersWithLocal as globalReducers };
+export const globalActions = actions;
+export const globalReducers = globalReducersWithLocal;

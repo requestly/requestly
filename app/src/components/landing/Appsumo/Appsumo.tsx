@@ -20,7 +20,7 @@ import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/tea
 import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { getAvailableTeams } from "store/features/teams/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import "./index.scss";
 
 interface AppSumoCode {
@@ -239,7 +239,7 @@ const AppSumoModal: React.FC = () => {
   }, [availableTeams]);
 
   useEffect(() => {
-    dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+    dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
   }, [dispatch]);
 
   return (

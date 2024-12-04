@@ -8,7 +8,7 @@ import { StorageService } from "../../../../init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 //REDUCER ACTIONS
-import { actions } from "../../../../store";
+import { globalActions } from "store/slices/global/slice";
 //UTILS
 import { submitAttrUtil } from "../../../../utils/AnalyticsUtils";
 import {
@@ -66,7 +66,7 @@ const RulesIndexPage = () => {
         if (isGroupsSanitizationPassedResult.success === false) {
           // Sanitization has updated the storage! but we dont need to fetch again as we have the updated copy
           stableDispatch(
-            actions.updateRulesAndGroups({
+            globalActions.updateRulesAndGroups({
               rules: isGroupsSanitizationPassedResult.updatedRules,
               groups,
             })
@@ -74,7 +74,7 @@ const RulesIndexPage = () => {
         } else {
           // Sanitization required doing nothing, so continue as it is
           stableDispatch(
-            actions.updateRulesAndGroups({
+            globalActions.updateRulesAndGroups({
               rules: isGroupsSanitizationPassedResult.updatedRules,
               groups,
             })

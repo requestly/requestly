@@ -4,7 +4,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import APP_CONSTANTS from "config/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentAnalyticsSource } from "features/apiClient/screens/environment/types";
 import "./emptyState.scss";
@@ -29,7 +29,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     if (!user.loggedIn) {
       dispatch(
         // @ts-ignore
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {

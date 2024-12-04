@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import Logger from "lib/logger";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { Tooltip } from "antd";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -30,7 +30,7 @@ const PremiumPlanBadge = () => {
   const handleBadgeClick = useCallback(() => {
     dispatch(
       // @ts-ignore
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "pricingModal",
         newValue: true,
         newProps: {

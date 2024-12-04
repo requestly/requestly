@@ -14,7 +14,7 @@ import {
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { ImportCollectionsModal } from "../../../modals/importCollectionsModal/ImportCollectionsModal";
@@ -55,7 +55,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         onClick: () => {
           if (!user.loggedIn) {
             dispatch(
-              actions.toggleActiveModal({
+              globalActions.toggleActiveModal({
                 modalName: "authModal",
                 newValue: true,
                 newProps: {
@@ -93,7 +93,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         if (!user.loggedIn) {
           dispatch(
             // @ts-ignore
-            actions.toggleActiveModal({
+            globalActions.toggleActiveModal({
               modalName: "authModal",
               newValue: true,
               newProps: {
@@ -124,7 +124,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         if (!user.loggedIn) {
           dispatch(
             // @ts-ignore
-            actions.toggleActiveModal({
+            globalActions.toggleActiveModal({
               modalName: "authModal",
               newValue: true,
               newProps: {
@@ -154,7 +154,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       onClick: () => {
         if (!user.loggedIn) {
           dispatch(
-            actions.toggleActiveModal({
+            globalActions.toggleActiveModal({
               modalName: "authModal",
               newValue: true,
               newProps: {

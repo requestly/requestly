@@ -13,7 +13,7 @@ import {
 import { useCallback, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { isValidUrl } from "utils/FormattingHelper";
 import { redirectToSessionSettings } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
@@ -69,7 +69,7 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
       eventPage: "session_recording_page",
     };
     // @ts-ignore
-    dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
+    dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
     trackInstallExtensionDialogShown({ src: "sessions_home_page" });
   }, [dispatch]);
 

@@ -11,7 +11,7 @@ import { EditableCell, EditableRow } from "./components/customTableRow/CustomTab
 import { toast } from "utils/Toast";
 import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../types";
 import { trackAddVariableClicked, trackVariableValueUpdated } from "../../analytics";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import "./variablesList.scss";
 
@@ -161,7 +161,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   const handleAddVariable = () => {
     if (!user.loggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {

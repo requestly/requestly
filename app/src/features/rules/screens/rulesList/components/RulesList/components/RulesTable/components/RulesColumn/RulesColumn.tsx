@@ -11,7 +11,7 @@ import { useTheme } from "styled-components";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackNewRuleButtonClicked } from "modules/analytics/events/common/rules";
 import { useDispatch } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackSampleRuleEditorViewed } from "features/rules/analytics";
 
 const RuleNameColumn: React.FC<{
@@ -46,7 +46,7 @@ const RuleNameColumn: React.FC<{
             }
 
             //@ts-ignore
-            dispatch(actions.updateSecondarySidebarCollapse(false));
+            dispatch(globalActions.updateSecondarySidebarCollapse(false));
           }}
         >
           <div className="rule-name-wrapper">

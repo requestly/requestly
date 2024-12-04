@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Row, Typography } from "antd";
 import SpinnerColumn from "../SpinnerColumn";
 import { RQButton, RQInput } from "lib/design-system/components";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode } from "../../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -43,7 +43,7 @@ const SignInViaEmailLink = () => {
 
   const logOutUser = useCallback(() => {
     handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch).then(() => {
-      dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
+      dispatch(globalActions.updateRefreshPendingStatus({ type: "rules" }));
     });
   }, [appMode, dispatch, isWorkspaceMode]);
 
@@ -71,9 +71,9 @@ const SignInViaEmailLink = () => {
       }
       toast.success(message);
       if (isLogin) {
-        dispatch(actions.updateAppOnboardingCompleted());
+        dispatch(globalActions.updateAppOnboardingCompleted());
       } else {
-        dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+        dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
         trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
       }
       redirectToRoot(navigate);

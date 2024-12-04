@@ -18,7 +18,7 @@ import { sessionRecordingActions } from "store/features/session-recording/slice"
 import PageError from "components/misc/PageError";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
 import { saveDraftSession, generateDraftSessionTitle } from "features/sessionBook/screens/DraftSessionScreen/utils";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import PATHS from "config/constants/sub/paths";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
@@ -211,7 +211,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
     if (!user?.loggedIn) {
       dispatch(
         // @ts-ignore
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
@@ -297,7 +297,10 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
               onClick={() => {
                 handleSaveDraftSession();
                 // @ts-ignore
-                actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" });
+                globalActions.updateProductTourCompleted({
+                  tour: TOUR_TYPES.MISCELLANEOUS,
+                  subTour: "firstDraftSession",
+                });
               }}
             >
               Save
@@ -311,7 +314,10 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
                 setIsSavePopupVisible((prev) => !prev);
                 dispatch(
                   // @ts-ignore
-                  actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" })
+                  globalActions.updateProductTourCompleted({
+                    tour: TOUR_TYPES.MISCELLANEOUS,
+                    subTour: "firstDraftSession",
+                  })
                 );
               }}
             >
@@ -356,7 +362,9 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
         startWalkthrough={!hasUserCreatedSessions && !isMiscTourCompleted?.firstDraftSession && !testRuleDraftSession}
         tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_DRAFT_SESSION}
         onTourComplete={() =>
-          dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" }))
+          dispatch(
+            globalActions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" })
+          )
         }
       />
     </div>

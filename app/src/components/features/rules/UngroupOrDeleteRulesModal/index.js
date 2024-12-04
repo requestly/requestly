@@ -6,7 +6,7 @@ import { StorageService } from "../../../../init";
 import { getAppMode, getGroupwiseRulesToPopulate, getIsRefreshRulesPending } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import APP_CONSTANTS from "config/constants";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { toast } from "utils/Toast.js";
 import { deleteGroup } from "../RulesListContainer/RulesTable/actions";
 import { deleteGroupsFromStorage, deleteRulesFromStorage } from "../DeleteRulesModal/actions";
@@ -66,7 +66,7 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
             callback && callback();
             // Refresh the rules list
             dispatch(
-              actions.updateRefreshPendingStatus({
+              globalActions.updateRefreshPendingStatus({
                 type: "rules",
                 newValue: !isRulesListRefreshPending,
               })
@@ -116,7 +116,7 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
     };
 
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {
@@ -141,7 +141,7 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
 
     handleRecordsDeletion(user?.details?.profile?.uid).then(() => {
       //Refresh List
-      dispatch(actions.updateHardRefreshPendingStatus({ type: "rules" }));
+      dispatch(globalActions.updateHardRefreshPendingStatus({ type: "rules" }));
       // Notify user
       toast.success("Group deleted");
       toggle();

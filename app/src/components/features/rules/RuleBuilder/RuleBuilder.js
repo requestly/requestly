@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import isEmpty from "is-empty";
 import { Col, Row } from "antd";
-import { actions } from "../../../../../../app/src/store";
+import { globalActions } from "store/slices/global/slice";
 import Body from "./Body";
 import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import SpinnerCard from "../../../misc/SpinnerCard";
@@ -176,7 +176,7 @@ const RuleBuilder = (props) => {
       .then((rules) => {
         //Set Flag to prevent loop
         setFetchAllRulesComplete(true);
-        dispatch(actions.updateRulesAndGroups({ rules, groups: [] }));
+        dispatch(globalActions.updateRulesAndGroups({ rules, groups: [] }));
       });
   }
 

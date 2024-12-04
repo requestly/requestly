@@ -19,7 +19,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
 import Logger from "lib/logger";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackHomeRulesActionClicked } from "components/Home/analytics";
 import {
   trackNewRuleButtonClicked,
@@ -168,7 +168,7 @@ export const RulesCard: React.FC = () => {
                       setIsRulesDrawerOpen(true);
                     } else {
                       // @ts-ignore
-                      dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
+                      dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
                     }
                   }}
                 >

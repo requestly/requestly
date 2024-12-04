@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { capitalize } from "lodash";
 import { Badge } from "antd";
@@ -19,7 +19,7 @@ export const PlanExpiredBadge = () => {
           trackRenewNowClicked("header");
           dispatch(
             // @ts-ignore
-            actions.toggleActiveModal({
+            globalActions.toggleActiveModal({
               modalName: "pricingModal",
               newValue: true,
               newProps: { selectedPlan: null, source: "header_renew_button" },

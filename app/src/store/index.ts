@@ -12,9 +12,7 @@ import { billingReducer } from "./features/billing/slice";
 import { harPreviewReducer } from "./features/network-sessions/slice";
 import { environmentVariablesReducer } from "./features/environment/slice";
 
-import { globalActions, globalReducers } from "./slices/global/slice";
-
-export const actions = globalActions;
+import { globalReducers } from "./slices/global/slice";
 
 export const reduxStore = configureStore({
   reducer: {

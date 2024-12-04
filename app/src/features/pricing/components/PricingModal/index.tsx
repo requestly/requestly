@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Col, Modal, Row, Switch, Typography } from "antd";
 import { useDispatch } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { PricingTable, PRICING } from "features/pricing";
 import { CompaniesSection } from "../CompaniesSection";
 import { CloseOutlined } from "@ant-design/icons";
@@ -120,7 +120,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
               setIsCheckoutScreenVisible(false);
               // remount the modal so to reset the selectedPlan
               dispatch(
-                actions.toggleActiveModal({
+                globalActions.toggleActiveModal({
                   modalName: "pricingModal",
                   newValue: true,
                   newProps: {

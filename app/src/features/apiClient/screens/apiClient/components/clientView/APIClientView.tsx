@@ -24,7 +24,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../../../constants";
@@ -206,7 +206,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         eventPage: "api_client",
       };
       // @ts-ignore
-      dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
+      dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
       trackInstallExtensionDialogShown({ src: "api_client" });
       return;
     }

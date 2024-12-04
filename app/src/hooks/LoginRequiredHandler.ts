@@ -1,4 +1,4 @@
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
@@ -12,7 +12,7 @@ export const LoginRequiredHandler = (): null => {
     if (searchParams.has("loginRequired")) {
       dispatch(
         // @ts-ignore
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {

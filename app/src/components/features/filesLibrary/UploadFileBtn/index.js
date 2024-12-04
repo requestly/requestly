@@ -4,7 +4,7 @@ import { Button, Input } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 //ACTIONS
 import { handleFileInput } from "./actions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 //UTILS
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -24,7 +24,7 @@ const UploadFileBtn = ({ updateCollection, buttonType = "primary" }) => {
 
   const openAuthModal = useCallback(() => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {
