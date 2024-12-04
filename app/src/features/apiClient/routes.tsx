@@ -6,6 +6,7 @@ import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { EnvironmentView } from "./screens/environment/components/environmentView/EnvironmentView";
 import { EmptyEnvironmentView } from "./screens/environment/components/emptyEnvironmentView/EmptyEnvironmentView";
 import { EnvironmentContainer } from "./screens/environment/container";
+import { CollectionView } from "./screens/apiClient/components/clientView/components/Collection/CollectionView";
 
 export const apiClientRoutes: RouteObject[] = [
   {
@@ -33,11 +34,11 @@ export const apiClientRoutes: RouteObject[] = [
       },
       {
         path: PATHS.API_CLIENT.COLLECTION.INDEX,
-        element: <ProtectedRoute component={APIClient} />,
+        element: <ProtectedRoute component={CollectionView} />,
         handle: {
           breadcrumb: {
-            label: "Request", // TODO: Fix, change it to collection, when collection view is added
-            isEditable: false,
+            label: "Collection", // TODO: Fix, change it to collection, when collection view is added
+            isEditable: true,
           },
         },
       },

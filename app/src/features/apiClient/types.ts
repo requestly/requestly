@@ -1,3 +1,5 @@
+import { EnvironmentVariables } from "backend/environment/types";
+
 export enum RequestMethod {
   GET = "GET",
   POST = "POST",
@@ -76,6 +78,7 @@ export namespace RQAPI {
       preRequest: string;
       postResponse: string;
     };
+    variables: EnvironmentVariables;
   }
 
   interface RecordMetadata {

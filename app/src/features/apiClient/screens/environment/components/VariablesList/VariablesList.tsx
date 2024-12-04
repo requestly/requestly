@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { EnvironmentVariableValue, EnvironmentVariableType } from "backend/environment/types";
+import { EnvironmentVariableValue, EnvironmentVariableType, EnvironmentVariables } from "backend/environment/types";
 import { useVariablesListColumns } from "./hooks/useVariablesListColumns";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -16,18 +15,23 @@ import APP_CONSTANTS from "config/constants";
 import "./variablesList.scss";
 
 interface VariablesListProps {
-  searchValue: string;
-  currentEnvironmentId: string;
+  variables: EnvironmentVariables;
+  searchValue?: string;
+  setVariables: (variables: EnvironmentVariables) => Promise<unknown>;
+  removeVariable: (key: string) => Promise<unknown>;
 }
 
 export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string; id: number };
 
-export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, currentEnvironmentId }) => {
+export const VariablesList: React.FC<VariablesListProps> = ({
+  searchValue = "",
+  variables,
+  setVariables,
+  removeVariable,
+}) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const { getEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
   const [dataSource, setDataSource] = useState([]);
-  const variables = getEnvironmentVariables(currentEnvironmentId);
   const [visibleSecretsRowIds, setVisibleSecrets] = useState([]);
 
   const filteredDataSource = useMemo(
@@ -76,7 +80,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
             return acc;
           }, {});
 
-          setVariables(currentEnvironmentId, variablesToSave).then(() => {
+          setVariables(variablesToSave).then(() => {
             setDataSource(variableRows);
             if (fieldChanged === "syncValue" || fieldChanged === "localValue") {
               trackVariableValueUpdated(fieldChanged, EnvironmentAnalyticsContext.API_CLIENT, variableRows.length);
@@ -85,7 +89,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
         }
       }
     },
-    [dataSource, setVariables, currentEnvironmentId, user.loggedIn]
+    [dataSource, setVariables, user.loggedIn]
   );
 
   const handleAddNewRow = useCallback((dataSource: EnvironmentVariableTableRow[]) => {
@@ -104,7 +108,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
       const newData = key ? dataSource.filter((item) => item.key !== key) : dataSource.slice(0, -1);
 
       if (key) {
-        await removeVariable(currentEnvironmentId, key);
+        await removeVariable(key);
       }
 
       setDataSource(newData);
@@ -113,7 +117,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
         handleAddNewRow([]);
       }
     },
-    [dataSource, removeVariable, handleAddNewRow, currentEnvironmentId]
+    [dataSource, removeVariable, handleAddNewRow]
   );
 
   const handleUpdateVisibleSecretsRowIds = useCallback(

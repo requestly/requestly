@@ -11,6 +11,8 @@ import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
+import { redirectToCollection } from "utils/RedirectionUtils";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -19,6 +21,7 @@ interface Props {
 }
 
 export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportClick }) => {
+  const navigate = useNavigate();
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeKey, setActiveKey] = useState(record.id); // TODO: Persist collapse active keys for all rows
   const [createNewField, setCreateNewField] = useState(null);
@@ -78,11 +81,16 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
           onChange={(keys) => {
             setActiveKey(keys[0]);
           }}
+          collapsible={activeKey === record.id ? "icon" : "header"}
           defaultActiveKey={[record.id]}
           ghost
           className="collections-list-item collection"
           expandIcon={({ isActive }) => {
-            return isActive ? <PiFolderOpen /> : <MdOutlineFolder />;
+            return isActive ? (
+              <PiFolderOpen className="collection-expand-icon" />
+            ) : (
+              <MdOutlineFolder className="collection-expand-icon" />
+            );
           }}
         >
           <Collapse.Panel
@@ -92,6 +100,9 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                 className="collection-name-container"
                 onMouseEnter={setHoveredId.bind(this, record.id)}
                 onMouseLeave={setHoveredId.bind(this, "")}
+                onClick={() => {
+                  redirectToCollection(navigate, record.id);
+                }}
               >
                 <div className="collection-name" title={record.name}>
                   {record.name}
