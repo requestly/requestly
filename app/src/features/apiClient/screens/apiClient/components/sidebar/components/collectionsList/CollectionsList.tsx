@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -10,6 +11,7 @@ import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/ExportCollectionsModal";
 import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import PATHS from "config/constants/sub/paths";
 import "./collectionsList.scss";
 
 interface Props {
@@ -25,6 +27,7 @@ export const CollectionsList: React.FC<Props> = ({
   isNewRecordNameInputVisible,
   hideNewRecordNameInput,
 }) => {
+  const location = useLocation();
   const { openTab } = useTabsLayoutContext();
   const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
@@ -60,6 +63,39 @@ export const CollectionsList: React.FC<Props> = ({
     trackExportCollectionsClicked();
     setIsExportModalOpen(true);
   }, []);
+
+  const hasOpenedDefaultTab = useRef(false);
+
+  useEffect(() => {
+    if (location.pathname === PATHS.API_CLIENT.ABSOLUTE) {
+      // TODO: Improve logic
+      hasOpenedDefaultTab.current = false;
+    }
+
+    if (isLoadingApiClientRecords) {
+      return;
+    }
+
+    if (hasOpenedDefaultTab.current) {
+      return;
+    }
+
+    hasOpenedDefaultTab.current = true;
+
+    if (updatedRecords.requests.length === 0) {
+      const recordId = "request/new";
+      openTab(recordId, {
+        title: "Untitled request",
+        url: `${PATHS.API_CLIENT.ABSOLUTE}/request/new`,
+      });
+    } else {
+      const recordId = updatedRecords.requests[0].id;
+      openTab(recordId, {
+        title: updatedRecords.requests[0].name,
+        url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${recordId}`,
+      });
+    }
+  }, [updatedRecords.requests, isLoadingApiClientRecords, openTab, location.pathname]);
 
   return (
     <>
