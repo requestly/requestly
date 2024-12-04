@@ -14,7 +14,7 @@ type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
 interface KeyValueTableProps {
   data: KeyValuePair[];
   pairType: KeyValueFormType;
-  setKeyValuePairs: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
+  setKeyValuePairs: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry, isInit?: boolean) => void;
 }
 
 // TODO: REFACTOR TYPES
@@ -76,11 +76,14 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
     []
   );
 
-  const handleAddPair = useCallback(() => {
-    const newPair = createEmptyPair();
-    setTableData((prev) => [...prev, newPair]);
-    setKeyValuePairs((prev) => handleUpdateRequestPairs(prev, pairType, "add", newPair));
-  }, [setKeyValuePairs, createEmptyPair, pairType, handleUpdateRequestPairs]);
+  const handleAddPair = useCallback(
+    (isInitPair = false) => {
+      const newPair = createEmptyPair();
+      setTableData((prev) => [...prev, newPair]);
+      setKeyValuePairs((prev) => handleUpdateRequestPairs(prev, pairType, "add", newPair), isInitPair);
+    },
+    [setKeyValuePairs, createEmptyPair, pairType, handleUpdateRequestPairs]
+  );
 
   const handleDeletePair = useCallback(
     (pair: KeyValuePair) => {
@@ -93,7 +96,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
 
   useEffect(() => {
     if (tableData.length === 0) {
-      handleAddPair();
+      handleAddPair(true);
     }
   }, [tableData, handleAddPair]);
 
@@ -181,7 +184,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
       scroll={{ x: true }}
       footer={() => (
         <div className="api-key-value-table-footer">
-          <RQButton icon={<MdAdd />} size="small" onClick={handleAddPair}>
+          <RQButton icon={<MdAdd />} size="small" onClick={() => handleAddPair(false)}>
             Add More
           </RQButton>
         </div>

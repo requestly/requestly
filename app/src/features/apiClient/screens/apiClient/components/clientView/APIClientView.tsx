@@ -23,7 +23,7 @@ import {
   trackRequestRenamed,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { unstable_usePrompt, useLocation, useNavigate } from "react-router-dom";
 import { actions } from "store";
 import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -79,16 +79,24 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
+  // TODO: Remove this once tabs view is implemented
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const animationTimerRef = useRef<NodeJS.Timeout>();
+
+  unstable_usePrompt({
+    when: hasUnsavedChanges,
+    message: "You have unsaved changes. Are you sure you want to leave?",
+  });
 
   useEffect(() => {
     if (apiEntry) {
       clearTimeout(animationTimerRef.current);
       // setIsAnimating(true);
       setEntry(apiEntry);
+      setHasUnsavedChanges(false);
       setRequestName("");
       animationTimerRef.current = setTimeout(() => setIsAnimating(false), 500);
     }
@@ -106,6 +114,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         url,
       },
     }));
+    setHasUnsavedChanges(true);
   }, []);
 
   const setMethod = useCallback((method: RequestMethod) => {
@@ -125,10 +134,15 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       }
       return newEntry;
     });
+    setHasUnsavedChanges(true);
   }, []);
 
-  const setRequestEntry = useCallback((updater: (prev: RQAPI.Entry) => RQAPI.Entry) => {
+  const setRequestEntry = useCallback((updater: (prev: RQAPI.Entry) => RQAPI.Entry, isInit = false) => {
+    // Added isInit to avoid setting hasUnsavedChanges to true when an empty key value pair is added in params and headers
     setEntry((prev) => updater(prev));
+    if (!isInit) {
+      setHasUnsavedChanges(true);
+    }
   }, []);
 
   const setContentType = useCallback((contentType: RequestContentType) => {
@@ -164,6 +178,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
       return newEntry;
     });
+    setHasUnsavedChanges(true);
   }, []);
 
   const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => {
@@ -313,9 +328,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
-      setEntry({ ...result.data.data });
-      // updateTab(requestDetails.id, { hasUnsavedChanges: false, data: requestDetails });
-
+      setHasUnsavedChanges(false);
       trackRequestSaved("api_client_view");
       if (location.pathname.includes("history")) {
         navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`);
@@ -413,7 +426,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                     onClick={onSaveButtonClick}
                     loading={isRequestSaving}
                   >
-                    Save
+                    Save {hasUnsavedChanges ? "*" : ""}
                   </RQButton>
                 ) : null}
               </div>
