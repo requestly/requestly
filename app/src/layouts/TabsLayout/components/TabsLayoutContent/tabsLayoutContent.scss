@@ -1,5 +1,8 @@
 .tabs-layout-container {
+  flex: auto;
   width: 100%;
+  height: 100%;
+  overflow-y: hidden;
 
   .ant-tabs,
   .ant-tabs-content-holder {
@@ -13,6 +16,13 @@
 
   .ant-tabs-nav {
     margin-bottom: 0;
+
+    .ant-tabs-nav-operations {
+      .ant-tabs-nav-more {
+        cursor: pointer;
+        padding: 1px 8px;
+      }
+    }
   }
 
   .ant-tabs-nav-wrap {
@@ -97,6 +107,25 @@
       .tab-close-button {
         transform: scale(1);
         display: flex;
+      }
+    }
+  }
+}
+
+.tabs-layout-more-dropdown {
+  .ant-tabs-dropdown-menu {
+    .ant-tabs-dropdown-menu-item {
+      .tab-title-container {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .tab-actions {
+        margin-left: auto;
       }
     }
   }
