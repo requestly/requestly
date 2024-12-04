@@ -15,4 +15,5 @@ export const environmentVariablesActions = actions;
 export const environmentVariablesReducer = getReducerWithLocalStorageSync(ReducerKeys.ENVIRONMENT, reducer, [
   "currentEnvironment",
   "environments",
+  "api_collections",
 ]);
