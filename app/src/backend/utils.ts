@@ -23,3 +23,13 @@ export const generateDocumentId = (path: string) => {
   const newDocRef = doc(collection(db, path));
   return newDocRef.id;
 };
+
+export const batchWrite = async (batchSize: number, items: any[], writeFunction: (item: any) => Promise<any>) => {
+  const results = [];
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    const batchResults = await Promise.allSettled(batch.map(writeFunction));
+    results.push(...batchResults);
+  }
+  return results;
+};
