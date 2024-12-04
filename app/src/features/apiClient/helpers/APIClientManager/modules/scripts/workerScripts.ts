@@ -12,6 +12,11 @@ export const requestWorkerFunction = function (e: MessageEvent) {
     },
   };
 
+  const logDummyErrorMessage = () => {
+    console.log("This Method is not supported.");
+    return undefined;
+  };
+
   const sandbox = {
     rq: {
       request,
@@ -27,6 +32,35 @@ export const requestWorkerFunction = function (e: MessageEvent) {
           mutations.environment.$unset[key] = "";
         },
       },
+      variables: new Proxy(
+        {},
+        {
+          get: () => logDummyErrorMessage,
+        }
+      ),
+
+      globals: new Proxy(
+        {},
+        {
+          get: () => logDummyErrorMessage,
+        }
+      ),
+
+      collectionVariables: new Proxy(
+        {},
+        {
+          get: () => logDummyErrorMessage,
+        }
+      ),
+
+      test: () => logDummyErrorMessage,
+      expect: () =>
+        new Proxy(
+          {},
+          {
+            get: () => logDummyErrorMessage,
+          }
+        ),
     },
   };
 

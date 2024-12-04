@@ -222,6 +222,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     abortControllerRef.current = new AbortController();
 
     setIsFailed(false);
+    setErrorMessage(null);
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
