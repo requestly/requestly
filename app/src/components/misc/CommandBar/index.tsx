@@ -9,7 +9,7 @@ import { Footer } from "./Footer";
 import { getAppMode, getUserAttributes, getIsCommandBarOpen } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAllRules } from "store/features/rules/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import {
   trackCommandPaletteClosed,
   trackCommandPaletteOpened,
@@ -40,12 +40,12 @@ export const CommandBar = () => {
     const down = (e: any) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        dispatch(actions.updateIsCommandBarOpen(!isCommandBarOpen));
+        dispatch(globalActions.updateIsCommandBarOpen(!isCommandBarOpen));
       }
     };
     const exit = (e: any) => {
       if (e.key === "Escape") {
-        dispatch(actions.updateIsCommandBarOpen(false));
+        dispatch(globalActions.updateIsCommandBarOpen(false));
         trackCommandPaletteClosed();
       }
     };
@@ -117,7 +117,7 @@ export const CommandBar = () => {
               item.action({ navigate, dispatch, user, appMode, rules });
               trackCommandPaletteOptionSelected(item.id.split(" ").join("_"));
               trackCommandPaletteClosed();
-              dispatch(actions.updateIsCommandBarOpen(false));
+              dispatch(globalActions.updateIsCommandBarOpen(false));
             }
 
             if (item?.nextPage) {
@@ -154,7 +154,7 @@ export const CommandBar = () => {
         <div
           className="cmdk-overlay"
           onClick={() => {
-            dispatch(actions.updateIsCommandBarOpen(false));
+            dispatch(globalActions.updateIsCommandBarOpen(false));
             trackCommandPaletteClosed();
           }}
         >

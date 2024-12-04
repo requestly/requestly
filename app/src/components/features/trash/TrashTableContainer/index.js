@@ -8,7 +8,7 @@ import { toast } from "utils/Toast";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../config/constants";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import ProCard from "@ant-design/pro-card";
 import ProTable from "@ant-design/pro-table";
 import { DeleteOutlined, ImportOutlined } from "@ant-design/icons";
@@ -62,7 +62,7 @@ const TrashTableContainer = ({ records, updateTrash }) => {
       newSelectedRulesObject[ruleId] = true;
     });
 
-    dispatch(actions.updateSelectedRules(newSelectedRulesObject));
+    dispatch(globalActions.updateSelectedRules(newSelectedRulesObject));
   };
 
   const rowSelection = {
@@ -103,7 +103,7 @@ const TrashTableContainer = ({ records, updateTrash }) => {
           updateTrash(selectedRules);
           toast.info(`Restored the ${selectedRules.length > 1 ? "rules" : "rule"}`);
           trackTrashRulesRecovered(selectedRules.length);
-          dispatch(actions.addRulesAndGroups({ rules: selectedRules, groups: [] }));
+          dispatch(globalActions.addRulesAndGroups({ rules: selectedRules, groups: [] }));
         }
         trackRQLastActivity("rules_recovered_from_trash");
 

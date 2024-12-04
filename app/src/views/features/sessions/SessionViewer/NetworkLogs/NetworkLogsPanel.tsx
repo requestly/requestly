@@ -2,8 +2,8 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Empty, Typography, Row } from "antd";
 import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
-import { actions } from "store";
-import { getActiveModals } from "store/selectors";
+import { globalActions } from "store/slices/global/slice";
+import { getActiveModals } from "store/slices/global/modals/selectors";
 import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
 import { RQNetworkTable, RQNetworkTableProps } from "lib/design-system/components/RQNetworkTable";
 import { APIClient, APIClientRequest } from "features/apiClient/components/common/APIClient";
@@ -43,7 +43,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
       };
 
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           newValue: true,
           modalName: "ruleEditorModal",
           newProps: { ruleData, ruleType: key },
@@ -58,7 +58,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
 
   const handleCloseRuleEditorModal = useCallback(() => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         newValue: false,
         modalName: "ruleEditorModal",
       })

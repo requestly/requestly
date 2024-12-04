@@ -12,7 +12,7 @@ import { parseGravatarImage } from "utils/Misc";
 import { toast } from "utils/Toast";
 import { trackTeamPlanBannerClicked, trackTeamPlanBannerViewed } from "modules/analytics/events/common/teams";
 import { useFeatureValue } from "@growthbook/growthbook-react";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import Logger from "lib/logger";
 import { capitalize } from "lodash";
 import "./appNotificationBanner.scss";
@@ -80,7 +80,7 @@ export const OrgNotificationBanner = () => {
   const handleCloseBannerClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(actions.updateIsOrgBannerDismissed(true));
+    dispatch(globalActions.updateIsOrgBannerDismissed(true));
   };
 
   const sendRequestEmail = useCallback(() => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -28,7 +28,7 @@ const RulesBackup = () => {
   const handleBackupEnabled = (status) => {
     if (!user.loggedIn || !user.details || !user.details.profile) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {

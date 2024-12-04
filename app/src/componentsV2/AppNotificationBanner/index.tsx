@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { RQButton } from "lib/design-system/components";
 import { useDispatch } from "react-redux";
 import { isAppOpenedInIframe } from "utils/AppUtils";
@@ -66,14 +66,14 @@ export const AppNotificationBanner = () => {
         label: "upgrade",
         type: "primary",
         onClick: () => {
-          dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
+          dispatch(globalActions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
         },
       },
       [BANNER_ACTIONS.CLAIM_NOW]: {
         label: "Claim now!",
         type: "primary",
         onClick: () => {
-          dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
+          dispatch(globalActions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
         },
       },
       [BANNER_ACTIONS.CONTACT_US]: {
@@ -127,30 +127,30 @@ export const AppNotificationBanner = () => {
       switch (bannerId) {
         case BANNER_ID.COMMERCIAL_LICENSE: {
           if (!user.details?.isPremium) {
-            dispatch(actions.updateIsAppBannerVisible(true));
+            dispatch(globalActions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
         }
         case BANNER_ID.REQUEST_TEAM_ACCESS: {
           if (billingTeams?.length && !billingTeams?.some((team) => user?.details?.profile?.uid in team.members)) {
-            dispatch(actions.updateIsAppBannerVisible(true));
+            dispatch(globalActions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
         }
         case BANNER_ID.ACCELERATOR_PROGRAM: {
           if (!user.details?.isPremium && !billingTeams?.length && user.loggedIn) {
-            dispatch(actions.updateIsAppBannerVisible(true));
+            dispatch(globalActions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
         }
         case BANNER_ID.BLACK_FRIDAY: {
           if (!user.details?.isPremium) {
-            dispatch(actions.updateIsAppBannerVisible(true));
+            dispatch(globalActions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
         }
         default: {
-          dispatch(actions.updateIsAppBannerVisible(true));
+          dispatch(globalActions.updateIsAppBannerVisible(true));
           return true;
         }
       }
@@ -170,8 +170,8 @@ export const AppNotificationBanner = () => {
   const handleCloseBannerClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(actions.updateIsAppBannerVisible(false));
-    dispatch(actions.updateAppNotificationBannerDismissTs(new Date().getTime()));
+    dispatch(globalActions.updateIsAppBannerVisible(false));
+    dispatch(globalActions.updateAppNotificationBannerDismissTs(new Date().getTime()));
   };
 
   useEffect(() => {
