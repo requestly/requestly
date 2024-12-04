@@ -2,6 +2,8 @@ import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCi
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Dropdown, Input, Tooltip, Typography } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import PATHS from "config/constants/sub/paths";
+import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -13,6 +15,8 @@ interface EnvironmentsListItemProps {
     id: string;
     name: string;
   };
+
+  openTab: TabsLayoutContextInterface["openTab"];
 }
 
 export enum EnvironmentMenuKey {
@@ -21,7 +25,7 @@ export enum EnvironmentMenuKey {
   DELETE = "delete",
 }
 
-export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ environment }) => {
+export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ environment, openTab }) => {
   const navigate = useNavigate();
   const { envId } = useParams();
   const { getCurrentEnvironment, renameEnvironment, duplicateEnvironment, deleteEnvironment } = useEnvironmentManager();
@@ -103,6 +107,10 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
       className={`environments-list-item ${environment.id === envId ? "active" : ""}`}
       onClick={() => {
         redirectToEnvironment(navigate, environment.id);
+        openTab(environment.id, {
+          title: environment.name,
+          url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environment.id}`,
+        });
       }}
     >
       <div className="environments-list-item__label">

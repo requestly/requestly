@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { Input } from "antd";
 import { upsertApiRecord } from "backend/apiClient";
@@ -17,6 +17,8 @@ import {
   trackCollectionRenamed,
   trackRequestSaved,
 } from "modules/analytics/events/features/apiClient";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
+import PATHS from "config/constants/sub/paths";
 
 export interface NewRecordNameInputProps {
   recordToBeEdited?: RQAPI.Record;
@@ -33,12 +35,14 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
   newRecordCollectionId,
   analyticEventSource = "",
 }) => {
+  const { requestId } = useParams();
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
   const { onSaveRecord } = useApiClientContext();
+  const { replaceTab } = useTabsLayoutContext();
 
   const defaultRecordName = recordType === RQAPI.RecordType.API ? "Untitled request" : "New collection";
   const [recordName, setRecordName] = useState(recordToBeEdited?.name || defaultRecordName);
@@ -78,7 +82,14 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
       if (recordType === RQAPI.RecordType.API) {
         trackRequestSaved(analyticEventSource);
-        redirectToRequest(navigate, result.data.id);
+
+        if (requestId === "new") {
+          replaceTab("request/new", {
+            id: result.data.id,
+            title: result.data.name,
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`,
+          });
+        }
       } else {
         trackCollectionSaved(analyticEventSource);
       }
@@ -99,9 +110,10 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     onSaveRecord,
     defaultRecordName,
     analyticEventSource,
-    navigate,
     newRecordCollectionId,
     onSuccess,
+    replaceTab,
+    requestId,
   ]);
 
   const updateRecord = useCallback(async () => {
