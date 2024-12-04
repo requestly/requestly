@@ -3,7 +3,7 @@ import { Typography, Dropdown, MenuProps } from "antd";
 import PATHS from "config/constants/sub/paths";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RQAPI } from "features/apiClient/types";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
+import { redirectToRequest } from "utils/RedirectionUtils";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -23,21 +24,30 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
   const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const teamId = useSelector(getCurrentlyActiveWorkspace);
+  const navigate = useNavigate();
 
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
       const newRecord = {
         ...record,
-        name: `${record.name} (Copy)`,
+        name: `(Copy) ${record.name || record.data.request.url}`,
       };
       delete newRecord.id;
-      const result = await upsertApiRecord(user?.details?.profile?.uid, newRecord, teamId);
-      if (result.success) {
-        onSaveRecord(result.data);
-        toast.success("Request duplicated successfully");
-      }
+      return upsertApiRecord(user?.details?.profile?.uid, newRecord, teamId)
+        .then((result) => {
+          if (!result.success) {
+            throw new Error("Failed to duplicate request");
+          }
+          onSaveRecord(result.data);
+          redirectToRequest(navigate, result.data.id);
+          toast.success("Request duplicated successfully");
+        })
+        .catch((error) => {
+          console.error("Error duplicating request:", error);
+          toast.error(error.message || "Unexpected error. Please contact support.");
+        });
     },
-    [teamId, user?.details?.profile?.uid, onSaveRecord]
+    [teamId, user?.details?.profile?.uid, onSaveRecord, navigate]
   );
 
   const getRequestOptions = useCallback((): MenuProps["items"] => {
