@@ -1,4 +1,4 @@
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getAndUpdateInstallationDate } from "utils/Misc";
 import { Option, SurveyPage, UserPersona } from "./types";
 import { getValueAsPromise, setValue } from "actions/FirebaseActions";
@@ -49,7 +49,7 @@ export const syncUserPersona = async (uid: string, dispatch: any, userPersona: U
     setValue(["users", uid, "persona"], { ...surveyData });
   } else {
     delete persona.isSurveyCompleted; // disable syncing this for existing users
-    dispatch(actions.setUserPersonaData({ ...persona }));
+    dispatch(globalActions.setUserPersonaData({ ...persona }));
   }
 };
 

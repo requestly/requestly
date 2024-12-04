@@ -1,6 +1,6 @@
 import APP_CONSTANTS from "config/constants";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { AiOutlineFolderOpen } from "@react-icons/all-files/ai/AiOutlineFolderOpen";
 import { AiFillYoutube } from "@react-icons/all-files/ai/AiFillYoutube";
 import { BsHandbag } from "@react-icons/all-files/bs/BsHandbag";
@@ -45,7 +45,7 @@ export const config: PageConfig[] = [
             title: "Switch workspace",
             icon: <BiShuffle />,
             action: ({ dispatch }) =>
-              dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: true })),
+              dispatch(globalActions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: true })),
           },
           {
             id: "join workspace",
@@ -53,7 +53,7 @@ export const config: PageConfig[] = [
             icon: <IoPersonAddOutline />,
             action: ({ dispatch }) =>
               dispatch(
-                actions.toggleActiveModal({
+                globalActions.toggleActiveModal({
                   modalName: "joinWorkspaceModal",
                   newValue: true,
                   newProps: { source: "command_bar" },
@@ -66,7 +66,7 @@ export const config: PageConfig[] = [
             icon: <HiOutlineUserGroup />,
             action: ({ dispatch }) =>
               dispatch(
-                actions.toggleActiveModal({
+                globalActions.toggleActiveModal({
                   modalName: "createWorkspaceModal",
                   newValue: true,
                   newProps: {

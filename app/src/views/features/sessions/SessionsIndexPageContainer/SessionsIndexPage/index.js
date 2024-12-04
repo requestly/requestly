@@ -22,7 +22,7 @@ import ShareRecordingModal from "../../ShareRecordingModal";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import RecordingsList from "./RecordingsList";
 import OnboardingView, { SessionOnboardingView } from "./OnboardingView";
-import { actions } from "../../../../../store";
+import { globalActions } from "store/slices/global/slice";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getOwnerId } from "backend/utils";
@@ -130,7 +130,7 @@ const SessionsIndexPage = () => {
   const redirectToSettingsPage = useCallback(() => {
     if (!user?.loggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
@@ -180,7 +180,7 @@ const SessionsIndexPage = () => {
   const toggleImportSessionModal = useCallback(() => {
     if (!user?.loggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {

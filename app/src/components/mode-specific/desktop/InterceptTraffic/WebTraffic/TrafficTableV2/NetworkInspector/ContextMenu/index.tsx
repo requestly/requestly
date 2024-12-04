@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
 import { copyToClipBoard } from "../../../../../../../../utils/Misc";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { RuleType } from "types";
 import { getIsTrafficTableTourCompleted } from "store/selectors";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
@@ -35,7 +35,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
   const handleOnClick = useCallback(
     (menuInfo: Parameters<MenuProps["onClick"]>[0], log: any) => {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           newValue: true,
           modalName: "ruleEditorModal",
           newProps: {
@@ -156,7 +156,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
       trackTrafficTableRequestRightClicked();
       trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_RIGHT_CLICKED);
       if (!isTrafficTableTourCompleted) {
-        dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }));
+        dispatch(globalActions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }));
         trackWalkthroughCompleted(FEATURES.DESKTOP_APP_TRAFFIC_TABLE);
       }
     }

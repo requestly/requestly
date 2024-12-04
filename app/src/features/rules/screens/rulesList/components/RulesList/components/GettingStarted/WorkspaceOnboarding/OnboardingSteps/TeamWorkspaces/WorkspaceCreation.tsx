@@ -23,7 +23,7 @@ import {
   trackAddTeamMemberSuccess,
   trackNewTeamCreateSuccess,
 } from "modules/analytics/events/features/teams";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { NewTeamData, OnboardingSteps } from "../../types";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
@@ -96,7 +96,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
                 ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
                 : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
             });
-            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+            dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
           }
           setIsProcessing(false);
           switchWorkspace(
@@ -133,7 +133,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
         handleAddMembers(newWorkspaceName, response?.data?.teamId);
       } else {
         setIsProcessing(false);
-        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+        dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
       }
       trackNewTeamCreateSuccess(response?.data?.teamId, newWorkspaceName, "onboarding");
       switchWorkspace(
@@ -247,7 +247,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           type="text"
           onClick={() => {
             trackOnboardingWorkspaceSkip(OnboardingSteps.CREATE_JOIN_WORKSPACE);
-            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+            dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
           }}
         >
           Skip for now

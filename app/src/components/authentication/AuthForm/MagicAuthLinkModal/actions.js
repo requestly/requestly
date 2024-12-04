@@ -1,4 +1,4 @@
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 let interval = null;
 export function updateTimeToResendEmailLogin(dispatch, time) {
@@ -11,7 +11,7 @@ export function updateTimeToResendEmailLogin(dispatch, time) {
 
   interval = setInterval(() => {
     timeLeft--;
-    dispatch(actions.updateTimeToResendEmailLogin(timeLeft));
+    dispatch(globalActions.updateTimeToResendEmailLogin(timeLeft));
     if (timeLeft === 0) {
       clearInterval(interval);
     }

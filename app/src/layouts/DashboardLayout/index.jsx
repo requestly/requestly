@@ -12,7 +12,7 @@ import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { AppNotificationBanner } from "../../componentsV2/AppNotificationBanner";
 import { httpsCallable, getFunctions } from "firebase/functions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
 import SupportPanel from "components/misc/SupportPanel";
@@ -54,7 +54,7 @@ const DashboardLayout = () => {
       try {
         getEnterpriseAdminDetails().then((response) => {
           if (response.data.success) {
-            dispatch(actions.updateOrganizationDetails(response.data.enterpriseData));
+            dispatch(globalActions.updateOrganizationDetails(response.data.enterpriseData));
           }
         });
       } catch (e) {

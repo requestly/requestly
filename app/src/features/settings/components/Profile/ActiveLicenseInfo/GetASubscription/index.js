@@ -5,7 +5,7 @@ import { Button, Space } from "antd";
 // UTILS
 // CONSTANTS
 import APP_CONSTANTS from "../../../../../../config/constants";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
 
 const GetASubscription = ({ hideShadow }) => {
@@ -22,7 +22,7 @@ const GetASubscription = ({ hideShadow }) => {
                   type="primary"
                   onClick={() => {
                     dispatch(
-                      actions.toggleActiveModal({
+                      globalActions.toggleActiveModal({
                         modalName: "pricingModal",
                         newValue: true,
                         newProps: { selectedPlan: null, source: "my_profile" },

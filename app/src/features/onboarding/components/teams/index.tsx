@@ -11,7 +11,7 @@ import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/tea
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import Logger from "lib/logger";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { OnboardingLoader } from "../loader";
 import { isNull } from "lodash";
 import { trackAppOnboardingTeamsViewed, trackAppOnboardingViewed } from "features/onboarding/analytics";
@@ -66,7 +66,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
       else {
         if (!appOnboardingDetails.createdWorkspace) {
           if (isTeamExist) {
-            dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+            dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
             setIsLoading(false);
             return;
           }
@@ -79,7 +79,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
             .then((response: any) => {
               trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "app_onboarding", false);
               handleSwitchWorkspace(response?.data?.teamId, newTeamName);
-              dispatch(actions.updateAppOnboardingTeamDetails({ name: newTeamName, ...response?.data }));
+              dispatch(globalActions.updateAppOnboardingTeamDetails({ name: newTeamName, ...response?.data }));
               setIsLoading(false);
             })
             .catch((e) => {
@@ -108,7 +108,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
 
     if (!isCompanyEmail(user?.details?.profile?.email) || !user?.details?.profile?.isEmailVerified) {
       setIsLoading(false);
-      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
       return;
     }
 

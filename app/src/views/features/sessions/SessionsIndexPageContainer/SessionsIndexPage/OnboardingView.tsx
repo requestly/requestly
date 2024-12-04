@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { CheckOutlined, SettingOutlined } from "@ant-design/icons";
 import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
 import { Button, Divider, Input, Row, Col, Typography, InputRef, Space } from "antd";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActions";
 import { isValidUrl } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
@@ -132,7 +132,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
         "Safely capture mouse movement, console, network & environment data automatically on your device for sharing and debugging. Private and secure, works locally on your browser.",
       eventPage: "session_recording_page",
     };
-    dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
+    dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
     trackInstallExtensionDialogShown({ src: "sessions_home_page" });
   }, [dispatch]);
 
