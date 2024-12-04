@@ -19,17 +19,19 @@ export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
         <div title={tab.title} className="tab-title-container">
           <div className="tab-title">{tab.title}</div>
 
-          <RQButton
-            size="small"
-            type="transparent"
-            // className="tab-close-button"
-            onClick={(e) => {
-              e.stopPropagation();
-              closeTab(tab.id);
-            }}
-            icon={<MdClose />}
-          />
-          {tab.hasUnsavedChanges ? <div className="unsaved-changes-indicator" /> : null}
+          <div className="tab-actions">
+            <RQButton
+              size="small"
+              type="transparent"
+              // className="tab-close-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                closeTab(tab.id);
+              }}
+              icon={<MdClose />}
+            />
+            {tab.hasUnsavedChanges ? <div className="unsaved-changes-indicator" /> : null}
+          </div>
         </div>
       ),
       children: <Outlet key={tab.id} />,
@@ -43,6 +45,7 @@ export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
           hideAdd
           activeKey={activeTab?.id}
           destroyInactiveTabPane={false}
+          popupClassName="tabs-layout-more-dropdown"
           items={items}
           onChange={(activeTabId) => {
             openTab(activeTabId);
