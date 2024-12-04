@@ -2,15 +2,10 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useSearchParams, Outlet } from "react-router-dom";
 import SpinnerModal from "components/misc/SpinnerModal";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 //UTILS
-import {
-  getActiveModals,
-  getAppMode,
-  getAppOnboardingDetails,
-  getIsWorkspaceOnboardingCompleted,
-  getRequestBot,
-} from "store/selectors";
+import { getAppMode, getAppOnboardingDetails, getIsWorkspaceOnboardingCompleted, getRequestBot } from "store/selectors";
+import { getActiveModals } from "store/slices/global/modals/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
@@ -62,17 +57,17 @@ const DashboardContent = () => {
   };
 
   const toggleSpinnerModal = () => {
-    dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
+    dispatch(globalActions.toggleActiveModal({ modalName: "loadingModal" }));
   };
 
   const toggleExtensionModal = () => {
-    dispatch(actions.toggleActiveModal({ modalName: "extensionModal" }));
+    dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal" }));
   };
   const toggleSyncConsentModal = () => {
-    dispatch(actions.toggleActiveModal({ modalName: "syncConsentModal" }));
+    dispatch(globalActions.toggleActiveModal({ modalName: "syncConsentModal" }));
   };
   const toggleConnectedAppsModal = () => {
-    dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
+    dispatch(globalActions.toggleActiveModal({ modalName: "connectedAppsModal" }));
   };
 
   const toggleImportRulesModal = () => {
@@ -80,7 +75,7 @@ const DashboardContent = () => {
   };
 
   const closeRequestBot = () => {
-    dispatch(actions.updateRequestBot({ isActive: false }));
+    dispatch(globalActions.updateRequestBot({ isActive: false }));
   };
 
   const prevProps = usePrevious({ location });
@@ -152,35 +147,35 @@ const DashboardContent = () => {
           {activeModals.createWorkspaceModal.isActive ? (
             <CreateWorkspaceModal
               isOpen={activeModals.createWorkspaceModal.isActive}
-              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal" }))}
+              toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "createWorkspaceModal" }))}
               {...activeModals.createWorkspaceModal.props}
             />
           ) : null}
           {activeModals.inviteMembersModal.isActive ? (
             <AddMemberModal
               isOpen={activeModals.inviteMembersModal.isActive}
-              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "inviteMembersModal" }))}
+              toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "inviteMembersModal" }))}
               {...activeModals.inviteMembersModal.props}
             />
           ) : null}
           {activeModals.switchWorkspaceModal.isActive ? (
             <SwitchWorkspaceModal
               isOpen={activeModals.switchWorkspaceModal.isActive}
-              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal" }))}
+              toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "switchWorkspaceModal" }))}
               {...activeModals.switchWorkspaceModal.props}
             />
           ) : null}
           {activeModals.joinWorkspaceModal.isActive ? (
             <JoinWorkspaceModal
               isOpen={activeModals.joinWorkspaceModal.isActive}
-              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal" }))}
+              toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "joinWorkspaceModal" }))}
               {...activeModals.joinWorkspaceModal.props}
             />
           ) : null}
           {activeModals.sharingModal.isActive ? (
             <SharingModal
               isOpen={activeModals.sharingModal.isActive}
-              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "sharingModal" }))}
+              toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "sharingModal" }))}
               {...activeModals.sharingModal.props}
             />
           ) : null}
@@ -188,8 +183,8 @@ const DashboardContent = () => {
             <MailLoginLinkPopup
               isOpen={activeModals.emailLoginLinkPopup.isActive}
               toggleModal={() => {
-                dispatch(actions.toggleActiveModal({ modalName: "emailLoginLinkPopup" }));
-                dispatch(actions.updateTimeToResendEmailLogin(0));
+                dispatch(globalActions.toggleActiveModal({ modalName: "emailLoginLinkPopup" }));
+                dispatch(globalActions.updateTimeToResendEmailLogin(0));
               }}
               {...activeModals.emailLoginLinkPopup.props}
             />
@@ -202,7 +197,7 @@ const DashboardContent = () => {
           {activeModals.pricingModal.isActive ? (
             <PricingModal
               isOpen={activeModals.pricingModal.isActive}
-              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "pricingModal" }))}
+              toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "pricingModal" }))}
               {...activeModals.pricingModal.props}
             />
           ) : null}

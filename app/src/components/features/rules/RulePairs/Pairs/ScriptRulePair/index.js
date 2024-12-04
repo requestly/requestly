@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import "./styles.css";
 
 const ScriptRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
@@ -29,7 +29,7 @@ const ScriptRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
       event?.preventDefault?.();
 
       dispatch(
-        actions.addValueInRulePairArray({
+        globalActions.addValueInRulePairArray({
           pairIndex,
           arrayPath: "scripts",
           value: {
@@ -48,7 +48,7 @@ const ScriptRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
     setHasUserClickedDeleteIconInThisSession(true);
 
     dispatch(
-      actions.removeValueInRulePairByIndex({
+      globalActions.removeValueInRulePairByIndex({
         pairIndex,
         arrayPath: "scripts",
         index: scriptIndex,

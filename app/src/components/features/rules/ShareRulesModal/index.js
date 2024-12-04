@@ -11,7 +11,7 @@ import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 //ACTIONS
 import { deleteRulesFromStorage } from "./actions";
-import { actions } from "../../../../store";
+import { globalActions } from "store/slices/global/slice";
 import { unselectAllRecords } from "../actions";
 
 const ShareRulesModal = (props) => {
@@ -117,7 +117,7 @@ const ShareRulesModal = (props) => {
     setDeleteRulesCompleted(true);
     //Refresh List
     dispatch(
-      actions.updateRefreshPendingStatus({
+      globalActions.updateRefreshPendingStatus({
         type: "rules",
         newValue: !isRulesListRefreshPending,
       })

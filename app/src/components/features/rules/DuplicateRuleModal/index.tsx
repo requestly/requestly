@@ -22,7 +22,7 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { Group, isGroup, isRule, RecordStatus, StorageRecord, Rule } from "features/rules";
 import { getAllRulesOfGroup } from "utils/rules/misc";
 import Logger from "lib/logger";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import "./duplicateRuleModal.scss";
 
 interface Props {
@@ -176,7 +176,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
               toast.success("Duplicated the group successfully.");
               dispatch(
                 // @ts-ignore
-                actions.updateRefreshPendingStatus({
+                globalActions.updateRefreshPendingStatus({
                   type: "rules",
                   newValue: !isRulesListRefreshPending,
                 })

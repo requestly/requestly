@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { CgOptions } from "@react-icons/all-files/cg/CgOptions";
 import { Alert, Button } from "antd";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getIsManageBillingTeamAlertVisible } from "store/selectors";
 import PATHS from "config/constants/sub/paths";
 import "./ManageBillingTeamAlert.scss";
@@ -30,7 +30,7 @@ export const ManageBillingTeamAlert: React.FC = () => {
             icon={<CgOptions />}
             onClick={() => {
               //@ts-ignore
-              dispatch(actions.updateIsManageBillingTeamAlertVisible(false));
+              dispatch(globalActions.updateIsManageBillingTeamAlertVisible(false));
               navigate(PATHS.SETTINGS.BILLING.ABSOLUTE);
             }}
           >
@@ -40,7 +40,7 @@ export const ManageBillingTeamAlert: React.FC = () => {
       }
       onClose={() => {
         //@ts-ignore
-        dispatch(actions.updateIsManageBillingTeamAlertVisible(false));
+        dispatch(globalActions.updateIsManageBillingTeamAlertVisible(false));
       }}
     />
   );

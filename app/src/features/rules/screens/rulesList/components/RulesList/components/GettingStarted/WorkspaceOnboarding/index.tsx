@@ -25,7 +25,7 @@ import { isExtensionInstalled } from "actions/ExtensionActions";
 import { OnboardingSteps } from "./types";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { getPendingInvites } from "backend/workspace";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { Invite, InviteUsage } from "types";
 import { PersonaSurvey } from "features/personaSurvey";
 //@ts-ignore
@@ -72,22 +72,22 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
 
   const handleAuthCompletion = useCallback(
     (isNewUser: boolean) => {
-      if (isNewUser) dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
-      else dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+      if (isNewUser) dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
+      else dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
     },
     [dispatch]
   );
 
   const handleOnSurveyCompletion = useCallback(async () => {
     if (isPendingEmailInvite) {
-      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+      dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
       return;
     }
 
     const verifiedUser = await isEmailVerified(user?.details?.profile?.uid);
     if (verifiedUser && pendingInvites != null) {
       if (!isCompanyEmail(user?.details?.profile?.email)) {
-        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+        dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
         return;
       }
 
@@ -100,7 +100,9 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
           upsertTeamCommonInvite({ teamId: response?.data?.teamId, domainEnabled: true });
           setDefaultTeamData({ name: newTeamName, ...response?.data });
           dispatch(
-            actions.updateWorkspaceOnboardingTeamDetails({ createdTeam: { name: newTeamName, ...response?.data } })
+            globalActions.updateWorkspaceOnboardingTeamDetails({
+              createdTeam: { name: newTeamName, ...response?.data },
+            })
           );
           trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "onboarding");
           switchWorkspace(
@@ -116,14 +118,14 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
             "onboarding"
           );
           setTimeout(() => {
-            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+            dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
           }, 50);
         });
       } else {
-        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+        dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
       }
     } else {
-      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+      dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
     }
   }, [
     pendingInvites,
@@ -146,10 +148,10 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     if (step === OnboardingSteps.CREATE_JOIN_WORKSPACE) {
       if (workspaceOnboardingTeamDetails.createdTeam) {
         setDefaultTeamData(workspaceOnboardingTeamDetails.createdTeam);
-        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+        dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
       } else if (workspaceOnboardingTeamDetails.pendingInvites?.length > 0) {
         setPendingInvites(workspaceOnboardingTeamDetails.pendingInvites);
-        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+        dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
       }
     }
   }, [dispatch, step, workspaceOnboardingTeamDetails]);
@@ -159,7 +161,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
       getPendingInvites({ email: true, domain: true })
         .then((res: any) => {
           setPendingInvites(res?.pendingInvites ?? []);
-          dispatch(actions.updateWorkspaceOnboardingTeamDetails({ pendingInvites: res?.pendingInvites ?? [] }));
+          dispatch(globalActions.updateWorkspaceOnboardingTeamDetails({ pendingInvites: res?.pendingInvites ?? [] }));
         })
         .catch((e) => {
           setPendingInvites([]);
@@ -169,10 +171,10 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
 
   useEffect(() => {
     if (user?.loggedIn && step === OnboardingSteps.AUTH) {
-      if (currentTeams?.length) dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+      if (currentTeams?.length) dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
       else if (isNewUserFromEmailLinkSignIn)
-        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
-      else dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
+        dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
+      else dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
     }
   }, [dispatch, user?.loggedIn, currentTeams?.length, step, isNewUserFromEmailLinkSignIn]);
 
@@ -181,7 +183,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
       shouldShowOnboarding(appMode).then((result) => {
         if (result && isExtensionInstalled()) {
           trackWorkspaceOnboardingViewed();
-          dispatch(actions.toggleActiveModal({ modalName: "workspaceOnboardingModal", newValue: true }));
+          dispatch(globalActions.toggleActiveModal({ modalName: "workspaceOnboardingModal", newValue: true }));
         }
       });
     }
@@ -196,7 +198,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
 
   useEffect(() => {
     if (userPersona?.page > 2) {
-      dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+      dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
       window.localStorage.removeItem("isNewUser");
     }
   }, [dispatch, userPersona?.page]);
@@ -222,7 +224,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
               type="text"
               onClick={() => {
                 trackOnboardingWorkspaceSkip(OnboardingSteps.AUTH);
-                dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
+                dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
               }}
             >
               Skip

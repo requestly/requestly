@@ -5,7 +5,7 @@ import ProCard from "@ant-design/pro-card";
 
 //CONSTANTS
 import APP_CONSTANTS from "../../../config/constants";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { useNavigate } from "react-router-dom";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import { SOURCE } from "modules/analytics/events/common/constants";
@@ -18,7 +18,7 @@ const LoginCTA = ({ heading, content, cbUrl }) => {
 
   const promptUserToLogIn = () => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {

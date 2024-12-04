@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { actions } from "../store";
+import { globalActions } from "store/slices/global/slice";
 import { getUserGeoDetails } from "utils/geoUtils";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
@@ -14,12 +14,12 @@ const useGeoLocation = () => {
     getUserGeoDetails()
       .then((details) => {
         // setCountry(currentCountry);
-        dispatch(actions.updateUserCountry(details?.loc));
+        dispatch(globalActions.updateUserCountry(details?.loc));
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.COUNTRY, details?.loc);
         window.country = details?.loc;
       })
       .catch(() => {
-        dispatch(actions.updateUserCountry("US"));
+        dispatch(globalActions.updateUserCountry("US"));
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.COUNTRY, "US");
         window.country = "US";
       });

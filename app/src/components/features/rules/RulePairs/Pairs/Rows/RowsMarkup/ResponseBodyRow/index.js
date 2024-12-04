@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useTheme } from "styled-components";
 import { Row, Col, Radio, Popover, Popconfirm, Space, Checkbox, Tooltip, Input } from "antd";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import {
   displayFileSelector,
@@ -57,7 +57,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
         }
 
         dispatch(
-          actions.updateRulePairAtGivenPath({
+          globalActions.updateRulePairAtGivenPath({
             pairIndex,
             triggerUnsavedChangesIndication: false,
             updates: {
@@ -74,7 +74,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
 
   const handleFileSelectCallback = (selectedFile) => {
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           "response.type": GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE,
@@ -123,7 +123,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                       value={pair.response.value}
                       onChange={(e) => {
                         dispatch(
-                          actions.updateRulePairAtGivenPath({
+                          globalActions.updateRulePairAtGivenPath({
                             pairIndex,
                             updates: { "response.value": e.target.value },
                           })
@@ -207,7 +207,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
 
   const responseBodyChangeHandler = (value) => {
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           "response.type": pair.response.type,
@@ -228,7 +228,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
       }
 
       dispatch(
-        actions.updateRulePairAtGivenPath({
+        globalActions.updateRulePairAtGivenPath({
           pairIndex,
           updates: {
             "response.serveWithoutRequest": flag,

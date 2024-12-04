@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Select, AutoComplete } from "antd";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { statusCodes } from "config/constants/sub/statusCode";
 import "./ResponseStatusCodeRow.css";
@@ -26,7 +26,7 @@ const ResponseStatusCodeRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
           dropdownMatchSelectWidth={false}
           onChange={(value) => {
             dispatch(
-              actions.updateRulePairAtGivenPath({
+              globalActions.updateRulePairAtGivenPath({
                 pairIndex,
                 updates: {
                   "response.statusCode": value,

@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { Row, Space, Typography } from "antd";
 import { Alert } from "antd";
 import UAParser from "ua-parser-js";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { supportedBrowserExtensions } from "./supportedBrowserExtensions";
 import LINKS from "config/constants/sub/links";
 import APP_CONSTANTS from "../../../config/constants";
@@ -56,7 +56,7 @@ const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
   }, [eventPage]);
 
   const handleDownloadExtensionClick = () => {
-    dispatch(actions.updateExtensionInstallSource(window.location.pathname));
+    dispatch(globalActions.updateExtensionInstallSource(window.location.pathname));
     setIsReloadPagePromptVisible(true);
     trackExtensionInstallationButtonClicked(eventPage);
   };

@@ -4,7 +4,7 @@ import { Col, Dropdown, Input, Menu } from "antd";
 import Text from "antd/lib/typography/Text";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { DownOutlined } from "@ant-design/icons";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 const HeadersRulePairV1 = ({ pair, pairIndex, isInputDisabled }) => {
   const dispatch = useDispatch();
@@ -14,7 +14,7 @@ const HeadersRulePairV1 = ({ pair, pairIndex, isInputDisabled }) => {
       event?.preventDefault?.();
 
       dispatch(
-        actions.updateRulePairAtGivenPath({
+        globalActions.updateRulePairAtGivenPath({
           pairIndex,
           updates: {
             [path]: value,

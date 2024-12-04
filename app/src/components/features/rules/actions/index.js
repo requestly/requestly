@@ -1,6 +1,6 @@
-import { actions } from "../../../../store";
+import { globalActions } from "store/slices/global/slice";
 
 export const unselectAllRecords = (dispatch) => {
   //Unselect All Rules
-  dispatch(actions.clearSelectedRecords());
+  dispatch(globalActions.clearSelectedRecords());
 };

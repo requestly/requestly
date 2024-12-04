@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "../store";
+import { globalActions } from "store/slices/global/slice";
 // UTILS
 import {
   getAppMode,
@@ -79,7 +79,7 @@ const AppModeInitializer = () => {
         // Start the bg process
         startBackgroundProcess().then((newStatus) => {
           dispatch(
-            actions.updateDesktopSpecificDetails({
+            globalActions.updateDesktopSpecificDetails({
               isBackgroundProcessActive: !!newStatus,
             })
           );
@@ -89,7 +89,7 @@ const AppModeInitializer = () => {
             window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("start-proxy-server").then((res) => {
               const { success, port, proxyIp, helperServerPort } = res;
               dispatch(
-                actions.updateDesktopSpecificDetails({
+                globalActions.updateDesktopSpecificDetails({
                   isProxyServerRunning: !!success,
                   proxyPort: port,
                   proxyIp: proxyIp,
@@ -100,7 +100,7 @@ const AppModeInitializer = () => {
               // Set handler for windows closed
               window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-closed", (payload) => {
                 dispatch(
-                  actions.updateDesktopSpecificAppProperty({
+                  globalActions.updateDesktopSpecificAppProperty({
                     appId: payload.appId,
                     property: "isActive",
                     value: false,
@@ -111,14 +111,14 @@ const AppModeInitializer = () => {
               // Set handler for activable sources
               window.RQ.DESKTOP.SERVICES.IPC.registerEvent("app-detected", (payload) => {
                 dispatch(
-                  actions.updateDesktopSpecificAppProperty({
+                  globalActions.updateDesktopSpecificAppProperty({
                     appId: payload.id,
                     property: "isScanned",
                     value: true,
                   })
                 );
                 dispatch(
-                  actions.updateDesktopSpecificAppProperty({
+                  globalActions.updateDesktopSpecificAppProperty({
                     appId: payload.id,
                     property: "isAvailable",
                     value: payload.isAppActivatable,
@@ -136,7 +136,7 @@ const AppModeInitializer = () => {
               window.RQ.DESKTOP.SERVICES.IPC.registerEvent("proxy-restarted", (payload) => {
                 const { port, proxyIp } = payload;
                 dispatch(
-                  actions.updateDesktopSpecificDetails({
+                  globalActions.updateDesktopSpecificDetails({
                     proxyPort: port,
                     proxyIp: proxyIp,
                   })
@@ -147,7 +147,7 @@ const AppModeInitializer = () => {
               window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-connected", (payload) => {
                 toast.success(`${getAppName(payload.appId)} profile connected`);
                 dispatch(
-                  actions.updateDesktopSpecificAppProperty({
+                  globalActions.updateDesktopSpecificAppProperty({
                     appId: payload.appId,
                     property: "isActive",
                     value: true,
@@ -155,7 +155,7 @@ const AppModeInitializer = () => {
                   })
                 );
                 dispatch(
-                  actions.updateDesktopSpecificAppProperty({
+                  globalActions.updateDesktopSpecificAppProperty({
                     appId: payload.appId,
                     property: "connectedExtensionClientId",
                     value: payload.connectedExtensionClientId,
@@ -167,7 +167,7 @@ const AppModeInitializer = () => {
               window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-disconnected", (payload) => {
                 toast.info(`${getAppName(payload.appId)} profile disconnected`);
                 dispatch(
-                  actions.updateDesktopSpecificAppProperty({
+                  globalActions.updateDesktopSpecificAppProperty({
                     appId: payload.appId,
                     property: "isActive",
                     value: false,
@@ -188,7 +188,7 @@ const AppModeInitializer = () => {
           });
           window.RQ.DESKTOP.SERVICES.IPC.registerEvent("helper-server-hit", () => {
             dispatch(
-              actions.updateDesktopSpecificAppProperty({
+              globalActions.updateDesktopSpecificAppProperty({
                 appId: "existing-terminal",
                 property: "isActive",
                 value: true,
@@ -213,7 +213,7 @@ const AppModeInitializer = () => {
   const closeConnectedAppsModal = useCallback(
     (props = {}) => {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "connectedAppsModal",
           newValue: false,
         })
@@ -273,7 +273,7 @@ const AppModeInitializer = () => {
       !hasConnectedAppBefore &&
       userPersona.isSurveyCompleted
     ) {
-      dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
+      dispatch(globalActions.toggleActiveModal({ modalName: "connectedAppsModal" }));
     }
   }, [appMode, dispatch, hasConnectedAppBefore, isProxyServerRunning, userPersona.isSurveyCompleted]);
 
@@ -285,7 +285,7 @@ const AppModeInitializer = () => {
         if (!isExtensionInstalled()) {
           if (isDesktopMode()) {
             dispatch(
-              actions.updateAppMode({
+              globalActions.updateAppMode({
                 appMode: GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
               })
             );
@@ -294,7 +294,7 @@ const AppModeInitializer = () => {
           if (appMode !== GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
             // Fallback to default value
             dispatch(
-              actions.updateAppMode({
+              globalActions.updateAppMode({
                 appMode: GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
               })
             );

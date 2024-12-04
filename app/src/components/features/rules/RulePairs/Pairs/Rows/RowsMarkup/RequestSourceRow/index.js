@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
 import { Row, Col, Input, Badge, Menu, Typography, Tooltip, Button, Dropdown, Space } from "antd";
 import { ExperimentOutlined } from "@ant-design/icons";
@@ -133,7 +133,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               key={id}
               onClick={(event) => {
                 dispatch(
-                  actions.updateRulePairAtGivenPath({
+                  globalActions.updateRulePairAtGivenPath({
                     pairIndex,
                     updates: {
                       [APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS]: ruleKey,
@@ -158,7 +158,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
             key={id}
             onClick={(event) => {
               dispatch(
-                actions.updateRulePairAtGivenPath({
+                globalActions.updateRulePairAtGivenPath({
                   pairIndex,
                   updates: {
                     [APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS]: ruleOperator,
@@ -186,7 +186,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
     const updatedSource = { ...pair.source, ...newSource };
 
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           [APP_CONSTANTS.PATH_FROM_PAIR.SOURCE]: updatedSource,
@@ -300,7 +300,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               onChange={(event) => {
                 event?.preventDefault?.();
                 dispatch(
-                  actions.updateRulePairAtGivenPath({
+                  globalActions.updateRulePairAtGivenPath({
                     pairIndex,
                     updates: {
                       [APP_CONSTANTS.PATH_FROM_PAIR.RULE_VALUE]: event?.target?.value,

@@ -6,7 +6,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Logger from "lib/logger";
 import { StorageService } from "init";
 import APP_CONSTANTS from "config/constants";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 
 export const useIsExtensionEnabled = () => {
@@ -22,9 +22,9 @@ export const useIsExtensionEnabled = () => {
           .getRecord("rq_var_isExtensionEnabled")
           .then((value) => {
             if (value !== undefined) {
-              dispatch(actions.updateIsExtensionEnabled(value));
+              dispatch(globalActions.updateIsExtensionEnabled(value));
             } else {
-              dispatch(actions.updateIsExtensionEnabled(true));
+              dispatch(globalActions.updateIsExtensionEnabled(true));
             }
           });
       } else {
@@ -33,9 +33,9 @@ export const useIsExtensionEnabled = () => {
           .getRecord(APP_CONSTANTS.RQ_SETTINGS)
           .then((value) => {
             if (value) {
-              dispatch(actions.updateIsExtensionEnabled(value.isExtensionEnabled));
+              dispatch(globalActions.updateIsExtensionEnabled(value.isExtensionEnabled));
             } else {
-              dispatch(actions.updateIsExtensionEnabled(true));
+              dispatch(globalActions.updateIsExtensionEnabled(true));
             }
           });
       }

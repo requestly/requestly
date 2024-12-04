@@ -5,8 +5,9 @@ import { CloseOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
 // import { makeOriginalLog } from "capture-console-logs";
-import { getActiveModals, getDesktopSpecificDetails } from "store/selectors";
-import { actions } from "store";
+import { getDesktopSpecificDetails } from "store/selectors";
+import { getActiveModals } from "store/slices/global/modals/selectors";
+import { globalActions } from "store/slices/global/slice";
 import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
 import RuleEditorModal from "components/common/RuleEditorModal";
@@ -107,7 +108,7 @@ const CurrentTrafficTable = ({
 
   const handleRuleEditorModalClose = useCallback(() => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         newValue: false,
         modalName: "ruleEditorModal",
       })
