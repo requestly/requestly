@@ -33,14 +33,18 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
     (tabId: TabsLayout.Tab["id"]) => {
       const copiedTabs = [...tabs];
       const targetTabIndex = copiedTabs.findIndex((tab) => tab.id === tabId);
+
+      if (targetTabIndex === -1) {
+        return;
+      }
+
       const targetTab = copiedTabs[targetTabIndex];
       const updatedTabs = copiedTabs.filter((tab) => tab.id !== tabId);
 
-      setTabs((prev) => prev.filter((tab) => tab.id !== tabId));
+      setTabs(updatedTabs);
 
       if (updatedTabs.length && targetTab.id === activeTab?.id) {
         const nextActiveTab = updatedTabs[targetTabIndex === updatedTabs.length ? targetTabIndex - 1 : targetTabIndex];
-        console.log({ nextActiveTab });
         updateActivetab(nextActiveTab);
       }
     },
