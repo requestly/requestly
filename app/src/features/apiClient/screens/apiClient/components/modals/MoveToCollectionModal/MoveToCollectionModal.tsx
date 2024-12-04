@@ -43,7 +43,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
   const createNewCollection = useCallback(async () => {
     const collectionToBeCreated: Partial<RQAPI.CollectionRecord> = {
       collectionId: "",
-      name: selectedCollection.label,
+      name: selectedCollection?.label,
       type: RQAPI.RecordType.COLLECTION,
       deleted: false,
       data: {},
@@ -55,7 +55,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
     } else {
       throw new Error("Failed to create a new collection");
     }
-  }, [user?.details?.profile?.uid, team?.id, onSaveRecord, selectedCollection.label]);
+  }, [user?.details?.profile?.uid, team?.id, onSaveRecord, selectedCollection?.label]);
 
   const moveRecordToCollection = useCallback(
     async (collectionId: string, isNewCollection: boolean) => {
