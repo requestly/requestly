@@ -48,7 +48,6 @@ export const CreditsProgressBar: React.FC<CreditsProgressBarProps> = ({ source }
       setIsRedeemModalVisible(true);
     } else {
       dispatch(
-        // @ts-ignore
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,

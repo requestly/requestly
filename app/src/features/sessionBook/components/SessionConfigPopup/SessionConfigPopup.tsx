@@ -95,7 +95,6 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
     (e: React.MouseEvent) => {
       if (!user?.loggedIn) {
         dispatch(
-          // @ts-ignore
           globalActions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,

@@ -299,7 +299,6 @@ export const UserPlanDetails = () => {
                       type="primary"
                       onClick={() => {
                         dispatch(
-                          // @ts-expect-error
                           globalActions.toggleActiveModal({
                             modalName: "pricingModal",
                             newValue: true,

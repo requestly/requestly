@@ -160,7 +160,6 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                 onUpgradeYourselfClickCallback();
                 trackUpgradeOptionClicked("upgrade_yourself");
                 dispatch(
-                  // @ts-ignore
                   globalActions.toggleActiveModal({
                     modalName: "pricingModal",
                     newValue: true,

@@ -18,7 +18,6 @@ export const PlanExpiredBadge = () => {
         onClick={() => {
           trackRenewNowClicked("header");
           dispatch(
-            // @ts-ignore
             globalActions.toggleActiveModal({
               modalName: "pricingModal",
               newValue: true,

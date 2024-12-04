@@ -129,7 +129,6 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
             dispatch(
-              // @ts-ignore
               globalActions.toggleActiveModal({
                 modalName: "pricingModal",
                 newValue: true,

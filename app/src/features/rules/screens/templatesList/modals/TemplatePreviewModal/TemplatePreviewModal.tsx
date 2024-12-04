@@ -39,7 +39,6 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({ rule
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       if (!isExtensionInstalled()) {
         dispatch(
-          // @ts-ignore
           globalActions.toggleActiveModal({
             modalName: "extensionModal",
             newValue: true,

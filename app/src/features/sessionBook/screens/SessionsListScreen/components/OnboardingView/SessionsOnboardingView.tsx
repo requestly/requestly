@@ -68,7 +68,6 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
         "Safely capture mouse movement, console, network & environment data automatically on your device for sharing and debugging. Private and secure, works locally on your browser.",
       eventPage: "session_recording_page",
     };
-    // @ts-ignore
     dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
     trackInstallExtensionDialogShown({ src: "sessions_home_page" });
   }, [dispatch]);

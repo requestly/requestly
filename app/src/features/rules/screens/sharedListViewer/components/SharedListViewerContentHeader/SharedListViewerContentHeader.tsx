@@ -63,7 +63,6 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
 
     if (!user.loggedIn) {
       dispatch(
-        // @ts-ignore
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,

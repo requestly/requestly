@@ -29,7 +29,6 @@ const PremiumPlanBadge = () => {
 
   const handleBadgeClick = useCallback(() => {
     dispatch(
-      // @ts-ignore
       globalActions.toggleActiveModal({
         modalName: "pricingModal",
         newValue: true,

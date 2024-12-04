@@ -28,7 +28,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   const handleOnClick = () => {
     if (!user.loggedIn) {
       dispatch(
-        // @ts-ignore
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,

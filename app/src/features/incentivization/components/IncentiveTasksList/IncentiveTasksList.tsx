@@ -189,7 +189,6 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
                   postActionClickCallback(IncentivizeEvent.RESPONSE_RULE_CREATED);
                 } else {
                   dispatch(
-                    // @ts-ignore
                     globalActions.toggleActiveModal({
                       modalName: "extensionModal",
                       newValue: true,
@@ -234,7 +233,6 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
                   postActionClickCallback(IncentivizeEvent.REDIRECT_RULE_CREATED);
                 } else {
                   dispatch(
-                    // @ts-ignore
                     globalActions.toggleActiveModal({
                       modalName: "extensionModal",
                       newValue: true,
@@ -274,7 +272,6 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
               onClick={() => {
                 postActionClickCallback(IncentivizeEvent.TEAM_WORKSPACE_CREATED);
                 dispatch(
-                  // @ts-ignore
                   globalActions.toggleActiveModal({
                     modalName: "createWorkspaceModal",
                     newValue: true,

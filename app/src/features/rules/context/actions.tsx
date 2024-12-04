@@ -163,7 +163,6 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         const ruleIds = rulesToShare.map((rule) => rule.id);
 
         dispatch(
-          // @ts-ignore
           globalActions.toggleActiveModal({
             modalName: "sharingModal",
             newValue: true,
@@ -175,7 +174,6 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         );
       } else {
         dispatch(
-          // @ts-ignore
           globalActions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,
@@ -364,7 +362,6 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         const ruleIds = groupRules.map((rule: Rule) => rule.id);
 
         dispatch(
-          // @ts-ignore
           globalActions.toggleActiveModal({
             modalName: "sharingModal",
             newValue: true,
@@ -376,7 +373,6 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         );
       } else {
         dispatch(
-          // @ts-ignore
           globalActions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,

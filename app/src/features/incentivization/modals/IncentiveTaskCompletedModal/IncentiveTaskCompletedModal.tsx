@@ -90,7 +90,6 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
     toggle();
 
     dispatch(
-      // @ts-ignore
       globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,

@@ -41,7 +41,6 @@ const FeatureLimiterBanner = () => {
               onClick={() => {
                 trackViewPricingPlansClicked("feature_limiter_banner");
                 dispatch(
-                  // @ts-ignore
                   globalActions.toggleActiveModal({
                     modalName: "pricingModal",
                     newValue: true,

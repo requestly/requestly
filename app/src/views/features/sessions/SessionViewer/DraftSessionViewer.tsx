@@ -210,7 +210,6 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   const handleSaveDraftSession = useCallback(() => {
     if (!user?.loggedIn) {
       dispatch(
-        // @ts-ignore
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,

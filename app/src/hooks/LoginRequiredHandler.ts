@@ -11,7 +11,6 @@ export const LoginRequiredHandler = (): null => {
   useEffect(() => {
     if (searchParams.has("loginRequired")) {
       dispatch(
-        // @ts-ignore
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,

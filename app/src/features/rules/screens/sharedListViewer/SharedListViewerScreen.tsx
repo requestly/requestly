@@ -39,7 +39,6 @@ export const SharedListViewerScreen = () => {
 
   const promptUserToSignup = (source: string) => {
     dispatch(
-      // @ts-ignore
       globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,

@@ -103,7 +103,6 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
     (e: React.MouseEvent) => {
       if (!user?.loggedIn) {
         dispatch(
-          // @ts-ignore
           globalActions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,

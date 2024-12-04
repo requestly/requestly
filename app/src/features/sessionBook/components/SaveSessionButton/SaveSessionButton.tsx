@@ -70,7 +70,6 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
   const handleSaveSession = useCallback(() => {
     if (!user?.loggedIn) {
       dispatch(
-        // @ts-ignore
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
