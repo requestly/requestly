@@ -140,3 +140,27 @@ export const trackImportFromPostmanDataProcessed = (num_collections, num_environ
 export const trackImportFromPostmanStarted = (num_collections, num_environments) => {
   trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_STARTED, { num_collections, num_environments });
 };
+
+export const trackDuplicateRequestClicked = () => {
+  trackEvent(API_CLIENT.DUPLICATE_REQUEST_CLICKED);
+};
+
+export const trackDuplicateRequestSuccessful = () => {
+  trackEvent(API_CLIENT.DUPLICATE_REQUEST_SUCCESSFUL);
+};
+
+export const trackDuplicateRequestFailed = () => {
+  trackEvent(API_CLIENT.DUPLICATE_REQUEST_FAILED);
+};
+
+export const trackMoveRequestToCollectionClicked = () => {
+  trackEvent(API_CLIENT.MOVE_REQUEST_TO_COLLECTION_CLICKED);
+};
+
+export const trackMoveRequestToCollectionSuccessful = (destination) => {
+  trackEvent(API_CLIENT.MOVE_REQUEST_TO_COLLECTION_SUCCESSFUL, { destination });
+};
+
+export const trackMoveRequestToCollectionFailed = (destination) => {
+  trackEvent(API_CLIENT.MOVE_REQUEST_TO_COLLECTION_FAILED, { destination });
+};

@@ -1,5 +1,5 @@
-import { MoreOutlined } from "@ant-design/icons";
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
+import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Dropdown, Input, Tooltip, Typography } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQButton } from "lib/design-system-v2/components";
@@ -30,18 +30,6 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
   const [isRenaming, setIsRenaming] = useState(false);
 
-  const menuItems = useMemo(() => {
-    return [
-      {
-        key: EnvironmentMenuKey.RENAME,
-        label: "Rename",
-        onClick: () => setIsRenameInputVisible(true),
-      },
-      { key: EnvironmentMenuKey.DUPLICATE, label: "Duplicate", onClick: () => handleEnvironmentDuplicate() },
-      { key: EnvironmentMenuKey.DELETE, label: "Delete", danger: true, onClick: () => handleEnvironmentDelete() },
-    ];
-  }, []);
-
   const handleEnvironmentRename = useCallback(async () => {
     if (newEnvironmentName === environment.name) {
       setIsRenameInputVisible(false);
@@ -59,7 +47,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
         setIsRenaming(false);
         setIsRenameInputVisible(false);
       });
-  }, [newEnvironmentName, environment.id]);
+  }, [newEnvironmentName, environment.id, environment.name, renameEnvironment]);
 
   const handleEnvironmentDuplicate = useCallback(async () => {
     toast.loading("Duplicating environment...");
@@ -70,7 +58,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
       .catch(() => {
         toast.error("Failed to duplicate environment");
       });
-  }, [environment.id]);
+  }, [environment.id, duplicateEnvironment]);
 
   const handleEnvironmentDelete = useCallback(() => {
     toast.loading("Deleting environment...");
@@ -81,7 +69,19 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
       .catch(() => {
         toast.error("Failed to delete environment");
       });
-  }, [environment.id]);
+  }, [environment.id, deleteEnvironment]);
+
+  const menuItems = useMemo(() => {
+    return [
+      {
+        key: EnvironmentMenuKey.RENAME,
+        label: "Rename",
+        onClick: () => setIsRenameInputVisible(true),
+      },
+      { key: EnvironmentMenuKey.DUPLICATE, label: "Duplicate", onClick: () => handleEnvironmentDuplicate() },
+      { key: EnvironmentMenuKey.DELETE, label: "Delete", danger: true, onClick: () => handleEnvironmentDelete() },
+    ];
+  }, [handleEnvironmentDuplicate, handleEnvironmentDelete]);
 
   if (isRenameInputVisible) {
     return (
@@ -130,7 +130,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
           <RQButton
             size="small"
             type="transparent"
-            icon={<MoreOutlined />}
+            icon={<MdOutlineMoreHoriz />}
             className="environment-list-item-dropdown-button"
             onClick={(e) => e.stopPropagation()}
           />

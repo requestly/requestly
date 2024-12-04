@@ -1,0 +1,14 @@
+.select-collection-group {
+  .select-collection-group__control {
+    border-color: var(--requestly-color-white-t-10);
+
+    &:hover {
+      border-color: var(--requestly-color-white-t-10);
+    }
+
+    .select-collection-group__single-value {
+      color: var(--requestly-color-default);
+      font-size: var(--requestly-font-size-sm);
+    }
+  }
+}
