@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -27,8 +27,9 @@ export const CollectionsList: React.FC<Props> = ({
   isNewRecordNameInputVisible,
   hideNewRecordNameInput,
 }) => {
+  const navigate = useNavigate();
   const location = useLocation();
-  const { openTab } = useTabsLayoutContext();
+  const { openTab, tabs } = useTabsLayoutContext();
   const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -64,8 +65,17 @@ export const CollectionsList: React.FC<Props> = ({
     setIsExportModalOpen(true);
   }, []);
 
-  const hasOpenedDefaultTab = useRef(false);
+  useEffect(() => {
+    if (isLoadingApiClientRecords) {
+      return;
+    }
 
+    if (tabs.length === 0) {
+      navigate(PATHS.API_CLIENT.ABSOLUTE);
+    }
+  }, [tabs.length, navigate, isLoadingApiClientRecords]);
+
+  const hasOpenedDefaultTab = useRef(false);
   useEffect(() => {
     if (location.pathname === PATHS.API_CLIENT.ABSOLUTE) {
       // TODO: Improve logic
