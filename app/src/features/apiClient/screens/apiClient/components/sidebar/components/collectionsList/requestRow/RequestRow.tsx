@@ -26,7 +26,7 @@ interface Props {
 
 export const RequestRow: React.FC<Props> = ({ record }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [requestToMove, setRequestToMove] = useState(null);
+  const [recordToMove, setRecordToMove] = useState(null);
   const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const teamId = useSelector(getCurrentlyActiveWorkspace);
@@ -80,7 +80,7 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
         label: <div>Move to Collection</div>,
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
-          setRequestToMove(record);
+          setRecordToMove(record);
           trackMoveRequestToCollectionClicked();
         },
       },
@@ -99,12 +99,12 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
 
   return (
     <>
-      {requestToMove && (
+      {recordToMove && (
         <MoveToCollectionModal
-          recordToMove={requestToMove}
-          isOpen={requestToMove}
+          recordToMove={recordToMove}
+          isOpen={recordToMove}
           onClose={() => {
-            setRequestToMove(null);
+            setRecordToMove(null);
           }}
         />
       )}
