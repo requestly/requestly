@@ -56,11 +56,17 @@ const createApiRecord = async (
   if (docId) {
     // Creating a new record with a given id
     const docRef = doc(db, "apis", docId);
-    await setDoc(docRef, { ...newRecord });
-    Logger.log(`Api document created with ID ${docId}`);
-    return { success: true, data: { ...newRecord, id: docId } };
+    return setDoc(docRef, { ...newRecord })
+      .then((docRef) => {
+        Logger.log(`Api document created with ID ${docId}`);
+        return { success: true, data: { ...newRecord, id: docId } };
+      })
+      .catch((err) => {
+        Logger.error(`Error creating Api document with ID ${docId}`);
+        return { success: false, data: null };
+      });
   } else {
-    const result = await addDoc(rootApiRecordsCollectionRef, { ...newRecord })
+    return addDoc(rootApiRecordsCollectionRef, { ...newRecord })
       .then((docRef) => {
         Logger.log(`Api document created ${docRef.id}`);
         updateDoc(docRef, {
@@ -73,8 +79,6 @@ const createApiRecord = async (
         Logger.error("Error while creating api record", err);
         return { success: false, data: null };
       });
-
-    return result;
   }
 };
 
