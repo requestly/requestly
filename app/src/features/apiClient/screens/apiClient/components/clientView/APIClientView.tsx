@@ -87,7 +87,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   useEffect(() => {
     if (apiEntry) {
       clearTimeout(animationTimerRef.current);
-      // setIsAnimating(true);
+      setIsAnimating(true);
       setEntry(apiEntry);
       setRequestName("");
       animationTimerRef.current = setTimeout(() => setIsAnimating(false), 500);
