@@ -4,8 +4,6 @@ import { GlobalSliceState } from "./types";
 
 import appListJson from "../../initial-state/sub/appsList.json";
 
-console.log(appListJson);
-
 const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   /* User */
   user: {
