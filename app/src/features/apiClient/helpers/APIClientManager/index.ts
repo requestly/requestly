@@ -29,7 +29,7 @@ export const executeAPIRequest = async (
       request: entry.request,
       response: null,
       error: {
-        source: "Prerequest script",
+        source: "Pre-request script",
         message: error.message,
         name: error.name,
       },
@@ -61,7 +61,7 @@ export const executeAPIRequest = async (
     } catch (error) {
       console.error("Post Response script error", error);
       notification.error({
-        message: "Something went wrong in postResponse script!",
+        message: "Something went wrong in post-response script!",
         description: `${error.name}: ${error.message}`,
         placement: "bottomRight",
       });
