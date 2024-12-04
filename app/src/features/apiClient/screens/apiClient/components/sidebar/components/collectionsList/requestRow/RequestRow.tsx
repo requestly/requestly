@@ -29,7 +29,7 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
   const [recordToMove, setRecordToMove] = useState(null);
   const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
-  const teamId = useSelector(getCurrentlyActiveWorkspace);
+  const team = useSelector(getCurrentlyActiveWorkspace);
   const navigate = useNavigate();
 
   const handleDuplicateRequest = useCallback(
@@ -39,7 +39,7 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
         name: `(Copy) ${record.name || record.data.request.url}`,
       };
       delete newRecord.id;
-      return upsertApiRecord(user?.details?.profile?.uid, newRecord, teamId)
+      return upsertApiRecord(user?.details?.profile?.uid, newRecord, team?.id)
         .then((result) => {
           if (!result.success) {
             throw new Error("Failed to duplicate request");
@@ -53,7 +53,7 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
           toast.error(error.message || "Unexpected error. Please contact support.");
         });
     },
-    [teamId, user?.details?.profile?.uid, onSaveRecord, navigate]
+    [team?.id, user?.details?.profile?.uid, onSaveRecord, navigate]
   );
 
   const getRequestOptions = useCallback((): MenuProps["items"] => {
