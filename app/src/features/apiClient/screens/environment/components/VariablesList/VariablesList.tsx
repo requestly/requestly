@@ -132,6 +132,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
     handleDeleteVariable,
     visibleSecretsRowIds,
     updateVisibleSecretsRowIds: handleUpdateVisibleSecretsRowIds,
+    recordsCount: dataSource.length,
   });
 
   useEffect(() => {
