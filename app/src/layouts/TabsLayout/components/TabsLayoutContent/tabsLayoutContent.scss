@@ -4,8 +4,8 @@
   height: 100%;
   overflow-y: hidden;
 
-  .ant-tabs,
-  .ant-tabs-content-holder {
+  .ant-tabs.tabs-layout-tabs-container,
+  .tabs-layout-tabs-container > .ant-tabs-content-holder {
     height: 100%;
 
     .ant-tabs-content,
@@ -14,48 +14,50 @@
     }
   }
 
-  .ant-tabs-nav {
-    margin-bottom: 0;
+  .ant-tabs.tabs-layout-tabs-container {
+    & > .ant-tabs-nav {
+      margin-bottom: 0;
 
-    .ant-tabs-nav-operations {
-      .ant-tabs-nav-more {
-        cursor: pointer;
-        padding: 1px 8px;
+      .ant-tabs-nav-wrap {
+        height: 32px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0px 12px;
+
+        .ant-tabs-nav-list {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .ant-tabs-tab {
+          padding: 0 4px;
+          width: 144px;
+          max-width: 144px;
+
+          .ant-tabs-tab-btn {
+            width: 100%;
+            overflow: hidden;
+          }
+        }
+
+        .ant-tabs-tab + .ant-tabs-tab {
+          margin: 0 0 0 12px;
+        }
+
+        .ant-tabs-tab-active {
+          .tab-title {
+            color: var(--requestly-color-text-default);
+          }
+        }
       }
-    }
-  }
 
-  .ant-tabs-nav-wrap {
-    height: 32px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0px 12px;
-
-    .ant-tabs-nav-list {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .ant-tabs-tab {
-      padding: 0 4px;
-      width: 144px;
-      max-width: 144px;
-
-      .ant-tabs-tab-btn {
-        width: 100%;
-        overflow: hidden;
-      }
-    }
-
-    .ant-tabs-tab + .ant-tabs-tab {
-      margin: 0 0 0 12px;
-    }
-
-    .ant-tabs-tab-active {
-      .tab-title {
-        color: var(--requestly-color-text-default);
+      .ant-tabs-nav-operations {
+        .ant-tabs-nav-more {
+          cursor: pointer;
+          padding: 1px 8px;
+        }
       }
     }
   }
