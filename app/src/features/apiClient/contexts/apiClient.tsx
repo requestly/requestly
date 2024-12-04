@@ -14,6 +14,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { redirectToRequest } from "utils/RedirectionUtils";
 import { getEmptyAPIEntry } from "../screens/apiClient/utils";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -100,6 +101,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [selectedEntry, setSelectedEntry] = useState<RQAPI.Entry>();
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
 
+  const { closeTab } = useTabsLayoutContext();
+
   useEffect(() => {
     if (!requestId || requestId === "new") {
       return;
@@ -174,13 +177,20 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     });
   }, []);
 
-  const onDeleteRecords = useCallback((recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
-    setApiClientRecords((prev) => {
-      return prev.filter((record) => {
-        return !recordIdsToBeDeleted.includes(record.id);
+  const onDeleteRecords = useCallback(
+    (recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
+      recordIdsToBeDeleted?.forEach((recordId) => {
+        closeTab(recordId);
       });
-    });
-  }, []);
+
+      setApiClientRecords((prev) => {
+        return prev.filter((record) => {
+          return !recordIdsToBeDeleted.includes(record.id);
+        });
+      });
+    },
+    [closeTab]
+  );
 
   const onSaveRecord = useCallback(
     (apiClientRecord: RQAPI.Record) => {
