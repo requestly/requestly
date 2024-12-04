@@ -30,7 +30,6 @@
       flex: auto;
       height: 32px;
       width: 100%;
-      max-width: 86%;
 
       .api-request-method-selector {
         width: 120px;
@@ -141,5 +140,18 @@
 
   .api-response-status-line {
     font-size: var(--requestly-font-size-xs);
+  }
+
+  .api-client-response__loading-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--requestly-color-background);
+    z-index: 2;
   }
 }
