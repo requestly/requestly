@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,7 +23,12 @@ export const EnvironmentsList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const user = useSelector(getUserAuthDetails);
-  const { getAllEnvironments, addNewEnvironment, setCurrentEnvironment } = useEnvironmentManager();
+  const {
+    getAllEnvironments,
+    addNewEnvironment,
+    setCurrentEnvironment,
+    isEnvironmentsLoading,
+  } = useEnvironmentManager();
   const [searchValue, setSearchValue] = useState("");
   const [isNewEnvironmentInputVisible, setIsNewEnvironmentInputVisible] = useState(false);
   const [newEnvironmentValue, setNewEnvironmentValue] = useState("");
@@ -36,6 +41,33 @@ export const EnvironmentsList = () => {
     () => environments.filter((environment) => environment.name.toLowerCase().includes(searchValue.toLowerCase())),
     [environments, searchValue]
   );
+
+  const hasOpenedDefaultTab = useRef(false);
+  useEffect(() => {
+    if (isEnvironmentsLoading) {
+      return;
+    }
+
+    if (hasOpenedDefaultTab.current) {
+      return;
+    }
+
+    hasOpenedDefaultTab.current = true;
+
+    if (environments.length === 0) {
+      const recordId = "environments/new";
+      openTab(recordId, {
+        title: "New environment",
+        url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/new`,
+      });
+    } else {
+      const recordId = environments[0].id;
+      openTab(recordId, {
+        title: environments[0].name,
+        url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${recordId}`,
+      });
+    }
+  }, [environments, openTab, isEnvironmentsLoading]);
 
   const handleAddEnvironmentClick = useCallback(() => {
     if (!user.loggedIn) {
