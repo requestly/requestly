@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { KeyValuePair } from "../../../../../../../types";
+import { KeyValuePair, RQAPI } from "../../../../../../../types";
 import { PropertiesGrid } from "componentsV2/PropertiesGrid/PropertiesGrid";
 import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
 import { Spin } from "antd";
@@ -11,10 +11,10 @@ interface Props {
   isLoading: boolean;
   isFailed: boolean;
   onCancelRequest: () => void;
-  errorMessage?: string;
+  error?: RQAPI.RequestErrorEntry["error"];
 }
 
-const ResponseHeaders: React.FC<Props> = ({ headers, isLoading, isFailed, onCancelRequest, errorMessage }) => {
+const ResponseHeaders: React.FC<Props> = ({ headers, isLoading, isFailed, onCancelRequest, error }) => {
   const transformedHeaders = useMemo(() => {
     return headers?.map((header) => ({
       key: header.key,
@@ -39,7 +39,7 @@ const ResponseHeaders: React.FC<Props> = ({ headers, isLoading, isFailed, onCanc
       ) : (
         <EmptyResponsePlaceholder
           isFailed={isFailed}
-          errorMessage={errorMessage}
+          error={error}
           emptyDescription="Please run a request to see the response headers"
         />
       )}

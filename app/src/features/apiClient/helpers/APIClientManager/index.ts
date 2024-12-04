@@ -7,12 +7,13 @@ export const executeAPIRequest = async (
   entry: RQAPI.Entry,
   environmentManager: any,
   signal?: AbortSignal
-): Promise<RQAPI.Entry | null> => {
-  try {
-    // Process request configuration with environment variables
-    const renderedRequest = environmentManager.renderVariables(entry.request);
-    let currentEnvironmentVariables = environmentManager.getCurrentEnvironmentVariables();
+): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
+  // Process request configuration with environment variables
+  const renderedRequest = environmentManager.renderVariables(entry.request);
+  let currentEnvironmentVariables = environmentManager.getCurrentEnvironmentVariables();
+  let response: RQAPI.Response | null = null;
 
+  try {
     if (entry.scripts.preRequest) {
       const { updatedVariables } = await executePrerequestScript(
         entry.scripts.preRequest,
@@ -22,29 +23,57 @@ export const executeAPIRequest = async (
 
       currentEnvironmentVariables = updatedVariables;
     }
+  } catch (error) {
+    return {
+      request: entry.request,
+      response: null,
+      error: {
+        source: "Prerequest script",
+        message: error.message,
+        name: error.name,
+      },
+    };
+  }
 
-    // Make the actual API request
-    const response = await makeRequest(appMode, renderedRequest, signal);
+  try {
+    response = await makeRequest(appMode, renderedRequest, signal);
+  } catch (error) {
+    return {
+      request: entry.request,
+      response: null,
+      error: {
+        source: "Request error",
+        message: error.message,
+        name: error.name,
+      },
+    };
+  }
 
-    if (entry.scripts.postResponse) {
+  if (entry.scripts.postResponse) {
+    try {
       await executePostresponseScript(
         entry.scripts.postResponse,
         { response, request: renderedRequest },
         environmentManager,
         currentEnvironmentVariables
       );
+    } catch (error) {
+      console.log("!!!debug", "postResponse error", error);
+      // return {
+      //   request: entry.request,
+      //   response: null,
+      //   error: {
+      //     source: "Postresponse script",
+      //     message: error.message,
+      //     name: error.name,
+      //   },
+      // };
     }
-
-    return {
-      ...entry,
-      response,
-      request: renderedRequest,
-    };
-  } catch (error) {
-    return {
-      ...entry,
-      response: null,
-      errorMessage: error,
-    };
   }
+
+  return {
+    ...entry,
+    response,
+    request: renderedRequest,
+  };
 };

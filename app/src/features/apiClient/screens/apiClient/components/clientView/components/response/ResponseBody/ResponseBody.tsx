@@ -7,6 +7,7 @@ import "./responseBody.scss";
 import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
 import { RQButton } from "lib/design-system-v2/components";
 import { IoMdCopy } from "@react-icons/all-files/io/IoMdCopy";
+import { RQAPI } from "features/apiClient/types";
 
 interface Props {
   responseText: string;
@@ -14,7 +15,7 @@ interface Props {
   isLoading: boolean;
   isFailed: boolean;
   onCancelRequest: () => void;
-  errorMessage?: string;
+  error?: RQAPI.RequestErrorEntry["error"];
 }
 
 enum ResponseMode {
@@ -36,7 +37,7 @@ const ResponseBody: React.FC<Props> = ({
   isLoading,
   isFailed,
   onCancelRequest,
-  errorMessage,
+  error,
 }) => {
   const [responseMode, setResponseMode] = useState(ResponseMode.PREVIEW);
   const [isResponseCopied, setIsResponseCopied] = useState(false);
@@ -141,7 +142,7 @@ const ResponseBody: React.FC<Props> = ({
         <EmptyResponsePlaceholder
           isFailed={isFailed}
           emptyDescription="Please run a request to see the response"
-          errorMessage={errorMessage}
+          error={error}
         />
       )}
     </div>

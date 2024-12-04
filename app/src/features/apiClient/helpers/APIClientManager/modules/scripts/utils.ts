@@ -2,6 +2,7 @@ import { EnvironmentVariables } from "backend/environment/types";
 import { RQAPI } from "../../../../types";
 import { requestWorkerFunction, responseWorkerFunction } from "./workerScripts";
 import { ScriptExecutedPayload } from "./types";
+import { isEmpty } from "lodash";
 
 interface WorkerMessage {
   type: "SCRIPT_EXECUTED" | "COMPLETE" | "ERROR";
@@ -30,6 +31,12 @@ const handleEnvironmentChanges = async (
   const currentVars = payload.currentVariables;
   const currentEnvironmentId = environmentManager.getCurrentEnvironment().currentEnvironmentId;
 
+  if (isEmpty(payload.mutations.environment.$set) && isEmpty(payload.mutations.environment.$unset)) {
+    return {
+      updatedVariables: currentVars,
+    };
+  }
+
   const variablesToSet = {
     ...currentVars,
     ...Object.fromEntries(
@@ -48,7 +55,7 @@ const handleEnvironmentChanges = async (
   });
 
   if (!currentEnvironmentId) {
-    throw new Error("No environment available to access the variables.Please select an environment.");
+    throw new Error("No environment available to access the variables.");
   }
 
   await environmentManager.setVariables(currentEnvironmentId, variablesToSet);
@@ -79,7 +86,7 @@ const messageHandler = async (
           resolve(updatedVariables);
         })
         .catch((e) => {
-          reject(e.message);
+          reject(e);
         })
         .finally(() => {
           cleanupWorker(worker);

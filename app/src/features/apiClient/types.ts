@@ -68,7 +68,16 @@ export namespace RQAPI {
       preRequest: string;
       postResponse: string;
     };
-    errorMessage?: string;
+  }
+
+  export interface RequestErrorEntry {
+    request: RQAPI.Request;
+    response: null;
+    error: {
+      source: string;
+      message: Error["message"];
+      name: Error["name"];
+    };
   }
 
   export interface Collection {

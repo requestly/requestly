@@ -90,13 +90,13 @@ export const requestWorkerFunction = function (e: MessageEvent) {
         },
       });
     })
-    .catch((err: unknown) => {
+    .catch((error: unknown) => {
       this.postMessage({
         type: "ERROR",
         payload: {
           name: "Script Execution",
           passed: false,
-          error: err.message,
+          error,
         },
       });
     });
@@ -131,10 +131,9 @@ export const responseWorkerFunction = function (e: MessageEvent) {
     },
   };
 
-  try {
-    const scriptFunction = new Function(
-      "rq",
-      `
+  const scriptFunction = new Function(
+    "rq",
+    `
       "use strict";
       return (async () => {
       try {
@@ -146,9 +145,10 @@ export const responseWorkerFunction = function (e: MessageEvent) {
       }
       })();
       `
-    );
+  );
 
-    scriptFunction(sandbox.rq).then(() => {
+  scriptFunction(sandbox.rq)
+    .then(() => {
       this.postMessage({
         type: "SCRIPT_EXECUTED",
         payload: {
@@ -156,15 +156,15 @@ export const responseWorkerFunction = function (e: MessageEvent) {
           mutations,
         },
       });
+    })
+    .catch((error: unknown) => {
+      this.postMessage({
+        type: "ERROR",
+        payload: {
+          name: "Script Execution",
+          passed: false,
+          error,
+        },
+      });
     });
-  } catch (error) {
-    this.postMessage({
-      type: "ERROR",
-      payload: {
-        name: "Script Execution",
-        passed: false,
-        error: error.message,
-      },
-    });
-  }
 };
