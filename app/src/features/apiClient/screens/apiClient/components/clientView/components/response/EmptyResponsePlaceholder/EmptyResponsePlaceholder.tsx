@@ -15,7 +15,7 @@ export const EmptyResponsePlaceholder: React.FC<EmptyResponseViewProps> = ({ isF
         {isFailed ? (
           <Space>
             <CloseCircleFilled style={{ color: "#ff4d4f" }} />
-            Failed to send the request. Please check if the URL is valid.
+            Failed to send the request. Please check if the URL is valid or check the console for error.
           </Space>
         ) : (
           <>
