@@ -59,7 +59,13 @@ const cleanupWorker = (worker: Worker | null) => {
   }
 };
 
-const messageHandler = async (worker: Worker, environmentManager: any, event: MessageEvent, resolve: any) => {
+const messageHandler = async (
+  worker: Worker,
+  environmentManager: any,
+  event: MessageEvent,
+  resolve: any,
+  reject: any
+) => {
   const { type, payload } = event.data as WorkerMessage;
 
   switch (type) {
@@ -72,7 +78,7 @@ const messageHandler = async (worker: Worker, environmentManager: any, event: Me
 
     case "ERROR": {
       cleanupWorker(worker);
-      throw new Error(payload);
+      reject(payload);
     }
   }
 };
@@ -87,7 +93,7 @@ export const executePrerequestScript = (
   return new Promise((resolve, reject) => {
     worker = createWorker(requestWorkerFunction);
 
-    worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event, resolve);
+    worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event, resolve, reject);
 
     worker.onerror = (error) => {
       cleanupWorker(worker);
@@ -123,7 +129,7 @@ export const executePostresponseScript = (
   return new Promise((resolve, reject) => {
     worker = createWorker(responseWorkerFunction);
 
-    worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event, resolve);
+    worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event, resolve, reject);
 
     worker.onerror = (error) => {
       console.error("Response Worker error:", error);

@@ -41,6 +41,9 @@ export const executeAPIRequest = async (
       request: renderedRequest,
     };
   } catch (error) {
-    return null;
+    return {
+      ...entry,
+      response: null,
+    };
   }
 };

@@ -30,10 +30,9 @@ export const requestWorkerFunction = function (e: MessageEvent) {
     },
   };
 
-  try {
-    const scriptFunction = new Function(
-      "rq",
-      `
+  const scriptFunction = new Function(
+    "rq",
+    `
       "use strict";
       return (async () => {
       try {
@@ -45,9 +44,10 @@ export const requestWorkerFunction = function (e: MessageEvent) {
       }
       })();
       `
-    );
+  );
 
-    scriptFunction(sandbox.rq).then(() => {
+  scriptFunction(sandbox.rq)
+    .then(() => {
       this.postMessage({
         type: "SCRIPT_EXECUTED",
         payload: {
@@ -55,17 +55,18 @@ export const requestWorkerFunction = function (e: MessageEvent) {
           mutations,
         },
       });
+    })
+    .catch((err: unknown) => {
+      console.log("!!!debug", "promise catch", err);
+      this.postMessage({
+        type: "ERROR",
+        payload: {
+          name: "Script Execution",
+          passed: false,
+          error: err.message,
+        },
+      });
     });
-  } catch (error) {
-    this.postMessage({
-      type: "ERROR",
-      payload: {
-        name: "Script Execution",
-        passed: false,
-        error: error.message,
-      },
-    });
-  }
 };
 
 export const responseWorkerFunction = function (e: MessageEvent) {
