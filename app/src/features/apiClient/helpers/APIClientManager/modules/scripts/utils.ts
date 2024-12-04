@@ -79,7 +79,7 @@ const messageHandler = async (
           resolve(updatedVariables);
         })
         .catch((e) => {
-          reject(e);
+          reject(e.message);
         })
         .finally(() => {
           cleanupWorker(worker);
@@ -89,7 +89,7 @@ const messageHandler = async (
 
     case "ERROR": {
       cleanupWorker(worker);
-      reject(payload);
+      reject(payload.error);
     }
   }
 };

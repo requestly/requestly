@@ -12,6 +12,7 @@ interface Props {
   isFailed: boolean;
   isRequestCancelled: boolean;
   onCancelRequest: () => void;
+  errorMessage?: string;
 }
 
 const BOTTOM_SHEET_TAB_KEYS = {
@@ -25,6 +26,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   isFailed,
   isRequestCancelled,
   onCancelRequest,
+  errorMessage,
 }) => {
   const contentTypeHeader = useMemo(() => {
     return response?.headers ? getContentTypeFromResponseHeaders(response.headers) : "";
@@ -42,6 +44,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
             isLoading={isLoading}
             isFailed={isFailed}
             onCancelRequest={onCancelRequest}
+            errorMessage={errorMessage}
           />
         ),
       },
@@ -54,11 +57,12 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
             isLoading={isLoading}
             isFailed={isFailed}
             onCancelRequest={onCancelRequest}
+            errorMessage={errorMessage}
           />
         ),
       },
     ];
-  }, [response, isLoading, isFailed, onCancelRequest, contentTypeHeader]);
+  }, [response?.body, response?.headers, contentTypeHeader, isLoading, isFailed, onCancelRequest, errorMessage]);
 
   return <BottomSheet items={bottomSheetTabItems} disableDocking utilities={<StatusLine response={response} />} />;
 };

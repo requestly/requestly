@@ -78,6 +78,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
@@ -241,6 +242,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
         } else {
           setIsFailed(true);
+          setErrorMessage(entry?.errorMessage ?? null);
           trackRequestFailed();
           trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
           trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
@@ -359,6 +361,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               isFailed={isFailed}
               isRequestCancelled={isRequestCancelled}
               onCancelRequest={cancelRequest}
+              errorMessage={errorMessage}
             />
           }
           minSize={200}

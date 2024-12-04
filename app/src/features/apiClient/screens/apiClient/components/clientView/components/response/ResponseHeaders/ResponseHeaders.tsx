@@ -11,9 +11,10 @@ interface Props {
   isLoading: boolean;
   isFailed: boolean;
   onCancelRequest: () => void;
+  errorMessage?: string;
 }
 
-const ResponseHeaders: React.FC<Props> = ({ headers, isLoading, isFailed, onCancelRequest }) => {
+const ResponseHeaders: React.FC<Props> = ({ headers, isLoading, isFailed, onCancelRequest, errorMessage }) => {
   const transformedHeaders = useMemo(() => {
     return headers?.map((header) => ({
       key: header.key,
@@ -38,6 +39,7 @@ const ResponseHeaders: React.FC<Props> = ({ headers, isLoading, isFailed, onCanc
       ) : (
         <EmptyResponsePlaceholder
           isFailed={isFailed}
+          errorMessage={errorMessage}
           emptyDescription="Please run a request to see the response headers"
         />
       )}

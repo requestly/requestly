@@ -14,6 +14,7 @@ interface Props {
   isLoading: boolean;
   isFailed: boolean;
   onCancelRequest: () => void;
+  errorMessage?: string;
 }
 
 enum ResponseMode {
@@ -29,7 +30,14 @@ const ImageResponsePreview: React.FC<{ responseText: string; mimeType: string }>
   return <img src={responseText} className="image-response-preview" alt="Response" />;
 };
 
-const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader, isLoading, isFailed, onCancelRequest }) => {
+const ResponseBody: React.FC<Props> = ({
+  responseText,
+  contentTypeHeader,
+  isLoading,
+  isFailed,
+  onCancelRequest,
+  errorMessage,
+}) => {
   const [responseMode, setResponseMode] = useState(ResponseMode.PREVIEW);
   const [isResponseCopied, setIsResponseCopied] = useState(false);
 
@@ -130,7 +138,11 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader, isLoad
           )}
         </div>
       ) : (
-        <EmptyResponsePlaceholder isFailed={isFailed} emptyDescription="Please run a request to see the response" />
+        <EmptyResponsePlaceholder
+          isFailed={isFailed}
+          emptyDescription="Please run a request to see the response"
+          errorMessage={errorMessage}
+        />
       )}
     </div>
   );

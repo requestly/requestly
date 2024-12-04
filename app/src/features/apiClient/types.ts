@@ -68,6 +68,7 @@ export namespace RQAPI {
       preRequest: string;
       postResponse: string;
     };
+    errorMessage?: string;
   }
 
   export interface Collection {
