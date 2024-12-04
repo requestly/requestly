@@ -11,6 +11,10 @@ import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
 import { redirectToRequest } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import {
+  trackMoveRequestToCollectionFailed,
+  trackMoveRequestToCollectionSuccessful,
+} from "modules/analytics/events/features/apiClient";
 import "./moveToCollectionModal.scss";
 
 interface Props {
@@ -25,7 +29,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector(getUserAuthDetails);
-  const teamId = useSelector(getCurrentlyActiveWorkspace);
+  const team = useSelector(getCurrentlyActiveWorkspace);
 
   const collectionOptions = useMemo(() => {
     return apiClientRecords
@@ -36,50 +40,56 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       }));
   }, [apiClientRecords]);
 
-  const handleRecordMove = useCallback(async () => {
-    setIsLoading(true);
-    if (selectedCollection?.__isNew__) {
-      //create new collection and move request to it
-      const collectionToBeCreated: Partial<RQAPI.CollectionRecord> = {
-        collectionId: "",
-        name: selectedCollection.label,
-        type: RQAPI.RecordType.COLLECTION,
-        deleted: false,
-        data: {},
-      };
-      setIsLoading(true);
-      const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToBeCreated, teamId);
-      if (newCollection.success) {
-        onSaveRecord(newCollection.data);
-        const updatedRequest = { ...recordToMove, collectionId: newCollection.data.id };
-        const result = await upsertApiRecord(user?.details?.profile?.uid, updatedRequest, teamId);
-        if (result.success) {
-          toast.success("Request moved to collection successfully");
-          onSaveRecord(result.data);
-          redirectToRequest(navigate, result.data.id);
-        } else {
-          toast.error("Failed to move request to collection");
-        }
-      } else {
-        toast.error("Failed to create a new collection");
-      }
-      setIsLoading(false);
-      onClose();
+  const createNewCollection = useCallback(async () => {
+    const collectionToBeCreated: Partial<RQAPI.CollectionRecord> = {
+      collectionId: "",
+      name: selectedCollection.label,
+      type: RQAPI.RecordType.COLLECTION,
+      deleted: false,
+      data: {},
+    };
+    const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToBeCreated, team?.id);
+    if (newCollection.success) {
+      onSaveRecord(newCollection.data);
+      return newCollection.data.id;
     } else {
-      //move request to existing collection
-      const updatedRequest = { ...recordToMove, collectionId: selectedCollection.value };
-      const result = await upsertApiRecord(user.details?.profile?.uid, updatedRequest, teamId);
-      setIsLoading(false);
+      throw new Error("Failed to create a new collection");
+    }
+  }, [user?.details?.profile?.uid, team?.id, onSaveRecord, selectedCollection.label]);
+
+  const moveRecordToCollection = useCallback(
+    async (collectionId: string, isNewCollection: boolean) => {
+      const updatedRequest = { ...recordToMove, collectionId };
+      const result = await upsertApiRecord(user?.details?.profile?.uid, updatedRequest, team?.id);
       if (result.success) {
+        trackMoveRequestToCollectionSuccessful(isNewCollection ? "new_collection" : "existing_collection");
         toast.success("Request moved to collection successfully");
         onSaveRecord(result.data);
         redirectToRequest(navigate, result.data.id);
       } else {
-        toast.error("Failed to move request to collection");
+        throw new Error("Failed to move request to collection");
       }
+    },
+    [user?.details?.profile?.uid, team?.id, onSaveRecord, recordToMove, navigate]
+  );
+
+  const handleRecordMove = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const collectionId = selectedCollection?.__isNew__ ? await createNewCollection() : selectedCollection.value;
+
+      if (collectionId) {
+        await moveRecordToCollection(collectionId, selectedCollection?.__isNew__);
+      }
+    } catch (error) {
+      console.error("Error moving request to collection:", error);
+      toast.error(error.message);
+      trackMoveRequestToCollectionFailed(selectedCollection?.__isNew__ ? "new_collection" : "existing_collection");
+    } finally {
+      setIsLoading(false);
       onClose();
     }
-  }, [user?.details?.profile?.uid, teamId, onSaveRecord, recordToMove, selectedCollection, onClose, navigate]);
+  }, [selectedCollection, onClose, createNewCollection, moveRecordToCollection]);
 
   return (
     <Modal
@@ -98,7 +108,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         className="select-collection-group"
         classNamePrefix="select-collection-group"
         options={collectionOptions}
-        filterOption={(option) => option.value !== selectedCollection?.value}
+        filterOption={(option) => recordToMove.collectionId !== option.value}
         placeholder="Select or type collection name"
         theme={(theme) => ({
           ...theme,

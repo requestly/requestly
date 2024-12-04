@@ -14,6 +14,10 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/MoveToCollectionModal";
+import {
+  trackDuplicateRequestClicked,
+  trackMoveRequestToCollectionClicked,
+} from "modules/analytics/events/features/apiClient";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -21,7 +25,6 @@ interface Props {
 
 export const RequestRow: React.FC<Props> = ({ record }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [isMoveToCollectionModalOpen, setIsMoveToCollectionModalOpen] = useState(false);
   const [requestToMove, setRequestToMove] = useState(null);
   const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
@@ -59,6 +62,7 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           handleDuplicateRequest(record);
+          trackDuplicateRequestClicked();
         },
       },
       {
@@ -67,7 +71,7 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setRequestToMove(record);
-          setIsMoveToCollectionModalOpen(true);
+          trackMoveRequestToCollectionClicked();
         },
       },
       {
@@ -85,12 +89,11 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
 
   return (
     <>
-      {isMoveToCollectionModalOpen && (
+      {requestToMove && (
         <MoveToCollectionModal
           recordToMove={requestToMove}
-          isOpen={isMoveToCollectionModalOpen}
+          isOpen={requestToMove}
           onClose={() => {
-            setIsMoveToCollectionModalOpen(false);
             setRequestToMove(null);
           }}
         />
