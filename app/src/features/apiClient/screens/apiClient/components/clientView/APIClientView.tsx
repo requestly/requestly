@@ -404,7 +404,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   Send
                 </RQButton>
                 {user.loggedIn && !openInModal ? (
-                  <RQButton onClick={onSaveButtonClick} loading={isRequestSaving}>
+                  <RQButton
+                    showHotKeyText
+                    hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
+                    onClick={onSaveButtonClick}
+                    loading={isRequestSaving}
+                  >
                     Save
                   </RQButton>
                 ) : null}
