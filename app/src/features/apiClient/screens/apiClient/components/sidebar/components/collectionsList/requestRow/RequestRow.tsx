@@ -13,6 +13,11 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
+import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/MoveToCollectionModal";
+import {
+  trackDuplicateRequestClicked,
+  trackMoveRequestToCollectionClicked,
+} from "modules/analytics/events/features/apiClient";
 import { redirectToRequest } from "utils/RedirectionUtils";
 
 interface Props {
@@ -21,6 +26,7 @@ interface Props {
 
 export const RequestRow: React.FC<Props> = ({ record }) => {
   const [isEditMode, setIsEditMode] = useState(false);
+  const [recordToMove, setRecordToMove] = useState(null);
   const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const teamId = useSelector(getCurrentlyActiveWorkspace);
@@ -66,10 +72,20 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           handleDuplicateRequest(record);
+          trackDuplicateRequestClicked();
         },
       },
       {
         key: "2",
+        label: <div>Move to Collection</div>,
+        onClick: (itemInfo) => {
+          itemInfo.domEvent?.stopPropagation?.();
+          setRecordToMove(record);
+          trackMoveRequestToCollectionClicked();
+        },
+      },
+      {
+        key: "3",
         label: <div>Delete</div>,
         danger: true,
         onClick: (itemInfo) => {
@@ -83,6 +99,15 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
 
   return (
     <>
+      {recordToMove && (
+        <MoveToCollectionModal
+          recordToMove={recordToMove}
+          isOpen={recordToMove}
+          onClose={() => {
+            setRecordToMove(null);
+          }}
+        />
+      )}
       {isEditMode ? (
         <NewRecordNameInput
           analyticEventSource="collection_row"
