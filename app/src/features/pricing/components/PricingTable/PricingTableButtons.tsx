@@ -11,7 +11,7 @@ import {
   trackCheckoutInitiated,
 } from "modules/analytics/events/misc/business/checkout";
 import { useState } from "react";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import { ChangePlanRequestConfirmationModal } from "../ChangePlanRequestConfirmationModal";
@@ -189,7 +189,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     setIsButtonLoading(true);
     if (!user?.details?.isLoggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
@@ -210,7 +210,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       }
       case CTA_ONCLICK_FUNCTIONS.SIGNUP: {
         dispatch(
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,
             newProps: {
@@ -226,7 +226,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       case CTA_ONCLICK_FUNCTIONS.CHECKOUT: {
         trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
         dispatch(
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "pricingModal",
             newValue: true,
             newProps: {

@@ -5,7 +5,7 @@ import { useCallback, useState } from "react";
 import starAnimation from "assets/images/gifs/Stars.gif";
 import { trackSlackConnectClicked } from "modules/analytics/events/misc/UnifiedSupport";
 import { useDispatch } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import "./joinSlackButton.scss";
 import Logger from "lib/logger";
 
@@ -18,7 +18,7 @@ const JoinSlackButton = () => {
     sendSlackInvite()
       .then(() => {
         // @ts-ignore
-        dispatch(actions.updateIsSlackConnectButtonVisible(false));
+        dispatch(globalActions.updateIsSlackConnectButtonVisible(false));
         trackSlackConnectClicked("sidebar");
       })
       .catch((err) => {

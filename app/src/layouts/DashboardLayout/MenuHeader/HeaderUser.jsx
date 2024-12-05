@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Dropdown, Col, Avatar, Spin, Button } from "antd";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import {
   redirectToAccountDetails,
   redirectToBillingTeamSettings,
@@ -89,7 +89,7 @@ export default function HeaderUser() {
           handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch)
             .then(() => {
               dispatch(
-                actions.updateHardRefreshPendingStatus({
+                globalActions.updateHardRefreshPendingStatus({
                   type: "rules",
                 })
               );
@@ -141,7 +141,7 @@ export default function HeaderUser() {
               onClick={() => {
                 trackUpgradeClicked("header");
                 dispatch(
-                  actions.toggleActiveModal({
+                  globalActions.toggleActiveModal({
                     modalName: "pricingModal",
                     newValue: true,
                     newProps: { selectedPlan: null, source: "header_upgrade_button" },
@@ -163,7 +163,7 @@ export default function HeaderUser() {
               onClick={(e) => {
                 e.preventDefault();
                 dispatch(
-                  actions.toggleActiveModal({
+                  globalActions.toggleActiveModal({
                     modalName: "authModal",
                     newValue: true,
                     newProps: {

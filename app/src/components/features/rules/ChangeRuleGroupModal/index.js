@@ -9,7 +9,7 @@ import { StorageService } from "../../../../init";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //REDUCER ACTIONS
-import { actions } from "../../../../store";
+import { globalActions } from "store/slices/global/slice";
 import { getAllGroups, getAppMode, getCurrentlySelectedRuleData, getIsRefreshRulesPending } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 //ACTIONS
@@ -83,7 +83,7 @@ const ChangeRuleGroupModal = (props) => {
           props.clearSearch?.();
           //Refresh List
           dispatch(
-            actions.updateRefreshPendingStatus({
+            globalActions.updateRefreshPendingStatus({
               type: "rules",
               newValue: !isRulesListRefreshPending,
             })
@@ -109,7 +109,7 @@ const ChangeRuleGroupModal = (props) => {
     StorageService(appMode)
       .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP)
       .then((groups) => {
-        dispatch(actions.updateGroups(groups));
+        dispatch(globalActions.updateGroups(groups));
       });
   }, [dispatch, currentlySelectedRuleData, appMode]);
 
