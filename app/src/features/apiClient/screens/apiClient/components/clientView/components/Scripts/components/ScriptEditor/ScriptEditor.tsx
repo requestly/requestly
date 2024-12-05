@@ -17,13 +17,13 @@ const DEFAULT_SCRIPT_VALUES = {
 };
 
 export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts }) => {
-  const ActiveScript = scripts?.[RQAPI.ScriptType.PRE_REQUEST]
+  const activeScriptType = scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
     : scripts?.[RQAPI.ScriptType.POST_RESPONSE]
     ? RQAPI.ScriptType.POST_RESPONSE
     : RQAPI.ScriptType.PRE_REQUEST;
 
-  const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(ActiveScript);
+  const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
 
   const scriptTypeOptions = useMemo(() => {
     return (
