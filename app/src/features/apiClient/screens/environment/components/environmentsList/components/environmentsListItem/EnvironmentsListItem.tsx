@@ -3,7 +3,7 @@ import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz
 import { Dropdown, Input, Tooltip, Typography } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import PATHS from "config/constants/sub/paths";
-import { TabsLayoutContextInterface } from "layouts/TabsLayout";
+import { TabsLayoutContextInterface, useTabsLayoutContext } from "layouts/TabsLayout";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -33,6 +33,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
   const [isRenaming, setIsRenaming] = useState(false);
+  const { updateTab } = useTabsLayoutContext();
 
   const handleEnvironmentRename = useCallback(async () => {
     if (newEnvironmentName === environment.name) {
@@ -42,6 +43,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
     setIsRenaming(true);
     renameEnvironment(environment.id, newEnvironmentName)
       .then(() => {
+        updateTab(environment.id, { title: newEnvironmentName });
         toast.success("Environment renamed successfully");
       })
       .catch(() => {
@@ -51,7 +53,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
         setIsRenaming(false);
         setIsRenameInputVisible(false);
       });
-  }, [newEnvironmentName, environment.id, environment.name, renameEnvironment]);
+  }, [newEnvironmentName, environment.id, environment.name, renameEnvironment, updateTab]);
 
   const handleEnvironmentDuplicate = useCallback(async () => {
     toast.loading("Duplicating environment...");
