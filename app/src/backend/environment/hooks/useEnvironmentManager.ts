@@ -227,7 +227,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       }
       return null;
     },
-    [allEnvironmentData]
+    [allEnvironmentData, currentEnvironmentId]
   );
 
   const renameEnvironment = useCallback(
@@ -239,31 +239,29 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     [ownerId, dispatch]
   );
 
-  const duplicateEnvironment = useCallback(async (environmentId: string) => {
-    return duplicateEnvironmentInDB(ownerId, environmentId, allEnvironmentData).then((newEnvironment) => {
-      dispatch(environmentVariablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name }));
-      dispatch(
-        environmentVariablesActions.updateEnvironmentData({
-          newVariables: newEnvironment.variables,
-          environmentId: newEnvironment.id,
-        })
-      );
-    });
-  }, []);
+  const duplicateEnvironment = useCallback(
+    async (environmentId: string) => {
+      return duplicateEnvironmentInDB(ownerId, environmentId, allEnvironmentData).then((newEnvironment) => {
+        dispatch(environmentVariablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name }));
+        dispatch(
+          environmentVariablesActions.updateEnvironmentData({
+            newVariables: newEnvironment.variables,
+            environmentId: newEnvironment.id,
+          })
+        );
+      });
+    },
+    [allEnvironmentData, dispatch, ownerId]
+  );
 
-  const deleteEnvironment = useCallback(async (environmentId: string) => {
-    const allEnvironmentsMap = { ...allEnvironmentData };
-    const isActiveEnvironmentBeingDeleted = currentEnvironmentId === environmentId;
-    return deleteEnvironmentFromDB(ownerId, environmentId).then(() => {
-      dispatch(environmentVariablesActions.removeEnvironment({ environmentId }));
-      delete allEnvironmentsMap[environmentId];
-      if (isActiveEnvironmentBeingDeleted && Object.keys(allEnvironmentsMap).length > 0) {
-        setCurrentEnvironment(Object.keys(allEnvironmentsMap)[0]);
-      } else {
-        dispatch(environmentVariablesActions.resetState());
-      }
-    });
-  }, []);
+  const deleteEnvironment = useCallback(
+    async (environmentId: string) => {
+      return deleteEnvironmentFromDB(ownerId, environmentId).then(() => {
+        dispatch(environmentVariablesActions.removeEnvironment({ environmentId }));
+      });
+    },
+    [ownerId, dispatch]
+  );
 
   return {
     setCurrentEnvironment,

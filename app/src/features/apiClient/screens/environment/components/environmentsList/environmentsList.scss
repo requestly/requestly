@@ -14,12 +14,16 @@
     svg.active-env-icon {
       position: relative;
       top: 2px;
-      font-size: var(--requestly-font-size-sm);
+      font-size: var(--requestly-font-size-md);
       color: var(--requestly-color-success);
     }
 
     &:hover {
       background-color: var(--requestly-color-white-t-10);
+
+      .environment-list-item-dropdown-button {
+        opacity: 1;
+      }
     }
 
     &:not(:first-child) {
@@ -43,7 +47,7 @@
 }
 
 .environment-input.ant-input {
-  width: 220px;
+  width: 100%;
   margin: 8px 0;
   font-size: var(--requestly-font-size-xs);
   padding: var(--space-2, 4px) var(--space-4, 8px) !important;
@@ -59,4 +63,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0;
 }

@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState, useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState, useMemo, useRef } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { Input } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../../../apiClient/components/sidebar/components/sidebarListHeader/SidebarListHeader";
-import { redirectToEnvironment, redirectToNewEnvironment } from "utils/RedirectionUtils";
+import { redirectToNewEnvironment } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
 import { globalActions } from "store/slices/global/slice";
@@ -14,24 +14,60 @@ import { EmptyState } from "features/apiClient/screens/apiClient/components/side
 import { ListEmptySearchView } from "features/apiClient/screens/apiClient/components/sidebar/components/listEmptySearchView/ListEmptySearchView";
 import { EnvironmentAnalyticsSource } from "../../types";
 import { EnvironmentsListItem } from "./components/environmentsListItem/EnvironmentsListItem";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
+  const { envId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const user = useSelector(getUserAuthDetails);
-  const { getAllEnvironments, addNewEnvironment, setCurrentEnvironment } = useEnvironmentManager();
+  const {
+    getAllEnvironments,
+    addNewEnvironment,
+    setCurrentEnvironment,
+    isEnvironmentsLoading,
+  } = useEnvironmentManager();
   const [searchValue, setSearchValue] = useState("");
   const [isNewEnvironmentInputVisible, setIsNewEnvironmentInputVisible] = useState(false);
   const [newEnvironmentValue, setNewEnvironmentValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const { openTab, replaceTab } = useTabsLayoutContext();
 
   const environments = useMemo(() => getAllEnvironments(), [getAllEnvironments]);
   const filteredEnvironments = useMemo(
     () => environments.filter((environment) => environment.name.toLowerCase().includes(searchValue.toLowerCase())),
     [environments, searchValue]
   );
+
+  const hasOpenedDefaultTab = useRef(false);
+  useEffect(() => {
+    if (isEnvironmentsLoading) {
+      return;
+    }
+
+    if (hasOpenedDefaultTab.current) {
+      return;
+    }
+
+    hasOpenedDefaultTab.current = true;
+
+    if (environments.length === 0) {
+      const recordId = "environments/new";
+      openTab(recordId, {
+        title: "New environment",
+        url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/new`,
+      });
+    } else {
+      const recordId = environments[0].id;
+      openTab(recordId, {
+        title: environments[0].name,
+        url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${recordId}`,
+      });
+    }
+  }, [environments, openTab, isEnvironmentsLoading]);
 
   const handleAddEnvironmentClick = useCallback(() => {
     if (!user.loggedIn) {
@@ -53,24 +89,28 @@ export const EnvironmentsList = () => {
   }, [user.loggedIn, dispatch, navigate]);
 
   const handleAddNewEnvironment = useCallback(async () => {
-    if (newEnvironmentValue) {
-      setIsLoading(true);
-      const newEnvironment = await addNewEnvironment(newEnvironmentValue);
-      if (newEnvironment) {
-        if (environments.length === 0) {
-          // if there are no environments, set the new environment as the active environment
-          setCurrentEnvironment(newEnvironment.id);
-        }
-        redirectToEnvironment(navigate, newEnvironment.id);
-        trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
+    setIsLoading(true);
+    const newEnvironment = await addNewEnvironment(newEnvironmentValue || "New Environment");
+    if (newEnvironment) {
+      if (environments.length === 0) {
+        // if there are no environments, set the new environment as the active environment
+        setCurrentEnvironment(newEnvironment.id);
       }
-      setIsLoading(false);
-    } else {
-      navigate(-1);
+
+      if (envId === "new") {
+        replaceTab("environments/new", {
+          id: newEnvironment.id,
+          title: newEnvironment.name,
+          url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${newEnvironment.id}`,
+        });
+      }
+
+      trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
     }
+    setIsLoading(false);
     setIsNewEnvironmentInputVisible(false);
     setNewEnvironmentValue("");
-  }, [addNewEnvironment, navigate, environments.length, newEnvironmentValue, setCurrentEnvironment]);
+  }, [addNewEnvironment, environments.length, newEnvironmentValue, setCurrentEnvironment, replaceTab, envId]);
 
   useEffect(() => {
     if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE) && user.loggedIn) {
@@ -128,7 +168,7 @@ export const EnvironmentsList = () => {
               <>
                 {filteredEnvironments.map((environment) =>
                   environment.name.toLowerCase().includes(searchValue.toLowerCase()) ? (
-                    <EnvironmentsListItem environment={environment} />
+                    <EnvironmentsListItem openTab={openTab} environment={environment} />
                   ) : null
                 )}
               </>
