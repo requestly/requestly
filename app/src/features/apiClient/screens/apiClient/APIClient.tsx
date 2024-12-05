@@ -1,61 +1,124 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import APIClientView from "./components/clientView/APIClientView";
 import { DeleteApiRecordModal, ImportRequestModal } from "./components/modals";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { useNavigate, useParams } from "react-router-dom";
+import { getEmptyAPIEntry } from "./utils";
+import { getApiRecord, upsertApiRecord } from "backend/apiClient";
+import Logger from "lib/logger";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { redirectToRequest } from "utils/RedirectionUtils";
 import "./apiClient.scss";
 
 interface Props {}
 
 export const APIClient: React.FC<Props> = () => {
+  const user = useSelector(getUserAuthDetails);
+  const uid = user?.details?.profile?.uid;
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const teamId = workspace?.id;
+
+  const { requestId } = useParams();
   const {
     recordToBeDeleted,
     isDeleteModalOpen,
     onDeleteModalClose,
     addToHistory,
-    selectedEntryDetails,
-    isLoading,
     isImportModalOpen,
-    handleImportRequest,
     onImportRequestModalClose,
+    onSaveRecord,
+    setIsImportModalOpen,
   } = useApiClientContext();
 
-  const { activeTab } = useTabsLayoutContext();
+  const navigate = useNavigate();
 
-  const [apiEntry, setApiEntry] = useState<RQAPI.Entry>();
-  const [apiEntryDetails, setApiEntryDetails] = useState<RQAPI.ApiRecord>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
 
-  const hasUpdated = useRef(false);
+  const isRequestFetched = useRef(false);
 
-  const shouldUpdate = activeTab?.id === selectedEntryDetails?.id;
-
-  const isApiEntryDetailsExist = !!apiEntryDetails;
-
-  // Stopping the internal re-renders
   useEffect(() => {
-    if (!shouldUpdate) {
+    if (isRequestFetched.current) {
       return;
     }
 
-    if (hasUpdated.current) {
+    if (!requestId || requestId === "new") {
       return;
     }
 
-    if (isApiEntryDetailsExist) {
-      hasUpdated.current = true;
-    }
+    setIsLoading(true);
 
-    setApiEntry(selectedEntryDetails?.data);
-    setApiEntryDetails(selectedEntryDetails);
-  }, [selectedEntryDetails, isApiEntryDetailsExist, shouldUpdate]);
+    getApiRecord(requestId)
+      .then((result) => {
+        if (result.success) {
+          isRequestFetched.current = true;
+
+          if (result.data.type === RQAPI.RecordType.API) {
+            setSelectedEntryDetails(result.data);
+          }
+        }
+      })
+      .catch((error) => {
+        setSelectedEntryDetails(null);
+        // TODO: redirect to new empty entry
+        Logger.error("Error loading api record", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [requestId]);
+
+  const saveRequest = useCallback(
+    async (apiEntry: RQAPI.Entry) => {
+      if (!user?.loggedIn) {
+        return;
+      }
+
+      setIsLoading(true);
+
+      const record: Partial<RQAPI.ApiRecord> = {
+        type: RQAPI.RecordType.API,
+        data: apiEntry,
+      };
+
+      const result = await upsertApiRecord(uid, record, teamId);
+
+      if (result.success) {
+        onSaveRecord(result.data);
+        redirectToRequest(navigate, result.data.id);
+      }
+
+      setIsLoading(false);
+
+      return result.data;
+    },
+    [uid, user?.loggedIn, teamId, onSaveRecord, navigate]
+  );
+
+  const handleImportRequest = useCallback(
+    async (request: RQAPI.Request) => {
+      const apiEntry = getEmptyAPIEntry(request);
+
+      return saveRequest(apiEntry)
+        .then((apiRecord: RQAPI.ApiRecord) => {
+          setSelectedEntryDetails(apiRecord);
+        })
+        .finally(() => {
+          setIsImportModalOpen(false);
+        });
+    },
+    [saveRequest, setIsImportModalOpen]
+  );
 
   return (
-    <div className="api-client-container-content" key={apiEntryDetails?.id}>
+    <div className="api-client-container-content" key={selectedEntryDetails?.id}>
       <APIClientView
         // TODO: Fix - "apiEntry" is used for history, remove this prop and derive everything from "apiEntryDetails"
-        apiEntry={apiEntry}
-        apiEntryDetails={apiEntryDetails}
+        apiEntry={selectedEntryDetails?.data}
+        apiEntryDetails={selectedEntryDetails}
         notifyApiRequestFinished={addToHistory}
       />
       <ImportRequestModal
