@@ -3,7 +3,7 @@ import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz
 import { Dropdown, Input, Tooltip, Typography } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import PATHS from "config/constants/sub/paths";
-import { TabsLayoutContextInterface } from "layouts/TabsLayout";
+import { TabsLayoutContextInterface, useTabsLayoutContext } from "layouts/TabsLayout";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -41,6 +41,8 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
   const [isRenaming, setIsRenaming] = useState(false);
+
+  const { closeTab } = useTabsLayoutContext();
 
   const handleEnvironmentRename = useCallback(async () => {
     if (newEnvironmentName === environment.name) {
@@ -85,6 +87,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
             setCurrentEnvironment(availableEnvironments[0].id);
           }
         }
+        closeTab(environment.id);
       })
       .catch(() => {
         toast.error("Failed to delete environment");
@@ -97,6 +100,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
     envId,
     currentEnvironmentId,
     setCurrentEnvironment,
+    closeTab,
   ]);
 
   const menuItems = useMemo(() => {
