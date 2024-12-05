@@ -7,6 +7,7 @@ import "./responseBody.scss";
 import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
 import { RQButton } from "lib/design-system-v2/components";
 import { IoMdCopy } from "@react-icons/all-files/io/IoMdCopy";
+import { RQAPI } from "features/apiClient/types";
 
 interface Props {
   responseText: string;
@@ -14,6 +15,7 @@ interface Props {
   isLoading: boolean;
   isFailed: boolean;
   onCancelRequest: () => void;
+  error?: RQAPI.RequestErrorEntry["error"];
 }
 
 enum ResponseMode {
@@ -29,7 +31,14 @@ const ImageResponsePreview: React.FC<{ responseText: string; mimeType: string }>
   return <img src={responseText} className="image-response-preview" alt="Response" />;
 };
 
-const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader, isLoading, isFailed, onCancelRequest }) => {
+const ResponseBody: React.FC<Props> = ({
+  responseText,
+  contentTypeHeader,
+  isLoading,
+  isFailed,
+  onCancelRequest,
+  error,
+}) => {
   const [responseMode, setResponseMode] = useState(ResponseMode.PREVIEW);
   const [isResponseCopied, setIsResponseCopied] = useState(false);
 
@@ -130,7 +139,11 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader, isLoad
           )}
         </div>
       ) : (
-        <EmptyResponsePlaceholder isFailed={isFailed} emptyDescription="Please run a request to see the response" />
+        <EmptyResponsePlaceholder
+          isFailed={isFailed}
+          emptyDescription="Please run a request to see the response"
+          error={error}
+        />
       )}
     </div>
   );
