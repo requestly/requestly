@@ -36,6 +36,9 @@ export const requestWorkerFunction = function (e: MessageEvent) {
       request,
       environment: {
         set: (key: string, value: any) => {
+          if (key === undefined || value === undefined) {
+            throw new Error("Key or value is undefined while setting environment variable.");
+          }
           mutations.environment.$set[key] = value;
         },
         get: (key: string) => {
@@ -135,6 +138,9 @@ export const responseWorkerFunction = function (e: MessageEvent) {
       response,
       environment: {
         set: (key: string, value: any) => {
+          if (key === undefined || value === undefined) {
+            throw new Error("Key or value is undefined while setting environment variable.");
+          }
           mutations.environment.$set[key] = value;
         },
         get: (key: string) => {
