@@ -220,3 +220,7 @@ export const updateBillingTeamNudgeLastSeenTs = (prevState, action) => {
 export const updateIsSlackConnectButtonVisible = (prevState, action) => {
   prevState.misc.persist.isSlackConnectButtonVisible = action.payload;
 };
+
+export const setIsSyncingV2 = (prevState, action) => {
+  prevState.syncingV2 = action.payload;
+};

@@ -31,7 +31,7 @@ import {
 import { StorageService } from "init";
 import { getEventsEngineFlag, handleEventBatches } from "modules/analytics/events/extension";
 import PSMH from "../config/PageScriptMessageHandler";
-import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
+// import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { trackDesktopBGEvent, trackDesktopMainEvent } from "modules/analytics/events/desktopApp/backgroundEvents";
@@ -327,29 +327,29 @@ const AppModeInitializer = () => {
         .saveRecord(getEventsEngineFlag)
         .then(() => notifyAppLoadedToExtension());
 
-      PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS, (message) => {
-        const batchIdsToAcknowledge = handleEventBatches(message.eventBatches);
-        return {
-          ackIds: batchIdsToAcknowledge,
-          received: true,
-        };
-      });
+      // PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS, (message) => {
+      //   const batchIdsToAcknowledge = handleEventBatches(message.eventBatches);
+      //   return {
+      //     ackIds: batchIdsToAcknowledge,
+      //     received: true,
+      //   };
+      // });
 
-      PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (_message) => {
-        window.skipSyncListenerForNextOneTime = false;
-        toast.loading("Just a sec, fetching updated rules..", 2, true);
-        invokeSyncingIfRequired({
-          dispatch,
-          uid: user?.details?.profile?.uid,
-          team_id: currentlyActiveWorkspace?.id,
-          appMode,
-          isSyncEnabled: user?.details?.isSyncEnabled,
-        });
+      // PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (_message) => {
+      //   window.skipSyncListenerForNextOneTime = false;
+      //   toast.loading("Just a sec, fetching updated rules..", 2, true);
+      //   invokeSyncingIfRequired({
+      //     dispatch,
+      //     uid: user?.details?.profile?.uid,
+      //     team_id: currentlyActiveWorkspace?.id,
+      //     appMode,
+      //     isSyncEnabled: user?.details?.isSyncEnabled,
+      //   });
 
-        return {
-          received: true,
-        };
-      });
+      //   return {
+      //     received: true,
+      //   };
+      // });
     }
   }, [appMode, currentlyActiveWorkspace?.id, dispatch, user?.details?.isSyncEnabled, user?.details?.profile?.uid]);
 

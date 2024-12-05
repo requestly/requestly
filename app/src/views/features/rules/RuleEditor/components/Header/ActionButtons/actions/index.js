@@ -30,38 +30,39 @@ export const saveRule = async (appMode, dispatch, ruleObject) => {
 
   //Save the rule
   Logger.log("Writing to storage in saveRule");
-  const ruleSavePromises = [
-    detectUnsettledPromise(StorageService(appMode).saveRuleOrGroup(ruleToSave), 10000),
-    detectUnsettledPromise(StorageService(appMode).getRecord(ruleToSave.groupId), 10000),
-  ];
+  await StorageService(appMode).saveRuleOrGroup(ruleToSave);
+  // const ruleSavePromises = [
+  //   detectUnsettledPromise(StorageService(appMode).saveRuleOrGroup(ruleToSave), 10000),
+  //   detectUnsettledPromise(StorageService(appMode).getRecord(ruleToSave.groupId), 10000),
+  // ];
 
-  return Promise.all(ruleSavePromises)
-    .then(([_, result_1]) => {
-      //Set the modification date of group
-      if (result_1 && result_1.objectType === "group") {
-        const groupToSave = {
-          ...result_1,
-          modificationDate: generateObjectCreationDate(),
-        };
-        //Save the group
-        Logger.log("Writing to storage in saveRule");
-        return StorageService(appMode)
-          .saveRuleOrGroup(groupToSave)
-          .catch(() => {
-            throw new Error("Error in saving rule");
-          });
-      }
-    })
-    .catch((error) => {
-      Logger.log("Error in saving rule:", error);
-      trackErrorInRuleCreation("save_rule_error", ruleToSave.ruleType);
-      Sentry.captureException(error, {
-        tags: {
-          error_source: "save_rule",
-        },
-      });
-      throw new Error("Error in saving rule");
-    });
+  // return Promise.all(ruleSavePromises)
+  //   .then(([_, result_1]) => {
+  //     //Set the modification date of group
+  //     if (result_1 && result_1.objectType === "group") {
+  //       const groupToSave = {
+  //         ...result_1,
+  //         modificationDate: generateObjectCreationDate(),
+  //       };
+  //       //Save the group
+  //       Logger.log("Writing to storage in saveRule");
+  //       return StorageService(appMode)
+  //         .saveRuleOrGroup(groupToSave)
+  //         .catch(() => {
+  //           throw new Error("Error in saving rule");
+  //         });
+  //     }
+  //   })
+  //   .catch((error) => {
+  //     Logger.log("Error in saving rule:", error);
+  //     trackErrorInRuleCreation("save_rule_error", ruleToSave.ruleType);
+  //     Sentry.captureException(error, {
+  //       tags: {
+  //         error_source: "save_rule",
+  //       },
+  //     });
+  //     throw new Error("Error in saving rule");
+  //   });
 };
 
 export const validateSyntaxInRule = async (dispatch, ruleToSave) => {
