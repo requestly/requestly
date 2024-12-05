@@ -2,6 +2,7 @@ import { notification } from "antd";
 import { makeRequest } from "../../screens/apiClient/utils";
 import { RQAPI } from "../../types";
 import { executePrerequestScript, executePostresponseScript } from "./modules/scripts/utils";
+import { renderTemplate } from "backend/environment/utils";
 
 export const executeAPIRequest = async (
   appMode: string,
@@ -10,7 +11,7 @@ export const executeAPIRequest = async (
   signal?: AbortSignal
 ): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
   // Process request configuration with environment variables
-  const renderedRequest = environmentManager.renderVariables(entry.request);
+  let renderedRequest = environmentManager.renderVariables(entry.request);
   let currentEnvironmentVariables = environmentManager.getCurrentEnvironmentVariables();
   let response: RQAPI.Response | null = null;
 
@@ -23,6 +24,9 @@ export const executeAPIRequest = async (
       );
 
       currentEnvironmentVariables = updatedVariables;
+      // TODO@nafees87n: Fix this while refactoring, rendering should always get fresh variables
+      // Temporarily passing current variables
+      renderedRequest = renderTemplate(entry.request, currentEnvironmentVariables);
     }
   } catch (error) {
     return {
