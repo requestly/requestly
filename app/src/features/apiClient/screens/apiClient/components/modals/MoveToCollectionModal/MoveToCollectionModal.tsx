@@ -108,7 +108,9 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         className="select-collection-group"
         classNamePrefix="select-collection-group"
         options={collectionOptions}
-        filterOption={(option) => recordToMove.collectionId !== option.value}
+        filterOption={(option, inputValue) =>
+          recordToMove.collectionId !== option.value && option.label.toLowerCase().includes(inputValue.toLowerCase())
+        }
         placeholder="Select or type collection name"
         theme={(theme) => ({
           ...theme,
