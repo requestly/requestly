@@ -40,13 +40,25 @@ const handleEnvironmentChanges = async (
   const variablesToSet = {
     ...currentVars,
     ...Object.fromEntries(
-      Object.entries(payload.mutations.environment.$set).map(([key, value]) => [
-        key,
-        {
-          syncValue: value,
-          localValue: value,
-        },
-      ])
+      Object.entries(payload.mutations.environment.$set).map(([key, value]) => {
+        if (currentVars[key]) {
+          return [
+            key,
+            {
+              syncValue: currentVars[key].syncValue,
+              localValue: value,
+            },
+          ];
+        }
+
+        return [
+          key,
+          {
+            syncValue: value,
+            localValue: value,
+          },
+        ];
+      })
     ),
   };
 
