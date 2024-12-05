@@ -9,6 +9,7 @@ const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
   openTab: (tabId: TabsLayout.Tab["id"], tabDetails?: Partial<TabsLayout.Tab>) => {},
   updateTab: (tabId: TabsLayout.Tab["id"], updatedTabData?: Partial<TabsLayout.Tab>) => {},
   replaceTab: (tabId: TabsLayout.Tab["id"], newTabData?: Partial<TabsLayout.Tab>) => {},
+  tabOutletElementsMap: undefined,
 });
 
 interface TabsLayoutProviderProps {
@@ -17,6 +18,9 @@ interface TabsLayoutProviderProps {
 
 export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children }) => {
   const navigate = useNavigate();
+
+  // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
+  const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
 
   const [tabs, setTabs] = useState<TabsLayout.Tab[]>([]); // TODO: Persist saved tabs
   const [activeTab, setActiveTab] = useState<TabsLayout.Tab>();
@@ -47,6 +51,8 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
         const nextActiveTab = updatedTabs[targetTabIndex === updatedTabs.length ? targetTabIndex - 1 : targetTabIndex];
         updateActivetab(nextActiveTab);
       }
+
+      delete tabOutletElementsMap.current[tabId];
     },
     [tabs, activeTab?.id, updateActivetab]
   );
@@ -89,7 +95,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
     [activeTab, updateActivetab]
   );
 
-  const value = { activeTab, tabs, openTab, closeTab, updateTab, replaceTab };
+  const value = { activeTab, tabs, openTab, closeTab, updateTab, replaceTab, tabOutletElementsMap };
 
   return <TabsLayoutContext.Provider value={value}>{children}</TabsLayoutContext.Provider>;
 };
