@@ -43,6 +43,8 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
   const [isRenaming, setIsRenaming] = useState(false);
   const { updateTab } = useTabsLayoutContext();
 
+  const { closeTab } = useTabsLayoutContext();
+
   const handleEnvironmentRename = useCallback(async () => {
     if (newEnvironmentName === environment.name) {
       setIsRenameInputVisible(false);
@@ -87,6 +89,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
             setCurrentEnvironment(availableEnvironments[0].id);
           }
         }
+        closeTab(environment.id);
       })
       .catch(() => {
         toast.error("Failed to delete environment");
@@ -99,6 +102,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
     envId,
     currentEnvironmentId,
     setCurrentEnvironment,
+    closeTab,
   ]);
 
   const menuItems = useMemo(() => {
