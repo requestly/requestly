@@ -3,8 +3,8 @@ import { Checkbox, Form, FormInstance } from "antd";
 import { KeyValueFormType, KeyValuePair } from "features/apiClient/types";
 import { trackEnableKeyValueToggled } from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
+import { EnvironmentVariables } from "backend/environment/types";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -29,6 +29,7 @@ interface EditableCellProps {
   dataIndex: keyof KeyValuePair;
   record: KeyValuePair;
   pairtype: KeyValueFormType;
+  variables: EnvironmentVariables;
   handleUpdatePair: (record: KeyValuePair) => void;
 }
 
@@ -39,12 +40,11 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
   dataIndex,
   record,
   pairtype,
+  variables,
   handleUpdatePair,
   ...restProps
 }) => {
   const form = useContext(EditableContext);
-  const { getCurrentEnvironmentVariables } = useEnvironmentManager();
-  const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
   const save = async () => {
     try {
@@ -81,7 +81,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
               form.setFieldsValue({ [dataIndex]: value });
               save();
             }}
-            variables={currentEnvironmentVariables}
+            variables={variables}
           />
         )}
       </Form.Item>
