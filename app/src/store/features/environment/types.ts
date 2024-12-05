@@ -4,7 +4,7 @@ export interface InitialState {
   currentEnvironment: string;
   environments: EnvironmentMap;
   api_collections: {
-    [key: string]: {
+    [collectionId: string]: {
       variables: EnvironmentVariables;
     };
   };
