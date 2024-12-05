@@ -37,7 +37,7 @@
       display: flex;
       flex: auto;
       height: 32px;
-      width: 100%;
+      width: calc(100% - 205px);
 
       .api-request-method-selector {
         width: 120px;
