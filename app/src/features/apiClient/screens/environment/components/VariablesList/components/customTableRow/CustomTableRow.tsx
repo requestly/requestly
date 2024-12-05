@@ -101,7 +101,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         debouncedSave();
       }
     },
-    [form, dataIndex, debouncedSave, handleSaveVariable, record]
+    [dataIndex, debouncedSave, handleSaveVariable, record]
   );
 
   useEffect(() => {
