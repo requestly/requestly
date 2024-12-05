@@ -11,6 +11,8 @@ import { isApiCollection } from "../../../utils";
 import { deleteApiRecords } from "backend/apiClient";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { trackCollectionDeleted } from "modules/analytics/events/features/apiClient";
+import { useNavigate } from "react-router-dom";
+import { redirectToApiClient } from "utils/RedirectionUtils";
 import "./deleteApiRecordModal.scss";
 
 interface DeleteApiRecordModalProps {
@@ -26,7 +28,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
   const { onDeleteRecords } = useApiClientContext();
-
+  const navigate = useNavigate();
   const [isDeleting, setIsDeleting] = useState(false);
 
   if (!record) {
@@ -55,7 +57,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
       toast.success(record.type === RQAPI.RecordType.API ? "API request deleted" : "Collection deleted");
       onClose();
       onSuccess?.();
-
+      redirectToApiClient(navigate);
       // TODO: add analytics
     }
 
