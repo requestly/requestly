@@ -33,7 +33,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
   const [isRenaming, setIsRenaming] = useState(false);
-  const { updateTab } = useTabsLayoutContext();
+  const { updateTab, activeTab } = useTabsLayoutContext();
 
   const handleEnvironmentRename = useCallback(async () => {
     if (newEnvironmentName === environment.name) {
@@ -106,7 +106,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
   return (
     <div
       key={environment.id}
-      className={`environments-list-item ${environment.id === envId ? "active" : ""}`}
+      className={`environments-list-item ${environment.id === envId && activeTab?.id === envId ? "active" : ""}`}
       onClick={() => {
         redirectToEnvironment(navigate, environment.id);
         openTab(environment.id, {
