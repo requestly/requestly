@@ -26,17 +26,13 @@ export const getUploadedPostmanFileType = (fileContent: PostmanCollectionExport 
   if ("info" in fileContent && fileContent.info?.schema) {
     return "collection";
   }
-  if ("_postman_variable_scope" in fileContent && fileContent._postman_variable_scope) {
+  if ("values" in fileContent && fileContent.values) {
     return "environment";
   }
   return null;
 };
 
 export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExport) => {
-  if (!fileContent.values.length) {
-    throw new Error("No variables found in the environment file");
-  }
-
   const variables = fileContent.values.reduce((acc: Record<string, EnvironmentVariableValue>, variable: any) => {
     acc[variable.key] = {
       syncValue: variable.value,
