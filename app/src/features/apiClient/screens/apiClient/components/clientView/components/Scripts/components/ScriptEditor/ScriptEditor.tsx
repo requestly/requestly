@@ -13,7 +13,7 @@ interface ScriptEditorProps {
 
 const DEFAULT_SCRIPT_VALUES = {
   [RQAPI.ScriptType.PRE_REQUEST]: "// Use JavaScript to configure this request dynamically\n",
-  [RQAPI.ScriptType.POST_RESPONSE]: "// Use JavaScript visualize responses\n",
+  [RQAPI.ScriptType.POST_RESPONSE]: "// Use JavaScript to visualize responses\n",
 };
 
 export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts }) => {
