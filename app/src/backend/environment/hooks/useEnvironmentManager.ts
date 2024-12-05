@@ -66,7 +66,6 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       fetchAllEnvironmentDetails(ownerId)
         .then((environmentMap) => {
           if (Object.keys(environmentMap).length > 0 && !environmentMap[currentEnvironmentId]) {
-            // setting the first environment as the current environment if the current environment is not found in environmentMap
             setCurrentEnvironment(Object.keys(environmentMap)[0]);
           }
 
@@ -76,6 +75,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
             Object.keys(environmentMap).forEach((key) => {
               updatedEnvironmentMap[key] = {
                 ...allEnvironmentData[key],
+                ...environmentMap[key],
                 variables: mergeLocalAndSyncVariables(
                   allEnvironmentData[key]?.variables ?? {},
                   environmentMap[key].variables
@@ -83,7 +83,9 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
               };
             });
             dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: updatedEnvironmentMap }));
-          } else dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
+          } else {
+            dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
+          }
         })
         .catch((err) => {
           Logger.error("Error while fetching all environment variables", err);
