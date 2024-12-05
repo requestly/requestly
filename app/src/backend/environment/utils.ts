@@ -1,6 +1,7 @@
 import { compile } from "handlebars";
 import { EnvironmentVariables, EnvironmentVariableValue } from "./types";
 import Logger from "lib/logger";
+import { isEmpty } from "lodash";
 
 type Variables = Record<string, string | number | boolean>;
 
@@ -13,7 +14,11 @@ export const renderTemplate = (
   }
 
   const parsedVariables = Object.entries(variables).reduce((envVars, [key, value]) => {
-    envVars[key] = JSON.stringify(value.localValue).length === 0 ? value.syncValue : value.localValue;
+    envVars[key] = !isEmpty(value.localValue)
+      ? typeof value.localValue === "number"
+        ? JSON.stringify(value.localValue).length !== 0
+        : value.localValue
+      : value.syncValue;
     return envVars;
   }, {} as Variables);
 
