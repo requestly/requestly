@@ -1,5 +1,5 @@
 import { notification } from "antd";
-import { makeRequest } from "../../screens/apiClient/utils";
+import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
 import { RQAPI } from "../../types";
 import { executePrerequestScript, executePostresponseScript } from "./modules/scripts/utils";
 import { renderTemplate } from "backend/environment/utils";
@@ -41,6 +41,8 @@ export const executeAPIRequest = async (
   }
 
   try {
+    // Prefix https:// if not present
+    renderedRequest.url = addUrlSchemeIfMissing(renderedRequest.url);
     response = await makeRequest(appMode, renderedRequest, signal);
   } catch (error) {
     return {

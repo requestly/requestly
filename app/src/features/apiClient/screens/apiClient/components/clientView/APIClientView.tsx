@@ -216,8 +216,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     const sanitizedEntry = sanitizeEntry(entry);
     sanitizedEntry.response = null;
 
-    sanitizedEntry.request.url = addUrlSchemeIfMissing(sanitizedEntry.request.url);
-
     abortControllerRef.current = new AbortController();
 
     setIsFailed(false);
