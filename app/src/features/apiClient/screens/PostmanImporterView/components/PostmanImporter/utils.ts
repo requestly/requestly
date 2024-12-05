@@ -38,6 +38,11 @@ export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExp
   }
 
   const variables = fileContent.values.reduce((acc: Record<string, EnvironmentVariableValue>, variable: any) => {
+    // dont add variables with empty key
+    if (!variable.key) {
+      return acc;
+    }
+
     acc[variable.key] = {
       syncValue: variable.value,
       type: variable.type === "secret" ? "secret" : "string",
