@@ -190,6 +190,17 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       } else {
         onNewRecord(apiClientRecord);
       }
+      /*apiEntryDetails was not getting updated on renaming in APIClientView component
+      so we are updating the previous state of selectedEntryDetails with the new state of apiclient record
+      selectedEntryDetails : helping to update the apiClientview breadcrumb
+      apiClientrecord : helping in updating sidebar
+      */
+      setSelectedEntryDetails((prev) => {
+        if (prev?.type === RQAPI.RecordType.API && prev.id === apiClientRecord.id) {
+          return { ...prev, ...apiClientRecord } as RQAPI.ApiRecord;
+        }
+        return prev as RQAPI.ApiRecord;
+      });
     },
     [apiClientRecords, onUpdateRecord, onNewRecord]
   );
