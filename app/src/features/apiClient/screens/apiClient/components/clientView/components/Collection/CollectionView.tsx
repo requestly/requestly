@@ -82,7 +82,7 @@ export const CollectionView = () => {
 
   return (
     <div className="collection-view-container">
-      {!collection ? (
+      {!collection && collectionId !== "new" ? (
         <Result
           status="error"
           title="Collection not found"
@@ -90,7 +90,7 @@ export const CollectionView = () => {
         />
       ) : (
         <>
-          <RQBreadcrumb recordName={collection.name} disabled={true} />
+          <RQBreadcrumb recordName={collection?.name || "New Collection"} disabled={true} />
           <div className="collection-view-content">
             <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} />
           </div>

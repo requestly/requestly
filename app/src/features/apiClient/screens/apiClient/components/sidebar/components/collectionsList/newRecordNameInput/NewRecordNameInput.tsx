@@ -10,7 +10,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { toast } from "utils/Toast";
 import { LoadingOutlined } from "@ant-design/icons";
 import { getEmptyAPIEntry } from "features/apiClient/screens/apiClient/utils";
-import { redirectToRequest } from "utils/RedirectionUtils";
+import { redirectToCollection, redirectToRequest } from "utils/RedirectionUtils";
 import "./newRecordNameInput.scss";
 import {
   trackCollectionSaved,
@@ -80,6 +80,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
         trackRequestSaved(analyticEventSource);
         redirectToRequest(navigate, result.data.id);
       } else {
+        redirectToCollection(navigate, result.data.id);
         trackCollectionSaved(analyticEventSource);
       }
 
