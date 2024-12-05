@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useCallback, useState } from "react";
-import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
+import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEnvironmentData, getCurrentEnvironmentId } from "store/features/environment/selectors";
 import { environmentVariablesActions } from "store/features/environment/slice";
@@ -66,7 +66,6 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       fetchAllEnvironmentDetails(ownerId)
         .then((environmentMap) => {
           if (Object.keys(environmentMap).length > 0 && !environmentMap[currentEnvironmentId]) {
-            // setting the first environment as the current environment if the current environment is not found in environmentMap
             setCurrentEnvironment(Object.keys(environmentMap)[0]);
           }
 
@@ -76,6 +75,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
             Object.keys(environmentMap).forEach((key) => {
               updatedEnvironmentMap[key] = {
                 ...allEnvironmentData[key],
+                ...environmentMap[key],
                 variables: mergeLocalAndSyncVariables(
                   allEnvironmentData[key]?.variables ?? {},
                   environmentMap[key].variables
@@ -83,7 +83,9 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
               };
             });
             dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: updatedEnvironmentMap }));
-          } else dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
+          } else {
+            dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
+          }
         })
         .catch((err) => {
           Logger.error("Error while fetching all environment variables", err);
@@ -138,7 +140,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   }, [allEnvironmentData, currentEnvironmentId]);
 
   const setVariables = useCallback(
-    async (environmentId: string, variables: Record<string, EnvironmentVariableValue>) => {
+    async (environmentId: string, variables: EnvironmentVariables) => {
       const newVariables: EnvironmentVariables = Object.fromEntries(
         Object.entries(variables).map(([key, value]) => {
           const typeToSaveInDB =
