@@ -42,7 +42,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
   const { onSaveRecord } = useApiClientContext();
-  const { replaceTab } = useTabsLayoutContext();
+  const { replaceTab, updateTab } = useTabsLayoutContext();
 
   const defaultRecordName = recordType === RQAPI.RecordType.API ? "Untitled request" : "New collection";
   const [recordName, setRecordName] = useState(recordToBeEdited?.name || defaultRecordName);
@@ -140,6 +140,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       onSaveRecord(result.data);
 
       if (recordType === RQAPI.RecordType.API) {
+        updateTab(record.id, { title: result.data.name });
         redirectToRequest(navigate, result.data.id);
       } else {
         trackCollectionRenamed();
@@ -153,7 +154,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
     setIsLoading(false);
     onSuccess?.();
-  }, [recordType, recordToBeEdited, recordName, uid, teamId, onSaveRecord, navigate, onSuccess]);
+  }, [recordType, recordToBeEdited, recordName, uid, teamId, onSaveRecord, navigate, onSuccess, updateTab]);
 
   const onBlur = isEditMode ? updateRecord : saveNewRecord;
 
