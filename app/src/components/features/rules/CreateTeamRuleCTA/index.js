@@ -82,7 +82,7 @@ const CreateTeamRuleCTA = () => {
                 >
                   <strong>switch to that workspace</strong>
                 </Button>
-                &nbsp; and use the <strong>Share rule</strong> option to transfer the rule to this workspace.
+                &nbsp; and use the <strong>Share rule</strong> option to copy the rule to this workspace.
               </p>
             </Jumbotron>
           </Col>

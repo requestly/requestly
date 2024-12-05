@@ -147,7 +147,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
       </Row>
       {_availableTeams.current.length ? (
         <>
-          <div className="mt-1">Transfer rules into a workspace to start collaborating</div>
+          <div className="mt-1">Copy rules into a workspace to start collaborating</div>
           <WorkspaceShareMenu isLoading={isLoading} defaultActiveWorkspaces={2} onTransferClick={handleRulesTransfer} />
           <Divider />
         </>
