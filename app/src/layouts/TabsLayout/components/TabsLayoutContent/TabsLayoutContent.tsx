@@ -34,7 +34,7 @@ export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
           </div>
         </div>
       ),
-      children: <Outlet key={tab.id} />,
+      children: <Outlet key={tab.id} context={{ tab }} />,
     };
   });
 
