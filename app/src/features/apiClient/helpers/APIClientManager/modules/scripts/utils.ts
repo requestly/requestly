@@ -2,6 +2,7 @@ import { EnvironmentVariables } from "backend/environment/types";
 import { RQAPI } from "../../../../types";
 import { requestWorkerFunction, responseWorkerFunction } from "./workerScripts";
 import { ScriptExecutedPayload } from "./types";
+import { isEmpty } from "lodash";
 
 interface WorkerMessage {
   type: "SCRIPT_EXECUTED" | "COMPLETE" | "ERROR";
@@ -30,6 +31,12 @@ const handleEnvironmentChanges = async (
   const currentVars = payload.currentVariables;
   const currentEnvironmentId = environmentManager.getCurrentEnvironment().currentEnvironmentId;
 
+  if (isEmpty(payload.mutations.environment.$set) && isEmpty(payload.mutations.environment.$unset)) {
+    return {
+      updatedVariables: currentVars,
+    };
+  }
+
   const variablesToSet = {
     ...currentVars,
     ...Object.fromEntries(
@@ -46,6 +53,10 @@ const handleEnvironmentChanges = async (
   Object.keys(payload.mutations.environment.$unset).forEach((key) => {
     delete variablesToSet[key];
   });
+
+  if (!currentEnvironmentId) {
+    throw new Error("No environment available to access the variables.");
+  }
 
   await environmentManager.setVariables(currentEnvironmentId, variablesToSet);
   return {
@@ -70,15 +81,22 @@ const messageHandler = async (
 
   switch (type) {
     case "SCRIPT_EXECUTED": {
-      const updatedVariables = await handleEnvironmentChanges(environmentManager, payload);
-      cleanupWorker(worker);
-      resolve(updatedVariables);
+      handleEnvironmentChanges(environmentManager, payload)
+        .then((updatedVariables) => {
+          resolve(updatedVariables);
+        })
+        .catch((e) => {
+          reject(e);
+        })
+        .finally(() => {
+          cleanupWorker(worker);
+        });
       break;
     }
 
     case "ERROR": {
       cleanupWorker(worker);
-      reject(payload);
+      reject(payload.error);
     }
   }
 };

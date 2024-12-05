@@ -12,6 +12,25 @@ export const requestWorkerFunction = function (e: MessageEvent) {
     },
   };
 
+  const createInfiniteChainable = (methodName: string) => {
+    let hasLogged = false;
+
+    const handler = {
+      get: () => {
+        if (!hasLogged) {
+          console.log(`Using unsupported method: ${methodName}`);
+          hasLogged = true;
+        }
+        return new Proxy(() => {}, handler);
+      },
+      apply: () => {
+        return new Proxy(() => {}, handler);
+      },
+    };
+
+    return new Proxy(() => {}, handler);
+  };
+
   const sandbox = {
     rq: {
       request,
@@ -27,6 +46,19 @@ export const requestWorkerFunction = function (e: MessageEvent) {
           mutations.environment.$unset[key] = "";
         },
       },
+      collectionVariables: createInfiniteChainable("collectionVariables"),
+      cookies: createInfiniteChainable("cookie"),
+      execution: createInfiniteChainable("execution"),
+      expect: createInfiniteChainable("expect"),
+      globals: createInfiniteChainable("globals"),
+      info: createInfiniteChainable("info"),
+      iterationData: createInfiniteChainable("iterationData"),
+      require: createInfiniteChainable("require"),
+      sendRequest: createInfiniteChainable("sendRequest"),
+      test: createInfiniteChainable("test"),
+      variables: createInfiniteChainable("variables"),
+      vault: createInfiniteChainable("vault"),
+      visualizer: createInfiniteChainable("visualizer"),
     },
   };
 
@@ -56,14 +88,13 @@ export const requestWorkerFunction = function (e: MessageEvent) {
         },
       });
     })
-    .catch((err: unknown) => {
-      console.log("!!!debug", "promise catch", err);
+    .catch((error: unknown) => {
       this.postMessage({
         type: "ERROR",
         payload: {
           name: "Script Execution",
           passed: false,
-          error: err.message,
+          error,
         },
       });
     });
@@ -77,6 +108,25 @@ export const responseWorkerFunction = function (e: MessageEvent) {
       $set: {},
       $unset: {},
     },
+  };
+
+  const createInfiniteChainable = (methodName: string) => {
+    let hasLogged = false;
+
+    const handler = {
+      get: () => {
+        if (!hasLogged) {
+          console.log(`Using unsupported method: ${methodName}`);
+          hasLogged = true;
+        }
+        return new Proxy(() => {}, handler);
+      },
+      apply: () => {
+        return new Proxy(() => {}, handler);
+      },
+    };
+
+    return new Proxy(() => {}, handler);
   };
 
   const sandbox = {
@@ -95,13 +145,25 @@ export const responseWorkerFunction = function (e: MessageEvent) {
           mutations.environment.$unset[key] = "";
         },
       },
+      collectionVariables: createInfiniteChainable("collectionVariables"),
+      cookies: createInfiniteChainable("cookie"),
+      execution: createInfiniteChainable("execution"),
+      expect: createInfiniteChainable("expect"),
+      globals: createInfiniteChainable("globals"),
+      info: createInfiniteChainable("info"),
+      iterationData: createInfiniteChainable("iterationData"),
+      require: createInfiniteChainable("require"),
+      sendRequest: createInfiniteChainable("sendRequest"),
+      test: createInfiniteChainable("test"),
+      variables: createInfiniteChainable("variables"),
+      vault: createInfiniteChainable("vault"),
+      visualizer: createInfiniteChainable("visualizer"),
     },
   };
 
-  try {
-    const scriptFunction = new Function(
-      "rq",
-      `
+  const scriptFunction = new Function(
+    "rq",
+    `
       "use strict";
       return (async () => {
       try {
@@ -113,9 +175,10 @@ export const responseWorkerFunction = function (e: MessageEvent) {
       }
       })();
       `
-    );
+  );
 
-    scriptFunction(sandbox.rq).then(() => {
+  scriptFunction(sandbox.rq)
+    .then(() => {
       this.postMessage({
         type: "SCRIPT_EXECUTED",
         payload: {
@@ -123,15 +186,15 @@ export const responseWorkerFunction = function (e: MessageEvent) {
           mutations,
         },
       });
+    })
+    .catch((error: unknown) => {
+      this.postMessage({
+        type: "ERROR",
+        payload: {
+          name: "Script Execution",
+          passed: false,
+          error,
+        },
+      });
     });
-  } catch (error) {
-    this.postMessage({
-      type: "ERROR",
-      payload: {
-        name: "Script Execution",
-        passed: false,
-        error: error.message,
-      },
-    });
-  }
 };
