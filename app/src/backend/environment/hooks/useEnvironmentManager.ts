@@ -137,7 +137,6 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     if (ownerId) {
       unsubscribeCollectionListener?.();
       unsubscribeCollectionListener = attachCollectionVariableListener(ownerId, (collectionDetails) => {
-        console.log("collectionDetails", collectionDetails);
         Object.keys(collectionDetails).forEach((collectionId) => {
           const mergedCollectionVariables = mergeLocalAndSyncVariables(
             collectionVariables[collectionId]?.variables ?? {},
@@ -153,6 +152,8 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     return () => {
       unsubscribeCollectionListener?.();
     };
+    // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ownerId, dispatch]);
 
   useEffect(() => {
