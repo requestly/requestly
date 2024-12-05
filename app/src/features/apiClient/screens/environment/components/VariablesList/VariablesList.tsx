@@ -193,7 +193,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
           cell: EditableCell,
         },
       }}
-      scroll={{ y: "calc(100vh - 240px)" }}
+      scroll={{ y: "calc(100vh - 280px)" }}
       footer={() => (
         <div className="variables-list-footer">
           <RQButton icon={<MdAdd />} size="small" onClick={handleAddVariable}>
