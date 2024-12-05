@@ -10,4 +10,5 @@ export enum ReducerKeys {
   BILLING = "billing",
   INCENTIVIZATION = "incentivization",
   ENVIRONMENT = "environment",
+  WORKSPACE = "workspace",
 }
