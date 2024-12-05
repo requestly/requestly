@@ -1,10 +1,14 @@
 import { Dispatch } from "react";
+import { clone } from "lodash";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+
 import { Workspace } from "../types";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { RuleStorageModel, syncEngine } from "requestly-sync-engine";
 import { LocalStorageService } from "services/localStorageService";
 import { hasAccessToWorkspace } from "../utils";
-import { clone } from "lodash";
+import { globalActions } from "store/slices/global/slice";
+import { StorageService } from "init";
 
 class WorkspaceManager {
   dispatch!: Dispatch<any>;
@@ -32,28 +36,42 @@ class WorkspaceManager {
   }
 
   // Reset
-  initActiveWorkspaces(workspaceIds: Workspace["id"][]) {
+  async initActiveWorkspaces(workspaceIds: Workspace["id"][]) {
     this.resetActiveWorkspaces();
-    this.connectWorkspaces(workspaceIds);
+
+    //#region - Extension Storage backup -> reset -> reinit
+    // TODO-syncing: Take backups of extensions storage changes before clearing
+    const refreshToken = await StorageService(this.appMode).getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN);
+    StorageService(this.appMode).clearDB();
+    StorageService(this.appMode).saveRecord({
+      [GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN]: refreshToken,
+    });
+    //#endregion
+
+    this.dispatch(globalActions.toggleActiveModal({ modalName: "workspaceLoadingModal", newValue: true }));
+    await this.connectWorkspaces(workspaceIds);
+    this.dispatch(globalActions.toggleActiveModal({ modalName: "workspaceLoadingModal", newValue: false }));
   }
 
   // append
-  private connectWorkspaces(workspaceIds: Workspace["id"][]) {
+  private async connectWorkspaces(workspaceIds: Workspace["id"][]) {
     console.log("[WorkspaceManager.connectWorkspaces]", { workspaceIds });
     const connectedWorkspaceIds: string[] = [];
-    workspaceIds.forEach((workspaceId) => {
-      const connected = this.connectWorkspace(workspaceId);
+    // FIXME-syncing: Can be made parallel
+    const promises = workspaceIds.map(async (workspaceId) => {
+      const connected = await this.connectWorkspace(workspaceId);
       if (connected) {
         connectedWorkspaceIds.push(workspaceId);
       }
     });
+    await Promise.all(promises);
 
     window.activeWorkspaceIds = connectedWorkspaceIds;
     this.dispatch(workspaceActions.setActiveWorkspaceIds(connectedWorkspaceIds));
   }
 
   // append
-  private connectWorkspace(workspaceId: Workspace["id"]): boolean {
+  private async connectWorkspace(workspaceId: Workspace["id"]): Promise<boolean> {
     const workspace = this.workspaceMap[workspaceId];
     console.log("[WorkspaceManager.connectWorkspace]", { workspaceId, workspace });
 
@@ -65,7 +83,7 @@ class WorkspaceManager {
     //#endregion
 
     //#region - syncing init
-    syncEngine.init([workspaceId], this.userId);
+    await syncEngine.init([workspaceId], this.userId);
 
     RuleStorageModel.registerOnUpdateHook((models: RuleStorageModel[]) => {
       console.log("onUpdateHook Custom");
