@@ -32,7 +32,8 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
 
   useEffect(() => {
     if (editorViewRef.current) {
-      return;
+      editorViewRef.current.destroy(); // Destroy the current editor view
+      editorViewRef.current = null; // Reset the reference
     }
 
     editorViewRef.current = new EditorView({
@@ -72,12 +73,13 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
 
     return () => {
       editorViewRef.current?.destroy();
+      editorViewRef.current = null; // Ensure cleanup
     };
 
     //Need to disable to implement the onChange handler
     // Shouldn't be recreated every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [placeholder]);
+  }, [placeholder, variables]);
 
   return (
     <>
