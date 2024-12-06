@@ -54,7 +54,7 @@
   }
 
   .api-response-body-content {
-    height: calc(100% - 35px); //deduct footer height
+    height: 100%;
 
     pre {
       overflow: hidden;
