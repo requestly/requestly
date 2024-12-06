@@ -116,12 +116,12 @@ const APIClientSidebar: React.FC<Props> = () => {
       key: ApiClientSidebarTabKey.COLLECTIONS,
       label: (
         <Tooltip title="Collections" placement="right">
-          <NavLink
-            to={PATHS.API_CLIENT.ABSOLUTE}
-            className={({ isActive }) => `${isActive ? "active" : ""} api-client-tab-link`}
+          <div
+            onClick={() => setActiveKey(ApiClientSidebarTabKey.COLLECTIONS)}
+            className={`api-client-tab-link ${activeKey === ApiClientSidebarTabKey.COLLECTIONS ? "active" : ""}`}
           >
             <CgStack />
-          </NavLink>
+          </div>
         </Tooltip>
       ),
       children: (
@@ -151,12 +151,12 @@ const APIClientSidebar: React.FC<Props> = () => {
       key: ApiClientSidebarTabKey.HISTORY,
       label: (
         <Tooltip title="History" placement="right">
-          <NavLink
-            to={PATHS.API_CLIENT.HISTORY.ABSOLUTE}
-            className={({ isActive }) => `${isActive ? "active" : ""} api-client-tab-link`}
+          <div
+            onClick={() => setActiveKey(ApiClientSidebarTabKey.HISTORY)}
+            className={`api-client-tab-link ${activeKey === ApiClientSidebarTabKey.HISTORY ? "active" : ""}`}
           >
             <MdOutlineHistory />
-          </NavLink>
+          </div>
         </Tooltip>
       ),
       children: <HistoryList history={history} onSelectionFromHistory={onSelectionFromHistory} />,
