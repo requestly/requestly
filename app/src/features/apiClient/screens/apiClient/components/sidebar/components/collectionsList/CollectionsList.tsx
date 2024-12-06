@@ -77,8 +77,8 @@ export const CollectionsList: React.FC<Props> = ({
 
   const hasOpenedDefaultTab = useRef(false);
   useEffect(() => {
-    // TODO: Improve logic
     if (location.pathname === PATHS.API_CLIENT.ABSOLUTE) {
+      // TODO: Improve logic
       hasOpenedDefaultTab.current = false;
     }
 
@@ -92,14 +92,24 @@ export const CollectionsList: React.FC<Props> = ({
 
     hasOpenedDefaultTab.current = true;
 
-    if (tabs.length === 0 || location.pathname === PATHS.API_CLIENT.ABSOLUTE) {
+    if (tabs.length > 0) {
+      return;
+    }
+
+    if (updatedRecords.requests.length === 0) {
       const recordId = "request/new";
       openTab(recordId, {
         title: "Untitled request",
         url: `${PATHS.API_CLIENT.ABSOLUTE}/request/new`,
       });
+    } else {
+      const recordId = updatedRecords.requests[0].id;
+      openTab(recordId, {
+        title: updatedRecords.requests[0].name,
+        url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${recordId}`,
+      });
     }
-  }, [isLoadingApiClientRecords, openTab, location.pathname, tabs.length]);
+  }, [updatedRecords.requests, isLoadingApiClientRecords, openTab, location.pathname, tabs.length]);
 
   return (
     <>
