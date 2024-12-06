@@ -67,7 +67,22 @@ export const executeAPIRequest = async (
       );
     } catch (error) {
       console.error("Post Response script error", error);
-      Sentry.captureException(error);
+      Sentry.withScope((scope) => {
+        scope.setTag("error_type", "api_scripts_error");
+        scope.setContext("request_details", {
+          url: renderedRequest.url,
+          method: renderedRequest.method,
+          headers: renderedRequest.headers,
+          queryParams: renderedRequest.queryParams,
+        });
+        scope.setContext("error_details", {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        });
+        scope.setFingerprint(["api_request_error", renderedRequest.method, error.message]);
+        Sentry.captureException(new Error(`API Request Failed: ${error.message}`));
+      });
       notification.error({
         message: "Something went wrong in post-response script!",
         description: `${error.name}: ${error.message}`,
