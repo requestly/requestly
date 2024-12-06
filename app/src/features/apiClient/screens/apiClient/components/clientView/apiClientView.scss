@@ -127,6 +127,12 @@
       */
       // height: calc(100% - px) !important;
       height: 100%;
+
+      .ant-tabs-content-holder {
+        // FIXED HEIGHT FIXES HEIGHT CHANGE OF SPILT PANEL HEIGHT CHANGE ON CODE MIRROR MOUNT
+        // TODO: FIX THIS
+        height: 35px;
+      }
     }
   }
 
