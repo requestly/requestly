@@ -57,32 +57,28 @@ export const EnvironmentsList = () => {
   }, [user.loggedIn, dispatch, navigate]);
 
   const handleAddNewEnvironment = useCallback(async () => {
-    if (newEnvironmentValue) {
-      setIsLoading(true);
-      const newEnvironment = await addNewEnvironment(newEnvironmentValue);
-      if (newEnvironment) {
-        if (environments.length === 0) {
-          // if there are no environments, set the new environment as the active environment
-          setCurrentEnvironment(newEnvironment.id);
-        }
-
-        if (envId === "new") {
-          replaceTab("environments/new", {
-            id: newEnvironment.id,
-            title: newEnvironment.name,
-            url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${newEnvironment.id}`,
-          });
-        }
-
-        trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
+    setIsLoading(true);
+    const newEnvironment = await addNewEnvironment(newEnvironmentValue || "New Environment");
+    if (newEnvironment) {
+      if (environments.length === 0) {
+        // if there are no environments, set the new environment as the active environment
+        setCurrentEnvironment(newEnvironment.id);
       }
-      setIsLoading(false);
-    } else {
-      navigate(-1);
+
+      if (envId === "new") {
+        replaceTab("environments/new", {
+          id: newEnvironment.id,
+          title: newEnvironment.name,
+          url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${newEnvironment.id}`,
+        });
+      }
+
+      trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
     }
+    setIsLoading(false);
     setIsNewEnvironmentInputVisible(false);
     setNewEnvironmentValue("");
-  }, [addNewEnvironment, navigate, environments.length, newEnvironmentValue, setCurrentEnvironment, replaceTab, envId]);
+  }, [addNewEnvironment, environments.length, newEnvironmentValue, setCurrentEnvironment, replaceTab, envId]);
 
   useEffect(() => {
     if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE) && user.loggedIn) {

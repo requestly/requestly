@@ -28,12 +28,22 @@ export enum EnvironmentMenuKey {
 export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ environment, openTab }) => {
   const navigate = useNavigate();
   const { envId } = useParams();
-  const { getCurrentEnvironment, renameEnvironment, duplicateEnvironment, deleteEnvironment } = useEnvironmentManager();
+  const {
+    getCurrentEnvironment,
+    renameEnvironment,
+    duplicateEnvironment,
+    deleteEnvironment,
+    getAllEnvironments,
+    setCurrentEnvironment,
+  } = useEnvironmentManager();
+  const allEnvironments = getAllEnvironments();
   const { currentEnvironmentId } = getCurrentEnvironment();
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
   const [isRenaming, setIsRenaming] = useState(false);
   const { updateTab, activeTab } = useTabsLayoutContext();
+
+  const { closeTab } = useTabsLayoutContext();
 
   const handleEnvironmentRename = useCallback(async () => {
     if (newEnvironmentName === environment.name) {
@@ -71,11 +81,29 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
     deleteEnvironment(environment.id)
       .then(() => {
         toast.success("Environment deleted successfully");
+        const availableEnvironments = allEnvironments.filter((env) => env.id !== environment.id);
+        const isActiveEnvironmentBeingDeleted = environment.id === currentEnvironmentId;
+        if (availableEnvironments.length && (envId === environment.id || isActiveEnvironmentBeingDeleted)) {
+          redirectToEnvironment(navigate, availableEnvironments[0].id);
+          if (isActiveEnvironmentBeingDeleted) {
+            setCurrentEnvironment(availableEnvironments[0].id);
+          }
+        }
+        closeTab(environment.id);
       })
       .catch(() => {
         toast.error("Failed to delete environment");
       });
-  }, [environment.id, deleteEnvironment]);
+  }, [
+    environment.id,
+    deleteEnvironment,
+    allEnvironments,
+    navigate,
+    envId,
+    currentEnvironmentId,
+    setCurrentEnvironment,
+    closeTab,
+  ]);
 
   const menuItems = useMemo(() => {
     return [
