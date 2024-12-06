@@ -26,7 +26,7 @@ export const getUploadedPostmanFileType = (fileContent: PostmanCollectionExport 
   if ("info" in fileContent && fileContent.info?.schema) {
     return "collection";
   }
-  if ("_postman_variable_scope" in fileContent && fileContent._postman_variable_scope) {
+  if ("values" in fileContent) {
     return "environment";
   }
   return null;
