@@ -1,5 +1,5 @@
 import { EnvironmentVariableValue } from "backend/environment/types";
-import { RequestMethod, RQAPI } from "features/apiClient/types";
+import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { generateDocumentId } from "backend/utils";
 
 interface PostmanCollectionExport {
@@ -101,6 +101,25 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
       isEnabled: true,
     })) ?? [];
 
+  let contentType: RequestContentType | null = null;
+  let requestBody: string | KeyValuePair[] | null = null;
+
+  const { mode, raw, formdata, options } = request.body || {};
+
+  if (mode === "raw") {
+    requestBody = raw;
+    contentType = options?.raw.language === "json" ? RequestContentType.JSON : RequestContentType.RAW;
+  } else if (mode === "formdata") {
+    contentType = RequestContentType.FORM;
+    requestBody =
+      formdata?.map((formData: { key: string; value: string }) => ({
+        id: Date.now(),
+        key: formData.key,
+        value: formData.value,
+        isEnabled: true,
+      })) || [];
+  }
+
   return {
     id: generateDocumentId("apis"),
     collectionId: parentCollectionId,
@@ -113,7 +132,8 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
         method: request.method || RequestMethod.GET,
         queryParams,
         headers,
-        body: request.body?.raw ?? null,
+        body: requestBody,
+        contentType,
       },
       scripts: processScripts(item),
     },

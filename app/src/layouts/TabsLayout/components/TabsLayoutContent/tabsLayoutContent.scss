@@ -1,0 +1,134 @@
+.tabs-layout-container {
+  flex: auto;
+  width: 100%;
+  height: 100%;
+  overflow-y: hidden;
+
+  .ant-tabs.tabs-layout-tabs-container,
+  .tabs-layout-tabs-container > .ant-tabs-content-holder {
+    height: 100%;
+
+    .ant-tabs-content,
+    .ant-tabs-tabpane {
+      height: 100%;
+    }
+  }
+
+  .ant-tabs.tabs-layout-tabs-container {
+    & > .ant-tabs-nav {
+      margin-bottom: 0;
+
+      .ant-tabs-nav-wrap {
+        height: 32px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0px 12px;
+
+        .ant-tabs-nav-list {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .ant-tabs-tab {
+          padding: 0 4px;
+          width: 144px;
+          max-width: 144px;
+
+          .ant-tabs-tab-btn {
+            width: 100%;
+            overflow: hidden;
+          }
+        }
+
+        .ant-tabs-tab + .ant-tabs-tab {
+          margin: 0 0 0 12px;
+        }
+
+        .ant-tabs-tab-active {
+          .tab-title {
+            color: var(--requestly-color-text-default);
+          }
+        }
+      }
+
+      .ant-tabs-nav-operations {
+        .ant-tabs-nav-more {
+          cursor: pointer;
+          padding: 1px 8px;
+        }
+      }
+    }
+  }
+
+  .tab-title-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .tab-title {
+      text-align: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 106px;
+      padding: 8px 0;
+
+      color: var(--requestly-color-text-subtle, #bbb);
+
+      font-size: var(--requestly-font-size-xs, 11px);
+      font-style: normal;
+      font-weight: 400;
+      line-height: var(--requestly-font-line-height-xs, 15px);
+    }
+
+    .tab-actions {
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    .unsaved-changes-indicator {
+      border-radius: 50%;
+      width: 6px;
+      height: 6px;
+      background-color: var(--requestly-color-primary-soft);
+    }
+
+    .tab-close-button {
+      transform: scale(0);
+      display: none;
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      .tab-close-button {
+        transform: scale(1);
+        display: flex;
+      }
+    }
+  }
+}
+
+.tabs-layout-more-dropdown {
+  .ant-tabs-dropdown-menu {
+    .ant-tabs-dropdown-menu-item {
+      .tab-title-container {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .tab-actions {
+        margin-left: auto;
+      }
+    }
+  }
+}
