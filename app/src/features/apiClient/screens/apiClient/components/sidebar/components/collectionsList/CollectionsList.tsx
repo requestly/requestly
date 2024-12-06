@@ -96,13 +96,7 @@ export const CollectionsList: React.FC<Props> = ({
       return;
     }
 
-    if (updatedRecords.requests.length === 0) {
-      const recordId = "request/new";
-      openTab(recordId, {
-        title: "Untitled request",
-        url: `${PATHS.API_CLIENT.ABSOLUTE}/request/new`,
-      });
-    } else {
+    if (updatedRecords.requests.length) {
       const recordId = updatedRecords.requests[0].id;
       openTab(recordId, {
         title: updatedRecords.requests[0].name,
