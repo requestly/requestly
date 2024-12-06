@@ -5,6 +5,7 @@ import { getContentTypeFromResponseHeaders } from "features/apiClient/screens/ap
 import ResponseBody from "../ResponseBody/ResponseBody";
 import { BottomSheet } from "componentsV2/BottomSheet";
 import StatusLine from "../StatusLine";
+import { Tag } from "antd";
 
 interface Props {
   response: RQAPI.Response;
@@ -50,7 +51,9 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.HEADERS,
-        label: "Headers",
+        label: (
+          <>Headers {response?.headers?.length ? <Tag className="count">{response?.headers?.length}</Tag> : null}</>
+        ),
         children: (
           <ResponseHeaders
             headers={response?.headers}

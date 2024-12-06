@@ -16,6 +16,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToApiClientCollection, redirectToNewEnvironment, redirectToRequest } from "utils/RedirectionUtils";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import { useApiClientContext } from "features/apiClient/contexts";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./apiClientSidebar.scss";
 
 interface Props {}
@@ -38,6 +39,7 @@ const APIClientSidebar: React.FC<Props> = () => {
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
 
   const { history, clearHistory, onNewClick, onImportClick, onSelectionFromHistory } = useApiClientContext();
+  const { openTab } = useTabsLayoutContext();
 
   const hideNewRecordNameInput = () => {
     setIsNewRecordNameInputVisible(false);
@@ -51,6 +53,13 @@ const APIClientSidebar: React.FC<Props> = () => {
 
       switch (recordType) {
         case RQAPI.RecordType.API: {
+          const recordId = "request/new";
+
+          openTab(recordId, {
+            title: "Untitled request",
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/request/new`,
+          });
+
           onNewClick(analyticEventSource, RQAPI.RecordType.API);
           redirectToRequest(navigate);
           return;
@@ -61,16 +70,25 @@ const APIClientSidebar: React.FC<Props> = () => {
           redirectToApiClientCollection(navigate);
           return;
         }
+
         case RQAPI.RecordType.ENVIRONMENT: {
+          const recordId = "environments/new";
+
+          openTab(recordId, {
+            title: "New environment",
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/new`,
+          });
+
           redirectToNewEnvironment(navigate);
           trackCreateEnvironmentClicked(analyticEventSource);
           return;
         }
+
         default:
           return;
       }
     },
-    [onNewClick, navigate]
+    [onNewClick, navigate, openTab]
   );
 
   useEffect(() => {
