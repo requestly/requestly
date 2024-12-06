@@ -4,6 +4,8 @@ import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/util
 import { RQAPI } from "../../types";
 import { executePrerequestScript, executePostresponseScript } from "./modules/scripts/utils";
 import { renderTemplate } from "backend/environment/utils";
+import { DEMO_API_URL } from "features/apiClient/constants";
+import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient";
 
 export const executeAPIRequest = async (
   appMode: string,
@@ -45,6 +47,14 @@ export const executeAPIRequest = async (
     // Prefix https:// if not present
     renderedRequest.url = addUrlSchemeIfMissing(renderedRequest.url);
     response = await makeRequest(appMode, renderedRequest, signal);
+    trackAPIRequestSent({
+      method: renderedRequest.method,
+      queryParamsCount: renderedRequest.queryParams.length,
+      headersCount: renderedRequest.headers.length,
+      requestContentType: renderedRequest.contentType,
+      isDemoURL: renderedRequest.url === DEMO_API_URL,
+      path: window.location.pathname,
+    });
   } catch (error) {
     return {
       request: entry.request,

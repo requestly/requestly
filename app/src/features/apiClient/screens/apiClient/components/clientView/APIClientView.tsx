@@ -277,14 +277,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         setIsLoadingResponse(false);
       });
 
-    // trackAPIRequestSent({
-    //   method: renderedEntry.request.method,
-    //   queryParamsCount: renderedEntry.request.queryParams.length,
-    //   headersCount: renderedEntry.request.headers.length,
-    //   requestContentType: renderedEntry.request.contentType,
-    //   isDemoURL: renderedEntry.request.url === DEMO_API_URL,
-    //   path: location.pathname,
-    // });
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [entry, environmentManager, appMode, dispatch, notifyApiRequestFinished, toggleBottomSheet]);
