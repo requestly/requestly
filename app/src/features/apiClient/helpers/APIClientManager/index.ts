@@ -1,4 +1,5 @@
 import { notification } from "antd";
+import * as Sentry from "@sentry/react";
 import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
 import { RQAPI } from "../../types";
 import { executePrerequestScript, executePostresponseScript } from "./modules/scripts/utils";
@@ -66,6 +67,7 @@ export const executeAPIRequest = async (
       );
     } catch (error) {
       console.error("Post Response script error", error);
+      Sentry.captureException(error);
       notification.error({
         message: "Something went wrong in post-response script!",
         description: `${error.name}: ${error.message}`,
