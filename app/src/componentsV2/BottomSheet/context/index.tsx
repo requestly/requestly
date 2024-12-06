@@ -15,11 +15,12 @@ interface BottomSheetContextProps {
 
 const BottomSheetContext = createContext<BottomSheetContextProps | undefined>(undefined);
 
-export const BottomSheetProvider: React.FC<{ children: React.ReactNode; defaultPlacement: BottomSheetPlacement }> = ({
-  children,
-  defaultPlacement,
-}) => {
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+export const BottomSheetProvider: React.FC<{
+  children: React.ReactNode;
+  defaultPlacement: BottomSheetPlacement;
+  isSheetOpenByDefault?: boolean;
+}> = ({ children, defaultPlacement, isSheetOpenByDefault = false }) => {
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(isSheetOpenByDefault);
   const [sheetPlacement, setSheetPlacement] = useState(defaultPlacement);
 
   const toggleBottomSheet = (isOpen?: boolean) => {
