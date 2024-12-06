@@ -58,13 +58,6 @@ export const EmptyEnvironmentView = () => {
         <Skeleton active />
       ) : (
         <>
-          <div className="env-view-breadcrumb">
-            <MdDisplaySettings />
-            <span className="env-view-breadcrumb-1">
-              API Client <MdOutlineChevronRight />
-            </span>
-            <span className="env-view-breadcrumb-1">Environments</span>
-          </div>
           <div className="empty-environment-view-content">
             <img src={emptyEnvironmentViewImage} alt="empty environment" />
             <div className="empty-environment-view-title">No environment created yet</div>

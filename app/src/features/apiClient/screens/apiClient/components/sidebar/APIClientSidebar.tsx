@@ -13,7 +13,12 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { redirectToApiClientCollection, redirectToNewEnvironment, redirectToRequest } from "utils/RedirectionUtils";
+import {
+  redirectToApiClient,
+  redirectToApiClientCollection,
+  redirectToNewEnvironment,
+  redirectToRequest,
+} from "utils/RedirectionUtils";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
@@ -110,6 +115,12 @@ const APIClientSidebar: React.FC<Props> = () => {
       setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!requestId && activeKey === ApiClientSidebarTabKey.COLLECTIONS) {
+      redirectToApiClient(navigate);
+    }
+  }, [navigate, requestId, activeKey]);
 
   const items: TabsProps["items"] = [
     {
