@@ -67,7 +67,6 @@ export const executeAPIRequest = async (
       );
     } catch (error) {
       console.error("Post Response script error", error);
-      Sentry.captureException(error);
       Sentry.withScope((scope) => {
         scope.setTag("error_type", "api_scripts_error");
         scope.setContext("request_details", {
