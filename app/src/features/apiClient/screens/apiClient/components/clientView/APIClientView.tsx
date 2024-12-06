@@ -247,7 +247,19 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           setIsFailed(true);
           setError(erroredEntry?.error ?? null);
           if (erroredEntry?.error) {
-            Sentry.captureException(erroredEntry?.error);
+            Sentry.withScope((scope) => {
+              scope.setTag("error_type", "api_request_failure");
+              scope.setContext("request_details", {
+                url: sanitizedEntry.request.url,
+                method: sanitizedEntry.request.method,
+                headers: sanitizedEntry.request.headers,
+                queryParams: sanitizedEntry.request.queryParams,
+              });
+              scope.setFingerprint(["api_request_error", sanitizedEntry.request.method, erroredEntry.error.source]);
+              Sentry.captureException(
+                new Error(`API Request Failed: ${erroredEntry.error.message || "Unknown error"}`)
+              );
+            });
           }
           trackRequestFailed();
           trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
