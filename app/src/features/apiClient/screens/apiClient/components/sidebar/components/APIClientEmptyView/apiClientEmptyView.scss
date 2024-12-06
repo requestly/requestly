@@ -1,0 +1,26 @@
+.empty-api-client-view {
+  height: 100%;
+  width: 100%;
+
+  .empty-api-client-view-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-12, 56px) var(--space-0, 0px);
+  }
+
+  img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .empty-api-client-view-title {
+    font-size: var(--requestly-font-siz-md);
+    color: var(--requestly-color-text-default);
+  }
+
+  p {
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+  }
+}
