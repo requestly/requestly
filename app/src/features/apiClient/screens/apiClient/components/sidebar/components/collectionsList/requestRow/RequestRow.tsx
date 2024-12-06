@@ -21,12 +21,14 @@ import {
   trackMoveRequestToCollectionClicked,
 } from "modules/analytics/events/features/apiClient";
 import { redirectToRequest } from "utils/RedirectionUtils";
+import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 
 interface Props {
   record: RQAPI.ApiRecord;
+  openTab: TabsLayoutContextInterface["openTab"];
 }
 
-export const RequestRow: React.FC<Props> = ({ record }) => {
+export const RequestRow: React.FC<Props> = ({ record, openTab }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
   const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
@@ -123,18 +125,24 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
         />
       ) : (
         <NavLink
-          title={record.name || record.data.request.url}
+          title={record.name || record.data.request?.url}
           to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`}
           className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
+          onClick={() => {
+            openTab(record.id, {
+              title: record.name || record.data.request?.url,
+              url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`,
+            });
+          }}
         >
           <Typography.Text
             strong
             className="request-method"
-            style={{ color: REQUEST_METHOD_COLORS[record.data.request.method] }}
+            style={{ color: REQUEST_METHOD_COLORS[record.data.request?.method] }}
           >
-            {record.data.request.method}
+            {record.data.request?.method}
           </Typography.Text>
-          <div className="request-url">{record.name || record.data.request.url}</div>
+          <div className="request-url">{record.name || record.data.request?.url}</div>
 
           <div className="request-options">
             <Dropdown trigger={["click"]} menu={{ items: getRequestOptions() }} placement="bottomRight">
