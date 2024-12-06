@@ -100,7 +100,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         key: "3",
         label: (
           <div className="new-btn-option">
-            <SiPostman /> Postman
+            <SiPostman /> Postman Collection
           </div>
         ),
         onClick: () => {

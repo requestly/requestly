@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
-import { getApiRecord, getApiRecords, upsertApiRecord } from "backend/apiClient";
+import { getApiRecords } from "backend/apiClient";
 import Logger from "lib/logger";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
@@ -11,9 +11,7 @@ import {
   trackImportCurlClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
-import { useNavigate, useParams } from "react-router-dom";
-import { redirectToRequest } from "utils/RedirectionUtils";
-import { getEmptyAPIEntry } from "../screens/apiClient/utils";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -28,21 +26,19 @@ interface ApiClientContextInterface {
   isDeleteModalOpen: boolean;
   setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onDeleteModalClose: () => void;
+
   history: RQAPI.Entry[];
   addToHistory: (apiEntry: RQAPI.Entry) => void;
   clearHistory: () => void;
 
-  isLoading: boolean;
-  selectedEntry: RQAPI.Entry;
-  selectedEntryDetails: RQAPI.ApiRecord;
   isImportModalOpen: boolean;
 
   onSelectionFromHistory: (index: number) => void;
-  saveRequest: (apiEntry: RQAPI.Entry) => Promise<void>;
-  handleImportRequest: (request: RQAPI.Request) => Promise<void>;
   onImportClick: () => void;
   onImportRequestModalClose: () => void;
   onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => void;
+
+  setIsImportModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
@@ -62,17 +58,14 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   addToHistory: (apiEntry: RQAPI.Entry) => {},
   clearHistory: () => {},
 
-  isLoading: false,
   isImportModalOpen: false,
-  selectedEntry: undefined,
-  selectedEntryDetails: undefined,
 
   onSelectionFromHistory: (index: number) => {},
-  saveRequest: async (apiEntry: RQAPI.Entry) => {},
-  handleImportRequest: async (request: RQAPI.Request) => {},
   onImportClick: () => {},
   onImportRequestModalClose: () => {},
   onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource) => {},
+
+  setIsImportModalOpen: () => {},
 });
 
 interface ApiClientProviderProps {
@@ -80,9 +73,6 @@ interface ApiClientProviderProps {
 }
 
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
-  const { requestId } = useParams();
-  const navigate = useNavigate();
-
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -93,37 +83,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
 
-  const [isLoading, setIsLoading] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
-  const [selectedEntry, setSelectedEntry] = useState<RQAPI.Entry>();
-  const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
-
-  useEffect(() => {
-    if (!requestId || requestId === "new") {
-      return;
-    }
-
-    setSelectedEntry(null);
-    setIsLoading(true);
-
-    getApiRecord(requestId)
-      .then((result) => {
-        if (result.success) {
-          if (result.data.type === RQAPI.RecordType.API) {
-            setSelectedEntryDetails(result.data);
-          }
-        }
-      })
-      .catch((error) => {
-        setSelectedEntryDetails(null);
-        // TODO: redirect to new empty entry
-        Logger.error("Error loading api record", error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [requestId]);
+  const { closeTab } = useTabsLayoutContext();
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -173,13 +135,20 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     });
   }, []);
 
-  const onDeleteRecords = useCallback((recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
-    setApiClientRecords((prev) => {
-      return prev.filter((record) => {
-        return !recordIdsToBeDeleted.includes(record.id);
+  const onDeleteRecords = useCallback(
+    (recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
+      recordIdsToBeDeleted?.forEach((recordId) => {
+        closeTab(recordId);
       });
-    });
-  }, []);
+
+      setApiClientRecords((prev) => {
+        return prev.filter((record) => {
+          return !recordIdsToBeDeleted.includes(record.id);
+        });
+      });
+    },
+    [closeTab]
+  );
 
   const onSaveRecord = useCallback(
     (apiClientRecord: RQAPI.Record) => {
@@ -216,49 +185,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onSelectionFromHistory = useCallback(
     (index: number) => {
-      setSelectedEntry(history[index]);
+      // setSelectedEntry(history[index]);
     },
-    [history]
-  );
-
-  const saveRequest = useCallback(
-    async (apiEntry: RQAPI.Entry) => {
-      if (!user?.loggedIn) {
-        return;
-      }
-
-      setIsLoading(true);
-
-      const record: Partial<RQAPI.ApiRecord> = {
-        type: RQAPI.RecordType.API,
-        data: apiEntry,
-      };
-
-      const result = await upsertApiRecord(uid, record, teamId);
-
-      if (result.success) {
-        onSaveRecord(result.data);
-        redirectToRequest(navigate, result.data.id);
-      }
-
-      setIsLoading(false);
-    },
-    [uid, user?.loggedIn, teamId, onSaveRecord, navigate]
-  );
-
-  const handleImportRequest = useCallback(
-    async (request: RQAPI.Request) => {
-      const apiEntry = getEmptyAPIEntry(request);
-
-      return saveRequest(apiEntry)
-        .then(() => {
-          setSelectedEntry(apiEntry);
-        })
-        .finally(() => {
-          setIsImportModalOpen(false);
-        });
-    },
-    [saveRequest]
+    [
+      // history
+    ]
   );
 
   const onImportClick = useCallback(() => {
@@ -269,8 +200,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);
 
   const onNewClick = useCallback((analyticEventSource: RQAPI.AnalyticsEventSource) => {
-    setSelectedEntry(getEmptyAPIEntry());
-    setSelectedEntryDetails(null);
     trackNewRequestClicked(analyticEventSource);
   }, []);
 
@@ -287,18 +216,15 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     onDeleteModalClose,
+
     history,
     addToHistory,
     clearHistory,
-
-    isLoading,
-    isImportModalOpen,
-    selectedEntry,
-    selectedEntryDetails,
-
     onSelectionFromHistory,
-    saveRequest,
-    handleImportRequest,
+
+    isImportModalOpen,
+    setIsImportModalOpen,
+
     onImportClick,
     onImportRequestModalClose,
     onNewClick,
