@@ -8,6 +8,7 @@ import { EmptyEnvironmentView } from "./screens/environment/components/emptyEnvi
 import { EnvironmentContainer } from "./screens/environment/container";
 import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImporterView";
 import { TabOutletHOC } from "layouts/TabsLayout/hoc/TabOutletHOC";
+import { APIClientEmptyView } from "./screens/apiClient/components/sidebar/components/APIClientEmptyView/APIClientEmptyView";
 
 export const apiClientRoutes: RouteObject[] = [
   {
@@ -23,7 +24,7 @@ export const apiClientRoutes: RouteObject[] = [
         index: true,
         element: (
           <TabOutletHOC>
-            <APIClient />
+            <APIClientEmptyView />
           </TabOutletHOC>
         ),
       },
