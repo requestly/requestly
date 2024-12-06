@@ -6,7 +6,12 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { NewRecordNameInput } from "./newRecordNameInput/NewRecordNameInput";
 import { CollectionRow } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
-import { convertFlatRecordsToNestedRecords, isApiCollection, isApiRequest } from "../../../../utils";
+import {
+  convertFlatRecordsToNestedRecords,
+  isApiCollection,
+  isApiRequest,
+  getFromSessionStorage,
+} from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/ExportCollectionsModal";
 import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
@@ -33,6 +38,7 @@ export const CollectionsList: React.FC<Props> = ({
   const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [collapsedKeys] = useState(getFromSessionStorage("keys", []));
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const updatedRecords = convertFlatRecordsToNestedRecords(records);
@@ -122,6 +128,7 @@ export const CollectionsList: React.FC<Props> = ({
                     key={record.id}
                     record={record}
                     onNewClick={onNewClick}
+                    collapsedKeys={collapsedKeys}
                     onExportClick={handleExportCollection}
                   />
                 );
