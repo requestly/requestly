@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { isEmpty } from "lodash";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Collapse, Dropdown, MenuProps, Tooltip } from "antd";
 import { RQAPI } from "features/apiClient/types";
@@ -12,17 +13,21 @@ import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
+import { setToSessionStorage } from "features/apiClient/screens/apiClient/utils";
 
 interface Props {
   record: RQAPI.CollectionRecord;
   onNewClick: (src: RQAPI.AnalyticsEventSource) => void;
   onExportClick: (collection: RQAPI.CollectionRecord) => void;
   openTab: TabsLayoutContextInterface["openTab"];
+  collapsedKeys: string[];
 }
 
-export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportClick, openTab }) => {
+export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportClick, openTab, collapsedKeys }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [activeKey, setActiveKey] = useState(record.id); // TODO: Persist collapse active keys for all rows
+  const [activeKey, setActiveKey] = useState(
+    !isEmpty(collapsedKeys) ? (collapsedKeys.includes(record.id) ? null : record.id) : record.id
+  );
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
@@ -63,6 +68,17 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
     [setIsDeleteModalOpen, updateRecordToBeDeleted]
   );
 
+  const collapseChangeHandler = useCallback((keys: string[]) => {
+    if (isEmpty(keys)) {
+      collapsedKeys.push(record.id);
+    } else {
+      const activeKeyIndex = collapsedKeys.indexOf(record.id);
+      collapsedKeys.splice(activeKeyIndex, 1);
+    }
+    setActiveKey(keys[0]);
+    setToSessionStorage("keys", collapsedKeys);
+  }, []);
+
   return (
     <>
       {isEditMode ? (
@@ -77,10 +93,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
       ) : (
         <Collapse
           activeKey={activeKey}
-          onChange={(keys) => {
-            setActiveKey(keys[0]);
-          }}
-          defaultActiveKey={[record.id]}
+          onChange={collapseChangeHandler}
           ghost
           className="collections-list-item collection"
           expandIcon={({ isActive }) => {
@@ -162,6 +175,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                       record={apiRecord}
                       onNewClick={onNewClick}
                       onExportClick={onExportClick}
+                      collapsedKeys={collapsedKeys}
                     />
                   );
                 }
