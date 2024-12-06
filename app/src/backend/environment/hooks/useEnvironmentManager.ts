@@ -75,6 +75,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
           if (!isEmpty(allEnvironmentData)) {
             Object.keys(environmentMap).forEach((key) => {
               updatedEnvironmentMap[key] = {
+                ...environmentMap[key],
                 ...allEnvironmentData[key],
                 variables: mergeLocalAndSyncVariables(
                   allEnvironmentData[key]?.variables ?? {},
