@@ -1,10 +1,10 @@
 import { Select, Skeleton, Space } from "antd";
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import * as Sentry from "@sentry/react";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
 import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
 import {
-  addUrlSchemeIfMissing,
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
   getEmptyPair,
@@ -14,7 +14,6 @@ import {
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
   trackAPIRequestCancelled,
-  trackAPIRequestSent,
   trackRequestFailed,
   trackResponseLoaded,
   trackInstallExtensionDialogShown,
@@ -244,6 +243,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
           setIsFailed(true);
           setError(erroredEntry?.error ?? null);
+          if (erroredEntry?.error) {
+            Sentry.captureException(erroredEntry?.error);
+          }
           trackRequestFailed();
           trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
           trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
