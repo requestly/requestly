@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { Avatar, Row, Divider } from "antd";
 import { LockOutlined } from "@ant-design/icons";
@@ -146,7 +147,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
       </Row>
       {_availableTeams.current.length ? (
         <>
-          <div className="mt-1">Transfer rules into a workspace to start collaborating</div>
+          <div className="mt-1">Copy rules into a workspace to start collaborating</div>
           <WorkspaceShareMenu isLoading={isLoading} defaultActiveWorkspaces={2} onTransferClick={handleRulesTransfer} />
           <Divider />
         </>

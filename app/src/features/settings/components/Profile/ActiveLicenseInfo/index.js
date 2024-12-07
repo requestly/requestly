@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ProCard from "@ant-design/pro-card";
-import { getUserAuthDetails } from "../../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import GetASubscription from "./GetASubscription";
 import SubscriptionInfo from "./SubscriptionInfo";
 import { useSelector } from "react-redux";

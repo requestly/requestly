@@ -16,8 +16,9 @@ import {
   getSessionRecordingAttributes,
 } from "store/features/session-recording/selectors";
 import { toast } from "utils/Toast";
-import { getUserAttributes, getAppMode, getUserAuthDetails } from "store/selectors";
-import { actions } from "store";
+import { getUserAttributes, getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { trackDraftSessionSaved } from "features/sessionBook/analytics";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
@@ -94,8 +95,7 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
     (e: React.MouseEvent) => {
       if (!user?.loggedIn) {
         dispatch(
-          // @ts-ignore
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,
             newProps: {

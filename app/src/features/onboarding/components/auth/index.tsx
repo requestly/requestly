@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { AuthForm } from "./components/Form";
 import { OnboardingAuthBanner } from "./components/Banner";
 import AUTH from "config/constants/sub/auth";
 import MagicLinkModalContent from "components/authentication/AuthForm/MagicAuthLinkModal/MagicLinkModalContent";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { BiArrowBack } from "@react-icons/all-files/bi/BiArrowBack";
 import { trackAppOnboardingStepCompleted, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { m } from "framer-motion";
@@ -54,7 +54,7 @@ export const AuthScreen: React.FC<Props> = ({
 
   useEffect(() => {
     if (user.loggedIn && isOnboarding) {
-      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
       trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
     }
   }, [user.loggedIn, dispatch, isOnboarding]);
@@ -66,7 +66,7 @@ export const AuthScreen: React.FC<Props> = ({
           <button
             className="auth-screen-back-btn"
             onClick={() => {
-              dispatch(actions.updateIsAppOnboardingStepDisabled(false));
+              dispatch(globalActions.updateIsAppOnboardingStepDisabled(false));
               setIsVerifyEmailPopupVisible(false);
             }}
           >

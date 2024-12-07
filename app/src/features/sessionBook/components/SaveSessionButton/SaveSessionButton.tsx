@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { SessionConfigPopup } from "features/sessionBook/components/SessionConfigPopup/SessionConfigPopup";
@@ -22,7 +22,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { useSaveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/hooks/useSaveDraftSession";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import "./saveSessionButton.scss";
 
 interface SaveSessionButtonProps {
@@ -70,8 +70,7 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
   const handleSaveSession = useCallback(() => {
     if (!user?.loggedIn) {
       dispatch(
-        // @ts-ignore
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {

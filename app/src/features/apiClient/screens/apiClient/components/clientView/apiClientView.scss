@@ -3,9 +3,25 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 20px 10px;
   box-sizing: border-box;
-  background-color: var(--body-background);
+  background-color: var(--requestly-color-background);
+
+  .api-client-header-container {
+    padding: 8px 16px 0 6px;
+  }
+
+  .api-client-body {
+    padding: 0 16px;
+    overflow: hidden;
+
+    .ant-tabs {
+      .ant-tabs-nav-wrap {
+        .ant-tabs-tab {
+          padding: 6px 4px;
+        }
+      }
+    }
+  }
 
   .rq-breadcrumb {
     margin: 0 10px;
@@ -16,15 +32,12 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0 10px;
-    flex-wrap: wrap;
 
     .api-client-url-container {
       display: flex;
       flex: auto;
       height: 32px;
-      width: 100%;
-      max-width: 86%;
+      width: calc(100% - 205px);
 
       .api-request-method-selector {
         width: 120px;
@@ -34,6 +47,7 @@
         padding: 4px 8px;
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
+        background: transparent;
       }
     }
   }
@@ -49,8 +63,18 @@
   }
 
   .api-request-tabs {
-    height: 100%;
-    padding: 0 10px;
+    height: calc(100% - 35px);
+    overflow: hidden;
+    margin-top: 8px;
+
+    .ant-tabs-content-holder {
+      height: inherit;
+
+      .ant-tabs-content-top {
+        height: 100%;
+        overflow: auto;
+      }
+    }
   }
 
   .api-response-view {
@@ -101,5 +125,47 @@
         margin-right: 0;
       }
     }
+  }
+
+  .bottom-sheet-container.ant-col {
+    .ant-tabs {
+      /*
+      HACKY HEIGHT OVERFLOW FIX: CODEMIRROR EDITOR OVERFLOWING ON SMALL HEIGHTS
+      TODO: Fix this properly
+      */
+      // height: calc(100% - px) !important;
+      height: 100%;
+
+      .ant-tabs-content-holder {
+        // FIXED HEIGHT FIXES HEIGHT CHANGE OF SPILT PANEL HEIGHT CHANGE ON CODE MIRROR MOUNT
+        // TODO: FIX THIS
+        height: 35px;
+      }
+    }
+  }
+
+  .empty-api-response-view-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .api-response-status-line {
+    font-size: var(--requestly-font-size-xs);
+  }
+
+  .api-client-response__loading-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--requestly-color-background);
+    z-index: 2;
   }
 }

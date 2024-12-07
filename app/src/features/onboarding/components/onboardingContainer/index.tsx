@@ -9,7 +9,7 @@ import { ONBOARDING_STEPS } from "../../types";
 import { RecommendationsView } from "../recommendations";
 import { PersonaScreen } from "../persona/components/personaScreen";
 import { MdOutlineArrowForward } from "@react-icons/all-files/md/MdOutlineArrowForward";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import { trackAppOnboardingSkipped } from "features/onboarding/analytics";
 import { getAndUpdateInstallationDate } from "utils/Misc";
@@ -35,14 +35,14 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
   const handleSkip = () => {
     trackAppOnboardingSkipped(step);
     if (step === ONBOARDING_STEPS.AUTH) {
-      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
     } else if (step === ONBOARDING_STEPS.TEAMS) {
-      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
     } else {
       redirectToWebAppHomePage(navigate);
-      dispatch(actions.updateAppOnboardingCompleted());
+      dispatch(globalActions.updateAppOnboardingCompleted());
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "appOnboardingModal",
           newValue: false,
         })
@@ -51,21 +51,23 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
   };
 
   useEffect(() => {
-    dispatch(actions.updateIsAppOnboardingStepDisabled(false));
+    dispatch(globalActions.updateIsAppOnboardingStepDisabled(false));
   }, [dispatch]);
 
   useEffect(() => {
     getAndUpdateInstallationDate(appMode, false, false)
       .then((install_date) => {
-        if (new Date(install_date) >= new Date("2024-10-18")) {
-          dispatch(
-            actions.toggleActiveModal({
-              modalName: "appOnboardingModal",
-              newValue: true,
-            })
-          );
-        } else {
-          dispatch(actions.updateAppOnboardingCompleted());
+        if (install_date) {
+          if (new Date(install_date) >= new Date("2024-10-18")) {
+            dispatch(
+              globalActions.toggleActiveModal({
+                modalName: "appOnboardingModal",
+                newValue: true,
+              })
+            );
+          } else {
+            dispatch(globalActions.updateAppOnboardingCompleted());
+          }
         }
       })
       .catch((err) => {

@@ -1,7 +1,8 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { actions } from "store";
-import { getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selectors";
+import { globalActions } from "store/slices/global/slice";
+import { getCurrentlySelectedRuleData } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Row, Tooltip } from "antd";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
@@ -22,7 +23,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
       toggleSharingModal();
     } else {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
@@ -36,7 +37,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
 
   const toggleSharingModal = () => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "sharingModal",
         newValue: true,
         newProps: {

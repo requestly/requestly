@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useDispatch, useSelector } from "react-redux";
-import { getBillingTeamNudgeLastSeenTs, getUserAuthDetails } from "store/selectors";
+import { getBillingTeamNudgeLastSeenTs } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCompanyNameFromEmail, getPrettyPlanName } from "utils/FormattingHelper";
 import { getAvailableBillingTeams, getBillingTeamMemberById } from "store/features/billing/selectors";
 import PATHS from "config/constants/sub/paths";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
 import { PlanStatus } from "features/settings/components/BillingTeam/types";
@@ -57,7 +58,7 @@ export const BillingTeamNudge: React.FC = () => {
 
   const handleCloseBillingTeamNudge = useCallback(() => {
     // @ts-ignore
-    dispatch(actions.updateBillingTeamNudgeLastSeenTs(new Date().getTime()));
+    dispatch(globalActions.updateBillingTeamNudgeLastSeenTs(new Date().getTime()));
     trackBillingTeamNudgeClosed();
   }, [dispatch]);
 

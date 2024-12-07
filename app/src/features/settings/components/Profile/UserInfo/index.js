@@ -5,12 +5,12 @@ import { Button, Typography } from "antd";
 import { toast } from "utils/Toast.js";
 // UTILS
 import DataStoreUtils from "../../../../../utils/DataStoreUtils";
-import { getUserAuthDetails } from "../../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 // ACTIONS
 import { updateUserProfile } from "./actions";
 // CONSTANTS
 import { getUsername, updateUsername } from "backend/auth/username";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackUsernameUpdated } from "modules/analytics/events/misc/username";
 import { getUser } from "backend/user/getUser";
 
@@ -45,7 +45,7 @@ const UserInfo = ({ customHeading, shadow }) => {
         displayName: userFullName,
       }).then(() => {
         if (userFullName) {
-          dispatch(actions.updateUserDisplayName(userFullName));
+          dispatch(globalActions.updateUserDisplayName(userFullName));
         }
       }),
       updateUsername(user?.details?.profile?.uid, username)
@@ -53,7 +53,7 @@ const UserInfo = ({ customHeading, shadow }) => {
           trackUsernameUpdated(username, user?.details?.username);
           setUsernameError("");
           dispatch(
-            actions.updateUsername({
+            globalActions.updateUsername({
               username: username,
             })
           );

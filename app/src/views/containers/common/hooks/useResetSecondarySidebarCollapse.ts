@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 export const useResetSecondarySidebarCollapse = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(actions.updateSecondarySidebarCollapse(false));
+    dispatch(globalActions.updateSecondarySidebarCollapse(false));
   }, [dispatch]);
 };

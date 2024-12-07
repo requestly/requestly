@@ -24,15 +24,11 @@ import {
   trackCreateNewTeamClicked,
 } from "modules/analytics/events/common/teams";
 import { getCurrentlyActiveWorkspace, getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
-import {
-  getAppMode,
-  getIsCurrentlySelectedRuleHasUnsavedChanges,
-  getUserAuthDetails,
-  getLastSeenInviteTs,
-} from "store/selectors";
+import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getLastSeenInviteTs } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToTeam, redirectToWorkspaceSettings } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
@@ -188,7 +184,7 @@ const WorkspaceSelector = () => {
 
   const promptUserSignupModal = (callback = () => {}, source) => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {
@@ -205,7 +201,7 @@ const WorkspaceSelector = () => {
   const handleJoinWorkspaceMenuItemClick = () => {
     if (user.loggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "joinWorkspaceModal",
           newValue: true,
           newProps: { source: "workspaces_dropdown" },
@@ -215,7 +211,7 @@ const WorkspaceSelector = () => {
     } else {
       promptUserSignupModal(() => {
         dispatch(
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "joinWorkspaceModal",
             newValue: true,
             newProps: { source: "workspaces_dropdown" },
@@ -229,7 +225,7 @@ const WorkspaceSelector = () => {
   const handleCreateNewWorkspaceRedirect = () => {
     if (user.loggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "createWorkspaceModal",
           newValue: true,
           newProps: { source: "workspaces_dropdown" },
@@ -238,7 +234,7 @@ const WorkspaceSelector = () => {
     } else {
       promptUserSignupModal(() => {
         dispatch(
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "createWorkspaceModal",
             newValue: true,
             newProps: { source: "workspaces_dropdown" },
@@ -251,7 +247,7 @@ const WorkspaceSelector = () => {
   const handleInviteTeammatesClick = () => {
     if (user.loggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "inviteMembersModal",
           newValue: true,
           newProps: { source: "workspaces_dropdown" },
@@ -298,7 +294,7 @@ const WorkspaceSelector = () => {
   const confirmWorkspaceSwitch = useCallback(
     (callback = () => {}) => {
       const handleCallback = () => {
-        dispatch(actions.updateIsWorkspaceSwitchConfirmationActive(false));
+        dispatch(globalActions.updateIsWorkspaceSwitchConfirmationActive(false));
         callback();
 
         if (path) {
@@ -311,14 +307,14 @@ const WorkspaceSelector = () => {
         return;
       }
 
-      dispatch(actions.updateIsWorkspaceSwitchConfirmationActive(true));
+      dispatch(globalActions.updateIsWorkspaceSwitchConfirmationActive(true));
       Modal.confirm({
         title: "Discard changes?",
         icon: <ExclamationCircleFilled />,
         content: "Changes you made on a rule may not be saved.",
         okText: "Switch",
         onOk: handleCallback,
-        afterClose: () => dispatch(actions.updateIsWorkspaceSwitchConfirmationActive(false)),
+        afterClose: () => dispatch(globalActions.updateIsWorkspaceSwitchConfirmationActive(false)),
       });
     },
     [isCurrentlySelectedRuleHasUnsavedChanges, navigate, path, pathname, redirects, dispatch]

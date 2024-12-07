@@ -1,0 +1,150 @@
+.collections-list-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  overflow-x: hidden;
+  padding: 8px 8px 8px 0;
+  flex: auto;
+
+  .collections-list-header {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+
+    .create-collection-btn {
+      margin-left: auto;
+    }
+  }
+
+  .collections-list-content {
+    .collections-list-item + .collections-list-item {
+      margin-top: 4px;
+    }
+
+    .collections-list-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-sm, 13px);
+
+      &.api {
+        .request-method {
+          flex-shrink: 0;
+          font-size: var(--requestly-font-size-2xs);
+        }
+
+        .request-url {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          font-size: var(--requestly-font-size-xs);
+          color: var(--requestly-color-text-default);
+        }
+        .request-options {
+          margin-left: auto;
+          visibility: hidden;
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        &:hover .request-options {
+          visibility: visible;
+          opacity: 1;
+        }
+
+        &:hover,
+        &.active {
+          background: var(--requestly-color-surface-1);
+        }
+      }
+
+      &.collection.ant-collapse {
+        padding: 0;
+
+        &:hover .ant-collapse-item .ant-collapse-header .collection-name-container .visible {
+          visibility: visible;
+        }
+      }
+
+      .ant-collapse-item {
+        width: 100%;
+
+        &.ant-collapse-item-active {
+          .ant-collapse-header {
+            color: var(--requestly-color-text-default);
+          }
+        }
+
+        .ant-collapse-header {
+          padding: 2px 4px;
+          border-radius: 4px;
+          user-select: none;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--requestly-color-text-subtle);
+
+          &-text {
+            overflow: hidden;
+          }
+
+          &:hover {
+            background: var(--requestly-color-surface-1);
+          }
+
+          .ant-collapse-expand-icon {
+            svg {
+              width: 12px;
+              height: 12px;
+              color: inherit;
+              margin: 0;
+            }
+          }
+
+          .collection-name-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          }
+
+          .collection-name {
+            max-width: 140px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-style: normal;
+            font-size: var(--requestly-font-size-xs);
+            font-weight: var(--requestly-font-weight-medium);
+            font-weight: var(--requestly-font-weight-normal);
+            line-height: var(--line-height-xs, 15px);
+          }
+
+          .collection-options {
+            flex-shrink: 0;
+            visibility: hidden;
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: var(--space-1, 2px);
+            visibility: hidden;
+
+            svg {
+              color: var(--requestly-color-text-subtle);
+            }
+          }
+        }
+
+        .ant-collapse-content-box {
+          margin-left: 6px;
+          padding: 2px 0px 0px 6px;
+          border-left: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+        }
+      }
+    }
+  }
+}

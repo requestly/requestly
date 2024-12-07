@@ -4,7 +4,7 @@ import { Button } from "antd";
 import APP_CONSTANTS from "../../../../../../../../config/constants";
 import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
 import CancelPlanModal from "./CancelPlanModal";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
 
 // DEAD CODE
@@ -28,7 +28,7 @@ const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
           type="primary"
           onClick={() => {
             dispatch(
-              actions.toggleActiveModal({
+              globalActions.toggleActiveModal({
                 modalName: "pricingModal",
                 newValue: true,
                 newProps: { selectedPlan: null, source: "workspace_upgrade" },

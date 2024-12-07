@@ -4,9 +4,9 @@ import { Outlet, useSearchParams } from "react-router-dom";
 import { Result, Spin } from "antd";
 import { getAvailableBillingTeams, getIsBillingTeamsLoading } from "store/features/billing/selectors";
 import APP_CONSTANTS from "config/constants";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQButton } from "lib/design-system/components";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { toast } from "utils/Toast";
 import { BillingTeamsSidebar } from "./components/BillingTeamsSidebar";
@@ -39,8 +39,7 @@ export const BillingTeamContainer: React.FC = () => {
           : `You need to login to view this billing team`
       );
       dispatch(
-        // @ts-ignore
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
@@ -68,8 +67,7 @@ export const BillingTeamContainer: React.FC = () => {
               type="primary"
               onClick={() => {
                 dispatch(
-                  // @ts-ignore
-                  actions.toggleActiveModal({
+                  globalActions.toggleActiveModal({
                     modalName: "authModal",
                     newValue: true,
                     newProps: {

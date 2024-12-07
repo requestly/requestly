@@ -7,11 +7,11 @@ import { getIncentivizationMilestones, getUserIncentivizationDetails } from "sto
 import { getTotalCredits } from "features/incentivization/utils";
 import LottieAnimation from "componentsV2/LottieAnimation/LottieAnimation";
 import creditsEarnedAnimation from "./assets/creditsEarned.json";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization/analytics/constants";
 import { trackCreditsAssignedModalClicked, trackCreditsAssignedModalViewed } from "features/incentivization/analytics";
 import "./incentiveTaskCompletedModal.scss";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import APP_CONSTANTS from "config/constants";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
@@ -90,8 +90,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
     toggle();
 
     dispatch(
-      // @ts-ignore
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {

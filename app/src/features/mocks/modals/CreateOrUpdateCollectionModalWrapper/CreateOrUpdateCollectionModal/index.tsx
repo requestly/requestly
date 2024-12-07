@@ -4,7 +4,7 @@ import { Button, Input, Row, Tooltip } from "antd";
 import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { RQModal } from "lib/design-system/components";
 import { createCollection } from "backend/mocks/createCollection";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { updateCollections } from "backend/mocks/updateCollections";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";

@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Col, Row, Spin } from "antd";
 import { useSelector, useDispatch } from "react-redux";
-import { getAppMode, getIsRulesListLoading, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsRulesListLoading } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useHasChanged } from "hooks";
 import { HomepageEmptyCard } from "../EmptyCard";
@@ -18,7 +19,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
 import Logger from "lib/logger";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackHomeRulesActionClicked } from "components/Home/analytics";
 import {
   trackNewRuleButtonClicked,
@@ -166,8 +167,7 @@ export const RulesCard: React.FC = () => {
                     if (isExtensionInstalled()) {
                       setIsRulesDrawerOpen(true);
                     } else {
-                      // @ts-ignore
-                      dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
+                      dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
                     }
                   }}
                 >

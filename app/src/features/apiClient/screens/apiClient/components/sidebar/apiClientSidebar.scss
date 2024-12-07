@@ -2,13 +2,12 @@
   width: 320px;
   flex: 0 0 auto;
   border-right: 1px solid var(--border-dark);
-  background-color: var(--component-background);
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
   border-right: 1px solid var(--border-dark);
-  background-color: var(--body-background);
+  background-color: var(--requestly-color-background);
   padding-bottom: 32px;
 
   .api-client-sidebar-header {
@@ -17,7 +16,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--body-background);
     border-bottom: 1px solid var(--border-dark);
   }
 
@@ -25,7 +23,7 @@
     flex-shrink: 0;
     height: 100%;
     overflow: hidden;
-    background-color: var(--body-background);
+    background-color: var(--requestly-color-background);
 
     .api-client-sidebar-placeholder {
       height: 100%;
@@ -193,25 +191,6 @@
   }
 
   .ant-dropdown-menu-item.ant-dropdown-menu-item-disabled {
-    opacity: 0.6;
-  }
-}
-
-.api-client-new-btn-dropdown-overlay {
-  .new-btn-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--requestly-color-text-default);
-
-    svg {
-      width: 16px;
-      height: 16px;
-      color: var(--requestly-color-text-subtle);
-    }
-  }
-
-  .ant-dropdown-menu-item.ant-dropdown-menu-item-disabled {
-    opacity: 0.6;
+    display: none;
   }
 }

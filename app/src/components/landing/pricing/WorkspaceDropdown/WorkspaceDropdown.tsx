@@ -3,7 +3,7 @@ import { DownOutlined, LockOutlined } from "@ant-design/icons";
 import { Avatar, Dropdown, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { getUniqueColorForWorkspace } from "utils/teams";

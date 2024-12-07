@@ -1,54 +1,62 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import APIClientSidebar from "./components/sidebar/APIClientSidebar";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import APIClientView from "./components/clientView/APIClientView";
-import { RQAPI } from "../../types";
-import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "./historyStore";
-import { getEmptyAPIEntry } from "./utils";
-import {
-  trackHistoryCleared,
-  trackImportCurlClicked,
-  trackNewRequestClicked,
-} from "modules/analytics/events/features/apiClient";
 import { DeleteApiRecordModal, ImportRequestModal } from "./components/modals";
+import { useApiClientContext } from "features/apiClient/contexts";
+import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import { RQAPI } from "features/apiClient/types";
+import { useNavigate, useParams } from "react-router-dom";
+import { getEmptyAPIEntry } from "./utils";
 import { getApiRecord, upsertApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
-import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { redirectToRequest } from "utils/RedirectionUtils";
 import "./apiClient.scss";
 
 interface Props {}
 
 export const APIClient: React.FC<Props> = () => {
-  const { requestId } = useParams();
-  const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
-  const { onSaveRecord, recordToBeDeleted, isDeleteModalOpen, onDeleteModalClose } = useApiClientContext();
+  const { requestId } = useParams();
+  const {
+    recordToBeDeleted,
+    isDeleteModalOpen,
+    onDeleteModalClose,
+    addToHistory,
+    isImportModalOpen,
+    onImportRequestModalClose,
+    onSaveRecord,
+    setIsImportModalOpen,
+  } = useApiClientContext();
+
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
-  const [selectedEntry, setSelectedEntry] = useState<RQAPI.Entry>();
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
 
+  const isRequestFetched = useRef(false);
+
   useEffect(() => {
+    if (isRequestFetched.current) {
+      return;
+    }
+
     if (!requestId || requestId === "new") {
       return;
     }
 
-    setSelectedEntry(null);
     setIsLoading(true);
 
     getApiRecord(requestId)
       .then((result) => {
         if (result.success) {
+          isRequestFetched.current = true;
+
           if (result.data.type === RQAPI.RecordType.API) {
             setSelectedEntryDetails(result.data);
           }
@@ -63,17 +71,6 @@ export const APIClient: React.FC<Props> = () => {
         setIsLoading(false);
       });
   }, [requestId]);
-
-  const addToHistory = useCallback((apiEntry: RQAPI.Entry) => {
-    setHistory((history) => [...history, apiEntry]);
-    addToHistoryInStore(apiEntry);
-  }, []);
-
-  const clearHistory = useCallback(() => {
-    setHistory([]);
-    clearHistoryFromStore();
-    trackHistoryCleared();
-  }, [setHistory]);
 
   const saveRequest = useCallback(
     async (apiEntry: RQAPI.Entry) => {
@@ -96,6 +93,8 @@ export const APIClient: React.FC<Props> = () => {
       }
 
       setIsLoading(false);
+
+      return result.data;
     },
     [uid, user?.loggedIn, teamId, onSaveRecord, navigate]
   );
@@ -105,48 +104,22 @@ export const APIClient: React.FC<Props> = () => {
       const apiEntry = getEmptyAPIEntry(request);
 
       return saveRequest(apiEntry)
-        .then(() => {
-          setSelectedEntry(apiEntry);
+        .then((apiRecord: RQAPI.ApiRecord) => {
+          setSelectedEntryDetails(apiRecord);
         })
         .finally(() => {
           setIsImportModalOpen(false);
         });
     },
-    [saveRequest]
-  );
-
-  const onImportClick = useCallback(() => {
-    setIsImportModalOpen(true);
-    trackImportCurlClicked();
-  }, []);
-
-  const onNewClick = useCallback((analyticEventSource: RQAPI.AnalyticsEventSource) => {
-    setSelectedEntry(getEmptyAPIEntry());
-    setSelectedEntryDetails(null);
-    trackNewRequestClicked(analyticEventSource);
-  }, []);
-
-  const onSelectionFromHistory = useCallback(
-    (index: number) => {
-      setSelectedEntry(history[index]);
-    },
-    [history]
+    [saveRequest, setIsImportModalOpen]
   );
 
   return (
-    <div className="api-client-container">
-      <>
-        <APIClientSidebar
-          history={history}
-          onSelectionFromHistory={onSelectionFromHistory}
-          clearHistory={clearHistory}
-          onNewClick={onNewClick}
-          onImportClick={onImportClick}
-        />
+    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
+      <div className="api-client-container-content">
         <APIClientView
-          key={requestId}
           // TODO: Fix - "apiEntry" is used for history, remove this prop and derive everything from "apiEntryDetails"
-          apiEntry={selectedEntry ?? selectedEntryDetails?.data}
+          apiEntry={selectedEntryDetails?.data}
           apiEntryDetails={selectedEntryDetails}
           notifyApiRequestFinished={addToHistory}
         />
@@ -154,11 +127,11 @@ export const APIClient: React.FC<Props> = () => {
           isRequestLoading={isLoading}
           isOpen={isImportModalOpen}
           handleImportRequest={handleImportRequest}
-          onClose={() => setIsImportModalOpen(false)}
+          onClose={onImportRequestModalClose}
         />
 
         <DeleteApiRecordModal open={isDeleteModalOpen} record={recordToBeDeleted} onClose={onDeleteModalClose} />
-      </>
-    </div>
+      </div>
+    </BottomSheetProvider>
   );
 };

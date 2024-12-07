@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getIsSlackConnectButtonVisible, getUserAuthDetails } from "store/selectors";
+import { getIsSlackConnectButtonVisible } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
 
 export default function useFetchSlackInviteVisibility() {

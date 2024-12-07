@@ -1,22 +1,24 @@
 import { useCallback, useEffect, useState, useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { getUserAuthDetails } from "store/selectors";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { Input } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../../../apiClient/components/sidebar/components/sidebarListHeader/SidebarListHeader";
-import { redirectToEnvironment, redirectToNewEnvironment } from "utils/RedirectionUtils";
+import { redirectToNewEnvironment } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
-import { EmptyState } from "features/apiClient/screens/apiClient/components/sidebar/emptyState/EmptyState";
+import { EmptyState } from "features/apiClient/screens/apiClient/components/sidebar/components/emptyState/EmptyState";
 import { ListEmptySearchView } from "features/apiClient/screens/apiClient/components/sidebar/components/listEmptySearchView/ListEmptySearchView";
 import { EnvironmentAnalyticsSource } from "../../types";
 import { EnvironmentsListItem } from "./components/environmentsListItem/EnvironmentsListItem";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
+  const { envId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,16 +29,18 @@ export const EnvironmentsList = () => {
   const [newEnvironmentValue, setNewEnvironmentValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const { openTab, replaceTab } = useTabsLayoutContext();
+
   const environments = useMemo(() => getAllEnvironments(), [getAllEnvironments]);
   const filteredEnvironments = useMemo(
-    () => environments.filter((environment) => environment.name.toLowerCase().includes(searchValue.toLowerCase())),
+    () => environments.filter((environment) => environment.name?.toLowerCase().includes(searchValue?.toLowerCase())),
     [environments, searchValue]
   );
 
   const handleAddEnvironmentClick = useCallback(() => {
     if (!user.loggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
@@ -53,24 +57,28 @@ export const EnvironmentsList = () => {
   }, [user.loggedIn, dispatch, navigate]);
 
   const handleAddNewEnvironment = useCallback(async () => {
-    if (newEnvironmentValue) {
-      setIsLoading(true);
-      const newEnvironment = await addNewEnvironment(newEnvironmentValue);
-      if (newEnvironment) {
-        if (environments.length === 0) {
-          // if there are no environments, set the new environment as the active environment
-          setCurrentEnvironment(newEnvironment.id);
-        }
-        redirectToEnvironment(navigate, newEnvironment.id);
-        trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
+    setIsLoading(true);
+    const newEnvironment = await addNewEnvironment(newEnvironmentValue || "New Environment");
+    if (newEnvironment) {
+      if (environments.length === 0) {
+        // if there are no environments, set the new environment as the active environment
+        setCurrentEnvironment(newEnvironment.id);
       }
-      setIsLoading(false);
-    } else {
-      navigate(-1);
+
+      if (envId === "new") {
+        replaceTab("environments/new", {
+          id: newEnvironment.id,
+          title: newEnvironment.name,
+          url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${newEnvironment.id}`,
+        });
+      }
+
+      trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
     }
+    setIsLoading(false);
     setIsNewEnvironmentInputVisible(false);
     setNewEnvironmentValue("");
-  }, [addNewEnvironment, navigate, environments.length, newEnvironmentValue, setCurrentEnvironment]);
+  }, [addNewEnvironment, environments.length, newEnvironmentValue, setCurrentEnvironment, replaceTab, envId]);
 
   useEffect(() => {
     if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE) && user.loggedIn) {
@@ -127,8 +135,8 @@ export const EnvironmentsList = () => {
             ) : (
               <>
                 {filteredEnvironments.map((environment) =>
-                  environment.name.toLowerCase().includes(searchValue.toLowerCase()) ? (
-                    <EnvironmentsListItem environment={environment} />
+                  environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
+                    <EnvironmentsListItem openTab={openTab} environment={environment} />
                   ) : null
                 )}
               </>

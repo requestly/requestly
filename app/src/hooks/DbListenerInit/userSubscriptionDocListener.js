@@ -1,6 +1,6 @@
 import firebaseApp from "../../firebase";
 import { doc, getFirestore, onSnapshot } from "firebase/firestore";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getPlanName, isPremiumUser } from "utils/PremiumUtils";
 import Logger from "lib/logger";
 
@@ -18,7 +18,7 @@ export const userSubscriptionDocListener = (dispatch, uid) => {
             const isUserPremium = isPremiumUser(planDetails);
 
             dispatch(
-              actions.updateUserPlanDetails({
+              globalActions.updateUserPlanDetails({
                 userPlanDetails: {
                   ...planDetails,
                   planName: getPlanName(planDetails),
@@ -34,7 +34,7 @@ export const userSubscriptionDocListener = (dispatch, uid) => {
       );
     } catch (err) {
       dispatch(
-        actions.updateUserPlanDetails({
+        globalActions.updateUserPlanDetails({
           userPlanDetails: null,
           isUserPremium: false,
         })
@@ -42,7 +42,7 @@ export const userSubscriptionDocListener = (dispatch, uid) => {
     }
   } else {
     dispatch(
-      actions.updateUserPlanDetails({
+      globalActions.updateUserPlanDetails({
         userPlanDetails: null,
         isUserPremium: false,
       })

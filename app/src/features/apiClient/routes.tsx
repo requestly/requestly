@@ -6,6 +6,9 @@ import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { EnvironmentView } from "./screens/environment/components/environmentView/EnvironmentView";
 import { EmptyEnvironmentView } from "./screens/environment/components/emptyEnvironmentView/EmptyEnvironmentView";
 import { EnvironmentContainer } from "./screens/environment/container";
+import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImporterView";
+import { TabOutletHOC } from "layouts/TabsLayout/hoc/TabOutletHOC";
+import { APIClientEmptyView } from "./screens/apiClient/components/sidebar/components/APIClientEmptyView/APIClientEmptyView";
 
 export const apiClientRoutes: RouteObject[] = [
   {
@@ -19,11 +22,19 @@ export const apiClientRoutes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <APIClient />,
+        element: (
+          <TabOutletHOC>
+            <APIClientEmptyView />
+          </TabOutletHOC>
+        ),
       },
       {
         path: PATHS.API_CLIENT.REQUEST.INDEX,
-        element: <ProtectedRoute component={APIClient} />,
+        element: (
+          <TabOutletHOC>
+            <ProtectedRoute component={APIClient} />
+          </TabOutletHOC>
+        ),
         handle: {
           breadcrumb: {
             label: "Request",
@@ -33,7 +44,11 @@ export const apiClientRoutes: RouteObject[] = [
       },
       {
         path: PATHS.API_CLIENT.COLLECTION.INDEX,
-        element: <ProtectedRoute component={APIClient} />,
+        element: (
+          <TabOutletHOC>
+            <ProtectedRoute component={APIClient} />
+          </TabOutletHOC>
+        ),
         handle: {
           breadcrumb: {
             label: "Request", // TODO: Fix, change it to collection, when collection view is added
@@ -43,7 +58,11 @@ export const apiClientRoutes: RouteObject[] = [
       },
       {
         path: PATHS.API_CLIENT.HISTORY.INDEX,
-        element: <APIClient />,
+        element: (
+          <TabOutletHOC>
+            <APIClient />
+          </TabOutletHOC>
+        ),
         handle: {
           breadcrumb: {
             label: "History",
@@ -52,7 +71,11 @@ export const apiClientRoutes: RouteObject[] = [
       },
       {
         path: PATHS.API_CLIENT.ENVIRONMENTS.INDEX,
-        element: <EnvironmentContainer />,
+        element: (
+          <TabOutletHOC>
+            <EnvironmentContainer />
+          </TabOutletHOC>
+        ),
         children: [
           {
             index: true,
@@ -62,11 +85,11 @@ export const apiClientRoutes: RouteObject[] = [
             path: PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE + "/:envId",
             element: <EnvironmentView />,
           },
-          {
-            path: PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE,
-            element: <EnvironmentView />,
-          },
         ],
+      },
+      {
+        path: PATHS.API_CLIENT.IMPORT_FROM_POSTMAN.RELATIVE,
+        element: <ProtectedRoute component={PostmanImporterView} />,
       },
     ],
   },

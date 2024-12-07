@@ -8,10 +8,11 @@ import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
 import CharlesIcon from "assets/icons/charlesIcon.svg?react";
 import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
-import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAllRules } from "store/features/rules/selectors";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
 import { RQButton } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
@@ -156,7 +157,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
       addRulesAndGroupsToStorage(appMode, dataToImport)
         .then(async () => {
           dispatch(
-            actions.updateRefreshPendingStatus({
+            globalActions.updateRefreshPendingStatus({
               type: "rules",
               newValue: !isRulesListRefreshPending,
             })

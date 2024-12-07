@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Modal } from "antd";
 import { BiArrowBack } from "@react-icons/all-files/bi/BiArrowBack";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import MagicLinkModalContent from "./MagicLinkModalContent";
 import { isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";

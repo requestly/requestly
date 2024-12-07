@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import Modal from "antd/lib/modal/Modal";
 import { Col, Row, Space, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -11,7 +11,7 @@ import { RiCheckboxCircleLine } from "@react-icons/all-files/ri/RiCheckboxCircle
 import { CloseOutlined } from "@ant-design/icons";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { capitalize } from "lodash";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "../../analytics";
 import { trackTeamPlanCardClicked } from "modules/analytics/events/common/teams";
@@ -160,8 +160,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                 onUpgradeYourselfClickCallback();
                 trackUpgradeOptionClicked("upgrade_yourself");
                 dispatch(
-                  // @ts-ignore
-                  actions.toggleActiveModal({
+                  globalActions.toggleActiveModal({
                     modalName: "pricingModal",
                     newValue: true,
                     newProps: { selectedPlan: null, source: SOURCE.REQUEST_FEATURE_MODAL },

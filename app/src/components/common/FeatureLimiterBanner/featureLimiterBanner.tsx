@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Alert, Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { TbInfoTriangle } from "@react-icons/all-files/tb/TbInfoTriangle";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { PRICING } from "features/pricing";
 import { trackFeatureLimitUpgradeBannerViewed } from "modules/analytics/events/common/feature-limiter";
 import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
@@ -41,7 +41,7 @@ const FeatureLimiterBanner = () => {
               onClick={() => {
                 trackViewPricingPlansClicked("feature_limiter_banner");
                 dispatch(
-                  actions.toggleActiveModal({
+                  globalActions.toggleActiveModal({
                     modalName: "pricingModal",
                     newValue: true,
                     newProps: { selectedPlan: null, source: "feature_limiter_banner" },

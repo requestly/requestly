@@ -4,11 +4,8 @@ import { Checkbox, Col, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { trackTestRuleClicked } from "../../analytics";
-import {
-  getCurrentlySelectedRuleData,
-  getIsCurrentlySelectedRuleHasUnsavedChanges,
-  getUserAuthDetails,
-} from "store/selectors";
+import { getCurrentlySelectedRuleData, getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { prefixUrlWithHttps } from "utils/URLUtils";
 import { isValidUrl } from "utils/FormattingHelper";
 import { testRuleOnUrl } from "actions/ExtensionActions";

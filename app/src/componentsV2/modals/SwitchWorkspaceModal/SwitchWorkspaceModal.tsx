@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { Avatar, Button, Col, Row } from "antd";
 import { RQModal } from "lib/design-system/components";
@@ -9,7 +10,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Team } from "types";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import "./switchWorkspaceModal.css";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
@@ -34,7 +35,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
     trackCreateNewTeamClicked("switch_workspace_modal");
     toggleModal();
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "createWorkspaceModal",
         newValue: true,
         newProps: { source: "switch_workspace_modal" },
@@ -60,7 +61,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
       "switch_workspace_modal"
     );
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "inviteMembersModal",
         newValue: true,
         newProps: { source: "switch_workspace_modal" },

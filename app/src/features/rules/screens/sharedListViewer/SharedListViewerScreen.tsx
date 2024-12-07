@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Col, Row } from "antd";
 import { SharedListsContentHeader } from "./components/SharedListViewerContentHeader/SharedListViewerContentHeader";
 import { useFetchSharedListData } from "./hooks/useFetchSharedListData";
@@ -11,7 +11,7 @@ import PageLoader from "components/misc/PageLoader";
 import { isEmpty } from "lodash";
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import PATHS from "config/constants/sub/paths";
 import "./sharedListViewerScreen.css";
@@ -39,8 +39,7 @@ export const SharedListViewerScreen = () => {
 
   const promptUserToSignup = (source: string) => {
     dispatch(
-      // @ts-ignore
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {

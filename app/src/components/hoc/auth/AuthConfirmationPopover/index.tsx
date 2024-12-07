@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Popconfirm } from "antd";
 import APP_CONSTANTS from "config/constants";
 import {
@@ -42,8 +42,7 @@ export const AuthConfirmationPopover: React.FC<Props> = ({
 
   const openAuthModal = () => {
     dispatch(
-      // @ts-ignore
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {

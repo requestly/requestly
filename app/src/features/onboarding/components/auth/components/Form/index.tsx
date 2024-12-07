@@ -8,11 +8,12 @@ import googleLogo from "assets/icons/google.svg";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import AUTH from "config/constants/sub/auth";
 import { handleEmailSignIn, handleEmailSignUp, handleGoogleSignIn } from "./actions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getGreeting, isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { isNull } from "lodash";
 import { sendEmailLinkForSignin } from "actions/FirebaseActions";
 import { updateTimeToResendEmailLogin } from "components/authentication/AuthForm/MagicAuthLinkModal/actions";
@@ -132,7 +133,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     }
 
     setIsLoading(true);
-    dispatch(actions.updateIsAppOnboardingStepDisabled(true));
+    dispatch(globalActions.updateIsAppOnboardingStepDisabled(true));
     handleSendEmailLink();
   }, [authMode, email, handleSendEmailLink, dispatch]);
 
@@ -196,9 +197,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
         // Note: Currently we cannot indentify if the user is new or not in desktop app mode.
         if (isNewUser || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-          dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+          dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
         } else {
-          dispatch(actions.updateAppOnboardingCompleted());
+          dispatch(globalActions.updateAppOnboardingCompleted());
         }
       }
     }

@@ -4,7 +4,7 @@ import { InputNumber, Input, Tooltip } from "antd";
 import { AimOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import {
   getIsReadOnly,
   getSessionRecordingAttributes,

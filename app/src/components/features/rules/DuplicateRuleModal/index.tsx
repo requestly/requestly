@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Col, Input, Modal, Row, Select, Space } from "antd";
 import { StorageService } from "../../../../init";
-import { getAppMode, getIsRefreshRulesPending, getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsRefreshRulesPending, getUserAttributes } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { transformAndValidateRuleFields } from "views/features/rules/RuleEditor/components/Header/ActionButtons/CreateRuleButton/actions";
 import { generateObjectId } from "utils/FormattingHelper";
@@ -21,7 +22,7 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { Group, isGroup, isRule, RecordStatus, StorageRecord, Rule } from "features/rules";
 import { getAllRulesOfGroup } from "utils/rules/misc";
 import Logger from "lib/logger";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import "./duplicateRuleModal.scss";
 
 interface Props {
@@ -175,7 +176,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
               toast.success("Duplicated the group successfully.");
               dispatch(
                 // @ts-ignore
-                actions.updateRefreshPendingStatus({
+                globalActions.updateRefreshPendingStatus({
                   type: "rules",
                   newValue: !isRulesListRefreshPending,
                 })

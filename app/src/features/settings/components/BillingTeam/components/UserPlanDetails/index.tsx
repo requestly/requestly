@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Col, Modal, Row, Space } from "antd";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { TeamPlanStatus } from "../TeamPlanStatus";
@@ -11,7 +11,7 @@ import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { MdDiversity1 } from "@react-icons/all-files/md/MdDiversity1";
 import UpgradeIcon from "../../assets/upgrade.svg";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { PRICING } from "features/pricing";
 import Logger from "lib/logger";
 import APP_CONSTANTS from "config/constants";
@@ -299,8 +299,7 @@ export const UserPlanDetails = () => {
                       type="primary"
                       onClick={() => {
                         dispatch(
-                          // @ts-expect-error
-                          actions.toggleActiveModal({
+                          globalActions.toggleActiveModal({
                             modalName: "pricingModal",
                             newValue: true,
                             newProps: { selectedPlan: null, source: "user_plan_billing_team" },

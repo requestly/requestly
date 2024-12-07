@@ -6,8 +6,9 @@ import { toast } from "utils/Toast.js";
 import SpinnerColumn from "../../../misc/SpinnerColumn";
 //SERVICES
 import { StorageService } from "../../../../init";
-import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "../../../../store/selectors";
-import { actions } from "../../../../store";
+import { getAppMode, getIsRefreshRulesPending } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { globalActions } from "store/slices/global/slice";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";
 import { trackGroupRenamed } from "features/rules/analytics";
@@ -92,7 +93,7 @@ const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
         trackGroupRenamed();
         //Refresh List
         dispatch(
-          actions.updateRefreshPendingStatus({
+          globalActions.updateRefreshPendingStatus({
             type: "rules",
             newValue: !isRulesListRefreshPending,
           })

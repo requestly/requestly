@@ -4,9 +4,10 @@ import { Avatar, Button, Col, Tag, Menu, Row, Tooltip, Checkbox, Space } from "a
 import { CloseOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
-import { makeOriginalLog } from "capture-console-logs";
-import { getActiveModals, getDesktopSpecificDetails } from "store/selectors";
-import { actions } from "store";
+// import { makeOriginalLog } from "capture-console-logs";
+import { getDesktopSpecificDetails } from "store/selectors";
+import { getActiveModals } from "store/slices/global/modals/selectors";
+import { globalActions } from "store/slices/global/slice";
 import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
 import RuleEditorModal from "components/common/RuleEditorModal";
@@ -24,9 +25,10 @@ import {
   getLogResponseById,
 } from "store/features/desktop-traffic-table/selectors";
 import Logger from "lib/logger";
-import { getConnectedAppsCount } from "utils/Misc";
+import { getConnectedAppNames, getConnectedAppsCount } from "utils/Misc";
 import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
 import {
+  trackTrafficInterceptionStarted,
   trackTrafficTableFilterApplied,
   trackTrafficTableLogsCleared,
   trackTrafficTableRequestClicked,
@@ -46,6 +48,7 @@ import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
 import { doesStatusCodeMatchLabels, getGraphQLOperationValues } from "./utils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
+import { RQTooltip } from "lib/design-system-v2/components/RQTooltip/RQTooltip";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -82,7 +85,7 @@ const CurrentTrafficTable = ({
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
 
-  const [consoleLogsShown, setConsoleLogsShown] = useState([]);
+  // const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
 
@@ -105,7 +108,7 @@ const CurrentTrafficTable = ({
 
   const handleRuleEditorModalClose = useCallback(() => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         newValue: false,
         modalName: "ruleEditorModal",
       })
@@ -138,15 +141,15 @@ const CurrentTrafficTable = ({
     handlePreviewVisibility(false);
   };
 
-  const printLogsToConsole = useCallback(
-    (log) => {
-      if (log.consoleLogs && !consoleLogsShown.includes(log.id)) {
-        log.consoleLogs.forEach((consoleLog) => [makeOriginalLog(consoleLog)]);
-        setConsoleLogsShown((c) => [...c, log.id]);
-      }
-    },
-    [consoleLogsShown]
-  );
+  // const printLogsToConsole = useCallback(
+  //   (log) => {
+  //     if (log.consoleLogs && !consoleLogsShown.includes(log.id)) {
+  //       log.consoleLogs.forEach((consoleLog) => [makeOriginalLog(consoleLog)]);
+  //       setConsoleLogsShown((c) => [...c, log.id]);
+  //     }
+  //   },
+  //   [consoleLogsShown]
+  // );
 
   const clearLogs = () => {
     // New Logs Clear
@@ -191,8 +194,18 @@ const CurrentTrafficTable = ({
     [setAppList]
   );
 
-  useEffect(() => {
-    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
+  const trackIfFirstLog = useCallback(
+    (rqLog) => {
+      if (rqLog && newLogs.length === 0) {
+        const currentlyConnectedApps = getConnectedAppNames(Object.values(desktopSpecificDetails.appsList));
+        trackTrafficInterceptionStarted(currentlyConnectedApps);
+      }
+    },
+    [newLogs.length, desktopSpecificDetails.appsList]
+  );
+
+  const handleLogNetworkRequest = useCallback(
+    (payload) => {
       if (isInterceptingTraffic) {
         const rqLog = convertProxyLogToUILog(payload);
         if (rqLog?.domain) {
@@ -201,20 +214,27 @@ const CurrentTrafficTable = ({
         if (rqLog?.app) {
           updateAppList(rqLog.app);
         }
-
         // @wrongsahil: Disabling this for now as this is leading to rerendering of this component which is degrading the perfomance
         // printLogsToConsole(rqLog);
 
+        trackIfFirstLog(rqLog);
         saveLogInRedux(rqLog);
       }
-    });
+    },
+    [isInterceptingTraffic, updateDomainList, updateAppList, trackIfFirstLog, saveLogInRedux]
+  );
+
+  useEffect(() => {
+    if (window?.RQ?.DESKTOP?.SERVICES?.IPC) {
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", handleLogNetworkRequest);
+    }
 
     return () => {
-      if (window.RQ?.DESKTOP) {
-        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
+      if (window.RQ?.DESKTOP?.SERVICES?.IPC) {
+        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2", handleLogNetworkRequest);
       }
     };
-  }, [printLogsToConsole, saveLogInRedux, isInterceptingTraffic, updateDomainList, updateAppList]);
+  }, [handleLogNetworkRequest]);
 
   useEffect(() => {
     if (window.RQ?.DESKTOP && !isStaticPreview) {
@@ -473,7 +493,7 @@ const CurrentTrafficTable = ({
       const isSelected = trafficTableFilters[key].includes(logName);
 
       return (
-        <Tooltip mouseEnterDelay={0.3} placement="topLeft" title={logName.length >= 20 ? logName : ""}>
+        <RQTooltip mouseEnterDelay={0.3} placement="right" title={logName.length >= 20 ? logName : ""}>
           <Avatar size={18} src={avatarUrl} style={{ display: "inline-block", marginRight: "4px" }} />
           <span className="log-name">{`  ${logName}`}</span>
           {isSelected && (
@@ -487,7 +507,7 @@ const CurrentTrafficTable = ({
               />
             </Tooltip>
           )}
-        </Tooltip>
+        </RQTooltip>
       );
     },
     [handleClearFilter, trafficTableFilters]
@@ -653,7 +673,7 @@ const CurrentTrafficTable = ({
       <Row wrap={false} className="traffic-table-container-row">
         {isStaticPreview ? null : (
           <Col
-            flex="197px"
+            flex="224px"
             style={getGroupFiltersLength() > 0 ? { paddingTop: "8px" } : {}}
             className="traffic-table-sidebar"
           >

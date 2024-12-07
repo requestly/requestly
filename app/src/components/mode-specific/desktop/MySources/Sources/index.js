@@ -8,7 +8,7 @@ import { toast } from "utils/Toast.js";
 import CloseConfirmModal from "./ErrorHandling/CloseConfirmModal";
 import { RQButton, RQModal } from "lib/design-system/components";
 // CONSTANTS
-import { actions } from "../../../../../store";
+import { globalActions } from "store/slices/global/slice";
 // UTILS
 import { getDesktopSpecificDetails } from "../../../../../store/selectors";
 import SetupInstructions from "./InstructionsModal";
@@ -26,7 +26,6 @@ import {
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
 import "./index.css";
-import { trackTrafficInterceptionStarted } from "modules/analytics/events/desktopApp";
 import TroubleshootLink from "./InstructionsModal/common/InstructionsTroubleshootButton";
 import PATHS from "config/constants/sub/paths";
 import { getConnectedAppsCount } from "utils/Misc";
@@ -93,7 +92,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           }
         });
         console.log("Updated Apps List", updatedAppsList);
-        dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
+        dispatch(globalActions.updateDesktopAppsList({ appsList: updatedAppsList }));
       }
       setFetchingDevices(false);
     });
@@ -150,7 +149,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                 : toast.success(`Connected to ${options.deviceId}`, 10);
               console.log(appId, options.deviceId, options.launchOptions);
               dispatch(
-                actions.updateDesktopSpecificAppProperty({
+                globalActions.updateDesktopSpecificAppProperty({
                   appId: options.deviceId,
                   property: "isActive",
                   value: true,
@@ -159,7 +158,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             } else {
               toast.success(`Connected ${getAppName(appId)}`);
               dispatch(
-                actions.updateDesktopSpecificAppProperty({
+                globalActions.updateDesktopSpecificAppProperty({
                   appId: appId,
                   property: "isActive",
                   value: true,
@@ -167,13 +166,12 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               );
             }
 
-            dispatch(actions.updateHasConnectedApp(true));
+            dispatch(globalActions.updateHasConnectedApp(true));
             trackAppConnectedEvent(getAppName(appId), getAppCount() + 1, getAppType(appId), options?.launchOptions);
             toggle();
 
             // navigate to traffic table
             redirectToTraffic(navigate);
-            trackTrafficInterceptionStarted(getAppName(appId));
           } else if (res.metadata && res.metadata.closeConfirmRequired) {
             setAppIdToCloseConfirm(appId);
             setIsCloseConfirmModalActive(true);
@@ -225,7 +223,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               toast.info(`Disconnected ${options.deviceId}`);
               console.log(appId, options.deviceId, options.launchOptions);
               dispatch(
-                actions.updateDesktopSpecificAppProperty({
+                globalActions.updateDesktopSpecificAppProperty({
                   appId: options.deviceId,
                   property: "isActive",
                   value: false,
@@ -234,7 +232,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             } else {
               toast.info(`Disconnected ${getAppName(appId)}`);
               dispatch(
-                actions.updateDesktopSpecificAppProperty({
+                globalActions.updateDesktopSpecificAppProperty({
                   appId: appId,
                   property: "isActive",
                   value: false,

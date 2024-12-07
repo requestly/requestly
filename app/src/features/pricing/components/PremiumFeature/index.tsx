@@ -2,11 +2,11 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
-import { Popconfirm, PopconfirmProps, Tooltip, Typography } from "antd";
+import { Popconfirm, PopconfirmProps, Typography } from "antd";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytics";
 import { capitalize } from "lodash";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
@@ -17,7 +17,6 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import LINKS from "config/constants/sub/links";
-import { useTheme } from "styled-components";
 import "./index.scss";
 
 interface PremiumFeatureProps {
@@ -54,8 +53,6 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const [openPopup, setOpenPopup] = useState(false);
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
   const isIncentivizationEnabled = useIsIncentivizationEnabled();
-
-  const theme = useTheme();
 
   const isExceedingLimits = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
@@ -127,26 +124,12 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           showArrow={false}
           placement={popoverPlacement}
           okText="See upgrade plans"
-          cancelText={
-            isIncentivizationEnabled ? (
-              "Upgrade for free"
-            ) : (
-              <Tooltip
-                overlayStyle={{ zIndex: 10011 }}
-                overlayInnerStyle={{ width: 300 }}
-                color={theme?.colors?.black}
-                placement="bottom"
-                title="Requestly is offering 6 months free for teams in its Accelerator program!"
-              >
-                Unlock 6 months free access
-              </Tooltip>
-            )
-          }
+          cancelText={isIncentivizationEnabled ? "Upgrade for free" : null}
+          cancelButtonProps={{ style: { display: isIncentivizationEnabled ? "inline-flex" : "none" } }}
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
             dispatch(
-              // @ts-ignore
-              actions.toggleActiveModal({
+              globalActions.toggleActiveModal({
                 modalName: "pricingModal",
                 newValue: true,
                 newProps: { source },

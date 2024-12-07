@@ -10,7 +10,7 @@ import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 //ACTIONS
 import { deleteSharedList } from "backend/sharedList/deleteSharedList";
 import { LoadingOutlined } from "@ant-design/icons";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 const DeleteSharedListModal = ({ sharedListIdsToDelete, userId, isOpen, toggle }) => {
   //Global State
@@ -119,7 +119,7 @@ const DeleteSharedListModal = ({ sharedListIdsToDelete, userId, isOpen, toggle }
   const stableDoDeleteSharedLists = useCallback(doDeleteSharedLists, [dispatch, sharedListIdsToDelete]);
 
   const updateCurrentlySelectedLists = (dispatch, newValue) => {
-    dispatch(actions.updateSelectedSharedLists(newValue));
+    dispatch(globalActions.updateSelectedSharedLists(newValue));
   };
 
   useEffect(() => {
@@ -131,7 +131,7 @@ const DeleteSharedListModal = ({ sharedListIdsToDelete, userId, isOpen, toggle }
         //Unselect all lists
         updateCurrentlySelectedLists(dispatch, {});
         //Mark flag to Refresh Lists on index page
-        dispatch(actions.updateRefreshPendingStatus({ type: "sharedLists" }));
+        dispatch(globalActions.updateRefreshPendingStatus({ type: "sharedLists" }));
         //Close the modal -> Unmount this component
         toggle();
       });

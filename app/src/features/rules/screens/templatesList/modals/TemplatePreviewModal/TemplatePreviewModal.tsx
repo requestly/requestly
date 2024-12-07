@@ -5,8 +5,9 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { snakeCase } from "lodash";
 import { trackTemplateImportCompleted, trackTemplateImportStarted } from "../../analytics";
-import { actions } from "store";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { globalActions } from "store/slices/global/slice";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { generateObjectId } from "utils/FormattingHelper";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { saveRule } from "views/features/rules/RuleEditor/components/Header/ActionButtons/actions";
@@ -38,8 +39,7 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({ rule
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       if (!isExtensionInstalled()) {
         dispatch(
-          // @ts-ignore
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "extensionModal",
             newValue: true,
             newProps: {},

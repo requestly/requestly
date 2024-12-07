@@ -4,10 +4,11 @@ import { Button, Col, List, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
-import { getIsRefreshRulesPending, getUserAuthDetails, getAppMode } from "../../../../store/selectors";
+import { getIsRefreshRulesPending, getAppMode } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAllRules } from "store/features/rules/selectors";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
-import { actions } from "../../../../store";
+import { globalActions } from "store/slices/global/slice";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -142,7 +143,7 @@ const ImportRulesModal = (props) => {
     addRulesAndGroupsToStorage(appMode, dataToImport)
       .then(async () => {
         dispatch(
-          actions.updateRefreshPendingStatus({
+          globalActions.updateRefreshPendingStatus({
             type: "rules",
             newValue: !isRulesListRefreshPending,
           })

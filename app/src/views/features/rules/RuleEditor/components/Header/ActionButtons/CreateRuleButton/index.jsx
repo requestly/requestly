@@ -9,8 +9,8 @@ import {
   getCurrentlySelectedRuleData,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
   getUserAttributes,
-  getUserAuthDetails,
 } from "../../../../../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { trackRQLastActivity } from "../../../../../../../../utils/AnalyticsUtils";
 import { saveRule, validateSyntaxInRule } from "../actions";
 import {
@@ -35,7 +35,7 @@ import { ResponseRuleResourceType } from "types/rules";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { RuleType } from "features/rules";
 import { incentivizationActions } from "store/features/incentivization/slice";
@@ -236,7 +236,7 @@ const CreateRuleButton = ({
   const handleBtnOnClick = async (saveType = "button_click") => {
     trackRuleSaveClicked(MODE);
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
-      dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
+      dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
       return;
     }
 
@@ -322,7 +322,7 @@ const CreateRuleButton = ({
         })
         .then(() => {
           if (!isRuleEditorModal && MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
-            dispatch(actions.updateSecondarySidebarCollapse(true));
+            dispatch(globalActions.updateSecondarySidebarCollapse(true));
             redirectToRuleEditor(navigate, finalRuleData.id, MODE, false, true);
           }
         })

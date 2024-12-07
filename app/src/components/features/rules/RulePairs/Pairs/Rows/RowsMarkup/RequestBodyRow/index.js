@@ -1,12 +1,12 @@
 import React, { useRef, useState, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Row, Col, Radio, Tooltip } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { Popconfirm } from "antd";
 import { formatJSONString } from "utils/CodeEditorUtils";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
@@ -35,7 +35,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
         }
 
         dispatch(
-          actions.updateRulePairAtGivenPath({
+          globalActions.updateRulePairAtGivenPath({
             pairIndex,
             triggerUnsavedChangesIndication: false,
             updates: {
@@ -70,7 +70,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
 
   const requestBodyChangeHandler = (value) => {
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         triggerUnsavedChangesIndication: !codeFormattedFlag.current,
         updates: {

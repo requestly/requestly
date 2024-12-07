@@ -1,8 +1,9 @@
 import { useSelector } from "react-redux";
-import { getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getUserAttributes } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { featureLimits } from "./featureLimitTypes";
 import { useDispatch } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { FeatureLimitType } from "./types";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { PRICING } from "features/pricing";
@@ -19,7 +20,7 @@ export const useFeatureLimiter = () => {
   const checkFeatureLimits = () => {
     if (isUserPremium && !premiumPlansToCheckLimit.includes(userPlan)) {
       if (user.isLimitReached) {
-        dispatch(actions.updateUserLimitReached(false));
+        dispatch(globalActions.updateUserLimitReached(false));
       }
       return;
     }
@@ -27,7 +28,7 @@ export const useFeatureLimiter = () => {
     const isLimitReached = Object.values(FeatureLimitType).some((featureLimitType) =>
       checkIfFeatureLimitReached(featureLimitType, "breached")
     );
-    dispatch(actions.updateUserLimitReached(isLimitReached));
+    dispatch(globalActions.updateUserLimitReached(isLimitReached));
   };
 
   const checkIfFeatureLimitReached = (featureLimitType: FeatureLimitType, checkType: "breached" | "reached") => {

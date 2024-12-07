@@ -4,10 +4,10 @@ import { Button, Input } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 //ACTIONS
 import { handleFileInput } from "./actions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 //UTILS
-import { getUserAuthDetails } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 //CONSTANTS
 import APP_CONSTANTS from "config/constants";
@@ -24,7 +24,7 @@ const UploadFileBtn = ({ updateCollection, buttonType = "primary" }) => {
 
   const openAuthModal = useCallback(() => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {

@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Feature } from "../../types";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import {
   trackAppOnboardingRecommendationSelected,
   trackAppOnboardingStepCompleted,
@@ -18,9 +18,9 @@ export const FeatureCard: React.FC<Feature> = ({ id, icon: Icon, title, subTitle
     (e: React.MouseEvent<HTMLElement>) => {
       trackAppOnboardingStepCompleted(ONBOARDING_STEPS.GETTING_STARTED);
       trackAppOnboardingRecommendationSelected(id);
-      dispatch(actions.updateAppOnboardingCompleted());
+      dispatch(globalActions.updateAppOnboardingCompleted());
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "appOnboardingModal",
           newValue: false,
         })

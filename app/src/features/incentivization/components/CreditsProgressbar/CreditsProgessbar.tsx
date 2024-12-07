@@ -10,11 +10,11 @@ import {
   getIsIncentivizationDetailsLoading,
 } from "store/features/incentivization/selectors";
 import { getTotalCredits } from "features/incentivization/utils";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import "./creditsProgessbar.scss";
 import APP_CONSTANTS from "config/constants";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 interface CreditsProgressBarProps {
   source: string;
@@ -48,8 +48,7 @@ export const CreditsProgressBar: React.FC<CreditsProgressBarProps> = ({ source }
       setIsRedeemModalVisible(true);
     } else {
       dispatch(
-        // @ts-ignore
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {

@@ -15,8 +15,8 @@ import NewMockSelector from "../FilesLibraryTableContainer/NewMockSelector";
 import UploadFileBtn from "../UploadFileBtn";
 import { redirectToCreateNewFile } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
-import { getUserAuthDetails } from "store/selectors";
-import { actions } from "store";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { globalActions } from "store/slices/global/slice";
 import TeamFeatureComingSoon from "components/landing/TeamFeatureComingSoon";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
@@ -39,7 +39,7 @@ const GetStartedWithFiles = ({ updateCollection }) => {
 
   const openAuthModal = useCallback(() => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {

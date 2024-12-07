@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { globalActions } from "store/slices/global/slice";
+import { getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
@@ -21,7 +22,7 @@ const RulesSyncing = () => {
   const handleRulesSyncToggle = (status) => {
     if (!user.loggedIn || !user.details || !user.details.profile) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {

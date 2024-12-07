@@ -12,13 +12,8 @@ import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
 import { MdOutlineToggleOn } from "@react-icons/all-files/md/MdOutlineToggleOn";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
-import {
-  getAppMode,
-  getIsAppBannerVisible,
-  getIsSampleRulesImported,
-  getIsRefreshRulesPending,
-  getUserAuthDetails,
-} from "store/selectors";
+import { getAppMode, getIsAppBannerVisible, getIsSampleRulesImported, getIsRefreshRulesPending } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import {
   trackRulesListBulkActionPerformed,
@@ -35,7 +30,7 @@ import {
 } from "componentsV2/ContentList";
 import { enhanceRecords, importSampleRules, normalizeRecords } from "./utils/rules";
 import { useRulesActionContext } from "features/rules/context/actions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import "./rulesTable.css";
 
@@ -102,11 +97,11 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       trackSampleRulesImported();
 
       // @ts-ignore
-      dispatch(actions.updateIsSampleRulesImported(true));
+      dispatch(globalActions.updateIsSampleRulesImported(true));
 
       dispatch(
         // @ts-ignore
-        actions.updateRefreshPendingStatus({
+        globalActions.updateRefreshPendingStatus({
           type: "rules",
           newValue: !isRulesListRefreshPending,
         })

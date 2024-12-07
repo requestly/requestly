@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Row, Avatar, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { CloseOutlined } from "@ant-design/icons";
@@ -8,7 +8,7 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { getPendingInvites } from "backend/workspace";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { isEmailVerified } from "utils/AuthUtils";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { capitalize } from "lodash";
 import { Invite, User } from "types";
 import {
@@ -56,11 +56,11 @@ export const JoinWorkspaceCard = () => {
     if (hasActiveWorkspace || hasEmailInvite) {
       trackWorkspaceJoiningModalOpened(teamInvites.length, "join_workspace_card");
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "joinWorkspaceModal",
           newValue: true,
           newProps: {
-            callback: () => dispatch(actions.updateJoinWorkspaceCardVisible(false)),
+            callback: () => dispatch(globalActions.updateJoinWorkspaceCardVisible(false)),
             source: "card_business_users",
           },
         })
@@ -68,12 +68,12 @@ export const JoinWorkspaceCard = () => {
     } else {
       trackWorkspaceOrganizationCardClicked("Start collaborating");
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "createWorkspaceModal",
           newValue: true,
           newProps: {
             callback: () => {
-              dispatch(actions.updateJoinWorkspaceCardVisible(false));
+              dispatch(globalActions.updateJoinWorkspaceCardVisible(false));
             },
             source: "join_workspace_card",
           },
@@ -140,7 +140,7 @@ export const JoinWorkspaceCard = () => {
               iconOnly
               icon={<CloseOutlined />}
               onClick={() => {
-                dispatch(actions.updateJoinWorkspaceCardVisible(false));
+                dispatch(globalActions.updateJoinWorkspaceCardVisible(false));
                 trackWorkspaceOrganizationCardCancelled(getDomainFromEmail(user?.details?.profile?.email), cardCTA);
               }}
             />

@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { MdKeyboardArrowLeft } from "@react-icons/all-files/md/MdKeyboardArrowLeft";
 import { MdKeyboardArrowRight } from "@react-icons/all-files/md/MdKeyboardArrowRight";
 import { getIsSecondarySidebarCollapsed } from "store/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackSecondarySidebarToggleButtonClicked } from "componentsV2/SecondarySidebar/analytics";
 import "./sidebarToggleButton.scss";
 
@@ -15,7 +15,7 @@ export const SidebarToggleButton = () => {
       <div
         className="secondary-sidebar-toggle-btn"
         onClick={() => {
-          dispatch(actions.updateSecondarySidebarCollapse(!isSecondarySidebarCollapsed));
+          dispatch(globalActions.updateSecondarySidebarCollapse(!isSecondarySidebarCollapsed));
           trackSecondarySidebarToggleButtonClicked(isSecondarySidebarCollapsed);
         }}
       >

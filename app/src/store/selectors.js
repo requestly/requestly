@@ -103,10 +103,6 @@ export const getLastBackupTimeStamp = (state) => {
   return rulesNode["lastBackupTimeStamp"];
 };
 
-export const getUserAuthDetails = (state) => {
-  return getGlobalState(state)["user"];
-};
-
 export const getSearch = (state) => {
   return getGlobalState(state)["search"];
 };
@@ -162,10 +158,6 @@ export const getSharedListsNode = (state) => {
 export const getSelectedSharedLists = (state) => {
   const sharedListsNode = getSharedListsNode(state);
   return sharedListsNode["selectedLists"];
-};
-
-export const getActiveModals = (state) => {
-  return getGlobalState(state)["activeModals"];
 };
 
 export const getHasConnectedApp = (state) => {

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails, getAppMode, getIsJoinWorkspaceCardVisible } from "store/selectors";
+import { getAppMode, getIsJoinWorkspaceCardVisible } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Avatar, Button, Col, Row } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { RQModal } from "lib/design-system/components";
 import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/teams";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getPendingInvites, acceptTeamInvite } from "backend/workspace";
 import { LearnMoreLink } from "components/common/LearnMoreLink";
 import { toast } from "utils/Toast";
@@ -63,15 +64,15 @@ const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
             );
           }
         }
-        if (isJoinWorkspaceCardVisible) dispatch(actions.updateJoinWorkspaceCardVisible(false));
+        if (isJoinWorkspaceCardVisible) dispatch(globalActions.updateJoinWorkspaceCardVisible(false));
         callback?.();
         setIsJoining(false);
-        dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: false }));
+        dispatch(globalActions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: false }));
       })
       .catch((err) => {
         toast.error("Error while accepting invitation. Please contact workspace admin");
         setIsJoining(false);
-        dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: false }));
+        dispatch(globalActions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: false }));
       });
   };
 
@@ -116,7 +117,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
               )
             : [];
           setTeamInvites(sortedInvites);
-          dispatch(actions.updateLastSeenInviteTs(new Date().getTime()));
+          dispatch(globalActions.updateLastSeenInviteTs(new Date().getTime()));
         })
         .catch((e) => setTeamInvites([]));
     }
@@ -127,7 +128,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
     toggleModal();
     if (user.loggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "createWorkspaceModal",
           newValue: true,
           newProps: { source: "join_workspace_modal" },
@@ -135,13 +136,13 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
       );
     } else {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
             callback: () =>
               dispatch(
-                actions.toggleActiveModal({
+                globalActions.toggleActiveModal({
                   modalName: "createWorkspaceModal",
                   newValue: true,
                   newProps: { source: "join_workspace_modal" },

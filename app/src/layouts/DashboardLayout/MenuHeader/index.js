@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
-import { getAppMode, getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
-import { actions } from "store";
+import { getAppMode, getIsPlanExpiredBannerClosed } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { globalActions } from "store/slices/global/slice";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
 import { SearchOutlined } from "@ant-design/icons";
@@ -104,7 +105,7 @@ const MenuHeader = () => {
                 <RQButton
                   type="default"
                   className="header-search-btn"
-                  onClick={() => dispatch(actions.updateIsCommandBarOpen(true))}
+                  onClick={() => dispatch(globalActions.updateIsCommandBarOpen(true))}
                 >
                   <div>
                     <SearchOutlined /> Search
@@ -116,7 +117,7 @@ const MenuHeader = () => {
                   className="ask-ai-btn"
                   onClick={() => {
                     trackAskAIClicked("app_header");
-                    dispatch(actions.updateRequestBot({ isActive: true, modelType: "app" }));
+                    dispatch(globalActions.updateRequestBot({ isActive: true, modelType: "app" }));
                   }}
                 >
                   <div className="ask-ai-btn-content">

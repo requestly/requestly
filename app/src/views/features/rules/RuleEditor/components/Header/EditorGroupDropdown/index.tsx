@@ -2,15 +2,10 @@ import React, { useEffect, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { Divider, Input, Row, Menu, Dropdown } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getAllGroups,
-  getAppMode,
-  getCurrentlySelectedRuleData,
-  getIsRefreshRulesPending,
-  getUserAuthDetails,
-} from "store/selectors";
+import { getAllGroups, getAppMode, getCurrentlySelectedRuleData, getIsRefreshRulesPending } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { createNewGroup, updateGroupOfSelectedRules } from "components/features/rules/ChangeRuleGroupModal/actions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { StorageService } from "init";
 import GroupMenuItem from "./GroupMenuItem";
 import APP_CONSTANTS from "config/constants";
@@ -48,7 +43,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
     Logger.log("Reading storage in EditorGroupDropdown");
     StorageService(appMode)
       .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP)
-      .then((groups) => dispatch(actions.updateGroups(groups)));
+      .then((groups) => dispatch(globalActions.updateGroups(groups)));
   }, [appMode, dispatch]);
 
   useEffect(() => {
@@ -75,7 +70,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
         Logger.log("Reading storage in EditorGroupDropdown handleAddNewGroup");
         StorageService(appMode)
           .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP)
-          .then((groups) => dispatch(actions.updateGroups(groups)));
+          .then((groups) => dispatch(globalActions.updateGroups(groups)));
       },
       user
     );
@@ -93,11 +88,11 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   };
 
   const handleGroupChange = (groupId: string) => {
-    dispatch(actions.updateCurrentlySelectedRuleData({ ...rule, groupId }));
+    dispatch(globalActions.updateCurrentlySelectedRuleData({ ...rule, groupId }));
 
     updateGroupOfSelectedRules(appMode, [rule.id], groupId, user).then(() => {
       dispatch(
-        actions.updateRefreshPendingStatus({
+        globalActions.updateRefreshPendingStatus({
           type: "rules",
           newValue: !isRulesListRefreshPending,
         })
