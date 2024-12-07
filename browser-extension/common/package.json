@@ -59,7 +59,7 @@
     "@devtools-ds/object-inspector": "^1.2.1",
     "@devtools-ds/table": "^1.2.1",
     "@devtools-ds/themes": "^1.2.1",
-    "@requestly/analytics-vendors": "file:../../common/analytics-vendors/dist",
+    "@requestly/analytics-vendors": "file:../../common/analytics-vendors",
     "@uiw/codemirror-theme-vscode": "^4.23.0",
     "@uiw/react-codemirror": "^4.23.0",
     "antd": "^5.0.4",
