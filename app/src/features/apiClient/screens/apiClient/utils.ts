@@ -5,6 +5,7 @@ import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../ty
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
+import PATHS from "config/constants/sub/paths";
 
 export const makeRequest = async (
   appMode: string,
@@ -207,12 +208,10 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
 
 export const getBreadCrumbOptions = (record: RQAPI.Record) => {
-  let formattedOptions = [];
   const options = record?.breadcrumbOptions || [];
-  formattedOptions = [
-    ...formattedOptions,
+  const formattedOptions = [
     ...options.map((option) => ({
-      pathname: `/api-client/${option.type}/${option.id}`,
+      pathname: `${PATHS.API_CLIENT.INDEX}/${option.type}/${option.id}`,
       label: option.name,
       disabled: option.type === RQAPI.RecordType.COLLECTION,
     })),
