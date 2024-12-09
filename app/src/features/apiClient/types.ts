@@ -32,7 +32,11 @@ export enum KeyValueFormType {
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
 
 export namespace RQAPI {
-  export type AnalyticsEventSource = "collection_row" | "collection_list_empty_state" | "api_client_sidebar_header";
+  export type AnalyticsEventSource =
+    | "collection_row"
+    | "collection_list_empty_state"
+    | "api_client_sidebar_header"
+    | "api_client_sidebar";
 
   export enum RecordType {
     API = "api",

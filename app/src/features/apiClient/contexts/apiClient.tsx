@@ -9,9 +9,12 @@ import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from 
 import {
   trackHistoryCleared,
   trackImportCurlClicked,
+  trackNewCollectionClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { trackCreateEnvironmentClicked } from "../screens/environment/analytics";
+import PATHS from "config/constants/sub/paths";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -85,7 +88,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
-  const { closeTab } = useTabsLayoutContext();
+  const { openTab, closeTab } = useTabsLayoutContext();
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -199,9 +202,43 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);
 
-  const onNewClick = useCallback((analyticEventSource: RQAPI.AnalyticsEventSource) => {
-    trackNewRequestClicked(analyticEventSource);
-  }, []);
+  const onNewClick = useCallback(
+    (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => {
+      switch (recordType) {
+        case RQAPI.RecordType.API: {
+          trackNewRequestClicked(analyticEventSource);
+          openTab("request/new", {
+            title: "Untitled request",
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/request/new`,
+          });
+          return;
+        }
+
+        case RQAPI.RecordType.COLLECTION: {
+          trackNewCollectionClicked(analyticEventSource);
+          openTab("collection/new", {
+            title: "New collection",
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/new`,
+          });
+          return;
+        }
+
+        case RQAPI.RecordType.ENVIRONMENT: {
+          trackCreateEnvironmentClicked(analyticEventSource);
+          openTab("environments/new", {
+            title: "New environment",
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/new`,
+          });
+          return;
+        }
+
+        default: {
+          return;
+        }
+      }
+    },
+    [openTab]
+  );
 
   const value = {
     apiClientRecords,
