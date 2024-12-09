@@ -93,7 +93,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
-  const { openTab, closeTab } = useTabsLayoutContext();
+  const { openTab, closeTab, updateTab } = useTabsLayoutContext();
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -137,11 +137,18 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     });
   }, []);
 
-  const onUpdateRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-    setApiClientRecords((prev) => {
-      return prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record));
-    });
-  }, []);
+  const onUpdateRecord = useCallback(
+    (apiClientRecord: RQAPI.Record) => {
+      setApiClientRecords((prev) => {
+        return prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record));
+      });
+
+      updateTab(apiClientRecord.id, {
+        title: apiClientRecord.name,
+      });
+    },
+    [updateTab]
+  );
 
   const onDeleteRecords = useCallback(
     (recordIdsToBeDeleted: RQAPI.Record["id"][]) => {

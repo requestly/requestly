@@ -337,7 +337,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
       setEntry({ ...result.data.data });
-      // updateTab(requestDetails.id, { hasUnsavedChanges: false, data: requestDetails });
 
       trackRequestSaved("api_client_view");
       toast.success("Request saved!");
