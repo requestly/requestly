@@ -11,17 +11,17 @@ import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
-import { redirectToCollection } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
+import { TabsLayoutContextInterface } from "layouts/TabsLayout";
+import PATHS from "config/constants/sub/paths";
 
 interface Props {
   record: RQAPI.CollectionRecord;
   onNewClick: (src: RQAPI.AnalyticsEventSource) => void;
   onExportClick: (collection: RQAPI.CollectionRecord) => void;
+  openTab: TabsLayoutContextInterface["openTab"];
 }
 
-export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportClick }) => {
-  const navigate = useNavigate();
+export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportClick, openTab }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeKey, setActiveKey] = useState(record.id); // TODO: Persist collapse active keys for all rows
   const [createNewField, setCreateNewField] = useState(null);
@@ -101,7 +101,10 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                 onMouseEnter={setHoveredId.bind(this, record.id)}
                 onMouseLeave={setHoveredId.bind(this, "")}
                 onClick={() => {
-                  redirectToCollection(navigate, record.id);
+                  openTab(record.id, {
+                    title: record.name || "New Collection",
+                    url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${record.id}`,
+                  });
                 }}
               >
                 <div className="collection-name" title={record.name}>
@@ -162,11 +165,12 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
             ) : (
               record.data.children.map((apiRecord) => {
                 if (apiRecord.type === RQAPI.RecordType.API) {
-                  return <RequestRow key={apiRecord.id} record={apiRecord} />;
+                  return <RequestRow key={apiRecord.id} record={apiRecord} openTab={openTab} />;
                 } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
                   return (
                     <CollectionRow
                       key={apiRecord.id}
+                      openTab={openTab}
                       record={apiRecord}
                       onNewClick={onNewClick}
                       onExportClick={onExportClick}

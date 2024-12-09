@@ -13,11 +13,17 @@ interface ScriptEditorProps {
 
 const DEFAULT_SCRIPT_VALUES = {
   [RQAPI.ScriptType.PRE_REQUEST]: "// Use JavaScript to configure this request dynamically\n",
-  [RQAPI.ScriptType.POST_RESPONSE]: "// Use JavaScript visualize responses\n",
+  [RQAPI.ScriptType.POST_RESPONSE]: "// Use JavaScript to visualize responses\n",
 };
 
 export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts }) => {
-  const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(RQAPI.ScriptType.PRE_REQUEST);
+  const activeScriptType = scripts?.[RQAPI.ScriptType.PRE_REQUEST]
+    ? RQAPI.ScriptType.PRE_REQUEST
+    : scripts?.[RQAPI.ScriptType.POST_RESPONSE]
+    ? RQAPI.ScriptType.POST_RESPONSE
+    : RQAPI.ScriptType.PRE_REQUEST;
+
+  const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
 
   const scriptTypeOptions = useMemo(() => {
     return (

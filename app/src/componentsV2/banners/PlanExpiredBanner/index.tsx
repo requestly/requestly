@@ -4,7 +4,7 @@ import { getIsPlanExpiredBannerClosed } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQButton } from "lib/design-system/components";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import APP_CONSTANTS from "config/constants";
@@ -23,10 +23,10 @@ export const PlanExpiredBanner = () => {
       !isPlanExpiredBannerClosed
     ) {
       setIsBannerVisible(true);
-      dispatch(actions.updateIsAppBannerVisible(true));
+      dispatch(globalActions.updateIsAppBannerVisible(true));
     } else {
       setIsBannerVisible(false);
-      dispatch(actions.updateIsAppBannerVisible(false));
+      dispatch(globalActions.updateIsAppBannerVisible(false));
     }
   }, [user?.details?.planDetails?.status, isPlanExpiredBannerClosed, dispatch]);
 
@@ -43,7 +43,7 @@ export const PlanExpiredBanner = () => {
           className="plan-expired-banner-btn"
           onClick={() => {
             dispatch(
-              actions.toggleActiveModal({
+              globalActions.toggleActiveModal({
                 modalName: "pricingModal",
                 newValue: true,
                 newProps: { selectedPlan: null, source: SOURCE.PLAN_EXPIRED_BANNER },
@@ -56,7 +56,7 @@ export const PlanExpiredBanner = () => {
 
         <IoMdClose
           className="plan-expired-banner-close-btn"
-          onClick={() => dispatch(actions.updatePlanExpiredBannerClosed(true))}
+          onClick={() => dispatch(globalActions.updatePlanExpiredBannerClosed(true))}
         />
       </div>
     );

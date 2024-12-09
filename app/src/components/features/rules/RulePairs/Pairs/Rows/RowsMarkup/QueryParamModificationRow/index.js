@@ -4,7 +4,7 @@ import { Row, Col, Input, Tooltip, Dropdown, Menu } from "antd";
 import { ImCross } from "@react-icons/all-files/im/ImCross";
 import Text from "antd/lib/typography/Text";
 import { DownOutlined } from "@ant-design/icons";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modificationIndex, isInputDisabled }) => {
   const dispatch = useDispatch();
@@ -29,7 +29,7 @@ const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modifica
 
   const handleModificationTypeClick = (type) => {
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           [`modifications[${modificationIndex}].type`]: type,
@@ -78,7 +78,7 @@ const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modifica
               onChange={(event) => {
                 event?.preventDefault?.();
                 dispatch(
-                  actions.updateRulePairAtGivenPath({
+                  globalActions.updateRulePairAtGivenPath({
                     pairIndex,
                     updates: {
                       [`modifications[${modificationIndex}].param`]: event?.target?.value,
@@ -100,7 +100,7 @@ const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modifica
               onChange={(event) => {
                 event?.preventDefault?.();
                 dispatch(
-                  actions.updateRulePairAtGivenPath({
+                  globalActions.updateRulePairAtGivenPath({
                     pairIndex,
                     updates: {
                       [`modifications[${modificationIndex}].value`]: event?.target?.value,
@@ -121,7 +121,7 @@ const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modifica
                   onClick={(event) => {
                     event?.preventDefault?.();
                     dispatch(
-                      actions.removeValueInRulePairByIndex({
+                      globalActions.removeValueInRulePairByIndex({
                         pairIndex,
                         arrayPath: "modifications",
                         index: modificationIndex,

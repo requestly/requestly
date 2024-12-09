@@ -21,7 +21,7 @@ import {
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { Group, Rule } from "types";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import Logger from "lib/logger";
 import "./sharedListViewerContentHeader.scss";
 import APP_CONSTANTS from "config/constants";
@@ -63,8 +63,7 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
 
     if (!user.loggedIn) {
       dispatch(
-        // @ts-ignore
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
@@ -81,7 +80,7 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) {
       dispatch(
         // @ts-ignore
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "extensionModal",
           newValue: true,
           newProps: {

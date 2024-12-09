@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 
 import { getUserAttributes } from "store/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import useGrowthBookIntegration, { GrowthbookExperimentHelperComponent } from "./useGrowthbookIntegration";
 
 const LocalUserAttributesHelperComponent = () => {
@@ -16,14 +16,14 @@ const LocalUserAttributesHelperComponent = () => {
   useEffect(() => {
     if (!userAttributes?.deviceId) {
       const deviceId = uuidv4();
-      stableDispatch(actions.updateUserAttributes({ deviceId }));
+      stableDispatch(globalActions.updateUserAttributes({ deviceId }));
     }
   }, [userAttributes?.deviceId, stableDispatch]);
 
   // sessionId generation. Reset after every refresh
   useEffect(() => {
     const sessionId = uuidv4();
-    stableDispatch(actions.updateUserAttributes({ sessionId }));
+    stableDispatch(globalActions.updateUserAttributes({ sessionId }));
   }, [stableDispatch]);
 
   useGrowthBookIntegration();

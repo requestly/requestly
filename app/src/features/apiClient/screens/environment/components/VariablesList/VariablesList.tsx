@@ -10,7 +10,7 @@ import { EditableCell, EditableRow } from "./components/customTableRow/CustomTab
 import { toast } from "utils/Toast";
 import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../types";
 import { trackAddVariableClicked, trackVariableValueUpdated } from "../../analytics";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import "./variablesList.scss";
 
@@ -136,6 +136,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
     handleDeleteVariable,
     visibleSecretsRowIds,
     updateVisibleSecretsRowIds: handleUpdateVisibleSecretsRowIds,
+    recordsCount: dataSource.length,
   });
 
   useEffect(() => {
@@ -165,7 +166,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   const handleAddVariable = () => {
     if (!user.loggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
@@ -196,7 +197,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
           cell: EditableCell,
         },
       }}
-      scroll={{ y: "calc(100vh - 240px)" }}
+      scroll={{ y: "calc(100vh - 280px)" }}
       footer={() => (
         <div className="variables-list-footer">
           <RQButton icon={<MdAdd />} size="small" onClick={handleAddVariable}>

@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import { checkUserBackupState, getAuthData, getOrUpdateUserSyncState } from "actions/FirebaseActions";
 import firebaseApp from "firebase.js";
 import { User, getAuth, onAuthStateChanged, signInWithCustomToken } from "firebase/auth";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getDomainFromEmail, getEmailType, isCompanyEmail } from "utils/FormattingHelper";
 import { getAppMode, getUserAttributes, getAppOnboardingDetails } from "store/selectors";
@@ -65,13 +65,13 @@ const AuthHandler: React.FC<{}> = () => {
       if (userData?.username) {
         dispatch(
           // @ts-ignore
-          actions.updateUsername({ username: userData.username })
+          globalActions.updateUsername({ username: userData.username })
         );
       }
 
       dispatch(
         // @ts-ignore
-        actions.updateUserInfo({
+        globalActions.updateUserInfo({
           loggedIn: true,
           details: {
             organization: enterpriseDetails?.data?.enterpriseData ?? null,
@@ -116,7 +116,7 @@ const AuthHandler: React.FC<{}> = () => {
 
         dispatch(
           // @ts-ignore
-          actions.updateUserInfo({
+          globalActions.updateUserInfo({
             loggedIn: true,
             details: {
               profile: authData,
@@ -133,7 +133,7 @@ const AuthHandler: React.FC<{}> = () => {
         );
         dispatch(
           // @ts-ignore
-          actions.updateInitializations({
+          globalActions.updateInitializations({
             initType: "auth",
             initValue: true,
           })
@@ -161,14 +161,14 @@ const AuthHandler: React.FC<{}> = () => {
 
         dispatch(
           // @ts-ignore
-          actions.updateUserInfo({
+          globalActions.updateUserInfo({
             loggedIn: false,
             details: null,
           })
         );
         dispatch(
           // @ts-ignore
-          actions.updateInitializations({
+          globalActions.updateInitializations({
             initType: "auth",
             initValue: true,
           })
@@ -246,11 +246,11 @@ const AuthHandler: React.FC<{}> = () => {
 
         dispatch(
           // @ts-ignore
-          actions.updateUserInfo({ loggedIn: false, details: null })
+          globalActions.updateUserInfo({ loggedIn: false, details: null })
         );
         dispatch(
           // @ts-ignore
-          actions.updateInitializations({
+          globalActions.updateInitializations({
             initType: "auth",
             initValue: true,
           })

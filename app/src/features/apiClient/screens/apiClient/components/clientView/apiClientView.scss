@@ -13,6 +13,14 @@
   .api-client-body {
     padding: 0 16px;
     overflow: hidden;
+
+    .ant-tabs {
+      .ant-tabs-nav-wrap {
+        .ant-tabs-tab {
+          padding: 6px 4px;
+        }
+      }
+    }
   }
 
   .rq-breadcrumb {
@@ -29,8 +37,7 @@
       display: flex;
       flex: auto;
       height: 32px;
-      width: 100%;
-      max-width: 86%;
+      width: calc(100% - 205px);
 
       .api-request-method-selector {
         width: 120px;
@@ -128,6 +135,12 @@
       */
       // height: calc(100% - px) !important;
       height: 100%;
+
+      .ant-tabs-content-holder {
+        // FIXED HEIGHT FIXES HEIGHT CHANGE OF SPILT PANEL HEIGHT CHANGE ON CODE MIRROR MOUNT
+        // TODO: FIX THIS
+        height: 35px;
+      }
     }
   }
 
@@ -141,5 +154,18 @@
 
   .api-response-status-line {
     font-size: var(--requestly-font-size-xs);
+  }
+
+  .api-client-response__loading-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--requestly-color-background);
+    z-index: 2;
   }
 }
