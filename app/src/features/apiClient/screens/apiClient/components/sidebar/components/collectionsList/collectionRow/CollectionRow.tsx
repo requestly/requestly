@@ -25,9 +25,7 @@ interface Props {
 
 export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportClick, openTab, collapsedKeys }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [activeKey, setActiveKey] = useState(
-    !isEmpty(collapsedKeys) ? (collapsedKeys.includes(record.id) ? null : record.id) : record.id
-  );
+  const [activeKey, setActiveKey] = useState(collapsedKeys?.includes(record.id) ? null : record.id);
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
@@ -76,7 +74,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
       collapsedKeys.splice(activeKeyIndex, 1);
     }
     setActiveKey(keys[0]);
-    setToSessionStorage("keys", collapsedKeys);
+    isEmpty(collapsedKeys) ? window.sessionStorage.removeItem("keys") : setToSessionStorage("keys", collapsedKeys);
   }, []);
 
   return (
