@@ -338,3 +338,7 @@ export const getBillingTeamNudgeLastSeenTs = (state) => {
 export const getIsSlackConnectButtonVisible = (state) => {
   return getGlobalState(state).misc.persist?.isSlackConnectButtonVisible;
 };
+
+export const getIsSyncingV2 = (state) => {
+  return getGlobalState(state).syncingV2;
+};

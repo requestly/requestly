@@ -31,6 +31,7 @@ import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useWorkspaceManager } from "features/workspaces/hooks/useWorkspaceManager";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -50,6 +51,7 @@ const App: React.FC = () => {
   submitAppDetailAttributes();
   useAppUpdateChecker();
   useFetchIncentivizationDetails();
+  useWorkspaceManager();
 
   if (!isEmpty(window.location.hash)) {
     //Support legacy URL formats
