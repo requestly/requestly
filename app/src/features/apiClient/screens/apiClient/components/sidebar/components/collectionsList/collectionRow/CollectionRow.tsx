@@ -13,6 +13,7 @@ import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analy
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
+import { useParams } from "react-router-dom";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -27,6 +28,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
+  const { collectionId } = useParams();
 
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {
@@ -94,6 +96,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
           }}
         >
           <Collapse.Panel
+            className={`collection-panel ${record.id === collectionId ? "active" : ""}`}
             key={record.id}
             header={
               <div

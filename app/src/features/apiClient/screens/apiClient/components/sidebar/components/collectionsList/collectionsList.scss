@@ -6,6 +6,12 @@
   padding: 8px 8px 8px 0;
   flex: auto;
 
+  .collection-panel.active {
+    & > .ant-collapse-header {
+      background: var(--requestly-color-surface-1);
+    }
+  }
+
   .collections-list-header {
     display: flex;
     align-items: center;
