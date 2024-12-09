@@ -11,6 +11,9 @@ interface Props {
   recordName?: string;
   placeholder?: string;
   onRecordNameUpdate?: (updatedRecordName: string) => void;
+  breadcrumbOptions?: ({
+    pathname: MatchedRoute["pathname"];
+  } & MatchedRoute["handle"]["breadcrumb"])[];
 }
 
 interface MatchedRoute {
@@ -33,6 +36,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
   recordName,
   placeholder,
   onRecordNameUpdate,
+  breadcrumbOptions = [],
 }) => {
   const [name, setName] = useState(recordName || "");
   const [isEditRecord, setIsEditRecord] = useState(false);
@@ -44,9 +48,17 @@ export const RQBreadcrumb: React.FC<Props> = ({
 
   const breadcrumbs: ({
     pathname: MatchedRoute["pathname"];
-  } & MatchedRoute["handle"]["breadcrumb"])[] = matchedRoutes.reduce((result, route) => {
-    return route.handle?.breadcrumb ? [...result, { ...route.handle.breadcrumb, pathname: route.pathname }] : result;
-  }, []);
+  } & MatchedRoute["handle"]["breadcrumb"])[] = matchedRoutes.reduce(
+    (result, route, currentIndex, array) =>
+      route.handle?.breadcrumb
+        ? [
+            ...result,
+            { ...route.handle.breadcrumb, pathname: route.pathname },
+            ...(currentIndex === array.length - 2 ? breadcrumbOptions : []),
+          ]
+        : result,
+    []
+  );
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const updatedValue = e.target.value;
@@ -107,7 +119,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
             ) : (
               <>
                 {isPathDisabled ? (
-                  <li key={index} className="rq-breadcrumb-item">
+                  <li key={index} className="rq-breadcrumb-item disabled">
                     {label}
                   </li>
                 ) : (

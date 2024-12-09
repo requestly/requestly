@@ -12,9 +12,12 @@ import {
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { convertFlatRecordsToNestedRecords } from "../screens/apiClient/utils";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
+  recordsMap: Record<string, RQAPI.Record>;
+  formattedRecords: RQAPI.Record[];
   isLoadingApiClientRecords: boolean;
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
@@ -43,6 +46,8 @@ interface ApiClientContextInterface {
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
   apiClientRecords: [],
+  recordsMap: {},
+  formattedRecords: [],
   isLoadingApiClientRecords: false,
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
@@ -80,6 +85,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(false);
   const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
+  const [formattedRecords, setFormattedRecords] = useState([]);
+  const [recordsMapState, setRecordsMap] = useState({});
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
 
@@ -116,6 +123,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         setIsLoadingApiClientRecords(false);
       });
   }, [uid, teamId]);
+
+  useEffect(() => {
+    const { updatedRecords = [], recordsMap = {} } = convertFlatRecordsToNestedRecords(apiClientRecords);
+    setRecordsMap(recordsMap);
+    setFormattedRecords(updatedRecords);
+  }, [apiClientRecords]);
 
   const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
     setApiClientRecords((prev) => {
@@ -205,6 +218,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const value = {
     apiClientRecords,
+    recordsMap: recordsMapState,
+    formattedRecords,
     isLoadingApiClientRecords,
     onNewRecord,
     onRemoveRecord,

@@ -6,7 +6,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { NewRecordNameInput } from "./newRecordNameInput/NewRecordNameInput";
 import { CollectionRow } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
-import { convertFlatRecordsToNestedRecords, isApiCollection, isApiRequest } from "../../../../utils";
+import { isApiCollection, isApiRequest } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/ExportCollectionsModal";
 import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
@@ -30,14 +30,12 @@ export const CollectionsList: React.FC<Props> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { openTab, tabs } = useTabsLayoutContext();
-  const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
+  const { isLoadingApiClientRecords, formattedRecords } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
-    const updatedRecords = convertFlatRecordsToNestedRecords(records);
-
-    updatedRecords.sort((recordA, recordB) => {
+    records.sort((recordA, recordB) => {
       // If different type, then keep collection first
       if (recordA.type !== recordB.type) {
         return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
@@ -48,14 +46,14 @@ export const CollectionsList: React.FC<Props> = ({
     });
 
     return {
-      count: updatedRecords.length,
-      collections: updatedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
-      requests: updatedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
+      count: records.length,
+      collections: records.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
+      requests: records.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
     };
   }, []);
 
-  const updatedRecords = useMemo(() => prepareRecordsToRender(apiClientRecords), [
-    apiClientRecords,
+  const updatedRecords = useMemo(() => prepareRecordsToRender(formattedRecords), [
+    formattedRecords,
     prepareRecordsToRender,
   ]);
 
