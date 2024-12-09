@@ -88,7 +88,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
           url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`,
         });
       } else {
-        redirectToCollection(navigate, result.data.id);
         trackCollectionSaved(analyticEventSource);
 
         replaceTab("collection/new", {
