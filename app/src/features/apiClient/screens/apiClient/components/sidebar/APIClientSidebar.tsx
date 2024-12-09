@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { RQAPI } from "../../../../types";
-import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
-import PATHS from "config/constants/sub/paths";
+import { useParams } from "react-router-dom";
 import { Tabs, TabsProps, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
@@ -9,14 +8,8 @@ import { CollectionsList } from "./components/collectionsList/CollectionsList";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { HistoryList } from "./components/historyList/HistoryList";
 import { ApiClientSidebarHeader } from "./components/apiClientSidebarHeader/ApiClientSidebarHeader";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { redirectToNewEnvironment, redirectToRequest } from "utils/RedirectionUtils";
-import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./apiClientSidebar.scss";
 
 interface Props {}
@@ -29,17 +22,11 @@ export enum ApiClientSidebarTabKey {
 
 const APIClientSidebar: React.FC<Props> = () => {
   const { requestId, collectionId } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const user = useSelector(getUserAuthDetails);
-  const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(null);
-  const { getCurrentEnvironment } = useEnvironmentManager();
-  const { currentEnvironmentId } = getCurrentEnvironment();
+  const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
 
   const { history, clearHistory, onNewClick, onImportClick, onSelectionFromHistory } = useApiClientContext();
-  const { openTab } = useTabsLayoutContext();
 
   const hideNewRecordNameInput = () => {
     setIsNewRecordNameInputVisible(false);
@@ -53,37 +40,20 @@ const APIClientSidebar: React.FC<Props> = () => {
 
       switch (recordType) {
         case RQAPI.RecordType.API: {
-          const recordId = "request/new";
-
-          openTab(recordId, {
-            title: "Untitled request",
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/request/new`,
-          });
-
+          setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
           onNewClick(analyticEventSource, RQAPI.RecordType.API);
-          redirectToRequest(navigate);
           return;
         }
 
         case RQAPI.RecordType.COLLECTION: {
+          setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
           onNewClick(analyticEventSource, RQAPI.RecordType.COLLECTION);
-          openTab("collection/new", {
-            title: "New collection",
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/new`,
-          });
           return;
         }
 
         case RQAPI.RecordType.ENVIRONMENT: {
-          const recordId = "environments/new";
-
-          openTab(recordId, {
-            title: "New environment",
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/new`,
-          });
-
-          redirectToNewEnvironment(navigate);
-          trackCreateEnvironmentClicked(analyticEventSource);
+          setActiveKey(ApiClientSidebarTabKey.ENVIRONMENTS);
+          onNewClick(analyticEventSource, RQAPI.RecordType.ENVIRONMENT);
           return;
         }
 
@@ -91,7 +61,7 @@ const APIClientSidebar: React.FC<Props> = () => {
           return;
       }
     },
-    [onNewClick, navigate, openTab]
+    [onNewClick]
   );
 
   useEffect(() => {
@@ -103,16 +73,6 @@ const APIClientSidebar: React.FC<Props> = () => {
       setRecordTypeToBeCreated(RQAPI.RecordType.COLLECTION);
     }
   }, [requestId, collectionId]);
-
-  useEffect(() => {
-    if (location.pathname.includes(PATHS.API_CLIENT.HISTORY.ABSOLUTE)) {
-      setActiveKey(ApiClientSidebarTabKey.HISTORY);
-    } else if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.INDEX)) {
-      setActiveKey(ApiClientSidebarTabKey.ENVIRONMENTS);
-    } else {
-      setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
-    }
-  }, [location.pathname]);
 
   const items: TabsProps["items"] = [
     {
@@ -140,12 +100,9 @@ const APIClientSidebar: React.FC<Props> = () => {
       key: ApiClientSidebarTabKey.ENVIRONMENTS,
       label: (
         <Tooltip title="Environments" placement="right">
-          <NavLink
-            to={PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE + `${user.loggedIn ? `/${currentEnvironmentId}` : ""}`}
-            className={({ isActive }) => `${isActive ? "active" : ""} api-client-tab-link`}
-          >
+          <div className={`api-client-tab-link ${activeKey === ApiClientSidebarTabKey.ENVIRONMENTS ? "active" : ""}`}>
             <MdHorizontalSplit />
-          </NavLink>
+          </div>
         </Tooltip>
       ),
       children: <EnvironmentsList />,
@@ -186,6 +143,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         tabPosition="left"
         className="api-client-sidebar-tabs"
         activeKey={activeKey}
+        defaultActiveKey={ApiClientSidebarTabKey.COLLECTIONS}
         onChange={handleActiveTabChange}
       />
     </div>
