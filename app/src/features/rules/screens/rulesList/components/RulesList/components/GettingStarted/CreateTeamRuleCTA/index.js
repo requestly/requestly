@@ -10,7 +10,7 @@ import { redirectToTeam } from "utils/RedirectionUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import TeamSolvingPuzzleAnimation from "componentsV2/LottieAnimation/TeamSolvingPuzzleAnimation";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { RuleSelectionListDrawer } from "../../RuleSelectionListDrawer/RuleSelectionListDrawer";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackNewRuleButtonClicked, trackRulesEmptyStateClicked } from "modules/analytics/events/common/rules";
@@ -94,13 +94,13 @@ export const CreateTeamRuleCTA = () => {
                 <Button
                   type="link"
                   onClick={() =>
-                    dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: true }))
+                    dispatch(globalActions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: true }))
                   }
                   style={{ paddingLeft: "0", paddingRight: "0" }}
                 >
                   <strong>switch to that workspace</strong>
                 </Button>
-                &nbsp; and use the <strong>Share rule</strong> option to transfer the rule to this workspace.
+                &nbsp; and use the <strong>Share rule</strong> option to copy the rule to this workspace.
               </p>
             </Jumbotron>
           </Col>

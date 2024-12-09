@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Input, Radio, Popconfirm, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getCurrentlySelectedRuleConfig } from "store/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { InfoTag } from "components/misc/InfoTag";
@@ -51,7 +51,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     trackSelectMock(url);
     setIsMockPickerVisible(false);
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: { destination: url },
       })
@@ -61,7 +61,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
   const handleFileSelectCallback = (filePath) => {
     trackSelectMapLocalFile(filePath);
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           destination: `file://${filePath}`,
@@ -82,7 +82,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
         !currentDestinationURL.startsWith("file://")
       ) {
         dispatch(
-          actions.updateRulePairAtGivenPath({
+          globalActions.updateRulePairAtGivenPath({
             pairIndex,
             updates: {
               destination: "http://" + currentDestinationURL,
@@ -127,7 +127,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
 
   const handleDestinationTypeChange = () => {
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         triggerUnsavedChangesIndication: false,
         updates: {
@@ -150,7 +150,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
         type="text"
         onChange={(event) =>
           dispatch(
-            actions.updateRulePairAtGivenPath({
+            globalActions.updateRulePairAtGivenPath({
               pairIndex,
               updates: {
                 destination: event?.target?.value,
@@ -226,7 +226,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                 value={pair.destination}
                 onChange={(e) => {
                   dispatch(
-                    actions.updateRulePairAtGivenPath({
+                    globalActions.updateRulePairAtGivenPath({
                       pairIndex,
                       updates: { destination: e.target.value },
                     })

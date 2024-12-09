@@ -1,5 +1,5 @@
 import APP_CONSTANTS from "config/constants";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { StorageService } from "init";
 import { getExecutionLogsId } from "utils/rules/misc";
 import Logger from "lib/logger";
@@ -12,7 +12,7 @@ export const deleteRule = async (appMode, dispatch, ruleId, isRulesListRefreshPe
   await StorageService(appMode).removeRecord(ruleId);
   deleteRuleExecutionLog(appMode, ruleId);
   dispatch(
-    actions.updateRefreshPendingStatus({
+    globalActions.updateRefreshPendingStatus({
       type: "rules",
       newValue: !isRulesListRefreshPending,
     })

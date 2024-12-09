@@ -12,7 +12,7 @@ import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAllRules } from "store/features/rules/selectors";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
 import { RQButton } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
@@ -157,7 +157,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
       addRulesAndGroupsToStorage(appMode, dataToImport)
         .then(async () => {
           dispatch(
-            actions.updateRefreshPendingStatus({
+            globalActions.updateRefreshPendingStatus({
               type: "rules",
               newValue: !isRulesListRefreshPending,
             })

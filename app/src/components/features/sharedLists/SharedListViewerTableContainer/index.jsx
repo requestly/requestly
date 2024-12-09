@@ -26,7 +26,7 @@ import {
 import { trackTemplateImportCompleted } from "modules/analytics/events/features/templates";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getSharedListIdFromURL } from "features/rules/screens/sharedLists";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { snakeCase } from "lodash";
@@ -65,7 +65,7 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
 
   const openAuthModal = (source) => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {
@@ -84,7 +84,7 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
 
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "extensionModal",
           newValue: true,
           newProps: {

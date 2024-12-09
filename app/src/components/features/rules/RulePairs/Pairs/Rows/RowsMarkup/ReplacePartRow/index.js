@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Input } from "antd";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 const ReplacePartRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
   const dispatch = useDispatch();
@@ -11,7 +11,7 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
       e?.preventDefault?.();
 
       dispatch(
-        actions.updateRulePairAtGivenPath({
+        globalActions.updateRulePairAtGivenPath({
           pairIndex,
           updates: {
             [path]: e?.target?.value,

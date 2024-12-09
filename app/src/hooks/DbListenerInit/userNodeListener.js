@@ -1,7 +1,7 @@
 import { onValue } from "firebase/database";
 import Logger from "lib/logger";
 import { getNodeRef } from "../../actions/FirebaseActions";
-import { actions } from "../../store";
+import { globalActions } from "store/slices/global/slice";
 import { getUser } from "backend/user/getUser";
 
 const userNodeListener = (dispatch, uid) => {
@@ -13,7 +13,7 @@ const userNodeListener = (dispatch, uid) => {
         if (userDetails) {
           getUser(uid).then((profile) => {
             dispatch(
-              actions.updateUserProfile({
+              globalActions.updateUserProfile({
                 userProfile: profile
                   ? {
                       ...(userDetails ?? {}),

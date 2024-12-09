@@ -5,8 +5,9 @@ import { CloseOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
 // import { makeOriginalLog } from "capture-console-logs";
-import { getActiveModals, getDesktopSpecificDetails } from "store/selectors";
-import { actions } from "store";
+import { getDesktopSpecificDetails } from "store/selectors";
+import { getActiveModals } from "store/slices/global/modals/selectors";
+import { globalActions } from "store/slices/global/slice";
 import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
 import RuleEditorModal from "components/common/RuleEditorModal";
@@ -47,6 +48,7 @@ import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
 import { doesStatusCodeMatchLabels, getGraphQLOperationValues } from "./utils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
+import { RQTooltip } from "lib/design-system-v2/components/RQTooltip/RQTooltip";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -106,7 +108,7 @@ const CurrentTrafficTable = ({
 
   const handleRuleEditorModalClose = useCallback(() => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         newValue: false,
         modalName: "ruleEditorModal",
       })
@@ -491,7 +493,7 @@ const CurrentTrafficTable = ({
       const isSelected = trafficTableFilters[key].includes(logName);
 
       return (
-        <Tooltip mouseEnterDelay={0.3} placement="topLeft" title={logName.length >= 20 ? logName : ""}>
+        <RQTooltip mouseEnterDelay={0.3} placement="right" title={logName.length >= 20 ? logName : ""}>
           <Avatar size={18} src={avatarUrl} style={{ display: "inline-block", marginRight: "4px" }} />
           <span className="log-name">{`  ${logName}`}</span>
           {isSelected && (
@@ -505,7 +507,7 @@ const CurrentTrafficTable = ({
               />
             </Tooltip>
           )}
-        </Tooltip>
+        </RQTooltip>
       );
     },
     [handleClearFilter, trafficTableFilters]
@@ -671,7 +673,7 @@ const CurrentTrafficTable = ({
       <Row wrap={false} className="traffic-table-container-row">
         {isStaticPreview ? null : (
           <Col
-            flex="197px"
+            flex="224px"
             style={getGroupFiltersLength() > 0 ? { paddingTop: "8px" } : {}}
             className="traffic-table-sidebar"
           >

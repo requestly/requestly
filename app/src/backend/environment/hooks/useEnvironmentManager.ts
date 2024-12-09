@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useCallback, useState } from "react";
-import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
+import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEnvironmentData, getCurrentEnvironmentId } from "store/features/environment/selectors";
 import { environmentVariablesActions } from "store/features/environment/slice";
@@ -75,6 +75,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
           if (!isEmpty(allEnvironmentData)) {
             Object.keys(environmentMap).forEach((key) => {
               updatedEnvironmentMap[key] = {
+                ...environmentMap[key],
                 ...allEnvironmentData[key],
                 variables: mergeLocalAndSyncVariables(
                   allEnvironmentData[key]?.variables ?? {},
@@ -138,7 +139,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   }, [allEnvironmentData, currentEnvironmentId]);
 
   const setVariables = useCallback(
-    async (environmentId: string, variables: Record<string, EnvironmentVariableValue>) => {
+    async (environmentId: string, variables: EnvironmentVariables) => {
       const newVariables: EnvironmentVariables = Object.fromEntries(
         Object.entries(variables).map(([key, value]) => {
           const typeToSaveInDB =
@@ -225,7 +226,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       }
       return null;
     },
-    [allEnvironmentData]
+    [allEnvironmentData, currentEnvironmentId]
   );
 
   const renameEnvironment = useCallback(
@@ -237,31 +238,29 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     [ownerId, dispatch]
   );
 
-  const duplicateEnvironment = useCallback(async (environmentId: string) => {
-    return duplicateEnvironmentInDB(ownerId, environmentId, allEnvironmentData).then((newEnvironment) => {
-      dispatch(environmentVariablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name }));
-      dispatch(
-        environmentVariablesActions.updateEnvironmentData({
-          newVariables: newEnvironment.variables,
-          environmentId: newEnvironment.id,
-        })
-      );
-    });
-  }, []);
+  const duplicateEnvironment = useCallback(
+    async (environmentId: string) => {
+      return duplicateEnvironmentInDB(ownerId, environmentId, allEnvironmentData).then((newEnvironment) => {
+        dispatch(environmentVariablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name }));
+        dispatch(
+          environmentVariablesActions.updateEnvironmentData({
+            newVariables: newEnvironment.variables,
+            environmentId: newEnvironment.id,
+          })
+        );
+      });
+    },
+    [allEnvironmentData, dispatch, ownerId]
+  );
 
-  const deleteEnvironment = useCallback(async (environmentId: string) => {
-    const allEnvironmentsMap = { ...allEnvironmentData };
-    const isActiveEnvironmentBeingDeleted = currentEnvironmentId === environmentId;
-    return deleteEnvironmentFromDB(ownerId, environmentId).then(() => {
-      dispatch(environmentVariablesActions.removeEnvironment({ environmentId }));
-      delete allEnvironmentsMap[environmentId];
-      if (isActiveEnvironmentBeingDeleted && Object.keys(allEnvironmentsMap).length > 0) {
-        setCurrentEnvironment(Object.keys(allEnvironmentsMap)[0]);
-      } else {
-        dispatch(environmentVariablesActions.resetState());
-      }
-    });
-  }, []);
+  const deleteEnvironment = useCallback(
+    async (environmentId: string) => {
+      return deleteEnvironmentFromDB(ownerId, environmentId).then(() => {
+        dispatch(environmentVariablesActions.removeEnvironment({ environmentId }));
+      });
+    },
+    [ownerId, dispatch]
+  );
 
   return {
     setCurrentEnvironment,

@@ -204,7 +204,6 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 
   return { updatedRecords, recordsMap };
 };
-
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
 
 export const getBreadCrumbOptions = (record: RQAPI.Record) => {

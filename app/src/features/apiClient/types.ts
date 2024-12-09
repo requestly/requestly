@@ -70,6 +70,16 @@ export namespace RQAPI {
     };
   }
 
+  export interface RequestErrorEntry {
+    request: RQAPI.Request;
+    response: null;
+    error: {
+      source: string;
+      message: Error["message"];
+      name: Error["name"];
+    };
+  }
+
   export interface Collection {
     children?: Record[];
     scripts?: {
