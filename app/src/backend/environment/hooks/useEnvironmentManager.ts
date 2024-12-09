@@ -254,8 +254,8 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const renderVariables = useCallback(
     (template: string | Record<string, any>, requestCollectionId: string = "") => {
       const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
-      console.log("DBG variablesWithPrecedence", variablesWithPrecedence);
       const renderedTemplate = renderTemplate(template, variablesWithPrecedence);
+
       return {
         renderedTemplate,
         variables: variablesWithPrecedence,
