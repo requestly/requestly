@@ -26,7 +26,14 @@ const APIClientSidebar: React.FC<Props> = () => {
   const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
 
-  const { history, clearHistory, onNewClick, onImportClick, onSelectionFromHistory } = useApiClientContext();
+  const {
+    history,
+    clearHistory,
+    onNewClick,
+    onImportClick,
+    onSelectionFromHistory,
+    selectedHistoryIndex,
+  } = useApiClientContext();
 
   const hideNewRecordNameInput = () => {
     setIsNewRecordNameInputVisible(false);
@@ -119,7 +126,13 @@ const APIClientSidebar: React.FC<Props> = () => {
           </div>
         </Tooltip>
       ),
-      children: <HistoryList history={history} onSelectionFromHistory={onSelectionFromHistory} />,
+      children: (
+        <HistoryList
+          history={history}
+          selectedHistoryIndex={selectedHistoryIndex}
+          onSelectionFromHistory={onSelectionFromHistory}
+        />
+      ),
     },
   ];
 
