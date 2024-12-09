@@ -9,7 +9,7 @@ import { Badge } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import "./desktopAppProxyInfo.scss";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackConnectAppsClicked } from "modules/analytics/events/desktopApp/apps";
 import { getConnectedAppsCount } from "utils/Misc";
 import FEATURES from "config/constants/sub/features";
@@ -48,7 +48,7 @@ const DesktopAppProxyInfo = () => {
 
   const handleConnectAppsButtonClick = () => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "connectedAppsModal",
         newValue: true,
         newProps: { source: "app_header" },
@@ -68,7 +68,7 @@ const DesktopAppProxyInfo = () => {
         <ProductWalkthrough
           tourFor={FEATURES.CONNECTED_APPS}
           startWalkthrough={startWalkthrough && !isConnectedAppsTourCompleted}
-          onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.CONNECTED_APPS }))}
+          onTourComplete={() => dispatch(globalActions.updateProductTourCompleted({ tour: TOUR_TYPES.CONNECTED_APPS }))}
         />
         <span className="proxy-status-text">Proxy server is listening at{` ${proxyIp}:${proxyPort}`}</span>
         <RQButton

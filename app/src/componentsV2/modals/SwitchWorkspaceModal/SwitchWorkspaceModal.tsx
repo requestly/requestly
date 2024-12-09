@@ -10,7 +10,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Team } from "types";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import "./switchWorkspaceModal.css";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
@@ -35,7 +35,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
     trackCreateNewTeamClicked("switch_workspace_modal");
     toggleModal();
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "createWorkspaceModal",
         newValue: true,
         newProps: { source: "switch_workspace_modal" },
@@ -61,7 +61,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
       "switch_workspace_modal"
     );
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "inviteMembersModal",
         newValue: true,
         newProps: { source: "switch_workspace_modal" },

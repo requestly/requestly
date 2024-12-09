@@ -6,7 +6,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
 import { Popconfirm, PopconfirmProps, Typography } from "antd";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytics";
 import { capitalize } from "lodash";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
@@ -129,8 +129,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
             dispatch(
-              // @ts-ignore
-              actions.toggleActiveModal({
+              globalActions.toggleActiveModal({
                 modalName: "pricingModal",
                 newValue: true,
                 newProps: { source },

@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { Feature } from "../types";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import RightChevron from "assets/icons/chevron-right.svg?react";
@@ -15,8 +15,8 @@ export const FeatureCard: React.FC<Feature> = ({ id, icon: Icon, title, subTitle
   const handleNavigation = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
       trackPersonaRecommendationSelected(id);
-      dispatch(actions.updateIsPersonaSurveyCompleted(true));
-      dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+      dispatch(globalActions.updateIsPersonaSurveyCompleted(true));
+      dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
       navigate(link, { replace: true });
     },
     [id, dispatch, navigate, link]

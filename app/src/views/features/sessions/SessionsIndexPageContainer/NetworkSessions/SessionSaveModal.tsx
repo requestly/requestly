@@ -12,7 +12,7 @@ import {
   trackNetworkSessionSaved,
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getIsNetworkTooltipShown } from "store/selectors";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
@@ -61,10 +61,10 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
     }
     setName("");
     if (!networkSessionTooltipShown) {
-      dispatch(actions.updateNetworkSessionSaveInProgress(true));
-      dispatch(actions.updateNetworkSessionTooltipShown());
+      dispatch(globalActions.updateNetworkSessionSaveInProgress(true));
+      dispatch(globalActions.updateNetworkSessionTooltipShown());
       setTimeout(() => {
-        dispatch(actions.updateNetworkSessionSaveInProgress(false));
+        dispatch(globalActions.updateNetworkSessionSaveInProgress(false));
       }, 2500);
     }
     trackNetworkSessionSaved();

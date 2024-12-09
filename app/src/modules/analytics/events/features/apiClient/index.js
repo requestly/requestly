@@ -120,3 +120,47 @@ export const trackImportApiCollectionsSuccessful = (num_records, num_variables) 
 export const trackEnableKeyValueToggled = (is_active, type) => {
   trackEvent(API_CLIENT.ENABLE_KEY_VALUE_TOGGLED, { is_active, type });
 };
+
+export const trackImportFromPostmanClicked = () => {
+  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_CLICKED);
+};
+
+export const trackImportFromPostmanCompleted = (num_collections, num_environments) => {
+  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_COMPLETED, { num_collections, num_environments });
+};
+
+export const trackImportFromPostmanFailed = (num_collections, num_environments) => {
+  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_FAILED, { num_collections, num_environments });
+};
+
+export const trackImportFromPostmanDataProcessed = (num_collections, num_environments) => {
+  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_DATA_PROCESSED, { num_collections, num_environments });
+};
+
+export const trackImportFromPostmanStarted = (num_collections, num_environments) => {
+  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_STARTED, { num_collections, num_environments });
+};
+
+export const trackDuplicateRequestClicked = () => {
+  trackEvent(API_CLIENT.DUPLICATE_REQUEST_CLICKED);
+};
+
+export const trackDuplicateRequestSuccessful = () => {
+  trackEvent(API_CLIENT.DUPLICATE_REQUEST_SUCCESSFUL);
+};
+
+export const trackDuplicateRequestFailed = () => {
+  trackEvent(API_CLIENT.DUPLICATE_REQUEST_FAILED);
+};
+
+export const trackMoveRequestToCollectionClicked = () => {
+  trackEvent(API_CLIENT.MOVE_REQUEST_TO_COLLECTION_CLICKED);
+};
+
+export const trackMoveRequestToCollectionSuccessful = (destination) => {
+  trackEvent(API_CLIENT.MOVE_REQUEST_TO_COLLECTION_SUCCESSFUL, { destination });
+};
+
+export const trackMoveRequestToCollectionFailed = (destination) => {
+  trackEvent(API_CLIENT.MOVE_REQUEST_TO_COLLECTION_FAILED, { destination });
+};

@@ -9,7 +9,7 @@ import APP_CONSTANTS from "config/constants";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getAppMode, getCurrentlySelectedRuleData, getIsMiscTourCompleted } from "store/selectors";
 import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 
@@ -81,7 +81,7 @@ export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mo
             onTourComplete={() => {
               dispatch(
                 // @ts-ignore
-                actions.updateProductTourCompleted({
+                globalActions.updateProductTourCompleted({
                   tour: TOUR_TYPES.MISCELLANEOUS,
                   subTour: "testThisRule",
                 })

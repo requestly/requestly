@@ -12,7 +12,7 @@ import { acceptTeamInvite } from "backend/workspace";
 import { BiCheckCircle } from "@react-icons/all-files/bi/BiCheckCircle";
 import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
 import Logger from "lib/logger";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
 import { SOURCE } from "modules/analytics/events/common/constants";
@@ -180,7 +180,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
             onClick={() => {
               trackHomeWorkspaceActionClicked("invite_members_clicked");
               dispatch(
-                actions.toggleActiveModal({
+                globalActions.toggleActiveModal({
                   modalName: "inviteMembersModal",
                   newValue: true,
                   newProps: {

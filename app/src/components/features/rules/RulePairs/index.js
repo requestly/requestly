@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Collapse, Popconfirm, Tooltip } from "antd";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { addEmptyPair } from "../RuleBuilder/Body/Columns/AddPairButton/actions";
 import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "../../../../store/selectors";
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
@@ -44,7 +44,7 @@ const RulePairs = (props) => {
       <Popconfirm
         placement="left"
         title="Are you sure you want to delete this rule pair?"
-        onConfirm={() => dispatch(actions.removeRulePairByIndex({ pairIndex }))}
+        onConfirm={() => dispatch(globalActions.removeRulePairByIndex({ pairIndex }))}
       >
         <Tooltip title="Remove Pair" placement="bottom" overlayClassName="rq-tooltip">
           <FaTrash

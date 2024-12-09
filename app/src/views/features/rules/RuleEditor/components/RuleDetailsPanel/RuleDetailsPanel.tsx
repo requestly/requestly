@@ -9,7 +9,7 @@ import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDo
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
 import { MdOutlineDashboard } from "@react-icons/all-files/md/MdOutlineDashboard";
 import { useDispatch } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import {
   trackRuleDetailsPanelClosed,
   trackRuleDetailsPanelDocsClicked,
@@ -53,7 +53,7 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({
 
   const handleCloseClick = () => {
     trackRuleDetailsPanelClosed(ruleType, source);
-    dispatch(actions.closeCurrentlySelectedRuleDetailsPanel());
+    dispatch(globalActions.closeCurrentlySelectedRuleDetailsPanel());
   };
 
   const handleAllTemplatesClick = () => {

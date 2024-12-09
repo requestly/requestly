@@ -14,7 +14,12 @@ export const renderTemplate = (
   }
 
   const parsedVariables = Object.entries(variables).reduce((envVars, [key, value]) => {
-    envVars[key] = isEmpty(value.localValue) ? value.syncValue : value.localValue;
+    if (typeof value.localValue === "number") {
+      envVars[key] = value.localValue ?? value.syncValue;
+    } else {
+      envVars[key] = isEmpty(value.localValue) ? value.syncValue : value.localValue;
+    }
+
     return envVars;
   }, {} as Variables);
 

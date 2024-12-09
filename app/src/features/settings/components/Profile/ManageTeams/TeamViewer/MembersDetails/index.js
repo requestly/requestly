@@ -8,7 +8,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { PlusOutlined } from "@ant-design/icons";
 import PublicInviteLink from "./PublicInviteLink";
 import "./MembersDetails.css";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 
@@ -35,7 +35,7 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
   const handleAddMemberClick = useCallback(() => {
     trackInviteTeammatesClicked("manage_workspace");
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "inviteMembersModal",
         newValue: true,
         newProps: {
@@ -50,7 +50,7 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
   useEffect(() => {
     if (isNewTeam) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "inviteMembersModal",
           newValue: true,
           newProps: {

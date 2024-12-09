@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { RQButton } from "lib/design-system/components";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 const ManageSubscription = () => {
   const dispatch = useDispatch();
@@ -9,7 +9,7 @@ const ManageSubscription = () => {
     <RQButton
       onClick={() => {
         dispatch(
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "pricingModal",
             newValue: true,
             newProps: { selectedPlan: null, source: "my-account" },

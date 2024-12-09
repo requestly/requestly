@@ -37,7 +37,7 @@ import { RuleSelectionListDrawer } from "../RuleSelectionListDrawer/RuleSelectio
 import { trackAskAIClicked } from "features/requestBot";
 import { RQButton } from "lib/design-system/components";
 import BotIcon from "assets/icons/bot.svg?react";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
@@ -301,7 +301,7 @@ export const GettingStarted: React.FC = () => {
                 onClick={() => {
                   trackAskAIClicked("rules_empty_state");
                   trackRulesEmptyStateClicked("ai_bot");
-                  dispatch(actions.updateRequestBot({ isActive: true, modelType: "app" }));
+                  dispatch(globalActions.updateRequestBot({ isActive: true, modelType: "app" }));
                 }}
               >
                 <div className="ask-ai-btn-content">

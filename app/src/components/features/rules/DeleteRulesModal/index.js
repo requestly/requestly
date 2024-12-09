@@ -5,7 +5,7 @@ import { unselectAllRecords } from "../actions";
 import { toast } from "utils/Toast.js";
 import { addRecordsToTrash } from "utils/trash/TrashUtils";
 import DeleteConfirmationModal from "components/user/DeleteConfirmationModal";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getAppMode } from "store/selectors";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRulesTrashedEvent, trackRulesDeletedEvent } from "modules/analytics/events/common/rules";
@@ -43,7 +43,7 @@ const DeleteRulesModal = ({
     //Delete test reports for ruleIdsToDelete
     handleDeleteRuleTestReports();
     //Refresh List
-    dispatch(actions.updateHardRefreshPendingStatus({ type: "rules" }));
+    dispatch(globalActions.updateHardRefreshPendingStatus({ type: "rules" }));
     // Set loading to false
     setAreRulesMovingToTrash(false);
     setAreRulesBeingDeleted(false);

@@ -1,7 +1,9 @@
-import { MoreOutlined } from "@ant-design/icons";
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
+import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Dropdown, Input, Tooltip, Typography } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import PATHS from "config/constants/sub/paths";
+import { TabsLayoutContextInterface, useTabsLayoutContext } from "layouts/TabsLayout";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -13,6 +15,8 @@ interface EnvironmentsListItemProps {
     id: string;
     name: string;
   };
+
+  openTab: TabsLayoutContextInterface["openTab"];
 }
 
 export enum EnvironmentMenuKey {
@@ -21,14 +25,85 @@ export enum EnvironmentMenuKey {
   DELETE = "delete",
 }
 
-export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ environment }) => {
+export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ environment, openTab }) => {
   const navigate = useNavigate();
   const { envId } = useParams();
-  const { getCurrentEnvironment, renameEnvironment, duplicateEnvironment, deleteEnvironment } = useEnvironmentManager();
+  const {
+    getCurrentEnvironment,
+    renameEnvironment,
+    duplicateEnvironment,
+    deleteEnvironment,
+    getAllEnvironments,
+    setCurrentEnvironment,
+  } = useEnvironmentManager();
+  const allEnvironments = getAllEnvironments();
   const { currentEnvironmentId } = getCurrentEnvironment();
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
   const [isRenaming, setIsRenaming] = useState(false);
+  const { updateTab, activeTab } = useTabsLayoutContext();
+
+  const { closeTab } = useTabsLayoutContext();
+
+  const handleEnvironmentRename = useCallback(async () => {
+    if (newEnvironmentName === environment.name) {
+      setIsRenameInputVisible(false);
+      return;
+    }
+    setIsRenaming(true);
+    renameEnvironment(environment.id, newEnvironmentName)
+      .then(() => {
+        updateTab(environment.id, { title: newEnvironmentName });
+        toast.success("Environment renamed successfully");
+      })
+      .catch(() => {
+        toast.error("Failed to rename environment");
+      })
+      .finally(() => {
+        setIsRenaming(false);
+        setIsRenameInputVisible(false);
+      });
+  }, [newEnvironmentName, environment.id, environment.name, renameEnvironment, updateTab]);
+
+  const handleEnvironmentDuplicate = useCallback(async () => {
+    toast.loading("Duplicating environment...");
+    duplicateEnvironment(environment.id)
+      .then(() => {
+        toast.success("Environment duplicated successfully");
+      })
+      .catch(() => {
+        toast.error("Failed to duplicate environment");
+      });
+  }, [environment.id, duplicateEnvironment]);
+
+  const handleEnvironmentDelete = useCallback(() => {
+    toast.loading("Deleting environment...");
+    deleteEnvironment(environment.id)
+      .then(() => {
+        toast.success("Environment deleted successfully");
+        const availableEnvironments = allEnvironments.filter((env) => env.id !== environment.id);
+        const isActiveEnvironmentBeingDeleted = environment.id === currentEnvironmentId;
+        if (availableEnvironments.length && (envId === environment.id || isActiveEnvironmentBeingDeleted)) {
+          redirectToEnvironment(navigate, availableEnvironments[0].id);
+          if (isActiveEnvironmentBeingDeleted) {
+            setCurrentEnvironment(availableEnvironments[0].id);
+          }
+        }
+        closeTab(environment.id);
+      })
+      .catch(() => {
+        toast.error("Failed to delete environment");
+      });
+  }, [
+    environment.id,
+    deleteEnvironment,
+    allEnvironments,
+    navigate,
+    envId,
+    currentEnvironmentId,
+    setCurrentEnvironment,
+    closeTab,
+  ]);
 
   const menuItems = useMemo(() => {
     return [
@@ -40,48 +115,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
       { key: EnvironmentMenuKey.DUPLICATE, label: "Duplicate", onClick: () => handleEnvironmentDuplicate() },
       { key: EnvironmentMenuKey.DELETE, label: "Delete", danger: true, onClick: () => handleEnvironmentDelete() },
     ];
-  }, []);
-
-  const handleEnvironmentRename = useCallback(async () => {
-    if (newEnvironmentName === environment.name) {
-      setIsRenameInputVisible(false);
-      return;
-    }
-    setIsRenaming(true);
-    renameEnvironment(environment.id, newEnvironmentName)
-      .then(() => {
-        toast.success("Environment renamed successfully");
-      })
-      .catch(() => {
-        toast.error("Failed to rename environment");
-      })
-      .finally(() => {
-        setIsRenaming(false);
-        setIsRenameInputVisible(false);
-      });
-  }, [newEnvironmentName, environment.id]);
-
-  const handleEnvironmentDuplicate = useCallback(async () => {
-    toast.loading("Duplicating environment...");
-    duplicateEnvironment(environment.id)
-      .then(() => {
-        toast.success("Environment duplicated successfully");
-      })
-      .catch(() => {
-        toast.error("Failed to duplicate environment");
-      });
-  }, [environment.id]);
-
-  const handleEnvironmentDelete = useCallback(() => {
-    toast.loading("Deleting environment...");
-    deleteEnvironment(environment.id)
-      .then(() => {
-        toast.success("Environment deleted successfully");
-      })
-      .catch(() => {
-        toast.error("Failed to delete environment");
-      });
-  }, [environment.id]);
+  }, [handleEnvironmentDuplicate, handleEnvironmentDelete]);
 
   if (isRenameInputVisible) {
     return (
@@ -100,9 +134,13 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
   return (
     <div
       key={environment.id}
-      className={`environments-list-item ${environment.id === envId ? "active" : ""}`}
+      className={`environments-list-item ${environment.id === envId && activeTab?.id === envId ? "active" : ""}`}
       onClick={() => {
         redirectToEnvironment(navigate, environment.id);
+        openTab(environment.id, {
+          title: environment.name,
+          url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environment.id}`,
+        });
       }}
     >
       <div className="environments-list-item__label">
@@ -130,7 +168,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
           <RQButton
             size="small"
             type="transparent"
-            icon={<MoreOutlined />}
+            icon={<MdOutlineMoreHoriz />}
             className="environment-list-item-dropdown-button"
             onClick={(e) => e.stopPropagation()}
           />

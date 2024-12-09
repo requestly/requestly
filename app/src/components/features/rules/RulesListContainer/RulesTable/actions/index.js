@@ -2,7 +2,7 @@ import isEmpty from "is-empty";
 //CONSTANTS
 import APP_CONSTANTS from "config/constants";
 //REDUCER ACTION OBJECTS
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { StorageService } from "../../../../../../init";
 import Logger from "lib/logger";
 //Utils
@@ -11,7 +11,7 @@ const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
 export const updateRulesListRefreshPendingStatus = (dispatch, isRulesListRefreshPending) => {
   dispatch(
-    actions.updateRefreshPendingStatus({
+    globalActions.updateRefreshPendingStatus({
       type: "rules",
       newValue: !isRulesListRefreshPending,
     })

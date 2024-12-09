@@ -7,7 +7,7 @@ import { redirectToTeam } from "../../../../../../utils/RedirectionUtils";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
 
 const TeamsList = ({ teams = [] }) => {
@@ -96,7 +96,7 @@ const TeamsList = ({ teams = [] }) => {
             onClick={() => {
               trackCreateNewTeamClicked("my_teams");
               dispatch(
-                actions.toggleActiveModal({
+                globalActions.toggleActiveModal({
                   modalName: "createWorkspaceModal",
                   newValue: true,
                   newProps: { source: "my_teams" },

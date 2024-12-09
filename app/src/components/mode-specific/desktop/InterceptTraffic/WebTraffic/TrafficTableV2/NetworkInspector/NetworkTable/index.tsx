@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getIsTrafficTableTourCompleted, getIsConnectedAppsTourCompleted } from "store/selectors";
 import { Table } from "@devtools-ds/table";
 import { get } from "lodash";
@@ -259,7 +259,7 @@ const NetworkTable: React.FC<Props> = ({
       <ProductWalkthrough
         tourFor={FEATURES.DESKTOP_APP_TRAFFIC_TABLE}
         startWalkthrough={!isTrafficTableTourCompleted && isConnectedAppsTourCompleted}
-        onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }))}
+        onTourComplete={() => dispatch(globalActions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }))}
       />
       <div className="web-traffic-table-container">
         <VirtualTableV2

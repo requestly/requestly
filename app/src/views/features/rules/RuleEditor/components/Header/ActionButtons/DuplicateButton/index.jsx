@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "antd";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getModeData } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { toast } from "utils/Toast";
 import DuplicateRuleModal from "components/features/rules/DuplicateRuleModal";
@@ -21,7 +21,7 @@ const DuplicateButton = ({ rule, isDisabled, handleRuleOptionsDropdownClose }) =
 
   const onRuleDuplicated = useCallback(() => {
     closeDuplicateRuleModal();
-    dispatch(actions.clearCurrentlySelectedRuleAndConfig());
+    dispatch(globalActions.clearCurrentlySelectedRuleAndConfig());
     trackRuleEditorHeaderClicked("duplicate_button", rule.ruleType, MODE);
   }, [MODE, closeDuplicateRuleModal, dispatch, rule.ruleType]);
 

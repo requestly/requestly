@@ -38,7 +38,7 @@ import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/
 import { Typography, Tag } from "antd";
 import Text from "antd/lib/typography/Text";
 import { deleteGroup, ungroupSelectedRules, updateRulesListRefreshPendingStatus } from "./actions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { compareRuleByModificationDate, isDesktopOnlyRule } from "utils/rules/misc";
 import { isFeatureCompatible } from "../../../../../utils/CompatibilityUtils";
@@ -204,7 +204,7 @@ const RulesTable = ({
   };
 
   const setRulesToPopulate = (rulesToPopulate) => {
-    dispatch(actions.updateRulesToPopulate(rulesToPopulate));
+    dispatch(globalActions.updateRulesToPopulate(rulesToPopulate));
   };
 
   const getPrettyDesktopRuleTooltipTitle = (ruleType) => {
@@ -217,7 +217,7 @@ const RulesTable = ({
   const stableSetRulesToPopulate = useCallback(setRulesToPopulate, [dispatch]);
 
   const setGroupwiseRulesToPopulate = (incomingGroupwiseRules) => {
-    dispatch(actions.updateGroupwiseRulesToPopulate(incomingGroupwiseRules));
+    dispatch(globalActions.updateGroupwiseRulesToPopulate(incomingGroupwiseRules));
   };
 
   const stableSetGroupwiseRulesToPopulate = useCallback(setGroupwiseRulesToPopulate, [dispatch]);
@@ -294,7 +294,7 @@ const RulesTable = ({
       status: updatedStatus,
     };
 
-    dispatch(actions.updateRecord(newGroup));
+    dispatch(globalActions.updateRecord(newGroup));
 
     Logger.log("Writing storage in RulesTable toggleIncomingGroupStatus");
     StorageService(appMode)
@@ -305,7 +305,7 @@ const RulesTable = ({
           : toast.success(`Group is now ${updatedStatus.toLowerCase()}`);
       })
       .catch(() => {
-        dispatch(actions.updateRecord(groupData));
+        dispatch(globalActions.updateRecord(groupData));
       });
   };
 
@@ -367,7 +367,7 @@ const RulesTable = ({
     event.stopPropagation();
     const groupId = groupData.id;
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "renameGroupModal",
         newValue: true,
         newProps: {
@@ -392,7 +392,7 @@ const RulesTable = ({
       isFavourite: newValue,
     };
 
-    dispatch(actions.updateRecord(updatedRule));
+    dispatch(globalActions.updateRecord(updatedRule));
     Logger.log("Writing storage in RulesTable changeFavouriteState");
     StorageService(appMode)
       .saveRuleOrGroup(updatedRule, { silentUpdate: true })
@@ -400,7 +400,7 @@ const RulesTable = ({
         trackRulePinToggled(updatedRule.id, updatedRule.ruleType, newValue);
       })
       .catch(() => {
-        dispatch(actions.updateRecord(rule));
+        dispatch(globalActions.updateRecord(rule));
       });
   };
 
@@ -450,7 +450,7 @@ const RulesTable = ({
       status: newStatus,
     };
 
-    dispatch(actions.updateRecord(updatedRule));
+    dispatch(globalActions.updateRecord(updatedRule));
     Logger.log("Writing storage in RulesTable changeRuleStatus");
     StorageService(appMode)
       .saveRuleOrGroup(updatedRule, { silentUpdate: true })
@@ -472,7 +472,7 @@ const RulesTable = ({
       })
       .catch((err) => {
         console.error(err);
-        dispatch(actions.updateRecord(rule));
+        dispatch(globalActions.updateRecord(rule));
       });
   };
 
@@ -488,7 +488,7 @@ const RulesTable = ({
 
   const toggleSharingModal = (rule) => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "sharingModal",
         newValue: true,
         newProps: {
@@ -500,7 +500,7 @@ const RulesTable = ({
 
   const promptUserToSignup = (source) => {
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {
@@ -548,8 +548,8 @@ const RulesTable = ({
         newSelectedGroupObject[objectId] = true;
       }
     });
-    dispatch(actions.updateSelectedGroups(newSelectedGroupObject));
-    dispatch(actions.updateSelectedRules(newSelectedRulesObject));
+    dispatch(globalActions.updateSelectedGroups(newSelectedGroupObject));
+    dispatch(globalActions.updateSelectedRules(newSelectedRulesObject));
   };
 
   const rowSelection = {
@@ -977,7 +977,7 @@ const RulesTable = ({
   }, [stableGenerateGroupwiseRulesToPopulate]);
 
   useEffect(() => {
-    dispatch(actions.updateGroups(groups));
+    dispatch(globalActions.updateGroups(groups));
   }, [dispatch, groups]);
 
   useEffect(() => {

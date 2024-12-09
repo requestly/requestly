@@ -2,14 +2,15 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ProCard from "@ant-design/pro-card";
-import { actions } from "../../../../store";
+import { globalActions } from "store/slices/global/slice";
 //Sub Components
 import CreateNewRuleGroupModal from "../CreateNewRuleGroupModal";
 import DeleteRulesModal from "../DeleteRulesModal";
 import ImportRulesModal from "../ImportRulesModal";
 import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import RenameGroupModal from "../RenameGroupModal";
-import { getRulesSelection, getAllRules, getActiveModals, getGroupsSelection } from "../../../../store/selectors";
+import { getRulesSelection, getAllRules, getGroupsSelection } from "../../../../store/selectors";
+import { getActiveModals } from "store/slices/global/modals/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { submitAttrUtil, trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 //ACTIONS
@@ -83,7 +84,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const toggleSharingModal = (selectedRules) => {
     trackShareButtonClicked("rules_list", selectedRules.length);
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "sharingModal",
         newValue: true,
         newProps: { selectedRules: selectedRules, source: "rules_list" },
@@ -92,7 +93,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   };
 
   const toggleRenameGroupModal = () => {
-    dispatch(actions.toggleActiveModal({ modalName: "renameGroupModal" }));
+    dispatch(globalActions.toggleActiveModal({ modalName: "renameGroupModal" }));
   };
 
   const handleNewRuleOnClick = async (_e, ruleType) => {

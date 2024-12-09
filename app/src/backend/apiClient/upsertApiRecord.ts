@@ -1,5 +1,5 @@
 import firebaseApp from "../../firebase";
-import { getFirestore, Timestamp, updateDoc, addDoc, collection, doc } from "firebase/firestore";
+import { getFirestore, Timestamp, updateDoc, addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { getOwnerId } from "backend/utils";
 import Logger from "lib/logger";
 import { RQAPI } from "features/apiClient/types";
@@ -7,7 +7,8 @@ import { RQAPI } from "features/apiClient/types";
 export const upsertApiRecord = async (
   uid: string,
   record: Partial<RQAPI.Record>,
-  teamId?: string
+  teamId?: string,
+  docId?: string
 ): Promise<{ success: boolean; data: RQAPI.Record | null }> => {
   let result;
 
@@ -20,8 +21,8 @@ export const upsertApiRecord = async (
     delete sanitizedRecord.data.children;
   }
 
-  if (!record.id) {
-    result = await createApiRecord(uid, sanitizedRecord, teamId);
+  if (!record.id || docId) {
+    result = await createApiRecord(uid, sanitizedRecord, teamId, docId);
   } else {
     result = await updateApiRecord(uid, sanitizedRecord, teamId);
   }
@@ -32,7 +33,8 @@ export const upsertApiRecord = async (
 const createApiRecord = async (
   uid: string,
   record: Partial<RQAPI.Record>,
-  teamId?: string
+  teamId?: string,
+  docId?: string
 ): Promise<{ success: boolean; data: RQAPI.Record | null }> => {
   const db = getFirestore(firebaseApp);
   const rootApiRecordsCollectionRef = collection(db, "apis");
@@ -51,21 +53,33 @@ const createApiRecord = async (
     updatedTs: Timestamp.now().toMillis(),
   } as RQAPI.Record;
 
-  const result = await addDoc(rootApiRecordsCollectionRef, { ...newRecord })
-    .then((docRef) => {
-      Logger.log(`Api document created ${docRef.id}`);
-      updateDoc(docRef, {
-        id: docRef.id,
+  if (docId) {
+    // Creating a new record with a given id
+    const docRef = doc(db, "apis", docId);
+    return setDoc(docRef, { ...newRecord, id: docId })
+      .then((docRef) => {
+        Logger.log(`Api document created with ID ${docId}`);
+        return { success: true, data: { ...newRecord, id: docId } };
+      })
+      .catch((err) => {
+        Logger.error(`Error creating Api document with ID ${docId}`);
+        return { success: false, data: null };
       });
+  } else {
+    return addDoc(rootApiRecordsCollectionRef, { ...newRecord })
+      .then((docRef) => {
+        Logger.log(`Api document created ${docRef.id}`);
+        updateDoc(docRef, {
+          id: docRef.id,
+        });
 
-      return { success: true, data: { ...newRecord, id: docRef.id } };
-    })
-    .catch((err) => {
-      Logger.error("Error while creating api record", err);
-      return { success: false, data: null };
-    });
-
-  return result;
+        return { success: true, data: { ...newRecord, id: docRef.id } };
+      })
+      .catch((err) => {
+        Logger.error("Error while creating api record", err);
+        return { success: false, data: null };
+      });
+  }
 };
 
 const updateApiRecord = async (
