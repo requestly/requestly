@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -14,7 +14,7 @@ import "../../index.scss";
 
 export const RequestBillingTeamAccessReminder = () => {
   const dispatch = useDispatch();
-  const joinTeamReminder = useFeatureValue("join_team_reminder", null);
+  const joinTeamReminder = useFeatureValue("join_team_reminder_test", null);
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -22,6 +22,13 @@ export const RequestBillingTeamAccessReminder = () => {
 
   const emailSubject = "Request a new Billing Team";
   const emailBody = `Hey Requestly Team\n\n We'd like to setup a new Billing Team. Could you please assist with the next step here?\n\nThanks\n${user?.details?.profile?.displayName}`;
+
+  const availableBillingTeams = useMemo(() => {
+    if (billingTeams) {
+      return billingTeams.filter((team) => Object.keys(team.members).length > 1 && !team?.isAcceleratorTeam);
+    }
+    return [];
+  }, [billingTeams]);
 
   useEffect(() => {
     if (isModalVisible) {
@@ -67,6 +74,10 @@ export const RequestBillingTeamAccessReminder = () => {
     return null;
   }
 
+  if (!availableBillingTeams?.length) {
+    return null;
+  }
+
   return (
     <Modal
       maskStyle={{
@@ -98,7 +109,7 @@ export const RequestBillingTeamAccessReminder = () => {
           )}
         </div>
         <div className="mt-8 billing-teams-card-wrapper">
-          {billingTeams?.map((team: BillingTeamDetails) => {
+          {availableBillingTeams?.map((team: BillingTeamDetails) => {
             if (
               team?.subscriptionDetails?.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE ||
               team?.subscriptionDetails?.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.PAST_DUE
