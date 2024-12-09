@@ -5,7 +5,6 @@ import * as Sentry from "@sentry/react";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
 import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
 import {
-  addUrlSchemeIfMissing,
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
   getEmptyPair,
@@ -72,7 +71,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const { toggleBottomSheet } = useBottomSheetContext();
   const { onSaveRecord } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
-  const { renderVariables, getVariablesWithPrecedence } = environmentManager;
+  const { getVariablesWithPrecedence } = environmentManager;
   const currentEnvironmentVariables = getVariablesWithPrecedence(apiEntryDetails?.collectionId);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
@@ -218,9 +217,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     const sanitizedEntry = sanitizeEntry(entry);
     sanitizedEntry.response = null;
 
-    const renderedRequest = renderVariables<RQAPI.Request>(sanitizedEntry.request, apiEntryDetails.collectionId);
-    renderedRequest.url = addUrlSchemeIfMissing(renderedRequest.url);
-
     abortControllerRef.current = new AbortController();
 
     setIsFailed(false);
@@ -229,7 +225,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    executeAPIRequest(appMode, sanitizedEntry, environmentManager, abortControllerRef.current.signal)
+    executeAPIRequest(
+      appMode,
+      sanitizedEntry,
+      environmentManager,
+      abortControllerRef.current.signal,
+      apiEntryDetails?.collectionId
+    )
       .then((entry) => {
         const response = entry.response;
         // TODO: Add an entry in history
@@ -283,13 +285,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
-    entry,
+    apiEntryDetails?.collectionId,
     appMode,
     dispatch,
-    notifyApiRequestFinished,
-    renderVariables,
-    apiEntryDetails?.collectionId,
+    entry,
     environmentManager,
+    notifyApiRequestFinished,
     toggleBottomSheet,
   ]);
 
