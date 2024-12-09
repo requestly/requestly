@@ -155,6 +155,21 @@ export const isApiCollection = (record: RQAPI.Record) => {
 
 export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
   const recordsCopy = [...records];
+
+  const getCollectionDepth = (record: RQAPI.Record, records: RQAPI.Record[], depth: number = 0): number => {
+    if (!record.collectionId) {
+      return depth;
+    }
+    const parent = records.find((rec) => rec.id === record.collectionId);
+    return parent ? getCollectionDepth(parent, records, depth + 1) : depth;
+  };
+
+  recordsCopy.sort((a, b) => {
+    const depthA = getCollectionDepth(a, records);
+    const depthB = getCollectionDepth(b, records);
+    return depthA - depthB;
+  });
+
   const recordsMap: Record<string, RQAPI.Record> = {};
   const updatedRecords: RQAPI.Record[] = [];
 
@@ -192,31 +207,17 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
 
-export const getBreadCrumbOptions = (
-  record: RQAPI.Record,
-  prefixOption: {
-    pathname: string;
-    label: string;
-    disabled?: boolean;
-    isEditable?: boolean;
-  }
-) => {
-  let formattedOptions = [prefixOption];
+export const getBreadCrumbOptions = (record: RQAPI.Record) => {
+  let formattedOptions = [];
   const options = record?.breadcrumbOptions || [];
   formattedOptions = [
     ...formattedOptions,
     ...options.map((option) => ({
-      pathname: `${prefixOption.pathname}/${option.type}/${option.id}`,
+      pathname: `/api-client/${option.type}/${option.id}`,
       label: option.name,
       disabled: option.type === RQAPI.RecordType.COLLECTION,
     })),
   ];
-
-  formattedOptions.push({
-    pathname: `${prefixOption.pathname}/${record?.type}/${record?.id}`,
-    label: record?.name,
-    isEditable: true,
-  });
 
   return formattedOptions;
 };

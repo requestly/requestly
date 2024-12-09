@@ -3,7 +3,6 @@ import { Link, Params, useMatches } from "react-router-dom";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import { Input, Typography } from "antd";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
-import { isEmpty } from "lodash";
 import "./RQBreadcrumb.scss";
 
 interface Props {
@@ -49,13 +48,17 @@ export const RQBreadcrumb: React.FC<Props> = ({
 
   const breadcrumbs: ({
     pathname: MatchedRoute["pathname"];
-  } & MatchedRoute["handle"]["breadcrumb"])[] = !isEmpty(breadcrumbOptions)
-    ? breadcrumbOptions
-    : matchedRoutes.reduce((result, route) => {
-        return route.handle?.breadcrumb
-          ? [...result, { ...route.handle.breadcrumb, pathname: route.pathname }]
-          : result;
-      }, []);
+  } & MatchedRoute["handle"]["breadcrumb"])[] = matchedRoutes.reduce(
+    (result, route, currentIndex, array) =>
+      route.handle?.breadcrumb
+        ? [
+            ...result,
+            { ...route.handle.breadcrumb, pathname: route.pathname },
+            ...(currentIndex === array.length - 2 ? breadcrumbOptions : []),
+          ]
+        : result,
+    []
+  );
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const updatedValue = e.target.value;

@@ -346,10 +346,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             recordName={apiEntryDetails?.name}
             onRecordNameUpdate={setRequestName}
             onBlur={handleRecordNameUpdate}
-            breadcrumbOptions={getBreadCrumbOptions(recordsMap[apiEntryDetails?.id], {
-              pathname: PATHS.API_CLIENT.INDEX,
-              label: startCase(PATHS.API_CLIENT.INDEX.split("/")[1]),
-            })}
+            breadcrumbOptions={getBreadCrumbOptions(recordsMap[apiEntryDetails?.id])}
           />
         ) : null}
       </div>
