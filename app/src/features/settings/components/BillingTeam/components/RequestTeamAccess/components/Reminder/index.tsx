@@ -14,7 +14,7 @@ import "../../index.scss";
 
 export const RequestBillingTeamAccessReminder = () => {
   const dispatch = useDispatch();
-  const joinTeamReminder = useFeatureValue("join_team_reminder_test", null);
+  const joinTeamReminder = useFeatureValue("join_team_reminder", null);
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [isModalVisible, setIsModalVisible] = useState(false);
