@@ -11,7 +11,7 @@ import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { getAuth } from "firebase/auth";
 import firebaseApp from "../../firebase";
 import Logger from "lib/logger";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { isArray } from "lodash";
 import { useHasChanged } from "hooks/useHasChanged";
 import { userSubscriptionDocListener } from "./userSubscriptionDocListener";
@@ -46,7 +46,7 @@ const DBListeners = () => {
   useEffect(() => {
     if (!hasAuthInitialized) return;
     if (hasAuthStateChanged || !window.isFirstSyncComplete) {
-      dispatch(actions.updateIsRulesListLoading(true));
+      dispatch(globalActions.updateIsRulesListLoading(true));
     }
 
     // Unsubscribe any existing listener
@@ -70,12 +70,12 @@ const DBListeners = () => {
       } else {
         // Do it here if syncing is not enabled. Else syncing would have triggered this.
         window.isFirstSyncComplete = true;
-        dispatch(actions.updateIsRulesListLoading(false));
+        dispatch(globalActions.updateIsRulesListLoading(false));
       }
     } else {
       // Do it here if syncing is not enabled. Else syncing would have triggered this.
       window.isFirstSyncComplete = true;
-      dispatch(actions.updateIsRulesListLoading(false));
+      dispatch(globalActions.updateIsRulesListLoading(false));
     }
   }, [
     hasAuthInitialized,

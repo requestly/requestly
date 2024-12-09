@@ -12,7 +12,7 @@ import { getUniqueColorForWorkspace } from "utils/teams";
 import APP_CONSTANTS from "config/constants";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackPricingWorkspaceSwitched } from "features/pricing/analytics";
 import "./index.scss";
 
@@ -119,7 +119,10 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
         startWalkthrough={!isOpenedFromModal && !isMiscTourCompleted?.upgradeWorkspaceMenu}
         onTourComplete={() =>
           dispatch(
-            actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "upgradeWorkspaceMenu" })
+            globalActions.updateProductTourCompleted({
+              tour: TOUR_TYPES.MISCELLANEOUS,
+              subTour: "upgradeWorkspaceMenu",
+            })
           )
         }
         completeTourOnUnmount={false}
@@ -138,7 +141,7 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
               onClick={() => {
                 if (!isMiscTourCompleted?.upgradeWorkspaceMenu) {
                   dispatch(
-                    actions.updateProductTourCompleted({
+                    globalActions.updateProductTourCompleted({
                       tour: TOUR_TYPES.MISCELLANEOUS,
                       subTour: "upgradeWorkspaceMenu",
                     })

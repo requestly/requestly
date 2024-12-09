@@ -10,6 +10,7 @@ import { toast } from "utils/Toast";
 import { redirectToEnvironment } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
 import { trackEnvironmentSwitched } from "features/apiClient/screens/environment/analytics";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./environmentSwitcher.scss";
 
 export const EnvironmentSwitcher = () => {
@@ -18,6 +19,7 @@ export const EnvironmentSwitcher = () => {
   const { getAllEnvironments, getCurrentEnvironment, setCurrentEnvironment } = useEnvironmentManager();
   const { currentEnvironmentId, currentEnvironmentName } = getCurrentEnvironment();
   const environments = getAllEnvironments();
+  const { openTab } = useTabsLayoutContext();
 
   const dropdownItems = useMemo(() => {
     return environments.map((environment) => ({
@@ -40,13 +42,14 @@ export const EnvironmentSwitcher = () => {
       onClick: () => {
         setCurrentEnvironment(environment.id);
         if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
+          openTab(environment.id, { title: environment.name });
           trackEnvironmentSwitched(environments.length);
           redirectToEnvironment(navigate, environment.id);
         }
         toast.success(`Switched to ${environment.name} environment`);
       },
     }));
-  }, [environments, setCurrentEnvironment, currentEnvironmentId, navigate, location.pathname]);
+  }, [environments, setCurrentEnvironment, currentEnvironmentId, navigate, location.pathname, openTab]);
 
   if (environments.length === 0) {
     return (
@@ -59,7 +62,7 @@ export const EnvironmentSwitcher = () => {
   return (
     <Dropdown overlayClassName="environment-switcher-dropdown" trigger={["click"]} menu={{ items: dropdownItems }}>
       <RQButton className="environment-switcher-button" size="small">
-        <MdOutlineSyncAlt />
+        {currentEnvironmentName && <MdOutlineSyncAlt />}
         <Typography.Text
           ellipsis={{
             tooltip: {
@@ -68,7 +71,7 @@ export const EnvironmentSwitcher = () => {
             },
           }}
         >
-          {currentEnvironmentName}
+          {currentEnvironmentName || "No environment"}
         </Typography.Text>
       </RQButton>
     </Dropdown>

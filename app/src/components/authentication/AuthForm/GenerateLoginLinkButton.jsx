@@ -7,7 +7,7 @@ import { sendEmailLinkForSignin } from "actions/FirebaseActions";
 import { useSelector } from "react-redux";
 import { getTimeToResendEmailLogin } from "store/selectors";
 import { useDispatch } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { updateTimeToResendEmailLogin } from "./MagicAuthLinkModal/actions";
 
 export default function GenerateEmailAuthLinkBtn({ email, authMode, eventSource, callback }) {
@@ -26,7 +26,7 @@ export default function GenerateEmailAuthLinkBtn({ email, authMode, eventSource,
       sendEmailLinkForSignin(email, eventSource).then(() => {
         // open dialog
         dispatch(
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "emailLoginLinkPopup",
             newValue: true,
             newProps: {

@@ -2,7 +2,7 @@ import { teamsActions } from "store/features/teams/slice";
 import { StorageService } from "init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "./ExtensionActions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { trackWorkspaceSwitched } from "modules/analytics/events/common/teams";
 import {
   mergeRecordsAndSaveToFirebase,
@@ -56,7 +56,7 @@ export const switchWorkspace = async (
     }
   }
   trackWorkspaceSwitched(source);
-  dispatch(actions.updateIsRulesListLoading(true));
+  dispatch(globalActions.updateIsRulesListLoading(true));
 
   if (window.unsubscribeSyncingNodeRef.current && isArray(window.unsubscribeSyncingNodeRef.current)) {
     window.unsubscribeSyncingNodeRef.current.forEach((removeFirebaseListener) => {
@@ -118,7 +118,7 @@ export const switchWorkspace = async (
   });
 
   //Refresh Rules List
-  dispatch(actions.updateHardRefreshPendingStatus({ type: "rules" }));
+  dispatch(globalActions.updateHardRefreshPendingStatus({ type: "rules" }));
 
   // Notify other tabs
   window.activeWorkspaceBroadcastChannel &&

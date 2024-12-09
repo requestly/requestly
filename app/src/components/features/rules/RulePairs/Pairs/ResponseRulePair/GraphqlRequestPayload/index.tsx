@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { Input, Row, Col, Tooltip, Select, Button } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import deleteObjectAtPath from "../../../Filters/actions/deleteObjectAtPath";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
@@ -54,7 +54,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   useEffect(() => {
     if (gqlOperationFilter.key && gqlOperationFilter.value) {
       dispatch(
-        actions.updateRulePairAtGivenPath({
+        globalActions.updateRulePairAtGivenPath({
           pairIndex,
           triggerUnsavedChangesIndication: false,
           updates: {
@@ -81,7 +81,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     const newPayloadKey = e?.target?.value ?? "";
 
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: { [SOURCE_REQUEST_PAYLOAD_KEY]: newPayloadKey },
       })
@@ -96,7 +96,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
 
   const handleRequestPayloadOperatorChange = (operator: string) => {
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: { [SOURCE_REQUEST_PAYLOAD_OPERATOR]: operator },
       })
@@ -113,7 +113,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     const newPayloadValue = e?.target?.value ?? "";
 
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: { [SOURCE_REQUEST_PAYLOAD_VALUE]: newPayloadValue },
       })

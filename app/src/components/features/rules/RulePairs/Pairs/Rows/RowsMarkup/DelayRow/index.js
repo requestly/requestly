@@ -1,7 +1,7 @@
 import { Row, Col } from "antd";
 import { useDispatch } from "react-redux";
 import { RQInput } from "lib/design-system/components";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import "./delayRow.css";
 
 const DelayRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
@@ -19,7 +19,7 @@ const DelayRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           addonBefore={<span className="text-gray">DELAY (ms):</span>}
           onChange={(event) =>
             dispatch(
-              actions.updateRulePairAtGivenPath({
+              globalActions.updateRulePairAtGivenPath({
                 pairIndex,
                 updates: {
                   delay: event?.target?.value,

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useCallback, useState } from "react";
-import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
+import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllEnvironmentData,
@@ -82,6 +82,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
           if (!isEmpty(allEnvironmentData)) {
             Object.keys(environmentMap).forEach((key) => {
               updatedEnvironmentMap[key] = {
+                ...environmentMap[key],
                 ...allEnvironmentData[key],
                 variables: mergeLocalAndSyncVariables(
                   allEnvironmentData[key]?.variables ?? {},
@@ -167,7 +168,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   }, [allEnvironmentData, currentEnvironmentId]);
 
   const setVariables = useCallback(
-    async (environmentId: string, variables: Record<string, EnvironmentVariableValue>) => {
+    async (environmentId: string, variables: EnvironmentVariables) => {
       const newVariables: EnvironmentVariables = Object.fromEntries(
         Object.entries(variables).map(([key, value]) => {
           const typeToSaveInDB =
@@ -283,19 +284,11 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
 
   const deleteEnvironment = useCallback(
     async (environmentId: string) => {
-      const allEnvironmentsMap = { ...allEnvironmentData };
-      const isActiveEnvironmentBeingDeleted = currentEnvironmentId === environmentId;
       return deleteEnvironmentFromDB(ownerId, environmentId).then(() => {
         dispatch(environmentVariablesActions.removeEnvironment({ environmentId }));
-        delete allEnvironmentsMap[environmentId];
-        if (isActiveEnvironmentBeingDeleted && Object.keys(allEnvironmentsMap).length > 0) {
-          setCurrentEnvironment(Object.keys(allEnvironmentsMap)[0]);
-        } else {
-          dispatch(environmentVariablesActions.resetState());
-        }
       });
     },
-    [allEnvironmentData, dispatch, currentEnvironmentId, ownerId, setCurrentEnvironment]
+    [ownerId, dispatch]
   );
 
   return {

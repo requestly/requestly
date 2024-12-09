@@ -6,7 +6,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { ImCross } from "@react-icons/all-files/im/ImCross";
 import HEADER_SUGGESTIONS from "../../../../../../../config/constants/sub/header-suggestions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 
 const HeadersPairModificationRowV2 = ({
   modification,
@@ -38,7 +38,7 @@ const HeadersPairModificationRowV2 = ({
   const handlePairTypeMenuItemClick = useCallback(
     (type) => {
       dispatch(
-        actions.updateRulePairAtGivenPath({
+        globalActions.updateRulePairAtGivenPath({
           pairIndex,
           updates: {
             [`modifications[${modificationType}][${modificationIndex}].type`]: type,
@@ -84,7 +84,7 @@ const HeadersPairModificationRowV2 = ({
               options={HEADER_SUGGESTIONS[modificationType]}
               onChange={(value) =>
                 dispatch(
-                  actions.updateRulePairAtGivenPath({
+                  globalActions.updateRulePairAtGivenPath({
                     pairIndex,
                     updates: {
                       [`modifications[${modificationType}][${modificationIndex}].header`]: value?.trim(),
@@ -116,7 +116,7 @@ const HeadersPairModificationRowV2 = ({
                 data-selectionid="header-value"
                 onChange={(event) =>
                   dispatch(
-                    actions.updateRulePairAtGivenPath({
+                    globalActions.updateRulePairAtGivenPath({
                       pairIndex,
                       updates: {
                         [`modifications[${modificationType}][${modificationIndex}].value`]: event?.target?.value?.trim(),
@@ -137,7 +137,7 @@ const HeadersPairModificationRowV2 = ({
                   onClick={(event) => {
                     event?.preventDefault?.();
                     dispatch(
-                      actions.removeValueInRulePairByIndex({
+                      globalActions.removeValueInRulePairByIndex({
                         pairIndex,
                         arrayPath: ["modifications", modificationType],
                         index: modificationIndex,

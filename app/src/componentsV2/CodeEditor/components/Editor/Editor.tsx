@@ -8,7 +8,7 @@ import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { EditorLanguage, EditorCustomToolbar, AnalyticEventProperties } from "componentsV2/CodeEditor/types";
 import { ResizableBox } from "react-resizable";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getAllEditorToast, getIsCodeEditorFullScreenModeOnboardingCompleted } from "store/selectors";
 import { EditorToastContainer } from "../EditorToast/EditorToastContainer";
 import { getByteSize } from "utils/FormattingHelper";
@@ -74,7 +74,7 @@ const Editor: React.FC<EditorProps> = ({
         if (isRuleEditor) {
           toast.info(`Use '⌘+S' or 'ctrl+S' to save the rule`, 3);
           // @ts-ignore
-          dispatch(actions.updateIsCodeEditorFullScreenModeOnboardingCompleted(true));
+          dispatch(globalActions.updateIsCodeEditorFullScreenModeOnboardingCompleted(true));
         }
       }
     } else {
@@ -124,8 +124,7 @@ const Editor: React.FC<EditorProps> = ({
 
   const handleEditorClose = useCallback(
     (id: string) => {
-      // @ts-expect-error
-      dispatch(actions.removeToastForEditor({ id }));
+      dispatch(globalActions.removeToastForEditor({ id }));
     },
     [dispatch]
   );
@@ -183,7 +182,7 @@ const Editor: React.FC<EditorProps> = ({
             defaultValue={defaultValue}
             onChange={handleEditorBodyChange}
             theme={vscodeDark}
-            extensions={[editorLanguage, EditorView.lineWrapping]}
+            extensions={[editorLanguage, EditorView.lineWrapping].filter(Boolean)}
             basicSetup={{
               highlightActiveLine: false,
               bracketMatching: true,

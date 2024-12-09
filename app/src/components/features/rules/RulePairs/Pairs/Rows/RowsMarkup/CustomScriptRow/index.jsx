@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Input, Tooltip, Typography, Menu, Dropdown, Popconfirm } from "antd";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 //Icons
 import { DeleteOutlined, DownOutlined, FolderOpenOutlined } from "@ant-design/icons";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
@@ -85,7 +85,7 @@ const CustomScriptRow = ({
   const handleMockPickerSelectionCallback = (url) => {
     setIsMockPickerVisible(false);
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           [`scripts[${scriptIndex}].value`]: url,
@@ -118,7 +118,7 @@ const CustomScriptRow = ({
               disabled={isInputDisabled}
               onChange={(event) =>
                 dispatch(
-                  actions.updateRulePairAtGivenPath({
+                  globalActions.updateRulePairAtGivenPath({
                     pairIndex,
                     updates: {
                       [`scripts[${scriptIndex}].value`]: event?.target?.value,
@@ -171,7 +171,7 @@ const CustomScriptRow = ({
   const onCodeTypeChange = (codeType) => {
     setInitialCodeEditorValue(null);
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           [`scripts[${scriptIndex}].codeType`]: codeType,
@@ -192,7 +192,7 @@ const CustomScriptRow = ({
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
         /* THIS IS TEMPORARY REPRESENTATION OF SCRIPT ATTRIBUTE */
         dispatch(
-          actions.updateRulePairAtGivenPath({
+          globalActions.updateRulePairAtGivenPath({
             pairIndex,
             updates: {
               [`scripts[${scriptIndex}].wrapperElement`]: value,
@@ -202,7 +202,7 @@ const CustomScriptRow = ({
         );
       } else {
         dispatch(
-          actions.updateRulePairAtGivenPath({
+          globalActions.updateRulePairAtGivenPath({
             pairIndex,
             triggerUnsavedChangesIndication: triggerUnsavedChanges,
             updates: {
@@ -296,7 +296,7 @@ const CustomScriptRow = ({
   const handleLoadTimeClick = useCallback(
     (type) =>
       dispatch(
-        actions.updateRulePairAtGivenPath({
+        globalActions.updateRulePairAtGivenPath({
           pairIndex,
           updates: {
             [`scripts[${scriptIndex}].loadTime`]: type,
@@ -391,7 +391,7 @@ const CustomScriptRow = ({
   const onSourceTypeChange = (sourceType) => {
     setInitialCodeEditorValue(null);
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           [`scripts[${scriptIndex}].type`]: sourceType,
