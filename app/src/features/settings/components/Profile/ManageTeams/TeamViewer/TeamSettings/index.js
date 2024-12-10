@@ -8,7 +8,7 @@ import SpinnerColumn from "../../../../../../../components/misc/SpinnerColumn";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { redirectToRules, redirectToWorkspaceSettings } from "../../../../../../../utils/RedirectionUtils";
 import { clearCurrentlyActiveWorkspace, showSwitchWorkspaceSuccessToast } from "actions/TeamWorkspaceActions";
-import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
+import WorkspaceRuleMetadataSyncing from "./WorkspaceRuleMetadataSyncing";
 import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
 import LoadingModal from "../../../../../../../layouts/DashboardLayout/MenuHeader/WorkspaceSelector/LoadingModal";
 import { toast } from "utils/Toast";
@@ -136,7 +136,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
           <SpinnerColumn message="Fetching workspace settings" />
         ) : !isTeamAdmin ? (
           <>
-            <WorkspaceStatusSyncing />
+            <WorkspaceRuleMetadataSyncing teamId={teamId} />
             <div>Only admins can view rest of the workspace settings.</div>
           </>
         ) : (
@@ -182,7 +182,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
               </div>
             </form>
 
-            <WorkspaceStatusSyncing />
+            <WorkspaceRuleMetadataSyncing teamId={teamId} />
 
             <Row className="w-full">
               <Col span={24}>
