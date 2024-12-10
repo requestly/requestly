@@ -73,3 +73,123 @@
     }
   }
 }
+
+.authorization-view {
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  height: calc(100% - 45px);
+  overflow: scroll;
+
+  .form-and-description {
+    display: flex;
+    height: calc(100% - 45px);
+
+    .form-view {
+      max-width: 680px;
+      flex: 1;
+      padding: 16px;
+
+      .form {
+        .field-group {
+          display: flex;
+          gap: 8px;
+          margin-bottom: 16px;
+          align-items: center;
+
+          label {
+            width: 120px;
+          }
+
+          .field {
+            width: 448px;
+          }
+
+          .ant-select-selector {
+            width: 448px;
+            background: none;
+          }
+
+          .ant-input {
+            height: 32px;
+            background: none;
+            font-size: 13px;
+            line-height: 20px;
+          }
+
+          label,
+          .ant-input,
+          .ant-select-selector {
+            color: #fff;
+          }
+        }
+      }
+    }
+
+    .auth-description {
+      padding: 16px;
+      max-width: 320px;
+      margin-left: auto;
+      border-left: 1px solid rgba(255, 255, 255, 0.06);
+
+      h1 {
+        line-height: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #bbbbbb;
+      }
+
+      h2,
+      li {
+        font-size: 11px;
+        line-height: 17px;
+        color: #bbbbbb;
+      }
+
+      ul {
+        margin-left: -20px;
+        li {
+          display: list-item;
+          list-style-type: disc;
+        }
+      }
+
+      .step {
+        p {
+          color: blue;
+        }
+        .step {
+          p {
+            color: pink;
+          }
+        }
+      }
+    }
+  }
+
+  .type-of-authorization {
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+    .form-selector {
+      display: flex;
+      align-items: center;
+
+      label {
+        font-size: 11px;
+        line-height: 15px;
+        color: #bbbbbb;
+        margin-right: 12px;
+        font-weight: 500;
+      }
+
+      .ant-select-selector {
+        color: #fff;
+      }
+
+      .form-selector-dropdown {
+        width: 200px;
+      }
+    }
+  }
+}
