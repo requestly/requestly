@@ -37,3 +37,12 @@ export const acceptTeamInvite = async (inviteId: string) => {
       return null;
     });
 };
+
+export const changeWorkspaceSyncState = async (teamId: string, state: boolean) => {
+  const db = getFirestore();
+  const teamRef = doc(db, "teams", teamId);
+
+  return updateDoc(teamRef, {
+    isSyncEnabled: state,
+  });
+};
