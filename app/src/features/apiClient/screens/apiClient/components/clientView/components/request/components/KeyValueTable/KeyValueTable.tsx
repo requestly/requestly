@@ -7,6 +7,7 @@ import { EditableRow, EditableCell } from "./KeyValueTableRow";
 import { KeyValueFormType, KeyValuePair, RQAPI } from "features/apiClient/types";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { isArray } from "lodash";
+import { EnvironmentVariables } from "backend/environment/types";
 import "./keyValueTable.scss";
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
@@ -14,12 +15,13 @@ type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
 interface KeyValueTableProps {
   data: KeyValuePair[];
   pairType: KeyValueFormType;
+  variables: EnvironmentVariables;
   setKeyValuePairs: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
 }
 
 // TODO: REFACTOR TYPES
 
-export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValuePairs, pairType }) => {
+export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValuePairs, pairType, variables }) => {
   const [tableData, setTableData] = useState<KeyValuePair[]>(data);
 
   const handleUpdateRequestPairs = useCallback(
@@ -110,6 +112,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
           dataIndex: "isEnabled",
           title: "isEnabled",
           pairType,
+          variables,
           handleUpdatePair,
         }),
       },
@@ -124,6 +127,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
           dataIndex: "key",
           title: "key",
           pairType,
+          variables,
           handleUpdatePair,
         }),
       },
@@ -137,6 +141,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
           dataIndex: "value",
           title: "value",
           pairType,
+          variables,
           handleUpdatePair,
         }),
       },
@@ -160,7 +165,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
         },
       },
     ];
-  }, [pairType, handleUpdatePair, handleDeletePair, tableData.length]);
+  }, [pairType, handleUpdatePair, handleDeletePair, tableData.length, variables]);
 
   return (
     <ContentListTable
