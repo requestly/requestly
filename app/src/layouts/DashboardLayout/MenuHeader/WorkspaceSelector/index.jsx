@@ -4,14 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   DownOutlined,
   LoadingOutlined,
-  LockOutlined,
   PlusOutlined,
   PlusSquareOutlined,
   SettingOutlined,
   UserOutlined,
   RightOutlined,
 } from "@ant-design/icons";
-import { Avatar, Badge, Divider, Dropdown, Menu, Modal, Spin, Tag, Tooltip } from "antd";
+import { Badge, Divider, Dropdown, Menu, Spin, Tag, Tooltip } from "antd";
 import {
   trackInviteTeammatesClicked,
   trackWorkspaceDropdownClicked,
@@ -25,7 +24,6 @@ import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getUniqueColorForWorkspace } from "utils/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import { trackWorkspaceInviteAnimationViewed } from "modules/analytics/events/common/teams";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
@@ -35,6 +33,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import { getActiveWorkspaceIds, getAllWorkspaces, getWorkspaceById } from "store/slices/workspaces/selectors";
 import { getActiveWorkspaceId, isPersonalWorkspace, isSharedWorkspace } from "features/workspaces/utils";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
 export const isWorkspacesFeatureEnabled = (email) => {
   if (!email) return false;
@@ -45,14 +44,8 @@ const prettifyWorkspaceName = (workspaceName) => {
   return workspaceName || "Workspaces";
 };
 
-const getWorkspaceIcon = (workspaceName, workspaceId) => {
-  if (isPersonalWorkspace(workspaceId)) return <LockOutlined />;
-  return workspaceName ? workspaceName[0].toUpperCase() : "?";
-};
-
 const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
   // Global State
-  const user = useSelector(getUserAuthDetails);
   const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
   // For right now only as we only support to connect one workspace at a time
   const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
@@ -77,19 +70,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
       <div className="cursor-pointer items-center">
         {activeWorkspace ? (
           <>
-            <Avatar
-              size={26}
-              shape="square"
-              icon={getWorkspaceIcon(activeWorkspaceName, activeWorkspaceId)}
-              className="workspace-avatar"
-              style={{
-                backgroundColor: user.loggedIn
-                  ? isPersonalWorkspace(activeWorkspaceId)
-                    ? "#1E69FF"
-                    : getUniqueColorForWorkspace(activeWorkspaceId, activeWorkspaceName)
-                  : "#ffffff4d",
-              }}
-            />
+            {<WorkspaceAvatar workspaceId={activeWorkspace?.id} workspaceName={activeWorkspace?.name} />}
             <Tooltip
               overlayClassName="workspace-selector-tooltip"
               style={{ top: "35px" }}
@@ -107,15 +88,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
           </>
         ) : (
           <>
-            <Avatar
-              size={26}
-              shape="square"
-              icon={"?"}
-              className="workspace-avatar"
-              style={{
-                backgroundColor: "#ffffff4d",
-              }}
-            />
+            {<WorkspaceAvatar workspaceId={activeWorkspace?.id} workspaceName={activeWorkspace?.name} />}
             <Tooltip
               overlayClassName="workspace-selector-tooltip"
               style={{ top: "35px" }}
@@ -375,27 +348,7 @@ const WorkspaceSelector = () => {
               <Menu.Item
                 key={workspace.id}
                 disabled={!!workspace.archived || isTeamCurrentlyActive(workspace.id)}
-                icon={
-                  isPersonalWorkspace(workspace.id) ? (
-                    <Avatar
-                      size={28}
-                      shape="square"
-                      icon={getWorkspaceIcon(APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE, workspace.id)}
-                      className="workspace-avatar"
-                      style={{ backgroundColor: "#1E69FF" }}
-                    />
-                  ) : (
-                    <Avatar
-                      size={28}
-                      shape="square"
-                      icon={workspace.name?.[0]?.toUpperCase() ?? "P"}
-                      className="workspace-avatar"
-                      style={{
-                        backgroundColor: `${getUniqueColorForWorkspace(workspace.id, workspace.name)}`,
-                      }}
-                    />
-                  )
-                }
+                icon={<WorkspaceAvatar workspaceId={workspace.id} workspaceName={workspace.name} />}
                 className={`workspace-menu-item ${
                   workspace.id === activeWorkspaceId ? "active-workspace-dropdownItem" : ""
                 }`}

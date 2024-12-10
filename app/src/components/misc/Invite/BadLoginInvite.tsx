@@ -2,7 +2,7 @@ import { Avatar, Col, Row } from "antd";
 
 import { RQButton } from "lib/design-system/components";
 import { useDispatch, useSelector } from "react-redux";
-import { getUniqueColorForWorkspace } from "utils/teams";
+import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 import { globalActions } from "store/slices/global/slice";
 import "./index.css";
 import APP_CONSTANTS from "config/constants";

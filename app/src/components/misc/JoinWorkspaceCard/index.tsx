@@ -19,7 +19,8 @@ import {
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import PATHS from "config/constants/sub/paths";
 import "./index.css";
-import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/teams";
+import { getUniqueTeamsFromInvites } from "utils/teams";
+import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 
 const MIN_MEMBERS_IN_WORKSPACE = 3;
 

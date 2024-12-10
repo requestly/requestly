@@ -2,10 +2,6 @@ import { Invite, TeamInviteMetadata } from "types";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { getColorFromString } from "utils/getColorFromString";
 
-export const getUniqueColorForWorkspace = (teamId: string, teamName: string) => {
-  return getColorFromString(teamId + teamName);
-};
-
 export const getUniqueColorForUser = (userEmail: string) => {
   return getColorFromString(userEmail);
 };
