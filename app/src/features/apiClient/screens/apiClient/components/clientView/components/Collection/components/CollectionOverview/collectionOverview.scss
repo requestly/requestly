@@ -1,0 +1,14 @@
+.collection-overview-container {
+  padding: 0 1rem;
+
+  .collection-overview-title {
+    font-size: 2rem;
+    font-weight: var(--requestly-font-weight-medium);
+  }
+
+  .collection-overview-description {
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+    margin-top: 1rem;
+  }
+}

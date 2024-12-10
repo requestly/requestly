@@ -8,9 +8,12 @@ import {
   getDocs,
   getFirestore,
   onSnapshot,
+  query,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { EnvironmentData, EnvironmentMap, EnvironmentVariables } from "./types";
+import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 
 const db = getFirestore(firebaseApp);
 
@@ -79,6 +82,29 @@ export const attachEnvironmentVariableListener = (
 
       callback(environmentData);
     }
+  });
+
+  return unsubscribe;
+};
+
+export const attachCollectionVariableListener = (
+  ownerId: string,
+  callback: (newVariables: CollectionVariableMap) => void
+) => {
+  if (!ownerId) {
+    return () => {};
+  }
+
+  const apisRef = collection(db, "apis");
+  const q = query(apisRef, where("ownerId", "==", ownerId), where("type", "==", RQAPI.RecordType.COLLECTION));
+
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    const collectionVariableDetails: CollectionVariableMap = {};
+    snapshot.forEach((doc) => {
+      const collectionData = { id: doc.id, ...doc.data() } as RQAPI.CollectionRecord;
+      collectionVariableDetails[doc.id] = { variables: collectionData.data.variables };
+    });
+    callback(collectionVariableDetails);
   });
 
   return unsubscribe;

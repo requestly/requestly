@@ -3,15 +3,17 @@ import { Input, Radio } from "antd";
 import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../../types";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { KeyValueTable } from "./components/KeyValueTable/KeyValueTable";
+import { EnvironmentVariables } from "backend/environment/types";
 
 interface Props {
   body: RQAPI.RequestBody;
   contentType: RequestContentType;
+  variables: EnvironmentVariables;
   setRequestEntry: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
 }
 
-const RequestBody: React.FC<Props> = ({ body, contentType, setRequestEntry, setContentType }) => {
+const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequestEntry, setContentType }) => {
   const handleBodyChange = useCallback(
     (body: string) => {
       setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body } }));
@@ -40,6 +42,7 @@ const RequestBody: React.FC<Props> = ({ body, contentType, setRequestEntry, setC
             pairType={KeyValueFormType.FORM}
             data={body as KeyValuePair[]}
             setKeyValuePairs={setRequestEntry}
+            variables={variables}
           />
         );
 
@@ -53,7 +56,7 @@ const RequestBody: React.FC<Props> = ({ body, contentType, setRequestEntry, setC
           />
         );
     }
-  }, [body, contentType, setRequestEntry, handleBodyChange]);
+  }, [body, contentType, setRequestEntry, handleBodyChange, variables]);
 
   return (
     <div className="api-request-body">

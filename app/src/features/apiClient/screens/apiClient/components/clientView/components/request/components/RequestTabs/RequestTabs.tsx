@@ -6,6 +6,7 @@ import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../ut
 import { KeyValueTable } from "../KeyValueTable/KeyValueTable";
 import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEditor";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
 
 enum Tab {
@@ -27,13 +28,16 @@ const LabelWithCount: React.FC<{ label: string; count: number; showDot?: boolean
 
 interface Props {
   requestEntry: RQAPI.Entry;
+  collectionId: string;
   setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
 }
 
-const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setContentType }) => {
+const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEntry, setContentType }) => {
   const [selectedTab, setSelectedTab] = useState(Tab.QUERY_PARAMS);
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
+  const { getVariablesWithPrecedence } = useEnvironmentManager();
+  const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
   useEffect(() => {
     if (selectedTab === Tab.BODY && !supportsRequestBody(requestEntry.request.method)) {
@@ -56,6 +60,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setConten
             data={requestEntry.request.queryParams}
             setKeyValuePairs={setRequestEntry}
             pairType={KeyValueFormType.QUERY_PARAMS}
+            variables={variables}
           />
         ),
       },
@@ -70,6 +75,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setConten
             contentType={requestEntry.request.contentType}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
+            variables={variables}
           />
         ),
         disabled: !isRequestBodySupported,
@@ -82,6 +88,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setConten
             data={requestEntry.request.headers}
             setKeyValuePairs={setRequestEntry}
             pairType={KeyValueFormType.HEADERS}
+            variables={variables}
           />
         ),
       },
@@ -107,7 +114,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setConten
     }
 
     return items;
-  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts]);
+  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts, variables]);
 
   return (
     <Tabs

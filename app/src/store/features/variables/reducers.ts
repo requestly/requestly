@@ -5,6 +5,7 @@ import { InitialState } from "./types";
 const initialState = {
   currentEnvironment: "",
   environments: {},
+  api_collections: {},
 };
 
 const resetState = (): InitialState => initialState;
@@ -76,6 +77,16 @@ const updateEnvironmentName = (
   state.environments[action.payload.environmentId].name = action.payload.newName;
 };
 
+const setCollectionVariables = (
+  state: InitialState,
+  action: PayloadAction<{ collectionId: string; variables: EnvironmentVariables }>
+) => {
+  state.api_collections = {
+    ...state.api_collections,
+    [action.payload.collectionId]: { variables: action.payload.variables },
+  };
+};
+
 const environmentVariablesReducerFunctions = {
   addNewEnvironment,
   resetState,
@@ -85,6 +96,7 @@ const environmentVariablesReducerFunctions = {
   updateEnvironmentData,
   removeEnvironment,
   updateEnvironmentName,
+  setCollectionVariables,
 };
 
 export { initialState };
