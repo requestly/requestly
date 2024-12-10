@@ -24,6 +24,10 @@ interface KeyValueTableProps {
 export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValuePairs, pairType, variables }) => {
   const [tableData, setTableData] = useState<KeyValuePair[]>(data);
 
+  useEffect(() => {
+    setTableData(data);
+  }, [data]);
+
   const handleUpdateRequestPairs = useCallback(
     (prev: RQAPI.Entry, pairType: KeyValueFormType, action: "add" | "update" | "delete", pair?: KeyValuePair) => {
       const updatedRequest = { ...prev.request };

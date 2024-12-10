@@ -21,6 +21,7 @@ export interface KeyValuePair {
   key: string;
   value: string;
   isEnabled: boolean;
+  type?: string;
 }
 
 export enum KeyValueFormType {

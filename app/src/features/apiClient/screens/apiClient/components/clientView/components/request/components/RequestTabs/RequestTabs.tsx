@@ -8,6 +8,7 @@ import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEdi
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
+import AuthorizationView from "../AuthorizationView";
 
 enum Tab {
   QUERY_PARAMS = "query_params",
@@ -17,7 +18,7 @@ enum Tab {
   SCRIPTS = "scripts",
 }
 
-const LabelWithCount: React.FC<{ label: string; count: number; showDot?: boolean }> = ({ label, count, showDot }) => {
+const LabelWithCount: React.FC<{ label: string; count?: number; showDot?: boolean }> = ({ label, count, showDot }) => {
   return (
     <div className="request-tab-label">
       <span>{label}</span>
@@ -92,11 +93,11 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
           />
         ),
       },
-      // {
-      //   key: Tab.AUTHORIZATION,
-      //   label: "Authorization",
-      //   children: <div></div>,
-      // },
+      {
+        key: Tab.AUTHORIZATION,
+        label: <LabelWithCount label="Authorization" showDot={true} />,
+        children: <AuthorizationView requestHeaders={requestEntry.request.headers} setAuthHeaders={setRequestEntry} />,
+      },
     ];
 
     if (isScriptsSupported) {
