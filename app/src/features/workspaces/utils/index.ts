@@ -5,6 +5,11 @@ export const LOGGED_OUT_WORKSPACE_ID = "local";
 export const LoggedOutWorkspace: Workspace = {
   id: LOGGED_OUT_WORKSPACE_ID,
   name: "Private (Local)",
+  members: {},
+};
+
+export const isLocalWorkspace = (workspaceId: string) => {
+  return workspaceId === LOGGED_OUT_WORKSPACE_ID;
 };
 
 const PERSONAL_WORKSPACE_PREFIX = "personal-";

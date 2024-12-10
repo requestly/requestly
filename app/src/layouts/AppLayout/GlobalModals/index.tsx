@@ -3,6 +3,7 @@ import AuthModal from "components/authentication/AuthModal";
 import { globalActions } from "store/slices/global/slice";
 import { getActiveModals } from "store/slices/global/modals/selectors";
 import WorkspaceLoadingModal from "features/workspaces/modals/WorkspaceLoadingModal";
+import SwitchWorkspaceModal from "features/workspaces/modals/SwitchWorkspaceModal/SwitchWorkspaceModal";
 
 export const GlobalModals = () => {
   const dispatch = useDispatch();
@@ -28,6 +29,13 @@ export const GlobalModals = () => {
             dispatch(globalActions.toggleActiveModal({ modalName: "workspaceLoadingModal", newValue: false }))
           }
           {...activeModals.workspaceLoadingModal.props}
+        />
+      ) : null}
+      {activeModals.switchWorkspaceModal.isActive ? (
+        <SwitchWorkspaceModal
+          isOpen={activeModals.switchWorkspaceModal.isActive}
+          toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "switchWorkspaceModal" }))}
+          {...activeModals.switchWorkspaceModal.props}
         />
       ) : null}
     </>

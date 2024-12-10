@@ -14,7 +14,7 @@ import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sourc
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
 import CreateWorkspaceModal from "componentsV2/modals/CreateWorkspaceModal";
 import AddMemberModal from "features/settings/components/Profile/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
-import SwitchWorkspaceModal from "componentsV2/modals/SwitchWorkspaceModal/SwitchWorkspaceModal";
+import SwitchWorkspaceModal from "features/workspaces/modals/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
 import JoinWorkspaceModal from "componentsV2/modals/JoinWorkspaceModal";
 import { isAppOpenedInIframe } from "utils/AppUtils";
@@ -156,13 +156,6 @@ const DashboardContent = () => {
               isOpen={activeModals.inviteMembersModal.isActive}
               toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "inviteMembersModal" }))}
               {...activeModals.inviteMembersModal.props}
-            />
-          ) : null}
-          {activeModals.switchWorkspaceModal.isActive ? (
-            <SwitchWorkspaceModal
-              isOpen={activeModals.switchWorkspaceModal.isActive}
-              toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "switchWorkspaceModal" }))}
-              {...activeModals.switchWorkspaceModal.props}
             />
           ) : null}
           {activeModals.joinWorkspaceModal.isActive ? (

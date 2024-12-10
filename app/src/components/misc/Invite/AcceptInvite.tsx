@@ -2,7 +2,7 @@ import { Avatar, Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUniqueColorForWorkspace } from "utils/teams";
+import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 import { toast } from "utils/Toast";
 import "./index.css";
 import { redirectToTeam } from "utils/RedirectionUtils";

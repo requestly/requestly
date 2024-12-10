@@ -8,7 +8,7 @@ import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { getIsMiscTourCompleted } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { getUniqueColorForWorkspace } from "utils/teams";
+import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 import APP_CONSTANTS from "config/constants";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";

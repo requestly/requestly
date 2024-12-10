@@ -1,13 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { getActiveWorkspaceIds, getAllWorkspaces, getIsWorkspacesFetched } from "store/slices/workspaces/selectors";
 import { useAvailableWorkspacesListener } from "./useAvailableTeamsListener";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { workspaceManager } from "../helpers/workspaceManager";
 import { getAppMode } from "store/selectors";
-import { getPersonalWorkspaceId, LOGGED_OUT_WORKSPACE_ID } from "../utils";
-import { Workspace } from "../types";
+import { LOGGED_OUT_WORKSPACE_ID } from "../utils";
 import { workspaceActions } from "store/slices/workspaces/slice";
+import { globalActions } from "store/slices/global/slice";
 
 export const useWorkspaceManager = () => {
   const dispatch = useDispatch();
@@ -49,6 +49,7 @@ export const useWorkspaceManager = () => {
   }, []);
 
   const initialWorkspacesSelector = useCallback(() => {
+    dispatch(globalActions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: false }));
     console.log("[useWorkspaceManager].initialWorkspacesSelector", { isFirstInitDone: isFirstInitDone.current });
     if (!isFirstInitDone.current) {
       // Cached Workspaces
@@ -79,13 +80,14 @@ export const useWorkspaceManager = () => {
       }
     } else {
       if (activeWorkspaceIds.length === 0) {
-        console.log("[useWorkspaceManager].initialWorkspacesSelector . No active Workspace selected", {
+        console.log("[useWorkspaceManager].initialWorkspacesSelector . Cant select Workspace automatically", {
           isFirstInitDone,
         });
-        // TODO-syncing: Show workspace selector modal.
+
+        dispatch(globalActions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: true }));
       }
     }
-  }, [activeWorkspaceIds, fetchUnattemptedWorkspaceId, isWorkspacesFetched]);
+  }, [activeWorkspaceIds, dispatch, fetchUnattemptedWorkspaceId, isWorkspacesFetched]);
 
   useEffect(initialWorkspacesSelector, [initialWorkspacesSelector]);
 

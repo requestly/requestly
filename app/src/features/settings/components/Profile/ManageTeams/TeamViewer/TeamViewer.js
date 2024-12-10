@@ -7,7 +7,7 @@ import MembersDetails from "./MembersDetails";
 import TeamSettings from "./TeamSettings";
 import BillingDetails from "./BillingDetails";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { getUniqueColorForWorkspace } from "utils/teams";
+import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 import { trackWorkspaceSettingToggled } from "modules/analytics/events/common/teams";
 import SwitchWorkspaceButton from "./SwitchWorkspaceButton";
 import { useIsTeamAdmin } from "./hooks/useIsTeamAdmin";
