@@ -94,6 +94,7 @@ const sendStartRecordingEvent = async (sessionRecordingConfig: SessionRecordingC
     maxDuration: (sessionRecordingConfig.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
     previousSession: !isIFrame ? previousSession : null,
     localStorage: true,
+    enableHeadersCapture: sessionRecordingConfig?.captureHeaders,
   });
 
   sessionRecorderState.isExplicitRecording = explicit;
