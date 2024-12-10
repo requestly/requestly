@@ -1,47 +1,7 @@
-import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
-import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
 // @ts-ignore
-import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
-
-export const makeRequest = async (
-  appMode: string,
-  request: RQAPI.Request,
-  signal?: AbortSignal
-): Promise<RQAPI.Response> => {
-  return new Promise((resolve, reject) => {
-    if (signal) {
-      if (signal.aborted) {
-        reject();
-      }
-
-      const abortListener = () => {
-        signal.removeEventListener("abort", abortListener);
-        reject();
-      };
-      signal.addEventListener("abort", abortListener);
-    }
-
-    if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
-      getAPIResponseViaExtension(request).then(resolve);
-    } else if (appMode === CONSTANTS.APP_MODES.DESKTOP) {
-      getAPIResponseViaProxy(request).then(resolve);
-    } else {
-      resolve(null);
-    }
-  });
-};
-
-// TODO: move this into top level common folder
-export const addUrlSchemeIfMissing = (url: string): string => {
-  if (url && !/^([a-z][a-z0-9+\-.]*):\/\//.test(url)) {
-    return "http://" + url;
-  }
-
-  return url;
-};
 
 export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
   return {

@@ -13,7 +13,6 @@ import {
 } from "../../utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
-  trackAPIRequestCancelled,
   trackRequestFailed,
   trackResponseLoaded,
   trackInstallExtensionDialogShown,
@@ -42,8 +41,8 @@ import { RQSingleLineEditor } from "features/apiClient/screens/environment/compo
 import { BottomSheetLayout, BottomSheetProvider, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
-import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { useAPIClientRequest } from "features/apiClient/hooks/useAPIClientRequest";
 
 interface Props {
   openInModal?: boolean;
@@ -70,6 +69,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   const { toggleBottomSheet } = useBottomSheetContext();
   const { onSaveRecord } = useApiClientContext();
+  const { abortRequest, executeRequest } = useAPIClientRequest();
   const environmentManager = useEnvironmentManager();
   const { getVariablesWithPrecedence } = environmentManager;
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
@@ -228,20 +228,20 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    executeAPIRequest(
+    executeRequest({
+      entry: sanitizedEntry,
       appMode,
-      sanitizedEntry,
       environmentManager,
-      abortControllerRef.current.signal,
-      apiEntryDetails?.collectionId
-    )
-      .then((entry) => {
+      collectionId: apiEntryDetails?.collectionId,
+    })
+      .then((requestExecutionResult) => {
+        const entry = requestExecutionResult.data;
         const response = entry.response;
         // TODO: Add an entry in history
         const entryWithResponse = { ...sanitizedEntry, response };
         const renderedEntryWithResponse = { ...entry, response };
 
-        if (response) {
+        if (requestExecutionResult.success && response) {
           setEntry(entryWithResponse);
           trackResponseLoaded({
             type: getContentTypeFromResponseHeaders(response.headers),
@@ -250,11 +250,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
           trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
         } else {
-          const erroredEntry = entry as RQAPI.RequestErrorEntry;
-
           setIsFailed(true);
-          setError(erroredEntry?.error ?? null);
-          if (erroredEntry?.error) {
+          setError(requestExecutionResult?.error ?? null);
+          if (requestExecutionResult?.error) {
             Sentry.withScope((scope) => {
               scope.setTag("error_type", "api_request_failure");
               scope.setContext("request_details", {
@@ -263,9 +261,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                 headers: sanitizedEntry.request.headers,
                 queryParams: sanitizedEntry.request.queryParams,
               });
-              scope.setFingerprint(["api_request_error", sanitizedEntry.request.method, erroredEntry.error.source]);
+              scope.setFingerprint([
+                "api_request_error",
+                sanitizedEntry.request.method,
+                requestExecutionResult.error.source,
+              ]);
               Sentry.captureException(
-                new Error(`API Request Failed: ${erroredEntry.error.message || "Unknown error"}`)
+                new Error(`API Request Failed: ${requestExecutionResult.error.message || "Unknown error"}`)
               );
             });
           }
@@ -293,6 +295,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     dispatch,
     entry,
     environmentManager,
+    executeRequest,
     notifyApiRequestFinished,
     toggleBottomSheet,
   ]);
@@ -357,11 +360,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsRequestSaving(false);
   };
 
-  const cancelRequest = useCallback(() => {
-    abortControllerRef.current?.abort();
-    trackAPIRequestCancelled();
-  }, []);
-
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
     (evt.target as HTMLInputElement).blur();
   }, []);
@@ -387,7 +385,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               isLoading={isLoadingResponse}
               isFailed={isFailed}
               isRequestCancelled={isRequestCancelled}
-              onCancelRequest={cancelRequest}
+              onCancelRequest={abortRequest}
               error={error}
             />
           }

@@ -1,7 +1,7 @@
 import { Avatar } from "antd";
 import React, { CSSProperties, useEffect, useMemo, useState } from "react";
 import { debounce } from "lodash";
-import { addUrlSchemeIfMissing } from "features/apiClient/screens/apiClient/utils";
+import { addUrlSchemeIfMissing } from "features/apiClient/helpers/APIClientManager";
 
 const FAVICON_SIZE = {
   small: 16,
