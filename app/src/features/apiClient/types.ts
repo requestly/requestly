@@ -88,6 +88,12 @@ export namespace RQAPI {
     };
   }
 
+  export interface BreadcrumbOptions {
+    id: string;
+    name: string;
+    type: RecordType.API | RecordType.COLLECTION;
+  }
+
   interface RecordMetadata {
     id: string;
     name: string;
@@ -99,6 +105,7 @@ export namespace RQAPI {
     updatedBy: string;
     createdTs: number;
     updatedTs: number;
+    breadcrumbOptions?: BreadcrumbOptions[];
   }
 
   export interface ApiRecord extends RecordMetadata {

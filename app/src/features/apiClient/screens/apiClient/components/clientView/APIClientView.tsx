@@ -10,6 +10,7 @@ import {
   getEmptyPair,
   sanitizeKeyValuePairs,
   supportsRequestBody,
+  getBreadCrumbOptions,
 } from "../../utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
@@ -69,7 +70,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const teamId = workspace?.id;
 
   const { toggleBottomSheet } = useBottomSheetContext();
-  const { onSaveRecord } = useApiClientContext();
+  const { onSaveRecord, recordsMap } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const { getCurrentEnvironmentVariables } = environmentManager;
 
@@ -359,6 +360,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             recordName={apiEntryDetails?.name}
             onRecordNameUpdate={setRequestName}
             onBlur={handleRecordNameUpdate}
+            breadcrumbOptions={getBreadCrumbOptions(recordsMap[apiEntryDetails?.id])}
           />
         ) : null}
       </div>

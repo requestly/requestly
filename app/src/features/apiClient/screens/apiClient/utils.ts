@@ -5,6 +5,7 @@ import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../ty
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
+import PATHS from "config/constants/sub/paths";
 
 export const makeRequest = async (
   appMode: string,
@@ -155,6 +156,21 @@ export const isApiCollection = (record: RQAPI.Record) => {
 
 export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
   const recordsCopy = [...records];
+
+  const getCollectionDepth = (record: RQAPI.Record, records: RQAPI.Record[], depth: number = 0): number => {
+    if (!record.collectionId) {
+      return depth;
+    }
+    const parent = records.find((rec) => rec.id === record.collectionId);
+    return parent ? getCollectionDepth(parent, records, depth + 1) : depth;
+  };
+
+  recordsCopy.sort((a, b) => {
+    const depthA = getCollectionDepth(a, records);
+    const depthB = getCollectionDepth(b, records);
+    return depthA - depthB;
+  });
+
   const recordsMap: Record<string, RQAPI.Record> = {};
   const updatedRecords: RQAPI.Record[] = [];
 
@@ -163,9 +179,10 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
       recordsMap[record.id] = {
         ...record,
         data: { ...record.data, children: [] },
+        breadcrumbOptions: [],
       };
     } else if (isApiRequest(record)) {
-      recordsMap[record.id] = record;
+      recordsMap[record.id] = { ...record, breadcrumbOptions: [] };
     }
   });
 
@@ -175,12 +192,30 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
       const parentNode = recordsMap[record.collectionId] as RQAPI.CollectionRecord;
       if (parentNode) {
         parentNode.data.children.push(recordState);
+        const getBreadCrumbOptions = recordsMap[parentNode.id].breadcrumbOptions || [];
+        recordState.breadcrumbOptions = [
+          ...getBreadCrumbOptions,
+          { id: parentNode.id, name: parentNode.name, type: parentNode.type },
+        ];
       }
     } else {
       updatedRecords.push(recordState);
     }
   });
 
-  return updatedRecords;
+  return { updatedRecords, recordsMap };
 };
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
+
+export const getBreadCrumbOptions = (record: RQAPI.Record) => {
+  const options = record?.breadcrumbOptions || [];
+  const formattedOptions = [
+    ...options.map((option) => ({
+      pathname: `${PATHS.API_CLIENT.INDEX}/${option.type}/${option.id}`,
+      label: option.name,
+      disabled: option.type === RQAPI.RecordType.COLLECTION,
+    })),
+  ];
+
+  return formattedOptions;
+};
