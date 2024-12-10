@@ -8,11 +8,13 @@ import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
 import { CONSTANTS } from "@requestly/requestly-core";
+import { VariableKeyValuePairs } from "backend/environment/types";
 
-interface APIRequestConfig {
+export interface APIRequestConfig {
   entry: RQAPI.Entry;
   appMode: string;
-  environmentManager: any;
+  currentEnvironmentId: string;
+  setVariables?: (variables: VariableKeyValuePairs) => Promise<void>;
   signal?: AbortSignal;
   collectionId?: string;
 }
@@ -29,7 +31,7 @@ interface RequestExecutionResult {
 
 export class APIClientManager {
   private config: APIRequestConfig;
-  private currentVariables: Record<string, any>;
+  private currentVariables: VariableKeyValuePairs;
   private renderedRequest: RQAPI.Request;
   private response: RQAPI.Response;
 
@@ -39,25 +41,19 @@ export class APIClientManager {
   }
 
   private prepareRequest() {
-    const { renderedTemplate, variables } = this.config.environmentManager.renderVariables(
-      this.config.entry.request,
-      this.config.collectionId
-    );
-    this.currentVariables = variables;
-    this.renderedRequest = renderedTemplate;
+    this.renderedRequest = renderTemplate(this.config.entry.request, this.currentVariables);
   }
 
   private async executePreRequestScript(): Promise<void> {
     if (!this.config.entry.scripts.preRequest) return;
 
-    const { updatedVariables } = await executePrerequestScript(
+    await executePrerequestScript(
       this.config.entry.scripts.preRequest,
       this.renderedRequest,
-      this.config.environmentManager,
-      this.currentVariables
+      this.currentVariables,
+      this.config.currentEnvironmentId,
+      this.config.setVariables
     );
-
-    this.currentVariables = updatedVariables;
     this.renderedRequest = renderTemplate(this.config.entry.request, this.currentVariables);
   }
 
@@ -75,8 +71,9 @@ export class APIClientManager {
     await executePostresponseScript(
       this.config.entry.scripts.postResponse,
       { response, request: this.renderedRequest },
-      this.config.environmentManager,
-      this.currentVariables
+      this.currentVariables,
+      this.config.currentEnvironmentId,
+      this.config.setVariables
     );
   }
 
@@ -167,6 +164,10 @@ export class APIClientManager {
         request: this.renderedRequest,
       },
     };
+  }
+
+  setCurrentVariables(variables: VariableKeyValuePairs) {
+    this.currentVariables = variables;
   }
 }
 

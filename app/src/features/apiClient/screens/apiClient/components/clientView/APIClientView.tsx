@@ -71,7 +71,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const { onSaveRecord } = useApiClientContext();
   const { abortRequest, executeRequest } = useAPIClientRequest();
   const environmentManager = useEnvironmentManager();
-  const { getVariablesWithPrecedence } = environmentManager;
+  const { getVariablesWithPrecedence, getCurrentEnvironment } = environmentManager;
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
     apiEntryDetails?.collectionId,
     getVariablesWithPrecedence,
@@ -85,7 +85,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
 
-  const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const animationTimerRef = useRef<NodeJS.Timeout>();
 
@@ -220,8 +219,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     const sanitizedEntry = sanitizeEntry(entry);
     sanitizedEntry.response = null;
 
-    abortControllerRef.current = new AbortController();
-
     setIsFailed(false);
     setError(null);
     setEntry(sanitizedEntry);
@@ -231,8 +228,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     executeRequest({
       entry: sanitizedEntry,
       appMode,
-      environmentManager,
       collectionId: apiEntryDetails?.collectionId,
+      currentEnvironmentId: getCurrentEnvironment().currentEnvironmentId,
     })
       .then((requestExecutionResult) => {
         const entry = requestExecutionResult.data;
@@ -277,13 +274,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         }
         notifyApiRequestFinished?.(renderedEntryWithResponse);
       })
-      .catch(() => {
-        if (abortControllerRef.current?.signal.aborted) {
-          setIsRequestCancelled(true);
-        }
-      })
       .finally(() => {
-        abortControllerRef.current = null;
         setIsLoadingResponse(false);
       });
 
@@ -294,8 +285,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     appMode,
     dispatch,
     entry,
-    environmentManager,
     executeRequest,
+    getCurrentEnvironment,
     notifyApiRequestFinished,
     toggleBottomSheet,
   ]);

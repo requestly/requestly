@@ -1,4 +1,4 @@
-import { EnvironmentVariables } from "backend/environment/types";
+import { EnvironmentVariables, VariableKeyValuePairs } from "backend/environment/types";
 import { RQAPI } from "../../../../types";
 import { requestWorkerFunction, responseWorkerFunction } from "./workerScripts";
 import { ScriptExecutedPayload } from "./types";
@@ -21,15 +21,19 @@ const createWorker = (workerFn: Function) => {
   return new Worker(URL.createObjectURL(blob));
 };
 
-const handleEnvironmentChanges = async (
-  environmentManager: any,
+const handleVariableChanges = async (
   payload: {
     mutations: ScriptExecutedPayload["mutations"];
     currentVariables: EnvironmentVariables;
-  }
+  },
+  helperMethods?: any
 ) => {
+  console.log("!!!debug", "payload", {
+    payload,
+    helperMethods,
+  });
   const currentVars = payload.currentVariables;
-  const currentEnvironmentId = environmentManager.getCurrentEnvironment().currentEnvironmentId;
+  const currentEnvironmentId = helperMethods.currentEnvironmentId;
 
   if (isEmpty(payload.mutations.environment.$set) && isEmpty(payload.mutations.environment.$unset)) {
     return {
@@ -37,43 +41,17 @@ const handleEnvironmentChanges = async (
     };
   }
 
-  const variablesToSet = {
-    ...currentVars,
-    ...Object.fromEntries(
-      Object.entries(payload.mutations.environment.$set).map(([key, value]) => {
-        if (currentVars[key]) {
-          return [
-            key,
-            {
-              syncValue: currentVars[key].syncValue,
-              localValue: value,
-            },
-          ];
-        }
-
-        return [
-          key,
-          {
-            syncValue: value,
-            localValue: value,
-          },
-        ];
-      })
-    ),
-  };
+  const variablesToUpsert = { ...payload.mutations.environment.$set };
 
   Object.keys(payload.mutations.environment.$unset).forEach((key) => {
-    delete variablesToSet[key];
+    delete variablesToUpsert[key];
   });
 
   if (!currentEnvironmentId) {
     throw new Error("No environment available to access the variables.");
   }
 
-  await environmentManager.setVariables(currentEnvironmentId, variablesToSet);
-  return {
-    updatedVariables: variablesToSet,
-  };
+  return helperMethods.setVariables(variablesToUpsert);
 };
 
 const cleanupWorker = (worker: Worker | null) => {
@@ -82,20 +60,14 @@ const cleanupWorker = (worker: Worker | null) => {
   }
 };
 
-const messageHandler = async (
-  worker: Worker,
-  environmentManager: any,
-  event: MessageEvent,
-  resolve: any,
-  reject: any
-) => {
+const messageHandler = async (worker: Worker, event: MessageEvent, resolve: any, reject: any, helperMethods?: any) => {
   const { type, payload } = event.data as WorkerMessage;
 
   switch (type) {
     case "SCRIPT_EXECUTED": {
-      handleEnvironmentChanges(environmentManager, payload)
-        .then((updatedVariables) => {
-          resolve(updatedVariables);
+      handleVariableChanges(payload, helperMethods)
+        .then(() => {
+          resolve();
         })
         .catch((e) => {
           reject(e);
@@ -116,15 +88,21 @@ const messageHandler = async (
 export const executePrerequestScript = (
   script: string,
   request: RQAPI.Request,
-  environmentManager: any,
-  currentEnvironmentVariables: EnvironmentVariables
+  currentEnvironmentVariables: VariableKeyValuePairs,
+  currentEnvironmentId: string,
+  setVariables: (variables: VariableKeyValuePairs) => Promise<void>
 ): Promise<EnvironmentVariables | null> => {
   let worker: Worker | null = null;
 
   return new Promise((resolve, reject) => {
     worker = createWorker(requestWorkerFunction);
 
-    worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event, resolve, reject);
+    const helperMethods = {
+      currentEnvironmentId,
+      setVariables,
+    };
+
+    worker.onmessage = (event: MessageEvent) => messageHandler(worker, event, resolve, reject, helperMethods);
 
     worker.onerror = (error) => {
       cleanupWorker(worker);
@@ -136,6 +114,7 @@ export const executePrerequestScript = (
       script,
       request: request,
       currentVariables: currentEnvironmentVariables,
+      currentEnvironmentId,
     });
 
     setTimeout(() => {
@@ -150,15 +129,21 @@ export const executePostresponseScript = (
     request: RQAPI.Request;
     response: RQAPI.Response;
   },
-  environmentManager: any,
-  currentEnvironmentVariables: EnvironmentVariables
+  currentEnvironmentVariables: VariableKeyValuePairs,
+  currentEnvironmentId: string,
+  setVariables: (variables: VariableKeyValuePairs) => Promise<void>
 ) => {
   let worker: Worker | null = null;
 
   return new Promise((resolve, reject) => {
     worker = createWorker(responseWorkerFunction);
 
-    worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event, resolve, reject);
+    const helperMethods = {
+      currentEnvironmentId,
+      setVariables,
+    };
+
+    worker.onmessage = (event: MessageEvent) => messageHandler(worker, event, resolve, reject, helperMethods);
 
     worker.onerror = (error) => {
       console.error("Response Worker error:", error);
@@ -171,6 +156,7 @@ export const executePostresponseScript = (
       request: APIDetails.request,
       response: APIDetails.response,
       currentVariables: currentEnvironmentVariables,
+      currentEnvironmentId,
     });
 
     setTimeout(() => {

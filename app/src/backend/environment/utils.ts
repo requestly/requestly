@@ -1,18 +1,9 @@
 import { compile } from "handlebars";
-import { EnvironmentVariables, EnvironmentVariableValue } from "./types";
+import { EnvironmentVariables, VariableKeyValuePairs } from "./types";
 import Logger from "lib/logger";
 import { isEmpty } from "lodash";
 
-type Variables = Record<string, string | number | boolean>;
-
-export const renderTemplate = (
-  template: string | Record<string, any>,
-  variables: Record<string, EnvironmentVariableValue> = {}
-): any => {
-  if (!variables || Object.keys(variables).length === 0) {
-    return template;
-  }
-
+export const parseVariableValues = (variables: EnvironmentVariables) => {
   const parsedVariables = Object.entries(variables).reduce((envVars, [key, value]) => {
     if (typeof value.localValue === "number") {
       envVars[key] = value.localValue ?? value.syncValue;
@@ -21,12 +12,23 @@ export const renderTemplate = (
     }
 
     return envVars;
-  }, {} as Variables);
+  }, {} as VariableKeyValuePairs);
+
+  return parsedVariables;
+};
+
+export const renderTemplate = (
+  template: string | Record<string, any>,
+  parsedVariables: VariableKeyValuePairs = {}
+): any => {
+  if (!parsedVariables || Object.keys(parsedVariables).length === 0) {
+    return template;
+  }
 
   return recursiveRender(template, parsedVariables);
 };
 
-const recursiveRender = (input: string | Record<string, any>, variables: Variables): any => {
+const recursiveRender = (input: string | Record<string, any>, variables: VariableKeyValuePairs): any => {
   if (typeof input === "string") {
     try {
       const wrappedTemplate = wrapUnexpectedTemplateCaptures(input, variables);
