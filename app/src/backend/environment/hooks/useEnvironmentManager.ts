@@ -135,7 +135,6 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     if (ownerId) {
       unsubscribeCollectionListener?.();
       unsubscribeCollectionListener = attachCollectionVariableListener(ownerId, (collectionDetails) => {
-        console.log("collectionDetails", collectionDetails);
         Object.keys(collectionDetails).forEach((collectionId) => {
           const mergedCollectionVariables = mergeLocalAndSyncVariables(
             collectionVariables[collectionId]?.variables ?? {},
