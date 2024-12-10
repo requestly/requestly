@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useCallback, useState } from "react";
-import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType } from "../types";
+import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllEnvironmentData,
@@ -24,13 +24,19 @@ import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import { isEmpty } from "lodash";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { useApiClientContext } from "features/apiClient/contexts";
+import { RQAPI } from "features/apiClient/types";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
 
+// higher precedence is given to environment variables
+const VARIABLES_PRECEDENCE_ORDER = ["ENVIRONMENT", "COLLECTION"];
+
 const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const { apiClientRecords } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -150,6 +156,8 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     return () => {
       unsubscribeCollectionListener?.();
     };
+    // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ownerId, dispatch]);
 
   useEffect(() => {
@@ -209,12 +217,60 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     [ownerId, dispatch]
   );
 
-  const renderVariables = useCallback(
-    <T>(template: string | Record<string, any>): T => {
+  const getVariablesWithPrecedence = useCallback(
+    (currentCollectionId: string): Record<string, EnvironmentVariableValue> => {
+      const allVariables: Record<string, EnvironmentVariableValue> = {};
+
+      // Function to get all parent collection variables recursively
+      const getParentVariables = (collectionId: string) => {
+        const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+        if (!collection) return;
+
+        // Add current collection's variables
+        Object.entries(collectionVariables[collection.id]?.variables || {}).forEach(([key, value]) => {
+          // Only add if not already present (maintain precedence)
+          if (!(key in allVariables)) {
+            allVariables[key] = value;
+          }
+        });
+
+        // Recursively get parent variables
+        if (collection.collectionId) {
+          getParentVariables(collection.collectionId);
+        }
+      };
+
       const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId]?.variables;
-      return renderTemplate(template, currentEnvironmentVariables);
+      Object.entries(currentEnvironmentVariables || {}).forEach(([key, value]) => {
+        // environment variables (highest precedence)
+        if (VARIABLES_PRECEDENCE_ORDER[0] === "ENVIRONMENT") {
+          allVariables[key] = value;
+        } else {
+          if (!(key in allVariables)) {
+            allVariables[key] = value;
+          }
+        }
+      });
+
+      // Get collection hierarchy variables
+      getParentVariables(currentCollectionId);
+
+      return allVariables;
     },
-    [allEnvironmentData, currentEnvironmentId]
+    [allEnvironmentData, apiClientRecords, currentEnvironmentId, collectionVariables]
+  );
+
+  const renderVariables = useCallback(
+    (template: string | Record<string, any>, requestCollectionId: string = "") => {
+      const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
+      const renderedTemplate = renderTemplate(template, variablesWithPrecedence);
+
+      return {
+        renderedTemplate,
+        variables: variablesWithPrecedence,
+      };
+    },
+    [getVariablesWithPrecedence]
   );
 
   const getEnvironmentVariables = useCallback(
@@ -305,6 +361,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     renameEnvironment,
     duplicateEnvironment,
     deleteEnvironment,
+    getVariablesWithPrecedence,
     isEnvironmentsLoading: isLoading,
   };
 };
