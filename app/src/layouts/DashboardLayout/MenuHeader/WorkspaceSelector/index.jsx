@@ -57,7 +57,6 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
   const activeWorkspace = useSelector(getWorkspaceById(activeWorkspaceId));
 
   const activeWorkspaceName = activeWorkspace?.name || "";
-  console.log({ activeWorkspace });
 
   const handleWorkspaceDropdownClick = (open) => {
     if (open) {

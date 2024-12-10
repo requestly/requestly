@@ -10,6 +10,7 @@ export const useWorkspaceHelpers = () => {
     // // 2. Clear
     // StorageService(appMode).clearDB();
 
+    console.log("[useWorkspaceHelpers.switchWorkspace]", { workspaceId });
     dispatch(environmentVariablesActions.resetState());
     workspaceManager.initActiveWorkspaces([workspaceId]);
   };

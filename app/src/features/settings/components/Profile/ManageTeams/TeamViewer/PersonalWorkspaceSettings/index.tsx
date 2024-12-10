@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import SettingsItem from "features/settings/components/GlobalSettings/components/SettingsItem";
 import { getWorkspaceById } from "store/slices/workspaces/selectors";
 import { useSelector } from "react-redux";
-import { changeWorkspaceSyncState } from "backend/workspace";
+import { setWorkspaceSyncState } from "backend/workspace";
 
 interface Props {
   teamId: string;
@@ -18,7 +18,7 @@ const PersonalWorkspaceSettings: React.FC<Props> = ({ teamId }) => {
 
   useEffect(() => {
     setIsSyncEnabledLocal(isSyncEnabled);
-  }, []);
+  }, [isSyncEnabled]);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,7 +26,7 @@ const PersonalWorkspaceSettings: React.FC<Props> = ({ teamId }) => {
     (status: boolean) => {
       setIsLoading(true);
       setIsSyncEnabledLocal(status);
-      changeWorkspaceSyncState(teamId, status)
+      setWorkspaceSyncState(teamId, status)
         .then(() => {
           setIsLoading(false);
         })
