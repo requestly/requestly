@@ -85,14 +85,21 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
   }, []);
 
   const replaceTab = useCallback(
-    (tabId: TabsLayout.Tab["id"], newTabData?: Partial<TabsLayout.Tab>) => {
+    (tabId: TabsLayout.Tab["id"], newTabData: Partial<TabsLayout.Tab>) => {
+      const existingTab = tabs.find((tab) => tab.id === tabId);
+
+      if (!existingTab) {
+        openTab(newTabData.id, newTabData);
+        return;
+      }
+
       setTabs((prev) => prev.map((tab) => (tab.id === tabId ? { ...tab, ...newTabData } : tab)));
 
       if (tabId === activeTab?.id) {
         updateActivetab({ ...activeTab, ...newTabData } as TabsLayout.Tab);
       }
     },
-    [activeTab, updateActivetab]
+    [tabs, activeTab, updateActivetab, openTab]
   );
 
   const value = { activeTab, tabs, openTab, closeTab, updateTab, replaceTab, tabOutletElementsMap };

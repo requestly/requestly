@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useCallback, useState } from "react";
 import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType } from "../types";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllEnvironmentData, getCurrentEnvironmentId } from "store/features/environment/selectors";
+import {
+  getAllEnvironmentData,
+  getCollectionVariables,
+  getCurrentEnvironmentId,
+} from "store/features/environment/selectors";
 import { environmentVariablesActions } from "store/features/environment/slice";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
@@ -14,6 +18,7 @@ import {
   updateEnvironmentNameInDB,
   duplicateEnvironmentInDB,
   deleteEnvironmentFromDB,
+  attachCollectionVariableListener,
 } from "..";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
@@ -21,6 +26,7 @@ import { isEmpty } from "lodash";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 let unsubscribeListener: () => void = null;
+let unsubscribeCollectionListener: () => void = null;
 
 const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const dispatch = useDispatch();
@@ -30,6 +36,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
+  const collectionVariables = useSelector(getCollectionVariables);
 
   const ownerId = useMemo(
     () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
@@ -123,6 +130,27 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentEnvironmentId, dispatch, initListenerAndFetcher, ownerId]);
+
+  useEffect(() => {
+    if (ownerId) {
+      unsubscribeCollectionListener?.();
+      unsubscribeCollectionListener = attachCollectionVariableListener(ownerId, (collectionDetails) => {
+        Object.keys(collectionDetails).forEach((collectionId) => {
+          const mergedCollectionVariables = mergeLocalAndSyncVariables(
+            collectionVariables[collectionId]?.variables ?? {},
+            collectionDetails[collectionId].variables ?? {}
+          );
+          dispatch(
+            environmentVariablesActions.setCollectionVariables({ collectionId, variables: mergedCollectionVariables })
+          );
+        });
+      });
+    }
+
+    return () => {
+      unsubscribeCollectionListener?.();
+    };
+  }, [ownerId, dispatch]);
 
   useEffect(() => {
     if (!user.loggedIn) {

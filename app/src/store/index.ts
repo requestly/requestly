@@ -24,7 +24,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.RULES]: recordsReducer, // SLICE ALSO CONTAINS GROUP RECORDS
     [ReducerKeys.BILLING]: billingReducer,
     [ReducerKeys.INCENTIVIZATION]: incentivizationReducer,
-    [ReducerKeys.ENVIRONMENT]: environmentVariablesReducer,
+    [ReducerKeys.VARIABLES]: environmentVariablesReducer,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will

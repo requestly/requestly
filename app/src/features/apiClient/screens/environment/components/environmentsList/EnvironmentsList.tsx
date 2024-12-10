@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { Input } from "antd";
@@ -18,7 +18,6 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
-  const { envId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,20 +64,18 @@ export const EnvironmentsList = () => {
         setCurrentEnvironment(newEnvironment.id);
       }
 
-      if (envId === "new") {
-        replaceTab("environments/new", {
-          id: newEnvironment.id,
-          title: newEnvironment.name,
-          url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${newEnvironment.id}`,
-        });
-      }
+      replaceTab("environments/new", {
+        id: newEnvironment.id,
+        title: newEnvironment.name,
+        url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${newEnvironment.id}`,
+      });
 
       trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
     }
     setIsLoading(false);
     setIsNewEnvironmentInputVisible(false);
     setNewEnvironmentValue("");
-  }, [addNewEnvironment, environments.length, newEnvironmentValue, setCurrentEnvironment, replaceTab, envId]);
+  }, [addNewEnvironment, environments.length, newEnvironmentValue, setCurrentEnvironment, replaceTab]);
 
   useEffect(() => {
     if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE) && user.loggedIn) {

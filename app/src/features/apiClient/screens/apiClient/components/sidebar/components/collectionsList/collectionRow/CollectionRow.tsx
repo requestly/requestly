@@ -12,6 +12,7 @@ import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
+import PATHS from "config/constants/sub/paths";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -80,11 +81,16 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
           onChange={(keys) => {
             setActiveKey(keys[0]);
           }}
+          collapsible={activeKey === record.id ? "icon" : "header"}
           defaultActiveKey={[record.id]}
           ghost
           className="collections-list-item collection"
           expandIcon={({ isActive }) => {
-            return isActive ? <PiFolderOpen /> : <MdOutlineFolder />;
+            return isActive ? (
+              <PiFolderOpen className="collection-expand-icon" />
+            ) : (
+              <MdOutlineFolder className="collection-expand-icon" />
+            );
           }}
         >
           <Collapse.Panel
@@ -94,6 +100,12 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                 className="collection-name-container"
                 onMouseEnter={setHoveredId.bind(this, record.id)}
                 onMouseLeave={setHoveredId.bind(this, "")}
+                onClick={() => {
+                  openTab(record.id, {
+                    title: record.name || "New Collection",
+                    url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${record.id}`,
+                  });
+                }}
               >
                 <div className="collection-name" title={record.name}>
                   {record.name}

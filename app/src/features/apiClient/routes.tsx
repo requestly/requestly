@@ -9,6 +9,7 @@ import { EnvironmentContainer } from "./screens/environment/container";
 import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImporterView";
 import { TabOutletHOC } from "layouts/TabsLayout/hoc/TabOutletHOC";
 import { APIClientEmptyView } from "./screens/apiClient/components/sidebar/components/APIClientEmptyView/APIClientEmptyView";
+import { CollectionView } from "./screens/apiClient/components/clientView/components/Collection/CollectionView";
 
 export const apiClientRoutes: RouteObject[] = [
   {
@@ -46,13 +47,13 @@ export const apiClientRoutes: RouteObject[] = [
         path: PATHS.API_CLIENT.COLLECTION.INDEX,
         element: (
           <TabOutletHOC>
-            <ProtectedRoute component={APIClient} />
+            <ProtectedRoute component={CollectionView} />
           </TabOutletHOC>
         ),
         handle: {
           breadcrumb: {
-            label: "Request", // TODO: Fix, change it to collection, when collection view is added
-            isEditable: false,
+            label: "Collection", // TODO: Fix, change it to collection, when collection view is added
+            isEditable: true,
           },
         },
       },
