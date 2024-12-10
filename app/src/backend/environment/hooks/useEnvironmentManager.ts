@@ -30,6 +30,9 @@ import { RQAPI } from "features/apiClient/types";
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
 
+// higher precedence is given to environment variables
+const VARIABLES_PRECEDENCE_ORDER = ["ENVIRONMENT", "COLLECTION"];
+
 const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -238,9 +241,15 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       };
 
       const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId]?.variables;
-      // environment variables (highest precedence)
       Object.entries(currentEnvironmentVariables || {}).forEach(([key, value]) => {
-        allVariables[key] = value;
+        // environment variables (highest precedence)
+        if (VARIABLES_PRECEDENCE_ORDER[0] === "ENVIRONMENT") {
+          allVariables[key] = value;
+        } else {
+          if (!(key in allVariables)) {
+            allVariables[key] = value;
+          }
+        }
       });
 
       // Get collection hierarchy variables
