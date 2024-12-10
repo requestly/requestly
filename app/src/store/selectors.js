@@ -176,6 +176,10 @@ export const getDesktopSpecificDetails = (state) => {
   return getGlobalState(state)["desktopSpecificDetails"];
 };
 
+export const getDesktopSpecificAppDetails = (state, appId) => {
+  return getDesktopSpecificDetails(state)?.["appsList"]?.[appId];
+};
+
 export const getUserCountry = (state) => {
   return getGlobalState(state)["country"];
 };
