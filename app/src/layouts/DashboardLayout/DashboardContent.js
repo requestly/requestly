@@ -4,7 +4,7 @@ import { useLocation, useSearchParams, Outlet } from "react-router-dom";
 import SpinnerModal from "components/misc/SpinnerModal";
 import { globalActions } from "store/slices/global/slice";
 //UTILS
-import { getAppMode, getAppOnboardingDetails, getIsWorkspaceOnboardingCompleted, getRequestBot } from "store/selectors";
+import { getAppOnboardingDetails, getRequestBot } from "store/selectors";
 import { getActiveModals } from "store/slices/global/modals/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
@@ -21,7 +21,6 @@ import { isAppOpenedInIframe } from "utils/AppUtils";
 import { SharingModal } from "components/common/SharingModal";
 import { PricingModal } from "features/pricing";
 import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLinkModal";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 import { RequestBillingTeamAccessReminder } from "features/settings";
@@ -37,11 +36,9 @@ const DashboardContent = () => {
   const [searchParams] = useSearchParams();
   //Global state
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const incentiveActiveModals = useSelector(getIncentivizationActiveModals);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
-  const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
   const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
@@ -207,13 +204,7 @@ const DashboardContent = () => {
             !appOnboardingDetails.isOnboardingCompleted && (
               <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
             )}
-
-          {/* {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null} */}
-          {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
-          isWorkspaceOnboardingCompleted ||
-          appOnboardingDetails.isOnboardingCompleted ? (
-            <RequestBillingTeamAccessReminder />
-          ) : null}
+          <RequestBillingTeamAccessReminder />
 
           <RequestBot isOpen={isRequestBotVisible} onClose={closeRequestBot} modelType={requestBotDetails?.modelType} />
         </>
