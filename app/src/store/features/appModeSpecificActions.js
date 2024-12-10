@@ -16,6 +16,12 @@ export const updateDesktopSpecificAppProperty = (prevState, action) => {
   prevState.desktopSpecificDetails.appsList[appId][property] = value;
 };
 
+export const updateDesktopSpecificAppDetails = (prevState, action) => {
+  const { appId, appDetails } = action.payload;
+
+  prevState.desktopSpecificDetails.appsList[appId] = appDetails;
+};
+
 export const updateDesktopAppsList = (prevState, action) => {
   const { appsList } = action.payload;
   prevState.desktopSpecificDetails.appsList = appsList;
