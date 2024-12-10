@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { Avatar, Row, Dropdown } from "antd";
-import { getUniqueColorForWorkspace } from "utils/teams";
+import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import type { MenuProps } from "antd";

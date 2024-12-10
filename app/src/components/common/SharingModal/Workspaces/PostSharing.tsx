@@ -6,7 +6,7 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Avatar } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { getUniqueColorForWorkspace } from "utils/teams";
+import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 import { FaRegCopy } from "@react-icons/all-files/fa/FaRegCopy";
 import { LockOutlined } from "@ant-design/icons";
 import mailSuccessImg from "assets/images/illustrations/mail-success.svg";

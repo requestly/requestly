@@ -4,7 +4,7 @@ import { getCurrentlyActiveWorkspace, getCurrentlyActiveWorkspaceMembers } from 
 import { getAppMode, getAuthInitialization } from "../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import availableTeamsListener from "./availableTeamsListener";
-import syncingNodeListener from "./syncingNodeListener";
+// import syncingNodeListener from "./syncingNodeListener";
 import userNodeListener from "./userNodeListener";
 import { teamsActions } from "store/features/teams/slice";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
@@ -43,50 +43,50 @@ const DBListeners = () => {
   }, [dispatch, user?.details?.profile.uid, user?.loggedIn, appMode]);
 
   // Listens to /sync/{id}/metadata or /teamSync/{id}/metadata changes
-  useEffect(() => {
-    if (!hasAuthInitialized) return;
-    if (hasAuthStateChanged || !window.isFirstSyncComplete) {
-      dispatch(globalActions.updateIsRulesListLoading(true));
-    }
+  // useEffect(() => {
+  //   if (!hasAuthInitialized) return;
+  //   if (hasAuthStateChanged || !window.isFirstSyncComplete) {
+  //     dispatch(globalActions.updateIsRulesListLoading(true));
+  //   }
 
-    // Unsubscribe any existing listener
-    if (window.unsubscribeSyncingNodeRef.current && isArray(window.unsubscribeSyncingNodeRef.current)) {
-      window.unsubscribeSyncingNodeRef.current.forEach((removeFirebaseListener) => {
-        removeFirebaseListener && removeFirebaseListener();
-      });
-    }
+  //   // Unsubscribe any existing listener
+  //   if (window.unsubscribeSyncingNodeRef.current && isArray(window.unsubscribeSyncingNodeRef.current)) {
+  //     window.unsubscribeSyncingNodeRef.current.forEach((removeFirebaseListener) => {
+  //       removeFirebaseListener && removeFirebaseListener();
+  //     });
+  //   }
 
-    if (user?.loggedIn && user?.details?.profile?.uid) {
-      if (currentlyActiveWorkspace.id || user?.details?.isSyncEnabled) {
-        // This is a team or individual sync
-        // Set the db node listener
-        window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
-          dispatch,
-          user?.details?.profile.uid,
-          currentlyActiveWorkspace?.id,
-          appMode,
-          user?.details?.isSyncEnabled
-        );
-      } else {
-        // Do it here if syncing is not enabled. Else syncing would have triggered this.
-        window.isFirstSyncComplete = true;
-        dispatch(globalActions.updateIsRulesListLoading(false));
-      }
-    } else {
-      // Do it here if syncing is not enabled. Else syncing would have triggered this.
-      window.isFirstSyncComplete = true;
-      dispatch(globalActions.updateIsRulesListLoading(false));
-    }
-  }, [
-    hasAuthInitialized,
-    appMode,
-    currentlyActiveWorkspace.id,
-    dispatch,
-    user?.loggedIn,
-    user?.details?.profile.uid,
-    user?.details?.isSyncEnabled,
-    hasAuthStateChanged,
-  ]);
+  //   if (user?.loggedIn && user?.details?.profile?.uid) {
+  //     if (currentlyActiveWorkspace.id || user?.details?.isSyncEnabled) {
+  //       // This is a team or individual sync
+  //       // Set the db node listener
+  //       window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
+  //         dispatch,
+  //         user?.details?.profile.uid,
+  //         currentlyActiveWorkspace?.id,
+  //         appMode,
+  //         user?.details?.isSyncEnabled
+  //       );
+  //     } else {
+  //       // Do it here if syncing is not enabled. Else syncing would have triggered this.
+  //       window.isFirstSyncComplete = true;
+  //       dispatch(globalActions.updateIsRulesListLoading(false));
+  //     }
+  //   } else {
+  //     // Do it here if syncing is not enabled. Else syncing would have triggered this.
+  //     window.isFirstSyncComplete = true;
+  //     dispatch(globalActions.updateIsRulesListLoading(false));
+  //   }
+  // }, [
+  //   hasAuthInitialized,
+  //   appMode,
+  //   currentlyActiveWorkspace.id,
+  //   dispatch,
+  //   user?.loggedIn,
+  //   user?.details?.profile.uid,
+  //   user?.details?.isSyncEnabled,
+  //   hasAuthStateChanged,
+  // ]);
 
   // Listens to teams available to the user
   // Also listens to changes to the currently active workspace /* TODO: THIS SHOULD BE DONE IN A SEPARATE USEEFFECT */
