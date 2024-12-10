@@ -34,7 +34,7 @@ import "./WorkSpaceSelector.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import { getActiveWorkspaceIds, getAllWorkspaces, getWorkspaceById } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId, isPrivateWorkspace, isSharedWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceId, isPersonalWorkspace, isSharedWorkspace } from "features/workspaces/utils";
 
 export const isWorkspacesFeatureEnabled = (email) => {
   if (!email) return false;
@@ -46,7 +46,7 @@ const prettifyWorkspaceName = (workspaceName) => {
 };
 
 const getWorkspaceIcon = (workspaceName, workspaceId) => {
-  if (isPrivateWorkspace(workspaceId)) return <LockOutlined />;
+  if (isPersonalWorkspace(workspaceId)) return <LockOutlined />;
   return workspaceName ? workspaceName[0].toUpperCase() : "?";
 };
 
@@ -75,33 +75,63 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
       onOpenChange={handleWorkspaceDropdownClick}
     >
       <div className="cursor-pointer items-center">
-        <Avatar
-          size={26}
-          shape="square"
-          icon={getWorkspaceIcon(activeWorkspaceName, activeWorkspaceId)}
-          className="workspace-avatar"
-          style={{
-            backgroundColor: user.loggedIn
-              ? isPrivateWorkspace(activeWorkspaceId)
-                ? "#1E69FF"
-                : getUniqueColorForWorkspace(activeWorkspaceId, activeWorkspaceName)
-              : "#ffffff4d",
-          }}
-        />
-        <Tooltip
-          overlayClassName="workspace-selector-tooltip"
-          style={{ top: "35px" }}
-          title={prettifyWorkspaceName(activeWorkspaceName)}
-          placement={"bottomRight"}
-          showArrow={false}
-          mouseEnterDelay={2}
-        >
-          <span className="items-center active-workspace-name">
-            <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
-            {hasNewInvites ? <Badge dot={true} /> : null}
-            <DownOutlined className="active-workspace-name-down-icon" />
-          </span>
-        </Tooltip>
+        {activeWorkspace ? (
+          <>
+            <Avatar
+              size={26}
+              shape="square"
+              icon={getWorkspaceIcon(activeWorkspaceName, activeWorkspaceId)}
+              className="workspace-avatar"
+              style={{
+                backgroundColor: user.loggedIn
+                  ? isPersonalWorkspace(activeWorkspaceId)
+                    ? "#1E69FF"
+                    : getUniqueColorForWorkspace(activeWorkspaceId, activeWorkspaceName)
+                  : "#ffffff4d",
+              }}
+            />
+            <Tooltip
+              overlayClassName="workspace-selector-tooltip"
+              style={{ top: "35px" }}
+              title={prettifyWorkspaceName(activeWorkspaceName)}
+              placement={"bottomRight"}
+              showArrow={false}
+              mouseEnterDelay={2}
+            >
+              <span className="items-center active-workspace-name">
+                <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
+                {hasNewInvites ? <Badge dot={true} /> : null}
+                <DownOutlined className="active-workspace-name-down-icon" />
+              </span>
+            </Tooltip>
+          </>
+        ) : (
+          <>
+            <Avatar
+              size={26}
+              shape="square"
+              icon={"?"}
+              className="workspace-avatar"
+              style={{
+                backgroundColor: "#ffffff4d",
+              }}
+            />
+            <Tooltip
+              overlayClassName="workspace-selector-tooltip"
+              style={{ top: "35px" }}
+              title={"No Workspace Selected"}
+              placement={"bottomRight"}
+              showArrow={false}
+              mouseEnterDelay={2}
+            >
+              <span className="items-center active-workspace-name">
+                <span className="active-workspace-name">{"No Workspace Selected"}</span>
+                {hasNewInvites ? <Badge dot={true} /> : null}
+                <DownOutlined className="active-workspace-name-down-icon" />
+              </span>
+            </Tooltip>
+          </>
+        )}
       </div>
     </Dropdown>
   );
@@ -346,7 +376,7 @@ const WorkspaceSelector = () => {
                 key={workspace.id}
                 disabled={!!workspace.archived || isTeamCurrentlyActive(workspace.id)}
                 icon={
-                  isPrivateWorkspace(workspace.id) ? (
+                  isPersonalWorkspace(workspace.id) ? (
                     <Avatar
                       size={28}
                       shape="square"
@@ -386,7 +416,7 @@ const WorkspaceSelector = () => {
                       }`}
                     >
                       <div className="workspace-name">{workspace.name}</div>
-                      {isPrivateWorkspace(workspace.id) ? null : (
+                      {isPersonalWorkspace(workspace.id) ? null : (
                         <div className="text-gray workspace-details">
                           {workspace.subscriptionStatus ? `${workspace.subscriptionStatus} • ` : null}
                           {workspace.accessCount} {workspace.accessCount > 1 ? "members" : "member"}

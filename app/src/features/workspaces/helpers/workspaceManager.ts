@@ -11,6 +11,7 @@ import { globalActions } from "store/slices/global/slice";
 import { StorageService } from "init";
 
 class WorkspaceManager {
+  initInProgress = false;
   dispatch!: Dispatch<any>;
   workspaceMap!: {
     [id: string]: Workspace;
@@ -37,6 +38,12 @@ class WorkspaceManager {
 
   // Reset
   async initActiveWorkspaces(workspaceIds: Workspace["id"][]) {
+    if (this.initInProgress) {
+      console.log("[WorkspaceManager.initActiveWorkspaces] initInProgress. Skipping", { workspaceIds });
+      return;
+    }
+
+    this.dispatch(globalActions.toggleActiveModal({ modalName: "workspaceLoadingModal", newValue: true }));
     this.resetActiveWorkspaces();
 
     //#region - Extension Storage backup -> reset -> reinit
@@ -48,9 +55,9 @@ class WorkspaceManager {
     });
     //#endregion
 
-    this.dispatch(globalActions.toggleActiveModal({ modalName: "workspaceLoadingModal", newValue: true }));
     await this.connectWorkspaces(workspaceIds);
     this.dispatch(globalActions.toggleActiveModal({ modalName: "workspaceLoadingModal", newValue: false }));
+    this.initInProgress = false;
   }
 
   // append
@@ -65,9 +72,6 @@ class WorkspaceManager {
       }
     });
     await Promise.all(promises);
-
-    window.activeWorkspaceIds = connectedWorkspaceIds;
-    this.dispatch(workspaceActions.setActiveWorkspaceIds(connectedWorkspaceIds));
   }
 
   // append
@@ -78,6 +82,7 @@ class WorkspaceManager {
     //#region - Access Check
     if (!hasAccessToWorkspace(this.userId, workspace)) {
       console.log("[WorkspaceManager.connectWorkspace] Skipping connect. Unauthorized", { workspaceId });
+      this.dispatch(workspaceActions.removeActiveWorkspaceId(workspaceId));
       return false;
     }
     //#endregion
@@ -91,19 +96,22 @@ class WorkspaceManager {
     });
     //#endregion
 
-    //#region - Disconnection Steps
+    //#region - Connect
     const disconnect = () => {
       console.log(`[WorkspaceManager] workspaceId=${workspaceId} disconnect`);
       delete this.activeWorkspaceMap[workspaceId];
       syncEngine.disconnectWorkspace(workspaceId);
+      this.dispatch(workspaceActions.removeActiveWorkspaceId(workspaceId));
     };
     this.activeWorkspaceMap[workspaceId] = {
       disconnect: disconnect,
     };
-    //#endregion
 
-    // For Future. Right now we only support one workspace. Handled in connectWorkspaces
-    // this.dispatch(workspaceActions.appendActiveWorkspaceId());
+    const connectedWorkspaceIds = Object.keys(this.activeWorkspaceMap);
+    window.activeWorkspaceIds = connectedWorkspaceIds;
+    this.dispatch(workspaceActions.setActiveWorkspaceIds(connectedWorkspaceIds));
+    console.log("[WorkspaceManager.connectWorkspace] Connected", { workspaceId });
+    //#endregion
     return true;
   }
 
@@ -114,6 +122,7 @@ class WorkspaceManager {
     Object.values(this.activeWorkspaceMap).forEach((iter) => {
       iter.disconnect();
     });
+    this.dispatch(workspaceActions.setActiveWorkspaceIds([]));
   }
 }
 

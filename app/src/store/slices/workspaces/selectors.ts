@@ -17,3 +17,5 @@ export const getAllWorkspaces = (state: RootState) => workspacesEntitySelectors.
 export const getActiveWorkspaceIds = (state: RootState) => {
   return sliceRootState(state).activeWorkspaceIds;
 };
+
+export const getIsWorkspacesFetched = (state: RootState) => sliceRootState(state).isWorkspacesFetched;

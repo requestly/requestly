@@ -7,18 +7,18 @@ export const LoggedOutWorkspace: Workspace = {
   name: "Private (Local)",
 };
 
-const PRIVATE_WORKSPACE_SUFFIX = "private-";
-export const isPrivateWorkspace = (workspaceId: string) => {
-  return !!workspaceId?.startsWith(PRIVATE_WORKSPACE_SUFFIX);
+const PERSONAL_WORKSPACE_PREFIX = "personal-";
+export const isPersonalWorkspace = (workspaceId: string) => {
+  return !!workspaceId?.startsWith(PERSONAL_WORKSPACE_PREFIX);
 };
 
-export const getPrivateWorkspaceId = (userId?: string) => {
-  return `${PRIVATE_WORKSPACE_SUFFIX}${userId}`;
+export const getPersonalWorkspaceId = (userId?: string) => {
+  return `${PERSONAL_WORKSPACE_PREFIX}${userId}`;
 };
 
 export const getPrivateWorkspace = (userId: string): Workspace => {
   return {
-    id: getPrivateWorkspaceId(userId),
+    id: getPersonalWorkspaceId(userId),
     name: "Private Workspace (Default)",
     members: {
       [userId]: {
@@ -43,7 +43,7 @@ export const hasAccessToWorkspace = (userId?: string, workspace?: Workspace): bo
 };
 
 export const isSharedWorkspace = (workspaceId: string) => {
-  if (workspaceId === LOGGED_OUT_WORKSPACE_ID || isPrivateWorkspace(workspaceId)) {
+  if (workspaceId === LOGGED_OUT_WORKSPACE_ID || isPersonalWorkspace(workspaceId)) {
     return false;
   }
 
