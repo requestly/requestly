@@ -1,12 +1,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { FilePicker } from "components/common/FilePicker";
-import {
-  getUploadedPostmanFileType,
-  processPostmanCollectionData,
-  processPostmanEnvironmentData,
-  processPostmanVariablesData,
-} from "./utils";
+import { getUploadedPostmanFileType, processPostmanCollectionData, processPostmanEnvironmentData } from "./utils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
@@ -89,13 +84,11 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 resolve({ type: postmanFileType, data: processedData });
               } else {
                 const processedApiRecords = processPostmanCollectionData(fileContent);
-                const processedVariables = processPostmanVariablesData(fileContent);
                 resolve({
                   type: postmanFileType,
                   data: {
                     type: postmanFileType,
                     apiRecords: processedApiRecords,
-                    variables: processedVariables,
                   },
                 });
               }
@@ -233,21 +226,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     return importedCollectionsCount;
   }, [processedFileData.apiRecords, user?.details?.profile?.uid, workspace?.id, onSaveRecord]);
 
-  const handleImportVariables = useCallback(async () => {
-    if (Object.keys(processedFileData.variables).length === 0) {
-      return Promise.resolve();
-    }
-    const newEnvironment = await addNewEnvironment("New Environment");
-    if (newEnvironment) {
-      return setVariables(newEnvironment.id, processedFileData.variables);
-    }
-    return Promise.resolve();
-  }, [processedFileData.variables, setVariables, addNewEnvironment]);
-
   const handleImportPostmanData = useCallback(() => {
     trackImportFromPostmanStarted(collectionsCount.current, processedFileData.environments.length);
     setIsImporting(true);
-    Promise.allSettled([handleImportEnvironments(), handleImportCollectionsAndApis(), handleImportVariables()])
+    Promise.allSettled([handleImportEnvironments(), handleImportCollectionsAndApis()])
       .then((results) => {
         const [environmentsResult, collectionsResult] = results;
         const importedEnvironments = environmentsResult.status === "fulfilled" ? environmentsResult.value : 0;
@@ -298,13 +280,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       .finally(() => {
         setIsImporting(false);
       });
-  }, [
-    handleImportEnvironments,
-    handleImportCollectionsAndApis,
-    handleImportVariables,
-    onSuccess,
-    processedFileData.environments.length,
-  ]);
+  }, [handleImportEnvironments, handleImportCollectionsAndApis, onSuccess, processedFileData.environments.length]);
 
   const handleResetImport = () => {
     setProcessingStatus("idle");
