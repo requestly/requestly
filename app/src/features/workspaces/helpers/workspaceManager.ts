@@ -88,7 +88,10 @@ class WorkspaceManager {
     //#endregion
 
     //#region - syncing init
-    await syncEngine.init([workspaceId], this.userId);
+    await syncEngine.init(
+      [{ id: workspaceId, replication: this.workspaceMap[workspaceId]?.isSyncEnabled }],
+      this.userId
+    );
 
     RuleStorageModel.registerOnUpdateHook((models: RuleStorageModel[]) => {
       console.log("onUpdateHook Custom");
