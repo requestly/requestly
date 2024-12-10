@@ -22,7 +22,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   placeholder,
   onPressEnter,
   onBlur,
-  variables,
+  variables = {},
 }) => {
   const editorRef = useRef(null);
   const editorViewRef = useRef(null);
