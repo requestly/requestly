@@ -6,7 +6,7 @@ import {
   getCollectionVariables,
   getCurrentEnvironmentId,
 } from "store/features/variables/selectors";
-import { environmentVariablesActions } from "store/features/variables/slice";
+import { variablesActions } from "store/features/variables/slice";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
 import {
@@ -51,7 +51,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
 
   const setCurrentEnvironment = useCallback(
     (environmentId: string) => {
-      dispatch(environmentVariablesActions.setCurrentEnvironment({ environmentId }));
+      dispatch(variablesActions.setCurrentEnvironment({ environmentId }));
     },
     [dispatch]
   );
@@ -60,7 +60,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     async (newEnvironment: string) => {
       return upsertEnvironmentInDB(ownerId, newEnvironment)
         .then(({ id, name }) => {
-          dispatch(environmentVariablesActions.addNewEnvironment({ id, name }));
+          dispatch(variablesActions.addNewEnvironment({ id, name }));
           return {
             id,
             name,
@@ -96,12 +96,12 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
                 ),
               };
             });
-            dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: updatedEnvironmentMap }));
-          } else dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap }));
+            dispatch(variablesActions.setAllEnvironmentData({ environmentMap: updatedEnvironmentMap }));
+          } else dispatch(variablesActions.setAllEnvironmentData({ environmentMap }));
         })
         .catch((err) => {
           Logger.error("Error while fetching all environment variables", err);
-          dispatch(environmentVariablesActions.setAllEnvironmentData({ environmentMap: {} }));
+          dispatch(variablesActions.setAllEnvironmentData({ environmentMap: {} }));
         })
         .finally(() => {
           setIsLoading(false);
@@ -120,7 +120,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
           environmentData.variables
         );
         dispatch(
-          environmentVariablesActions.updateEnvironmentData({
+          variablesActions.updateEnvironmentData({
             newVariables: mergedVariables,
             environmentId: environmentData.id,
             environmentName: environmentData.name,
@@ -146,9 +146,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
             collectionVariables[collectionId]?.variables ?? {},
             collectionDetails[collectionId].variables ?? {}
           );
-          dispatch(
-            environmentVariablesActions.setCollectionVariables({ collectionId, variables: mergedCollectionVariables })
-          );
+          dispatch(variablesActions.setCollectionVariables({ collectionId, variables: mergedCollectionVariables }));
         });
       });
     }
@@ -163,7 +161,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   useEffect(() => {
     if (!user.loggedIn) {
       unsubscribeListener?.();
-      dispatch(environmentVariablesActions.resetState());
+      dispatch(variablesActions.resetState());
     }
   }, [dispatch, user.loggedIn]);
 
@@ -187,7 +185,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariables)
         .then(() => {
           dispatch(
-            environmentVariablesActions.updateEnvironmentData({
+            variablesActions.updateEnvironmentData({
               newVariables,
               environmentId,
             })
@@ -206,7 +204,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     async (environmentId: string, key: string) => {
       return removeEnvironmentVariableFromDB(ownerId, { environmentId, key })
         .then(() => {
-          dispatch(environmentVariablesActions.removeVariableFromEnvironment({ key, environmentId }));
+          dispatch(variablesActions.removeVariableFromEnvironment({ key, environmentId }));
         })
         .catch((err) => {
           toast.error("Error while removing environment variables.");
@@ -316,7 +314,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const renameEnvironment = useCallback(
     async (environmentId: string, newName: string) => {
       return updateEnvironmentNameInDB(ownerId, environmentId, newName).then(() => {
-        dispatch(environmentVariablesActions.updateEnvironmentName({ environmentId, newName }));
+        dispatch(variablesActions.updateEnvironmentName({ environmentId, newName }));
       });
     },
     [ownerId, dispatch]
@@ -325,9 +323,9 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const duplicateEnvironment = useCallback(
     async (environmentId: string) => {
       return duplicateEnvironmentInDB(ownerId, environmentId, allEnvironmentData).then((newEnvironment) => {
-        dispatch(environmentVariablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name }));
+        dispatch(variablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name }));
         dispatch(
-          environmentVariablesActions.updateEnvironmentData({
+          variablesActions.updateEnvironmentData({
             newVariables: newEnvironment.variables,
             environmentId: newEnvironment.id,
           })
@@ -340,7 +338,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const deleteEnvironment = useCallback(
     async (environmentId: string) => {
       return deleteEnvironmentFromDB(ownerId, environmentId).then(() => {
-        dispatch(environmentVariablesActions.removeEnvironment({ environmentId }));
+        dispatch(variablesActions.removeEnvironment({ environmentId }));
       });
     },
     [ownerId, dispatch]

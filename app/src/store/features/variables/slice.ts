@@ -11,8 +11,8 @@ const slice = createSlice({
 
 const { actions, reducer } = slice;
 
-export const environmentVariablesActions = actions;
-export const environmentVariablesReducer = getReducerWithLocalStorageSync(ReducerKeys.VARIABLES, reducer, [
+export const variablesActions = actions;
+export const variablesReducer = getReducerWithLocalStorageSync(ReducerKeys.VARIABLES, reducer, [
   "currentEnvironment",
   "environments",
   "api_collections",

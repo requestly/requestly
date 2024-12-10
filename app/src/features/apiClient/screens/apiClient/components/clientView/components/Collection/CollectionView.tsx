@@ -12,7 +12,7 @@ import { upsertApiRecord } from "backend/apiClient";
 import { EnvironmentVariables } from "backend/environment/types";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
 import "./collectionView.scss";
-import { environmentVariablesActions } from "store/features/variables/slice";
+import { variablesActions } from "store/features/variables/slice";
 import { getCollectionVariables } from "store/features/variables/selectors";
 
 const TAB_KEYS = {
@@ -41,7 +41,7 @@ export const CollectionView = () => {
       const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
       return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
         onSaveRecord(result.data);
-        dispatch(environmentVariablesActions.setCollectionVariables({ collectionId, variables }));
+        dispatch(variablesActions.setCollectionVariables({ collectionId, variables }));
       });
     },
     [collection, teamId, user.details?.profile?.uid, onSaveRecord, dispatch, collectionId]
