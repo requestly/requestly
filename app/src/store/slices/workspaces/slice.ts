@@ -5,6 +5,7 @@ import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync
 
 export interface WorkspaceSliceState {
   allWorkspaces?: EntityState<Workspace>;
+  isWorkspacesFetched?: boolean;
   activeWorkspaceIds?: string[];
 }
 
@@ -17,6 +18,7 @@ export const workspacesEntityAdapter = createEntityAdapter<Workspace>({
 
 const initialState: WorkspaceSliceState = {
   allWorkspaces: workspacesEntityAdapter.getInitialState(),
+  isWorkspacesFetched: false,
   activeWorkspaceIds: [],
 };
 
@@ -29,9 +31,15 @@ const slice = createSlice({
     setAllWorkspaces: (state: WorkspaceSliceState, action: PayloadAction<Workspace[]>) => {
       workspacesEntityAdapter.setAll(state.allWorkspaces, action.payload);
     },
+    setWorkspacesFetched: (state: WorkspaceSliceState, action: PayloadAction<boolean>) => {
+      state.isWorkspacesFetched = action.payload;
+    },
 
     setActiveWorkspaceIds: (state: WorkspaceSliceState, action: PayloadAction<string[]>) => {
       state.activeWorkspaceIds = action.payload;
+    },
+    removeActiveWorkspaceId: (state: WorkspaceSliceState, action: PayloadAction<string>) => {
+      state.activeWorkspaceIds = state.activeWorkspaceIds?.filter((id) => id !== action.payload);
     },
   },
 });
@@ -39,6 +47,7 @@ const { actions, reducer: workspaceReducer } = slice;
 
 export const workspaceReducerWithLocal = getReducerWithLocalStorageSync(ReducerKeys.WORKSPACE, workspaceReducer, [
   "allWorkspaces",
+  "isWorkspacesFetched",
   "activeWorkspaceIds",
 ]);
 

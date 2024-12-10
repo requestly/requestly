@@ -8,7 +8,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { Workspace } from "../types";
 import firebaseApp from "firebase";
-import { getPrivateWorkspace, LoggedOutWorkspace } from "../utils";
+import { LoggedOutWorkspace } from "../utils";
 
 const db = getFirestore(firebaseApp);
 
@@ -20,11 +20,12 @@ export const useAvailableWorkspacesListener = () => {
   const uid = user.details?.profile?.uid;
 
   useEffect(() => {
-    Logger.log("[useAvailableTeamsListener] start");
+    console.log("[useAvailableTeamsListener] start");
 
     if (!uid) {
-      Logger.log("[useAvailableTeamsListener] User not logged in");
+      console.log("[useAvailableTeamsListener] User not logged in");
       dispatch(workspaceActions.setAllWorkspaces([LoggedOutWorkspace]));
+      dispatch(workspaceActions.setWorkspacesFetched(true));
       return;
     }
 
@@ -58,18 +59,19 @@ export const useAvailableWorkspacesListener = () => {
           })
           .filter(Boolean);
 
-        Logger.log("[useAvailableTeamsListener] fetched teams", { records });
+        console.log("[useAvailableTeamsListener] fetched teams", { records });
 
         // FIXME-syncing: private workspace should not be hardcoded like this here. It should automatically get fetched from db
-        dispatch(workspaceActions.setAllWorkspaces([...records, getPrivateWorkspace(uid)]));
+        dispatch(workspaceActions.setAllWorkspaces([...records]));
+        dispatch(workspaceActions.setWorkspacesFetched(true));
       });
 
       return () => {
-        Logger.log("[useAvailableTeamsListener] Unsubscribing Workspaces Listener");
+        console.log("[useAvailableTeamsListener] Unsubscribing Workspaces Listener");
         unsub?.();
       };
     } catch (error) {
-      Logger.error(error);
+      console.error(error);
     }
   }, [dispatch, uid]);
 };
