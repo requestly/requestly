@@ -99,12 +99,12 @@ export const attachCollectionVariableListener = (
   const q = query(apisRef, where("ownerId", "==", ownerId), where("type", "==", RQAPI.RecordType.COLLECTION));
 
   const unsubscribe = onSnapshot(q, (snapshot) => {
-    const collectionDetails: CollectionVariableMap = {};
+    const collectionVariableDetails: CollectionVariableMap = {};
     snapshot.forEach((doc) => {
       const collectionData = { id: doc.id, ...doc.data() } as RQAPI.CollectionRecord;
-      collectionDetails[doc.id] = { variables: collectionData.data.variables };
+      collectionVariableDetails[doc.id] = { variables: collectionData.data.variables };
     });
-    callback(collectionDetails);
+    callback(collectionVariableDetails);
   });
 
   return unsubscribe;

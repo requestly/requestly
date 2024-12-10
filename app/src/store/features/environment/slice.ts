@@ -4,7 +4,7 @@ import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync
 import reducerFunctions, { initialState } from "./reducers";
 
 const slice = createSlice({
-  name: ReducerKeys.ENVIRONMENT,
+  name: ReducerKeys.VARIABLES,
   initialState,
   reducers: reducerFunctions,
 });
@@ -12,7 +12,7 @@ const slice = createSlice({
 const { actions, reducer } = slice;
 
 export const environmentVariablesActions = actions;
-export const environmentVariablesReducer = getReducerWithLocalStorageSync(ReducerKeys.ENVIRONMENT, reducer, [
+export const environmentVariablesReducer = getReducerWithLocalStorageSync(ReducerKeys.VARIABLES, reducer, [
   "currentEnvironment",
   "environments",
   "api_collections",

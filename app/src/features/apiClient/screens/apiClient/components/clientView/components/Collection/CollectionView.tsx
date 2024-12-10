@@ -32,7 +32,6 @@ export const CollectionView = () => {
 
   const handleSetVariables = useCallback(
     async (variables: EnvironmentVariables) => {
-      dispatch(environmentVariablesActions.setCollectionVariables({ collectionId, variables }));
       const updatedVariables = Object.fromEntries(
         Object.entries(variables).map(([key, value]) => {
           const { localValue, ...rest } = value;
@@ -42,6 +41,7 @@ export const CollectionView = () => {
       const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
       return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
         onSaveRecord(result.data);
+        dispatch(environmentVariablesActions.setCollectionVariables({ collectionId, variables }));
       });
     },
     [collection, teamId, user.details?.profile?.uid, onSaveRecord, dispatch, collectionId]
