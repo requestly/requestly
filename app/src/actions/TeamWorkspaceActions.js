@@ -16,7 +16,7 @@ import { getValueAsPromise } from "./FirebaseActions";
 import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUtils";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
-import { environmentVariablesActions } from "store/features/environment/slice";
+import { environmentVariablesActions } from "store/features/variables/slice";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast

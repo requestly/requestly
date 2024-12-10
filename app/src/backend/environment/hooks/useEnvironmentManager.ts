@@ -5,8 +5,8 @@ import {
   getAllEnvironmentData,
   getCollectionVariables,
   getCurrentEnvironmentId,
-} from "store/features/environment/selectors";
-import { environmentVariablesActions } from "store/features/environment/slice";
+} from "store/features/variables/selectors";
+import { environmentVariablesActions } from "store/features/variables/slice";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
 import {

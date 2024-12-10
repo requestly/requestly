@@ -10,7 +10,7 @@ import { desktopTrafficTableReducer } from "./features/desktop-traffic-table/sli
 import { recordsReducer } from "./features/rules/slice";
 import { billingReducer } from "./features/billing/slice";
 import { harPreviewReducer } from "./features/network-sessions/slice";
-import { environmentVariablesReducer } from "./features/environment/slice";
+import { environmentVariablesReducer } from "./features/variables/slice";
 
 import { globalReducers } from "./slices/global/slice";
 

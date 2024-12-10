@@ -12,8 +12,8 @@ import { upsertApiRecord } from "backend/apiClient";
 import { EnvironmentVariables } from "backend/environment/types";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
 import "./collectionView.scss";
-import { environmentVariablesActions } from "store/features/environment/slice";
-import { getCollectionVariables } from "store/features/environment/selectors";
+import { environmentVariablesActions } from "store/features/variables/slice";
+import { getCollectionVariables } from "store/features/variables/selectors";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
