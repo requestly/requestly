@@ -55,6 +55,14 @@ export const isSharedWorkspace = (workspaceId: string) => {
   return true;
 };
 
+export const isOnlineWorkspace = (workspaceId: string) => {
+  if (workspaceId === LOGGED_OUT_WORKSPACE_ID) {
+    return false;
+  }
+
+  return true;
+};
+
 // For now only as we can have only 1 connected workspace right now
 export const getActiveWorkspaceId = (activeWorkspaceIds: string[]) => {
   return activeWorkspaceIds?.[0];

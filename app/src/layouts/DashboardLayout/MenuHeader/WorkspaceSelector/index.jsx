@@ -32,7 +32,12 @@ import "./WorkSpaceSelector.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import { getActiveWorkspaceIds, getAllWorkspaces, getWorkspaceById } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId, isPersonalWorkspace, isSharedWorkspace } from "features/workspaces/utils";
+import {
+  getActiveWorkspaceId,
+  isOnlineWorkspace,
+  isPersonalWorkspace,
+  isSharedWorkspace,
+} from "features/workspaces/utils";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
 export const isWorkspacesFeatureEnabled = (email) => {
@@ -424,23 +429,25 @@ const WorkspaceSelector = () => {
           >
             Invite teammates
           </Menu.Item>
-
-          <Menu.Item
-            key="5"
-            icon={<SettingOutlined className="icon-wrapper" />}
-            className="workspace-menu-item"
-            onClick={() => {
-              if (isSharedWorkspace(activeWorkspaceId)) {
-                redirectToTeam(navigate, activeWorkspaceId);
-              } else {
-                redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");
-              }
-              trackWorkspaceDropdownClicked("manage_workspace");
-            }}
-          >
-            Manage Workspace
-          </Menu.Item>
         </>
+      ) : null}
+      {/* FIXME-syncing-cleanup: Improve this settings UI-UX */}
+      {isOnlineWorkspace(activeWorkspaceId) ? (
+        <Menu.Item
+          key="5"
+          icon={<SettingOutlined className="icon-wrapper" />}
+          className="workspace-menu-item"
+          onClick={() => {
+            if (isOnlineWorkspace(activeWorkspaceId)) {
+              redirectToTeam(navigate, activeWorkspaceId);
+            } else {
+              redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");
+            }
+            trackWorkspaceDropdownClicked("manage_workspace");
+          }}
+        >
+          Manage Workspace
+        </Menu.Item>
       ) : null}
     </Menu>
   );

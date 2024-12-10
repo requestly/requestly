@@ -14,4 +14,12 @@ export interface Workspace {
   appsumo?: boolean;
   deleted?: boolean;
   createdAt?: number;
+
+  isSyncEnabled?: boolean;
+  workspaceType?: WorkspaceType;
+}
+
+export enum WorkspaceType {
+  PERSONAL = "PERSONAL",
+  SHARED = "SHARED",
 }

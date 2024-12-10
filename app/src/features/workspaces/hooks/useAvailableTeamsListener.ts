@@ -55,6 +55,9 @@ export const useAvailableWorkspacesListener = () => {
               appsumo: teamData?.appsumo || null,
               // @ts-ignore
               createdAt: teamData?.creationTime?.toMillis(),
+
+              isSyncEnabled: teamData.isSyncEnabled,
+              workspaceType: teamData.workspaceType,
             };
           })
           .filter(Boolean);
