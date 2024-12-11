@@ -8,24 +8,16 @@ import { useNavigate } from "react-router-dom";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { useDispatch } from "react-redux";
-import { getAppMode } from "store/selectors";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useSelector } from "react-redux";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import TeamWorkSolvePuzzleAnimation from "components/misc/LottieAnimation/TeamWorkSolvePuzzleAnimation";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 const CreateWorkspace = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
   // Component State
   const [isSubmitProcess, setIsSubmitProcess] = useState(false);
+
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const onFinish = (filledData) => {
     const newTeamName = filledData.workspaceName;
@@ -42,19 +34,7 @@ const CreateWorkspace = () => {
         toast.info("Workspace Created");
         const teamId = response.data.teamId;
         setIsSubmitProcess(false);
-        switchWorkspace(
-          {
-            teamId,
-            teamName: newTeamName,
-            teamMembersCount: 1,
-          },
-          dispatch,
-          {
-            isSyncEnabled: user?.details?.isSyncEnabled,
-            isWorkspaceMode,
-          },
-          appMode
-        );
+        switchWorkspace(teamId);
         redirectToTeam(navigate, teamId, {
           state: {
             isNewTeam: true,

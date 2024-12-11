@@ -6,14 +6,10 @@ import { getUniqueColorForWorkspace } from "features/workspaces/components/Works
 import { toast } from "utils/Toast";
 import "./index.css";
 import { redirectToTeam } from "utils/RedirectionUtils";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { useDispatch, useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { acceptTeamInvite } from "backend/workspace";
 import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
 import InviteAcceptAnimation from "../LottieAnimation/InviteAcceptAnimation";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 interface Props {
   inviteId: string;
@@ -25,10 +21,7 @@ interface Props {
 
 const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const [inProgress, setInProgress] = useState(false);
 
@@ -48,21 +41,7 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
           );
 
           if (res?.data?.data?.invite.type === "teams") {
-            switchWorkspace(
-              {
-                teamId: res?.data?.data?.invite?.metadata?.teamId,
-                teamName: res?.data?.data?.invite?.metadata?.teamName,
-                teamMembersCount: 1,
-              },
-              dispatch,
-              {
-                isSyncEnabled: user?.details?.isSyncEnabled,
-                isWorkspaceMode,
-              },
-              appMode,
-              null,
-              "invite_screen"
-            );
+            switchWorkspace(res?.data?.data?.invite?.metadata?.teamId, "invite_screen");
             redirectToTeam(navigate, res?.data?.data?.invite?.metadata?.teamId, {
               state: {
                 isNewTeam: false,
