@@ -36,6 +36,7 @@ const APIClientSidebar: React.FC<Props> = () => {
     recordToBeDeleted,
     isDeleteModalOpen,
     onDeleteModalClose,
+    selectedHistoryIndex,
   } = useApiClientContext();
 
   const hideNewRecordNameInput = () => {
@@ -129,7 +130,13 @@ const APIClientSidebar: React.FC<Props> = () => {
           </div>
         </Tooltip>
       ),
-      children: <HistoryList history={history} onSelectionFromHistory={onSelectionFromHistory} />,
+      children: (
+        <HistoryList
+          history={history}
+          selectedHistoryIndex={selectedHistoryIndex}
+          onSelectionFromHistory={onSelectionFromHistory}
+        />
+      ),
     },
   ];
 
