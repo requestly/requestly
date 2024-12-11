@@ -16,7 +16,7 @@ export const useAPIClientRequest = () => {
 
   const upsertEnvironmentVariables = useCallback(
     async (variablesToUpsert: VariableKeyValuePairs) => {
-      const currentVariables = getVariablesWithPrecedence(requestConfig?.collectionId);
+      const currentVariables = getVariablesWithPrecedence(requestConfig?.requestCollectionId);
 
       const variablesToSet = {
         ...currentVariables,
@@ -47,7 +47,7 @@ export const useAPIClientRequest = () => {
 
       await setVariables(currentEnvironmentId, variablesToSet);
     },
-    [currentEnvironmentId, getVariablesWithPrecedence, requestConfig?.collectionId, setVariables]
+    [currentEnvironmentId, getVariablesWithPrecedence, requestConfig?.requestCollectionId, setVariables]
   );
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export const useAPIClientRequest = () => {
       return;
     }
 
-    const currentVariables = getVariablesWithPrecedence(requestConfig?.collectionId);
+    const currentVariables = getVariablesWithPrecedence(requestConfig?.requestCollectionId);
     const formattedCurrentVariables = parseVariableValues(currentVariables);
 
     APIClientManagerRef.current.setCurrentVariables(formattedCurrentVariables);
@@ -63,7 +63,7 @@ export const useAPIClientRequest = () => {
     return () => {
       APIClientManagerRef.current = null;
     };
-  }, [getVariablesWithPrecedence, requestConfig?.collectionId]);
+  }, [getVariablesWithPrecedence, requestConfig?.requestCollectionId]);
 
   const executeRequest = async (config: APIRequestConfig) => {
     setRequestConfig(config);
@@ -75,7 +75,7 @@ export const useAPIClientRequest = () => {
       signal: abortControllerRef.current.signal,
     });
 
-    const currentVariables = getVariablesWithPrecedence(config?.collectionId);
+    const currentVariables = getVariablesWithPrecedence(config?.requestCollectionId);
     const formattedCurrentVariables = parseVariableValues(currentVariables);
     APIClientManagerRef.current.setCurrentVariables(formattedCurrentVariables);
 

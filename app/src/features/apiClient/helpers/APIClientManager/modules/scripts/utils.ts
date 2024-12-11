@@ -9,6 +9,22 @@ interface WorkerMessage {
   payload?: any;
 }
 
+interface ScriptExecutionConfig {
+  script: string;
+  currentEnvironmentVariables: VariableKeyValuePairs;
+  currentEnvironmentId: string;
+  setVariables: (variables: VariableKeyValuePairs) => Promise<void>;
+}
+
+interface PreRequestConfig extends ScriptExecutionConfig {
+  request: RQAPI.Request;
+}
+
+interface PostResponseConfig extends ScriptExecutionConfig {
+  request: RQAPI.Request;
+  response: RQAPI.Response;
+}
+
 const createWorkerCode = (fn: Function) => {
   return `
     self.onmessage = ${fn.toString()};
@@ -26,7 +42,10 @@ const handleVariableChanges = async (
     mutations: ScriptExecutedPayload["mutations"];
     currentVariables: EnvironmentVariables;
   },
-  helperMethods?: any
+  helperMethods: {
+    currentEnvironmentId: string;
+    setVariables: (variables: VariableKeyValuePairs) => Promise<void>;
+  }
 ) => {
   console.log("!!!debug", "payload", {
     payload,
@@ -85,13 +104,9 @@ const messageHandler = async (worker: Worker, event: MessageEvent, resolve: any,
   }
 };
 
-export const executePrerequestScript = (
-  script: string,
-  request: RQAPI.Request,
-  currentEnvironmentVariables: VariableKeyValuePairs,
-  currentEnvironmentId: string,
-  setVariables: (variables: VariableKeyValuePairs) => Promise<void>
-): Promise<EnvironmentVariables | null> => {
+export const executePrerequestScript = (config: PreRequestConfig): Promise<EnvironmentVariables | null> => {
+  const { script, request, currentEnvironmentVariables, currentEnvironmentId, setVariables } = config;
+
   let worker: Worker | null = null;
 
   return new Promise((resolve, reject) => {
@@ -123,16 +138,9 @@ export const executePrerequestScript = (
   });
 };
 
-export const executePostresponseScript = (
-  script: string,
-  APIDetails: {
-    request: RQAPI.Request;
-    response: RQAPI.Response;
-  },
-  currentEnvironmentVariables: VariableKeyValuePairs,
-  currentEnvironmentId: string,
-  setVariables: (variables: VariableKeyValuePairs) => Promise<void>
-) => {
+export const executePostresponseScript = (config: PostResponseConfig) => {
+  const { script, request, response, currentEnvironmentVariables, currentEnvironmentId, setVariables } = config;
+
   let worker: Worker | null = null;
 
   return new Promise((resolve, reject) => {
@@ -153,8 +161,8 @@ export const executePostresponseScript = (
 
     worker.postMessage({
       script,
-      request: APIDetails.request,
-      response: APIDetails.response,
+      request: request,
+      response: response,
       currentVariables: currentEnvironmentVariables,
       currentEnvironmentId,
     });

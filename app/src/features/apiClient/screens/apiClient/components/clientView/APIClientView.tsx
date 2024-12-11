@@ -228,7 +228,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     executeRequest({
       entry: sanitizedEntry,
       appMode,
-      collectionId: apiEntryDetails?.collectionId,
+      requestCollectionId: apiEntryDetails?.collectionId,
       currentEnvironmentId: getCurrentEnvironment().currentEnvironmentId,
     })
       .then((requestExecutionResult) => {

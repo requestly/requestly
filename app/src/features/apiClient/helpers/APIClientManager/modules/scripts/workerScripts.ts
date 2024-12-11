@@ -42,8 +42,7 @@ export const requestWorkerFunction = function (e: MessageEvent) {
           mutations.environment.$set[key] = value;
         },
         get: (key: string) => {
-          const variable = currentVariables[key];
-          return variable?.localValue || variable?.syncValue;
+          return currentVariables[key];
         },
         unset: (key: string) => {
           mutations.environment.$unset[key] = "";
@@ -144,8 +143,7 @@ export const responseWorkerFunction = function (e: MessageEvent) {
           mutations.environment.$set[key] = value;
         },
         get: (key: string) => {
-          const variable = currentVariables[key];
-          return variable?.localValue || variable?.syncValue;
+          return currentVariables[key];
         },
         unset: (key: string) => {
           mutations.environment.$unset[key] = "";

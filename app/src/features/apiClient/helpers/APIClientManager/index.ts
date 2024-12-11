@@ -16,7 +16,7 @@ export interface APIRequestConfig {
   currentEnvironmentId: string;
   setVariables?: (variables: VariableKeyValuePairs) => Promise<void>;
   signal?: AbortSignal;
-  collectionId?: string;
+  requestCollectionId?: string;
 }
 
 interface RequestExecutionResult {
@@ -47,13 +47,13 @@ export class APIClientManager {
   private async executePreRequestScript(): Promise<void> {
     if (!this.config.entry.scripts.preRequest) return;
 
-    await executePrerequestScript(
-      this.config.entry.scripts.preRequest,
-      this.renderedRequest,
-      this.currentVariables,
-      this.config.currentEnvironmentId,
-      this.config.setVariables
-    );
+    await executePrerequestScript({
+      script: this.config.entry.scripts.preRequest,
+      currentEnvironmentId: this.config.currentEnvironmentId,
+      currentEnvironmentVariables: this.currentVariables,
+      setVariables: this.config.setVariables,
+      request: this.config.entry.request,
+    });
     this.renderedRequest = renderTemplate(this.config.entry.request, this.currentVariables);
   }
 
@@ -68,13 +68,14 @@ export class APIClientManager {
   private async executePostResponseScript(response: RQAPI.Response): Promise<void> {
     if (!this.config.entry.scripts.postResponse) return;
 
-    await executePostresponseScript(
-      this.config.entry.scripts.postResponse,
-      { response, request: this.renderedRequest },
-      this.currentVariables,
-      this.config.currentEnvironmentId,
-      this.config.setVariables
-    );
+    await executePostresponseScript({
+      script: this.config.entry.scripts.postResponse,
+      request: this.config.entry.request,
+      response,
+      currentEnvironmentVariables: this.currentVariables,
+      currentEnvironmentId: this.config.currentEnvironmentId,
+      setVariables: this.config.setVariables,
+    });
   }
 
   private trackRequest() {
