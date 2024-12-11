@@ -4,7 +4,6 @@ import { Button, Col, Row, Spin } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsRulesListLoading } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useHasChanged } from "hooks";
 import { HomepageEmptyCard } from "../EmptyCard";
 import { m, AnimatePresence } from "framer-motion";
@@ -29,13 +28,14 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/components/RulesList/components";
 import "./rulesCard.scss";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 export const RulesCard: React.FC = () => {
   const MAX_RULES_TO_SHOW = 3;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
   const user = useSelector(getUserAuthDetails);
   const isRulesLoading = useSelector(getIsRulesListLoading);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
@@ -67,7 +67,7 @@ export const RulesCard: React.FC = () => {
     } else {
       setIsLoading(false);
     }
-  }, [appMode, workspace.id, hasUserChanged, isRulesLoading]);
+  }, [appMode, activeWorkspaceIds, hasUserChanged, isRulesLoading]);
 
   if (isLoading || isRulesLoading)
     return (
