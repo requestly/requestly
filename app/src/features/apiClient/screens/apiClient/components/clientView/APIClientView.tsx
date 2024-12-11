@@ -21,7 +21,6 @@ import {
   trackRequestRenamed,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
 import { globalActions } from "store/slices/global/slice";
 import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -37,7 +36,6 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
-import PATHS from "config/constants/sub/paths";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
@@ -59,8 +57,6 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
 
 const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRequestFinished, openInModal }) => {
   const dispatch = useDispatch();
-  const location = useLocation();
-  const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
@@ -341,13 +337,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
       setEntry({ ...result.data.data });
-      // updateTab(requestDetails.id, { hasUnsavedChanges: false, data: requestDetails });
 
       trackRequestSaved("api_client_view");
-      if (location.pathname.includes("history")) {
-        navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`);
-      }
-
       toast.success("Request saved!");
     } else {
       toast.error("Something went wrong!");
