@@ -5,6 +5,8 @@ import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../ty
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
+import { AUTHORIZATION_TYPES } from "./components/clientView/components/request/components/AuthorizationView/types";
+import { AUTH_OPTIONS } from "./components/clientView/components/request/components/AuthorizationView/types/form";
 
 export const makeRequest = async (
   appMode: string,
@@ -43,6 +45,15 @@ export const addUrlSchemeIfMissing = (url: string): string => {
   return url;
 };
 
+const getEmptyAuthOptions = (): AUTH_OPTIONS => {
+  return {
+    [AUTHORIZATION_TYPES.NO_AUTH]: null,
+    [AUTHORIZATION_TYPES.API_KEY]: { key: "", value: "" },
+    [AUTHORIZATION_TYPES.BEARER_TOKEN]: { bearer: "" },
+    [AUTHORIZATION_TYPES.BASIC_AUTH]: { username: "", password: "" },
+  };
+};
+
 export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
   return {
     request: {
@@ -53,6 +64,11 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
       body: null,
       contentType: RequestContentType.RAW,
       ...(request || {}),
+      auth: {
+        currentAuthType: AUTHORIZATION_TYPES.NO_AUTH,
+        authOptions: getEmptyAuthOptions(),
+        ...request?.auth,
+      },
     },
     response: null,
   };
@@ -147,6 +163,10 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
       headers,
       contentType,
       body,
+      auth: {
+        currentAuthType: AUTHORIZATION_TYPES.NO_AUTH,
+        authOptions: getEmptyAuthOptions(),
+      },
     };
     return request;
   } catch (e) {

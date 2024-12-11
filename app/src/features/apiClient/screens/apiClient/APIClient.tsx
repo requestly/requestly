@@ -40,6 +40,8 @@ export const APIClient: React.FC<Props> = () => {
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
   const isHistoryPath = location.pathname.includes("history");
 
+  console.log("DBG-1: selectedEntryDetails", selectedEntryDetails);
+
   const requestHistoryEntry = useMemo(() => {
     if (!isHistoryPath) {
       return;

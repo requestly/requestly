@@ -174,6 +174,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         ...entry.request,
         queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys),
         headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys),
+        auth: {
+          currentAuthType: entry.request.auth.currentAuthType,
+          authOptions: entry.request.auth.authOptions,
+        },
       },
       scripts: {
         preRequest: entry.scripts?.preRequest || "",
