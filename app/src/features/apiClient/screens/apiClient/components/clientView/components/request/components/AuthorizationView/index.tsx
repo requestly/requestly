@@ -14,37 +14,18 @@ import React from "react";
 
 interface Props {
   requestHeaders: KeyValuePair[];
+  prefillAuthValues: {};
   setAuthHeaders: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
 }
 
-const AuthorizationView: React.FC<Props> = ({ requestHeaders, setAuthHeaders }) => {
-  const [selectedForm, setSelectedForm] = useState("");
-  const [formValues, setFormValues] = useState({});
+const AuthorizationView: React.FC<Props> = ({ requestHeaders, setAuthHeaders, prefillAuthValues }) => {
+  const [selectedForm, setSelectedForm] = useState(prefillAuthValues?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH);
+  const [formValues, setFormValues] = useState<Record<string, any>>(prefillAuthValues?.authOptions || {});
   const [requestHeadersState, updateRequestHeaders] = useState(requestHeaders);
 
   useEffect(() => {
     updateRequestHeaders(requestHeaders);
   }, [requestHeaders]);
-
-  const updateHeadersInState = (
-    headersState: KeyValuePair[],
-    type: string,
-    key: string | null,
-    value: string | null,
-    id: string | null = null
-  ) => {
-    const existingHeader = headersState.find((header) => header.type === type);
-
-    if (existingHeader) {
-      existingHeader.key = key || existingHeader.key;
-      existingHeader.value = value || existingHeader.value;
-      if (id) {
-        existingHeader[id] = value;
-      }
-    } else {
-      headersState.unshift(createAuthorizationHeader(type, key, value, id));
-    }
-  };
 
   const createAuthorizationHeader = (
     type: string,
@@ -60,6 +41,25 @@ const AuthorizationView: React.FC<Props> = ({ requestHeaders, setAuthHeaders }) 
     ...(id ? { [id]: value } : {}),
   });
 
+  const updateHeadersInState = (
+    headersState: KeyValuePair[],
+    type: string,
+    key: string | null,
+    value: string | null,
+    selectortId: string | null = null
+  ) => {
+    const existingHeaderIndex = headersState.findIndex((header) => header.type === type);
+    if (existingHeaderIndex !== -1) {
+      headersState[existingHeaderIndex] = {
+        ...headersState[existingHeaderIndex],
+        key: key || headersState[existingHeaderIndex].key,
+        value: value || headersState[existingHeaderIndex].value,
+      };
+    } else {
+      headersState.unshift(createAuthorizationHeader(type, key, value, selectortId));
+    }
+  };
+
   const onChangeHandler = (value: string, id: string) => {
     setFormValues((prevValues) => ({
       ...prevValues,
@@ -69,39 +69,22 @@ const AuthorizationView: React.FC<Props> = ({ requestHeaders, setAuthHeaders }) 
       },
     }));
 
+    const currentFormValues = { ...formValues[selectedForm], [id]: value };
     const headersState = [...requestHeadersState];
 
     switch (selectedForm) {
       case AUTHORIZATION_TYPES.API_KEY:
-        updateHeadersInState(headersState, "auth", null, value, id);
+        updateHeadersInState(headersState, "auth", currentFormValues.key || "", currentFormValues.value || "");
         break;
 
       case AUTHORIZATION_TYPES.BEARER_TOKEN:
-        updateHeadersInState(headersState, "auth", "Authorization", `Bearer ${value}`);
+        updateHeadersInState(headersState, "auth", "Authorization", `Bearer ${currentFormValues.bearer}`);
         break;
 
       case AUTHORIZATION_TYPES.BASIC_AUTH: {
-        const existingHeaderIndex = headersState.findIndex((header) => header.type === "auth");
-        let headerValue = "";
-
-        if (existingHeaderIndex !== -1) {
-          const existingHeader = headersState[existingHeaderIndex];
-          const existingUsername = existingHeader.value?.split("Basic ")[1]?.split(":")[0];
-          const existingPassword = existingHeader.value?.split("Basic ")[1]?.split(":")[1];
-          const username = id === "username" ? value : existingUsername;
-          const password = id === "password" ? value : existingPassword;
-          headerValue = `Basic ${username}:${password}`;
-          headersState[existingHeaderIndex] = {
-            ...existingHeader,
-            key: "Authorization",
-            value: headerValue,
-          };
-        } else {
-          const username = id === "username" ? value : "";
-          const password = id === "password" ? value : "";
-          headerValue = `Basic ${username}:${password}`;
-          headersState.unshift(createAuthorizationHeader("auth", "Authorization", headerValue));
-        }
+        const username = currentFormValues.username || "";
+        const password = currentFormValues.password || "";
+        updateHeadersInState(headersState, "auth", "Authorization", `Basic ${`${username}:${password}`}`);
         break;
       }
 
@@ -114,6 +97,7 @@ const AuthorizationView: React.FC<Props> = ({ requestHeaders, setAuthHeaders }) 
       request: {
         ...prev.request,
         headers: headersState,
+        auth: { currentAuthType: selectedForm, authOptions: formValues },
       },
     }));
   };
@@ -127,7 +111,7 @@ const AuthorizationView: React.FC<Props> = ({ requestHeaders, setAuthHeaders }) 
           <label>Authorization Type</label>
           <Select
             className="form-selector-dropdown"
-            defaultValue={AUTHORIZATION_TYPES_META[0]}
+            value={selectedForm}
             onChange={(value) => {
               setSelectedForm(value);
               if (value === AUTHORIZATION_TYPES.NO_AUTH) {
@@ -151,7 +135,7 @@ const AuthorizationView: React.FC<Props> = ({ requestHeaders, setAuthHeaders }) 
               formData={AUTHORIZATION_FORM_DATA[selectedForm]}
               formType={selectedForm}
               onChangeHandler={debouncedOnChange}
-              formvalues={formValues[selectedForm]}
+              formvalues={formValues[selectedForm] || {}}
             />
           )}
         </div>

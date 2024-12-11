@@ -83,7 +83,12 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
       },
       {
         key: Tab.HEADERS,
-        label: <LabelWithCount label="Headers" count={sanitizeKeyValuePairs(requestEntry.request.headers).length} />,
+        label: (
+          <LabelWithCount
+            label="Headers"
+            count={sanitizeKeyValuePairs(requestEntry.request.headers, true, false).length}
+          />
+        ),
         children: (
           <KeyValueTable
             data={requestEntry.request.headers}
@@ -95,8 +100,19 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
       },
       {
         key: Tab.AUTHORIZATION,
-        label: <LabelWithCount label="Authorization" showDot={true} />,
-        children: <AuthorizationView requestHeaders={requestEntry.request.headers} setAuthHeaders={setRequestEntry} />,
+        label: (
+          <LabelWithCount
+            label="Authorization"
+            showDot={requestEntry.request.headers.findIndex((header) => header.type === "auth") !== -1}
+          />
+        ),
+        children: (
+          <AuthorizationView
+            requestHeaders={requestEntry.request.headers}
+            setAuthHeaders={setRequestEntry}
+            prefillAuthValues={requestEntry.request.auth}
+          />
+        ),
       },
     ];
 
