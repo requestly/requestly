@@ -12,6 +12,34 @@ export const requestWorkerFunction = function (e: MessageEvent) {
     },
   };
 
+  const recursiveJSONify = (obj: any): any => {
+    try {
+      // If it's a JSON string, try to parse it first
+      if (typeof obj === "string") {
+        try {
+          return recursiveJSONify(JSON.parse(obj));
+        } catch {
+          return obj;
+        }
+      }
+
+      if (typeof obj !== "object" || obj === null) {
+        return obj;
+      }
+
+      if (Array.isArray(obj)) {
+        return obj.map((item) => recursiveJSONify(item));
+      }
+
+      return Object.entries(obj).reduce((acc, [key, value]) => {
+        acc[key] = recursiveJSONify(value);
+        return acc;
+      }, {} as any);
+    } catch {
+      return String(obj);
+    }
+  };
+
   const createInfiniteChainable = (methodName: string) => {
     let hasLogged = false;
 
@@ -33,7 +61,16 @@ export const requestWorkerFunction = function (e: MessageEvent) {
 
   const sandbox = {
     rq: {
-      request,
+      request: {
+        ...request,
+        toJSON: () => {
+          return {
+            method: request.method,
+            url: request.url,
+            body: recursiveJSONify(request.body),
+          };
+        },
+      },
       environment: {
         set: (key: string, value: any) => {
           if (key === undefined || value === undefined) {
@@ -132,10 +169,54 @@ export const responseWorkerFunction = function (e: MessageEvent) {
     return new Proxy(() => {}, handler);
   };
 
+  const recursiveJSONify = (obj: any): any => {
+    try {
+      // If it's a JSON string, try to parse it first
+      if (typeof obj === "string") {
+        try {
+          return recursiveJSONify(JSON.parse(obj));
+        } catch {
+          return obj;
+        }
+      }
+
+      if (typeof obj !== "object" || obj === null) {
+        return obj;
+      }
+
+      if (Array.isArray(obj)) {
+        return obj.map((item) => recursiveJSONify(item));
+      }
+
+      return Object.entries(obj).reduce((acc, [key, value]) => {
+        acc[key] = recursiveJSONify(value);
+        return acc;
+      }, {} as any);
+    } catch {
+      return String(obj);
+    }
+  };
+
   const sandbox = {
     rq: {
-      request,
-      response,
+      request: {
+        ...request,
+        toJSON: () => {
+          return {
+            method: request.method,
+            url: request.url,
+            body: recursiveJSONify(request.body),
+          };
+        },
+      },
+      response: {
+        ...response,
+        toJSON: () => {
+          return { response: recursiveJSONify(response) };
+        },
+        json: () => recursiveJSONify(response.body),
+        text: () => response.body,
+      },
       environment: {
         set: (key: string, value: any) => {
           if (key === undefined || value === undefined) {
