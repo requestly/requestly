@@ -64,7 +64,10 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
       {
         key: Tab.QUERY_PARAMS,
         label: (
-          <LabelWithCount label="Query Params" count={sanitizeKeyValuePairs(requestEntry.request.queryParams).length} />
+          <LabelWithCount
+            label="Query Params"
+            count={sanitizeKeyValuePairs(requestEntry.request.queryParams, true, false).length}
+          />
         ),
         children: (
           <KeyValueTable
