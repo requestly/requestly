@@ -103,7 +103,12 @@ export const EnvironmentsList = () => {
         ) : (
           <div className="mt-8">
             <EmptyState
-              onNewRecordClick={() => redirectToNewEnvironment(navigate)}
+              onNewRecordClick={() =>
+                openTab("environments/new", {
+                  title: "New environment",
+                  url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/new`,
+                })
+              }
               message="No environment created yet"
               newRecordBtnText="Create new environment"
               analyticEventSource={EnvironmentAnalyticsSource.ENVIRONMENTS_LIST}
