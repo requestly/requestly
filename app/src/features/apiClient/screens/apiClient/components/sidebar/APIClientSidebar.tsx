@@ -10,6 +10,7 @@ import { HistoryList } from "./components/historyList/HistoryList";
 import { ApiClientSidebarHeader } from "./components/apiClientSidebarHeader/ApiClientSidebarHeader";
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
 import { useApiClientContext } from "features/apiClient/contexts";
+import { DeleteApiRecordModal } from "../modals";
 import "./apiClientSidebar.scss";
 
 interface Props {}
@@ -26,7 +27,17 @@ const APIClientSidebar: React.FC<Props> = () => {
   const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
 
-  const { history, clearHistory, onNewClick, onImportClick, onSelectionFromHistory } = useApiClientContext();
+  const {
+    history,
+    clearHistory,
+    onNewClick,
+    onImportClick,
+    onSelectionFromHistory,
+    recordToBeDeleted,
+    isDeleteModalOpen,
+    onDeleteModalClose,
+    selectedHistoryIndex,
+  } = useApiClientContext();
 
   const hideNewRecordNameInput = () => {
     setIsNewRecordNameInputVisible(false);
@@ -119,7 +130,13 @@ const APIClientSidebar: React.FC<Props> = () => {
           </div>
         </Tooltip>
       ),
-      children: <HistoryList history={history} onSelectionFromHistory={onSelectionFromHistory} />,
+      children: (
+        <HistoryList
+          history={history}
+          selectedHistoryIndex={selectedHistoryIndex}
+          onSelectionFromHistory={onSelectionFromHistory}
+        />
+      ),
     },
   ];
 
@@ -128,25 +145,29 @@ const APIClientSidebar: React.FC<Props> = () => {
   };
 
   return (
-    <div className="api-client-sidebar">
-      <ApiClientSidebarHeader
-        activeTab={activeKey}
-        history={history}
-        onClearHistory={clearHistory}
-        onImportClick={onImportClick}
-        onNewClick={(recordType) => handleNewRecordClick(recordType, "api_client_sidebar_header")}
-      />
+    <>
+      <div className="api-client-sidebar">
+        <ApiClientSidebarHeader
+          activeTab={activeKey}
+          history={history}
+          onClearHistory={clearHistory}
+          onImportClick={onImportClick}
+          onNewClick={(recordType) => handleNewRecordClick(recordType, "api_client_sidebar_header")}
+        />
 
-      <Tabs
-        items={items}
-        size="small"
-        tabPosition="left"
-        className="api-client-sidebar-tabs"
-        activeKey={activeKey}
-        defaultActiveKey={ApiClientSidebarTabKey.COLLECTIONS}
-        onChange={handleActiveTabChange}
-      />
-    </div>
+        <Tabs
+          items={items}
+          size="small"
+          tabPosition="left"
+          className="api-client-sidebar-tabs"
+          activeKey={activeKey}
+          defaultActiveKey={ApiClientSidebarTabKey.COLLECTIONS}
+          onChange={handleActiveTabChange}
+        />
+      </div>
+
+      <DeleteApiRecordModal open={isDeleteModalOpen} record={recordToBeDeleted} onClose={onDeleteModalClose} />
+    </>
   );
 };
 
