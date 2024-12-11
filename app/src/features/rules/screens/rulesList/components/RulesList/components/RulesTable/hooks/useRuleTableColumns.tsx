@@ -328,19 +328,21 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         ];
 
         const ruleActions: MenuProps["items"] = [
-          {
-            key: 0,
-            onClick: (info) => {
-              info.domEvent?.stopPropagation?.();
-              recordsUngroupAction([normalizeRecord(record)]);
-            },
-            label: (
-              <Row>
-                <ImUngroup />
-                Ungroup
-              </Row>
-            ),
-          },
+          isRule(record) && !record.isSample && record.groupId
+            ? {
+                key: 0,
+                onClick: (info) => {
+                  info.domEvent?.stopPropagation?.();
+                  recordsUngroupAction([normalizeRecord(record)]);
+                },
+                label: (
+                  <Row>
+                    <ImUngroup />
+                    Ungroup
+                  </Row>
+                ),
+              }
+            : null,
           {
             key: 1,
             onClick: (info) => {
