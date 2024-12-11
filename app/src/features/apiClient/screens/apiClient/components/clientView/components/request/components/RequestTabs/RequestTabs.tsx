@@ -2,13 +2,14 @@ import { Tabs, TabsProps, Tag } from "antd";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import { KeyValueFormType, RQAPI, RequestContentType } from "../../../../../../../../types";
 import RequestBody from "../../RequestBody";
-import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
+import { appendAuthOptions, sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
 import { KeyValueTable } from "../KeyValueTable/KeyValueTable";
 import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEditor";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
 import AuthorizationView from "../AuthorizationView";
+import { AUTHORIZATION_TYPES } from "../AuthorizationView/authStaticData";
 
 enum Tab {
   QUERY_PARAMS = "query_params",
@@ -39,6 +40,15 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
+
+  useEffect(() => {
+    appendAuthOptions(
+      requestEntry,
+      setRequestEntry,
+      requestEntry?.auth?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH,
+      requestEntry.auth?.authOptions
+    );
+  }, []);
 
   useEffect(() => {
     if (selectedTab === Tab.BODY && !supportsRequestBody(requestEntry.request.method)) {
@@ -108,9 +118,9 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
         ),
         children: (
           <AuthorizationView
-            requestHeaders={requestEntry.request.headers}
-            setAuthHeaders={setRequestEntry}
-            prefillAuthValues={requestEntry.request.auth}
+            apiEntry={requestEntry}
+            updateEntry={setRequestEntry}
+            prefillAuthValues={requestEntry.auth}
           />
         ),
       },
