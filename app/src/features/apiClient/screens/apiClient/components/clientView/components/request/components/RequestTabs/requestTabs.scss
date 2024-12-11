@@ -76,14 +76,40 @@
 
 .authorization-view {
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  height: calc(100% - 45px);
+  border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+  height: 100%;
   overflow: scroll;
 
   .form-and-description {
     display: flex;
     height: calc(100% - 45px);
 
+    .no-auth-banner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      padding-top: var(--space-11, 48px);
+
+      .banner-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        gap: var(--space-6, 16px);
+
+        .banner-text {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          gap: var(--space-2, 4px);
+          align-self: stretch;
+        }
+      }
+    }
     .form-view {
       max-width: 680px;
       flex: 1;

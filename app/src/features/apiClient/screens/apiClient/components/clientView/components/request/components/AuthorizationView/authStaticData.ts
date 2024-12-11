@@ -1,24 +1,20 @@
-export const AUTHORIZATION_TYPES = {
-  NO_AUTH: "NO_AUTH",
-  API_KEY: "API_KEY",
-  BEARER_TOKEN: "BEARER_TOKEN",
-  BASIC_AUTH: "BASIC_AUTH",
-};
+import { AuthFormData, AuthStaticData, AUTHORIZATION_TYPES, AUTH_FORM_FIELD_TYPES } from "./types";
 
-export const AUTHORIZATION_TYPES_META = [
+export const AUTHORIZATION_TYPE_OPTIONS: { label: string; value: string }[] = [
   { label: "No Auth", value: AUTHORIZATION_TYPES.NO_AUTH },
   { label: "API Key", value: AUTHORIZATION_TYPES.API_KEY },
   { label: "Bearer Token", value: AUTHORIZATION_TYPES.BEARER_TOKEN },
   { label: "Basic Auth", value: AUTHORIZATION_TYPES.BASIC_AUTH },
 ];
 
-export const AUTHORIZATION_FORM_DATA = {
+export const AUTHORIZATION_FORM_DATA: AuthFormData = {
+  [AUTHORIZATION_TYPES.NO_AUTH]: [],
   [AUTHORIZATION_TYPES.API_KEY]: [
-    { id: "key", type: "RQ_SINGLE_LINE_EDITOR", label: "Key", placeholder: "Key" },
-    { id: "value", type: "RQ_SINGLE_LINE_EDITOR", label: "Value", placeholder: "Value" },
+    { id: "key", type: AUTH_FORM_FIELD_TYPES.INPUT, label: "Key", placeholder: "Key" },
+    { id: "value", type: AUTH_FORM_FIELD_TYPES.INPUT, label: "Value", placeholder: "Value" },
     {
       id: "addTo",
-      type: "SELECT",
+      type: AUTH_FORM_FIELD_TYPES.SELECT,
       label: "Add to",
       options: [
         { label: "Header", value: "HEADER" },
@@ -28,15 +24,16 @@ export const AUTHORIZATION_FORM_DATA = {
     },
   ],
   [AUTHORIZATION_TYPES.BEARER_TOKEN]: [
-    { id: "bearer", type: "RQ_SINGLE_LINE_EDITOR", label: "Token", placeholder: "Token" },
+    { id: "bearer", type: AUTH_FORM_FIELD_TYPES.INPUT, label: "Token", placeholder: "Token" },
   ],
   [AUTHORIZATION_TYPES.BASIC_AUTH]: [
-    { id: "username", type: "RQ_SINGLE_LINE_EDITOR", label: "Username", placeholder: "Username" },
-    { id: "password", type: "RQ_SINGLE_LINE_EDITOR", label: "Password", placeholder: "Password" },
+    { id: "username", type: AUTH_FORM_FIELD_TYPES.INPUT, label: "Username", placeholder: "Username" },
+    { id: "password", type: AUTH_FORM_FIELD_TYPES.INPUT, label: "Password", placeholder: "Password" },
   ],
 };
 
-export const AUTHORIZATION_STATIC_DATA = {
+export const AUTHORIZATION_STATIC_DATA: AuthStaticData = {
+  [AUTHORIZATION_TYPES.NO_AUTH]: null,
   [AUTHORIZATION_TYPES.API_KEY]: {
     formData: AUTHORIZATION_FORM_DATA[AUTHORIZATION_TYPES.API_KEY],
     description: {

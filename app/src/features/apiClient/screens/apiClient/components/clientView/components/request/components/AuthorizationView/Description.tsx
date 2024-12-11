@@ -1,18 +1,23 @@
 import { isEmpty } from "lodash";
+import { AuthDescriptionData, AuthDescriptionStep } from "./types";
+import React from "react";
+interface DescriptionProps {
+  data: AuthDescriptionData;
+}
 
-const Description = ({ data }) => {
+const Description: React.FC<DescriptionProps> = ({ data }) => {
   const { heading, subHeading, steps = [] } = data;
 
-  const renderSteps = (data) => {
-    if (isEmpty(data)) {
+  const renderSteps = (descriptionSteps: AuthDescriptionStep[]) => {
+    if (isEmpty(descriptionSteps)) {
       return;
     }
 
-    return data.map((item) => {
+    return descriptionSteps.map((step) => {
       return (
         <>
-          <li className="step-item">{item.value}</li>
-          {!isEmpty(item.steps) && <ul className="steps">{renderSteps(item.steps)}</ul>}
+          <li className="step-item">{step.value}</li>
+          {!isEmpty(step.steps) && <ul className="steps">{renderSteps(step.steps)}</ul>}
         </>
       );
     });

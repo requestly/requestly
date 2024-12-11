@@ -18,7 +18,7 @@ enum Tab {
   SCRIPTS = "scripts",
 }
 
-const LabelWithCount: React.FC<{ label: string; count?: number; showDot?: boolean }> = ({ label, count, showDot }) => {
+const TabHeaderLabel: React.FC<{ label: string; count?: number; showDot?: boolean }> = ({ label, count, showDot }) => {
   return (
     <div className="request-tab-label">
       <span>{label}</span>
@@ -54,7 +54,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
       {
         key: Tab.QUERY_PARAMS,
         label: (
-          <LabelWithCount label="Query Params" count={sanitizeKeyValuePairs(requestEntry.request.queryParams).length} />
+          <TabHeaderLabel label="Query Params" count={sanitizeKeyValuePairs(requestEntry.request.queryParams).length} />
         ),
         children: (
           <KeyValueTable
@@ -68,7 +68,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
       {
         key: Tab.BODY,
         label: (
-          <LabelWithCount label="Body" count={requestEntry.request.body ? 1 : 0} showDot={isRequestBodySupported} />
+          <TabHeaderLabel label="Body" count={requestEntry.request.body ? 1 : 0} showDot={isRequestBodySupported} />
         ),
         children: (
           <RequestBody
@@ -84,7 +84,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
       {
         key: Tab.HEADERS,
         label: (
-          <LabelWithCount
+          <TabHeaderLabel
             label="Headers"
             count={sanitizeKeyValuePairs(requestEntry.request.headers, true, false).length}
           />
@@ -101,7 +101,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
       {
         key: Tab.AUTHORIZATION,
         label: (
-          <LabelWithCount
+          <TabHeaderLabel
             label="Authorization"
             showDot={requestEntry.request.headers.findIndex((header) => header.type === "auth") !== -1}
           />
@@ -109,7 +109,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
         children: (
           <AuthorizationView
             requestHeaders={requestEntry.request.headers}
-            setAuthHeaders={setRequestEntry}
+            setRequestEntry={setRequestEntry}
             prefillAuthValues={requestEntry.request.auth}
           />
         ),
@@ -120,7 +120,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
       items.push({
         key: Tab.SCRIPTS,
         label: (
-          <LabelWithCount
+          <TabHeaderLabel
             label="Scripts"
             showDot={true}
             count={requestEntry.scripts?.postResponse?.length || requestEntry.scripts?.preRequest?.length}

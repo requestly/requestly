@@ -1,4 +1,6 @@
 import { EnvironmentVariables } from "backend/environment/types";
+import { AUTH_OPTIONS } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/form";
+import { AUTHORIZATION_TYPES } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 
 export enum RequestMethod {
   GET = "GET",
@@ -52,6 +54,10 @@ export namespace RQAPI {
 
   export type RequestBody = string | KeyValuePair[]; // in case of form data, body will be key-value pairs
 
+  type AuthOptions = {
+    currentAuthType: AUTHORIZATION_TYPES;
+    authOptions: AUTH_OPTIONS; // todo: could be empty, need to check // also need to add inherit from parent later
+  };
   export interface Request {
     url: string;
     queryParams: KeyValuePair[];
@@ -59,6 +65,7 @@ export namespace RQAPI {
     headers: KeyValuePair[];
     body?: RequestBody;
     contentType?: RequestContentType;
+    auth: AuthOptions;
   }
 
   export interface Response {
@@ -96,6 +103,7 @@ export namespace RQAPI {
       postResponse: string;
     };
     variables: Omit<EnvironmentVariables, "localValue">;
+    auth: AuthOptions;
   }
 
   interface RecordMetadata {

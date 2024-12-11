@@ -14,10 +14,12 @@ import { CollectionOverview } from "./components/CollectionOverview/CollectionOv
 import { variablesActions } from "store/features/variables/slice";
 import { getCollectionVariables } from "store/features/variables/selectors";
 import "./collectionView.scss";
+import AuthorizationView from "../request/components/AuthorizationView";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
   VARIABLES: "variables",
+  AUTHORIZATION: "authorization",
 };
 
 export const CollectionView = () => {
@@ -74,6 +76,17 @@ export const CollectionView = () => {
             variables={collectionVariables[collectionId]?.variables || {}}
             setVariables={handleSetVariables}
             removeVariable={handleRemoveVariable}
+          />
+        ),
+      },
+      {
+        label: "Authorization",
+        key: TAB_KEYS.AUTHORIZATION,
+        children: (
+          <AuthorizationView
+            requestHeaders={[]}
+            setRequestEntry={() => {}} // todo
+            prefillAuthValues={{}}
           />
         ),
       },

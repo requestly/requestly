@@ -1,106 +1,114 @@
 import { Select } from "antd";
 import { KeyValuePair, RQAPI } from "features/apiClient/types";
-import { debounce, isEmpty } from "lodash";
-import { useEffect, useState } from "react";
+import { debounce } from "lodash";
+import { useCallback, useEffect, useState } from "react";
 import AuthorizationForm from "./AuthorizationForm";
 import Description from "./Description";
-import {
-  AUTHORIZATION_FORM_DATA,
-  AUTHORIZATION_STATIC_DATA,
-  AUTHORIZATION_TYPES,
-  AUTHORIZATION_TYPES_META,
-} from "./authStaticData";
+import { AUTHORIZATION_FORM_DATA, AUTHORIZATION_STATIC_DATA, AUTHORIZATION_TYPE_OPTIONS } from "./authStaticData";
 import React from "react";
+import { AUTH_ENTRY_IDENTIFIER, AUTHORIZATION_TYPES } from "./types";
+import NoAuthBanner from "./NoAuthBanner";
+import { AUTH_OPTIONS } from "./types/form";
 
-interface Props {
+interface AuthorizationViewProps {
   requestHeaders: KeyValuePair[];
-  prefillAuthValues: {};
-  setAuthHeaders: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
+  prefillAuthValues: {
+    currentAuthType?: AUTHORIZATION_TYPES;
+    authOptions?: AUTH_OPTIONS; // todo: could be empty, need to check // also need to add inherit from parent later
+  };
+  setRequestEntry: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
 }
 
-const AuthorizationView: React.FC<Props> = ({ requestHeaders, setAuthHeaders, prefillAuthValues }) => {
+const AuthorizationView: React.FC<AuthorizationViewProps> = ({
+  requestHeaders,
+  setRequestEntry,
+  prefillAuthValues,
+}) => {
   const [selectedForm, setSelectedForm] = useState(prefillAuthValues?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH);
-  const [formValues, setFormValues] = useState<Record<string, any>>(prefillAuthValues?.authOptions || {});
+  const [formValues, setFormValues] = useState<AUTH_OPTIONS>(prefillAuthValues?.authOptions);
   const [requestHeadersState, updateRequestHeaders] = useState(requestHeaders);
 
   useEffect(() => {
     updateRequestHeaders(requestHeaders);
   }, [requestHeaders]);
 
-  const createAuthorizationHeader = (
-    type: string,
-    key: string | null,
-    value: string | null,
-    id: string | null = null
-  ) => ({
-    id: Math.random(),
-    key,
-    value,
-    type,
-    isEnabled: true,
-    ...(id ? { [id]: value } : {}),
-  });
+  const onChangeHandler = useCallback(
+    (value: string, id: string) => {
+      console.log("DBG: onChangeHandler", value, id);
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        [selectedForm]: {
+          ...prevValues[selectedForm],
+          [id]: value,
+        },
+      }));
 
-  const updateHeadersInState = (
-    headersState: KeyValuePair[],
-    type: string,
-    key: string | null,
-    value: string | null,
-    selectortId: string | null = null
-  ) => {
-    const existingHeaderIndex = headersState.findIndex((header) => header.type === type);
-    if (existingHeaderIndex !== -1) {
-      headersState[existingHeaderIndex] = {
-        ...headersState[existingHeaderIndex],
-        key: key || headersState[existingHeaderIndex].key,
-        value: value || headersState[existingHeaderIndex].value,
-      };
-    } else {
-      headersState.unshift(createAuthorizationHeader(type, key, value, selectortId));
-    }
-  };
+      let currentFormValues; // fix-me: have to define it this way to avoid type inference issues
+      const headersState = [...requestHeadersState];
 
-  const onChangeHandler = (value: string, id: string) => {
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      [selectedForm]: {
-        ...prevValues[selectedForm],
-        [id]: value,
-      },
-    }));
+      switch (selectedForm) {
+        case AUTHORIZATION_TYPES.API_KEY:
+          currentFormValues = { ...formValues[selectedForm], [id]: value };
+          updateHeadersInState(headersState, currentFormValues.key || "", currentFormValues.value || "");
+          break;
 
-    const currentFormValues = { ...formValues[selectedForm], [id]: value };
-    const headersState = [...requestHeadersState];
+        case AUTHORIZATION_TYPES.BEARER_TOKEN:
+          currentFormValues = { ...formValues[selectedForm], [id]: value };
+          updateHeadersInState(headersState, "Authorization", `Bearer ${currentFormValues.bearer}`);
+          break;
 
-    switch (selectedForm) {
-      case AUTHORIZATION_TYPES.API_KEY:
-        updateHeadersInState(headersState, "auth", currentFormValues.key || "", currentFormValues.value || "");
-        break;
+        case AUTHORIZATION_TYPES.BASIC_AUTH: {
+          currentFormValues = { ...formValues[selectedForm], [id]: value };
+          const username = currentFormValues.username || "";
+          const password = currentFormValues.password || "";
+          updateHeadersInState(headersState, "Authorization", `Basic ${`${username}:${password}`}`);
+          break;
+        }
 
-      case AUTHORIZATION_TYPES.BEARER_TOKEN:
-        updateHeadersInState(headersState, "auth", "Authorization", `Bearer ${currentFormValues.bearer}`);
-        break;
-
-      case AUTHORIZATION_TYPES.BASIC_AUTH: {
-        const username = currentFormValues.username || "";
-        const password = currentFormValues.password || "";
-        updateHeadersInState(headersState, "auth", "Authorization", `Basic ${`${username}:${password}`}`);
-        break;
+        default:
+          break;
       }
 
-      default:
-        break;
-    }
+      function updateHeadersInState(
+        headersState: KeyValuePair[],
+        key: string | null,
+        value: string | null,
+        selectortId: string | null = null
+      ) {
+        const existingHeaderIndex = headersState.findIndex((header) => header.type === AUTH_ENTRY_IDENTIFIER);
+        if (existingHeaderIndex !== -1) {
+          headersState[existingHeaderIndex] = {
+            ...headersState[existingHeaderIndex],
+            key: key || headersState[existingHeaderIndex].key,
+            value: value || headersState[existingHeaderIndex].value,
+          };
+        } else {
+          headersState.unshift(createAuthorizationHeader(key, value, selectortId));
+        }
 
-    setAuthHeaders((prev) => ({
-      ...prev,
-      request: {
-        ...prev.request,
-        headers: headersState,
-        auth: { currentAuthType: selectedForm, authOptions: formValues },
-      },
-    }));
-  };
+        setRequestEntry((prev) => ({
+          ...prev,
+          request: {
+            ...prev.request,
+            headers: headersState,
+            auth: { currentAuthType: selectedForm, authOptions: formValues },
+          },
+        }));
+      }
+
+      function createAuthorizationHeader(key: string | null, value: string | null, id: string | null = null) {
+        return {
+          id: Math.random(),
+          key,
+          value,
+          type: AUTH_ENTRY_IDENTIFIER,
+          isEnabled: true,
+          ...(id ? { [id]: value } : {}),
+        };
+      }
+    },
+    [formValues, requestHeadersState, selectedForm, setRequestEntry]
+  );
 
   const debouncedOnChange = debounce(onChangeHandler, 500);
 
@@ -115,32 +123,35 @@ const AuthorizationView: React.FC<Props> = ({ requestHeaders, setAuthHeaders, pr
             onChange={(value) => {
               setSelectedForm(value);
               if (value === AUTHORIZATION_TYPES.NO_AUTH) {
-                setAuthHeaders((prev) => ({
+                setRequestEntry((prev) => ({
                   ...prev,
                   request: {
                     ...prev.request,
                     headers: prev.request.headers.filter((header) => header.type !== "auth"),
+                    auth: { currentAuthType: AUTHORIZATION_TYPES.NO_AUTH },
                   },
                 }));
               }
             }}
-            options={AUTHORIZATION_TYPES_META}
+            options={AUTHORIZATION_TYPE_OPTIONS}
           />
         </div>
       </div>
       <div className="form-and-description">
-        <div className="form-view">
-          {!isEmpty(AUTHORIZATION_FORM_DATA[selectedForm]) && (
-            <AuthorizationForm
-              formData={AUTHORIZATION_FORM_DATA[selectedForm]}
-              formType={selectedForm}
-              onChangeHandler={debouncedOnChange}
-              formvalues={formValues[selectedForm] || {}}
-            />
-          )}
-        </div>
-        {!isEmpty(AUTHORIZATION_STATIC_DATA[selectedForm]?.description) && (
-          <Description data={AUTHORIZATION_STATIC_DATA[selectedForm]?.description} />
+        {selectedForm === AUTHORIZATION_TYPES.NO_AUTH ? (
+          <NoAuthBanner />
+        ) : (
+          <>
+            <div className="form-view">
+              <AuthorizationForm
+                formData={AUTHORIZATION_FORM_DATA[selectedForm]}
+                formType={selectedForm}
+                onChangeHandler={debouncedOnChange}
+                formvalues={formValues[selectedForm]}
+              />
+            </div>
+            <Description data={AUTHORIZATION_STATIC_DATA[selectedForm]?.description} />
+          </>
         )}
       </div>
     </div>
