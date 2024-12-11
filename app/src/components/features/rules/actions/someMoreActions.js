@@ -21,7 +21,7 @@ export const deleteRule = async (appMode, dispatch, ruleId, isRulesListRefreshPe
 
 const deleteRuleExecutionLog = (appMode, ruleId) => {
   Logger.log("Removing from storage in deleteRuleExecutionLog");
-  return StorageService(appMode).removeRecord(getExecutionLogsId(ruleId));
+  return StorageService(appMode).removeRecordsWithoutSyncing(getExecutionLogsId(ruleId));
 };
 
 export const exportRule = (rule, groupwiseRules) => {

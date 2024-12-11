@@ -10,7 +10,6 @@ import APP_CONSTANTS from "config/constants";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import Logger from "../../../../../../../../../common/logger";
 import { trackRulesListLoaded } from "features/rules/analytics";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { migrateAllRulesToMV3 } from "modules/extension/utils";
 import { sendIndividualRuleTypesCountAttributes } from "../utils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -27,7 +26,6 @@ interface Props {
 
 const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
   const appMode = useSelector(getAppMode);
-  const activeWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
   const userAuthDetails = useSelector(getUserAuthDetails);
   const userId = userAuthDetails.loggedIn && userAuthDetails.details?.profile?.uid;
@@ -40,7 +38,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
     async (rules: Rule[], groups: Group[]) => {
       console.log("!!!debug", { groups, rules });
       //@ts-ignore
-      rules = migrateAllRulesToMV3(rules, activeWorkspace.id);
+      rules = migrateAllRulesToMV3(rules, activeWorkspaceId);
 
       Logger.log("DBG: fetched data", JSON.stringify({ rules, groups }));
 
@@ -84,7 +82,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
       sendIndividualRuleTypesCountAttributes(rules);
       trackRulesListLoaded(rules.length, activeRulesCount, activePremiumRules.length, groups.length);
     },
-    [activeWorkspace.id, appMode, dispatch, setIsLoading]
+    [appMode, dispatch, setIsLoading]
   );
 
   useEffect(() => {
@@ -125,7 +123,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
       console.log("[Debug] Unsubbing explicit subscribers");
       unsubscribe?.();
     };
-  }, [userId, activeWorkspaceId, updateRulesAndGroups, appMode]);
+  }, [userId, activeWorkspaceId, appMode, updateRulesAndGroups]);
 };
 
 export default useFetchAndUpdateRules;

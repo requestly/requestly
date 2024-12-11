@@ -241,7 +241,7 @@ const AuthHandler: React.FC<{}> = () => {
         window.isSyncEnabled = null;
         window.keySetDoneisSyncEnabled = true;
         localStorage.removeItem("__rq_uid");
-        StorageService(appMode).removeRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN);
+        StorageService(appMode).removeRecordsWithoutSyncing([GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN]);
         // set amplitude anon id to local storage:
 
         dispatch(
