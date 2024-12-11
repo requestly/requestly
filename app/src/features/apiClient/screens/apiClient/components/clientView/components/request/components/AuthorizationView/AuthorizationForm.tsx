@@ -18,7 +18,16 @@ const getFields = (field, index, currentEnvironmentVariables, formType, onChange
         />
       );
     case "SELECT":
-      return <Select value={value} options={options} defaultValue={defaultValue} className={className} />;
+      return (
+        <Select
+          key={`${formType}-${index}`}
+          value={value}
+          options={options}
+          defaultValue={defaultValue}
+          className={className}
+          onChange={(value) => onChangeHandler(value, id)}
+        />
+      );
     default:
       break;
   }
