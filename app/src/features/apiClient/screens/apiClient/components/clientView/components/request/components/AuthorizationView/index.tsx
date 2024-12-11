@@ -12,6 +12,9 @@ import {
 } from "./authStaticData";
 import React from "react";
 import { appendAuthOptions } from "features/apiClient/screens/apiClient/utils";
+import "./authorizationView.scss";
+import { LABEL_TEXT } from "./authConstants";
+import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 
 interface Props {
   requestHeaders: KeyValuePair[];
@@ -40,7 +43,7 @@ const AuthorizationView: React.FC<Props> = ({ apiEntry, updateEntry, prefillAuth
     <div className="authorization-view">
       <div className="type-of-authorization">
         <div className="form-selector">
-          <label>Authorization Type</label>
+          <label>{LABEL_TEXT.AUTHORIZATION_TYPE_LABEL}</label>
           <Select
             className="form-selector-dropdown"
             value={selectedForm}
@@ -52,6 +55,11 @@ const AuthorizationView: React.FC<Props> = ({ apiEntry, updateEntry, prefillAuth
                   request: {
                     ...prev.request,
                     headers: prev.request.headers.filter((header) => header.type !== "auth"),
+                    queryParams: prev.request.queryParams.filter((queryParam) => queryParam.type !== "auth"),
+                  },
+                  auth: {
+                    ...prev.auth,
+                    currentAuthType: value,
                   },
                 }));
               }
@@ -61,18 +69,25 @@ const AuthorizationView: React.FC<Props> = ({ apiEntry, updateEntry, prefillAuth
         </div>
       </div>
       <div className="form-and-description">
-        <div className="form-view">
-          {!isEmpty(AUTHORIZATION_FORM_DATA[selectedForm]) && (
+        {!isEmpty(AUTHORIZATION_FORM_DATA[selectedForm]) && (
+          <div className="form-view">
+            <p className="info-text">
+              <AiOutlineExclamationCircle size={"12px"} color="#8f8f8f" />
+              <span>{LABEL_TEXT.INFO_TEXT}</span>
+            </p>
             <AuthorizationForm
               formData={AUTHORIZATION_FORM_DATA[selectedForm]}
               formType={selectedForm}
-              onChangeHandler={onChangeHandler}
+              onChangeHandler={debouncedOnChange}
               formvalues={formValues[selectedForm] || {}}
             />
-          )}
-        </div>
+          </div>
+        )}
         {!isEmpty(AUTHORIZATION_STATIC_DATA[selectedForm]?.description) && (
-          <Description data={AUTHORIZATION_STATIC_DATA[selectedForm]?.description} />
+          <Description
+            data={AUTHORIZATION_STATIC_DATA[selectedForm]?.description}
+            wrapperClass={`${selectedForm === AUTHORIZATION_TYPES.NO_AUTH ? "no-auth" : ""}`}
+          />
         )}
       </div>
     </div>

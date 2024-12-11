@@ -1,3 +1,5 @@
+import noAuth from "./assets/no-auth.svg";
+
 export const AUTHORIZATION_TYPES = {
   NO_AUTH: "NO_AUTH",
   API_KEY: "API_KEY",
@@ -37,12 +39,21 @@ export const AUTHORIZATION_FORM_DATA = {
 };
 
 export const AUTHORIZATION_STATIC_DATA = {
+  [AUTHORIZATION_TYPES.NO_AUTH]: {
+    description: {
+      img: noAuth,
+      heading: "No authorization type selected for this request.",
+      subHeading: "Please select a authorization type above.",
+    },
+  },
   [AUTHORIZATION_TYPES.API_KEY]: {
     formData: AUTHORIZATION_FORM_DATA[AUTHORIZATION_TYPES.API_KEY],
     description: {
       heading: "API Key",
       subHeading:
         "API Key authentication allows you to send a key-value pair to the API for verification. Here’s how to set it up:",
+      note: "Store your key in a variable for enhanced security.",
+      externalLink: "https://app.requestly.io/",
       steps: [
         { value: "In the Authorization tab, choose API Key from the dropdown." },
         { value: "Enter your key name and value in the respective fields." },
@@ -62,6 +73,8 @@ export const AUTHORIZATION_STATIC_DATA = {
       heading: "Bearer Token",
       subHeading:
         "API Key authentication allows you to send a key-value pair to the API for verification. Here’s how to set it up:",
+      note: "Store your key in a variable for enhanced security.",
+      externalLink: "https://app.requestly.io/",
       steps: [
         { value: "In the Authorization tab, choose API Key from the dropdown." },
         { value: "Enter your key name and value in the respective fields." },
@@ -81,6 +94,8 @@ export const AUTHORIZATION_STATIC_DATA = {
       heading: "Basic Auth",
       subHeading:
         "API Key authentication allows you to send a key-value pair to the API for verification. Here’s how to set it up:",
+      note: "Store your key in a variable for enhanced security.",
+      externalLink: "https://app.requestly.io/",
       steps: [
         { value: "In the Authorization tab, choose API Key from the dropdown." },
         { value: "Enter your key name and value in the respective fields." },
