@@ -17,6 +17,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RuleStorageModel, syncEngine } from "requestly-sync-engine";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { LocalStorageService } from "services/localStorageService";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -97,8 +98,9 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
         }, 1000);
         return;
       }
+      // FIXME-syncing: Improvements Required
       console.log("subscribe RuleStorageModels", activeWorkspaceId);
-      unsubscribe = await RuleStorageModel.subscribe((ruleStorageModels: RuleStorageModel[]) => {
+      unsubscribe = await RuleStorageModel.subscribe(async (ruleStorageModels: RuleStorageModel[]) => {
         console.log("!!!debug", { ruleStorageModels });
 
         let rulesAndGroups = ruleStorageModels.map((ruleStorageModel) => {
@@ -107,6 +109,10 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
         let groups = rulesAndGroups.filter((val) => val.objectType === "group") as Group[];
         let rules = rulesAndGroups.filter((val) => val.objectType === "rule") as Rule[];
         updateRulesAndGroups(rules, groups);
+
+        // TODO-syncing: THese are triggered multiple times
+        await LocalStorageService(appMode).resetRulesAndGroups();
+        await LocalStorageService(appMode).saveMultipleRulesOrGroups(rulesAndGroups);
       });
     }
 
@@ -119,7 +125,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
       console.log("[Debug] Unsubbing explicit subscribers");
       unsubscribe?.();
     };
-  }, [userId, activeWorkspaceId, updateRulesAndGroups]);
+  }, [userId, activeWorkspaceId, updateRulesAndGroups, appMode]);
 };
 
 export default useFetchAndUpdateRules;

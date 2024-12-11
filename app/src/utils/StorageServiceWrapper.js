@@ -105,7 +105,7 @@ class StorageServiceWrapper {
     // if (window.syncingV2) {
     const workspaceId = getActiveWorkspaceId(window.activeWorkspaceIds);
     console.log("[SyncingV2][debug]saveRuleOrGroup", { ruleOrGroup, workspaceId });
-    return await RuleStorageModel.create(ruleOrGroup, workspaceId);
+    return await RuleStorageModel.create(ruleOrGroup, workspaceId).save();
     // } else {
     //   const formattedObject = {
     //     [ruleOrGroup.id]: {
@@ -167,6 +167,9 @@ class StorageServiceWrapper {
 
   async removeRecord(key) {
     try {
+      console.log("[StorageServiceWrapper]removeRecord", { key });
+      // TODO-syncing: Temporary fix to remove record from RuleStorageModel
+      RuleStorageModel.create({ id: key }, getActiveWorkspaceId(window.activeWorkspaceIds)).delete();
       // const syncResult = await doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
       await this.StorageHelper.removeStorageObject(key);
       // this.trackPromise(Promise.resolve(syncResult));
@@ -177,10 +180,15 @@ class StorageServiceWrapper {
 
   async removeRecords(array) {
     try {
-      // await doSyncRecords(array, SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
-      const removalResult = await this.StorageHelper.removeStorageObjects(array);
-      // this.trackPromise(Promise.resolve(removalResult));
-      return removalResult;
+      console.log("[StorageServiceWrapper]removeRecords", { array });
+      const promises = array?.forEach((key) => {
+        return this.removeRecord(key);
+      });
+      await Promise.all(promises);
+      // // await doSyncRecords(array, SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
+      // const removalResult = await this.StorageHelper.removeStorageObjects(array);
+      // // this.trackPromise(Promise.resolve(removalResult));
+      // return removalResult;
     } catch (error) {
       console.error("Error removing record:", error);
       throw error;
