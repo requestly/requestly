@@ -24,6 +24,7 @@ export const APIClient: React.FC<Props> = () => {
 
   const { requestId } = useParams();
   const {
+    apiClientRecords,
     recordToBeDeleted,
     isDeleteModalOpen,
     onDeleteModalClose,
@@ -42,6 +43,7 @@ export const APIClient: React.FC<Props> = () => {
   const isRequestFetched = useRef(false);
 
   useEffect(() => {
+    const record = apiClientRecords.find((rec) => rec.id === requestId);
     if (isRequestFetched.current) {
       return;
     }
@@ -49,9 +51,16 @@ export const APIClient: React.FC<Props> = () => {
     if (!requestId || requestId === "new") {
       return;
     }
-
+    if (record?.type === RQAPI.RecordType.API) {
+      setSelectedEntryDetails((prev) => {
+        if (prev?.id === record.id && prev.name === record.name) {
+          return prev;
+        }
+        return record as RQAPI.ApiRecord;
+      });
+      return;
+    }
     setIsLoading(true);
-
     getApiRecord(requestId)
       .then((result) => {
         if (result.success) {
@@ -70,7 +79,7 @@ export const APIClient: React.FC<Props> = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [requestId]);
+  }, [requestId, apiClientRecords, onSaveRecord]);
 
   const saveRequest = useCallback(
     async (apiEntry: RQAPI.Entry) => {
