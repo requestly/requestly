@@ -58,13 +58,22 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
   };
 };
 
-export const sanitizeKeyValuePairs = (keyValuePairs: KeyValuePair[], removeDisabledKeys = true): KeyValuePair[] => {
+export const sanitizeKeyValuePairs = (
+  keyValuePairs: KeyValuePair[],
+  removeDisabledKeys = true,
+  excludeAuthHeaders = true
+): KeyValuePair[] => {
   return keyValuePairs
     .map((pair) => ({
       ...pair,
       isEnabled: pair.isEnabled ?? true,
     }))
-    .filter((pair) => pair.key.length > 0 && (!removeDisabledKeys || pair.isEnabled));
+    .filter(
+      (pair) =>
+        pair.key.length > 0 &&
+        (excludeAuthHeaders ? pair.type !== "auth" : true) &&
+        (!removeDisabledKeys || pair.isEnabled)
+    );
 };
 
 export const supportsRequestBody = (method: RequestMethod): boolean => {
