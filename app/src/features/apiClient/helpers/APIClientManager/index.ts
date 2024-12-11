@@ -202,7 +202,7 @@ export const makeRequest = async (
 
 export const addUrlSchemeIfMissing = (url: string): string => {
   if (url && !/^([a-z][a-z0-9+\-.]*):\/\//.test(url)) {
-    return "http://" + url;
+    return "https://" + url;
   }
 
   return url;
