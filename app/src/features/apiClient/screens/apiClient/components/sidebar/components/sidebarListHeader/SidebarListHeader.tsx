@@ -6,12 +6,11 @@ import { RQButton } from "lib/design-system-v2/components";
 import "./sidebarListHeader.scss";
 
 interface ListHeaderProps {
-  onAddRecordClick: () => void;
   onSearch: (value: string) => void;
   menuItems?: MenuProps["items"];
 }
 
-export const SidebarListHeader: React.FC<ListHeaderProps> = ({ onAddRecordClick, onSearch, menuItems }) => {
+export const SidebarListHeader: React.FC<ListHeaderProps> = ({ onSearch, menuItems }) => {
   return (
     <div className="sidebar-list-header">
       <Input
