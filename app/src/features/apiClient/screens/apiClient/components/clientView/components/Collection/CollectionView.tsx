@@ -11,9 +11,9 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import { EnvironmentVariables } from "backend/environment/types";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
-import "./collectionView.scss";
 import { variablesActions } from "store/features/variables/slice";
 import { getCollectionVariables } from "store/features/variables/selectors";
+import "./collectionView.scss";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
