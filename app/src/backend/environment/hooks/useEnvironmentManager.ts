@@ -174,10 +174,6 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
 
   const setVariables = useCallback(
     async (environmentId: string, variables: EnvironmentVariables) => {
-      console.log("!!!debug", "setVar", {
-        environmentId,
-        variables,
-      });
       const newVariables: EnvironmentVariables = Object.fromEntries(
         Object.entries(variables).map(([key, value]) => {
           const typeToSaveInDB =

@@ -47,10 +47,6 @@ const handleVariableChanges = async (
     setVariables: (variables: VariableKeyValuePairs) => Promise<void>;
   }
 ) => {
-  console.log("!!!debug", "payload", {
-    payload,
-    helperMethods,
-  });
   const currentVars = payload.currentVariables;
   const currentEnvironmentId = helperMethods.currentEnvironmentId;
 
