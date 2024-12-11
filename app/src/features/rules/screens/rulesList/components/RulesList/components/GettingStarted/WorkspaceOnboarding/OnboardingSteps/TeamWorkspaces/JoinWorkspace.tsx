@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAppMode } from "store/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { Avatar } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -11,7 +9,6 @@ import { TeamInviteMetadata } from "types";
 import { acceptTeamInvite } from "backend/workspace";
 import { toast } from "utils/Toast";
 import { redirectToRules } from "utils/RedirectionUtils";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import {
   trackOnboardingWorkspaceSkip,
   trackWorkspaceOnboardingPageViewed,
@@ -19,15 +16,15 @@ import {
 import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import { OnboardingSteps } from "../../types";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const appMode = useSelector(getAppMode);
-
   const [isJoining, setIsJoining] = useState<boolean>(false);
+
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const handleJoinWorkspace = () => {
     trackWorkspaceJoinClicked(team?.teamId, "workspace_onboarding");
@@ -46,21 +43,7 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
           );
 
           if (res?.data?.data?.invite.type === "teams") {
-            switchWorkspace(
-              {
-                teamId: team.teamId,
-                teamName: team.teamName,
-                teamMembersCount: team.accessCount,
-              },
-              dispatch,
-              {
-                isWorkspaceMode,
-                isSyncEnabled: true,
-              },
-              appMode,
-              null,
-              "onboarding"
-            );
+            switchWorkspace(team.teamId, "onboarding");
             redirectToRules(navigate);
           }
         }
