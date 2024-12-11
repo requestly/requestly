@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import APIClientView from "./components/clientView/APIClientView";
-import { DeleteApiRecordModal, ImportRequestModal } from "./components/modals";
+import { ImportRequestModal } from "./components/modals";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
@@ -27,9 +27,6 @@ export const APIClient: React.FC<Props> = () => {
   const {
     history,
     selectedHistoryIndex,
-    recordToBeDeleted,
-    isDeleteModalOpen,
-    onDeleteModalClose,
     addToHistory,
     isImportModalOpen,
     onImportRequestModalClose,
@@ -152,8 +149,6 @@ export const APIClient: React.FC<Props> = () => {
           handleImportRequest={handleImportRequest}
           onClose={onImportRequestModalClose}
         />
-
-        <DeleteApiRecordModal open={isDeleteModalOpen} record={recordToBeDeleted} onClose={onDeleteModalClose} />
       </div>
     </BottomSheetProvider>
   );
