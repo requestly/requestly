@@ -35,4 +35,39 @@ class LocalStorageServiceWrapper {
 
     this.storageClient.saveStorageObject(formattedObject);
   }
+
+  async deleteRuleOrGroup(ruleOrGroup: any, options = {}) {
+    console.log("[LocalStorageServiceWrapper][debug]", "deleteRuleOrGroup", ruleOrGroup);
+    this.storageClient.removeStorageObject(ruleOrGroup.id);
+  }
+
+  async deleteMultipleRulesOrGroups(array: any[], options = {}) {
+    console.log("[LocalStorageServiceWrapper][debug]", "deleteMultipleRulesOrGroups", array);
+    array.forEach((object) => {
+      this.deleteRuleOrGroup(object);
+    });
+  }
+
+  async clearStorage() {
+    await this.storageClient.clearStorage();
+  }
+
+  async resetRulesAndGroups() {
+    return this.storageClient.getStorageSuperObject().then(async (superObject: Record<string, any>) => {
+      console.log("[LocalStorageServiceWrapper][debug]", "resetRulesAndGroups", { superObject });
+      await this.clearStorage();
+
+      const newSuperObject: Record<string, any> = {};
+      for (let key in superObject) {
+        if (superObject[key]?.objectType === "rule" || superObject[key]?.objectType === "group") {
+          continue;
+        }
+
+        newSuperObject[key] = superObject[key];
+      }
+
+      console.log("[LocalStorageServiceWrapper][debug]", "resetRulesAndGroups", { newSuperObject });
+      await this.storageClient.saveStorageObject(newSuperObject);
+    });
+  }
 }
