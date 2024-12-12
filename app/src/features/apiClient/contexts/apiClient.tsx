@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
-import { getApiRecords } from "backend/apiClient";
+import { getApiRecords, upsertApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
@@ -232,11 +232,25 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
         case RQAPI.RecordType.COLLECTION: {
           trackNewCollectionClicked(analyticEventSource);
-          openTab("collection/new", {
-            title: "New collection",
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/new`,
-          });
-          return;
+          const newCollection: Partial<RQAPI.CollectionRecord> = {
+            name: "New collection",
+            type: RQAPI.RecordType.COLLECTION,
+            data: { variables: {} },
+            collectionId: "",
+          };
+          return upsertApiRecord(uid, newCollection, teamId)
+            .then((result) => {
+              if (result.success) {
+                onSaveRecord(result.data);
+                openTab(result.data.id, {
+                  title: result.data.name,
+                  url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${result.data.id}?new`,
+                });
+              }
+            })
+            .catch((error) => {
+              console.error("Error adding new collection", error);
+            });
         }
 
         case RQAPI.RecordType.ENVIRONMENT: {
@@ -258,7 +272,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [openTab, addNewEnvironment]
+    [openTab, addNewEnvironment, teamId, uid, onSaveRecord]
   );
 
   const value = {

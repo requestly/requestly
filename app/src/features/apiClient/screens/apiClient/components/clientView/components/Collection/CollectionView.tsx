@@ -2,7 +2,7 @@ import { Result, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { useCallback, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { VariablesList } from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
 import { RQAPI } from "features/apiClient/types";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,6 +27,7 @@ export const CollectionView = () => {
   const user = useSelector(getUserAuthDetails);
   const teamId = useSelector(getCurrentlyActiveWorkspace);
   const collectionVariables = useSelector(getCollectionVariables);
+  const location = useLocation();
 
   const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
 
@@ -80,6 +81,16 @@ export const CollectionView = () => {
     ];
   }, [handleRemoveVariable, handleSetVariables, collectionVariables, collectionId, collection]);
 
+  const handleCollectionNameChange = useCallback(
+    async (name: string) => {
+      const record = { ...collection, name };
+      return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
+        onSaveRecord(result.data);
+      });
+    },
+    [collection, teamId, user.details?.profile?.uid, onSaveRecord]
+  );
+
   return (
     <div className="collection-view-container">
       {!collection && collectionId !== "new" ? (
@@ -90,7 +101,12 @@ export const CollectionView = () => {
         />
       ) : (
         <>
-          <RQBreadcrumb recordName={collection?.name || "New Collection"} disabled={true} />
+          <RQBreadcrumb
+            placeholder="New Collection"
+            recordName={collection?.name || "New Collection"}
+            onBlur={(newName) => handleCollectionNameChange(newName)}
+            autoFocus={location.search.includes("new")}
+          />
           <div className="collection-view-content">
             <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} />
           </div>
