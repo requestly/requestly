@@ -50,11 +50,13 @@ export const EnvironmentsList = () => {
       return;
     }
     trackCreateEnvironmentClicked(EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
-    openTab("environments/new", {
-      title: "New environment",
-      url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/new`,
+    addNewEnvironment("New Environment").then((result) => {
+      openTab(result.id, {
+        title: result.name,
+        url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${result.id}?new`,
+      });
     });
-  }, [user.loggedIn, dispatch, openTab]);
+  }, [user.loggedIn, dispatch, openTab, addNewEnvironment]);
 
   const handleAddNewEnvironment = useCallback(async () => {
     setIsLoading(true);
@@ -88,29 +90,14 @@ export const EnvironmentsList = () => {
   return (
     <div style={{ height: "inherit" }}>
       {environments?.length === 0 ? (
-        isNewEnvironmentInputVisible ? (
-          <div className="mt-8">
-            <Input
-              autoFocus
-              className="environment-input"
-              size="small"
-              placeholder="New Environment name"
-              disabled={isLoading}
-              onChange={(e) => setNewEnvironmentValue(e.target.value)}
-              onPressEnter={handleAddNewEnvironment}
-              onBlur={handleAddNewEnvironment}
-            />
-          </div>
-        ) : (
-          <div className="mt-8">
-            <EmptyState
-              onNewRecordClick={handleAddEnvironmentClick}
-              message="No environment created yet"
-              newRecordBtnText="Create new environment"
-              analyticEventSource={EnvironmentAnalyticsSource.ENVIRONMENTS_LIST}
-            />
-          </div>
-        )
+        <div className="mt-8">
+          <EmptyState
+            onNewRecordClick={handleAddEnvironmentClick}
+            message="No environment created yet"
+            newRecordBtnText="Create new environment"
+            analyticEventSource={EnvironmentAnalyticsSource.ENVIRONMENTS_LIST}
+          />
+        </div>
       ) : (
         <>
           <SidebarListHeader onSearch={(value) => setSearchValue(value)} />
