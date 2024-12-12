@@ -16,10 +16,15 @@ import { getCollectionVariables } from "store/features/variables/selectors";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import "./collectionView.scss";
+import AuthorizationView from "../request/components/AuthorizationView";
+import { AUTHORIZATION_TYPES } from "../request/components/AuthorizationView/types";
+import { getEmptyAuthOptions } from "features/apiClient/screens/apiClient/utils";
+import { debounce } from "lodash";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
   VARIABLES: "variables",
+  AUTHORIZATION: "authorization",
 };
 
 export const CollectionView = () => {
@@ -63,6 +68,47 @@ export const CollectionView = () => {
     [collection, teamId, user.details?.profile?.uid, onSaveRecord]
   );
 
+  const updateCollectionAuthData = useCallback(
+    (currentAuthType: AUTHORIZATION_TYPES, updatedAuthKey: string, updatedValue: string) => {
+      const oldAuth = collection?.data?.auth ?? {
+        currentAuthType: AUTHORIZATION_TYPES.NO_AUTH,
+        authOptions: getEmptyAuthOptions(),
+      };
+
+      const newAuthOptions = updatedAuthKey
+        ? {
+            ...oldAuth.authOptions,
+            [currentAuthType]: {
+              ...oldAuth.authOptions?.[currentAuthType],
+              [updatedAuthKey]: updatedValue,
+            },
+          }
+        : oldAuth.authOptions;
+
+      const record = {
+        ...collection,
+        data: {
+          ...collection?.data,
+          auth: {
+            currentAuthType,
+            authOptions: newAuthOptions,
+          },
+        },
+      };
+      return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
+        onSaveRecord(result.data);
+      });
+    },
+    [collection, onSaveRecord, teamId, user.details?.profile?.uid]
+  );
+
+  const handleAuthChange = useCallback(
+    (currentAuthType: AUTHORIZATION_TYPES, updatedAuthKey: string, updatedValue: string) => {
+      updateCollectionAuthData(currentAuthType, updatedAuthKey, updatedValue);
+    },
+    [updateCollectionAuthData]
+  );
+
   const tabItems = useMemo(() => {
     return [
       {
@@ -81,8 +127,15 @@ export const CollectionView = () => {
           />
         ),
       },
+      {
+        label: "Authorization",
+        key: TAB_KEYS.AUTHORIZATION,
+        children: (
+          <AuthorizationView defaultValues={collection?.data?.auth} onAuthUpdate={debounce(handleAuthChange, 500)} />
+        ),
+      },
     ];
-  }, [handleRemoveVariable, handleSetVariables, collectionVariables, collectionId, collection]);
+  }, [collection, collectionVariables, collectionId, handleSetVariables, handleRemoveVariable, handleAuthChange]);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
