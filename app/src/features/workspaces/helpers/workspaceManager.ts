@@ -93,15 +93,15 @@ class WorkspaceManager {
       this.userId
     );
 
-    // RuleStorageModel.registerOnUpdateHook((models: RuleStorageModel[]) => {
-    //   console.log("onUpdateHook Custom");
-    //   LocalStorageService(this.appMode).saveMultipleRulesOrGroups(models.map((model) => model.data));
-    // });
+    RuleStorageModel.registerOnUpdateHook((models: RuleStorageModel[]) => {
+      console.log("[workspaceManager] onUpdateHook Custom");
+      LocalStorageService(this.appMode).saveMultipleRulesOrGroups(models.map((model) => model.data));
+    });
 
-    // RuleStorageModel.registerOnDeleteHook((models: RuleStorageModel[]) => {
-    //   console.log("onDeleteHook Custom", { models });
-    //   LocalStorageService(this.appMode).deleteMultipleRulesOrGroups(models.map((model) => model.data));
-    // });
+    RuleStorageModel.registerOnDeleteHook((models: RuleStorageModel[]) => {
+      console.log("[workspaceManager] onDeleteHook Custom", { models });
+      LocalStorageService(this.appMode).deleteMultipleRulesOrGroups(models.map((model) => model.data));
+    });
     //#endregion
 
     //#region - Connect
