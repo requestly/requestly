@@ -26,6 +26,14 @@
       color: var(--requestly-color-text-subtle);
     }
 
+    svg.global-var-info-icon {
+      position: relative;
+      top: 3px;
+      margin-left: 3px;
+      font-size: var(--requestly-font-size-md);
+      color: var(--requestly-color-text-subtle);
+    }
+
     &:hover {
       background-color: var(--requestly-color-white-t-10);
 
