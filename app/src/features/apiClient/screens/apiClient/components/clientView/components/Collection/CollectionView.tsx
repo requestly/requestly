@@ -15,6 +15,8 @@ import { variablesActions } from "store/features/variables/slice";
 import { getCollectionVariables } from "store/features/variables/selectors";
 import "./collectionView.scss";
 import AuthorizationView from "../request/components/AuthorizationView";
+import { AUTHORIZATION_TYPES } from "../request/components/AuthorizationView/types";
+import { getEmptyAuthOptions } from "features/apiClient/screens/apiClient/utils";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -61,6 +63,47 @@ export const CollectionView = () => {
     [collection, teamId, user.details?.profile?.uid, onSaveRecord]
   );
 
+  const updateCollectionAuthData = useCallback((currentAuthType: AUTHORIZATION_TYPES, updatedAuthKey: string, updatedValue: string) => {
+    const oldAuth = collection?.data?.auth ?? {
+      currentAuthType: AUTHORIZATION_TYPES.NO_AUTH,
+      authOptions: getEmptyAuthOptions(),
+    };
+
+    console.log("DBG: oldAuth", oldAuth);
+
+    const newAuthOptions = updatedAuthKey ? {
+      ...oldAuth.authOptions,
+      [currentAuthType]: {
+        ...oldAuth.authOptions?.[currentAuthType],
+        [updatedAuthKey]: updatedValue,
+      },
+    } : oldAuth.authOptions;
+
+    const record = { 
+      ...collection, 
+      data: { 
+        ...collection?.data, 
+        auth: {
+          currentAuthType,
+          authOptions: newAuthOptions
+        } 
+      } 
+    };
+    return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
+      console.log("DBG: collectionview backend updated", result.data)
+      onSaveRecord(result.data);
+    });
+  }, [collection, onSaveRecord, teamId, user.details?.profile?.uid])
+
+  // const handleAuthChange = useCallback((currentAuthType: AUTHORIZATION_TYPES, newAuthData: AUTH_OPTIONS) => {
+  const handleAuthChange = useCallback((
+    currentAuthType: AUTHORIZATION_TYPES, 
+    updatedAuthKey: string, 
+    updatedValue: string
+  ) => {
+    updateCollectionAuthData(currentAuthType, updatedAuthKey, updatedValue);
+  }, [updateCollectionAuthData])
+
   const tabItems = useMemo(() => {
     return [
       {
@@ -84,14 +127,13 @@ export const CollectionView = () => {
         key: TAB_KEYS.AUTHORIZATION,
         children: (
           <AuthorizationView
-            requestHeaders={[]}
-            setRequestEntry={() => {}} // todo
-            prefillAuthValues={{}}
+            defaultValues={collection?.data?.auth}
+            onAuthUpdate={handleAuthChange}
           />
         ),
       },
     ];
-  }, [handleRemoveVariable, handleSetVariables, collectionVariables, collectionId, collection]);
+  }, [collection, collectionVariables, collectionId, handleSetVariables, handleRemoveVariable, handleAuthChange]);
 
   return (
     <div className="collection-view-container">

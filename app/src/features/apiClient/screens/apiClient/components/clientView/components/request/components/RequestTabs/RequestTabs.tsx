@@ -9,6 +9,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
 import AuthorizationView from "../AuthorizationView";
+import { AUTHORIZATION_TYPES } from "../AuthorizationView/types";
 
 enum Tab {
   QUERY_PARAMS = "query_params",
@@ -32,9 +33,10 @@ interface Props {
   collectionId: string;
   setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
+  handleAuthChange: (currentAuthType: AUTHORIZATION_TYPES, updatedKey: string, updatedValue: string) => any;
 }
 
-const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEntry, setContentType }) => {
+const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEntry, setContentType, handleAuthChange }) => {
   const [selectedTab, setSelectedTab] = useState(Tab.QUERY_PARAMS);
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
@@ -108,9 +110,8 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
         ),
         children: (
           <AuthorizationView
-            requestHeaders={requestEntry.request.headers}
-            setRequestEntry={setRequestEntry}
-            prefillAuthValues={requestEntry.request.auth}
+            defaultValues={requestEntry.request.auth}
+            onAuthUpdate={handleAuthChange}
           />
         ),
       },
@@ -131,7 +132,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
     }
 
     return items;
-  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts, variables]);
+  }, [requestEntry.request.method, requestEntry.request.queryParams, requestEntry.request.body, requestEntry.request.contentType, requestEntry.request.headers, requestEntry.request.auth, requestEntry.scripts, isApiClientScripts, setRequestEntry, variables, setContentType, handleAuthChange]);
 
   return (
     <Tabs

@@ -7,6 +7,7 @@ import RequestTabs from "./components/request/components/RequestTabs/RequestTabs
 import {
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
+  getEmptyAuthOptions,
   getEmptyPair,
   sanitizeKeyValuePairs,
   supportsRequestBody,
@@ -42,6 +43,7 @@ import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { AUTH_ENTRY_IDENTIFIER, AUTHORIZATION_TYPES } from "./components/request/components/AuthorizationView/types";
 
 interface Props {
   openInModal?: boolean;
@@ -196,6 +198,97 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     return sanitizedEntry;
   };
+
+  const handleAuthChange = useCallback((currentAuthType: AUTHORIZATION_TYPES, updatedKey: string, updatedValue: string) => {
+    console.log("DBG: handleAuthChange", currentAuthType, JSON.stringify({updatedKey, updatedValue}, null, 2));
+    // clear all based details on the current entry:
+    const currentEntry = { ...entry };
+    const oldAuth = currentEntry.request.auth ?? {
+      currentAuthType: AUTHORIZATION_TYPES.NO_AUTH,
+      authOptions: getEmptyAuthOptions(),
+    };
+    const newAuthOptions = updatedKey ? {
+      ...oldAuth.authOptions,
+      [currentAuthType]: {
+        ...oldAuth.authOptions[currentAuthType],
+        [updatedKey]: updatedValue,
+      },
+    } : oldAuth.authOptions
+
+    console.log("DBG: handleAuthChange newAuthOptions", JSON.stringify({newAuthOptions}, null, 2));
+
+    currentEntry.request.auth = {
+      currentAuthType,
+      authOptions: newAuthOptions,
+    };
+
+    deleteAuthHeaders(currentEntry);
+    deleteAuthQueryParams(currentEntry);
+
+    let newKeyValuePair: KeyValuePair;
+
+    switch (currentAuthType) {
+      case AUTHORIZATION_TYPES.NO_AUTH:
+        break;
+      case AUTHORIZATION_TYPES.BASIC_AUTH:
+        const {username, password} = newAuthOptions[currentAuthType];
+        if(username) {
+          newKeyValuePair = {
+            id: Math.floor(Math.random() * 100000000),
+            key: "Authorization",
+            value: `Basic ${`${username}:${password}`}`,
+            isEnabled: true,
+            type: AUTH_ENTRY_IDENTIFIER,
+          }
+          currentEntry.request.headers.push(newKeyValuePair);
+        }
+        break;
+      case AUTHORIZATION_TYPES.BEARER_TOKEN:
+        const {bearer} = newAuthOptions[currentAuthType];
+        if(bearer) {
+          newKeyValuePair = {
+            id: Math.floor(Math.random() * 100000000),
+            key: "Authorization",
+            value: `Bearer ${bearer}`,
+            isEnabled: true,
+            type: AUTH_ENTRY_IDENTIFIER,
+          }
+          currentEntry.request.headers.push(newKeyValuePair);
+        }
+        break;
+      case AUTHORIZATION_TYPES.API_KEY:
+        const {key, value, addTo} = newAuthOptions[currentAuthType];
+        console.log("DBG-3: handleAuthChange API_KEY", key, value, addTo);
+        if(key) {
+          newKeyValuePair = {
+            id: Math.floor(Math.random() * 100000000),
+            key,
+            value,
+            isEnabled: true,
+            type: AUTH_ENTRY_IDENTIFIER,
+          }
+
+          if(addTo === "HEADER") {
+            currentEntry.request.headers.push(newKeyValuePair);
+          } else {
+            currentEntry.request.queryParams.push(newKeyValuePair);
+          }
+        }
+        break;
+      default:
+        break;
+    }
+
+    setEntry(currentEntry);
+
+    function deleteAuthHeaders(entry: RQAPI.Entry) {
+      entry.request.headers = currentEntry.request.headers.filter((header) => header.type !== AUTH_ENTRY_IDENTIFIER);
+    }
+
+    function deleteAuthQueryParams(entry: RQAPI.Entry) {
+      entry.request.queryParams = currentEntry.request.queryParams.filter((param) => param.type !== AUTH_ENTRY_IDENTIFIER);
+    }
+  }, [entry])
 
   const onSendButtonClick = useCallback(() => {
     if (!entry.request.url) {
@@ -442,6 +535,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               requestEntry={entry}
               setRequestEntry={setRequestEntry}
               setContentType={setContentType}
+              handleAuthChange={handleAuthChange}
             />
           </Skeleton>
         </div>

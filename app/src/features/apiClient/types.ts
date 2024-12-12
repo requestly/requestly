@@ -23,7 +23,7 @@ export interface KeyValuePair {
   key: string;
   value: string;
   isEnabled: boolean;
-  type?: string;
+  type?: string; // added for special identifiers like auth
 }
 
 export enum KeyValueFormType {
@@ -54,7 +54,7 @@ export namespace RQAPI {
 
   export type RequestBody = string | KeyValuePair[]; // in case of form data, body will be key-value pairs
 
-  type AuthOptions = {
+  export type AuthOptions = {
     currentAuthType: AUTHORIZATION_TYPES;
     authOptions: AUTH_OPTIONS; // todo: could be empty, need to check // also need to add inherit from parent later
   };

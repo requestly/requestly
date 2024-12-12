@@ -45,10 +45,10 @@ export const addUrlSchemeIfMissing = (url: string): string => {
   return url;
 };
 
-const getEmptyAuthOptions = (): AUTH_OPTIONS => {
+export const getEmptyAuthOptions = (): AUTH_OPTIONS => {
   return {
     [AUTHORIZATION_TYPES.NO_AUTH]: null,
-    [AUTHORIZATION_TYPES.API_KEY]: { key: "", value: "" },
+    [AUTHORIZATION_TYPES.API_KEY]: { key: "", value: "", addTo: "HEADER" },
     [AUTHORIZATION_TYPES.BEARER_TOKEN]: { bearer: "" },
     [AUTHORIZATION_TYPES.BASIC_AUTH]: { username: "", password: "" },
   };
