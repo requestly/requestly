@@ -46,7 +46,7 @@ interface ApiClientContextInterface {
   onSelectionFromHistory: (index: number) => void;
   onImportClick: () => void;
   onImportRequestModalClose: () => void;
-  onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => void;
+  onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise<void>;
 
   setIsImportModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -77,7 +77,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   onSelectionFromHistory: (index: number) => {},
   onImportClick: () => {},
   onImportRequestModalClose: () => {},
-  onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource) => {},
+  onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise.resolve(),
 
   setIsImportModalOpen: () => {},
 });
