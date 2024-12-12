@@ -42,6 +42,7 @@ import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { useLocation } from "react-router-dom";
 
 interface Props {
   openInModal?: boolean;
@@ -57,6 +58,7 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
 
 const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRequestFinished, openInModal }) => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
@@ -365,6 +367,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             recordName={apiEntryDetails?.name}
             onRecordNameUpdate={setRequestName}
             onBlur={handleRecordNameUpdate}
+            autoFocus={location.search.includes("new")}
           />
         ) : null}
       </div>

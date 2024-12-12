@@ -17,7 +17,7 @@ import { useParams } from "react-router-dom";
 
 interface Props {
   record: RQAPI.CollectionRecord;
-  onNewClick: (src: RQAPI.AnalyticsEventSource) => void;
+  onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => void;
   onExportClick: (collection: RQAPI.CollectionRecord) => void;
   openTab: TabsLayoutContextInterface["openTab"];
 }
@@ -123,7 +123,8 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                       onClick={(e) => {
                         e.stopPropagation();
                         setActiveKey(record.id);
-                        setCreateNewField(RQAPI.RecordType.API);
+                        // setCreateNewField(RQAPI.RecordType.API);
+                        onNewClick("collection_row", RQAPI.RecordType.API, record.id);
                         trackNewRequestClicked("collection_row");
                       }}
                     />
@@ -136,7 +137,8 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                       onClick={(e) => {
                         e.stopPropagation();
                         setActiveKey(record.id);
-                        setCreateNewField(RQAPI.RecordType.COLLECTION);
+                        // setCreateNewField(RQAPI.RecordType.COLLECTION);
+                        onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id);
                         trackNewCollectionClicked("collection_row");
                       }}
                     />
@@ -163,7 +165,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                 newRecordCollectionId={record.id}
                 message="No requests created yet"
                 newRecordBtnText="New request"
-                onNewRecordClick={() => onNewClick("collection_row")}
+                onNewRecordClick={() => onNewClick("collection_row", RQAPI.RecordType.API, record.id)}
               />
             ) : (
               record.data.children.map((apiRecord) => {
