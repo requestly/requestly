@@ -16,6 +16,7 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { trackCreateEnvironmentClicked } from "../screens/environment/analytics";
 import PATHS from "config/constants/sub/paths";
 import { useLocation } from "react-router-dom";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -94,6 +95,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const { openTab, closeTab, updateTab } = useTabsLayoutContext();
+  const { addNewEnvironment } = useEnvironmentManager();
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -239,11 +241,16 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
         case RQAPI.RecordType.ENVIRONMENT: {
           trackCreateEnvironmentClicked(analyticEventSource);
-          openTab("environments/new", {
-            title: "New environment",
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/new`,
-          });
-          return;
+          return addNewEnvironment("New Environment")
+            .then((newEnvironment) => {
+              openTab(newEnvironment.id, {
+                title: newEnvironment.name,
+                url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${newEnvironment.id}?new`,
+              });
+            })
+            .catch((error) => {
+              console.error("Error adding new environment", error);
+            });
         }
 
         default: {
@@ -251,7 +258,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [openTab]
+    [openTab, addNewEnvironment]
   );
 
   const value = {

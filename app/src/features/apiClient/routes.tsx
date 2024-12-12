@@ -85,6 +85,12 @@ export const apiClientRoutes: RouteObject[] = [
           {
             path: PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE + "/:envId",
             element: <EnvironmentView />,
+            handle: {
+              breadcrumb: {
+                label: "Environments",
+                isEditable: true,
+              },
+            },
           },
         ],
       },
