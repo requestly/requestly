@@ -1,16 +1,22 @@
 import { isEmpty } from "lodash";
 import { BiLinkExternal } from "@react-icons/all-files/bi/BiLinkExternal";
 import { LABEL_TEXT } from "./authConstants";
+import { AuthDescriptionData, AuthDescriptionStep } from "./types";
+import React from "react";
+interface DescriptionProps {
+  data: AuthDescriptionData;
+  wrapperClass: string;
+}
 
-const Description = ({ data, wrapperClass = "" }) => {
+const Description: React.FC<DescriptionProps> = ({ data, wrapperClass = "" }) => {
   const { img, heading, subHeading, note, externalLink, steps = [] } = data;
 
-  const renderSteps = (data) => {
-    if (isEmpty(data)) {
+  const renderSteps = (descriptionSteps: AuthDescriptionStep[]) => {
+    if (isEmpty(descriptionSteps)) {
       return;
     }
 
-    return data.map((item) => {
+    return descriptionSteps.map((item) => {
       return (
         <>
           <li className="step-item">{item.value}</li>

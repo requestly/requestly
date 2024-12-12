@@ -1,46 +1,62 @@
 import { Select } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
+import { AuthFormField, SingleLineEditorField, SelectField, AUTH_FORM_FIELD_TYPES, AuthFormData } from "./types";
+import React from "react";
 
-const getFields = (field, index, currentEnvironmentVariables, formType, onChangeHandler, value) => {
-  const { type = "", placeholder = "", options = [], id = "", defaultValue = "", className } = field;
+interface AuthorizationFormProps {
+  formData: AuthFormData;
+  formType: string;
+  onChangeHandler: (value: string, id: string) => void;
+  formvalues: Record<string, any>;
+}
+
+const getFields = (
+  field: AuthFormField,
+  index: number,
+  currentEnvironmentVariables: Record<string, any>,
+  formType: string,
+  onChangeHandler: (value: string, id: string) => void,
+  value: any
+) => {
+  const { type = "", id = "", className = "" } = field;
 
   switch (type) {
-    case "RQ_SINGLE_LINE_EDITOR":
+    case AUTH_FORM_FIELD_TYPES.INPUT:
       return (
         <RQSingleLineEditor
           key={`${formType}-${index}`}
           className={className}
-          placeholder={placeholder}
+          placeholder={(field as SingleLineEditorField).placeholder}
           defaultValue={value}
-          onChange={(value) => onChangeHandler(value, id)}
+          onChange={(value: any) => onChangeHandler(value, id)}
           variables={currentEnvironmentVariables}
         />
       );
-    case "SELECT":
+    case AUTH_FORM_FIELD_TYPES.SELECT:
       return (
         <Select
           key={`${formType}-${index}`}
           value={value}
-          options={options}
-          defaultValue={defaultValue}
+          options={(field as SelectField).options}
+          defaultValue={(field as SelectField).defaultValue}
           className={className}
-          onChange={(value) => onChangeHandler(value, id)}
+          onChange={(value: any) => onChangeHandler(value, id)}
         />
       );
     default:
-      break;
+      return null;
   }
 };
 
-const AuthorizationForm = ({ formData = [], formType = "", onChangeHandler, formvalues = {} }) => {
+const AuthorizationForm: React.FC<AuthorizationFormProps> = ({ formData, formType, onChangeHandler, formvalues }) => {
   const { getCurrentEnvironmentVariables } = useEnvironmentManager();
   const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
   return (
     <div className="form">
       {formData.map((formField, index) => (
-        <div className="field-group">
+        <div className="field-group" key={formField.id || index}>
           <label>{formField.label}</label>
           <div className="field">
             {getFields(

@@ -32,7 +32,7 @@ export interface SelectField extends BaseAuthFormField {
 
 export type AuthFormField = SingleLineEditorField | SelectField;
 
-export type AuthFormData = Record<AUTHORIZATION_TYPES, AuthFormField[]>;
+export type AuthFormData = Record<AUTHORIZATION_TYPES, AuthFormField[] | null>;
 
 /* DESCRIPTION */
 export interface AuthDescriptionStep {
@@ -43,7 +43,10 @@ export interface AuthDescriptionStep {
 export interface AuthDescriptionData {
   heading: string;
   subHeading: string;
-  steps: AuthDescriptionStep[];
+  note?: string;
+  externalLink?: string;
+  img?: string;
+  steps?: AuthDescriptionStep[];
 }
 
 export type AuthStaticData = Record<

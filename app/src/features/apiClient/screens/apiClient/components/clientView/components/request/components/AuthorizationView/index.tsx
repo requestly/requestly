@@ -3,22 +3,20 @@ import { debounce, isEmpty } from "lodash";
 import { useState } from "react";
 import AuthorizationForm from "./AuthorizationForm";
 import Description from "./Description";
-import {
-  AUTHORIZATION_FORM_DATA,
-  AUTHORIZATION_STATIC_DATA,
-  AUTHORIZATION_TYPES,
-  AUTHORIZATION_TYPES_META,
-} from "./authStaticData";
+import { AUTHORIZATION_FORM_DATA, AUTHORIZATION_STATIC_DATA, AUTHORIZATION_TYPES_META } from "./authStaticData";
 import React from "react";
 import "./authorizationView.scss";
 import { LABEL_TEXT } from "./authConstants";
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { MdClear } from "@react-icons/all-files/md/MdClear";
 import { getEmptyAuthOptions, updateAuthOptions } from "features/apiClient/screens/apiClient/utils";
+import { AUTHORIZATION_TYPES } from "./types";
+import { AUTH_OPTIONS } from "./types/form";
+import { RQAPI } from "features/apiClient/types";
 
 interface Props {
-  prefillAuthValues: {};
-  handleAuthChange: (authType: string, id?: string, value?: string) => void;
+  requestEntry: RQAPI.Entry;
+  setRequestEntry: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
 }
 
 const AuthorizationView: React.FC<Props> = ({ requestEntry, setRequestEntry }) => {
@@ -86,7 +84,7 @@ const AuthorizationView: React.FC<Props> = ({ requestEntry, setRequestEntry }) =
               <span>{LABEL_TEXT.INFO_TEXT}</span>
             </p>
             <AuthorizationForm
-              formData={AUTHORIZATION_FORM_DATA[selectedForm]}
+              formData={AUTHORIZATION_FORM_DATA[selectedForm] || []}
               formType={selectedForm}
               onChangeHandler={debouncedOnChange}
               formvalues={formValues[selectedForm] || {}}
