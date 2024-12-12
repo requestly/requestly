@@ -170,13 +170,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => {
+  const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true, removeAuthOptions = false) => {
     const sanitizedEntry: RQAPI.Entry = {
       ...entry,
       request: {
         ...entry.request,
-        queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys),
-        headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys),
+        queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys, removeAuthOptions),
+        headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys, removeAuthOptions),
       },
       scripts: {
         preRequest: entry.scripts?.preRequest || "",
@@ -328,7 +328,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
-      data: { ...sanitizeEntry(entry, false) },
+      data: { ...sanitizeEntry(entry, false, true) },
     };
 
     if (apiEntryDetails?.id) {
