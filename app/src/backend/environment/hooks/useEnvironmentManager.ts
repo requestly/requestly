@@ -81,7 +81,8 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
         .then((environmentMap) => {
           if (Object.keys(environmentMap).length > 0 && !environmentMap[currentEnvironmentId]) {
             // setting the first environment as the current environment if the current environment is not found in environmentMap
-            setCurrentEnvironment(Object.keys(environmentMap)[0]);
+            // do not set global env as active
+            setCurrentEnvironment(Object.keys(environmentMap).filter((key) => !environmentMap[key].isGlobal)[0]);
           }
 
           const updatedEnvironmentMap: EnvironmentMap = {};
