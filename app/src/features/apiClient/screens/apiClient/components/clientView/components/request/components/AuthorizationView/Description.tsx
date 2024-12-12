@@ -25,12 +25,14 @@ const Description = ({ data, wrapperClass = "" }) => {
       {img && <img src={img} alt="auth" />}
       <h1>{heading}</h1>
       <h2>{subHeading}</h2>
-      <ul>{renderSteps(steps)}</ul>
-      <p className="note">{note}</p>
-      <a href={externalLink} className="link-text">
-        <BiLinkExternal size={"12px"} />
-        <span>{LABEL_TEXT.LEARN_MORE}</span>
-      </a>
+      {!isEmpty(steps) && <ul>{renderSteps(steps)}</ul>}
+      {note && <p className="note">{note}</p>}
+      {externalLink && (
+        <a href={externalLink} className="link-text">
+          <BiLinkExternal size={"12px"} />
+          <span>{LABEL_TEXT.LEARN_MORE}</span>
+        </a>
+      )}
     </div>
   );
 };
