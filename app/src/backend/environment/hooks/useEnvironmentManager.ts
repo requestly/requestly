@@ -57,13 +57,14 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   );
 
   const addNewEnvironment = useCallback(
-    async (newEnvironment: string) => {
-      return upsertEnvironmentInDB(ownerId, newEnvironment)
+    async (newEnvironmentName: string, isGlobal = false) => {
+      return upsertEnvironmentInDB(ownerId, newEnvironmentName, isGlobal)
         .then(({ id, name }) => {
-          dispatch(variablesActions.addNewEnvironment({ id, name }));
+          dispatch(variablesActions.addNewEnvironment({ id, name, isGlobal }));
           return {
             id,
             name,
+            isGlobal,
           };
         })
         .catch((err) => {
@@ -219,25 +220,6 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     (currentCollectionId: string): Record<string, EnvironmentVariableValue> => {
       const allVariables: Record<string, EnvironmentVariableValue> = {};
 
-      // Function to get all parent collection variables recursively
-      const getParentVariables = (collectionId: string) => {
-        const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
-        if (!collection) return;
-
-        // Add current collection's variables
-        Object.entries(collectionVariables[collection.id]?.variables || {}).forEach(([key, value]) => {
-          // Only add if not already present (maintain precedence)
-          if (!(key in allVariables)) {
-            allVariables[key] = value;
-          }
-        });
-
-        // Recursively get parent variables
-        if (collection.collectionId) {
-          getParentVariables(collection.collectionId);
-        }
-      };
-
       const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId]?.variables;
       Object.entries(currentEnvironmentVariables || {}).forEach(([key, value]) => {
         // environment variables (highest precedence)
@@ -250,8 +232,37 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
         }
       });
 
+      // Function to get all parent collection variables recursively
+      const getParentVariables = (collectionId: string) => {
+        const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+        if (!collection) return;
+
+        // Add current collection's variables
+        Object.entries(collectionVariables[collection.id]?.variables || {}).forEach(([key, value]) => {
+          // Only add if not already present (maintain precedence) with sub collections
+          if (!(key in allVariables)) {
+            allVariables[key] = value;
+          }
+        });
+
+        // Recursively get parent variables
+        if (collection.collectionId) {
+          getParentVariables(collection.collectionId);
+        }
+      };
+
       // Get collection hierarchy variables
       getParentVariables(currentCollectionId);
+
+      const globalEnvironmentId = Object.keys(allEnvironmentData).find((envId) => allEnvironmentData[envId].isGlobal);
+      const globalEnvironmentVariables = allEnvironmentData[globalEnvironmentId]?.variables || {};
+
+      Object.entries(globalEnvironmentVariables).forEach(([key, value]) => {
+        // global variables (lowest precedence)
+        if (!(key in allVariables)) {
+          allVariables[key] = value;
+        }
+      });
 
       return allVariables;
     },
@@ -287,6 +298,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
       return {
         id: key,
         name: allEnvironmentData[key].name,
+        isGlobal: allEnvironmentData[key].isGlobal,
       };
     });
   }, [allEnvironmentData]);

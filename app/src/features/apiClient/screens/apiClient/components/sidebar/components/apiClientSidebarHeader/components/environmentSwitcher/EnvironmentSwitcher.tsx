@@ -22,33 +22,35 @@ export const EnvironmentSwitcher = () => {
   const { openTab } = useTabsLayoutContext();
 
   const dropdownItems = useMemo(() => {
-    return environments.map((environment) => ({
-      key: environment.id,
-      label: (
-        <div className={`${environment.id === currentEnvironmentId ? "active-env-item" : ""} env-item`}>
-          <Typography.Text
-            ellipsis={{
-              tooltip: {
-                title: environment.name,
-                placement: "right",
-              },
-            }}
-          >
-            {environment.name}
-          </Typography.Text>{" "}
-          {environment.id === currentEnvironmentId ? <MdOutlineCheckCircleOutline /> : null}
-        </div>
-      ),
-      onClick: () => {
-        setCurrentEnvironment(environment.id);
-        if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
-          openTab(environment.id, { title: environment.name });
-          trackEnvironmentSwitched(environments.length);
-          redirectToEnvironment(navigate, environment.id);
-        }
-        toast.success(`Switched to ${environment.name} environment`);
-      },
-    }));
+    return environments
+      .filter((env) => !env.isGlobal)
+      .map((environment) => ({
+        key: environment.id,
+        label: (
+          <div className={`${environment.id === currentEnvironmentId ? "active-env-item" : ""} env-item`}>
+            <Typography.Text
+              ellipsis={{
+                tooltip: {
+                  title: environment.name,
+                  placement: "right",
+                },
+              }}
+            >
+              {environment.name}
+            </Typography.Text>{" "}
+            {environment.id === currentEnvironmentId ? <MdOutlineCheckCircleOutline /> : null}
+          </div>
+        ),
+        onClick: () => {
+          setCurrentEnvironment(environment.id);
+          if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
+            openTab(environment.id, { title: environment.name });
+            trackEnvironmentSwitched(environments.length);
+            redirectToEnvironment(navigate, environment.id);
+          }
+          toast.success(`Switched to ${environment.name} environment`);
+        },
+      }));
   }, [environments, setCurrentEnvironment, currentEnvironmentId, navigate, location.pathname, openTab]);
 
   if (environments.length === 0) {
