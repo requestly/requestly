@@ -24,6 +24,7 @@ import APP_CONSTANTS from "config/constants";
 import { useRulesActionContext } from "features/rules/context/actions";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { WarningOutlined } from "@ant-design/icons";
+import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import RuleNameColumn from "../components/RulesColumn/RulesColumn";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
@@ -40,6 +41,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     groupDeleteAction,
     recordsPinAction,
     groupShareAction,
+    recordsUngroupAction,
   } = useRulesActionContext();
   const isEditingEnabled = !(options && options.disableEditing);
 
@@ -326,8 +328,23 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         ];
 
         const ruleActions: MenuProps["items"] = [
+          isRule(record) && !record.isSample && record.groupId
+            ? {
+                key: 0,
+                onClick: (info) => {
+                  info.domEvent?.stopPropagation?.();
+                  recordsUngroupAction([normalizeRecord(record)]);
+                },
+                label: (
+                  <Row>
+                    <ImUngroup />
+                    Ungroup
+                  </Row>
+                ),
+              }
+            : null,
           {
-            key: 0,
+            key: 1,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
               recordsChangeGroupAction([normalizeRecord(record)]);
@@ -339,7 +356,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             ),
           },
           {
-            key: 1,
+            key: 2,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
               recordDuplicateAction(normalizeRecord(record) as Rule);
@@ -352,7 +369,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             ),
           },
           {
-            key: 2,
+            key: 3,
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();

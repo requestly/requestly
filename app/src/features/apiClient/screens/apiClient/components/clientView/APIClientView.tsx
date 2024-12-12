@@ -22,7 +22,6 @@ import {
   trackRequestRenamed,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
 import { globalActions } from "store/slices/global/slice";
 import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -38,10 +37,9 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
-import PATHS from "config/constants/sub/paths";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
-import { BottomSheetLayout, BottomSheetProvider, useBottomSheetContext } from "componentsV2/BottomSheet";
-import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
+import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
+import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
@@ -62,8 +60,6 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
 
 const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRequestFinished, openInModal }) => {
   const dispatch = useDispatch();
-  const location = useLocation();
-  const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
@@ -204,9 +200,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (!entry.request.url) {
       return;
     }
-
-    toggleBottomSheet(true);
-
     if (!isExtensionInstalled() && !isDesktopMode()) {
       /* SHOW INSTALL EXTENSION MODAL */
       const modalProps = {
@@ -219,6 +212,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       trackInstallExtensionDialogShown({ src: "api_client" });
       return;
     }
+
+    toggleBottomSheet(true);
 
     const sanitizedEntry = sanitizeEntry(entry);
     sanitizedEntry.response = null;
@@ -345,13 +340,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
       setEntry({ ...result.data.data });
-      // updateTab(requestDetails.id, { hasUnsavedChanges: false, data: requestDetails });
 
       trackRequestSaved("api_client_view");
-      if (location.pathname.includes("history")) {
-        navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`);
-      }
-
       toast.success("Request saved!");
     } else {
       toast.error("Something went wrong!");
@@ -483,32 +473,31 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           />
         ) : null}
       </div>
-      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-        <BottomSheetLayout
-          layout={SheetLayout.SPLIT}
-          bottomSheet={
-            <ApiClientBottomSheet
-              response={entry.response}
-              isLoading={isLoadingResponse}
-              isFailed={isFailed}
-              isRequestCancelled={isRequestCancelled}
-              onCancelRequest={cancelRequest}
-              error={error}
-            />
-          }
-          minSize={35}
-        >
-          <div className="api-client-body">
-            <Skeleton loading={isAnimating} active>
-              <div className="api-client-header">
-                <Space.Compact className="api-client-url-container">
-                  <Select
-                    className="api-request-method-selector"
-                    options={requestMethodOptions}
-                    value={entry.request.method}
-                    onChange={setMethod}
-                  />
-                  {/* <Input
+      <BottomSheetLayout
+        layout={SheetLayout.SPLIT}
+        bottomSheet={
+          <ApiClientBottomSheet
+            response={entry.response}
+            isLoading={isLoadingResponse}
+            isFailed={isFailed}
+            isRequestCancelled={isRequestCancelled}
+            onCancelRequest={cancelRequest}
+            error={error}
+          />
+        }
+        minSize={35}
+      >
+        <div className="api-client-body">
+          <Skeleton loading={isAnimating} active>
+            <div className="api-client-header">
+              <Space.Compact className="api-client-url-container">
+                <Select
+                  className="api-request-method-selector"
+                  options={requestMethodOptions}
+                  value={entry.request.method}
+                  onChange={setMethod}
+                />
+                {/* <Input
               className="api-request-url"
               placeholder="https://example.com"
               value={entry.request.url}
@@ -517,49 +506,48 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               onBlur={onUrlInputBlur}
               prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
             /> */}
-                  <RQSingleLineEditor
-                    className="api-request-url"
-                    placeholder="https://example.com"
-                    // value={entry.request.url}
-                    defaultValue={entry.request.url}
-                    onChange={(text) => setUrl(text)}
-                    onPressEnter={onUrlInputEnterPressed}
-                    variables={currentEnvironmentVariables}
-                    // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
-                  />
-                </Space.Compact>
+                <RQSingleLineEditor
+                  className="api-request-url"
+                  placeholder="https://example.com"
+                  // value={entry.request.url}
+                  defaultValue={entry.request.url}
+                  onChange={(text) => setUrl(text)}
+                  onPressEnter={onUrlInputEnterPressed}
+                  variables={currentEnvironmentVariables}
+                  // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
+                />
+              </Space.Compact>
+              <RQButton
+                showHotKeyText
+                onClick={onSendButtonClick}
+                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
+                type="primary"
+                className="text-bold"
+                disabled={!entry.request.url}
+              >
+                Send
+              </RQButton>
+              {user.loggedIn && !openInModal ? (
                 <RQButton
                   showHotKeyText
-                  onClick={onSendButtonClick}
-                  hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
-                  type="primary"
-                  className="text-bold"
-                  disabled={!entry.request.url}
+                  hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
+                  onClick={onSaveButtonClick}
+                  loading={isRequestSaving}
                 >
-                  Send
+                  Save
                 </RQButton>
-                {user.loggedIn && !openInModal ? (
-                  <RQButton
-                    showHotKeyText
-                    hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
-                    onClick={onSaveButtonClick}
-                    loading={isRequestSaving}
-                  >
-                    Save
-                  </RQButton>
-                ) : null}
-              </div>
-              <RequestTabs
-                collectionId={apiEntryDetails?.collectionId}
-                requestEntry={entry}
-                setRequestEntry={setRequestEntry}
-                setContentType={setContentType}
-                handleAuthChange={handleAuthChange}
-              />
-            </Skeleton>
-          </div>
-        </BottomSheetLayout>
-      </BottomSheetProvider>
+              ) : null}
+            </div>
+            <RequestTabs
+              collectionId={apiEntryDetails?.collectionId}
+              requestEntry={entry}
+              setRequestEntry={setRequestEntry}
+              setContentType={setContentType}
+              handleAuthChange={handleAuthChange}
+            />
+          </Skeleton>
+        </div>
+      </BottomSheetLayout>
     </div>
   ) : (
     <div className="w-full">
