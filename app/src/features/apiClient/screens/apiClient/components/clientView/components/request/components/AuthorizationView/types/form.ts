@@ -1,4 +1,4 @@
-import { AUTHORIZATION_TYPES } from "../authStaticData";
+import { AUTHORIZATION_TYPES } from ".";
 
 interface API_KEY_FORM_VALUES {
   key: string;

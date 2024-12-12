@@ -5,9 +5,11 @@ import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../ty
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
-import { AUTHORIZATION_TYPES } from "./components/clientView/components/request/components/AuthorizationView/authStaticData";
 import { AUTH_OPTIONS } from "./components/clientView/components/request/components/AuthorizationView/types/form";
-import { AUTH_ENTRY_IDENTIFIER } from "./components/clientView/components/request/components/AuthorizationView/types";
+import {
+  AUTH_ENTRY_IDENTIFIER,
+  AUTHORIZATION_TYPES,
+} from "./components/clientView/components/request/components/AuthorizationView/types";
 import { isEmpty } from "lodash";
 
 export const makeRequest = async (
@@ -208,10 +210,10 @@ export const getEmptyAuthOptions = (): AUTH_OPTIONS => {
 };
 
 export const updateAuthOptions = (
-  entry: RQAPI.ApiRecord,
-  currentAuthType: any,
-  updatedKey: string,
-  updatedValue: string
+  entry: RQAPI.Entry,
+  currentAuthType: AUTHORIZATION_TYPES,
+  updatedKey?: string,
+  updatedValue?: string
 ) => {
   // clear all based details on the current entry:
   const currentEntry = { ...entry };
@@ -249,7 +251,7 @@ export const updateAuthOptions = (
     isEnabled: true,
   });
 
-  const updateDataInState = (data, type, key, value) => {
+  const updateDataInState = (data: KeyValuePair[], type = AUTH_ENTRY_IDENTIFIER, key: string, value: string) => {
     const existingIndex = data.findIndex((header) => header.type === type);
     const newHeader = createAuthorizationHeader(type, key, value);
 
