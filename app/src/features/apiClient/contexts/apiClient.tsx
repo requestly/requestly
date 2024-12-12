@@ -16,6 +16,7 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { trackCreateEnvironmentClicked } from "../screens/environment/analytics";
 import PATHS from "config/constants/sub/paths";
 import { useLocation } from "react-router-dom";
+import { updateAuthOptions } from "../screens/apiClient/utils";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -170,7 +171,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
 
       if (isRecordExist) {
-        onUpdateRecord(apiClientRecord);
+        const apiClientRecordWithAuthOptions = updateAuthOptions(
+          apiClientRecord.data,
+          apiClientRecord.data.auth?.currentAuthType
+        );
+        onUpdateRecord(apiClientRecordWithAuthOptions);
       } else {
         onNewRecord(apiClientRecord);
 

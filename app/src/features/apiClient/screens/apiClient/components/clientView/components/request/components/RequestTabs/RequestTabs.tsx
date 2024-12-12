@@ -32,24 +32,13 @@ interface Props {
   collectionId: string;
   setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
-  handleAuthChange: (currentAuthType: string, updatedKey?: string, updatedValue?: string) => void;
 }
 
-const RequestTabs: React.FC<Props> = ({
-  requestEntry,
-  collectionId,
-  setRequestEntry,
-  setContentType,
-  handleAuthChange,
-}) => {
+const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEntry, setContentType }) => {
   const [selectedTab, setSelectedTab] = useState(Tab.QUERY_PARAMS);
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
-
-  useEffect(() => {
-    handleAuthChange(requestEntry.auth?.currentAuthType);
-  }, []);
 
   useEffect(() => {
     if (selectedTab === Tab.BODY && !supportsRequestBody(requestEntry.request.method)) {
@@ -115,7 +104,7 @@ const RequestTabs: React.FC<Props> = ({
       {
         key: Tab.AUTHORIZATION,
         label: <LabelWithCount label="Authorization" />,
-        children: <AuthorizationView prefillAuthValues={requestEntry.auth} handleAuthChange={handleAuthChange} />,
+        children: <AuthorizationView requestEntry={requestEntry} setRequestEntry={setRequestEntry} />,
       },
     ];
 
