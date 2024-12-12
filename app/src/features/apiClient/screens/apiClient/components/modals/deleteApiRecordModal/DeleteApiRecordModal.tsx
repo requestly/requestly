@@ -32,21 +32,24 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
   if (!record) {
     return null;
   }
-  // TODO: handle single api request deletion - update the modal message too
+
   let apiRequestCount = isApiCollection(record) ? record.data.children.length : 1;
+
+  const collectAllRecordIds = (record: RQAPI.Record): string[] => {
+    const recordIds: string[] = [record.id];
+
+    if (isApiCollection(record) && record.data.children) {
+      record.data.children.forEach((child) => {
+        recordIds.push(...collectAllRecordIds(child));
+      });
+    }
+    return recordIds;
+  };
 
   const handleDeleteApiRecord = async () => {
     setIsDeleting(true);
 
-    const recordIds: string[] = [];
-
-    recordIds.push(record.id);
-    if (isApiCollection(record)) {
-      record.data.children.forEach((request) => {
-        recordIds.push(request.id);
-      });
-    }
-
+    const recordIds = collectAllRecordIds(record);
     const result = await deleteApiRecords(uid, recordIds, teamId);
     onDeleteRecords(recordIds);
 
