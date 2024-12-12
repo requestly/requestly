@@ -14,15 +14,18 @@ import "./authorizationView.scss";
 import { LABEL_TEXT } from "./authConstants";
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { MdClear } from "@react-icons/all-files/md/MdClear";
+import { getEmptyAuthOptions, updateAuthOptions } from "features/apiClient/screens/apiClient/utils";
 
 interface Props {
   prefillAuthValues: {};
   handleAuthChange: (authType: string, id?: string, value?: string) => void;
 }
 
-const AuthorizationView: React.FC<Props> = ({ prefillAuthValues, handleAuthChange }) => {
-  const [selectedForm, setSelectedForm] = useState(prefillAuthValues?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH);
-  const [formValues, setFormValues] = useState<Record<string, any>>(prefillAuthValues?.authOptions || {});
+const AuthorizationView: React.FC<Props> = ({ requestEntry, setRequestEntry }) => {
+  const [selectedForm, setSelectedForm] = useState(requestEntry.auth?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH);
+  const [formValues, setFormValues] = useState<Record<string, any>>(
+    requestEntry.auth?.authOptions || getEmptyAuthOptions()
+  );
 
   const onChangeHandler = (value: string, id: string) => {
     setFormValues((prevValues) => ({
@@ -33,7 +36,8 @@ const AuthorizationView: React.FC<Props> = ({ prefillAuthValues, handleAuthChang
       },
     }));
 
-    handleAuthChange(selectedForm, id, value);
+    const updatedEntry = updateAuthOptions(requestEntry, selectedForm, id, value);
+    setRequestEntry((prev) => ({ ...prev, ...updatedEntry }));
   };
 
   const debouncedOnChange = debounce(onChangeHandler, 500);
@@ -49,7 +53,10 @@ const AuthorizationView: React.FC<Props> = ({ prefillAuthValues, handleAuthChang
             onChange={(value) => {
               setSelectedForm(value);
               if (value === AUTHORIZATION_TYPES.NO_AUTH) {
-                handleAuthChange(value);
+                setRequestEntry((prev) => ({
+                  ...prev,
+                  ...updateAuthOptions(requestEntry, value),
+                }));
               }
             }}
             options={AUTHORIZATION_TYPES_META}
@@ -58,8 +65,11 @@ const AuthorizationView: React.FC<Props> = ({ prefillAuthValues, handleAuthChang
             <div
               className="clear-icon"
               onClick={() => {
+                setRequestEntry((prev) => ({
+                  ...prev,
+                  ...updateAuthOptions(requestEntry, AUTHORIZATION_TYPES.NO_AUTH),
+                }));
                 setSelectedForm(AUTHORIZATION_TYPES.NO_AUTH);
-                handleAuthChange(AUTHORIZATION_TYPES.NO_AUTH);
               }}
             >
               <MdClear color="#bbbbbb" size="12px" />

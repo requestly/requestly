@@ -7,6 +7,8 @@ import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { AUTHORIZATION_TYPES } from "./components/clientView/components/request/components/AuthorizationView/authStaticData";
 import { AUTH_OPTIONS } from "./components/clientView/components/request/components/AuthorizationView/types/form";
+import { AUTH_ENTRY_IDENTIFIER } from "./components/clientView/components/request/components/AuthorizationView/types";
+import { isEmpty } from "lodash";
 
 export const makeRequest = async (
   appMode: string,
@@ -203,4 +205,105 @@ export const getEmptyAuthOptions = (): AUTH_OPTIONS => {
     [AUTHORIZATION_TYPES.BEARER_TOKEN]: { bearer: "" },
     [AUTHORIZATION_TYPES.BASIC_AUTH]: { username: "", password: "" },
   };
+};
+
+export const updateAuthOptions = (
+  entry: RQAPI.ApiRecord,
+  currentAuthType: any,
+  updatedKey: string,
+  updatedValue: string
+) => {
+  // clear all based details on the current entry:
+  const currentEntry = { ...entry };
+  const oldAuth = currentEntry.auth ?? {
+    currentAuthType: AUTHORIZATION_TYPES.NO_AUTH,
+    authOptions: getEmptyAuthOptions(),
+  };
+  const newAuthOptions =
+    updatedKey || updatedValue
+      ? {
+          ...oldAuth.authOptions,
+          [currentAuthType]: {
+            ...oldAuth.authOptions[currentAuthType],
+            [updatedKey]: updatedValue,
+            ...(updatedKey || updatedValue ? { [updatedKey]: updatedValue } : {}),
+          },
+        }
+      : oldAuth.authOptions;
+
+  currentEntry.auth = {
+    currentAuthType,
+    authOptions: newAuthOptions,
+  };
+
+  !isEmpty(currentEntry.request.headers) && deleteAuthHeaders(currentEntry);
+  !isEmpty(currentEntry.request.queryParams) && deleteAuthQueryParams(currentEntry);
+
+  let newKeyValuePair: KeyValuePair;
+
+  const createAuthorizationHeader = (type: string, key: string, value: string): typeof newKeyValuePair => ({
+    id: Math.random(),
+    key,
+    value,
+    type,
+    isEnabled: true,
+  });
+
+  const updateDataInState = (data, type, key, value) => {
+    const existingIndex = data.findIndex((header) => header.type === type);
+    const newHeader = createAuthorizationHeader(type, key, value);
+
+    if (existingIndex !== -1) {
+      data[existingIndex] = { ...data[existingIndex], ...newHeader };
+    } else {
+      data.unshift(newHeader);
+    }
+  };
+
+  switch (currentAuthType) {
+    case AUTHORIZATION_TYPES.NO_AUTH:
+      break;
+    case AUTHORIZATION_TYPES.BASIC_AUTH: {
+      const { username, password } = newAuthOptions[currentAuthType];
+      updateDataInState(
+        currentEntry.request.headers,
+        AUTH_ENTRY_IDENTIFIER,
+        "Authorization",
+        `Basic ${btoa(`${username || ""}:${password || ""}`)}`
+      );
+      break;
+    }
+    case AUTHORIZATION_TYPES.BEARER_TOKEN: {
+      const { bearer } = newAuthOptions[currentAuthType];
+      updateDataInState(currentEntry.request.headers, AUTH_ENTRY_IDENTIFIER, "Authorization", `Bearer ${bearer}`);
+      break;
+    }
+    case AUTHORIZATION_TYPES.API_KEY: {
+      const { key, value, addTo } = newAuthOptions[currentAuthType];
+
+      if (key) {
+        updateDataInState(
+          addTo === "QUERY" ? currentEntry.request.queryParams : currentEntry.request.headers,
+          AUTH_ENTRY_IDENTIFIER,
+          key || "",
+          value || ""
+        );
+      }
+      break;
+    }
+    default:
+      break;
+  }
+
+  return currentEntry;
+
+  function deleteAuthHeaders(entry: RQAPI.Entry) {
+    entry.request.headers = currentEntry.request.headers.filter((header) => header.type !== AUTH_ENTRY_IDENTIFIER);
+  }
+
+  function deleteAuthQueryParams(entry: RQAPI.Entry) {
+    entry.request.queryParams = currentEntry.request.queryParams.filter(
+      (param) => param.type !== AUTH_ENTRY_IDENTIFIER
+    );
+  }
 };
