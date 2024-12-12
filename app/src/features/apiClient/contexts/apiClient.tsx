@@ -37,6 +37,9 @@ interface ApiClientContextInterface {
   addToHistory: (apiEntry: RQAPI.Entry) => void;
   clearHistory: () => void;
 
+  isRecordBeingCreated: RQAPI.RecordType | null;
+  setIsRecordBeingCreated: (recordType: RQAPI.RecordType | null) => void;
+
   isImportModalOpen: boolean;
 
   selectedHistoryIndex: number;
@@ -64,6 +67,9 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   history: [],
   addToHistory: (apiEntry: RQAPI.Entry) => {},
   clearHistory: () => {},
+
+  isRecordBeingCreated: null,
+  setIsRecordBeingCreated: (recordType: RQAPI.RecordType | null) => {},
 
   isImportModalOpen: false,
 
@@ -94,6 +100,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
 
   const { openTab, closeTab, updateTab } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
@@ -247,6 +254,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             name: "New collection",
             type: RQAPI.RecordType.COLLECTION,
             data: { variables: {} },
+            deleted: false,
             collectionId,
           };
           return upsertApiRecord(uid, newCollection, teamId)
@@ -308,6 +316,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
     isImportModalOpen,
     setIsImportModalOpen,
+
+    isRecordBeingCreated,
+    setIsRecordBeingCreated,
 
     onImportClick,
     onImportRequestModalClose,

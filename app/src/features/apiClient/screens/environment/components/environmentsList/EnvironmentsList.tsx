@@ -14,6 +14,9 @@ import { ListEmptySearchView } from "features/apiClient/screens/apiClient/compon
 import { EnvironmentAnalyticsSource } from "../../types";
 import { EnvironmentsListItem } from "./components/environmentsListItem/EnvironmentsListItem";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { RQAPI } from "features/apiClient/types";
+import { useApiClientContext } from "features/apiClient/contexts";
+import { SidebarPlaceholderItem } from "features/apiClient/screens/apiClient/components/sidebar/components/SidebarPlaceholderItem/SidebarPlaceholderItem";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
@@ -25,6 +28,7 @@ export const EnvironmentsList = () => {
   const [isNewEnvironmentInputVisible, setIsNewEnvironmentInputVisible] = useState(false);
   const [newEnvironmentValue, setNewEnvironmentValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { setIsRecordBeingCreated, isRecordBeingCreated } = useApiClientContext();
 
   const { openTab, replaceTab } = useTabsLayoutContext();
 
@@ -32,6 +36,50 @@ export const EnvironmentsList = () => {
   const filteredEnvironments = useMemo(
     () => environments.filter((environment) => environment.name?.toLowerCase().includes(searchValue?.toLowerCase())),
     [environments, searchValue]
+  );
+
+  const createNewEnvironment = useCallback(
+    async (environmentName?: string) => {
+      setIsLoading(true);
+      setIsRecordBeingCreated(RQAPI.RecordType.ENVIRONMENT);
+
+      const newEnvironment = await addNewEnvironment(environmentName || "New Environment");
+
+      if (newEnvironment) {
+        if (environments.length === 0) {
+          setCurrentEnvironment(newEnvironment.id);
+        }
+
+        const targetPath = `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${newEnvironment.id}`;
+        const tabConfig = {
+          id: newEnvironment.id,
+          title: newEnvironment.name,
+          url: targetPath,
+        };
+
+        if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE)) {
+          replaceTab("environments/new", tabConfig);
+        } else {
+          openTab(newEnvironment.id, tabConfig);
+        }
+
+        trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
+      }
+
+      setIsLoading(false);
+      setIsNewEnvironmentInputVisible(false);
+      setNewEnvironmentValue("");
+      setIsRecordBeingCreated(null);
+    },
+    [
+      addNewEnvironment,
+      environments.length,
+      setCurrentEnvironment,
+      replaceTab,
+      openTab,
+      location.pathname,
+      setIsRecordBeingCreated,
+    ]
   );
 
   const handleAddEnvironmentClick = useCallback(() => {
@@ -50,35 +98,12 @@ export const EnvironmentsList = () => {
       return;
     }
     trackCreateEnvironmentClicked(EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
-    addNewEnvironment("New Environment").then((result) => {
-      openTab(result.id, {
-        title: result.name,
-        url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${result.id}?new`,
-      });
-    });
-  }, [user.loggedIn, dispatch, openTab, addNewEnvironment]);
+    createNewEnvironment();
+  }, [user.loggedIn, dispatch, createNewEnvironment]);
 
-  const handleAddNewEnvironment = useCallback(async () => {
-    setIsLoading(true);
-    const newEnvironment = await addNewEnvironment(newEnvironmentValue || "New Environment");
-    if (newEnvironment) {
-      if (environments.length === 0) {
-        // if there are no environments, set the new environment as the active environment
-        setCurrentEnvironment(newEnvironment.id);
-      }
-
-      replaceTab("environments/new", {
-        id: newEnvironment.id,
-        title: newEnvironment.name,
-        url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${newEnvironment.id}`,
-      });
-
-      trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
-    }
-    setIsLoading(false);
-    setIsNewEnvironmentInputVisible(false);
-    setNewEnvironmentValue("");
-  }, [addNewEnvironment, environments.length, newEnvironmentValue, setCurrentEnvironment, replaceTab]);
+  const handleAddNewEnvironment = useCallback(() => {
+    createNewEnvironment(newEnvironmentValue);
+  }, [createNewEnvironment, newEnvironmentValue]);
 
   useEffect(() => {
     if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE) && user.loggedIn) {
@@ -91,12 +116,16 @@ export const EnvironmentsList = () => {
     <div style={{ height: "inherit" }}>
       {environments?.length === 0 ? (
         <div className="mt-8">
-          <EmptyState
-            onNewRecordClick={handleAddEnvironmentClick}
-            message="No environment created yet"
-            newRecordBtnText="Create new environment"
-            analyticEventSource={EnvironmentAnalyticsSource.ENVIRONMENTS_LIST}
-          />
+          {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT ? (
+            <SidebarPlaceholderItem name="New Environment" />
+          ) : (
+            <EmptyState
+              onNewRecordClick={handleAddEnvironmentClick}
+              message="No environment created yet"
+              newRecordBtnText="Create new environment"
+              analyticEventSource={EnvironmentAnalyticsSource.ENVIRONMENTS_LIST}
+            />
+          )}
         </div>
       ) : (
         <>
@@ -124,6 +153,11 @@ export const EnvironmentsList = () => {
                     <EnvironmentsListItem openTab={openTab} environment={environment} />
                   ) : null
                 )}
+                <div className="mt-8">
+                  {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && (
+                    <SidebarPlaceholderItem name="New Environment" />
+                  )}
+                </div>
               </>
             )}
           </div>

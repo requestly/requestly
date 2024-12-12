@@ -25,21 +25,23 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   const { replaceTab } = useTabsLayoutContext();
   const location = useLocation();
 
+  const handleNewEnvironmentNameChange = (newName: string) => {
+    renameEnvironment(environmentId, newName).then(() => {
+      replaceTab(environmentId, {
+        id: environmentId,
+        title: newName,
+        url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environmentId}`,
+      });
+    });
+  };
+
   return (
     <div className="variables-list-header">
       <RQBreadcrumb
         autoFocus={location.search.includes("new")}
         placeholder="New Environment"
         recordName={currentEnvironmentName}
-        onBlur={(newName) => {
-          renameEnvironment(environmentId, newName).then(() => {
-            replaceTab(environmentId, {
-              id: environmentId,
-              title: newName,
-              url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environmentId}`,
-            });
-          });
-        }}
+        onBlur={handleNewEnvironmentNameChange}
       />
       <div className="variables-list-action-container">
         <Input

@@ -11,10 +11,11 @@ import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/E
 import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
+import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import "./collectionsList.scss";
 
 interface Props {
-  onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => void;
+  onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
   recordTypeToBeCreated: RQAPI.RecordType;
   isNewRecordNameInputVisible: boolean;
   hideNewRecordNameInput: () => void;
@@ -29,7 +30,7 @@ export const CollectionsList: React.FC<Props> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { openTab, tabs } = useTabsLayoutContext();
-  const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
+  const { isLoadingApiClientRecords, apiClientRecords, isRecordBeingCreated } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
@@ -126,9 +127,20 @@ export const CollectionsList: React.FC<Props> = ({
                 );
               })}
 
+              {isRecordBeingCreated === RQAPI.RecordType.COLLECTION &&
+                recordTypeToBeCreated === RQAPI.RecordType.COLLECTION && (
+                  <div style={{ marginBottom: "8px" }}>
+                    <SidebarPlaceholderItem name="New Collection" />
+                  </div>
+                )}
+
               {updatedRecords.requests.map((record) => {
                 return <RequestRow key={record.id} record={record} openTab={openTab} />;
               })}
+
+              {isRecordBeingCreated === RQAPI.RecordType.API && recordTypeToBeCreated === RQAPI.RecordType.API && (
+                <SidebarPlaceholderItem name="New Request" />
+              )}
             </div>
           ) : (
             <ApiRecordEmptyState
