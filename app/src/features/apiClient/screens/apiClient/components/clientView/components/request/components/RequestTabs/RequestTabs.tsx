@@ -9,6 +9,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
 import AuthorizationView from "../AuthorizationView";
+import { AUTHORIZATION_TYPES } from "../AuthorizationView/types";
 
 enum Tab {
   QUERY_PARAMS = "query_params",
@@ -32,9 +33,16 @@ interface Props {
   collectionId: string;
   setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
+  handleAuthChange: (currentAuthType: AUTHORIZATION_TYPES, updatedKey: string, updatedValue: string) => any;
 }
 
-const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEntry, setContentType }) => {
+const RequestTabs: React.FC<Props> = ({
+  requestEntry,
+  collectionId,
+  setRequestEntry,
+  setContentType,
+  handleAuthChange,
+}) => {
   const [selectedTab, setSelectedTab] = useState(Tab.QUERY_PARAMS);
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
@@ -104,7 +112,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
       {
         key: Tab.AUTHORIZATION,
         label: <LabelWithCount label="Authorization" />,
-        children: <AuthorizationView requestEntry={requestEntry} setRequestEntry={setRequestEntry} />,
+        children: <AuthorizationView defaultValues={requestEntry.auth} onAuthUpdate={handleAuthChange} />,
       },
     ];
 
