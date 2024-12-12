@@ -19,7 +19,7 @@ export const PricingPlans: PricingPlansType = {
     plans: {
       monthly: {
         usd: {
-          price: 9,
+          price: 8,
         },
       },
       annually: {
