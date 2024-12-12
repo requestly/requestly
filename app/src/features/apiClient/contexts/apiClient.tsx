@@ -17,6 +17,7 @@ import { trackCreateEnvironmentClicked } from "../screens/environment/analytics"
 import PATHS from "config/constants/sub/paths";
 import { useLocation } from "react-router-dom";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { getEmptyAPIEntry } from "../screens/apiClient/utils";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -219,15 +220,25 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);
 
   const onNewClick = useCallback(
-    (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => {
+    async (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId = "") => {
       switch (recordType) {
         case RQAPI.RecordType.API: {
           trackNewRequestClicked(analyticEventSource);
-          openTab("request/new", {
-            title: "Untitled request",
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/request/new`,
+          const newRequest: Partial<RQAPI.Record> = {
+            name: "Untitled request",
+            type: RQAPI.RecordType.API,
+            data: getEmptyAPIEntry(),
+            deleted: false,
+            collectionId,
+          };
+
+          return upsertApiRecord(uid, newRequest, teamId).then((result) => {
+            onSaveRecord(result.data);
+            openTab(result.data.id, {
+              title: result.data.name,
+              url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}?new`,
+            });
           });
-          return;
         }
 
         case RQAPI.RecordType.COLLECTION: {
@@ -236,7 +247,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             name: "New collection",
             type: RQAPI.RecordType.COLLECTION,
             data: { variables: {} },
-            collectionId: "",
+            collectionId,
           };
           return upsertApiRecord(uid, newCollection, teamId)
             .then((result) => {

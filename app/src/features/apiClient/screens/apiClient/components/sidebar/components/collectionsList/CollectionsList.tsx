@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { NewRecordNameInput } from "./newRecordNameInput/NewRecordNameInput";
 import { CollectionRow } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
 import { convertFlatRecordsToNestedRecords, isApiCollection, isApiRequest } from "../../../../utils";
@@ -15,7 +14,7 @@ import PATHS from "config/constants/sub/paths";
 import "./collectionsList.scss";
 
 interface Props {
-  onNewClick: (src: RQAPI.AnalyticsEventSource) => void;
+  onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => void;
   recordTypeToBeCreated: RQAPI.RecordType;
   isNewRecordNameInputVisible: boolean;
   hideNewRecordNameInput: () => void;
@@ -130,20 +129,12 @@ export const CollectionsList: React.FC<Props> = ({
               {updatedRecords.requests.map((record) => {
                 return <RequestRow key={record.id} record={record} openTab={openTab} />;
               })}
-
-              {isNewRecordNameInputVisible && recordTypeToBeCreated === RQAPI.RecordType.API ? (
-                <NewRecordNameInput
-                  recordType={RQAPI.RecordType.API}
-                  analyticEventSource="api_client_sidebar"
-                  onSuccess={() => hideNewRecordNameInput()}
-                />
-              ) : null}
             </div>
           ) : (
             <ApiRecordEmptyState
               newRecordBtnText="New collection"
               message="No collections created yet"
-              onNewRecordClick={() => onNewClick("collection_list_empty_state")}
+              onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.COLLECTION)}
               recordType={RQAPI.RecordType.COLLECTION}
               analyticEventSource="collection_list_empty_state"
             />
