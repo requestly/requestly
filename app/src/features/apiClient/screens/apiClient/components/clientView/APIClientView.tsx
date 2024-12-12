@@ -43,6 +43,7 @@ import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { AUTHORIZATION_TYPES } from "./components/request/components/AuthorizationView/types";
 
 interface Props {
   openInModal?: boolean;
@@ -353,6 +354,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackAPIRequestCancelled();
   }, []);
 
+  const handleAuthChange = useCallback(
+    (currentAuthType: AUTHORIZATION_TYPES, updatedKey: string, updatedValue: string) => {
+      const updatedEntry = updateAuthOptions(entry, currentAuthType, updatedKey, updatedValue);
+      setEntry(updatedEntry);
+    },
+    [entry]
+  );
+
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
     (evt.target as HTMLInputElement).blur();
   }, []);
@@ -439,6 +448,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               requestEntry={entry}
               setRequestEntry={setRequestEntry}
               setContentType={setContentType}
+              handleAuthChange={handleAuthChange}
             />
           </Skeleton>
         </div>

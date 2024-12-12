@@ -9,20 +9,22 @@ import "./authorizationView.scss";
 import { LABEL_TEXT } from "./authConstants";
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { MdClear } from "@react-icons/all-files/md/MdClear";
-import { getEmptyAuthOptions, updateAuthOptions } from "features/apiClient/screens/apiClient/utils";
+import { getEmptyAuthOptions } from "features/apiClient/screens/apiClient/utils";
 import { AUTHORIZATION_TYPES } from "./types";
 import { AUTH_OPTIONS } from "./types/form";
-import { RQAPI } from "features/apiClient/types";
 
 interface Props {
-  requestEntry: RQAPI.Entry;
-  setRequestEntry: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
+  defaultValues: {
+    currentAuthType?: AUTHORIZATION_TYPES;
+    authOptions?: AUTH_OPTIONS;
+  };
+  onAuthUpdate: (currentAuthType: AUTHORIZATION_TYPES, updatedKey?: string, updatedValue?: string) => any;
 }
 
-const AuthorizationView: React.FC<Props> = ({ requestEntry, setRequestEntry }) => {
-  const [selectedForm, setSelectedForm] = useState(requestEntry.auth?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH);
+const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => {
+  const [selectedForm, setSelectedForm] = useState(defaultValues?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH);
   const [formValues, setFormValues] = useState<Record<string, any>>(
-    requestEntry.auth?.authOptions || getEmptyAuthOptions()
+    defaultValues?.authOptions || getEmptyAuthOptions()
   );
 
   const onChangeHandler = (value: string, id: string) => {
@@ -34,8 +36,7 @@ const AuthorizationView: React.FC<Props> = ({ requestEntry, setRequestEntry }) =
       },
     }));
 
-    const updatedEntry = updateAuthOptions(requestEntry, selectedForm, id, value);
-    setRequestEntry((prev) => ({ ...prev, ...updatedEntry }));
+    onAuthUpdate(selectedForm, id, value);
   };
 
   const debouncedOnChange = debounce(onChangeHandler, 500);
@@ -51,10 +52,7 @@ const AuthorizationView: React.FC<Props> = ({ requestEntry, setRequestEntry }) =
             onChange={(value) => {
               setSelectedForm(value);
               if (value === AUTHORIZATION_TYPES.NO_AUTH) {
-                setRequestEntry((prev) => ({
-                  ...prev,
-                  ...updateAuthOptions(requestEntry, value),
-                }));
+                onAuthUpdate(value);
               }
             }}
             options={AUTHORIZATION_TYPES_META}
@@ -63,10 +61,7 @@ const AuthorizationView: React.FC<Props> = ({ requestEntry, setRequestEntry }) =
             <div
               className="clear-icon"
               onClick={() => {
-                setRequestEntry((prev) => ({
-                  ...prev,
-                  ...updateAuthOptions(requestEntry, AUTHORIZATION_TYPES.NO_AUTH),
-                }));
+                onAuthUpdate(AUTHORIZATION_TYPES.NO_AUTH);
                 setSelectedForm(AUTHORIZATION_TYPES.NO_AUTH);
               }}
             >
