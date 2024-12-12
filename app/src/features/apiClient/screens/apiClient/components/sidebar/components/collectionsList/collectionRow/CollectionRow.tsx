@@ -14,10 +14,11 @@ import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import { useParams } from "react-router-dom";
+import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 
 interface Props {
   record: RQAPI.CollectionRecord;
-  onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => void;
+  onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
   onExportClick: (collection: RQAPI.CollectionRecord) => void;
   openTab: TabsLayoutContextInterface["openTab"];
 }
@@ -25,7 +26,7 @@ interface Props {
 export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportClick, openTab }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeKey, setActiveKey] = useState(record.id); // TODO: Persist collapse active keys for all rows
-  const [createNewField, setCreateNewField] = useState(null);
+  const [createNewRecord, setCreateNewRecord] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
   const { collectionId } = useParams();
@@ -123,8 +124,10 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                       onClick={(e) => {
                         e.stopPropagation();
                         setActiveKey(record.id);
-                        // setCreateNewField(RQAPI.RecordType.API);
-                        onNewClick("collection_row", RQAPI.RecordType.API, record.id);
+                        setCreateNewRecord(RQAPI.RecordType.API);
+                        onNewClick("collection_row", RQAPI.RecordType.API, record.id).then(() => {
+                          setCreateNewRecord(null);
+                        });
                         trackNewRequestClicked("collection_row");
                       }}
                     />
@@ -137,8 +140,10 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                       onClick={(e) => {
                         e.stopPropagation();
                         setActiveKey(record.id);
-                        // setCreateNewField(RQAPI.RecordType.COLLECTION);
-                        onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id);
+                        setCreateNewRecord(RQAPI.RecordType.COLLECTION);
+                        onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id).then(() => {
+                          setCreateNewRecord(null);
+                        });
                         trackNewCollectionClicked("collection_row");
                       }}
                     />
@@ -187,16 +192,9 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
               })
             )}
 
-            {createNewField ? (
-              <NewRecordNameInput
-                analyticEventSource="collection_row"
-                recordType={
-                  createNewField === RQAPI.RecordType.API ? RQAPI.RecordType.API : RQAPI.RecordType.COLLECTION
-                }
-                newRecordCollectionId={record.id}
-                onSuccess={() => {
-                  setCreateNewField("");
-                }}
+            {createNewRecord ? (
+              <SidebarPlaceholderItem
+                name={createNewRecord === RQAPI.RecordType.API ? "New Request" : "New Collection"}
               />
             ) : null}
           </Collapse.Panel>
