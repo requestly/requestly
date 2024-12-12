@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { RQAPI } from "../../../../types";
 import { useParams } from "react-router-dom";
 import { Tabs, TabsProps, Tooltip } from "antd";
@@ -12,6 +12,7 @@ import { EnvironmentsList } from "../../../environment/components/environmentsLi
 import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal } from "../modals";
 import "./apiClientSidebar.scss";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 
 interface Props {}
 
@@ -26,6 +27,16 @@ const APIClientSidebar: React.FC<Props> = () => {
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
+
+  const { addNewEnvironment, getAllEnvironments } = useEnvironmentManager();
+  const environments = getAllEnvironments();
+  const isGlobalEnvironmentExists = useMemo(() => environments.some((env) => env.isGlobal), [environments]);
+
+  useEffect(() => {
+    if (!isGlobalEnvironmentExists) {
+      addNewEnvironment("Global variables", true);
+    }
+  }, [addNewEnvironment, isGlobalEnvironmentExists]);
 
   const {
     history,

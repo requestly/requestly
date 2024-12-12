@@ -18,6 +18,14 @@
       color: var(--requestly-color-success);
     }
 
+    svg.global-var-icon {
+      position: relative;
+      top: 3px;
+      margin-right: 3px;
+      font-size: var(--requestly-font-size-md);
+      color: var(--requestly-color-text-subtle);
+    }
+
     &:hover {
       background-color: var(--requestly-color-white-t-10);
 

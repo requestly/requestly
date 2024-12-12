@@ -1,5 +1,6 @@
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
+import { IoMdGlobe } from "@react-icons/all-files/io/IoMdGlobe";
 import { Dropdown, Input, Tooltip, Typography } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import PATHS from "config/constants/sub/paths";
@@ -14,6 +15,7 @@ interface EnvironmentsListItemProps {
   environment: {
     id: string;
     name: string;
+    isGlobal?: boolean;
   };
 
   openTab: TabsLayoutContextInterface["openTab"];
@@ -149,6 +151,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
             tooltip: environment.name,
           }}
         >
+          {environment.isGlobal && <IoMdGlobe className="global-var-icon" />}
           {environment.name}
         </Typography.Text>
         <Tooltip
@@ -164,15 +167,17 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
       </div>
       {/* wrapping dropdown in a div to prevent it from triggering click events on parent div element*/}
       <div onClick={(e) => e.stopPropagation()}>
-        <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
-          <RQButton
-            size="small"
-            type="transparent"
-            icon={<MdOutlineMoreHoriz />}
-            className="environment-list-item-dropdown-button"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </Dropdown>
+        {!environment.isGlobal ? (
+          <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
+            <RQButton
+              size="small"
+              type="transparent"
+              icon={<MdOutlineMoreHoriz />}
+              className="environment-list-item-dropdown-button"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </Dropdown>
+        ) : null}
       </div>
     </div>
   );

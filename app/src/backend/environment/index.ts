@@ -21,10 +21,11 @@ const getDocPath = (ownerId: string, environmentId: string) => {
   return doc(db, "environments", ownerId, "environments", environmentId);
 };
 
-export const upsertEnvironmentInDB = async (ownerId: string, environmentName: string) => {
+export const upsertEnvironmentInDB = async (ownerId: string, environmentName: string, isGlobal?: boolean) => {
   return addDoc(collection(db, "environments", ownerId, "environments"), {
     name: environmentName,
     variables: {},
+    isGlobal,
   }).then((doc) => {
     return {
       id: doc.id,
@@ -76,6 +77,7 @@ export const attachEnvironmentVariableListener = (
         id: environmentId,
         name: "",
         variables: {},
+        isGlobal: false,
       });
     } else {
       const environmentData = { id: environmentId, ...snapshot.data() } as EnvironmentData;

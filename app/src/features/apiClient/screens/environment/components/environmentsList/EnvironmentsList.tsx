@@ -132,11 +132,20 @@ export const EnvironmentsList = () => {
               <ListEmptySearchView message="No environments found. Try searching with a different name" />
             ) : (
               <>
-                {filteredEnvironments.map((environment) =>
-                  environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
-                    <EnvironmentsListItem openTab={openTab} environment={environment} />
-                  ) : null
-                )}
+                {filteredEnvironments
+                  .filter((env) => env.isGlobal)
+                  .map((environment) =>
+                    environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
+                      <EnvironmentsListItem openTab={openTab} environment={environment} />
+                    ) : null
+                  )}
+                {filteredEnvironments
+                  .filter((env) => !env.isGlobal)
+                  .map((environment) =>
+                    environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
+                      <EnvironmentsListItem openTab={openTab} environment={environment} />
+                    ) : null
+                  )}
               </>
             )}
           </div>
