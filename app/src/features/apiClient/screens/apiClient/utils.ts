@@ -6,7 +6,7 @@ import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { AUTHORIZATION_TYPES } from "./components/clientView/components/request/components/AuthorizationView/authStaticData";
-import { isEmpty, noop } from "lodash";
+import { AUTH_OPTIONS } from "./components/clientView/components/request/components/AuthorizationView/types/form";
 
 export const makeRequest = async (
   appMode: string,
@@ -196,83 +196,11 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 };
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
 
-export const appendAuthOptions = (apiEntry, updateEntry = noop, selectedForm, formValues = {}, value, id) => {
-  const createAuthorizationHeader = (type, key = null, value = null, id = null) => ({
-    id: Math.random(),
-    key,
-    value,
-    type,
-    isEnabled: true,
-    ...(id ? { [id]: value } : {}),
-  });
-
-  const updateHeadersInState = (headers, type, key, value, selectorId = null) => {
-    const existingIndex = headers.findIndex((header) => header.type === type);
-    const newHeader = createAuthorizationHeader(type, key, value, selectorId);
-
-    if (existingIndex !== -1) {
-      headers[existingIndex] = { ...headers[existingIndex], ...newHeader };
-    } else {
-      headers.unshift(newHeader);
-    }
+export const getEmptyAuthOptions = (): AUTH_OPTIONS => {
+  return {
+    [AUTHORIZATION_TYPES.NO_AUTH]: null,
+    [AUTHORIZATION_TYPES.API_KEY]: { key: "", value: "", addTo: "HEADER" },
+    [AUTHORIZATION_TYPES.BEARER_TOKEN]: { bearer: "" },
+    [AUTHORIZATION_TYPES.BASIC_AUTH]: { username: "", password: "" },
   };
-
-  const currentFormValues = {
-    ...formValues[selectedForm],
-    ...(id || value ? { [id]: value } : {}),
-  };
-
-  const headersState = [...apiEntry.request.headers];
-  const queriesState = [...apiEntry.request.queryParams];
-  const { addTo, key, bearer, username, password } = currentFormValues;
-
-  switch (selectedForm) {
-    case AUTHORIZATION_TYPES.API_KEY:
-      updateHeadersInState(
-        addTo === "QUERY" ? queriesState : headersState,
-        "auth",
-        key || "",
-        currentFormValues.value || ""
-      );
-      break;
-
-    case AUTHORIZATION_TYPES.BEARER_TOKEN:
-      updateHeadersInState(headersState, "auth", "Authorization", `Bearer ${bearer}`);
-      break;
-
-    case AUTHORIZATION_TYPES.BASIC_AUTH:
-      updateHeadersInState(
-        headersState,
-        "auth",
-        "Authorization",
-        `Basic ${btoa(`${username || ""}:${password || ""}`)}`
-      );
-      break;
-
-    default:
-      break;
-  }
-
-  updateEntry((prev) => ({
-    ...prev,
-    request: {
-      ...prev.request,
-      ...(addTo === "QUERY"
-        ? {
-            queryParams: queriesState,
-            headers: prev.request.headers.filter((header) => header.type !== "auth"),
-          }
-        : {
-            headers: headersState,
-            queryParams: prev.request.queryParams.filter((query) => query.type !== "auth"),
-          }),
-    },
-    auth: {
-      currentAuthType: selectedForm,
-      authOptions: {
-        ...formValues,
-        [selectedForm]: { ...formValues[selectedForm], ...currentFormValues },
-      },
-    },
-  }));
 };

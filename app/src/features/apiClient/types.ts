@@ -1,4 +1,6 @@
 import { EnvironmentVariables } from "backend/environment/types";
+import { AUTHORIZATION_TYPES } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
+import { AUTH_OPTIONS } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/form";
 
 export enum RequestMethod {
   GET = "GET",
@@ -76,6 +78,10 @@ export namespace RQAPI {
     scripts?: {
       preRequest: string;
       postResponse: string;
+    };
+    auth?: {
+      currentAuthType: AUTHORIZATION_TYPES;
+      authOptions: AUTH_OPTIONS;
     };
   }
 

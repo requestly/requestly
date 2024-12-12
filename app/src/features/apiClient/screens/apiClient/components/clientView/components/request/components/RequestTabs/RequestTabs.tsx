@@ -2,14 +2,13 @@ import { Tabs, TabsProps, Tag } from "antd";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import { KeyValueFormType, RQAPI, RequestContentType } from "../../../../../../../../types";
 import RequestBody from "../../RequestBody";
-import { appendAuthOptions, sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
+import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
 import { KeyValueTable } from "../KeyValueTable/KeyValueTable";
 import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEditor";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
 import AuthorizationView from "../AuthorizationView";
-import { AUTHORIZATION_TYPES } from "../AuthorizationView/authStaticData";
 
 enum Tab {
   QUERY_PARAMS = "query_params",
@@ -33,21 +32,23 @@ interface Props {
   collectionId: string;
   setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
+  handleAuthChange: (currentAuthType: string, updatedKey?: string, updatedValue?: string) => void;
 }
 
-const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEntry, setContentType }) => {
+const RequestTabs: React.FC<Props> = ({
+  requestEntry,
+  collectionId,
+  setRequestEntry,
+  setContentType,
+  handleAuthChange,
+}) => {
   const [selectedTab, setSelectedTab] = useState(Tab.QUERY_PARAMS);
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
   useEffect(() => {
-    appendAuthOptions(
-      requestEntry,
-      setRequestEntry,
-      requestEntry?.auth?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH,
-      requestEntry.auth?.authOptions
-    );
+    handleAuthChange(requestEntry.auth?.currentAuthType);
   }, []);
 
   useEffect(() => {
@@ -113,19 +114,8 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
       },
       {
         key: Tab.AUTHORIZATION,
-        label: (
-          <LabelWithCount
-            label="Authorization"
-            showDot={requestEntry.request.headers.findIndex((header) => header.type === "auth") !== -1}
-          />
-        ),
-        children: (
-          <AuthorizationView
-            apiEntry={requestEntry}
-            updateEntry={setRequestEntry}
-            prefillAuthValues={requestEntry.auth}
-          />
-        ),
+        label: <LabelWithCount label="Authorization" />,
+        children: <AuthorizationView prefillAuthValues={requestEntry.auth} handleAuthChange={handleAuthChange} />,
       },
     ];
 

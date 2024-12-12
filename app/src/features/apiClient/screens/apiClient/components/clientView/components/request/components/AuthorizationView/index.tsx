@@ -1,5 +1,4 @@
 import { Select } from "antd";
-import { KeyValuePair, RQAPI } from "features/apiClient/types";
 import { debounce, isEmpty } from "lodash";
 import { useState } from "react";
 import AuthorizationForm from "./AuthorizationForm";
@@ -11,20 +10,20 @@ import {
   AUTHORIZATION_TYPES_META,
 } from "./authStaticData";
 import React from "react";
-import { appendAuthOptions } from "features/apiClient/screens/apiClient/utils";
 import "./authorizationView.scss";
 import { LABEL_TEXT } from "./authConstants";
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
+import { MdClear } from "@react-icons/all-files/md/MdClear";
 
 interface Props {
-  requestHeaders: KeyValuePair[];
   prefillAuthValues: {};
-  updateEntry: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
+  handleAuthChange: (authType: string, id?: string, value?: string) => void;
 }
 
-const AuthorizationView: React.FC<Props> = ({ apiEntry, updateEntry, prefillAuthValues }) => {
+const AuthorizationView: React.FC<Props> = ({ prefillAuthValues, handleAuthChange }) => {
   const [selectedForm, setSelectedForm] = useState(prefillAuthValues?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH);
   const [formValues, setFormValues] = useState<Record<string, any>>(prefillAuthValues?.authOptions || {});
+
   const onChangeHandler = (value: string, id: string) => {
     setFormValues((prevValues) => ({
       ...prevValues,
@@ -34,7 +33,7 @@ const AuthorizationView: React.FC<Props> = ({ apiEntry, updateEntry, prefillAuth
       },
     }));
 
-    appendAuthOptions(apiEntry, updateEntry, selectedForm, formValues, value, id);
+    handleAuthChange(selectedForm, id, value);
   };
 
   const debouncedOnChange = debounce(onChangeHandler, 500);
@@ -50,22 +49,23 @@ const AuthorizationView: React.FC<Props> = ({ apiEntry, updateEntry, prefillAuth
             onChange={(value) => {
               setSelectedForm(value);
               if (value === AUTHORIZATION_TYPES.NO_AUTH) {
-                updateEntry((prev) => ({
-                  ...prev,
-                  request: {
-                    ...prev.request,
-                    headers: prev.request.headers.filter((header) => header.type !== "auth"),
-                    queryParams: prev.request.queryParams.filter((queryParam) => queryParam.type !== "auth"),
-                  },
-                  auth: {
-                    ...prev.auth,
-                    currentAuthType: value,
-                  },
-                }));
+                handleAuthChange(value);
               }
             }}
             options={AUTHORIZATION_TYPES_META}
           />
+          {selectedForm !== AUTHORIZATION_TYPES.NO_AUTH && (
+            <div
+              className="clear-icon"
+              onClick={() => {
+                setSelectedForm(AUTHORIZATION_TYPES.NO_AUTH);
+                handleAuthChange(AUTHORIZATION_TYPES.NO_AUTH);
+              }}
+            >
+              <MdClear color="#bbbbbb" size="12px" />
+              <span>{LABEL_TEXT.CLEAR}</span>
+            </div>
+          )}
         </div>
       </div>
       <div className="form-and-description">
