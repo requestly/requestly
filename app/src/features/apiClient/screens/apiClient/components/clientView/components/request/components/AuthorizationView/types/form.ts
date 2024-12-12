@@ -3,6 +3,7 @@ import { AUTHORIZATION_TYPES } from ".";
 interface API_KEY_FORM_VALUES {
   key: string;
   value: string;
+  addTo: "HEADER" | "QUERY";
 }
 
 interface BEARER_TOKEN_FORM_VALUES {
