@@ -210,7 +210,7 @@ export const getEmptyAuthOptions = (): AUTH_OPTIONS => {
 };
 
 export const updateAuthOptions = (
-  entry: RQAPI.Entry,
+  entry: RQAPI.Record["data"],
   currentAuthType: AUTHORIZATION_TYPES,
   updatedKey?: string,
   updatedValue?: string
@@ -238,63 +238,65 @@ export const updateAuthOptions = (
     authOptions: newAuthOptions,
   };
 
-  !isEmpty(currentEntry.request.headers) && deleteAuthHeaders(currentEntry);
-  !isEmpty(currentEntry.request.queryParams) && deleteAuthQueryParams(currentEntry);
+  if (isRequestEntry(currentEntry)) {
+    !isEmpty(currentEntry.request.headers) && deleteAuthHeaders(currentEntry);
+    !isEmpty(currentEntry.request.queryParams) && deleteAuthQueryParams(currentEntry);
 
-  let newKeyValuePair: KeyValuePair;
+    let newKeyValuePair: KeyValuePair;
 
-  const createAuthorizationHeader = (type: string, key: string, value: string): typeof newKeyValuePair => ({
-    id: Math.random(),
-    key,
-    value,
-    type,
-    isEnabled: true,
-  });
+    const createAuthorizationHeader = (type: string, key: string, value: string): typeof newKeyValuePair => ({
+      id: Math.random(),
+      key,
+      value,
+      type,
+      isEnabled: true,
+    });
 
-  const updateDataInState = (data: KeyValuePair[], type = AUTH_ENTRY_IDENTIFIER, key: string, value: string) => {
-    const existingIndex = data.findIndex((header) => header.type === type);
-    const newHeader = createAuthorizationHeader(type, key, value);
+    const updateDataInState = (data: KeyValuePair[], type = AUTH_ENTRY_IDENTIFIER, key: string, value: string) => {
+      const existingIndex = data.findIndex((header) => header.type === type);
+      const newHeader = createAuthorizationHeader(type, key, value);
 
-    if (existingIndex !== -1) {
-      data[existingIndex] = { ...data[existingIndex], ...newHeader };
-    } else {
-      data.unshift(newHeader);
-    }
-  };
-
-  switch (currentAuthType) {
-    case AUTHORIZATION_TYPES.NO_AUTH:
-      break;
-    case AUTHORIZATION_TYPES.BASIC_AUTH: {
-      const { username, password } = newAuthOptions[currentAuthType];
-      updateDataInState(
-        currentEntry.request.headers,
-        AUTH_ENTRY_IDENTIFIER,
-        "Authorization",
-        `Basic ${btoa(`${username || ""}:${password || ""}`)}`
-      );
-      break;
-    }
-    case AUTHORIZATION_TYPES.BEARER_TOKEN: {
-      const { bearer } = newAuthOptions[currentAuthType];
-      updateDataInState(currentEntry.request.headers, AUTH_ENTRY_IDENTIFIER, "Authorization", `Bearer ${bearer}`);
-      break;
-    }
-    case AUTHORIZATION_TYPES.API_KEY: {
-      const { key, value, addTo } = newAuthOptions[currentAuthType];
-
-      if (key) {
-        updateDataInState(
-          addTo === "QUERY" ? currentEntry.request.queryParams : currentEntry.request.headers,
-          AUTH_ENTRY_IDENTIFIER,
-          key || "",
-          value || ""
-        );
+      if (existingIndex !== -1) {
+        data[existingIndex] = { ...data[existingIndex], ...newHeader };
+      } else {
+        data.unshift(newHeader);
       }
-      break;
+    };
+
+    switch (currentAuthType) {
+      case AUTHORIZATION_TYPES.NO_AUTH:
+        break;
+      case AUTHORIZATION_TYPES.BASIC_AUTH: {
+        const { username, password } = newAuthOptions[currentAuthType];
+        updateDataInState(
+          currentEntry.request.headers,
+          AUTH_ENTRY_IDENTIFIER,
+          "Authorization",
+          `Basic ${btoa(`${username || ""}:${password || ""}`)}`
+        );
+        break;
+      }
+      case AUTHORIZATION_TYPES.BEARER_TOKEN: {
+        const { bearer } = newAuthOptions[currentAuthType];
+        updateDataInState(currentEntry.request.headers, AUTH_ENTRY_IDENTIFIER, "Authorization", `Bearer ${bearer}`);
+        break;
+      }
+      case AUTHORIZATION_TYPES.API_KEY: {
+        const { key, value, addTo } = newAuthOptions[currentAuthType];
+
+        if (key) {
+          updateDataInState(
+            addTo === "QUERY" ? currentEntry.request.queryParams : currentEntry.request.headers,
+            AUTH_ENTRY_IDENTIFIER,
+            key || "",
+            value || ""
+          );
+        }
+        break;
+      }
+      default:
+        break;
     }
-    default:
-      break;
   }
 
   return currentEntry;
@@ -307,5 +309,9 @@ export const updateAuthOptions = (
     entry.request.queryParams = currentEntry.request.queryParams.filter(
       (param) => param.type !== AUTH_ENTRY_IDENTIFIER
     );
+  }
+
+  function isRequestEntry(e: RQAPI.Record["data"]): e is RQAPI.Entry {
+    return "request" in e;
   }
 };
