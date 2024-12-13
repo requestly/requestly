@@ -98,6 +98,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
           activeKey={activeKey}
           onChange={collapseChangeHandler}
           collapsible={activeKey === record.id ? "icon" : "header"}
+          defaultActiveKey={[record.id]}
           ghost
           className="collections-list-item collection"
           expandIcon={({ isActive }) => {
