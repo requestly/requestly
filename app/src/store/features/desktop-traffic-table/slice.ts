@@ -135,6 +135,8 @@ const slice = createSlice({
 const { actions, reducer } = slice;
 
 export const desktopTrafficTableActions = actions;
-export const desktopTrafficTableReducerWithLocalSync = getReducerWithLocalStorageSync("desktopTrafficTable", reducer, [
-  "filters",
-]);
+export const desktopTrafficTableReducerWithLocalSync = getReducerWithLocalStorageSync(
+  ReducerKeys.DESKTOP_TRAFFIC_TABLE,
+  reducer,
+  ["filters"]
+);
