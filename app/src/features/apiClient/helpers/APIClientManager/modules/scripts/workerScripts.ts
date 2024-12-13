@@ -1,5 +1,6 @@
 /* eslint-disable no-new-func */
 
+import { RQAPI } from "features/apiClient/types";
 import { ScriptExecutedPayload } from "./types";
 
 export const requestWorkerFunction = function (e: MessageEvent) {
@@ -59,17 +60,22 @@ export const requestWorkerFunction = function (e: MessageEvent) {
     return new Proxy(() => {}, handler);
   };
 
+  function Request(request: RQAPI.Request) {
+    Object.assign(this, request);
+  }
+
+  Request.prototype.toJSON = function () {
+    return {
+      method: this.method,
+      url: this.url,
+      body: recursiveJSONify(this.body),
+    };
+  };
+
   const sandbox = {
     rq: {
       request: {
         ...request,
-        toJSON: () => {
-          return {
-            method: request.method,
-            url: request.url,
-            body: recursiveJSONify(request.body),
-          };
-        },
       },
       environment: {
         set: (key: string, value: any) => {
@@ -101,6 +107,16 @@ export const requestWorkerFunction = function (e: MessageEvent) {
       visualizer: createInfiniteChainable("visualizer"),
     },
   };
+
+  Object.setPrototypeOf(sandbox.rq.request, {
+    toJSON: () => {
+      return {
+        method: request.method,
+        url: request.url,
+        body: recursiveJSONify(request.body),
+      };
+    },
+  });
 
   const scriptFunction = new Function(
     "rq",
@@ -201,24 +217,12 @@ export const responseWorkerFunction = function (e: MessageEvent) {
     rq: {
       request: {
         ...request,
-        toJSON: () => {
-          return {
-            method: request.method,
-            url: request.url,
-            body: recursiveJSONify(request.body),
-          };
-        },
       },
       response: {
         ...response,
         code: response.status,
         status: response.statusText,
         responseTime: response.time,
-        toJSON: () => {
-          return { response: recursiveJSONify(response) };
-        },
-        json: () => recursiveJSONify(response.body),
-        text: () => response.body,
       },
       environment: {
         set: (key: string, value: any) => {
@@ -250,6 +254,26 @@ export const responseWorkerFunction = function (e: MessageEvent) {
       visualizer: createInfiniteChainable("visualizer"),
     },
   };
+
+  Object.setPrototypeOf(sandbox.rq.request, {
+    toJSON: () => {
+      return {
+        method: request.method,
+        url: request.url,
+        body: recursiveJSONify(request.body),
+      };
+    },
+  });
+
+  Object.setPrototypeOf(sandbox.rq.response, {
+    toJSON: () => {
+      return {
+        response: recursiveJSONify(response),
+      };
+    },
+    json: () => recursiveJSONify(response.body),
+    text: () => response.body,
+  });
 
   const scriptFunction = new Function(
     "rq",
