@@ -364,6 +364,10 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     );
   }
 
+  if (columnPlanName === PRICING.PLAN_NAMES.LITE && duration === PRICING.DURATION.MONTHLY) {
+    return <p className="only-annual-text">Available only as an annual plan</p>;
+  }
+
   return (
     <>
       <Space size={8}>
