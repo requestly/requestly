@@ -330,6 +330,10 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     return allEnvironmentData[currentEnvironmentId]?.variables ?? {};
   }, [allEnvironmentData, currentEnvironmentId]);
 
+  const getGlobalVariables = useCallback(() => {
+    return allEnvironmentData[globalEnvironmentId]?.variables ?? {};
+  }, [allEnvironmentData, globalEnvironmentId]);
+
   const getAllEnvironments = useCallback(() => {
     return Object.keys(allEnvironmentData).map((key) => {
       return {
@@ -410,6 +414,8 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     deleteEnvironment,
     getVariablesWithPrecedence,
     isEnvironmentsLoading: isLoading,
+    globalEnvironmentId,
+    getGlobalVariables,
   };
 };
 

@@ -21,6 +21,58 @@ const createWorker = (workerFn: Function) => {
   return new Worker(URL.createObjectURL(blob));
 };
 
+const handleGlobalEnvironmentMutations = async (
+  environmentManager: any,
+  payload: {
+    mutations: ScriptExecutedPayload["mutations"];
+    globalVariables: EnvironmentVariables;
+  }
+) => {
+  const { mutations, globalVariables } = payload;
+  const globalEnvironmentId = environmentManager.globalEnvironmentId;
+
+  if (isEmpty(mutations.globals.$set) && isEmpty(mutations.globals.$unset)) {
+    return {
+      updatedGlobalVariables: globalVariables,
+    };
+  }
+
+  const variablesToSet = {
+    ...globalVariables,
+    ...Object.fromEntries(
+      Object.entries(mutations.globals.$set).map(([key, value]) => {
+        if (globalVariables[key]) {
+          return [
+            key,
+            {
+              syncValue: globalVariables[key].syncValue,
+              localValue: value,
+            },
+          ];
+        }
+
+        return [
+          key,
+          {
+            syncValue: value,
+            localValue: value,
+          },
+        ];
+      })
+    ),
+  };
+
+  Object.keys(mutations.globals.$unset).forEach((key) => {
+    delete variablesToSet[key];
+  });
+
+  await environmentManager.setVariables(globalEnvironmentId, variablesToSet);
+
+  return {
+    updatedGlobalVariables: variablesToSet,
+  };
+};
+
 const handleEnvironmentChanges = async (
   environmentManager: any,
   payload: {
@@ -29,11 +81,12 @@ const handleEnvironmentChanges = async (
   }
 ) => {
   const currentVars = payload.currentVariables;
+  console.log("!!!debug", "currentVars", Object.keys(currentVars));
   const currentEnvironmentId = environmentManager.getCurrentEnvironment().currentEnvironmentId;
 
   if (isEmpty(payload.mutations.environment.$set) && isEmpty(payload.mutations.environment.$unset)) {
     return {
-      updatedVariables: currentVars,
+      updatedEnvironmentVariables: currentVars,
     };
   }
 
@@ -72,7 +125,7 @@ const handleEnvironmentChanges = async (
 
   await environmentManager.setVariables(currentEnvironmentId, variablesToSet);
   return {
-    updatedVariables: variablesToSet,
+    updatedEnvironmentVariables: variablesToSet,
   };
 };
 
@@ -93,9 +146,13 @@ const messageHandler = async (
 
   switch (type) {
     case "SCRIPT_EXECUTED": {
+      const globalEnvironmentUpdations = await handleGlobalEnvironmentMutations(environmentManager, payload);
       handleEnvironmentChanges(environmentManager, payload)
         .then((updatedVariables) => {
-          resolve(updatedVariables);
+          resolve({
+            ...globalEnvironmentUpdations,
+            ...updatedVariables,
+          });
         })
         .catch((e) => {
           reject(e);
@@ -117,7 +174,8 @@ export const executePrerequestScript = (
   script: string,
   request: RQAPI.Request,
   environmentManager: any,
-  currentEnvironmentVariables: EnvironmentVariables
+  currentEnvironmentVariables: EnvironmentVariables,
+  globalEnvironmentVariables: EnvironmentVariables
 ): Promise<EnvironmentVariables | null> => {
   let worker: Worker | null = null;
 
@@ -136,6 +194,7 @@ export const executePrerequestScript = (
       script,
       request: request,
       currentVariables: currentEnvironmentVariables,
+      globalVariables: globalEnvironmentVariables,
     });
 
     setTimeout(() => {
@@ -151,7 +210,8 @@ export const executePostresponseScript = (
     response: RQAPI.Response;
   },
   environmentManager: any,
-  currentEnvironmentVariables: EnvironmentVariables
+  currentEnvironmentVariables: EnvironmentVariables,
+  globalEnvironmentVariables: EnvironmentVariables
 ) => {
   let worker: Worker | null = null;
 
@@ -171,6 +231,7 @@ export const executePostresponseScript = (
       request: APIDetails.request,
       response: APIDetails.response,
       currentVariables: currentEnvironmentVariables,
+      globalVariables: globalEnvironmentVariables,
     });
 
     setTimeout(() => {
