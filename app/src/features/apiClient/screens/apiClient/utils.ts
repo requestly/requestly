@@ -210,7 +210,6 @@ export const getEmptyAuthOptions = (): AUTH_OPTIONS => {
   };
 };
 
-// only solves rendering in one case, still need to make it possible to correctly send updates
 function getAuthOfParent(allRecords: RQAPI.Record[], parentId: RQAPI.Record["collectionId"]): RQAPI.AuthOptions | null {
   const parentRecord = allRecords.find((record) => record.id === parentId);
   if (!parentRecord) {
