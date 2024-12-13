@@ -1,6 +1,4 @@
 /* eslint-disable no-new-func */
-
-import { RQAPI } from "features/apiClient/types";
 import { ScriptExecutedPayload } from "./types";
 
 export const requestWorkerFunction = function (e: MessageEvent) {
@@ -13,31 +11,11 @@ export const requestWorkerFunction = function (e: MessageEvent) {
     },
   };
 
-  const recursiveJSONify = (obj: any): any => {
+  const JSONifyObject = (stringifiedObject: string): any => {
     try {
-      // If it's a JSON string, try to parse it first
-      if (typeof obj === "string") {
-        try {
-          return recursiveJSONify(JSON.parse(obj));
-        } catch {
-          return obj;
-        }
-      }
-
-      if (typeof obj !== "object" || obj === null) {
-        return obj;
-      }
-
-      if (Array.isArray(obj)) {
-        return obj.map((item) => recursiveJSONify(item));
-      }
-
-      return Object.entries(obj).reduce((acc, [key, value]) => {
-        acc[key] = recursiveJSONify(value);
-        return acc;
-      }, {} as any);
+      JSON.parse(stringifiedObject);
     } catch {
-      return String(obj);
+      throw new Error("JSON parse error");
     }
   };
 
@@ -58,18 +36,6 @@ export const requestWorkerFunction = function (e: MessageEvent) {
     };
 
     return new Proxy(() => {}, handler);
-  };
-
-  function Request(request: RQAPI.Request) {
-    Object.assign(this, request);
-  }
-
-  Request.prototype.toJSON = function () {
-    return {
-      method: this.method,
-      url: this.url,
-      body: recursiveJSONify(this.body),
-    };
   };
 
   const sandbox = {
@@ -113,7 +79,7 @@ export const requestWorkerFunction = function (e: MessageEvent) {
       return {
         method: request.method,
         url: request.url,
-        body: recursiveJSONify(request.body),
+        body: JSONifyObject(request.body),
       };
     },
   });
@@ -185,31 +151,11 @@ export const responseWorkerFunction = function (e: MessageEvent) {
     return new Proxy(() => {}, handler);
   };
 
-  const recursiveJSONify = (obj: any): any => {
+  const JSONifyObject = (stringifiedObject: string): any => {
     try {
-      // If it's a JSON string, try to parse it first
-      if (typeof obj === "string") {
-        try {
-          return recursiveJSONify(JSON.parse(obj));
-        } catch {
-          return obj;
-        }
-      }
-
-      if (typeof obj !== "object" || obj === null) {
-        return obj;
-      }
-
-      if (Array.isArray(obj)) {
-        return obj.map((item) => recursiveJSONify(item));
-      }
-
-      return Object.entries(obj).reduce((acc, [key, value]) => {
-        acc[key] = recursiveJSONify(value);
-        return acc;
-      }, {} as any);
+      JSON.parse(stringifiedObject);
     } catch {
-      return String(obj);
+      throw new Error("JSON parse error");
     }
   };
 
@@ -260,7 +206,7 @@ export const responseWorkerFunction = function (e: MessageEvent) {
       return {
         method: request.method,
         url: request.url,
-        body: recursiveJSONify(request.body),
+        body: JSONifyObject(request.body),
       };
     },
   });
@@ -268,10 +214,10 @@ export const responseWorkerFunction = function (e: MessageEvent) {
   Object.setPrototypeOf(sandbox.rq.response, {
     toJSON: () => {
       return {
-        response: recursiveJSONify(response),
+        response: JSONifyObject(response),
       };
     },
-    json: () => recursiveJSONify(response.body),
+    json: () => JSONifyObject(response.body),
     text: () => response.body,
   });
 
