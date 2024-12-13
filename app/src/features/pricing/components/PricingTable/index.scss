@@ -121,3 +121,15 @@
   text-decoration-style: dashed;
   text-underline-offset: 4px;
 }
+
+.disabled-col {
+  background-color: rgba(31, 31, 31, 0.7);
+  & * {
+    opacity: 0.7;
+  }
+}
+
+.only-annual-text {
+  color: var(--requestly-color-primary-300);
+  opacity: 1;
+}
