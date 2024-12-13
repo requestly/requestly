@@ -81,7 +81,6 @@ const handleEnvironmentChanges = async (
   }
 ) => {
   const currentVars = payload.currentVariables;
-  console.log("!!!debug", "currentVars", Object.keys(currentVars));
   const currentEnvironmentId = environmentManager.getCurrentEnvironment().currentEnvironmentId;
 
   if (isEmpty(payload.mutations.environment.$set) && isEmpty(payload.mutations.environment.$unset)) {

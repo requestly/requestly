@@ -31,11 +31,6 @@ export const executeAPIRequest = async (
         globalEnvironmentVariables
       );
 
-      console.log("!!!debug", "upated things", {
-        updatedEnvironmentVariables,
-        updatedGlobalVariables,
-      });
-
       currentEnvironmentVariables = updatedEnvironmentVariables;
       globalEnvironmentVariables = updatedGlobalVariables;
       // TODO@nafees87n: Fix this while refactoring, rendering should always get fresh variables

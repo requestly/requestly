@@ -4,7 +4,6 @@ import { ScriptExecutedPayload } from "./types";
 
 export const requestWorkerFunction = function (e: MessageEvent) {
   const { script, request, currentVariables, globalVariables } = e.data;
-  console.log("!!!debug", "re worker funcrion", Object.keys(currentVariables));
 
   const mutations: ScriptExecutedPayload["mutations"] = {
     environment: {
@@ -35,9 +34,6 @@ export const requestWorkerFunction = function (e: MessageEvent) {
 
     return new Proxy(() => {}, handler);
   };
-
-  console.log("!!!debug", "inside request worker", Object.keys(currentVariables));
-  console.log("!!!debug", "inside reqglo worker", Object.keys(globalVariables));
 
   const sandbox = {
     rq: {
