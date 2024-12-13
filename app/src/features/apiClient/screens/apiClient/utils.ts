@@ -5,7 +5,6 @@ import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../ty
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
-import { isEmpty } from "lodash";
 
 export const makeRequest = async (
   appMode: string,
@@ -185,13 +184,3 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
   return updatedRecords;
 };
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
-
-export const setToSessionStorage = (key: string, data: string | [] | {}) => {
-  typeof window !== "undefined" && window.sessionStorage.setItem(key, JSON.stringify(data));
-};
-
-export const getFromSessionStorage = (key: string, emptyValue: string | [] | {}) =>
-  (typeof window !== "undefined" &&
-    !isEmpty(window.sessionStorage.getItem(key)) &&
-    JSON.parse(window.sessionStorage.getItem(key))) ||
-  (typeof emptyValue === "undefined" ? {} : emptyValue);
