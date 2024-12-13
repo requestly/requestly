@@ -25,7 +25,7 @@ import "./postmanImporter.scss";
 import { batchWrite } from "backend/utils";
 
 type ProcessedData = {
-  environments: { name: string; variables: Record<string, EnvironmentVariableValue> }[];
+  environments: { name: string; variables: Record<string, EnvironmentVariableValue>; isGlobal: boolean }[];
   apiRecords: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[];
   variables: Record<string, EnvironmentVariableValue>;
 };
@@ -51,7 +51,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
 
-  const { addNewEnvironment, setVariables } = useEnvironmentManager();
+  const { addNewEnvironment, setVariables, getGlobalEnvironmentData } = useEnvironmentManager();
   const { onSaveRecord } = useApiClientContext();
 
   const collectionsCount = useRef(0);
@@ -151,10 +151,16 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   const handleImportEnvironments = useCallback(async () => {
     try {
       const importPromises = processedFileData.environments.map(async (env) => {
-        const newEnvironment = await addNewEnvironment(env.name);
-        if (newEnvironment) {
-          await setVariables(newEnvironment.id, env.variables);
+        if (env.isGlobal) {
+          const globalEnvData = getGlobalEnvironmentData();
+          await setVariables(globalEnvData.id, { ...globalEnvData.variables, ...env.variables });
           return true;
+        } else {
+          const newEnvironment = await addNewEnvironment(env.name);
+          if (newEnvironment) {
+            await setVariables(newEnvironment.id, env.variables);
+            return true;
+          }
         }
         return false;
       });
@@ -165,7 +171,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       Logger.error("Postman data import failed:", error);
       throw error;
     }
-  }, [addNewEnvironment, setVariables, processedFileData.environments]);
+  }, [addNewEnvironment, setVariables, processedFileData.environments, getGlobalEnvironmentData]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
