@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { EnvironmentVariableValue, EnvironmentVariableType, EnvironmentVariables } from "backend/environment/types";
@@ -13,26 +13,38 @@ import { trackAddVariableClicked, trackVariableValueUpdated } from "../../analyt
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import "./variablesList.scss";
+import { useParams } from "react-router-dom";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 
 interface VariablesListProps {
-  variables: EnvironmentVariables;
   searchValue?: string;
-  setVariables: (variables: EnvironmentVariables) => Promise<unknown>;
-  removeVariable: (key: string) => Promise<unknown>;
 }
 
 export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string; id: number };
 
-export const VariablesList: React.FC<VariablesListProps> = ({
-  searchValue = "",
-  variables,
-  setVariables,
-  removeVariable,
-}) => {
+export const VariablesList: React.FC<VariablesListProps> = React.memo(({ searchValue = "" }) => {
+  const { envId } = useParams();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [dataSource, setDataSource] = useState([]);
   const [visibleSecretsRowIds, setVisibleSecrets] = useState([]);
+
+  const { getEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
+  const variables = getEnvironmentVariables(envId);
+
+  const handleSetVariables = useCallback(
+    async (variables: EnvironmentVariables) => {
+      return setVariables(envId, variables);
+    },
+    [envId, setVariables]
+  );
+
+  const handleRemoveVariable = useCallback(
+    async (key: string) => {
+      return removeVariable(envId, key);
+    },
+    [envId, removeVariable]
+  );
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
@@ -80,7 +92,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
             return acc;
           }, {});
 
-          setVariables(variablesToSave).then(() => {
+          handleSetVariables(variablesToSave).then(() => {
             setDataSource(variableRows);
             if (fieldChanged === "syncValue" || fieldChanged === "localValue") {
               trackVariableValueUpdated(fieldChanged, EnvironmentAnalyticsContext.API_CLIENT, variableRows.length);
@@ -89,7 +101,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
         }
       }
     },
-    [dataSource, setVariables, user.loggedIn]
+    [dataSource, handleSetVariables, user.loggedIn]
   );
 
   const handleAddNewRow = useCallback((dataSource: EnvironmentVariableTableRow[]) => {
@@ -108,7 +120,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       const newData = key ? dataSource.filter((item) => item.key !== key) : dataSource.slice(0, -1);
 
       if (key) {
-        await removeVariable(key);
+        await handleRemoveVariable(key);
       }
 
       setDataSource(newData);
@@ -117,7 +129,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
         handleAddNewRow([]);
       }
     },
-    [dataSource, removeVariable, handleAddNewRow]
+    [dataSource, handleRemoveVariable, handleAddNewRow]
   );
 
   const handleUpdateVisibleSecretsRowIds = useCallback(
@@ -139,8 +151,16 @@ export const VariablesList: React.FC<VariablesListProps> = ({
     recordsCount: dataSource.length,
   });
 
+  const hasDataSourceUpdated = useRef(false);
+
   useEffect(() => {
+    if (hasDataSourceUpdated.current) {
+      return;
+    }
+
     if (variables) {
+      hasDataSourceUpdated.current = true;
+
       const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(
         ([key, value], index) => ({
           id: index,
@@ -150,6 +170,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
           syncValue: value.syncValue,
         })
       );
+
       if (formattedDataSource.length === 0) {
         formattedDataSource.push({
           id: 0,
@@ -207,4 +228,4 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       )}
     />
   );
-};
+});
