@@ -171,11 +171,14 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
 
       if (isRecordExist) {
-        const apiClientRecordWithAuthOptions = updateAuthOptions(
+        const updatedRecord = { ...apiClientRecord };
+        updatedRecord.data = updateAuthOptions(
+          apiClientRecords,
+          apiClientRecord.collectionId,
           apiClientRecord.data,
           apiClientRecord.data.auth?.currentAuthType
-        );
-        onUpdateRecord(apiClientRecordWithAuthOptions);
+        ) as RQAPI.Entry;
+        onUpdateRecord(updatedRecord);
       } else {
         onNewRecord(apiClientRecord);
 

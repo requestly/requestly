@@ -91,9 +91,11 @@ export const CollectionView = () => {
           },
         },
       };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
-        onSaveRecord(result.data);
-      });
+      return upsertApiRecord(user.details?.profile?.uid, record, teamId)
+        .then((result) => {
+          onSaveRecord(result.data);
+        })
+        .catch(console.error);
     },
     [collection, onSaveRecord, teamId, user.details?.profile?.uid]
   );
