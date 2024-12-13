@@ -10,6 +10,10 @@ export const requestWorkerFunction = function (e: MessageEvent) {
       $set: {},
       $unset: {},
     },
+    globals: {
+      $set: {},
+      $unset: {},
+    },
   };
 
   const createInfiniteChainable = (methodName: string) => {
@@ -111,6 +115,10 @@ export const responseWorkerFunction = function (e: MessageEvent) {
       $set: {},
       $unset: {},
     },
+    globals: {
+      $set: {},
+      $unset: {},
+    },
   };
 
   const createInfiniteChainable = (methodName: string) => {
@@ -151,11 +159,26 @@ export const responseWorkerFunction = function (e: MessageEvent) {
           mutations.environment.$unset[key] = "";
         },
       },
+      globals: {
+        set: (key: string, value: any) => {
+          if (key === undefined || value === undefined) {
+            throw new Error("Key or value is undefined while setting environment variable.");
+          }
+          mutations.globals.$set[key] = value;
+        },
+        get: (key: string) => {
+          //TODO global variables
+          const variable = currentVariables[key];
+          return variable?.localValue || variable?.syncValue;
+        },
+        unset: (key: string) => {
+          mutations.globals.$unset[key] = "";
+        },
+      },
       collectionVariables: createInfiniteChainable("collectionVariables"),
       cookies: createInfiniteChainable("cookie"),
       execution: createInfiniteChainable("execution"),
       expect: createInfiniteChainable("expect"),
-      globals: createInfiniteChainable("globals"),
       info: createInfiniteChainable("info"),
       iterationData: createInfiniteChainable("iterationData"),
       require: createInfiniteChainable("require"),
