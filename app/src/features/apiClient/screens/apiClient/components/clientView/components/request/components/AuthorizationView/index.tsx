@@ -87,7 +87,9 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => 
         {!isEmpty(AUTHORIZATION_STATIC_DATA[selectedForm]?.description) && (
           <Description
             data={AUTHORIZATION_STATIC_DATA[selectedForm]?.description}
-            wrapperClass={`${selectedForm === AUTHORIZATION_TYPES.NO_AUTH ? "no-auth" : ""}`}
+            wrapperClass={`${
+              [AUTHORIZATION_TYPES.NO_AUTH, AUTHORIZATION_TYPES.INHERIT].includes(selectedForm) ? "no-auth" : ""
+            }`}
           />
         )}
       </div>
