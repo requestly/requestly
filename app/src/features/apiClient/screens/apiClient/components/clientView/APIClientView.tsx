@@ -338,8 +338,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       data: { ...sanitizeEntry(entry, false) },
     };
 
-    console.log("DBG: onSaveButtonClick entry", JSON.stringify(record, null, 2));
-
     if (apiEntryDetails?.id) {
       record.id = apiEntryDetails?.id;
     }

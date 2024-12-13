@@ -15,14 +15,12 @@ export const executeAPIRequest = async (
   signal?: AbortSignal,
   requestCollectionId?: string
 ): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
-  // get updated entry based on auth details
   const updatedEntry = updateAuthOptions(
     apiRecords,
     requestCollectionId,
     entry,
     entry.auth?.currentAuthType ?? AUTHORIZATION_TYPES.NO_AUTH
   ) as RQAPI.Entry;
-  console.log("DBG: updatedEntry", JSON.stringify(updatedEntry, null, 2));
   // Process request configuration with environment variables
   const renderedRequestDetails = environmentManager.renderVariables(updatedEntry.request, requestCollectionId);
   let currentEnvironmentVariables = renderedRequestDetails.variables;
