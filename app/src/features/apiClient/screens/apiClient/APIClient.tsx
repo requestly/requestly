@@ -40,6 +40,10 @@ export const APIClient: React.FC<Props> = () => {
   const isRequestFetched = useRef(false);
 
   useEffect(() => {
+    //to update breadcrumb name
+    if (!requestId || requestId == "new") {
+      return;
+    }
     const record = apiClientRecords.find((rec) => rec.id == requestId);
     if (record?.type === RQAPI.RecordType.API) {
       setSelectedEntryDetails((prev) => {
