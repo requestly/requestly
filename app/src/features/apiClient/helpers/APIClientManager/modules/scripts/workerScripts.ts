@@ -153,7 +153,7 @@ export const responseWorkerFunction = function (e: MessageEvent) {
 
   const JSONifyObject = (stringifiedObject: string): any => {
     try {
-      JSON.parse(stringifiedObject);
+      return JSON.parse(stringifiedObject);
     } catch {
       throw new Error("JSON parse error");
     }
