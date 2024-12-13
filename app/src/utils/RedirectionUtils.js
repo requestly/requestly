@@ -185,6 +185,10 @@ export const redirectToRequest = (navigate, requestId = "new") => {
   navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}`);
 };
 
+export const redirectToCollection = (navigate, collectionId) => {
+  navigate(`${PATHS.API_CLIENT.ABSOLUTE}/collection/${collectionId}`);
+};
+
 export const redirectToApiClientCollection = (navigate, collectionId = "new") => {
   navigate(`${PATHS.API_CLIENT.ABSOLUTE}/collection/${collectionId}`);
 };

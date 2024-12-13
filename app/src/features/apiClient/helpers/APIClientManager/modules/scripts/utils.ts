@@ -116,7 +116,8 @@ const messageHandler = async (
 export const executePrerequestScript = (
   script: string,
   request: RQAPI.Request,
-  environmentManager: any
+  environmentManager: any,
+  currentEnvironmentVariables: EnvironmentVariables
 ): Promise<EnvironmentVariables | null> => {
   let worker: Worker | null = null;
 
@@ -131,12 +132,10 @@ export const executePrerequestScript = (
       reject();
     };
 
-    const currentVars = environmentManager.getCurrentEnvironmentVariables();
-
     worker.postMessage({
       script,
       request: request,
-      currentVariables: currentVars,
+      currentVariables: currentEnvironmentVariables,
     });
 
     setTimeout(() => {
@@ -152,7 +151,7 @@ export const executePostresponseScript = (
     response: RQAPI.Response;
   },
   environmentManager: any,
-  currentEnvironmentVariables: Record<string, string | number | boolean>
+  currentEnvironmentVariables: EnvironmentVariables
 ) => {
   let worker: Worker | null = null;
 

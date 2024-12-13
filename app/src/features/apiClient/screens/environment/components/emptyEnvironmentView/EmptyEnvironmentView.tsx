@@ -4,7 +4,7 @@ import emptyEnvironmentViewImage from "../../assets/emptyEnvironment.svg";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { getCurrentEnvironmentId } from "store/features/environment/selectors";
+import { getCurrentEnvironmentId } from "store/features/variables/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { redirectToNewEnvironment } from "utils/RedirectionUtils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";

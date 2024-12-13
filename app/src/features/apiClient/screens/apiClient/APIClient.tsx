@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import APIClientView from "./components/clientView/APIClientView";
-import { DeleteApiRecordModal, ImportRequestModal } from "./components/modals";
+import { ImportRequestModal } from "./components/modals";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getEmptyAPIEntry } from "./utils";
 import { getApiRecord, upsertApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
@@ -22,11 +22,12 @@ export const APIClient: React.FC<Props> = () => {
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
+  const location = useLocation();
   const { requestId } = useParams();
   const {
-    recordToBeDeleted,
-    isDeleteModalOpen,
-    onDeleteModalClose,
+    apiClientRecords,
+    history,
+    selectedHistoryIndex,
     addToHistory,
     isImportModalOpen,
     onImportRequestModalClose,
@@ -38,8 +39,42 @@ export const APIClient: React.FC<Props> = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
+  const isHistoryPath = location.pathname.includes("history");
+
+  const requestHistoryEntry = useMemo(() => {
+    if (!isHistoryPath) {
+      return;
+    }
+
+    if (history?.length === 0) {
+      return;
+    }
+
+    const entryDetails: Partial<RQAPI.ApiRecord> = {
+      type: RQAPI.RecordType.API,
+      data: { ...history[selectedHistoryIndex] },
+    };
+
+    return entryDetails;
+  }, [isHistoryPath, history, selectedHistoryIndex]);
 
   const isRequestFetched = useRef(false);
+
+  useEffect(() => {
+    //For updating breadcrumb name
+    if (!requestId || requestId == "new") {
+      return;
+    }
+    const record = apiClientRecords.find((rec) => rec.id == requestId);
+    if (record?.type === RQAPI.RecordType.API) {
+      setSelectedEntryDetails((prev) => {
+        if (prev?.id === record.id && prev.name == record.name) {
+          return prev;
+        }
+        return record as RQAPI.ApiRecord;
+      });
+    }
+  }, [requestId, apiClientRecords]);
 
   useEffect(() => {
     if (isRequestFetched.current) {
@@ -49,9 +84,7 @@ export const APIClient: React.FC<Props> = () => {
     if (!requestId || requestId === "new") {
       return;
     }
-
     setIsLoading(true);
-
     getApiRecord(requestId)
       .then((result) => {
         if (result.success) {
@@ -114,13 +147,15 @@ export const APIClient: React.FC<Props> = () => {
     [saveRequest, setIsImportModalOpen]
   );
 
+  const entryDetails = (isHistoryPath ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord;
+
   return (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
       <div className="api-client-container-content">
         <APIClientView
           // TODO: Fix - "apiEntry" is used for history, remove this prop and derive everything from "apiEntryDetails"
-          apiEntry={selectedEntryDetails?.data}
-          apiEntryDetails={selectedEntryDetails}
+          apiEntry={entryDetails?.data}
+          apiEntryDetails={entryDetails}
           notifyApiRequestFinished={addToHistory}
         />
         <ImportRequestModal
@@ -129,8 +164,6 @@ export const APIClient: React.FC<Props> = () => {
           handleImportRequest={handleImportRequest}
           onClose={onImportRequestModalClose}
         />
-
-        <DeleteApiRecordModal open={isDeleteModalOpen} record={recordToBeDeleted} onClose={onDeleteModalClose} />
       </div>
     </BottomSheetProvider>
   );

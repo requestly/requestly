@@ -6,21 +6,28 @@ import { REQUEST_METHOD_COLORS } from "../../../../../../../../constants";
 import { trackRequestSelectedFromHistory } from "modules/analytics/events/features/apiClient";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
+import PATHS from "config/constants/sub/paths";
 
 interface Props {
   history: RQAPI.Entry[];
+  selectedHistoryIndex: number;
   onSelectionFromHistory: (index: number) => void;
 }
 
-export const HistoryList: React.FC<Props> = ({ history, onSelectionFromHistory }) => {
+export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, onSelectionFromHistory }) => {
+  const { openTab } = useTabsLayoutContext();
+
   const onHistoryLinkClick = useCallback(
     (index: number) => {
       onSelectionFromHistory(index);
+
+      openTab("history", { title: "History", url: `${PATHS.API_CLIENT.HISTORY.ABSOLUTE}` });
       trackRequestSelectedFromHistory();
       trackRQLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
       trackRQDesktopLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
     },
-    [onSelectionFromHistory]
+    [onSelectionFromHistory, openTab]
   );
 
   return history?.length ? (
@@ -35,7 +42,11 @@ export const HistoryList: React.FC<Props> = ({ history, onSelectionFromHistory }
         </Timeline.Item>
         {history.map((entry, index) => (
           <Timeline.Item key={index} color={REQUEST_METHOD_COLORS[entry.request.method]}>
-            <div className={`api-history-row ${entry.request.url ? "clickable" : ""}`}>
+            <div
+              className={`api-history-row ${entry.request.url ? "clickable" : ""} ${
+                selectedHistoryIndex === index ? "active" : ""
+              }`}
+            >
               <Typography.Text
                 strong
                 className="api-method"

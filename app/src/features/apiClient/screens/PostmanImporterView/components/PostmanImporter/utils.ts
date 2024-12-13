@@ -140,13 +140,30 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
   };
 };
 
-const createCollectionRecord = (name: string, id = generateDocumentId("apis")): Partial<RQAPI.CollectionRecord> => ({
-  id,
-  name,
-  deleted: false,
-  data: {},
-  type: RQAPI.RecordType.COLLECTION,
-});
+const createCollectionRecord = (
+  name: string,
+  id = generateDocumentId("apis"),
+  variables?: any[]
+): Partial<RQAPI.CollectionRecord> => {
+  const collectionVariables: Record<string, EnvironmentVariableValue> = {};
+  if (variables) {
+    variables.forEach((variable: any) => {
+      collectionVariables[variable.key] = {
+        syncValue: variable.value,
+        type: variable.type === "secret" ? "secret" : "string",
+      };
+    });
+  }
+  return {
+    id,
+    name,
+    deleted: false,
+    data: {
+      variables: collectionVariables,
+    },
+    type: RQAPI.RecordType.COLLECTION,
+  };
+};
 
 export const processPostmanCollectionData = (
   fileContent: any
@@ -181,7 +198,7 @@ export const processPostmanCollectionData = (
   };
 
   const rootCollectionId = generateDocumentId("apis");
-  const rootCollection = createCollectionRecord(fileContent.info.name, rootCollectionId);
+  const rootCollection = createCollectionRecord(fileContent.info.name, rootCollectionId, fileContent.variable);
   rootCollection.collectionId = "";
   const processedItems = processItems(fileContent.item, rootCollectionId);
 
