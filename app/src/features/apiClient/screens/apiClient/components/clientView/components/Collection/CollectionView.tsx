@@ -13,6 +13,8 @@ import { EnvironmentVariables } from "backend/environment/types";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
 import { variablesActions } from "store/features/variables/slice";
 import { getCollectionVariables } from "store/features/variables/selectors";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
+import PATHS from "config/constants/sub/paths";
 import "./collectionView.scss";
 
 const TAB_KEYS = {
@@ -24,6 +26,7 @@ export const CollectionView = () => {
   const dispatch = useDispatch();
   const { collectionId } = useParams();
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const { replaceTab } = useTabsLayoutContext();
   const user = useSelector(getUserAuthDetails);
   const teamId = useSelector(getCurrentlyActiveWorkspace);
   const collectionVariables = useSelector(getCollectionVariables);
@@ -86,9 +89,14 @@ export const CollectionView = () => {
       const record = { ...collection, name };
       return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
         onSaveRecord(result.data);
+        replaceTab(result.data.id, {
+          id: result.data.id,
+          title: result.data.name,
+          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${result.data.id}`,
+        });
       });
     },
-    [collection, teamId, user.details?.profile?.uid, onSaveRecord]
+    [collection, teamId, user.details?.profile?.uid, onSaveRecord, replaceTab]
   );
 
   return (

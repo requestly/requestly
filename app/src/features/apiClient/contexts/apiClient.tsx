@@ -230,6 +230,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     async (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId = "") => {
       switch (recordType) {
         case RQAPI.RecordType.API: {
+          setIsRecordBeingCreated(recordType);
           trackNewRequestClicked(analyticEventSource);
           const newRequest: Partial<RQAPI.Record> = {
             name: "Untitled request",
@@ -240,6 +241,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           };
 
           return upsertApiRecord(uid, newRequest, teamId).then((result) => {
+            setIsRecordBeingCreated(null);
             onSaveRecord(result.data);
             openTab(result.data.id, {
               title: result.data.name,
@@ -249,6 +251,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
 
         case RQAPI.RecordType.COLLECTION: {
+          setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
           const newCollection: Partial<RQAPI.CollectionRecord> = {
             name: "New collection",
@@ -259,6 +262,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           };
           return upsertApiRecord(uid, newCollection, teamId)
             .then((result) => {
+              setIsRecordBeingCreated(null);
               if (result.success) {
                 onSaveRecord(result.data);
                 openTab(result.data.id, {
@@ -273,9 +277,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
 
         case RQAPI.RecordType.ENVIRONMENT: {
+          setIsRecordBeingCreated(recordType);
           trackCreateEnvironmentClicked(analyticEventSource);
           return addNewEnvironment("New Environment")
             .then((newEnvironment) => {
+              setIsRecordBeingCreated(null);
               openTab(newEnvironment.id, {
                 title: newEnvironment.name,
                 url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${newEnvironment.id}?new`,
