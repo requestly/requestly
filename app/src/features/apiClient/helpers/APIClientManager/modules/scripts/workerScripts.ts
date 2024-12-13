@@ -211,6 +211,9 @@ export const responseWorkerFunction = function (e: MessageEvent) {
       },
       response: {
         ...response,
+        code: response.status,
+        status: response.statusText,
+        responseTime: response.time,
         toJSON: () => {
           return { response: recursiveJSONify(response) };
         },
