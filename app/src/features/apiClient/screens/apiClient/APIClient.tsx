@@ -40,7 +40,18 @@ export const APIClient: React.FC<Props> = () => {
   const isRequestFetched = useRef(false);
 
   useEffect(() => {
-    const record = apiClientRecords.find((rec) => rec.id === requestId);
+    const record = apiClientRecords.find((rec) => rec.id == requestId);
+    if (record?.type === RQAPI.RecordType.API) {
+      setSelectedEntryDetails((prev) => {
+        if (prev?.id === record.id && prev.name == record.name) {
+          return prev;
+        }
+        return record as RQAPI.ApiRecord;
+      });
+    }
+  }, [requestId, apiClientRecords]);
+
+  useEffect(() => {
     if (isRequestFetched.current) {
       return;
     }
@@ -48,17 +59,7 @@ export const APIClient: React.FC<Props> = () => {
     if (!requestId || requestId === "new") {
       return;
     }
-    if (record?.type === RQAPI.RecordType.API) {
-      setSelectedEntryDetails((prev) => {
-        if (prev?.id === record.id && prev.name === record.name) {
-          return prev;
-        }
-        return record as RQAPI.ApiRecord;
-      });
-      return;
-    }
     setIsLoading(true);
-
     getApiRecord(requestId)
       .then((result) => {
         if (result.success) {
@@ -77,7 +78,7 @@ export const APIClient: React.FC<Props> = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [requestId, apiClientRecords, onSaveRecord]);
+  }, [requestId]);
 
   const saveRequest = useCallback(
     async (apiEntry: RQAPI.Entry) => {
