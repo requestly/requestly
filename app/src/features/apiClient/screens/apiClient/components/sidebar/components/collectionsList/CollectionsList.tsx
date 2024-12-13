@@ -129,7 +129,7 @@ export const CollectionsList: React.FC<Props> = ({
 
               {isRecordBeingCreated === RQAPI.RecordType.COLLECTION &&
                 recordTypeToBeCreated === RQAPI.RecordType.COLLECTION && (
-                  <div style={{ marginBottom: "8px" }}>
+                  <div style={{ margin: "8px 0" }}>
                     <SidebarPlaceholderItem name="New Collection" />
                   </div>
                 )}

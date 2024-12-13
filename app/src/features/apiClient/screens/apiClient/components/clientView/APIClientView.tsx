@@ -43,6 +43,8 @@ import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
 
 interface Props {
   openInModal?: boolean;
@@ -68,6 +70,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   const { toggleBottomSheet } = useBottomSheetContext();
   const { onSaveRecord } = useApiClientContext();
+  const { replaceTab } = useTabsLayoutContext();
   const environmentManager = useEnvironmentManager();
   const { getVariablesWithPrecedence } = environmentManager;
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
@@ -315,6 +318,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
       trackRequestRenamed("breadcrumb");
       setRequestName("");
+      replaceTab(result.data.id, {
+        id: result.data.id,
+        title: result.data.name,
+        url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${result.data.id}`,
+      });
 
       toast.success("Request name updated!");
     } else {
