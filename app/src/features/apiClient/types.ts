@@ -103,7 +103,7 @@ export namespace RQAPI {
       postResponse: string;
     };
     variables: Omit<EnvironmentVariables, "localValue">;
-    auth: AuthOptions;
+    auth?: AuthOptions;
   }
 
   interface RecordMetadata {
