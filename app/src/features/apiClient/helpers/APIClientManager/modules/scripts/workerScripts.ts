@@ -227,6 +227,7 @@ export const responseWorkerFunction = function (e: MessageEvent) {
         payload: {
           currentVariables,
           mutations,
+          globalVariables,
         },
       });
     })
