@@ -64,6 +64,10 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
 
   const addNewEnvironment = useCallback(
     async (newEnvironmentName: string, isGlobal = false) => {
+      if (globalEnvironmentId && isGlobal) {
+        throw new Error("Global environment already exists");
+      }
+
       return upsertEnvironmentInDB(ownerId, newEnvironmentName, isGlobal)
         .then(({ id, name }) => {
           dispatch(variablesActions.addNewEnvironment({ id, name, isGlobal }));
@@ -77,7 +81,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
           console.error("Error while setting environment in db", err);
         });
     },
-    [ownerId, dispatch]
+    [globalEnvironmentId, ownerId, dispatch]
   );
 
   useEffect(() => {
