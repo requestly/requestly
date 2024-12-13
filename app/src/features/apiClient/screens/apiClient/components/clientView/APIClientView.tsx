@@ -356,10 +356,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   const handleAuthChange = useCallback(
     (currentAuthType: AUTHORIZATION_TYPES, updatedKey: string, updatedValue: string) => {
-      const updatedEntry = updateAuthOptions(entry, currentAuthType, updatedKey, updatedValue);
-      setEntry(updatedEntry);
+      setEntry((prevEntry) => {
+        const updatedEntry = updateAuthOptions(prevEntry, currentAuthType, updatedKey, updatedValue);
+        return updatedEntry;
+      });
     },
-    [entry]
+    []
   );
 
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
