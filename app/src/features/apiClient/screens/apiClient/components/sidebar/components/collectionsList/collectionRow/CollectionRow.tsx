@@ -13,7 +13,7 @@ import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
-import { setToSessionStorage } from "features/apiClient/screens/apiClient/utils";
+import { sessionStorage } from "utils/sessionStorage";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -74,7 +74,9 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
       collapsedKeys.splice(activeKeyIndex, 1);
     }
     setActiveKey(keys[0]);
-    isEmpty(collapsedKeys) ? window.sessionStorage.removeItem("keys") : setToSessionStorage("keys", collapsedKeys);
+    isEmpty(collapsedKeys)
+      ? sessionStorage.removeItem("collapsed_collection_keys")
+      : sessionStorage.setItem("collapsed_collection_keys", collapsedKeys);
   }, []);
 
   return (
