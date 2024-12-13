@@ -357,6 +357,11 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     [ownerId, dispatch]
   );
 
+  const getGlobalEnvironmentData = useCallback(() => {
+    const globalEnvironmentId = Object.keys(allEnvironmentData).find((envId) => allEnvironmentData[envId].isGlobal);
+    return allEnvironmentData[globalEnvironmentId];
+  }, [allEnvironmentData]);
+
   return {
     setCurrentEnvironment,
     addNewEnvironment,
@@ -373,6 +378,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     duplicateEnvironment,
     deleteEnvironment,
     getVariablesWithPrecedence,
+    getGlobalEnvironmentData,
     isEnvironmentsLoading: isLoading,
   };
 };
