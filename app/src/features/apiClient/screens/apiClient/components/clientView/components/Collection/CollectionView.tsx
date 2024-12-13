@@ -66,6 +66,7 @@ export const CollectionView = () => {
 
   const updateCollectionAuthData = useCallback(
     (currentAuthType: AUTHORIZATION_TYPES, updatedAuthKey: string, updatedValue: string) => {
+      console.log("DBG-1:updateCollectionAuthData called");
       const oldAuth = collection?.data?.auth ?? {
         currentAuthType: AUTHORIZATION_TYPES.NO_AUTH,
         authOptions: getEmptyAuthOptions(),
@@ -91,9 +92,13 @@ export const CollectionView = () => {
           },
         },
       };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
-        onSaveRecord(result.data);
-      });
+      return upsertApiRecord(user.details?.profile?.uid, record, teamId)
+        .then((result) => {
+          // fix-me: maybe happening but need to broadcast new change to child entries that are open in tabs
+          console.log("DBG-1: udpated collection data", JSON.stringify(result, null, 2));
+          onSaveRecord(result.data);
+        })
+        .catch(console.error);
     },
     [collection, onSaveRecord, teamId, user.details?.profile?.uid]
   );

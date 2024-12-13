@@ -67,7 +67,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const teamId = workspace?.id;
 
   const { toggleBottomSheet } = useBottomSheetContext();
-  const { onSaveRecord } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const { getVariablesWithPrecedence } = environmentManager;
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
@@ -91,7 +91,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (apiEntry) {
       clearTimeout(animationTimerRef.current);
       setIsAnimating(true);
-      const entryWithAuthOptions = updateAuthOptions(apiEntry, apiEntry.auth?.currentAuthType);
+      const entryWithAuthOptions = updateAuthOptions(
+        apiClientRecords,
+        apiEntryDetails.collectionId,
+        apiEntry,
+        apiEntry.auth?.currentAuthType
+      );
       setEntry(entryWithAuthOptions);
       setRequestName("");
       animationTimerRef.current = setTimeout(() => setIsAnimating(false), 500);
@@ -228,6 +233,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     executeAPIRequest(
       appMode,
+      apiClientRecords,
       sanitizedEntry,
       environmentManager,
       abortControllerRef.current.signal,
@@ -286,6 +292,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
+    apiClientRecords,
     apiEntryDetails?.collectionId,
     appMode,
     dispatch,
@@ -331,6 +338,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       data: { ...sanitizeEntry(entry, false) },
     };
 
+    console.log("DBG: onSaveButtonClick entry", JSON.stringify(record, null, 2));
+
     if (apiEntryDetails?.id) {
       record.id = apiEntryDetails?.id;
     }
@@ -356,10 +365,17 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   const handleAuthChange = useCallback(
     (currentAuthType: AUTHORIZATION_TYPES, updatedKey: string, updatedValue: string) => {
-      const updatedEntry = updateAuthOptions(entry, currentAuthType, updatedKey, updatedValue);
+      const updatedEntry = updateAuthOptions(
+        apiClientRecords,
+        apiEntryDetails?.collectionId,
+        entry,
+        currentAuthType,
+        updatedKey,
+        updatedValue
+      ) as RQAPI.Entry;
       setEntry(updatedEntry);
     },
-    [entry]
+    [apiClientRecords, apiEntryDetails?.collectionId, entry]
   );
 
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
