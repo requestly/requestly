@@ -9,9 +9,13 @@ import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from 
 import {
   trackHistoryCleared,
   trackImportCurlClicked,
+  trackNewCollectionClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { trackCreateEnvironmentClicked } from "../screens/environment/analytics";
+import PATHS from "config/constants/sub/paths";
+import { useLocation } from "react-router-dom";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -33,6 +37,7 @@ interface ApiClientContextInterface {
 
   isImportModalOpen: boolean;
 
+  selectedHistoryIndex: number;
   onSelectionFromHistory: (index: number) => void;
   onImportClick: () => void;
   onImportRequestModalClose: () => void;
@@ -60,6 +65,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
 
   isImportModalOpen: false,
 
+  selectedHistoryIndex: 0,
   onSelectionFromHistory: (index: number) => {},
   onImportClick: () => {},
   onImportRequestModalClose: () => {},
@@ -73,6 +79,7 @@ interface ApiClientProviderProps {
 }
 
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
+  const location = useLocation();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -82,10 +89,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
+  const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
-  const { closeTab } = useTabsLayoutContext();
+  const { openTab, closeTab, updateTab } = useTabsLayoutContext();
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -129,11 +137,18 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     });
   }, []);
 
-  const onUpdateRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-    setApiClientRecords((prev) => {
-      return prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record));
-    });
-  }, []);
+  const onUpdateRecord = useCallback(
+    (apiClientRecord: RQAPI.Record) => {
+      setApiClientRecords((prev) => {
+        return prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record));
+      });
+
+      updateTab(apiClientRecord.id, {
+        title: apiClientRecord.name,
+      });
+    },
+    [updateTab]
+  );
 
   const onDeleteRecords = useCallback(
     (recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
@@ -158,9 +173,16 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         onUpdateRecord(apiClientRecord);
       } else {
         onNewRecord(apiClientRecord);
+
+        if (location.pathname.includes("history")) {
+          openTab(apiClientRecord.id, {
+            title: apiClientRecord.name,
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${apiClientRecord.id}`,
+          });
+        }
       }
     },
-    [apiClientRecords, onUpdateRecord, onNewRecord]
+    [apiClientRecords, onUpdateRecord, onNewRecord, openTab, location.pathname]
   );
 
   const updateRecordToBeDeleted = useCallback((record: RQAPI.Record) => {
@@ -183,14 +205,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     trackHistoryCleared();
   }, []);
 
-  const onSelectionFromHistory = useCallback(
-    (index: number) => {
-      // setSelectedEntry(history[index]);
-    },
-    [
-      // history
-    ]
-  );
+  const onSelectionFromHistory = useCallback((index: number) => {
+    setSelectedHistoryIndex(index);
+  }, []);
 
   const onImportClick = useCallback(() => {
     setIsImportModalOpen(true);
@@ -199,9 +216,43 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);
 
-  const onNewClick = useCallback((analyticEventSource: RQAPI.AnalyticsEventSource) => {
-    trackNewRequestClicked(analyticEventSource);
-  }, []);
+  const onNewClick = useCallback(
+    (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => {
+      switch (recordType) {
+        case RQAPI.RecordType.API: {
+          trackNewRequestClicked(analyticEventSource);
+          openTab("request/new", {
+            title: "Untitled request",
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/request/new`,
+          });
+          return;
+        }
+
+        case RQAPI.RecordType.COLLECTION: {
+          trackNewCollectionClicked(analyticEventSource);
+          openTab("collection/new", {
+            title: "New collection",
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/new`,
+          });
+          return;
+        }
+
+        case RQAPI.RecordType.ENVIRONMENT: {
+          trackCreateEnvironmentClicked(analyticEventSource);
+          openTab("environments/new", {
+            title: "New environment",
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/new`,
+          });
+          return;
+        }
+
+        default: {
+          return;
+        }
+      }
+    },
+    [openTab]
+  );
 
   const value = {
     apiClientRecords,
@@ -221,6 +272,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     addToHistory,
     clearHistory,
     onSelectionFromHistory,
+    selectedHistoryIndex,
 
     isImportModalOpen,
     setIsImportModalOpen,

@@ -115,6 +115,10 @@ export const AppNotificationBanner = () => {
           }
           return "Requestly is offering six months of free access to its Professional Plan through the Accelerator program, limited to 20 companies.";
         }
+        case BANNER_ID.REQUEST_TEAM_ACCESS: {
+          const companyName = getCompanyNameFromEmail(user?.details?.profile?.email) || "";
+          return `Dear ${companyName} user, ${text}`;
+        }
         default:
           return text;
       }

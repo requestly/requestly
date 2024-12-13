@@ -17,7 +17,6 @@ import PricingFAQs from "./components/FAQs";
 import PricingPageFooter from "./components/PricingPageFooter";
 import EnterpriseRequestBanner from "./components/EnterpriseRequestBanner";
 import "./pricingIndexPage.scss";
-import BlackFridaySaleBanner from "./components/SaleBanner/PricingBannerSale";
 
 export const PricingIndexPage = () => {
   const navigate = useNavigate();
@@ -33,7 +32,6 @@ export const PricingIndexPage = () => {
           </div>
         </Layout.Header>
         <div className="pricing-page-body-wrapper">
-          <BlackFridaySaleBanner />
           <EnterpriseRequestBanner />
           <div className="pricing-page-body">
             <div className="page-yellow-text">Plans & pricing</div>

@@ -14,6 +14,8 @@ import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analy
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 import { sessionStorage } from "utils/sessionStorage";
+import PATHS from "config/constants/sub/paths";
+import { useParams } from "react-router-dom";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -29,6 +31,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
+  const { collectionId } = useParams();
 
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {
@@ -94,19 +97,31 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
         <Collapse
           activeKey={activeKey}
           onChange={collapseChangeHandler}
+          collapsible={activeKey === record.id ? "icon" : "header"}
           ghost
           className="collections-list-item collection"
           expandIcon={({ isActive }) => {
-            return isActive ? <PiFolderOpen /> : <MdOutlineFolder />;
+            return isActive ? (
+              <PiFolderOpen className="collection-expand-icon" />
+            ) : (
+              <MdOutlineFolder className="collection-expand-icon" />
+            );
           }}
         >
           <Collapse.Panel
+            className={`collection-panel ${record.id === collectionId ? "active" : ""}`}
             key={record.id}
             header={
               <div
                 className="collection-name-container"
                 onMouseEnter={setHoveredId.bind(this, record.id)}
                 onMouseLeave={setHoveredId.bind(this, "")}
+                onClick={() => {
+                  openTab(record.id, {
+                    title: record.name || "New Collection",
+                    url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${record.id}`,
+                  });
+                }}
               >
                 <div className="collection-name" title={record.name}>
                   {record.name}

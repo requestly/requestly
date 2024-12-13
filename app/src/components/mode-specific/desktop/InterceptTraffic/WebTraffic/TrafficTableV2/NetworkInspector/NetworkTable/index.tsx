@@ -14,9 +14,9 @@ import { APIClient, APIClientRequest } from "features/apiClient/components/commo
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
 import { Checkbox, Typography } from "antd";
 import { trackMockResponsesRequestsSelected } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
-
-import "./index.scss";
 import { REQUEST_METHOD_COLORS, RequestMethod } from "../../../../../../../../constants/requestMethodColors";
+import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import "./index.scss";
 
 export const ITEM_SIZE = 30;
 
@@ -271,13 +271,15 @@ const NetworkTable: React.FC<Props> = ({
         />
       </div>
       {isReplayRequestModalOpen ? (
-        <APIClient
-          request={apiClientRequestForSelectedRowRef.current}
-          openInModal
-          modalTitle="Replay request"
-          isModalOpen
-          onModalClose={onReplayRequestModalClose}
-        />
+        <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+          <APIClient
+            request={apiClientRequestForSelectedRowRef.current}
+            openInModal
+            modalTitle="Replay request"
+            isModalOpen
+            onModalClose={onReplayRequestModalClose}
+          />
+        </BottomSheetProvider>
       ) : null}
     </>
   );

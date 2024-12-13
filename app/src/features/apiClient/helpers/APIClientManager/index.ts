@@ -11,11 +11,13 @@ export const executeAPIRequest = async (
   appMode: string,
   entry: RQAPI.Entry,
   environmentManager: any,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  requestCollectionId?: string
 ): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
   // Process request configuration with environment variables
-  let renderedRequest = environmentManager.renderVariables(entry.request);
-  let currentEnvironmentVariables = environmentManager.getCurrentEnvironmentVariables();
+  const renderedRequestDetails = environmentManager.renderVariables(entry.request, requestCollectionId);
+  let currentEnvironmentVariables = renderedRequestDetails.variables;
+  let renderedRequest = renderedRequestDetails.renderedTemplate;
   let response: RQAPI.Response | null = null;
 
   try {
@@ -23,7 +25,8 @@ export const executeAPIRequest = async (
       const { updatedVariables } = await executePrerequestScript(
         entry.scripts.preRequest,
         renderedRequest,
-        environmentManager
+        environmentManager,
+        currentEnvironmentVariables
       );
 
       currentEnvironmentVariables = updatedVariables;
