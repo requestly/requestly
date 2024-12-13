@@ -1,21 +1,30 @@
 import { notification } from "antd";
 import * as Sentry from "@sentry/react";
-import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
+import { addUrlSchemeIfMissing, makeRequest, updateAuthOptions } from "../../screens/apiClient/utils";
 import { RQAPI } from "../../types";
 import { executePrerequestScript, executePostresponseScript } from "./modules/scripts/utils";
 import { renderTemplate } from "backend/environment/utils";
 import { DEMO_API_URL } from "features/apiClient/constants";
 import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient";
-
+import { AUTHORIZATION_TYPES } from "../../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 export const executeAPIRequest = async (
   appMode: string,
+  apiRecords: RQAPI.Record[],
   entry: RQAPI.Entry,
   environmentManager: any,
   signal?: AbortSignal,
   requestCollectionId?: string
 ): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
+  // get updated entry based on auth details
+  const updatedEntry = updateAuthOptions(
+    apiRecords,
+    requestCollectionId,
+    entry,
+    entry.auth?.currentAuthType ?? AUTHORIZATION_TYPES.NO_AUTH
+  ) as RQAPI.Entry;
+  console.log("DBG: updatedEntry", JSON.stringify(updatedEntry, null, 2));
   // Process request configuration with environment variables
-  const renderedRequestDetails = environmentManager.renderVariables(entry.request, requestCollectionId);
+  const renderedRequestDetails = environmentManager.renderVariables(updatedEntry.request, requestCollectionId);
   let currentEnvironmentVariables = renderedRequestDetails.variables;
   let renderedRequest = renderedRequestDetails.renderedTemplate;
   let response: RQAPI.Response | null = null;

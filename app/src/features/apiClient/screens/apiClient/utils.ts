@@ -202,6 +202,7 @@ export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", v
 
 export const getEmptyAuthOptions = (): AUTH_OPTIONS => {
   return {
+    [AUTHORIZATION_TYPES.INHERIT]: null,
     [AUTHORIZATION_TYPES.NO_AUTH]: null,
     [AUTHORIZATION_TYPES.API_KEY]: { key: "", value: "", addTo: "HEADER" },
     [AUTHORIZATION_TYPES.BEARER_TOKEN]: { bearer: "" },
@@ -209,19 +210,38 @@ export const getEmptyAuthOptions = (): AUTH_OPTIONS => {
   };
 };
 
+// only solves rendering in one case, still need to make it possible to correctly send updates
+function getAuthOfParent(allRecords: RQAPI.Record[], parentId: RQAPI.Record["collectionId"]): RQAPI.AuthOptions | null {
+  const parentRecord = allRecords.find((record) => record.id === parentId);
+  if (!parentRecord) {
+    // error case: suggested parent does not exist
+    return null;
+  }
+  let parentAuthData = parentRecord.data.auth;
+  if (parentAuthData.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
+    const nextParentId = parentRecord.collectionId;
+    if (!nextParentId) {
+      return null;
+    }
+    parentAuthData = getAuthOfParent(allRecords, nextParentId);
+  }
+  return parentAuthData;
+}
+
 export const updateAuthOptions = (
+  allRecords: RQAPI.Record[],
+  parentId: RQAPI.Record["collectionId"],
   entry: RQAPI.Record["data"],
   currentAuthType: AUTHORIZATION_TYPES,
   updatedKey?: string,
   updatedValue?: string
-) => {
-  // clear all based details on the current entry:
+): typeof entry => {
   const currentEntry = { ...entry };
   const oldAuth = currentEntry.auth ?? {
     currentAuthType: AUTHORIZATION_TYPES.NO_AUTH,
     authOptions: getEmptyAuthOptions(),
   };
-  const newAuthOptions =
+  let newAuthOptions =
     updatedKey || updatedValue
       ? {
           ...oldAuth.authOptions,
@@ -262,12 +282,24 @@ export const updateAuthOptions = (
         data.unshift(newHeader);
       }
     };
+    const effectiveAuthOfCurrentEntry = getEffectiveAuthOfEntry(allRecords, currentEntry, parentId);
 
-    switch (currentAuthType) {
+    // no modifications need to be made, parent was not found
+    if (!effectiveAuthOfCurrentEntry?.currentAuthType) return currentEntry;
+
+    newAuthOptions = effectiveAuthOfCurrentEntry.authOptions;
+    const appliedAuthType = effectiveAuthOfCurrentEntry.currentAuthType;
+
+    switch (appliedAuthType) {
+      case AUTHORIZATION_TYPES.INHERIT:
+        console.error(
+          "getEffectiveAuthOfEntry should had avoided AUTHORIZATION_TYPES.INHERIT to be used for deciding post processing on entry"
+        );
+        break;
       case AUTHORIZATION_TYPES.NO_AUTH:
         break;
       case AUTHORIZATION_TYPES.BASIC_AUTH: {
-        const { username, password } = newAuthOptions[currentAuthType];
+        const { username, password } = newAuthOptions[appliedAuthType];
         updateDataInState(
           currentEntry.request.headers,
           AUTH_ENTRY_IDENTIFIER,
@@ -277,12 +309,12 @@ export const updateAuthOptions = (
         break;
       }
       case AUTHORIZATION_TYPES.BEARER_TOKEN: {
-        const { bearer } = newAuthOptions[currentAuthType];
+        const { bearer } = newAuthOptions[appliedAuthType];
         updateDataInState(currentEntry.request.headers, AUTH_ENTRY_IDENTIFIER, "Authorization", `Bearer ${bearer}`);
         break;
       }
       case AUTHORIZATION_TYPES.API_KEY: {
-        const { key, value, addTo } = newAuthOptions[currentAuthType];
+        const { key, value, addTo } = newAuthOptions[appliedAuthType];
 
         if (key) {
           updateDataInState(
@@ -300,6 +332,18 @@ export const updateAuthOptions = (
   }
 
   return currentEntry;
+
+  // to account for inheriting the auth details to be applied
+  function getEffectiveAuthOfEntry(
+    allRecords: RQAPI.Record[],
+    entry: RQAPI.Record["data"],
+    entryParent: RQAPI.Record["collectionId"]
+  ) {
+    if (entry.auth.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
+      return getAuthOfParent(allRecords, entryParent);
+    }
+    return entry.auth;
+  }
 
   function deleteAuthHeaders(entry: RQAPI.Entry) {
     entry.request.headers = currentEntry.request.headers.filter((header) => header.type !== AUTH_ENTRY_IDENTIFIER);
