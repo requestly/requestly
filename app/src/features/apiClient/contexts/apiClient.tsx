@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
-import { getApiRecords, upsertApiRecord } from "backend/apiClient";
+import { getApiRecords } from "backend/apiClient";
 import Logger from "lib/logger";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
@@ -17,7 +17,7 @@ import { trackCreateEnvironmentClicked } from "../screens/environment/analytics"
 import PATHS from "config/constants/sub/paths";
 import { useLocation } from "react-router-dom";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { getEmptyAPIEntry } from "../screens/apiClient/utils";
+import { createBlankApiRecord } from "../screens/apiClient/utils";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -232,15 +232,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         case RQAPI.RecordType.API: {
           setIsRecordBeingCreated(recordType);
           trackNewRequestClicked(analyticEventSource);
-          const newRequest: Partial<RQAPI.Record> = {
-            name: "Untitled request",
-            type: RQAPI.RecordType.API,
-            data: getEmptyAPIEntry(),
-            deleted: false,
-            collectionId,
-          };
-
-          return upsertApiRecord(uid, newRequest, teamId).then((result) => {
+          return createBlankApiRecord(uid, teamId, recordType, collectionId).then((result) => {
             setIsRecordBeingCreated(null);
             onSaveRecord(result.data);
             openTab(result.data.id, {
@@ -253,14 +245,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          const newCollection: Partial<RQAPI.CollectionRecord> = {
-            name: "New collection",
-            type: RQAPI.RecordType.COLLECTION,
-            data: { variables: {} },
-            deleted: false,
-            collectionId,
-          };
-          return upsertApiRecord(uid, newCollection, teamId)
+          return createBlankApiRecord(uid, teamId, recordType, collectionId)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
