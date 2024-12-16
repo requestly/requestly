@@ -54,8 +54,17 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
       }
 
       const targetTab = copiedTabs[targetTabIndex];
-      const updatedTabs = copiedTabs.filter((tab) => tab.id !== tabId);
 
+      if (targetTab.hasUnsavedChanges) {
+        // TODO: Trigger a warning modal
+        const result = window.confirm("Discard changes? Changes you made may not be saved.");
+
+        if (!result) {
+          return;
+        }
+      }
+
+      const updatedTabs = copiedTabs.filter((tab) => tab.id !== tabId);
       dispatch(tabsLayoutActions.setTabs({ featureId: id, tabs: updatedTabs }));
 
       if (updatedTabs.length && targetTab.id === activeTab?.id) {
