@@ -94,6 +94,10 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
 
   const updateTab = useCallback(
     (tabId: TabsLayout.Tab["id"], updatedTabData?: Partial<TabsLayout.Tab>) => {
+      if (!tabId) {
+        return;
+      }
+
       dispatch(tabsLayoutActions.updateTab({ featureId: id, tabId, updatedTabData }));
     },
     [dispatch, id]
