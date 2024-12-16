@@ -1,33 +1,48 @@
 import React from "react";
-import { MdDisplaySettings } from "@react-icons/all-files/md/MdDisplaySettings";
 import { Input } from "antd";
-import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
+import { RQBreadcrumb } from "lib/design-system-v2/components";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
+import PATHS from "config/constants/sub/paths";
+import { useLocation } from "react-router-dom";
 import "./variablesListHeader.scss";
 
 interface VariablesListHeaderProps {
   searchValue: string;
   currentEnvironmentName: string;
+  environmentId: string;
   onSearchValueChange: (value: string) => void;
 }
 
 export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   searchValue,
   onSearchValueChange,
+  environmentId,
   currentEnvironmentName = "New",
 }) => {
+  const { renameEnvironment } = useEnvironmentManager();
+  const { replaceTab } = useTabsLayoutContext();
+  const location = useLocation();
+
+  const handleNewEnvironmentNameChange = (newName: string) => {
+    renameEnvironment(environmentId, newName).then(() => {
+      replaceTab(environmentId, {
+        id: environmentId,
+        title: newName,
+        url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environmentId}`,
+      });
+    });
+  };
+
   return (
     <div className="variables-list-header">
-      <div className="env-view-breadcrumb">
-        <MdDisplaySettings />
-        <span className="env-view-breadcrumb-1">
-          API Client <MdOutlineChevronRight />
-        </span>
-        <span className="env-view-breadcrumb-1">
-          Environments <MdOutlineChevronRight />
-        </span>
-        <span className="env-view-breadcrumb-2">{currentEnvironmentName}</span>
-      </div>
+      <RQBreadcrumb
+        autoFocus={location.search.includes("new")}
+        placeholder="New Environment"
+        recordName={currentEnvironmentName}
+        onBlur={handleNewEnvironmentNameChange}
+      />
       <div className="variables-list-action-container">
         <Input
           placeholder="Search"

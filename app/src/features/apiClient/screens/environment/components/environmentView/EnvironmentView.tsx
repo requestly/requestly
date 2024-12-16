@@ -64,6 +64,7 @@ export const EnvironmentView = () => {
               searchValue={searchValue}
               onSearchValueChange={setSearchValue}
               currentEnvironmentName={environmentName}
+              environmentId={envId}
             />
             <VariablesList
               searchValue={searchValue}
