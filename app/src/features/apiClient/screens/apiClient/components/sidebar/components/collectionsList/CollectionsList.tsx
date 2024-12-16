@@ -139,7 +139,9 @@ export const CollectionsList: React.FC<Props> = ({
               })}
 
               {isRecordBeingCreated === RQAPI.RecordType.API && recordTypeToBeCreated === RQAPI.RecordType.API && (
-                <SidebarPlaceholderItem name="New Request" />
+                <div className="mt-8">
+                  <SidebarPlaceholderItem name="New Request" />
+                </div>
               )}
             </div>
           ) : (
