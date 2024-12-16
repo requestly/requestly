@@ -12,6 +12,7 @@ import { trackExportCollectionsClicked } from "modules/analytics/events/features
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
+import { sessionStorage } from "utils/sessionStorage";
 import "./collectionsList.scss";
 
 interface Props {
@@ -33,6 +34,7 @@ export const CollectionsList: React.FC<Props> = ({
   const { isLoadingApiClientRecords, apiClientRecords, isRecordBeingCreated } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [collapsedKeys] = useState(sessionStorage.getItem("collapsed_collection_keys", []));
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const updatedRecords = convertFlatRecordsToNestedRecords(records);
@@ -122,6 +124,7 @@ export const CollectionsList: React.FC<Props> = ({
                     key={record.id}
                     record={record}
                     onNewClick={onNewClick}
+                    collapsedKeys={collapsedKeys}
                     onExportClick={handleExportCollection}
                   />
                 );
