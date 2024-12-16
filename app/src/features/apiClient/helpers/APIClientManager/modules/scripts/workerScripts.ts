@@ -12,11 +12,7 @@ export const requestWorkerFunction = function (e: MessageEvent) {
   };
 
   const JSONifyObject = (stringifiedObject: string): any => {
-    try {
-      JSON.parse(stringifiedObject);
-    } catch {
-      throw new Error("JSON parse error");
-    }
+    JSON.parse(stringifiedObject);
   };
 
   const createInfiniteChainable = (methodName: string) => {
@@ -152,11 +148,7 @@ export const responseWorkerFunction = function (e: MessageEvent) {
   };
 
   const JSONifyObject = (stringifiedObject: string): any => {
-    try {
-      return JSON.parse(stringifiedObject);
-    } catch {
-      throw new Error("JSON parse error");
-    }
+    return JSON.parse(stringifiedObject);
   };
 
   const sandbox = {
@@ -212,9 +204,10 @@ export const responseWorkerFunction = function (e: MessageEvent) {
   });
 
   Object.setPrototypeOf(sandbox.rq.response, {
-    toJSON: () => {
+    toJSON() {
       return {
-        response: JSONifyObject(response),
+        ...this,
+        body: JSONifyObject(this.body),
       };
     },
     json: () => JSONifyObject(response.body),
