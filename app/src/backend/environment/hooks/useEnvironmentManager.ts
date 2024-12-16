@@ -58,17 +58,13 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
 
   const addNewEnvironment = useCallback(
     async (newEnvironment: string) => {
-      return upsertEnvironmentInDB(ownerId, newEnvironment)
-        .then(({ id, name }) => {
-          dispatch(variablesActions.addNewEnvironment({ id, name }));
-          return {
-            id,
-            name,
-          };
-        })
-        .catch((err) => {
-          console.error("Error while setting environment in db", err);
-        });
+      return upsertEnvironmentInDB(ownerId, newEnvironment).then(({ id, name }) => {
+        dispatch(variablesActions.addNewEnvironment({ id, name }));
+        return {
+          id,
+          name,
+        };
+      });
     },
     [ownerId, dispatch]
   );

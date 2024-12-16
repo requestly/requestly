@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { NewRecordNameInput } from "./newRecordNameInput/NewRecordNameInput";
 import { CollectionRow } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
 import { convertFlatRecordsToNestedRecords, isApiCollection, isApiRequest } from "../../../../utils";
@@ -12,10 +11,11 @@ import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/E
 import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
+import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import "./collectionsList.scss";
 
 interface Props {
-  onNewClick: (src: RQAPI.AnalyticsEventSource) => void;
+  onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
   recordTypeToBeCreated: RQAPI.RecordType;
   isNewRecordNameInputVisible: boolean;
   hideNewRecordNameInput: () => void;
@@ -30,7 +30,7 @@ export const CollectionsList: React.FC<Props> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { openTab, tabs } = useTabsLayoutContext();
-  const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
+  const { isLoadingApiClientRecords, apiClientRecords, isRecordBeingCreated } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
@@ -119,31 +119,28 @@ export const CollectionsList: React.FC<Props> = ({
                 );
               })}
 
-              {isNewRecordNameInputVisible && recordTypeToBeCreated === RQAPI.RecordType.COLLECTION ? (
-                <NewRecordNameInput
-                  recordType={RQAPI.RecordType.COLLECTION}
-                  analyticEventSource="api_client_sidebar"
-                  onSuccess={() => hideNewRecordNameInput()}
-                />
-              ) : null}
+              {isRecordBeingCreated === RQAPI.RecordType.COLLECTION &&
+                recordTypeToBeCreated === RQAPI.RecordType.COLLECTION && (
+                  <div style={{ margin: "8px 0" }}>
+                    <SidebarPlaceholderItem name="New Collection" />
+                  </div>
+                )}
 
               {updatedRecords.requests.map((record) => {
                 return <RequestRow key={record.id} record={record} openTab={openTab} />;
               })}
 
-              {isNewRecordNameInputVisible && recordTypeToBeCreated === RQAPI.RecordType.API ? (
-                <NewRecordNameInput
-                  recordType={RQAPI.RecordType.API}
-                  analyticEventSource="api_client_sidebar"
-                  onSuccess={() => hideNewRecordNameInput()}
-                />
-              ) : null}
+              {isRecordBeingCreated === RQAPI.RecordType.API && recordTypeToBeCreated === RQAPI.RecordType.API && (
+                <div className="mt-8">
+                  <SidebarPlaceholderItem name="New Request" />
+                </div>
+              )}
             </div>
           ) : (
             <ApiRecordEmptyState
               newRecordBtnText="New collection"
               message="No collections created yet"
-              onNewRecordClick={() => onNewClick("collection_list_empty_state")}
+              onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.COLLECTION)}
               recordType={RQAPI.RecordType.COLLECTION}
               analyticEventSource="collection_list_empty_state"
             />

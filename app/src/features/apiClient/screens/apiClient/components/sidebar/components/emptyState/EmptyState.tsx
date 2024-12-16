@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import emptyCardImage from "../../../../../../assets/empty-card.svg";
 import { RQButton } from "lib/design-system-v2/components";
 import APP_CONSTANTS from "config/constants";
@@ -13,7 +13,7 @@ export interface EmptyStateProps {
   analyticEventSource: RQAPI.AnalyticsEventSource | EnvironmentAnalyticsSource;
   message: string;
   newRecordBtnText: string;
-  onNewRecordClick: () => void;
+  onNewRecordClick: () => Promise<void>;
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
@@ -24,6 +24,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleOnClick = () => {
     if (!user.loggedIn) {
@@ -41,8 +42,17 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
       return;
     }
-
-    onNewRecordClick();
+    setIsLoading(true);
+    onNewRecordClick()
+      .then(() => {
+        // DO NOTHING
+      })
+      .catch((error) => {
+        console.error("Error creating new API Client record", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -50,7 +60,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       <img className="empty-card-image" width={40} height={40} src={emptyCardImage} alt="Empty collection list" />
       <div className="empty-message">{message}</div>
 
-      <RQButton size="small" className="new-record-btn" onClick={handleOnClick}>
+      <RQButton loading={isLoading} size="small" className="new-record-btn" onClick={handleOnClick}>
         {newRecordBtnText}
       </RQButton>
     </div>
