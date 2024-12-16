@@ -37,6 +37,7 @@ const VARIABLES_PRECEDENCE_ORDER = ["ENVIRONMENT", "COLLECTION"];
 const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const [isEnvironmentsDataLoaded, setIsEnvironmentsDataLoaded] = useState(false);
   const { apiClientRecords } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
@@ -87,6 +88,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   useEffect(() => {
     if (initListenerAndFetcher) {
       setIsLoading(true);
+      setIsEnvironmentsDataLoaded(false);
       fetchAllEnvironmentDetails(ownerId)
         .then((environmentMap) => {
           if (Object.keys(environmentMap).length > 0 && !environmentMap[currentEnvironmentId]) {
@@ -117,6 +119,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
         })
         .finally(() => {
           setIsLoading(false);
+          setIsEnvironmentsDataLoaded(true);
         });
     }
     // Disabled otherwise infinite loop if allEnvironmentData is included here, allEnvironmentData should be fetched only once
@@ -413,6 +416,7 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
     duplicateEnvironment,
     deleteEnvironment,
     getVariablesWithPrecedence,
+    isEnvironmentsDataLoaded,
     isEnvironmentsLoading: isLoading,
   };
 };

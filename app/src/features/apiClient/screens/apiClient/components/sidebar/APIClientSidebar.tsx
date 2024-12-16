@@ -28,15 +28,15 @@ const APIClientSidebar: React.FC<Props> = () => {
   const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
 
-  const { addNewEnvironment, getAllEnvironments } = useEnvironmentManager();
+  const { addNewEnvironment, getAllEnvironments, isEnvironmentsDataLoaded } = useEnvironmentManager();
   const environments = getAllEnvironments();
   const isGlobalEnvironmentExists = useMemo(() => environments.some((env) => env.isGlobal), [environments]);
 
   useEffect(() => {
-    if (!isGlobalEnvironmentExists) {
+    if (!isGlobalEnvironmentExists && isEnvironmentsDataLoaded) {
       addNewEnvironment("Global variables", true);
     }
-  }, [addNewEnvironment, isGlobalEnvironmentExists]);
+  }, [addNewEnvironment, isGlobalEnvironmentExists, isEnvironmentsDataLoaded]);
 
   const {
     history,
