@@ -200,6 +200,7 @@ export const createBlankApiRecord = (
     newRecord.data = getEmptyAPIEntry();
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
+    newRecord.data = getEmptyAPIEntry();
   }
 
   if (recordType === RQAPI.RecordType.COLLECTION) {
