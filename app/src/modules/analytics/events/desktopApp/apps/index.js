@@ -60,3 +60,7 @@ export const trackConnectAppsCategorySwitched = (category_name) => {
 export const trackConnectAppsModalClosed = (app_count) => {
   trackEvent(APPS.CONNECT_APPS_MODAL_CLOSED, { app_count });
 };
+
+export function trackFailedToConnectToSimulator() {
+  trackEvent("failure_to_connect_to_simulator");
+}
