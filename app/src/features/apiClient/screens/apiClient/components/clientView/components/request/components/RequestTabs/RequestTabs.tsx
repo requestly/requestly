@@ -33,7 +33,12 @@ interface Props {
   collectionId: string;
   setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
-  handleAuthChange: (currentAuthType: AUTHORIZATION_TYPES, updatedKey: string, updatedValue: string) => any;
+  handleAuthChange: (
+    currentAuthType: AUTHORIZATION_TYPES,
+    updatedKey: string,
+    updatedValue: string,
+    formValues: any
+  ) => any;
 }
 
 const RequestTabs: React.FC<Props> = ({
