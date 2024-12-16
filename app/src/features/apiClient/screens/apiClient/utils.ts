@@ -5,7 +5,6 @@ import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../ty
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
-import { AUTH_OPTIONS } from "./components/clientView/components/request/components/AuthorizationView/types/form";
 import {
   AUTH_ENTRY_IDENTIFIER,
   AUTHORIZATION_TYPES,
@@ -200,46 +199,41 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 };
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
 
-export const getEmptyAuthOptions = (): AUTH_OPTIONS => {
-  return {
-    [AUTHORIZATION_TYPES.NO_AUTH]: null,
-    [AUTHORIZATION_TYPES.API_KEY]: { key: "", value: "", addTo: "HEADER" },
-    [AUTHORIZATION_TYPES.BEARER_TOKEN]: { bearer: "" },
-    [AUTHORIZATION_TYPES.BASIC_AUTH]: { username: "", password: "" },
-  };
-};
-
 export const updateAuthOptions = (
   entry: RQAPI.Entry,
   currentAuthType: AUTHORIZATION_TYPES,
   updatedKey?: string,
-  updatedValue?: string
+  updatedValue?: string,
+  formValues = {}
 ) => {
-  // clear all based details on the current entry:
   const currentEntry = { ...entry };
-  const oldAuth = currentEntry.auth ?? {
-    currentAuthType: AUTHORIZATION_TYPES.NO_AUTH,
-    authOptions: getEmptyAuthOptions(),
+
+  const currentFormValues = {
+    ...formValues[currentAuthType],
+    ...(updatedKey || updatedValue ? { [updatedKey]: updatedValue } : {}),
   };
-  const newAuthOptions =
-    updatedKey || updatedValue
-      ? {
-          ...oldAuth.authOptions,
-          [currentAuthType]: {
-            ...oldAuth.authOptions[currentAuthType],
-            [updatedKey]: updatedValue,
-            ...(updatedKey || updatedValue ? { [updatedKey]: updatedValue } : {}),
-          },
-        }
-      : oldAuth.authOptions;
 
   currentEntry.auth = {
     currentAuthType,
-    authOptions: newAuthOptions,
+    [currentAuthType]: currentFormValues,
   };
 
-  !isEmpty(currentEntry.request.headers) && deleteAuthHeaders(currentEntry);
-  !isEmpty(currentEntry.request.queryParams) && deleteAuthQueryParams(currentEntry);
+  return currentEntry;
+};
+
+export const deleteAuthOptions = (dataToUpdate: KeyValuePair[]) => {
+  return dataToUpdate.filter((option) => option.type !== AUTH_ENTRY_IDENTIFIER);
+};
+
+export const updateRequestWithAuthOptions = (
+  dataToUpdate: KeyValuePair[],
+  dataToAppend: RQAPI.AuthOptions,
+  dataAppendType: AUTHORIZATION_TYPES
+) => {
+  const dataToUpdateCopy = !isEmpty(dataToUpdate)
+    ? [...deleteAuthOptions(JSON.parse(JSON.stringify(dataToUpdate)))]
+    : JSON.parse(JSON.stringify(dataToUpdate));
+  console.log(dataToUpdateCopy, "copy sata");
 
   let newKeyValuePair: KeyValuePair;
 
@@ -262,13 +256,13 @@ export const updateAuthOptions = (
     }
   };
 
-  switch (currentAuthType) {
+  switch (dataAppendType) {
     case AUTHORIZATION_TYPES.NO_AUTH:
       break;
     case AUTHORIZATION_TYPES.BASIC_AUTH: {
-      const { username, password } = newAuthOptions[currentAuthType];
+      const { username, password } = dataToAppend[dataAppendType];
       updateDataInState(
-        currentEntry.request.headers,
+        dataToUpdateCopy,
         AUTH_ENTRY_IDENTIFIER,
         "Authorization",
         `Basic ${btoa(`${username || ""}:${password || ""}`)}`
@@ -276,20 +270,15 @@ export const updateAuthOptions = (
       break;
     }
     case AUTHORIZATION_TYPES.BEARER_TOKEN: {
-      const { bearer } = newAuthOptions[currentAuthType];
-      updateDataInState(currentEntry.request.headers, AUTH_ENTRY_IDENTIFIER, "Authorization", `Bearer ${bearer}`);
+      const { bearer } = dataToAppend[dataAppendType];
+      updateDataInState(dataToUpdateCopy, AUTH_ENTRY_IDENTIFIER, "Authorization", `Bearer ${bearer}`);
       break;
     }
     case AUTHORIZATION_TYPES.API_KEY: {
-      const { key, value, addTo } = newAuthOptions[currentAuthType];
+      const { key, value } = dataToAppend[dataAppendType];
 
       if (key) {
-        updateDataInState(
-          addTo === "QUERY" ? currentEntry.request.queryParams : currentEntry.request.headers,
-          AUTH_ENTRY_IDENTIFIER,
-          key || "",
-          value || ""
-        );
+        updateDataInState(dataToUpdateCopy, AUTH_ENTRY_IDENTIFIER, key || "", value || "");
       }
       break;
     }
@@ -297,15 +286,5 @@ export const updateAuthOptions = (
       break;
   }
 
-  return currentEntry;
-
-  function deleteAuthHeaders(entry: RQAPI.Entry) {
-    entry.request.headers = currentEntry.request.headers.filter((header) => header.type !== AUTH_ENTRY_IDENTIFIER);
-  }
-
-  function deleteAuthQueryParams(entry: RQAPI.Entry) {
-    entry.request.queryParams = currentEntry.request.queryParams.filter(
-      (param) => param.type !== AUTH_ENTRY_IDENTIFIER
-    );
-  }
+  return dataToUpdateCopy;
 };

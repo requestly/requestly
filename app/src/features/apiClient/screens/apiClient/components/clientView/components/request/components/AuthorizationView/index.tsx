@@ -9,7 +9,6 @@ import "./authorizationView.scss";
 import { LABEL_TEXT } from "./authConstants";
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { MdClear } from "@react-icons/all-files/md/MdClear";
-import { getEmptyAuthOptions } from "features/apiClient/screens/apiClient/utils";
 import { AUTHORIZATION_TYPES } from "./types";
 import { AUTH_OPTIONS } from "./types/form";
 
@@ -18,25 +17,29 @@ interface Props {
     currentAuthType?: AUTHORIZATION_TYPES;
     authOptions?: AUTH_OPTIONS;
   };
-  onAuthUpdate: (currentAuthType: AUTHORIZATION_TYPES, updatedKey?: string, updatedValue?: string) => any;
+  onAuthUpdate: (
+    currentAuthType: AUTHORIZATION_TYPES,
+    updatedKey?: string,
+    updatedValue?: string,
+    formValues?: any
+  ) => any;
 }
 
 const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => {
   const [selectedForm, setSelectedForm] = useState(defaultValues?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH);
-  const [formValues, setFormValues] = useState<Record<string, any>>(
-    defaultValues?.authOptions || getEmptyAuthOptions()
-  );
+  const [formValues, setFormValues] = useState<Record<string, any>>(defaultValues || {});
 
   const onChangeHandler = (value: string, id: string) => {
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      [selectedForm]: {
-        ...prevValues[selectedForm],
-        [id]: value,
-      },
-    }));
-
-    onAuthUpdate(selectedForm, id, value);
+    setFormValues((prevValues) => {
+      onAuthUpdate(selectedForm, id, value, prevValues);
+      return {
+        ...prevValues,
+        [selectedForm]: {
+          ...prevValues[selectedForm],
+          [id]: value,
+        },
+      };
+    });
   };
 
   const debouncedOnChange = debounce(onChangeHandler, 500);

@@ -1,11 +1,18 @@
 import { notification } from "antd";
 import * as Sentry from "@sentry/react";
-import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
+import {
+  addUrlSchemeIfMissing,
+  deleteAuthOptions,
+  makeRequest,
+  updateRequestWithAuthOptions,
+} from "../../screens/apiClient/utils";
 import { RQAPI } from "../../types";
 import { executePrerequestScript, executePostresponseScript } from "./modules/scripts/utils";
 import { renderTemplate } from "backend/environment/utils";
 import { DEMO_API_URL } from "features/apiClient/constants";
 import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient";
+import { isEmpty } from "lodash";
+import { AUTHORIZATION_TYPES } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
 
 export const executeAPIRequest = async (
   appMode: string,
@@ -15,6 +22,22 @@ export const executeAPIRequest = async (
   requestCollectionId?: string
 ): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
   // Process request configuration with environment variables
+
+  if (!isEmpty(entry.auth)) {
+    const authType = entry.auth.currentAuthType;
+    const requestHeaders = entry.request.headers;
+    const queryParmas = entry.request.queryParams;
+    const addToQuery = authType === AUTHORIZATION_TYPES.API_KEY && entry.auth[authType].addTo === "QUERY";
+
+    if (addToQuery) {
+      entry.request.headers = deleteAuthOptions(requestHeaders);
+      entry.request.queryParams = updateRequestWithAuthOptions(queryParmas, entry.auth, authType);
+    } else {
+      entry.request.queryParams = deleteAuthOptions(queryParmas);
+      entry.request.headers = updateRequestWithAuthOptions(requestHeaders, entry.auth, authType);
+    }
+  }
+
   const renderedRequestDetails = environmentManager.renderVariables(entry.request, requestCollectionId);
   let currentEnvironmentVariables = renderedRequestDetails.variables;
   let renderedRequest = renderedRequestDetails.renderedTemplate;
@@ -103,7 +126,7 @@ export const executeAPIRequest = async (
       });
     }
   }
-
+  console.log(renderedRequest, "rendered");
   return {
     ...entry,
     response,

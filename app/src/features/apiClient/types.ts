@@ -54,9 +54,10 @@ export namespace RQAPI {
 
   export type RequestBody = string | KeyValuePair[]; // in case of form data, body will be key-value pairs
 
-  export type AuthOptions = {
-    currentAuthType: AUTHORIZATION_TYPES;
-    authOptions: AUTH_OPTIONS; // todo: could be empty, need to check // also need to add inherit from parent later
+  export type AuthOptions<T extends AUTHORIZATION_TYPES = AUTHORIZATION_TYPES> = {
+    currentAuthType: T;
+  } & {
+    [K in AUTHORIZATION_TYPES]?: K extends T ? AUTH_OPTIONS : never;
   };
   export interface Request {
     url: string;
@@ -103,7 +104,7 @@ export namespace RQAPI {
       postResponse: string;
     };
     variables: Omit<EnvironmentVariables, "localValue">;
-    auth: AuthOptions;
+    auth?: AuthOptions;
   }
 
   interface RecordMetadata {

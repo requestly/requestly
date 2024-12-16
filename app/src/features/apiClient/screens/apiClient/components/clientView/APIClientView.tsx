@@ -91,8 +91,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (apiEntry) {
       clearTimeout(animationTimerRef.current);
       setIsAnimating(true);
-      const entryWithAuthOptions = updateAuthOptions(apiEntry, apiEntry.auth?.currentAuthType);
-      setEntry(entryWithAuthOptions);
+      setEntry(apiEntry);
       setRequestName("");
       animationTimerRef.current = setTimeout(() => setIsAnimating(false), 500);
     }
@@ -355,9 +354,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, []);
 
   const handleAuthChange = useCallback(
-    (currentAuthType: AUTHORIZATION_TYPES, updatedKey: string, updatedValue: string) => {
+    (currentAuthType: AUTHORIZATION_TYPES, updatedKey: string, updatedValue: string, formValues: any) => {
       setEntry((prevEntry) => {
-        const updatedEntry = updateAuthOptions(prevEntry, currentAuthType, updatedKey, updatedValue);
+        const updatedEntry = updateAuthOptions(prevEntry, currentAuthType, updatedKey, updatedValue, formValues);
         return updatedEntry;
       });
     },
