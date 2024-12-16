@@ -193,9 +193,11 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
             )}
 
             {createNewRecord ? (
-              <SidebarPlaceholderItem
-                name={createNewRecord === RQAPI.RecordType.API ? "New Request" : "New Collection"}
-              />
+              <div className="mt-8">
+                <SidebarPlaceholderItem
+                  name={createNewRecord === RQAPI.RecordType.API ? "New Request" : "New Collection"}
+                />
+              </div>
             ) : null}
           </Collapse.Panel>
         </Collapse>
