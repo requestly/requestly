@@ -23,7 +23,7 @@ export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
             <RQButton
               size="small"
               type="transparent"
-              // className="tab-close-button"
+              className="tab-close-button"
               onClick={(e) => {
                 e.stopPropagation();
                 closeTab(tab.id);
