@@ -15,7 +15,7 @@ import { redirectToSharedListViewer } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { UserIcon } from "components/common/UserIcon";
+import { UserAvatar } from "componentsV2/UserAvatar";
 
 interface Props {
   handleDeleteSharedListClick: (sharedListId: string) => void;
@@ -117,7 +117,7 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
       render: (_: any, record: SharedList) => {
         return (
           <div className="mock-table-user-icon">
-            <UserIcon uid={record.createdBy} />
+            <UserAvatar uid={record.createdBy} />
           </div>
         );
       },
