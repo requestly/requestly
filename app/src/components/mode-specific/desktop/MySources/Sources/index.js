@@ -157,7 +157,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             } else if (appId === "ios-simulator") {
               toast.success(`iOS simulator(s) connected successfully`);
               dispatch(
-                actions.updateDesktopSpecificAppProperty({
+                globalActions.updateDesktopSpecificAppProperty({
                   appId: appId,
                   property: "isActive",
                   value: true,
@@ -296,7 +296,9 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           }
         })
         .finally(() => {
-          dispatch(actions.updateDesktopSpecificAppDetails({ appId: "ios-simulator", appDetails: newIosDetails }));
+          dispatch(
+            globalActions.updateDesktopSpecificAppDetails({ appId: "ios-simulator", appDetails: newIosDetails })
+          );
           setFetchingDevices(false);
           if (shouldShowPopup) {
             if (deviceCount === 0) {
