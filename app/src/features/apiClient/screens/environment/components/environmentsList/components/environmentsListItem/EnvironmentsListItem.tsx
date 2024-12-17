@@ -11,12 +11,12 @@ import React, { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { redirectToEnvironment } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
+import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 
 interface EnvironmentsListItemProps {
   environment: {
     id: string;
     name: string;
-    isGlobal?: boolean;
   };
 
   openTab: TabsLayoutContextInterface["openTab"];
@@ -152,9 +152,9 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
             tooltip: environment.name,
           }}
         >
-          {environment.isGlobal && <IoMdGlobe className="global-var-icon" />}
+          {isGlobalEnvironment(environment.id) && <IoMdGlobe className="global-var-icon" />}
           {environment.name}
-          {environment.isGlobal && (
+          {isGlobalEnvironment(environment.id) && (
             <Tooltip
               overlayClassName="active-environment-tooltip"
               title={
@@ -190,7 +190,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
       </div>
       {/* wrapping dropdown in a div to prevent it from triggering click events on parent div element*/}
       <div onClick={(e) => e.stopPropagation()}>
-        {!environment.isGlobal ? (
+        {!isGlobalEnvironment(environment.id) ? (
           <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
             <RQButton
               size="small"
