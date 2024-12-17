@@ -375,6 +375,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             recordName={apiEntryDetails?.name}
             onRecordNameUpdate={setRequestName}
             onBlur={handleRecordNameUpdate}
+            // Auto focus breadcrumb input when a new record is created
             autoFocus={location.search.includes("new")}
           />
         ) : null}

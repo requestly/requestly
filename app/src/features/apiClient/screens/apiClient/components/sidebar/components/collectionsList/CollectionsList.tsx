@@ -18,16 +18,9 @@ import "./collectionsList.scss";
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
   recordTypeToBeCreated: RQAPI.RecordType;
-  isNewRecordNameInputVisible: boolean;
-  hideNewRecordNameInput: () => void;
 }
 
-export const CollectionsList: React.FC<Props> = ({
-  onNewClick,
-  recordTypeToBeCreated,
-  isNewRecordNameInputVisible,
-  hideNewRecordNameInput,
-}) => {
+export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { openTab, tabs } = useTabsLayoutContext();
@@ -115,7 +108,7 @@ export const CollectionsList: React.FC<Props> = ({
             <div className="api-client-sidebar-placeholder">
               <Typography.Text type="secondary">Loading...</Typography.Text>
             </div>
-          ) : updatedRecords.count > 0 || isNewRecordNameInputVisible ? (
+          ) : updatedRecords.count > 0 ? (
             <div className="collections-list">
               {updatedRecords.collections.map((record) => {
                 return (
