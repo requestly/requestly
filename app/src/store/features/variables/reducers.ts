@@ -15,14 +15,12 @@ const addNewEnvironment = (
   action: PayloadAction<{
     id: string;
     name: string;
-    isGlobal?: boolean;
   }>
 ) => {
   state.environments[action.payload.id] = {
     id: action.payload.id,
     variables: {},
     name: action.payload.name,
-    isGlobal: action.payload.isGlobal ?? false,
   };
 };
 

@@ -9,6 +9,7 @@ import {
   getFirestore,
   onSnapshot,
   query,
+  setDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
@@ -21,17 +22,35 @@ const getDocPath = (ownerId: string, environmentId: string) => {
   return doc(db, "environments", ownerId, "environments", environmentId);
 };
 
-export const upsertEnvironmentInDB = async (ownerId: string, environmentName: string, isGlobal?: boolean) => {
-  return addDoc(collection(db, "environments", ownerId, "environments"), {
-    name: environmentName,
-    variables: {},
-    isGlobal,
-  }).then((doc) => {
-    return {
-      id: doc.id,
+export const upsertEnvironmentInDB = async (
+  ownerId: string,
+  environmentName: string,
+  isGlobal?: boolean,
+  docId?: string
+) => {
+  if (docId) {
+    const docRef = doc(db, "environments", ownerId, "environments", docId);
+    return setDoc(docRef, {
       name: environmentName,
-    };
-  });
+      variables: {},
+      id: docId,
+    }).then(() => {
+      return {
+        id: docId,
+        name: environmentName,
+      };
+    });
+  } else {
+    return addDoc(collection(db, "environments", ownerId, "environments"), {
+      name: environmentName,
+      variables: {},
+    }).then((doc) => {
+      return {
+        id: doc.id,
+        name: environmentName,
+      };
+    });
+  }
 };
 
 export const updateEnvironmentVariablesInDB = async (
@@ -77,7 +96,6 @@ export const attachEnvironmentVariableListener = (
         id: environmentId,
         name: "",
         variables: {},
-        isGlobal: false,
       });
     } else {
       const environmentData = { id: environmentId, ...snapshot.data() } as EnvironmentData;
