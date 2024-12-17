@@ -23,6 +23,8 @@ interface CodeEditorToolbarProps {
   onCodeFormat: (formattedCode: string) => void;
   isFullScreen: boolean;
   handleFullScreenToggle: () => void;
+  isCodePrettified: boolean;
+  setIsCodePrettified: (value: boolean) => void;
 }
 
 const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
@@ -32,9 +34,11 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
   customOptions,
   isFullScreen = false,
   handleFullScreenToggle = () => {},
+  isCodePrettified,
+  setIsCodePrettified,
 }) => {
   const theme = useTheme();
-  const [isCodePrettified, setIsCodePrettified] = useState(false);
+  //const [isCodePrettified, setIsCodePrettified] = useState(true);
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCodeFormatting = () => {
