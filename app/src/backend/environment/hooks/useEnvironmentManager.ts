@@ -90,7 +90,9 @@ const useEnvironmentManager = () => {
         if (Object.keys(environmentMap).length > 0 && !environmentMap[currentEnvironmentId]) {
           // setting the first environment as the current environment if the current environment is not found in environmentMap
           // do not set global env as active
-          setCurrentEnvironment(Object.keys(environmentMap).filter((key) => environmentMap[key].id !== "global")[0]);
+          setCurrentEnvironment(
+            Object.keys(environmentMap).filter((key) => !isGlobalEnvironment(environmentMap[key].id))[0]
+          );
         }
 
         const updatedEnvironmentMap: EnvironmentMap = {};
