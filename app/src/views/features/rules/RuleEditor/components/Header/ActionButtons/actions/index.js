@@ -26,7 +26,7 @@ export const saveRule = async (appMode, dispatch, ruleObject) => {
   // ruleToSave.extensionRules = parseDNRRules(ruleToSave);
 
   //Set the modification date of rule
-  ruleToSave.modificationDate = generateObjectCreationDate();
+  // ruleToSave.modificationDate = generateObjectCreationDate();
 
   //Save the rule
   Logger.log("Writing to storage in saveRule");
