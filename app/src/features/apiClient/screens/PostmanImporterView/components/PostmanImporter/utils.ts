@@ -1,5 +1,5 @@
 import { EnvironmentVariableValue } from "backend/environment/types";
-import { RequestMethod, RQAPI } from "features/apiClient/types";
+import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { generateDocumentId } from "backend/utils";
 
 interface PostmanCollectionExport {
@@ -26,7 +26,7 @@ export const getUploadedPostmanFileType = (fileContent: PostmanCollectionExport 
   if ("info" in fileContent && fileContent.info?.schema) {
     return "collection";
   }
-  if ("_postman_variable_scope" in fileContent && fileContent._postman_variable_scope) {
+  if ("values" in fileContent) {
     return "environment";
   }
   return null;
@@ -38,6 +38,11 @@ export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExp
   }
 
   const variables = fileContent.values.reduce((acc: Record<string, EnvironmentVariableValue>, variable: any) => {
+    // dont add variables with empty key
+    if (!variable.key) {
+      return acc;
+    }
+
     acc[variable.key] = {
       syncValue: variable.value,
       type: variable.type === "secret" ? "secret" : "string",
@@ -96,6 +101,25 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
       isEnabled: true,
     })) ?? [];
 
+  let contentType: RequestContentType | null = null;
+  let requestBody: string | KeyValuePair[] | null = null;
+
+  const { mode, raw, formdata, options } = request.body || {};
+
+  if (mode === "raw") {
+    requestBody = raw;
+    contentType = options?.raw.language === "json" ? RequestContentType.JSON : RequestContentType.RAW;
+  } else if (mode === "formdata") {
+    contentType = RequestContentType.FORM;
+    requestBody =
+      formdata?.map((formData: { key: string; value: string }) => ({
+        id: Date.now(),
+        key: formData.key,
+        value: formData.value,
+        isEnabled: true,
+      })) || [];
+  }
+
   return {
     id: generateDocumentId("apis"),
     collectionId: parentCollectionId,
@@ -108,20 +132,38 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
         method: request.method || RequestMethod.GET,
         queryParams,
         headers,
-        body: request.body?.raw ?? null,
+        body: requestBody,
+        contentType,
       },
       scripts: processScripts(item),
     },
   };
 };
 
-const createCollectionRecord = (name: string, id = generateDocumentId("apis")): Partial<RQAPI.CollectionRecord> => ({
-  id,
-  name,
-  deleted: false,
-  data: {},
-  type: RQAPI.RecordType.COLLECTION,
-});
+const createCollectionRecord = (
+  name: string,
+  id = generateDocumentId("apis"),
+  variables?: any[]
+): Partial<RQAPI.CollectionRecord> => {
+  const collectionVariables: Record<string, EnvironmentVariableValue> = {};
+  if (variables) {
+    variables.forEach((variable: any) => {
+      collectionVariables[variable.key] = {
+        syncValue: variable.value,
+        type: variable.type === "secret" ? "secret" : "string",
+      };
+    });
+  }
+  return {
+    id,
+    name,
+    deleted: false,
+    data: {
+      variables: collectionVariables,
+    },
+    type: RQAPI.RecordType.COLLECTION,
+  };
+};
 
 export const processPostmanCollectionData = (
   fileContent: any
@@ -156,7 +198,7 @@ export const processPostmanCollectionData = (
   };
 
   const rootCollectionId = generateDocumentId("apis");
-  const rootCollection = createCollectionRecord(fileContent.info.name, rootCollectionId);
+  const rootCollection = createCollectionRecord(fileContent.info.name, rootCollectionId, fileContent.variable);
   rootCollection.collectionId = "";
   const processedItems = processItems(fileContent.item, rootCollectionId);
 

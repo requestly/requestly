@@ -7,7 +7,7 @@ import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOut
 import { RQButton } from "lib/design-system-v2/components";
 import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
 import { processApiRecordsToImport, processVariablesToImport } from "./utils";
-import { getCurrentEnvironmentId } from "store/features/environment/selectors";
+import { getCurrentEnvironmentId } from "store/features/variables/selectors";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQAPI } from "features/apiClient/types";
 import { upsertApiRecord } from "backend/apiClient";

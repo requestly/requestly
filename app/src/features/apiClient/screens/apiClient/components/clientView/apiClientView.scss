@@ -13,6 +13,14 @@
   .api-client-body {
     padding: 0 16px;
     overflow: hidden;
+
+    .ant-tabs {
+      .ant-tabs-nav-wrap {
+        .ant-tabs-tab {
+          padding: 6px 4px;
+        }
+      }
+    }
   }
 
   .rq-breadcrumb {
@@ -29,7 +37,7 @@
       display: flex;
       flex: auto;
       height: 32px;
-      width: 100%;
+      width: calc(100% - 205px);
 
       .api-request-method-selector {
         width: 120px;
@@ -127,6 +135,12 @@
       */
       // height: calc(100% - px) !important;
       height: 100%;
+
+      .ant-tabs-content-holder {
+        // FIXED HEIGHT FIXES HEIGHT CHANGE OF SPILT PANEL HEIGHT CHANGE ON CODE MIRROR MOUNT
+        // TODO: FIX THIS
+        height: 35px;
+      }
     }
   }
 

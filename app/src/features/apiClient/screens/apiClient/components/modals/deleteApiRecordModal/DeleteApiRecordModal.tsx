@@ -11,8 +11,6 @@ import { isApiCollection } from "../../../utils";
 import { deleteApiRecords } from "backend/apiClient";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { trackCollectionDeleted } from "modules/analytics/events/features/apiClient";
-import { useNavigate } from "react-router-dom";
-import { redirectToApiClient } from "utils/RedirectionUtils";
 import "./deleteApiRecordModal.scss";
 
 interface DeleteApiRecordModalProps {
@@ -28,27 +26,30 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
   const { onDeleteRecords } = useApiClientContext();
-  const navigate = useNavigate();
+
   const [isDeleting, setIsDeleting] = useState(false);
 
   if (!record) {
     return null;
   }
-  // TODO: handle single api request deletion - update the modal message too
+
   let apiRequestCount = isApiCollection(record) ? record.data.children.length : 1;
+
+  const collectAllRecordIds = (record: RQAPI.Record): string[] => {
+    const recordIds: string[] = [record.id];
+
+    if (isApiCollection(record) && record.data.children) {
+      record.data.children.forEach((child) => {
+        recordIds.push(...collectAllRecordIds(child));
+      });
+    }
+    return recordIds;
+  };
 
   const handleDeleteApiRecord = async () => {
     setIsDeleting(true);
 
-    const recordIds: string[] = [];
-
-    recordIds.push(record.id);
-    if (isApiCollection(record)) {
-      record.data.children.forEach((request) => {
-        recordIds.push(request.id);
-      });
-    }
-
+    const recordIds = collectAllRecordIds(record);
     const result = await deleteApiRecords(uid, recordIds, teamId);
     onDeleteRecords(recordIds);
 
@@ -57,7 +58,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
       toast.success(record.type === RQAPI.RecordType.API ? "API request deleted" : "Collection deleted");
       onClose();
       onSuccess?.();
-      redirectToApiClient(navigate);
+
       // TODO: add analytics
     }
 

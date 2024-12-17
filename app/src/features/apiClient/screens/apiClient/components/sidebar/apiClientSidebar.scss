@@ -76,6 +76,7 @@
         margin: -8px 10px;
         border-radius: 4px;
 
+        &.active,
         &.clickable:hover {
           cursor: pointer;
           background-color: var(--gray-dark);

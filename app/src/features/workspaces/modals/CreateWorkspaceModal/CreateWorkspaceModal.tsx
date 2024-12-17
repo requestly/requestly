@@ -179,7 +179,6 @@ const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, callback, 
     isVerifiedBusinessDomainUser(user?.details?.profile?.email, user?.details?.profile?.uid).then((isVerified) => {
       if (isVerified) {
         setIsVerifiedBusinessUser(isVerified);
-        setIsNotifyAllSelected(true);
         const defaultTeamName = generateDefaultTeamName(
           user.details?.profile?.displayName,
           user?.details?.profile?.email

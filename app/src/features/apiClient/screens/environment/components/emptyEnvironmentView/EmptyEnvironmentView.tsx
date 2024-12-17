@@ -4,7 +4,7 @@ import emptyEnvironmentViewImage from "../../assets/emptyEnvironment.svg";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { getCurrentEnvironmentId } from "store/features/environment/selectors";
+import { getCurrentEnvironmentId } from "store/features/variables/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { redirectToNewEnvironment } from "utils/RedirectionUtils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -58,13 +58,6 @@ export const EmptyEnvironmentView = () => {
         <Skeleton active />
       ) : (
         <>
-          <div className="env-view-breadcrumb">
-            <MdDisplaySettings />
-            <span className="env-view-breadcrumb-1">
-              API Client <MdOutlineChevronRight />
-            </span>
-            <span className="env-view-breadcrumb-1">Environments</span>
-          </div>
           <div className="empty-environment-view-content">
             <img src={emptyEnvironmentViewImage} alt="empty environment" />
             <div className="empty-environment-view-title">No environment created yet</div>

@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -9,6 +10,9 @@ import { convertFlatRecordsToNestedRecords, isApiCollection, isApiRequest } from
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/ExportCollectionsModal";
 import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
+import PATHS from "config/constants/sub/paths";
+import { sessionStorage } from "utils/sessionStorage";
 import "./collectionsList.scss";
 
 interface Props {
@@ -24,9 +28,13 @@ export const CollectionsList: React.FC<Props> = ({
   isNewRecordNameInputVisible,
   hideNewRecordNameInput,
 }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { openTab, tabs } = useTabsLayoutContext();
   const { isLoadingApiClientRecords, apiClientRecords } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [collapsedKeys] = useState(sessionStorage.getItem("collapsed_collection_keys", []));
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const updatedRecords = convertFlatRecordsToNestedRecords(records);
@@ -59,6 +67,46 @@ export const CollectionsList: React.FC<Props> = ({
     setIsExportModalOpen(true);
   }, []);
 
+  useEffect(() => {
+    if (isLoadingApiClientRecords) {
+      return;
+    }
+
+    if (tabs.length === 0) {
+      navigate(PATHS.API_CLIENT.ABSOLUTE);
+    }
+  }, [tabs.length, navigate, isLoadingApiClientRecords]);
+
+  const hasOpenedDefaultTab = useRef(false);
+  useEffect(() => {
+    if (location.pathname === PATHS.API_CLIENT.ABSOLUTE) {
+      // TODO: Improve logic
+      hasOpenedDefaultTab.current = false;
+    }
+
+    if (isLoadingApiClientRecords) {
+      return;
+    }
+
+    if (hasOpenedDefaultTab.current) {
+      return;
+    }
+
+    hasOpenedDefaultTab.current = true;
+
+    if (tabs.length > 0) {
+      return;
+    }
+
+    if (updatedRecords.requests.length) {
+      const recordId = updatedRecords.requests[0].id;
+      openTab(recordId, {
+        title: updatedRecords.requests[0].name,
+        url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${recordId}`,
+      });
+    }
+  }, [updatedRecords.requests, isLoadingApiClientRecords, openTab, location.pathname, tabs.length]);
+
   return (
     <>
       <div className="collections-list-container">
@@ -72,9 +120,11 @@ export const CollectionsList: React.FC<Props> = ({
               {updatedRecords.collections.map((record) => {
                 return (
                   <CollectionRow
+                    openTab={openTab}
                     key={record.id}
                     record={record}
                     onNewClick={onNewClick}
+                    collapsedKeys={collapsedKeys}
                     onExportClick={handleExportCollection}
                   />
                 );
@@ -83,19 +133,19 @@ export const CollectionsList: React.FC<Props> = ({
               {isNewRecordNameInputVisible && recordTypeToBeCreated === RQAPI.RecordType.COLLECTION ? (
                 <NewRecordNameInput
                   recordType={RQAPI.RecordType.COLLECTION}
-                  analyticEventSource="api_client_sidebar_header"
+                  analyticEventSource="api_client_sidebar"
                   onSuccess={() => hideNewRecordNameInput()}
                 />
               ) : null}
 
               {updatedRecords.requests.map((record) => {
-                return <RequestRow key={record.id} record={record} />;
+                return <RequestRow key={record.id} record={record} openTab={openTab} />;
               })}
 
               {isNewRecordNameInputVisible && recordTypeToBeCreated === RQAPI.RecordType.API ? (
                 <NewRecordNameInput
                   recordType={RQAPI.RecordType.API}
-                  analyticEventSource="api_client_sidebar_header"
+                  analyticEventSource="api_client_sidebar"
                   onSuccess={() => hideNewRecordNameInput()}
                 />
               ) : null}
