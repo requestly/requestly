@@ -1,5 +1,15 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
+import { InlineInput } from "componentsV2/InlineInput/InlineInput";
+import { Input } from "antd";
+import { upsertApiRecord } from "backend/apiClient";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { useApiClientContext } from "features/apiClient/contexts";
+import { useDebounce } from "hooks/useDebounce";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
+import PATHS from "config/constants/sub/paths";
 import "./collectionOverview.scss";
 
 interface CollectionOverviewProps {
@@ -7,11 +17,69 @@ interface CollectionOverviewProps {
 }
 
 export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collection }) => {
+  const user = useSelector(getUserAuthDetails);
+  const team = useSelector(getCurrentlyActiveWorkspace);
+  const { onSaveRecord } = useApiClientContext();
+  const { replaceTab } = useTabsLayoutContext();
+
+  const [collectionName, setCollectionName] = useState(collection?.name || "");
+  const [collectionDescription, setCollectionDescription] = useState(collection?.description || "");
+
+  const handleDescriptionChange = useCallback(
+    async (value: string) => {
+      const newDescription = value;
+      const updatedCollection = {
+        ...collection,
+        description: newDescription,
+      };
+      return upsertApiRecord(user.details?.profile?.uid, updatedCollection, team?.id).then((result) => {
+        onSaveRecord(result.data);
+      });
+    },
+    [collection, onSaveRecord, user.details?.profile?.uid, team?.id]
+  );
+
+  const debouncedDescriptionChange = useDebounce(handleDescriptionChange, 1500);
+
+  const handleCollectionNameChange = async () => {
+    const updatedCollection = {
+      ...collection,
+      name: collectionName,
+    };
+    return upsertApiRecord(user.details?.profile?.uid, updatedCollection, team?.id).then((result) => {
+      onSaveRecord(result.data);
+      replaceTab(result.data.id, {
+        id: result.data.id,
+        title: result.data.name,
+        url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${result.data.id}`,
+      });
+    });
+  };
+
   return (
-    <div className="collection-overview-container">
-      <div className="collection-overview-title">{collection?.name || "New Collection"}</div>
-      <div className="collection-overview-description">
-        {collection?.description || "No description for this collection"}
+    <div className="collection-overview-wrapper">
+      <div className="collection-overview-container">
+        <InlineInput
+          value={collectionName}
+          onChange={(value) => {
+            setCollectionName(value);
+          }}
+          onBlur={handleCollectionNameChange}
+          placeholder="Collection name"
+        />
+        {/* TODO: Replace textarea with inline markdown editor */}
+        <div className="collection-overview-description">
+          <Input.TextArea
+            value={collectionDescription}
+            placeholder="Collection description"
+            className="collection-overview-description-textarea"
+            autoSize={{ minRows: 2 }}
+            onChange={(e) => {
+              setCollectionDescription(e.target.value);
+              debouncedDescriptionChange(e.target.value);
+            }}
+          />
+        </div>
       </div>
     </div>
   );
