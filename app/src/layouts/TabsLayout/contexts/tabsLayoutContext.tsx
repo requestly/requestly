@@ -1,6 +1,13 @@
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TabsLayout, TabsLayoutContextInterface } from "../types";
+import { useDispatch, useSelector } from "react-redux";
+import { tabsLayoutActions } from "store/features/tabs-layout/slice";
+import { getActiveTab, getTabs } from "store/features/tabs-layout/selectors";
+
+export enum Feature {
+  API_CLIENT = "api-client",
+}
 
 const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
   tabs: [],
@@ -14,16 +21,47 @@ const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
 
 interface TabsLayoutProviderProps {
   children: React.ReactElement;
+  childFeatureName: Feature;
 }
 
-export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children }) => {
+export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children, childFeatureName }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const persistedTabs = useSelector((state: any) => getTabs(state, childFeatureName));
+  const persistedActiveTab = useSelector((state: any) => getActiveTab(state, childFeatureName));
 
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
 
-  const [tabs, setTabs] = useState<TabsLayout.Tab[]>([]); // TODO: Persist saved tabs
-  const [activeTab, setActiveTab] = useState<TabsLayout.Tab>();
+  // TODO: remove this local states when tabs persistence approached is finalised
+  const [tabs, setTabs] = useState<TabsLayout.Tab[]>(persistedTabs);
+  const [activeTab, setActiveTab] = useState<TabsLayout.Tab>(persistedActiveTab);
+
+  const hasInitialized = useRef(false);
+  useEffect(() => {
+    if (hasInitialized.current) {
+      return;
+    }
+
+    hasInitialized.current = true;
+
+    if (!persistedActiveTab) {
+      return;
+    }
+
+    delete tabOutletElementsMap.current[persistedActiveTab.id];
+    navigate(persistedActiveTab.url);
+  }, [navigate, persistedActiveTab]);
+
+  // FIXME: Needs refactor, temp solution to update in store
+  useEffect(() => {
+    dispatch(tabsLayoutActions.updateTabs({ feature: childFeatureName, tabs: tabs }));
+  }, [tabs, dispatch, childFeatureName]);
+
+  // FIXME: Needs refactor, temp solution to update in store
+  useEffect(() => {
+    dispatch(tabsLayoutActions.setActiveTab({ feature: childFeatureName, tab: activeTab }));
+  }, [activeTab, dispatch, childFeatureName]);
 
   const updateActivetab = useCallback(
     (tab: TabsLayout.Tab) => {
