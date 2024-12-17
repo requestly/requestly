@@ -12,6 +12,7 @@ import {
 } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import APIClientView from "../../../screens/apiClient/components/clientView/APIClientView";
+import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import "./apiClient.scss";
 
 interface Props {
@@ -86,10 +87,14 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       width="70%"
       destroyOnClose
     >
-      <APIClientView apiEntry={apiEntry} openInModal={openInModal} />
+      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+        <APIClientView apiEntry={apiEntry} openInModal={openInModal} />
+      </BottomSheetProvider>
     </Modal>
   ) : (
-    <APIClientView apiEntry={apiEntry} />
+    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+      <APIClientView apiEntry={apiEntry} />
+    </BottomSheetProvider>
   );
 };
 

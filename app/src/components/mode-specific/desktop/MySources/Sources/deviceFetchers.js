@@ -4,3 +4,10 @@ export const getAndroidDevices = async () => {
     return res;
   });
 };
+
+export const getIosSimulators = async () => {
+  return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("detect-available-ios-simulators", {}).then((res) => {
+    console.log("Available iOS Simulators", res);
+    return res;
+  });
+};
