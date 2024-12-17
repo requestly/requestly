@@ -172,6 +172,7 @@ class StorageServiceWrapper {
       RuleStorageModel.create({ id: key }, getActiveWorkspaceId(window.activeWorkspaceIds)).delete();
       // const syncResult = await doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
       await this.StorageHelper.removeStorageObject(key);
+      return Promise.resolve(true);
       // this.trackPromise(Promise.resolve(syncResult));
     } catch (error) {
       console.error("Error removing record:", error);
@@ -181,7 +182,7 @@ class StorageServiceWrapper {
   async removeRecords(array) {
     try {
       console.log("[StorageServiceWrapper]removeRecords", { array });
-      const promises = array?.forEach((key) => {
+      const promises = array?.map((key) => {
         return this.removeRecord(key);
       });
       await Promise.all(promises);
