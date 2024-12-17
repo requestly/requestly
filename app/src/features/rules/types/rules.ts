@@ -49,13 +49,19 @@ enum RedirectDestinationType {
 
 // Other mock, session can also extend this in future to keep consistency
 interface RecordMetaData {
-  createdBy: string;
+  // createdBy: string;
   creationDate: number;
   currentOwner: string;
   lastModifiedBy: string;
   modificationDate: number;
   isSample?: boolean;
   isReadOnly?: boolean;
+
+  // TODO-syncing: Create common types
+  createdAt: number;
+  updatedAt: number;
+  createdBy: string;
+  updatedBy: string;
 }
 
 export interface RuleRecord extends RecordMetaData {

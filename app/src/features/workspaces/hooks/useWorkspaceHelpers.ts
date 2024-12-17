@@ -1,7 +1,7 @@
-import { environmentVariablesActions } from "store/features/environment/slice";
 import { workspaceManager } from "../helpers/workspaceManager";
 import { useDispatch } from "react-redux";
 import { trackWorkspaceSwitched } from "modules/analytics/events/common/teams";
+import { variablesActions } from "store/features/variables/slice";
 
 export const useWorkspaceHelpers = () => {
   const dispatch = useDispatch();
@@ -16,7 +16,7 @@ export const useWorkspaceHelpers = () => {
 
     trackWorkspaceSwitched(source);
     console.log("[useWorkspaceHelpers.switchWorkspace]", { workspaceId });
-    dispatch(environmentVariablesActions.resetState());
+    dispatch(variablesActions.resetState());
     return workspaceManager.initActiveWorkspaces([workspaceId]);
   };
 
