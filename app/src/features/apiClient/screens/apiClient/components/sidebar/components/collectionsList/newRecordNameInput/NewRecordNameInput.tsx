@@ -139,7 +139,8 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     const result = await upsertApiRecord(uid, record, teamId);
 
     if (result.success) {
-      onSaveRecord(result.data);
+      // False is passed to not open the tab when renaming the record from sidebar
+      onSaveRecord(result.data, false);
 
       if (recordType === RQAPI.RecordType.API) {
         trackRequestRenamed("api_client_sidebar");
