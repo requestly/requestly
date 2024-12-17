@@ -50,7 +50,7 @@ import { StorageService } from "init";
 import { toast } from "utils/Toast.js";
 import { InfoTag } from "components/misc/InfoTag";
 import ReactHoverObserver from "react-hover-observer";
-import { UserIcon } from "components/common/UserIcon";
+import { UserAvatar } from "componentsV2/UserAvatar";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import FEATURES from "config/constants/sub/features";
 import DeleteRulesModal from "../../DeleteRulesModal";
@@ -562,7 +562,7 @@ const RulesTable = ({
     const { beautifiedDate, uid } = props;
     return (
       <span>
-        {beautifiedDate} by <UserIcon uid={uid} />
+        {beautifiedDate} by <UserAvatar uid={uid} />
       </span>
     );
   };
@@ -927,7 +927,7 @@ const RulesTable = ({
         }
         const uid = record.createdBy ?? null;
         if (currentlyActiveWorkspace?.id) {
-          return <UserIcon uid={uid} />;
+          return <UserAvatar uid={uid} />;
         } else return null;
       },
     });
