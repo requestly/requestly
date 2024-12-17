@@ -318,6 +318,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
       trackRequestRenamed("breadcrumb");
       setRequestName("");
+      // TODO: @Rohan to refactor this
       replaceTab(result.data.id, {
         id: result.data.id,
         title: result.data.name,
