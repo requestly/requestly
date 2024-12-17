@@ -233,7 +233,6 @@ export const updateRequestWithAuthOptions = (
   const dataToUpdateCopy = !isEmpty(dataToUpdate)
     ? [...deleteAuthOptions(JSON.parse(JSON.stringify(dataToUpdate)))]
     : JSON.parse(JSON.stringify(dataToUpdate));
-  console.log(dataToUpdateCopy, "copy sata");
 
   let newKeyValuePair: KeyValuePair;
 
