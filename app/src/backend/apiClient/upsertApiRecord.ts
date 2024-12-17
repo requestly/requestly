@@ -41,7 +41,7 @@ const createApiRecord = async (
   const ownerId = getOwnerId(uid, teamId);
 
   const newRecord = {
-    name: record.name || "",
+    name: record.name || "Untitled request",
     type: record.type,
     data: record.data,
     collectionId: record.collectionId || "",
@@ -56,7 +56,7 @@ const createApiRecord = async (
   if (docId) {
     // Creating a new record with a given id
     const docRef = doc(db, "apis", docId);
-    return setDoc(docRef, { ...newRecord })
+    return setDoc(docRef, { ...newRecord, id: docId })
       .then((docRef) => {
         Logger.log(`Api document created with ID ${docId}`);
         return { success: true, data: { ...newRecord, id: docId } };

@@ -155,7 +155,7 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
           className="workspace-menu-item-transfer-btn"
           onClick={() => onTransferClick(team)}
         >
-          Transfer here
+          Copy here
         </RQButton>
       )}
     </div>

@@ -1,3 +1,5 @@
+import { EnvironmentVariables } from "backend/environment/types";
+
 export enum RequestMethod {
   GET = "GET",
   POST = "POST",
@@ -27,8 +29,14 @@ export enum KeyValueFormType {
   FORM = "form",
 }
 
+export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
+
 export namespace RQAPI {
-  export type AnalyticsEventSource = "collection_row" | "collection_list_empty_state" | "api_client_sidebar_header";
+  export type AnalyticsEventSource =
+    | "collection_row"
+    | "collection_list_empty_state"
+    | "api_client_sidebar_header"
+    | "api_client_sidebar";
 
   export enum RecordType {
     API = "api",
@@ -70,12 +78,23 @@ export namespace RQAPI {
     };
   }
 
+  export interface RequestErrorEntry {
+    request: RQAPI.Request;
+    response: null;
+    error: {
+      source: string;
+      message: Error["message"];
+      name: Error["name"];
+    };
+  }
+
   export interface Collection {
     children?: Record[];
     scripts?: {
       preRequest: string;
       postResponse: string;
     };
+    variables: Omit<EnvironmentVariables, "localValue">;
   }
 
   interface RecordMetadata {
