@@ -12,27 +12,22 @@ import { trackExportCollectionsClicked } from "modules/analytics/events/features
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
+import { sessionStorage } from "utils/sessionStorage";
 import "./collectionsList.scss";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
   recordTypeToBeCreated: RQAPI.RecordType;
-  isNewRecordNameInputVisible: boolean;
-  hideNewRecordNameInput: () => void;
 }
 
-export const CollectionsList: React.FC<Props> = ({
-  onNewClick,
-  recordTypeToBeCreated,
-  isNewRecordNameInputVisible,
-  hideNewRecordNameInput,
-}) => {
+export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { openTab, tabs } = useTabsLayoutContext();
   const { isLoadingApiClientRecords, apiClientRecords, isRecordBeingCreated } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [collapsedKeys] = useState(sessionStorage.getItem("collapsed_collection_keys", []));
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const updatedRecords = convertFlatRecordsToNestedRecords(records);
@@ -105,7 +100,7 @@ export const CollectionsList: React.FC<Props> = ({
             <div className="api-client-sidebar-placeholder">
               <Typography.Text type="secondary">Loading...</Typography.Text>
             </div>
-          ) : updatedRecords.count > 0 || isNewRecordNameInputVisible ? (
+          ) : updatedRecords.count > 0 ? (
             <div className="collections-list">
               {updatedRecords.collections.map((record) => {
                 return (
@@ -114,6 +109,7 @@ export const CollectionsList: React.FC<Props> = ({
                     key={record.id}
                     record={record}
                     onNewClick={onNewClick}
+                    collapsedKeys={collapsedKeys}
                     onExportClick={handleExportCollection}
                   />
                 );

@@ -1,5 +1,4 @@
 /* eslint-disable no-new-func */
-
 import { ScriptExecutedPayload } from "./types";
 
 export const requestWorkerFunction = function (e: MessageEvent) {
@@ -10,6 +9,10 @@ export const requestWorkerFunction = function (e: MessageEvent) {
       $set: {},
       $unset: {},
     },
+  };
+
+  const JSONifyObject = (stringifiedObject: string): any => {
+    JSON.parse(stringifiedObject);
   };
 
   const createInfiniteChainable = (methodName: string) => {
@@ -33,7 +36,9 @@ export const requestWorkerFunction = function (e: MessageEvent) {
 
   const sandbox = {
     rq: {
-      request,
+      request: {
+        ...request,
+      },
       environment: {
         set: (key: string, value: any) => {
           if (key === undefined || value === undefined) {
@@ -64,6 +69,16 @@ export const requestWorkerFunction = function (e: MessageEvent) {
       visualizer: createInfiniteChainable("visualizer"),
     },
   };
+
+  Object.setPrototypeOf(sandbox.rq.request, {
+    toJSON: () => {
+      return {
+        method: request.method,
+        url: request.url,
+        body: JSONifyObject(request.body),
+      };
+    },
+  });
 
   const scriptFunction = new Function(
     "rq",
@@ -132,10 +147,21 @@ export const responseWorkerFunction = function (e: MessageEvent) {
     return new Proxy(() => {}, handler);
   };
 
+  const JSONifyObject = (stringifiedObject: string): any => {
+    return JSON.parse(stringifiedObject);
+  };
+
   const sandbox = {
     rq: {
-      request,
-      response,
+      request: {
+        ...request,
+      },
+      response: {
+        ...response,
+        code: response.status,
+        status: response.statusText,
+        responseTime: response.time,
+      },
       environment: {
         set: (key: string, value: any) => {
           if (key === undefined || value === undefined) {
@@ -166,6 +192,27 @@ export const responseWorkerFunction = function (e: MessageEvent) {
       visualizer: createInfiniteChainable("visualizer"),
     },
   };
+
+  Object.setPrototypeOf(sandbox.rq.request, {
+    toJSON: () => {
+      return {
+        method: request.method,
+        url: request.url,
+        body: JSONifyObject(request.body),
+      };
+    },
+  });
+
+  Object.setPrototypeOf(sandbox.rq.response, {
+    toJSON() {
+      return {
+        ...this,
+        body: JSONifyObject(this.body),
+      };
+    },
+    json: () => JSONifyObject(response.body),
+    text: () => response.body,
+  });
 
   const scriptFunction = new Function(
     "rq",
