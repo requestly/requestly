@@ -1,8 +1,6 @@
 import emptyViewIcon from "../../../../../../assets/emptyView.svg";
 import defaultViewIcon from "../../../../../../assets/defaultView.svg";
 import { RQButton } from "lib/design-system-v2/components";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
-import PATHS from "config/constants/sub/paths";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { createBlankApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,7 +17,6 @@ export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
 
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
-  const { openTab } = useTabsLayoutContext();
 
   const user = useSelector(getUserAuthDetails);
   const team = useSelector(getCurrentlyActiveWorkspace);
@@ -47,12 +44,6 @@ export const ApiClientEmptyView = () => {
     createBlankApiRecord(user?.details?.profile?.uid, team?.id, recordType, "")
       .then((result) => {
         onSaveRecord(result.data);
-        openTab(result.data.id, {
-          title: recordType === RQAPI.RecordType.API ? "Untitled request" : "New collection",
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/${recordType === RQAPI.RecordType.API ? "request" : "collection"}/${
-            result.data.id
-          }?new`,
-        });
       })
       .catch((error) => {
         console.error("Error creating record", error);

@@ -15,7 +15,6 @@ import {
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { trackCreateEnvironmentClicked } from "../screens/environment/analytics";
 import PATHS from "config/constants/sub/paths";
-import { useLocation } from "react-router-dom";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { createBlankApiRecord } from "../screens/apiClient/utils";
 
@@ -87,7 +86,6 @@ interface ApiClientProviderProps {
 }
 
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
-  const location = useLocation();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -102,7 +100,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
 
-  const { openTab, closeTab, updateTab } = useTabsLayoutContext();
+  const { openTab, closeTab, updateTab, replaceTab } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
 
   useEffect(() => {
@@ -178,21 +176,23 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const onSaveRecord = useCallback(
     (apiClientRecord: RQAPI.Record) => {
       const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
+      const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
 
       if (isRecordExist) {
         onUpdateRecord(apiClientRecord);
+        replaceTab(apiClientRecord.id, {
+          title: apiClientRecord.name,
+          url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?new`,
+        });
       } else {
         onNewRecord(apiClientRecord);
-
-        if (location.pathname.includes("history")) {
-          openTab(apiClientRecord.id, {
-            title: apiClientRecord.name,
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${apiClientRecord.id}`,
-          });
-        }
+        openTab(apiClientRecord.id, {
+          title: apiClientRecord.name,
+          url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?new`,
+        });
       }
     },
-    [apiClientRecords, onUpdateRecord, onNewRecord, openTab, location.pathname]
+    [apiClientRecords, onUpdateRecord, onNewRecord, openTab, replaceTab]
   );
 
   const updateRecordToBeDeleted = useCallback((record: RQAPI.Record) => {
@@ -235,10 +235,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           return createBlankApiRecord(uid, teamId, recordType, collectionId).then((result) => {
             setIsRecordBeingCreated(null);
             onSaveRecord(result.data);
-            openTab(result.data.id, {
-              title: result.data.name,
-              url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}?new`,
-            });
           });
         }
 
@@ -250,10 +246,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
               setIsRecordBeingCreated(null);
               if (result.success) {
                 onSaveRecord(result.data);
-                openTab(result.data.id, {
-                  title: result.data.name,
-                  url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${result.data.id}?new`,
-                });
               }
             })
             .catch((error) => {
