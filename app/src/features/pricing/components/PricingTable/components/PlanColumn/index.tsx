@@ -85,6 +85,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   };
 
   const getPricingPlanAnnualBillingSubtitle = (planName: string) => {
+    if (planName === PRICING.PLAN_NAMES.LITE && duration === PRICING.DURATION.MONTHLY) {
+      return `Billed $${PricingPlans[planName]?.plans[PRICING.DURATION.ANNUALLY]?.usd?.price * quantity} annually`;
+    }
     if (
       planName === PRICING.PLAN_NAMES.BASIC ||
       planName === PRICING.PLAN_NAMES.PROFESSIONAL ||
@@ -147,7 +150,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   return (
     <Col
       key={planName}
-      className={`plan-card ${planName === PRICING.PLAN_NAMES.PROFESSIONAL ? "recommended-plan-card" : ""}`}
+      className={`plan-card ${planName === PRICING.PLAN_NAMES.PROFESSIONAL ? "recommended-plan-card" : ""} ${
+        planName === PRICING.PLAN_NAMES.LITE && duration === PRICING.DURATION.MONTHLY ? "disabled-col" : ""
+      }`}
     >
       <Space size={8}>
         <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
@@ -208,7 +213,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       <Row className="mt-8" style={{ display: getPricingPlanAnnualBillingSubtitle(planName) ? "flex" : "none" }}>
         <Typography.Text type="secondary">
           {duration === PRICING.DURATION.MONTHLY
-            ? "Billed monthly"
+            ? planName === PRICING.PLAN_NAMES.LITE
+              ? getPricingPlanAnnualBillingSubtitle(planName) || ""
+              : "Billed monthly"
             : getPricingPlanAnnualBillingSubtitle(planName) || ""}
         </Typography.Text>
       </Row>

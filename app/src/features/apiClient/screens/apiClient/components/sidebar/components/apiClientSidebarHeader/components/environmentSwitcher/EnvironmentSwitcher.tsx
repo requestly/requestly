@@ -12,6 +12,7 @@ import PATHS from "config/constants/sub/paths";
 import { trackEnvironmentSwitched } from "features/apiClient/screens/environment/analytics";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./environmentSwitcher.scss";
+import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 
 export const EnvironmentSwitcher = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export const EnvironmentSwitcher = () => {
 
   const dropdownItems = useMemo(() => {
     return environments
-      .filter((env) => !env.isGlobal)
+      .filter((env) => !isGlobalEnvironment(env.id))
       .map((environment) => ({
         key: environment.id,
         label: (
