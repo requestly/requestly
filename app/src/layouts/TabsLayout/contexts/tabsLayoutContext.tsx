@@ -57,7 +57,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
 
       if (targetTab.hasUnsavedChanges) {
         // TODO: Trigger a warning modal
-        const result = window.confirm("Discard changes? Changes you made may not be saved.");
+        const result = window.confirm("Discard changes? Changes you made will not be saved.");
 
         if (!result) {
           return;
