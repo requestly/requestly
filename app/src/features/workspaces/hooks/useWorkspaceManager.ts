@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect, useRef } from "react";
 import { getActiveWorkspaceIds, getAllWorkspaces, getIsWorkspacesFetched } from "store/slices/workspaces/selectors";
-import { useAvailableWorkspacesListener } from "./useAvailableTeamsListener";
+import { useAvailableWorkspacesListener } from "./useAvailableWorkspacesListener";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { workspaceManager } from "../helpers/workspaceManager";
 import { getAppMode } from "store/selectors";
