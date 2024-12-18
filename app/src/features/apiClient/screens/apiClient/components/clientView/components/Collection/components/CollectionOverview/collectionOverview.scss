@@ -1,5 +1,14 @@
+.collection-overview-wrapper {
+  display: flex;
+  justify-content: center;
+  height: inherit;
+}
+
 .collection-overview-container {
-  padding: 0 1rem;
+  padding: var(--space-8, 24px) var(--space-6, 16px);
+  width: 100%;
+  height: inherit;
+  max-width: 680px;
 
   .collection-overview-title {
     font-size: 2rem;
@@ -10,5 +19,10 @@
     font-size: var(--requestly-font-size-sm);
     color: var(--requestly-color-text-subtle);
     margin-top: 1rem;
+    height: inherit;
+
+    &-textarea.ant-input {
+      max-height: 100%;
+    }
   }
 }

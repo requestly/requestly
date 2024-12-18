@@ -7,7 +7,7 @@ import { MockType, RQMockCollection, RQMockMetadataSchema, RQMockSchema } from "
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { EditOutlined } from "@ant-design/icons";
-import { UserIcon } from "components/common/UserIcon";
+import { UserAvatar } from "componentsV2/UserAvatar";
 import { fileTypeColorMap, generateFinalUrl } from "components/features/mocksV2/utils";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOutline";
@@ -214,7 +214,7 @@ export const useMocksTableColumns = ({
       render: (_: any, record: RQMockSchema) => {
         return (
           <div className="mock-table-user-icon">
-            <UserIcon uid={record.createdBy ?? record.lastUpdatedBy} />
+            <UserAvatar uid={record.createdBy ?? record.lastUpdatedBy} />
           </div>
         );
       },
@@ -230,7 +230,7 @@ export const useMocksTableColumns = ({
             {moment(record.updatedTs).format("MMM DD, YYYY") + (record.isOldMock ? "." : "")}{" "}
             {isWorkspaceMode && (
               <>
-                by <UserIcon uid={record.lastUpdatedBy ?? record.createdBy} />
+                by <UserAvatar uid={record.lastUpdatedBy ?? record.createdBy} />
               </>
             )}
           </div>

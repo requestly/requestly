@@ -67,6 +67,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
       }
 
       const newTabDetails = {
+        title: "Untitled",
         ...(tabDetails ?? {}),
         id: tabId,
         isSaved: false,
