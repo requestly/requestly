@@ -1,10 +1,13 @@
 import { workspaceManager } from "../helpers/workspaceManager";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { trackWorkspaceSwitched } from "modules/analytics/events/common/teams";
 import { variablesActions } from "store/features/variables/slice";
+import { LocalStorageService } from "services/localStorageService";
+import { getAppMode } from "store/selectors";
 
 export const useWorkspaceHelpers = () => {
   const dispatch = useDispatch();
+  const appMode = useSelector(getAppMode);
 
   const switchWorkspace = async (workspaceId: string, source?: string) => {
     // // TODO-Syncing: 1. Offload things that needs to be saved
@@ -17,6 +20,7 @@ export const useWorkspaceHelpers = () => {
     trackWorkspaceSwitched(source);
     console.log("[useWorkspaceHelpers.switchWorkspace]", { workspaceId });
     dispatch(variablesActions.resetState());
+    await LocalStorageService(appMode).resetRulesAndGroups();
     return workspaceManager.initActiveWorkspaces([workspaceId]);
   };
 

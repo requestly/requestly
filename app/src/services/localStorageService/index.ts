@@ -70,4 +70,12 @@ class LocalStorageServiceWrapper {
       await this.storageClient.saveStorageObject(newSuperObject);
     });
   }
+
+  async getStorageSuperObject(): Promise<Record<string, any> | void> {
+    return this.storageClient.getStorageSuperObject();
+  }
+
+  async getRecord(key: string) {
+    return this.storageClient.getStorageObject(key);
+  }
 }

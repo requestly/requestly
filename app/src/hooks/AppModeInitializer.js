@@ -327,13 +327,13 @@ const AppModeInitializer = () => {
         .saveRecord(getEventsEngineFlag)
         .then(() => notifyAppLoadedToExtension());
 
-      // PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS, (message) => {
-      //   const batchIdsToAcknowledge = handleEventBatches(message.eventBatches);
-      //   return {
-      //     ackIds: batchIdsToAcknowledge,
-      //     received: true,
-      //   };
-      // });
+      PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS, (message) => {
+        const batchIdsToAcknowledge = handleEventBatches(message.eventBatches);
+        return {
+          ackIds: batchIdsToAcknowledge,
+          received: true,
+        };
+      });
 
       // PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (_message) => {
       //   window.skipSyncListenerForNextOneTime = false;
