@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Input, Radio } from "antd";
 import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../../types";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
@@ -14,9 +14,36 @@ interface Props {
 }
 
 const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequestEntry, setContentType }) => {
-  const handleBodyChange = useCallback(
-    (body: string) => {
-      setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body } }));
+  console.log(body, contentType);
+  const [rawBody, setRawBody] = useState(RequestContentType.RAW === contentType ? body : "");
+  const [jsonBody, setJsonBody] = useState(RequestContentType.JSON === contentType ? body : "");
+  const [formBody, setFormBody] = useState(RequestContentType.FORM === contentType ? body : []);
+
+  const handleRawChange = useCallback(
+    (value: string) => {
+      setRawBody(value);
+      setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
+    },
+    [setRequestEntry]
+  );
+
+  const handleJsonChange = useCallback(
+    (value: string) => {
+      setJsonBody(value);
+      //const parsedValue = JSON.parse(value);
+      setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
+    },
+    [setRequestEntry]
+  );
+  //since setKeyValuePairs requires a updater fn, which requires entry object & returns the updated object
+  //wrapping this with updated fn
+  const handleFormChange = useCallback(
+    (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => {
+      setRequestEntry((prevEntry) => {
+        const updatedEntry = updaterFn(prevEntry);
+        setFormBody(updatedEntry.request.body as KeyValuePair[]);
+        return updatedEntry;
+      });
     },
     [setRequestEntry]
   );
@@ -28,8 +55,8 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
           // @ts-ignore
           <CodeEditor
             language={EditorLanguage.JSON}
-            value={body as string}
-            handleChange={handleBodyChange}
+            value={jsonBody as string}
+            handleChange={handleJsonChange}
             isResizable={false}
             hideCharacterCount
             analyticEventProperties={{ source: "api_client" }}
@@ -40,8 +67,8 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
         return (
           <KeyValueTable
             pairType={KeyValueFormType.FORM}
-            data={body as KeyValuePair[]}
-            setKeyValuePairs={setRequestEntry}
+            data={formBody as KeyValuePair[]}
+            setKeyValuePairs={handleFormChange}
             variables={variables}
           />
         );
@@ -51,12 +78,22 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
           <Input.TextArea
             className="api-request-body-raw"
             placeholder="Enter text here..."
-            value={body as string}
-            onChange={(e) => handleBodyChange(e.target.value)}
+            value={rawBody as string}
+            onChange={(e) => handleRawChange(e.target.value)}
           />
         );
     }
-  }, [body, contentType, setRequestEntry, handleBodyChange, variables]);
+  }, [
+    rawBody,
+    formBody,
+    jsonBody,
+    contentType,
+    setRequestEntry,
+    handleRawChange,
+    handleFormChange,
+    handleJsonChange,
+    variables,
+  ]);
 
   return (
     <div className="api-request-body">
