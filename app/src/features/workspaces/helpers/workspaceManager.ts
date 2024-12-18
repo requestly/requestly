@@ -6,9 +6,11 @@ import { Workspace } from "../types";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { RuleStorageModel, syncEngine } from "requestly-sync-engine";
 import { LocalStorageService } from "services/localStorageService";
-import { hasAccessToWorkspace } from "../utils";
+import { getActiveWorkspaceId, hasAccessToWorkspace } from "../utils";
 import { globalActions } from "store/slices/global/slice";
 import { StorageService } from "init";
+
+import PSMH from "../../../config/PageScriptMessageHandler";
 
 class WorkspaceManager {
   initInProgress = false;
@@ -48,8 +50,29 @@ class WorkspaceManager {
 
     //#region - Extension Storage backup -> reset -> reinit
     // TODO-syncing: Take backups of extensions storage changes before clearing
-    const refreshToken = await StorageService(this.appMode).getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN);
+    const storageDump = await LocalStorageService(this.appMode).getStorageSuperObject();
+    const rulesAndGroupsObject: Record<string, any> = {};
+    let refreshToken = "";
+    if (storageDump) {
+      for (let key in storageDump) {
+        if (storageDump[key]?.objectType === "rule" || storageDump[key]?.objectType === "group") {
+          rulesAndGroupsObject[key] = storageDump[key];
+        }
+      }
+
+      refreshToken = storageDump[GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN];
+
+      console.log("[WorkspaceManager.initActiveWorkspaces] storageDump", {
+        storageDump,
+        rulesAndGroupsObject,
+        refreshToken,
+      });
+    }
+
+    console.log("[WorkspaceManager.initActiveWorkspaces] Clearing Extension Storage");
     StorageService(this.appMode).clearDB();
+
+    console.log("[WorkspaceManager.initActiveWorkspaces] Reinit Extension Storage");
     StorageService(this.appMode).saveRecord({
       [GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN]: refreshToken,
     });
@@ -57,6 +80,24 @@ class WorkspaceManager {
 
     await this.connectWorkspaces(workspaceIds);
     this.dispatch(globalActions.toggleActiveModal({ modalName: "workspaceLoadingModal", newValue: false }));
+
+    // Rules And Group Extension Changes Propogation
+    // #region - Rules And Group Extension Changes Propogation
+    console.log("[WorkspaceManager.initActiveWorkspaces] Extension Changes -> SyncEngine");
+    Object.values(rulesAndGroupsObject).forEach((ruleOrGroup) => {
+      // FIXME-syncing: Which workspaceId to sync to?
+      RuleStorageModel.create(ruleOrGroup, getActiveWorkspaceId(workspaceIds)).save();
+    });
+
+    PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (message: any) => {
+      console.log("[workspaceManager] NOTIFY_RECORD_UPDATED", { message });
+      const recordValue = message?.payload;
+      if (recordValue?.objectType === "rule" || recordValue?.objectType === "group") {
+        RuleStorageModel.create(recordValue, getActiveWorkspaceId(workspaceIds)).save();
+      }
+    });
+    // #endregion
+
     this.initInProgress = false;
   }
 
@@ -131,6 +172,10 @@ class WorkspaceManager {
       iter.disconnect();
     });
     this.dispatch(workspaceActions.setActiveWorkspaceIds([]));
+
+    // Rules And Group Extension Changes Propogation remove old one
+    console.log("[WorkspaceManager.resetActiveWorkspaces] Removing Message Listener");
+    PSMH.removeMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED);
   }
 }
 

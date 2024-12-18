@@ -4,4 +4,6 @@ export abstract class BaseStorageClient {
 
   async getStorageSuperObject(): Promise<Record<string, any> | void> {}
   async clearStorage() {}
+
+  async getStorageObject(key: string) {}
 }
