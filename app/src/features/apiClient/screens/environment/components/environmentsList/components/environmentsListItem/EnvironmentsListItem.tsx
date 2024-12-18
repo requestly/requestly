@@ -1,14 +1,17 @@
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
+import { IoMdGlobe } from "@react-icons/all-files/io/IoMdGlobe";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { Dropdown, Input, Tooltip, Typography } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import PATHS from "config/constants/sub/paths";
 import { TabsLayoutContextInterface, useTabsLayoutContext } from "layouts/TabsLayout";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useCallback, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { redirectToEnvironment } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
+import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 
 interface EnvironmentsListItemProps {
   environment: {
@@ -149,7 +152,30 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
             tooltip: environment.name,
           }}
         >
+          {isGlobalEnvironment(environment.id) && <IoMdGlobe className="global-var-icon" />}
           {environment.name}
+          {isGlobalEnvironment(environment.id) && (
+            <Tooltip
+              overlayClassName="active-environment-tooltip"
+              title={
+                <span>
+                  Global variables are accessible across the workspace and editable by all the workspace members.{" "}
+                  <Link
+                    to="https://docs.requestly.com/general/api-client/environments-and-variables/add-and-use-variables"
+                    target="_blank"
+                  >
+                    Learn more.
+                  </Link>
+                </span>
+              }
+              placement="top"
+              showArrow={false}
+            >
+              <span>
+                <MdInfoOutline className="global-var-info-icon" />
+              </span>
+            </Tooltip>
+          )}
         </Typography.Text>
         <Tooltip
           overlayClassName="active-environment-tooltip"
@@ -164,15 +190,17 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
       </div>
       {/* wrapping dropdown in a div to prevent it from triggering click events on parent div element*/}
       <div onClick={(e) => e.stopPropagation()}>
-        <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
-          <RQButton
-            size="small"
-            type="transparent"
-            icon={<MdOutlineMoreHoriz />}
-            className="environment-list-item-dropdown-button"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </Dropdown>
+        {!isGlobalEnvironment(environment.id) ? (
+          <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
+            <RQButton
+              size="small"
+              type="transparent"
+              icon={<MdOutlineMoreHoriz />}
+              className="environment-list-item-dropdown-button"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </Dropdown>
+        ) : null}
       </div>
     </div>
   );
