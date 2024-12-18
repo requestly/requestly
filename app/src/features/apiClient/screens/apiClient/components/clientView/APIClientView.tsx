@@ -89,7 +89,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [isAnimating, setIsAnimating] = useState(false);
   const animationTimerRef = useRef<NodeJS.Timeout>();
 
-  const { hasUnsavedChanges } = useHasUnsavedChanges(entry, isAnimating);
+  const { hasUnsavedChanges } = useHasUnsavedChanges(entry, isAnimating || isRequestSaving);
   const { updateTab } = useTabsLayoutContext();
 
   useEffect(() => {
