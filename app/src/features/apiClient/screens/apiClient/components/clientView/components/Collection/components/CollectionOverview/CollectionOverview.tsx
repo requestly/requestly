@@ -44,8 +44,13 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
   const handleCollectionNameChange = async () => {
     const updatedCollection = {
       ...collection,
-      name: collectionName,
+      name: collectionName || "Untitled Collection",
     };
+
+    if (collectionName === "") {
+      setCollectionName("Untitled Collection");
+    }
+
     return upsertApiRecord(user.details?.profile?.uid, updatedCollection, team?.id).then((result) => {
       onSaveRecord(result.data);
       replaceTab(result.data.id, {
