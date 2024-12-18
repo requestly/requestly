@@ -67,10 +67,7 @@ const RequestTabs: React.FC<Props> = ({
       {
         key: Tab.QUERY_PARAMS,
         label: (
-          <LabelWithCount
-            label="Query Params"
-            count={sanitizeKeyValuePairs(requestEntry.request.queryParams, true, false).length}
-          />
+          <LabelWithCount label="Query Params" count={sanitizeKeyValuePairs(requestEntry.request.queryParams).length} />
         ),
         children: (
           <KeyValueTable
@@ -99,12 +96,7 @@ const RequestTabs: React.FC<Props> = ({
       },
       {
         key: Tab.HEADERS,
-        label: (
-          <LabelWithCount
-            label="Headers"
-            count={sanitizeKeyValuePairs(requestEntry.request.headers, true, false).length}
-          />
-        ),
+        label: <LabelWithCount label="Headers" count={sanitizeKeyValuePairs(requestEntry.request.headers).length} />,
         children: (
           <KeyValueTable
             data={requestEntry.request.headers}
