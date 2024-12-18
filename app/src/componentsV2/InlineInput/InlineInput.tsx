@@ -8,7 +8,7 @@ interface Props {
   placeholder: string;
   disabled?: boolean;
   textarea?: boolean;
-  onChange: (value: String) => void;
+  onChange: (value: string) => void;
   onBlur?: () => void;
 }
 
@@ -28,7 +28,10 @@ export const InlineInput: React.FC<Props> = ({
       spellCheck: false,
       placeholder: placeholder,
       onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange(e.target.value),
-      onPressEnter: () => setIsEditable(false),
+      onPressEnter: () => {
+        setIsEditable(false);
+        onBlur?.();
+      },
       onFocus: () => setIsEditable(true),
       onBlur: () => {
         setIsEditable(false);
@@ -50,7 +53,7 @@ export const InlineInput: React.FC<Props> = ({
                 autoSize={{ minRows: 2, maxRows: 4 }}
               />
             ) : (
-              <Input {...commonInputProps} className="active-inline-input" bordered={false} value={value} />
+              <Input {...commonInputProps} className="active-inline-input" value={value} />
             )}
           </>
         ) : (
