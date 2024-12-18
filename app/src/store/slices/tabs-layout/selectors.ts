@@ -1,6 +1,6 @@
 import { ReducerKeys } from "store/constants";
 import { RootState } from "store/types";
-import { TabsLayoutState } from "./slice";
+import { TabsLayoutState } from "./reducers";
 
 export const getTabsLayoutState = (state: RootState): TabsLayoutState => {
   return state[ReducerKeys.TABS_LAYOUT];
