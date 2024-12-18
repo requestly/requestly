@@ -10,7 +10,6 @@ import {
   getEmptyPair,
   sanitizeKeyValuePairs,
   supportsRequestBody,
-  updateAuthOptions,
 } from "../../utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
@@ -169,13 +168,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true, removeAuthOptions = false) => {
+  const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => {
     const sanitizedEntry: RQAPI.Entry = {
       ...entry,
       request: {
         ...entry.request,
-        queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys, removeAuthOptions),
-        headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys, removeAuthOptions),
+        queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys),
+        headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys),
       },
       scripts: {
         preRequest: entry.scripts?.preRequest || "",
@@ -327,7 +326,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
-      data: { ...sanitizeEntry(entry, false, true) },
+      data: { ...sanitizeEntry(entry) },
     };
 
     if (apiEntryDetails?.id) {
