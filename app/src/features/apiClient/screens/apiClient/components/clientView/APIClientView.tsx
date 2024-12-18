@@ -310,7 +310,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     const result = await upsertApiRecord(uid, record, teamId);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
-      onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
+      onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
       trackRequestRenamed("breadcrumb");
       setRequestName("");
 
@@ -335,7 +335,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     const result = await upsertApiRecord(uid, record, teamId);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
-      onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
+      onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
       setEntry({ ...result.data.data });
 
       trackRequestSaved("api_client_view");
