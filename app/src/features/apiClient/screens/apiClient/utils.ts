@@ -199,28 +199,6 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 };
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
 
-export const updateAuthOptions = (
-  entry: RQAPI.Entry,
-  currentAuthType: AUTHORIZATION_TYPES,
-  updatedKey?: string,
-  updatedValue?: string,
-  formValues = {}
-) => {
-  const currentEntry = { ...entry };
-
-  const currentFormValues = {
-    ...formValues[currentAuthType],
-    ...(updatedKey || updatedValue ? { [updatedKey]: updatedValue } : {}),
-  };
-
-  currentEntry.auth = {
-    currentAuthType,
-    [currentAuthType]: currentFormValues,
-  };
-
-  return currentEntry;
-};
-
 export const deleteAuthOptions = (dataToUpdate: KeyValuePair[]) => {
   return dataToUpdate.filter((option) => option.type !== AUTH_ENTRY_IDENTIFIER);
 };

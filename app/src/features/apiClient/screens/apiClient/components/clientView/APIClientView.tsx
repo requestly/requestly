@@ -353,15 +353,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackAPIRequestCancelled();
   }, []);
 
-  const handleAuthChange = useCallback(
-    (currentAuthType: AUTHORIZATION_TYPES, updatedKey: string, updatedValue: string, formValues: any) => {
-      setEntry((prevEntry) => {
-        const updatedEntry = updateAuthOptions(prevEntry, currentAuthType, updatedKey, updatedValue, formValues);
-        return updatedEntry;
-      });
-    },
-    []
-  );
+  const handleAuthChange = useCallback((authOptions: RQAPI.AuthOptions) => {
+    setEntry((prevEntry) => {
+      const updatedEntry = prevEntry;
+      updatedEntry.auth = authOptions;
+      return updatedEntry;
+    });
+  }, []);
 
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
     (evt.target as HTMLInputElement).blur();

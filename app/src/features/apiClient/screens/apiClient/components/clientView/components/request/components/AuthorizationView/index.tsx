@@ -31,7 +31,12 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => 
 
   const onChangeHandler = (value: string, id: string) => {
     setFormValues((prevValues) => {
-      onAuthUpdate(selectedForm, id, value, prevValues);
+      const authOptions = {
+        currentAuthType: selectedForm,
+        [selectedForm]: { ...prevValues[selectedForm], ...(id || value ? { [id]: value } : {}) },
+      };
+
+      onAuthUpdate(authOptions);
       return {
         ...prevValues,
         [selectedForm]: {

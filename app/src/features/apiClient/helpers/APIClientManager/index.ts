@@ -1,11 +1,6 @@
 import { notification } from "antd";
 import * as Sentry from "@sentry/react";
-import {
-  addUrlSchemeIfMissing,
-  deleteAuthOptions,
-  makeRequest,
-  updateRequestWithAuthOptions,
-} from "../../screens/apiClient/utils";
+import { addUrlSchemeIfMissing, makeRequest, updateRequestWithAuthOptions } from "../../screens/apiClient/utils";
 import { RQAPI } from "../../types";
 import { executePrerequestScript, executePostresponseScript } from "./modules/scripts/utils";
 import { renderTemplate } from "backend/environment/utils";
@@ -23,30 +18,30 @@ export const executeAPIRequest = async (
 ): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
   // Process request configuration with environment variables
 
-  if (!isEmpty(entry.auth)) {
-    const authType = entry.auth.currentAuthType;
-    const requestHeaders = entry.request.headers;
-    const queryParmas = entry.request.queryParams;
-    const addToQuery = authType === AUTHORIZATION_TYPES.API_KEY && entry.auth[authType].addTo === "QUERY";
+  const updatedEntry = JSON.parse(JSON.stringify(entry)); //Deep Copy
+
+  if (!isEmpty(updatedEntry.auth)) {
+    const authType = updatedEntry.auth.currentAuthType;
+    const requestHeaders = updatedEntry.request.headers;
+    const queryParmas = updatedEntry.request.queryParams;
+    const addToQuery = authType === AUTHORIZATION_TYPES.API_KEY && updatedEntry.auth[authType].addTo === "QUERY";
 
     if (addToQuery) {
-      entry.request.headers = deleteAuthOptions(requestHeaders);
-      entry.request.queryParams = updateRequestWithAuthOptions(queryParmas, entry.auth, authType);
+      updatedEntry.request.queryParams = updateRequestWithAuthOptions(queryParmas, updatedEntry.auth, authType);
     } else {
-      entry.request.queryParams = deleteAuthOptions(queryParmas);
-      entry.request.headers = updateRequestWithAuthOptions(requestHeaders, entry.auth, authType);
+      updatedEntry.request.headers = updateRequestWithAuthOptions(requestHeaders, updatedEntry.auth, authType);
     }
   }
 
-  const renderedRequestDetails = environmentManager.renderVariables(entry.request, requestCollectionId);
+  const renderedRequestDetails = environmentManager.renderVariables(updatedEntry.request, requestCollectionId);
   let currentEnvironmentVariables = renderedRequestDetails.variables;
   let renderedRequest = renderedRequestDetails.renderedTemplate;
   let response: RQAPI.Response | null = null;
 
   try {
-    if (entry.scripts.preRequest) {
+    if (updatedEntry.scripts.preRequest) {
       const { updatedVariables } = await executePrerequestScript(
-        entry.scripts.preRequest,
+        updatedEntry.scripts.preRequest,
         renderedRequest,
         environmentManager,
         currentEnvironmentVariables
@@ -55,11 +50,11 @@ export const executeAPIRequest = async (
       currentEnvironmentVariables = updatedVariables;
       // TODO@nafees87n: Fix this while refactoring, rendering should always get fresh variables
       // Temporarily passing current variables
-      renderedRequest = renderTemplate(entry.request, currentEnvironmentVariables);
+      renderedRequest = renderTemplate(updatedEntry.request, currentEnvironmentVariables);
     }
   } catch (error) {
     return {
-      request: entry.request,
+      request: updatedEntry.request,
       response: null,
       error: {
         source: "Pre-request script",
@@ -83,7 +78,7 @@ export const executeAPIRequest = async (
     });
   } catch (error) {
     return {
-      request: entry.request,
+      request: updatedEntry.request,
       response: null,
       error: {
         source: "Request error",
@@ -93,10 +88,10 @@ export const executeAPIRequest = async (
     };
   }
 
-  if (entry.scripts.postResponse) {
+  if (updatedEntry.scripts.postResponse) {
     try {
       await executePostresponseScript(
-        entry.scripts.postResponse,
+        updatedEntry.scripts.postResponse,
         { response, request: renderedRequest },
         environmentManager,
         currentEnvironmentVariables
@@ -126,9 +121,8 @@ export const executeAPIRequest = async (
       });
     }
   }
-  console.log(renderedRequest, "rendered");
   return {
-    ...entry,
+    ...updatedEntry,
     response,
     request: renderedRequest,
   };
