@@ -27,17 +27,22 @@ const slice = createSlice({
       const { featureId, tab } = action.payload;
       state[featureId].tabs.push(tab);
     },
-    removeTab: (state, action: PayloadAction<{ featureId: string; tabId: TabsLayout.Tab["id"] }>) => {
-      const { featureId, tabId } = action.payload;
-      state[featureId].tabs = state[featureId].tabs.filter((tab) => tab.id !== tabId);
-    },
-    updateTabs: (state, action: PayloadAction<{ featureId: string; tabs: TabsLayout.Tab[] }>) => {
-      const { featureId, tabs } = action.payload;
-      state[featureId].tabs = tabs;
+    updateTab: (
+      state,
+      action: PayloadAction<{ featureId: string; tabId: TabsLayout.Tab["id"]; updatedTabData: Partial<TabsLayout.Tab> }>
+    ) => {
+      const { featureId, tabId, updatedTabData } = action.payload;
+      state[featureId].tabs = state[featureId].tabs.map((tab) =>
+        tab.id === tabId ? { ...tab, ...updatedTabData } : tab
+      );
     },
     setActiveTab: (state, action: PayloadAction<{ featureId: string; tab: TabsLayout.Tab }>) => {
       const { featureId, tab } = action.payload;
       state[featureId].activeTab = { ...(state[featureId].activeTab ?? {}), ...tab };
+    },
+    setTabs: (state, action: PayloadAction<{ featureId: string; tabs: TabsLayout.Tab[] }>) => {
+      const { featureId, tabs } = action.payload;
+      state[featureId].tabs = tabs;
     },
   },
 });

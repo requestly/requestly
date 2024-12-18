@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { TabsLayout, TabsLayoutContextInterface } from "../types";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,14 +22,11 @@ interface TabsLayoutProviderProps {
 export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children, id }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const persistedTabs = useSelector(getTabs(id));
+  const tabs = useSelector(getTabs(id));
   const activeTab = useSelector(getActiveTab(id));
 
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
-
-  // TODO: remove this local states when tabs persistence approached is finalised
-  const [tabs, setTabs] = useState<TabsLayout.Tab[]>(persistedTabs);
 
   const hasInitialized = useRef(false);
   useEffect(() => {
@@ -46,11 +43,6 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
     delete tabOutletElementsMap.current[activeTab.id];
     navigate(activeTab.url);
   }, [navigate, activeTab]);
-
-  // FIXME: Needs refactor, temp solution to update in store
-  useEffect(() => {
-    dispatch(tabsLayoutActions.updateTabs({ featureId: id, tabs: tabs }));
-  }, [tabs, dispatch, id]);
 
   const updateActivetab = useCallback(
     (tab: TabsLayout.Tab) => {
@@ -72,7 +64,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
       const targetTab = copiedTabs[targetTabIndex];
       const updatedTabs = copiedTabs.filter((tab) => tab.id !== tabId);
 
-      setTabs(updatedTabs);
+      dispatch(tabsLayoutActions.setTabs({ featureId: id, tabs: updatedTabs }));
 
       if (updatedTabs.length && targetTab.id === activeTab?.id) {
         const nextActiveTab = updatedTabs[targetTabIndex === updatedTabs.length ? targetTabIndex - 1 : targetTabIndex];
@@ -81,7 +73,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
 
       delete tabOutletElementsMap.current[tabId];
     },
-    [tabs, activeTab?.id, updateActivetab]
+    [tabs, activeTab?.id, updateActivetab, dispatch, id]
   );
 
   const openTab = useCallback(
@@ -102,15 +94,18 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
         timeStamp: Date.now(),
       } as TabsLayout.Tab;
 
-      setTabs((prev) => [...prev, newTabDetails]);
+      dispatch(tabsLayoutActions.addTab({ featureId: id, tab: newTabDetails }));
       updateActivetab(newTabDetails);
     },
-    [tabs, updateActivetab]
+    [tabs, updateActivetab, dispatch, id]
   );
 
-  const updateTab = useCallback((tabId: TabsLayout.Tab["id"], updatedTabData?: Partial<TabsLayout.Tab>) => {
-    setTabs((prev) => prev.map((tab) => (tab.id === tabId ? { ...tab, ...updatedTabData, id: tabId } : tab)));
-  }, []);
+  const updateTab = useCallback(
+    (tabId: TabsLayout.Tab["id"], updatedTabData?: Partial<TabsLayout.Tab>) => {
+      dispatch(tabsLayoutActions.updateTab({ featureId: id, tabId, updatedTabData }));
+    },
+    [dispatch, id]
+  );
 
   const replaceTab = useCallback(
     (tabId: TabsLayout.Tab["id"], newTabData: Partial<TabsLayout.Tab>) => {
@@ -121,13 +116,13 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
         return;
       }
 
-      setTabs((prev) => prev.map((tab) => (tab.id === tabId ? { ...tab, ...newTabData } : tab)));
+      updateTab(tabId, newTabData);
 
       if (tabId === activeTab?.id) {
         updateActivetab({ ...activeTab, ...newTabData } as TabsLayout.Tab);
       }
     },
-    [tabs, activeTab, updateActivetab, openTab]
+    [tabs, activeTab, updateTab, updateActivetab, openTab]
   );
 
   const value = { activeTab, tabs, openTab, closeTab, updateTab, replaceTab, tabOutletElementsMap };
