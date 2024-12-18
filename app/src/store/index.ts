@@ -11,9 +11,9 @@ import { recordsReducer } from "./features/rules/slice";
 import { billingReducer } from "./features/billing/slice";
 import { harPreviewReducer } from "./features/network-sessions/slice";
 import { variablesReducer } from "./features/variables/slice";
-import { tabsLayoutReducerWithLocalSync } from "./features/tabs-layout/slice";
 
 import { globalReducers } from "./slices/global/slice";
+import { tabsLayoutReducerWithLocalSync } from "./slices/tabs-layout";
 
 export const reduxStore = configureStore({
   reducer: {

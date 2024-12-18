@@ -2,8 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import { useNavigate } from "react-router-dom";
 import { TabsLayout, TabsLayoutContextInterface } from "../types";
 import { useDispatch, useSelector } from "react-redux";
-import { tabsLayoutActions } from "store/features/tabs-layout/slice";
-import { getActiveTab, getTabs } from "store/features/tabs-layout/selectors";
+import { getActiveTab, getTabs, tabsLayoutActions } from "store/slices/tabs-layout";
 
 export enum Feature {
   API_CLIENT = "api-client",
