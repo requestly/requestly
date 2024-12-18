@@ -1,16 +1,9 @@
 import React from "react";
 import { TabsLayoutProvider } from "./contexts";
 import { TabsLayoutContent } from "./components";
-import { Feature } from "./contexts/tabsLayoutContext";
 
 interface TabsLayoutContainerProps {
-  /**
-   * Unique id when its consumed, can be feature name.
-   *
-   * @example
-   * "api-client"
-   */
-  id: Feature;
+  id: string;
   children: React.ReactElement;
 }
 

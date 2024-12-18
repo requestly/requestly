@@ -4,10 +4,6 @@ import { TabsLayout, TabsLayoutContextInterface } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { getActiveTab, getTabs, tabsLayoutActions } from "store/slices/tabs-layout";
 
-export enum Feature {
-  API_CLIENT = "api-client",
-}
-
 const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
   tabs: [],
   activeTab: undefined,
@@ -19,7 +15,7 @@ const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
 });
 
 interface TabsLayoutProviderProps {
-  id: Feature;
+  id: string;
   children: React.ReactElement;
 }
 
@@ -27,14 +23,13 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const persistedTabs = useSelector(getTabs(id));
-  const persistedActiveTab = useSelector(getActiveTab(id));
+  const activeTab = useSelector(getActiveTab(id));
 
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
 
   // TODO: remove this local states when tabs persistence approached is finalised
   const [tabs, setTabs] = useState<TabsLayout.Tab[]>(persistedTabs);
-  const [activeTab, setActiveTab] = useState<TabsLayout.Tab>(persistedActiveTab);
 
   const hasInitialized = useRef(false);
   useEffect(() => {
@@ -44,30 +39,25 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
 
     hasInitialized.current = true;
 
-    if (!persistedActiveTab) {
+    if (!activeTab) {
       return;
     }
 
-    delete tabOutletElementsMap.current[persistedActiveTab.id];
-    navigate(persistedActiveTab.url);
-  }, [navigate, persistedActiveTab]);
+    delete tabOutletElementsMap.current[activeTab.id];
+    navigate(activeTab.url);
+  }, [navigate, activeTab]);
 
   // FIXME: Needs refactor, temp solution to update in store
   useEffect(() => {
-    dispatch(tabsLayoutActions.updateTabs({ feature: id, tabs: tabs }));
+    dispatch(tabsLayoutActions.updateTabs({ featureId: id, tabs: tabs }));
   }, [tabs, dispatch, id]);
-
-  // FIXME: Needs refactor, temp solution to update in store
-  useEffect(() => {
-    dispatch(tabsLayoutActions.setActiveTab({ feature: id, tab: activeTab }));
-  }, [activeTab, dispatch, id]);
 
   const updateActivetab = useCallback(
     (tab: TabsLayout.Tab) => {
       navigate(tab.url);
-      setActiveTab((prev) => ({ ...(prev ?? {}), ...tab }));
+      dispatch(tabsLayoutActions.setActiveTab({ featureId: id, tab }));
     },
-    [navigate]
+    [navigate, dispatch, id]
   );
 
   const closeTab = useCallback(
