@@ -20,15 +20,15 @@ const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
 });
 
 interface TabsLayoutProviderProps {
+  id: Feature;
   children: React.ReactElement;
-  childFeatureName: Feature;
 }
 
-export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children, childFeatureName }) => {
+export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children, id }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const persistedTabs = useSelector((state: any) => getTabs(state, childFeatureName));
-  const persistedActiveTab = useSelector((state: any) => getActiveTab(state, childFeatureName));
+  const persistedTabs = useSelector(getTabs(id));
+  const persistedActiveTab = useSelector(getActiveTab(id));
 
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
@@ -55,13 +55,13 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
 
   // FIXME: Needs refactor, temp solution to update in store
   useEffect(() => {
-    dispatch(tabsLayoutActions.updateTabs({ feature: childFeatureName, tabs: tabs }));
-  }, [tabs, dispatch, childFeatureName]);
+    dispatch(tabsLayoutActions.updateTabs({ feature: id, tabs: tabs }));
+  }, [tabs, dispatch, id]);
 
   // FIXME: Needs refactor, temp solution to update in store
   useEffect(() => {
-    dispatch(tabsLayoutActions.setActiveTab({ feature: childFeatureName, tab: activeTab }));
-  }, [activeTab, dispatch, childFeatureName]);
+    dispatch(tabsLayoutActions.setActiveTab({ feature: id, tab: activeTab }));
+  }, [activeTab, dispatch, id]);
 
   const updateActivetab = useCallback(
     (tab: TabsLayout.Tab) => {
