@@ -70,7 +70,7 @@ export const useAvailableWorkspacesListener = () => {
       });
 
       return () => {
-        console.log("[useAvailableTeamsListener] Unsubscribing Workspaces Listener");
+        console.log("[useAvailableWorkspacesListener] Unsubscribing Workspaces Listener");
         unsub?.();
       };
     } catch (error) {
