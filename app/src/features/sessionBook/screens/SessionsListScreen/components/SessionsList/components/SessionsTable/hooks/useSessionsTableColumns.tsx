@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Table, Tooltip } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { UserIcon } from "components/common/UserIcon";
+import { UserAvatar } from "componentsV2/UserAvatar";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import Favicon from "components/misc/Favicon";
@@ -93,7 +93,7 @@ export const useSessionsTableColumns = ({
       className: "text-gray mock-table-user-icon",
       dataIndex: "createdBy",
       render: (creatorUserID) => {
-        return <UserIcon uid={creatorUserID} />;
+        return <UserAvatar uid={creatorUserID} />;
       },
     },
     {
