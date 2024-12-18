@@ -23,6 +23,9 @@
 
     &-textarea.ant-input {
       max-height: 100%;
+      background: var(--requestly-color-surface-0);
+      border-radius: 8px;
+      border: none;
     }
   }
 }
