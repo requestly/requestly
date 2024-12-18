@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { Input, Radio } from "antd";
 import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../../types";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
@@ -14,10 +14,23 @@ interface Props {
 }
 
 const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequestEntry, setContentType }) => {
-  console.log(body, contentType);
   const [rawBody, setRawBody] = useState(RequestContentType.RAW === contentType ? body : "");
   const [jsonBody, setJsonBody] = useState(RequestContentType.JSON === contentType ? body : "");
   const [formBody, setFormBody] = useState(RequestContentType.FORM === contentType ? body : []);
+
+  useEffect(() => {
+    let updatedBody: string | KeyValuePair[];
+
+    if (contentType === RequestContentType.RAW) {
+      updatedBody = rawBody;
+    } else if (contentType === RequestContentType.JSON) {
+      updatedBody = jsonBody;
+    } else if (contentType === RequestContentType.FORM) {
+      updatedBody = formBody;
+    }
+
+    setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: updatedBody } }));
+  }, [contentType, rawBody, jsonBody, formBody, setRequestEntry]);
 
   const handleRawChange = useCallback(
     (value: string) => {
@@ -30,19 +43,23 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
   const handleJsonChange = useCallback(
     (value: string) => {
       setJsonBody(value);
-      //const parsedValue = JSON.parse(value);
       setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
     },
     [setRequestEntry]
   );
-  //since setKeyValuePairs requires a updater fn, which requires entry object & returns the updated object
-  //wrapping this with updated fn
+
   const handleFormChange = useCallback(
     (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => {
-      setRequestEntry((prevEntry) => {
-        const updatedEntry = updaterFn(prevEntry);
+      setRequestEntry((prev) => {
+        const updatedEntry = updaterFn(prev);
         setFormBody(updatedEntry.request.body as KeyValuePair[]);
-        return updatedEntry;
+        return {
+          ...prev,
+          request: {
+            ...prev.request,
+            body: updatedEntry.request.body,
+          },
+        };
       });
     },
     [setRequestEntry]
