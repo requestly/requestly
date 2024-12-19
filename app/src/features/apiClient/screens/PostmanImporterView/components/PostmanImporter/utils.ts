@@ -35,9 +35,7 @@ export const getUploadedPostmanFileType = (fileContent: PostmanCollectionExport 
 };
 
 export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExport) => {
-  if (!fileContent.values.length) {
-    throw new Error("No variables found in the environment file");
-  }
+  const isGlobalEnvironment = fileContent?._postman_variable_scope === "globals";
 
   const variables = fileContent.values.reduce((acc: Record<string, EnvironmentVariableValue>, variable: any) => {
     // dont add variables with empty key
@@ -55,6 +53,7 @@ export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExp
   return {
     name: fileContent.name,
     variables,
+    isGlobal: isGlobalEnvironment,
   };
 };
 
