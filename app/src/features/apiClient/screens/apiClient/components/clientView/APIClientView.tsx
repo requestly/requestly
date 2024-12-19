@@ -42,6 +42,7 @@ import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { AUTHORIZATION_TYPES } from "./components/request/components/AuthorizationView/types";
 
 interface Props {
   openInModal?: boolean;
@@ -310,7 +311,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     const result = await upsertApiRecord(uid, record, teamId);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
-      onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
+      onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
       trackRequestRenamed("breadcrumb");
       setRequestName("");
 
@@ -325,17 +326,16 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
-      data: { ...sanitizeEntry(entry, false) },
+      data: { ...sanitizeEntry(entry) },
     };
 
     if (apiEntryDetails?.id) {
       record.id = apiEntryDetails?.id;
     }
-
     const result = await upsertApiRecord(uid, record, teamId);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
-      onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
+      onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
       setEntry({ ...result.data.data });
 
       trackRequestSaved("api_client_view");
@@ -350,6 +350,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const cancelRequest = useCallback(() => {
     abortControllerRef.current?.abort();
     trackAPIRequestCancelled();
+  }, []);
+
+  const handleAuthChange = useCallback((authOptions: RQAPI.AuthOptions) => {
+    setEntry((prevEntry) => {
+      const updatedEntry = { ...prevEntry };
+      updatedEntry.auth = authOptions;
+      return updatedEntry;
+    });
   }, []);
 
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
@@ -438,6 +446,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               requestEntry={entry}
               setRequestEntry={setRequestEntry}
               setContentType={setContentType}
+              handleAuthChange={handleAuthChange}
             />
           </Skeleton>
         </div>
