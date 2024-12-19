@@ -42,7 +42,13 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       switch (action) {
         case "add":
           if (pair) keyValuePairs.push(pair);
-          break;
+          return {
+            ...prev,
+            request: {
+              ...prev.request,
+              [pairTypeToUpdate]: [...keyValuePairs],
+            },
+          };
         case "update":
           if (pair) {
             const index = keyValuePairs.findIndex((item: KeyValuePair) => item.id === pair.id);
@@ -53,8 +59,15 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
               });
             }
             setTableData(() => [...keyValuePairs]);
+            return {
+              ...prev,
+              request: {
+                ...prev.request,
+                [pairTypeToUpdate]: [...keyValuePairs],
+              },
+            };
           }
-          break;
+          return { ...prev };
         case "delete":
           return {
             ...prev,
@@ -64,7 +77,6 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
             },
           };
       }
-      return { ...prev, request: updatedRequest };
     },
     []
   );
