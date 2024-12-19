@@ -60,6 +60,7 @@ const Editor: React.FC<EditorProps> = ({
   const allEditorToast = useSelector(getAllEditorToast);
   const toastOverlay = useMemo(() => allEditorToast[id], [allEditorToast, id]); // todo: rename
   const [isCodePrettified, setIsCodePrettified] = useState(defaultPrettified);
+  const isDefaultPrettificationDone = useRef(false);
 
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
@@ -122,16 +123,21 @@ const Editor: React.FC<EditorProps> = ({
     if (!value?.length) {
       setEditorContent(defaultValue);
     } else {
-      if (isCodePrettified && (language === EditorLanguage.JSON || language == EditorLanguage.JAVASCRIPT)) {
-        const prettifiedCode = prettifyCode(value, language);
-        setEditorContent(prettifiedCode.code);
-        handleChange(value);
-      } else {
-        setEditorContent(value);
-      }
+      setEditorContent(value);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultValue, value, language, handleChange, isCodePrettified]);
+  }, [defaultValue]);
+
+  useEffect(() => {
+    if (!isDefaultPrettificationDone.current) {
+      if (defaultPrettified && (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT)) {
+        const prettifiedCode = prettifyCode(value, language);
+        setEditorContent(prettifiedCode.code);
+        handleChange(prettifiedCode.code);
+        isDefaultPrettificationDone.current = true;
+      }
+    }
+  }, [defaultPrettified, language]);
 
   const handleEditorClose = useCallback(
     (id: string) => {

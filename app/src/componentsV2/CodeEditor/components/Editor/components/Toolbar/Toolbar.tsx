@@ -38,7 +38,6 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
   setIsCodePrettified,
 }) => {
   const theme = useTheme();
-  //const [isCodePrettified, setIsCodePrettified] = useState(true);
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCodeFormatting = () => {
