@@ -50,4 +50,34 @@
   .ant-table-footer {
     background: var(--requestly-color-background);
   }
+
+  &.auto-generated-values {
+    margin-bottom: -1rem;
+    border-bottom: 0;
+    border-radius: 4px 4px 0 0;
+    .ant-table-footer {
+      display: none;
+    }
+    tr {
+      height: 41px;
+      &:last-child {
+        td.ant-table-cell {
+          border-bottom: none !important;
+        }
+      }
+      td.ant-table-cell {
+        padding: 4px 24px !important;
+        color: rgba(255, 255, 255, 0.5) !important;
+      }
+    }
+  }
+
+  &.pairs-with-auto-generated-values {
+    border-radius: 0 0 4px 4px;
+    border-top: 0;
+
+    tr {
+      border-radius: 0 !important;
+    }
+  }
 }
