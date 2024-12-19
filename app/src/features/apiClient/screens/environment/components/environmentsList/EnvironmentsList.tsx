@@ -15,6 +15,7 @@ import { EnvironmentAnalyticsSource } from "../../types";
 import { EnvironmentsListItem } from "./components/environmentsListItem/EnvironmentsListItem";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./environmentsList.scss";
+import { isGlobalEnvironment } from "../../utils";
 
 export const EnvironmentsList = () => {
   const dispatch = useDispatch();
@@ -133,14 +134,14 @@ export const EnvironmentsList = () => {
             ) : (
               <>
                 {filteredEnvironments
-                  .filter((env) => env.isGlobal)
+                  .filter((env) => isGlobalEnvironment(env.id))
                   .map((environment) =>
                     environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
                       <EnvironmentsListItem openTab={openTab} environment={environment} />
                     ) : null
                   )}
                 {filteredEnvironments
-                  .filter((env) => !env.isGlobal)
+                  .filter((env) => !isGlobalEnvironment(env.id))
                   .map((environment) =>
                     environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
                       <EnvironmentsListItem openTab={openTab} environment={environment} />

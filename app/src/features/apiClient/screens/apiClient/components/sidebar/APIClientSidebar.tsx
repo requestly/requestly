@@ -13,6 +13,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal } from "../modals";
 import "./apiClientSidebar.scss";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 
 interface Props {}
 
@@ -28,15 +29,17 @@ const APIClientSidebar: React.FC<Props> = () => {
   const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
 
-  const { addNewEnvironment, getAllEnvironments } = useEnvironmentManager();
+  const { addNewEnvironment, getAllEnvironments, isEnvironmentsDataLoaded } = useEnvironmentManager();
   const environments = getAllEnvironments();
-  const isGlobalEnvironmentExists = useMemo(() => environments.some((env) => env.isGlobal), [environments]);
+  const isGlobalEnvironmentExists = useMemo(() => environments.some((env) => isGlobalEnvironment(env.id)), [
+    environments,
+  ]);
 
   useEffect(() => {
-    if (!isGlobalEnvironmentExists) {
+    if (!isGlobalEnvironmentExists && isEnvironmentsDataLoaded) {
       addNewEnvironment("Global variables", true);
     }
-  }, [addNewEnvironment, isGlobalEnvironmentExists]);
+  }, [addNewEnvironment, isGlobalEnvironmentExists, isEnvironmentsDataLoaded]);
 
   const {
     history,
