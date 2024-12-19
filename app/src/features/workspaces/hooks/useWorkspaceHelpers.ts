@@ -4,10 +4,17 @@ import { trackWorkspaceSwitched } from "modules/analytics/events/common/teams";
 import { variablesActions } from "store/features/variables/slice";
 import { LocalStorageService } from "services/localStorageService";
 import { getAppMode } from "store/selectors";
+import { getPersonalWorkspaceId } from "../utils";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 export const useWorkspaceHelpers = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
+  const userId = useSelector(getUserAuthDetails)?.details?.profile?.uid;
+
+  const switchToPersonalWorkspace = async () => {
+    return switchWorkspace(getPersonalWorkspaceId(userId));
+  };
 
   const switchWorkspace = async (workspaceId: string, source?: string) => {
     // // TODO-Syncing: 1. Offload things that needs to be saved
@@ -24,5 +31,5 @@ export const useWorkspaceHelpers = () => {
     return workspaceManager.initActiveWorkspaces([workspaceId]);
   };
 
-  return { switchWorkspace };
+  return { switchWorkspace, switchToPersonalWorkspace };
 };

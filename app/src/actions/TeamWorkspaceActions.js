@@ -125,6 +125,6 @@ export const switchWorkspace = async (
     window.activeWorkspaceBroadcastChannel.postMessage("active_workspace_changed");
 };
 
-export const clearCurrentlyActiveWorkspace = async (dispatch, appMode) => {
-  await switchWorkspace({ teamId: null, teamName: null, teamMembersCount: null }, dispatch, null, appMode);
-};
+// export const clearCurrentlyActiveWorkspace = async (dispatch, appMode) => {
+//   await switchWorkspace({ teamId: null, teamName: null, teamMembersCount: null }, dispatch, null, appMode);
+// };

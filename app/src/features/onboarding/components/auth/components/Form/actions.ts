@@ -21,7 +21,7 @@ import { getAuthErrorMessage, AuthTypes } from "components/authentication/utils"
 import posthog from "posthog-js";
 import { StorageService } from "init";
 import { isLocalStoragePresent } from "utils/AppUtils";
-import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
+// import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 
 const showError = (err: string) => {
   toast.error(err, 3);
@@ -186,7 +186,9 @@ export const handleLogoutButtonOnClick = async (appMode: string, isWorkspaceMode
     }
 
     if (isWorkspaceMode) {
-      clearCurrentlyActiveWorkspace(dispatch, appMode);
+      // TODO-syncing: Switch to personal workspace. But this needs a react component to call it
+      // switchToPersonalWorkspace()
+      // clearCurrentlyActiveWorkspace(dispatch, appMode);
     } else if (window.uid && window.isSyncEnabled) {
       StorageService(appMode).clearDB();
     }
