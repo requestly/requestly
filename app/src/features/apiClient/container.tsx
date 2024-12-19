@@ -7,7 +7,7 @@ import "./container.scss";
 
 const ApiClientFeatureContainer: React.FC = () => {
   return (
-    <TabsLayoutContainer>
+    <TabsLayoutContainer id="apiClient">
       <ApiClientProvider>
         <div className="api-client-container">
           <APIClientSidebar />
