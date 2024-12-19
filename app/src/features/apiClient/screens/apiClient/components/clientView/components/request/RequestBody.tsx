@@ -18,6 +18,10 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
   const [jsonBody, setJsonBody] = useState(RequestContentType.JSON === contentType ? body : "");
   const [formBody, setFormBody] = useState(RequestContentType.FORM === contentType ? body : []);
 
+  /*
+  when switching between RAW,JSON & Form , setContentype reinitalizes the request body as an empty string, array
+  useEffect synchronizes the request body with the parent (setRequestEntry) whenever contentType is changed.
+  */
   useEffect(() => {
     let updatedBody: string | KeyValuePair[];
 
