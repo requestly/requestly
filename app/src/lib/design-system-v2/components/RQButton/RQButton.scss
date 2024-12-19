@@ -156,7 +156,6 @@
     border: none;
     background: transparent;
     color: var(--requestly-color-text-default, #fff);
-
     &:hover {
       background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
     }
@@ -197,4 +196,19 @@
       border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
     }
   }
+}
+
+.rq-custom-btn.ant-btn.source-filter-icon-container {
+  color: var(--requestly-color-primary-400);
+}
+.rq-custom-btn.ant-btn.source-filter-icon-container .badge-default {
+  display: none;
+}
+.rq-custom-btn.ant-btn.source-filter-icon-container .badge-active {
+  color: var(--requestly-color-text-default);
+  background-color: var(--requestly-color-primary-400);
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 2px 6px;
+  line-height: 16px;
 }

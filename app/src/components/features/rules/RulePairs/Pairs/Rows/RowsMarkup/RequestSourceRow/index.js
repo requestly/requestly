@@ -375,7 +375,9 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
                 >
                   Filters
                   {getFilterCount(pairIndex) !== 0 ? (
-                    <Badge style={{ color: "#465967", backgroundColor: "#E5EAEF" }}>{getFilterCount(pairIndex)}</Badge>
+                    <Badge className={getFilterCount(pairIndex) !== 0 ? "badge-active" : "badge-default"}>
+                      {getFilterCount(pairIndex)}
+                    </Badge>
                   ) : null}
                 </RQButton>
               </Tooltip>
