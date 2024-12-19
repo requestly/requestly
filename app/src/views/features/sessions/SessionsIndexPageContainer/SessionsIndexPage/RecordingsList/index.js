@@ -12,7 +12,7 @@ import { getPrettyVisibilityName, renderHeroIcon } from "../../../ShareRecording
 import { deleteRecording } from "../../../api";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { UserIcon } from "components/common/UserIcon";
+import { UserAvatar } from "componentsV2/UserAvatar";
 import Favicon from "components/misc/Favicon";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -119,7 +119,7 @@ const RecordingsList = ({
         dataIndex: "createdBy",
         textAlign: "center",
         render: (creatorUserID) => {
-          return <UserIcon uid={creatorUserID} />;
+          return <UserAvatar uid={creatorUserID} />;
         },
       },
       {

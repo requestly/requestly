@@ -12,6 +12,7 @@ import PATHS from "config/constants/sub/paths";
 import { trackEnvironmentSwitched } from "features/apiClient/screens/environment/analytics";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./environmentSwitcher.scss";
+import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 
 export const EnvironmentSwitcher = () => {
   const navigate = useNavigate();
@@ -22,33 +23,35 @@ export const EnvironmentSwitcher = () => {
   const { openTab } = useTabsLayoutContext();
 
   const dropdownItems = useMemo(() => {
-    return environments.map((environment) => ({
-      key: environment.id,
-      label: (
-        <div className={`${environment.id === currentEnvironmentId ? "active-env-item" : ""} env-item`}>
-          <Typography.Text
-            ellipsis={{
-              tooltip: {
-                title: environment.name,
-                placement: "right",
-              },
-            }}
-          >
-            {environment.name}
-          </Typography.Text>{" "}
-          {environment.id === currentEnvironmentId ? <MdOutlineCheckCircleOutline /> : null}
-        </div>
-      ),
-      onClick: () => {
-        setCurrentEnvironment(environment.id);
-        if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
-          openTab(environment.id, { title: environment.name });
-          trackEnvironmentSwitched(environments.length);
-          redirectToEnvironment(navigate, environment.id);
-        }
-        toast.success(`Switched to ${environment.name} environment`);
-      },
-    }));
+    return environments
+      .filter((env) => !isGlobalEnvironment(env.id))
+      .map((environment) => ({
+        key: environment.id,
+        label: (
+          <div className={`${environment.id === currentEnvironmentId ? "active-env-item" : ""} env-item`}>
+            <Typography.Text
+              ellipsis={{
+                tooltip: {
+                  title: environment.name,
+                  placement: "right",
+                },
+              }}
+            >
+              {environment.name}
+            </Typography.Text>{" "}
+            {environment.id === currentEnvironmentId ? <MdOutlineCheckCircleOutline /> : null}
+          </div>
+        ),
+        onClick: () => {
+          setCurrentEnvironment(environment.id);
+          if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
+            openTab(environment.id, { title: environment.name });
+            trackEnvironmentSwitched(environments.length);
+            redirectToEnvironment(navigate, environment.id);
+          }
+          toast.success(`Switched to ${environment.name} environment`);
+        },
+      }));
   }, [environments, setCurrentEnvironment, currentEnvironmentId, navigate, location.pathname, openTab]);
 
   if (environments.length === 0) {

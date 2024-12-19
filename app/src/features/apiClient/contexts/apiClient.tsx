@@ -185,6 +185,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         });
       } else {
         onNewRecord(apiClientRecord);
+        console.log("apiClientRecord v2", apiClientRecord);
         openTab(apiClientRecord.id, {
           title: apiClientRecord.name,
           url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?new`,
