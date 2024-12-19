@@ -42,6 +42,7 @@ import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { getCollectionVariables } from "store/features/variables/selectors";
 
 interface Props {
   openInModal?: boolean;
@@ -63,6 +64,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
+  const collectionVariables = useSelector(getCollectionVariables);
 
   const { toggleBottomSheet } = useBottomSheetContext();
   const { onSaveRecord } = useApiClientContext();
@@ -227,6 +229,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       appMode,
       sanitizedEntry,
       environmentManager,
+      collectionVariables[apiEntryDetails?.collectionId]?.variables || {},
       abortControllerRef.current.signal,
       apiEntryDetails?.collectionId
     )
@@ -290,6 +293,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     environmentManager,
     notifyApiRequestFinished,
     toggleBottomSheet,
+    collectionVariables,
   ]);
 
   const handleRecordNameUpdate = async () => {

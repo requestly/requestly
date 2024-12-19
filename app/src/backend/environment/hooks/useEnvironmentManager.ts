@@ -27,6 +27,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
+import { upsertApiRecord } from "backend/apiClient/upsertApiRecord";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -39,7 +40,7 @@ const useEnvironmentManager = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [isEnvironmentsDataLoaded, setIsEnvironmentsDataLoaded] = useState(false);
-  const { apiClientRecords } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -434,6 +435,47 @@ const useEnvironmentManager = () => {
     [ownerId, dispatch]
   );
 
+  const setCollectionVariables = useCallback(
+    async (variables: EnvironmentVariables, collectionId: string) => {
+      const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+
+      if (!collection) {
+        throw new Error("Collection not found");
+      }
+
+      const updatedVariables = Object.fromEntries(
+        Object.entries(variables).map(([key, value]) => {
+          const { localValue, ...rest } = value;
+          return [key, rest];
+        })
+      );
+      const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
+      return upsertApiRecord(user.details?.profile?.uid, record, currentlyActiveWorkspace?.id).then((result) => {
+        onSaveRecord(result.data);
+        dispatch(variablesActions.setCollectionVariables({ collectionId, variables }));
+      });
+    },
+    [currentlyActiveWorkspace?.id, user.details?.profile?.uid, onSaveRecord, dispatch, apiClientRecords]
+  );
+
+  const removeCollectionVariable = useCallback(
+    async (key: string, collectionId: string) => {
+      const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+
+      if (!collection) {
+        throw new Error("Collection not found");
+      }
+
+      const updatedVariables = { ...collection?.data?.variables };
+      delete updatedVariables[key];
+      const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
+      return upsertApiRecord(user.details?.profile?.uid, record, currentlyActiveWorkspace?.id).then((result) => {
+        onSaveRecord(result.data);
+      });
+    },
+    [currentlyActiveWorkspace?.id, user.details?.profile?.uid, onSaveRecord, apiClientRecords]
+  );
+
   return {
     setCurrentEnvironment,
     addNewEnvironment,
@@ -453,6 +495,8 @@ const useEnvironmentManager = () => {
     isEnvironmentsDataLoaded,
     isEnvironmentsLoading: isLoading,
     getGlobalVariables,
+    setCollectionVariables,
+    removeCollectionVariable,
   };
 };
 
