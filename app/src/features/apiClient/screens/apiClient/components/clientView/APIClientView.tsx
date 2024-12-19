@@ -238,9 +238,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       appMode,
       apiClientRecords,
       sanitizedEntry,
+      {
+        id: apiEntryDetails?.id,
+        collectionId: apiEntryDetails?.collectionId,
+      },
       environmentManager,
-      abortControllerRef.current.signal,
-      apiEntryDetails?.collectionId
+      abortControllerRef.current.signal
     )
       .then((entry) => {
         const response = entry.response;
@@ -296,6 +299,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
     apiClientRecords,
+    apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
     appMode,
     dispatch,
