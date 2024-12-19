@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { RQModal } from "lib/design-system/components";
 import deleteIcon from "../../../../../assets/delete.svg";
@@ -12,6 +11,8 @@ import { deleteApiRecords } from "backend/apiClient";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { trackCollectionDeleted } from "modules/analytics/events/features/apiClient";
 import "./deleteApiRecordModal.scss";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
@@ -23,8 +24,7 @@ interface DeleteApiRecordModalProps {
 export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open, record, onClose, onSuccess }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const { onDeleteRecords } = useApiClientContext();
 
   const [isDeleting, setIsDeleting] = useState(false);
@@ -50,7 +50,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
     setIsDeleting(true);
 
     const recordIds = collectAllRecordIds(record);
-    const result = await deleteApiRecords(uid, recordIds, teamId);
+    const result = await deleteApiRecords(uid, recordIds, activeWorkspaceId);
     onDeleteRecords(recordIds);
 
     if (result.success) {

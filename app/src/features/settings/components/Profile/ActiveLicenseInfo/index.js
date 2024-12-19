@@ -9,8 +9,9 @@ import { Row, Space } from "antd";
 import ManageSubscription from "./ManageSubscription/ManageSubscription";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import firebaseApp from "../../../../../firebase";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import Logger from "lib/logger";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 const ActiveLicenseInfo = ({
   hideShadow,
@@ -21,7 +22,7 @@ const ActiveLicenseInfo = ({
 }) => {
   //Global State
   const user = useSelector(getUserAuthDetails);
-  const teamId = useSelector(getCurrentlyActiveWorkspace)?.id;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const [isSessionReplayLifetimeActive, setIsSessionReplayLifetimeActive] = useState(false);
   const [lifeTimeSubscriptionDetails, setLifeTimeSubscriptionDetails] = useState({});
@@ -40,9 +41,9 @@ const ActiveLicenseInfo = ({
   }, []);
 
   useEffect(() => {
-    if (teamId) {
+    if (activeWorkspaceId) {
       const db = getFirestore(firebaseApp);
-      const teamsRef = doc(db, "teams", teamId);
+      const teamsRef = doc(db, "teams", activeWorkspaceId);
       getDoc(teamsRef)
         .then((docSnap) => {
           if (docSnap.exists()) {
@@ -73,7 +74,7 @@ const ActiveLicenseInfo = ({
           Logger.log("Error while fetching appsumo details for individual");
         });
     }
-  }, [teamId, getSubscriptionEndDateForAppsumo]);
+  }, [activeWorkspaceId, getSubscriptionEndDateForAppsumo]);
 
   const renderSubscriptionInfo = () => {
     if (isSessionReplayLifetimeActive && status === "trialing") return <></>;

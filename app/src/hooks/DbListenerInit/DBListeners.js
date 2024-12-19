@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace, getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
 import { getAppMode, getAuthInitialization } from "../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import availableTeamsListener from "./availableTeamsListener";
@@ -15,6 +15,8 @@ import { globalActions } from "store/slices/global/slice";
 import { isArray } from "lodash";
 import { useHasChanged } from "hooks/useHasChanged";
 import { userSubscriptionDocListener } from "./userSubscriptionDocListener";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 window.isFirstSyncComplete = false;
 
@@ -22,7 +24,7 @@ const DBListeners = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const currentTeamMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
   const hasAuthInitialized = useSelector(getAuthInitialization);
 
@@ -90,23 +92,23 @@ const DBListeners = () => {
 
   // Listens to teams available to the user
   // Also listens to changes to the currently active workspace /* TODO: THIS SHOULD BE DONE IN A SEPARATE USEEFFECT */
-  useEffect(() => {
-    if (unsubscribeAvailableTeams.current) unsubscribeAvailableTeams.current(); // Unsubscribe any existing listener
-    if (user?.loggedIn && user?.details?.profile?.uid) {
-      unsubscribeAvailableTeams.current = availableTeamsListener(
-        dispatch,
-        user?.details?.profile?.uid,
-        currentlyActiveWorkspace,
-        appMode
-      );
-    } else {
-      dispatch(teamsActions.setAvailableTeams(null));
-      // Very edge case
-      if (currentlyActiveWorkspace.id) {
-        clearCurrentlyActiveWorkspace(dispatch, appMode);
-      }
-    }
-  }, [appMode, currentlyActiveWorkspace, dispatch, user?.details?.profile?.uid, user?.loggedIn]);
+  // useEffect(() => {
+  //   if (unsubscribeAvailableTeams.current) unsubscribeAvailableTeams.current(); // Unsubscribe any existing listener
+  //   if (user?.loggedIn && user?.details?.profile?.uid) {
+  //     unsubscribeAvailableTeams.current = availableTeamsListener(
+  //       dispatch,
+  //       user?.details?.profile?.uid,
+  //       currentlyActiveWorkspace,
+  //       appMode
+  //     );
+  //   } else {
+  //     dispatch(teamsActions.setAvailableTeams(null));
+  //     // Very edge case
+  //     if (currentlyActiveWorkspace.id) {
+  //       clearCurrentlyActiveWorkspace(dispatch, appMode);
+  //     }
+  //   }
+  // }, [appMode, currentlyActiveWorkspace, dispatch, user?.details?.profile?.uid, user?.loggedIn]);
 
   /* Force refresh custom claims in auth token */
   useEffect(() => {
@@ -115,7 +117,7 @@ const DBListeners = () => {
       ?.then((status) => {
         Logger.log("force updated auth token");
       });
-  }, [user?.details?.profile?.uid, user?.loggedIn, currentlyActiveWorkspace, currentTeamMembers, dispatch]);
+  }, [user?.details?.profile?.uid, user?.loggedIn, activeWorkspaceId, currentTeamMembers, dispatch]);
 
   return null;
 };

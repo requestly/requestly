@@ -11,6 +11,7 @@ export interface Workspace {
       role: "write" | "admin";
     };
   };
+  membersCount?: number; // Old Field
   appsumo?: boolean;
   deleted?: boolean;
   createdAt?: number;

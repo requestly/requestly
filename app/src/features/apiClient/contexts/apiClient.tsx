@@ -1,6 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
 import { getApiRecords } from "backend/apiClient";
@@ -16,6 +15,8 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { trackCreateEnvironmentClicked } from "../screens/environment/analytics";
 import PATHS from "config/constants/sub/paths";
 import { useLocation } from "react-router-dom";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -82,8 +83,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const location = useLocation();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(false);
   const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
@@ -110,7 +110,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     }
 
     setIsLoadingApiClientRecords(true);
-    getApiRecords(uid, teamId)
+    getApiRecords(uid, activeWorkspaceId)
       .then((result) => {
         if (result.success) {
           setApiClientRecords(result.data);
@@ -123,7 +123,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       .finally(() => {
         setIsLoadingApiClientRecords(false);
       });
-  }, [uid, teamId]);
+  }, [uid, activeWorkspaceId]);
 
   const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
     setApiClientRecords((prev) => {

@@ -4,7 +4,6 @@ import { Input } from "antd";
 import { upsertApiRecord } from "backend/apiClient";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { toast } from "utils/Toast";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -18,6 +17,8 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 export interface NewRecordNameInputProps {
   recordToBeEdited?: RQAPI.Record;
@@ -36,8 +37,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const { onSaveRecord } = useApiClientContext();
   const { replaceTab, updateTab } = useTabsLayoutContext();
 
@@ -74,7 +74,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       record.collectionId = newRecordCollectionId;
     }
 
-    const result = await upsertApiRecord(uid, record, teamId);
+    const result = await upsertApiRecord(uid, record, activeWorkspaceId);
 
     if (result.success) {
       onSaveRecord(result.data);
@@ -109,7 +109,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     recordType,
     recordName,
     uid,
-    teamId,
+    activeWorkspaceId,
     onSaveRecord,
     defaultRecordName,
     analyticEventSource,
@@ -136,7 +136,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       name: recordName,
     };
 
-    const result = await upsertApiRecord(uid, record, teamId);
+    const result = await upsertApiRecord(uid, record, activeWorkspaceId);
 
     if (result.success) {
       onSaveRecord(result.data);
@@ -157,7 +157,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
     setIsLoading(false);
     onSuccess?.();
-  }, [recordType, recordToBeEdited, recordName, uid, teamId, onSaveRecord, onSuccess, updateTab]);
+  }, [recordType, recordToBeEdited, recordName, uid, activeWorkspaceId, onSaveRecord, onSuccess, updateTab]);
 
   const onBlur = isEditMode ? updateRecord : saveNewRecord;
 

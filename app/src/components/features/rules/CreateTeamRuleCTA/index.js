@@ -9,16 +9,17 @@ import ProCard from "@ant-design/pro-card";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import { useNavigate } from "react-router-dom";
 import { redirectToTeam } from "utils/RedirectionUtils";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import TeamSolvingPuzzleAnimation from "components/misc/LottieAnimation/TeamSolvingPuzzleAnimation";
 import { globalActions } from "store/slices/global/slice";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 const CreateTeamRuleCTA = () => {
   const navigate = useNavigate();
   //Global State
   const dispatch = useDispatch();
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   //Component State
   const [isNewRuleSelectorModalActive, setIsNewRuleSelectorModalActive] = useState(false);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
@@ -49,7 +50,7 @@ const CreateTeamRuleCTA = () => {
                   className="cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
-                    redirectToTeam(navigate, currentlyActiveWorkspace.id);
+                    redirectToTeam(navigate, activeWorkspaceId);
                   }}
                 >
                   here

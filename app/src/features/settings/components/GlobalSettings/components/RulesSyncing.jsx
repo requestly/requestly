@@ -4,19 +4,20 @@ import { globalActions } from "store/slices/global/slice";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 // import { setSyncState } from "utils/syncing/SlyncUtils";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import SettingsItem from "./SettingsItem";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 
 const RulesSyncing = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
   const [isSyncStatusChangeProcessing, setIsSyncStatusChangeProcessing] = useState(false);
-  const isWorkspaceMode = !!currentlyActiveWorkspace?.id;
   const isUserLoggedIn = !!(user?.loggedIn || user?.details || user?.details?.profile);
 
   const handleRulesSyncToggle = (status) => {
@@ -49,12 +50,12 @@ const RulesSyncing = () => {
 
   return (
     <SettingsItem
-      isActive={isUserLoggedIn && (isWorkspaceMode || (user?.details?.isSyncEnabled ?? false))}
+      isActive={isUserLoggedIn && (isSharedWorkspaceMode || (user?.details?.isSyncEnabled ?? false))}
       onChange={handleRulesSyncToggle}
-      disabled={isWorkspaceMode}
+      disabled={isSharedWorkspaceMode}
       loading={isSyncStatusChangeProcessing}
       title="Enable syncing"
-      toolTipTitle={isWorkspaceMode ? "Syncing is on" : ""}
+      toolTipTitle={isSharedWorkspaceMode ? "Syncing is on" : ""}
       caption="Always keep your rules in sync irrespective of the device you use."
     />
   );

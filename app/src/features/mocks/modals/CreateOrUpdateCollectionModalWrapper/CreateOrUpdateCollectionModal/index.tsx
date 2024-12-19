@@ -5,7 +5,6 @@ import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/type
 import { RQModal } from "lib/design-system/components";
 import { createCollection } from "backend/mocks/createCollection";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { updateCollections } from "backend/mocks/updateCollections";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { trackMockCollectionCreated, trackMockCollectionUpdated } from "modules/analytics/events/features/mocksV2";
@@ -13,6 +12,8 @@ import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { cleanupEndpoint, validateEndpoint } from "components/features/mocksV2/MockEditorIndex/utils";
 import { toast } from "utils/Toast";
 import "./createOrUpdateCollectionModal.scss";
+import { getActiveWorkspaceIds, getWorkspaceById } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 interface Props {
   id?: string;
@@ -39,8 +40,8 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspace = useSelector(getWorkspaceById(activeWorkspaceId));
 
   const [isLoading, setIsLoading] = useState(false);
   const [collectionName, setCollectionName] = useState("");
@@ -98,16 +99,17 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
           const mockIds = mocks?.map((mock) => mock.id);
 
           // TODO: Improve this as it will make one more call to update the collection id
-          await updateMocksCollection(uid, mockIds, id, collectionPath, teamId);
+          await updateMocksCollection(uid, mockIds, id, collectionPath, activeWorkspaceId);
         }
 
         await updateCollections(uid, collectionsData);
 
         trackMockCollectionUpdated(
           "mocksTable",
-          workspace?.id,
-          workspace?.name,
-          workspace?.membersCount,
+          activeWorkspace?.id,
+          activeWorkspace?.name,
+          // @ts-ignore
+          activeWorkspace?.membersCount,
           !!cleanedUpPath
         );
         toast.success("Collection updated!");
@@ -121,13 +123,14 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
           path: cleanedUpPath,
         };
 
-        await createCollection(uid, collectionsData, teamId);
+        await createCollection(uid, collectionsData, activeWorkspaceId);
 
         trackMockCollectionCreated(
           "mocksTable",
-          workspace?.id,
-          workspace?.name,
-          workspace?.membersCount,
+          activeWorkspace?.id,
+          activeWorkspace?.name,
+          // @ts-ignore
+          activeWorkspace?.membersCount,
           !!cleanedUpPath
         );
         toast.success("Collection created!");

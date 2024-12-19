@@ -21,11 +21,12 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { updateMock } from "backend/mocks/updateMock";
 import { createMock } from "backend/mocks/createMock";
 import { trackCreateMockEvent, trackUpdateMockEvent } from "modules/analytics/events/features/mocksV2";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 interface Props {
   isNew?: boolean;
@@ -52,8 +53,7 @@ const MockEditorIndex: React.FC<Props> = ({
   const userAttributes = useSelector(getUserAttributes);
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const [mockEditorData, setMockEditorData] = useState<MockEditorDataSchema>(null);
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
@@ -71,7 +71,7 @@ const MockEditorIndex: React.FC<Props> = ({
     }
 
     setIsMockLoading(true);
-    getMock(uid, mockId, teamId).then((data: any) => {
+    getMock(uid, mockId, activeWorkspaceId).then((data: any) => {
       if (data) {
         const editorData = mockDataToEditorDataAdapter(data);
         setMockEditorData(editorData);
@@ -83,7 +83,7 @@ const MockEditorIndex: React.FC<Props> = ({
 
       setIsMockLoading(false);
     });
-  }, [mockId, uid, teamId]);
+  }, [mockId, uid, activeWorkspaceId]);
 
   useEffect(() => {
     if (!mockEditorData?.collectionId) {
@@ -91,7 +91,7 @@ const MockEditorIndex: React.FC<Props> = ({
     }
 
     setIsMockCollectionLoading(true);
-    getMock(uid, mockEditorData.collectionId, teamId)
+    getMock(uid, mockEditorData.collectionId, activeWorkspaceId)
       .then((data: any) => {
         if (data) {
           setMockCollectionData(data);
@@ -100,14 +100,14 @@ const MockEditorIndex: React.FC<Props> = ({
       .finally(() => {
         setIsMockCollectionLoading(false);
       });
-  }, [mockEditorData?.collectionId, teamId, uid]);
+  }, [mockEditorData?.collectionId, activeWorkspaceId, uid]);
 
   const onMockSave = (data: MockEditorDataSchema) => {
     setSavingInProgress(true);
 
     const finalMockData = editorDataToMockDataConverter(data);
     if (isNew) {
-      return createMock(uid, { ...finalMockData, collectionId }, teamId, collectionId).then((mockId) => {
+      return createMock(uid, { ...finalMockData, collectionId }, activeWorkspaceId, collectionId).then((mockId) => {
         setSavingInProgress(false);
         if (mockId) {
           toast.success("Mock Created Successfully");
@@ -141,7 +141,7 @@ const MockEditorIndex: React.FC<Props> = ({
               endpoint: finalMockData.endpoint,
               uid: user?.details?.profile?.uid,
               username: null,
-              teamId: teamId,
+              teamId: activeWorkspaceId,
               password: data?.password,
             });
             selectOnSave(url);
@@ -156,7 +156,7 @@ const MockEditorIndex: React.FC<Props> = ({
       });
     }
 
-    updateMock(uid, mockId, finalMockData, teamId).then((success) => {
+    updateMock(uid, mockId, finalMockData, activeWorkspaceId).then((success) => {
       setSavingInProgress(false);
       if (success) {
         toast.success("Mock Updated Successfully");

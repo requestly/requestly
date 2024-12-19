@@ -12,7 +12,6 @@ import {
 import { updateMock } from "backend/mocks/updateMock";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import {
   trackMockImportClicked,
   trackMockStarToggledEvent,
@@ -25,6 +24,8 @@ import { toast } from "utils/Toast";
 import { isMock, isCollection } from "../screens/mocksList/components/MocksList/components/MocksTable/utils";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH } from "../constants";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
@@ -51,8 +52,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const {
     openCollectionModalAction,
@@ -115,13 +115,13 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
       toast.loading(isStarred ? `Unstarring ${recordType}...` : `Starring ${recordType}...`, 3);
 
-      updateMock(uid, record.id, { ...record, isFavourite: updatedValue }, teamId).then(() => {
+      updateMock(uid, record.id, { ...record, isFavourite: updatedValue }, activeWorkspaceId).then(() => {
         trackMockStarToggledEvent(record.id, record.type, record?.fileType, updatedValue, record.recordType);
         toast.success(isStarred ? `${recordType} unstarred!` : `${recordType} starred!`);
         onSuccess?.();
       });
     },
-    [teamId]
+    [activeWorkspaceId]
   );
 
   const uploadMockAction = useCallback(
@@ -160,12 +160,14 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
       Logger.log("[DEBUG]", "removeMocksFromCollectionAction", { records });
       const mockIds = records.filter(isMock).map((mock) => mock.id);
 
-      updateMocksCollection(uid, mockIds, DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH, teamId).then(() => {
-        toast.success(`${mockIds.length > 1 ? "Mocks" : "Mock"} removed from collection!`);
-        onSuccess?.();
-      });
+      updateMocksCollection(uid, mockIds, DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH, activeWorkspaceId).then(
+        () => {
+          toast.success(`${mockIds.length > 1 ? "Mocks" : "Mock"} removed from collection!`);
+          onSuccess?.();
+        }
+      );
     },
-    [uid, teamId]
+    [uid, activeWorkspaceId]
   );
 
   const exportMocksAction = useCallback(

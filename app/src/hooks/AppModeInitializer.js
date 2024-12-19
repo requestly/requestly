@@ -32,7 +32,6 @@ import { StorageService } from "init";
 import { getEventsEngineFlag, handleEventBatches } from "modules/analytics/events/extension";
 import PSMH from "../config/PageScriptMessageHandler";
 // import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { trackDesktopBGEvent, trackDesktopMainEvent } from "modules/analytics/events/desktopApp/backgroundEvents";
 import { useNavigate } from "react-router-dom";
@@ -55,7 +54,6 @@ const AppModeInitializer = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const { appsList, isBackgroundProcessActive, isProxyServerRunning } = useSelector(getDesktopSpecificDetails);
   const hasConnectedAppBefore = useSelector(getHasConnectedApp);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -351,7 +349,7 @@ const AppModeInitializer = () => {
       //   };
       // });
     }
-  }, [appMode, currentlyActiveWorkspace?.id, dispatch, user?.details?.isSyncEnabled, user?.details?.profile?.uid]);
+  }, [appMode, dispatch, user?.details?.isSyncEnabled, user?.details?.profile?.uid]);
 
   return null;
 };

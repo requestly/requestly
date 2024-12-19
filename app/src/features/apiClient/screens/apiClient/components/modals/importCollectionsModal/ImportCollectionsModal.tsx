@@ -11,7 +11,6 @@ import { getCurrentEnvironmentId } from "store/features/variables/selectors";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQAPI } from "features/apiClient/types";
 import { upsertApiRecord } from "backend/apiClient";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
 import {
@@ -21,6 +20,8 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
 import "./importCollectionsModal.scss";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 interface Props {
   isOpen: boolean;
@@ -30,7 +31,7 @@ interface Props {
 export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const user = useSelector(getUserAuthDetails);
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const { setVariables, getCurrentEnvironmentVariables, getAllEnvironments } = useEnvironmentManager();
   const { onSaveRecord } = useApiClientContext();
 
@@ -112,7 +113,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
       apiRecordsToImport.collections.forEach((collection: RQAPI.CollectionRecord) => {
         const collectionToImport = { ...collection, name: `(Imported) ${collection.name}` };
         delete collectionToImport.id;
-        const promise = upsertApiRecord(user?.details?.profile?.uid, collectionToImport, workspace?.id)
+        const promise = upsertApiRecord(user?.details?.profile?.uid, collectionToImport, activeWorkspaceId)
           .then((newCollection) => {
             onSaveRecord(newCollection.data);
             return {
@@ -145,7 +146,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
         }
 
         const updatedApi = { ...apiToImport, collectionId: newCollectionId };
-        const promise = upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id)
+        const promise = upsertApiRecord(user.details?.profile?.uid, updatedApi, activeWorkspaceId)
           .then((newApi) => {
             onSaveRecord(newApi.data);
           })
@@ -163,7 +164,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
       trackImportApiCollectionsFailed(apiRecordsToImport?.count, Object.keys(variablesToImport || {}).length);
       throw error;
     }
-  }, [apiRecordsToImport, onSaveRecord, user.details?.profile?.uid, workspace?.id, apiRecordsToImport?.count]);
+  }, [apiRecordsToImport, onSaveRecord, user.details?.profile?.uid, activeWorkspaceId, apiRecordsToImport?.count]);
 
   const handleImport = useCallback(async () => {
     trackImportApiCollectionsStarted(apiRecordsToImport?.count, Object.keys(variablesToImport || {}).length);

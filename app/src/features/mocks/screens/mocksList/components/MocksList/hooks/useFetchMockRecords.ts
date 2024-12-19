@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getMocks } from "backend/mocks/getMocks";
 import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 export const useFetchMockRecords = (type: MockType, forceRender: boolean) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [mockRecords, setMockRecords] = useState<RQMockMetadataSchema[]>([]);
@@ -58,7 +59,7 @@ export const useFetchMockRecords = (type: MockType, forceRender: boolean) => {
   useEffect(() => {
     const fetchMocks = () => {
       // API|FILE|null
-      getMocks(uid, type, workspace?.id)
+      getMocks(uid, type, activeWorkspaceId)
         .then((data) => {
           setMockRecords([...data]);
           setIsLoading(false);
@@ -70,7 +71,7 @@ export const useFetchMockRecords = (type: MockType, forceRender: boolean) => {
     };
 
     fetchMocks();
-  }, [uid, type, workspace?.id, forceRender]);
+  }, [uid, type, activeWorkspaceId, forceRender]);
 
   return { mockRecords, isLoading };
 };
