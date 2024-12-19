@@ -16,6 +16,9 @@ export const mockServerRoutes: RouteObject[] = [
       //  MOCKS V2
       {
         index: true,
+        element: <Navigate to={PATHS.MOCK_SERVER_V2.RELATIVE} />,
+      },
+      {
         path: PATHS.MOCK_SERVER_V2.RELATIVE,
         element: <MocksListScreen type={MockType.API} />,
       },
