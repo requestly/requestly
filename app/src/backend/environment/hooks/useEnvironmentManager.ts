@@ -67,12 +67,13 @@ const useEnvironmentManager = () => {
         throw new Error("Global environment already exists");
       }
       const docId = isGlobal ? "global" : undefined;
-      return upsertEnvironmentInDB(ownerId, newEnvironmentName, isGlobal, docId)
+      return upsertEnvironmentInDB(ownerId, newEnvironmentName, docId)
         .then(({ id, name }) => {
           dispatch(variablesActions.addNewEnvironment({ id, name }));
           return {
             id,
             name,
+            isGlobal,
           };
         })
         .catch((err) => {
@@ -149,6 +150,36 @@ const useEnvironmentManager = () => {
     // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentEnvironmentId, dispatch, ownerId]);
+
+  useEffect(() => {
+    if (ownerId && globalEnvironmentData?.id) {
+      unsubscribeGlobalVariablesListener?.();
+      unsubscribeGlobalVariablesListener = attachEnvironmentVariableListener(
+        ownerId,
+        globalEnvironmentData.id,
+        (environmentData) => {
+          const mergedVariables = mergeLocalAndSyncVariables(
+            allEnvironmentData[environmentData.id]?.variables ?? {},
+            environmentData.variables
+          );
+          dispatch(
+            variablesActions.updateEnvironmentData({
+              newVariables: mergedVariables,
+              environmentId: environmentData.id,
+              environmentName: environmentData.name,
+            })
+          );
+        }
+      );
+    }
+
+    return () => {
+      unsubscribeGlobalVariablesListener?.();
+    };
+
+    // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalEnvironmentData?.id, dispatch, ownerId]);
 
   useEffect(() => {
     if (ownerId && globalEnvironmentData?.id) {
@@ -337,6 +368,10 @@ const useEnvironmentManager = () => {
     return allEnvironmentData[currentEnvironmentId]?.variables ?? {};
   }, [allEnvironmentData, currentEnvironmentId]);
 
+  const getGlobalVariables = useCallback(() => {
+    return allEnvironmentData[globalEnvironmentData?.id]?.variables ?? {};
+  }, [allEnvironmentData, globalEnvironmentData?.id]);
+
   const getAllEnvironments = useCallback(() => {
     return Object.keys(allEnvironmentData).map((key) => {
       return {
@@ -417,6 +452,7 @@ const useEnvironmentManager = () => {
     getVariablesWithPrecedence,
     isEnvironmentsDataLoaded,
     isEnvironmentsLoading: isLoading,
+    getGlobalVariables,
   };
 };
 

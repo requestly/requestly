@@ -16,20 +16,23 @@ export const executeAPIRequest = async (
 ): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
   // Process request configuration with environment variables
   const renderedRequestDetails = environmentManager.renderVariables(entry.request, requestCollectionId);
-  let currentEnvironmentVariables = renderedRequestDetails.variables;
+  let currentEnvironmentVariables = environmentManager.getCurrentEnvironmentVariables();
   let renderedRequest = renderedRequestDetails.renderedTemplate;
   let response: RQAPI.Response | null = null;
+  let globalEnvironmentVariables = environmentManager.getGlobalVariables();
 
   try {
     if (entry.scripts.preRequest) {
-      const { updatedVariables } = await executePrerequestScript(
+      const { updatedEnvironmentVariables, updatedGlobalVariables } = await executePrerequestScript(
         entry.scripts.preRequest,
         renderedRequest,
         environmentManager,
-        currentEnvironmentVariables
+        currentEnvironmentVariables,
+        globalEnvironmentVariables
       );
 
-      currentEnvironmentVariables = updatedVariables;
+      currentEnvironmentVariables = updatedEnvironmentVariables;
+      globalEnvironmentVariables = updatedGlobalVariables;
       // TODO@nafees87n: Fix this while refactoring, rendering should always get fresh variables
       // Temporarily passing current variables
       renderedRequest = renderTemplate(entry.request, currentEnvironmentVariables);
@@ -76,7 +79,8 @@ export const executeAPIRequest = async (
         entry.scripts.postResponse,
         { response, request: renderedRequest },
         environmentManager,
-        currentEnvironmentVariables
+        currentEnvironmentVariables,
+        globalEnvironmentVariables
       );
     } catch (error) {
       console.error("Post Response script error", error);
