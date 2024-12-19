@@ -8,6 +8,8 @@ import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEdi
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
+import AuthorizationView from "../AuthorizationView";
+import { AUTHORIZATION_TYPES } from "../AuthorizationView/types";
 
 enum Tab {
   QUERY_PARAMS = "query_params",
@@ -17,7 +19,7 @@ enum Tab {
   SCRIPTS = "scripts",
 }
 
-const LabelWithCount: React.FC<{ label: string; count: number; showDot?: boolean }> = ({ label, count, showDot }) => {
+const LabelWithCount: React.FC<{ label: string; count?: number; showDot?: boolean }> = ({ label, count, showDot }) => {
   return (
     <div className="request-tab-label">
       <span>{label}</span>
@@ -31,9 +33,16 @@ interface Props {
   collectionId: string;
   setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
+  handleAuthChange: (authOptions: RQAPI.AuthOptions) => void;
 }
 
-const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEntry, setContentType }) => {
+const RequestTabs: React.FC<Props> = ({
+  requestEntry,
+  collectionId,
+  setRequestEntry,
+  setContentType,
+  handleAuthChange,
+}) => {
   const [selectedTab, setSelectedTab] = useState(Tab.QUERY_PARAMS);
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
@@ -92,11 +101,11 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, collectionId, setRequestEn
           />
         ),
       },
-      // {
-      //   key: Tab.AUTHORIZATION,
-      //   label: "Authorization",
-      //   children: <div></div>,
-      // },
+      {
+        key: Tab.AUTHORIZATION,
+        label: <LabelWithCount label="Authorization" />,
+        children: <AuthorizationView defaultValues={requestEntry.auth} onAuthUpdate={handleAuthChange} />,
+      },
     ];
 
     if (isScriptsSupported) {
