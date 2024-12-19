@@ -22,12 +22,7 @@ const getDocPath = (ownerId: string, environmentId: string) => {
   return doc(db, "environments", ownerId, "environments", environmentId);
 };
 
-export const upsertEnvironmentInDB = async (
-  ownerId: string,
-  environmentName: string,
-  isGlobal?: boolean,
-  docId?: string
-) => {
+export const upsertEnvironmentInDB = async (ownerId: string, environmentName: string, docId?: string) => {
   if (docId) {
     const docRef = doc(db, "environments", ownerId, "environments", docId);
     return setDoc(docRef, {

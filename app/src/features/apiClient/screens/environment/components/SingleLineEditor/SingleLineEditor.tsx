@@ -81,6 +81,19 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placeholder, variables]);
 
+  // Commenting out for now, breaking the the editors cursor position
+  // useEffect(() => {
+  //   if (editorViewRef.current && defaultValue !== undefined) {
+  //     editorViewRef.current.dispatch({
+  //       changes: {
+  //         from: 0,
+  //         to: editorViewRef.current.state.doc.length,
+  //         insert: defaultValue,
+  //       },
+  //     });
+  //   }
+  // }, [defaultValue]);
+
   return (
     <>
       <div
