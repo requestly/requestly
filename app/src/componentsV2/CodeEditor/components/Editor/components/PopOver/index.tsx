@@ -10,7 +10,7 @@ interface EditorPopoverProps {
   variables: Record<string, any>;
 }
 
-export const EditorPopOver: React.FC<EditorPopoverProps> = ({
+export const EditorPopover: React.FC<EditorPopoverProps> = ({
   hoveredVariable,
   editorRef,
   popupPosition,
@@ -41,10 +41,8 @@ export const EditorPopOver: React.FC<EditorPopoverProps> = ({
       <div
         style={{
           position: "absolute",
-          // @ts-ignore
-          top: popupPosition?.y - editorRef.current?.editor.getBoundingClientRect().top + 10,
-          // @ts-ignore
-          left: popupPosition?.x - editorRef.current?.editor.getBoundingClientRect().left + 10,
+          top: popupPosition?.y - editorRef.current?.getBoundingClientRect().top + 10,
+          left: popupPosition?.x - editorRef.current?.getBoundingClientRect().left + 10,
           zIndex: 1000,
         }}
         className="variable-info-div"

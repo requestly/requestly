@@ -20,7 +20,7 @@ import PATHS from "config/constants/sub/paths";
 import { trackCodeEditorCollapsedClick, trackCodeEditorExpandedClick } from "../analytics";
 import { EnvironmentVariables } from "backend/environment/types";
 import { highlightVariablesPlugin } from "features/apiClient/screens/environment/components/SingleLineEditor/plugins/highlightVariables";
-import { EditorPopOver } from "./components/PopOver";
+import { EditorPopover } from "./components/Popover";
 import "./editor.scss";
 import "./components/PopOver/popover.scss";
 interface EditorProps {
@@ -54,7 +54,7 @@ const Editor: React.FC<EditorProps> = ({
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
-  const editorRef = useRef(null);
+  const editorRef = useRef<HTMLDivElement | null>(null);
   const [editorHeight, setEditorHeight] = useState(height);
   const [editorContent, setEditorContent] = useState(value);
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -132,6 +132,7 @@ const Editor: React.FC<EditorProps> = ({
 
   const handleEditorClose = useCallback(
     (id: string) => {
+      // @ts-expect-error
       dispatch(globalActions.removeToastForEditor({ id }));
     },
     [dispatch]
@@ -246,7 +247,11 @@ const Editor: React.FC<EditorProps> = ({
             />
           )}
           <CodeMirror
-            ref={editorRef}
+            ref={(instance) => {
+              if (instance) {
+                editorRef.current = instance.editor;
+              }
+            }}
             className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""}`}
             width="100%"
             readOnly={isReadOnly}
@@ -278,13 +283,9 @@ const Editor: React.FC<EditorProps> = ({
             data-gramm="false"
           >
             {envVariables && (
-              <div
-                ref={editorRef}
-                className="editor-popup-container ant-input"
-                onMouseLeave={() => setHoveredVariable(null)}
-              >
+              <div className="editor-popup-container ant-input" onMouseLeave={() => setHoveredVariable(null)}>
                 {hoveredVariable && (
-                  <EditorPopOver
+                  <EditorPopover
                     editorRef={editorRef}
                     hoveredVariable={hoveredVariable}
                     popupPosition={popupPosition}

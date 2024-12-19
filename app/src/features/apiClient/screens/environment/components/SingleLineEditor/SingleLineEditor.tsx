@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useState } from "react";
 import { EditorView, placeholder as cmPlaceHolder } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
-import "./SingleLineEditor.scss";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
-import { SingleLineEditorPopover } from "./SingleLineEditorPopover";
+import { EditorPopover } from "componentsV2/CodeEditor/components/Editor/components/Popover";
+import "componentsV2/CodeEditor/components/Editor/components/Popover/popover.scss";
 
 interface RQSingleLineEditorProps {
   defaultValue?: string;
@@ -85,11 +85,11 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
     <>
       <div
         ref={editorRef}
-        className={`${className ?? ""} single-line-editor-container ant-input`}
+        className={`${className ?? ""} editor-popup-container ant-input`}
         onMouseLeave={() => setHoveredVariable(null)}
       >
         {hoveredVariable && (
-          <SingleLineEditorPopover
+          <EditorPopover
             editorRef={editorRef}
             hoveredVariable={hoveredVariable}
             popupPosition={popupPosition}
