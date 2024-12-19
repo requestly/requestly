@@ -1,20 +1,7 @@
 import { CaseReducer, PayloadAction } from "@reduxjs/toolkit";
 import { TabsLayout } from "layouts/TabsLayout";
-
-export type TabsLayoutState = Record<
-  string,
-  {
-    tabs: TabsLayout.Tab[];
-    activeTab: TabsLayout.Tab | null;
-  }
->;
-
-export const initialState: TabsLayoutState = {
-  apiClient: {
-    tabs: [],
-    activeTab: null,
-  },
-};
+import { initialState } from "./initialState";
+import { TabsLayoutState } from "./types";
 
 export const resetState = () => initialState;
 
