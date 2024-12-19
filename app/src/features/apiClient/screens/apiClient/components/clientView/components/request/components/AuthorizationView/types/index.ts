@@ -1,4 +1,5 @@
 export enum AUTHORIZATION_TYPES {
+  INHERIT = "INHERIT",
   NO_AUTH = "NO_AUTH",
   API_KEY = "API_KEY",
   BEARER_TOKEN = "BEARER_TOKEN",
@@ -50,11 +51,12 @@ export interface AuthDescriptionData {
 }
 
 export type AuthStaticData = Record<
-  Exclude<AUTHORIZATION_TYPES, AUTHORIZATION_TYPES.NO_AUTH>,
+  Exclude<AUTHORIZATION_TYPES, [AUTHORIZATION_TYPES.NO_AUTH, AUTHORIZATION_TYPES.INHERIT]>,
   {
     formData: AuthFormField[];
     description: AuthDescriptionData;
   }
 > & {
+  [AUTHORIZATION_TYPES.INHERIT]: null;
   [AUTHORIZATION_TYPES.NO_AUTH]: null;
 };
