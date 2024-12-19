@@ -9,13 +9,23 @@ import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient
 import { isEmpty } from "lodash";
 import { processAuthOptions, updateRequestWithAuthOptions } from "../auth";
 
+// import { AUTHORIZATION_TYPES } from "../../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 export const executeAPIRequest = async (
   appMode: string,
+  apiRecords: RQAPI.Record[],
   entry: RQAPI.Entry,
   environmentManager: any,
   signal?: AbortSignal,
   requestCollectionId?: string
 ): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
+  // // get updated entry based on auth details
+  // const updatedEntry = updateAuthOptions(
+  //   apiRecords,
+  //   requestCollectionId,
+  //   entry,
+  //   entry.auth?.currentAuthType ?? AUTHORIZATION_TYPES.NO_AUTH
+  // ) as RQAPI.Entry;
+
   // Process request configuration with environment variables
 
   const updatedEntry = JSON.parse(JSON.stringify(entry)); //Deep Copy

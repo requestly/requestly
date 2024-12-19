@@ -69,13 +69,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const teamId = workspace?.id;
 
   const { toggleBottomSheet } = useBottomSheetContext();
-  const { onSaveRecord } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const { getVariablesWithPrecedence } = environmentManager;
-  const currentEnvironmentVariables = useMemo(
-    () => getVariablesWithPrecedence(apiEntryDetails?.collectionId),
-    [apiEntryDetails?.collectionId, getVariablesWithPrecedence]
-  );
+  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
+    apiEntryDetails?.collectionId,
+    getVariablesWithPrecedence,
+  ]);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>({ ...(apiEntry ?? getEmptyAPIEntry()) });
@@ -236,6 +236,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     executeAPIRequest(
       appMode,
+      apiClientRecords,
       sanitizedEntry,
       environmentManager,
       abortControllerRef.current.signal,
@@ -294,6 +295,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
+    apiClientRecords,
     apiEntryDetails?.collectionId,
     appMode,
     dispatch,
