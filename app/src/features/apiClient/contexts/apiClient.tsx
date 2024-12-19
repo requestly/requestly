@@ -100,7 +100,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
 
-  const { openTab, closeTab, updateTab } = useTabsLayoutContext();
+  const { openTab, closeTab, updateTab, replaceTab } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
 
   useEffect(() => {
@@ -180,7 +180,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
       if (isRecordExist) {
         onUpdateRecord(apiClientRecord);
-        updateTab(apiClientRecord.id, {
+        replaceTab(apiClientRecord.id, {
           title: apiClientRecord.name,
           url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}`,
         });
@@ -193,7 +193,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         });
       }
     },
-    [apiClientRecords, onUpdateRecord, onNewRecord, openTab, updateTab]
+    [apiClientRecords, onUpdateRecord, onNewRecord, openTab, replaceTab]
   );
 
   const updateRecordToBeDeleted = useCallback((record: RQAPI.Record) => {
