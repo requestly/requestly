@@ -22,19 +22,19 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
   when switching between RAW,JSON & Form , setContentype reinitalizes the request body as an empty string, array
   useEffect synchronizes the request body with the parent (setRequestEntry) whenever request body is saved & contentType is changed.
   */
-  // useEffect(() => {
-  //   let updatedBody: string | KeyValuePair[];
+  useEffect(() => {
+    let updatedBody: string | KeyValuePair[];
 
-  //   if (contentType === RequestContentType.RAW) {
-  //     updatedBody = rawBody;
-  //   } else if (contentType === RequestContentType.JSON) {
-  //     updatedBody = jsonBody;
-  //   } else if (contentType === RequestContentType.FORM) {
-  //     updatedBody = formBody;
-  //   }
+    if (contentType === RequestContentType.RAW) {
+      updatedBody = rawBody;
+    } else if (contentType === RequestContentType.JSON) {
+      updatedBody = jsonBody;
+    } else if (contentType === RequestContentType.FORM) {
+      updatedBody = formBody;
+    }
 
-  //   setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: updatedBody } }));
-  // }, [contentType, rawBody, jsonBody, formBody, setRequestEntry]);
+    setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: updatedBody } }));
+  }, [contentType, rawBody, jsonBody, formBody, setRequestEntry]);
 
   const handleRawChange = useCallback(
     (value: string) => {
