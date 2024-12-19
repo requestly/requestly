@@ -52,6 +52,7 @@ const App: React.FC = () => {
   useAppUpdateChecker();
   useFetchIncentivizationDetails();
 
+  // FIXME-syncing: Move to AppModeProvider after refractoring. Everything triggered by appMode should be there
   useClientStorageService();
   useWorkspaceManager();
 
