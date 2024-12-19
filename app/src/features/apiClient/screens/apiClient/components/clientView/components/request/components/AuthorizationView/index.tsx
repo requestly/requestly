@@ -60,7 +60,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => 
             onChange={(value) => {
               setSelectedForm(value);
               if (value === AUTHORIZATION_TYPES.NO_AUTH) {
-                onAuthUpdate(value);
+                onAuthUpdate({ currentAuthType: value });
               }
             }}
             options={AUTHORIZATION_TYPES_META}
@@ -69,7 +69,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => 
             <div
               className="clear-icon"
               onClick={() => {
-                onAuthUpdate(AUTHORIZATION_TYPES.NO_AUTH);
+                onAuthUpdate({ currentAuthType: AUTHORIZATION_TYPES.NO_AUTH });
                 setSelectedForm(AUTHORIZATION_TYPES.NO_AUTH);
               }}
             >
