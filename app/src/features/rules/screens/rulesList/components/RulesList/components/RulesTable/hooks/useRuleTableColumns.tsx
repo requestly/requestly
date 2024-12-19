@@ -6,7 +6,7 @@ import { RuleTableRecord } from "../types";
 import { getAllRecordsMap } from "store/features/rules/selectors";
 import { Group, RecordStatus, Rule } from "features/rules/types/rules";
 import RuleTypeTag from "components/common/RuleTypeTag";
-import { UserIcon } from "components/common/UserIcon";
+import { UserAvatar } from "componentsV2/UserAvatar";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { MdOutlineShare } from "@react-icons/all-files/md/MdOutlineShare";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
@@ -242,7 +242,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         if (currentlyActiveWorkspace?.id && !options?.hideLastModifiedBy) {
           return (
             <span className="rule-updated-on-cell">
-              {beautifiedDate} <UserIcon uid={record.lastModifiedBy} />
+              {beautifiedDate} <UserAvatar uid={record.lastModifiedBy} />
             </span>
           );
         } else return <span className="rule-updated-on-cell">{beautifiedDate}</span>;
@@ -429,7 +429,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           return null;
         }
         const uid = record.createdBy ?? null;
-        return currentlyActiveWorkspace?.id ? <UserIcon uid={uid} /> : null;
+        return currentlyActiveWorkspace?.id ? <UserAvatar uid={uid} /> : null;
       },
     });
   }

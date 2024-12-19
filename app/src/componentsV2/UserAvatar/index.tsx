@@ -7,7 +7,7 @@ interface UserIconProps {
   uid?: string;
 }
 
-export const UserIcon = ({ uid }: UserIconProps) => {
+export const UserAvatar = ({ uid }: UserIconProps) => {
   const currentlyActiveWorkspaceMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
 
   if (uid && currentlyActiveWorkspaceMembers[uid])
@@ -18,10 +18,17 @@ export const UserIcon = ({ uid }: UserIconProps) => {
         </Tooltip>
       </>
     );
-  else
+  else if (uid) {
+    return (
+      <Tooltip title={`uid=${uid}`}>
+        <Avatar size={22} icon={<UserOutlined />} />
+      </Tooltip>
+    );
+  } else {
     return (
       <Tooltip title="Anonymous">
         <Avatar size={22} icon={<UserOutlined />} />
       </Tooltip>
     );
+  }
 };
