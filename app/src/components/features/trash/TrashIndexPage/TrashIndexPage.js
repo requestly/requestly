@@ -15,13 +15,15 @@ import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationM
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import TeamFeatureComingSoon from "components/landing/TeamFeatureComingSoon";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 const TrashIndexPage = () => {
   //Global State
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
   const trashLimit = 30; // days
   //Component State
   const [loadingRecords, setLoadingRecords] = useState(true);
@@ -75,7 +77,7 @@ const TrashIndexPage = () => {
     return <InstallExtensionCTA eventPage="trash_page" />;
   }
 
-  if (isWorkspaceMode) return <TeamFeatureComingSoon title="Trash" />;
+  if (isSharedWorkspaceMode) return <TeamFeatureComingSoon title="Trash" />;
 
   return loadingRecords ? (
     <SpinnerCard customLoadingMessage="Loading deleted rules" />

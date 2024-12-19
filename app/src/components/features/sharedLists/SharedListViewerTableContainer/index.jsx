@@ -27,13 +27,14 @@ import { trackTemplateImportCompleted } from "modules/analytics/events/features/
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getSharedListIdFromURL } from "features/rules/screens/sharedLists";
 import { globalActions } from "store/slices/global/slice";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { snakeCase } from "lodash";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 
 // no longer used, should be cleaned up!
 const SharedListViewerTableContainer = ({ id, rules, groups }) => {
@@ -47,7 +48,10 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
   //Global State
   const appMode = useSelector(getAppMode);
   const allRules = useSelector(getAllRules);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+
   const user = useSelector(getUserAuthDetails);
   const isTemplate = queryParams.get("template") === "true" ? true : false;
 
@@ -110,7 +114,7 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
       return;
     }
 
-    if (isWorkspaceMode) {
+    if (isSharedWorkspaceMode) {
       const message =
         "Do you really want to import this shared list to current workspace? It will be available for every team member.";
       if (!window.confirm(message) === true) {

@@ -16,13 +16,14 @@ import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/c
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { parseGravatarImage } from "utils/Misc";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import { RQButton } from "lib/design-system/components";
 import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationExperiment";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -30,7 +31,8 @@ export default function HeaderUser() {
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
   const appMode = useSelector(getAppMode);
 
   const userName = user.loggedIn ? user?.details?.profile?.displayName ?? "User" : null;
@@ -86,7 +88,7 @@ export default function HeaderUser() {
         label: "Sign out",
         onClick: () => {
           setLoading(true);
-          handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch)
+          handleLogoutButtonOnClick(appMode, isSharedWorkspaceMode, dispatch)
             .then(() => {
               dispatch(
                 globalActions.updateHardRefreshPendingStatus({
@@ -100,7 +102,7 @@ export default function HeaderUser() {
         },
       },
     ],
-    [appMode, dispatch, isWorkspaceMode, navigate, userEmail, userPhoto, userName, appFlavour]
+    [appMode, dispatch, isSharedWorkspaceMode, navigate, userEmail, userPhoto, userName, appFlavour]
   );
 
   if (loading) {

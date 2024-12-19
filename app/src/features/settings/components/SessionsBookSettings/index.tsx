@@ -17,10 +17,11 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import Logger from "lib/logger";
 import { StorageService } from "init";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./sessionsSettings.css";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 const emptyPageSourceData: SessionRecordingPageSource = {
   value: "",
@@ -46,7 +47,9 @@ export const defaultSessionRecordingConfig: SessionRecordingConfig = {
 
 export const SessionsSettings: React.FC = () => {
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+
   const [config, setConfig] = useState<SessionRecordingConfig>({});
   const [showNewPageSource, setShowNewPageSource] = useState<boolean>(false);
   const { autoRecording } = config;
@@ -131,10 +134,10 @@ export const SessionsSettings: React.FC = () => {
   }, [appMode]);
 
   useEffect(() => {
-    if (!isWorkspaceMode) {
+    if (!isSharedWorkspaceMode) {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_ENABLED, config?.pageSources?.length > 0);
     }
-  }, [config?.pageSources?.length, isWorkspaceMode]);
+  }, [config?.pageSources?.length, isSharedWorkspaceMode]);
 
   const handleAutoRecordingToggle = useCallback(
     (status: boolean) => {

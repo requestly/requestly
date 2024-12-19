@@ -7,8 +7,9 @@ import { globalActions } from "store/slices/global/slice";
 import "./index.css";
 import APP_CONSTANTS from "config/constants";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 interface Props {
   inviteId: string;
@@ -19,11 +20,12 @@ interface Props {
 
 const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Props) => {
   const dispatch = useDispatch();
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
   const appMode = useSelector(getAppMode);
 
   const openAuthModal = () => {
-    handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch).then(() => {
+    handleLogoutButtonOnClick(appMode, isSharedWorkspaceMode, dispatch).then(() => {
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "authModal",
