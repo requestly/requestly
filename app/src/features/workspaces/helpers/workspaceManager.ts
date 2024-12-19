@@ -5,12 +5,12 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { Workspace } from "../types";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { RuleStorageModel, syncEngine } from "requestly-sync-engine";
-import { LocalStorageService } from "services/localStorageService";
 import { getActiveWorkspaceId, hasAccessToWorkspace } from "../utils";
 import { globalActions } from "store/slices/global/slice";
-import { StorageService } from "init";
 
 import PSMH from "../../../config/PageScriptMessageHandler";
+import { clientStorageService } from "services/clientStorageService";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 class WorkspaceManager {
   initInProgress = false;
@@ -50,7 +50,7 @@ class WorkspaceManager {
 
     //#region - Extension Storage backup -> reset -> reinit
     // TODO-syncing: Take backups of extensions storage changes before clearing
-    const storageDump = await LocalStorageService(this.appMode).getStorageSuperObject();
+    const storageDump = await clientStorageService.getStorageSuperObject();
     const rulesAndGroupsObject: Record<string, any> = {};
     let refreshToken = "";
     if (storageDump) {
@@ -70,10 +70,10 @@ class WorkspaceManager {
     }
 
     console.log("[WorkspaceManager.initActiveWorkspaces] Clearing Extension Storage");
-    StorageService(this.appMode).clearDB();
+    clientStorageService.clearStorage();
 
     console.log("[WorkspaceManager.initActiveWorkspaces] Reinit Extension Storage");
-    StorageService(this.appMode).saveRecord({
+    clientStorageService.saveStorageObject({
       [GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN]: refreshToken,
     });
     //#endregion
@@ -136,12 +136,12 @@ class WorkspaceManager {
 
     RuleStorageModel.registerOnUpdateHook((models: RuleStorageModel[]) => {
       console.log("[workspaceManager] onUpdateHook Custom");
-      LocalStorageService(this.appMode).saveMultipleRulesOrGroups(models.map((model) => model.data));
+      clientRuleStorageService.saveMultipleRulesOrGroups(models.map((model) => model.data));
     });
 
     RuleStorageModel.registerOnDeleteHook((models: RuleStorageModel[]) => {
       console.log("[workspaceManager] onDeleteHook Custom", { models });
-      LocalStorageService(this.appMode).deleteMultipleRulesOrGroups(models.map((model) => model.data));
+      clientRuleStorageService.deleteMultipleRulesOrGroups(models.map((model) => model.data));
     });
     //#endregion
 

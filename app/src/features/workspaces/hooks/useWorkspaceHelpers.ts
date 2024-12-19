@@ -2,14 +2,12 @@ import { workspaceManager } from "../helpers/workspaceManager";
 import { useDispatch, useSelector } from "react-redux";
 import { trackWorkspaceSwitched } from "modules/analytics/events/common/teams";
 import { variablesActions } from "store/features/variables/slice";
-import { LocalStorageService } from "services/localStorageService";
-import { getAppMode } from "store/selectors";
 import { getPersonalWorkspaceId } from "../utils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 export const useWorkspaceHelpers = () => {
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
   const userId = useSelector(getUserAuthDetails)?.details?.profile?.uid;
 
   const switchToPersonalWorkspace = async () => {
@@ -27,7 +25,7 @@ export const useWorkspaceHelpers = () => {
     trackWorkspaceSwitched(source);
     console.log("[useWorkspaceHelpers.switchWorkspace]", { workspaceId });
     dispatch(variablesActions.resetState());
-    await LocalStorageService(appMode).resetRulesAndGroups();
+    await clientRuleStorageService.resetRulesAndGroups();
     return workspaceManager.initActiveWorkspaces([workspaceId]);
   };
 
