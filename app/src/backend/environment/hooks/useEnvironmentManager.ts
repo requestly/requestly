@@ -8,7 +8,7 @@ import {
 } from "store/features/variables/selectors";
 import { variablesActions } from "store/features/variables/slice";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
+import { mergeLocalAndSyncVariables, parseVariableValues, renderTemplate } from "../utils";
 import {
   attachEnvironmentVariableListener,
   removeEnvironmentVariableFromDB,
@@ -316,12 +316,11 @@ const useEnvironmentManager = () => {
   const renderVariables = useCallback(
     (template: string | Record<string, any>, requestCollectionId: string = "") => {
       const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
-      const renderedTemplate = renderTemplate(template, variablesWithPrecedence);
 
-      return {
-        renderedTemplate,
-        variables: variablesWithPrecedence,
-      };
+      const parsedVariables = parseVariableValues(variablesWithPrecedence);
+      const renderedTemplate = renderTemplate(template, parsedVariables);
+
+      return renderedTemplate;
     },
     [getVariablesWithPrecedence]
   );
