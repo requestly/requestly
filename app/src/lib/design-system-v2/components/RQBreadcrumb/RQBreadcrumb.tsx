@@ -11,6 +11,7 @@ interface Props {
   recordName?: string;
   placeholder?: string;
   onRecordNameUpdate?: (updatedRecordName: string) => void;
+  autoFocus?: boolean;
 }
 
 interface MatchedRoute {
@@ -33,6 +34,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
   recordName,
   placeholder,
   onRecordNameUpdate,
+  autoFocus = false,
 }) => {
   const [name, setName] = useState(recordName || "");
   const [isEditRecord, setIsEditRecord] = useState(false);
@@ -41,6 +43,12 @@ export const RQBreadcrumb: React.FC<Props> = ({
   useEffect(() => {
     setName(recordName);
   }, [recordName]);
+
+  useEffect(() => {
+    if (autoFocus) {
+      setIsEditRecord(true);
+    }
+  }, [autoFocus]);
 
   const breadcrumbs: ({
     pathname: MatchedRoute["pathname"];
@@ -56,7 +64,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
     }
 
     setName(updatedValue);
-    onRecordNameUpdate(updatedValue);
+    onRecordNameUpdate?.(updatedValue);
   };
 
   const handleOnBlur = () => {

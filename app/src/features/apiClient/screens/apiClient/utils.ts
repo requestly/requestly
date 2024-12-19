@@ -5,6 +5,7 @@ import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../ty
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
+import { upsertApiRecord } from "backend/apiClient";
 
 export const makeRequest = async (
   appMode: string,
@@ -185,3 +186,30 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 };
 
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
+
+export const createBlankApiRecord = (
+  uid: string,
+  teamId: string,
+  recordType: RQAPI.RecordType,
+  collectionId: string
+) => {
+  const newRecord: Partial<RQAPI.Record> = {};
+
+  if (recordType === RQAPI.RecordType.API) {
+    newRecord.name = "Untitled request";
+    newRecord.type = RQAPI.RecordType.API;
+    newRecord.data = getEmptyAPIEntry();
+    newRecord.deleted = false;
+    newRecord.collectionId = collectionId;
+  }
+
+  if (recordType === RQAPI.RecordType.COLLECTION) {
+    newRecord.name = "New collection";
+    newRecord.type = RQAPI.RecordType.COLLECTION;
+    newRecord.data = { variables: {} };
+    newRecord.deleted = false;
+    newRecord.collectionId = collectionId;
+  }
+
+  return upsertApiRecord(uid, newRecord, teamId);
+};
