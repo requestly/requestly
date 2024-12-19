@@ -42,7 +42,6 @@ import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
-import { AUTHORIZATION_TYPES } from "./components/request/components/AuthorizationView/types";
 
 interface Props {
   openInModal?: boolean;
