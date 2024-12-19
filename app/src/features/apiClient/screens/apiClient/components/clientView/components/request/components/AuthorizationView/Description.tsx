@@ -34,7 +34,7 @@ const Description: React.FC<DescriptionProps> = ({ data, wrapperClass = "" }) =>
       {!isEmpty(steps) && <ul>{renderSteps(steps)}</ul>}
       {note && <p className="note">{note}</p>}
       {externalLink && (
-        <a href={externalLink} className="link-text">
+        <a href={externalLink} target="__blank" className="link-text">
           <BiLinkExternal size={"12px"} />
           <span>{LABEL_TEXT.LEARN_MORE}</span>
         </a>
