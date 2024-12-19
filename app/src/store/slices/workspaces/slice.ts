@@ -7,6 +7,7 @@ export interface WorkspaceSliceState {
   allWorkspaces?: EntityState<Workspace>;
   isWorkspacesFetched?: boolean;
   activeWorkspaceIds?: string[];
+  activeWorkspacesMembers?: Record<string, any>;
 }
 
 export const workspacesEntityAdapter = createEntityAdapter<Workspace>({
@@ -20,6 +21,7 @@ const initialState: WorkspaceSliceState = {
   allWorkspaces: workspacesEntityAdapter.getInitialState(),
   isWorkspacesFetched: false,
   activeWorkspaceIds: [],
+  activeWorkspacesMembers: {},
 };
 
 const slice = createSlice({
@@ -40,6 +42,22 @@ const slice = createSlice({
     },
     removeActiveWorkspaceId: (state: WorkspaceSliceState, action: PayloadAction<string>) => {
       state.activeWorkspaceIds = state.activeWorkspaceIds?.filter((id) => id !== action.payload);
+    },
+
+    setActiveWorkspacesMembers: (
+      state: WorkspaceSliceState,
+      action: PayloadAction<WorkspaceSliceState["activeWorkspacesMembers"]>
+    ) => {
+      state.activeWorkspacesMembers = action.payload;
+    },
+    updateActiveWorkspacesMembers: (
+      state: WorkspaceSliceState,
+      action: PayloadAction<WorkspaceSliceState["activeWorkspacesMembers"]>
+    ) => {
+      state.activeWorkspacesMembers = {
+        ...state.activeWorkspacesMembers,
+        ...action.payload,
+      };
     },
   },
 });

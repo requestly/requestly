@@ -8,6 +8,7 @@ import { getAppMode } from "store/selectors";
 import { LOGGED_OUT_WORKSPACE_ID } from "../utils";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { globalActions } from "store/slices/global/slice";
+import { useActiveWorkspacesMembersListener } from "./useActiveWorkspacesMembersListener";
 
 export const useWorkspaceManager = () => {
   const dispatch = useDispatch();
@@ -28,6 +29,7 @@ export const useWorkspaceManager = () => {
   const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
 
   useAvailableWorkspacesListener();
+  useActiveWorkspacesMembersListener();
 
   useEffect(() => {
     console.log("[useWorkspaceManager] workspaceManager updater", { workspaces, userId, appMode });
