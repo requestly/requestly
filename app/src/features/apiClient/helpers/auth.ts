@@ -7,7 +7,7 @@ export const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
   const headers: KeyValuePair[] = [];
   const queryParams: KeyValuePair[] = [];
 
-  const { currentAuthType = "" } = authOptions;
+  const { currentAuthType = "" } = authOptions || {};
 
   let newKeyValuePair: KeyValuePair;
 

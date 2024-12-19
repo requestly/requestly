@@ -8,11 +8,13 @@ import { KeyValueFormType, KeyValuePair, RQAPI } from "features/apiClient/types"
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { isArray } from "lodash";
 import { EnvironmentVariables } from "backend/environment/types";
+import { AUTH_ENTRY_IDENTIFIER } from "../AuthorizationView/types";
 import "./keyValueTable.scss";
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
 
 interface KeyValueTableProps {
+  wrapperClass?: string;
   data: KeyValuePair[];
   pairType: KeyValueFormType;
   variables: EnvironmentVariables;
@@ -21,7 +23,13 @@ interface KeyValueTableProps {
 
 // TODO: REFACTOR TYPES
 
-export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValuePairs, pairType, variables }) => {
+export const KeyValueTable: React.FC<KeyValueTableProps> = ({
+  wrapperClass,
+  data,
+  setKeyValuePairs,
+  pairType,
+  variables,
+}) => {
   const [tableData, setTableData] = useState<KeyValuePair[]>(data);
 
   const handleUpdateRequestPairs = useCallback(
@@ -108,7 +116,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
-          editable: true,
+          editable: record.type !== AUTH_ENTRY_IDENTIFIER,
           dataIndex: "isEnabled",
           title: "isEnabled",
           pairType,
@@ -123,7 +131,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
-          editable: true,
+          editable: record.type !== AUTH_ENTRY_IDENTIFIER,
           dataIndex: "key",
           title: "key",
           pairType,
@@ -137,7 +145,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
-          editable: true,
+          editable: record.type !== AUTH_ENTRY_IDENTIFIER,
           dataIndex: "value",
           title: "value",
           pairType,
@@ -149,7 +157,10 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
         title: "",
         width: "50px",
         render: (_: any, record: KeyValuePair) => {
-          if (record.key === "" && record.value === "" && tableData.length === 1) {
+          if (
+            (record.key === "" && record.value === "" && tableData.length === 1) ||
+            record.type === AUTH_ENTRY_IDENTIFIER
+          ) {
             return null;
           }
 
@@ -170,7 +181,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
   return (
     <ContentListTable
       id="api-key-value-table"
-      className="api-key-value-table"
+      className={`api-key-value-table ${wrapperClass}`}
       bordered
       showHeader={false}
       rowKey="id"
