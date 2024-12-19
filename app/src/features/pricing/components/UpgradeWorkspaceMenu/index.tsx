@@ -7,7 +7,6 @@ import { RQButton } from "lib/design-system/components";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { getIsMiscTourCompleted } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 import APP_CONSTANTS from "config/constants";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
@@ -15,6 +14,8 @@ import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/const
 import { globalActions } from "store/slices/global/slice";
 import { trackPricingWorkspaceSwitched } from "features/pricing/analytics";
 import "./index.scss";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceIds, getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface MenuProps {
   workspaceToUpgrade: { name: string; id: string; accessCount: number };
@@ -38,17 +39,19 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const availableTeams = useSelector(getAvailableTeams);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
+  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
+  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
+
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
 
   const filteredAvailableTeams = useMemo(() => {
     return (
-      availableTeams?.filter(
+      availableWorkspaces?.filter(
         (team: any) => !team?.archived && team.members?.[user?.details?.profile?.uid]?.role === "admin"
       ) ?? []
     );
-  }, [availableTeams, user?.details?.profile?.uid]);
+  }, [availableWorkspaces, user?.details?.profile?.uid]);
 
   const populateWorkspaceDetails = useCallback(
     (workspaceId: string) => {
@@ -59,14 +62,14 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
 
   useEffect(() => {
     if (
-      currentlyActiveWorkspace?.id &&
-      filteredAvailableTeams.some((availableTeam: any) => availableTeam.id === currentlyActiveWorkspace?.id)
+      activeWorkspaceId &&
+      filteredAvailableTeams.some((availableTeam: any) => availableTeam.id === activeWorkspaceId)
     ) {
-      setWorkspaceToUpgrade(populateWorkspaceDetails(currentlyActiveWorkspace?.id));
+      setWorkspaceToUpgrade(populateWorkspaceDetails(activeWorkspaceId));
     } else {
       setWorkspaceToUpgrade(APP_CONSTANTS.TEAM_WORKSPACES.PRIVATE_WORKSPACE);
     }
-  }, [currentlyActiveWorkspace?.id, populateWorkspaceDetails, setWorkspaceToUpgrade, filteredAvailableTeams]);
+  }, [activeWorkspaceId, populateWorkspaceDetails, setWorkspaceToUpgrade, filteredAvailableTeams]);
 
   const workspaceMenuItems = {
     items: [

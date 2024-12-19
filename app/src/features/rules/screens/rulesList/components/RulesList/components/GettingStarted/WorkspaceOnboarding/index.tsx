@@ -8,7 +8,6 @@ import {
   getUserPersonaSurveyDetails,
 } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { FullPageHeader } from "components/common/FullPageHeader";
 import { AuthFormHero } from "components/authentication/AuthForm/AuthFormHero";
@@ -35,6 +34,7 @@ import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/misc/onbo
 import { trackNewTeamCreateSuccess, trackWorkspaceOnboardingViewed } from "modules/analytics/events/features/teams";
 import { capitalize } from "lodash";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface OnboardingProps {
   isOpen: boolean;
@@ -46,7 +46,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const currentTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const step = useSelector(getWorkspaceOnboardingStep);
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -160,12 +160,12 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
 
   useEffect(() => {
     if (user?.loggedIn && step === OnboardingSteps.AUTH) {
-      if (currentTeams?.length) dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
+      if (availableWorkspaces?.length) dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
       else if (isNewUserFromEmailLinkSignIn)
         dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
       else dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
     }
-  }, [dispatch, user?.loggedIn, currentTeams?.length, step, isNewUserFromEmailLinkSignIn]);
+  }, [dispatch, user?.loggedIn, availableWorkspaces?.length, step, isNewUserFromEmailLinkSignIn]);
 
   useEffect(() => {
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {

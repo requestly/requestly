@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { toast } from "utils/Toast.js";
 import { Row, Col, Checkbox, Typography } from "antd";
-import { getAvailableTeams, getCurrentlyActiveWorkspace, getUserTeamRole } from "store/features/teams/selectors";
+import { getUserTeamRole } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import isEmail from "validator/lib/isEmail";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -23,6 +23,8 @@ import "./AddMemberModal.css";
 import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "backend/billing";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { TeamRole } from "types";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceIds, getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
@@ -48,13 +50,17 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   const isLoggedInUserAdmin = userTeamRole === TeamRole.admin;
   const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
 
-  const availableTeams = useSelector(getAvailableTeams);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const { id: activeWorkspaceId } = currentlyActiveWorkspace;
+  const availableWorkspaces = useSelector(getAllWorkspaces);
+  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
+  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
+
   const teamId = useMemo(() => currentTeamId ?? activeWorkspaceId, [activeWorkspaceId, currentTeamId]);
   const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
 
-  const teamDetails = useMemo(() => availableTeams?.find((team) => team.id === teamId), [availableTeams, teamId]);
+  const teamDetails = useMemo(() => availableWorkspaces?.find((team) => team.id === teamId), [
+    availableWorkspaces,
+    teamId,
+  ]);
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);

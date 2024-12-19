@@ -8,7 +8,6 @@ import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { getPendingInvites } from "backend/workspace";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
 import { OnboardingLoader } from "../loader";
@@ -17,6 +16,8 @@ import { trackAppOnboardingTeamsViewed, trackAppOnboardingViewed } from "feature
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import "./index.scss";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { Workspace } from "features/workspaces/types";
 
 interface WorkspaceOnboardingViewProps {
   isOpen: boolean;
@@ -28,11 +29,11 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
   const user = useSelector(getUserAuthDetails);
   const [pendingInvites, setPendingInvites] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const isTeamExist = useMemo(() => {
-    const ownedTeams = availableTeams?.filter((team: { owner: string }) => team?.owner === user?.details?.profile?.uid);
+    const ownedTeams = availableWorkspaces?.filter((team: Workspace) => team?.owner === user?.details?.profile?.uid);
     return !!ownedTeams?.length;
-  }, [availableTeams, user?.details?.profile?.uid]);
+  }, [availableWorkspaces, user?.details?.profile?.uid]);
 
   const { switchWorkspace } = useWorkspaceHelpers();
 

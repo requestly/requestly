@@ -2,17 +2,17 @@ import React from "react";
 import CreateFirstTeam from "./CreateFirstTeam";
 import TeamsList from "./TeamsList";
 import { useSelector } from "react-redux";
-import { getAvailableTeams } from "store/features/teams/selectors";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 const ManageTeams = () => {
   // Global State
-  const teams = useSelector(getAvailableTeams);
+  const workspaces = useSelector(getAllWorkspaces);
 
   return (
     <>
       <div>
-        {teams && teams.length > 0 ? (
-          <TeamsList teams={teams} />
+        {workspaces && workspaces.length > 0 ? (
+          <TeamsList teams={workspaces} />
         ) : (
           <>
             <CreateFirstTeam />

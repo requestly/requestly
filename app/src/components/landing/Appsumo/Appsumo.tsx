@@ -17,10 +17,11 @@ import { useDebounce } from "hooks/useDebounce";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import { globalActions } from "store/slices/global/slice";
 import "./index.scss";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { Workspace } from "features/workspaces/types";
 
 interface AppSumoCode {
   error: string;
@@ -37,11 +38,11 @@ const DEFAULT_APPSUMO_INPUT: AppSumoCode = {
 const AppSumoModal: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
   const [emailValidationError, setEmailValidationError] = useState(null);
-  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE);
+  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState<Workspace>(APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE);
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdatingSubscription, setIsUpdatingSubscription] = useState(false);
   const [showMaxCodesExeceededError, setShowMaxCodesExeceededError] = useState(false);
@@ -219,11 +220,11 @@ const AppSumoModal: React.FC = () => {
   };
 
   useEffect(() => {
-    const appsumoWorkspace = availableTeams?.find((team: any) => team?.appsumo);
+    const appsumoWorkspace = availableWorkspaces?.find((team: Workspace) => team?.appsumo);
     if (appsumoWorkspace) {
       setWorkspaceToUpgrade(appsumoWorkspace);
     }
-  }, [availableTeams]);
+  }, [availableWorkspaces]);
 
   useEffect(() => {
     dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
