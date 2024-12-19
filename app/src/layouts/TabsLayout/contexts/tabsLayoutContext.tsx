@@ -1,6 +1,8 @@
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { TabsLayout, TabsLayoutContextInterface } from "../types";
+import { useDispatch, useSelector } from "react-redux";
+import { getActiveTab, getTabs, tabsLayoutActions } from "store/slices/tabs-layout";
 
 const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
   tabs: [],
@@ -13,24 +15,33 @@ const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
 });
 
 interface TabsLayoutProviderProps {
+  id: string;
   children: React.ReactElement;
 }
 
-export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children }) => {
+export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children, id }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const tabs = useSelector(getTabs(id));
+  const activeTab = useSelector(getActiveTab(id));
 
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
 
-  const [tabs, setTabs] = useState<TabsLayout.Tab[]>([]); // TODO: Persist saved tabs
-  const [activeTab, setActiveTab] = useState<TabsLayout.Tab>();
+  useEffect(() => {
+    if (!activeTab) {
+      return;
+    }
+    delete tabOutletElementsMap.current[activeTab.id];
+    navigate(activeTab.url);
+  }, [navigate, activeTab]);
 
   const updateActivetab = useCallback(
     (tab: TabsLayout.Tab) => {
       navigate(tab.url);
-      setActiveTab((prev) => ({ ...(prev ?? {}), ...tab }));
+      dispatch(tabsLayoutActions.setActiveTab({ featureId: id, tab }));
     },
-    [navigate]
+    [navigate, dispatch, id]
   );
 
   const closeTab = useCallback(
@@ -45,7 +56,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
       const targetTab = copiedTabs[targetTabIndex];
       const updatedTabs = copiedTabs.filter((tab) => tab.id !== tabId);
 
-      setTabs(updatedTabs);
+      dispatch(tabsLayoutActions.setTabs({ featureId: id, tabs: updatedTabs }));
 
       if (updatedTabs.length && targetTab.id === activeTab?.id) {
         const nextActiveTab = updatedTabs[targetTabIndex === updatedTabs.length ? targetTabIndex - 1 : targetTabIndex];
@@ -54,7 +65,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
 
       delete tabOutletElementsMap.current[tabId];
     },
-    [tabs, activeTab?.id, updateActivetab]
+    [tabs, activeTab?.id, updateActivetab, dispatch, id]
   );
 
   const openTab = useCallback(
@@ -67,6 +78,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
       }
 
       const newTabDetails = {
+        title: "Untitled",
         ...(tabDetails ?? {}),
         id: tabId,
         isSaved: false,
@@ -74,15 +86,18 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
         timeStamp: Date.now(),
       } as TabsLayout.Tab;
 
-      setTabs((prev) => [...prev, newTabDetails]);
+      dispatch(tabsLayoutActions.addTab({ featureId: id, tab: newTabDetails }));
       updateActivetab(newTabDetails);
     },
-    [tabs, updateActivetab]
+    [tabs, updateActivetab, dispatch, id]
   );
 
-  const updateTab = useCallback((tabId: TabsLayout.Tab["id"], updatedTabData?: Partial<TabsLayout.Tab>) => {
-    setTabs((prev) => prev.map((tab) => (tab.id === tabId ? { ...tab, ...updatedTabData, id: tabId } : tab)));
-  }, []);
+  const updateTab = useCallback(
+    (tabId: TabsLayout.Tab["id"], updatedTabData?: Partial<TabsLayout.Tab>) => {
+      dispatch(tabsLayoutActions.updateTab({ featureId: id, tabId, updatedTabData }));
+    },
+    [dispatch, id]
+  );
 
   const replaceTab = useCallback(
     (tabId: TabsLayout.Tab["id"], newTabData: Partial<TabsLayout.Tab>) => {
@@ -93,13 +108,13 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
         return;
       }
 
-      setTabs((prev) => prev.map((tab) => (tab.id === tabId ? { ...tab, ...newTabData } : tab)));
+      updateTab(tabId, newTabData);
 
       if (tabId === activeTab?.id) {
         updateActivetab({ ...activeTab, ...newTabData } as TabsLayout.Tab);
       }
     },
-    [tabs, activeTab, updateActivetab, openTab]
+    [tabs, activeTab, updateTab, updateActivetab, openTab]
   );
 
   const value = { activeTab, tabs, openTab, closeTab, updateTab, replaceTab, tabOutletElementsMap };

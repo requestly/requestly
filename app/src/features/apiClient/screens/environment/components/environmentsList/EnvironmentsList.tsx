@@ -17,6 +17,7 @@ import { RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { SidebarPlaceholderItem } from "features/apiClient/screens/apiClient/components/sidebar/components/SidebarPlaceholderItem/SidebarPlaceholderItem";
 import "./environmentsList.scss";
+import { isGlobalEnvironment } from "../../utils";
 
 export const EnvironmentsList = () => {
   const dispatch = useDispatch();
@@ -114,11 +115,20 @@ export const EnvironmentsList = () => {
               <ListEmptySearchView message="No environments found. Try searching with a different name" />
             ) : (
               <>
-                {filteredEnvironments.map((environment) =>
-                  environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
-                    <EnvironmentsListItem openTab={openTab} environment={environment} />
-                  ) : null
-                )}
+                {filteredEnvironments
+                  .filter((env) => isGlobalEnvironment(env.id))
+                  .map((environment) =>
+                    environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
+                      <EnvironmentsListItem openTab={openTab} environment={environment} />
+                    ) : null
+                  )}
+                {filteredEnvironments
+                  .filter((env) => !isGlobalEnvironment(env.id))
+                  .map((environment) =>
+                    environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
+                      <EnvironmentsListItem openTab={openTab} environment={environment} />
+                    ) : null
+                  )}
                 <div className="mt-8">
                   {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && (
                     <SidebarPlaceholderItem name="New Environment" />
