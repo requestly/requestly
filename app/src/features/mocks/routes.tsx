@@ -1,11 +1,8 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { joinPaths } from "utils/PathUtils";
-import FilesLibraryIndexPage from "components/features/filesLibrary/FilesLibraryIndexPage";
-import MyFilesLibraryView from "components/features/filesLibrary/FilesLibraryTableContainer/MyFilesView";
 import FileMockEditorCreateView from "views/features/mocksV2/FileMockEditorCreateView";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
-import FileViewerIndexPage from "components/features/filesLibrary/FileViewerIndexPage";
 import { MockType } from "components/features/mocksV2/types";
 import MockEditorIndex from "components/features/mocksV2/MockEditorIndex";
 import MocksFeatureContainer from "./container";
@@ -16,34 +13,6 @@ export const mockServerRoutes: RouteObject[] = [
     path: PATHS.MOCK_SERVER.INDEX,
     element: <MocksFeatureContainer />,
     children: [
-      /** @deprecated */
-      {
-        path: PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE,
-        element: <ProtectedRoute component={FilesLibraryIndexPage} />,
-      },
-      /** @deprecated */
-      {
-        path: PATHS.FILES.MY_FILES.ABSOLUTE,
-        element: <ProtectedRoute component={MyFilesLibraryView} />,
-      },
-      /** @deprecated */
-      {
-        path: PATHS.MOCK_SERVER.RELATIVE,
-        element: <Navigate to={PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE} />,
-      },
-      /** @deprecated */
-      {
-        path: PATHS.FILES.RELATIVE,
-        element: <Navigate to={PATHS.FILES.MY_FILES.ABSOLUTE} />,
-      },
-      {
-        path: joinPaths(PATHS.FILES.VIEWER.RELATIVE, PATHS.ANY),
-        element: <ProtectedRoute component={FileViewerIndexPage} />,
-      },
-      {
-        path: joinPaths(PATHS.MOCK_SERVER.VIEWER.RELATIVE, PATHS.ANY),
-        element: <ProtectedRoute component={FileViewerIndexPage} />,
-      },
       //  MOCKS V2
       {
         index: true,
