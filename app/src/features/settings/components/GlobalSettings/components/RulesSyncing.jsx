@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { setSyncState } from "utils/syncing/SyncUtils";
+// import { setSyncState } from "utils/syncing/SlyncUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { SOURCE } from "modules/analytics/events/common/constants";
@@ -34,15 +34,15 @@ const RulesSyncing = () => {
       return;
     }
 
-    setIsSyncStatusChangeProcessing(true);
-    setSyncState(user.details.profile.uid, status, appMode)
-      .then(() => {
-        toast.info(`We ${status ? "will" : "won't"} be syncing your rules automatically hereon.`);
-      })
-      .catch(() => {
-        toast.error(`Sorry, we are experiencing issues updating the sync state.`);
-      })
-      .finally(() => setIsSyncStatusChangeProcessing(false));
+    // setIsSyncStatusChangeProcessing(true);
+    // setSyncState(user.details.profile.uid, status, appMode)
+    //   .then(() => {
+    //     toast.info(`We ${status ? "will" : "won't"} be syncing your rules automatically hereon.`);
+    //   })
+    //   .catch(() => {
+    //     toast.error(`Sorry, we are experiencing issues updating the sync state.`);
+    //   })
+    //   .finally(() => setIsSyncStatusChangeProcessing(false));
 
     trackSettingsToggled("rules_syncing", status);
   };

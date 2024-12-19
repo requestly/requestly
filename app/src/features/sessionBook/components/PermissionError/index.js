@@ -8,7 +8,8 @@ import img from "assets/images/pages/error/403.svg";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 // DUPLICATED
 // TODO: REMOVE OLD FILE
@@ -16,7 +17,9 @@ const PermissionError = ({ isInsideIframe = false }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
   const dispatch = useDispatch();
 
   // Component State
@@ -35,7 +38,7 @@ const PermissionError = ({ isInsideIframe = false }) => {
           <Button
             type="primary"
             onClick={() => {
-              handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch);
+              handleLogoutButtonOnClick(appMode, isSharedWorkspaceMode, dispatch);
               setAuthAutoPrompt(true);
             }}
           >

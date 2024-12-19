@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { Col, Row, Button, Typography } from "antd";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import TeamMembersTable from "./TeamMembersTable";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { PlusOutlined } from "@ant-design/icons";
@@ -11,21 +10,27 @@ import "./MembersDetails.css";
 import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
+import { getWorkspaceById } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "features/workspaces/types";
 
-const MembersDetails = ({ teamId, isTeamAdmin }) => {
+interface Props {
+  teamId: string;
+  isTeamAdmin: boolean;
+}
+
+const MembersDetails: React.FC<Props> = ({ teamId, isTeamAdmin }) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const isNewTeam = location.state?.isNewTeam;
 
   // Component state
-  const [seats, setSeats] = useState({});
+  const [seats, setSeats] = useState<any>({});
   const [showSeatStatus, setShowSeatStatus] = useState(false);
   const [refreshTeamMembersTable, setRefreshTeamMembersTable] = useState(false);
 
   // Global state
-  const availableTeams = useSelector(getAvailableTeams);
-  const teamDetails = availableTeams?.find((team) => team.id === teamId) ?? {};
-  const accessCount = teamDetails?.accessCount;
+  const workspaceDetails = useSelector(getWorkspaceById(teamId));
+  const accessCount = workspaceDetails?.accessCount;
 
   // To handle refresh in TeamMembersTable
   const doRefreshTeamMembersTable = useCallback(() => {
@@ -72,7 +77,7 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
         teamId,
       })
         .then((res) => {
-          const seatsData = res.data;
+          const seatsData: any = res.data;
           if (seatsData.success) {
             setSeats({
               billQuantity: seatsData.billQuantity, // quantity passed to stripe to bill
@@ -97,7 +102,11 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
           </div>
         </Col>
         <Col>
-          <Button type="primary" onClick={handleAddMemberClick}>
+          <Button
+            disabled={workspaceDetails?.workspaceType === WorkspaceType.PERSONAL}
+            type="primary"
+            onClick={handleAddMemberClick}
+          >
             <PlusOutlined /> <span className="text-bold caption">Invite People</span>
           </Button>
         </Col>
@@ -107,7 +116,7 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
         <TeamMembersTable
           teamId={teamId}
           isTeamAdmin={isTeamAdmin}
-          teamDetails={teamDetails}
+          teamDetails={workspaceDetails}
           refresh={refreshTeamMembersTable}
           callback={doRefreshTeamMembersTable}
         />

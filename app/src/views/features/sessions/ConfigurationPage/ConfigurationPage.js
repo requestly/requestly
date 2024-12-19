@@ -10,7 +10,6 @@ import { getAppMode } from "store/selectors";
 import Logger from "lib/logger";
 import { StorageService } from "init";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { RQButton } from "lib/design-system/components";
@@ -21,6 +20,8 @@ import "./configurationPage.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 const emptyPageSourceData = {
   key: GLOBAL_CONSTANTS.URL_COMPONENTS.URL,
@@ -46,7 +47,8 @@ const ConfigurationPage = () => {
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
   const [customPageSources, setCustomPageSources] = useState([]);
   const [pageSourceType, setPageSourceType] = useState(PAGE_SOURCES_TYPE.ALL_PAGES);
   const inputRef = useRef(null);
@@ -83,10 +85,10 @@ const ConfigurationPage = () => {
   }, [appMode]);
 
   useEffect(() => {
-    if (!isWorkspaceMode) {
+    if (!isSharedWorkspaceMode) {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_ENABLED, config?.pageSources?.length > 0);
     }
-  }, [config?.pageSources?.length, isWorkspaceMode]);
+  }, [config?.pageSources?.length, isSharedWorkspaceMode]);
 
   useEffect(() => {
     const initialCustomPageSources = [{ ...emptyPageSourceData }];

@@ -34,7 +34,6 @@ import {
   getUserAttributes,
 } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Typography, Tag } from "antd";
 import Text from "antd/lib/typography/Text";
 import { deleteGroup, ungroupSelectedRules, updateRulesListRefreshPendingStatus } from "./actions";
@@ -79,6 +78,8 @@ import { PremiumFeature } from "features/pricing";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import "./rulesTable.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 //Lodash
 const set = require("lodash/set");
@@ -160,8 +161,8 @@ const RulesTable = ({
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const rulesSelection = useSelector(getRulesSelection);
   const selectedGroups = useSelector(getGroupsSelection);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
 
   const { getFeatureLimitValue } = useFeatureLimiter();
   const enableTrash = useFeatureIsOn("enable-trash");
@@ -723,7 +724,7 @@ const RulesTable = ({
         }
         const dateToDisplay = record.modificationDate ? record.modificationDate : record.creationDate;
         const beautifiedDate = moment(dateToDisplay).format("MMM DD");
-        if (currentlyActiveWorkspace?.id && !options.hideLastModifiedBy) {
+        if (activeWorkspaceId && !options.hideLastModifiedBy) {
           return <LastModified beautifiedDate={beautifiedDate} uid={record.lastModifiedBy} />;
         } else return beautifiedDate;
       },
@@ -913,7 +914,7 @@ const RulesTable = ({
     },
   ];
 
-  if (isWorkspaceMode && !options.hideCreatedBy) {
+  if (isSharedWorkspaceMode && !options.hideCreatedBy) {
     columns.splice(3, 0, {
       title: "Created by",
       align: "center",
@@ -926,7 +927,7 @@ const RulesTable = ({
           return null;
         }
         const uid = record.createdBy ?? null;
-        if (currentlyActiveWorkspace?.id) {
+        if (activeWorkspaceId) {
           return <UserAvatar uid={uid} />;
         } else return null;
       },
@@ -1215,7 +1216,7 @@ const RulesTable = ({
               <Tooltip
                 title={
                   isScreenSmall
-                    ? enableTrash && user.loggedIn && !isWorkspaceMode
+                    ? enableTrash && user.loggedIn && !isSharedWorkspaceMode
                       ? "Move to Trash"
                       : "Delete Permanently"
                     : null
@@ -1229,7 +1230,7 @@ const RulesTable = ({
                 >
                   {isScreenSmall
                     ? null
-                    : enableTrash && user.loggedIn && !isWorkspaceMode
+                    : enableTrash && user.loggedIn && !isSharedWorkspaceMode
                     ? "Move to Trash"
                     : "Delete Permanently"}
                 </Button>
