@@ -4,10 +4,12 @@ import { Avatar, Dropdown, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 import "./index.scss";
+import { getActiveWorkspaceIds, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { Workspace } from "features/workspaces/types";
 
 const getWorkspaceIcon = (workspaceName: string) => {
   if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
@@ -16,22 +18,23 @@ const getWorkspaceIcon = (workspaceName: string) => {
 
 const WorkspaceDropdown: React.FC<{
   isAppSumo?: boolean;
-  workspaceToUpgrade: { name: string; id: string; accessCount: number };
+  workspaceToUpgrade: { name: string; id: string; accessCount?: number };
   setWorkspaceToUpgrade: (workspaceDetails: any) => void;
   className?: string;
   disabled?: boolean;
 }> = ({ isAppSumo = false, workspaceToUpgrade, setWorkspaceToUpgrade, className, disabled = false }) => {
   const user = useSelector(getUserAuthDetails);
-  const availableTeams = useSelector(getAvailableTeams);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
+  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
+  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
 
   const filteredAvailableTeams = useMemo(() => {
     return (
-      availableTeams?.filter(
-        (team: any) => !team?.archived && team.members?.[user?.details?.profile?.uid]?.role === "admin"
+      availableWorkspaces?.filter(
+        (team: Workspace) => !team?.archived && team.members?.[user?.details?.profile?.uid]?.role === "admin"
       ) ?? []
     );
-  }, [availableTeams, user?.details?.profile?.uid]);
+  }, [availableWorkspaces, user?.details?.profile?.uid]);
 
   const populateWorkspaceDetails = useCallback(
     (workspaceId: string) => {
@@ -41,10 +44,10 @@ const WorkspaceDropdown: React.FC<{
   );
 
   useEffect(() => {
-    if (currentlyActiveWorkspace?.id) {
-      setWorkspaceToUpgrade(populateWorkspaceDetails(currentlyActiveWorkspace?.id));
+    if (activeWorkspaceId) {
+      setWorkspaceToUpgrade(populateWorkspaceDetails(activeWorkspaceId));
     }
-  }, [currentlyActiveWorkspace?.id, populateWorkspaceDetails, setWorkspaceToUpgrade]);
+  }, [activeWorkspaceId, populateWorkspaceDetails, setWorkspaceToUpgrade]);
 
   const workspaceMenuItems = {
     items: [

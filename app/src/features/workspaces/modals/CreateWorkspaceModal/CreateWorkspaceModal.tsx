@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Button, Checkbox, Col, Form, Input, Row } from "antd";

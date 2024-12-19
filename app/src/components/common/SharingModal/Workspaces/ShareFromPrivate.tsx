@@ -2,7 +2,6 @@ import React, { useState, useRef, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { Avatar, Row, Divider } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
@@ -13,7 +12,7 @@ import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackAddTeamMemberSuccess, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { WorkspaceSharingTypes, PostShareViewData } from "../types";
-import { Team, TeamRole } from "types";
+import { TeamRole } from "types";
 import { trackSharingModalRulesDuplicated } from "modules/analytics/events/misc/sharing";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import { generateDefaultTeamName } from "utils/teams";
@@ -21,6 +20,9 @@ import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import "./index.scss";
+import { Workspace } from "features/workspaces/types";
+import { getActiveWorkspaceIds, getAllWorkspaces, getWorkspaceById } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 interface Props {
   selectedRules: string[];
@@ -35,10 +37,13 @@ export const ShareFromPrivate: React.FC<Props> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const availableTeams = useSelector(getAvailableTeams);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
+  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
+  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
+  const activeWorkspace = useSelector(getWorkspaceById(activeWorkspaceId));
+
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const _availableTeams = useRef(availableTeams);
+  const _availableTeams = useRef(availableWorkspaces);
 
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -113,7 +118,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
   ]);
 
   const handleRulesTransfer = useCallback(
-    (teamData: Team) => {
+    (teamData: Workspace) => {
       setIsLoading(true);
       duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules).then(() => {
         setIsLoading(false);
@@ -121,13 +126,13 @@ export const ShareFromPrivate: React.FC<Props> = ({
         setPostShareViewData({
           type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
           targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
-          sourceTeamData: currentlyActiveWorkspace,
+          sourceTeamData: activeWorkspace,
         });
 
         onRulesShared();
       });
     },
-    [appMode, onRulesShared, selectedRules, currentlyActiveWorkspace, setPostShareViewData]
+    [appMode, onRulesShared, selectedRules, activeWorkspace, setPostShareViewData]
   );
 
   return (
