@@ -140,7 +140,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
     if (result.success) {
       // False is passed to not open the tab when renaming the record from sidebar
-      onSaveRecord(result.data, false);
+      onSaveRecord(result.data);
 
       if (recordType === RQAPI.RecordType.API) {
         trackRequestRenamed("api_client_sidebar");
