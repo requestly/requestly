@@ -1,4 +1,3 @@
-import { teamsActions } from "store/features/teams/slice";
 import { StorageService } from "init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "./ExtensionActions";
@@ -95,19 +94,19 @@ export const switchWorkspace = async (
   // window.skipSyncListenerForNextOneTime = false;
   // window.isFirstSyncComplete = false;
 
-  if (teamId === null) {
-    // We are switching to pvt workspace
-    // Clear team members info
-    dispatch(teamsActions.setCurrentlyActiveWorkspaceMembers({}));
-  }
+  // if (teamId === null) {
+  //   // We are switching to pvt workspace
+  //   // Clear team members info
+  //   dispatch(teamsActions.setCurrentlyActiveWorkspaceMembers({}));
+  // }
 
-  dispatch(
-    teamsActions.setCurrentlyActiveWorkspace({
-      id: teamId,
-      name: teamName,
-      membersCount: teamMembersCount,
-    })
-  );
+  // dispatch(
+  //   teamsActions.setCurrentlyActiveWorkspace({
+  //     id: teamId,
+  //     name: teamName,
+  //     membersCount: teamMembersCount,
+  //   })
+  // );
 
   StorageService(appMode).saveRecord({
     [GLOBAL_CONSTANTS.STORAGE_KEYS.ACTIVE_WORKSPACE_ID]: teamId,

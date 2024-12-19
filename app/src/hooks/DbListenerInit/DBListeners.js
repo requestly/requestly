@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getAuthInitialization } from "../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import availableTeamsListener from "./availableTeamsListener";
 // import syncingNodeListener from "./syncingNodeListener";
 import userNodeListener from "./userNodeListener";
 import { teamsActions } from "store/features/teams/slice";
