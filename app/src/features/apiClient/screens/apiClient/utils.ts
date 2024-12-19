@@ -5,11 +5,6 @@ import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../ty
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
-import {
-  AUTH_ENTRY_IDENTIFIER,
-  AUTHORIZATION_TYPES,
-} from "./components/clientView/components/request/components/AuthorizationView/types";
-import { isEmpty } from "lodash";
 
 export const makeRequest = async (
   appMode: string,
@@ -188,71 +183,5 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 
   return updatedRecords;
 };
+
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
-
-export const deleteAuthOptions = (dataToUpdate: KeyValuePair[]) => {
-  return dataToUpdate.filter((option) => option.type !== AUTH_ENTRY_IDENTIFIER);
-};
-
-export const updateRequestWithAuthOptions = (
-  dataToUpdate: KeyValuePair[],
-  dataToAppend: RQAPI.AuthOptions,
-  dataAppendType: AUTHORIZATION_TYPES
-) => {
-  const dataToUpdateCopy = !isEmpty(dataToUpdate)
-    ? [...deleteAuthOptions(JSON.parse(JSON.stringify(dataToUpdate)))]
-    : JSON.parse(JSON.stringify(dataToUpdate));
-
-  let newKeyValuePair: KeyValuePair;
-
-  const createAuthorizationHeader = (type: string, key: string, value: string): typeof newKeyValuePair => ({
-    id: Math.random(),
-    key,
-    value,
-    type,
-    isEnabled: true,
-  });
-
-  const updateDataInState = (data: KeyValuePair[], type = AUTH_ENTRY_IDENTIFIER, key: string, value: string) => {
-    const existingIndex = data.findIndex((header) => header.type === type);
-    const newHeader = createAuthorizationHeader(type, key, value);
-
-    if (existingIndex !== -1) {
-      data[existingIndex] = { ...data[existingIndex], ...newHeader };
-    } else {
-      data.unshift(newHeader);
-    }
-  };
-
-  switch (dataAppendType) {
-    case AUTHORIZATION_TYPES.NO_AUTH:
-      break;
-    case AUTHORIZATION_TYPES.BASIC_AUTH: {
-      const { username, password } = dataToAppend[dataAppendType];
-      updateDataInState(
-        dataToUpdateCopy,
-        AUTH_ENTRY_IDENTIFIER,
-        "Authorization",
-        `Basic ${btoa(`${username || ""}:${password || ""}`)}`
-      );
-      break;
-    }
-    case AUTHORIZATION_TYPES.BEARER_TOKEN: {
-      const { bearer } = dataToAppend[dataAppendType];
-      updateDataInState(dataToUpdateCopy, AUTH_ENTRY_IDENTIFIER, "Authorization", `Bearer ${bearer}`);
-      break;
-    }
-    case AUTHORIZATION_TYPES.API_KEY: {
-      const { key, value } = dataToAppend[dataAppendType];
-
-      if (key) {
-        updateDataInState(dataToUpdateCopy, AUTH_ENTRY_IDENTIFIER, key || "", value || "");
-      }
-      break;
-    }
-    default:
-      break;
-  }
-
-  return dataToUpdateCopy;
-};

@@ -1,13 +1,13 @@
 import { notification } from "antd";
 import * as Sentry from "@sentry/react";
-import { addUrlSchemeIfMissing, makeRequest, updateRequestWithAuthOptions } from "../../screens/apiClient/utils";
+import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
 import { RQAPI } from "../../types";
 import { executePrerequestScript, executePostresponseScript } from "./modules/scripts/utils";
 import { renderTemplate } from "backend/environment/utils";
 import { DEMO_API_URL } from "features/apiClient/constants";
 import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient";
 import { isEmpty } from "lodash";
-import { AUTHORIZATION_TYPES } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
+import { processAuthOptions, updateRequestWithAuthOptions } from "../auth";
 
 export const executeAPIRequest = async (
   appMode: string,
@@ -21,16 +21,9 @@ export const executeAPIRequest = async (
   const updatedEntry = JSON.parse(JSON.stringify(entry)); //Deep Copy
 
   if (!isEmpty(updatedEntry.auth)) {
-    const authType = updatedEntry.auth.currentAuthType;
-    const requestHeaders = updatedEntry.request.headers;
-    const queryParmas = updatedEntry.request.queryParams;
-    const addToQuery = authType === AUTHORIZATION_TYPES.API_KEY && updatedEntry.auth[authType].addTo === "QUERY";
-
-    if (addToQuery) {
-      updatedEntry.request.queryParams = updateRequestWithAuthOptions(queryParmas, updatedEntry.auth, authType);
-    } else {
-      updatedEntry.request.headers = updateRequestWithAuthOptions(requestHeaders, updatedEntry.auth, authType);
-    }
+    const { headers, queryParams } = processAuthOptions(updatedEntry.auth);
+    updatedEntry.request.headers = updateRequestWithAuthOptions(updatedEntry.request.headers, headers);
+    updatedEntry.request.queryParams = updateRequestWithAuthOptions(updatedEntry.request.queryParams, queryParams);
   }
 
   const renderedRequestDetails = environmentManager.renderVariables(updatedEntry.request, requestCollectionId);

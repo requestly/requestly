@@ -16,12 +16,12 @@ const Description: React.FC<DescriptionProps> = ({ data, wrapperClass = "" }) =>
       return;
     }
 
-    return descriptionSteps.map((item) => {
+    return descriptionSteps.map((item, index) => {
       return (
-        <>
+        <div key={`item-${index}`}>
           <li className="step-item">{item.value}</li>
           {!isEmpty(item.steps) && <ul className="steps">{renderSteps(item.steps)}</ul>}
-        </>
+        </div>
       );
     });
   };
