@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef } from "react";
+import React, { createContext, useCallback, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { TabsLayout, TabsLayoutContextInterface } from "../types";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,18 +28,10 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
 
-  const hasInitialized = useRef(false);
   useEffect(() => {
-    if (hasInitialized.current) {
-      return;
-    }
-
-    hasInitialized.current = true;
-
     if (!activeTab) {
       return;
     }
-
     delete tabOutletElementsMap.current[activeTab.id];
     navigate(activeTab.url);
   }, [navigate, activeTab]);
