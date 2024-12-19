@@ -18,14 +18,15 @@ import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import { trackCreateMockEvent, trackUpdateMockEvent } from "modules/analytics/events/features/mockServer/mocks";
 import { trackCreateFileEvent, trackUpdateFileEvent } from "modules/analytics/events/features/mockServer/files";
 import TeamFeatureComingSoon from "components/landing/TeamFeatureComingSoon";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 
 const FileViewerIndexPage = () => {
   const navigate = useNavigate();
   //const mockURL = window.location.pathname.includes("API") ? true : false;
   //Global State
   const user = useSelector(getUserAuthDetails);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = !isPersonalWorkspace(getActiveWorkspaceId(useSelector(getActiveWorkspaceIds)));
 
   //Component State
   const [isFileContentLoading, setIsFileContentLoading] = useState(true);
@@ -210,7 +211,7 @@ const FileViewerIndexPage = () => {
     }
   }, [fileDetails]);
 
-  if (isWorkspaceMode) return <TeamFeatureComingSoon title="File server" />;
+  if (isSharedWorkspaceMode) return <TeamFeatureComingSoon title="File server" />;
 
   return (
     <Row>

@@ -18,7 +18,8 @@ import { useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { globalActions } from "store/slices/global/slice";
 import TeamFeatureComingSoon from "components/landing/TeamFeatureComingSoon";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 
 const GetStartedWithFiles = ({ updateCollection }) => {
   const navigate = useNavigate();
@@ -26,7 +27,9 @@ const GetStartedWithFiles = ({ updateCollection }) => {
   const user = useSelector(getUserAuthDetails);
   const path = window.location.pathname;
   const isMockServerPage = path.includes("mock-server");
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+
   const [isNewRuleSelectorModalActive, setIsNewRuleSelectorModalActive] = useState(false);
 
   const toggleNewRuleSelectorModal = () => {
@@ -61,7 +64,7 @@ const GetStartedWithFiles = ({ updateCollection }) => {
       openAuthModal();
     }
   };
-  if (isWorkspaceMode) return <TeamFeatureComingSoon title={isMockServerPage ? "Mock server" : "File server"} />;
+  if (isSharedWorkspaceMode) return <TeamFeatureComingSoon title={isMockServerPage ? "Mock server" : "File server"} />;
 
   return (
     <ProCard className="primary-card github-like-border">

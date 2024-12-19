@@ -15,13 +15,15 @@ import { Visibility } from "../SessionViewer/types";
 import { useDispatch, useSelector } from "react-redux";
 import { getSessionRecordingVisibility } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 
 const ShareButton = ({ recordingId, showShareModal }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
   const currentVisibility = useSelector(getSessionRecordingVisibility);
   const sharedLink = getSessionRecordingSharedLink(recordingId);
   const [linkCopied, setLinkCopied] = useState();
@@ -39,7 +41,7 @@ const ShareButton = ({ recordingId, showShareModal }) => {
       default:
         return (
           <span>
-            <LockOutlined /> {isWorkspaceMode ? "Private to workspace" : "Private to me"}
+            <LockOutlined /> {isSharedWorkspaceMode ? "Private to workspace" : "Private to me"}
           </span>
         );
 
@@ -87,7 +89,7 @@ const ShareButton = ({ recordingId, showShareModal }) => {
 
     if (currentVisibility !== Visibility.ONLY_ME) {
       options.push({
-        label: isWorkspaceMode ? "Make private to workspace" : "Make private to me",
+        label: isSharedWorkspaceMode ? "Make private to workspace" : "Make private to me",
         key: Visibility.ONLY_ME,
         icon: <LockOutlined />,
       });
@@ -110,7 +112,7 @@ const ShareButton = ({ recordingId, showShareModal }) => {
     }
 
     return options;
-  }, [currentVisibility, isWorkspaceMode]);
+  }, [currentVisibility, isSharedWorkspaceMode]);
 
   const onCopyLinkClicked = useCallback(() => {
     trackSessionRecordingShareLinkCopied("app");

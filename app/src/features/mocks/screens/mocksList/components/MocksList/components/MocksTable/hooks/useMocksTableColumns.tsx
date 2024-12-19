@@ -5,7 +5,6 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table, TooltipProps } from "antd";
 import { MockType, RQMockCollection, RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { EditOutlined } from "@ant-design/icons";
 import { UserAvatar } from "componentsV2/UserAvatar";
 import { fileTypeColorMap, generateFinalUrl } from "components/features/mocksV2/utils";
@@ -25,6 +24,8 @@ import { isMock, isCollection } from "../utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
 import PATHS from "config/constants/sub/paths";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 export const useMocksTableColumns = ({
   source,
@@ -43,9 +44,8 @@ export const useMocksTableColumns = ({
   };
 
   const user = useSelector(getUserAuthDetails);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
   const { pathname } = useLocation();
   const isOpenedInRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
@@ -87,7 +87,7 @@ export const useMocksTableColumns = ({
       title: <div className="rq-col-title">Name</div>,
       dataIndex: "name",
       ellipsis: true,
-      width: isWorkspaceMode ? (isOpenedInRuleEditor ? 110 : 290) : isOpenedInRuleEditor ? 290 : 360,
+      width: isSharedWorkspaceMode ? (isOpenedInRuleEditor ? 110 : 290) : isOpenedInRuleEditor ? 290 : 360,
       render: (_: any, record: RQMockSchema) => {
         const collectionPath = ((record as unknown) as RQMockCollection)?.path ?? "";
 
@@ -228,7 +228,7 @@ export const useMocksTableColumns = ({
         return (
           <div className="last-modified">
             {moment(record.updatedTs).format("MMM DD, YYYY") + (record.isOldMock ? "." : "")}{" "}
-            {isWorkspaceMode && (
+            {isSharedWorkspaceMode && (
               <>
                 by <UserAvatar uid={record.lastUpdatedBy ?? record.createdBy} />
               </>
@@ -240,7 +240,7 @@ export const useMocksTableColumns = ({
     {
       key: "actions",
       align: "right",
-      width: isWorkspaceMode ? (isOpenedInRuleEditor ? 50 : 90) : 90,
+      width: isSharedWorkspaceMode ? (isOpenedInRuleEditor ? 50 : 90) : 90,
       render: (_: any, record: RQMockSchema) => {
         const collectionPath =
           isMock(record) && record.collectionId
@@ -302,7 +302,7 @@ export const useMocksTableColumns = ({
                     endpoint: record.endpoint,
                     uid: user?.details?.profile?.uid,
                     username: user?.details?.username,
-                    teamId,
+                    teamId: activeWorkspaceId,
                     password: record?.password,
                     collectionPath,
                   });
@@ -402,7 +402,7 @@ export const useMocksTableColumns = ({
                     endpoint: record.endpoint,
                     uid: user?.details?.profile?.uid,
                     username: null,
-                    teamId,
+                    teamId: activeWorkspaceId,
                     password: record?.password,
                     collectionPath,
                   });
@@ -433,7 +433,7 @@ export const useMocksTableColumns = ({
     },
   ];
 
-  if (!isWorkspaceMode) {
+  if (!isSharedWorkspaceMode) {
     //remove created by column from mock table in private workspace
     columns.splice(4, 1);
   }

@@ -7,7 +7,6 @@ import { getAllRecordsMap } from "store/features/rules/selectors";
 import { Group, RecordStatus, Rule } from "features/rules/types/rules";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { UserAvatar } from "componentsV2/UserAvatar";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { MdOutlineShare } from "@react-icons/all-files/md/MdOutlineShare";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
@@ -27,12 +26,12 @@ import { WarningOutlined } from "@ant-design/icons";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import RuleNameColumn from "../components/RulesColumn/RulesColumn";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
   const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
   const allRecordsMap = useSelector(getAllRecordsMap);
   const {
     recordsChangeGroupAction,
@@ -85,7 +84,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     {
       title: "Rules",
       key: "name",
-      width: isWorkspaceMode ? 322 : 376,
+      width: isSharedWorkspaceMode ? 322 : 376,
       ellipsis: true,
       render: (record: RuleTableRecord) => {
         return <RuleNameColumn record={record} />;
@@ -422,7 +421,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
   ];
 
   // FIXME: Extend the column type to also support custom fields eg hidden property to hide the column
-  if (isWorkspaceMode && !options.hideCreatedBy) {
+  if (isSharedWorkspaceMode && !options.hideCreatedBy) {
     columns.splice(6, 0, {
       title: "Author",
       width: 92,

@@ -20,13 +20,14 @@ import {
   getAllGroups,
 } from "../../../../store/selectors";
 import { isGroupsSanitizationPassed } from "./actions";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import CreateTeamRuleCTA from "../CreateTeamRuleCTA";
 import GettingStarted from "../GettingStarted";
 import Logger from "lib/logger";
 import { useHasChanged } from "hooks";
 import MonitorMountedTime from "components/common/SentryMonitoring/MonitorMountedTime";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -38,7 +39,9 @@ const RulesIndexPage = () => {
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const isRulesListHardRefreshPending = useSelector(getIsHardRefreshRulesPending);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+
   const isRulesListLoading = useSelector(getIsRulesListLoading);
 
   //Component State
@@ -118,7 +121,7 @@ const RulesIndexPage = () => {
   ]);
 
   const CreateFirstRule = () => {
-    if (isWorkspaceMode) return <CreateTeamRuleCTA />;
+    if (isSharedWorkspaceMode) return <CreateTeamRuleCTA />;
     return <GettingStarted />;
   };
 

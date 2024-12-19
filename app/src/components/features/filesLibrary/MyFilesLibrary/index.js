@@ -10,14 +10,16 @@ import GetStartedWithFiles from "../GetStartedWithFiles";
 import { fetchUserMocks, fetchFiles, checkMigrationDone, migrateAndUpdate } from "../FilesLibraryIndexPage/actions";
 //UTILS
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import TeamFeatureComingSoon from "components/landing/TeamFeatureComingSoon";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 // import DataStoreUtils from "../../../../utils/DataStoreUtils";
 
 const FilesLib = () => {
   //Global State
   const user = useSelector(getUserAuthDetails);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
 
   //Component State
   const [loadingFilesList, setLoadingFileList] = useState(true);
@@ -64,7 +66,7 @@ const FilesLib = () => {
     else setLoadingFileList(false);
   }, [user, stableUpdateCollection]);
 
-  if (isWorkspaceMode) return <TeamFeatureComingSoon title="File server" />;
+  if (isSharedWorkspaceMode) return <TeamFeatureComingSoon title="File server" />;
 
   return loadingFilesList ? (
     <SpinnerCard customLoadingMessage="Loading Files" />
