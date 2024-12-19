@@ -90,14 +90,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     if (tabs.length > 0) {
       return;
     }
-
-    if (updatedRecords.requests.length) {
-      const recordId = updatedRecords.requests[0].id;
-      openTab(recordId, {
-        title: updatedRecords.requests[0].name,
-        url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${recordId}`,
-      });
-    }
   }, [updatedRecords.requests, isLoadingApiClientRecords, openTab, location.pathname, tabs.length]);
 
   return (
