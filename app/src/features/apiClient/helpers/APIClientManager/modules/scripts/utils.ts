@@ -29,7 +29,6 @@ const handleGlobalEnvironmentMutations = async (
   }
 ) => {
   const { mutations, globalVariables } = payload;
-  const globalEnvironmentId = environmentManager.globalEnvironmentId;
 
   if (isEmpty(mutations.globals.$set) && isEmpty(mutations.globals.$unset)) {
     return {
@@ -66,7 +65,7 @@ const handleGlobalEnvironmentMutations = async (
     delete variablesToSet[key];
   });
 
-  await environmentManager.setVariables(globalEnvironmentId, variablesToSet);
+  await environmentManager.setVariables("global", variablesToSet);
 
   return {
     updatedGlobalVariables: variablesToSet,

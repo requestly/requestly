@@ -67,9 +67,9 @@ const useEnvironmentManager = () => {
         throw new Error("Global environment already exists");
       }
       const docId = isGlobal ? "global" : undefined;
-      return upsertEnvironmentInDB(ownerId, newEnvironmentName, isGlobal, docId)
+      return upsertEnvironmentInDB(ownerId, newEnvironmentName, docId)
         .then(({ id, name }) => {
-          dispatch(variablesActions.addNewEnvironment({ id, name, isGlobal }));
+          dispatch(variablesActions.addNewEnvironment({ id, name }));
           return {
             id,
             name,
@@ -377,7 +377,6 @@ const useEnvironmentManager = () => {
       return {
         id: key,
         name: allEnvironmentData[key].name,
-        isGlobal: allEnvironmentData[key].isGlobal,
       };
     });
   }, [allEnvironmentData]);

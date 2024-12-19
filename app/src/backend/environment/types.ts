@@ -10,7 +10,6 @@ export interface EnvironmentData {
   id: string;
   name: string;
   variables: EnvironmentVariables;
-  isGlobal: boolean;
 }
 
 export type EnvironmentMap = Record<string, EnvironmentData>;
