@@ -8,24 +8,15 @@ import PATHS from "config/constants/sub/paths";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import "./environmentView.scss";
-import { EnvironmentVariables } from "backend/environment/types";
 
 export const EnvironmentView = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const {
-    isEnvironmentsLoading,
-    getEnvironmentName,
-    getAllEnvironments,
-    getEnvironmentVariables,
-    setVariables,
-    removeVariable,
-  } = useEnvironmentManager();
+  const { isEnvironmentsLoading, getEnvironmentName, getAllEnvironments } = useEnvironmentManager();
   const user = useSelector(getUserAuthDetails);
   const [searchValue, setSearchValue] = useState<string>("");
   const { envId } = useParams();
   const environmentName = getEnvironmentName(envId);
-  const variables = getEnvironmentVariables(envId);
 
   useEffect(() => {
     if (!isEnvironmentsLoading) {
@@ -45,14 +36,6 @@ export const EnvironmentView = () => {
     }
   }, [getAllEnvironments, navigate, isEnvironmentsLoading, user.loggedIn, envId, location.pathname]);
 
-  const handleSetVariables = async (variables: EnvironmentVariables) => {
-    return setVariables(envId, variables);
-  };
-
-  const handleRemoveVariable = async (key: string) => {
-    return removeVariable(envId, key);
-  };
-
   return (
     <div className="variables-list-view-container">
       <div className="variables-list-view">
@@ -65,12 +48,7 @@ export const EnvironmentView = () => {
               onSearchValueChange={setSearchValue}
               currentEnvironmentName={environmentName}
             />
-            <VariablesList
-              searchValue={searchValue}
-              variables={variables}
-              setVariables={handleSetVariables}
-              removeVariable={handleRemoveVariable}
-            />
+            <VariablesList searchValue={searchValue} />
           </>
         )}
       </div>
