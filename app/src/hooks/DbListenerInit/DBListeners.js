@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
 import { getAppMode, getAuthInitialization } from "../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import availableTeamsListener from "./availableTeamsListener";
@@ -15,8 +14,7 @@ import { globalActions } from "store/slices/global/slice";
 import { isArray } from "lodash";
 import { useHasChanged } from "hooks/useHasChanged";
 import { userSubscriptionDocListener } from "./userSubscriptionDocListener";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceIds, getActiveWorkspacesMembers } from "store/slices/workspaces/selectors";
 
 window.isFirstSyncComplete = false;
 
@@ -24,8 +22,8 @@ const DBListeners = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const currentTeamMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
+  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
+  const activeWorkspacesMembers = useSelector(getActiveWorkspacesMembers);
   const hasAuthInitialized = useSelector(getAuthInitialization);
 
   let unsubscribeUserNodeRef = useRef(null);
@@ -117,7 +115,7 @@ const DBListeners = () => {
       ?.then((status) => {
         Logger.log("force updated auth token");
       });
-  }, [user?.details?.profile?.uid, user?.loggedIn, activeWorkspaceId, currentTeamMembers, dispatch]);
+  }, [user?.details?.profile?.uid, user?.loggedIn, activeWorkspaceIds, activeWorkspacesMembers, dispatch]);
 
   return null;
 };
