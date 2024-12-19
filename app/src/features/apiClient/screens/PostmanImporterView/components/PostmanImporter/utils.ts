@@ -1,6 +1,8 @@
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { generateDocumentId } from "backend/utils";
+import { AUTHORIZATION_TYPES } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
+import { POSTMAN_AUTH_TYPES_MAPPING } from "features/apiClient/constants";
 
 interface PostmanCollectionExport {
   info: {
@@ -80,6 +82,24 @@ const processScripts = (item: any) => {
   return scripts;
 };
 
+const processAuthorizationOptions = (item = {}) => {
+  try {
+    const auth = {};
+    const authType = POSTMAN_AUTH_TYPES_MAPPING[item.type] ?? AUTHORIZATION_TYPES.NO_AUTH;
+    auth.currentAuthType = authType;
+    auth[authType] = {};
+
+    const authOptionsArray = item[item?.type] || [];
+    authOptionsArray.forEach((option) => {
+      auth[authType][option.key] = option.value;
+    });
+
+    return auth;
+  } catch (error) {
+    return {};
+  }
+};
+
 const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.ApiRecord> => {
   const { request } = item;
   if (!request) throw new Error(`Invalid API item: ${item.name}`);
@@ -134,6 +154,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
         body: requestBody,
         contentType,
       },
+      auth: processAuthorizationOptions(request.auth),
       scripts: processScripts(item),
     },
   };
