@@ -62,18 +62,19 @@ export const APIClient: React.FC<Props> = () => {
 
   useEffect(() => {
     //For updating breadcrumb name
-    if (!requestId || requestId == "new") {
+    if (!requestId || requestId === "new") {
       return;
     }
-    const record = apiClientRecords.find((rec) => rec.id == requestId);
-    if (record?.type === RQAPI.RecordType.API) {
-      setSelectedEntryDetails((prev) => {
-        if (prev?.id === record.id && prev.name == record.name) {
-          return prev;
-        }
-        return record as RQAPI.ApiRecord;
-      });
+
+    const record = apiClientRecords.find((rec) => rec.id === requestId);
+
+    if (!record) {
+      return;
     }
+
+    setSelectedEntryDetails((prev) => {
+      return prev?.id === record?.id ? ({ ...(prev ?? {}), name: record?.name } as RQAPI.ApiRecord) : prev;
+    });
   }, [requestId, apiClientRecords]);
 
   useEffect(() => {
