@@ -4,7 +4,6 @@ import { getAppMode, getAuthInitialization } from "../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 // import syncingNodeListener from "./syncingNodeListener";
 import userNodeListener from "./userNodeListener";
-import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { getAuth } from "firebase/auth";
 import firebaseApp from "../../firebase";
 import Logger from "lib/logger";

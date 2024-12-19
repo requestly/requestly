@@ -1,13 +1,12 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Row, Button, Input, message, Col, Tooltip } from "antd";
-import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import SpinnerColumn from "../../../../../../../components/misc/SpinnerColumn";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { redirectToRules, redirectToWorkspaceSettings } from "../../../../../../../utils/RedirectionUtils";
-import { clearCurrentlyActiveWorkspace, showSwitchWorkspaceSuccessToast } from "actions/TeamWorkspaceActions";
+import { showSwitchWorkspaceSuccessToast } from "actions/TeamWorkspaceActions";
 import WorkspaceRuleMetadataSyncing from "./WorkspaceRuleMetadataSyncing";
 import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
 import LoadingModal from "../../../../../../../layouts/DashboardLayout/MenuHeader/WorkspaceSelector/LoadingModal";
@@ -15,12 +14,11 @@ import { toast } from "utils/Toast";
 import { trackWorkspaceDeleted, trackWorkspaceDeleteClicked } from "modules/analytics/events/common/teams";
 import "./TeamSettings.css";
 import { renameWorkspace } from "backend/workspace";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const mountedRef = useRef(true);
-  const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const userId = user?.details?.profile?.uid;
   const isLoggedInUserOwner = userId === teamOwnerId;
@@ -36,6 +34,8 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   const [isDeleteModalActive, setIsDeleteModalActive] = useState(false);
   const [isTeamSwitchModalActive, setIsTeamSwitchModalActive] = useState(false);
 
+  const { switchToPersonalWorkspace } = useWorkspaceHelpers();
+
   const handleDeleteModalOpen = () => {
     setIsDeleteModalActive(true);
     trackWorkspaceDeleteClicked();
@@ -47,7 +47,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
 
   const handleSwitchToPrivateWorkspace = async () => {
     setIsTeamSwitchModalActive(true);
-    return clearCurrentlyActiveWorkspace(dispatch, appMode).then(() => {
+    return switchToPersonalWorkspace().then(() => {
       setIsTeamSwitchModalActive(false);
       showSwitchWorkspaceSuccessToast();
     });
