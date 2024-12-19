@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { toast } from "utils/Toast.js";
 import { Row, Col, Checkbox, Typography } from "antd";
-import { getUserTeamRole } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import isEmail from "validator/lib/isEmail";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -22,9 +21,9 @@ import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWi
 import "./AddMemberModal.css";
 import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "backend/billing";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { TeamRole } from "types";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceIds, getAllWorkspaces, getWorkspaceById } from "store/slices/workspaces/selectors";
+import { TeamRole } from "types";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
@@ -46,15 +45,16 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   // Global state
   const user = useSelector(getUserAuthDetails);
   const loggedInUserId = user?.details?.profile?.uid;
-  const userTeamRole = useSelector(getUserTeamRole);
-  const isLoggedInUserAdmin = userTeamRole === TeamRole.admin;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
 
   const availableWorkspaces = useSelector(getAllWorkspaces);
-  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
-  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
 
   const teamId = useMemo(() => currentTeamId ?? activeWorkspaceId, [activeWorkspaceId, currentTeamId]);
+  const currentWorkspace = useSelector(getWorkspaceById(teamId));
+  const isLoggedInUserAdmin =
+    currentWorkspace?.members?.[loggedInUserId]?.role === TeamRole.admin || currentWorkspace?.owner === loggedInUserId;
+
   const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
 
   const teamDetails = useMemo(() => availableWorkspaces?.find((team) => team.id === teamId), [
