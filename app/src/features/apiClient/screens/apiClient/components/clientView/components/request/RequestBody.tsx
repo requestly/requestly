@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { Input, Radio } from "antd";
+import { Radio } from "antd";
 import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../../types";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { KeyValueTable } from "./components/KeyValueTable/KeyValueTable";
@@ -15,15 +15,6 @@ interface Props {
 }
 
 const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequestEntry, setContentType }) => {
-  const handleBodyChange = useDebounce(
-    useCallback(
-      (body: string) => {
-        setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body } }));
-      },
-      [setRequestEntry]
-    ),
-    500
-  );
   const [rawBody, setRawBody] = useState(RequestContentType.RAW === contentType ? body : "");
   const [jsonBody, setJsonBody] = useState(RequestContentType.JSON === contentType ? body : "");
   const [formBody, setFormBody] = useState(RequestContentType.FORM === contentType ? body : []);
@@ -46,12 +37,15 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
     setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: updatedBody } }));
   }, [contentType, rawBody, jsonBody, formBody, setRequestEntry]);
 
-  const handleRawChange = useCallback(
-    (value: string) => {
-      setRawBody(value);
-      setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
-    },
-    [setRequestEntry]
+  const handleRawChange = useDebounce(
+    useCallback(
+      (value: string) => {
+        setRawBody(value);
+        setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
+      },
+      [setRequestEntry]
+    ),
+    500
   );
 
   const handleJsonChange = useCallback(
@@ -108,8 +102,8 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
         return (
           <CodeEditor
             language={null}
-            value={body as string}
-            handleChange={handleBodyChange}
+            value={rawBody as string}
+            handleChange={handleRawChange}
             isResizable={false}
             hideCharacterCount
             analyticEventProperties={{ source: "api_client" }}
@@ -117,17 +111,7 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
           />
         );
     }
-  }, [
-    rawBody,
-    formBody,
-    jsonBody,
-    contentType,
-    setRequestEntry,
-    handleRawChange,
-    handleFormChange,
-    handleJsonChange,
-    variables,
-  ]);
+  }, [contentType, jsonBody, handleJsonChange, variables, formBody, handleFormChange, rawBody, handleRawChange]);
 
   return (
     <div className="api-request-body">
