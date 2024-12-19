@@ -1,9 +1,13 @@
 import React, { useCallback, useMemo } from "react";
-import { Input, Radio } from "antd";
+import {
+  // Input,
+  Radio,
+} from "antd";
 import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../../types";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { KeyValueTable } from "./components/KeyValueTable/KeyValueTable";
 import { EnvironmentVariables } from "backend/environment/types";
+import { useDebounce } from "hooks/useDebounce";
 
 interface Props {
   body: RQAPI.RequestBody;
@@ -14,18 +18,20 @@ interface Props {
 }
 
 const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequestEntry, setContentType }) => {
-  const handleBodyChange = useCallback(
-    (body: string) => {
-      setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body } }));
-    },
-    [setRequestEntry]
+  const handleBodyChange = useDebounce(
+    useCallback(
+      (body: string) => {
+        setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body } }));
+      },
+      [setRequestEntry]
+    ),
+    500
   );
 
   const bodyEditor = useMemo(() => {
     switch (contentType) {
       case RequestContentType.JSON:
         return (
-          // @ts-ignore
           <CodeEditor
             language={EditorLanguage.JSON}
             value={body as string}
@@ -33,6 +39,7 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
             isResizable={false}
             hideCharacterCount
             analyticEventProperties={{ source: "api_client" }}
+            envVariables={variables}
           />
         );
 
@@ -48,11 +55,14 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
 
       default:
         return (
-          <Input.TextArea
-            className="api-request-body-raw"
-            placeholder="Enter text here..."
+          <CodeEditor
+            language={null}
             value={body as string}
-            onChange={(e) => handleBodyChange(e.target.value)}
+            handleChange={handleBodyChange}
+            isResizable={false}
+            hideCharacterCount
+            analyticEventProperties={{ source: "api_client" }}
+            envVariables={variables}
           />
         );
     }
