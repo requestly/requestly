@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -7,7 +7,6 @@ import {
   getCurrentEnvironmentId,
 } from "store/features/variables/selectors";
 import { variablesActions } from "store/features/variables/slice";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
 import {
   attachEnvironmentVariableListener,
@@ -26,6 +25,9 @@ import { isEmpty } from "lodash";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
+import { getOwnerId } from "backend/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -39,15 +41,12 @@ const useEnvironmentManager = (initListenerAndFetcher: boolean = false) => {
   const { apiClientRecords } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
   const collectionVariables = useSelector(getCollectionVariables);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
-  const ownerId = useMemo(
-    () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
-    [currentlyActiveWorkspace.id, user?.details?.profile?.uid]
-  );
+  const ownerId = getOwnerId(user?.details?.profile?.uid, activeWorkspaceId);
 
   const setCurrentEnvironment = useCallback(
     (environmentId: string) => {

@@ -5,9 +5,10 @@ import { getIsExtensionEnabled, getIsRefreshSharesListsPending } from "store/sel
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { SharedList } from "../types";
 import { getOwnerId } from "backend/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -16,9 +17,9 @@ export const useFetchSharedLists = () => {
   const user = useSelector(getUserAuthDetails);
   const isRefreshSharesListsPending = useSelector(getIsRefreshSharesListsPending);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
-  const ownerId = getOwnerId(user?.details?.profile?.uid, workspace?.id);
+  const ownerId = getOwnerId(user?.details?.profile?.uid, activeWorkspaceId);
 
   const [sharedLists, setSharedLists] = useState(null);
   const [isSharedListsLoading, setIsSharedListsLoading] = useState(true);

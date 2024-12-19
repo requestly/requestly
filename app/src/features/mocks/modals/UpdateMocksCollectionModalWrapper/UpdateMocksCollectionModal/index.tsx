@@ -8,8 +8,9 @@ import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { toast } from "utils/Toast";
 import { createCollection } from "backend/mocks/createCollection";
 import { trackMockCollectionCreated } from "modules/analytics/events/features/mocksV2";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import "./updateMocksCollectionModal.scss";
+import { getActiveWorkspaceIds, getWorkspaceById } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 interface Props {
   visible: boolean;
@@ -31,9 +32,9 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
   mockType,
 }) => {
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspace = useSelector(getWorkspaceById(activeWorkspaceId));
   const uid = user?.details?.profile?.uid;
-  const teamId = workspace?.id;
 
   const [isLoading, setIsLoading] = useState(false);
   const [collectionId, setCollectionId] = useState("");
@@ -51,7 +52,7 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
     setIsLoading(true);
     const mockIds = mocks?.map((mock) => mock.id);
 
-    return updateMocksCollection(uid, mockIds, collectionId, collectionPath, teamId)
+    return updateMocksCollection(uid, mockIds, collectionId, collectionPath, activeWorkspaceId)
       .then(() => {
         // TODO: add analytic event
         onSuccess?.();
@@ -92,9 +93,14 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
     };
 
     setIsLoading(true);
-    createCollection(uid, collectionData, teamId)
+    createCollection(uid, collectionData, activeWorkspaceId)
       .then((collection) => {
-        trackMockCollectionCreated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
+        trackMockCollectionCreated(
+          "mocksTable",
+          activeWorkspace?.id,
+          activeWorkspace?.name,
+          activeWorkspace?.membersCount
+        );
         return handleMoveMocks(collection.id, collection.name);
       })
       .finally(() => {

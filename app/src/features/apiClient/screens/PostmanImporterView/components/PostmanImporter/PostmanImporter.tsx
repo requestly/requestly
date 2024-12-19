@@ -11,7 +11,6 @@ import { RQAPI } from "features/apiClient/types";
 import { upsertApiRecord } from "backend/apiClient";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { Row } from "antd";
 import {
@@ -23,6 +22,8 @@ import {
 import Logger from "lib/logger";
 import "./postmanImporter.scss";
 import { batchWrite } from "backend/utils";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableValue> }[];
@@ -49,7 +50,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   });
 
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const { addNewEnvironment, setVariables } = useEnvironmentManager();
   const { onSaveRecord } = useApiClientContext();
@@ -179,7 +180,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         const newCollection = await upsertApiRecord(
           user?.details?.profile?.uid,
           collection,
-          workspace?.id,
+          activeWorkspaceId,
           collection.id
         );
         onSaveRecord(newCollection.data);
@@ -200,7 +201,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
-        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
+        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, activeWorkspaceId, updatedApi.id);
         onSaveRecord(newApi.data);
       } catch (error) {
         failedCollectionsCount++;
@@ -224,7 +225,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     }
 
     return importedCollectionsCount;
-  }, [processedFileData.apiRecords, user?.details?.profile?.uid, workspace?.id, onSaveRecord]);
+  }, [processedFileData.apiRecords, user?.details?.profile?.uid, activeWorkspaceId, onSaveRecord]);
 
   const handleImportPostmanData = useCallback(() => {
     trackImportFromPostmanStarted(collectionsCount.current, processedFileData.environments.length);

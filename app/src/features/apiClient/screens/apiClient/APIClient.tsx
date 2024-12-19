@@ -10,17 +10,17 @@ import { getApiRecord, upsertApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { redirectToRequest } from "utils/RedirectionUtils";
 import "./apiClient.scss";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 interface Props {}
 
 export const APIClient: React.FC<Props> = () => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const location = useLocation();
   const { requestId } = useParams();
@@ -118,7 +118,7 @@ export const APIClient: React.FC<Props> = () => {
         data: apiEntry,
       };
 
-      const result = await upsertApiRecord(uid, record, teamId);
+      const result = await upsertApiRecord(uid, record, activeWorkspaceId);
 
       if (result.success) {
         onSaveRecord(result.data);
@@ -129,7 +129,7 @@ export const APIClient: React.FC<Props> = () => {
 
       return result.data;
     },
-    [uid, user?.loggedIn, teamId, onSaveRecord, navigate]
+    [uid, user?.loggedIn, activeWorkspaceId, onSaveRecord, navigate]
   );
 
   const handleImportRequest = useCallback(

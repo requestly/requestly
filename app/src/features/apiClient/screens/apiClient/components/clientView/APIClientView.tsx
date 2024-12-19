@@ -32,7 +32,6 @@ import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -42,6 +41,8 @@ import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 interface Props {
   openInModal?: boolean;
@@ -61,8 +62,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const { toggleBottomSheet } = useBottomSheetContext();
   const { onSaveRecord } = useApiClientContext();
@@ -307,7 +307,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.name = requestName;
     }
 
-    const result = await upsertApiRecord(uid, record, teamId);
+    const result = await upsertApiRecord(uid, record, activeWorkspaceId);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });
@@ -332,7 +332,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.id = apiEntryDetails?.id;
     }
 
-    const result = await upsertApiRecord(uid, record, teamId);
+    const result = await upsertApiRecord(uid, record, activeWorkspaceId);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...result.data, data: { ...result.data.data, ...record.data } });

@@ -38,9 +38,10 @@ import { DebugInfo, SessionRecordingMode } from "./types";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { toast } from "utils/Toast";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import Logger from "../../../../../../common/logger";
 import { useIncentiveActions } from "features/incentivization/hooks";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 export interface DraftSessionViewerProps {
   testRuleDraftSession?: {
     draftSessionTabId: string;
@@ -69,7 +70,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const isImportedSession = tabId === "imported";
 
   const [isLoading, setIsLoading] = useState(true);
@@ -240,7 +241,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
       appMode,
       dispatch,
       navigate,
-      workspace?.id,
+      activeWorkspaceId,
       sessionRecordingMetadata,
       sessionEvents,
       [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS],
@@ -263,7 +264,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
     source,
     user,
     userAttributes,
-    workspace?.id,
+    activeWorkspaceId,
     isSessionSaving,
     claimIncentiveRewards,
   ]);
