@@ -36,7 +36,7 @@ interface EditorProps {
   hideCharacterCount?: boolean;
   handleChange?: (value: string) => void;
   analyticEventProperties?: AnalyticEventProperties;
-  defaultPrettified?: boolean;
+  prettifyOnInit?: boolean;
   envVariables?: EnvironmentVariables;
 }
 
@@ -52,7 +52,7 @@ const Editor: React.FC<EditorProps> = ({
   toolbarOptions,
   id = "",
   analyticEventProperties = {},
-  defaultPrettified = false,
+  prettifyOnInit = false,
   envVariables,
 }) => {
   const location = useLocation();
@@ -67,7 +67,7 @@ const Editor: React.FC<EditorProps> = ({
 
   const allEditorToast = useSelector(getAllEditorToast);
   const toastOverlay = useMemo(() => allEditorToast[id], [allEditorToast, id]); // todo: rename
-  const [isCodePrettified, setIsCodePrettified] = useState(defaultPrettified);
+  const [isCodePrettified, setIsCodePrettified] = useState(prettifyOnInit);
   const isDefaultPrettificationDone = useRef(false);
 
   const handleResize = (event: any, { element, size, handle }: any) => {
@@ -138,14 +138,14 @@ const Editor: React.FC<EditorProps> = ({
 
   useEffect(() => {
     if (!isDefaultPrettificationDone.current) {
-      if (defaultPrettified && (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT)) {
+      if (prettifyOnInit && (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT)) {
         const prettifiedCode = prettifyCode(value, language);
         setEditorContent(prettifiedCode.code);
         handleChange(prettifiedCode.code);
         isDefaultPrettificationDone.current = true;
       }
     }
-  }, [defaultPrettified, language]);
+  }, [prettifyOnInit, language]);
 
   const handleEditorClose = useCallback(
     (id: string) => {
