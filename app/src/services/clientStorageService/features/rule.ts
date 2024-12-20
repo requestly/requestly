@@ -54,6 +54,25 @@ class ClientRuleStorageService {
       await clientStorageService.saveStorageObject(newSuperObject);
     });
   }
+
+  getAllRulesAndGroups = async (): Promise<Record<string, any>> => {
+    console.log("[ClientRuleStorageService] getAllRulesAndGroups");
+    const superObject = await clientStorageService.getStorageSuperObject();
+    const rulesSuperObject: Record<string, any> = {};
+
+    if (!superObject) {
+      return rulesSuperObject;
+    }
+
+    for (let key in superObject) {
+      if (superObject[key]?.objectType === "rule" || superObject[key]?.objectType === "group") {
+        rulesSuperObject[key] = superObject[key];
+      }
+    }
+
+    console.log("[ClientRuleStorageService] getAllRulesAndGroups", { rulesSuperObject });
+    return rulesSuperObject;
+  };
 }
 
 const clientRuleStorageService = new ClientRuleStorageService();

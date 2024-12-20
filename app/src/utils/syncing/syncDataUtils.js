@@ -348,7 +348,7 @@ export const syncToLocalFromFirebase = async (allSyncedRecords, appMode, uid) =>
   // END - Handle prevention of syncing of isFavourite and syncRuleStatus
 
   Logger.log("Writing storage in syncToLocalFromFirebase");
-  await StorageService(appMode).saveRulesOrGroupsWithoutSyncing(allSyncedRecords);
+  // await StorageService(appMode).saveRulesOrGroupsWithoutSyncing(allSyncedRecords);
   return updateLastSyncedTS(appMode);
 };
 
