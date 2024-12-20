@@ -6,9 +6,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "../../../../utils/Toast";
 import { isEqual } from "lodash";
-import { getAppMode } from "store/selectors";
 import Logger from "lib/logger";
-import { StorageService } from "init";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
@@ -22,6 +20,7 @@ import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
 
 const emptyPageSourceData = {
   key: GLOBAL_CONSTANTS.URL_COMPONENTS.URL,
@@ -46,7 +45,6 @@ const ConfigurationPage = () => {
   const navigate = useNavigate();
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
-  const appMode = useSelector(getAppMode);
   const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
   const [customPageSources, setCustomPageSources] = useState([]);
@@ -57,19 +55,16 @@ const ConfigurationPage = () => {
     trackConfigurationOpened();
   }, []);
 
-  const handleSaveConfig = useCallback(
-    async (newConfig) => {
-      Logger.log("Writing storage in handleSaveConfig");
-      await StorageService(appMode).saveSessionRecordingPageConfig(newConfig);
-      setConfig(newConfig);
-      toast.success("Saved configuration successfully.");
-      trackConfigurationSaved({
-        pageSources: newConfig.pageSources.length,
-        maxDuration: newConfig.maxDuration,
-      });
-    },
-    [appMode]
-  );
+  const handleSaveConfig = useCallback(async (newConfig) => {
+    Logger.log("Writing storage in handleSaveConfig");
+    clientSessionRecordingStorageService.saveSessionRecordingConfig(newConfig);
+    setConfig(newConfig);
+    toast.success("Saved configuration successfully.");
+    trackConfigurationSaved({
+      pageSources: newConfig.pageSources.length,
+      maxDuration: newConfig.maxDuration,
+    });
+  }, []);
 
   useEffect(() => {
     if (inputRef.current?.input?.dataset.index === "0") {
@@ -79,10 +74,10 @@ const ConfigurationPage = () => {
 
   useEffect(() => {
     Logger.log("Reading storage in SessionsIndexPage");
-    StorageService(appMode)
-      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
+    clientSessionRecordingStorageService
+      .getSessionRecordingConfig()
       .then((savedConfig) => setConfig(savedConfig || {}));
-  }, [appMode]);
+  }, []);
 
   useEffect(() => {
     if (!isSharedWorkspaceMode) {
