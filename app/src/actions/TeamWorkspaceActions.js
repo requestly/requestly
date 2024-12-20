@@ -17,6 +17,7 @@ import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUt
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
 import { variablesActions } from "store/features/variables/slice";
+import { tabsLayoutActions } from "store/slices/tabs-layout";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -89,6 +90,7 @@ export const switchWorkspace = async (
   }
 
   dispatch(variablesActions.resetState());
+  dispatch(tabsLayoutActions.resetState());
 
   // Just in case
   window.skipSyncListenerForNextOneTime = false;
