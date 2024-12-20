@@ -357,6 +357,7 @@ const MockEditor: React.FC<Props> = ({
             handleChange={setBody}
             language={getEditorLanguage(fileType)}
             isReadOnly={isEditorReadOnly}
+            prettifyOnInit={true}
             analyticEventProperties={{ source: "mocks", mock_type: mockType }}
             toolbarOptions={{
               title: mockType === MockType.FILE ? "File content" : "",

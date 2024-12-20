@@ -189,6 +189,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                 defaultValue={getEditorDefaultValue()}
                 value={pair.request.value}
                 handleChange={requestBodyChangeHandler}
+                prettifyOnInit={true}
                 isReadOnly={isInputDisabled}
                 analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.REQUEST }}
                 toolbarOptions={{
