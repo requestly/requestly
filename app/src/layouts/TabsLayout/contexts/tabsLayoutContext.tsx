@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef } from "react";
+import React, { createContext, useCallback, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { TabsLayout, TabsLayoutContextInterface } from "../types";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,18 +28,10 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
 
-  const hasInitialized = useRef(false);
   useEffect(() => {
-    if (hasInitialized.current) {
-      return;
-    }
-
-    hasInitialized.current = true;
-
     if (!activeTab) {
       return;
     }
-
     delete tabOutletElementsMap.current[activeTab.id];
     navigate(activeTab.url);
   }, [navigate, activeTab]);
@@ -62,8 +54,17 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
       }
 
       const targetTab = copiedTabs[targetTabIndex];
-      const updatedTabs = copiedTabs.filter((tab) => tab.id !== tabId);
 
+      if (targetTab.hasUnsavedChanges) {
+        // TODO: Trigger a warning modal
+        const result = window.confirm("Discard changes? Changes you made will not be saved.");
+
+        if (!result) {
+          return;
+        }
+      }
+
+      const updatedTabs = copiedTabs.filter((tab) => tab.id !== tabId);
       dispatch(tabsLayoutActions.setTabs({ featureId: id, tabs: updatedTabs }));
 
       if (updatedTabs.length && targetTab.id === activeTab?.id) {
@@ -102,6 +103,10 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
 
   const updateTab = useCallback(
     (tabId: TabsLayout.Tab["id"], updatedTabData?: Partial<TabsLayout.Tab>) => {
+      if (!tabId) {
+        return;
+      }
+
       dispatch(tabsLayoutActions.updateTab({ featureId: id, tabId, updatedTabData }));
     },
     [dispatch, id]
@@ -109,20 +114,13 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
 
   const replaceTab = useCallback(
     (tabId: TabsLayout.Tab["id"], newTabData: Partial<TabsLayout.Tab>) => {
-      const existingTab = tabs.find((tab) => tab.id === tabId);
-
-      if (!existingTab) {
-        openTab(newTabData.id, newTabData);
-        return;
-      }
-
       updateTab(tabId, newTabData);
 
       if (tabId === activeTab?.id) {
         updateActivetab({ ...activeTab, ...newTabData } as TabsLayout.Tab);
       }
     },
-    [tabs, activeTab, updateTab, updateActivetab, openTab]
+    [activeTab, updateTab, updateActivetab]
   );
 
   const value = { activeTab, tabs, openTab, closeTab, updateTab, replaceTab, tabOutletElementsMap };
