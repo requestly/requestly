@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { checkUserBackupState, getAuthData, getOrUpdateUserSyncState } from "actions/FirebaseActions";
+import { checkUserBackupState, getAuthData } from "actions/FirebaseActions";
 import firebaseApp from "firebase.js";
 import { User, getAuth, onAuthStateChanged, signInWithCustomToken } from "firebase/auth";
 import { globalActions } from "store/slices/global/slice";
@@ -20,6 +20,7 @@ import { getUser } from "backend/user/getUser";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { StorageService } from "init";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { clientStorageService } from "services/clientStorageService";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -101,17 +102,14 @@ const AuthHandler: React.FC<{}> = () => {
 
       try {
         // FIXME: getOrUpdateUserSyncState, checkUserBackupState taking too long for large workspace, can this be improved or moved to non-blocking operations?
-        const [firestorePlanDetails, isSyncEnabled, isBackupEnabled] = await Promise.all([
+        const [firestorePlanDetails, isBackupEnabled] = await Promise.all([
           getUserSubscription(user.uid),
-          getOrUpdateUserSyncState(user.uid, appMode),
           checkUserBackupState(user.uid),
         ]);
 
         // phase-1 migration: Adaptor to convert firestore schema into old schema
         const planDetails = newSchemaToOldSchemaAdapter(firestorePlanDetails);
         const isUserPremium = isPremiumUser(planDetails);
-
-        window.isSyncEnabled = isSyncEnabled;
         window.keySetDoneisSyncEnabled = true;
 
         dispatch(
@@ -126,7 +124,6 @@ const AuthHandler: React.FC<{}> = () => {
                 planName: getPlanName(planDetails),
               },
               isBackupEnabled,
-              isSyncEnabled,
               isPremium: isUserPremium,
             },
           })
@@ -177,7 +174,7 @@ const AuthHandler: React.FC<{}> = () => {
         return false;
       }
     },
-    [appMode, dispatch, onboardingDetails.fullName]
+    [dispatch, onboardingDetails.fullName]
   );
 
   useEffect(() => {
@@ -241,9 +238,8 @@ const AuthHandler: React.FC<{}> = () => {
         window.isSyncEnabled = null;
         window.keySetDoneisSyncEnabled = true;
         localStorage.removeItem("__rq_uid");
-        StorageService(appMode).removeRecordsWithoutSyncing([GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN]);
+        clientStorageService.removeStorageObjects([GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN]);
         // set amplitude anon id to local storage:
-
         dispatch(
           // @ts-ignore
           globalActions.updateUserInfo({ loggedIn: false, details: null })

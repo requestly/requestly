@@ -12,7 +12,7 @@ class DesktopStorageClient extends BaseStorageClient {
   }
 
   /** getAll */
-  async getStorageSuperObject(): Promise<Record<string, any> | void> {
+  async getStorageSuperObject(): Promise<Record<string, any> | undefined> {
     return new Promise((resolve, reject) => {
       if (isDesktopStorageServiceAvailable()) {
         resolve(window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE.getStorageSuperObject());

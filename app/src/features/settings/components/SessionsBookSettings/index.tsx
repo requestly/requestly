@@ -12,16 +12,14 @@ import { AutoRecordingMode, SessionRecordingConfig } from "features/sessionBook"
 import { generateObjectId } from "utils/FormattingHelper";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
-// @ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import Logger from "lib/logger";
-import { StorageService } from "init";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./sessionsSettings.css";
 import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
 
 const emptyPageSourceData: SessionRecordingPageSource = {
   value: "",
@@ -70,30 +68,27 @@ export const SessionsSettings: React.FC = () => {
     trackConfigurationOpened();
   }, []);
 
-  const handleSaveConfig = useCallback(
-    async (newConfig: SessionRecordingConfig, showToast = true) => {
-      Logger.log("Writing storage in handleSaveConfig");
-      await StorageService(appMode).saveSessionRecordingPageConfig(newConfig);
-      setConfig(newConfig);
+  const handleSaveConfig = useCallback(async (newConfig: SessionRecordingConfig, showToast = true) => {
+    Logger.log("Writing storage in handleSaveConfig");
+    await clientSessionRecordingStorageService.saveSessionRecordingConfig(newConfig);
+    setConfig(newConfig);
 
-      if (showToast) {
-        toast.success("Settings saved successfully.");
-      }
+    if (showToast) {
+      toast.success("Settings saved successfully.");
+    }
 
-      trackConfigurationSaved({
-        maxDuration: newConfig?.maxDuration,
-        pageSources: newConfig?.pageSources?.length ?? 0,
-        autoRecordingMode: newConfig?.autoRecording?.mode,
-        isAutoRecordingActive: newConfig?.autoRecording?.isActive,
-      });
-    },
-    [appMode]
-  );
+    trackConfigurationSaved({
+      maxDuration: newConfig?.maxDuration,
+      pageSources: newConfig?.pageSources?.length ?? 0,
+      autoRecordingMode: newConfig?.autoRecording?.mode,
+      isAutoRecordingActive: newConfig?.autoRecording?.isActive,
+    });
+  }, []);
 
   useEffect(() => {
     Logger.log("Reading storage in SessionsIndexPage");
-    StorageService(appMode)
-      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
+    clientSessionRecordingStorageService
+      .getSessionRecordingConfig()
       .then((config) => {
         if (!config || Object.keys(config).length === 0) return defaultSessionRecordingConfig;
 

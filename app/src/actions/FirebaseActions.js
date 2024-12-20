@@ -553,34 +553,6 @@ export async function checkUserBackupState(uid) {
   return backupStatus;
 }
 
-/* Syncing is not enable when storage is remote */
-export async function getOrUpdateUserSyncState(uid, appMode) {
-  const database = getDatabase();
-  const userProfileRef = ref(database, getUserProfilePath(uid));
-  let syncStatus = null;
-
-  const profile = (await get(child(userProfileRef, "/"))).toJSON();
-
-  if (profile) {
-    if (profile.isSyncEnabled === undefined) {
-      await update(userProfileRef, { isSyncEnabled: true });
-      syncStatus = true;
-    } else {
-      syncStatus = profile.isSyncEnabled;
-      // Optional - Just in case!
-      if (!syncStatus) await StorageService(appMode).removeRecordsWithoutSyncing([APP_CONSTANTS.LAST_SYNC_TARGET]);
-    }
-  } else {
-    // Profile has not been created yet - user must have signed up recently
-    // Retry! - Helpful when getOrUpdateUserSyncState is first invoked from auth state listener
-    setTimeout(() => {
-      getOrUpdateUserSyncState(uid, appMode);
-    }, 2000);
-  }
-
-  return syncStatus;
-}
-
 export function getAuthData(user) {
   const userProfile = Object.assign({}, user.providerData[0]);
 

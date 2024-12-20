@@ -21,6 +21,7 @@ import { getAuthErrorMessage, AuthTypes } from "components/authentication/utils"
 import posthog from "posthog-js";
 import { StorageService } from "init";
 import { isLocalStoragePresent } from "utils/AppUtils";
+import { clientStorageService } from "services/clientStorageService";
 // import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 
 const showError = (err: string) => {
@@ -190,7 +191,7 @@ export const handleLogoutButtonOnClick = async (appMode: string, isWorkspaceMode
       // switchToPersonalWorkspace()
       // clearCurrentlyActiveWorkspace(dispatch, appMode);
     } else if (window.uid && window.isSyncEnabled) {
-      StorageService(appMode).clearDB();
+      clientStorageService.clearStorage();
     }
 
     return signOut();
