@@ -2,8 +2,8 @@ import React, { useRef, useEffect, useState } from "react";
 import { EditorView, placeholder as cmPlaceHolder } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
-import { EditorPopover } from "componentsV2/CodeEditor/components/Editor/components/Popover";
-import "componentsV2/CodeEditor/components/Editor/components/Popover/popover.scss";
+import { EditorPopover } from "componentsV2/CodeEditor/components/Editor/components/PopOver";
+import "componentsV2/CodeEditor/components/Editor/components/PopOver/popover.scss";
 
 interface RQSingleLineEditorProps {
   defaultValue?: string;
