@@ -97,3 +97,9 @@ export const AUTHORIZATION_STATIC_DATA = {
     },
   },
 };
+
+export const GET_KEY_VALUE_PAIR_DESCRIPTION = (keyValuePairType: string) => `<div>
+        <p>This ${keyValuePairType} was automatically added.</p>
+        <p>This ${keyValuePairType} is added because of the authorization method used for this request.</p>
+        <p>Use the authorization tab to remove authorization or to change the value of this ${keyValuePairType}.</p>
+      </div>`;

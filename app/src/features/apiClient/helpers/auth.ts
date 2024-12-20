@@ -1,5 +1,8 @@
 import { isEmpty, unionBy } from "lodash";
-import { AUTHORIZATION_TYPES } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
+import {
+  AUTHORIZATION_TYPES,
+  GET_KEY_VALUE_PAIR_DESCRIPTION,
+} from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
 import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 import { KeyValuePair, RQAPI } from "../types";
 
@@ -11,18 +14,24 @@ export const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
 
   let newKeyValuePair: KeyValuePair;
 
-  const createAuthorizationKeyValuePair = (type: string, key: string, value: string): typeof newKeyValuePair => ({
+  const createAuthorizationKeyValuePair = (
+    type: string,
+    key: string,
+    value: string,
+    keyValuePairType = "header"
+  ): typeof newKeyValuePair => ({
     id: Date.now(),
     key,
     value,
     type,
     isEnabled: true,
     isEditable: false,
+    description: GET_KEY_VALUE_PAIR_DESCRIPTION(keyValuePairType),
   });
 
-  const updateDataInState = (data: KeyValuePair[], key: string, value: string) => {
+  const updateDataInState = (data: KeyValuePair[], key: string, value: string, keyValuePairType: string = "header") => {
     const existingIndex = data.findIndex((option) => option.type === AUTH_ENTRY_IDENTIFIER);
-    const newOption = createAuthorizationKeyValuePair(AUTH_ENTRY_IDENTIFIER, key, value);
+    const newOption = createAuthorizationKeyValuePair(AUTH_ENTRY_IDENTIFIER, key, value, keyValuePairType);
 
     if (existingIndex !== -1) {
       data[existingIndex] = { ...data[existingIndex], ...newOption };
@@ -47,7 +56,12 @@ export const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
     case AUTHORIZATION_TYPES.API_KEY: {
       const { key, value, addTo } = authOptions[currentAuthType];
 
-      updateDataInState(addTo === "QUERY" ? queryParams : headers, key || "", value || "");
+      updateDataInState(
+        addTo === "QUERY" ? queryParams : headers,
+        key || "",
+        value || "",
+        addTo === "QUERY" ? "query param" : "header"
+      );
 
       break;
     }

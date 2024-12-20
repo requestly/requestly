@@ -152,6 +152,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           title: "key",
           pairType,
           variables,
+          description: record.description,
           handleUpdatePair,
         }),
       },
