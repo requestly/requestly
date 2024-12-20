@@ -3,14 +3,14 @@ import { Popover, Row } from "antd";
 import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
 import { capitalize } from "lodash";
 
-interface SingleLineEditorPopoverProps {
+interface EditorPopoverProps {
   hoveredVariable: string;
   popupPosition: { x: number; y: number };
   editorRef: React.RefObject<HTMLDivElement>;
   variables: Record<string, any>;
 }
 
-export const SingleLineEditorPopover: React.FC<SingleLineEditorPopoverProps> = ({
+export const EditorPopover: React.FC<EditorPopoverProps> = ({
   hoveredVariable,
   editorRef,
   popupPosition,
@@ -41,8 +41,8 @@ export const SingleLineEditorPopover: React.FC<SingleLineEditorPopoverProps> = (
       <div
         style={{
           position: "absolute",
-          top: popupPosition?.y - editorRef.current.getBoundingClientRect().top + 10,
-          left: popupPosition?.x - editorRef.current.getBoundingClientRect().left + 10,
+          top: popupPosition?.y - editorRef.current?.getBoundingClientRect().top + 10,
+          left: popupPosition?.x - editorRef.current?.getBoundingClientRect().left + 10,
           zIndex: 1000,
         }}
         className="variable-info-div"
@@ -87,23 +87,6 @@ const AddNewVariable: React.FC<{}> = () => {
       <Row className="add-new-variable-info-content">
         {"Make sure that the variable is defined in the globals or any of the active environments."}
       </Row>
-      {/* <RQButton
-        block
-        type="primary"
-        className="add-new-variable-btn"
-        onClick={() => {
-          //TODO: Fix this to add new Variables
-          addNewVariable({
-            [variableName]: {
-              syncValue: "",
-              localValue: "",
-              type: "string",
-            },
-          });
-        }}
-      >
-        {"Add as a new variable"}
-      </RQButton> */}
     </>
   );
 };
