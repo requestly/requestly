@@ -63,7 +63,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
       <td {...restProps}>
         <div className="table-cell-data">
           {children}
-          {description && (
+          {description && children && (
             <Tooltip title={<div dangerouslySetInnerHTML={{ __html: description }}></div>} showArrow={false}>
               <RxInfoCircled />
             </Tooltip>
