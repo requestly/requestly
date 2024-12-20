@@ -6,11 +6,13 @@ import { executePrerequestScript, executePostresponseScript } from "./modules/sc
 import { renderTemplate } from "backend/environment/utils";
 import { DEMO_API_URL } from "features/apiClient/constants";
 import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient";
+import { EnvironmentVariables } from "backend/environment/types";
 
 export const executeAPIRequest = async (
   appMode: string,
   entry: RQAPI.Entry,
   environmentManager: any,
+  collectionVariables: EnvironmentVariables,
   signal?: AbortSignal,
   requestCollectionId?: string
 ): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
@@ -28,7 +30,9 @@ export const executeAPIRequest = async (
         renderedRequest,
         environmentManager,
         currentEnvironmentVariables,
-        globalEnvironmentVariables
+        globalEnvironmentVariables,
+        collectionVariables,
+        requestCollectionId
       );
 
       currentEnvironmentVariables = updatedEnvironmentVariables;
@@ -80,7 +84,9 @@ export const executeAPIRequest = async (
         { response, request: renderedRequest },
         environmentManager,
         currentEnvironmentVariables,
-        globalEnvironmentVariables
+        globalEnvironmentVariables,
+        collectionVariables,
+        requestCollectionId
       );
     } catch (error) {
       console.error("Post Response script error", error);
