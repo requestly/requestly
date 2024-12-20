@@ -188,7 +188,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           workspace?.id,
           collection.id
         );
-        onSaveRecord(newCollection.data);
+        onSaveRecord(newCollection.data, false);
         importedCollectionsCount++;
         return newCollection.data.id;
       } catch (error) {
@@ -207,7 +207,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
         const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
-        onSaveRecord(newApi.data);
+        onSaveRecord(newApi.data, false);
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing API:", error);
