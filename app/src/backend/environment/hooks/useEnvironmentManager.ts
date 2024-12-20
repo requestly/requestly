@@ -445,8 +445,10 @@ const useEnvironmentManager = () => {
 
       const updatedVariables = Object.fromEntries(
         Object.entries(variables).map(([key, value]) => {
+          const typeToSave =
+            value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
           const { localValue, ...rest } = value;
-          return [key, rest];
+          return [key, { ...rest, type: typeToSave }];
         })
       );
       const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
@@ -471,9 +473,10 @@ const useEnvironmentManager = () => {
       const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
       return upsertApiRecord(user.details?.profile?.uid, record, currentlyActiveWorkspace?.id).then((result) => {
         onSaveRecord(result.data);
+        dispatch(variablesActions.setCollectionVariables({ collectionId, variables: updatedVariables }));
       });
     },
-    [currentlyActiveWorkspace?.id, user.details?.profile?.uid, onSaveRecord, apiClientRecords]
+    [currentlyActiveWorkspace?.id, user.details?.profile?.uid, onSaveRecord, dispatch, apiClientRecords]
   );
 
   return {

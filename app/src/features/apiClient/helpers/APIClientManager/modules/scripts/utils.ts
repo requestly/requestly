@@ -151,7 +151,6 @@ const handleCollectionVariablesMutations = async (
           return [
             key,
             {
-              type: "string",
               syncValue: collectionVariables[key].syncValue,
               localValue: value,
             },
@@ -160,7 +159,6 @@ const handleCollectionVariablesMutations = async (
         return [
           key,
           {
-            type: "string",
             syncValue: value,
             localValue: value,
           },
