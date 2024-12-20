@@ -23,6 +23,7 @@ import { highlightVariablesPlugin } from "features/apiClient/screens/environment
 import { EditorPopover } from "./components/PopOver";
 import "./editor.scss";
 import "./components/PopOver/popover.scss";
+import { customCompletions, SANDBOX } from "./plugins/autocompletions";
 interface EditorProps {
   value: string;
   defaultValue?: string; // required in the special case of rules where value and default value need to stay in sync
@@ -262,15 +263,18 @@ const Editor: React.FC<EditorProps> = ({
             extensions={[
               editorLanguage,
               EditorView.lineWrapping,
-              envVariables
-                ? highlightVariablesPlugin(
-                    {
-                      setHoveredVariable,
-                      setPopupPosition,
-                    },
-                    envVariables
-                  )
-                : null,
+              ...(envVariables
+                ? [
+                    highlightVariablesPlugin(
+                      {
+                        setHoveredVariable,
+                        setPopupPosition,
+                      },
+                      envVariables
+                    ),
+                    customCompletions(envVariables, SANDBOX),
+                  ]
+                : []),
             ].filter(Boolean)}
             basicSetup={{
               highlightActiveLine: false,
