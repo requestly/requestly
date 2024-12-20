@@ -23,6 +23,7 @@ export interface KeyValuePair {
   key: string;
   value: string;
   isEnabled: boolean;
+  isEditable?: boolean;
   type?: string; // added for special identifiers like auth
 }
 

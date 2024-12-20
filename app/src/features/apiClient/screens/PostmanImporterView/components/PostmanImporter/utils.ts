@@ -110,6 +110,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
       key: query.key,
       value: query.value,
       isEnabled: true,
+      isEditable: true,
     })) ?? [];
 
   const headers =
@@ -118,6 +119,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
       key: header.key,
       value: header.value,
       isEnabled: true,
+      isEditable: true,
     })) ?? [];
 
   let contentType: RequestContentType | null = null;
@@ -136,6 +138,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
         key: formData.key,
         value: formData.value,
         isEnabled: true,
+        isEditable: true,
       })) || [];
   }
 
