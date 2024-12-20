@@ -373,12 +373,10 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
                   onClick={() => openFilterModal(pairIndex)}
                   className="cursor-pointer source-filter-icon-container"
                 >
-                  Filters
-                  {getFilterCount(pairIndex) !== 0 ? (
-                    <Badge className={getFilterCount(pairIndex) !== 0 ? "badge-active" : "badge-default"}>
-                      {getFilterCount(pairIndex)}
-                    </Badge>
-                  ) : null}
+                  <span className={getFilterCount(pairIndex) !== 0 ? "badge-active" : "badge-default"}>
+                    Filters
+                    {getFilterCount(pairIndex) !== 0 ? <Badge>{getFilterCount(pairIndex)}</Badge> : null}
+                  </span>
                 </RQButton>
               </Tooltip>
             )}

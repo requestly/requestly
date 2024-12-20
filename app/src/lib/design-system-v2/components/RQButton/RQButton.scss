@@ -197,18 +197,3 @@
     }
   }
 }
-
-.rq-custom-btn.ant-btn.source-filter-icon-container {
-  color: var(--requestly-color-primary-400);
-}
-.rq-custom-btn.ant-btn.source-filter-icon-container .badge-default {
-  display: none;
-}
-.rq-custom-btn.ant-btn.source-filter-icon-container .badge-active {
-  color: var(--requestly-color-text-default);
-  background-color: var(--requestly-color-primary-400);
-  border-radius: 4px;
-  font-size: 12px;
-  padding: 2px 6px;
-  line-height: 16px;
-}
