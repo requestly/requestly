@@ -11,6 +11,7 @@ interface RQSingleLineEditorProps {
   onChange: (value: string) => void;
   placeholder?: string;
   onPressEnter?: (event: KeyboardEvent, text: string) => void;
+  onKeyDown?: (event: KeyboardEvent, text: string) => void;
   onBlur?: (text: string) => void;
   variables?: Record<string, any>;
 }
@@ -21,6 +22,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   onChange,
   placeholder,
   onPressEnter,
+  onKeyDown,
   onBlur,
   variables = {},
 }) => {
@@ -46,6 +48,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
           }),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
+              console.log("update: ", update.state.doc.toString());
               onChange?.(update.state.doc.toString());
             }
           }),
@@ -53,11 +56,18 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
             blur: (_, view) => {
               onBlur?.(view.state.doc.toString());
             },
-            keypress: (event, view) => {
-              if (event.key === "Enter") {
-                onPressEnter?.(event, view.state.doc.toString());
+            keydown: (event, view) => {
+              const currentText = view.state.doc.toString();
+              if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
+                event.preventDefault();
+                onKeyDown?.(event, currentText);
               }
             },
+            // keypress: (event, view) => {
+            //   if (event.key === "Enter") {
+            //     onPressEnter?.(event, view.state.doc.toString());
+            //   }
+            // },
           }),
           highlightVariablesPlugin(
             {
@@ -81,17 +91,18 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placeholder, variables]);
 
-  useEffect(() => {
-    if (editorViewRef.current && defaultValue !== undefined) {
-      editorViewRef.current.dispatch({
-        changes: {
-          from: 0,
-          to: editorViewRef.current.state.doc.length,
-          insert: defaultValue,
-        },
-      });
-    }
-  }, [defaultValue]);
+  // useEffect(() => {
+  //   if (editorViewRef.current && defaultValue !== undefined) {
+  //     console.log("called:", editorViewRef.current.state.doc.toString());
+  //     editorViewRef.current.dispatch({
+  //       changes: {
+  //         from: 0,
+  //         to: editorViewRef.current.state.doc.length,
+  //         insert: defaultValue,
+  //       },
+  //     });
+  //   }
+  // }, [defaultValue]);
 
   return (
     <>

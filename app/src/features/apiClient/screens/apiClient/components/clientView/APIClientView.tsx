@@ -328,11 +328,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       data: { ...sanitizeEntry(entry) },
     };
 
+    console.log("onSaveEntry:", entry);
+
     if (apiEntryDetails?.id) {
       record.id = apiEntryDetails?.id;
     }
+    console.log("record:", record);
     const result = await upsertApiRecord(uid, record, teamId);
-
+    console.log("result:", result);
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
       setEntry({ ...result.data.data });
@@ -362,6 +365,20 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
     (evt.target as HTMLInputElement).blur();
   }, []);
+  //console.log("debug: ",entry.request);
+  const onUrlKeyDown = useCallback(
+    (evt: KeyboardEvent, text: string) => {
+      if (evt.metaKey) {
+        if (evt.key.toLowerCase() === "s") {
+          evt.preventDefault();
+          console.log("KeyDownFx: ", text, entry.request.url);
+          //setUrl(text);
+          onSaveButtonClick();
+        }
+      }
+    },
+    [entry.request.url, onSaveButtonClick]
+  );
 
   return isExtensionEnabled ? (
     <div className="api-client-view">
@@ -411,10 +428,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                 <RQSingleLineEditor
                   className="api-request-url"
                   placeholder="https://example.com"
-                  // value={entry.request.url}
+                  //value={entry.request.url}
                   defaultValue={entry.request.url}
-                  onChange={(text) => setUrl(text)}
-                  onPressEnter={onUrlInputEnterPressed}
+                  onChange={(text) => {
+                    setUrl(text);
+                    console.log("onChange: ", entry.request.url, "", text);
+                  }}
+                  onKeyDown={onUrlKeyDown}
+                  //onPressEnter={onUrlInputEnterPressed}
                   variables={currentEnvironmentVariables}
                   // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
                 />
