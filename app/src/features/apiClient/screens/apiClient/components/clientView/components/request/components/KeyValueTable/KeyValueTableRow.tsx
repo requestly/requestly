@@ -1,10 +1,11 @@
 import React, { useContext } from "react";
-import { Checkbox, Form, FormInstance } from "antd";
+import { Checkbox, Form, FormInstance, Tooltip } from "antd";
 import { KeyValueFormType, KeyValuePair } from "features/apiClient/types";
 import { trackEnableKeyValueToggled } from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 import { EnvironmentVariables } from "backend/environment/types";
+import { RxInfoCircled } from "@react-icons/all-files/rx/RxInfoCircled";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -26,6 +27,7 @@ export const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => 
 interface EditableCellProps {
   title: React.ReactNode;
   editable: boolean;
+  description: string;
   dataIndex: keyof KeyValuePair;
   record: KeyValuePair;
   pairtype: KeyValueFormType;
@@ -41,6 +43,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
   record,
   pairtype,
   variables,
+  description,
   handleUpdatePair,
   ...restProps
 }) => {
@@ -56,7 +59,18 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
   };
 
   if (!editable) {
-    return <td {...restProps}>{children}</td>;
+    return (
+      <td {...restProps}>
+        <div className="table-cell-data">
+          {children}
+          {description && (
+            <Tooltip title={<div dangerouslySetInnerHTML={{ __html: description }}></div>} showArrow={false}>
+              <RxInfoCircled />
+            </Tooltip>
+          )}
+        </div>
+      </td>
+    );
   }
 
   return (

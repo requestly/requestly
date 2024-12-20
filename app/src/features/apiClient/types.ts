@@ -1,6 +1,7 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { AUTH_OPTIONS } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/form";
 import { AUTHORIZATION_TYPES } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
+import { ReactNode } from "react";
 
 export enum RequestMethod {
   GET = "GET",
@@ -25,6 +26,7 @@ export interface KeyValuePair {
   isEnabled: boolean;
   isEditable?: boolean;
   type?: string; // added for special identifiers like auth
+  description?: ReactNode;
 }
 
 export enum KeyValueFormType {
