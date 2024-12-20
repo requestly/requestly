@@ -4,7 +4,7 @@ export function getAppVersion() {
   return window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.VERSION;
 }
 
-const isDesktopStorageServiceAvailable = () => {
+export const isDesktopStorageServiceAvailable = () => {
   return window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE;
 };
 

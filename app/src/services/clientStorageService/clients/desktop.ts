@@ -1,8 +1,5 @@
+import { isDesktopStorageServiceAvailable } from "actions/DesktopActions";
 import { BaseStorageClient } from "./base";
-
-const isDesktopStorageServiceAvailable = () => {
-  return window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE;
-};
 
 class DesktopStorageClient extends BaseStorageClient {
   /** get */
