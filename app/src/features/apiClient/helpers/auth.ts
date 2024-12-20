@@ -7,7 +7,7 @@ export const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
   const headers: KeyValuePair[] = [];
   const queryParams: KeyValuePair[] = [];
 
-  const { currentAuthType = "" } = authOptions || {};
+  const { currentAuthType } = authOptions || {};
 
   let newKeyValuePair: KeyValuePair;
 
@@ -17,6 +17,7 @@ export const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
     value,
     type,
     isEnabled: true,
+    isEditable: false,
   });
 
   const updateDataInState = (data: KeyValuePair[], key: string, value: string) => {

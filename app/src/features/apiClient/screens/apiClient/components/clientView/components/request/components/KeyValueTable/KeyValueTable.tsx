@@ -8,7 +8,6 @@ import { KeyValueFormType, KeyValuePair, RQAPI } from "features/apiClient/types"
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { isArray } from "lodash";
 import { EnvironmentVariables } from "backend/environment/types";
-import { AUTH_ENTRY_IDENTIFIER } from "../AuthorizationView/types";
 import "./keyValueTable.scss";
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
@@ -94,6 +93,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       key: "",
       value: "",
       isEnabled: true,
+      isEditable: true,
     }),
     []
   );
@@ -119,6 +119,10 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
     }
   }, [tableData, handleAddPair]);
 
+  useEffect(() => {
+    setTableData(data);
+  }, [data]);
+
   const columns = useMemo(() => {
     return [
       {
@@ -128,7 +132,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
-          editable: record.type !== AUTH_ENTRY_IDENTIFIER,
+          editable: record.isEditable,
           dataIndex: "isEnabled",
           title: "isEnabled",
           pairType,
@@ -143,7 +147,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
-          editable: record.type !== AUTH_ENTRY_IDENTIFIER,
+          editable: record.isEditable,
           dataIndex: "key",
           title: "key",
           pairType,
@@ -157,7 +161,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
-          editable: record.type !== AUTH_ENTRY_IDENTIFIER,
+          editable: record.isEditable,
           dataIndex: "value",
           title: "value",
           pairType,
@@ -169,10 +173,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         title: "",
         width: "50px",
         render: (_: any, record: KeyValuePair) => {
-          if (
-            (record.key === "" && record.value === "" && tableData.length === 1) ||
-            record.type === AUTH_ENTRY_IDENTIFIER
-          ) {
+          if ((record.key === "" && record.value === "" && tableData.length === 1) || !record.isEditable) {
             return null;
           }
 
