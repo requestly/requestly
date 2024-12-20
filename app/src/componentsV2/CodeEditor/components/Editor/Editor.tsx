@@ -20,7 +20,7 @@ import PATHS from "config/constants/sub/paths";
 import { trackCodeEditorCollapsedClick, trackCodeEditorExpandedClick } from "../analytics";
 import { EnvironmentVariables } from "backend/environment/types";
 import { highlightVariablesPlugin } from "features/apiClient/screens/environment/components/SingleLineEditor/plugins/highlightVariables";
-import { EditorPopover } from "./components/Popover";
+import { EditorPopover } from "./components/PopOver";
 import "./editor.scss";
 import "./components/PopOver/popover.scss";
 interface EditorProps {
