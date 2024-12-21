@@ -320,7 +320,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
   };
 
-  const onSaveButtonClick = async () => {
+  const onSaveButtonClick = useCallback(async () => {
     setIsRequestSaving(true);
 
     const record: Partial<RQAPI.ApiRecord> = {
@@ -347,7 +347,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
 
     setIsRequestSaving(false);
-  };
+  }, [entry, apiEntryDetails, onSaveRecord, setEntry, teamId, uid]);
 
   const cancelRequest = useCallback(() => {
     abortControllerRef.current?.abort();
@@ -362,22 +362,16 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
-    (evt.target as HTMLInputElement).blur();
-  }, []);
-  //console.log("debug: ",entry.request);
   const onUrlKeyDown = useCallback(
     (evt: KeyboardEvent, text: string) => {
       if (evt.metaKey) {
         if (evt.key.toLowerCase() === "s") {
           evt.preventDefault();
-          console.log("KeyDownFx: ", text, entry.request.url);
-          //setUrl(text);
           onSaveButtonClick();
         }
       }
     },
-    [entry.request.url, onSaveButtonClick]
+    [onSaveButtonClick]
   );
 
   return isExtensionEnabled ? (
