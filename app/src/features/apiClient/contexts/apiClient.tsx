@@ -9,9 +9,14 @@ import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from 
 import {
   trackHistoryCleared,
   trackImportCurlClicked,
+  trackNewCollectionClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { trackCreateEnvironmentClicked } from "../screens/environment/analytics";
+import PATHS from "config/constants/sub/paths";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { createBlankApiRecord } from "../screens/apiClient/utils";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -19,7 +24,7 @@ interface ApiClientContextInterface {
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => void;
-  onSaveRecord: (apiClientRecord: RQAPI.Record) => void;
+  onSaveRecord: (apiClientRecord: RQAPI.Record, openTabOnSave?: boolean) => void;
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => void;
   recordToBeDeleted: RQAPI.Record;
   updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => void;
@@ -31,12 +36,16 @@ interface ApiClientContextInterface {
   addToHistory: (apiEntry: RQAPI.Entry) => void;
   clearHistory: () => void;
 
+  isRecordBeingCreated: RQAPI.RecordType | null;
+  setIsRecordBeingCreated: (recordType: RQAPI.RecordType | null) => void;
+
   isImportModalOpen: boolean;
 
+  selectedHistoryIndex: number;
   onSelectionFromHistory: (index: number) => void;
   onImportClick: () => void;
   onImportRequestModalClose: () => void;
-  onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => void;
+  onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise<void>;
 
   setIsImportModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -47,7 +56,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => {},
-  onSaveRecord: (apiClientRecord: RQAPI.Record) => {},
+  onSaveRecord: (apiClientRecord: RQAPI.Record, openTabOnSave?: boolean) => {},
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => {},
   recordToBeDeleted: null,
   updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => {},
@@ -58,12 +67,16 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   addToHistory: (apiEntry: RQAPI.Entry) => {},
   clearHistory: () => {},
 
+  isRecordBeingCreated: null,
+  setIsRecordBeingCreated: (recordType: RQAPI.RecordType | null) => {},
+
   isImportModalOpen: false,
 
+  selectedHistoryIndex: 0,
   onSelectionFromHistory: (index: number) => {},
   onImportClick: () => {},
   onImportRequestModalClose: () => {},
-  onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource) => {},
+  onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise.resolve(),
 
   setIsImportModalOpen: () => {},
 });
@@ -82,10 +95,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
+  const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
 
-  const { closeTab } = useTabsLayoutContext();
+  const { openTab, closeTab, updateTab, replaceTab } = useTabsLayoutContext();
+  const { addNewEnvironment } = useEnvironmentManager();
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -129,11 +145,19 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     });
   }, []);
 
-  const onUpdateRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-    setApiClientRecords((prev) => {
-      return prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record));
-    });
-  }, []);
+  const onUpdateRecord = useCallback(
+    (apiClientRecord: RQAPI.Record) => {
+      setApiClientRecords((prev) => {
+        return prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record));
+      });
+
+      updateTab(apiClientRecord.id, {
+        title: apiClientRecord.name,
+        hasUnsavedChanges: false,
+      });
+    },
+    [updateTab]
+  );
 
   const onDeleteRecords = useCallback(
     (recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
@@ -151,16 +175,27 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   );
 
   const onSaveRecord = useCallback(
-    (apiClientRecord: RQAPI.Record) => {
+    (apiClientRecord: RQAPI.Record, openTabOnSave = true) => {
       const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
-
+      const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
       if (isRecordExist) {
         onUpdateRecord(apiClientRecord);
+        replaceTab(apiClientRecord.id, {
+          title: apiClientRecord.name,
+          url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}`,
+        });
       } else {
         onNewRecord(apiClientRecord);
+        console.log("apiClientRecord v2", apiClientRecord);
+        if (openTabOnSave) {
+          openTab(apiClientRecord.id, {
+            title: apiClientRecord.name,
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?new`,
+          });
+        }
       }
     },
-    [apiClientRecords, onUpdateRecord, onNewRecord]
+    [apiClientRecords, onUpdateRecord, onNewRecord, openTab, replaceTab]
   );
 
   const updateRecordToBeDeleted = useCallback((record: RQAPI.Record) => {
@@ -183,14 +218,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     trackHistoryCleared();
   }, []);
 
-  const onSelectionFromHistory = useCallback(
-    (index: number) => {
-      // setSelectedEntry(history[index]);
-    },
-    [
-      // history
-    ]
-  );
+  const onSelectionFromHistory = useCallback((index: number) => {
+    setSelectedHistoryIndex(index);
+  }, []);
 
   const onImportClick = useCallback(() => {
     setIsImportModalOpen(true);
@@ -199,9 +229,56 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);
 
-  const onNewClick = useCallback((analyticEventSource: RQAPI.AnalyticsEventSource) => {
-    trackNewRequestClicked(analyticEventSource);
-  }, []);
+  const onNewClick = useCallback(
+    async (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId = "") => {
+      switch (recordType) {
+        case RQAPI.RecordType.API: {
+          setIsRecordBeingCreated(recordType);
+          trackNewRequestClicked(analyticEventSource);
+          return createBlankApiRecord(uid, teamId, recordType, collectionId).then((result) => {
+            setIsRecordBeingCreated(null);
+            onSaveRecord(result.data);
+          });
+        }
+
+        case RQAPI.RecordType.COLLECTION: {
+          setIsRecordBeingCreated(recordType);
+          trackNewCollectionClicked(analyticEventSource);
+          return createBlankApiRecord(uid, teamId, recordType, collectionId)
+            .then((result) => {
+              setIsRecordBeingCreated(null);
+              if (result.success) {
+                onSaveRecord(result.data);
+              }
+            })
+            .catch((error) => {
+              console.error("Error adding new collection", error);
+            });
+        }
+
+        case RQAPI.RecordType.ENVIRONMENT: {
+          setIsRecordBeingCreated(recordType);
+          trackCreateEnvironmentClicked(analyticEventSource);
+          return addNewEnvironment("New Environment")
+            .then((newEnvironment: { id: string; name: string }) => {
+              setIsRecordBeingCreated(null);
+              openTab(newEnvironment?.id, {
+                title: newEnvironment?.name,
+                url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${newEnvironment?.id}?new`,
+              });
+            })
+            .catch((error) => {
+              console.error("Error adding new environment", error);
+            });
+        }
+
+        default: {
+          return;
+        }
+      }
+    },
+    [openTab, addNewEnvironment, teamId, uid, onSaveRecord]
+  );
 
   const value = {
     apiClientRecords,
@@ -221,9 +298,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     addToHistory,
     clearHistory,
     onSelectionFromHistory,
+    selectedHistoryIndex,
 
     isImportModalOpen,
     setIsImportModalOpen,
+
+    isRecordBeingCreated,
+    setIsRecordBeingCreated,
 
     onImportClick,
     onImportRequestModalClose,

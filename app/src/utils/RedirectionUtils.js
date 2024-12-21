@@ -95,12 +95,6 @@ export const redirectToMocks = (navigate) => {
 };
 
 /* FEATURE - FILES LIBRARY */
-
-/* FEATURE - FILES LIBRARY - List of All Files */
-export const redirectToFiles = (navigate) => {
-  navigate(PATHS.FILES.MY_FILES.ABSOLUTE);
-};
-
 /* FEATURE - FILES LIBRARY - View a File */
 export const redirectToFileViewer = (navigate, fileId, url = null) => {
   navigate({
@@ -183,6 +177,10 @@ export const redirectToApiClient = (navigate) => {
 
 export const redirectToRequest = (navigate, requestId = "new") => {
   navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}`);
+};
+
+export const redirectToCollection = (navigate, collectionId) => {
+  navigate(`${PATHS.API_CLIENT.ABSOLUTE}/collection/${collectionId}`);
 };
 
 export const redirectToApiClientCollection = (navigate, collectionId = "new") => {

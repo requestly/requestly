@@ -8,9 +8,13 @@ import {
   getDocs,
   getFirestore,
   onSnapshot,
+  query,
+  setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { EnvironmentData, EnvironmentMap, EnvironmentVariables } from "./types";
+import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 
 const db = getFirestore(firebaseApp);
 
@@ -18,16 +22,30 @@ const getDocPath = (ownerId: string, environmentId: string) => {
   return doc(db, "environments", ownerId, "environments", environmentId);
 };
 
-export const upsertEnvironmentInDB = async (ownerId: string, environmentName: string) => {
-  return addDoc(collection(db, "environments", ownerId, "environments"), {
-    name: environmentName,
-    variables: {},
-  }).then((doc) => {
-    return {
-      id: doc.id,
+export const upsertEnvironmentInDB = async (ownerId: string, environmentName: string, docId?: string) => {
+  if (docId) {
+    const docRef = doc(db, "environments", ownerId, "environments", docId);
+    return setDoc(docRef, {
       name: environmentName,
-    };
-  });
+      variables: {},
+      id: docId,
+    }).then(() => {
+      return {
+        id: docId,
+        name: environmentName,
+      };
+    });
+  } else {
+    return addDoc(collection(db, "environments", ownerId, "environments"), {
+      name: environmentName,
+      variables: {},
+    }).then((doc) => {
+      return {
+        id: doc.id,
+        name: environmentName,
+      };
+    });
+  }
 };
 
 export const updateEnvironmentVariablesInDB = async (
@@ -79,6 +97,29 @@ export const attachEnvironmentVariableListener = (
 
       callback(environmentData);
     }
+  });
+
+  return unsubscribe;
+};
+
+export const attachCollectionVariableListener = (
+  ownerId: string,
+  callback: (newVariables: CollectionVariableMap) => void
+) => {
+  if (!ownerId) {
+    return () => {};
+  }
+
+  const apisRef = collection(db, "apis");
+  const q = query(apisRef, where("ownerId", "==", ownerId), where("type", "==", RQAPI.RecordType.COLLECTION));
+
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    const collectionVariableDetails: CollectionVariableMap = {};
+    snapshot.forEach((doc) => {
+      const collectionData = { id: doc.id, ...doc.data() } as RQAPI.CollectionRecord;
+      collectionVariableDetails[doc.id] = { variables: collectionData.data.variables };
+    });
+    callback(collectionVariableDetails);
   });
 
   return unsubscribe;

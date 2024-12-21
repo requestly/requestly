@@ -18,12 +18,15 @@ import { toast } from "utils/Toast";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { trackCodeEditorCollapsedClick, trackCodeEditorExpandedClick } from "../analytics";
+import { EnvironmentVariables } from "backend/environment/types";
+import { highlightVariablesPlugin } from "features/apiClient/screens/environment/components/SingleLineEditor/plugins/highlightVariables";
+import { EditorPopover } from "./components/PopOver";
 import "./editor.scss";
-
+import "./components/PopOver/popover.scss";
 interface EditorProps {
   value: string;
-  defaultValue: string;
-  language: EditorLanguage;
+  defaultValue?: string; // required in the special case of rules where value and default value need to stay in sync
+  language: EditorLanguage | null;
   isReadOnly?: boolean;
   height?: number;
   isResizable?: boolean;
@@ -32,6 +35,7 @@ interface EditorProps {
   hideCharacterCount?: boolean;
   handleChange?: (value: string) => void;
   analyticEventProperties?: AnalyticEventProperties;
+  envVariables?: EnvironmentVariables;
 }
 
 const Editor: React.FC<EditorProps> = ({
@@ -46,12 +50,16 @@ const Editor: React.FC<EditorProps> = ({
   toolbarOptions,
   id = "",
   analyticEventProperties = {},
+  envVariables,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
+  const editorRef = useRef<HTMLDivElement | null>(null);
   const [editorHeight, setEditorHeight] = useState(height);
   const [editorContent, setEditorContent] = useState(value);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [hoveredVariable, setHoveredVariable] = useState(null);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const isFullScreenModeOnboardingCompleted = useSelector(getIsCodeEditorFullScreenModeOnboardingCompleted);
 
   const allEditorToast = useSelector(getAllEditorToast);
@@ -124,6 +132,7 @@ const Editor: React.FC<EditorProps> = ({
 
   const handleEditorClose = useCallback(
     (id: string) => {
+      // @ts-expect-error
       dispatch(globalActions.removeToastForEditor({ id }));
     },
     [dispatch]
@@ -238,14 +247,31 @@ const Editor: React.FC<EditorProps> = ({
             />
           )}
           <CodeMirror
-            className="code-editor"
+            ref={(instance) => {
+              if (instance) {
+                editorRef.current = instance.editor;
+              }
+            }}
+            className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""}`}
             width="100%"
             readOnly={isReadOnly}
             value={editorContent ?? ""}
             defaultValue={defaultValue}
             onChange={handleEditorBodyChange}
             theme={vscodeDark}
-            extensions={editorLanguage ? [editorLanguage, EditorView.lineWrapping] : []}
+            extensions={[
+              editorLanguage,
+              EditorView.lineWrapping,
+              envVariables
+                ? highlightVariablesPlugin(
+                    {
+                      setHoveredVariable,
+                      setPopupPosition,
+                    },
+                    envVariables
+                  )
+                : null,
+            ].filter(Boolean)}
             basicSetup={{
               highlightActiveLine: false,
               bracketMatching: true,
@@ -255,7 +281,20 @@ const Editor: React.FC<EditorProps> = ({
             data-enable-grammarly="false"
             data-gramm_editor="false"
             data-gramm="false"
-          />
+          >
+            {envVariables && (
+              <div className="editor-popup-container ant-input" onMouseLeave={() => setHoveredVariable(null)}>
+                {hoveredVariable && (
+                  <EditorPopover
+                    editorRef={editorRef}
+                    hoveredVariable={hoveredVariable}
+                    popupPosition={popupPosition}
+                    variables={envVariables}
+                  />
+                )}
+              </div>
+            )}
+          </CodeMirror>
         </>
       </ResizableBox>
     </>

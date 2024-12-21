@@ -6,7 +6,10 @@ import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../ut
 import { KeyValueTable } from "../KeyValueTable/KeyValueTable";
 import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEditor";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
+import AuthorizationView from "../AuthorizationView";
+import { AUTHORIZATION_TYPES } from "../AuthorizationView/types";
 
 enum Tab {
   QUERY_PARAMS = "query_params",
@@ -16,7 +19,7 @@ enum Tab {
   SCRIPTS = "scripts",
 }
 
-const LabelWithCount: React.FC<{ label: string; count: number; showDot?: boolean }> = ({ label, count, showDot }) => {
+const LabelWithCount: React.FC<{ label: string; count?: number; showDot?: boolean }> = ({ label, count, showDot }) => {
   return (
     <div className="request-tab-label">
       <span>{label}</span>
@@ -27,13 +30,23 @@ const LabelWithCount: React.FC<{ label: string; count: number; showDot?: boolean
 
 interface Props {
   requestEntry: RQAPI.Entry;
+  collectionId: string;
   setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
+  handleAuthChange: (authOptions: RQAPI.AuthOptions) => void;
 }
 
-const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setContentType }) => {
+const RequestTabs: React.FC<Props> = ({
+  requestEntry,
+  collectionId,
+  setRequestEntry,
+  setContentType,
+  handleAuthChange,
+}) => {
   const [selectedTab, setSelectedTab] = useState(Tab.QUERY_PARAMS);
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
+  const { getVariablesWithPrecedence } = useEnvironmentManager();
+  const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
   useEffect(() => {
     if (selectedTab === Tab.BODY && !supportsRequestBody(requestEntry.request.method)) {
@@ -56,6 +69,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setConten
             data={requestEntry.request.queryParams}
             setKeyValuePairs={setRequestEntry}
             pairType={KeyValueFormType.QUERY_PARAMS}
+            variables={variables}
           />
         ),
       },
@@ -70,6 +84,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setConten
             contentType={requestEntry.request.contentType}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
+            variables={variables}
           />
         ),
         disabled: !isRequestBodySupported,
@@ -82,14 +97,15 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setConten
             data={requestEntry.request.headers}
             setKeyValuePairs={setRequestEntry}
             pairType={KeyValueFormType.HEADERS}
+            variables={variables}
           />
         ),
       },
-      // {
-      //   key: Tab.AUTHORIZATION,
-      //   label: "Authorization",
-      //   children: <div></div>,
-      // },
+      {
+        key: Tab.AUTHORIZATION,
+        label: <LabelWithCount label="Authorization" />,
+        children: <AuthorizationView defaultValues={requestEntry.auth} onAuthUpdate={handleAuthChange} />,
+      },
     ];
 
     if (isScriptsSupported) {
@@ -107,7 +123,7 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setConten
     }
 
     return items;
-  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts]);
+  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts, variables]);
 
   return (
     <Tabs

@@ -1,3 +1,7 @@
+import { EnvironmentVariables } from "backend/environment/types";
+import { AUTH_OPTIONS } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/form";
+import { AUTHORIZATION_TYPES } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
+
 export enum RequestMethod {
   GET = "GET",
   POST = "POST",
@@ -19,6 +23,7 @@ export interface KeyValuePair {
   key: string;
   value: string;
   isEnabled: boolean;
+  type?: string; // added for special identifiers like auth
 }
 
 export enum KeyValueFormType {
@@ -27,8 +32,14 @@ export enum KeyValueFormType {
   FORM = "form",
 }
 
+export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
+
 export namespace RQAPI {
-  export type AnalyticsEventSource = "collection_row" | "collection_list_empty_state" | "api_client_sidebar_header";
+  export type AnalyticsEventSource =
+    | "collection_row"
+    | "collection_list_empty_state"
+    | "api_client_sidebar_header"
+    | "api_client_sidebar";
 
   export enum RecordType {
     API = "api",
@@ -43,6 +54,11 @@ export namespace RQAPI {
 
   export type RequestBody = string | KeyValuePair[]; // in case of form data, body will be key-value pairs
 
+  export type AuthOptions<T extends AUTHORIZATION_TYPES = AUTHORIZATION_TYPES> = {
+    currentAuthType: T;
+  } & {
+    [K in AUTHORIZATION_TYPES]?: K extends T ? AUTH_OPTIONS : never;
+  };
   export interface Request {
     url: string;
     queryParams: KeyValuePair[];
@@ -68,6 +84,7 @@ export namespace RQAPI {
       preRequest: string;
       postResponse: string;
     };
+    auth?: AuthOptions;
   }
 
   export interface RequestErrorEntry {
@@ -86,6 +103,8 @@ export namespace RQAPI {
       preRequest: string;
       postResponse: string;
     };
+    variables: Omit<EnvironmentVariables, "localValue">;
+    auth?: AuthOptions;
   }
 
   interface RecordMetadata {

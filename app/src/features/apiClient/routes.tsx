@@ -1,14 +1,14 @@
-import { RouteObject } from "react-router-dom";
+import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import ApiClientFeatureContainer from "./container";
 import { APIClient } from "./screens/apiClient/APIClient";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { EnvironmentView } from "./screens/environment/components/environmentView/EnvironmentView";
-import { EmptyEnvironmentView } from "./screens/environment/components/emptyEnvironmentView/EmptyEnvironmentView";
 import { EnvironmentContainer } from "./screens/environment/container";
 import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImporterView";
 import { TabOutletHOC } from "layouts/TabsLayout/hoc/TabOutletHOC";
-import { APIClientEmptyView } from "./screens/apiClient/components/sidebar/components/APIClientEmptyView/APIClientEmptyView";
+import { CollectionView } from "./screens/apiClient/components/clientView/components/Collection/CollectionView";
+import { ApiClientEmptyView } from "./screens/apiClient/components/clientView/components/ApiClientEmptyView/ApiClientEmptyView";
 
 export const apiClientRoutes: RouteObject[] = [
   {
@@ -24,7 +24,7 @@ export const apiClientRoutes: RouteObject[] = [
         index: true,
         element: (
           <TabOutletHOC>
-            <APIClientEmptyView />
+            <ApiClientEmptyView />
           </TabOutletHOC>
         ),
       },
@@ -46,13 +46,13 @@ export const apiClientRoutes: RouteObject[] = [
         path: PATHS.API_CLIENT.COLLECTION.INDEX,
         element: (
           <TabOutletHOC>
-            <ProtectedRoute component={APIClient} />
+            <ProtectedRoute component={CollectionView} />
           </TabOutletHOC>
         ),
         handle: {
           breadcrumb: {
-            label: "Request", // TODO: Fix, change it to collection, when collection view is added
-            isEditable: false,
+            label: "Collection", // TODO: Fix, change it to collection, when collection view is added
+            isEditable: true,
           },
         },
       },
@@ -79,11 +79,17 @@ export const apiClientRoutes: RouteObject[] = [
         children: [
           {
             index: true,
-            element: <EmptyEnvironmentView />,
+            element: <Navigate to={PATHS.API_CLIENT.RELATIVE} />,
           },
           {
             path: PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE + "/:envId",
             element: <EnvironmentView />,
+            handle: {
+              breadcrumb: {
+                label: "Environments",
+                isEditable: true,
+              },
+            },
           },
         ],
       },

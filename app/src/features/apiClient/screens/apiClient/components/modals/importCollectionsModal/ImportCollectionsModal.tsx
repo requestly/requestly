@@ -7,7 +7,7 @@ import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOut
 import { RQButton } from "lib/design-system-v2/components";
 import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
 import { processApiRecordsToImport, processVariablesToImport } from "./utils";
-import { getCurrentEnvironmentId } from "store/features/environment/selectors";
+import { getCurrentEnvironmentId } from "store/features/variables/selectors";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQAPI } from "features/apiClient/types";
 import { upsertApiRecord } from "backend/apiClient";
@@ -163,7 +163,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
       trackImportApiCollectionsFailed(apiRecordsToImport?.count, Object.keys(variablesToImport || {}).length);
       throw error;
     }
-  }, [apiRecordsToImport, onSaveRecord, user.details?.profile?.uid, workspace?.id, apiRecordsToImport?.count]);
+  }, [apiRecordsToImport, onSaveRecord, user.details?.profile?.uid, workspace?.id, variablesToImport]);
 
   const handleImport = useCallback(async () => {
     trackImportApiCollectionsStarted(apiRecordsToImport?.count, Object.keys(variablesToImport || {}).length);
@@ -180,7 +180,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
     } finally {
       setIsImporting(false);
     }
-  }, [handleImportVariables, handleImportCollectionsAndApis, onClose, apiRecordsToImport?.count]);
+  }, [handleImportVariables, handleImportCollectionsAndApis, onClose, apiRecordsToImport?.count, variablesToImport]);
 
   return (
     <Modal

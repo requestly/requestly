@@ -1,0 +1,31 @@
+.collection-overview-wrapper {
+  display: flex;
+  justify-content: center;
+  height: inherit;
+}
+
+.collection-overview-container {
+  padding: var(--space-8, 24px) var(--space-6, 16px);
+  width: 100%;
+  height: inherit;
+  max-width: 680px;
+
+  .collection-overview-title {
+    font-size: 2rem;
+    font-weight: var(--requestly-font-weight-medium);
+  }
+
+  .collection-overview-description {
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+    margin-top: 1rem;
+    height: inherit;
+
+    &-textarea.ant-input {
+      max-height: 100%;
+      background: var(--requestly-color-surface-0);
+      border-radius: 8px;
+      border: none;
+    }
+  }
+}
