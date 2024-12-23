@@ -1,5 +1,3 @@
-//EXTERNALS
-import { StorageService } from "../init";
 //CONSTANTS
 import APP_CONSTANTS from "../config/constants";
 import firebaseApp from "../firebase";
@@ -52,9 +50,9 @@ export const isNewBackupRequired = (backupTimestamp) => {
 export const updateLastBackupTimeStamp = async (appMode, newTimestamp) => {
   let timestamp = newTimestamp || Date.now();
   Logger.log("Writing storage in updateLastBackupTimeStamp");
-  await StorageService(appMode).saveRecord({
-    [APP_CONSTANTS.LAST_BACKUP_TIMESTAMP]: timestamp,
-  });
+  // await StorageService(appMode).saveRecord({
+  //   [APP_CONSTANTS.LAST_BACKUP_TIMESTAMP]: timestamp,
+  // });
   return { success: true, time: timestamp };
 };
 
@@ -110,5 +108,5 @@ export const updateRecordWithBackup = (appMode, backupData) => {
   const backupArray = [...backup.groups, ...backup.rules]; // To also include groups that are empty
 
   Logger.log("Writing storage in updateRecordWithBackup");
-  return StorageService(appMode).saveMultipleRulesOrGroups(backupArray);
+  // return StorageService(appMode).saveMultipleRulesOrGroups(backupArray);
 };
