@@ -12,7 +12,7 @@ export const requestWorkerFunction = function (e: MessageEvent) {
   };
 
   const JSONifyObject = (stringifiedObject: string): any => {
-    JSON.parse(stringifiedObject);
+    return JSON.parse(stringifiedObject);
   };
 
   const createInfiniteChainable = (methodName: string) => {
