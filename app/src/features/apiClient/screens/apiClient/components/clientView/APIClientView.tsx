@@ -72,10 +72,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const { onSaveRecord } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const { getVariablesWithPrecedence } = environmentManager;
-  const currentEnvironmentVariables = useMemo(
-    () => getVariablesWithPrecedence(apiEntryDetails?.collectionId),
-    [apiEntryDetails?.collectionId, getVariablesWithPrecedence]
-  );
+  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
+    apiEntryDetails?.collectionId,
+    getVariablesWithPrecedence,
+  ]);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>({ ...(apiEntry ?? getEmptyAPIEntry()) });
@@ -346,7 +346,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
-      setEntry({ ...result.data.data });
+      setEntry({ ...result.data.data, response: entry.response });
 
       trackRequestSaved("api_client_view");
       toast.success("Request saved!");

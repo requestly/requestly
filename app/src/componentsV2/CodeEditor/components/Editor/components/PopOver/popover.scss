@@ -1,4 +1,4 @@
-.single-line-editor-container {
+.editor-popup-container {
   .highlight-defined-variable {
     color: var(--requestly-color-primary-text);
     cursor: pointer;
@@ -27,6 +27,21 @@
     line-height: inherit !important;
     overflow: hidden;
   }
+
+  .cm-tooltip-hover {
+    background-color: var(--requestly-color-surface-0);
+    color: var(--requestly-color-text-default);
+    border-radius: 4px;
+    padding: 4px;
+    font-size: var(--requestly-font-size-xs);
+    line-height: var(--requestly-font-line-height-xs);
+    box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
+    z-index: 10;
+  }
+}
+
+.editor-popup-container.ant-input {
+  padding: 0;
 }
 
 div.n-popup {
@@ -102,9 +117,5 @@ div.n-popup {
     .add-new-variable-btn.rq-custom-btn.ant-btn.ant-btn-block {
       border-radius: 4px;
     }
-
-    // .ant-popover-arrow {
-    //   // display: none;
-    // }
   }
 }
