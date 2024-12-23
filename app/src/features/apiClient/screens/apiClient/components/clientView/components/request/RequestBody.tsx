@@ -109,6 +109,9 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
             hideCharacterCount
             analyticEventProperties={{ source: "api_client" }}
             envVariables={variables}
+            config={{
+              enablePrettify: false,
+            }}
           />
         );
     }
