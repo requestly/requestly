@@ -247,9 +247,9 @@ export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString:
     .map(({ key, value }) => {
       if (!key) return "";
       if (value === undefined || value === "") {
-        return encodeURIComponent(key);
+        return key;
       } else {
-        return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+        return `${key}=${value}`;
       }
     })
     .filter(Boolean)
