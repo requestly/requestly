@@ -74,6 +74,26 @@ class ClientRuleStorageService {
     return rulesSuperObject;
   };
 
+  getRecordsByObjectType = async (objectType: string): Promise<any> => {
+    console.log("[ClientRuleStorageService] getRecordsByObjectType", objectType);
+    const superObject = await clientStorageService.getStorageSuperObject();
+    const records: any[] = [];
+
+    for (let key in superObject) {
+      if (superObject[key]?.objectType === "rule" || superObject[key]?.objectType === "group") {
+        records.push(superObject[key]);
+      }
+    }
+
+    if (!objectType) {
+      return records;
+    }
+
+    const filteredRecords = records.filter((record) => record.objectType === objectType);
+    console.log("[ClientRuleStorageService] getRecordsByObjectType", { filteredRecords });
+    return filteredRecords;
+  };
+
   getRecordById = async (id: string): Promise<any> => {
     console.log("[ClientRuleStorageService] getRecordById", id);
     const record = await clientStorageService.getStorageObject(id);

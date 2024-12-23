@@ -16,36 +16,36 @@ class StorageServiceWrapper {
     this.primaryKeys = options.primaryKeys || ["objectType", "ruleType"];
 
     // this.saveRecordWithID = this.saveRecordWithID.bind(this);
-    this.saveRecord = this.saveRecord.bind(this);
+    // this.saveRecord = this.saveRecord.bind(this);
     // this.getRecord = this.getRecord.bind(this);
-    this.getRecords = this.getRecords.bind(this);
+    // this.getRecords = this.getRecords.bind(this);
 
-    this.transactionQueue = new Set(); // promises of transactions that are still pending
-    this.transactionLedger = new Map(); // optional: helpful only in putting console logs
+    // this.transactionQueue = new Set(); // promises of transactions that are still pending
+    // this.transactionLedger = new Map(); // optional: helpful only in putting console logs
   }
 
-  trackPromise(promise) {
-    const id = generateObjectId();
-    console.log("promise id", id);
+  // trackPromise(promise) {
+  //   const id = generateObjectId();
+  //   console.log("promise id", id);
 
-    this.transactionQueue.add(promise);
-    this.transactionLedger.set(promise, { id, startTime: Date.now() });
+  //   this.transactionQueue.add(promise);
+  //   this.transactionLedger.set(promise, { id, startTime: Date.now() });
 
-    promise.finally(() => {
-      const endTime = Date.now();
-      const ledgerEntry = this.transactionLedger.get(promise);
-      console.log(`Promise resolved: ${ledgerEntry.id}, Duration: ${endTime - ledgerEntry.startTime}ms`);
+  //   promise.finally(() => {
+  //     const endTime = Date.now();
+  //     const ledgerEntry = this.transactionLedger.get(promise);
+  //     console.log(`Promise resolved: ${ledgerEntry.id}, Duration: ${endTime - ledgerEntry.startTime}ms`);
 
-      this.transactionQueue.delete(promise);
-      this.transactionLedger.delete(promise);
-    });
-  }
+  //     this.transactionQueue.delete(promise);
+  //     this.transactionLedger.delete(promise);
+  //   });
+  // }
 
-  async waitForAllTransactions() {
-    await Promise.allSettled([...this.transactionQueue]);
-    this.transactionQueue.clear();
-    this.transactionLedger.clear();
-  }
+  // async waitForAllTransactions() {
+  //   await Promise.allSettled([...this.transactionQueue]);
+  //   this.transactionQueue.clear();
+  //   this.transactionLedger.clear();
+  // }
 
   getAllRecords() {
     return this.StorageHelper.getStorageSuperObject();
@@ -89,10 +89,10 @@ class StorageServiceWrapper {
     });
   }
 
-  async saveRecord(object) {
-    await this.StorageHelper.saveStorageObject(object); // writes to Extension or Desktop storage
-    return Object.values(object)[0]; // why???
-  }
+  // async saveRecord(object) {
+  //   await this.StorageHelper.saveStorageObject(object); // writes to Extension or Desktop storage
+  //   return Object.values(object)[0]; // why???
+  // }
 
   /**
    * @param ruleOrGroup rule or group
