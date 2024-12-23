@@ -42,6 +42,7 @@ const createApiRecord = async (
 
   const newRecord = {
     name: record.name || "Untitled request",
+    description: record.description || "",
     type: record.type,
     data: record.data,
     collectionId: record.collectionId || "",
