@@ -339,14 +339,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       data: { ...sanitizeEntry(entry) },
     };
 
-    console.log("onSaveEntry:", entry);
-
     if (apiEntryDetails?.id) {
       record.id = apiEntryDetails?.id;
     }
-    console.log("record:", record);
+
     const result = await upsertApiRecord(uid, record, teamId);
-    console.log("result:", result);
+
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
       setEntry({ ...result.data.data });
@@ -446,7 +444,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   defaultValue={entry.request.url}
                   onChange={(text) => {
                     setUrl(text);
-                    console.log("onChange: ", entry.request.url, "", text);
                   }}
                   onKeyDown={onUrlKeyDown}
                   onPressEnter={onUrlInputEnterPressed}
