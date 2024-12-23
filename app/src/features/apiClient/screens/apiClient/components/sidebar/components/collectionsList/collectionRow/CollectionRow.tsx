@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { isEmpty } from "lodash";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Collapse, Dropdown, MenuProps, Tooltip } from "antd";
 import { RQAPI } from "features/apiClient/types";
@@ -12,19 +13,22 @@ import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
+import { sessionStorage } from "utils/sessionStorage";
 import PATHS from "config/constants/sub/paths";
 import { useParams } from "react-router-dom";
+import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 
 interface Props {
   record: RQAPI.CollectionRecord;
-  onNewClick: (src: RQAPI.AnalyticsEventSource) => void;
+  onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
   onExportClick: (collection: RQAPI.CollectionRecord) => void;
   openTab: TabsLayoutContextInterface["openTab"];
+  collapsedKeys: string[];
 }
 
-export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportClick, openTab }) => {
+export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportClick, openTab, collapsedKeys }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [activeKey, setActiveKey] = useState(record.id); // TODO: Persist collapse active keys for all rows
+  const [activeKey, setActiveKey] = useState(collapsedKeys?.includes(record.id) ? null : record.id);
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
@@ -66,6 +70,19 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
     [setIsDeleteModalOpen, updateRecordToBeDeleted]
   );
 
+  const collapseChangeHandler = useCallback((keys: string[]) => {
+    if (isEmpty(keys)) {
+      collapsedKeys.push(record.id);
+    } else {
+      const activeKeyIndex = collapsedKeys.indexOf(record.id);
+      collapsedKeys.splice(activeKeyIndex, 1);
+    }
+    setActiveKey(keys[0]);
+    isEmpty(collapsedKeys)
+      ? sessionStorage.removeItem("collapsed_collection_keys")
+      : sessionStorage.setItem("collapsed_collection_keys", collapsedKeys);
+  }, []);
+
   return (
     <>
       {isEditMode ? (
@@ -80,9 +97,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
       ) : (
         <Collapse
           activeKey={activeKey}
-          onChange={(keys) => {
-            setActiveKey(keys[0]);
-          }}
+          onChange={collapseChangeHandler}
           collapsible={activeKey === record.id ? "icon" : "header"}
           defaultActiveKey={[record.id]}
           ghost
@@ -124,6 +139,9 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                         e.stopPropagation();
                         setActiveKey(record.id);
                         setCreateNewField(RQAPI.RecordType.API);
+                        onNewClick("collection_row", RQAPI.RecordType.API, record.id).then(() => {
+                          setCreateNewField(null);
+                        });
                         trackNewRequestClicked("collection_row");
                       }}
                     />
@@ -137,6 +155,9 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                         e.stopPropagation();
                         setActiveKey(record.id);
                         setCreateNewField(RQAPI.RecordType.COLLECTION);
+                        onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id).then(() => {
+                          setCreateNewField(null);
+                        });
                         trackNewCollectionClicked("collection_row");
                       }}
                     />
@@ -163,7 +184,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                 newRecordCollectionId={record.id}
                 message="No requests created yet"
                 newRecordBtnText="New request"
-                onNewRecordClick={() => onNewClick("collection_row")}
+                onNewRecordClick={() => onNewClick("collection_row", RQAPI.RecordType.API, record.id)}
               />
             ) : (
               record.data.children.map((apiRecord) => {
@@ -177,6 +198,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                       record={apiRecord}
                       onNewClick={onNewClick}
                       onExportClick={onExportClick}
+                      collapsedKeys={collapsedKeys}
                     />
                   );
                 }
@@ -186,15 +208,8 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
             )}
 
             {createNewField ? (
-              <NewRecordNameInput
-                analyticEventSource="collection_row"
-                recordType={
-                  createNewField === RQAPI.RecordType.API ? RQAPI.RecordType.API : RQAPI.RecordType.COLLECTION
-                }
-                newRecordCollectionId={record.id}
-                onSuccess={() => {
-                  setCreateNewField("");
-                }}
+              <SidebarPlaceholderItem
+                name={createNewField === RQAPI.RecordType.API ? "New Request" : "New Collection"}
               />
             ) : null}
           </Collapse.Panel>

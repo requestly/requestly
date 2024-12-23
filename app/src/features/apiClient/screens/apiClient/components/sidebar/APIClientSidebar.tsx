@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { RQAPI } from "../../../../types";
 import { useParams } from "react-router-dom";
 import { Tabs, TabsProps, Tooltip } from "antd";
@@ -12,6 +12,8 @@ import { EnvironmentsList } from "../../../environment/components/environmentsLi
 import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal } from "../modals";
 import "./apiClientSidebar.scss";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 
 interface Props {}
 
@@ -24,8 +26,19 @@ export enum ApiClientSidebarTabKey {
 const APIClientSidebar: React.FC<Props> = () => {
   const { requestId, collectionId } = useParams();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
-  const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
+
+  const { addNewEnvironment, getAllEnvironments, isEnvironmentsDataLoaded } = useEnvironmentManager();
+  const environments = getAllEnvironments();
+  const isGlobalEnvironmentExists = useMemo(() => environments.some((env) => isGlobalEnvironment(env.id)), [
+    environments,
+  ]);
+
+  useEffect(() => {
+    if (!isGlobalEnvironmentExists && isEnvironmentsDataLoaded) {
+      addNewEnvironment("Global variables", true);
+    }
+  }, [addNewEnvironment, isGlobalEnvironmentExists, isEnvironmentsDataLoaded]);
 
   const {
     history,
@@ -39,14 +52,8 @@ const APIClientSidebar: React.FC<Props> = () => {
     selectedHistoryIndex,
   } = useApiClientContext();
 
-  const hideNewRecordNameInput = () => {
-    setIsNewRecordNameInputVisible(false);
-    setRecordTypeToBeCreated(null);
-  };
-
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
-      setIsNewRecordNameInputVisible(true);
       setRecordTypeToBeCreated(recordType);
 
       switch (recordType) {
@@ -77,10 +84,8 @@ const APIClientSidebar: React.FC<Props> = () => {
 
   useEffect(() => {
     if (requestId === "new") {
-      setIsNewRecordNameInputVisible(true);
       setRecordTypeToBeCreated(RQAPI.RecordType.API);
     } else if (collectionId === "new") {
-      setIsNewRecordNameInputVisible(true);
       setRecordTypeToBeCreated(RQAPI.RecordType.COLLECTION);
     }
   }, [requestId, collectionId]);
@@ -98,14 +103,7 @@ const APIClientSidebar: React.FC<Props> = () => {
           </div>
         </Tooltip>
       ),
-      children: (
-        <CollectionsList
-          onNewClick={onNewClick}
-          recordTypeToBeCreated={recordTypeToBeCreated}
-          isNewRecordNameInputVisible={isNewRecordNameInputVisible}
-          hideNewRecordNameInput={hideNewRecordNameInput}
-        />
-      ),
+      children: <CollectionsList onNewClick={onNewClick} recordTypeToBeCreated={recordTypeToBeCreated} />,
     },
     {
       key: ApiClientSidebarTabKey.ENVIRONMENTS,

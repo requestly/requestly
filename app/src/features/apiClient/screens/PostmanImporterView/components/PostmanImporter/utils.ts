@@ -1,6 +1,8 @@
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { generateDocumentId } from "backend/utils";
+import { AUTHORIZATION_TYPES } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
+import { POSTMAN_AUTH_TYPES_MAPPING } from "features/apiClient/constants";
 
 interface PostmanCollectionExport {
   info: {
@@ -33,9 +35,7 @@ export const getUploadedPostmanFileType = (fileContent: PostmanCollectionExport 
 };
 
 export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExport) => {
-  if (!fileContent.values.length) {
-    throw new Error("No variables found in the environment file");
-  }
+  const isGlobalEnvironment = fileContent?._postman_variable_scope === "globals";
 
   const variables = fileContent.values.reduce((acc: Record<string, EnvironmentVariableValue>, variable: any) => {
     // dont add variables with empty key
@@ -53,6 +53,7 @@ export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExp
   return {
     name: fileContent.name,
     variables,
+    isGlobal: isGlobalEnvironment,
   };
 };
 
@@ -79,6 +80,24 @@ const processScripts = (item: any) => {
   });
 
   return scripts;
+};
+
+const processAuthorizationOptions = (item = {}) => {
+  try {
+    const auth = {};
+    const authType = POSTMAN_AUTH_TYPES_MAPPING[item.type] ?? AUTHORIZATION_TYPES.NO_AUTH;
+    auth.currentAuthType = authType;
+    auth[authType] = {};
+
+    const authOptionsArray = item[item?.type] || [];
+    authOptionsArray.forEach((option) => {
+      auth[authType][option.key] = option.value;
+    });
+
+    return auth;
+  } catch (error) {
+    return {};
+  }
 };
 
 const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.ApiRecord> => {
@@ -135,6 +154,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
         body: requestBody,
         contentType,
       },
+      auth: processAuthorizationOptions(request.auth),
       scripts: processScripts(item),
     },
   };

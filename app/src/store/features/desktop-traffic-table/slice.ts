@@ -1,5 +1,6 @@
 import { createSlice, createEntityAdapter, EntityState, PayloadAction, prepareAutoBatched } from "@reduxjs/toolkit";
 import { ReducerKeys } from "store/constants";
+import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
 
 // TODO: @wrongsahil, add types here when send_network_logs is moved to new events schema
 
@@ -131,4 +132,11 @@ const slice = createSlice({
   },
 });
 
-export const { actions: desktopTrafficTableActions, reducer: desktopTrafficTableReducer } = slice;
+const { actions, reducer } = slice;
+
+export const desktopTrafficTableActions = actions;
+export const desktopTrafficTableReducerWithLocalSync = getReducerWithLocalStorageSync(
+  ReducerKeys.DESKTOP_TRAFFIC_TABLE,
+  reducer,
+  ["filters"]
+);

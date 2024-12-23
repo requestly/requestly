@@ -34,7 +34,7 @@
   padding: 11px 16px;
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr minmax(auto, 1fr) 0.5fr;
+  grid-template-columns: 1fr minmax(auto, 1fr) minmax(auto, 0.5fr);
   align-items: center;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
@@ -157,4 +157,19 @@
 .rq-btn.troubleshoot-btn.ant-btn:hover {
   color: var(--text-gray);
   text-decoration: underline;
+}
+
+.no-simulators-message {
+  padding: 8px 0;
+  max-width: 260px;
+  white-space: normal;
+  line-height: 1.5;
+}
+
+.mobile-connect-btn {
+  width: 145px;
+}
+
+.mobile-connect-btn > .ant-btn-compact-item {
+  flex: auto;
 }
