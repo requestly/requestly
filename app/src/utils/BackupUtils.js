@@ -30,7 +30,8 @@ export const setIsBackupEnabled = async (uid, state) => {
 
 export const getLastBackupTimestamp = (appMode) => {
   Logger.log("Reading storage in getLastBackupTimestamp");
-  return StorageService(appMode).getRecord(APP_CONSTANTS.LAST_BACKUP_TIMESTAMP);
+  // Backups aren't enabled right now
+  // return StorageService(appMode).getRecord(APP_CONSTANTS.LAST_BACKUP_TIMESTAMP);
 };
 
 export const isNewBackupRequired = (backupTimestamp) => {
