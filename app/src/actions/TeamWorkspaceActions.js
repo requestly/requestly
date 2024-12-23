@@ -88,7 +88,8 @@
 //   //   await StorageService(appMode).clearDB();
 //   // }
 
-//   dispatch(variablesActions.resetState());
+// dispatch(variablesActions.resetState());
+// dispatch(tabsLayoutActions.resetState());
 
 //   // Just in case
 //   // window.skipSyncListenerForNextOneTime = false;

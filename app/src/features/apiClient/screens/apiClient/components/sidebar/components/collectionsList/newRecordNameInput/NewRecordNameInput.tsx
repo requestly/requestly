@@ -139,6 +139,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     const result = await upsertApiRecord(uid, record, activeWorkspaceId);
 
     if (result.success) {
+      // False is passed to not open the tab when renaming the record from sidebar
       onSaveRecord(result.data);
 
       if (recordType === RQAPI.RecordType.API) {

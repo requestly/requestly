@@ -164,7 +164,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
       trackImportApiCollectionsFailed(apiRecordsToImport?.count, Object.keys(variablesToImport || {}).length);
       throw error;
     }
-  }, [apiRecordsToImport, onSaveRecord, user.details?.profile?.uid, activeWorkspaceId, apiRecordsToImport?.count]);
+  }, [apiRecordsToImport, onSaveRecord, user.details?.profile?.uid, activeWorkspaceId, variablesToImport]);
 
   const handleImport = useCallback(async () => {
     trackImportApiCollectionsStarted(apiRecordsToImport?.count, Object.keys(variablesToImport || {}).length);
@@ -181,7 +181,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
     } finally {
       setIsImporting(false);
     }
-  }, [handleImportVariables, handleImportCollectionsAndApis, onClose, apiRecordsToImport?.count]);
+  }, [handleImportVariables, handleImportCollectionsAndApis, onClose, apiRecordsToImport?.count, variablesToImport]);
 
   return (
     <Modal

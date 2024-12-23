@@ -367,6 +367,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                 defaultValue={getEditorDefaultValue()}
                 value={pair.response.value}
                 isReadOnly={isInputDisabled}
+                prettifyOnInit={true}
                 handleChange={responseBodyChangeHandler}
                 isResizable
                 analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.RESPONSE }}
