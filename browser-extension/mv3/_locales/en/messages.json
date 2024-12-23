@@ -1,14 +1,14 @@
 {
   "extName": {
-    "message": "Requestly - Intercept, Modify & Mock HTTP Requests",
+    "message": "Requestly - Free API Testing & Mocking Tool",
     "description": "Requestly browser extension name which is visible in Web Stores"
   },
   "extDesc": {
-    "message": "The easiest way to Redirect URLs, Modify HTTP Headers, Mock APIs, Inject custom JS, Modify GraphQL Requests",
+    "message": "Open-Source API Client & HTTP Interceptor. API Collections, Environments, JS Redirects, API Mocks, Modify Headers and Insert Scripts",
     "description": "Requestly browser extension description visible in Web Stores"
   },
   "extIconTitle": {
-    "message": "Requestly - Intercept, Modify & Mock HTTP Requests",
+    "message": "Requestly - Free API Testing & Mocking Tool",
     "description": "Tooltip text shown on hovering Requestly browser extension icon"
   }
 }
