@@ -73,6 +73,12 @@ class ClientRuleStorageService {
     console.log("[ClientRuleStorageService] getAllRulesAndGroups", { rulesSuperObject });
     return rulesSuperObject;
   };
+
+  getRecordById = async (id: string): Promise<any> => {
+    console.log("[ClientRuleStorageService] getRecordById", id);
+    const record = await clientStorageService.getStorageObject(id);
+    return record;
+  };
 }
 
 const clientRuleStorageService = new ClientRuleStorageService();

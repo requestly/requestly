@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
-import { StorageService } from "init";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 
@@ -17,6 +16,7 @@ import pathContainsImg from "./path-contains.png";
 import pageUrlSourceFilterImg from "./source-filter-page-url.png";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { clientStorageService } from "services/clientStorageService";
 
 const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
   const navigate = useNavigate();
@@ -82,7 +82,7 @@ const MigratedRules = () => {
   useEffect(() => {
     if (Object.keys(migratedRulesLogs).length) {
       Object.keys(migratedRulesLogs).forEach((ruleId) => {
-        StorageService(appMode)
+        clientStorageService
           .getRecord(ruleId)
           .then((rule) => {
             if (rule) {

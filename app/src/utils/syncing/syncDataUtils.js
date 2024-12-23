@@ -427,12 +427,12 @@ export const getSyncedSessionRecordingPageConfig = (uid) => {
 };
 
 export const getLocalSessionRecordingPageConfig = (appMode) => {
-  Logger.log("Reading storage in getLocalSessionRecordingPageConfig");
-  return new Promise((resolve) => {
-    StorageService(appMode)
-      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
-      .then((savedConfig) => resolve(savedConfig || {}));
-  });
+  // Logger.log("Reading storage in getLocalSessionRecordingPageConfig");
+  // return new Promise((resolve) => {
+  //   StorageService(appMode)
+  //     .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
+  //     .then((savedConfig) => resolve(savedConfig || {}));
+  // });
 };
 
 export const syncSessionRecordingPageConfigToFirebase = async (uid, appMode) => {
