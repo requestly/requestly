@@ -81,6 +81,7 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
             language={EditorLanguage.JSON}
             value={jsonBody as string}
             handleChange={handleJsonChange}
+            prettifyOnInit={true}
             isResizable={false}
             hideCharacterCount
             analyticEventProperties={{ source: "api_client" }}
