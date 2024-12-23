@@ -75,9 +75,12 @@ export const CollectionView = () => {
           auth: newAuthOptions,
         },
       };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
-        onSaveRecord(result.data);
-      });
+      return upsertApiRecord(user.details?.profile?.uid, record, teamId)
+        .then((result) => {
+          // fix-me: to verify new change are broadcasted to child entries that are open in tabs
+          onSaveRecord(result.data);
+        })
+        .catch(console.error);
     },
     [collection, onSaveRecord, teamId, user.details?.profile?.uid]
   );
