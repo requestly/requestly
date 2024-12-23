@@ -18,7 +18,6 @@ import APP_CONSTANTS from "config/constants";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getUser } from "backend/user/getUser";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { StorageService } from "init";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { clientStorageService } from "services/clientStorageService";
 
@@ -220,7 +219,7 @@ const AuthHandler: React.FC<{}> = () => {
 
       if (user) {
         Logger.timeLog("AuthHandler-preloader", "User found");
-        StorageService(appMode).saveRecord({
+        clientStorageService.saveStorageObject({
           [GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN]: user.refreshToken,
         });
 

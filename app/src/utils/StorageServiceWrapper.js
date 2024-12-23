@@ -17,7 +17,7 @@ class StorageServiceWrapper {
 
     // this.saveRecordWithID = this.saveRecordWithID.bind(this);
     this.saveRecord = this.saveRecord.bind(this);
-    this.getRecord = this.getRecord.bind(this);
+    // this.getRecord = this.getRecord.bind(this);
     this.getRecords = this.getRecords.bind(this);
 
     this.transactionQueue = new Set(); // promises of transactions that are still pending
@@ -161,9 +161,9 @@ class StorageServiceWrapper {
   //   await this.StorageHelper.saveStorageObject({ [object.id]: object });
   // }
 
-  getRecord(key) {
-    return this.StorageHelper.getStorageObject(key);
-  }
+  // getRecord(key) {
+  //   return this.StorageHelper.getStorageObject(key);
+  // }
 
   async removeRecord(key) {
     try {
@@ -171,7 +171,7 @@ class StorageServiceWrapper {
       // TODO-syncing: Temporary fix to remove record from RuleStorageModel
       RuleStorageModel.create({ id: key }, getActiveWorkspaceId(window.activeWorkspaceIds)).delete();
       // const syncResult = await doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
-      await this.StorageHelper.removeStorageObject(key);
+      // await this.StorageHelper.removeStorageObject(key);
       return Promise.resolve(true);
       // this.trackPromise(Promise.resolve(syncResult));
     } catch (error) {
