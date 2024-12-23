@@ -42,7 +42,6 @@ const createApiRecord = async (
 
   const newRecord = {
     name: record.name || "Untitled request",
-    description: record.description || "",
     type: record.type,
     data: record.data,
     collectionId: record.collectionId || "",
@@ -53,6 +52,10 @@ const createApiRecord = async (
     createdTs: Timestamp.now().toMillis(),
     updatedTs: Timestamp.now().toMillis(),
   } as RQAPI.Record;
+
+  if (record.type === RQAPI.RecordType.COLLECTION) {
+    newRecord.description = record.description || "";
+  }
 
   if (docId) {
     // Creating a new record with a given id
