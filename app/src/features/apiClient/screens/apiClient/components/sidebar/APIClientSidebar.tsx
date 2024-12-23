@@ -26,7 +26,6 @@ export enum ApiClientSidebarTabKey {
 const APIClientSidebar: React.FC<Props> = () => {
   const { requestId, collectionId } = useParams();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
-  const [isNewRecordNameInputVisible, setIsNewRecordNameInputVisible] = useState(false);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
 
   const { addNewEnvironment, getAllEnvironments, isEnvironmentsDataLoaded } = useEnvironmentManager();
@@ -53,14 +52,8 @@ const APIClientSidebar: React.FC<Props> = () => {
     selectedHistoryIndex,
   } = useApiClientContext();
 
-  const hideNewRecordNameInput = () => {
-    setIsNewRecordNameInputVisible(false);
-    setRecordTypeToBeCreated(null);
-  };
-
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
-      setIsNewRecordNameInputVisible(true);
       setRecordTypeToBeCreated(recordType);
 
       switch (recordType) {
@@ -91,10 +84,8 @@ const APIClientSidebar: React.FC<Props> = () => {
 
   useEffect(() => {
     if (requestId === "new") {
-      setIsNewRecordNameInputVisible(true);
       setRecordTypeToBeCreated(RQAPI.RecordType.API);
     } else if (collectionId === "new") {
-      setIsNewRecordNameInputVisible(true);
       setRecordTypeToBeCreated(RQAPI.RecordType.COLLECTION);
     }
   }, [requestId, collectionId]);
@@ -112,14 +103,7 @@ const APIClientSidebar: React.FC<Props> = () => {
           </div>
         </Tooltip>
       ),
-      children: (
-        <CollectionsList
-          onNewClick={onNewClick}
-          recordTypeToBeCreated={recordTypeToBeCreated}
-          isNewRecordNameInputVisible={isNewRecordNameInputVisible}
-          hideNewRecordNameInput={hideNewRecordNameInput}
-        />
-      ),
+      children: <CollectionsList onNewClick={onNewClick} recordTypeToBeCreated={recordTypeToBeCreated} />,
     },
     {
       key: ApiClientSidebarTabKey.ENVIRONMENTS,

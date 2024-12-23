@@ -40,6 +40,21 @@
             width: 100%;
             overflow: hidden;
           }
+
+          .tab-close-button {
+            flex-shrink: 0;
+            display: none;
+          }
+
+          &:hover {
+            .tab-close-button {
+              display: flex;
+            }
+
+            .unsaved-changes-indicator {
+              display: none;
+            }
+          }
         }
 
         .ant-tabs-tab + .ant-tabs-tab {
@@ -90,25 +105,26 @@
     .tab-actions {
       flex-shrink: 0;
       margin-left: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .unsaved-changes-indicator {
-      border-radius: 50%;
-      width: 6px;
-      height: 6px;
-      background-color: var(--requestly-color-primary-soft);
-    }
-
-    .tab-close-button {
-      transform: scale(0);
-      display: none;
       flex-shrink: 0;
-    }
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-    &:hover {
-      .tab-close-button {
-        transform: scale(1);
-        display: flex;
+      &::after {
+        content: "";
+        display: block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: var(--requestly-color-primary-soft);
       }
     }
   }
