@@ -153,6 +153,7 @@ const handleCollectionVariablesMutations = async (
             {
               syncValue: collectionVariables[key].syncValue,
               localValue: value,
+              type: typeof collectionVariables[key].syncValue,
             },
           ];
         }
@@ -161,6 +162,7 @@ const handleCollectionVariablesMutations = async (
           {
             syncValue: value,
             localValue: value,
+            type: typeof value,
           },
         ];
       })
@@ -232,7 +234,11 @@ export const executePrerequestScript = (
   globalEnvironmentVariables: EnvironmentVariables,
   collectionVariables: EnvironmentVariables,
   requestCollectionId: string
-): Promise<EnvironmentVariables | null> => {
+): Promise<{
+  updatedEnvironmentVariables: EnvironmentVariables;
+  updatedGlobalVariables: EnvironmentVariables;
+  updatedCollectionVariables: EnvironmentVariables;
+} | null> => {
   let worker: Worker | null = null;
 
   return new Promise((resolve, reject) => {
