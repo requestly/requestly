@@ -47,47 +47,47 @@ class StorageServiceWrapper {
   //   this.transactionLedger.clear();
   // }
 
-  getAllRecords() {
-    return this.StorageHelper.getStorageSuperObject();
-  }
+  // getAllRecords() {
+  //   return this.StorageHelper.getStorageSuperObject();
+  // }
 
-  hasPrimaryKey(record) {
-    if (typeof record === "object" && !Array.isArray(record) && record !== null) {
-      for (let index = 0; index < this.primaryKeys.length; index++) {
-        if (typeof record[this.primaryKeys[index]] !== "undefined") {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
+  // hasPrimaryKey(record) {
+  //   if (typeof record === "object" && !Array.isArray(record) && record !== null) {
+  //     for (let index = 0; index < this.primaryKeys.length; index++) {
+  //       if (typeof record[this.primaryKeys[index]] !== "undefined") {
+  //         return true;
+  //       }
+  //     }
+  //   }
+  //   return false;
+  // }
 
-  getRecords(objectType) {
-    const self = this;
-    return new Promise((resolve) => {
-      this.StorageHelper.getStorageSuperObject().then((superObject) => {
-        const myArr = [];
-        for (let key in superObject) {
-          // clear out everything that is not an object with a primary key - eventually allows only rules & groups
-          if (self.hasPrimaryKey(superObject[key])) {
-            myArr.push(superObject[key]);
-          }
-        }
-        resolve(self.filterRecordsByType(myArr, objectType));
-      });
-    });
-  }
+  // getRecords(objectType) {
+  //   const self = this;
+  //   return new Promise((resolve) => {
+  //     this.StorageHelper.getStorageSuperObject().then((superObject) => {
+  //       const myArr = [];
+  //       for (let key in superObject) {
+  //         // clear out everything that is not an object with a primary key - eventually allows only rules & groups
+  //         if (self.hasPrimaryKey(superObject[key])) {
+  //           myArr.push(superObject[key]);
+  //         }
+  //       }
+  //       resolve(self.filterRecordsByType(myArr, objectType));
+  //     });
+  //   });
+  // }
 
-  filterRecordsByType(records, requestedObjectType) {
-    if (!requestedObjectType) {
-      return records;
-    }
+  // filterRecordsByType(records, requestedObjectType) {
+  //   if (!requestedObjectType) {
+  //     return records;
+  //   }
 
-    return records.filter((record) => {
-      let objectType = record.objectType || GLOBAL_CONSTANTS.OBJECT_TYPES.RULE;
-      return objectType === requestedObjectType;
-    });
-  }
+  //   return records.filter((record) => {
+  //     let objectType = record.objectType || GLOBAL_CONSTANTS.OBJECT_TYPES.RULE;
+  //     return objectType === requestedObjectType;
+  //   });
+  // }
 
   // async saveRecord(object) {
   //   await this.StorageHelper.saveStorageObject(object); // writes to Extension or Desktop storage
