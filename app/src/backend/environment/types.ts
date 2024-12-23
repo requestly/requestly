@@ -24,3 +24,5 @@ export enum EnvironmentVariableType {
 export type VariableExport = EnvironmentVariableValue & {
   key: string;
 };
+
+export type VariableKeyValuePairs = Record<string, string | number | boolean>;
