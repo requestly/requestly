@@ -6,6 +6,7 @@ import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
+import { forEach, isEmpty, split, unionBy } from "lodash";
 
 export const makeRequest = async (
   appMode: string,
@@ -212,4 +213,87 @@ export const createBlankApiRecord = (
   }
 
   return upsertApiRecord(uid, newRecord, teamId);
+};
+
+export const extractQueryParams = (inputString: string) => {
+  const queryParams: KeyValuePair[] = [];
+
+  inputString = split(inputString, "?")[1];
+
+  if (inputString) {
+    const queryParamsList = split(inputString, "&");
+    forEach(queryParamsList, (queryParam) => {
+      const queryParamValues = split(queryParam, "=");
+      queryParams.push({
+        id: Math.random(),
+        key: queryParamValues[0],
+        value: queryParamValues[1],
+        isEnabled: true,
+      });
+    });
+  }
+
+  return queryParams;
+};
+
+export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString: string) => {
+  if (isEmpty(queryParams)) {
+    return inputString;
+  }
+  const baseUrl = split(inputString, "?")[0];
+  const enabledParams = queryParams.filter((param) => param.isEnabled);
+
+  const queryString = enabledParams
+    .map(({ key, value }) => {
+      if (!key) return "";
+      if (value === undefined || value === "") {
+        return encodeURIComponent(key);
+      } else {
+        return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+      }
+    })
+    .filter(Boolean)
+    .join("&");
+
+  return `${baseUrl}${queryString ? `?${queryString}` : queryString}`;
+};
+
+export const syncQueryParams = (queryParams: KeyValuePair[], url: string, type: number = 0) => {
+  const updatedQueryParams = extractQueryParams(url);
+
+  switch (type) {
+    case 0: {
+      const updatedUrl = queryParamsToURLString(updatedQueryParams, url);
+      // Dont sync if URL is same
+      if (updatedUrl !== url) {
+        const combinedParams = unionBy(queryParams, updatedQueryParams, "id");
+        const deduplicatedParams: KeyValuePair[] = [];
+        const seenPairs = new Set();
+
+        combinedParams.forEach((param) => {
+          const pair = `${param.key}=${param.value}`;
+          if (!seenPairs.has(pair)) {
+            seenPairs.add(pair);
+            deduplicatedParams.push(param);
+          }
+        });
+
+        return { queryParams: deduplicatedParams, url: queryParamsToURLString(deduplicatedParams, url) };
+      }
+
+      return { queryParams, url };
+    }
+    case 1:
+      return { queryParams: isEmpty(updatedQueryParams) ? [getEmptyPair()] : updatedQueryParams };
+    case 2: {
+      const updatedUrl = queryParamsToURLString(queryParams, url);
+      return { url: updatedUrl };
+    }
+
+    default:
+      return {
+        queryParams,
+        url,
+      };
+  }
 };
