@@ -52,20 +52,20 @@ class WorkspaceManager {
     // TODO-syncing: Take backups of extensions storage changes before clearing
     const storageDump = await clientStorageService.getStorageSuperObject();
     const rulesAndGroupsObject: Record<string, any> = {};
-    let refreshToken = "";
+    const restOfTheThings: Record<string, any> = {};
     if (storageDump) {
       for (let key in storageDump) {
         if (storageDump[key]?.objectType === "rule" || storageDump[key]?.objectType === "group") {
           rulesAndGroupsObject[key] = storageDump[key];
+        } else {
+          restOfTheThings[key] = storageDump[key];
         }
       }
-
-      refreshToken = storageDump[GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN];
 
       console.log("[WorkspaceManager.initActiveWorkspaces] storageDump", {
         storageDump,
         rulesAndGroupsObject,
-        refreshToken,
+        restOfTheThings,
       });
     }
 
@@ -73,9 +73,7 @@ class WorkspaceManager {
     clientStorageService.clearStorage();
 
     console.log("[WorkspaceManager.initActiveWorkspaces] Reinit Extension Storage");
-    clientStorageService.saveStorageObject({
-      [GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN]: refreshToken,
-    });
+    clientStorageService.saveStorageObject(restOfTheThings);
     //#endregion
 
     await this.connectWorkspaces(workspaceIds);
