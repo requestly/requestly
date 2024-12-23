@@ -1,10 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
-import { StorageService } from "init";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 import { Popover, Typography } from "antd";
 
@@ -16,6 +14,9 @@ import { RuleMigrationChange, getMV3MigrationData } from "modules/extension/util
 import { isEmpty } from "lodash";
 import pathContainsImg from "./path-contains.png";
 import pageUrlSourceFilterImg from "./source-filter-page-url.png";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { clientStorageService } from "services/clientStorageService";
 
 const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
 };
 
 const MigratedRules = () => {
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const appMode = useSelector(getAppMode);
 
   const [rulesData, setRulesData] = useState({});
@@ -71,17 +72,17 @@ const MigratedRules = () => {
   const migratedRulesLogs = useMemo(() => {
     const migrationData = getMV3MigrationData();
 
-    const migratedRulesLogs = migrationData?.[currentlyActiveWorkspace?.id ?? "private"]?.rulesMigrationLogs;
+    const migratedRulesLogs = migrationData?.[activeWorkspaceId ?? "private"]?.rulesMigrationLogs;
 
     if (isEmpty(migratedRulesLogs)) return {};
 
     return migratedRulesLogs;
-  }, [currentlyActiveWorkspace]);
+  }, [activeWorkspaceId]);
 
   useEffect(() => {
     if (Object.keys(migratedRulesLogs).length) {
       Object.keys(migratedRulesLogs).forEach((ruleId) => {
-        StorageService(appMode)
+        clientStorageService
           .getRecord(ruleId)
           .then((rule) => {
             if (rule) {

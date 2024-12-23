@@ -7,7 +7,6 @@ import { VariablesList } from "features/apiClient/screens/environment/components
 import { RQAPI } from "features/apiClient/types";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import { EnvironmentVariables } from "backend/environment/types";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
@@ -16,6 +15,8 @@ import { getCollectionVariables } from "store/features/variables/selectors";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import "./collectionView.scss";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -28,7 +29,7 @@ export const CollectionView = () => {
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
   const { replaceTab } = useTabsLayoutContext();
   const user = useSelector(getUserAuthDetails);
-  const teamId = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const collectionVariables = useSelector(getCollectionVariables);
   const location = useLocation();
 
@@ -43,12 +44,12 @@ export const CollectionView = () => {
         })
       );
       const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
+      return upsertApiRecord(user.details?.profile?.uid, record, activeWorkspaceId).then((result) => {
         onSaveRecord(result.data);
         dispatch(variablesActions.setCollectionVariables({ collectionId, variables }));
       });
     },
-    [collection, teamId, user.details?.profile?.uid, onSaveRecord, dispatch, collectionId]
+    [collection, activeWorkspaceId, user.details?.profile?.uid, onSaveRecord, dispatch, collectionId]
   );
 
   const handleRemoveVariable = useCallback(
@@ -56,11 +57,11 @@ export const CollectionView = () => {
       const updatedVariables = { ...collection?.data?.variables };
       delete updatedVariables[key];
       const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
+      return upsertApiRecord(user.details?.profile?.uid, record, activeWorkspaceId).then((result) => {
         onSaveRecord(result.data);
       });
     },
-    [collection, teamId, user.details?.profile?.uid, onSaveRecord]
+    [collection, activeWorkspaceId, user.details?.profile?.uid, onSaveRecord]
   );
 
   const tabItems = useMemo(() => {
@@ -87,7 +88,7 @@ export const CollectionView = () => {
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
       const record = { ...collection, name };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
+      return upsertApiRecord(user.details?.profile?.uid, record, activeWorkspaceId).then((result) => {
         onSaveRecord(result.data);
         replaceTab(result.data.id, {
           id: result.data.id,
@@ -96,7 +97,7 @@ export const CollectionView = () => {
         });
       });
     },
-    [collection, teamId, user.details?.profile?.uid, onSaveRecord, replaceTab]
+    [collection, activeWorkspaceId, user.details?.profile?.uid, onSaveRecord, replaceTab]
   );
 
   return (

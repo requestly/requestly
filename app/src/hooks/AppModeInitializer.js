@@ -28,11 +28,9 @@ import {
   trackProxyReStartedEvent,
   trackProxyServerStartedEvent,
 } from "modules/analytics/events/desktopApp";
-import { StorageService } from "init";
 import { getEventsEngineFlag, handleEventBatches } from "modules/analytics/events/extension";
 import PSMH from "../config/PageScriptMessageHandler";
-import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+// import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
 import { toast } from "utils/Toast";
 import { trackDesktopBGEvent, trackDesktopMainEvent } from "modules/analytics/events/desktopApp/backgroundEvents";
 import { useNavigate } from "react-router-dom";
@@ -47,6 +45,7 @@ import FEATURES from "config/constants/sub/features";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { trackHarFileOpened } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { trackLocalSessionRecordingOpened } from "modules/analytics/events/features/sessionRecording";
+import { clientStorageService } from "services/clientStorageService";
 
 let hasAppModeBeenSet = false;
 
@@ -55,7 +54,6 @@ const AppModeInitializer = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const { appsList, isBackgroundProcessActive, isProxyServerRunning } = useSelector(getDesktopSpecificDetails);
   const hasConnectedAppBefore = useSelector(getHasConnectedApp);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -323,9 +321,7 @@ const AppModeInitializer = () => {
     hasMessageHandlersBeenSet.current = true;
 
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
-      StorageService(appMode)
-        .saveRecord(getEventsEngineFlag)
-        .then(() => notifyAppLoadedToExtension());
+      clientStorageService.saveStorageObject(getEventsEngineFlag).then(() => notifyAppLoadedToExtension());
 
       PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS, (message) => {
         const batchIdsToAcknowledge = handleEventBatches(message.eventBatches);
@@ -335,23 +331,23 @@ const AppModeInitializer = () => {
         };
       });
 
-      PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (_message) => {
-        window.skipSyncListenerForNextOneTime = false;
-        toast.loading("Just a sec, fetching updated rules..", 2, true);
-        invokeSyncingIfRequired({
-          dispatch,
-          uid: user?.details?.profile?.uid,
-          team_id: currentlyActiveWorkspace?.id,
-          appMode,
-          isSyncEnabled: user?.details?.isSyncEnabled,
-        });
+      // PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (_message) => {
+      //   window.skipSyncListenerForNextOneTime = false;
+      //   toast.loading("Just a sec, fetching updated rules..", 2, true);
+      //   invokeSyncingIfRequired({
+      //     dispatch,
+      //     uid: user?.details?.profile?.uid,
+      //     team_id: currentlyActiveWorkspace?.id,
+      //     appMode,
+      //     isSyncEnabled: user?.details?.isSyncEnabled,
+      //   });
 
-        return {
-          received: true,
-        };
-      });
+      //   return {
+      //     received: true,
+      //   };
+      // });
     }
-  }, [appMode, currentlyActiveWorkspace?.id, dispatch, user?.details?.isSyncEnabled, user?.details?.profile?.uid]);
+  }, [appMode, dispatch, user?.details?.isSyncEnabled, user?.details?.profile?.uid]);
 
   return null;
 };

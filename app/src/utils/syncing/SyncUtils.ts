@@ -89,7 +89,7 @@ export const setSyncState = async (uid: string, state: boolean, appMode: AppMode
     updateValueAsPromise(["users", uid, "profile"], { isSyncEnabled: state })
       .then(async () => {
         // If state is false, remove records without syncing
-        if (!state) await StorageService(appMode).removeRecordsWithoutSyncing([APP_CONSTANTS.LAST_SYNC_TARGET]);
+        // if (!state) await StorageService(appMode).removeRecordsWithoutSyncing([APP_CONSTANTS.LAST_SYNC_TARGET]);
 
         // Track the event of toggling synchronization
         // trackSyncToggled(uid, state);

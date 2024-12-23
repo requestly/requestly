@@ -6,7 +6,6 @@ import React, { useCallback, useMemo, useState } from "react";
 import { upsertApiRecord } from "backend/apiClient";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
 import { redirectToRequest } from "utils/RedirectionUtils";
@@ -16,6 +15,8 @@ import {
   trackMoveRequestToCollectionSuccessful,
 } from "modules/analytics/events/features/apiClient";
 import "./moveToCollectionModal.scss";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 interface Props {
   recordToMove: RQAPI.Record;
@@ -29,7 +30,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const collectionOptions = useMemo(() => {
     return apiClientRecords
@@ -48,19 +49,19 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       deleted: false,
       data: {},
     };
-    const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToBeCreated, team?.id);
+    const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToBeCreated, activeWorkspaceId);
     if (newCollection.success) {
       onSaveRecord(newCollection.data);
       return newCollection.data.id;
     } else {
       throw new Error("Failed to create a new collection");
     }
-  }, [user?.details?.profile?.uid, team?.id, onSaveRecord, selectedCollection?.label]);
+  }, [user?.details?.profile?.uid, activeWorkspaceId, onSaveRecord, selectedCollection?.label]);
 
   const moveRecordToCollection = useCallback(
     async (collectionId: string, isNewCollection: boolean) => {
       const updatedRequest = { ...recordToMove, collectionId };
-      const result = await upsertApiRecord(user?.details?.profile?.uid, updatedRequest, team?.id);
+      const result = await upsertApiRecord(user?.details?.profile?.uid, updatedRequest, activeWorkspaceId);
       if (result.success) {
         trackMoveRequestToCollectionSuccessful(isNewCollection ? "new_collection" : "existing_collection");
         toast.success("Request moved to collection successfully");
@@ -70,7 +71,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         throw new Error("Failed to move request to collection");
       }
     },
-    [user?.details?.profile?.uid, team?.id, onSaveRecord, recordToMove, navigate]
+    [user?.details?.profile?.uid, activeWorkspaceId, onSaveRecord, recordToMove, navigate]
   );
 
   const handleRecordMove = useCallback(async () => {

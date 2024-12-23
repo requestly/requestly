@@ -5,13 +5,14 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { createBlankApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { RQAPI } from "features/apiClient/types";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { useState } from "react";
 import { toast } from "utils/Toast";
 import "./apiClientEmptyView.scss";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
@@ -19,7 +20,7 @@ export const ApiClientEmptyView = () => {
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const [isRecordCreating, setIsRecordCreating] = useState(null);
 
@@ -41,7 +42,7 @@ export const ApiClientEmptyView = () => {
       return;
     }
     setIsRecordCreating(recordType);
-    createBlankApiRecord(user?.details?.profile?.uid, team?.id, recordType, "")
+    createBlankApiRecord(user?.details?.profile?.uid, activeWorkspaceId, recordType, "")
       .then((result) => {
         onSaveRecord(result.data);
       })

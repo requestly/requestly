@@ -1,7 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { useDispatch } from "react-redux";
 import { Avatar, Spin } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { Invite } from "types";
@@ -13,9 +11,9 @@ import { BiCheckCircle } from "@react-icons/all-files/bi/BiCheckCircle";
 import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { globalActions } from "store/slices/global/slice";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { isNull } from "lodash";
 import "./index.scss";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 interface TeamCardProps {
   invite: Invite & { metadata?: any };
@@ -25,10 +23,10 @@ interface TeamCardProps {
 
 export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJoiningTeamId }) => {
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const [hasJoined, setHasJoined] = useState<boolean>(false);
+
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const handleJoining = useCallback(() => {
     trackWorkspaceJoinClicked(invite?.metadata?.teamId, "app_onboarding");
@@ -39,21 +37,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJo
         if (res?.data?.success) {
           toast.success("Team joined successfully");
           setHasJoined(true);
-          switchWorkspace(
-            {
-              teamId: invite?.metadata?.teamId,
-              teamName: invite?.metadata?.teamName,
-              teamMembersCount: res?.data?.data?.invite?.metadata?.teamAccessCount,
-            },
-            dispatch,
-            {
-              isWorkspaceMode,
-              isSyncEnabled: true,
-            },
-            appMode,
-            null,
-            "onboarding"
-          );
+          switchWorkspace(invite?.metadata?.teamId, "onboarding");
           trackWorkspaceInviteAccepted(
             invite?.metadata?.teamId,
             invite?.metadata?.teamName,
@@ -74,15 +58,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJo
         setIsJoining(false);
         setJoiningTeamId(null);
       });
-  }, [
-    invite.id,
-    invite?.metadata?.teamId,
-    invite?.metadata?.teamName,
-    dispatch,
-    isWorkspaceMode,
-    appMode,
-    setJoiningTeamId,
-  ]);
+  }, [invite?.metadata?.teamId, invite?.metadata?.teamName, invite.id, setJoiningTeamId, dispatch, switchWorkspace]);
 
   return (
     <div className="team-card-wrapper">

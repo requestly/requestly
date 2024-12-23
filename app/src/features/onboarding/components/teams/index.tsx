@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getAppMode, getAppOnboardingDetails } from "store/selectors";
+import { getAppOnboardingDetails } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { DefaultTeamView } from "./components/defaultTeamView";
 import { JoinTeamView } from "./components/joinTeamsView";
@@ -8,8 +8,6 @@ import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { getPendingInvites } from "backend/workspace";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
 import { OnboardingLoader } from "../loader";
@@ -17,6 +15,9 @@ import { isNull } from "lodash";
 import { trackAppOnboardingTeamsViewed, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import "./index.scss";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { Workspace } from "features/workspaces/types";
 
 interface WorkspaceOnboardingViewProps {
   isOpen: boolean;
@@ -24,17 +25,17 @@ interface WorkspaceOnboardingViewProps {
 
 export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = ({ isOpen }) => {
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const user = useSelector(getUserAuthDetails);
   const [pendingInvites, setPendingInvites] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const isTeamExist = useMemo(() => {
-    const ownedTeams = availableTeams?.filter((team: { owner: string }) => team?.owner === user?.details?.profile?.uid);
+    const ownedTeams = availableWorkspaces?.filter((team: Workspace) => team?.owner === user?.details?.profile?.uid);
     return !!ownedTeams?.length;
-  }, [availableTeams, user?.details?.profile?.uid]);
+  }, [availableWorkspaces, user?.details?.profile?.uid]);
+
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const createTeam = useMemo(
     () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
@@ -43,20 +44,9 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
 
   const handleSwitchWorkspace = useCallback(
     (teamId: string, newTeamName: string) => {
-      switchWorkspace(
-        {
-          teamId: teamId,
-          teamName: newTeamName,
-          teamMembersCount: 1,
-        },
-        dispatch,
-        { isWorkspaceMode, isSyncEnabled: true },
-        appMode,
-        null,
-        "app_onboarding"
-      );
+      switchWorkspace(teamId, "app_onboarding");
     },
-    [dispatch, isWorkspaceMode, appMode]
+    [switchWorkspace]
   );
 
   const handlePendingInvites = useCallback(

@@ -2,26 +2,27 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { Row, Col, Avatar, Tabs, Alert } from "antd";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import MembersDetails from "./MembersDetails";
 import TeamSettings from "./TeamSettings";
 import BillingDetails from "./BillingDetails";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { getUniqueColorForWorkspace } from "utils/teams";
+import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 import { trackWorkspaceSettingToggled } from "modules/analytics/events/common/teams";
 import SwitchWorkspaceButton from "./SwitchWorkspaceButton";
 import { useIsTeamAdmin } from "./hooks/useIsTeamAdmin";
 import "./TeamViewer.css";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getWorkspaceById } from "store/slices/workspaces/selectors";
+import { isPersonalWorkspace } from "features/workspaces/utils";
+import PersonalWorkspaceSettings from "./PersonalWorkspaceSettings";
 
 const TeamViewer = () => {
   const { teamId } = useParams();
   const { isTeamAdmin } = useIsTeamAdmin(teamId);
-  const availableTeams = useSelector(getAvailableTeams);
   const user = useSelector(getUserAuthDetails);
   const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
 
-  const teamDetails = useMemo(() => availableTeams?.find((team) => team.id === teamId), [availableTeams, teamId]);
+  const teamDetails = useSelector(getWorkspaceById(teamId));
   const name = teamDetails?.name;
   const teamOwnerId = teamDetails?.owner;
   const isTeamArchived = teamDetails?.archived;
@@ -37,7 +38,15 @@ const TeamViewer = () => {
       {
         key: "Workspace settings",
         label: "Workspace settings",
-        children: (
+        children: isPersonalWorkspace(teamId) ? (
+          <PersonalWorkspaceSettings
+            key={teamId}
+            teamId={teamId}
+            teamOwnerId={teamOwnerId}
+            isTeamAdmin={isTeamAdmin}
+            isTeamArchived={isTeamArchived}
+          />
+        ) : (
           <TeamSettings
             key={teamId}
             teamId={teamId}

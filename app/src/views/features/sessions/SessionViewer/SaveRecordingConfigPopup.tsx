@@ -19,7 +19,6 @@ import { getSessionRecordingMetaData, getSessionRecordingEvents } from "store/fe
 import { toast } from "utils/Toast";
 import { getUserAttributes, getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
@@ -30,6 +29,8 @@ import { DraftSessionViewerProps } from "./DraftSessionViewer";
 import { useIncentiveActions } from "features/incentivization/hooks";
 import { saveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/utils";
 import Logger from "../../../../../../common/logger";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -53,7 +54,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
   const { pathname } = useLocation();
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const appMode = useSelector(getAppMode);
@@ -133,7 +134,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
         appMode,
         dispatch,
         navigate,
-        workspace?.id,
+        activeWorkspaceId,
         sessionRecordingMetadata,
         sessionEvents,
         includedDebugInfo,
@@ -156,7 +157,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       sessionRecordingMetadata,
       includedDebugInfo,
       setIsSaveSessionClicked,
-      workspace?.id,
+      activeWorkspaceId,
       sessionEvents,
       dispatch,
       appMode,

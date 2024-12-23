@@ -6,14 +6,15 @@ import ProTable from "@ant-design/pro-table";
 import { redirectToTeam } from "../../../../../../utils/RedirectionUtils";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 const TeamsList = ({ teams = [] }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const columns = [
     {
@@ -34,7 +35,7 @@ const TeamsList = ({ teams = [] }) => {
             {_}
           </span>
 
-          {currentlyActiveWorkspace.id === record.id ? (
+          {activeWorkspaceId === record.id ? (
             <Tag style={{ marginLeft: "1em" }} color="green">
               Current
             </Tag>
