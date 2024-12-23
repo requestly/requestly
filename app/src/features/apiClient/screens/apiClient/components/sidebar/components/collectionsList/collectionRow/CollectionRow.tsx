@@ -16,10 +16,11 @@ import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 import { sessionStorage } from "utils/sessionStorage";
 import PATHS from "config/constants/sub/paths";
 import { useParams } from "react-router-dom";
+import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 
 interface Props {
   record: RQAPI.CollectionRecord;
-  onNewClick: (src: RQAPI.AnalyticsEventSource) => void;
+  onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
   onExportClick: (collection: RQAPI.CollectionRecord) => void;
   openTab: TabsLayoutContextInterface["openTab"];
   collapsedKeys: string[];
@@ -138,6 +139,9 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                         e.stopPropagation();
                         setActiveKey(record.id);
                         setCreateNewField(RQAPI.RecordType.API);
+                        onNewClick("collection_row", RQAPI.RecordType.API, record.id).then(() => {
+                          setCreateNewField(null);
+                        });
                         trackNewRequestClicked("collection_row");
                       }}
                     />
@@ -151,6 +155,9 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                         e.stopPropagation();
                         setActiveKey(record.id);
                         setCreateNewField(RQAPI.RecordType.COLLECTION);
+                        onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id).then(() => {
+                          setCreateNewField(null);
+                        });
                         trackNewCollectionClicked("collection_row");
                       }}
                     />
@@ -177,7 +184,7 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                 newRecordCollectionId={record.id}
                 message="No requests created yet"
                 newRecordBtnText="New request"
-                onNewRecordClick={() => onNewClick("collection_row")}
+                onNewRecordClick={() => onNewClick("collection_row", RQAPI.RecordType.API, record.id)}
               />
             ) : (
               record.data.children.map((apiRecord) => {
@@ -201,15 +208,8 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
             )}
 
             {createNewField ? (
-              <NewRecordNameInput
-                analyticEventSource="collection_row"
-                recordType={
-                  createNewField === RQAPI.RecordType.API ? RQAPI.RecordType.API : RQAPI.RecordType.COLLECTION
-                }
-                newRecordCollectionId={record.id}
-                onSuccess={() => {
-                  setCreateNewField("");
-                }}
+              <SidebarPlaceholderItem
+                name={createNewField === RQAPI.RecordType.API ? "New Request" : "New Collection"}
               />
             ) : null}
           </Collapse.Panel>

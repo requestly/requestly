@@ -1,9 +1,10 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { Input, Radio } from "antd";
+import { Radio } from "antd";
 import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../../types";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { KeyValueTable } from "./components/KeyValueTable/KeyValueTable";
 import { EnvironmentVariables } from "backend/environment/types";
+import { useDebounce } from "hooks/useDebounce";
 
 interface Props {
   body: RQAPI.RequestBody;
@@ -36,12 +37,15 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
     setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: updatedBody } }));
   }, [contentType, rawBody, jsonBody, formBody, setRequestEntry]);
 
-  const handleRawChange = useCallback(
-    (value: string) => {
-      setRawBody(value);
-      setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
-    },
-    [setRequestEntry]
+  const handleRawChange = useDebounce(
+    useCallback(
+      (value: string) => {
+        setRawBody(value);
+        setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
+      },
+      [setRequestEntry]
+    ),
+    500
   );
 
   const handleJsonChange = useCallback(
@@ -73,14 +77,15 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
     switch (contentType) {
       case RequestContentType.JSON:
         return (
-          // @ts-ignore
           <CodeEditor
             language={EditorLanguage.JSON}
             value={jsonBody as string}
             handleChange={handleJsonChange}
+            prettifyOnInit={true}
             isResizable={false}
             hideCharacterCount
             analyticEventProperties={{ source: "api_client" }}
+            envVariables={variables}
           />
         );
 
@@ -96,25 +101,18 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
 
       default:
         return (
-          <Input.TextArea
-            className="api-request-body-raw"
-            placeholder="Enter text here..."
+          <CodeEditor
+            language={null}
             value={rawBody as string}
-            onChange={(e) => handleRawChange(e.target.value)}
+            handleChange={handleRawChange}
+            isResizable={false}
+            hideCharacterCount
+            analyticEventProperties={{ source: "api_client" }}
+            envVariables={variables}
           />
         );
     }
-  }, [
-    rawBody,
-    formBody,
-    jsonBody,
-    contentType,
-    setRequestEntry,
-    handleRawChange,
-    handleFormChange,
-    handleJsonChange,
-    variables,
-  ]);
+  }, [contentType, jsonBody, handleJsonChange, variables, formBody, handleFormChange, rawBody, handleRawChange]);
 
   return (
     <div className="api-request-body">
