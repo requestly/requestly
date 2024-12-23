@@ -75,6 +75,14 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
               if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
                 event.preventDefault();
                 onKeyDownRef.current?.(event, currentText);
+              } else if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "enter") {
+                event.preventDefault();
+                onKeyDownRef.current?.(event, currentText);
+              }
+            },
+            keypress: (event, view) => {
+              if (event.key === "Enter") {
+                onPressEnter?.(event, view.state.doc.toString());
               }
             },
           }),

@@ -373,16 +373,23 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
+  const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
+    (evt.target as HTMLInputElement).blur();
+  }, []);
+
   const onUrlKeyDown = useCallback(
     (evt: KeyboardEvent, text: string) => {
       if (evt.metaKey) {
         if (evt.key.toLowerCase() === "s") {
           evt.preventDefault();
           onSaveButtonClick();
+        } else if (evt.key.toLowerCase() === "enter") {
+          evt.preventDefault();
+          onSendButtonClick();
         }
       }
     },
-    [onSaveButtonClick]
+    [onSaveButtonClick, onSendButtonClick]
   );
 
   return isExtensionEnabled ? (
@@ -442,7 +449,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                     console.log("onChange: ", entry.request.url, "", text);
                   }}
                   onKeyDown={onUrlKeyDown}
-                  //onPressEnter={onUrlInputEnterPressed}
+                  onPressEnter={onUrlInputEnterPressed}
                   variables={currentEnvironmentVariables}
                   // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
                 />
