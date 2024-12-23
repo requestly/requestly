@@ -1,6 +1,7 @@
 import noAuth from "./assets/no-auth.svg";
 
 export const AUTHORIZATION_TYPES = {
+  INHERIT: "INHERIT",
   NO_AUTH: "NO_AUTH",
   API_KEY: "API_KEY",
   BEARER_TOKEN: "BEARER_TOKEN",
@@ -8,6 +9,7 @@ export const AUTHORIZATION_TYPES = {
 };
 
 export const AUTHORIZATION_TYPES_META = [
+  { label: "Inherit from Parent", value: AUTHORIZATION_TYPES.INHERIT },
   { label: "No Auth", value: AUTHORIZATION_TYPES.NO_AUTH },
   { label: "API Key", value: AUTHORIZATION_TYPES.API_KEY },
   { label: "Bearer Token", value: AUTHORIZATION_TYPES.BEARER_TOKEN },
@@ -39,6 +41,12 @@ export const AUTHORIZATION_FORM_DATA = {
 };
 
 export const AUTHORIZATION_STATIC_DATA = {
+  [AUTHORIZATION_TYPES.INHERIT]: {
+    description: {
+      heading: "Inherits from parent",
+      subHeading: "The authorization header will be automatically generated when you send the request",
+    },
+  },
   [AUTHORIZATION_TYPES.NO_AUTH]: {
     description: {
       img: noAuth,
