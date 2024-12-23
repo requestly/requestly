@@ -43,6 +43,9 @@ import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { getCollectionVariables } from "store/features/variables/selectors";
+import { useLocation } from "react-router-dom";
+import { useHasUnsavedChanges } from "hooks";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
 
 interface Props {
   openInModal?: boolean;
@@ -58,6 +61,7 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
 
 const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRequestFinished, openInModal }) => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
@@ -76,7 +80,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   ]);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
-  const [entry, setEntry] = useState<RQAPI.Entry>(apiEntry ?? getEmptyAPIEntry());
+  const [entry, setEntry] = useState<RQAPI.Entry>({ ...(apiEntry ?? getEmptyAPIEntry()) });
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.RequestErrorEntry["error"]>(null);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
@@ -86,6 +90,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const animationTimerRef = useRef<NodeJS.Timeout>();
+
+  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(entry, isAnimating);
+  const { updateTab } = useTabsLayoutContext();
+
+  useEffect(() => {
+    updateTab(apiEntryDetails?.id, { hasUnsavedChanges: hasUnsavedChanges });
+  }, [updateTab, apiEntryDetails?.id, hasUnsavedChanges]);
 
   useEffect(() => {
     if (apiEntry) {
@@ -329,13 +340,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
-      data: { ...sanitizeEntry(entry, false) },
+      data: { ...sanitizeEntry(entry) },
     };
 
     if (apiEntryDetails?.id) {
       record.id = apiEntryDetails?.id;
     }
-
     const result = await upsertApiRecord(uid, record, teamId);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
@@ -349,11 +359,20 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
 
     setIsRequestSaving(false);
+    setTimeout(() => resetChanges(), 0);
   };
 
   const cancelRequest = useCallback(() => {
     abortControllerRef.current?.abort();
     trackAPIRequestCancelled();
+  }, []);
+
+  const handleAuthChange = useCallback((authOptions: RQAPI.AuthOptions) => {
+    setEntry((prevEntry) => {
+      const updatedEntry = { ...prevEntry };
+      updatedEntry.auth = authOptions;
+      return updatedEntry;
+    });
   }, []);
 
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
@@ -369,6 +388,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             recordName={apiEntryDetails?.name}
             onRecordNameUpdate={setRequestName}
             onBlur={handleRecordNameUpdate}
+            // Auto focus breadcrumb input when a new record is created
+            autoFocus={location.search.includes("new")}
           />
         ) : null}
       </div>
@@ -442,6 +463,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               requestEntry={entry}
               setRequestEntry={setRequestEntry}
               setContentType={setContentType}
+              handleAuthChange={handleAuthChange}
             />
           </Skeleton>
         </div>
