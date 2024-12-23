@@ -162,6 +162,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
 
 const createCollectionRecord = (
   name: string,
+  description: string,
   id = generateDocumentId("apis"),
   variables?: any[]
 ): Partial<RQAPI.CollectionRecord> => {
@@ -177,6 +178,7 @@ const createCollectionRecord = (
   return {
     id,
     name,
+    description,
     deleted: false,
     data: {
       variables: collectionVariables,
@@ -201,7 +203,7 @@ export const processPostmanCollectionData = (
     items.forEach((item) => {
       if (item.item?.length) {
         // This is a sub-collection
-        const subCollection = createCollectionRecord(item.name, generateDocumentId("apis"));
+        const subCollection = createCollectionRecord(item.name, item.description || "", generateDocumentId("apis"));
         subCollection.collectionId = parentCollectionId;
         result.collections.push(subCollection);
 
@@ -218,7 +220,12 @@ export const processPostmanCollectionData = (
   };
 
   const rootCollectionId = generateDocumentId("apis");
-  const rootCollection = createCollectionRecord(fileContent.info.name, rootCollectionId, fileContent.variable);
+  const rootCollection = createCollectionRecord(
+    fileContent.info.name,
+    fileContent.info?.description || "",
+    rootCollectionId,
+    fileContent.variable
+  );
   rootCollection.collectionId = "";
   const processedItems = processItems(fileContent.item, rootCollectionId);
 
