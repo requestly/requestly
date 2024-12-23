@@ -11,4 +11,5 @@ export enum ReducerKeys {
   INCENTIVIZATION = "incentivization",
   WORKSPACE = "workspace",
   VARIABLES = "variables",
+  TABS_LAYOUT = "tabsLayout",
 }

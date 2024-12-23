@@ -5,6 +5,7 @@ import { variablesActions } from "store/features/variables/slice";
 import { getPersonalWorkspaceId } from "../utils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import clientRuleStorageService from "services/clientStorageService/features/rule";
+import { tabsLayoutActions } from "store/slices/tabs-layout";
 
 export const useWorkspaceHelpers = () => {
   const dispatch = useDispatch();
@@ -25,6 +26,7 @@ export const useWorkspaceHelpers = () => {
     trackWorkspaceSwitched(source);
     console.log("[useWorkspaceHelpers.switchWorkspace]", { workspaceId });
     dispatch(variablesActions.resetState());
+    dispatch(tabsLayoutActions.resetState());
     await clientRuleStorageService.resetRulesAndGroups();
     return workspaceManager.initActiveWorkspaces([workspaceId]);
   };
