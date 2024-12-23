@@ -379,10 +379,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     (evt: KeyboardEvent, text: string) => {
       if (evt.metaKey) {
         if (evt.key.toLowerCase() === "s") {
-          evt.preventDefault();
           onSaveButtonClick();
         } else if (evt.key.toLowerCase() === "enter") {
-          evt.preventDefault();
           onSendButtonClick();
         }
       }
