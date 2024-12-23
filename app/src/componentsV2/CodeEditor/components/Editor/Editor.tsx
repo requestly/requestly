@@ -38,6 +38,9 @@ interface EditorProps {
   analyticEventProperties?: AnalyticEventProperties;
   prettifyOnInit?: boolean;
   envVariables?: EnvironmentVariables;
+  config?: {
+    enablePrettify?: boolean;
+  };
 }
 
 const Editor: React.FC<EditorProps> = ({
@@ -54,6 +57,7 @@ const Editor: React.FC<EditorProps> = ({
   analyticEventProperties = {},
   prettifyOnInit = false,
   envVariables,
+  config = { enablePrettify: true },
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -190,6 +194,7 @@ const Editor: React.FC<EditorProps> = ({
           setIsCodePrettified={setIsCodePrettified}
           handleFullScreenToggle={handleFullScreenToggle}
           customOptions={toolbarOptions}
+          enablePrettify={config.enablePrettify}
         />
 
         <>
@@ -237,6 +242,7 @@ const Editor: React.FC<EditorProps> = ({
         setIsCodePrettified={setIsCodePrettified}
         handleFullScreenToggle={handleFullScreenToggle}
         customOptions={toolbarOptions}
+        enablePrettify={config?.enablePrettify}
       />
       <ResizableBox
         height={editorHeight}
