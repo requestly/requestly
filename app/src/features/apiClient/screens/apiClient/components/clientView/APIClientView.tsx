@@ -10,6 +10,7 @@ import {
   getEmptyPair,
   sanitizeKeyValuePairs,
   supportsRequestBody,
+  syncQueryParams,
 } from "../../utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
@@ -100,7 +101,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (apiEntry) {
       clearTimeout(animationTimerRef.current);
       setIsAnimating(true);
-      setEntry(apiEntry);
+      setEntry({
+        ...apiEntry,
+        request: { ...apiEntry.request, ...syncQueryParams(apiEntry.request.queryParams, apiEntry.request.url) },
+      });
       setRequestName("");
       animationTimerRef.current = setTimeout(() => setIsAnimating(false), 500);
     }
@@ -116,6 +120,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       request: {
         ...entry.request,
         url,
+        ...syncQueryParams(entry.request.queryParams, url, 1),
       },
     }));
   }, []);

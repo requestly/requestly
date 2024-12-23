@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { EditorView, placeholder as cmPlaceHolder } from "@codemirror/view";
-import { EditorState } from "@codemirror/state";
+import { EditorState, Transaction } from "@codemirror/state";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { EditorPopover } from "componentsV2/CodeEditor/components/Editor/components/PopOver";
 import "componentsV2/CodeEditor/components/Editor/components/PopOver/popover.scss";
@@ -45,7 +45,10 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
             return tr.newDoc.lines > 1 ? [] : [tr]; // Prevent new lines
           }),
           EditorView.updateListener.of((update) => {
-            if (update.docChanged) {
+            const isUserInput = update.transactions.find((tr) => tr.annotation(Transaction.userEvent));
+
+            // To prevent calling onChange when defaultValue Changes
+            if (update.docChanged && isUserInput) {
               onChange?.(update.state.doc.toString());
             }
           }),
@@ -81,18 +84,25 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placeholder, variables]);
 
-  // Commenting out for now, breaking the the editors cursor position
-  // useEffect(() => {
-  //   if (editorViewRef.current && defaultValue !== undefined) {
-  //     editorViewRef.current.dispatch({
-  //       changes: {
-  //         from: 0,
-  //         to: editorViewRef.current.state.doc.length,
-  //         insert: defaultValue,
-  //       },
-  //     });
-  //   }
-  // }, [defaultValue]);
+  useEffect(() => {
+    if (editorViewRef.current && defaultValue !== undefined) {
+      const editorView = editorViewRef.current;
+      const currentDoc = editorView.state.doc.toString();
+
+      if (currentDoc !== defaultValue) {
+        const { from = 0, to = 0 } = editorView.state.selection.main;
+
+        editorView.dispatch({
+          changes: {
+            from: 0,
+            to: currentDoc.length,
+            insert: defaultValue,
+          },
+          selection: { anchor: from, head: to },
+        });
+      }
+    }
+  }, [defaultValue]);
 
   return (
     <>
