@@ -53,6 +53,10 @@ const createApiRecord = async (
     updatedTs: Timestamp.now().toMillis(),
   } as RQAPI.Record;
 
+  if (record.type === RQAPI.RecordType.COLLECTION) {
+    newRecord.description = record.description || "";
+  }
+
   if (docId) {
     // Creating a new record with a given id
     const docRef = doc(db, "apis", docId);
