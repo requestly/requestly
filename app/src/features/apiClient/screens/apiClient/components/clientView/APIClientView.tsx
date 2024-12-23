@@ -69,7 +69,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const teamId = workspace?.id;
 
   const { toggleBottomSheet } = useBottomSheetContext();
-  const { onSaveRecord } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const { getVariablesWithPrecedence } = environmentManager;
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
@@ -236,10 +236,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     executeAPIRequest(
       appMode,
+      apiClientRecords,
       sanitizedEntry,
+      {
+        id: apiEntryDetails?.id,
+        collectionId: apiEntryDetails?.collectionId,
+      },
       environmentManager,
-      abortControllerRef.current.signal,
-      apiEntryDetails?.collectionId
+      abortControllerRef.current.signal
     )
       .then((entry) => {
         const response = entry.response;
@@ -294,6 +298,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
+    apiClientRecords,
+    apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
     appMode,
     dispatch,
