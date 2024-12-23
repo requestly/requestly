@@ -88,6 +88,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
     if (editorViewRef.current && defaultValue !== undefined) {
       const editorView = editorViewRef.current;
       const currentDoc = editorView.state.doc.toString();
+      const newDocLength = defaultValue.length;
 
       if (currentDoc !== defaultValue) {
         const { from = 0, to = 0 } = editorView.state.selection.main;
@@ -98,7 +99,10 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
             to: currentDoc.length,
             insert: defaultValue,
           },
-          selection: { anchor: from, head: to },
+          selection: {
+            anchor: from > newDocLength ? newDocLength : from,
+            head: to > newDocLength ? newDocLength : to,
+          },
         });
       }
     }
