@@ -91,7 +91,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const { response, ...entryWithoutResponse } = entry;
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB
-  const { hasUnsavedChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse), isAnimating);
+  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse), isAnimating);
   const { updateTab } = useTabsLayoutContext();
 
   useEffect(() => {
@@ -330,7 +330,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
       setEntry({ ...result.data.data, response: entry.response });
-
+      resetChanges();
       trackRequestSaved("api_client_view");
       toast.success("Request saved!");
     } else {
@@ -338,7 +338,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
 
     setIsRequestSaving(false);
-  }, [entry, apiEntryDetails, onSaveRecord, setEntry, teamId, uid]);
+  }, [entry, apiEntryDetails, onSaveRecord, setEntry, teamId, uid, resetChanges]);
 
   const cancelRequest = useCallback(() => {
     abortControllerRef.current?.abort();
