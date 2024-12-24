@@ -17,6 +17,7 @@ interface EnvironmentsListItemProps {
   environment: {
     id: string;
     name: string;
+    isGlobal?: boolean;
   };
 
   openTab: TabsLayoutContextInterface["openTab"];

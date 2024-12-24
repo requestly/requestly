@@ -20,7 +20,6 @@ export const executeAPIRequest = async (
   environmentManager: any,
   signal?: AbortSignal
 ): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
-  // Process request configuration with environment variables
   const updatedEntry = JSON.parse(JSON.stringify(entry)); //Deep Copy
 
   if (!isEmpty(updatedEntry.auth)) {
@@ -29,21 +28,25 @@ export const executeAPIRequest = async (
     updatedEntry.request.queryParams = updateRequestWithAuthOptions(updatedEntry.request.queryParams, queryParams);
   }
 
+  // Process request configuration with environment variables
   const renderedRequestDetails = environmentManager.renderVariables(updatedEntry.request, entryDetails.collectionId);
   let currentEnvironmentVariables = renderedRequestDetails.variables;
   let renderedRequest = renderedRequestDetails.renderedTemplate;
   let response: RQAPI.Response | null = null;
+  let globalEnvironmentVariables = environmentManager.getGlobalVariables();
 
   try {
     if (updatedEntry.scripts.preRequest) {
-      const { updatedVariables } = await executePrerequestScript(
+      const { updatedEnvironmentVariables, updatedGlobalVariables } = await executePrerequestScript(
         updatedEntry.scripts.preRequest,
         renderedRequest,
         environmentManager,
-        currentEnvironmentVariables
+        currentEnvironmentVariables,
+        globalEnvironmentVariables
       );
 
-      currentEnvironmentVariables = updatedVariables;
+      currentEnvironmentVariables = updatedEnvironmentVariables;
+      globalEnvironmentVariables = updatedGlobalVariables;
       // TODO@nafees87n: Fix this while refactoring, rendering should always get fresh variables
       // Temporarily passing current variables
       renderedRequest = renderTemplate(updatedEntry.request, currentEnvironmentVariables);
@@ -90,7 +93,8 @@ export const executeAPIRequest = async (
         updatedEntry.scripts.postResponse,
         { response, request: renderedRequest },
         environmentManager,
-        currentEnvironmentVariables
+        currentEnvironmentVariables,
+        globalEnvironmentVariables
       );
     } catch (error) {
       console.error("Post Response script error", error);

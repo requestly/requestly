@@ -2,10 +2,14 @@
 import { ScriptExecutedPayload } from "./types";
 
 export const requestWorkerFunction = function (e: MessageEvent) {
-  const { script, request, currentVariables } = e.data;
+  const { script, request, currentVariables, globalVariables } = e.data;
 
   const mutations: ScriptExecutedPayload["mutations"] = {
     environment: {
+      $set: {},
+      $unset: {},
+    },
+    globals: {
       $set: {},
       $unset: {},
     },
@@ -54,11 +58,25 @@ export const requestWorkerFunction = function (e: MessageEvent) {
           mutations.environment.$unset[key] = "";
         },
       },
+      globals: {
+        set: (key: string, value: any) => {
+          if (key === undefined || value === undefined) {
+            throw new Error("Key or value is undefined while setting environment variable.");
+          }
+          mutations.globals.$set[key] = value;
+        },
+        get: (key: string) => {
+          const variable = globalVariables[key];
+          return variable?.localValue || variable?.syncValue;
+        },
+        unset: (key: string) => {
+          mutations.globals.$unset[key] = "";
+        },
+      },
       collectionVariables: createInfiniteChainable("collectionVariables"),
       cookies: createInfiniteChainable("cookie"),
       execution: createInfiniteChainable("execution"),
       expect: createInfiniteChainable("expect"),
-      globals: createInfiniteChainable("globals"),
       info: createInfiniteChainable("info"),
       iterationData: createInfiniteChainable("iterationData"),
       require: createInfiniteChainable("require"),
@@ -103,6 +121,7 @@ export const requestWorkerFunction = function (e: MessageEvent) {
         payload: {
           currentVariables,
           mutations,
+          globalVariables,
         },
       });
     })
@@ -119,10 +138,14 @@ export const requestWorkerFunction = function (e: MessageEvent) {
 };
 
 export const responseWorkerFunction = function (e: MessageEvent) {
-  const { script, request, response, currentVariables } = e.data;
+  const { script, request, response, currentVariables, globalVariables } = e.data;
 
   const mutations: ScriptExecutedPayload["mutations"] = {
     environment: {
+      $set: {},
+      $unset: {},
+    },
+    globals: {
       $set: {},
       $unset: {},
     },
@@ -177,11 +200,25 @@ export const responseWorkerFunction = function (e: MessageEvent) {
           mutations.environment.$unset[key] = "";
         },
       },
+      globals: {
+        set: (key: string, value: any) => {
+          if (key === undefined || value === undefined) {
+            throw new Error("Key or value is undefined while setting environment variable.");
+          }
+          mutations.globals.$set[key] = value;
+        },
+        get: (key: string) => {
+          const variable = globalVariables[key];
+          return variable?.localValue || variable?.syncValue;
+        },
+        unset: (key: string) => {
+          mutations.globals.$unset[key] = "";
+        },
+      },
       collectionVariables: createInfiniteChainable("collectionVariables"),
       cookies: createInfiniteChainable("cookie"),
       execution: createInfiniteChainable("execution"),
       expect: createInfiniteChainable("expect"),
-      globals: createInfiniteChainable("globals"),
       info: createInfiniteChainable("info"),
       iterationData: createInfiniteChainable("iterationData"),
       require: createInfiniteChainable("require"),
@@ -237,6 +274,7 @@ export const responseWorkerFunction = function (e: MessageEvent) {
         payload: {
           currentVariables,
           mutations,
+          globalVariables,
         },
       });
     })
