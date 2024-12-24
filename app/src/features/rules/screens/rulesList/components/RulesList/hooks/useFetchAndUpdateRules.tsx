@@ -99,11 +99,11 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
       // FIXME-syncing: Improvements Required
       console.log("subscribe RuleStorageModels", activeWorkspaceId);
       unsubscribe = await RuleStorageModel.subscribe(async (ruleStorageModels: RuleStorageModel[]) => {
-        console.log("!!!debug", { ruleStorageModels });
-
         let rulesAndGroups = ruleStorageModels.map((ruleStorageModel) => {
           return ruleStorageModel.data;
         });
+        console.log("!!!debug", { ruleStorageModels, rulesAndGroups });
+
         let groups = rulesAndGroups.filter((val) => val.objectType === "group") as Group[];
         let rules = rulesAndGroups.filter((val) => val.objectType === "rule") as Rule[];
         updateRulesAndGroups(rules, groups);
