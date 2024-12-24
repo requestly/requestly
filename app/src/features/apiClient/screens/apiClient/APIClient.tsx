@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { redirectToRequest } from "utils/RedirectionUtils";
+import { toast } from "utils/Toast";
 import "./apiClient.scss";
 
 interface Props {}
@@ -140,6 +141,10 @@ export const APIClient: React.FC<Props> = () => {
       return saveRequest(apiEntry)
         .then((apiRecord: RQAPI.ApiRecord) => {
           setSelectedEntryDetails(apiRecord);
+        })
+        .catch((error) => {
+          console.error("Error importing request", error);
+          toast.error("Error importing request");
         })
         .finally(() => {
           setIsImportModalOpen(false);
