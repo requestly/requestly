@@ -1,7 +1,6 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
-// @ts-ignore
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
@@ -57,6 +56,32 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
     },
     response: null,
   };
+};
+
+export const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => {
+  const sanitizedEntry: RQAPI.Entry = {
+    ...entry,
+    request: {
+      ...entry.request,
+      queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys),
+      headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys),
+    },
+    scripts: {
+      preRequest: entry.scripts?.preRequest || "",
+      postResponse: entry.scripts?.postResponse || "",
+    },
+  };
+
+  if (!supportsRequestBody(entry.request.method)) {
+    sanitizedEntry.request.body = null;
+  } else if (entry.request.contentType === RequestContentType.FORM) {
+    sanitizedEntry.request.body = sanitizeKeyValuePairs(
+      sanitizedEntry.request.body as KeyValuePair[],
+      removeDisabledKeys
+    );
+  }
+
+  return sanitizedEntry;
 };
 
 export const sanitizeKeyValuePairs = (keyValuePairs: KeyValuePair[], removeDisabledKeys = true): KeyValuePair[] => {
@@ -138,8 +163,9 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
       queryParams,
       headers,
       contentType,
-      body,
+      body: body ?? null,
     };
+
     return request;
   } catch (e) {
     return null;

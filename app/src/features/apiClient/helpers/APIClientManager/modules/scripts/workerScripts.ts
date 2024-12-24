@@ -15,8 +15,8 @@ export const requestWorkerFunction = function (e: MessageEvent) {
     },
   };
 
-  const JSONifyObject = (stringifiedObject: string): any => {
-    JSON.parse(stringifiedObject);
+  const JSONifyObject = (stringifiedObject: string): Record<string, any> => {
+    return JSON.parse(stringifiedObject);
   };
 
   const createInfiniteChainable = (methodName: string) => {
@@ -170,7 +170,7 @@ export const responseWorkerFunction = function (e: MessageEvent) {
     return new Proxy(() => {}, handler);
   };
 
-  const JSONifyObject = (stringifiedObject: string): any => {
+  const JSONifyObject = (stringifiedObject: string): Record<string, any> => {
     return JSON.parse(stringifiedObject);
   };
 
