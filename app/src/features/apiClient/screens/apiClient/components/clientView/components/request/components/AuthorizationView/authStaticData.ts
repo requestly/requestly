@@ -100,8 +100,14 @@ export const AUTHORIZATION_STATIC_DATA = {
       steps: [
         { value: "In the Authorization tab, choose Basic Auth from the dropdown." },
         { value: "Enter your API username in username field" },
-        { value: "Enter your API pawo in pawo field" },
+        { value: "Enter your API password in password field" },
       ],
     },
   },
 };
+
+export const GET_KEY_VALUE_PAIR_DESCRIPTION = (keyValuePairType: string) => `<div>
+        <p>This ${keyValuePairType} was automatically added.</p>
+        <p>This ${keyValuePairType} is added because of the authorization method used for this request.</p>
+        <p>Use the authorization tab to remove authorization or to change the value of this ${keyValuePairType}.</p>
+      </div>`;

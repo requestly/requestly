@@ -11,18 +11,14 @@ import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineE
 import { MdClear } from "@react-icons/all-files/md/MdClear";
 import { AUTHORIZATION_TYPES } from "./types";
 import { AUTH_OPTIONS } from "./types/form";
+import { RQAPI } from "features/apiClient/types";
 
 interface Props {
   defaultValues: {
     currentAuthType?: AUTHORIZATION_TYPES;
     authOptions?: AUTH_OPTIONS;
   };
-  onAuthUpdate: (
-    currentAuthType: AUTHORIZATION_TYPES,
-    updatedKey?: string,
-    updatedValue?: string,
-    formValues?: any
-  ) => any;
+  onAuthUpdate: (authOptions: RQAPI.AuthOptions) => void;
 }
 
 const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => {

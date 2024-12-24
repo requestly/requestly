@@ -13,6 +13,7 @@ import "./keyValueTable.scss";
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
 
 interface KeyValueTableProps {
+  wrapperClass?: string;
   data: KeyValuePair[];
   pairType: KeyValueFormType;
   variables: EnvironmentVariables;
@@ -21,7 +22,13 @@ interface KeyValueTableProps {
 
 // TODO: REFACTOR TYPES
 
-export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValuePairs, pairType, variables }) => {
+export const KeyValueTable: React.FC<KeyValueTableProps> = ({
+  wrapperClass,
+  data,
+  setKeyValuePairs,
+  pairType,
+  variables,
+}) => {
   const [tableData, setTableData] = useState<KeyValuePair[]>(data);
 
   const handleUpdateRequestPairs = useCallback(
@@ -86,6 +93,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
       key: "",
       value: "",
       isEnabled: true,
+      isEditable: true,
     }),
     []
   );
@@ -111,6 +119,10 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
     }
   }, [tableData, handleAddPair]);
 
+  useEffect(() => {
+    setTableData(data);
+  }, [data]);
+
   const columns = useMemo(() => {
     return [
       {
@@ -120,7 +132,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
-          editable: true,
+          editable: record.isEditable ?? true,
           dataIndex: "isEnabled",
           title: "isEnabled",
           pairType,
@@ -135,11 +147,12 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
-          editable: true,
+          editable: record.isEditable ?? true,
           dataIndex: "key",
           title: "key",
           pairType,
           variables,
+          description: record.description,
           handleUpdatePair,
         }),
       },
@@ -149,7 +162,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
-          editable: true,
+          editable: record.isEditable ?? true,
           dataIndex: "value",
           title: "value",
           pairType,
@@ -161,7 +174,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
         title: "",
         width: "50px",
         render: (_: any, record: KeyValuePair) => {
-          if (record.key === "" && record.value === "" && tableData.length === 1) {
+          if ((record.key === "" && record.value === "" && tableData.length === 1) || !record.isEditable) {
             return null;
           }
 
@@ -182,7 +195,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
   return (
     <ContentListTable
       id="api-key-value-table"
-      className="api-key-value-table"
+      className={`api-key-value-table ${wrapperClass}`}
       bordered
       showHeader={false}
       rowKey="id"
