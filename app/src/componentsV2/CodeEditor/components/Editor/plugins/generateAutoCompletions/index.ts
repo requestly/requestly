@@ -18,11 +18,11 @@ export function generateCompletionSource(
   lengthOfStartingChars: number
 ): CompletionSource {
   return (context) => {
-    console.log(`DBG: ${matchPattern} context: `, context);
     const match = context.matchBefore(matchPattern);
     if (match) {
       return {
-        from: lengthOfStartingChars,
+        from: match.from + lengthOfStartingChars,
+        to: match.to,
         options: completions,
         filter: false,
       } as CompletionResult;

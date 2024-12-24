@@ -3,8 +3,8 @@ import { generateCompletionSource } from ".";
 
 export interface MethodDetails {
   name: string; // name of the method
-  docstring?: string; // brief explanation of the method
-  signature?: string; // the method signature // AI GENERATED - TODO: PROBABLY DOESN'T WORK
+  docstring?: string; // brief explanation of what the method/attribute is about
+  signature?: string; // doesn't provide intellisense, but is used to display the method signature in the completion dropdown
 }
 
 interface NameSpaceConfig {
@@ -24,7 +24,7 @@ export default function generateRQNamespaceCompletions(
       info: method.docstring,
     } as Completion;
   });
-  let matchPattern = /rq\..*?/g;
+  let matchPattern = /rq\.$/g;
   let length = 3;
 
   if (config) {
