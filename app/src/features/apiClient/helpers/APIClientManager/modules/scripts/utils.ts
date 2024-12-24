@@ -127,6 +127,58 @@ const handleEnvironmentChanges = async (
   };
 };
 
+const handleCollectionVariablesMutations = async (
+  environmentManager: any,
+  requestCollectionId: string,
+  payload: {
+    mutations: ScriptExecutedPayload["mutations"];
+    collectionVariables: EnvironmentVariables;
+  }
+) => {
+  const { mutations, collectionVariables } = payload;
+
+  if (isEmpty(mutations.collectionVariables.$set) && isEmpty(mutations.collectionVariables.$unset)) {
+    return {
+      updatedCollectionVariables: collectionVariables,
+    };
+  }
+
+  const variablesToSet = {
+    ...collectionVariables,
+    ...Object.fromEntries(
+      Object.entries(mutations.collectionVariables.$set).map(([key, value]) => {
+        if (collectionVariables[key]) {
+          return [
+            key,
+            {
+              syncValue: collectionVariables[key].syncValue,
+              localValue: value,
+              type: typeof collectionVariables[key].syncValue,
+            },
+          ];
+        }
+        return [
+          key,
+          {
+            syncValue: value,
+            localValue: value,
+            type: typeof value,
+          },
+        ];
+      })
+    ),
+  };
+
+  Object.keys(mutations.collectionVariables.$unset).forEach((key) => {
+    delete variablesToSet[key];
+  });
+
+  await environmentManager.setCollectionVariables(variablesToSet, requestCollectionId);
+  return {
+    updatedCollectionVariables: variablesToSet,
+  };
+};
+
 const cleanupWorker = (worker: Worker | null) => {
   if (worker) {
     worker.terminate();
@@ -138,18 +190,23 @@ const messageHandler = async (
   environmentManager: any,
   event: MessageEvent,
   resolve: any,
-  reject: any
+  reject: any,
+  requestCollectionId: string
 ) => {
   const { type, payload } = event.data as WorkerMessage;
 
   switch (type) {
     case "SCRIPT_EXECUTED": {
-      const globalEnvironmentUpdations = await handleGlobalEnvironmentMutations(environmentManager, payload);
-      handleEnvironmentChanges(environmentManager, payload)
-        .then((updatedVariables) => {
+      Promise.all([
+        handleGlobalEnvironmentMutations(environmentManager, payload),
+        handleEnvironmentChanges(environmentManager, payload),
+        handleCollectionVariablesMutations(environmentManager, requestCollectionId, payload),
+      ])
+        .then(([globalUpdates, envUpdates, collectionUpdates]) => {
           resolve({
-            ...globalEnvironmentUpdations,
-            ...updatedVariables,
+            ...globalUpdates,
+            ...envUpdates,
+            ...collectionUpdates,
           });
         })
         .catch((e) => {
@@ -158,6 +215,7 @@ const messageHandler = async (
         .finally(() => {
           cleanupWorker(worker);
         });
+
       break;
     }
 
@@ -173,14 +231,21 @@ export const executePrerequestScript = (
   request: RQAPI.Request,
   environmentManager: any,
   currentEnvironmentVariables: EnvironmentVariables,
-  globalEnvironmentVariables: EnvironmentVariables
-): Promise<EnvironmentVariables | null> => {
+  globalEnvironmentVariables: EnvironmentVariables,
+  collectionVariables: EnvironmentVariables,
+  requestCollectionId: string
+): Promise<{
+  updatedEnvironmentVariables: EnvironmentVariables;
+  updatedGlobalVariables: EnvironmentVariables;
+  updatedCollectionVariables: EnvironmentVariables;
+} | null> => {
   let worker: Worker | null = null;
 
   return new Promise((resolve, reject) => {
     worker = createWorker(requestWorkerFunction);
 
-    worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event, resolve, reject);
+    worker.onmessage = (event: MessageEvent) =>
+      messageHandler(worker, environmentManager, event, resolve, reject, requestCollectionId);
 
     worker.onerror = (error) => {
       cleanupWorker(worker);
@@ -193,6 +258,8 @@ export const executePrerequestScript = (
       request: request,
       currentVariables: currentEnvironmentVariables,
       globalVariables: globalEnvironmentVariables,
+      collectionVariables: collectionVariables,
+      collectionId: requestCollectionId,
     });
 
     setTimeout(() => {
@@ -209,14 +276,17 @@ export const executePostresponseScript = (
   },
   environmentManager: any,
   currentEnvironmentVariables: EnvironmentVariables,
-  globalEnvironmentVariables: EnvironmentVariables
+  globalEnvironmentVariables: EnvironmentVariables,
+  collectionVariables: EnvironmentVariables,
+  requestCollectionId: string
 ) => {
   let worker: Worker | null = null;
 
   return new Promise((resolve, reject) => {
     worker = createWorker(responseWorkerFunction);
 
-    worker.onmessage = (event: MessageEvent) => messageHandler(worker, environmentManager, event, resolve, reject);
+    worker.onmessage = (event: MessageEvent) =>
+      messageHandler(worker, environmentManager, event, resolve, reject, requestCollectionId);
 
     worker.onerror = (error) => {
       console.error("Response Worker error:", error);
@@ -230,6 +300,8 @@ export const executePostresponseScript = (
       response: APIDetails.response,
       currentVariables: currentEnvironmentVariables,
       globalVariables: globalEnvironmentVariables,
+      collectionVariables: collectionVariables,
+      collectionId: requestCollectionId,
     });
 
     setTimeout(() => {

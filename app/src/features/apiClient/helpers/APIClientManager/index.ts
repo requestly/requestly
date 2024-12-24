@@ -6,6 +6,7 @@ import { executePrerequestScript, executePostresponseScript } from "./modules/sc
 import { renderTemplate } from "backend/environment/utils";
 import { DEMO_API_URL } from "features/apiClient/constants";
 import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient";
+import { EnvironmentVariables } from "backend/environment/types";
 import { isEmpty } from "lodash";
 import { processAuthForEntry, updateRequestWithAuthOptions } from "../auth";
 
@@ -18,6 +19,7 @@ export const executeAPIRequest = async (
     collectionId: RQAPI.Record["collectionId"];
   },
   environmentManager: any,
+  collectionVariables: EnvironmentVariables,
   signal?: AbortSignal
 ): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
   const updatedEntry = JSON.parse(JSON.stringify(entry)); //Deep Copy
@@ -34,19 +36,27 @@ export const executeAPIRequest = async (
   let renderedRequest = renderedRequestDetails.renderedTemplate;
   let response: RQAPI.Response | null = null;
   let globalEnvironmentVariables = environmentManager.getGlobalVariables();
+  let currentCollectionVariables = collectionVariables;
 
   try {
     if (updatedEntry.scripts.preRequest) {
-      const { updatedEnvironmentVariables, updatedGlobalVariables } = await executePrerequestScript(
+      const {
+        updatedEnvironmentVariables,
+        updatedGlobalVariables,
+        updatedCollectionVariables,
+      } = await executePrerequestScript(
         updatedEntry.scripts.preRequest,
         renderedRequest,
         environmentManager,
         currentEnvironmentVariables,
-        globalEnvironmentVariables
+        globalEnvironmentVariables,
+        currentCollectionVariables,
+        entryDetails.collectionId
       );
 
       currentEnvironmentVariables = updatedEnvironmentVariables;
       globalEnvironmentVariables = updatedGlobalVariables;
+      currentCollectionVariables = updatedCollectionVariables;
       // TODO@nafees87n: Fix this while refactoring, rendering should always get fresh variables
       // Temporarily passing current variables
       renderedRequest = renderTemplate(updatedEntry.request, currentEnvironmentVariables);
@@ -94,7 +104,9 @@ export const executeAPIRequest = async (
         { response, request: renderedRequest },
         environmentManager,
         currentEnvironmentVariables,
-        globalEnvironmentVariables
+        globalEnvironmentVariables,
+        currentCollectionVariables,
+        entryDetails.collectionId
       );
     } catch (error) {
       console.error("Post Response script error", error);
