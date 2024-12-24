@@ -164,7 +164,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
                 <span>
                   Global variables are accessible across the workspace and editable by all the workspace members.{" "}
                   <Link
-                    to="https://docs.requestly.com/general/api-client/environments-and-variables/add-and-use-variables"
+                    to="https://docs.requestly.com/general/api-client/environments-and-variables#global-variables"
                     target="_blank"
                   >
                     Learn more.
