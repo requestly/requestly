@@ -24,7 +24,7 @@ interface ApiClientContextInterface {
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => void;
-  onSaveRecord: (apiClientRecord: RQAPI.Record) => void;
+  onSaveRecord: (apiClientRecord: RQAPI.Record, openTabOnSave?: boolean) => void;
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => void;
   recordToBeDeleted: RQAPI.Record;
   updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => void;
@@ -56,7 +56,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => {},
-  onSaveRecord: (apiClientRecord: RQAPI.Record) => {},
+  onSaveRecord: (apiClientRecord: RQAPI.Record, openTabOnSave?: boolean) => {},
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => {},
   recordToBeDeleted: null,
   updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => {},
@@ -175,7 +175,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   );
 
   const onSaveRecord = useCallback(
-    (apiClientRecord: RQAPI.Record) => {
+    (apiClientRecord: RQAPI.Record, openTabOnSave = true) => {
       const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
       if (isRecordExist) {
@@ -187,10 +187,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       } else {
         onNewRecord(apiClientRecord);
         console.log("apiClientRecord v2", apiClientRecord);
-        openTab(apiClientRecord.id, {
-          title: apiClientRecord.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?new`,
-        });
+        if (openTabOnSave) {
+          openTab(apiClientRecord.id, {
+            title: apiClientRecord.name,
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?new`,
+          });
+        }
       }
     },
     [apiClientRecords, onUpdateRecord, onNewRecord, openTab, replaceTab]

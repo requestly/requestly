@@ -7,26 +7,29 @@ import { renderTemplate } from "backend/environment/utils";
 import { DEMO_API_URL } from "features/apiClient/constants";
 import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient";
 import { isEmpty } from "lodash";
-import { processAuthOptions, updateRequestWithAuthOptions } from "../auth";
+import { processAuthForEntry, updateRequestWithAuthOptions } from "../auth";
 
 export const executeAPIRequest = async (
   appMode: string,
+  apiRecords: RQAPI.Record[],
   entry: RQAPI.Entry,
+  entryDetails: {
+    id: RQAPI.Record["id"];
+    collectionId: RQAPI.Record["collectionId"];
+  },
   environmentManager: any,
-  signal?: AbortSignal,
-  requestCollectionId?: string
+  signal?: AbortSignal
 ): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
   // Process request configuration with environment variables
-
   const updatedEntry = JSON.parse(JSON.stringify(entry)); //Deep Copy
 
   if (!isEmpty(updatedEntry.auth)) {
-    const { headers, queryParams } = processAuthOptions(updatedEntry.auth);
+    const { headers, queryParams } = processAuthForEntry(updatedEntry, entryDetails, apiRecords);
     updatedEntry.request.headers = updateRequestWithAuthOptions(updatedEntry.request.headers, headers);
     updatedEntry.request.queryParams = updateRequestWithAuthOptions(updatedEntry.request.queryParams, queryParams);
   }
 
-  const renderedRequestDetails = environmentManager.renderVariables(updatedEntry.request, requestCollectionId);
+  const renderedRequestDetails = environmentManager.renderVariables(updatedEntry.request, entryDetails.collectionId);
   let currentEnvironmentVariables = renderedRequestDetails.variables;
   let renderedRequest = renderedRequestDetails.renderedTemplate;
   let response: RQAPI.Response | null = null;

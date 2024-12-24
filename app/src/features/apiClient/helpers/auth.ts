@@ -6,7 +6,55 @@ import {
 import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 import { KeyValuePair, RQAPI } from "../types";
 
-export const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
+export const processAuthForEntry = (
+  entry: RQAPI.Entry,
+  entryDetails: {
+    id: RQAPI.Record["id"];
+    collectionId: RQAPI.Record["collectionId"];
+  },
+  allRecords: RQAPI.Record[]
+) => {
+  let authOptions = entry.auth;
+  if (entry.auth.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
+    authOptions = inheritAuth(entry, entryDetails, allRecords);
+  }
+
+  if (!authOptions) {
+    return {
+      headers: [],
+      queryParams: [],
+    };
+  }
+
+  return processAuthOptions(authOptions);
+};
+
+function inheritAuth(
+  entry: RQAPI.Record["data"],
+  entryDetails: {
+    id: RQAPI.Record["id"];
+    collectionId: RQAPI.Record["collectionId"];
+  },
+  allRecords: RQAPI.Record[]
+) {
+  const parentRecord = entryDetails.collectionId
+    ? allRecords.find((record) => record.id === entryDetails.collectionId)
+    : null;
+  if (!parentRecord) {
+    return null;
+  }
+  let parentAuthData = parentRecord.data.auth;
+  if (parentAuthData.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
+    const parentDetails = {
+      id: parentRecord.id,
+      collectionId: parentRecord.collectionId,
+    };
+    parentAuthData = inheritAuth(parentRecord.data, parentDetails, allRecords);
+  }
+  return parentAuthData;
+}
+
+const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
   const headers: KeyValuePair[] = [];
   const queryParams: KeyValuePair[] = [];
 
@@ -41,6 +89,8 @@ export const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
   };
 
   switch (currentAuthType) {
+    case AUTHORIZATION_TYPES.INHERIT:
+      throw new Error("Inherit auth type should not be processed inside processAuthOptions");
     case AUTHORIZATION_TYPES.NO_AUTH:
       break;
     case AUTHORIZATION_TYPES.BASIC_AUTH: {

@@ -1,11 +1,8 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { RulesContainer } from "views/containers/RulesContainer";
-import TrashIndexPage from "components/features/trash/TrashIndexPage";
 import RuleEditor from "views/features/rules/RuleEditor";
 import { joinPaths } from "utils/PathUtils";
-import ImportSharedListIndexPage from "components/features/sharedLists/ImportSharedListIndexPage";
-import ProtectedRoute from "components/authentication/ProtectedRoute";
 import RootComponent from "components/redirects/RootComponent";
 
 // V2 Imports
@@ -23,14 +20,6 @@ export const ruleRoutes: RouteObject[] = [
       {
         path: PATHS.SHARED_LISTS.VIEWER.RELATIVE, // currently broken in prod
         element: <Navigate to={PATHS.SHARED_LISTS.ABSOLUTE} />,
-      },
-      {
-        path: PATHS.SHARED_LISTS.IMPORT_LIST.RELATIVE, // for desktop app
-        element: <ProtectedRoute component={ImportSharedListIndexPage} />,
-      },
-      {
-        path: PATHS.RULES.TRASH.RELATIVE,
-        element: <TrashIndexPage />,
       },
     ],
   },
