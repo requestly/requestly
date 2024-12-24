@@ -65,7 +65,23 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             cURL
           </div>
         ),
-        onClick: onImportClick,
+        onClick: () => {
+          if (!user.loggedIn) {
+            dispatch(
+              globalActions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  eventSource: "api_client_sidebar",
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                  warningMessage: `Please log in to import a cURL request`,
+                },
+              })
+            );
+          } else {
+            onImportClick();
+          }
+        },
         disabled: location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.INDEX),
       },
       {
@@ -105,7 +121,21 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         ),
         onClick: () => {
           trackImportFromPostmanClicked();
-          setIsPostmanImporterModalOpen(true);
+          if (!user.loggedIn) {
+            dispatch(
+              globalActions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  eventSource: "api_client_sidebar",
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                  warningMessage: `Please log in to import Postman collections`,
+                },
+              })
+            );
+          } else {
+            setIsPostmanImporterModalOpen(true);
+          }
         },
       },
     ],
