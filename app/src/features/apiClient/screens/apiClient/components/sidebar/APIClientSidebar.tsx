@@ -10,10 +10,16 @@ import { HistoryList } from "./components/historyList/HistoryList";
 import { ApiClientSidebarHeader } from "./components/apiClientSidebarHeader/ApiClientSidebarHeader";
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { DeleteApiRecordModal } from "../modals";
-import "./apiClientSidebar.scss";
+import { DeleteApiRecordModal, ImportRequestModal } from "../modals";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
+import { getEmptyAPIEntry } from "../../utils";
+import { upsertApiRecord } from "backend/apiClient";
+import { toast } from "utils/Toast";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import "./apiClientSidebar.scss";
 
 interface Props {}
 
@@ -24,10 +30,14 @@ export enum ApiClientSidebarTabKey {
 }
 
 const APIClientSidebar: React.FC<Props> = () => {
+  const user = useSelector(getUserAuthDetails);
+  const team = useSelector(getCurrentlyActiveWorkspace);
   const { requestId, collectionId } = useParams();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
+  const [isLoading, setIsLoading] = useState(false);
 
+  const { isImportModalOpen, onImportRequestModalClose, onSaveRecord, setIsImportModalOpen } = useApiClientContext();
   const { addNewEnvironment, getAllEnvironments, isEnvironmentsDataLoaded } = useEnvironmentManager();
   const environments = getAllEnvironments();
   const isGlobalEnvironmentExists = useMemo(() => environments.some((env) => isGlobalEnvironment(env.id)), [
@@ -142,6 +152,42 @@ const APIClientSidebar: React.FC<Props> = () => {
     setActiveKey(activeKey);
   };
 
+  // TODO: Move this import logic and the import modal to the api client container which wraps all the routes.
+  const handleImportRequest = useCallback(
+    async (request: RQAPI.Request) => {
+      if (!user?.loggedIn) {
+        return;
+      }
+      setIsLoading(true);
+
+      try {
+        const apiEntry = getEmptyAPIEntry(request);
+
+        const record: Partial<RQAPI.ApiRecord> = {
+          type: RQAPI.RecordType.API,
+          data: apiEntry,
+        };
+
+        const result = await upsertApiRecord(user.details?.profile?.uid, record, team?.id);
+
+        if (result.success) {
+          onSaveRecord(result.data);
+
+          setIsImportModalOpen(false);
+        }
+
+        return result.data;
+      } catch (error) {
+        console.error("Error importing request", error);
+        toast.error("Error importing request");
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [user.details?.profile?.uid, user?.loggedIn, team?.id, onSaveRecord, setIsImportModalOpen]
+  );
+
   return (
     <>
       <div className="api-client-sidebar">
@@ -165,6 +211,13 @@ const APIClientSidebar: React.FC<Props> = () => {
       </div>
 
       <DeleteApiRecordModal open={isDeleteModalOpen} record={recordToBeDeleted} onClose={onDeleteModalClose} />
+
+      <ImportRequestModal
+        isRequestLoading={isLoading}
+        isOpen={isImportModalOpen}
+        handleImportRequest={handleImportRequest}
+        onClose={onImportRequestModalClose}
+      />
     </>
   );
 };

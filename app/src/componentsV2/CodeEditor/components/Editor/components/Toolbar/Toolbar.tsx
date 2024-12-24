@@ -119,7 +119,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
           >
             <RQButton
               type="text"
-              icon={isCodePrettified && code.length > 0 ? <BsFiletypeRaw /> : <PiBracketsCurlyBold />}
+              icon={isCodePrettified && code?.length > 0 ? <BsFiletypeRaw /> : <PiBracketsCurlyBold />}
               onClick={handleCodeFormatting}
             />
           </Tooltip>
