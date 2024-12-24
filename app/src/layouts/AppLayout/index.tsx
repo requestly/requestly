@@ -43,6 +43,9 @@ const App: React.FC = () => {
 
   usePreLoadRemover();
   useGeoLocation();
+
+  useClientStorageService();
+
   useIsExtensionEnabled();
   useBillingTeamsListener();
   useEnvironmentManager();
@@ -53,7 +56,6 @@ const App: React.FC = () => {
   useFetchIncentivizationDetails();
 
   // FIXME-syncing: Move to AppModeProvider after refractoring. Everything triggered by appMode should be there
-  useClientStorageService();
   useWorkspaceManager();
 
   if (!isEmpty(window.location.hash)) {
