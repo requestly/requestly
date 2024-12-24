@@ -129,6 +129,7 @@ class WorkspaceManager {
     //#region - syncing init
     await syncEngine.init(
       [{ id: workspaceId, replication: this.workspaceMap[workspaceId]?.isSyncEnabled }],
+      this.userId,
       this.userId
     );
 
