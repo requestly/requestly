@@ -69,7 +69,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const teamId = workspace?.id;
 
   const { toggleBottomSheet } = useBottomSheetContext();
-  const { onSaveRecord } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const { getVariablesWithPrecedence } = environmentManager;
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
@@ -236,10 +236,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     executeAPIRequest(
       appMode,
+      apiClientRecords,
       sanitizedEntry,
+      {
+        id: apiEntryDetails?.id,
+        collectionId: apiEntryDetails?.collectionId,
+      },
       environmentManager,
-      abortControllerRef.current.signal,
-      apiEntryDetails?.collectionId
+      abortControllerRef.current.signal
     )
       .then((entry) => {
         const response = entry.response;
@@ -294,6 +298,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
+    apiClientRecords,
+    apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
     appMode,
     dispatch,
@@ -331,7 +337,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
   };
 
-  const onSaveButtonClick = async () => {
+  const onSaveButtonClick = useCallback(async () => {
     setIsRequestSaving(true);
 
     const record: Partial<RQAPI.ApiRecord> = {
@@ -342,11 +348,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (apiEntryDetails?.id) {
       record.id = apiEntryDetails?.id;
     }
+
     const result = await upsertApiRecord(uid, record, teamId);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
-      setEntry({ ...result.data.data });
+      setEntry({ ...result.data.data, response: entry.response });
 
       trackRequestSaved("api_client_view");
       toast.success("Request saved!");
@@ -355,8 +362,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
 
     setIsRequestSaving(false);
-    setTimeout(() => resetChanges(), 0);
-  };
+  }, [entry, apiEntryDetails, onSaveRecord, setEntry, teamId, uid]);
 
   const cancelRequest = useCallback(() => {
     abortControllerRef.current?.abort();
@@ -374,6 +380,19 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
     (evt.target as HTMLInputElement).blur();
   }, []);
+
+  const onUrlKeyDown = useCallback(
+    (evt: KeyboardEvent, text: string) => {
+      if (evt.metaKey) {
+        if (evt.key.toLowerCase() === "s") {
+          onSaveButtonClick();
+        } else if (evt.key.toLowerCase() === "enter") {
+          onSendButtonClick();
+        }
+      }
+    },
+    [onSaveButtonClick, onSendButtonClick]
+  );
 
   return isExtensionEnabled ? (
     <div className="api-client-view">
@@ -425,9 +444,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                 <RQSingleLineEditor
                   className="api-request-url"
                   placeholder="https://example.com"
-                  // value={entry.request.url}
+                  //value={entry.request.url}
                   defaultValue={entry.request.url}
-                  onChange={(text) => setUrl(text)}
+                  onChange={(text) => {
+                    setUrl(text);
+                  }}
+                  onKeyDown={onUrlKeyDown}
                   onPressEnter={onUrlInputEnterPressed}
                   variables={currentEnvironmentVariables}
                   // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}

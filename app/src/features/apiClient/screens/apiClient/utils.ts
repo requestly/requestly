@@ -1,7 +1,6 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
-// @ts-ignore
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
@@ -138,8 +137,9 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
       queryParams,
       headers,
       contentType,
-      body,
+      body: body ?? null,
     };
+
     return request;
   } catch (e) {
     return null;
