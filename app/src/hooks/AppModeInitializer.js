@@ -288,7 +288,7 @@ const AppModeInitializer = () => {
               })
             );
           }
-        } else {
+        } else if (isExtensionInstalled()) {
           if (appMode !== GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
             // Fallback to default value
             dispatch(
