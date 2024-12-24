@@ -22,10 +22,11 @@ import { EnvironmentVariables } from "backend/environment/types";
 import { highlightVariablesPlugin } from "features/apiClient/screens/environment/components/SingleLineEditor/plugins/highlightVariables";
 import { EditorPopover } from "./components/PopOver";
 import "./editor.scss";
+import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/PopOver/popover.scss";
 interface EditorProps {
   value: string;
-  defaultValue?: string; // required in the special case of rules where value and default value need to stay in sync
+  defaultValue: string; // required in the special case of rules where value and default value need to stay in sync
   language: EditorLanguage | null;
   isReadOnly?: boolean;
   height?: number;
@@ -35,7 +36,11 @@ interface EditorProps {
   hideCharacterCount?: boolean;
   handleChange?: (value: string) => void;
   analyticEventProperties?: AnalyticEventProperties;
+  prettifyOnInit?: boolean;
   envVariables?: EnvironmentVariables;
+  config?: {
+    enablePrettify?: boolean;
+  };
 }
 
 const Editor: React.FC<EditorProps> = ({
@@ -50,7 +55,9 @@ const Editor: React.FC<EditorProps> = ({
   toolbarOptions,
   id = "",
   analyticEventProperties = {},
+  prettifyOnInit = false,
   envVariables,
+  config = { enablePrettify: true },
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -64,6 +71,8 @@ const Editor: React.FC<EditorProps> = ({
 
   const allEditorToast = useSelector(getAllEditorToast);
   const toastOverlay = useMemo(() => allEditorToast[id], [allEditorToast, id]); // todo: rename
+  const [isCodePrettified, setIsCodePrettified] = useState(prettifyOnInit);
+  const isDefaultPrettificationDone = useRef(false);
 
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
@@ -121,6 +130,7 @@ const Editor: React.FC<EditorProps> = ({
   }, [defaultValue, value]);
 
   // Had to keep both useEffects because some cases were not handled with the above useEffect
+
   useEffect(() => {
     if (!value?.length) {
       setEditorContent(defaultValue);
@@ -129,6 +139,16 @@ const Editor: React.FC<EditorProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultValue]);
+
+  useEffect(() => {
+    if (!isDefaultPrettificationDone.current) {
+      if (prettifyOnInit && (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT)) {
+        const prettifiedCode = prettifyCode(value, language);
+        setEditorContent(prettifiedCode.code);
+        isDefaultPrettificationDone.current = true;
+      }
+    }
+  }, [prettifyOnInit, language, value]);
 
   const handleEditorClose = useCallback(
     (id: string) => {
@@ -169,8 +189,11 @@ const Editor: React.FC<EditorProps> = ({
           onCodeFormat={(formattedCode: string) => {
             setEditorContent(formattedCode);
           }}
+          isCodePrettified={isCodePrettified}
+          setIsCodePrettified={setIsCodePrettified}
           handleFullScreenToggle={handleFullScreenToggle}
           customOptions={toolbarOptions}
+          enablePrettify={config.enablePrettify}
         />
 
         <>
@@ -214,8 +237,11 @@ const Editor: React.FC<EditorProps> = ({
         onCodeFormat={(formattedCode: string) => {
           setEditorContent(formattedCode);
         }}
+        isCodePrettified={isCodePrettified}
+        setIsCodePrettified={setIsCodePrettified}
         handleFullScreenToggle={handleFullScreenToggle}
         customOptions={toolbarOptions}
+        enablePrettify={config?.enablePrettify}
       />
       <ResizableBox
         height={editorHeight}
