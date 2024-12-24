@@ -137,8 +137,9 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
       queryParams,
       headers,
       contentType,
-      body,
+      body: body ?? null,
     };
+
     return request;
   } catch (e) {
     return null;
