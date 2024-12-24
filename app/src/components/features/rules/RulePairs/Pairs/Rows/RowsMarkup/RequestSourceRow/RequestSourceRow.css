@@ -79,7 +79,7 @@
   color: var(--requestly-color-neutral-100);
   background-color: var(--requestly-color-primary-500);
   border-radius: 4px;
-  font-size: var(--requestly-font-size-sm);
+  font-size: var(--requestly-font-size-xs);
   padding: 2px 4px;
-  line-height: var(--requestly-font-size-base);
+  line-height: var(--requestly-font-line-height-sm);
 }
