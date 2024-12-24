@@ -1,44 +1,20 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import APIClientView from "./components/clientView/APIClientView";
-import { ImportRequestModal } from "./components/modals";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { getEmptyAPIEntry } from "./utils";
-import { getApiRecord, upsertApiRecord } from "backend/apiClient";
+import { useLocation, useParams } from "react-router-dom";
+import { getApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { redirectToRequest } from "utils/RedirectionUtils";
-import { toast } from "utils/Toast";
 import "./apiClient.scss";
 
 interface Props {}
 
 export const APIClient: React.FC<Props> = () => {
-  const user = useSelector(getUserAuthDetails);
-  const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
-
   const location = useLocation();
   const { requestId } = useParams();
-  const {
-    apiClientRecords,
-    history,
-    selectedHistoryIndex,
-    addToHistory,
-    isImportModalOpen,
-    onImportRequestModalClose,
-    onSaveRecord,
-    setIsImportModalOpen,
-  } = useApiClientContext();
+  const { apiClientRecords, history, selectedHistoryIndex, addToHistory } = useApiClientContext();
 
-  const navigate = useNavigate();
-
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
   const isHistoryPath = location.pathname.includes("history");
 
@@ -86,7 +62,6 @@ export const APIClient: React.FC<Props> = () => {
     if (!requestId || requestId === "new") {
       return;
     }
-    setIsLoading(true);
     getApiRecord(requestId)
       .then((result) => {
         if (result.success) {
@@ -102,56 +77,8 @@ export const APIClient: React.FC<Props> = () => {
         // TODO: redirect to new empty entry
         Logger.error("Error loading api record", error);
       })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      .finally(() => {});
   }, [requestId]);
-
-  const saveRequest = useCallback(
-    async (apiEntry: RQAPI.Entry) => {
-      if (!user?.loggedIn) {
-        return;
-      }
-
-      setIsLoading(true);
-
-      const record: Partial<RQAPI.ApiRecord> = {
-        type: RQAPI.RecordType.API,
-        data: apiEntry,
-      };
-
-      const result = await upsertApiRecord(uid, record, teamId);
-
-      if (result.success) {
-        onSaveRecord(result.data);
-        redirectToRequest(navigate, result.data.id);
-      }
-
-      setIsLoading(false);
-
-      return result.data;
-    },
-    [uid, user?.loggedIn, teamId, onSaveRecord, navigate]
-  );
-
-  const handleImportRequest = useCallback(
-    async (request: RQAPI.Request) => {
-      const apiEntry = getEmptyAPIEntry(request);
-
-      return saveRequest(apiEntry)
-        .then((apiRecord: RQAPI.ApiRecord) => {
-          setSelectedEntryDetails(apiRecord);
-        })
-        .catch((error) => {
-          console.error("Error importing request", error);
-          toast.error("Error importing request");
-        })
-        .finally(() => {
-          setIsImportModalOpen(false);
-        });
-    },
-    [saveRequest, setIsImportModalOpen]
-  );
 
   const entryDetails = (isHistoryPath ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord;
 
@@ -163,12 +90,6 @@ export const APIClient: React.FC<Props> = () => {
           apiEntry={entryDetails?.data}
           apiEntryDetails={entryDetails}
           notifyApiRequestFinished={addToHistory}
-        />
-        <ImportRequestModal
-          isRequestLoading={isLoading}
-          isOpen={isImportModalOpen}
-          handleImportRequest={handleImportRequest}
-          onClose={onImportRequestModalClose}
         />
       </div>
     </BottomSheetProvider>
