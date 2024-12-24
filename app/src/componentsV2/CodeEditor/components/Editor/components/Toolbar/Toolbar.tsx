@@ -24,6 +24,7 @@ interface CodeEditorToolbarProps {
   isFullScreen: boolean;
   handleFullScreenToggle: () => void;
   isCodePrettified: boolean;
+  enablePrettify?: boolean;
   setIsCodePrettified: (value: boolean) => void;
 }
 
@@ -36,6 +37,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
   handleFullScreenToggle = () => {},
   isCodePrettified,
   setIsCodePrettified,
+  enablePrettify,
 }) => {
   const theme = useTheme();
   const [isCopied, setIsCopied] = useState(false);
@@ -109,18 +111,19 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
         <Tooltip title={isCopied ? "Copied" : "Copy code"} color={theme.colors.black} mouseEnterDelay={0.6}>
           <RQButton type="text" icon={<IoMdCopy />} onClick={handleCopyCode} />
         </Tooltip>
-        <Tooltip
-          title={language === EditorLanguage.JSON && isCodePrettified ? "View raw" : "Prettify code"}
-          color={theme.colors.black}
-          mouseEnterDelay={0.6}
-        >
-          <RQButton
-            type="text"
-            icon={isCodePrettified ? <BsFiletypeRaw /> : <PiBracketsCurlyBold />}
-            onClick={handleCodeFormatting}
-          />
-        </Tooltip>
-
+        {enablePrettify && (
+          <Tooltip
+            title={language === EditorLanguage.JSON && isCodePrettified ? "View raw" : "Prettify code"}
+            color={theme.colors.black}
+            mouseEnterDelay={0.6}
+          >
+            <RQButton
+              type="text"
+              icon={isCodePrettified && code?.length > 0 ? <BsFiletypeRaw /> : <PiBracketsCurlyBold />}
+              onClick={handleCodeFormatting}
+            />
+          </Tooltip>
+        )}
         <Tooltip
           color={theme.colors.black}
           title={isFullScreen ? "Exit full screen (esc)" : "Full screen"}

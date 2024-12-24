@@ -73,12 +73,17 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
     [setRequestEntry]
   );
 
+  /*
+  Added key prop in codeEditor to force re-render the component when contentType changes
+  */
   const bodyEditor = useMemo(() => {
     switch (contentType) {
       case RequestContentType.JSON:
         return (
           <CodeEditor
+            key={contentType}
             language={EditorLanguage.JSON}
+            defaultValue={jsonBody as string}
             value={jsonBody as string}
             handleChange={handleJsonChange}
             prettifyOnInit={true}
@@ -102,13 +107,18 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
       default:
         return (
           <CodeEditor
+            key={contentType}
             language={null}
+            defaultValue={rawBody as string}
             value={rawBody as string}
             handleChange={handleRawChange}
             isResizable={false}
             hideCharacterCount
             analyticEventProperties={{ source: "api_client" }}
             envVariables={variables}
+            config={{
+              enablePrettify: false,
+            }}
           />
         );
     }

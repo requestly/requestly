@@ -15,10 +15,13 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
+import AuthorizationView from "../request/components/AuthorizationView";
+import { debounce } from "lodash";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
   VARIABLES: "variables",
+  AUTHORIZATION: "authorization",
 };
 
 export const CollectionView = () => {
@@ -35,6 +38,24 @@ export const CollectionView = () => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
   }, [apiClientRecords, collectionId]);
 
+  const updateCollectionAuthData = useCallback(
+    async (newAuthOptions: RQAPI.AuthOptions) => {
+      const record = {
+        ...collection,
+        data: {
+          ...collection?.data,
+          auth: newAuthOptions,
+        },
+      };
+      return upsertApiRecord(user.details?.profile?.uid, record, teamId)
+        .then((result) => {
+          // fix-me: to verify new change are broadcasted to child entries that are open in tabs
+          onSaveRecord(result.data);
+        })
+        .catch(console.error);
+    },
+    [collection, onSaveRecord, teamId, user.details?.profile?.uid]
+  );
   const tabItems = useMemo(() => {
     return [
       {
@@ -53,8 +74,25 @@ export const CollectionView = () => {
           />
         ),
       },
+      {
+        label: "Authorization",
+        key: TAB_KEYS.AUTHORIZATION,
+        children: (
+          <AuthorizationView
+            defaultValues={collection?.data?.auth}
+            onAuthUpdate={debounce(updateCollectionAuthData, 500)}
+          />
+        ),
+      },
     ];
-  }, [setCollectionVariables, removeCollectionVariable, collectionVariables, collectionId, collection]);
+  }, [
+    collection,
+    collectionVariables,
+    collectionId,
+    updateCollectionAuthData,
+    setCollectionVariables,
+    removeCollectionVariable,
+  ]);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
