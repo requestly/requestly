@@ -5,6 +5,7 @@ import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { KeyValueTable } from "./components/KeyValueTable/KeyValueTable";
 import { EnvironmentVariables } from "backend/environment/types";
 import { useDebounce } from "hooks/useDebounce";
+import { prettifyCode } from "componentsV2/CodeEditor/utils";
 
 interface Props {
   body: RQAPI.RequestBody;
@@ -36,6 +37,13 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
 
     setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: updatedBody } }));
   }, [contentType, rawBody, jsonBody, formBody, setRequestEntry]);
+
+  useEffect(() => {
+    if (contentType === RequestContentType.JSON && typeof jsonBody === "string") {
+      const prettifiedContent = prettifyCode(jsonBody, EditorLanguage.JSON).code;
+      setJsonBody(prettifiedContent);
+    }
+  }, [contentType]);
 
   const handleRawChange = useDebounce(
     useCallback(
@@ -79,6 +87,7 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
         return (
           <CodeEditor
             language={EditorLanguage.JSON}
+            defaultValue={jsonBody as string}
             value={jsonBody as string}
             handleChange={handleJsonChange}
             prettifyOnInit={true}
@@ -103,6 +112,7 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
         return (
           <CodeEditor
             language={null}
+            defaultValue={rawBody as string}
             value={rawBody as string}
             handleChange={handleRawChange}
             isResizable={false}
