@@ -42,6 +42,7 @@ import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { getCollectionVariables } from "store/features/variables/selectors";
 import { useLocation } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
@@ -67,6 +68,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
+  const collectionVariables = useSelector(getCollectionVariables);
 
   const { toggleBottomSheet } = useBottomSheetContext();
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
@@ -219,6 +221,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         collectionId: apiEntryDetails?.collectionId,
       },
       environmentManager,
+      collectionVariables[apiEntryDetails?.collectionId]?.variables || {},
       abortControllerRef.current.signal
     )
       .then((entry) => {
@@ -283,6 +286,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     environmentManager,
     notifyApiRequestFinished,
     toggleBottomSheet,
+    collectionVariables,
   ]);
 
   const handleRecordNameUpdate = async () => {
