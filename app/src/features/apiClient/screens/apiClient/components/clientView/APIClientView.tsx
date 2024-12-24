@@ -2,13 +2,13 @@ import { Select, Skeleton, Space } from "antd";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
-import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
+import { RQAPI, RequestContentType, RequestMethod } from "../../../../types";
 import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
 import {
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
   getEmptyPair,
-  sanitizeKeyValuePairs,
+  sanitizeEntry,
   supportsRequestBody,
 } from "../../utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
@@ -88,8 +88,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const animationTimerRef = useRef<NodeJS.Timeout>();
+  const { response, ...entryWithoutResponse } = entry;
 
-  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(entry, isAnimating);
+  // Passing sanitized entry because response and empty key value pairs are saved in DB
+  const { hasUnsavedChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse), isAnimating);
   const { updateTab } = useTabsLayoutContext();
 
   useEffect(() => {
@@ -177,32 +179,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       return newEntry;
     });
   }, []);
-
-  const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => {
-    const sanitizedEntry: RQAPI.Entry = {
-      ...entry,
-      request: {
-        ...entry.request,
-        queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys),
-        headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys),
-      },
-      scripts: {
-        preRequest: entry.scripts?.preRequest || "",
-        postResponse: entry.scripts?.postResponse || "",
-      },
-    };
-
-    if (!supportsRequestBody(entry.request.method)) {
-      sanitizedEntry.request.body = null;
-    } else if (entry.request.contentType === RequestContentType.FORM) {
-      sanitizedEntry.request.body = sanitizeKeyValuePairs(
-        sanitizedEntry.request.body as KeyValuePair[],
-        removeDisabledKeys
-      );
-    }
-
-    return sanitizedEntry;
-  };
 
   const onSendButtonClick = useCallback(() => {
     if (!entry.request.url) {
