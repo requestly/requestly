@@ -5,6 +5,10 @@ import { useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { Radio } from "antd";
 import "./scriptEditor.scss";
+import generateRQNamespaceCompletions from "componentsV2/CodeEditor/components/Editor/plugins/generateAutoCompletions/RQScriptMethods";
+import { RQ_NAMESPACE_METHODS } from "./RQMethodDetails";
+
+const RQMethodCompletions = generateRQNamespaceCompletions(RQ_NAMESPACE_METHODS);
 
 interface ScriptEditorProps {
   scripts: RQAPI.Entry["scripts"];
@@ -55,6 +59,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts 
           options: [scriptTypeOptions],
         }}
         analyticEventProperties={{ source: "api_client_script_editor" }}
+        completions={RQMethodCompletions}
       />
     </div>
   );
