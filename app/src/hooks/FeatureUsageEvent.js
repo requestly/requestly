@@ -25,17 +25,14 @@ const FeatureUsageEvent = () => {
   useEffect(() => {
     const timerId = setTimeout(() => {
       Logger.log("Reading rules in useFeatureUsageEvent");
-      clientRuleStorageService
-        .getRecordsByObjectType(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
-        .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
-        .then((rules) => {
-          if (rules.length > 0) {
-            const featureUsageResults = getFeatureUsage(rules);
-            if (Object.keys(featureUsageResults).length > 0) {
-              trackRuleFeatureUsageEvent(featureUsageResults);
-            }
+      clientRuleStorageService.getRecordsByObjectType(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE).then((rules) => {
+        if (rules.length > 0) {
+          const featureUsageResults = getFeatureUsage(rules);
+          if (Object.keys(featureUsageResults).length > 0) {
+            trackRuleFeatureUsageEvent(featureUsageResults);
           }
-        });
+        }
+      });
     }, 5000);
 
     return () => clearTimeout(timerId);
