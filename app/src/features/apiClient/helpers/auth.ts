@@ -114,5 +114,8 @@ export const updateRequestWithAuthOptions = (data: KeyValuePair[], dataToAdd: Ke
   if (isEmpty(dataToAdd)) {
     return data;
   }
-  return unionBy(data, dataToAdd, "type");
+
+  const filterDataWithKeys = dataToAdd.filter((data) => data.key);
+
+  return unionBy(data, filterDataWithKeys, "type");
 };
