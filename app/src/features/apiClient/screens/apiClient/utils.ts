@@ -58,6 +58,32 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
   };
 };
 
+export const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => {
+  const sanitizedEntry: RQAPI.Entry = {
+    ...entry,
+    request: {
+      ...entry.request,
+      queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys),
+      headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys),
+    },
+    scripts: {
+      preRequest: entry.scripts?.preRequest || "",
+      postResponse: entry.scripts?.postResponse || "",
+    },
+  };
+
+  if (!supportsRequestBody(entry.request.method)) {
+    sanitizedEntry.request.body = null;
+  } else if (entry.request.contentType === RequestContentType.FORM) {
+    sanitizedEntry.request.body = sanitizeKeyValuePairs(
+      sanitizedEntry.request.body as KeyValuePair[],
+      removeDisabledKeys
+    );
+  }
+
+  return sanitizedEntry;
+};
+
 export const sanitizeKeyValuePairs = (keyValuePairs: KeyValuePair[], removeDisabledKeys = true): KeyValuePair[] => {
   return keyValuePairs
     .map((pair) => ({
