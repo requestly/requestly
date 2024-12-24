@@ -132,7 +132,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
-          editable: record.isEditable,
+          editable: record.isEditable ?? true,
           dataIndex: "isEnabled",
           title: "isEnabled",
           pairType,
@@ -147,7 +147,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
-          editable: record.isEditable,
+          editable: record.isEditable ?? true,
           dataIndex: "key",
           title: "key",
           pairType,
@@ -162,7 +162,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
-          editable: record.isEditable,
+          editable: record.isEditable ?? true,
           dataIndex: "value",
           title: "value",
           pairType,

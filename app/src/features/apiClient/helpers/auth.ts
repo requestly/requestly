@@ -14,8 +14,8 @@ export const processAuthForEntry = (
   },
   allRecords: RQAPI.Record[]
 ) => {
-  let authOptions = entry.auth;
-  if (entry.auth.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
+  let authOptions = entry.auth || ({} as RQAPI.AuthOptions);
+  if (authOptions.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
     authOptions = inheritAuth(entry, entryDetails, allRecords);
   }
 
@@ -88,23 +88,25 @@ const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
     }
   };
 
+  const authFormValues = authOptions[currentAuthType];
+
   switch (currentAuthType) {
     case AUTHORIZATION_TYPES.INHERIT:
       throw new Error("Inherit auth type should not be processed inside processAuthOptions");
     case AUTHORIZATION_TYPES.NO_AUTH:
       break;
     case AUTHORIZATION_TYPES.BASIC_AUTH: {
-      const { username, password } = authOptions[currentAuthType];
+      const { username, password } = authFormValues;
       updateDataInState(headers, "Authorization", `Basic ${btoa(`${username || ""}:${password || ""}`)}`);
       break;
     }
     case AUTHORIZATION_TYPES.BEARER_TOKEN: {
-      const { bearer } = authOptions[currentAuthType];
+      const { bearer } = authFormValues;
       updateDataInState(headers, "Authorization", `Bearer ${bearer}`);
       break;
     }
     case AUTHORIZATION_TYPES.API_KEY: {
-      const { key, value, addTo } = authOptions[currentAuthType];
+      const { key, value, addTo } = authFormValues;
 
       updateDataInState(
         addTo === "QUERY" ? queryParams : headers,
