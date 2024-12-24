@@ -26,7 +26,7 @@ import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/PopOver/popover.scss";
 interface EditorProps {
   value: string;
-  defaultValue?: string; // required in the special case of rules where value and default value need to stay in sync
+  defaultValue: string; // required in the special case of rules where value and default value need to stay in sync
   language: EditorLanguage | null;
   isReadOnly?: boolean;
   height?: number;
@@ -145,11 +145,10 @@ const Editor: React.FC<EditorProps> = ({
       if (prettifyOnInit && (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT)) {
         const prettifiedCode = prettifyCode(value, language);
         setEditorContent(prettifiedCode.code);
-        handleChange(prettifiedCode.code);
         isDefaultPrettificationDone.current = true;
       }
     }
-  }, [prettifyOnInit, language]);
+  }, [prettifyOnInit, language, value]);
 
   const handleEditorClose = useCallback(
     (id: string) => {
