@@ -89,7 +89,10 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
         if (availableEnvironments.length && (envId === environment.id || isActiveEnvironmentBeingDeleted)) {
           redirectToEnvironment(navigate, availableEnvironments[0].id);
           if (isActiveEnvironmentBeingDeleted) {
-            setCurrentEnvironment(availableEnvironments[0].id);
+            if (availableEnvironments.length > 1) {
+              const nonGlobalEnvironments = availableEnvironments.filter((env) => !isGlobalEnvironment(env.id));
+              setCurrentEnvironment(nonGlobalEnvironments[0].id);
+            }
           }
         }
         closeTab(environment.id);
@@ -184,7 +187,11 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
           showArrow={false}
         >
           <span>
-            {environment.id === currentEnvironmentId ? <MdOutlineCheckCircle className="active-env-icon" /> : ""}
+            {environment.id === currentEnvironmentId && !isGlobalEnvironment(environment.id) ? (
+              <MdOutlineCheckCircle className="active-env-icon" />
+            ) : (
+              ""
+            )}
           </span>
         </Tooltip>
       </div>
