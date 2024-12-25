@@ -5,26 +5,28 @@ import { useCallback, useMemo } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { VariablesList } from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
 import { RQAPI } from "features/apiClient/types";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { upsertApiRecord } from "backend/apiClient";
-import { EnvironmentVariables } from "backend/environment/types";
+import { useSelector } from "react-redux";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
-import { variablesActions } from "store/features/variables/slice";
 import { getCollectionVariables } from "store/features/variables/selectors";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import "./collectionView.scss";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { upsertApiRecord } from "backend/apiClient";
+import AuthorizationView from "../request/components/AuthorizationView";
+import { debounce } from "lodash";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
   VARIABLES: "variables",
+  AUTHORIZATION: "authorization",
 };
 
 export const CollectionView = () => {
-  const dispatch = useDispatch();
   const { collectionId } = useParams();
+  const { setCollectionVariables, removeCollectionVariable } = useEnvironmentManager();
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
   const { replaceTab } = useTabsLayoutContext();
   const user = useSelector(getUserAuthDetails);
@@ -32,37 +34,28 @@ export const CollectionView = () => {
   const collectionVariables = useSelector(getCollectionVariables);
   const location = useLocation();
 
-  const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+  const collection = useMemo(() => {
+    return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+  }, [apiClientRecords, collectionId]);
 
-  const handleSetVariables = useCallback(
-    async (variables: EnvironmentVariables) => {
-      const updatedVariables = Object.fromEntries(
-        Object.entries(variables).map(([key, value]) => {
-          const { localValue, ...rest } = value;
-          return [key, rest];
+  const updateCollectionAuthData = useCallback(
+    async (newAuthOptions: RQAPI.AuthOptions) => {
+      const record = {
+        ...collection,
+        data: {
+          ...collection?.data,
+          auth: newAuthOptions,
+        },
+      };
+      return upsertApiRecord(user.details?.profile?.uid, record, teamId)
+        .then((result) => {
+          // fix-me: to verify new change are broadcasted to child entries that are open in tabs
+          onSaveRecord(result.data);
         })
-      );
-      const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
-        onSaveRecord(result.data);
-        dispatch(variablesActions.setCollectionVariables({ collectionId, variables }));
-      });
+        .catch(console.error);
     },
-    [collection, teamId, user.details?.profile?.uid, onSaveRecord, dispatch, collectionId]
+    [collection, onSaveRecord, teamId, user.details?.profile?.uid]
   );
-
-  const handleRemoveVariable = useCallback(
-    async (key: string) => {
-      const updatedVariables = { ...collection?.data?.variables };
-      delete updatedVariables[key];
-      const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
-        onSaveRecord(result.data);
-      });
-    },
-    [collection, teamId, user.details?.profile?.uid, onSaveRecord]
-  );
-
   const tabItems = useMemo(() => {
     return [
       {
@@ -76,13 +69,30 @@ export const CollectionView = () => {
         children: (
           <VariablesList
             variables={collectionVariables[collectionId]?.variables || {}}
-            setVariables={handleSetVariables}
-            removeVariable={handleRemoveVariable}
+            setVariables={(variables) => setCollectionVariables(variables, collectionId)}
+            removeVariable={(key) => removeCollectionVariable(key, collectionId)}
+          />
+        ),
+      },
+      {
+        label: "Authorization",
+        key: TAB_KEYS.AUTHORIZATION,
+        children: (
+          <AuthorizationView
+            defaultValues={collection?.data?.auth}
+            onAuthUpdate={debounce(updateCollectionAuthData, 500)}
           />
         ),
       },
     ];
-  }, [handleRemoveVariable, handleSetVariables, collectionVariables, collectionId, collection]);
+  }, [
+    collection,
+    collectionVariables,
+    collectionId,
+    updateCollectionAuthData,
+    setCollectionVariables,
+    removeCollectionVariable,
+  ]);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
