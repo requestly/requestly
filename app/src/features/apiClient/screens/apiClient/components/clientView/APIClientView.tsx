@@ -213,7 +213,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     setIsFailed(false);
     setError(null);
-    setEntry(sanitizedEntry);
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
@@ -229,11 +228,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       collectionVariables[apiEntryDetails?.collectionId]?.variables || {},
       abortControllerRef.current.signal
     )
-      .then((entry) => {
-        const response = entry.response;
+      .then((executedEntry) => {
+        const response = executedEntry.response;
         // TODO: Add an entry in history
-        const entryWithResponse = { ...sanitizedEntry, response };
-        const renderedEntryWithResponse = { ...entry, response };
+        const entryWithResponse = { ...entry, response };
+        const renderedEntryWithResponse = { ...executedEntry, response };
 
         if (response) {
           setEntry(entryWithResponse);
@@ -327,7 +326,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
-      data: { ...sanitizeEntry(entry) },
+      data: { ...sanitizeEntry(entry, false) },
     };
 
     if (apiEntryDetails?.id) {
