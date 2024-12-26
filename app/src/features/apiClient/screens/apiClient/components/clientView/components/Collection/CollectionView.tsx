@@ -81,6 +81,7 @@ export const CollectionView = () => {
           <AuthorizationView
             defaultValues={collection?.data?.auth}
             onAuthUpdate={debounce(updateCollectionAuthData, 500)}
+            rootLevelRecord={!collection?.collectionId}
           />
         ),
       },
