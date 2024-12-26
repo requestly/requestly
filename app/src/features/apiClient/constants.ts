@@ -9,3 +9,9 @@ export const POSTMAN_AUTH_TYPES_MAPPING = {
   bearer: AUTHORIZATION_TYPES.BEARER_TOKEN,
   basic: AUTHORIZATION_TYPES.BASIC_AUTH,
 };
+
+export const POSTMAN_FIELD_MAPPING = {
+  in: "addTo",
+  query: "QUERY",
+  token: "bearer",
+};
