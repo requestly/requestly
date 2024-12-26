@@ -35,14 +35,14 @@ export const EnvironmentView = () => {
         return;
       }
       if (!user.loggedIn) {
-        navigate(PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE);
+        navigate(PATHS.API_CLIENT.ABSOLUTE);
         return;
       }
 
       const environments = getAllEnvironments();
       const hasAccessToEnvironment = environments?.some((env) => env.id === persistedEnvId);
       if (environments?.length === 0 || !hasAccessToEnvironment) {
-        navigate(PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE);
+        navigate(`${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/global`);
       }
     }
   }, [getAllEnvironments, navigate, isEnvironmentsLoading, user.loggedIn, persistedEnvId, location.pathname]);
