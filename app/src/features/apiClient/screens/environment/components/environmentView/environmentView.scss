@@ -1,19 +1,5 @@
 .variables-list-view-container {
-  flex: auto;
-  width: 100%;
-  min-width: 0;
-
-  .variables-list-view {
-    .ant-skeleton {
-      padding: 16px;
-    }
-  }
-
-  .variables-list-action-container {
-    padding: 0 16px 8px 16px;
-  }
-
   .rq-content-list-table-container {
-    padding: 0 16px;
+    padding: 0;
   }
 }
