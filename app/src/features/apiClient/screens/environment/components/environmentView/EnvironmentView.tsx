@@ -21,11 +21,13 @@ export const EnvironmentView = () => {
     setVariables,
     removeVariable,
   } = useEnvironmentManager();
+  const { envId } = useParams();
+  const [persistedEnvId] = useState<string>(envId);
+
   const user = useSelector(getUserAuthDetails);
   const [searchValue, setSearchValue] = useState<string>("");
-  const { envId } = useParams();
-  const environmentName = getEnvironmentName(envId);
-  const variables = getEnvironmentVariables(envId);
+  const environmentName = getEnvironmentName(persistedEnvId);
+  const variables = getEnvironmentVariables(persistedEnvId);
 
   useEffect(() => {
     if (!isEnvironmentsLoading) {
@@ -33,28 +35,28 @@ export const EnvironmentView = () => {
         return;
       }
       if (!user.loggedIn) {
-        navigate(PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE);
+        navigate(PATHS.API_CLIENT.ABSOLUTE);
         return;
       }
 
       const environments = getAllEnvironments();
-      const hasAccessToEnvironment = environments?.some((env) => env.id === envId);
+      const hasAccessToEnvironment = environments?.some((env) => env.id === persistedEnvId);
       if (environments?.length === 0 || !hasAccessToEnvironment) {
-        navigate(PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE);
+        navigate(`${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/global`);
       }
     }
-  }, [getAllEnvironments, navigate, isEnvironmentsLoading, user.loggedIn, envId, location.pathname]);
+  }, [getAllEnvironments, navigate, isEnvironmentsLoading, user.loggedIn, persistedEnvId, location.pathname]);
 
   const handleSetVariables = async (variables: EnvironmentVariables) => {
-    return setVariables(envId, variables);
+    return setVariables(persistedEnvId, variables);
   };
 
   const handleRemoveVariable = async (key: string) => {
-    return removeVariable(envId, key);
+    return removeVariable(persistedEnvId, key);
   };
 
   return (
-    <div className="variables-list-view-container">
+    <div key={persistedEnvId} className="variables-list-view-container">
       <div className="variables-list-view">
         {isEnvironmentsLoading ? (
           <Skeleton active />
@@ -64,7 +66,7 @@ export const EnvironmentView = () => {
               searchValue={searchValue}
               onSearchValueChange={setSearchValue}
               currentEnvironmentName={environmentName}
-              environmentId={envId}
+              environmentId={persistedEnvId}
             />
             <VariablesList
               searchValue={searchValue}
