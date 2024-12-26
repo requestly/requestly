@@ -9,7 +9,7 @@ import { ContentListTable } from "componentsV2/ContentList";
 import { EditableCell, EditableRow } from "./components/customTableRow/CustomTableRow";
 import { toast } from "utils/Toast";
 import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../types";
-import { trackAddVariableClicked, trackVariableValueUpdated } from "../../analytics";
+import { trackAddVariableClicked } from "../../analytics";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import "./variablesList.scss";
@@ -17,18 +17,12 @@ import "./variablesList.scss";
 interface VariablesListProps {
   variables: EnvironmentVariables;
   searchValue?: string;
-  setVariables: (variables: EnvironmentVariables) => Promise<unknown>;
-  removeVariable: (key: string) => Promise<unknown>;
+  onVariablesChange: (variables: EnvironmentVariables) => void;
 }
 
 export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string; id: number };
 
-export const VariablesList: React.FC<VariablesListProps> = ({
-  searchValue = "",
-  variables,
-  setVariables,
-  removeVariable,
-}) => {
+export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", variables, onVariablesChange }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [dataSource, setDataSource] = useState([]);
@@ -40,7 +34,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   );
 
   const handleSaveVariable = useCallback(
-    async (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
+    (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
       if (!user.loggedIn) {
         return;
       }
@@ -50,46 +44,34 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       const item = variableRows[index];
 
       if ((row.key && (row.syncValue || row.localValue)) || fieldChanged === "type" || fieldChanged === "key") {
-        // Check if the new key already exists (excluding the current row)
         const isDuplicate = variableRows.some(
           (variable, idx) => idx !== index && variable.key.toLowerCase() === row.key.toLowerCase()
         );
 
         if (isDuplicate && row.key) {
           toast.error(`Variable with name "${row.key}" already exists`);
-          console.error(`Variable with name "${row.key}" already exists`);
           return;
         }
+
         const updatedRow = { ...item, ...row };
         variableRows.splice(index, 1, updatedRow);
+        setDataSource(variableRows);
 
-        if (fieldChanged === "type" || fieldChanged === "key") {
-          // updating the dataSource state only when variable type or key is changed because state update makes the table inputs lose focus
-          setDataSource(variableRows);
-        }
+        const allVariables = variableRows.reduce((acc, variable) => {
+          if (variable.key) {
+            acc[variable.key] = {
+              type: variable.type,
+              syncValue: variable.syncValue,
+              localValue: variable.localValue,
+            };
+          }
+          return acc;
+        }, {});
 
-        if (row.key && (row.syncValue || row.localValue)) {
-          const variablesToSave = variableRows.reduce((acc, variable) => {
-            if (variable.key) {
-              acc[variable.key] = {
-                type: variable.type,
-                syncValue: variable.syncValue,
-                localValue: variable.localValue,
-              };
-            }
-            return acc;
-          }, {});
-
-          setVariables(variablesToSave).then(() => {
-            setDataSource(variableRows);
-            if (fieldChanged === "syncValue" || fieldChanged === "localValue") {
-              trackVariableValueUpdated(fieldChanged, EnvironmentAnalyticsContext.API_CLIENT, variableRows.length);
-            }
-          });
-        }
+        onVariablesChange(allVariables);
       }
     },
-    [dataSource, setVariables, user.loggedIn]
+    [dataSource, onVariablesChange, user.loggedIn]
   );
 
   const handleAddNewRow = useCallback((dataSource: EnvironmentVariableTableRow[]) => {
@@ -106,18 +88,26 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   const handleDeleteVariable = useCallback(
     async (key: string) => {
       const newData = key ? dataSource.filter((item) => item.key !== key) : dataSource.slice(0, -1);
-
-      if (key) {
-        await removeVariable(key);
-      }
-
       setDataSource(newData);
+
+      const remainingVariables = newData.reduce((acc, variable) => {
+        if (variable.key) {
+          acc[variable.key] = {
+            type: variable.type,
+            syncValue: variable.syncValue,
+            localValue: variable.localValue,
+          };
+        }
+        return acc;
+      }, {});
+
+      onVariablesChange(remainingVariables);
 
       if (newData.length === 0) {
         handleAddNewRow([]);
       }
     },
-    [dataSource, removeVariable, handleAddNewRow]
+    [dataSource, handleAddNewRow, onVariablesChange]
   );
 
   const handleUpdateVisibleSecretsRowIds = useCallback(

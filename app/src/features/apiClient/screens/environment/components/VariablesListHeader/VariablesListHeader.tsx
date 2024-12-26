@@ -1,25 +1,32 @@
 import React from "react";
 import { Input } from "antd";
 import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
-import { RQBreadcrumb } from "lib/design-system-v2/components";
+import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import { useLocation } from "react-router-dom";
+import { MdOutlineSave } from "@react-icons/all-files/md/MdOutlineSave";
 import "./variablesListHeader.scss";
 
 interface VariablesListHeaderProps {
   searchValue: string;
   currentEnvironmentName: string;
   environmentId: string;
+  hasUnsavedChanges: boolean;
+  hideBreadcrumb?: boolean;
   onSearchValueChange: (value: string) => void;
+  onSave: () => Promise<void>;
 }
 
 export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   searchValue,
   onSearchValueChange,
   environmentId,
+  hasUnsavedChanges,
   currentEnvironmentName = "New",
+  hideBreadcrumb = false,
+  onSave,
 }) => {
   const { renameEnvironment } = useEnvironmentManager();
   const { replaceTab } = useTabsLayoutContext();
@@ -37,12 +44,16 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
 
   return (
     <div className="variables-list-header">
-      <RQBreadcrumb
-        autoFocus={location.search.includes("new")}
-        placeholder="New Environment"
-        recordName={currentEnvironmentName}
-        onBlur={handleNewEnvironmentNameChange}
-      />
+      {!hideBreadcrumb ? (
+        <RQBreadcrumb
+          autoFocus={location.search.includes("new")}
+          placeholder="New Environment"
+          recordName={currentEnvironmentName}
+          onBlur={handleNewEnvironmentNameChange}
+        />
+      ) : (
+        <div />
+      )}
       <div className="variables-list-action-container">
         <Input
           placeholder="Search"
@@ -51,6 +62,11 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           value={searchValue}
           onChange={(e) => onSearchValueChange(e.target.value)}
         />
+        <div className="variables-list-btn-actions-container">
+          <RQButton type="primary" icon={<MdOutlineSave />} onClick={onSave} disabled={!hasUnsavedChanges}>
+            Save
+          </RQButton>
+        </div>
       </div>
     </div>
   );

@@ -1,8 +1,7 @@
 import { Form, FormInstance, Input, InputNumber, Select } from "antd";
-import React, { useCallback, useContext, useMemo, useRef, useEffect } from "react";
+import React, { useCallback, useContext, useRef, useEffect } from "react";
 import { EnvironmentVariableTableRow } from "../../VariablesList";
 import { EnvironmentVariableType } from "backend/environment/types";
-import debounce from "lodash/debounce";
 import Logger from "lib/logger";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
@@ -63,24 +62,8 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     }
   }, []);
 
-  const handleSaveCellValue = useCallback(async () => {
-    try {
-      const values = await form.validateFields();
-      const updatedRecord = { ...record, ...values };
-
-      updatedRecord.syncValue = convertValueByType(updatedRecord.syncValue, updatedRecord.type);
-      updatedRecord.localValue = convertValueByType(updatedRecord.localValue, updatedRecord.type);
-
-      handleSaveVariable(updatedRecord, dataIndex);
-    } catch (errInfo) {
-      Logger.log("Save failed:", errInfo);
-    }
-  }, [form, record, handleSaveVariable, convertValueByType, dataIndex]);
-
-  const debouncedSave = useMemo(() => debounce(handleSaveCellValue, 1000), [handleSaveCellValue]);
-
   const handleChange = useCallback(
-    (value: string | number | boolean) => {
+    async (value: string | number | boolean) => {
       if (dataIndex === "type") {
         const defaultValues = {
           syncValue: record.syncValue,
@@ -95,10 +78,20 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         }
         handleSaveVariable({ ...record, [dataIndex]: value, ...defaultValues }, dataIndex);
       } else {
-        debouncedSave();
+        try {
+          const values = await form.validateFields();
+          const updatedRecord = { ...record, ...values };
+
+          updatedRecord.syncValue = convertValueByType(updatedRecord.syncValue, updatedRecord.type);
+          updatedRecord.localValue = convertValueByType(updatedRecord.localValue, updatedRecord.type);
+
+          handleSaveVariable(updatedRecord, dataIndex);
+        } catch (errInfo) {
+          Logger.log("Save failed:", errInfo);
+        }
       }
     },
-    [dataIndex, debouncedSave, handleSaveVariable, record]
+    [dataIndex, handleSaveVariable, record, convertValueByType, form]
   );
 
   const getPlaceholderText = useCallback((dataIndex: string) => {

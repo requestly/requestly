@@ -7,8 +7,11 @@ import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader"
 import PATHS from "config/constants/sub/paths";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
-import "./environmentView.scss";
 import { EnvironmentVariables } from "backend/environment/types";
+import { toast } from "utils/Toast";
+import { useHasUnsavedChanges } from "hooks";
+import "./environmentView.scss";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
 
 export const EnvironmentView = () => {
   const navigate = useNavigate();
@@ -19,13 +22,21 @@ export const EnvironmentView = () => {
     getAllEnvironments,
     getEnvironmentVariables,
     setVariables,
-    removeVariable,
   } = useEnvironmentManager();
+  const { updateTab } = useTabsLayoutContext();
   const user = useSelector(getUserAuthDetails);
   const [searchValue, setSearchValue] = useState<string>("");
   const { envId } = useParams();
   const environmentName = getEnvironmentName(envId);
   const variables = getEnvironmentVariables(envId);
+
+  const [pendingVariables, setPendingVariables] = useState<EnvironmentVariables>(variables);
+
+  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
+
+  useEffect(() => {
+    updateTab(envId, { hasUnsavedChanges: hasUnsavedChanges });
+  }, [updateTab, envId, hasUnsavedChanges]);
 
   useEffect(() => {
     if (!isEnvironmentsLoading) {
@@ -45,12 +56,16 @@ export const EnvironmentView = () => {
     }
   }, [getAllEnvironments, navigate, isEnvironmentsLoading, user.loggedIn, envId, location.pathname]);
 
-  const handleSetVariables = async (variables: EnvironmentVariables) => {
-    return setVariables(envId, variables);
-  };
-
-  const handleRemoveVariable = async (key: string) => {
-    return removeVariable(envId, key);
+  const handleSaveVariables = async () => {
+    return setVariables(envId, pendingVariables)
+      .then(() => {
+        toast.success("Variables updated successfully");
+        resetChanges();
+      })
+      .catch((error) => {
+        toast.error("Failed to update variables");
+        console.error("Failed to updated variables: ", error);
+      });
   };
 
   return (
@@ -65,13 +80,10 @@ export const EnvironmentView = () => {
               onSearchValueChange={setSearchValue}
               currentEnvironmentName={environmentName}
               environmentId={envId}
+              onSave={handleSaveVariables}
+              hasUnsavedChanges={hasUnsavedChanges}
             />
-            <VariablesList
-              searchValue={searchValue}
-              variables={variables}
-              setVariables={handleSetVariables}
-              removeVariable={handleRemoveVariable}
-            />
+            <VariablesList searchValue={searchValue} variables={variables} onVariablesChange={setPendingVariables} />
           </>
         )}
       </div>
