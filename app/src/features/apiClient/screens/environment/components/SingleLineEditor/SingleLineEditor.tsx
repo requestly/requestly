@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { EditorView, placeholder as cmPlaceHolder } from "@codemirror/view";
-import { EditorState, Transaction } from "@codemirror/state";
+import { EditorState } from "@codemirror/state";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { EditorPopover } from "componentsV2/CodeEditor/components/Editor/components/PopOver";
 import "componentsV2/CodeEditor/components/Editor/components/PopOver/popover.scss";
@@ -37,6 +37,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   const onKeyDownRef = useRef(onKeyDown);
   const onBlurRef = useRef(onBlur);
   const onChangeRef = useRef(onChange);
+  const previousDefaultValueRef = useRef(defaultValue);
 
   useEffect(() => {
     onKeyDownRef.current = onKeyDown;
@@ -62,11 +63,8 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
             return tr.newDoc.lines > 1 ? [] : [tr];
           }),
           EditorView.updateListener.of((update) => {
-            const isUserInput = update.transactions.find((tr) => tr.annotation(Transaction.userEvent));
-
-            // To prevent calling onChange when defaultValue Changes
-            if (update.docChanged && isUserInput) {
-              onChange?.(update.state.doc.toString());
+            if (update.docChanged) {
+              onChangeRef.current?.(update.state.doc.toString());
             }
           }),
           EditorView.domEventHandlers({
@@ -111,45 +109,43 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   }, [placeholder, variables]);
 
   useEffect(() => {
-    if (editorViewRef.current && defaultValue !== undefined) {
-      const editorView = editorViewRef.current;
-      const currentDoc = editorView.state.doc.toString();
-      const newDocLength = defaultValue.length;
+    if (defaultValue !== previousDefaultValueRef.current) {
+      previousDefaultValueRef.current = defaultValue;
+      if (editorViewRef.current) {
+        const currentDoc = editorViewRef.current.state.doc.toString();
+        if (defaultValue !== currentDoc) {
+          const transaction = editorViewRef.current.state.update({
+            changes: {
+              from: 0,
+              to: currentDoc.length,
+              insert: defaultValue ?? "",
+            },
+          });
 
-      if (currentDoc !== defaultValue) {
-        const { from = 0, to = 0 } = editorView.state.selection.main;
-
-        editorView.dispatch({
-          changes: {
-            from: 0,
-            to: currentDoc.length,
-            insert: defaultValue,
-          },
-          selection: {
-            anchor: from > newDocLength ? newDocLength : from,
-            head: to > newDocLength ? newDocLength : to,
-          },
-        });
+          // Prevent calling onChange when default value is changed through this useEffect
+          const originalOnChange = onChangeRef.current;
+          onChangeRef.current = () => {};
+          editorViewRef.current.dispatch(transaction);
+          onChangeRef.current = originalOnChange;
+        }
       }
     }
   }, [defaultValue]);
 
   return (
-    <>
-      <div
-        ref={editorRef}
-        className={`${className ?? ""} editor-popup-container ant-input`}
-        onMouseLeave={() => setHoveredVariable(null)}
-      >
-        {hoveredVariable && (
-          <EditorPopover
-            editorRef={editorRef}
-            hoveredVariable={hoveredVariable}
-            popupPosition={popupPosition}
-            variables={variables}
-          />
-        )}
-      </div>
-    </>
+    <div
+      ref={editorRef}
+      className={`${className ?? ""} editor-popup-container ant-input`}
+      onMouseLeave={() => setHoveredVariable(null)}
+    >
+      {hoveredVariable && (
+        <EditorPopover
+          editorRef={editorRef}
+          hoveredVariable={hoveredVariable}
+          popupPosition={popupPosition}
+          variables={variables}
+        />
+      )}
+    </div>
   );
 };
