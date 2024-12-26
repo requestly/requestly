@@ -2,7 +2,7 @@ import { Select, Skeleton, Space } from "antd";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
-import { RQAPI, RequestContentType, RequestMethod } from "../../../../types";
+import { QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
 import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
 import {
   getContentTypeFromResponseHeaders,
@@ -10,6 +10,7 @@ import {
   getEmptyPair,
   sanitizeEntry,
   supportsRequestBody,
+  syncQueryParams,
 } from "../../utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
@@ -42,6 +43,7 @@ import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { getCollectionVariables } from "store/features/variables/selectors";
 import { useLocation } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
@@ -67,6 +69,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
+  const collectionVariables = useSelector(getCollectionVariables);
 
   const { toggleBottomSheet } = useBottomSheetContext();
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
@@ -102,7 +105,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (apiEntry) {
       clearTimeout(animationTimerRef.current);
       setIsAnimating(true);
-      setEntry(apiEntry);
+      setEntry({
+        ...apiEntry,
+        request: { ...apiEntry.request, ...syncQueryParams(apiEntry.request.queryParams, apiEntry.request.url) },
+      });
       setRequestName("");
       animationTimerRef.current = setTimeout(() => setIsAnimating(false), 500);
     }
@@ -118,6 +124,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       request: {
         ...entry.request,
         url,
+        ...syncQueryParams(entry.request.queryParams, url, QueryParamSyncType.TABLE),
       },
     }));
   }, []);
@@ -206,7 +213,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     setIsFailed(false);
     setError(null);
-    setEntry(sanitizedEntry);
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
@@ -219,13 +225,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         collectionId: apiEntryDetails?.collectionId,
       },
       environmentManager,
+      collectionVariables[apiEntryDetails?.collectionId]?.variables || {},
       abortControllerRef.current.signal
     )
-      .then((entry) => {
-        const response = entry.response;
+      .then((executedEntry) => {
+        const response = executedEntry.response;
         // TODO: Add an entry in history
-        const entryWithResponse = { ...sanitizedEntry, response };
-        const renderedEntryWithResponse = { ...entry, response };
+        const entryWithResponse = { ...entry, response };
+        const renderedEntryWithResponse = { ...executedEntry, response };
 
         if (response) {
           setEntry(entryWithResponse);
@@ -283,6 +290,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     environmentManager,
     notifyApiRequestFinished,
     toggleBottomSheet,
+    collectionVariables,
   ]);
 
   const handleRecordNameUpdate = async () => {
@@ -318,7 +326,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
-      data: { ...sanitizeEntry(entry) },
+      data: { ...sanitizeEntry(entry, false) },
     };
 
     if (apiEntryDetails?.id) {

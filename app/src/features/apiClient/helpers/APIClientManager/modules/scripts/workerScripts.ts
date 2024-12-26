@@ -2,17 +2,25 @@
 import { ScriptExecutedPayload } from "./types";
 
 export const requestWorkerFunction = function (e: MessageEvent) {
-  const { script, request, currentVariables } = e.data;
+  const { script, request, currentVariables, globalVariables, collectionVariables } = e.data;
 
   const mutations: ScriptExecutedPayload["mutations"] = {
     environment: {
       $set: {},
       $unset: {},
     },
+    globals: {
+      $set: {},
+      $unset: {},
+    },
+    collectionVariables: {
+      $set: {},
+      $unset: {},
+    },
   };
 
-  const JSONifyObject = (stringifiedObject: string): any => {
-    JSON.parse(stringifiedObject);
+  const JSONifyObject = (stringifiedObject: string): Record<string, any> => {
+    return JSON.parse(stringifiedObject);
   };
 
   const createInfiniteChainable = (methodName: string) => {
@@ -54,11 +62,39 @@ export const requestWorkerFunction = function (e: MessageEvent) {
           mutations.environment.$unset[key] = "";
         },
       },
-      collectionVariables: createInfiniteChainable("collectionVariables"),
+      globals: {
+        set: (key: string, value: any) => {
+          if (key === undefined || value === undefined) {
+            throw new Error("Key or value is undefined while setting environment variable.");
+          }
+          mutations.globals.$set[key] = value;
+        },
+        get: (key: string) => {
+          const variable = globalVariables[key];
+          return variable?.localValue || variable?.syncValue;
+        },
+        unset: (key: string) => {
+          mutations.globals.$unset[key] = "";
+        },
+      },
+      collectionVariables: {
+        set: (key: string, value: any) => {
+          if (key === undefined || value === undefined) {
+            throw new Error("Key or value is undefined while setting collection variable.");
+          }
+          mutations.collectionVariables.$set[key] = value;
+        },
+        get: (key: string) => {
+          const variable = collectionVariables[key];
+          return variable?.localValue || variable?.syncValue;
+        },
+        unset: (key: string) => {
+          mutations.collectionVariables.$unset[key] = "";
+        },
+      },
       cookies: createInfiniteChainable("cookie"),
       execution: createInfiniteChainable("execution"),
       expect: createInfiniteChainable("expect"),
-      globals: createInfiniteChainable("globals"),
       info: createInfiniteChainable("info"),
       iterationData: createInfiniteChainable("iterationData"),
       require: createInfiniteChainable("require"),
@@ -103,6 +139,8 @@ export const requestWorkerFunction = function (e: MessageEvent) {
         payload: {
           currentVariables,
           mutations,
+          globalVariables,
+          collectionVariables,
         },
       });
     })
@@ -119,10 +157,18 @@ export const requestWorkerFunction = function (e: MessageEvent) {
 };
 
 export const responseWorkerFunction = function (e: MessageEvent) {
-  const { script, request, response, currentVariables } = e.data;
+  const { script, request, response, currentVariables, globalVariables, collectionVariables } = e.data;
 
   const mutations: ScriptExecutedPayload["mutations"] = {
     environment: {
+      $set: {},
+      $unset: {},
+    },
+    globals: {
+      $set: {},
+      $unset: {},
+    },
+    collectionVariables: {
       $set: {},
       $unset: {},
     },
@@ -147,7 +193,7 @@ export const responseWorkerFunction = function (e: MessageEvent) {
     return new Proxy(() => {}, handler);
   };
 
-  const JSONifyObject = (stringifiedObject: string): any => {
+  const JSONifyObject = (stringifiedObject: string): Record<string, any> => {
     return JSON.parse(stringifiedObject);
   };
 
@@ -177,11 +223,39 @@ export const responseWorkerFunction = function (e: MessageEvent) {
           mutations.environment.$unset[key] = "";
         },
       },
-      collectionVariables: createInfiniteChainable("collectionVariables"),
+      globals: {
+        set: (key: string, value: any) => {
+          if (key === undefined || value === undefined) {
+            throw new Error("Key or value is undefined while setting environment variable.");
+          }
+          mutations.globals.$set[key] = value;
+        },
+        get: (key: string) => {
+          const variable = globalVariables[key];
+          return variable?.localValue || variable?.syncValue;
+        },
+        unset: (key: string) => {
+          mutations.globals.$unset[key] = "";
+        },
+      },
+      collectionVariables: {
+        set: (key: string, value: any) => {
+          if (key === undefined || value === undefined) {
+            throw new Error("Key or value is undefined while setting collection variable.");
+          }
+          mutations.collectionVariables.$set[key] = value;
+        },
+        get: (key: string) => {
+          const variable = collectionVariables[key];
+          return variable?.localValue || variable?.syncValue;
+        },
+        unset: (key: string) => {
+          mutations.collectionVariables.$unset[key] = "";
+        },
+      },
       cookies: createInfiniteChainable("cookie"),
       execution: createInfiniteChainable("execution"),
       expect: createInfiniteChainable("expect"),
-      globals: createInfiniteChainable("globals"),
       info: createInfiniteChainable("info"),
       iterationData: createInfiniteChainable("iterationData"),
       require: createInfiniteChainable("require"),
@@ -237,6 +311,8 @@ export const responseWorkerFunction = function (e: MessageEvent) {
         payload: {
           currentVariables,
           mutations,
+          globalVariables,
+          collectionVariables,
         },
       });
     })
