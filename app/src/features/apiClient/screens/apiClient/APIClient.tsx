@@ -15,7 +15,6 @@ export const APIClient: React.FC<Props> = () => {
   const { requestId } = useParams();
   const { apiClientRecords, history, selectedHistoryIndex, addToHistory } = useApiClientContext();
 
-  const [persistedRequestId] = useState<string>(requestId);
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
   const isHistoryPath = location.pathname.includes("history");
 
@@ -36,13 +35,15 @@ export const APIClient: React.FC<Props> = () => {
     return entryDetails;
   }, [isHistoryPath, history, selectedHistoryIndex]);
 
+  const isRequestFetched = useRef(false);
+
   useEffect(() => {
     //For updating breadcrumb name
-    if (!persistedRequestId || persistedRequestId === "new") {
+    if (!requestId || requestId === "new") {
       return;
     }
 
-    const record = apiClientRecords.find((rec) => rec.id === persistedRequestId);
+    const record = apiClientRecords.find((rec) => rec.id === requestId);
 
     if (!record) {
       return;
@@ -51,19 +52,17 @@ export const APIClient: React.FC<Props> = () => {
     setSelectedEntryDetails((prev) => {
       return prev?.id === record?.id ? ({ ...(prev ?? {}), name: record?.name } as RQAPI.ApiRecord) : prev;
     });
-  }, [persistedRequestId, apiClientRecords]);
+  }, [requestId, apiClientRecords]);
 
-  const isRequestFetched = useRef(false);
   useEffect(() => {
     if (isRequestFetched.current) {
       return;
     }
 
-    if (!persistedRequestId || persistedRequestId === "new") {
+    if (!requestId || requestId === "new") {
       return;
     }
-
-    getApiRecord(persistedRequestId)
+    getApiRecord(requestId)
       .then((result) => {
         if (result.success) {
           isRequestFetched.current = true;
@@ -79,20 +78,15 @@ export const APIClient: React.FC<Props> = () => {
         Logger.error("Error loading api record", error);
       })
       .finally(() => {});
-  }, [persistedRequestId]);
+  }, [requestId]);
 
-  const entryDetails = useMemo(() => (isHistoryPath ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord, [
-    isHistoryPath,
-    requestHistoryEntry,
-    selectedEntryDetails,
-  ]);
+  const entryDetails = (isHistoryPath ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord;
 
   return (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
       <div className="api-client-container-content">
         <APIClientView
           // TODO: Fix - "apiEntry" is used for history, remove this prop and derive everything from "apiEntryDetails"
-          key={persistedRequestId}
           apiEntry={entryDetails?.data}
           apiEntryDetails={entryDetails}
           notifyApiRequestFinished={addToHistory}
