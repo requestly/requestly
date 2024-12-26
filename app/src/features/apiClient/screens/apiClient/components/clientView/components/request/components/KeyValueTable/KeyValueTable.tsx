@@ -4,7 +4,7 @@ import { ContentListTable } from "componentsV2/ContentList";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { RQButton } from "lib/design-system-v2/components";
 import { EditableRow, EditableCell } from "./KeyValueTableRow";
-import { KeyValueFormType, KeyValuePair, RQAPI } from "features/apiClient/types";
+import { KeyValueFormType, KeyValuePair, QueryParamSyncType, RQAPI } from "features/apiClient/types";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { EnvironmentVariables } from "backend/environment/types";
 import { syncQueryParams } from "features/apiClient/screens/apiClient/utils";
@@ -58,7 +58,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
           ...updatedRequest,
           [pairTypeToUpdate]: keyValuePairs,
           ...(pairType === KeyValueFormType.QUERY_PARAMS
-            ? syncQueryParams(keyValuePairs, updatedRequest.url, "updateUrl")
+            ? syncQueryParams(keyValuePairs, updatedRequest.url, QueryParamSyncType.URL)
             : {}),
         },
       };
