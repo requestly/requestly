@@ -265,11 +265,6 @@ const useEnvironmentManager = () => {
           .map(([key, value]) => [key.trim(), { localValue: value.localValue, type: value.type }])
       );
 
-      console.log("!!!debug", "var", {
-        newVariablesWithSyncvalues,
-        variablesWithoutSyncvalues,
-      });
-
       dispatch(
         variablesActions.updateEnvironmentData({
           newVariables: variablesWithoutSyncvalues,
