@@ -1,6 +1,6 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
-import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import { KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
@@ -284,12 +284,17 @@ export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString:
   return `${baseUrl}${queryString ? `?${queryString}` : queryString}`;
 };
 
-export const syncQueryParams = (queryParams: KeyValuePair[], url: string, type: string = "sync") => {
+export const syncQueryParams = (
+  queryParams: KeyValuePair[],
+  url: string,
+  type: QueryParamSyncType = QueryParamSyncType.SYNC
+) => {
   const updatedQueryParams = extractQueryParams(url);
 
   switch (type) {
-    case "sync": {
+    case QueryParamSyncType.SYNC: {
       const updatedUrl = queryParamsToURLString(updatedQueryParams, url);
+
       // Dont sync if URL is same
       if (updatedUrl !== url) {
         const combinedParams = unionBy(queryParams, updatedQueryParams, "id");
@@ -309,7 +314,7 @@ export const syncQueryParams = (queryParams: KeyValuePair[], url: string, type: 
 
       return { queryParams, url };
     }
-    case "updateTable": {
+    case QueryParamSyncType.TABLE: {
       const updatedQueryParamsCopy = [...updatedQueryParams];
 
       // Adding disabled key value pairs
@@ -324,7 +329,7 @@ export const syncQueryParams = (queryParams: KeyValuePair[], url: string, type: 
       };
     }
 
-    case "updateUrl": {
+    case QueryParamSyncType.URL: {
       const updatedUrl = queryParamsToURLString(queryParams, url);
 
       return { url: updatedUrl };

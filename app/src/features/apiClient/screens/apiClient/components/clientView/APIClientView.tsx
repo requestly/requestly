@@ -2,7 +2,7 @@ import { Select, Skeleton, Space } from "antd";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
-import { RQAPI, RequestContentType, RequestMethod } from "../../../../types";
+import { QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
 import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
 import {
   getContentTypeFromResponseHeaders,
@@ -124,7 +124,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       request: {
         ...entry.request,
         url,
-        ...syncQueryParams(entry.request.queryParams, url, "updateTable"),
+        ...syncQueryParams(entry.request.queryParams, url, QueryParamSyncType.TABLE),
       },
     }));
   }, []);
