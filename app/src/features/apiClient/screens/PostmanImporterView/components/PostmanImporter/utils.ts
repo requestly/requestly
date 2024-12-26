@@ -1,8 +1,8 @@
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { generateDocumentId } from "backend/utils";
-import { AUTHORIZATION_TYPES } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
 import { POSTMAN_AUTH_TYPES_MAPPING, POSTMAN_FIELD_MAPPING } from "features/apiClient/constants";
+import { AUTHORIZATION_TYPES } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 
 interface PostmanCollectionExport {
   info: {
@@ -82,28 +82,21 @@ const processScripts = (item: any) => {
   return scripts;
 };
 
-const getPostmanFieldMapping = (key: string) => {
-  return POSTMAN_FIELD_MAPPING[key] ?? key;
-};
-
-const processAuthorizationOptions = (item = {}, parentCollectionId: string) => {
+const processAuthorizationOptions = (item: Record<string, any>, parentCollectionId: string): RQAPI.AuthOptions => {
   try {
-    const auth = {};
-    const authType =
-      POSTMAN_AUTH_TYPES_MAPPING[item.type] ??
+    const currentAuthType =
+      POSTMAN_AUTH_TYPES_MAPPING[item.type as AUTHORIZATION_TYPES] ??
       (parentCollectionId ? AUTHORIZATION_TYPES.INHERIT : AUTHORIZATION_TYPES.NO_AUTH);
-
-    auth.currentAuthType = authType;
-    auth[authType] = {};
+    const auth: RQAPI.AuthOptions = { currentAuthType, [currentAuthType]: {} };
 
     const authOptionsArray = item[item?.type] || [];
-    authOptionsArray.forEach((option) => {
-      auth[authType][getPostmanFieldMapping(option.key)] = getPostmanFieldMapping(option.value);
+    authOptionsArray.forEach((option: Record<string, any>) => {
+      auth[currentAuthType][POSTMAN_FIELD_MAPPING.get(option.key)] = POSTMAN_FIELD_MAPPING.get(option.value);
     });
 
     return auth;
   } catch (error) {
-    return {};
+    return { currentAuthType: AUTHORIZATION_TYPES.NO_AUTH };
   }
 };
 

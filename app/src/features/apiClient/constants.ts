@@ -11,7 +11,12 @@ export const POSTMAN_AUTH_TYPES_MAPPING = {
 };
 
 export const POSTMAN_FIELD_MAPPING = {
-  in: "addTo",
-  query: "QUERY",
-  token: "bearer",
+  mapping: {
+    in: "addTo",
+    query: "QUERY",
+    token: "bearer",
+  },
+  get(key: string): string {
+    return this.mapping[key] ?? key;
+  },
 };
