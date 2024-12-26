@@ -1,10 +1,11 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
-import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import { KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
+import { forEach, isEmpty, split, unionBy } from "lodash";
 
 export const makeRequest = async (
   appMode: string,
@@ -238,4 +239,106 @@ export const createBlankApiRecord = (
   }
 
   return upsertApiRecord(uid, newRecord, teamId);
+};
+
+export const extractQueryParams = (inputString: string) => {
+  const queryParams: KeyValuePair[] = [];
+
+  inputString = split(inputString, "?")[1];
+
+  if (inputString) {
+    const queryParamsList = split(inputString, "&");
+    forEach(queryParamsList, (queryParam) => {
+      const queryParamValues = split(queryParam, "=");
+      queryParams.push({
+        id: Math.random(),
+        key: queryParamValues[0],
+        value: queryParamValues[1],
+        isEnabled: true,
+      });
+    });
+  }
+
+  return queryParams;
+};
+
+export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString: string) => {
+  if (isEmpty(queryParams)) {
+    return inputString;
+  }
+  const baseUrl = split(inputString, "?")[0];
+  const enabledParams = queryParams.filter((param) => param.isEnabled);
+
+  const queryString = enabledParams
+    .map(({ key, value }) => {
+      if (!key) return "";
+      if (value === undefined || value === "") {
+        return key;
+      } else {
+        return `${key}=${value}`;
+      }
+    })
+    .filter(Boolean)
+    .join("&");
+
+  return `${baseUrl}${queryString ? `?${queryString}` : queryString}`;
+};
+
+export const syncQueryParams = (
+  queryParams: KeyValuePair[],
+  url: string,
+  type: QueryParamSyncType = QueryParamSyncType.SYNC
+) => {
+  const updatedQueryParams = extractQueryParams(url);
+
+  switch (type) {
+    case QueryParamSyncType.SYNC: {
+      const updatedUrl = queryParamsToURLString(updatedQueryParams, url);
+
+      // Dont sync if URL is same
+      if (updatedUrl !== url) {
+        const combinedParams = unionBy(queryParams, updatedQueryParams, "id");
+        const deduplicatedParams: KeyValuePair[] = [];
+        const seenPairs = new Set();
+
+        combinedParams.forEach((param) => {
+          const pair = `${param.key}=${param.value}`;
+          if (!seenPairs.has(pair)) {
+            seenPairs.add(pair);
+            deduplicatedParams.push(param);
+          }
+        });
+
+        return { queryParams: deduplicatedParams, url: queryParamsToURLString(deduplicatedParams, url) };
+      }
+
+      return { queryParams, url };
+    }
+    case QueryParamSyncType.TABLE: {
+      const updatedQueryParamsCopy = [...updatedQueryParams];
+
+      // Adding disabled key value pairs
+      queryParams.forEach((queryParam, index) => {
+        if (!queryParam.isEnabled) {
+          updatedQueryParamsCopy.splice(index, 0, queryParam);
+        }
+      });
+
+      return {
+        queryParams: isEmpty(updatedQueryParamsCopy) ? [getEmptyPair()] : updatedQueryParamsCopy,
+      };
+    }
+
+    case QueryParamSyncType.URL: {
+      const updatedUrl = queryParamsToURLString(queryParams, url);
+
+      return { url: updatedUrl };
+    }
+
+    default:
+      return {
+        queryParams,
+        url,
+      };
+  }
 };
