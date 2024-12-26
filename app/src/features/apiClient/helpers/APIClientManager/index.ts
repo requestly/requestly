@@ -24,6 +24,11 @@ export const executeAPIRequest = async (
 ): Promise<RQAPI.Entry | RQAPI.RequestErrorEntry> => {
   const updatedEntry = JSON.parse(JSON.stringify(entry)); //Deep Copy
 
+  /* Clearing the query params key value to avoid duplication of query params in request 
+  as the query param table changes are synced with request URL
+  */
+  updatedEntry.request.queryParams = [];
+
   if (!isEmpty(updatedEntry.auth)) {
     const { headers, queryParams } = processAuthForEntry(updatedEntry, entryDetails, apiRecords);
     updatedEntry.request.headers = updateRequestWithAuthOptions(updatedEntry.request.headers, headers);
