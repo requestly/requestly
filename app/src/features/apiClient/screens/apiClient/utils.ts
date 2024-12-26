@@ -284,11 +284,11 @@ export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString:
   return `${baseUrl}${queryString ? `?${queryString}` : queryString}`;
 };
 
-export const syncQueryParams = (queryParams: KeyValuePair[], url: string, type: number = 0) => {
+export const syncQueryParams = (queryParams: KeyValuePair[], url: string, type: string = "sync") => {
   const updatedQueryParams = extractQueryParams(url);
 
   switch (type) {
-    case 0: {
+    case "sync": {
       const updatedUrl = queryParamsToURLString(updatedQueryParams, url);
       // Dont sync if URL is same
       if (updatedUrl !== url) {
@@ -309,10 +309,24 @@ export const syncQueryParams = (queryParams: KeyValuePair[], url: string, type: 
 
       return { queryParams, url };
     }
-    case 1:
-      return { queryParams: isEmpty(updatedQueryParams) ? [getEmptyPair()] : updatedQueryParams };
-    case 2: {
+    case "updateTable": {
+      const updatedQueryParamsCopy = [...updatedQueryParams];
+
+      // Adding disabled key value pairs
+      queryParams.forEach((queryParam, index) => {
+        if (!queryParam.isEnabled) {
+          updatedQueryParamsCopy.splice(index, 0, queryParam);
+        }
+      });
+
+      return {
+        queryParams: isEmpty(updatedQueryParamsCopy) ? [getEmptyPair()] : updatedQueryParamsCopy,
+      };
+    }
+
+    case "updateUrl": {
       const updatedUrl = queryParamsToURLString(queryParams, url);
+
       return { url: updatedUrl };
     }
 

@@ -57,7 +57,9 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, setKeyValueP
         request: {
           ...updatedRequest,
           [pairTypeToUpdate]: keyValuePairs,
-          ...(pairType === KeyValueFormType.QUERY_PARAMS ? syncQueryParams(keyValuePairs, updatedRequest.url, 2) : {}),
+          ...(pairType === KeyValueFormType.QUERY_PARAMS
+            ? syncQueryParams(keyValuePairs, updatedRequest.url, "updateUrl")
+            : {}),
         },
       };
     },

@@ -124,7 +124,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       request: {
         ...entry.request,
         url,
-        ...syncQueryParams(entry.request.queryParams, url, 1),
+        ...syncQueryParams(entry.request.queryParams, url, "updateTable"),
       },
     }));
   }, []);
