@@ -128,7 +128,7 @@ const RequestTabs: React.FC<Props> = ({
     }
 
     return items;
-  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts, variables, collectionId]);
+  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts, variables]);
 
   return (
     <Tabs
