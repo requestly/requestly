@@ -255,15 +255,20 @@ const useEnvironmentManager = () => {
           .map(([key, value]) => {
             const typeToSaveInDB =
               value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
-            return [key, { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB }];
+            return [key.trim(), { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB }];
           })
       );
 
       const variablesWithoutSyncvalues = Object.fromEntries(
         Object.entries(variables)
           .filter(([_, value]) => value.syncValue === undefined)
-          .map(([key, value]) => [key, { localValue: value.localValue, type: value.type }])
+          .map(([key, value]) => [key.trim(), { localValue: value.localValue, type: value.type }])
       );
+
+      console.log("!!!debug", "var", {
+        newVariablesWithSyncvalues,
+        variablesWithoutSyncvalues,
+      });
 
       dispatch(
         variablesActions.updateEnvironmentData({
