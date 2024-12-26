@@ -21,13 +21,11 @@ export const EnvironmentView = () => {
     setVariables,
     removeVariable,
   } = useEnvironmentManager();
-  const { envId } = useParams();
-  const [persistedEnvId] = useState<string>(envId);
-
   const user = useSelector(getUserAuthDetails);
   const [searchValue, setSearchValue] = useState<string>("");
-  const environmentName = getEnvironmentName(persistedEnvId);
-  const variables = getEnvironmentVariables(persistedEnvId);
+  const { envId } = useParams();
+  const environmentName = getEnvironmentName(envId);
+  const variables = getEnvironmentVariables(envId);
 
   useEffect(() => {
     if (!isEnvironmentsLoading) {
@@ -40,23 +38,23 @@ export const EnvironmentView = () => {
       }
 
       const environments = getAllEnvironments();
-      const hasAccessToEnvironment = environments?.some((env) => env.id === persistedEnvId);
+      const hasAccessToEnvironment = environments?.some((env) => env.id === envId);
       if (environments?.length === 0 || !hasAccessToEnvironment) {
         navigate(PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE);
       }
     }
-  }, [getAllEnvironments, navigate, isEnvironmentsLoading, user.loggedIn, persistedEnvId, location.pathname]);
+  }, [getAllEnvironments, navigate, isEnvironmentsLoading, user.loggedIn, envId, location.pathname]);
 
   const handleSetVariables = async (variables: EnvironmentVariables) => {
-    return setVariables(persistedEnvId, variables);
+    return setVariables(envId, variables);
   };
 
   const handleRemoveVariable = async (key: string) => {
-    return removeVariable(persistedEnvId, key);
+    return removeVariable(envId, key);
   };
 
   return (
-    <div key={persistedEnvId} className="variables-list-view-container">
+    <div className="variables-list-view-container">
       <div className="variables-list-view">
         {isEnvironmentsLoading ? (
           <Skeleton active />
@@ -66,7 +64,7 @@ export const EnvironmentView = () => {
               searchValue={searchValue}
               onSearchValueChange={setSearchValue}
               currentEnvironmentName={environmentName}
-              environmentId={persistedEnvId}
+              environmentId={envId}
             />
             <VariablesList
               searchValue={searchValue}
