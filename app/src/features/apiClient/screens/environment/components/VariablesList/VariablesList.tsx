@@ -49,7 +49,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
 
-      if ((row.key && row.syncValue) || fieldChanged === "type" || fieldChanged === "key") {
+      if ((row.key && (row.syncValue || row.localValue)) || fieldChanged === "type" || fieldChanged === "key") {
         // Check if the new key already exists (excluding the current row)
         const isDuplicate = variableRows.some(
           (variable, idx) => idx !== index && variable.key.toLowerCase() === row.key.toLowerCase()
@@ -68,7 +68,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
           setDataSource(variableRows);
         }
 
-        if (row.key && row.syncValue) {
+        if (row.key && (row.syncValue || row.localValue)) {
           const variablesToSave = variableRows.reduce((acc, variable) => {
             if (variable.key) {
               acc[variable.key] = {

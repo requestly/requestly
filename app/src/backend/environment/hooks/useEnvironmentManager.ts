@@ -249,19 +249,34 @@ const useEnvironmentManager = () => {
 
   const setVariables = useCallback(
     async (environmentId: string, variables: EnvironmentVariables) => {
-      const newVariables: EnvironmentVariables = Object.fromEntries(
-        Object.entries(variables).map(([key, value]) => {
-          const typeToSaveInDB =
-            value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
-          return [key, { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB }];
+      const newVariablesWithSyncvalues: EnvironmentVariables = Object.fromEntries(
+        Object.entries(variables)
+          .filter(([_, value]) => value.syncValue !== undefined)
+          .map(([key, value]) => {
+            const typeToSaveInDB =
+              value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
+            return [key, { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB }];
+          })
+      );
+
+      const variablesWithoutSyncvalues = Object.fromEntries(
+        Object.entries(variables)
+          .filter(([_, value]) => value.syncValue === undefined)
+          .map(([key, value]) => [key, { localValue: value.localValue, type: value.type }])
+      );
+
+      dispatch(
+        variablesActions.updateEnvironmentData({
+          newVariables: variablesWithoutSyncvalues,
+          environmentId,
         })
       );
 
-      return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariables)
+      return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariablesWithSyncvalues)
         .then(() => {
           dispatch(
             variablesActions.updateEnvironmentData({
-              newVariables,
+              newVariables: newVariablesWithSyncvalues,
               environmentId,
             })
           );
