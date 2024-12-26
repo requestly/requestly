@@ -9,7 +9,6 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
 import AuthorizationView from "../AuthorizationView";
-import { AUTHORIZATION_TYPES } from "../AuthorizationView/types";
 
 enum Tab {
   QUERY_PARAMS = "query_params",

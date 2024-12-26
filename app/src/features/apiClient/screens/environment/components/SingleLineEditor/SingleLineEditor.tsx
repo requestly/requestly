@@ -29,14 +29,15 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   const editorRef = useRef(null);
   const editorViewRef = useRef(null);
   /*
-  onKeyDown, onBlur and onChange is in the useEffect dependencies (implicitly through the editor setup), 
+  onKeyDown, onBlur and onChange is in the useEffect dependencies (implicitly through the editor setup),
   which causes the editor to be recreated when onKeyDown changes
   Hence creating a ref for onKeyDown, onBlur and onChange to avoid the editor being recreated
-  
+
   */
   const onKeyDownRef = useRef(onKeyDown);
   const onBlurRef = useRef(onBlur);
   const onChangeRef = useRef(onChange);
+  const previousDefaultValueRef = useRef(defaultValue);
 
   useEffect(() => {
     onKeyDownRef.current = onKeyDown;
@@ -107,22 +108,44 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placeholder, variables]);
 
+  useEffect(() => {
+    if (defaultValue !== previousDefaultValueRef.current) {
+      previousDefaultValueRef.current = defaultValue;
+      if (editorViewRef.current) {
+        const currentDoc = editorViewRef.current.state.doc.toString();
+        if (defaultValue !== currentDoc) {
+          const transaction = editorViewRef.current.state.update({
+            changes: {
+              from: 0,
+              to: currentDoc.length,
+              insert: defaultValue ?? "",
+            },
+          });
+
+          // Prevent calling onChange when default value is changed through this useEffect
+          const originalOnChange = onChangeRef.current;
+          onChangeRef.current = () => {};
+          editorViewRef.current.dispatch(transaction);
+          onChangeRef.current = originalOnChange;
+        }
+      }
+    }
+  }, [defaultValue]);
+
   return (
-    <>
-      <div
-        ref={editorRef}
-        className={`${className ?? ""} editor-popup-container ant-input`}
-        onMouseLeave={() => setHoveredVariable(null)}
-      >
-        {hoveredVariable && (
-          <EditorPopover
-            editorRef={editorRef}
-            hoveredVariable={hoveredVariable}
-            popupPosition={popupPosition}
-            variables={variables}
-          />
-        )}
-      </div>
-    </>
+    <div
+      ref={editorRef}
+      className={`${className ?? ""} editor-popup-container ant-input`}
+      onMouseLeave={() => setHoveredVariable(null)}
+    >
+      {hoveredVariable && (
+        <EditorPopover
+          editorRef={editorRef}
+          hoveredVariable={hoveredVariable}
+          popupPosition={popupPosition}
+          variables={variables}
+        />
+      )}
+    </div>
   );
 };

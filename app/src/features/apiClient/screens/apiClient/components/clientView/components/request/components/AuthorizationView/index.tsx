@@ -11,32 +11,39 @@ import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineE
 import { MdClear } from "@react-icons/all-files/md/MdClear";
 import { AUTHORIZATION_TYPES } from "./types";
 import { AUTH_OPTIONS } from "./types/form";
+import { RQAPI } from "features/apiClient/types";
 
 interface Props {
   defaultValues: {
     currentAuthType?: AUTHORIZATION_TYPES;
     authOptions?: AUTH_OPTIONS;
   };
-  onAuthUpdate: (
-    currentAuthType: AUTHORIZATION_TYPES,
-    updatedKey?: string,
-    updatedValue?: string,
-    formValues?: any
-  ) => any;
+  onAuthUpdate: (authOptions: RQAPI.AuthOptions) => any;
 }
 
 const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => {
   const [selectedForm, setSelectedForm] = useState(defaultValues?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH);
   const [formValues, setFormValues] = useState<Record<string, any>>(defaultValues || {});
 
+  const getAuthOptions = (
+    previousFormValues: Record<string, any>,
+    currentAuthType: AUTHORIZATION_TYPES,
+    updatedValue?: string,
+    updatedId?: string
+  ) => {
+    const authOptions = {
+      currentAuthType,
+      [currentAuthType]: {
+        ...previousFormValues[currentAuthType],
+        ...(updatedId || updatedValue ? { [updatedId]: updatedValue } : {}),
+      },
+    };
+    return authOptions;
+  };
+
   const onChangeHandler = (value: string, id: string) => {
     setFormValues((prevValues) => {
-      const authOptions = {
-        currentAuthType: selectedForm,
-        [selectedForm]: { ...prevValues[selectedForm], ...(id || value ? { [id]: value } : {}) },
-      };
-
-      onAuthUpdate(authOptions);
+      onAuthUpdate(getAuthOptions(prevValues, selectedForm, value, id));
       return {
         ...prevValues,
         [selectedForm]: {
@@ -59,9 +66,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => 
             value={selectedForm}
             onChange={(value) => {
               setSelectedForm(value);
-              if ([AUTHORIZATION_TYPES.NO_AUTH, AUTHORIZATION_TYPES.INHERIT].includes(value)) {
-                onAuthUpdate({ currentAuthType: value });
-              }
+              onAuthUpdate(getAuthOptions(formValues, value));
             }}
             options={AUTHORIZATION_TYPES_META}
           />
