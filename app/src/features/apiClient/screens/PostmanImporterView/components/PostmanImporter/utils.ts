@@ -2,7 +2,7 @@ import { EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { generateDocumentId } from "backend/utils";
 import { AUTHORIZATION_TYPES } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
-import { POSTMAN_AUTH_TYPES_MAPPING } from "features/apiClient/constants";
+import { POSTMAN_AUTH_TYPES_MAPPING, POSTMAN_FIELD_MAPPING } from "features/apiClient/constants";
 
 interface PostmanCollectionExport {
   info: {
@@ -82,16 +82,23 @@ const processScripts = (item: any) => {
   return scripts;
 };
 
-const processAuthorizationOptions = (item = {}) => {
+const getPostmanFieldMapping = (key: string) => {
+  return POSTMAN_FIELD_MAPPING[key] ?? key;
+};
+
+const processAuthorizationOptions = (item = {}, parentCollectionId: string) => {
   try {
     const auth = {};
-    const authType = POSTMAN_AUTH_TYPES_MAPPING[item.type] ?? AUTHORIZATION_TYPES.NO_AUTH;
+    const authType =
+      POSTMAN_AUTH_TYPES_MAPPING[item.type] ??
+      (parentCollectionId ? AUTHORIZATION_TYPES.INHERIT : AUTHORIZATION_TYPES.NO_AUTH);
+
     auth.currentAuthType = authType;
     auth[authType] = {};
 
     const authOptionsArray = item[item?.type] || [];
     authOptionsArray.forEach((option) => {
-      auth[authType][option.key] = option.value;
+      auth[authType][getPostmanFieldMapping(option.key)] = getPostmanFieldMapping(option.value);
     });
 
     return auth;
@@ -154,7 +161,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
         body: requestBody,
         contentType,
       },
-      auth: processAuthorizationOptions(request.auth),
+      auth: processAuthorizationOptions(request.auth, parentCollectionId),
       scripts: processScripts(item),
     },
   };
@@ -164,7 +171,9 @@ const createCollectionRecord = (
   name: string,
   description: string,
   id = generateDocumentId("apis"),
-  variables?: any[]
+  variables?: any[],
+  auth?: any,
+  parentCollectionId?: string
 ): Partial<RQAPI.CollectionRecord> => {
   const collectionVariables: Record<string, EnvironmentVariableValue> = {};
   if (variables) {
@@ -182,6 +191,7 @@ const createCollectionRecord = (
     deleted: false,
     data: {
       variables: collectionVariables,
+      auth: processAuthorizationOptions(auth, parentCollectionId),
     },
     type: RQAPI.RecordType.COLLECTION,
   };
@@ -203,7 +213,14 @@ export const processPostmanCollectionData = (
     items.forEach((item) => {
       if (item.item?.length) {
         // This is a sub-collection
-        const subCollection = createCollectionRecord(item.name, item.description || "", generateDocumentId("apis"));
+        const subCollection = createCollectionRecord(
+          item.name,
+          item.description || "",
+          generateDocumentId("apis"),
+          [],
+          item.auth,
+          parentCollectionId
+        );
         subCollection.collectionId = parentCollectionId;
         result.collections.push(subCollection);
 
@@ -224,7 +241,8 @@ export const processPostmanCollectionData = (
     fileContent.info.name,
     fileContent.info?.description || "",
     rootCollectionId,
-    fileContent.variable
+    fileContent.variable,
+    fileContent.auth
   );
   rootCollection.collectionId = "";
   const processedItems = processItems(fileContent.item, rootCollectionId);
