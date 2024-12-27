@@ -51,7 +51,7 @@ export const APIClient: React.FC<Props> = () => {
     setSelectedEntryDetails((prev) => {
       return prev?.id === record?.id
         ? ({ ...(prev ?? {}), name: record?.name, collectionId: record?.collectionId } as RQAPI.ApiRecord)
-        : prev;
+        : (record as RQAPI.ApiRecord);
     });
   }, [persistedRequestId, apiClientRecords]);
 
