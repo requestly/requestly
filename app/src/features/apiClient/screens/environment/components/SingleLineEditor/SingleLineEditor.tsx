@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
-import { EditorView, placeholder as cmPlaceHolder } from "@codemirror/view";
-import { EditorState } from "@codemirror/state";
+import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
+import { EditorState, Prec } from "@codemirror/state";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { EditorPopover } from "componentsV2/CodeEditor/components/Editor/components/PopOver";
 import "componentsV2/CodeEditor/components/Editor/components/PopOver/popover.scss";
@@ -11,7 +11,6 @@ interface RQSingleLineEditorProps {
   onChange: (value: string) => void;
   placeholder?: string;
   onPressEnter?: (event: KeyboardEvent, text: string) => void;
-  onKeyDown?: (event: KeyboardEvent, text: string) => void;
   onBlur?: (text: string) => void;
   variables?: Record<string, any>;
 }
@@ -22,7 +21,6 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   onChange,
   placeholder,
   onPressEnter,
-  onKeyDown,
   onBlur,
   variables = {},
 }) => {
@@ -34,16 +32,14 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   Hence creating a ref for onKeyDown, onBlur and onChange to avoid the editor being recreated
 
   */
-  const onKeyDownRef = useRef(onKeyDown);
   const onBlurRef = useRef(onBlur);
   const onChangeRef = useRef(onChange);
   const previousDefaultValueRef = useRef(defaultValue);
 
   useEffect(() => {
-    onKeyDownRef.current = onKeyDown;
     onBlurRef.current = onBlur;
     onChangeRef.current = onChange;
-  }, [onKeyDown, onBlur, onChange]);
+  }, [onBlur, onChange]);
 
   const [hoveredVariable, setHoveredVariable] = useState(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
@@ -54,11 +50,49 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
       editorViewRef.current = null;
     }
 
+    /*
+    CodeMirror uses extensions to configure DOM interactions. 
+    Prec.highest ensures your keybinding takes priority. 
+    Returning true in the run function prevents default browser actions, like the save dialog for Ctrl-S
+    */
     editorViewRef.current = new EditorView({
       parent: editorRef.current,
       state: EditorState.create({
         doc: defaultValue ?? "",
         extensions: [
+          Prec.highest(
+            keymap.of([
+              {
+                key: "Mod-s",
+                run: (view) => {
+                  const event = new KeyboardEvent("keydown", {
+                    key: "s",
+                    metaKey: navigator.platform.includes("Mac"),
+                    ctrlKey: !navigator.platform.includes("Mac"),
+                    bubbles: true,
+                    cancelable: true,
+                  });
+                  view.dom.dispatchEvent(event);
+                  return true;
+                },
+              },
+              {
+                key: "Mod-Enter",
+                run: (view) => {
+                  const event = new KeyboardEvent("keydown", {
+                    key: "Enter",
+                    metaKey: navigator.platform.includes("Mac"),
+                    ctrlKey: !navigator.platform.includes("Mac"),
+                    bubbles: true,
+                    cancelable: true,
+                  });
+                  view.dom.dispatchEvent(event);
+                  return true;
+                },
+              },
+            ])
+          ),
+
           EditorState.transactionFilter.of((tr) => {
             return tr.newDoc.lines > 1 ? [] : [tr];
           }),
@@ -70,16 +104,6 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
           EditorView.domEventHandlers({
             blur: (_, view) => {
               onBlurRef.current?.(view.state.doc.toString());
-            },
-            keydown: (event, view) => {
-              const currentText = view.state.doc.toString();
-              if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
-                event.preventDefault();
-                onKeyDownRef.current?.(event, currentText);
-              } else if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "enter") {
-                event.preventDefault();
-                onKeyDownRef.current?.(event, currentText);
-              }
             },
             keypress: (event, view) => {
               if (event.key === "Enter") {
