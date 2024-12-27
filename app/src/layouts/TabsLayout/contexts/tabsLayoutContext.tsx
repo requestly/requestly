@@ -8,6 +8,7 @@ const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
   tabs: [],
   activeTab: undefined,
   closeTab: (tabId: TabsLayout.Tab["id"]) => {},
+  deleteTabs: (tabIds: TabsLayout.Tab["id"][]) => {},
   openTab: (tabId: TabsLayout.Tab["id"], tabDetails?: Partial<TabsLayout.Tab>) => {},
   updateTab: (tabId: TabsLayout.Tab["id"], updatedTabData?: Partial<TabsLayout.Tab>) => {},
   replaceTab: (tabId: TabsLayout.Tab["id"], newTabData?: Partial<TabsLayout.Tab>) => {},
@@ -123,7 +124,33 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
     [activeTab, updateTab, updateActivetab]
   );
 
-  const value = { activeTab, tabs, openTab, closeTab, updateTab, replaceTab, tabOutletElementsMap };
+  const deleteTabs = useCallback(
+    (tabIds: TabsLayout.Tab["id"][]) => {
+      if (tabIds.length === 0) {
+        return;
+      }
+
+      const updatedTabs = tabs.filter((tab) => {
+        const shouldFilter = tabIds.includes(tab.id);
+
+        if (shouldFilter) {
+          delete tabOutletElementsMap.current[tab.id];
+        }
+
+        return !shouldFilter;
+      });
+
+      dispatch(tabsLayoutActions.setTabs({ featureId: id, tabs: updatedTabs }));
+
+      if (updatedTabs.length && tabIds.includes(activeTab?.id)) {
+        const nextActiveTab = updatedTabs[updatedTabs.length - 1];
+        updateActivetab(nextActiveTab);
+      }
+    },
+    [tabs, activeTab?.id, updateActivetab, dispatch, id]
+  );
+
+  const value = { activeTab, tabs, openTab, closeTab, deleteTabs, updateTab, replaceTab, tabOutletElementsMap };
 
   return <TabsLayoutContext.Provider value={value}>{children}</TabsLayoutContext.Provider>;
 };
