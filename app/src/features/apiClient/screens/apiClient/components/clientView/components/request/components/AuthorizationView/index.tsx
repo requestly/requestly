@@ -23,7 +23,6 @@ interface Props {
 }
 
 const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootLevelRecord }) => {
-  console.log(rootLevelRecord, "root");
   const [selectedForm, setSelectedForm] = useState(
     defaultValues?.currentAuthType || (rootLevelRecord ? AUTHORIZATION_TYPES.NO_AUTH : AUTHORIZATION_TYPES.INHERIT)
   );

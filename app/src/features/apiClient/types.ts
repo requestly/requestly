@@ -90,7 +90,7 @@ export namespace RQAPI {
       preRequest: string;
       postResponse: string;
     };
-    auth?: AuthOptions | {};
+    auth?: AuthOptions;
   }
 
   export interface RequestErrorEntry {
@@ -110,7 +110,7 @@ export namespace RQAPI {
       postResponse: string;
     };
     variables: Omit<EnvironmentVariables, "localValue">;
-    auth?: AuthOptions | {};
+    auth?: AuthOptions;
   }
 
   interface RecordMetadata {
