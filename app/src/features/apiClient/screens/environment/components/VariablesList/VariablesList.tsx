@@ -7,7 +7,6 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { EditableCell, EditableRow } from "./components/customTableRow/CustomTableRow";
-import { toast } from "utils/Toast";
 import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../types";
 import { trackAddVariableClicked } from "../../analytics";
 import { globalActions } from "store/slices/global/slice";
@@ -33,6 +32,34 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
     [dataSource, searchValue]
   );
 
+  const duplicateKeyIndices = useMemo(() => {
+    const keyIndices = new Map<string, number[]>();
+
+    // Collecting all indices for each key
+    dataSource.forEach((row, index) => {
+      if (row.key) {
+        const lowercaseKey = row.key.toLowerCase();
+        const indices = keyIndices.get(lowercaseKey) || [];
+        indices.push(index);
+        keyIndices.set(lowercaseKey, indices);
+      }
+    });
+
+    // Create a set of indices (all except the last occurrence)
+    const overridenIndices = new Set<number>();
+
+    keyIndices.forEach((indices) => {
+      if (indices.length > 1) {
+        // Add all indices except the last one to the set
+        indices.slice(0, -1).forEach((index) => {
+          overridenIndices.add(dataSource[index].id);
+        });
+      }
+    });
+
+    return overridenIndices;
+  }, [dataSource]);
+
   const handleSaveVariable = useCallback(
     (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
       if (!user.loggedIn) {
@@ -44,15 +71,6 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
       const item = variableRows[index];
 
       if ((row.key && (row.syncValue || row.localValue)) || fieldChanged === "type" || fieldChanged === "key") {
-        const isDuplicate = variableRows.some(
-          (variable, idx) => idx !== index && variable.key.toLowerCase() === row.key.toLowerCase()
-        );
-
-        if (isDuplicate && row.key) {
-          toast.error(`Variable with name "${row.key}" already exists`);
-          return;
-        }
-
         const updatedRow = { ...item, ...row };
         variableRows.splice(index, 1, updatedRow);
         setDataSource(variableRows);
@@ -127,6 +145,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
     visibleSecretsRowIds,
     updateVisibleSecretsRowIds: handleUpdateVisibleSecretsRowIds,
     recordsCount: dataSource.length,
+    duplicateKeyIndices,
   });
 
   useEffect(() => {

@@ -13,6 +13,7 @@ interface Props {
   visibleSecretsRowIds: number[];
   updateVisibleSecretsRowIds: (id: number) => void;
   recordsCount: number;
+  duplicateKeyIndices?: Set<number>;
 }
 
 type ColumnTypes = Exclude<TableProps<EnvironmentVariableTableRow>["columns"], undefined>;
@@ -23,6 +24,7 @@ export const useVariablesListColumns = ({
   visibleSecretsRowIds,
   updateVisibleSecretsRowIds,
   recordsCount,
+  duplicateKeyIndices,
 }: Props) => {
   const checkIsSecretHidden = useCallback(
     (recordId: number) => {
@@ -41,6 +43,7 @@ export const useVariablesListColumns = ({
         dataIndex: "key",
         title: "Key",
         handleSaveVariable,
+        duplicateKeyIndices,
       }),
     },
     {

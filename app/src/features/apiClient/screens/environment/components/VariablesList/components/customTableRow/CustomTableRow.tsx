@@ -1,8 +1,9 @@
-import { Form, FormInstance, Input, InputNumber, Select } from "antd";
+import { Form, FormInstance, Input, InputNumber, Select, Tooltip } from "antd";
 import React, { useCallback, useContext, useRef, useEffect } from "react";
 import { EnvironmentVariableTableRow } from "../../VariablesList";
 import { EnvironmentVariableType } from "backend/environment/types";
 import Logger from "lib/logger";
+import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -20,6 +21,7 @@ interface EditableCellProps {
   handleSaveVariable: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
   isSecret?: boolean;
   options?: string[];
+  duplicateKeyIndices?: Set<number>;
 }
 
 export const EditableRow = ({ index, ...props }: { index: number }) => {
@@ -42,6 +44,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   handleSaveVariable,
   options,
   isSecret,
+  duplicateKeyIndices,
   ...restProps
 }) => {
   const form = useContext(EditableContext)!;
@@ -154,7 +157,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   }
 
   return (
-    <td {...restProps}>
+    <td {...restProps} style={{ position: "relative" }}>
       <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={record?.[dataIndex]}>
         {dataIndex === "type" ? (
           <Select
@@ -173,6 +176,15 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             ref={inputRef}
             onChange={(e) => handleChange(e.target.value)}
             placeholder={getPlaceholderText(dataIndex)}
+            suffix={
+              duplicateKeyIndices?.has(record.id) ? (
+                <Tooltip title="This variable has been overwritten by a duplicate key" color="#000">
+                  <MdOutlineWarningAmber className="warning" />
+                </Tooltip>
+              ) : (
+                <></>
+              )
+            }
           />
         ) : (
           renderValueInputByType()
