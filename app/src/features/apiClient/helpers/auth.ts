@@ -1,5 +1,5 @@
 import { isEmpty, unionBy } from "lodash";
-import { AUTHORIZATION_TYPES } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
+import { AUTHORIZATION_TYPES } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 import { KeyValuePair, RQAPI } from "../types";
 
@@ -11,9 +11,20 @@ export const processAuthForEntry = (
   },
   allRecords: RQAPI.Record[]
 ) => {
-  let authOptions = entry.auth;
+  const entryCopy = JSON.parse(JSON.stringify(entry)); // Deep Copy
+
+  let authOptions = entryCopy.auth;
+
+  if (isEmpty(authOptions)) {
+    if (entryDetails.collectionId) {
+      entryCopy.auth.currentAuthType = AUTHORIZATION_TYPES.INHERIT;
+    } else {
+      entryCopy.auth.currentAuthType = AUTHORIZATION_TYPES.NO_AUTH;
+    }
+  }
+
   if (entry.auth.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
-    authOptions = inheritAuth(entry, entryDetails, allRecords);
+    authOptions = inheritAuth(entryCopy, entryDetails, allRecords);
   }
 
   if (!authOptions) {
