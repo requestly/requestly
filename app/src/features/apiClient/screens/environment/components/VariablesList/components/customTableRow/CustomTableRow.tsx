@@ -18,7 +18,7 @@ interface EditableCellProps {
   children: React.ReactNode;
   dataIndex: keyof EnvironmentVariableTableRow;
   record: EnvironmentVariableTableRow;
-  handleSaveVariable: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
+  handleVariableChange: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
   isSecret?: boolean;
   options?: string[];
   duplicateKeyIndices?: Set<number>;
@@ -41,7 +41,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   children,
   dataIndex,
   record,
-  handleSaveVariable,
+  handleVariableChange,
   options,
   isSecret,
   duplicateKeyIndices,
@@ -65,36 +65,52 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     }
   }, []);
 
-  const handleChange = useCallback(
-    async (value: string | number | boolean) => {
-      if (dataIndex === "type") {
-        const defaultValues = {
-          syncValue: record.syncValue,
-          localValue: record.localValue,
-        };
-        if (value === EnvironmentVariableType.Boolean) {
+  const handleTypeChange = useCallback(
+    (value: EnvironmentVariableType) => {
+      const defaultValues = {
+        syncValue: record.syncValue,
+        localValue: record.localValue,
+      };
+
+      switch (value) {
+        case EnvironmentVariableType.Boolean:
           defaultValues.syncValue = true;
           defaultValues.localValue = true;
-        } else if (value === EnvironmentVariableType.Number) {
+          break;
+        case EnvironmentVariableType.Number:
           defaultValues.syncValue = 0;
           defaultValues.localValue = 0;
-        }
-        handleSaveVariable({ ...record, [dataIndex]: value, ...defaultValues }, dataIndex);
+          break;
+      }
+
+      handleVariableChange({ ...record, type: value, ...defaultValues }, "type");
+    },
+    [record, handleVariableChange]
+  );
+
+  const handleValueChange = useCallback(async () => {
+    try {
+      const values = await form.validateFields();
+      const updatedRecord = { ...record, ...values };
+
+      updatedRecord.syncValue = convertValueByType(updatedRecord.syncValue, updatedRecord.type);
+      updatedRecord.localValue = convertValueByType(updatedRecord.localValue, updatedRecord.type);
+
+      handleVariableChange(updatedRecord, dataIndex);
+    } catch (errInfo) {
+      Logger.log("Save failed:", errInfo);
+    }
+  }, [dataIndex, handleVariableChange, record, convertValueByType, form]);
+
+  const handleChange = useCallback(
+    (value: string | number | boolean) => {
+      if (dataIndex === "type") {
+        handleTypeChange(value as EnvironmentVariableType);
       } else {
-        try {
-          const values = await form.validateFields();
-          const updatedRecord = { ...record, ...values };
-
-          updatedRecord.syncValue = convertValueByType(updatedRecord.syncValue, updatedRecord.type);
-          updatedRecord.localValue = convertValueByType(updatedRecord.localValue, updatedRecord.type);
-
-          handleSaveVariable(updatedRecord, dataIndex);
-        } catch (errInfo) {
-          Logger.log("Save failed:", errInfo);
-        }
+        handleValueChange();
       }
     },
-    [dataIndex, handleSaveVariable, record, convertValueByType, form]
+    [dataIndex, handleTypeChange, handleValueChange]
   );
 
   const getPlaceholderText = useCallback((dataIndex: string) => {
@@ -178,7 +194,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             placeholder={getPlaceholderText(dataIndex)}
             suffix={
               duplicateKeyIndices?.has(record.id) ? (
-                <Tooltip title="This variable has been overwritten by a duplicate key" color="#000">
+                <Tooltip title="This variable has been overwritten by a duplicate key." color="#000">
                   <MdOutlineWarningAmber className="warning" />
                 </Tooltip>
               ) : (

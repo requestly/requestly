@@ -60,7 +60,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
     return overridenIndices;
   }, [dataSource]);
 
-  const handleSaveVariable = useCallback(
+  const handleVariableChange = useCallback(
     (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
       if (!user.loggedIn) {
         return;
@@ -140,7 +140,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
   );
 
   const columns = useVariablesListColumns({
-    handleSaveVariable,
+    handleVariableChange,
     handleDeleteVariable,
     visibleSecretsRowIds,
     updateVisibleSecretsRowIds: handleUpdateVisibleSecretsRowIds,
