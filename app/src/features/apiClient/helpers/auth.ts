@@ -16,14 +16,16 @@ export const processAuthForEntry = (
   let authOptions = entryCopy.auth;
 
   if (isEmpty(authOptions)) {
+    let currentAuthType = "";
     if (entryDetails.collectionId) {
-      entryCopy.auth.currentAuthType = AUTHORIZATION_TYPES.INHERIT;
+      currentAuthType = AUTHORIZATION_TYPES.INHERIT;
     } else {
-      entryCopy.auth.currentAuthType = AUTHORIZATION_TYPES.NO_AUTH;
+      currentAuthType = AUTHORIZATION_TYPES.NO_AUTH;
     }
+    entryCopy.auth = { currentAuthType };
   }
 
-  if (entry.auth.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
+  if (entryCopy.auth.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
     authOptions = inheritAuth(entryCopy, entryDetails, allRecords);
   }
 
@@ -52,7 +54,7 @@ function inheritAuth(
     return null;
   }
   let parentAuthData = parentRecord.data.auth;
-  if (parentAuthData.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
+  if (!isEmpty(parentAuthData) && parentAuthData.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
     const parentDetails = {
       id: parentRecord.id,
       collectionId: parentRecord.collectionId,
