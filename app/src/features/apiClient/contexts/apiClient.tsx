@@ -100,7 +100,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
 
-  const { openTab, closeTab, updateTab, replaceTab } = useTabsLayoutContext();
+  const { openTab, deleteTabs, updateTab, replaceTab } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
 
   useEffect(() => {
@@ -161,9 +161,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onDeleteRecords = useCallback(
     (recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
-      recordIdsToBeDeleted?.forEach((recordId) => {
-        closeTab(recordId);
-      });
+      deleteTabs(recordIdsToBeDeleted);
 
       setApiClientRecords((prev) => {
         return prev.filter((record) => {
@@ -171,7 +169,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         });
       });
     },
-    [closeTab]
+    [deleteTabs]
   );
 
   const onSaveRecord = useCallback(
