@@ -7,7 +7,6 @@ import { renderTemplate } from "backend/environment/utils";
 import { DEMO_API_URL } from "features/apiClient/constants";
 import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient";
 import { EnvironmentVariables } from "backend/environment/types";
-import { isEmpty } from "lodash";
 import { processAuthForEntry, updateRequestWithAuthOptions } from "../auth";
 
 export const executeAPIRequest = async (
@@ -29,11 +28,9 @@ export const executeAPIRequest = async (
   */
   updatedEntry.request.queryParams = [];
 
-  if (!isEmpty(updatedEntry.auth)) {
-    const { headers, queryParams } = processAuthForEntry(updatedEntry, entryDetails, apiRecords);
-    updatedEntry.request.headers = updateRequestWithAuthOptions(updatedEntry.request.headers, headers);
-    updatedEntry.request.queryParams = updateRequestWithAuthOptions(updatedEntry.request.queryParams, queryParams);
-  }
+  const { headers, queryParams } = processAuthForEntry(updatedEntry, entryDetails, apiRecords);
+  updatedEntry.request.headers = updateRequestWithAuthOptions(updatedEntry.request.headers, headers);
+  updatedEntry.request.queryParams = updateRequestWithAuthOptions(updatedEntry.request.queryParams, queryParams);
 
   // Process request configuration with environment variables
   const renderedRequestDetails = environmentManager.renderVariables(updatedEntry.request, entryDetails.collectionId);
