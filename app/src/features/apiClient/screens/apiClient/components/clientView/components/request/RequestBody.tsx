@@ -45,15 +45,20 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
       },
       [setRequestEntry]
     ),
-    500
+    500,
+    { leading: true, trailing: true }
   );
 
-  const handleJsonChange = useCallback(
-    (value: string) => {
-      setJsonBody(value);
-      setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
-    },
-    [setRequestEntry]
+  const handleJsonChange = useDebounce(
+    useCallback(
+      (value: string) => {
+        setJsonBody(value);
+        setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
+      },
+      [setRequestEntry]
+    ),
+    500,
+    { leading: true, trailing: true }
   );
 
   const handleFormChange = useCallback(
