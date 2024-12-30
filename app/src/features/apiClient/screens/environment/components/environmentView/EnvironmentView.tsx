@@ -51,7 +51,15 @@ export const EnvironmentView = () => {
         }
       }
     }
-  }, [getAllEnvironments, navigate, isEnvironmentsLoading, user.loggedIn, persistedEnvId, location.pathname, tabs]);
+  }, [
+    getAllEnvironments,
+    navigate,
+    isEnvironmentsLoading,
+    user.loggedIn,
+    persistedEnvId,
+    location.pathname,
+    tabs.length,
+  ]);
 
   const handleSetVariables = async (variables: EnvironmentVariables) => {
     return setVariables(persistedEnvId, variables);
