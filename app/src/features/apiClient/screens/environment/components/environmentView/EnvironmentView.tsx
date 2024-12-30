@@ -47,6 +47,7 @@ export const EnvironmentView = () => {
       if (environments?.length === 0 || !hasAccessToEnvironment) {
         if (!tabs.length) {
           navigate(PATHS.API_CLIENT.ABSOLUTE);
+          return;
         }
       }
     }
