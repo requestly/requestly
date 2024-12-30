@@ -362,7 +362,7 @@ export const filterRecordsBySearch = (records: RQAPI.Record[], searchValue: stri
     }
   });
 
-  // Helper function to add all descendants of a collection
+  // Add all children records of a collection
   const addChildrenRecords = (collectionId: string) => {
     const children = childrenMap.get(collectionId) || new Set();
     children.forEach((childId) => {
