@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import APIClientView from "./components/clientView/APIClientView";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
@@ -94,7 +94,12 @@ export const APIClient: React.FC<Props> = () => {
     requestHistoryEntry,
     selectedEntryDetails,
   ]);
-
+  const handleAppRequestFinished = useCallback(
+    (entry: RQAPI.Entry) => {
+      if (!isHistoryPath) addToHistory(entry);
+    },
+    [addToHistory, isHistoryPath]
+  );
   return (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
       <div className="api-client-container-content">
@@ -103,7 +108,7 @@ export const APIClient: React.FC<Props> = () => {
           key={persistedRequestId}
           apiEntry={entryDetails?.data}
           apiEntryDetails={entryDetails}
-          notifyApiRequestFinished={addToHistory}
+          notifyApiRequestFinished={handleAppRequestFinished}
         />
       </div>
     </BottomSheetProvider>

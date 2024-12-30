@@ -1,4 +1,4 @@
-import { Result, Tabs } from "antd";
+import { Result, Skeleton, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { useCallback, useMemo } from "react";
@@ -27,7 +27,7 @@ const TAB_KEYS = {
 export const CollectionView = () => {
   const { collectionId } = useParams();
   const { setCollectionVariables, removeCollectionVariable } = useEnvironmentManager();
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords } = useApiClientContext();
   const { replaceTab } = useTabsLayoutContext();
   const user = useSelector(getUserAuthDetails);
   const teamId = useSelector(getCurrentlyActiveWorkspace);
@@ -109,6 +109,14 @@ export const CollectionView = () => {
     },
     [collection, teamId, user.details?.profile?.uid, onSaveRecord, replaceTab]
   );
+
+  if (isLoadingApiClientRecords) {
+    return (
+      <div className="collection-view-container__loading">
+        <Skeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="collection-view-container">
