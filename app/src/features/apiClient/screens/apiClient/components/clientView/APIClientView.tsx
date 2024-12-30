@@ -369,6 +369,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       <div className="api-client-header-container">
         {user.loggedIn && !openInModal ? (
           <RQBreadcrumb
+            loading={isAnimating}
             placeholder="New Request"
             recordName={apiEntryDetails?.name}
             onRecordNameUpdate={setRequestName}
