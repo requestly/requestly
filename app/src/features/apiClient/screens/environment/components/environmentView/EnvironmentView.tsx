@@ -9,6 +9,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import "./environmentView.scss";
 import { EnvironmentVariables } from "backend/environment/types";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
 
 export const EnvironmentView = () => {
   const navigate = useNavigate();
@@ -29,6 +30,8 @@ export const EnvironmentView = () => {
   const environmentName = getEnvironmentName(persistedEnvId);
   const variables = getEnvironmentVariables(persistedEnvId);
 
+  const { tabs } = useTabsLayoutContext();
+
   useEffect(() => {
     if (!isEnvironmentsLoading) {
       if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE)) {
@@ -42,10 +45,12 @@ export const EnvironmentView = () => {
       const environments = getAllEnvironments();
       const hasAccessToEnvironment = environments?.some((env) => env.id === persistedEnvId);
       if (environments?.length === 0 || !hasAccessToEnvironment) {
-        navigate(`${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/global`);
+        if (!tabs.length) {
+          navigate(PATHS.API_CLIENT.ABSOLUTE);
+        }
       }
     }
-  }, [getAllEnvironments, navigate, isEnvironmentsLoading, user.loggedIn, persistedEnvId, location.pathname]);
+  }, [getAllEnvironments, navigate, isEnvironmentsLoading, user.loggedIn, persistedEnvId, location.pathname, tabs]);
 
   const handleSetVariables = async (variables: EnvironmentVariables) => {
     return setVariables(persistedEnvId, variables);
