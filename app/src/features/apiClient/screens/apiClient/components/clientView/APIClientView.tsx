@@ -110,7 +110,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       setRequestName("");
     }
 
-    animationTimerRef.current = setTimeout(() => setIsAnimating(false), 600);
+    animationTimerRef.current = setTimeout(() => setIsAnimating(false), 800);
 
     return () => {
       clearTimeout(animationTimerRef.current);
