@@ -15,6 +15,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getWorkspaceById } from "store/slices/workspaces/selectors";
 import { isPersonalWorkspace } from "features/workspaces/utils";
 import PersonalWorkspaceSettings from "./PersonalWorkspaceSettings";
+import { WorkspaceType } from "features/workspaces/types";
 
 const TeamViewer = () => {
   const { teamId } = useParams();
@@ -30,11 +31,13 @@ const TeamViewer = () => {
 
   const manageWorkspaceItems = useMemo(
     () => [
-      {
-        key: "Members",
-        label: "Members",
-        children: <MembersDetails key={teamId} teamId={teamId} isTeamAdmin={isTeamAdmin} />,
-      },
+      teamDetails?.workspaceType === WorkspaceType.PERSONAL
+        ? {}
+        : {
+            key: "Members",
+            label: "Members",
+            children: <MembersDetails key={teamId} teamId={teamId} isTeamAdmin={isTeamAdmin} />,
+          },
       {
         key: "Workspace settings",
         label: "Workspace settings",
