@@ -110,7 +110,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       setRequestName("");
     }
 
-    animationTimerRef.current = setTimeout(() => setIsAnimating(false), 600);
+    animationTimerRef.current = setTimeout(() => setIsAnimating(false), 800);
 
     return () => {
       clearTimeout(animationTimerRef.current);
@@ -369,6 +369,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       <div className="api-client-header-container">
         {user.loggedIn && !openInModal ? (
           <RQBreadcrumb
+            loading={isAnimating}
             placeholder="New Request"
             recordName={apiEntryDetails?.name}
             onRecordNameUpdate={setRequestName}
