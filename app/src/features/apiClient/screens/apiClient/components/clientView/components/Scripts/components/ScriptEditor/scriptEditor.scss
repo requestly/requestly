@@ -3,6 +3,7 @@
 
   .react-resizable {
     height: calc(100% - 35px) !important;
+    min-height: unset !important;
   }
 
   .code-editor-custom-options-row {
