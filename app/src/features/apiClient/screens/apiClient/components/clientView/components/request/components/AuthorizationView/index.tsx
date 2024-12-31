@@ -19,10 +19,13 @@ interface Props {
     authOptions?: AUTH_OPTIONS;
   };
   onAuthUpdate: (authOptions: RQAPI.AuthOptions) => any;
+  rootLevelRecord: Boolean;
 }
 
-const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => {
-  const [selectedForm, setSelectedForm] = useState(defaultValues?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH);
+const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootLevelRecord }) => {
+  const [selectedForm, setSelectedForm] = useState(
+    defaultValues?.currentAuthType || (rootLevelRecord ? AUTHORIZATION_TYPES.NO_AUTH : AUTHORIZATION_TYPES.INHERIT)
+  );
   const [formValues, setFormValues] = useState<Record<string, any>>(defaultValues || {});
 
   const getAuthOptions = (

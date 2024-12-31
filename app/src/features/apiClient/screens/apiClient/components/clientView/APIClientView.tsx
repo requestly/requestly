@@ -89,7 +89,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
 
   const abortControllerRef = useRef<AbortController>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(true);
   const animationTimerRef = useRef<NodeJS.Timeout>();
   const { response, ...entryWithoutResponse } = entry;
 
@@ -103,15 +103,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   useEffect(() => {
     if (apiEntry) {
-      clearTimeout(animationTimerRef.current);
-      setIsAnimating(true);
       setEntry({
         ...apiEntry,
         request: { ...apiEntry.request, ...syncQueryParams(apiEntry.request.queryParams, apiEntry.request.url) },
       });
       setRequestName("");
-      animationTimerRef.current = setTimeout(() => setIsAnimating(false), 500);
     }
+
+    animationTimerRef.current = setTimeout(() => setIsAnimating(false), 600);
 
     return () => {
       clearTimeout(animationTimerRef.current);
@@ -365,19 +364,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     (evt.target as HTMLInputElement).blur();
   }, []);
 
-  const onUrlKeyDown = useCallback(
-    (evt: KeyboardEvent, text: string) => {
-      if (evt.metaKey) {
-        if (evt.key.toLowerCase() === "s") {
-          onSaveButtonClick();
-        } else if (evt.key.toLowerCase() === "enter") {
-          onSendButtonClick();
-        }
-      }
-    },
-    [onSaveButtonClick, onSendButtonClick]
-  );
-
   return isExtensionEnabled ? (
     <div className="api-client-view">
       <div className="api-client-header-container">
@@ -433,7 +419,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   onChange={(text) => {
                     setUrl(text);
                   }}
-                  onKeyDown={onUrlKeyDown}
                   onPressEnter={onUrlInputEnterPressed}
                   variables={currentEnvironmentVariables}
                   // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
