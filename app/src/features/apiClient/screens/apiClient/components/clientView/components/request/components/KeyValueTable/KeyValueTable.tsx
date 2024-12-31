@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import type { TableProps } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { RQButton } from "lib/design-system-v2/components";
 import { EditableRow, EditableCell } from "./KeyValueTableRow";
-import { KeyValueFormType, KeyValuePair, RQAPI } from "features/apiClient/types";
+import { KeyValueFormType, KeyValuePair, QueryParamSyncType, RQAPI } from "features/apiClient/types";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
-import { isArray } from "lodash";
 import { EnvironmentVariables } from "backend/environment/types";
+import { syncQueryParams } from "features/apiClient/screens/apiClient/utils";
 import "./keyValueTable.scss";
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
@@ -29,27 +29,18 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
   pairType,
   variables,
 }) => {
-  const [tableData, setTableData] = useState<KeyValuePair[]>(data);
-
   const handleUpdateRequestPairs = useCallback(
     (prev: RQAPI.Entry, pairType: KeyValueFormType, action: "add" | "update" | "delete", pair?: KeyValuePair) => {
       const updatedRequest = { ...prev.request };
       const pairTypeToUpdate = pairType === KeyValueFormType.FORM ? "body" : pairType;
-      let keyValuePairs = updatedRequest[pairTypeToUpdate] as KeyValuePair[];
-      if (!isArray(keyValuePairs)) keyValuePairs = [];
+      let keyValuePairs = Array.isArray(updatedRequest[pairTypeToUpdate]) ? [...updatedRequest[pairTypeToUpdate]] : [];
 
-      switch (action) {
-        case "add":
-          if (pair) keyValuePairs.push(pair);
-          return {
-            ...prev,
-            request: {
-              ...prev.request,
-              [pairTypeToUpdate]: [...keyValuePairs],
-            },
-          };
-        case "update":
-          if (pair) {
+      if (pair) {
+        switch (action) {
+          case "add":
+            keyValuePairs.push(pair);
+            break;
+          case "update": {
             const index = keyValuePairs.findIndex((item: KeyValuePair) => item.id === pair.id);
             if (index !== -1) {
               keyValuePairs.splice(index, 1, {
@@ -57,25 +48,27 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
                 ...pair,
               });
             }
-            setTableData(() => [...keyValuePairs]);
-            return {
-              ...prev,
-              request: {
-                ...prev.request,
-                [pairTypeToUpdate]: [...keyValuePairs],
-              },
-            };
+            break;
           }
-          return { ...prev };
-        case "delete":
-          return {
-            ...prev,
-            request: {
-              ...updatedRequest,
-              [pairTypeToUpdate]: keyValuePairs.filter((item: KeyValuePair) => item.id !== pair?.id),
-            },
-          };
+          case "delete": {
+            keyValuePairs = keyValuePairs.filter((item: KeyValuePair) => item.id !== pair.id);
+            break;
+          }
+          default:
+            break;
+        }
       }
+
+      return {
+        ...prev,
+        request: {
+          ...updatedRequest,
+          [pairTypeToUpdate]: keyValuePairs,
+          ...(pairType === KeyValueFormType.QUERY_PARAMS
+            ? syncQueryParams(keyValuePairs, updatedRequest.url, QueryParamSyncType.URL)
+            : {}),
+        },
+      };
     },
     []
   );
@@ -100,28 +93,21 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
 
   const handleAddPair = useCallback(() => {
     const newPair = createEmptyPair();
-    setTableData((prev) => [...prev, newPair]);
     setKeyValuePairs((prev) => handleUpdateRequestPairs(prev, pairType, "add", newPair));
   }, [setKeyValuePairs, createEmptyPair, pairType, handleUpdateRequestPairs]);
 
   const handleDeletePair = useCallback(
     (pair: KeyValuePair) => {
-      const newData = tableData.filter((item) => item.id !== pair.id);
-      setTableData(newData);
       setKeyValuePairs((prev) => handleUpdateRequestPairs(prev, pairType, "delete", pair));
     },
-    [setKeyValuePairs, pairType, tableData, handleUpdateRequestPairs]
+    [setKeyValuePairs, pairType, handleUpdateRequestPairs]
   );
 
   useEffect(() => {
-    if (tableData.length === 0) {
+    if (data.length === 0) {
       handleAddPair();
     }
-  }, [tableData, handleAddPair]);
-
-  useEffect(() => {
-    setTableData(data);
-  }, [data]);
+  }, [data, handleAddPair]);
 
   const columns = useMemo(() => {
     return [
@@ -174,7 +160,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         title: "",
         width: "50px",
         render: (_: any, record: KeyValuePair) => {
-          if ((record.key === "" && record.value === "" && tableData.length === 1) || !record.isEditable) {
+          if ((record.key === "" && record.value === "" && data.length === 1) || !record.isEditable) {
             return null;
           }
 
@@ -190,7 +176,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         },
       },
     ];
-  }, [pairType, handleUpdatePair, handleDeletePair, tableData.length, variables]);
+  }, [pairType, handleUpdatePair, handleDeletePair, data.length, variables]);
 
   return (
     <ContentListTable
@@ -200,7 +186,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       showHeader={false}
       rowKey="id"
       columns={columns as ColumnTypes}
-      data={tableData}
+      data={data}
       locale={{ emptyText: `No ${pairType} found` }}
       components={{
         body: {

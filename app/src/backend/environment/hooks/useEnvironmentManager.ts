@@ -27,6 +27,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
+import { upsertApiRecord } from "backend/apiClient/upsertApiRecord";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -39,7 +40,7 @@ const useEnvironmentManager = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [isEnvironmentsDataLoaded, setIsEnvironmentsDataLoaded] = useState(false);
-  const { apiClientRecords } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -73,6 +74,7 @@ const useEnvironmentManager = () => {
           return {
             id,
             name,
+            isGlobal,
           };
         })
         .catch((err) => {
@@ -181,6 +183,36 @@ const useEnvironmentManager = () => {
   }, [globalEnvironmentData?.id, dispatch, ownerId]);
 
   useEffect(() => {
+    if (ownerId && globalEnvironmentData?.id) {
+      unsubscribeGlobalVariablesListener?.();
+      unsubscribeGlobalVariablesListener = attachEnvironmentVariableListener(
+        ownerId,
+        globalEnvironmentData.id,
+        (environmentData) => {
+          const mergedVariables = mergeLocalAndSyncVariables(
+            allEnvironmentData[environmentData.id]?.variables ?? {},
+            environmentData.variables
+          );
+          dispatch(
+            variablesActions.updateEnvironmentData({
+              newVariables: mergedVariables,
+              environmentId: environmentData.id,
+              environmentName: environmentData.name,
+            })
+          );
+        }
+      );
+    }
+
+    return () => {
+      unsubscribeGlobalVariablesListener?.();
+    };
+
+    // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalEnvironmentData?.id, dispatch, ownerId]);
+
+  useEffect(() => {
     if (ownerId) {
       unsubscribeCollectionListener?.();
       unsubscribeCollectionListener = attachCollectionVariableListener(ownerId, (collectionDetails) => {
@@ -217,19 +249,34 @@ const useEnvironmentManager = () => {
 
   const setVariables = useCallback(
     async (environmentId: string, variables: EnvironmentVariables) => {
-      const newVariables: EnvironmentVariables = Object.fromEntries(
-        Object.entries(variables).map(([key, value]) => {
-          const typeToSaveInDB =
-            value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
-          return [key, { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB }];
+      const newVariablesWithSyncvalues: EnvironmentVariables = Object.fromEntries(
+        Object.entries(variables)
+          .filter(([_, value]) => value.syncValue !== undefined)
+          .map(([key, value]) => {
+            const typeToSaveInDB =
+              value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
+            return [key.trim(), { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB }];
+          })
+      );
+
+      const variablesWithoutSyncvalues = Object.fromEntries(
+        Object.entries(variables)
+          .filter(([_, value]) => value.syncValue === undefined)
+          .map(([key, value]) => [key.trim(), { localValue: value.localValue, type: value.type }])
+      );
+
+      dispatch(
+        variablesActions.updateEnvironmentData({
+          newVariables: variablesWithoutSyncvalues,
+          environmentId,
         })
       );
 
-      return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariables)
+      return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariablesWithSyncvalues)
         .then(() => {
           dispatch(
             variablesActions.updateEnvironmentData({
-              newVariables,
+              newVariables: newVariablesWithSyncvalues,
               environmentId,
             })
           );
@@ -337,6 +384,10 @@ const useEnvironmentManager = () => {
     return allEnvironmentData[currentEnvironmentId]?.variables ?? {};
   }, [allEnvironmentData, currentEnvironmentId]);
 
+  const getGlobalVariables = useCallback(() => {
+    return allEnvironmentData[globalEnvironmentData?.id]?.variables ?? {};
+  }, [allEnvironmentData, globalEnvironmentData?.id]);
+
   const getAllEnvironments = useCallback(() => {
     return Object.keys(allEnvironmentData).map((key) => {
       return {
@@ -399,6 +450,50 @@ const useEnvironmentManager = () => {
     [ownerId, dispatch]
   );
 
+  const setCollectionVariables = useCallback(
+    async (variables: EnvironmentVariables, collectionId: string) => {
+      const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+
+      if (!collection) {
+        throw new Error("Collection not found");
+      }
+
+      const updatedVariables = Object.fromEntries(
+        Object.entries(variables).map(([key, value]) => {
+          const typeToSave =
+            value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
+          const { localValue, ...rest } = value;
+          return [key, { ...rest, type: typeToSave }];
+        })
+      );
+      const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
+      return upsertApiRecord(user.details?.profile?.uid, record, currentlyActiveWorkspace?.id).then((result) => {
+        onSaveRecord(result.data);
+        dispatch(variablesActions.setCollectionVariables({ collectionId, variables }));
+      });
+    },
+    [currentlyActiveWorkspace?.id, user.details?.profile?.uid, onSaveRecord, dispatch, apiClientRecords]
+  );
+
+  const removeCollectionVariable = useCallback(
+    async (key: string, collectionId: string) => {
+      const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+
+      if (!collection) {
+        throw new Error("Collection not found");
+      }
+
+      const updatedVariables = { ...collection?.data?.variables };
+      delete updatedVariables[key];
+      const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
+      return upsertApiRecord(user.details?.profile?.uid, record, currentlyActiveWorkspace?.id).then((result) => {
+        onSaveRecord(result.data);
+        dispatch(variablesActions.setCollectionVariables({ collectionId, variables: updatedVariables }));
+      });
+    },
+    [currentlyActiveWorkspace?.id, user.details?.profile?.uid, onSaveRecord, dispatch, apiClientRecords]
+  );
+
   return {
     setCurrentEnvironment,
     addNewEnvironment,
@@ -417,6 +512,9 @@ const useEnvironmentManager = () => {
     getVariablesWithPrecedence,
     isEnvironmentsDataLoaded,
     isEnvironmentsLoading: isLoading,
+    getGlobalVariables,
+    setCollectionVariables,
+    removeCollectionVariable,
   };
 };
 

@@ -14,25 +14,40 @@ import { AUTH_OPTIONS } from "./types/form";
 import { RQAPI } from "features/apiClient/types";
 
 interface Props {
+  wrapperClass?: string;
   defaultValues: {
     currentAuthType?: AUTHORIZATION_TYPES;
     authOptions?: AUTH_OPTIONS;
   };
-  onAuthUpdate: (authOptions: RQAPI.AuthOptions) => void;
+  onAuthUpdate: (authOptions: RQAPI.AuthOptions) => any;
+  rootLevelRecord: Boolean;
 }
 
-const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => {
-  const [selectedForm, setSelectedForm] = useState(defaultValues?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH);
+const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootLevelRecord, wrapperClass = "" }) => {
+  const [selectedForm, setSelectedForm] = useState(
+    defaultValues?.currentAuthType || (rootLevelRecord ? AUTHORIZATION_TYPES.NO_AUTH : AUTHORIZATION_TYPES.INHERIT)
+  );
   const [formValues, setFormValues] = useState<Record<string, any>>(defaultValues || {});
+
+  const getAuthOptions = (
+    previousFormValues: Record<string, any>,
+    currentAuthType: AUTHORIZATION_TYPES,
+    updatedValue?: string,
+    updatedId?: string
+  ) => {
+    const authOptions = {
+      currentAuthType,
+      [currentAuthType]: {
+        ...previousFormValues[currentAuthType],
+        ...(updatedId || updatedValue ? { [updatedId]: updatedValue } : {}),
+      },
+    };
+    return authOptions;
+  };
 
   const onChangeHandler = (value: string, id: string) => {
     setFormValues((prevValues) => {
-      const authOptions = {
-        currentAuthType: selectedForm,
-        [selectedForm]: { ...prevValues[selectedForm], ...(id || value ? { [id]: value } : {}) },
-      };
-
-      onAuthUpdate(authOptions);
+      onAuthUpdate(getAuthOptions(prevValues, selectedForm, value, id));
       return {
         ...prevValues,
         [selectedForm]: {
@@ -46,7 +61,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => 
   const debouncedOnChange = debounce(onChangeHandler, 500);
 
   return (
-    <div className="authorization-view">
+    <div className={`authorization-view ${wrapperClass}`}>
       <div className="type-of-authorization">
         <div className="form-selector">
           <label>{LABEL_TEXT.AUTHORIZATION_TYPE_LABEL}</label>
@@ -55,9 +70,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => 
             value={selectedForm}
             onChange={(value) => {
               setSelectedForm(value);
-              if ([AUTHORIZATION_TYPES.NO_AUTH, AUTHORIZATION_TYPES.INHERIT].includes(value)) {
-                onAuthUpdate({ currentAuthType: value });
-              }
+              onAuthUpdate(getAuthOptions(formValues, value));
             }}
             options={AUTHORIZATION_TYPES_META}
           />

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, Params, useMatches } from "react-router-dom";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
-import { Input, Typography } from "antd";
+import { Input, Skeleton, Typography } from "antd";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import "./RQBreadcrumb.scss";
 
 interface Props {
+  loading?: boolean;
   disabled?: boolean;
   onBlur?: (updatedRecordName: string) => void;
   recordName?: string;
@@ -30,6 +31,7 @@ interface MatchedRoute {
 
 export const RQBreadcrumb: React.FC<Props> = ({
   onBlur,
+  loading = false,
   disabled = false,
   recordName,
   placeholder,
@@ -86,54 +88,58 @@ export const RQBreadcrumb: React.FC<Props> = ({
 
   return breadcrumbs.length > 0 ? (
     <ol className="rq-breadcrumb">
-      {breadcrumbs.map(({ label, isEditable, pathname, disabled: isPathDisabled }, index) => {
-        return (
-          <>
-            {isEditable ? (
-              isEditRecord ? (
-                <Input
-                  autoFocus
-                  value={name}
-                  onChange={handleOnChange}
-                  placeholder={placeholder}
-                  className={`rq-breadcrumb-input`}
-                  onBlur={() => {
-                    handleOnBlur();
-                  }}
-                  onPressEnter={() => {
-                    handleOnBlur();
-                  }}
-                />
-              ) : (
-                <div className="rq-breadcrumb-record-name">
-                  <Typography.Text className="record-name" ellipsis={true} onClick={handleRecordNameEditClick}>
-                    {name || placeholder}
-                  </Typography.Text>
-                  {disabled ? null : <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />}
-                </div>
-              )
-            ) : (
-              <>
-                {isPathDisabled ? (
-                  <li key={index} className="rq-breadcrumb-item">
-                    {label}
-                  </li>
+      {loading ? (
+        <Skeleton.Input active size="small" block />
+      ) : (
+        breadcrumbs.map(({ label, isEditable, pathname, disabled: isPathDisabled }, index) => {
+          return (
+            <>
+              {isEditable ? (
+                isEditRecord ? (
+                  <Input
+                    autoFocus
+                    value={name}
+                    onChange={handleOnChange}
+                    placeholder={placeholder}
+                    className={`rq-breadcrumb-input`}
+                    onBlur={() => {
+                      handleOnBlur();
+                    }}
+                    onPressEnter={() => {
+                      handleOnBlur();
+                    }}
+                  />
                 ) : (
-                  <Link key={index} to={pathname} className="rq-breadcrumb-item">
-                    {label}
-                  </Link>
-                )}
-              </>
-            )}
+                  <div className="rq-breadcrumb-record-name">
+                    <Typography.Text className="record-name" ellipsis={true} onClick={handleRecordNameEditClick}>
+                      {name || placeholder}
+                    </Typography.Text>
+                    {disabled ? null : <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />}
+                  </div>
+                )
+              ) : (
+                <>
+                  {isPathDisabled ? (
+                    <li key={index} className="rq-breadcrumb-item">
+                      {label}
+                    </li>
+                  ) : (
+                    <Link key={index} to={pathname} className="rq-breadcrumb-item">
+                      {label}
+                    </Link>
+                  )}
+                </>
+              )}
 
-            {index < breadcrumbs.length - 1 ? (
-              <span className="rq-breadcrumb-separator">
-                <MdOutlineChevronRight />
-              </span>
-            ) : null}
-          </>
-        );
-      })}
+              {index < breadcrumbs.length - 1 ? (
+                <span className="rq-breadcrumb-separator">
+                  <MdOutlineChevronRight />
+                </span>
+              ) : null}
+            </>
+          );
+        })
+      )}
     </ol>
   ) : null;
 };

@@ -111,7 +111,13 @@ const RequestTabs: React.FC<Props> = ({
       {
         key: Tab.AUTHORIZATION,
         label: <LabelWithCount label="Authorization" />,
-        children: <AuthorizationView defaultValues={requestEntry.auth} onAuthUpdate={handleAuthChange} />,
+        children: (
+          <AuthorizationView
+            defaultValues={requestEntry.auth}
+            onAuthUpdate={handleAuthChange}
+            rootLevelRecord={!collectionId}
+          />
+        ),
       },
     ];
 
