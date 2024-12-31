@@ -342,3 +342,62 @@ export const syncQueryParams = (
       };
   }
 };
+
+export const filterRecordsBySearch = (records: RQAPI.Record[], searchValue: string): RQAPI.Record[] => {
+  if (!searchValue) return records;
+
+  const search = searchValue.toLowerCase();
+  const matchingRecords = new Set<string>();
+
+  const childrenMap = new Map<string, Set<string>>();
+  const parentMap = new Map<string, string>();
+
+  records.forEach((record) => {
+    if (record.collectionId) {
+      parentMap.set(record.id, record.collectionId);
+      if (!childrenMap.has(record.collectionId)) {
+        childrenMap.set(record.collectionId, new Set());
+      }
+      childrenMap.get(record.collectionId).add(record.id);
+    }
+  });
+
+  // Add all children records of a collection
+  const addChildrenRecords = (collectionId: string) => {
+    const children = childrenMap.get(collectionId) || new Set();
+    children.forEach((childId) => {
+      matchingRecords.add(childId);
+      if (childrenMap.has(childId)) {
+        addChildrenRecords(childId);
+      }
+    });
+  };
+
+  // Add all parent collections of a record
+  const addParentCollections = (recordId: string) => {
+    const parentId = parentMap.get(recordId);
+    if (parentId) {
+      matchingRecords.add(parentId);
+      addParentCollections(parentId);
+    }
+  };
+
+  // First pass: direct matches and their children
+  records.forEach((record) => {
+    if (record.name.toLowerCase().includes(search)) {
+      matchingRecords.add(record.id);
+
+      // If collection matches, add all children records
+      if (isApiCollection(record)) {
+        addChildrenRecords(record.id);
+      }
+    }
+  });
+
+  // Second pass: add parent collections
+  matchingRecords.forEach((id) => {
+    addParentCollections(id);
+  });
+
+  return records.filter((record) => matchingRecords.has(record.id));
+};
