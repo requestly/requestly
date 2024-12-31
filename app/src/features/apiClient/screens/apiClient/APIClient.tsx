@@ -19,7 +19,7 @@ export const APIClient: React.FC<Props> = () => {
   const [persistedRequestId, setPersistedRequestId] = useState<string>(() => requestId);
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
   const isHistoryPath = location.pathname.includes("history");
-  const isNewRequest = typeof searchParams.get("new") === "string";
+  const isNewRequest = searchParams.has("new");
 
   useEffect(() => {
     if (isNewRequest) {
