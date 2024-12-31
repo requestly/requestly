@@ -6,6 +6,7 @@ import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
 import { forEach, isEmpty, split, unionBy } from "lodash";
+import { sessionStorage } from "utils/sessionStorage";
 
 export const makeRequest = async (
   appMode: string,
@@ -341,4 +342,67 @@ export const syncQueryParams = (
         url,
       };
   }
+};
+
+export const clearActiveKeysFromSession = (keysToBeDeleted: string[]) => {
+  const activeKeys = sessionStorage.getItem("active_collection_keys", []);
+
+  if (keysToBeDeleted.length === 0) {
+    return;
+  }
+
+  const updatedActiveKeys: string[] = [];
+
+  activeKeys.forEach((key: string) => {
+    if (!keysToBeDeleted.includes(key)) updatedActiveKeys.push(key);
+  });
+
+  sessionStorage.setItem("active_collection_keys", updatedActiveKeys);
+};
+
+export const updateActiveKeys = (records: RQAPI.Record[], id: RQAPI.Record["id"], activeKeys: RQAPI.Record["id"][]) => {
+  if (!id) {
+    return activeKeys;
+  }
+
+  function getParents(
+    records: RQAPI.Record[],
+    startId: RQAPI.Record["id"],
+    getRelatedId: (record: RQAPI.Record, currentId: RQAPI.Record["id"]) => RQAPI.Record["id"]
+  ) {
+    const relatedIds: RQAPI.Record["id"][] = [];
+    const visited = new Set();
+    const stack = [startId];
+
+    while (stack.length > 0) {
+      const currentId = stack.pop();
+      if (visited.has(currentId)) continue;
+      visited.add(currentId);
+
+      records.forEach((record) => {
+        const relatedId = getRelatedId(record, currentId);
+        if (relatedId) {
+          relatedIds.push(relatedId);
+          stack.push(relatedId);
+        }
+      });
+    }
+
+    return relatedIds;
+  }
+
+  const updatedActiveKeys = [...activeKeys];
+
+  const parents = getParents(records, id, (record, currentId) => {
+    return record.id === currentId ? record.collectionId : null;
+  });
+  parents.push(id);
+
+  parents.forEach((ancestor) => {
+    if (!updatedActiveKeys.includes(ancestor)) {
+      updatedActiveKeys.push(ancestor);
+    }
+  });
+
+  return updatedActiveKeys;
 };
