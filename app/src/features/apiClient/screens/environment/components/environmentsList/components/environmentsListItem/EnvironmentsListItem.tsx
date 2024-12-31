@@ -84,11 +84,11 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
     toast.loading("Deleting environment...");
     deleteEnvironment(environment.id)
       .then(() => {
+        closeTab(environment.id);
         toast.success("Environment deleted successfully");
         const availableEnvironments = allEnvironments.filter((env) => env.id !== environment.id);
         const isActiveEnvironmentBeingDeleted = environment.id === currentEnvironmentId;
         if (availableEnvironments.length && (envId === environment.id || isActiveEnvironmentBeingDeleted)) {
-          redirectToEnvironment(navigate, availableEnvironments[0].id);
           if (isActiveEnvironmentBeingDeleted) {
             if (availableEnvironments.length > 1) {
               const nonGlobalEnvironments = availableEnvironments.filter((env) => !isGlobalEnvironment(env.id));
@@ -96,7 +96,6 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
             }
           }
         }
-        closeTab(environment.id);
       })
       .catch(() => {
         toast.error("Failed to delete environment");
@@ -105,7 +104,6 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
     environment.id,
     deleteEnvironment,
     allEnvironments,
-    navigate,
     envId,
     currentEnvironmentId,
     setCurrentEnvironment,
