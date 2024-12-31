@@ -15,6 +15,7 @@ interface VariablesListHeaderProps {
   environmentId: string;
   hasUnsavedChanges: boolean;
   hideBreadcrumb?: boolean;
+  isSaving: boolean;
   onSearchValueChange: (value: string) => void;
   onSave: () => Promise<void>;
 }
@@ -24,6 +25,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   onSearchValueChange,
   environmentId,
   hasUnsavedChanges,
+  isSaving,
   currentEnvironmentName = "New",
   hideBreadcrumb = false,
   onSave,
@@ -70,6 +72,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
             type="primary"
             onClick={onSave}
             disabled={!hasUnsavedChanges}
+            loading={isSaving}
           >
             Save
           </RQButton>

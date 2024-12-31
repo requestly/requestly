@@ -250,25 +250,10 @@ const useEnvironmentManager = () => {
   const setVariables = useCallback(
     async (environmentId: string, variables: EnvironmentVariables) => {
       const newVariablesWithSyncvalues: EnvironmentVariables = Object.fromEntries(
-        Object.entries(variables)
-          .filter(([_, value]) => value.syncValue !== undefined)
-          .map(([key, value]) => {
-            const typeToSaveInDB =
-              value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
-            return [key.trim(), { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB }];
-          })
-      );
-
-      const variablesWithoutSyncvalues = Object.fromEntries(
-        Object.entries(variables)
-          .filter(([_, value]) => value.syncValue === undefined)
-          .map(([key, value]) => [key.trim(), { localValue: value.localValue, type: value.type }])
-      );
-
-      dispatch(
-        variablesActions.updateEnvironmentData({
-          newVariables: variablesWithoutSyncvalues,
-          environmentId,
+        Object.entries(variables).map(([key, value]) => {
+          const typeToSaveInDB =
+            value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
+          return [key.trim(), { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB }];
         })
       );
 

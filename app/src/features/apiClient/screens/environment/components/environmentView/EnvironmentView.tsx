@@ -29,6 +29,7 @@ export const EnvironmentView = () => {
 
   const user = useSelector(getUserAuthDetails);
   const [searchValue, setSearchValue] = useState<string>("");
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const environmentName = getEnvironmentName(persistedEnvId);
   const variables = getEnvironmentVariables(persistedEnvId);
 
@@ -70,6 +71,7 @@ export const EnvironmentView = () => {
   ]);
 
   const handleSaveVariables = async () => {
+    setIsSaving(true);
     return setVariables(persistedEnvId, pendingVariables)
       .then(() => {
         toast.success("Variables updated successfully");
@@ -78,6 +80,9 @@ export const EnvironmentView = () => {
       .catch((error) => {
         toast.error("Failed to update variables");
         console.error("Failed to updated variables: ", error);
+      })
+      .finally(() => {
+        setIsSaving(false);
       });
   };
 
@@ -95,6 +100,7 @@ export const EnvironmentView = () => {
               environmentId={persistedEnvId}
               onSave={handleSaveVariables}
               hasUnsavedChanges={hasUnsavedChanges}
+              isSaving={isSaving}
             />
             <VariablesList searchValue={searchValue} variables={variables} onVariablesChange={setPendingVariables} />
           </>

@@ -20,6 +20,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   const collectionVariables = useSelector(getCollectionVariables);
   const [pendingVariables, setPendingVariables] = useState(collectionVariables[collection.id]?.variables || {});
   const [searchValue, setSearchValue] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
 
@@ -28,6 +29,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   }, [updateTab, collection.id, hasUnsavedChanges]);
 
   const handleSaveVariables = async () => {
+    setIsSaving(true);
     return setCollectionVariables(pendingVariables, collection.id)
       .then(() => {
         toast.success("Variables updated successfully");
@@ -36,6 +38,9 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
       .catch((error) => {
         toast.error("Failed to update variables");
         console.error("Failed to updated variables: ", error);
+      })
+      .finally(() => {
+        setIsSaving(false);
       });
   };
 
@@ -49,6 +54,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
         environmentId={collection.id}
         onSave={handleSaveVariables}
         hasUnsavedChanges={hasUnsavedChanges}
+        isSaving={isSaving}
       />
       <VariablesList
         variables={collectionVariables[collection.id]?.variables || {}}
