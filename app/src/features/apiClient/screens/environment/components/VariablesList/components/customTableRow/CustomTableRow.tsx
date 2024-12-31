@@ -66,7 +66,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   }, []);
 
   const handleTypeChange = useCallback(
-    (value: EnvironmentVariableType) => {
+    (value: EnvironmentVariableType, prevType: EnvironmentVariableType) => {
       const defaultValues = {
         syncValue: record.syncValue,
         localValue: record.localValue,
@@ -80,6 +80,18 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         case EnvironmentVariableType.Number:
           defaultValues.syncValue = 0;
           defaultValues.localValue = 0;
+          break;
+        case EnvironmentVariableType.String:
+          if (prevType !== EnvironmentVariableType.Secret) {
+            defaultValues.syncValue = "";
+            defaultValues.localValue = "";
+          }
+          break;
+        case EnvironmentVariableType.Secret:
+          if (prevType !== EnvironmentVariableType.String) {
+            defaultValues.syncValue = "";
+            defaultValues.localValue = "";
+          }
           break;
       }
 
@@ -103,9 +115,12 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   }, [dataIndex, handleVariableChange, record, convertValueByType, form]);
 
   const handleChange = useCallback(
-    (value: string | number | boolean) => {
+    (
+      value: string | number | boolean | EnvironmentVariableType,
+      prevValue?: string | number | boolean | EnvironmentVariableType
+    ) => {
       if (dataIndex === "type") {
-        handleTypeChange(value as EnvironmentVariableType);
+        handleTypeChange(value as EnvironmentVariableType, prevValue as EnvironmentVariableType);
       } else {
         handleValueChange();
       }
@@ -153,7 +168,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         );
       case EnvironmentVariableType.Boolean:
         return (
-          <Select onChange={handleChange} value={record[dataIndex]} placeholder="Select value">
+          <Select onChange={(value) => handleChange(value)} value={record[dataIndex]} placeholder="Select value">
             <Select.Option value={true}>True</Select.Option>
             <Select.Option value={false}>False</Select.Option>
           </Select>
@@ -178,7 +193,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         {dataIndex === "type" ? (
           <Select
             className="w-full"
-            onChange={(value) => handleChange(value as EnvironmentVariableType)}
+            onChange={(value) => handleChange(value as EnvironmentVariableType, record.type)}
             value={record.type}
           >
             {options?.map((option) => (
