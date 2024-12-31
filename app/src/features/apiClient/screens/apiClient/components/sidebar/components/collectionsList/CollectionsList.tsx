@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { CollectionRow } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
-import { convertFlatRecordsToNestedRecords, isApiCollection, isApiRequest } from "../../../../utils";
+import { convertFlatRecordsToNestedRecords, isApiCollection, isApiRequest, updateActiveKeys } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/ExportCollectionsModal";
 import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
@@ -14,6 +14,7 @@ import PATHS from "config/constants/sub/paths";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { sessionStorage } from "utils/sessionStorage";
 import "./collectionsList.scss";
+import { isEmpty, union } from "lodash";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -22,12 +23,13 @@ interface Props {
 
 export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated }) => {
   const navigate = useNavigate();
+  const { collectionId, requestId } = useParams();
   const location = useLocation();
   const { openTab, tabs } = useTabsLayoutContext();
   const { isLoadingApiClientRecords, apiClientRecords, isRecordBeingCreated } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [collapsedKeys] = useState(sessionStorage.getItem("collapsed_collection_keys", []));
+  const [activeKeys, setActiveKeys] = useState(sessionStorage.getItem("active_collection_keys", []));
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const updatedRecords = convertFlatRecordsToNestedRecords(records);
@@ -92,6 +94,27 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     }
   }, [updatedRecords.requests, isLoadingApiClientRecords, openTab, location.pathname, tabs.length]);
 
+  const updateActiveKeysHandler = useCallback(
+    (keys: string[], record: RQAPI.Record) => {
+      setActiveKeys((prev: RQAPI.Record["id"][]) => {
+        const updatedKeys = updateActiveKeys(apiClientRecords, record.id, prev);
+        const updatedActiveKeys = isEmpty(keys) ? prev.filter((key) => key !== record.id) : union(prev, updatedKeys);
+
+        isEmpty(updatedActiveKeys)
+          ? sessionStorage.removeItem("active_collection_keys")
+          : sessionStorage.setItem("active_collection_keys", updatedActiveKeys);
+
+        return updatedActiveKeys;
+      });
+    },
+    [apiClientRecords, activeKeys]
+  );
+
+  useEffect(() => {
+    const id = requestId || collectionId;
+    setActiveKeys((prev: RQAPI.Record["id"][]) => union(prev, updateActiveKeys(apiClientRecords, id, prev)));
+  }, [collectionId, requestId, apiClientRecords]);
+
   return (
     <>
       <div className="collections-list-container">
@@ -109,8 +132,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     key={record.id}
                     record={record}
                     onNewClick={onNewClick}
-                    collapsedKeys={collapsedKeys}
+                    activeKeys={activeKeys}
                     onExportClick={handleExportCollection}
+                    updateActiveKeysHandler={updateActiveKeysHandler}
                   />
                 );
               })}
