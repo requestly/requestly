@@ -14,6 +14,7 @@ import { AUTH_OPTIONS } from "./types/form";
 import { RQAPI } from "features/apiClient/types";
 
 interface Props {
+  wrapperClass?: string;
   defaultValues: {
     currentAuthType?: AUTHORIZATION_TYPES;
     authOptions?: AUTH_OPTIONS;
@@ -22,7 +23,7 @@ interface Props {
   rootLevelRecord: Boolean;
 }
 
-const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootLevelRecord }) => {
+const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootLevelRecord, wrapperClass = "" }) => {
   const [selectedForm, setSelectedForm] = useState(
     defaultValues?.currentAuthType || (rootLevelRecord ? AUTHORIZATION_TYPES.NO_AUTH : AUTHORIZATION_TYPES.INHERIT)
   );
@@ -60,7 +61,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootL
   const debouncedOnChange = debounce(onChangeHandler, 500);
 
   return (
-    <div className="authorization-view">
+    <div className={`authorization-view ${wrapperClass}`}>
       <div className="type-of-authorization">
         <div className="form-selector">
           <label>{LABEL_TEXT.AUTHORIZATION_TYPE_LABEL}</label>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Skeleton } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { VariablesList } from "../VariablesList/VariablesList";
@@ -9,10 +9,12 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import "./environmentView.scss";
 import { EnvironmentVariables } from "backend/environment/types";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
 
 export const EnvironmentView = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const {
     isEnvironmentsLoading,
     getEnvironmentName,
@@ -22,12 +24,21 @@ export const EnvironmentView = () => {
     removeVariable,
   } = useEnvironmentManager();
   const { envId } = useParams();
-  const [persistedEnvId] = useState<string>(envId);
+  const [persistedEnvId, setPersistedEnvId] = useState<string>(envId);
 
   const user = useSelector(getUserAuthDetails);
   const [searchValue, setSearchValue] = useState<string>("");
   const environmentName = getEnvironmentName(persistedEnvId);
   const variables = getEnvironmentVariables(persistedEnvId);
+  const isNewEnv = searchParams.has("new");
+
+  useEffect(() => {
+    if (isNewEnv) {
+      setPersistedEnvId(envId);
+    }
+  }, [isNewEnv, envId]);
+
+  const { tabs } = useTabsLayoutContext();
 
   useEffect(() => {
     if (!isEnvironmentsLoading) {
@@ -42,10 +53,21 @@ export const EnvironmentView = () => {
       const environments = getAllEnvironments();
       const hasAccessToEnvironment = environments?.some((env) => env.id === persistedEnvId);
       if (environments?.length === 0 || !hasAccessToEnvironment) {
-        navigate(`${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/global`);
+        if (!tabs.length) {
+          navigate(PATHS.API_CLIENT.ABSOLUTE);
+          return;
+        }
       }
     }
-  }, [getAllEnvironments, navigate, isEnvironmentsLoading, user.loggedIn, persistedEnvId, location.pathname]);
+  }, [
+    getAllEnvironments,
+    navigate,
+    isEnvironmentsLoading,
+    user.loggedIn,
+    persistedEnvId,
+    location.pathname,
+    tabs.length,
+  ]);
 
   const handleSetVariables = async (variables: EnvironmentVariables) => {
     return setVariables(persistedEnvId, variables);

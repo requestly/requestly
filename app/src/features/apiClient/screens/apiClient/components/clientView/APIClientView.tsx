@@ -89,7 +89,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
 
   const abortControllerRef = useRef<AbortController>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(true);
   const animationTimerRef = useRef<NodeJS.Timeout>();
   const { response, ...entryWithoutResponse } = entry;
 
@@ -103,15 +103,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   useEffect(() => {
     if (apiEntry) {
-      clearTimeout(animationTimerRef.current);
-      setIsAnimating(true);
       setEntry({
         ...apiEntry,
         request: { ...apiEntry.request, ...syncQueryParams(apiEntry.request.queryParams, apiEntry.request.url) },
       });
       setRequestName("");
-      animationTimerRef.current = setTimeout(() => setIsAnimating(false), 500);
     }
+
+    animationTimerRef.current = setTimeout(() => setIsAnimating(false), 800);
 
     return () => {
       clearTimeout(animationTimerRef.current);
@@ -370,6 +369,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       <div className="api-client-header-container">
         {user.loggedIn && !openInModal ? (
           <RQBreadcrumb
+            loading={isAnimating}
             placeholder="New Request"
             recordName={apiEntryDetails?.name}
             onRecordNameUpdate={setRequestName}

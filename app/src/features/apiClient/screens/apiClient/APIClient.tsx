@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import APIClientView from "./components/clientView/APIClientView";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { getApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
 import "./apiClient.scss";
@@ -13,11 +13,19 @@ interface Props {}
 export const APIClient: React.FC<Props> = () => {
   const location = useLocation();
   const { requestId } = useParams();
+  const [searchParams] = useSearchParams();
   const { apiClientRecords, history, selectedHistoryIndex, addToHistory } = useApiClientContext();
 
-  const [persistedRequestId] = useState<string>(requestId);
+  const [persistedRequestId, setPersistedRequestId] = useState<string>(() => requestId);
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
   const isHistoryPath = location.pathname.includes("history");
+  const isNewRequest = searchParams.has("new");
+
+  useEffect(() => {
+    if (isNewRequest) {
+      setPersistedRequestId(requestId);
+    }
+  }, [isNewRequest, requestId]);
 
   const requestHistoryEntry = useMemo(() => {
     if (!isHistoryPath) {
@@ -38,7 +46,7 @@ export const APIClient: React.FC<Props> = () => {
 
   useEffect(() => {
     //For updating breadcrumb name
-    if (!persistedRequestId || persistedRequestId === "new") {
+    if (!persistedRequestId) {
       return;
     }
 
@@ -61,7 +69,7 @@ export const APIClient: React.FC<Props> = () => {
       return;
     }
 
-    if (!persistedRequestId || persistedRequestId === "new") {
+    if (!persistedRequestId) {
       return;
     }
 
@@ -88,7 +96,12 @@ export const APIClient: React.FC<Props> = () => {
     requestHistoryEntry,
     selectedEntryDetails,
   ]);
-
+  const handleAppRequestFinished = useCallback(
+    (entry: RQAPI.Entry) => {
+      if (!isHistoryPath) addToHistory(entry);
+    },
+    [addToHistory, isHistoryPath]
+  );
   return (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
       <div className="api-client-container-content">
@@ -97,7 +110,7 @@ export const APIClient: React.FC<Props> = () => {
           key={persistedRequestId}
           apiEntry={entryDetails?.data}
           apiEntryDetails={entryDetails}
-          notifyApiRequestFinished={addToHistory}
+          notifyApiRequestFinished={handleAppRequestFinished}
         />
       </div>
     </BottomSheetProvider>
