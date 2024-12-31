@@ -6,10 +6,9 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import { useLocation } from "react-router-dom";
-import { MdOutlineSave } from "@react-icons/all-files/md/MdOutlineSave";
 import "./variablesListHeader.scss";
 import { isGlobalEnvironment } from "../../utils";
-
+import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 interface VariablesListHeaderProps {
   searchValue: string;
   currentEnvironmentName: string;
@@ -65,7 +64,13 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           onChange={(e) => onSearchValueChange(e.target.value)}
         />
         <div className="variables-list-btn-actions-container">
-          <RQButton type="primary" icon={<MdOutlineSave />} onClick={onSave} disabled={!hasUnsavedChanges}>
+          <RQButton
+            showHotKeyText
+            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+            type="primary"
+            onClick={onSave}
+            disabled={!hasUnsavedChanges}
+          >
             Save
           </RQButton>
         </div>

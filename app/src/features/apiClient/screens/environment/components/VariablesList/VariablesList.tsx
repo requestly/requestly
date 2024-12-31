@@ -70,7 +70,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
 
-      if ((row.key && (row.syncValue || row.localValue)) || fieldChanged === "type" || fieldChanged === "key") {
+      if (row.key) {
         const updatedRow = { ...item, ...row };
         variableRows.splice(index, 1, updatedRow);
         setDataSource(variableRows);
