@@ -35,6 +35,12 @@ export enum KeyValueFormType {
   FORM = "form",
 }
 
+export enum QueryParamSyncType {
+  SYNC = "sync",
+  URL = "url",
+  TABLE = "table",
+}
+
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
 
 export namespace RQAPI {

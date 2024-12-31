@@ -7,6 +7,7 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import { useLocation } from "react-router-dom";
 import "./variablesListHeader.scss";
+import { isGlobalEnvironment } from "../../utils";
 
 interface VariablesListHeaderProps {
   searchValue: string;
@@ -42,6 +43,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
         placeholder="New Environment"
         recordName={currentEnvironmentName}
         onBlur={handleNewEnvironmentNameChange}
+        disabled={isGlobalEnvironment(environmentId)}
       />
       <div className="variables-list-action-container">
         <Input
