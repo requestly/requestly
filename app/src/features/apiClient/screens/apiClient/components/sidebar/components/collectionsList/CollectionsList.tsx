@@ -5,7 +5,13 @@ import { Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { CollectionRow } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
-import { convertFlatRecordsToNestedRecords, isApiCollection, isApiRequest, updateActiveKeys } from "../../../../utils";
+import {
+  convertFlatRecordsToNestedRecords,
+  isApiCollection,
+  isApiRequest,
+  filterRecordsBySearch,
+  updateActiveKeys,
+} from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/ExportCollectionsModal";
 import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
@@ -13,6 +19,7 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { sessionStorage } from "utils/sessionStorage";
+import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
 import "./collectionsList.scss";
 import { isEmpty, union } from "lodash";
 
@@ -30,6 +37,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [activeKeys, setActiveKeys] = useState(sessionStorage.getItem("active_collection_keys", []));
+  const [searchValue, setSearchValue] = useState("");
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const updatedRecords = convertFlatRecordsToNestedRecords(records);
@@ -51,10 +59,11 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     };
   }, []);
 
-  const updatedRecords = useMemo(() => prepareRecordsToRender(apiClientRecords), [
-    apiClientRecords,
-    prepareRecordsToRender,
-  ]);
+  const updatedRecords = useMemo(() => {
+    const filteredRecords = filterRecordsBySearch(apiClientRecords, searchValue);
+    const recordsToRender = prepareRecordsToRender(filteredRecords);
+    return recordsToRender;
+  }, [apiClientRecords, prepareRecordsToRender, searchValue]);
 
   const handleExportCollection = useCallback((collection: RQAPI.CollectionRecord) => {
     setCollectionsToExport((prev) => [...prev, collection]);
@@ -117,6 +126,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
   return (
     <>
+      {apiClientRecords.length > 0 && <SidebarListHeader onSearch={setSearchValue} />}
       <div className="collections-list-container">
         <div className="collections-list-content">
           {isLoadingApiClientRecords ? (
@@ -159,7 +169,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           ) : (
             <ApiRecordEmptyState
               newRecordBtnText="New collection"
-              message="No collections created yet"
+              message={searchValue ? "No collection or request found" : "No collections created yet"}
               onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.COLLECTION)}
               recordType={RQAPI.RecordType.COLLECTION}
               analyticEventSource="collection_list_empty_state"
