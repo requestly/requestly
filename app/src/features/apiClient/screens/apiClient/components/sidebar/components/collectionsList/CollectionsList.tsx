@@ -21,7 +21,7 @@ import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceho
 import { sessionStorage } from "utils/sessionStorage";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
 import "./collectionsList.scss";
-import { isEmpty, union } from "lodash";
+import { union } from "lodash";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -103,22 +103,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     }
   }, [updatedRecords.requests, isLoadingApiClientRecords, openTab, location.pathname, tabs.length]);
 
-  const updateActiveKeysHandler = useCallback(
-    (keys: string[], record: RQAPI.Record) => {
-      setActiveKeys((prev: RQAPI.Record["id"][]) => {
-        const updatedKeys = updateActiveKeys(apiClientRecords, record.id, prev);
-        const updatedActiveKeys = isEmpty(keys) ? prev.filter((key) => key !== record.id) : union(prev, updatedKeys);
-
-        isEmpty(updatedActiveKeys)
-          ? sessionStorage.removeItem("active_collection_keys")
-          : sessionStorage.setItem("active_collection_keys", updatedActiveKeys);
-
-        return updatedActiveKeys;
-      });
-    },
-    [apiClientRecords, activeKeys]
-  );
-
   useEffect(() => {
     const id = requestId || collectionId;
     setActiveKeys((prev: RQAPI.Record["id"][]) => union(prev, updateActiveKeys(apiClientRecords, id, prev)));
@@ -143,8 +127,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     record={record}
                     onNewClick={onNewClick}
                     activeKeys={activeKeys}
+                    updateActiveKeys={setActiveKeys}
                     onExportClick={handleExportCollection}
-                    updateActiveKeysHandler={updateActiveKeysHandler}
                   />
                 );
               })}

@@ -15,13 +15,15 @@ import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import { useParams } from "react-router-dom";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
+import { isEmpty } from "lodash";
+import { sessionStorage } from "utils/sessionStorage";
 
 interface Props {
   record: RQAPI.CollectionRecord;
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
   onExportClick: (collection: RQAPI.CollectionRecord) => void;
   openTab: TabsLayoutContextInterface["openTab"];
-  updateActiveKeysHandler: (keys: RQAPI.Record["id"][], record: RQAPI.Record) => void;
+  updateActiveKeys: (keys: RQAPI.Record["id"][]) => void;
   activeKeys: string[];
 }
 
@@ -31,7 +33,7 @@ export const CollectionRow: React.FC<Props> = ({
   onExportClick,
   openTab,
   activeKeys,
-  updateActiveKeysHandler,
+  updateActiveKeys,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeKey, setActiveKey] = useState(activeKeys?.includes(record.id) ? record.id : null);
@@ -78,14 +80,29 @@ export const CollectionRow: React.FC<Props> = ({
 
   const collapseChangeHandler = useCallback(
     (keys: RQAPI.Record["id"][]) => {
-      updateActiveKeysHandler(keys, record);
+      let activeKeysCopy = [...activeKeys];
+      if (isEmpty(keys)) {
+        activeKeysCopy = activeKeysCopy.filter((key) => key !== record.id);
+      } else if (!activeKeysCopy.includes(record.id)) {
+        activeKeysCopy.push(record.id);
+      }
+      updateActiveKeys(activeKeysCopy);
+      isEmpty(activeKeysCopy)
+        ? sessionStorage.removeItem("active_collection_keys")
+        : sessionStorage.setItem("active_collection_keys", activeKeysCopy);
     },
-    [record]
+    [record, activeKeys]
   );
 
   useEffect(() => {
     setActiveKey(activeKeys?.includes(record.id) ? record.id : null);
   }, [activeKeys, record.id]);
+
+  useEffect(() => {
+    /* Temporary Change-> To remove previous key from session storage 
+       which was added due to the previous logic can be removed after some time */
+    sessionStorage.removeItem("collapsed_collection_keys");
+  }, []);
 
   return (
     <>
@@ -203,7 +220,7 @@ export const CollectionRow: React.FC<Props> = ({
                       onNewClick={onNewClick}
                       onExportClick={onExportClick}
                       activeKeys={activeKeys}
-                      updateActiveKeysHandler={updateActiveKeysHandler}
+                      updateActiveKeys={updateActiveKeys}
                     />
                   );
                 }
