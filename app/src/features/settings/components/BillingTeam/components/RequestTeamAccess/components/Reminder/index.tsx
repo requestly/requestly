@@ -87,7 +87,7 @@ export const RequestBillingTeamAccessReminder = () => {
       maskClosable={false}
       closable={false}
       wrapClassName="custom-rq-modal"
-      width={600}
+      width={700}
       open={isModalVisible}
       onCancel={handleModalClose}
       centered
@@ -126,10 +126,7 @@ export const RequestBillingTeamAccessReminder = () => {
           here
         </a>
         . Want to setup a new billing team? please write to us at{" "}
-        <a
-          className="external-link"
-          href={openEmailClientWithDefaultEmailBody("enterprise.support@requestly.io", emailSubject, emailBody)}
-        >
+        <a href={openEmailClientWithDefaultEmailBody("enterprise.support@requestly.io", emailSubject, emailBody)}>
           enterprise.support@requestly.io
         </a>
       </div>
