@@ -293,7 +293,7 @@ export const syncQueryParams = (
 
   switch (type) {
     case QueryParamSyncType.SYNC: {
-      const updatedUrl = queryParamsToURLString(updatedQueryParams, url);
+      const updatedUrl = queryParamsToURLString(queryParams, url);
 
       // Dont sync if URL is same
       if (updatedUrl !== url) {
