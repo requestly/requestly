@@ -1,5 +1,8 @@
 import { isEmpty, unionBy } from "lodash";
-import { AUTHORIZATION_TYPES } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
+import {
+  AUTHORIZATION_TYPES,
+  GET_KEY_VALUE_PAIR_DESCRIPTION,
+} from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
 import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 import { KeyValuePair, RQAPI } from "../types";
 
@@ -68,21 +71,28 @@ const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
   const headers: KeyValuePair[] = [];
   const queryParams: KeyValuePair[] = [];
 
-  const { currentAuthType = "" } = authOptions;
+  const { currentAuthType } = authOptions || {};
 
   let newKeyValuePair: KeyValuePair;
 
-  const createAuthorizationKeyValuePair = (type: string, key: string, value: string): typeof newKeyValuePair => ({
+  const createAuthorizationKeyValuePair = (
+    type: string,
+    key: string,
+    value: string,
+    keyValuePairType = "header"
+  ): typeof newKeyValuePair => ({
     id: Date.now(),
     key,
     value,
     type,
     isEnabled: true,
+    isEditable: false,
+    description: GET_KEY_VALUE_PAIR_DESCRIPTION(keyValuePairType),
   });
 
-  const updateDataInState = (data: KeyValuePair[], key: string, value: string) => {
+  const updateDataInState = (data: KeyValuePair[], key: string, value: string, keyValuePairType: string = "header") => {
     const existingIndex = data.findIndex((option) => option.type === AUTH_ENTRY_IDENTIFIER);
-    const newOption = createAuthorizationKeyValuePair(AUTH_ENTRY_IDENTIFIER, key, value);
+    const newOption = createAuthorizationKeyValuePair(AUTH_ENTRY_IDENTIFIER, key, value, keyValuePairType);
 
     if (existingIndex !== -1) {
       data[existingIndex] = { ...data[existingIndex], ...newOption };
@@ -91,25 +101,32 @@ const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
     }
   };
 
+  const authFormValues = authOptions[currentAuthType];
+
   switch (currentAuthType) {
     case AUTHORIZATION_TYPES.INHERIT:
       throw new Error("Inherit auth type should not be processed inside processAuthOptions");
     case AUTHORIZATION_TYPES.NO_AUTH:
       break;
     case AUTHORIZATION_TYPES.BASIC_AUTH: {
-      const { username, password } = authOptions[currentAuthType];
+      const { username, password } = authFormValues;
       updateDataInState(headers, "Authorization", `Basic ${btoa(`${username || ""}:${password || ""}`)}`);
       break;
     }
     case AUTHORIZATION_TYPES.BEARER_TOKEN: {
-      const { bearer } = authOptions[currentAuthType];
+      const { bearer } = authFormValues;
       updateDataInState(headers, "Authorization", `Bearer ${bearer}`);
       break;
     }
     case AUTHORIZATION_TYPES.API_KEY: {
-      const { key, value, addTo } = authOptions[currentAuthType];
+      const { key, value, addTo } = authFormValues;
 
-      updateDataInState(addTo === "QUERY" ? queryParams : headers, key || "", value || "");
+      updateDataInState(
+        addTo === "QUERY" ? queryParams : headers,
+        key || "",
+        value || "",
+        addTo === "QUERY" ? "query param" : "header"
+      );
 
       break;
     }

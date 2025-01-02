@@ -47,6 +47,7 @@ import { getCollectionVariables } from "store/features/variables/selectors";
 import { useLocation } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { processAuthForEntry } from "features/apiClient/helpers/auth";
 
 interface Props {
   openInModal?: boolean;
@@ -364,6 +365,18 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     (evt.target as HTMLInputElement).blur();
   }, []);
 
+  const getAuthOptions = useCallback(() => {
+    const { headers, queryParams } = processAuthForEntry(
+      entry,
+      {
+        id: apiEntryDetails?.id,
+        collectionId: apiEntryDetails?.collectionId,
+      },
+      apiClientRecords
+    );
+    return { headers, queryParams };
+  }, [entry, apiEntryDetails, apiClientRecords]);
+
   return isExtensionEnabled ? (
     <div className="api-client-view">
       <div className="api-client-header-container">
@@ -452,6 +465,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               setRequestEntry={setRequestEntry}
               setContentType={setContentType}
               handleAuthChange={handleAuthChange}
+              getAuthOptions={getAuthOptions}
             />
           </Skeleton>
         </div>
