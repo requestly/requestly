@@ -267,7 +267,7 @@ export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString:
     return inputString;
   }
   const baseUrl = split(inputString, "?")[0];
-  const enabledParams = queryParams.filter((param) => param.isEnabled);
+  const enabledParams = queryParams.filter((param) => param.isEnabled ?? true);
 
   const queryString = enabledParams
     .map(({ key, value }) => {
