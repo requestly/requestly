@@ -65,7 +65,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
         {dataIndex === "isEnabled" ? (
           <Checkbox
             className="key-value-table-checkbox"
-            checked={record?.isEnabled}
+            checked={record?.isEnabled ?? true}
             onChange={(e) => {
               form.setFieldsValue({ [dataIndex]: e.target.checked });
               save();
@@ -74,7 +74,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
           />
         ) : (
           <RQSingleLineEditor
-            className={`key-value-table-input ${!record.isEnabled ? "key-value-table-input-disabled" : ""}`}
+            className={`key-value-table-input ${record.isEnabled === false ? "key-value-table-input-disabled" : ""}`}
             placeholder={dataIndex === "key" ? "Key" : "Value"}
             defaultValue={record?.[dataIndex] as string}
             onChange={(value) => {
