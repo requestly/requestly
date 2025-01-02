@@ -12,6 +12,7 @@ import { MdClear } from "@react-icons/all-files/md/MdClear";
 import { AUTHORIZATION_TYPES } from "./types";
 import { AUTH_OPTIONS } from "./types/form";
 import { RQAPI } from "features/apiClient/types";
+import { EnvironmentVariables } from "backend/environment/types";
 
 interface Props {
   wrapperClass?: string;
@@ -21,9 +22,16 @@ interface Props {
   };
   onAuthUpdate: (authOptions: RQAPI.AuthOptions) => any;
   rootLevelRecord: Boolean;
+  variables: EnvironmentVariables;
 }
 
-const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootLevelRecord, wrapperClass = "" }) => {
+const AuthorizationView: React.FC<Props> = ({
+  defaultValues,
+  onAuthUpdate,
+  rootLevelRecord,
+  wrapperClass = "",
+  variables,
+}) => {
   const [selectedForm, setSelectedForm] = useState(
     defaultValues?.currentAuthType || (rootLevelRecord ? AUTHORIZATION_TYPES.NO_AUTH : AUTHORIZATION_TYPES.INHERIT)
   );
@@ -100,6 +108,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootL
               formType={selectedForm}
               onChangeHandler={debouncedOnChange}
               formvalues={formValues[selectedForm] || {}}
+              variables={variables}
             />
           </div>
         )}
