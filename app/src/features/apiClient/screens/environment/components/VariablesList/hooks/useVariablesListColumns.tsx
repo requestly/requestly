@@ -9,7 +9,7 @@ import { EnvironmentVariableType } from "backend/environment/types";
 
 interface Props {
   handleVariableChange: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
-  handleDeleteVariable: (key: string) => void;
+  handleDeleteVariable: (key: number) => void;
   visibleSecretsRowIds: number[];
   updateVisibleSecretsRowIds: (id: number) => void;
   recordsCount: number;
@@ -126,7 +126,7 @@ export const useVariablesListColumns = ({
                 type="transparent"
                 size="small"
                 className="delete-variable-btn"
-                onClick={() => handleDeleteVariable(record.key)}
+                onClick={() => handleDeleteVariable(record.id)}
               />
             )}
           </div>
