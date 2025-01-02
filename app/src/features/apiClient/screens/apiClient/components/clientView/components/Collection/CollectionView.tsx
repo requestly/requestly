@@ -13,8 +13,8 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import AuthorizationView from "../request/components/AuthorizationView";
-import { debounce } from "lodash";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -29,6 +29,9 @@ export const CollectionView = () => {
   const user = useSelector(getUserAuthDetails);
   const teamId = useSelector(getCurrentlyActiveWorkspace);
   const location = useLocation();
+
+  const { getVariablesWithPrecedence } = useEnvironmentManager();
+  const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
   const collection = useMemo(() => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
@@ -71,13 +74,14 @@ export const CollectionView = () => {
           <AuthorizationView
             wrapperClass="collection-auth"
             defaultValues={collection?.data?.auth}
-            onAuthUpdate={debounce(updateCollectionAuthData, 500)}
+            onAuthUpdate={updateCollectionAuthData}
             rootLevelRecord={!collection?.collectionId}
+            variables={variables}
           />
         ),
       },
     ];
-  }, [collection, updateCollectionAuthData]);
+  }, [collection, variables, updateCollectionAuthData]);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
