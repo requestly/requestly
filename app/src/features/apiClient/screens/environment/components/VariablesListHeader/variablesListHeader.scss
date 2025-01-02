@@ -20,6 +20,12 @@
     }
   }
 
+  .variables-list-action-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .variables-list-search-input {
     width: 200px;
     padding: 0 12px;
