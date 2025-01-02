@@ -1,4 +1,5 @@
 import noAuth from "./assets/no-auth.svg";
+import inheritAuth from "./assets/inherit-auth.svg";
 
 export const AUTHORIZATION_TYPES = {
   INHERIT: "INHERIT",
@@ -43,8 +44,9 @@ export const AUTHORIZATION_FORM_DATA = {
 export const AUTHORIZATION_STATIC_DATA = {
   [AUTHORIZATION_TYPES.INHERIT]: {
     description: {
-      heading: "Inherits from parent",
-      subHeading: "The authorization header will be automatically generated when you send the request",
+      img: inheritAuth,
+      heading: "Inherits authorization from the parent collection.",
+      subHeading: "This request will use its parent collection’s auth token when you send the request.",
     },
   },
   [AUTHORIZATION_TYPES.NO_AUTH]: {

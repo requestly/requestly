@@ -69,6 +69,7 @@ export const CollectionView = () => {
         key: TAB_KEYS.AUTHORIZATION,
         children: (
           <AuthorizationView
+            wrapperClass="collection-auth"
             defaultValues={collection?.data?.auth}
             onAuthUpdate={debounce(updateCollectionAuthData, 500)}
             rootLevelRecord={!collection?.collectionId}
