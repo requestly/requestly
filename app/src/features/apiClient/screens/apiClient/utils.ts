@@ -419,11 +419,39 @@ export const clearActiveKeysFromSession = (keysToBeDeleted: string[]) => {
   sessionStorage.setItem("active_collection_keys", updatedActiveKeys);
 };
 
+/**
+ * Updates the activeKeys array to include the parent IDs of the given ID.
+ *
+ * @description This method ensures that collections are expanded in the sidebar
+ * when switching tabs. It achieves this by identifying all parent IDs of the
+ * current tab's ID and adding them to the `activeKeys` array.
+ *
+ * @param records - Array of API client records.
+ * @param id - The ID of the record whose parent IDs need to be found.
+ * @param activeKeys - Array of IDs that are already active (expanded) in the sidebar.
+ *
+ * @returns The updated activeKeys array, including all parent IDs.
+ */
 export const updateActiveKeys = (records: RQAPI.Record[], id: RQAPI.Record["id"], activeKeys: RQAPI.Record["id"][]) => {
+  // If the provided ID is null or undefined, return the existing active keys.
   if (!id) {
     return activeKeys;
   }
 
+  /**
+   * Finds all parent IDs for a given record/collection using Depth First Search (DFS).
+   *
+   * @description This method uses a stack-based approach for DFS to avoid recursion
+   * and identify all parent IDs related to the given start ID. The getRelatedId function
+   * is used to retrieve the parent-child relationships.
+   *
+   * @param records - Array of API client records.
+   * @param startId - The ID to start searching for parent IDs.
+   * @param getRelatedId - A function that determines the related ID (parent or child)
+   *                       based on the current record and ID.
+   *
+   * @returns An array of parent IDs.
+   */
   function getParents(
     records: RQAPI.Record[],
     startId: RQAPI.Record["id"],
@@ -435,9 +463,13 @@ export const updateActiveKeys = (records: RQAPI.Record[], id: RQAPI.Record["id"]
 
     while (stack.length > 0) {
       const currentId = stack.pop();
+
+      // Skip if the current ID has already been visited.
       if (visited.has(currentId)) continue;
+
       visited.add(currentId);
 
+      // Iterate over records to find related IDs (parents).
       records.forEach((record) => {
         const relatedId = getRelatedId(record, currentId);
         if (relatedId) {
@@ -450,13 +482,18 @@ export const updateActiveKeys = (records: RQAPI.Record[], id: RQAPI.Record["id"]
     return relatedIds;
   }
 
+  // Create a copy of the activeKeys array to avoid mutating the original array.
   const activeKeysCopy = [...activeKeys];
 
+  // Retrieve all parent IDs of the given ID.
   const parents = getParents(records, id, (record, currentId) => {
     return record.id === currentId ? record.collectionId : null;
   });
+
+  // Include the original ID itself as an active key.
   parents.push(id);
 
+  // Add each parent ID to the active keys array, avoiding duplicates.
   parents.forEach((parent) => {
     if (!activeKeysCopy.includes(parent)) {
       activeKeysCopy.push(parent);
