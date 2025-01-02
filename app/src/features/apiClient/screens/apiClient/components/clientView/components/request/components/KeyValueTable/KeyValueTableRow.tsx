@@ -65,8 +65,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
         {dataIndex === "isEnabled" ? (
           <Checkbox
             className="key-value-table-checkbox"
-            // Adding undefined check for requests created before checkbox was introduced
-            checked={record?.isEnabled || record?.isEnabled === undefined}
+            checked={record?.isEnabled ?? true}
             onChange={(e) => {
               form.setFieldsValue({ [dataIndex]: e.target.checked });
               save();
