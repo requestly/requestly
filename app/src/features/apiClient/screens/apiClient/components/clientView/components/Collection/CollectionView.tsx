@@ -3,20 +3,18 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { useCallback, useMemo } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { VariablesList } from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
 import { RQAPI } from "features/apiClient/types";
 import { useSelector } from "react-redux";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
-import { getCollectionVariables } from "store/features/variables/selectors";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import "./collectionView.scss";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import AuthorizationView from "../request/components/AuthorizationView";
 import { debounce } from "lodash";
+import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -26,12 +24,10 @@ const TAB_KEYS = {
 
 export const CollectionView = () => {
   const { collectionId } = useParams();
-  const { setCollectionVariables, removeCollectionVariable } = useEnvironmentManager();
   const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords } = useApiClientContext();
   const { replaceTab } = useTabsLayoutContext();
   const user = useSelector(getUserAuthDetails);
   const teamId = useSelector(getCurrentlyActiveWorkspace);
-  const collectionVariables = useSelector(getCollectionVariables);
   const location = useLocation();
 
   const collection = useMemo(() => {
@@ -66,19 +62,14 @@ export const CollectionView = () => {
       {
         label: "Variables",
         key: TAB_KEYS.VARIABLES,
-        children: (
-          <VariablesList
-            variables={collectionVariables[collectionId]?.variables || {}}
-            setVariables={(variables) => setCollectionVariables(variables, collectionId)}
-            removeVariable={(key) => removeCollectionVariable(key, collectionId)}
-          />
-        ),
+        children: <CollectionsVariablesView collection={collection} />,
       },
       {
         label: "Authorization",
         key: TAB_KEYS.AUTHORIZATION,
         children: (
           <AuthorizationView
+            wrapperClass="collection-auth"
             defaultValues={collection?.data?.auth}
             onAuthUpdate={debounce(updateCollectionAuthData, 500)}
             rootLevelRecord={!collection?.collectionId}
@@ -86,14 +77,7 @@ export const CollectionView = () => {
         ),
       },
     ];
-  }, [
-    collection,
-    collectionVariables,
-    collectionId,
-    updateCollectionAuthData,
-    setCollectionVariables,
-    removeCollectionVariable,
-  ]);
+  }, [collection, updateCollectionAuthData]);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
