@@ -319,7 +319,7 @@ export const syncQueryParams = (
 
       // Adding disabled key value pairs
       queryParams.forEach((queryParam, index) => {
-        if (!queryParam.isEnabled) {
+        if (!(queryParam.isEnabled ?? true)) {
           updatedQueryParamsCopy.splice(index, 0, queryParam);
         }
       });
