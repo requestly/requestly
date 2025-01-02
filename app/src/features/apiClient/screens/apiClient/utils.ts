@@ -450,18 +450,18 @@ export const updateActiveKeys = (records: RQAPI.Record[], id: RQAPI.Record["id"]
     return relatedIds;
   }
 
-  const updatedActiveKeys = [...activeKeys];
+  const activeKeysCopy = [...activeKeys];
 
   const parents = getParents(records, id, (record, currentId) => {
     return record.id === currentId ? record.collectionId : null;
   });
   parents.push(id);
 
-  parents.forEach((ancestor) => {
-    if (!updatedActiveKeys.includes(ancestor)) {
-      updatedActiveKeys.push(ancestor);
+  parents.forEach((parent) => {
+    if (!activeKeysCopy.includes(parent)) {
+      activeKeysCopy.push(parent);
     }
   });
 
-  return updatedActiveKeys;
+  return activeKeysCopy;
 };
