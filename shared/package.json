@@ -7,7 +7,6 @@
     "build": "rimraf ./dist && rollup -c --bundleConfigAsCjs"
   },
   "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^28.0.2",
