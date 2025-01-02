@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Skeleton } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { VariablesList } from "../VariablesList/VariablesList";
@@ -14,6 +14,7 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 export const EnvironmentView = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const {
     isEnvironmentsLoading,
     getEnvironmentName,
@@ -23,12 +24,19 @@ export const EnvironmentView = () => {
     removeVariable,
   } = useEnvironmentManager();
   const { envId } = useParams();
-  const [persistedEnvId] = useState<string>(envId);
+  const [persistedEnvId, setPersistedEnvId] = useState<string>(envId);
 
   const user = useSelector(getUserAuthDetails);
   const [searchValue, setSearchValue] = useState<string>("");
   const environmentName = getEnvironmentName(persistedEnvId);
   const variables = getEnvironmentVariables(persistedEnvId);
+  const isNewEnv = searchParams.has("new");
+
+  useEffect(() => {
+    if (isNewEnv) {
+      setPersistedEnvId(envId);
+    }
+  }, [isNewEnv, envId]);
 
   const { tabs } = useTabsLayoutContext();
 
