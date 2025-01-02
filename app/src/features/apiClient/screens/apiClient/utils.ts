@@ -267,7 +267,7 @@ export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString:
     return inputString;
   }
   const baseUrl = split(inputString, "?")[0];
-  const enabledParams = queryParams.filter((param) => param.isEnabled);
+  const enabledParams = queryParams.filter((param) => param.isEnabled ?? true);
 
   const queryString = enabledParams
     .map(({ key, value }) => {
@@ -319,7 +319,7 @@ export const syncQueryParams = (
 
       // Adding disabled key value pairs
       queryParams.forEach((queryParam, index) => {
-        if (!queryParam.isEnabled) {
+        if (!(queryParam.isEnabled ?? true)) {
           updatedQueryParamsCopy.splice(index, 0, queryParam);
         }
       });
