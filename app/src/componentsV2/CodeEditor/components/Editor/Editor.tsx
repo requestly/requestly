@@ -26,6 +26,8 @@ import { EditorPopover } from "./components/PopOver";
 import "./editor.scss";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/PopOver/popover.scss";
+import { CompletionSource } from "@codemirror/autocomplete";
+import generateAutoCompletions from "./plugins/generateAutoCompletions";
 interface EditorProps {
   value: string;
   defaultValue: string; // required in the special case of rules where value and default value need to stay in sync
@@ -40,6 +42,7 @@ interface EditorProps {
   analyticEventProperties?: AnalyticEventProperties;
   prettifyOnInit?: boolean;
   envVariables?: EnvironmentVariables;
+  completions?: CompletionSource;
   config?: {
     enablePrettify?: boolean;
   };
@@ -59,6 +62,7 @@ const Editor: React.FC<EditorProps> = ({
   analyticEventProperties = {},
   prettifyOnInit = false,
   envVariables,
+  completions,
   config = { enablePrettify: true },
 }) => {
   const location = useLocation();
@@ -337,6 +341,7 @@ const Editor: React.FC<EditorProps> = ({
                     envVariables
                   )
                 : null,
+              generateAutoCompletions(envVariables, completions),
             ].filter(Boolean)}
             basicSetup={{
               highlightActiveLine: false,
