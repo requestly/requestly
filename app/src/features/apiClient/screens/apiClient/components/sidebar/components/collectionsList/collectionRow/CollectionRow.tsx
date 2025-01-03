@@ -1,5 +1,4 @@
-import React, { useCallback, useState } from "react";
-import { isEmpty } from "lodash";
+import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Collapse, Dropdown, MenuProps, Tooltip } from "antd";
 import { RQAPI } from "features/apiClient/types";
@@ -13,22 +12,31 @@ import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
-import { sessionStorage } from "utils/sessionStorage";
 import PATHS from "config/constants/sub/paths";
 import { useParams } from "react-router-dom";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
+import { isEmpty } from "lodash";
+import { sessionStorage } from "utils/sessionStorage";
 
 interface Props {
   record: RQAPI.CollectionRecord;
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
   onExportClick: (collection: RQAPI.CollectionRecord) => void;
   openTab: TabsLayoutContextInterface["openTab"];
-  collapsedKeys: string[];
+  updateActiveKeys: (keys: RQAPI.Record["id"][]) => void;
+  activeKeys: string[];
 }
 
-export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportClick, openTab, collapsedKeys }) => {
+export const CollectionRow: React.FC<Props> = ({
+  record,
+  onNewClick,
+  onExportClick,
+  openTab,
+  activeKeys,
+  updateActiveKeys,
+}) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [activeKey, setActiveKey] = useState(collapsedKeys?.includes(record.id) ? null : record.id);
+  const [activeKey, setActiveKey] = useState(activeKeys?.includes(record.id) ? record.id : null);
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
@@ -70,17 +78,30 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
     [setIsDeleteModalOpen, updateRecordToBeDeleted]
   );
 
-  const collapseChangeHandler = useCallback((keys: string[]) => {
-    if (isEmpty(keys)) {
-      collapsedKeys.push(record.id);
-    } else {
-      const activeKeyIndex = collapsedKeys.indexOf(record.id);
-      collapsedKeys.splice(activeKeyIndex, 1);
-    }
-    setActiveKey(keys[0]);
-    isEmpty(collapsedKeys)
-      ? sessionStorage.removeItem("collapsed_collection_keys")
-      : sessionStorage.setItem("collapsed_collection_keys", collapsedKeys);
+  const collapseChangeHandler = useCallback(
+    (keys: RQAPI.Record["id"][]) => {
+      let activeKeysCopy = [...activeKeys];
+      if (isEmpty(keys)) {
+        activeKeysCopy = activeKeysCopy.filter((key) => key !== record.id);
+      } else if (!activeKeysCopy.includes(record.id)) {
+        activeKeysCopy.push(record.id);
+      }
+      updateActiveKeys(activeKeysCopy);
+      isEmpty(activeKeysCopy)
+        ? sessionStorage.removeItem("active_collection_keys")
+        : sessionStorage.setItem("active_collection_keys", activeKeysCopy);
+    },
+    [record, activeKeys]
+  );
+
+  useEffect(() => {
+    setActiveKey(activeKeys?.includes(record.id) ? record.id : null);
+  }, [activeKeys, record.id]);
+
+  useEffect(() => {
+    /* Temporary Change-> To remove previous key from session storage 
+       which was added due to the previous logic can be removed after some time */
+    sessionStorage.removeItem("collapsed_collection_keys");
   }, []);
 
   return (
@@ -198,7 +219,8 @@ export const CollectionRow: React.FC<Props> = ({ record, onNewClick, onExportCli
                       record={apiRecord}
                       onNewClick={onNewClick}
                       onExportClick={onExportClick}
-                      collapsedKeys={collapsedKeys}
+                      activeKeys={activeKeys}
+                      updateActiveKeys={updateActiveKeys}
                     />
                   );
                 }

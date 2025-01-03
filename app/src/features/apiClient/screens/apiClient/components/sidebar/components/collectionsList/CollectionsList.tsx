@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -10,6 +10,7 @@ import {
   isApiCollection,
   isApiRequest,
   filterRecordsBySearch,
+  updateActiveKeys,
 } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/ExportCollectionsModal";
@@ -20,6 +21,7 @@ import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceho
 import { sessionStorage } from "utils/sessionStorage";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
 import "./collectionsList.scss";
+import { union } from "lodash";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -28,13 +30,14 @@ interface Props {
 
 export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated }) => {
   const navigate = useNavigate();
+  const { collectionId, requestId } = useParams();
   const location = useLocation();
   const { openTab, tabs } = useTabsLayoutContext();
   const { isLoadingApiClientRecords, apiClientRecords, isRecordBeingCreated } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [activeKeys, setActiveKeys] = useState(sessionStorage.getItem("active_collection_keys", []));
   const [searchValue, setSearchValue] = useState("");
-  const [collapsedKeys] = useState(sessionStorage.getItem("collapsed_collection_keys", []));
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const updatedRecords = convertFlatRecordsToNestedRecords(records);
@@ -100,6 +103,11 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     }
   }, [updatedRecords.requests, isLoadingApiClientRecords, openTab, location.pathname, tabs.length]);
 
+  useEffect(() => {
+    const id = requestId || collectionId;
+    setActiveKeys((prev: RQAPI.Record["id"][]) => union(prev, updateActiveKeys(apiClientRecords, id, prev)));
+  }, [collectionId, requestId, apiClientRecords]);
+
   return (
     <>
       {apiClientRecords.length > 0 && <SidebarListHeader onSearch={setSearchValue} />}
@@ -118,7 +126,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     key={record.id}
                     record={record}
                     onNewClick={onNewClick}
-                    collapsedKeys={collapsedKeys}
+                    activeKeys={activeKeys}
+                    updateActiveKeys={setActiveKeys}
                     onExportClick={handleExportCollection}
                   />
                 );
