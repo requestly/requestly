@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Tooltip } from "antd";
 import { getAppMode, getIsSecondarySidebarCollapsed, getNetworkSessionSaveInProgress } from "store/selectors";
-import { ApiOutlined, HomeOutlined } from "@ant-design/icons";
+import { ApiOutlined, CodepenSquareFilled, HomeOutlined } from "@ant-design/icons";
 import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
 import HttpRulesIcon from "assets/icons/http-rules.svg?react";
 import SessionIcon from "assets/icons/session.svg?react";
@@ -129,6 +129,14 @@ export const PrimarySidebar: React.FC = () => {
         icon: <ApiOutlined />,
         display: true,
         activeColor: "var(--api-client)",
+      },
+      {
+        id: 7,
+        title: "Graphify",
+        path: PATHS.GRAPHIFY.INDEX,
+        icon: <CodepenSquareFilled />,
+        display: true,
+        activeColor: "var(--graphify)",
       },
     ];
 

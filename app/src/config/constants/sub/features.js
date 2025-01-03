@@ -50,6 +50,7 @@ FEATURES.BLOCK_LIST = "block_list";
 FEATURES.DESKTOP_ANDROID_EMULATOR_SUPPORT = "desktop-android-emulator-support";
 FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT = "desktop-ios-simulator-support";
 FEATURES.SCRIPT_RULE_SOURCE_FILTER = "script-rule-source-filter";
+FEATURES.GRAPHIFY = "graphify";
 
 FEATURES.SCRIPT_RULE = {};
 FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT = "script-rule-html-block";

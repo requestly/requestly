@@ -37,6 +37,12 @@ const featureMap = {
     border: "#4F401B",
     title: "Sessions",
   },
+  [FEATURES.GRAPHIFY]: {
+    color: "var(--graphify)",
+    backgroundColor: "#292213",
+    border: "#4F401B",
+    title: "Sessions",
+  },
 };
 
 export const FeatureTag: React.FC<TagProps> = ({ feature }) => {
