@@ -4,6 +4,7 @@ import { initMessageHandler } from "./messageHandler";
 import { initSessionRecording } from "../common/sessionRecorder";
 import { initExtensionMessageListener } from "../common/extensionMessageListener";
 
+console.log("!!!debug", "app script loaded");
 document.documentElement.setAttribute("rq-ext-version", chrome.runtime.getManifest()["version"]);
 
 // manifest version

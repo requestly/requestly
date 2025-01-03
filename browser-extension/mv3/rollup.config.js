@@ -37,8 +37,10 @@ const processManifest = (content) => {
     .map((pattern) => generateUrlPattern(pattern, browser === "chrome"))
     .filter((pattern) => !!pattern); // remove null entries
 
-  contentScripts[0].matches = webURLPatterns;
-  contentScripts[1].exclude_matches = webURLPatterns;
+  // contentScripts[0].matches = ["*://localhost/*", "*://localhost:*//*", ...webURLPatterns];
+  // contentScripts[1].exclude_matches = ["*://localhost/*", "*://localhost:*//*", ...webURLPatterns];
+  contentScripts[0].matches = [...webURLPatterns];
+  contentScripts[1].exclude_matches = [...webURLPatterns];
 
   if (!isProductionBuildMode) {
     manifestJson.commands = {

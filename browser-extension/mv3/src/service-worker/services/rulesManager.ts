@@ -98,7 +98,7 @@ const addExtensionRules = async (): Promise<void> => {
     if (extensionRules?.length) {
       extensionRules.forEach((extensionRule) => {
         if (!extensionRule.condition.resourceTypes?.length) {
-          extensionRule.condition.resourceTypes = ALL_RESOURCE_TYPES;
+          extensionRule.condition.resourceTypes = ALL_RESOURCE_TYPES as chrome.declarativeNetRequest.ResourceType[];
         }
 
         if (extensionRule.condition.resourceTypes?.length && extensionRule.condition.excludedResourceTypes?.length) {
@@ -107,6 +107,9 @@ const addExtensionRules = async (): Promise<void> => {
           );
         }
 
+        // delete extensionRule.condition.isUrlFilterCaseSensitive;
+        // delete extensionRule.condition.excludedInitiatorDomains;
+        // delete extensionRule.condition.excludedRequestDomains;
         extensionRule.condition.excludedInitiatorDomains.push(...blockedDomains);
         extensionRule.condition.excludedRequestDomains.push(...blockedDomains);
 
@@ -124,6 +127,8 @@ const addExtensionRules = async (): Promise<void> => {
   if (config.logLevel === "debug") {
     console.log("Setting extension rules from requestly rules", parsedExtensionRules, enabledRules);
   }
+
+  console.log("!!!debug", "parsed extension rules", { parsedExtensionRules });
 
   await updateDynamicRules({
     addRules: parsedExtensionRules,
