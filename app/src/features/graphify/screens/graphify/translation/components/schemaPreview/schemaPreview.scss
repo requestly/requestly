@@ -1,0 +1,153 @@
+.schema-preview {
+  // Create a clean, organized layout with proper spacing
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 24px);
+
+  // Style the loading state to be centered and visually appealing
+  &-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: var(--space-4, 16px);
+
+    p {
+      font-size: var(--requestly-font-size-sm);
+      color: var(--requestly-color-text-subtle);
+      margin-top: var(--space-2, 8px);
+    }
+  }
+
+  // Style the error alert to be noticeable but not overwhelming
+  .schema-error {
+    margin-bottom: var(--space-4, 16px);
+
+    .ant-alert-message {
+      font-size: var(--requestly-font-size-sm);
+      font-weight: var(--requestly-font-weight-medium);
+    }
+
+    .ant-alert-description {
+      font-size: var(--requestly-font-size-xs);
+    }
+  }
+
+  // Style the tabs container for better visual hierarchy
+  .ant-tabs {
+    .ant-tabs-nav {
+      margin-bottom: var(--space-4, 16px);
+
+      // Style the tab labels
+      .ant-tabs-tab {
+        font-size: var(--requestly-font-size-sm);
+        padding: var(--space-3, 12px) var(--space-4, 16px);
+
+        &-active {
+          font-weight: var(--requestly-font-weight-medium);
+        }
+
+        // Style the tab ink bar (the line under active tab)
+        & + .ant-tabs-ink-bar {
+          background-color: var(--requestly-color-primary);
+        }
+      }
+    }
+
+    // Style the tab content area
+    .ant-tabs-content {
+      // Create a container for the Monaco editor
+      .schema-editor,
+      .query-preview {
+        border: 1px solid var(--requestly-color-border-default);
+        border-radius: var(--space-2, 8px);
+        overflow: hidden;
+
+        // Style the Monaco editor container
+        .monaco-editor {
+          padding: var(--space-2, 8px);
+
+          // Ensure proper font settings for code
+          .monaco-editor-background {
+            font-family: var(--requestly-font-family-mono);
+            font-size: var(--requestly-font-size-sm);
+          }
+        }
+      }
+
+      // Add some space between editors if needed
+      .query-preview {
+        margin-top: var(--space-4, 16px);
+      }
+    }
+  }
+
+  // Style the action buttons container
+  .schema-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3, 12px);
+    margin-top: var(--space-4, 16px);
+    padding-top: var(--space-4, 16px);
+    border-top: 1px solid var(--requestly-color-border-subtle);
+  }
+
+  // Add some responsive adjustments for smaller screens
+  @media (max-width: 768px) {
+    .ant-tabs-content {
+      .schema-editor,
+      .query-preview {
+        // Adjust editor height for better mobile viewing
+        .monaco-editor {
+          height: 300px !important;
+        }
+      }
+    }
+
+    .schema-actions {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Style Monaco editor theme overrides to match your design system
+.monaco-editor {
+  // Custom styling for the editor to match your theme
+  .monaco-editor-background {
+    background-color: var(--requestly-color-surface-raised) !important;
+  }
+
+  // Style the line numbers
+  .line-numbers {
+    color: var(--requestly-color-text-subtle) !important;
+  }
+
+  // Style the cursor
+  .cursor {
+    background-color: var(--requestly-color-primary) !important;
+    border-color: var(--requestly-color-primary) !important;
+  }
+
+  // Style the selection
+  .selected-text {
+    background-color: var(--requestly-color-primary-subtle) !important;
+  }
+
+  // Style the scrollbars
+  .scrollbar {
+    background-color: var(--requestly-color-surface-default) !important;
+
+    .slider {
+      background-color: var(--requestly-color-border-default) !important;
+
+      &:hover {
+        background-color: var(--requestly-color-border-hover) !important;
+      }
+    }
+  }
+}
