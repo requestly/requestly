@@ -1,3 +1,5 @@
+// app/src/features/graphify/screens/graphify/translation/components/createTranslation/createTranslation.scss
+
 .create-translation-container {
   display: flex;
   flex-direction: column;
@@ -6,6 +8,7 @@
   margin: 0 auto;
   min-height: 80vh;
 
+  // Style the header section
   .create-translation-header {
     text-align: center;
     margin-bottom: var(--space-8, 32px);
@@ -23,17 +26,16 @@
     }
   }
 
+  // Style the steps indicator
   .create-translation-steps {
     margin-bottom: var(--space-8, 32px);
 
-    // Style the Ant Design Steps component
     .translation-steps {
-      // Style the step items
+      // Style step items
       .ant-steps-item {
         // Style the step title
         .ant-steps-item-title {
           font-size: var(--requestly-font-size-sm);
-          font-weight: var(--requestly-font-weight-medium);
           color: var(--requestly-color-text-subtle);
 
           &::after {
@@ -49,12 +51,8 @@
 
         // Style the step icon
         .ant-steps-item-icon {
-          background-color: var(--requestly-color-surface-default);
+          background: var(--requestly-color-surface-default);
           border-color: var(--requestly-color-border-default);
-
-          .ant-steps-icon {
-            color: var(--requestly-color-text-subtle);
-          }
         }
 
         // Style active step
@@ -64,24 +62,16 @@
           }
 
           .ant-steps-item-icon {
-            background-color: var(--requestly-color-primary);
+            background: var(--requestly-color-primary);
             border-color: var(--requestly-color-primary);
-
-            .ant-steps-icon {
-              color: white;
-            }
           }
         }
 
         // Style completed step
         &.ant-steps-item-finish {
           .ant-steps-item-icon {
-            background-color: var(--requestly-color-success);
             border-color: var(--requestly-color-success);
-
-            .ant-steps-icon {
-              color: white;
-            }
+            background: var(--requestly-color-success);
           }
 
           .ant-steps-item-title::after {
@@ -92,6 +82,7 @@
     }
   }
 
+  // Style the main content area
   .create-translation-content {
     flex: 1;
     background: var(--requestly-color-surface-default);
@@ -100,12 +91,7 @@
     padding: var(--space-6, 24px);
     margin-bottom: var(--space-6, 24px);
     min-height: 400px;
-  }
-
-  .create-translation-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-4, 16px);
+    overflow: hidden; // Prevent content from breaking layout
   }
 }
 
@@ -117,17 +103,13 @@
     .create-translation-steps {
       .translation-steps {
         .ant-steps-item-description {
-          display: none; // Hide descriptions on mobile for better layout
+          display: none; // Hide descriptions on mobile
         }
       }
     }
 
-    .create-translation-actions {
-      flex-direction: column;
-
-      button {
-        width: 100%;
-      }
+    .create-translation-content {
+      padding: var(--space-4, 16px);
     }
   }
 }

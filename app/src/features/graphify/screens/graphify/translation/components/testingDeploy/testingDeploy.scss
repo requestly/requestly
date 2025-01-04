@@ -1,0 +1,135 @@
+.testing-deploy {
+  // Create a professional layout for testing and deployment interfaces
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 24px);
+
+  // Style the testing section that contains GraphiQL and REST calls display
+  .testing-section {
+    display: flex;
+    gap: var(--space-6, 24px);
+    height: 600px; // Provide enough height for comfortable testing
+
+    // Style the GraphiQL wrapper to ensure proper display
+    .graphiql-wrapper {
+      flex: 2;
+      border: 1px solid var(--requestly-color-border-default);
+      border-radius: var(--space-2, 8px);
+      overflow: hidden;
+
+      // Override default GraphiQL styles to match our theme
+      .graphiql-container {
+        height: 100%;
+        background: var(--requestly-color-surface-default);
+
+        // Style the GraphiQL header
+        .graphiql-session-header {
+          background: var(--requestly-color-surface-raised);
+          border-bottom: 1px solid var(--requestly-color-border-default);
+        }
+
+        // Style the query editor
+        .graphiql-editor {
+          .CodeMirror {
+            background: var(--requestly-color-surface-default);
+            font-family: var(--requestly-font-family-mono);
+            font-size: var(--requestly-font-size-sm);
+          }
+        }
+
+        // Style the execution button
+        .graphiql-execute-button {
+          background: var(--requestly-color-primary);
+          border-color: var(--requestly-color-primary);
+
+          &:hover {
+            background: var(--requestly-color-primary-hover);
+          }
+        }
+      }
+    }
+
+    // Style the REST calls section
+    .rest-calls-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4, 16px);
+      min-width: 300px;
+
+      h3 {
+        font-size: var(--requestly-font-size-md);
+        font-weight: var(--requestly-font-weight-medium);
+        margin-bottom: var(--space-2, 8px);
+      }
+
+      // Style individual REST call cards
+      .rest-call-card {
+        .ant-card-head {
+          background: var(--requestly-color-surface-raised);
+          border-bottom: 1px solid var(--requestly-color-border-default);
+          min-height: 40px;
+          padding: 0 var(--space-4, 16px);
+
+          .ant-card-head-title {
+            font-size: var(--requestly-font-size-sm);
+            padding: var(--space-2, 8px) 0;
+          }
+        }
+
+        .rest-call-details {
+          margin: 0;
+          font-family: var(--requestly-font-family-mono);
+          font-size: var(--requestly-font-size-xs);
+          color: var(--requestly-color-text-default);
+        }
+      }
+    }
+  }
+
+  // Style the deployment section
+  .deploy-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6, 24px);
+
+    // Style configuration items
+    .config-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2, 8px);
+
+      // Style input addons
+      .ant-input-group-addon {
+        background: var(--requestly-color-surface-raised);
+        border-color: var(--requestly-color-border-default);
+        color: var(--requestly-color-text-subtle);
+        font-size: var(--requestly-font-size-sm);
+      }
+    }
+  }
+
+  // Style the action buttons
+  .deploy-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3, 12px);
+    margin-top: var(--space-4, 16px);
+    padding-top: var(--space-4, 16px);
+    border-top: 1px solid var(--requestly-color-border-subtle);
+  }
+}
+
+// Add responsive adjustments
+@media (max-width: 1024px) {
+  .testing-deploy {
+    .testing-section {
+      flex-direction: column;
+      height: auto;
+
+      .graphiql-wrapper {
+        height: 400px;
+      }
+    }
+  }
+}
