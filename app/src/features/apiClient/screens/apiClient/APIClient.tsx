@@ -7,6 +7,7 @@ import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { getApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
 import "./apiClient.scss";
+import useSWR from "swr";
 
 interface Props {}
 
@@ -17,7 +18,7 @@ export const APIClient: React.FC<Props> = () => {
   const { apiClientRecords, history, selectedHistoryIndex, addToHistory } = useApiClientContext();
 
   const [persistedRequestId, setPersistedRequestId] = useState<string>(() => requestId);
-  const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
+  // const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
   const isHistoryPath = location.pathname.includes("history");
   const isNewRequest = searchParams.has("new");
 
@@ -44,6 +45,14 @@ export const APIClient: React.FC<Props> = () => {
     return entryDetails;
   }, [isHistoryPath, history, selectedHistoryIndex]);
 
+  const isRequestFetched = useRef(false);
+  const shouldFetch = isRequestFetched.current || !persistedRequestId;
+
+  const { isLoading, mutate, data: selectedEntryDetails } = useSWR(
+    shouldFetch ? `getApiRecord/${persistedRequestId}` : null,
+    () => getApiRecord(persistedRequestId).then((res) => res.data)
+  );
+
   useEffect(() => {
     //For updating breadcrumb name
     if (!persistedRequestId) {
@@ -56,40 +65,43 @@ export const APIClient: React.FC<Props> = () => {
       return;
     }
 
-    setSelectedEntryDetails((prev) => {
-      return prev?.id === record?.id
-        ? ({ ...(prev ?? {}), name: record?.name, collectionId: record?.collectionId } as RQAPI.ApiRecord)
-        : (record as RQAPI.ApiRecord);
-    });
-  }, [persistedRequestId, apiClientRecords]);
+    mutate(
+      selectedEntryDetails?.id === record?.id
+        ? ({
+            ...(selectedEntryDetails ?? {}),
+            name: record?.name,
+            collectionId: record?.collectionId,
+          } as RQAPI.ApiRecord)
+        : (record as RQAPI.ApiRecord)
+    );
+  }, [mutate, selectedEntryDetails, persistedRequestId, apiClientRecords]);
 
-  const isRequestFetched = useRef(false);
-  useEffect(() => {
-    if (isRequestFetched.current) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (isRequestFetched.current) {
+  //     return;
+  //   }
 
-    if (!persistedRequestId) {
-      return;
-    }
+  //   if (!persistedRequestId) {
+  //     return;
+  //   }
 
-    getApiRecord(persistedRequestId)
-      .then((result) => {
-        if (result.success) {
-          isRequestFetched.current = true;
+  //   getApiRecord(persistedRequestId)
+  //     .then((result) => {
+  //       if (result.success) {
+  //         isRequestFetched.current = true;
 
-          if (result.data.type === RQAPI.RecordType.API) {
-            setSelectedEntryDetails(result.data);
-          }
-        }
-      })
-      .catch((error) => {
-        setSelectedEntryDetails(null);
-        // TODO: redirect to new empty entry
-        Logger.error("Error loading api record", error);
-      })
-      .finally(() => {});
-  }, [persistedRequestId]);
+  //         if (result.data.type === RQAPI.RecordType.API) {
+  //           setSelectedEntryDetails(result.data);
+  //         }
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       setSelectedEntryDetails(null);
+  //       // TODO: redirect to new empty entry
+  //       Logger.error("Error loading api record", error);
+  //     })
+  //     .finally(() => {});
+  // }, [persistedRequestId]);
 
   const entryDetails = useMemo(() => (isHistoryPath ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord, [
     isHistoryPath,
@@ -108,6 +120,7 @@ export const APIClient: React.FC<Props> = () => {
         <APIClientView
           // TODO: Fix - "apiEntry" is used for history, remove this prop and derive everything from "apiEntryDetails"
           key={persistedRequestId}
+          isLoading={isLoading}
           apiEntry={entryDetails?.data}
           apiEntryDetails={entryDetails}
           notifyApiRequestFinished={handleAppRequestFinished}
