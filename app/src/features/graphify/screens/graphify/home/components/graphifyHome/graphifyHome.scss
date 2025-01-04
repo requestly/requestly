@@ -1,0 +1,94 @@
+.graphify-home-container {
+  // Keep the same flex layout from the original but with adjustments for our content
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12, 56px) 0px;
+  gap: var(--space-8, 24px);
+
+  // Style the main content area
+  .graphify-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 600px; // Limit content width for better readability
+    width: 100%;
+  }
+
+  // Style the main header text
+  .graphify-header {
+    text-align: center;
+    font-size: var(--requestly-font-size-lg); // Slightly larger than original
+    font-weight: var(--requestly-font-weight-bold); // More prominent
+    color: var(--requestly-color-text-default);
+    margin-bottom: var(--space-4, 16px);
+  }
+
+  // Style the description text
+  .graphify-description {
+    text-align: center;
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+    margin-bottom: var(--space-6, 20px);
+    line-height: 1.5; // Better readability for longer text
+  }
+
+  // Style the features section
+  .graphify-features {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    margin-bottom: var(--space-6, 20px);
+
+    div {
+      font-size: var(--requestly-font-size-xs);
+      color: var(--requestly-color-text-default);
+
+      // Style the checkmark
+      &:before {
+        color: var(--requestly-color-success);
+        margin-right: var(--space-2, 8px);
+      }
+    }
+  }
+
+  // Style the action buttons container
+  .graphify-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-3, 12px);
+    margin-top: var(--space-4, 16px);
+
+    // Ensure buttons have consistent width
+    button {
+      min-width: 160px;
+    }
+  }
+
+  // Style the image
+  img {
+    width: 240px; // Set a consistent size
+    height: auto;
+    margin-bottom: var(--space-6, 20px);
+  }
+
+  // Add responsive adjustments
+  @media (max-width: 768px) {
+    padding: var(--space-8, 24px) var(--space-4, 16px);
+
+    .graphify-content {
+      max-width: 100%;
+    }
+
+    .graphify-actions {
+      flex-direction: column;
+      width: 100%;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

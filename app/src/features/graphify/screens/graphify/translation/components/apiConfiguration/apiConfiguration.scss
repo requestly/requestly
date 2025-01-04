@@ -1,0 +1,331 @@
+.api-configuration {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 24px);
+
+  .section {
+    h2 {
+      font-size: var(--requestly-font-size-md);
+      font-weight: var(--requestly-font-weight-bold);
+      color: var(--requestly-color-text-default);
+      margin-bottom: var(--space-2, 8px);
+    }
+
+    .section-description {
+      font-size: var(--requestly-font-size-sm);
+      color: var(--requestly-color-text-subtle);
+      margin-bottom: var(--space-4, 16px);
+    }
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4, 16px);
+    padding: var(--space-4, 16px);
+    background: var(--requestly-color-surface-raised);
+    border-radius: var(--space-2, 8px);
+  }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4, 16px);
+    margin-top: var(--space-4, 16px);
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--space-6, 24px);
+  }
+  // Style the form fields consistently
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2, 8px);
+
+    .field-label {
+      font-size: var(--requestly-font-size-sm);
+      font-weight: var(--requestly-font-weight-medium);
+      color: var(--requestly-color-text-default);
+
+      .required-mark {
+        color: var(--requestly-color-danger);
+        margin-left: var(--space-1, 4px);
+      }
+    }
+
+    .field-message {
+      font-size: var(--requestly-font-size-xs);
+      color: var(--requestly-color-text-subtle);
+
+      &.error {
+        color: var(--requestly-color-danger);
+      }
+    }
+
+    // Style the antd Input component
+    .api-input {
+      &.ant-input {
+        height: 36px; // Consistent height with your design system
+        padding: var(--space-2, 8px) var(--space-3, 12px);
+        font-size: var(--requestly-font-size-sm);
+        color: var(--requestly-color-text-default);
+        background: var(--requestly-color-surface-default);
+        border: 1px solid var(--requestly-color-border-default);
+        border-radius: var(--space-1, 4px);
+        transition: all 0.2s ease;
+
+        &::placeholder {
+          color: var(--requestly-color-text-subtle);
+        }
+
+        // Hover state
+        &:hover {
+          border-color: var(--requestly-color-border-hover);
+        }
+
+        // Focus state
+        &:focus {
+          border-color: var(--requestly-color-primary);
+          box-shadow: 0 0 0 2px var(--requestly-color-primary-subtle);
+        }
+
+        // Error state
+        &.ant-input-status-error {
+          border-color: var(--requestly-color-danger);
+
+          &:focus {
+            box-shadow: 0 0 0 2px var(--requestly-color-danger-subtle);
+          }
+        }
+
+        // Disabled state
+        &:disabled {
+          background: var(--requestly-color-surface-raised);
+          color: var(--requestly-color-text-disabled);
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  // Add responsive adjustments
+  @media (max-width: 768px) {
+    .form-field {
+      .api-input {
+        font-size: var(--requestly-font-size-sm);
+      }
+    }
+  }
+
+  // Add styling for the select container
+  .select-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2, 8px);
+
+    .select-label {
+      font-size: var(--requestly-font-size-sm);
+      font-weight: var(--requestly-font-weight-medium);
+      color: var(--requestly-color-text-default);
+    }
+
+    // Style the antd Select component to match your design system
+    .auth-type-select {
+      .ant-select-selector {
+        border-color: var(--requestly-color-border-default);
+        border-radius: var(--space-1, 4px);
+        min-height: 36px; // Match your input heights
+
+        &:hover {
+          border-color: var(--requestly-color-border-hover);
+        }
+      }
+
+      &.ant-select-focused {
+        .ant-select-selector {
+          border-color: var(--requestly-color-primary);
+          box-shadow: 0 0 0 2px var(--requestly-color-primary-subtle);
+        }
+      }
+
+      // Style the placeholder
+      .ant-select-selection-placeholder {
+        color: var(--requestly-color-text-subtle);
+      }
+
+      // Style the selected value
+      .ant-select-selection-item {
+        color: var(--requestly-color-text-default);
+        font-size: var(--requestly-font-size-sm);
+      }
+    }
+  }
+}
+
+// Style the dropdown menu when it's opened
+.auth-type-select-dropdown.ant-select-dropdown {
+  border: 1px solid var(--requestly-color-border-default);
+  border-radius: var(--space-1, 4px);
+  box-shadow: var(--requestly-shadow-lg);
+
+  .ant-select-item {
+    padding: var(--space-2, 8px) var(--space-3, 12px);
+    font-size: var(--requestly-font-size-sm);
+
+    &-option-selected {
+      background-color: var(--requestly-color-primary-subtle);
+      color: var(--requestly-color-primary);
+    }
+
+    &-option-active {
+      background-color: var(--requestly-color-surface-hover);
+    }
+  }
+
+  // Add styling for the switch container and its components
+  .switch-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2, 8px);
+
+    .switch-label-group {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3, 12px);
+
+      .switch-label {
+        font-size: var(--requestly-font-size-sm);
+        font-weight: var(--requestly-font-weight-medium);
+        color: var(--requestly-color-text-default);
+      }
+    }
+
+    .switch-help-text {
+      font-size: var(--requestly-font-size-xs);
+      color: var(--requestly-color-text-subtle);
+    }
+
+    // Style the antd Switch component to match your design system
+    .discovery-mode-switch {
+      // Default state (unchecked)
+      &.ant-switch {
+        background-color: var(--requestly-color-surface-raised);
+        border: 1px solid var(--requestly-color-border-default);
+
+        .ant-switch-handle {
+          background-color: var(--requestly-color-text-subtle);
+        }
+      }
+
+      // Checked state
+      &.ant-switch-checked {
+        background-color: var(--requestly-color-primary);
+
+        .ant-switch-handle {
+          background-color: white;
+        }
+      }
+
+      // Hover states
+      &:hover {
+        &:not(.ant-switch-disabled) {
+          background-color: var(--requestly-color-primary-hover);
+        }
+      }
+
+      // Focus state
+      &:focus {
+        box-shadow: 0 0 0 2px var(--requestly-color-primary-subtle);
+      }
+
+      // Loading state
+      &.ant-switch-loading {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+    }
+  }
+  // Style the form fields consistently
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2, 8px);
+
+    .field-label {
+      font-size: var(--requestly-font-size-sm);
+      font-weight: var(--requestly-font-weight-medium);
+      color: var(--requestly-color-text-default);
+
+      .required-mark {
+        color: var(--requestly-color-danger);
+        margin-left: var(--space-1, 4px);
+      }
+    }
+
+    .field-message {
+      font-size: var(--requestly-font-size-xs);
+      color: var(--requestly-color-text-subtle);
+
+      &.error {
+        color: var(--requestly-color-danger);
+      }
+    }
+
+    // Style the antd Input component
+    .api-input {
+      &.ant-input {
+        height: 36px; // Consistent height with your design system
+        padding: var(--space-2, 8px) var(--space-3, 12px);
+        font-size: var(--requestly-font-size-sm);
+        color: var(--requestly-color-text-default);
+        background: var(--requestly-color-surface-default);
+        border: 1px solid var(--requestly-color-border-default);
+        border-radius: var(--space-1, 4px);
+        transition: all 0.2s ease;
+
+        &::placeholder {
+          color: var(--requestly-color-text-subtle);
+        }
+
+        // Hover state
+        &:hover {
+          border-color: var(--requestly-color-border-hover);
+        }
+
+        // Focus state
+        &:focus {
+          border-color: var(--requestly-color-primary);
+          box-shadow: 0 0 0 2px var(--requestly-color-primary-subtle);
+        }
+
+        // Error state
+        &.ant-input-status-error {
+          border-color: var(--requestly-color-danger);
+
+          &:focus {
+            box-shadow: 0 0 0 2px var(--requestly-color-danger-subtle);
+          }
+        }
+
+        // Disabled state
+        &:disabled {
+          background: var(--requestly-color-surface-raised);
+          color: var(--requestly-color-text-disabled);
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  // Add responsive adjustments
+  @media (max-width: 768px) {
+    .form-field {
+      .api-input {
+        font-size: var(--requestly-font-size-sm);
+      }
+    }
+  }
+}
