@@ -11,6 +11,7 @@ import AppLayout from "layouts/AppLayout";
 import { ruleRoutes } from "features/rules/routes";
 import { sessionRoutes } from "features/sessionBook";
 import { apiClientRoutes } from "features/apiClient";
+import { graphifyRoutes } from "features/graphify";
 import { accountRoutes } from "./accountRoutes";
 import { authRoutes } from "./authRoutes";
 import { desktopRoutes } from "./desktopRoutes";
@@ -42,6 +43,7 @@ export const routesV2: RouteObject[] = [
           ...ruleRoutes,
           ...sessionRoutes,
           ...apiClientRoutes,
+          ...graphifyRoutes,
           ...accountRoutes,
           ...authRoutes,
           ...desktopRoutes,

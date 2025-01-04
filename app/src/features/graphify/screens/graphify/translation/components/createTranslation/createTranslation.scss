@@ -1,0 +1,133 @@
+.create-translation-container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6, 24px);
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 80vh;
+
+  .create-translation-header {
+    text-align: center;
+    margin-bottom: var(--space-8, 32px);
+
+    h1 {
+      font-size: var(--requestly-font-size-xl);
+      font-weight: var(--requestly-font-weight-bold);
+      color: var(--requestly-color-text-default);
+      margin-bottom: var(--space-2, 8px);
+    }
+
+    p {
+      font-size: var(--requestly-font-size-sm);
+      color: var(--requestly-color-text-subtle);
+    }
+  }
+
+  .create-translation-steps {
+    margin-bottom: var(--space-8, 32px);
+
+    // Style the Ant Design Steps component
+    .translation-steps {
+      // Style the step items
+      .ant-steps-item {
+        // Style the step title
+        .ant-steps-item-title {
+          font-size: var(--requestly-font-size-sm);
+          font-weight: var(--requestly-font-weight-medium);
+          color: var(--requestly-color-text-subtle);
+
+          &::after {
+            background-color: var(--requestly-color-border-default) !important;
+          }
+        }
+
+        // Style the step description
+        .ant-steps-item-description {
+          font-size: var(--requestly-font-size-xs);
+          color: var(--requestly-color-text-subtle);
+        }
+
+        // Style the step icon
+        .ant-steps-item-icon {
+          background-color: var(--requestly-color-surface-default);
+          border-color: var(--requestly-color-border-default);
+
+          .ant-steps-icon {
+            color: var(--requestly-color-text-subtle);
+          }
+        }
+
+        // Style active step
+        &.ant-steps-item-active {
+          .ant-steps-item-title {
+            color: var(--requestly-color-text-default) !important;
+          }
+
+          .ant-steps-item-icon {
+            background-color: var(--requestly-color-primary);
+            border-color: var(--requestly-color-primary);
+
+            .ant-steps-icon {
+              color: white;
+            }
+          }
+        }
+
+        // Style completed step
+        &.ant-steps-item-finish {
+          .ant-steps-item-icon {
+            background-color: var(--requestly-color-success);
+            border-color: var(--requestly-color-success);
+
+            .ant-steps-icon {
+              color: white;
+            }
+          }
+
+          .ant-steps-item-title::after {
+            background-color: var(--requestly-color-success) !important;
+          }
+        }
+      }
+    }
+  }
+
+  .create-translation-content {
+    flex: 1;
+    background: var(--requestly-color-surface-default);
+    border: 1px solid var(--requestly-color-border-default);
+    border-radius: var(--space-2, 8px);
+    padding: var(--space-6, 24px);
+    margin-bottom: var(--space-6, 24px);
+    min-height: 400px;
+  }
+
+  .create-translation-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-4, 16px);
+  }
+}
+
+// Add responsive adjustments
+@media (max-width: 768px) {
+  .create-translation-container {
+    padding: var(--space-4, 16px);
+
+    .create-translation-steps {
+      .translation-steps {
+        .ant-steps-item-description {
+          display: none; // Hide descriptions on mobile for better layout
+        }
+      }
+    }
+
+    .create-translation-actions {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
