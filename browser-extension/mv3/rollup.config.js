@@ -32,7 +32,7 @@ const processManifest = (content) => {
   const { content_scripts: contentScripts } = manifestJson;
 
   const webURLPatterns = [WEB_URL, ...OTHER_WEB_URLS]
-    .map(generateUrlPattern, browser === "chrome")
+    .map((pattern) => generateUrlPattern(pattern, browser === "chrome"))
     .filter((pattern) => !!pattern); // remove null entries
 
   contentScripts[0].matches = webURLPatterns;
