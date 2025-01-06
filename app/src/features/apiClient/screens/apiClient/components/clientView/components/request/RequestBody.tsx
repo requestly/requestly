@@ -116,6 +116,10 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
     }
   }, [contentType, variables, formBody, handleFormChange, handleTextChange, textBody]);
 
+  /*
+  In select, label is used is 'Text' & RequestContentType.RAW is used as value since we have RAW, JSON, Form as types, 
+  we are considering RAW & Json as 'Text'
+  */
   return (
     <div className="api-request-body">
       <div className="api-request-body-options">
