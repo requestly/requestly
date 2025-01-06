@@ -10,7 +10,6 @@ import SpinnerColumn from "../../../../../../../../components/misc/SpinnerColumn
 import { toast } from "utils/Toast.js";
 import { redirectToWorkspaceSettings } from "../../../../../../../../utils/RedirectionUtils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import RemoveUserModal from "./RemoveUserModal";
 import ContactUsModal from "./ContactUsModal";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
 import "./TeamMembersTable.css";
@@ -31,10 +30,6 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
   const [members, setMembers] = useState([]);
   const [pendingMembers, setPendingMembers] = useState([]);
   const [dataSource, setDataSource] = useState([]);
-  const [deleteUserModal, setDeleteUserModal] = useState({
-    isActive: false,
-    userId: false,
-  });
   const [contactUsModal, setContactUsModal] = useState(false);
   const [isTeamPlanActive, setIsTeamPlanActive] = useState(true);
   const [billingExclude, setBillingExclude] = useState([]);
@@ -67,13 +62,6 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
       })
       .catch((err) => toast.error(err.message))
       .finally(() => setIsLoading(false));
-  };
-
-  const toggleDeleteUserModal = () => {
-    setDeleteUserModal({
-      ...deleteUserModal,
-      isActive: !deleteUserModal.isActive,
-    });
   };
 
   const toggleContactUsModal = () => setContactUsModal((prev) => !prev);
@@ -256,7 +244,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
         if (!mountedRef.current) return null;
         const response = res.data;
         if (response.success) {
-          setPendingMembers(response.users);
+          setPendingMembers(response.users || []);
         } else {
           throw new Error(response.message);
         }
@@ -311,7 +299,6 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
     setDataSource([]);
 
     const currentUser = members?.filter((member) => member.id === loggedInUserId) || [];
-
     const otherMembers = members?.filter((member) => member.id !== loggedInUserId) || [];
 
     const membersData = [...currentUser, ...otherMembers, ...pendingMembers].map((member, idx) => ({
