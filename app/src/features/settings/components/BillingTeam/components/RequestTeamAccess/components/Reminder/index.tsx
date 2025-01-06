@@ -26,7 +26,13 @@ export const RequestBillingTeamAccessReminder = () => {
 
   const availableBillingTeams = useMemo(() => {
     if (billingTeams) {
-      return billingTeams.filter((team) => Object.keys(team.members).length > 1 && !team?.isAcceleratorTeam);
+      return billingTeams.filter(
+        (team) =>
+          Object.keys(team.members).length > 1 &&
+          !team?.isAcceleratorTeam &&
+          (team?.subscriptionDetails?.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE ||
+            team?.subscriptionDetails?.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.PAST_DUE)
+      );
     }
     return [];
   }, [billingTeams]);
@@ -91,7 +97,7 @@ export const RequestBillingTeamAccessReminder = () => {
         <>
           <Col>
             <div className="text-white">
-              {billingTeams?.length > 1 ? (
+              {availableBillingTeams?.length > 1 ? (
                 <>
                   To continue using Requestly, you need a license. We have found the following billing teams in your
                   Organization. If you are part of one of these teams, you can request access to a license.
@@ -104,15 +110,9 @@ export const RequestBillingTeamAccessReminder = () => {
               )}
             </div>
             <div className="mt-8 billing-teams-card-wrapper">
-              {availableBillingTeams?.map((team: BillingTeamDetails) => {
-                if (
-                  team?.subscriptionDetails?.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE ||
-                  team?.subscriptionDetails?.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.PAST_DUE
-                ) {
-                  return <BillingTeamCard key={team.id} team={team} />;
-                }
-                return null;
-              })}
+              {availableBillingTeams?.map((team: BillingTeamDetails) => (
+                <BillingTeamCard key={team.id} team={team} />
+              ))}
             </div>
           </Col>
           <div className="text-white mt-24">
