@@ -52,7 +52,9 @@ export const RequestBillingTeamAccessReminder = () => {
 
       if (currentDate >= persistenceDate) {
         setIsModalClosable(false);
-        setIsModalVisible(true);
+        setTimeout(() => {
+          setIsModalVisible(true);
+        }, 4000);
         return;
       }
 
@@ -60,7 +62,9 @@ export const RequestBillingTeamAccessReminder = () => {
         return;
       }
       if (currentDate >= reminderStartDate) {
-        setIsModalVisible(true);
+        setTimeout(() => {
+          setIsModalVisible(true);
+        }, 4000);
       }
     } else setIsModalVisible(false);
   }, [joinTeamReminder, user.details?.isPremium, user.loggedIn]);
