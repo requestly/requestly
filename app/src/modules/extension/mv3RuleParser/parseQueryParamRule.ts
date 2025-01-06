@@ -27,6 +27,14 @@ const parseQueryParams = (modifications: QueryParamRule.Modification[]): QueryPa
     }
   }
 
+  if (!transform.queryTransform.addOrReplaceParams.length) {
+    delete transform.queryTransform.addOrReplaceParams;
+  }
+
+  if (!transform.queryTransform.removeParams.length) {
+    delete transform.queryTransform.removeParams;
+  }
+
   return transform;
 };
 
