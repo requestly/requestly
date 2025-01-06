@@ -12,9 +12,8 @@ import "./collectionView.scss";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
-import AuthorizationView from "../request/components/AuthorizationView";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -29,9 +28,6 @@ export const CollectionView = () => {
   const user = useSelector(getUserAuthDetails);
   const teamId = useSelector(getCurrentlyActiveWorkspace);
   const location = useLocation();
-
-  const { getVariablesWithPrecedence } = useEnvironmentManager();
-  const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
   const collection = useMemo(() => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
@@ -55,6 +51,7 @@ export const CollectionView = () => {
     },
     [collection, onSaveRecord, teamId, user.details?.profile?.uid]
   );
+
   const tabItems = useMemo(() => {
     return [
       {
@@ -71,17 +68,15 @@ export const CollectionView = () => {
         label: "Authorization",
         key: TAB_KEYS.AUTHORIZATION,
         children: (
-          <AuthorizationView
-            wrapperClass="collection-auth"
-            defaultValues={collection?.data?.auth}
-            onAuthUpdate={updateCollectionAuthData}
+          <CollectionAuthorizationView
+            authOptions={collection?.data?.auth}
+            updateAuthData={updateCollectionAuthData}
             rootLevelRecord={!collection?.collectionId}
-            variables={variables}
           />
         ),
       },
     ];
-  }, [collection, variables, updateCollectionAuthData]);
+  }, [collection, updateCollectionAuthData]);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
