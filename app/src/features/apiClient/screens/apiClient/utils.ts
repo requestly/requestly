@@ -146,7 +146,7 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
 
     const queryParamsFromJson = generateKeyValuePairsFromJson(requestJson.queries);
     /*
-      cURL converter is not able to parse query params from url
+      cURL converter is not able to parse query params from url for some cURL requests
       so parsing it manually from URL and populating queryParams property
     */
     const requestUrlParams = new URL(requestJson.url).searchParams;
