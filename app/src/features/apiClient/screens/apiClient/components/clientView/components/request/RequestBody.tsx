@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { Radio } from "antd";
+import { Radio, Select } from "antd";
 import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../../types";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { KeyValueTable } from "./components/KeyValueTable/KeyValueTable";
@@ -15,8 +15,9 @@ interface Props {
 }
 
 const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequestEntry, setContentType }) => {
-  const [rawBody, setRawBody] = useState(RequestContentType.RAW === contentType ? body : "");
-  const [jsonBody, setJsonBody] = useState(RequestContentType.JSON === contentType ? body : "");
+  const [textBody, setTextBody] = useState(
+    RequestContentType.RAW === contentType || RequestContentType.JSON === contentType ? body : ""
+  );
   const [formBody, setFormBody] = useState(RequestContentType.FORM === contentType ? body : []);
 
   /*
@@ -26,33 +27,19 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
   useEffect(() => {
     let updatedBody: string | KeyValuePair[];
 
-    if (contentType === RequestContentType.RAW) {
-      updatedBody = rawBody;
-    } else if (contentType === RequestContentType.JSON) {
-      updatedBody = jsonBody;
+    if (contentType === RequestContentType.RAW || contentType === RequestContentType.JSON) {
+      updatedBody = textBody;
     } else if (contentType === RequestContentType.FORM) {
       updatedBody = formBody;
     }
 
     setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: updatedBody } }));
-  }, [contentType, rawBody, jsonBody, formBody, setRequestEntry]);
+  }, [contentType, textBody, formBody, setRequestEntry]);
 
-  const handleRawChange = useDebounce(
+  const handleTextChange = useDebounce(
     useCallback(
       (value: string) => {
-        setRawBody(value);
-        setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
-      },
-      [setRequestEntry]
-    ),
-    500,
-    { leading: true, trailing: true }
-  );
-
-  const handleJsonChange = useDebounce(
-    useCallback(
-      (value: string) => {
-        setJsonBody(value);
+        setTextBody(value);
         setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
       },
       [setRequestEntry]
@@ -88,9 +75,9 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
           <CodeEditor
             key={contentType}
             language={EditorLanguage.JSON}
-            defaultValue={jsonBody as string}
-            value={jsonBody as string}
-            handleChange={handleJsonChange}
+            defaultValue={textBody as string}
+            value={textBody as string}
+            handleChange={handleTextChange}
             prettifyOnInit={true}
             isResizable={false}
             hideCharacterCount
@@ -114,9 +101,9 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
           <CodeEditor
             key={contentType}
             language={null}
-            defaultValue={rawBody as string}
-            value={rawBody as string}
-            handleChange={handleRawChange}
+            defaultValue={textBody as string}
+            value={textBody as string}
+            handleChange={handleTextChange}
             isResizable={false}
             hideCharacterCount
             analyticEventProperties={{ source: "api_client" }}
@@ -127,20 +114,34 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
           />
         );
     }
-  }, [contentType, jsonBody, handleJsonChange, variables, formBody, handleFormChange, rawBody, handleRawChange]);
+  }, [contentType, variables, formBody, handleFormChange, handleTextChange, textBody]);
 
   return (
     <div className="api-request-body">
       <div className="api-request-body-options">
         <Radio.Group
-          onChange={(e) => setContentType(e.target.value)}
+          onChange={(e) => setContentType(e.target.value === "text" ? RequestContentType.RAW : e.target.value)}
           defaultValue={RequestContentType.RAW}
-          value={contentType}
+          value={
+            contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? "text" : contentType
+          }
         >
-          <Radio value={RequestContentType.RAW}>Raw</Radio>
-          <Radio value={RequestContentType.JSON}>JSON</Radio>
+          <Radio value="text">Raw</Radio>
           <Radio value={RequestContentType.FORM}>Form</Radio>
         </Radio.Group>
+
+        {contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? (
+          <Select
+            className="api-request-body-options-select"
+            value={contentType}
+            options={[
+              { value: RequestContentType.RAW, label: "Text" },
+              { value: RequestContentType.JSON, label: "JSON" },
+            ]}
+            onChange={(value) => setContentType(value)}
+            size="small"
+          />
+        ) : null}
       </div>
       {bodyEditor}
     </div>
