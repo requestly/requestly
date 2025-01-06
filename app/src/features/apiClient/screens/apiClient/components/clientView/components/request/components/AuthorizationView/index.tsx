@@ -13,8 +13,6 @@ import { AUTHORIZATION_TYPES } from "./types";
 import { AUTH_OPTIONS } from "./types/form";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentVariables } from "backend/environment/types";
-import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constants/keyboardShortcuts";
-import { RQButton } from "lib/design-system-v2/components";
 
 interface Props {
   wrapperClass?: string;
@@ -25,10 +23,7 @@ interface Props {
   onAuthUpdate: (authOptions: RQAPI.AuthOptions) => any;
   rootLevelRecord: Boolean;
   variables: EnvironmentVariables;
-  showSaveButton?: Boolean;
-  hasUnsavedChanges?: Boolean;
-  onSaveButtonClick?: () => void;
-  savingChanges?: boolean;
+  authorizationViewActions?: React.ReactElement;
 }
 
 const AuthorizationView: React.FC<Props> = ({
@@ -37,10 +32,7 @@ const AuthorizationView: React.FC<Props> = ({
   rootLevelRecord,
   wrapperClass = "",
   variables,
-  showSaveButton,
-  hasUnsavedChanges,
-  onSaveButtonClick,
-  savingChanges,
+  authorizationViewActions,
 }) => {
   const [selectedForm, setSelectedForm] = useState(
     defaultValues?.currentAuthType || (rootLevelRecord ? AUTHORIZATION_TYPES.NO_AUTH : AUTHORIZATION_TYPES.INHERIT)
@@ -104,20 +96,7 @@ const AuthorizationView: React.FC<Props> = ({
               <span>{LABEL_TEXT.CLEAR}</span>
             </div>
           )}
-          {showSaveButton && (
-            <div className="authorization-save-btn">
-              <RQButton
-                showHotKeyText
-                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
-                type="primary"
-                onClick={onSaveButtonClick}
-                disabled={!hasUnsavedChanges}
-                loading={savingChanges}
-              >
-                {LABEL_TEXT.SAVE_BTN_CTA}
-              </RQButton>
-            </div>
-          )}
+          {authorizationViewActions}
         </div>
       </div>
       <div className="form-and-description">

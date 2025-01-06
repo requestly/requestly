@@ -3,5 +3,4 @@ export const LABEL_TEXT = {
   INFO_TEXT: "The Authorization header is automatically generated when you send the request. ",
   LEARN_MORE: "Learn More",
   CLEAR: "Clear",
-  SAVE_BTN_CTA: "Save",
 };

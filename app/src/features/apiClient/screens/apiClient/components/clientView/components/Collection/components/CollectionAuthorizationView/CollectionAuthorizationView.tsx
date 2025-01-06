@@ -1,10 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import AuthorizationView from "../../../request/components/AuthorizationView";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQAPI } from "features/apiClient/types";
+import { RQButton } from "lib/design-system-v2/components";
+import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constants/keyboardShortcuts";
 
 interface Props {
   authOptions: RQAPI.AuthOptions;
@@ -12,6 +14,14 @@ interface Props {
   rootLevelRecord: Boolean;
 }
 
+/**
+ *
+ * Wrapper component to reuse Authorization View
+ * Problem -> Saving the authorization data on typing were causing re-render which were resulting in losing focus from the input field.
+ * Solution -> To fix this creating this wrapper component for Authorization View so that save logic can be added
+ * and remain separated from the main Collection View
+ *
+ */
 const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthData, rootLevelRecord }) => {
   const { collectionId } = useParams();
   const [authOptionsState, setAuthOptionsState] = useState(authOptions);
@@ -28,7 +38,7 @@ const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthD
     updateTab(collectionId, { hasUnsavedChanges: hasUnsavedChanges });
   }, [updateTab, collectionId, hasUnsavedChanges]);
 
-  const onSaveAuthData = () => {
+  const onSaveAuthData = useCallback(() => {
     setIsSaving(true);
     updateAuthData(authOptionsState)
       .then(() => resetChanges())
@@ -38,7 +48,22 @@ const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthD
       .finally(() => {
         setIsSaving(false);
       });
-  };
+  }, [authOptionsState]);
+
+  const AuthorizationViewActions = () => (
+    <div className="authorization-save-btn">
+      <RQButton
+        showHotKeyText
+        hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+        type="primary"
+        onClick={onSaveAuthData}
+        disabled={!hasUnsavedChanges}
+        loading={isSaving}
+      >
+        Save
+      </RQButton>
+    </div>
+  );
 
   return (
     <AuthorizationView
@@ -47,10 +72,7 @@ const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthD
       onAuthUpdate={setAuthOptionsState}
       rootLevelRecord={rootLevelRecord}
       variables={variables}
-      showSaveButton
-      onSaveButtonClick={onSaveAuthData}
-      hasUnsavedChanges={hasUnsavedChanges}
-      savingChanges={isSaving}
+      authorizationViewActions={<AuthorizationViewActions />}
     />
   );
 };
