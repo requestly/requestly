@@ -164,6 +164,10 @@
       display: flex;
       align-items: center;
 
+      .authorization-save-btn {
+        margin-left: auto;
+      }
+
       .clear-icon {
         cursor: pointer;
         margin-left: 16px;
