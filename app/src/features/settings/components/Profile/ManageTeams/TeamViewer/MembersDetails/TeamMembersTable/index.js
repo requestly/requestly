@@ -310,9 +310,9 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
   useEffect(() => {
     setDataSource([]);
 
-    const currentUser = members.filter((member) => member.id === loggedInUserId);
+    const currentUser = members?.filter((member) => member.id === loggedInUserId) || [];
 
-    const otherMembers = members.filter((member) => member.id !== loggedInUserId);
+    const otherMembers = members?.filter((member) => member.id !== loggedInUserId) || [];
 
     const membersData = [...currentUser, ...otherMembers, ...pendingMembers].map((member, idx) => ({
       key: idx + 1,
