@@ -10,6 +10,32 @@
   background-color: var(--requestly-color-background);
   padding-bottom: 32px;
 
+  .storage-communication-note {
+    display: flex;
+    background: var(--blue-blue-900);
+    margin: 0 -8px;
+    padding: 4px 4px 8px 8px;
+    line-height: 17px;
+    font-size: 11px;
+    color: var(--requestly-color-primary-300);
+
+    svg {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    img {
+      margin-right: 6px;
+    }
+
+    p {
+      margin-top: 4px;
+      margin-bottom: 0;
+      margin-right: 4px;
+    }
+  }
+
   .api-client-sidebar-header {
     flex: 0 0 auto;
     padding: 3px 4px;
