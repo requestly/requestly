@@ -9,7 +9,6 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
 import AuthorizationView from "../AuthorizationView";
-import { AUTHORIZATION_TYPES } from "../AuthorizationView/types";
 
 enum Tab {
   QUERY_PARAMS = "query_params",
@@ -104,7 +103,14 @@ const RequestTabs: React.FC<Props> = ({
       {
         key: Tab.AUTHORIZATION,
         label: <LabelWithCount label="Authorization" />,
-        children: <AuthorizationView defaultValues={requestEntry.auth} onAuthUpdate={handleAuthChange} />,
+        children: (
+          <AuthorizationView
+            defaultValues={requestEntry.auth}
+            onAuthUpdate={handleAuthChange}
+            rootLevelRecord={!collectionId}
+            variables={variables}
+          />
+        ),
       },
     ];
 
@@ -123,7 +129,7 @@ const RequestTabs: React.FC<Props> = ({
     }
 
     return items;
-  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts, variables]);
+  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts, variables, handleAuthChange, collectionId]);
 
   return (
     <Tabs

@@ -1,10 +1,11 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
-import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import { KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
+import { forEach, isEmpty, split, unionBy } from "lodash";
 
 export const makeRequest = async (
   appMode: string,
@@ -56,6 +57,32 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
     },
     response: null,
   };
+};
+
+export const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => {
+  const sanitizedEntry: RQAPI.Entry = {
+    ...entry,
+    request: {
+      ...entry.request,
+      queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys),
+      headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys),
+    },
+    scripts: {
+      preRequest: entry.scripts?.preRequest || "",
+      postResponse: entry.scripts?.postResponse || "",
+    },
+  };
+
+  if (!supportsRequestBody(entry.request.method)) {
+    sanitizedEntry.request.body = null;
+  } else if (entry.request.contentType === RequestContentType.FORM) {
+    sanitizedEntry.request.body = sanitizeKeyValuePairs(
+      sanitizedEntry.request.body as KeyValuePair[],
+      removeDisabledKeys
+    );
+  }
+
+  return sanitizedEntry;
 };
 
 export const sanitizeKeyValuePairs = (keyValuePairs: KeyValuePair[], removeDisabledKeys = true): KeyValuePair[] => {
@@ -116,9 +143,15 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
   try {
     const requestJsonString = curlconverter.toJsonString(curl);
     const requestJson = JSON.parse(requestJsonString);
-    // console.log("converted", {curl, requestJson});
 
-    const queryParams = generateKeyValuePairsFromJson(requestJson.queries);
+    const queryParamsFromJson = generateKeyValuePairsFromJson(requestJson.queries);
+    /*
+      cURL converter is not able to parse query params from url for some cURL requests
+      so parsing it manually from URL and populating queryParams property
+    */
+    const requestUrlParams = new URL(requestJson.url).searchParams;
+    const paramsFromUrl = generateKeyValuePairsFromJson(Object.fromEntries(requestUrlParams.entries()));
+
     const headers = filterHeadersToImport(generateKeyValuePairsFromJson(requestJson.headers));
     const contentType = getContentTypeFromRequestHeaders(headers);
     let body: RQAPI.RequestBody;
@@ -131,14 +164,18 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
       body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
     }
 
+    // remove query params from url
+    const requestUrl = requestJson.url.split("?")[0];
+
     const request: RQAPI.Request = {
-      url: requestJson.url,
+      url: requestUrl,
       method: requestJson.method.toUpperCase() as RequestMethod,
-      queryParams,
+      queryParams: queryParamsFromJson.length ? queryParamsFromJson : paramsFromUrl,
       headers,
       contentType,
-      body,
+      body: body ?? null,
     };
+
     return request;
   } catch (e) {
     return null;
@@ -211,4 +248,165 @@ export const createBlankApiRecord = (
   }
 
   return upsertApiRecord(uid, newRecord, teamId);
+};
+
+export const extractQueryParams = (inputString: string) => {
+  const queryParams: KeyValuePair[] = [];
+
+  inputString = split(inputString, "?")[1];
+
+  if (inputString) {
+    const queryParamsList = split(inputString, "&");
+    forEach(queryParamsList, (queryParam) => {
+      const queryParamValues = split(queryParam, "=");
+      queryParams.push({
+        id: Math.random(),
+        key: queryParamValues[0],
+        value: queryParamValues[1],
+        isEnabled: true,
+      });
+    });
+  }
+
+  return queryParams;
+};
+
+export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString: string) => {
+  if (isEmpty(queryParams)) {
+    return inputString;
+  }
+  const baseUrl = split(inputString, "?")[0];
+  const enabledParams = queryParams.filter((param) => param.isEnabled ?? true);
+
+  const queryString = enabledParams
+    .map(({ key, value }) => {
+      if (!key) return "";
+      if (value === undefined || value === "") {
+        return key;
+      } else {
+        return `${key}=${value}`;
+      }
+    })
+    .filter(Boolean)
+    .join("&");
+
+  return `${baseUrl}${queryString ? `?${queryString}` : queryString}`;
+};
+
+export const syncQueryParams = (
+  queryParams: KeyValuePair[],
+  url: string,
+  type: QueryParamSyncType = QueryParamSyncType.SYNC
+) => {
+  const updatedQueryParams = extractQueryParams(url);
+
+  switch (type) {
+    case QueryParamSyncType.SYNC: {
+      const updatedUrl = queryParamsToURLString(queryParams, url);
+
+      // Dont sync if URL is same
+      if (updatedUrl !== url) {
+        const combinedParams = unionBy(queryParams, updatedQueryParams, "id");
+        const deduplicatedParams: KeyValuePair[] = [];
+        const seenPairs = new Set();
+
+        combinedParams.forEach((param) => {
+          const pair = `${param.key}=${param.value}`;
+          if (!seenPairs.has(pair)) {
+            seenPairs.add(pair);
+            deduplicatedParams.push(param);
+          }
+        });
+
+        return { queryParams: deduplicatedParams, url: queryParamsToURLString(deduplicatedParams, url) };
+      }
+
+      return { queryParams, url };
+    }
+    case QueryParamSyncType.TABLE: {
+      const updatedQueryParamsCopy = [...updatedQueryParams];
+
+      // Adding disabled key value pairs
+      queryParams.forEach((queryParam, index) => {
+        if (!(queryParam.isEnabled ?? true)) {
+          updatedQueryParamsCopy.splice(index, 0, queryParam);
+        }
+      });
+
+      return {
+        queryParams: isEmpty(updatedQueryParamsCopy) ? [getEmptyPair()] : updatedQueryParamsCopy,
+      };
+    }
+
+    case QueryParamSyncType.URL: {
+      const updatedUrl = queryParamsToURLString(queryParams, url);
+
+      return { url: updatedUrl };
+    }
+
+    default:
+      return {
+        queryParams,
+        url,
+      };
+  }
+};
+
+export const filterRecordsBySearch = (records: RQAPI.Record[], searchValue: string): RQAPI.Record[] => {
+  if (!searchValue) return records;
+
+  const search = searchValue.toLowerCase();
+  const matchingRecords = new Set<string>();
+
+  const childrenMap = new Map<string, Set<string>>();
+  const parentMap = new Map<string, string>();
+
+  records.forEach((record) => {
+    if (record.collectionId) {
+      parentMap.set(record.id, record.collectionId);
+      if (!childrenMap.has(record.collectionId)) {
+        childrenMap.set(record.collectionId, new Set());
+      }
+      childrenMap.get(record.collectionId).add(record.id);
+    }
+  });
+
+  // Add all children records of a collection
+  const addChildrenRecords = (collectionId: string) => {
+    const children = childrenMap.get(collectionId) || new Set();
+    children.forEach((childId) => {
+      matchingRecords.add(childId);
+      if (childrenMap.has(childId)) {
+        addChildrenRecords(childId);
+      }
+    });
+  };
+
+  // Add all parent collections of a record
+  const addParentCollections = (recordId: string) => {
+    const parentId = parentMap.get(recordId);
+    if (parentId) {
+      matchingRecords.add(parentId);
+      addParentCollections(parentId);
+    }
+  };
+
+  // First pass: direct matches and their children
+  records.forEach((record) => {
+    if (record.name.toLowerCase().includes(search)) {
+      matchingRecords.add(record.id);
+
+      // If collection matches, add all children records
+      if (isApiCollection(record)) {
+        addChildrenRecords(record.id);
+      }
+    }
+  });
+
+  // Second pass: add parent collections
+  matchingRecords.forEach((id) => {
+    addParentCollections(id);
+  });
+
+  return records.filter((record) => matchingRecords.has(record.id));
 };

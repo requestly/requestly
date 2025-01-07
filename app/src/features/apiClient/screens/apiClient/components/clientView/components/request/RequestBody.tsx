@@ -45,15 +45,20 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
       },
       [setRequestEntry]
     ),
-    500
+    500,
+    { leading: true, trailing: true }
   );
 
-  const handleJsonChange = useCallback(
-    (value: string) => {
-      setJsonBody(value);
-      setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
-    },
-    [setRequestEntry]
+  const handleJsonChange = useDebounce(
+    useCallback(
+      (value: string) => {
+        setJsonBody(value);
+        setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
+      },
+      [setRequestEntry]
+    ),
+    500,
+    { leading: true, trailing: true }
   );
 
   const handleFormChange = useCallback(
@@ -73,12 +78,17 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
     [setRequestEntry]
   );
 
+  /*
+  Added key prop in codeEditor to force re-render the component when contentType changes
+  */
   const bodyEditor = useMemo(() => {
     switch (contentType) {
       case RequestContentType.JSON:
         return (
           <CodeEditor
+            key={contentType}
             language={EditorLanguage.JSON}
+            defaultValue={jsonBody as string}
             value={jsonBody as string}
             handleChange={handleJsonChange}
             prettifyOnInit={true}
@@ -102,7 +112,9 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
       default:
         return (
           <CodeEditor
+            key={contentType}
             language={null}
+            defaultValue={rawBody as string}
             value={rawBody as string}
             handleChange={handleRawChange}
             isResizable={false}
