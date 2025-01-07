@@ -23,6 +23,7 @@ import { inviteRoutes } from "./inviteRoutes";
 import MinimalLayout from "layouts/MinimalLayout";
 import { paymentRoutes } from "./paymentRoutes";
 import { networkInspectorRoutes } from "features/networkInspector";
+import RouterError from "components/misc/PageError/RouterError";
 
 export const routesV2: RouteObject[] = [
   /** Misc **/
@@ -33,6 +34,15 @@ export const routesV2: RouteObject[] = [
   {
     path: "",
     element: <AppLayout />,
+    errorElement: (
+      <RouterError
+        error={"route-error"}
+        componentStack={""}
+        resetError={() => {
+          window.location.reload();
+        }}
+      />
+    ),
     children: [
       /** App Dashboard - Normal Paths **/
       {
