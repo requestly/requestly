@@ -2,8 +2,6 @@ import { autocompletion, Completion, CompletionResult, CompletionSource } from "
 import { EnvironmentVariables } from "backend/environment/types";
 
 /**
- * CORE UNDERLYING GENERATOR FUNCTION
- *
  * Creates a custom completion source that returns a set of suggestions
  * when the typed text matches a specified pattern.
  *
@@ -43,17 +41,10 @@ function varCompletionSource(envVariables: EnvironmentVariables): CompletionSour
 }
 
 /* CORE PLUGIN */
-export default function generateAutoCompletions(
-  envVariables?: EnvironmentVariables,
-  extendedCompletions: CompletionSource | null = null
-) {
+export default function generateCompletionsForVariables(envVariables?: EnvironmentVariables) {
   const customCompletions = [];
   if (envVariables) {
     customCompletions.push(varCompletionSource(envVariables));
-  }
-
-  if (extendedCompletions) {
-    customCompletions.push(extendedCompletions);
   }
 
   if (!customCompletions.length) return null;
