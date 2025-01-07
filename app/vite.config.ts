@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import viteTsconfigPaths from "vite-tsconfig-paths";
 import svgr from "vite-plugin-svgr";
 import commonjs from "vite-plugin-commonjs";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { getThemeVariables } from "antd/dist/theme";
 import { theme } from "./src/lib/design-system/theme";
@@ -11,6 +12,9 @@ import { theme } from "./src/lib/design-system/theme";
 // import { viteStaticCopy } from "vite-plugin-static-copy";
 
 const config = async ({ mode }) => {
+  // To Be used withing the vite.config.ts file
+  process.env = { ...process.env, ...loadEnv(mode, process.cwd(), "") };
+
   const { viteStaticCopy } = await import("vite-plugin-static-copy");
 
   return defineConfig({
@@ -46,6 +50,14 @@ const config = async ({ mode }) => {
           { src: "node_modules/curlconverter/dist/tree-sitter-bash.wasm", dest: "." },
         ],
       }),
+      sentryVitePlugin({
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        org: "requestly",
+        project: "web-app",
+        sourcemaps: {
+          // filesToDeleteAfterUpload: true
+        },
+      }),
     ],
     resolve: {
       // { find: '@', replacement: path.resolve(__dirname, 'src') },
@@ -79,6 +91,7 @@ const config = async ({ mode }) => {
     build: {
       outDir: "build",
       target: "esnext",
+      sourcemap: true,
     },
     server: {
       open: true,
