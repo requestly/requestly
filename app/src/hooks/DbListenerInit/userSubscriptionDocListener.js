@@ -50,6 +50,15 @@ export const userSubscriptionDocListener = (dispatch, uid) => {
   }
 };
 
+const checkIfAnnualPlan = (firestoreData) => {
+  const startDate = new Date(firestoreData?.subscriptionCurrentPeriodStart);
+  const renewalDate = new Date(firestoreData?.subscriptionCurrentPeriodEnd);
+  // Calculate the difference in months
+  const monthsDiff =
+    (renewalDate.getFullYear() - startDate.getFullYear()) * 12 + (renewalDate.getMonth() - startDate.getMonth());
+  return monthsDiff > 1;
+};
+
 export const newSchemaToOldSchemaAdapter = (firestoreData) => {
   if (!firestoreData) {
     return null;
@@ -67,6 +76,8 @@ export const newSchemaToOldSchemaAdapter = (firestoreData) => {
         firestoreData?.subscriptionCurrentPeriodEnd &&
         new Date(firestoreData?.subscriptionCurrentPeriodStart * 1000).toISOString().split("T")[0],
       id: firestoreData?.stripeActiveSubscriptionID,
+      duration: firestoreData?.duration ?? (checkIfAnnualPlan(firestoreData) ? "annually" : "monthly"),
+      quantity: firestoreData?.quantity,
     },
     type: firestoreData?.type,
   };
