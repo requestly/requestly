@@ -23,7 +23,7 @@ export const ApiClientEmptyView = () => {
 
   const [isRecordCreating, setIsRecordCreating] = useState(null);
 
-  const isEmpty = apiClientRecords.length === 0;
+  const isEmpty = apiClientRecords.size === 0;
 
   const handleNewRecordClick = (recordType: RQAPI.RecordType) => {
     if (!user.loggedIn) {

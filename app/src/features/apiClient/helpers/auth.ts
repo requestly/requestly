@@ -9,7 +9,7 @@ export const processAuthForEntry = (
     id: RQAPI.Record["id"];
     collectionId: RQAPI.Record["collectionId"];
   },
-  allRecords: RQAPI.Record[]
+  allRecords: Map<RQAPI.Record["id"], RQAPI.Record>
 ) => {
   const entryCopy = JSON.parse(JSON.stringify(entry)); // Deep Copy
 
@@ -45,11 +45,9 @@ function inheritAuth(
     id: RQAPI.Record["id"];
     collectionId: RQAPI.Record["collectionId"];
   },
-  allRecords: RQAPI.Record[]
+  allRecords: Map<RQAPI.Record["id"], RQAPI.Record>
 ) {
-  const parentRecord = entryDetails.collectionId
-    ? allRecords.find((record) => record.id === entryDetails.collectionId)
-    : null;
+  const parentRecord = entryDetails.collectionId ? allRecords.get(entryDetails.collectionId) : null;
   if (!parentRecord) {
     return null;
   }

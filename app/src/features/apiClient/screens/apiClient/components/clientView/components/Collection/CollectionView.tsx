@@ -30,7 +30,7 @@ export const CollectionView = () => {
   const location = useLocation();
 
   const collection = useMemo(() => {
-    return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+    return apiClientRecords.get(collectionId) as RQAPI.CollectionRecord;
   }, [apiClientRecords, collectionId]);
 
   const updateCollectionAuthData = useCallback(

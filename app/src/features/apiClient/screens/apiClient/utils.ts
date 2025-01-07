@@ -190,7 +190,7 @@ export const isApiCollection = (record: RQAPI.Record) => {
   return record?.type === RQAPI.RecordType.COLLECTION;
 };
 
-export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
+export const convertFlatRecordsToNestedRecords = (records: ReadonlyArray<RQAPI.Record>) => {
   const recordsCopy = [...records];
   const recordsMap: Record<string, RQAPI.Record> = {};
   const updatedRecords: RQAPI.Record[] = [];
@@ -352,7 +352,10 @@ export const syncQueryParams = (
   }
 };
 
-export const filterRecordsBySearch = (records: RQAPI.Record[], searchValue: string): RQAPI.Record[] => {
+export const filterRecordsBySearch = (
+  records: ReadonlyArray<RQAPI.Record>,
+  searchValue: string
+): ReadonlyArray<RQAPI.Record> => {
   if (!searchValue) return records;
 
   const search = searchValue.toLowerCase();

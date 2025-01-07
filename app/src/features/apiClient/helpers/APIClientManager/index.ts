@@ -11,7 +11,7 @@ import { processAuthForEntry, updateRequestWithAuthOptions } from "../auth";
 
 export const executeAPIRequest = async (
   appMode: string,
-  apiRecords: RQAPI.Record[],
+  apiRecords: Map<RQAPI.Record["id"], RQAPI.Record>,
   entry: RQAPI.Entry,
   entryDetails: {
     id: RQAPI.Record["id"];

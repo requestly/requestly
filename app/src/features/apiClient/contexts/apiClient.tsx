@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -19,7 +19,8 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { createBlankApiRecord } from "../screens/apiClient/utils";
 
 interface ApiClientContextInterface {
-  apiClientRecords: RQAPI.Record[];
+  apiClientRecords: Map<RQAPI.Record["id"], RQAPI.Record>;
+  apiRecordsList: ReadonlyArray<RQAPI.Record>;
   isLoadingApiClientRecords: boolean;
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
@@ -51,7 +52,8 @@ interface ApiClientContextInterface {
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
-  apiClientRecords: [],
+  apiClientRecords: new Map(),
+  apiRecordsList: [],
   isLoadingApiClientRecords: false,
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
@@ -92,7 +94,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const teamId = workspace?.id;
 
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(false);
-  const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
+  const [apiClientRecords, setApiClientRecords] = useState<Map<RQAPI.Record["id"], RQAPI.Record>>(new Map());
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
@@ -105,7 +107,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   useEffect(() => {
     if (!user.loggedIn) {
-      setApiClientRecords([]);
+      setApiClientRecords(new Map());
     }
   }, [user.loggedIn]);
 
@@ -121,11 +123,15 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     getApiRecords(uid, teamId)
       .then((result) => {
         if (result.success) {
-          setApiClientRecords(result.data);
+          const recordsMap = result.data.reduce((acc: Map<RQAPI.Record["id"], RQAPI.Record>, record: RQAPI.Record) => {
+            acc.set(record.id, record);
+            return acc;
+          }, new Map());
+          setApiClientRecords(recordsMap);
         }
       })
       .catch((error) => {
-        setApiClientRecords([]);
+        setApiClientRecords(new Map());
         Logger.error("Error loading api records!", error);
       })
       .finally(() => {
@@ -133,30 +139,36 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       });
   }, [uid, teamId]);
 
+  const apiRecordsList = useMemo(() => Array.from(apiClientRecords.values()), [
+    apiClientRecords,
+  ]) as ReadonlyArray<RQAPI.Record>;
+
   const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
     setApiClientRecords((prev) => {
-      return [...prev, { ...apiClientRecord }];
+      return prev.set(apiClientRecord.id, apiClientRecord);
     });
   }, []);
 
   const onRemoveRecord = useCallback((apiClientRecord: RQAPI.Record) => {
     setApiClientRecords((prev) => {
-      return prev.filter((record) => record.id !== apiClientRecord.id);
+      prev.delete(apiClientRecord.id);
+      return prev;
     });
   }, []);
 
   const onUpdateRecord = useCallback(
-    (apiClientRecord: RQAPI.Record) => {
+    (updatedRecord: RQAPI.Record) => {
       setApiClientRecords((prev) => {
-        return prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record));
+        prev.set(updatedRecord.id, updatedRecord);
+        return prev;
       });
 
-      updateTab(apiClientRecord.id, {
-        title: apiClientRecord.name,
+      updateTab(updatedRecord.id, {
+        title: updatedRecord.name,
         hasUnsavedChanges: false,
       });
     },
-    [updateTab]
+    [updateTab, setApiClientRecords]
   );
 
   const onDeleteRecords = useCallback(
@@ -164,19 +176,21 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       deleteTabs(recordIdsToBeDeleted);
 
       setApiClientRecords((prev) => {
-        return prev.filter((record) => {
-          return !recordIdsToBeDeleted.includes(record.id);
+        recordIdsToBeDeleted.forEach((id) => {
+          prev.delete(id);
         });
+        return prev;
       });
     },
-    [deleteTabs]
+
+    [deleteTabs, setApiClientRecords]
   );
 
   const onSaveRecord = useCallback(
     (apiClientRecord: RQAPI.Record, openTabOnSave = true) => {
-      const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
+      const existingRecord = apiClientRecords.get(apiClientRecord.id);
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
-      if (isRecordExist) {
+      if (existingRecord) {
         onUpdateRecord(apiClientRecord);
         replaceTab(apiClientRecord.id, {
           title: apiClientRecord.name,
@@ -257,7 +271,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setIsRecordBeingCreated(recordType);
           trackCreateEnvironmentClicked(analyticEventSource);
           return addNewEnvironment("New Environment")
-            .then((newEnvironment: { id: string; name: string }) => {
+            .then((newEnvironment: { id: string; name: string; isGlobal: boolean }) => {
               setIsRecordBeingCreated(null);
               openTab(newEnvironment?.id, {
                 title: newEnvironment?.name,
@@ -279,6 +293,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const value = {
     apiClientRecords,
+    apiRecordsList,
     isLoadingApiClientRecords,
     onNewRecord,
     onRemoveRecord,
