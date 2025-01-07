@@ -316,6 +316,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     if (isCreateMode) {
       args.push(requestId);
+      record.name = requestName;
     }
 
     const result = await upsertApiRecord(...args);
