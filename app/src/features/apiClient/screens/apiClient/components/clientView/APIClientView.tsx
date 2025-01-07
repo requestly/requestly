@@ -324,8 +324,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
         { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
-        true,
-        isCreateMode
+        isCreateMode ? "replace" : "open"
       );
       trackRequestRenamed("breadcrumb");
       setRequestName("");
@@ -359,8 +358,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
         { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
-        true,
-        isCreateMode
+        isCreateMode ? "replace" : "open"
       );
       setEntry({ ...result.data.data, response: entry.response });
       resetChanges();

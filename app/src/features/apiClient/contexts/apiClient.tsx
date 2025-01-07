@@ -25,7 +25,7 @@ interface ApiClientContextInterface {
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => void;
-  onSaveRecord: (apiClientRecord: RQAPI.Record, openTabOnSave?: boolean, replaceTabOnSave?: boolean) => void;
+  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => void;
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => void;
   recordToBeDeleted: RQAPI.Record;
   updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => void;
@@ -57,7 +57,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => {},
-  onSaveRecord: (apiClientRecord: RQAPI.Record, openTabOnSave?: boolean, replaceTabOnSave?: boolean) => {},
+  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => {},
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => {},
   recordToBeDeleted: null,
   updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => {},
@@ -174,7 +174,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   );
 
   const onSaveRecord = useCallback(
-    (apiClientRecord: RQAPI.Record, openTabOnSave = true, replaceTabOnSave = false) => {
+    (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open") => {
       const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
       if (isRecordExist) {
@@ -186,7 +186,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       } else {
         onNewRecord(apiClientRecord);
 
-        if (replaceTabOnSave) {
+        if (onSaveTabAction === "replace") {
           replaceTab(apiClientRecord.id, {
             title: apiClientRecord.name,
             url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}`,
@@ -194,7 +194,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           return;
         }
 
-        if (openTabOnSave) {
+        if (onSaveTabAction === "open") {
           openTab(apiClientRecord.id, {
             title: apiClientRecord.name,
             url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?new`,
