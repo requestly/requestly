@@ -4,7 +4,7 @@ import { Button, Tabs, Badge, Tag, List, Image } from "antd";
 import { CheckCircleTwoTone } from "@ant-design/icons";
 import { getDesktopSpecificDetails } from "../../../../../../../store/selectors";
 import proxyStepsGif from "assets/img/screenshots/proxy_steps.gif";
-import winProxyStepsGif from "assets/img/screenshots/win_proxy_steps.gif";
+// import winProxyStepsGif from "assets/img/screenshots/win_proxy_steps.gif";
 import UAParser from "ua-parser-js";
 import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
@@ -130,7 +130,7 @@ const ProxyInstructions = () => {
             description={
               <>
                 <br />
-                <Image width={"100%"} src={winProxyStepsGif} />
+                {/* <Image width={"100%"} src={winProxyStepsGif} /> */}
               </>
             }
           />
