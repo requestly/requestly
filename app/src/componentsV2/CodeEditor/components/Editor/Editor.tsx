@@ -26,7 +26,6 @@ import { EditorPopover } from "./components/PopOver";
 import "./editor.scss";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/PopOver/popover.scss";
-import { CompletionSource } from "@codemirror/autocomplete";
 import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 interface EditorProps {
   value: string;
@@ -42,7 +41,6 @@ interface EditorProps {
   analyticEventProperties?: AnalyticEventProperties;
   prettifyOnInit?: boolean;
   envVariables?: EnvironmentVariables;
-  completions?: CompletionSource;
   config?: {
     enablePrettify?: boolean;
   };
