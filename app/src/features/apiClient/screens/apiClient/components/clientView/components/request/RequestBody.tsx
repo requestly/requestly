@@ -15,10 +15,12 @@ interface Props {
 }
 
 const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequestEntry, setContentType }) => {
-  const [textBody, setTextBody] = useState(
-    RequestContentType.RAW === contentType || RequestContentType.JSON === contentType ? body : ""
+  const [textBody, setTextBody] = useState<string>(
+    RequestContentType.RAW === contentType || RequestContentType.JSON === contentType ? (body as string) : ""
   );
-  const [formBody, setFormBody] = useState(RequestContentType.FORM === contentType ? body : []);
+  const [formBody, setFormBody] = useState<KeyValuePair[]>(
+    RequestContentType.FORM === contentType ? (body as KeyValuePair[]) : []
+  );
 
   /*
   when switching between RAW,JSON & Form , setContentype reinitalizes the request body as an empty string, array
