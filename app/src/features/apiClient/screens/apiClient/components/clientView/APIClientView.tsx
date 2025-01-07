@@ -101,8 +101,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const { updateTab } = useTabsLayoutContext();
 
   useEffect(() => {
-    updateTab(apiEntryDetails?.id, { hasUnsavedChanges: hasUnsavedChanges });
-  }, [updateTab, apiEntryDetails?.id, hasUnsavedChanges]);
+    const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
+
+    updateTab(tabId, { hasUnsavedChanges: hasUnsavedChanges });
+  }, [updateTab, isCreateMode, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
 
   useEffect(() => {
     if (apiEntry) {
