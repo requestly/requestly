@@ -392,6 +392,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           />
         }
         minSize={35}
+        defaultSizing={false}
       >
         <div className="api-client-body">
           <Skeleton loading={isAnimating} active>
