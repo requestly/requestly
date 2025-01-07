@@ -3,7 +3,6 @@ import { globalActions } from "store/slices/global/slice";
 import { RQButton } from "lib/design-system/components";
 import { useDispatch } from "react-redux";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-//@ts-ignore
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useSelector } from "react-redux";
 import { getAppNotificationBannerDismissTs } from "store/selectors";
@@ -23,6 +22,8 @@ import "./appNotificationBanner.scss";
 import { trackCheckoutInitiated } from "modules/analytics/events/misc/business/checkout";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
+import { PlanStatus, PlanType } from "features/settings/components/BillingTeam/types";
+import { PRICING } from "features/pricing/constants/pricing";
 
 enum BANNER_TYPE {
   WARNING = "warning",
@@ -111,7 +112,7 @@ export const AppNotificationBanner = () => {
         onClick: () => {
           const manageSubscription = httpsCallable(firebaseFunction, "subscription-manageSubscription");
           manageSubscription({
-            planName: user.details.planDetails.planName,
+            planName: user?.details?.planDetails?.planName,
             duration: "annually",
             portalFlowType: "update_subscription",
             monthlyConversionToAnnual: true,
@@ -121,10 +122,10 @@ export const AppNotificationBanner = () => {
                 window.location.href = res?.data?.data?.portalUrl;
 
                 trackCheckoutInitiated({
-                  plan_name: user.details?.planDetails?.planName,
+                  plan_name: user?.details?.planDetails?.planName,
                   duration: "annually",
                   currency: "usd",
-                  quantity: user.details?.planDetails?.subscription?.quantity,
+                  quantity: user?.details?.planDetails?.subscription?.quantity,
                   source: "monthly_to_annual_conversion",
                 });
               }
@@ -136,7 +137,12 @@ export const AppNotificationBanner = () => {
         },
       },
     };
-  }, [dispatch, firebaseFunction, user.details.planDetails.planName, user.details.planDetails?.subscription?.quantity]);
+  }, [
+    dispatch,
+    firebaseFunction,
+    user?.details?.planDetails?.planName,
+    user?.details?.planDetails?.subscription?.quantity,
+  ]);
 
   const renderBannerText = useCallback(
     (bannerId: string, text: string) => {
@@ -197,17 +203,17 @@ export const AppNotificationBanner = () => {
           } else return false;
         }
         case BANNER_ID.CONVERT_TO_ANNUAL_PLAN: {
-          if (!user?.details?.isPremium || user?.details?.planDetails?.status !== "active") {
+          if (!user?.details?.isPremium || user?.details?.planDetails?.status !== PlanStatus.ACTIVE) {
             return false;
           }
 
           // Check if not monthly plan
-          if (user?.details?.planDetails?.subscription?.duration !== "monthly") {
+          if (user?.details?.planDetails?.subscription?.duration === PRICING.DURATION.ANNUALLY) {
             return false;
           }
 
           // Handle individual plan
-          if (user.details?.planDetails?.type !== "team") {
+          if (user?.details?.planDetails?.type === PlanType.INDIVIDUAL) {
             dispatch(globalActions.updateIsAppBannerVisible(true));
             return true;
           }
