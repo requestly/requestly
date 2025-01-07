@@ -55,7 +55,7 @@ const config = async ({ mode }) => {
         org: "requestly",
         project: "web-app",
         sourcemaps: {
-          // filesToDeleteAfterUpload: true
+          filesToDeleteAfterUpload: ["**/*.js.map"],
         },
       }),
     ],
