@@ -268,10 +268,10 @@ export const AppNotificationBanner = () => {
   };
 
   useEffect(() => {
-    if (newBanners?.length > 0) {
+    if (newBanners?.length > 0 && checkBannerVisibility(newBanners[0]?.id)) {
       trackAppNotificationBannerViewed(newBanners[0]?.id);
     }
-  }, [newBanners]);
+  }, [checkBannerVisibility, newBanners]);
 
   const renderAppBanner = () => {
     const banner = newBanners ? newBanners[0] : null;
