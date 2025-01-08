@@ -47,6 +47,7 @@ import { getCollectionVariables } from "store/features/variables/selectors";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { REQUEST_METHOD_COLORS } from "../../../../../../constants";
 
 interface Props {
   openInModal?: boolean;
@@ -424,6 +425,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             <div className="api-client-header">
               <Space.Compact className="api-client-url-container">
                 <Select
+                  popupClassName="api-request-method-selector"
                   className="api-request-method-selector"
                   options={requestMethodOptions}
                   value={entry.request.method}
