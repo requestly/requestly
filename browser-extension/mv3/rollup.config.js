@@ -9,10 +9,10 @@ import { browser, WEB_URL, OTHER_WEB_URLS } from "../config/dist/config.build.js
 const OUTPUT_DIR = "dist";
 const isProductionBuildMode = process.env.BUILD_MODE === "production";
 
-const generateUrlPattern = (urlString, port = true) => {
+const generateUrlPattern = (urlString, includePort = true) => {
   try {
     const webUrlObj = new URL(urlString);
-    if (port) {
+    if (includePort) {
       return `${webUrlObj.protocol}//${webUrlObj.host}/*`;
     } else {
       return `${webUrlObj.protocol}//${webUrlObj.hostname}/*`;
