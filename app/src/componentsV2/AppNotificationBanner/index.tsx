@@ -207,7 +207,12 @@ export const AppNotificationBanner = () => {
             return false;
           }
 
-          // Check if not monthly plan
+          // Check if lite plan
+          if (user?.details?.planDetails?.planId === PRICING.PLAN_NAMES.LITE) {
+            return false;
+          }
+
+          // Check if annual plan
           if (user?.details?.planDetails?.subscription?.duration === PRICING.DURATION.ANNUALLY) {
             return false;
           }
