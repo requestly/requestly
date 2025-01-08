@@ -11,7 +11,7 @@ interface Props {
 }
 
 export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
-  const { tabs, activeTab, openTab, closeTab } = useTabsLayoutContext();
+  const { tabs, activeTab, openTab, closeTab, onTabsEdit } = useTabsLayoutContext();
 
   const hasUnsavedChanges = tabs.some((tab) => tab.hasUnsavedChanges);
 
@@ -35,6 +35,7 @@ export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
   const items: TabsProps["items"] = tabs.map((tab) => {
     return {
       key: tab.id,
+      closable: false,
       label: (
         <div title={tab.title} className="tab-title-container">
           <div className="tab-title">{tab.title}</div>
@@ -62,12 +63,13 @@ export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
     <div className="tabs-layout-container">
       {tabs.length ? (
         <Tabs
-          hideAdd
+          type="editable-card"
           activeKey={activeTab?.id}
           destroyInactiveTabPane={false}
           className="tabs-layout-tabs-container"
           popupClassName="tabs-layout-more-dropdown"
           items={items}
+          onEdit={onTabsEdit}
           onChange={(activeTabId) => {
             openTab(activeTabId);
           }}
