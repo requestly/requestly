@@ -108,6 +108,7 @@ const RequestTabs: React.FC<Props> = ({
             defaultValues={requestEntry.auth}
             onAuthUpdate={handleAuthChange}
             rootLevelRecord={!collectionId}
+            variables={variables}
           />
         ),
       },
@@ -128,7 +129,7 @@ const RequestTabs: React.FC<Props> = ({
     }
 
     return items;
-  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts, variables]);
+  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts, variables, handleAuthChange, collectionId]);
 
   return (
     <Tabs

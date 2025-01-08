@@ -12,6 +12,7 @@ import { MdClear } from "@react-icons/all-files/md/MdClear";
 import { AUTHORIZATION_TYPES } from "./types";
 import { AUTH_OPTIONS } from "./types/form";
 import { RQAPI } from "features/apiClient/types";
+import { EnvironmentVariables } from "backend/environment/types";
 
 interface Props {
   wrapperClass?: string;
@@ -21,9 +22,18 @@ interface Props {
   };
   onAuthUpdate: (authOptions: RQAPI.AuthOptions) => any;
   rootLevelRecord: Boolean;
+  variables: EnvironmentVariables;
+  authorizationViewActions?: React.ReactElement;
 }
 
-const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootLevelRecord, wrapperClass = "" }) => {
+const AuthorizationView: React.FC<Props> = ({
+  defaultValues,
+  onAuthUpdate,
+  rootLevelRecord,
+  wrapperClass = "",
+  variables,
+  authorizationViewActions,
+}) => {
   const [selectedForm, setSelectedForm] = useState(
     defaultValues?.currentAuthType || (rootLevelRecord ? AUTHORIZATION_TYPES.NO_AUTH : AUTHORIZATION_TYPES.INHERIT)
   );
@@ -78,7 +88,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootL
             <div
               className="clear-icon"
               onClick={() => {
-                onAuthUpdate({ currentAuthType: AUTHORIZATION_TYPES.NO_AUTH });
+                onAuthUpdate(getAuthOptions(formValues, AUTHORIZATION_TYPES.NO_AUTH));
                 setSelectedForm(AUTHORIZATION_TYPES.NO_AUTH);
               }}
             >
@@ -86,6 +96,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootL
               <span>{LABEL_TEXT.CLEAR}</span>
             </div>
           )}
+          {authorizationViewActions}
         </div>
       </div>
       <div className="form-and-description">
@@ -100,6 +111,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootL
               formType={selectedForm}
               onChangeHandler={debouncedOnChange}
               formvalues={formValues[selectedForm] || {}}
+              variables={variables}
             />
           </div>
         )}
