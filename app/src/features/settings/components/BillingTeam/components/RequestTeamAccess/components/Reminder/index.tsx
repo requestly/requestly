@@ -11,11 +11,13 @@ import APP_CONSTANTS from "config/constants";
 import { openEmailClientWithDefaultEmailBody } from "utils/Misc";
 import { globalActions } from "store/slices/global/slice";
 import { RQButton } from "lib/design-system-v2/components";
+import LINKS from "config/constants/sub/links";
 import "../../index.scss";
 
 export const RequestBillingTeamAccessReminder = () => {
   const dispatch = useDispatch();
   const joinTeamReminder = useFeatureValue("join_team_reminder", null);
+  const isDomainBlocked = useFeatureValue("blocked_commercial_license_domain", false);
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -25,6 +27,9 @@ export const RequestBillingTeamAccessReminder = () => {
   const emailBody = `Hey Requestly Team\n\n We'd like to setup a new Billing Team. Could you please assist with the next step here?\n\nThanks\n${user?.details?.profile?.displayName}`;
 
   const availableBillingTeams = useMemo(() => {
+    if (isDomainBlocked) {
+      return [];
+    }
     if (billingTeams) {
       return billingTeams.filter(
         (team) =>
@@ -35,7 +40,7 @@ export const RequestBillingTeamAccessReminder = () => {
       );
     }
     return [];
-  }, [billingTeams]);
+  }, [billingTeams, isDomainBlocked]);
 
   useEffect(() => {
     if (isModalVisible) {
@@ -123,21 +128,30 @@ export const RequestBillingTeamAccessReminder = () => {
             You can purchase individual license for yourself{" "}
             <a href="#" onClick={handleOpenPricingModal}>
               here
-            </a>
-            . Want to setup a new billing team? please write to us at{" "}
+            </a>{" "}
+            or set up team billing by contacting us at{" "}
             <a href={openEmailClientWithDefaultEmailBody("enterprise.support@requestly.io", emailSubject, emailBody)}>
               enterprise.support@requestly.io
             </a>
+            . For any queries, you can schedule a call with our team{" "}
+            <a href={LINKS.CALENDLY_LINK} target="_blank" rel="noreferrer">
+              here
+            </a>
+            .
           </div>
         </>
       ) : (
         <>
           <div className="text-white">
             Requestly's free plan is limited to non-commercial use. To continue using Requestly within your
-            organization, please upgrade to a paid license. You can purchase licenses directly or set up team billing by
+            organization, please upgrade to a paid plan. You can purchase licenses directly or set up team billing by
             contacting us at{" "}
             <a href={openEmailClientWithDefaultEmailBody("enterprise.support@requestly.io", emailSubject, emailBody)}>
               enterprise.support@requestly.io
+            </a>
+            . For any queries, you can schedule a call with our team{" "}
+            <a href={LINKS.CALENDLY_LINK} target="_blank" rel="noreferrer">
+              here
             </a>
             .
           </div>
