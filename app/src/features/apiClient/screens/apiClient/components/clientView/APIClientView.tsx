@@ -47,6 +47,7 @@ import { getCollectionVariables } from "store/features/variables/selectors";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { getAllRecords } from "features/apiClient/contexts/slice";
 
 interface Props {
   openInModal?: boolean;
@@ -69,13 +70,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
+  const apiClientRecords = useSelector(getAllRecords);
   const collectionVariables = useSelector(getCollectionVariables);
   const [searchParams] = useSearchParams();
   const isCreateMode = searchParams.has("create");
   const { requestId } = useParams();
 
   const { toggleBottomSheet } = useBottomSheetContext();
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const { onSaveRecord } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const { getVariablesWithPrecedence } = environmentManager;
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [

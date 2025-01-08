@@ -28,6 +28,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { upsertApiRecord } from "backend/apiClient/upsertApiRecord";
+import { getAllRecords } from "features/apiClient/contexts/slice";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -38,9 +39,10 @@ const VARIABLES_PRECEDENCE_ORDER = ["ENVIRONMENT", "COLLECTION"];
 
 const useEnvironmentManager = () => {
   const dispatch = useDispatch();
+  const apiClientRecords = useSelector(getAllRecords);
   const [isLoading, setIsLoading] = useState(false);
   const [isEnvironmentsDataLoaded, setIsEnvironmentsDataLoaded] = useState(false);
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const { onSaveRecord } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);

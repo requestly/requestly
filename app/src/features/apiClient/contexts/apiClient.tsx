@@ -18,11 +18,9 @@ import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { createBlankApiRecord } from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
-import { deleteRecord, getAllRecords, getRecordsList, setRecord, setRecords } from "./slice";
+import { deleteRecord, getAllRecords, setRecord, setRecords } from "./slice";
 
 interface ApiClientContextInterface {
-  apiClientRecords: Record<RQAPI.Record["id"], RQAPI.Record>;
-  apiRecordsList: ReadonlyArray<RQAPI.Record>;
   isLoadingApiClientRecords: boolean;
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
@@ -54,8 +52,6 @@ interface ApiClientContextInterface {
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
-  apiClientRecords: {},
-  apiRecordsList: [],
   isLoadingApiClientRecords: false,
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
@@ -97,10 +93,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const dispatch = useDispatch();
   const apiClientRecords = useSelector(getAllRecords);
-  const apiRecordsList = useSelector(getRecordsList);
 
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(false);
-  // const [apiClientRecords, setApiClientRecords] = useState<Map<RQAPI.Record["id"], RQAPI.Record>>(new Map());
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
@@ -136,12 +130,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             },
             {}
           );
-          // setApiClientRecords(recordsMap);
           dispatch(setRecords(recordsMap));
         }
       })
       .catch((error) => {
-        // setApiClientRecords(new Map());
         dispatch(setRecords({}));
         Logger.error("Error loading api records!", error);
       })
@@ -150,15 +142,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       });
   }, [uid, teamId, dispatch]);
 
-  // const apiRecordsList = useMemo(() => Array.from(apiClientRecords.values()), [
-  //   apiClientRecords,
-  // ]) as ReadonlyArray<RQAPI.Record>;
-
   const onNewRecord = useCallback(
     (apiClientRecord: RQAPI.Record) => {
-      // setApiClientRecords((prev) => {
-      //   return prev.set(apiClientRecord.id, apiClientRecord);
-      // });
       dispatch(setRecord(apiClientRecord));
     },
     [dispatch]
@@ -166,11 +151,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onRemoveRecord = useCallback(
     (apiClientRecord: RQAPI.Record) => {
-      // setApiClientRecords((prev) => {
-      //   prev.delete(apiClientRecord.id);
-      //   return prev;
-      // });
-
       dispatch(deleteRecord(apiClientRecord));
     },
     [dispatch]
@@ -178,11 +158,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onUpdateRecord = useCallback(
     (updatedRecord: RQAPI.Record) => {
-      // setApiClientRecords((prev) => {
-      //   prev.set(updatedRecord.id, updatedRecord);
-      //   return prev;
-      // });
-
       dispatch(setRecord(updatedRecord));
 
       updateTab(updatedRecord.id, {
@@ -196,13 +171,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const onDeleteRecords = useCallback(
     (recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
       deleteTabs(recordIdsToBeDeleted);
-
-      // setApiClientRecords((prev) => {
-      //   recordIdsToBeDeleted.forEach((id) => {
-      //     prev.delete(id);
-      //   });
-      //   return prev;
-      // });
       dispatch(deleteRecord(recordIdsToBeDeleted));
     },
 
@@ -340,8 +308,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   );
 
   const value = {
-    apiClientRecords,
-    apiRecordsList,
     isLoadingApiClientRecords,
     onNewRecord,
     onRemoveRecord,

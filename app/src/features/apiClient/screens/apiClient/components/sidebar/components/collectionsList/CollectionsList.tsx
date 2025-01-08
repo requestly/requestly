@@ -20,6 +20,8 @@ import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceho
 import { sessionStorage } from "utils/sessionStorage";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
 import "./collectionsList.scss";
+import { useSelector } from "react-redux";
+import { getRecordsList } from "features/apiClient/contexts/slice";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -30,7 +32,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const navigate = useNavigate();
   const location = useLocation();
   const { openTab, tabs } = useTabsLayoutContext();
-  const { isLoadingApiClientRecords, apiRecordsList, isRecordBeingCreated } = useApiClientContext();
+  const apiRecordsList = useSelector(getRecordsList);
+  const { isLoadingApiClientRecords, isRecordBeingCreated } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");

@@ -14,6 +14,7 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
+import { getAllRecords } from "features/apiClient/contexts/slice";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -23,7 +24,8 @@ const TAB_KEYS = {
 
 export const CollectionView = () => {
   const { collectionId } = useParams();
-  const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords } = useApiClientContext();
+  const apiClientRecords = useSelector(getAllRecords);
+  const { onSaveRecord, isLoadingApiClientRecords } = useApiClientContext();
   const { replaceTab } = useTabsLayoutContext();
   const user = useSelector(getUserAuthDetails);
   const teamId = useSelector(getCurrentlyActiveWorkspace);

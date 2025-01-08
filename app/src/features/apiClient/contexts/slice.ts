@@ -23,7 +23,6 @@ export const ApiClientReducers = ApiClientRecords.reducer;
 export const { setRecords, setRecord, deleteRecord } = ApiClientRecords.actions;
 /* selectors */
 export const getAllRecords = (state: RootState) => {
-  console.log(state);
   return state.apiClient.records;
 };
 

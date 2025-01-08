@@ -13,11 +13,12 @@ import { useState } from "react";
 import { toast } from "utils/Toast";
 import "./apiClientEmptyView.scss";
 import * as _ from "lodash";
+import { getAllRecords } from "features/apiClient/contexts/slice";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
-
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const apiClientRecords = useSelector(getAllRecords);
+  const { onSaveRecord } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
   const team = useSelector(getCurrentlyActiveWorkspace);
