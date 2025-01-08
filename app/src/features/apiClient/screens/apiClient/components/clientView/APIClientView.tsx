@@ -407,6 +407,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         layout={SheetLayout.SPLIT}
         bottomSheet={
           <ApiClientBottomSheet
+            key={requestId}
             response={entry.response}
             isLoading={isLoadingResponse}
             isFailed={isFailed}
@@ -416,6 +417,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           />
         }
         minSize={35}
+        initialSizes={[60, 40]}
       >
         <div className="api-client-body">
           <Skeleton loading={isAnimating} active>
@@ -471,6 +473,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               ) : null}
             </div>
             <RequestTabs
+              key={requestId}
               collectionId={apiEntryDetails?.collectionId}
               requestEntry={entry}
               setRequestEntry={setRequestEntry}
