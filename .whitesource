@@ -8,7 +8,7 @@
     "useMendCheckNames": true
   },
   "issueSettings": {
-    "minSeverityLevel": "LOW",
+    "minSeverityLevel": "NONE",
     "issueType": "DEPENDENCY"
   }
 }
