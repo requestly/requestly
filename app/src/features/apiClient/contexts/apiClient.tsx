@@ -17,6 +17,7 @@ import { trackCreateEnvironmentClicked } from "../screens/environment/analytics"
 import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { createBlankApiRecord } from "../screens/apiClient/utils";
+import { generateDocumentId } from "backend/utils";
 
 interface ApiClientContextInterface {
   apiClientRecords: Map<RQAPI.Record["id"], RQAPI.Record>;
@@ -25,7 +26,7 @@ interface ApiClientContextInterface {
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => void;
-  onSaveRecord: (apiClientRecord: RQAPI.Record, openTabOnSave?: boolean) => void;
+  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => void;
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => void;
   recordToBeDeleted: RQAPI.Record;
   updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => void;
@@ -58,7 +59,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => {},
-  onSaveRecord: (apiClientRecord: RQAPI.Record, openTabOnSave?: boolean) => {},
+  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => {},
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => {},
   recordToBeDeleted: null,
   updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => {},
@@ -187,7 +188,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   );
 
   const onSaveRecord = useCallback(
-    (apiClientRecord: RQAPI.Record, openTabOnSave = true) => {
+    (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open") => {
       const existingRecord = apiClientRecords.get(apiClientRecord.id);
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
       if (existingRecord) {
@@ -198,11 +199,21 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         });
       } else {
         onNewRecord(apiClientRecord);
-        if (openTabOnSave) {
+
+        if (onSaveTabAction === "replace") {
+          replaceTab(apiClientRecord.id, {
+            title: apiClientRecord.name,
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}`,
+          });
+          return;
+        }
+
+        if (onSaveTabAction === "open") {
           openTab(apiClientRecord.id, {
             title: apiClientRecord.name,
             url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?new`,
           });
+          return;
         }
       }
     },
@@ -240,12 +251,27 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);
 
+  const openDraftRequest = useCallback(() => {
+    const requestId = generateDocumentId("apis");
+
+    openTab(requestId, {
+      title: "Untitled request",
+      url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?create=true`,
+    });
+  }, [openTab]);
+
   const onNewClick = useCallback(
     async (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId = "") => {
       switch (recordType) {
         case RQAPI.RecordType.API: {
-          setIsRecordBeingCreated(recordType);
           trackNewRequestClicked(analyticEventSource);
+
+          if (analyticEventSource === "api_client_sidebar_header") {
+            openDraftRequest();
+            return;
+          }
+
+          setIsRecordBeingCreated(recordType);
           return createBlankApiRecord(uid, teamId, recordType, collectionId).then((result) => {
             setIsRecordBeingCreated(null);
             onSaveRecord(result.data);
@@ -288,7 +314,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [openTab, addNewEnvironment, teamId, uid, onSaveRecord]
+    [openTab, openDraftRequest, addNewEnvironment, teamId, uid, onSaveRecord]
   );
 
   const value = {
