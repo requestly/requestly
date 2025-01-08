@@ -207,7 +207,7 @@ export const AppNotificationBanner = () => {
             return false;
           }
 
-          // Check if not monthly plan
+          // Check if annual plan
           if (user?.details?.planDetails?.subscription?.duration === PRICING.DURATION.ANNUALLY) {
             return false;
           }
