@@ -4,6 +4,7 @@ import { getMocks } from "backend/mocks/getMocks";
 import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import useSWR from "swr";
 
 export const useFetchMockRecords = (type: MockType, forceRender: boolean) => {
   const user = useSelector(getUserAuthDetails);
@@ -54,6 +55,10 @@ export const useFetchMockRecords = (type: MockType, forceRender: boolean) => {
   //     setOldMocksList([...adaptedData]);
   //   });
   // }, [type, uid]);
+
+  // const { data, isLoading, error, isValidating, mutate } = useSWR("getMocks" + type, () =>
+  //   getMocks(uid, type, workspace?.id)
+  // );
 
   useEffect(() => {
     const fetchMocks = () => {

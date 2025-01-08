@@ -49,6 +49,7 @@ import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 
 interface Props {
+  isLoading?: boolean;
   openInModal?: boolean;
   apiEntry?: RQAPI.Entry;
   notifyApiRequestFinished?: (apiEntry: RQAPI.Entry) => void;
@@ -60,7 +61,13 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   label: method,
 }));
 
-const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRequestFinished, openInModal }) => {
+const APIClientView: React.FC<Props> = ({
+  isLoading = false,
+  apiEntry,
+  apiEntryDetails,
+  notifyApiRequestFinished,
+  openInModal,
+}) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const appMode = useSelector(getAppMode);

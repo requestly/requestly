@@ -17,6 +17,7 @@ import { trackCreateEnvironmentClicked } from "../screens/environment/analytics"
 import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { createBlankApiRecord } from "../screens/apiClient/utils";
+import useSWR from "swr";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -91,8 +92,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
-  const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(false);
-  const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
+  // const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
@@ -103,73 +103,81 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const { openTab, deleteTabs, updateTab, replaceTab } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
 
-  useEffect(() => {
-    if (!user.loggedIn) {
-      setApiClientRecords([]);
-    }
-  }, [user.loggedIn]);
-
   // TODO: Create modal context
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const { mutate, error, isLoading, data: apiClientRecords = [] } = useSWR("getApiRecords", () =>
+    getApiRecords(uid, teamId).then((res) => res.data)
+  );
+
   useEffect(() => {
-    if (!uid) {
-      return;
+    if (!user.loggedIn) {
+      mutate([]);
     }
+  }, [user.loggedIn, mutate]);
 
-    setIsLoadingApiClientRecords(true);
-    getApiRecords(uid, teamId)
-      .then((result) => {
-        if (result.success) {
-          setApiClientRecords(result.data);
-        }
-      })
-      .catch((error) => {
-        setApiClientRecords([]);
-        Logger.error("Error loading api records!", error);
-      })
-      .finally(() => {
-        setIsLoadingApiClientRecords(false);
-      });
-  }, [uid, teamId]);
+  // useEffect(() => {
+  //   if (!uid) {
+  //     return;
+  //   }
 
-  const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-    setApiClientRecords((prev) => {
-      return [...prev, { ...apiClientRecord }];
-    });
-  }, []);
+  //   setIsLoadingApiClientRecords(true);
+  //   getApiRecords(uid, teamId)
+  //     .then((result) => {
+  //       if (result.success) {
+  //         setApiClientRecords(result.data);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       setApiClientRecords([]);
+  //       Logger.error("Error loading api records!", error);
+  //     })
+  //     .finally(() => {
+  //       setIsLoadingApiClientRecords(false);
+  //     });
+  // }, [uid, teamId]);
 
-  const onRemoveRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-    setApiClientRecords((prev) => {
-      return prev.filter((record) => record.id !== apiClientRecord.id);
-    });
-  }, []);
+  const onNewRecord = useCallback(
+    (apiClientRecord: RQAPI.Record) => {
+      mutate([...apiClientRecords, apiClientRecord]);
+    },
+    [apiClientRecords, mutate]
+  );
+
+  const onRemoveRecord = useCallback(
+    (apiClientRecord: RQAPI.Record) => {
+      mutate(apiClientRecords.filter((record) => record.id !== apiClientRecord.id));
+    },
+    [apiClientRecords, mutate]
+  );
 
   const onUpdateRecord = useCallback(
     (apiClientRecord: RQAPI.Record) => {
-      setApiClientRecords((prev) => {
-        return prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record));
-      });
+      mutate(
+        apiClientRecords.map((record) =>
+          record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record
+        )
+      );
 
       updateTab(apiClientRecord.id, {
         title: apiClientRecord.name,
         hasUnsavedChanges: false,
       });
     },
-    [updateTab]
+    [updateTab, apiClientRecords, mutate]
   );
 
   const onDeleteRecords = useCallback(
     (recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
       deleteTabs(recordIdsToBeDeleted);
 
-      setApiClientRecords((prev) => {
-        return prev.filter((record) => {
+      mutate(
+        apiClientRecords.filter((record) => {
           return !recordIdsToBeDeleted.includes(record.id);
-        });
-      });
+        })
+      );
     },
-    [deleteTabs]
+    [deleteTabs, apiClientRecords, mutate]
   );
 
   const onSaveRecord = useCallback(
@@ -256,17 +264,20 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         case RQAPI.RecordType.ENVIRONMENT: {
           setIsRecordBeingCreated(recordType);
           trackCreateEnvironmentClicked(analyticEventSource);
-          return addNewEnvironment("New Environment")
-            .then((newEnvironment: { id: string; name: string }) => {
-              setIsRecordBeingCreated(null);
-              openTab(newEnvironment?.id, {
-                title: newEnvironment?.name,
-                url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${newEnvironment?.id}?new`,
-              });
-            })
-            .catch((error) => {
-              console.error("Error adding new environment", error);
-            });
+          return (
+            addNewEnvironment("New Environment")
+              // @ts-ignore
+              .then((newEnvironment: { id: string; name: string }) => {
+                setIsRecordBeingCreated(null);
+                openTab(newEnvironment?.id, {
+                  title: newEnvironment?.name,
+                  url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${newEnvironment?.id}?new`,
+                });
+              })
+              .catch((error) => {
+                console.error("Error adding new environment", error);
+              })
+          );
         }
 
         default: {
@@ -279,7 +290,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const value = {
     apiClientRecords,
-    isLoadingApiClientRecords,
+    isLoadingApiClientRecords: isLoading,
     onNewRecord,
     onRemoveRecord,
     onUpdateRecord,
