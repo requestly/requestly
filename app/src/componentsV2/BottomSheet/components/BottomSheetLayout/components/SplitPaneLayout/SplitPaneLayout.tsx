@@ -8,10 +8,10 @@ interface Props {
   bottomSheet: ReactNode;
   children: ReactNode;
   minSize?: number;
-  defaultSizing?: boolean;
+  sizes?: Array<number>;
 }
 
-export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSize = 100, defaultSizing = true }) => {
+export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSize = 100, sizes = [40, 60] }) => {
   const { sheetPlacement, isBottomSheetOpen } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
   const splitPane = useRef(null);
@@ -21,7 +21,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   useEffect(() => {
     if (isSheetPlacedAtBottom && splitPane.current) {
       if (isBottomSheetOpen) {
-        splitPane.current.split.setSizes(defaultSizing ? [40, 60] : [60, 40]);
+        splitPane.current.split.setSizes(sizes);
       } else {
         splitPane.current.split.setSizes([100, 0]);
       }
