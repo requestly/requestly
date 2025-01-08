@@ -3,8 +3,9 @@ import { useTabsLayoutContext } from "layouts/TabsLayout/contexts";
 import { Tabs, TabsProps } from "antd";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { RQButton } from "lib/design-system-v2/components";
-import "./tabsLayoutContent.scss";
 import { unstable_useBlocker } from "react-router-dom";
+import { getIconTypeFromTabUrl, getTabIcon } from "./utils";
+import "./tabsLayoutContent.scss";
 
 interface Props {
   Outlet: (props: any) => React.ReactElement;
@@ -33,12 +34,18 @@ export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
   });
 
   const items: TabsProps["items"] = tabs.map((tab) => {
+    const iconType = getIconTypeFromTabUrl(tab.url);
+    const tabIcon = getTabIcon(iconType);
+
     return {
       key: tab.id,
       closable: false,
       label: (
         <div title={tab.title} className="tab-title-container">
-          <div className="tab-title">{tab.title}</div>
+          <div className="tab-title">
+            {tabIcon ? <div className="icon">{tabIcon}</div> : null}
+            <div className="title">{tab.title}</div>
+          </div>
 
           <div className="tab-actions">
             <RQButton
