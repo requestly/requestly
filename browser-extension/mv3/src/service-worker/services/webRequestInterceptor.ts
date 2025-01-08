@@ -7,8 +7,11 @@ import { Variable, onVariableChange } from "../variable";
 
 const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails) => {
   // @ts-ignore
-  if (details?.documentLifecycle !== "active" && details?.documentLifecycle !== "prerender") {
-    return;
+  if (details?.documentLifecyle) {
+    // @ts-ignore
+    if (details?.documentLifecycle !== "active" && details?.documentLifecycle !== "prerender") {
+      return;
+    }
   }
 
   let isMainOrPrerenderedFrame =
