@@ -1,3 +1,32 @@
+// Source: constants/requestMethodColors.ts
+@mixin request-method-colors($class) {
+  & .#{$class}[title="GET"] {
+    color: var(--requestly-color-success-300);
+  }
+  & .#{$class}[title="POST"] {
+    color: var(--requestly-color-warning-300);
+  }
+  & .#{$class}[title="PUT"] {
+    color: var(--requestly-color-primary-300);
+  }
+  & .#{$class}[title="PATCH"] {
+    color: var(--requestly-color-secondary-300);
+  }
+  & .#{$class}[title="DELETE"] {
+    color: var(--requestly-color-error-300);
+  }
+  & .#{$class}[title="HEAD"] {
+    color: var(--requestly-color-success-100);
+  }
+  & .#{$class}[title="OPTIONS"] {
+    color: var(--requestly-color-warning-100);
+  }
+}
+
+.api-request-method-selector.ant-select-dropdown {
+  @include request-method-colors("ant-select-item");
+}
+
 .api-client-view {
   height: 100%;
   display: flex;
@@ -48,6 +77,10 @@
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
         background: transparent;
+      }
+
+      .ant-select-selector {
+        @include request-method-colors("ant-select-selection-item");
       }
     }
   }
