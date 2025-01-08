@@ -2,6 +2,7 @@
   position: fixed;
   bottom: 5rem;
   right: 20px;
+  z-index: 9999;
 
   .ant-btn.ant-btn-primary > .support-panel-icon-style {
     font-size: var(--requestly-font-size-2xl);
