@@ -51,8 +51,8 @@ export const userSubscriptionDocListener = (dispatch, uid) => {
 };
 
 const checkIfAnnualPlan = (firestoreData) => {
-  const startDate = new Date(firestoreData?.subscriptionCurrentPeriodStart);
-  const renewalDate = new Date(firestoreData?.subscriptionCurrentPeriodEnd);
+  const startDate = new Date(firestoreData?.subscriptionCurrentPeriodStart * 1000);
+  const renewalDate = new Date(firestoreData?.subscriptionCurrentPeriodEnd * 1000);
   // Calculate the difference in months
   const monthsDiff =
     (renewalDate.getFullYear() - startDate.getFullYear()) * 12 + (renewalDate.getMonth() - startDate.getMonth());
