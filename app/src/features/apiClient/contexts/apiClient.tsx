@@ -254,15 +254,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);
 
-  const openDraftRequest = useCallback(() => {
-    const requestId = generateDocumentId("apis");
-
-    openTab(requestId, {
-      title: "Untitled request",
-      url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?create=true`,
-    });
-  }, [openTab]);
-
   const onNewClick = useCallback(
     async (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId = "") => {
       switch (recordType) {
