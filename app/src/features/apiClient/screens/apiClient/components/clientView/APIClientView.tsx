@@ -399,7 +399,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             <div className="api-client-header">
               <Space.Compact className="api-client-url-container">
                 <Select
-                  style={{ color: REQUEST_METHOD_COLORS[entry.request.method] }}
                   popupClassName="api-request-method-selector"
                   className="api-request-method-selector"
                   options={requestMethodOptions}
