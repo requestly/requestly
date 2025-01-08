@@ -50,7 +50,7 @@ export const APIClient: React.FC<Props> = () => {
       return;
     }
 
-    const record = apiClientRecords.get(persistedRequestId);
+    const record = apiClientRecords[persistedRequestId];
 
     if (!record) {
       return;

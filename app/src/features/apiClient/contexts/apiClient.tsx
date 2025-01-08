@@ -1,5 +1,5 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
@@ -18,9 +18,10 @@ import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { createBlankApiRecord } from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
+import { deleteRecord, getAllRecords, getRecordsList, setRecord, setRecords } from "./slice";
 
 interface ApiClientContextInterface {
-  apiClientRecords: Map<RQAPI.Record["id"], RQAPI.Record>;
+  apiClientRecords: Record<RQAPI.Record["id"], RQAPI.Record>;
   apiRecordsList: ReadonlyArray<RQAPI.Record>;
   isLoadingApiClientRecords: boolean;
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
@@ -53,7 +54,7 @@ interface ApiClientContextInterface {
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
-  apiClientRecords: new Map(),
+  apiClientRecords: {},
   apiRecordsList: [],
   isLoadingApiClientRecords: false,
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
@@ -94,8 +95,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
+  const dispatch = useDispatch();
+  const apiClientRecords = useSelector(getAllRecords);
+  const apiRecordsList = useSelector(getRecordsList);
+
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(false);
-  const [apiClientRecords, setApiClientRecords] = useState<Map<RQAPI.Record["id"], RQAPI.Record>>(new Map());
+  // const [apiClientRecords, setApiClientRecords] = useState<Map<RQAPI.Record["id"], RQAPI.Record>>(new Map());
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
@@ -108,9 +113,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   useEffect(() => {
     if (!user.loggedIn) {
-      setApiClientRecords(new Map());
+      dispatch(setRecords({}));
     }
-  }, [user.loggedIn]);
+  }, [user.loggedIn, dispatch]);
 
   // TODO: Create modal context
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -124,72 +129,89 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     getApiRecords(uid, teamId)
       .then((result) => {
         if (result.success) {
-          const recordsMap = result.data.reduce((acc: Map<RQAPI.Record["id"], RQAPI.Record>, record: RQAPI.Record) => {
-            acc.set(record.id, record);
-            return acc;
-          }, new Map());
-          setApiClientRecords(recordsMap);
+          const recordsMap = result.data.reduce(
+            (acc: Record<RQAPI.Record["id"], RQAPI.Record>, record: RQAPI.Record) => {
+              acc[record.id] = record;
+              return acc;
+            },
+            {}
+          );
+          // setApiClientRecords(recordsMap);
+          dispatch(setRecords(recordsMap));
         }
       })
       .catch((error) => {
-        setApiClientRecords(new Map());
+        // setApiClientRecords(new Map());
+        dispatch(setRecords({}));
         Logger.error("Error loading api records!", error);
       })
       .finally(() => {
         setIsLoadingApiClientRecords(false);
       });
-  }, [uid, teamId]);
+  }, [uid, teamId, dispatch]);
 
-  const apiRecordsList = useMemo(() => Array.from(apiClientRecords.values()), [
-    apiClientRecords,
-  ]) as ReadonlyArray<RQAPI.Record>;
+  // const apiRecordsList = useMemo(() => Array.from(apiClientRecords.values()), [
+  //   apiClientRecords,
+  // ]) as ReadonlyArray<RQAPI.Record>;
 
-  const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-    setApiClientRecords((prev) => {
-      return prev.set(apiClientRecord.id, apiClientRecord);
-    });
-  }, []);
+  const onNewRecord = useCallback(
+    (apiClientRecord: RQAPI.Record) => {
+      // setApiClientRecords((prev) => {
+      //   return prev.set(apiClientRecord.id, apiClientRecord);
+      // });
+      dispatch(setRecord(apiClientRecord));
+    },
+    [dispatch]
+  );
 
-  const onRemoveRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-    setApiClientRecords((prev) => {
-      prev.delete(apiClientRecord.id);
-      return prev;
-    });
-  }, []);
+  const onRemoveRecord = useCallback(
+    (apiClientRecord: RQAPI.Record) => {
+      // setApiClientRecords((prev) => {
+      //   prev.delete(apiClientRecord.id);
+      //   return prev;
+      // });
+
+      dispatch(deleteRecord(apiClientRecord));
+    },
+    [dispatch]
+  );
 
   const onUpdateRecord = useCallback(
     (updatedRecord: RQAPI.Record) => {
-      setApiClientRecords((prev) => {
-        prev.set(updatedRecord.id, updatedRecord);
-        return prev;
-      });
+      // setApiClientRecords((prev) => {
+      //   prev.set(updatedRecord.id, updatedRecord);
+      //   return prev;
+      // });
+
+      dispatch(setRecord(updatedRecord));
 
       updateTab(updatedRecord.id, {
         title: updatedRecord.name,
         hasUnsavedChanges: false,
       });
     },
-    [updateTab, setApiClientRecords]
+    [updateTab, dispatch]
   );
 
   const onDeleteRecords = useCallback(
     (recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
       deleteTabs(recordIdsToBeDeleted);
 
-      setApiClientRecords((prev) => {
-        recordIdsToBeDeleted.forEach((id) => {
-          prev.delete(id);
-        });
-        return prev;
-      });
+      // setApiClientRecords((prev) => {
+      //   recordIdsToBeDeleted.forEach((id) => {
+      //     prev.delete(id);
+      //   });
+      //   return prev;
+      // });
+      dispatch(deleteRecord(recordIdsToBeDeleted));
     },
 
-    [deleteTabs, setApiClientRecords]
+    [deleteTabs, dispatch]
   );
 
   const onSaveRecord = useCallback(
     (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open") => {
-      const existingRecord = apiClientRecords.get(apiClientRecord.id);
+      const existingRecord = apiClientRecords[apiClientRecord.id];
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
       if (existingRecord) {
         onUpdateRecord(apiClientRecord);

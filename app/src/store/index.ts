@@ -14,6 +14,7 @@ import { variablesReducer } from "./features/variables/slice";
 
 import { globalReducers } from "./slices/global/slice";
 import { tabsLayoutReducerWithLocalSync } from "./slices/tabs-layout";
+import { ApiClientReducers } from "features/apiClient/contexts/slice";
 
 export const reduxStore = configureStore({
   reducer: {
@@ -27,6 +28,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.INCENTIVIZATION]: incentivizationReducer,
     [ReducerKeys.VARIABLES]: variablesReducer,
     [ReducerKeys.TABS_LAYOUT]: tabsLayoutReducerWithLocalSync,
+    [ReducerKeys.API_CLIENT]: ApiClientReducers,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will
