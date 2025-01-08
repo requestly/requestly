@@ -101,14 +101,31 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
 
-  const { openTab, deleteTabs, updateTab, replaceTab } = useTabsLayoutContext();
+  const { openTab, deleteTabs, updateTab, replaceTab, updateAddTabBtnCallback } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
+
+  const openDraftRequest = useCallback(() => {
+    const requestId = generateDocumentId("apis");
+
+    openTab(requestId, {
+      title: "Untitled request",
+      url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?create=true`,
+    });
+  }, [openTab]);
 
   useEffect(() => {
     if (!user.loggedIn) {
       setApiClientRecords([]);
     }
   }, [user.loggedIn]);
+
+  useEffect(() => {
+    if (!user.loggedIn) {
+      return;
+    }
+
+    updateAddTabBtnCallback(openDraftRequest);
+  }, [user.loggedIn, updateAddTabBtnCallback, openDraftRequest]);
 
   // TODO: Create modal context
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
