@@ -84,14 +84,14 @@
     flex-wrap: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    position: relative;
 
     .tab-title {
       text-align: center;
-      flex-shrink: 0;
+      flex-grow: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      width: 106px;
       padding: 8px 0;
 
       color: var(--requestly-color-text-subtle, #bbb);
@@ -108,12 +108,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--requestly-color-background);
     }
 
     .unsaved-changes-indicator {
       flex-shrink: 0;
-      width: 24px;
-      height: 24px;
+      width: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
