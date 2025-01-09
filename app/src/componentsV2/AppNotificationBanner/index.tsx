@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useSelector } from "react-redux";
-import { getAppNotificationBannerDismissTs } from "store/selectors";
+import { getAppNotificationBannerDismissTs, getIsAppBannerVisible } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { OrgNotificationBanner } from "./OrgNotificationBanner";
 import ReactMarkdown from "react-markdown";
@@ -62,6 +62,7 @@ export const AppNotificationBanner = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const lastAppBannerDismissTs = useSelector(getAppNotificationBannerDismissTs);
+  const isAppBannerVisible = useSelector(getIsAppBannerVisible);
   const banners = useFeatureValue("app_banner", []);
   const firebaseFunction = getFunctions();
 
@@ -271,10 +272,10 @@ export const AppNotificationBanner = () => {
   };
 
   useEffect(() => {
-    if (newBanners?.length > 0) {
+    if (newBanners?.length > 0 && isAppBannerVisible) {
       trackAppNotificationBannerViewed(newBanners[0]?.id);
     }
-  }, [newBanners]);
+  }, [isAppBannerVisible, newBanners]);
 
   const renderAppBanner = () => {
     const banner = newBanners ? newBanners[0] : null;
