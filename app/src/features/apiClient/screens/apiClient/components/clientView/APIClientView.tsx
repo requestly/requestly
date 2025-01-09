@@ -200,6 +200,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, []);
 
   const onSendButtonClick = useCallback(() => {
+    updateTab(apiEntryDetails?.id, { isPreview: false });
+
     if (!entry.request.url) {
       return;
     }
@@ -293,6 +295,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
+    updateTab,
     apiClientRecords,
     apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
