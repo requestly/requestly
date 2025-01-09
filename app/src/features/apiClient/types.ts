@@ -83,9 +83,15 @@ export namespace RQAPI {
     redirectedUrl: string;
   }
 
+  export interface TestResult {
+    status: "passed" | "failed" | "skipped";
+    message: string;
+  }
+
   export interface Entry {
     request: Request;
     response?: Response;
+    testResults?: TestResult[];
     scripts?: {
       preRequest: string;
       postResponse: string;
