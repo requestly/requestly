@@ -12,8 +12,10 @@ interface ScriptEditorProps {
 }
 
 const DEFAULT_SCRIPT_VALUES = {
-  [RQAPI.ScriptType.PRE_REQUEST]: "// Use JavaScript to configure this request dynamically\n",
-  [RQAPI.ScriptType.POST_RESPONSE]: "// Use JavaScript to visualize responses\n",
+  [RQAPI.ScriptType.PRE_REQUEST]:
+    "// **********************************************\n// 🛠️ Learn more about scripts and snippets: https://docs.requestly.com/general/api-client/scripts\n// **********************************************\n",
+  [RQAPI.ScriptType.POST_RESPONSE]:
+    "// **********************************************\n// 🛠️ Use JavaScript to visualize responses: https://docs.requestly.com/general/api-client/scripts\n// **********************************************\n",
 };
 
 export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts }) => {
