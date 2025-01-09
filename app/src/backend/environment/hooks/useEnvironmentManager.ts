@@ -48,12 +48,14 @@ const useEnvironmentManager = () => {
   const allEnvironmentData = useSelector(getAllEnvironmentData);
   const collectionVariables = useSelector(getCollectionVariables);
 
-  const globalEnvironmentData = useMemo(() => allEnvironmentData?.["global"] || null, [allEnvironmentData]);
-
   const ownerId = useMemo(
     () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
     [currentlyActiveWorkspace.id, user?.details?.profile?.uid]
   );
+  const globalEnvironmentData = useMemo(() => allEnvironmentData?.[ownerId]?.["global"] || null, [
+    allEnvironmentData,
+    ownerId,
+  ]);
 
   const setCurrentEnvironment = useCallback(
     (environmentId: string) => {
@@ -70,7 +72,7 @@ const useEnvironmentManager = () => {
       const docId = isGlobal ? "global" : undefined;
       return upsertEnvironmentInDB(ownerId, newEnvironmentName, docId)
         .then(({ id, name }) => {
-          dispatch(variablesActions.addNewEnvironment({ id, name }));
+          dispatch(variablesActions.addNewEnvironment({ id, name, ownerId }));
           return {
             id,
             name,
@@ -105,17 +107,19 @@ const useEnvironmentManager = () => {
               ...environmentMap[key],
               ...allEnvironmentData[key],
               variables: mergeLocalAndSyncVariables(
-                allEnvironmentData[key]?.variables ?? {},
+                allEnvironmentData[ownerId][key]?.variables ?? {},
                 environmentMap[key].variables
               ),
             };
           });
-          dispatch(variablesActions.setAllEnvironmentData({ environmentMap: updatedEnvironmentMap }));
-        } else dispatch(variablesActions.setAllEnvironmentData({ environmentMap }));
+          dispatch(variablesActions.setAllEnvironmentData({ environmentMap: updatedEnvironmentMap, ownerId }));
+        } else {
+          dispatch(variablesActions.setAllEnvironmentData({ environmentMap, ownerId }));
+        }
       })
       .catch((err) => {
         Logger.error("Error while fetching all environment variables", err);
-        dispatch(variablesActions.setAllEnvironmentData({ environmentMap: {} }));
+        dispatch(variablesActions.setAllEnvironmentData({ environmentMap: {}, ownerId }));
       })
       .finally(() => {
         setIsLoading(false);
@@ -130,7 +134,7 @@ const useEnvironmentManager = () => {
       unsubscribeListener?.();
       unsubscribeListener = attachEnvironmentVariableListener(ownerId, currentEnvironmentId, (environmentData) => {
         const mergedVariables = mergeLocalAndSyncVariables(
-          allEnvironmentData[environmentData.id]?.variables ?? {},
+          allEnvironmentData[ownerId][environmentData.id]?.variables ?? {},
           environmentData.variables
         );
         dispatch(
@@ -138,6 +142,7 @@ const useEnvironmentManager = () => {
             newVariables: mergedVariables,
             environmentId: environmentData.id,
             environmentName: environmentData.name,
+            ownerId,
           })
         );
         setIsEnvironmentsDataLoaded(true);
@@ -160,7 +165,7 @@ const useEnvironmentManager = () => {
         globalEnvironmentData.id,
         (environmentData) => {
           const mergedVariables = mergeLocalAndSyncVariables(
-            allEnvironmentData[environmentData.id]?.variables ?? {},
+            allEnvironmentData[ownerId][environmentData.id]?.variables ?? {},
             environmentData.variables
           );
           dispatch(
@@ -168,6 +173,7 @@ const useEnvironmentManager = () => {
               newVariables: mergedVariables,
               environmentId: environmentData.id,
               environmentName: environmentData.name,
+              ownerId,
             })
           );
         }
@@ -190,7 +196,7 @@ const useEnvironmentManager = () => {
         globalEnvironmentData.id,
         (environmentData) => {
           const mergedVariables = mergeLocalAndSyncVariables(
-            allEnvironmentData[environmentData.id]?.variables ?? {},
+            allEnvironmentData[ownerId][environmentData.id]?.variables ?? {},
             environmentData.variables
           );
           dispatch(
@@ -198,6 +204,7 @@ const useEnvironmentManager = () => {
               newVariables: mergedVariables,
               environmentId: environmentData.id,
               environmentName: environmentData.name,
+              ownerId,
             })
           );
         }
@@ -242,10 +249,10 @@ const useEnvironmentManager = () => {
 
   const getCurrentEnvironment = useCallback(() => {
     return {
-      currentEnvironmentName: allEnvironmentData[currentEnvironmentId]?.name,
+      currentEnvironmentName: allEnvironmentData[ownerId][currentEnvironmentId]?.name,
       currentEnvironmentId,
     };
-  }, [allEnvironmentData, currentEnvironmentId]);
+  }, [allEnvironmentData, currentEnvironmentId, ownerId]);
 
   const setVariables = useCallback(
     async (environmentId: string, variables: EnvironmentVariables) => {
@@ -263,6 +270,7 @@ const useEnvironmentManager = () => {
             variablesActions.updateEnvironmentData({
               newVariables: newVariablesWithSyncvalues,
               environmentId,
+              ownerId,
             })
           );
         })
@@ -279,7 +287,7 @@ const useEnvironmentManager = () => {
     async (environmentId: string, key: string) => {
       return removeEnvironmentVariableFromDB(ownerId, { environmentId, key })
         .then(() => {
-          dispatch(variablesActions.removeVariableFromEnvironment({ key, environmentId }));
+          dispatch(variablesActions.removeVariableFromEnvironment({ key, environmentId, ownerId }));
         })
         .catch((err) => {
           toast.error("Error while removing environment variables.");
@@ -294,7 +302,7 @@ const useEnvironmentManager = () => {
     (currentCollectionId: string): Record<string, EnvironmentVariableValue> => {
       const allVariables: Record<string, EnvironmentVariableValue> = {};
 
-      const currentEnvironmentVariables = allEnvironmentData[currentEnvironmentId]?.variables;
+      const currentEnvironmentVariables = allEnvironmentData[ownerId][currentEnvironmentId]?.variables;
       Object.entries(currentEnvironmentVariables || {}).forEach(([key, value]) => {
         // environment variables (highest precedence)
         if (VARIABLES_PRECEDENCE_ORDER[0] === "ENVIRONMENT") {
@@ -328,10 +336,7 @@ const useEnvironmentManager = () => {
       // Get collection hierarchy variables
       getParentVariables(currentCollectionId);
 
-      const globalEnvironmentId = Object.keys(allEnvironmentData).find((envId) =>
-        isGlobalEnvironment(allEnvironmentData[envId].id)
-      );
-      const globalEnvironmentVariables = allEnvironmentData[globalEnvironmentId]?.variables || {};
+      const globalEnvironmentVariables = allEnvironmentData[ownerId]["global"]?.variables || {};
 
       Object.entries(globalEnvironmentVariables).forEach(([key, value]) => {
         // global variables (lowest precedence)
@@ -342,7 +347,7 @@ const useEnvironmentManager = () => {
 
       return allVariables;
     },
-    [allEnvironmentData, apiClientRecords, currentEnvironmentId, collectionVariables]
+    [allEnvironmentData, currentEnvironmentId, apiClientRecords, collectionVariables, ownerId]
   );
 
   const renderVariables = useCallback(
@@ -359,53 +364,53 @@ const useEnvironmentManager = () => {
   );
 
   const getEnvironmentVariables = useCallback(
-    (environmentId: string) => {
-      return allEnvironmentData[environmentId]?.variables ?? {};
+    (environmentId: string): EnvironmentVariables => {
+      return allEnvironmentData[ownerId][environmentId]?.variables ?? {};
     },
-    [allEnvironmentData]
+    [allEnvironmentData, ownerId]
   );
 
-  const getCurrentEnvironmentVariables = useCallback(() => {
-    return allEnvironmentData[currentEnvironmentId]?.variables ?? {};
-  }, [allEnvironmentData, currentEnvironmentId]);
+  const getCurrentEnvironmentVariables = useCallback((): EnvironmentVariables => {
+    return allEnvironmentData[ownerId][currentEnvironmentId]?.variables ?? {};
+  }, [allEnvironmentData, currentEnvironmentId, ownerId]);
 
-  const getGlobalVariables = useCallback(() => {
-    return allEnvironmentData[globalEnvironmentData?.id]?.variables ?? {};
-  }, [allEnvironmentData, globalEnvironmentData?.id]);
+  const getGlobalVariables = useCallback((): EnvironmentVariables => {
+    return allEnvironmentData[ownerId][globalEnvironmentData?.id]?.variables ?? {};
+  }, [allEnvironmentData, globalEnvironmentData?.id, ownerId]);
 
   const getAllEnvironments = useCallback(() => {
-    return Object.keys(allEnvironmentData).map((key) => {
+    return Object.keys(allEnvironmentData[ownerId]).map((key) => {
       return {
         id: key,
-        name: allEnvironmentData[key].name,
+        name: allEnvironmentData[ownerId][key].name,
       };
     });
-  }, [allEnvironmentData]);
+  }, [allEnvironmentData, ownerId]);
 
   const getEnvironmentName = useCallback(
     (environmentId: string) => {
-      return allEnvironmentData[environmentId]?.name;
+      return allEnvironmentData[ownerId][environmentId]?.name;
     },
-    [allEnvironmentData]
+    [allEnvironmentData, ownerId]
   );
 
   const getVariableData = useCallback(
     (variableKey: string) => {
-      if (allEnvironmentData[currentEnvironmentId].variables[variableKey]) {
+      if (allEnvironmentData[ownerId][currentEnvironmentId].variables[variableKey]) {
         return {
-          ...allEnvironmentData[currentEnvironmentId].variables[variableKey],
+          ...allEnvironmentData[ownerId][currentEnvironmentId].variables[variableKey],
           key: variableKey,
         };
       }
       return null;
     },
-    [allEnvironmentData, currentEnvironmentId]
+    [allEnvironmentData, currentEnvironmentId, ownerId]
   );
 
   const renameEnvironment = useCallback(
     async (environmentId: string, newName: string) => {
       return updateEnvironmentNameInDB(ownerId, environmentId, newName).then(() => {
-        dispatch(variablesActions.updateEnvironmentName({ environmentId, newName }));
+        dispatch(variablesActions.updateEnvironmentName({ environmentId, newName, ownerId }));
       });
     },
     [ownerId, dispatch]
@@ -413,12 +418,13 @@ const useEnvironmentManager = () => {
 
   const duplicateEnvironment = useCallback(
     async (environmentId: string) => {
-      return duplicateEnvironmentInDB(ownerId, environmentId, allEnvironmentData).then((newEnvironment) => {
-        dispatch(variablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name }));
+      return duplicateEnvironmentInDB(ownerId, environmentId, allEnvironmentData[ownerId]).then((newEnvironment) => {
+        dispatch(variablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name, ownerId }));
         dispatch(
           variablesActions.updateEnvironmentData({
             newVariables: newEnvironment.variables,
             environmentId: newEnvironment.id,
+            ownerId,
           })
         );
       });

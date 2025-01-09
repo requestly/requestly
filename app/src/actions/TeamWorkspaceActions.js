@@ -89,7 +89,6 @@ export const switchWorkspace = async (
     await StorageService(appMode).clearDB();
   }
 
-  dispatch(variablesActions.resetState());
   dispatch(tabsLayoutActions.resetState());
 
   // Just in case
