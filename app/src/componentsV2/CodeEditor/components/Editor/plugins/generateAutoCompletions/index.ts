@@ -51,5 +51,7 @@ export default function generateCompletionsForVariables(envVariables?: Environme
   return autocompletion({
     activateOnTyping: true,
     override: customCompletions,
+    tooltipClass: () => "popup-tooltip",
+    optionClass: () => "popup-option",
   });
 }
