@@ -33,7 +33,9 @@ const AuthModal = ({
 
   return (
     <>
-      <img src={closeIcon} width={15} className="modal-close-icon" onClick={() => toggle()} alt="close-icon" />
+      {closable && (
+        <img src={closeIcon} width={15} className="modal-close-icon" onClick={() => toggle()} alt="close-icon" />
+      )}
       <Modal
         size="small"
         visible={window.location.href.includes("/signin") || window.location.href.includes("/signup") ? false : isOpen}
