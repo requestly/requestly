@@ -50,7 +50,14 @@ const GraphifyHome = () => {
       <img src={hasExistingTranslations ? defaultViewIcon : emptyViewIcon} alt="graphify-view" />
 
       <div className="graphify-content">
-        <div className="graphify-header">Transform REST APIs into GraphQL Endpoints</div>
+        <div className="graphify-header">
+          <h3>
+            <u>Graphify - AI powered "GraphQL as a Service"</u>
+          </h3>
+        </div>
+        <br />
+        <div className="graphify-header">Transform REST APIs into GraphQL Endpoints </div>
+        <div className="graphify-header">in less than 2 minutes</div>
 
         <div className="graphify-description">
           {hasExistingTranslations
