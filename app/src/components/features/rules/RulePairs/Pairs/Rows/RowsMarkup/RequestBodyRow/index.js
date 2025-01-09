@@ -4,9 +4,6 @@ import { Row, Col, Radio, Tooltip } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { formatJSONString } from "utils/CodeEditorUtils";
 import { globalActions } from "store/slices/global/slice";
-import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { FeatureLimitType } from "hooks/featureLimiter/types";
-import { PremiumIcon } from "components/common/PremiumIcon";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { RuleType } from "features/rules";
@@ -14,7 +11,6 @@ import { RuleType } from "features/rules";
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
   const codeFormattedFlag = useRef(null);
-  const { getFeatureLimitValue } = useFeatureLimiter();
 
   const [requestBodies, setRequestBodies] = useState({
     static: "{}",
@@ -70,8 +66,6 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     );
   };
 
-  const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.dynamic_request_body);
-
   const EditorRadioGroupOptions = useMemo(() => {
     return (
       <Radio.Group
@@ -103,7 +97,6 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
         <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}>
           <Row align="middle">
             Dynamic (JavaScript)
-            {isPremiumFeature ? <PremiumIcon featureType="dynamic_request_body" /> : null}
             <Tooltip
               title={
                 <>
@@ -122,7 +115,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
         </Radio>
       </Radio.Group>
     );
-  }, [pair.request.type, isInputDisabled, isPremiumFeature, onChangeRequestType]);
+  }, [pair.request.type, isInputDisabled, onChangeRequestType]);
 
   return (
     <Col span={24} data-tour-id="code-editor">

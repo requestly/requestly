@@ -18,9 +18,6 @@ import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExtern
 import { InfoTag } from "components/misc/InfoTag";
 import { RQButton } from "lib/design-system-v2/components";
 import LINKS from "config/constants/sub/links";
-import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { FeatureLimitType } from "hooks/featureLimiter/types";
-import { PremiumIcon } from "components/common/PremiumIcon";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { RuleType } from "features/rules";
@@ -44,7 +41,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   });
 
   const codeFormattedFlag = useRef(null);
-  const { getFeatureLimitValue } = useFeatureLimiter();
 
   const onChangeResponseType = useCallback(
     (responseBodyType) => {
@@ -241,8 +237,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     return null;
   }, [pair.response.type]);
 
-  const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.dynamic_response_body);
-
   const EditorRadioGroupOptions = useMemo(() => {
     return (
       <Radio.Group
@@ -274,7 +268,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
         </Radio>
         <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
           <Row align="middle">
-            Dynamic (JavaScript){isPremiumFeature ? <PremiumIcon featureType="dynamic_response_body" /> : null}{" "}
+            Dynamic (JavaScript){" "}
             <Tooltip
               title={
                 <>
@@ -304,7 +298,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
         ) : null}
       </Radio.Group>
     );
-  }, [pair.response.type, isInputDisabled, isPremiumFeature, onChangeResponseType]);
+  }, [pair.response.type, isInputDisabled, onChangeResponseType]);
 
   return (
     <Col span={24} data-tour-id="code-editor" key={rowIndex}>
