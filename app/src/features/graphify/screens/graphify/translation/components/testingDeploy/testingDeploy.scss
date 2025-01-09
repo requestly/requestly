@@ -1,55 +1,41 @@
+// app/src/features/graphify/screens/graphify/translation/components/testingDeploy/testingDeploy.scss
+
 .testing-deploy {
-  // Create a professional layout for testing and deployment interfaces
   display: flex;
   flex-direction: column;
   gap: var(--space-6, 24px);
 
-  // Style the testing section that contains GraphiQL and REST calls display
   .testing-section {
     display: flex;
     gap: var(--space-6, 24px);
-    height: 600px; // Provide enough height for comfortable testing
 
-    // Style the GraphiQL wrapper to ensure proper display
-    .graphiql-wrapper {
+    .query-section {
       flex: 2;
-      border: 1px solid var(--requestly-color-border-default);
-      border-radius: var(--space-2, 8px);
-      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4, 16px);
 
-      // Override default GraphiQL styles to match our theme
-      .graphiql-container {
-        height: 100%;
-        background: var(--requestly-color-surface-default);
+      .query-editor {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3, 12px);
 
-        // Style the GraphiQL header
-        .graphiql-session-header {
-          background: var(--requestly-color-surface-raised);
-          border-bottom: 1px solid var(--requestly-color-border-default);
+        textarea {
+          font-family: var(--requestly-font-family-mono);
+          font-size: var(--requestly-font-size-sm);
         }
+      }
 
-        // Style the query editor
-        .graphiql-editor {
-          .CodeMirror {
-            background: var(--requestly-color-surface-default);
-            font-family: var(--requestly-font-family-mono);
-            font-size: var(--requestly-font-size-sm);
-          }
-        }
-
-        // Style the execution button
-        .graphiql-execute-button {
-          background: var(--requestly-color-primary);
-          border-color: var(--requestly-color-primary);
-
-          &:hover {
-            background: var(--requestly-color-primary-hover);
-          }
+      .result-card {
+        pre {
+          margin: 0;
+          font-family: var(--requestly-font-family-mono);
+          font-size: var(--requestly-font-size-sm);
+          white-space: pre-wrap;
         }
       }
     }
 
-    // Style the REST calls section
     .rest-calls-section {
       flex: 1;
       display: flex;
@@ -63,11 +49,9 @@
         margin-bottom: var(--space-2, 8px);
       }
 
-      // Style individual REST call cards
       .rest-call-card {
         .ant-card-head {
           background: var(--requestly-color-surface-raised);
-          border-bottom: 1px solid var(--requestly-color-border-default);
           min-height: 40px;
           padding: 0 var(--space-4, 16px);
 
@@ -81,35 +65,34 @@
           margin: 0;
           font-family: var(--requestly-font-family-mono);
           font-size: var(--requestly-font-size-xs);
-          color: var(--requestly-color-text-default);
+          white-space: pre-wrap;
         }
       }
     }
   }
 
-  // Style the deployment section
   .deploy-section {
     display: flex;
     flex-direction: column;
     gap: var(--space-6, 24px);
 
-    // Style configuration items
     .config-item {
       display: flex;
       flex-direction: column;
       gap: var(--space-2, 8px);
 
-      // Style input addons
       .ant-input-group-addon {
         background: var(--requestly-color-surface-raised);
-        border-color: var(--requestly-color-border-default);
         color: var(--requestly-color-text-subtle);
         font-size: var(--requestly-font-size-sm);
       }
     }
   }
 
-  // Style the action buttons
+  .error-alert {
+    margin: var(--space-4, 16px) 0;
+  }
+
   .deploy-actions {
     display: flex;
     justify-content: flex-end;
@@ -120,15 +103,14 @@
   }
 }
 
-// Add responsive adjustments
 @media (max-width: 1024px) {
   .testing-deploy {
     .testing-section {
       flex-direction: column;
-      height: auto;
 
-      .graphiql-wrapper {
-        height: 400px;
+      .query-section,
+      .rest-calls-section {
+        width: 100%;
       }
     }
   }

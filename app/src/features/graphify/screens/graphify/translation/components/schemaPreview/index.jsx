@@ -15,6 +15,19 @@ const SchemaPreview = ({ endpointData, onNext, onPrevious }) => {
   const [isGenerating, setIsGenerating] = useState(true);
   const [previewQuery, setPreviewQuery] = useState("");
   const [validationError, setValidationError] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    try {
+      // Validate the schema
+      if (schema) {
+        buildSchema(schema); // This will throw if schema is invalid
+        setError(null);
+      }
+    } catch (err) {
+      setError(`Invalid GraphQL schema: ${err.message}`);
+    }
+  }, [schema]);
 
   // Effect to generate initial schema from endpoint data
   useEffect(() => {

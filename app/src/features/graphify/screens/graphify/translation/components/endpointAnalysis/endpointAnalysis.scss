@@ -1,13 +1,14 @@
-// This file styles the endpoint analysis interface, focusing on clarity and usability
+// app/src/features/graphify/screens/graphify/translation/components/endpointAnalysis/endpointAnalysis.scss
 
 .endpoint-analysis {
-  // Create a clean, organized layout with consistent spacing
   display: flex;
   flex-direction: column;
-  gap: var(--space-6, 24px);
+  height: 100%; // Use full height
+  min-height: 400px;
 
-  // Main content sections
   .analysis-header {
+    padding-bottom: var(--space-4, 16px);
+
     h2 {
       font-size: var(--requestly-font-size-lg);
       font-weight: var(--requestly-font-weight-bold);
@@ -18,92 +19,82 @@
     .description {
       font-size: var(--requestly-font-size-sm);
       color: var(--requestly-color-text-subtle);
-      line-height: 1.5;
     }
   }
 
-  // Style the method badges to make HTTP methods easily distinguishable
-  .method-badge {
-    display: inline-block;
-    padding: var(--space-1, 4px) var(--space-2, 8px);
-    border-radius: var(--space-1, 4px);
-    font-size: var(--requestly-font-size-xs);
-    font-weight: var(--requestly-font-weight-medium);
-    text-transform: uppercase;
-
-    // Different colors for different HTTP methods
-    &.method-get {
-      background-color: var(--requestly-color-success-subtle);
-      color: var(--requestly-color-success-emphasis);
-    }
-
-    &.method-post {
-      background-color: var(--requestly-color-info-subtle);
-      color: var(--requestly-color-info-emphasis);
-    }
-
-    &.method-put {
-      background-color: var(--requestly-color-warning-subtle);
-      color: var(--requestly-color-warning-emphasis);
-    }
-
-    &.method-delete {
-      background-color: var(--requestly-color-danger-subtle);
-      color: var(--requestly-color-danger-emphasis);
-    }
-  }
-
-  // Style the relationships section to show clear connections
-  .relationships-section {
-    background: var(--requestly-color-surface-raised);
+  .endpoints-table {
+    flex: 1;
+    overflow: auto; // Make table section scrollable
+    margin-bottom: var(--space-4, 16px);
+    border: 1px solid var(--requestly-color-border-default);
     border-radius: var(--space-2, 8px);
-    padding: var(--space-4, 16px);
 
-    h3 {
-      font-size: var(--requestly-font-size-md);
-      font-weight: var(--requestly-font-weight-medium);
-      margin-bottom: var(--space-3, 12px);
+    .ant-table-wrapper {
+      height: 100%;
     }
 
-    .relationship-item {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3, 12px);
-      padding: var(--space-2, 8px) 0;
-      border-bottom: 1px solid var(--requestly-color-border-subtle);
+    // Keep table header visible while scrolling
+    .ant-table-header {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--requestly-color-surface-default);
+    }
 
-      &:last-child {
-        border-bottom: none;
+    // Style the method badges
+    .method-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: var(--requestly-font-size-xs);
+      font-weight: var(--requestly-font-weight-medium);
+      text-transform: uppercase;
+
+      &.method-get {
+        background-color: var(--requestly-color-success-subtle);
+        color: var(--requestly-color-success);
       }
 
-      // Style endpoint paths
-      .from,
-      .to {
-        font-family: var(--requestly-font-family-mono);
-        font-size: var(--requestly-font-size-sm);
-        color: var(--requestly-color-text-default);
+      &.method-post {
+        background-color: var(--requestly-color-info-subtle);
+        color: var(--requestly-color-info);
       }
 
-      // Style relationship arrow
-      .arrow {
-        color: var(--requestly-color-text-subtle);
+      &.method-put {
+        background-color: var(--requestly-color-warning-subtle);
+        color: var(--requestly-color-warning);
       }
 
-      // Style relationship type badge
-      .type {
-        background: var(--requestly-color-surface-default);
-        padding: var(--space-1, 4px) var(--space-2, 8px);
-        border-radius: var(--space-1, 4px);
-        font-size: var(--requestly-font-size-xs);
-        color: var(--requestly-color-text-subtle);
+      &.method-delete {
+        background-color: var(--requestly-color-danger-subtle);
+        color: var(--requestly-color-danger);
       }
     }
   }
 
-  // Loading state styling
+  // Keep action buttons always visible at the bottom
+  .analysis-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3, 12px);
+    padding-top: var(--space-4, 16px);
+    background: var(--requestly-color-surface-default);
+    border-top: 1px solid var(--requestly-color-border-subtle);
+
+    // Ensure buttons are properly sized
+    button {
+      min-width: 100px;
+    }
+  }
+
+  // Loading state styles
   &.loading {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: var(--space-8, 32px);
+    text-align: center;
 
     h3 {
       font-size: var(--requestly-font-size-md);
@@ -116,227 +107,23 @@
     }
   }
 
-  // Navigation buttons
-  .analysis-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-3, 12px);
-    margin-top: var(--space-4, 16px);
-    padding-top: var(--space-4, 16px);
-    border-top: 1px solid var(--requestly-color-border-subtle);
-  }
-
-  // Style the checkbox and table
-  .endpoints-table {
-    // Style the checkbox to match your design system
-    .endpoint-checkbox {
-      &.ant-checkbox-wrapper {
-        // Add spacing around the checkbox
-        padding: var(--space-1, 4px);
-
-        // Style the checkbox itself
-        .ant-checkbox {
-          // Default state
-          .ant-checkbox-inner {
-            border-color: var(--requestly-color-border-default);
-            background-color: var(--requestly-color-surface-default);
-            border-radius: 3px;
-            width: 16px;
-            height: 16px;
-          }
-
-          // Checked state
-          &.ant-checkbox-checked {
-            .ant-checkbox-inner {
-              background-color: var(--requestly-color-primary);
-              border-color: var(--requestly-color-primary);
-
-              // Style the checkmark
-              &:after {
-                border-color: white;
-              }
-            }
-          }
-
-          // Indeterminate state (for the header checkbox)
-          &.ant-checkbox-indeterminate {
-            .ant-checkbox-inner {
-              background-color: var(--requestly-color-primary);
-              border-color: var(--requestly-color-primary);
-
-              &:after {
-                background-color: white;
-                height: 2px;
-                width: 8px;
-                border: none;
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-              }
-            }
-          }
-
-          // Hover state
-          &:hover {
-            .ant-checkbox-inner {
-              border-color: var(--requestly-color-primary);
-            }
-          }
-
-          // Focus state
-          &.ant-checkbox-focused {
-            .ant-checkbox-inner {
-              box-shadow: 0 0 0 2px var(--requestly-color-primary-subtle);
-            }
-          }
-        }
-      }
-    }
-
-    // Style the table rows
-    .endpoint-row {
-      &:hover {
-        .endpoint-checkbox {
-          .ant-checkbox-inner {
-            border-color: var(--requestly-color-primary);
-          }
-        }
-      }
-    }
-  }
-  // Style the loading state to match our content layout
-  &.loading {
+  // Empty state styles
+  &.empty {
     display: flex;
     flex-direction: column;
-    gap: var(--space-6, 24px);
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-8, 32px);
+    text-align: center;
 
-    .loading-header {
-      // Style the header skeleton
-      .ant-skeleton-title {
-        height: 28px; // Match your heading size
-        margin-bottom: var(--space-2, 8px);
-      }
-
-      .ant-skeleton-paragraph {
-        margin-top: var(--space-2, 8px);
-
-        li {
-          height: 16px; // Match your description text size
-        }
-      }
+    h3 {
+      font-size: var(--requestly-font-size-md);
+      margin-bottom: var(--space-2, 8px);
     }
 
-    .loading-table {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-4, 16px);
-      padding: var(--space-4, 16px);
-      background: var(--requestly-color-surface-raised);
-      border-radius: var(--space-2, 8px);
-
-      .loading-row {
-        display: flex;
-        align-items: center;
-        gap: var(--space-4, 16px);
-        padding: var(--space-2, 8px) 0;
-
-        // Style the checkbox skeleton
-        .loading-checkbox {
-          width: 16px !important;
-          height: 16px !important;
-
-          .ant-skeleton-button {
-            width: 16px !important;
-            height: 16px !important;
-          }
-        }
-
-        // Style the method skeleton
-        .loading-method {
-          width: 80px !important;
-
-          .ant-skeleton-input {
-            width: 80px !important;
-          }
-        }
-
-        // Style the path skeleton
-        .loading-path {
-          flex: 1;
-        }
-
-        // Style the type skeleton
-        .loading-type {
-          width: 120px !important;
-
-          .ant-skeleton-input {
-            width: 120px !important;
-          }
-        }
-      }
-    }
-
-    .loading-relationships {
-      padding: var(--space-4, 16px);
-      background: var(--requestly-color-surface-raised);
-      border-radius: var(--space-2, 8px);
-
-      .loading-subtitle {
-        .ant-skeleton-title {
-          height: 24px; // Match your subtitle size
-          margin-bottom: var(--space-3, 12px);
-        }
-      }
-
-      .loading-relationship-items {
-        li {
-          height: 20px; // Match your relationship item height
-          margin-top: var(--space-3, 12px);
-        }
-      }
-    }
-
-    // Style all skeleton elements to match your design system
-    .ant-skeleton {
-      .ant-skeleton-title,
-      .ant-skeleton-paragraph li,
-      .ant-skeleton-button,
-      .ant-skeleton-input {
-        background: var(--requestly-color-surface-hover);
-
-        // Add a subtle animation
-        &::after {
-          background: linear-gradient(
-            90deg,
-            transparent 25%,
-            var(--requestly-color-surface-default) 50%,
-            transparent 75%
-          );
-        }
-      }
-    }
-  }
-}
-
-// Add responsive adjustments for smaller screens
-@media (max-width: 768px) {
-  .endpoint-analysis {
-    .relationship-item {
-      flex-direction: column;
-      align-items: flex-start;
-      padding: var(--space-3, 12px) 0;
-
-      .arrow {
-        transform: rotate(90deg);
-      }
-    }
-
-    .analysis-actions {
-      flex-direction: column;
-
-      button {
-        width: 100%;
-      }
+    p {
+      color: var(--requestly-color-text-subtle);
+      margin-bottom: var(--space-4, 16px);
     }
   }
 }
