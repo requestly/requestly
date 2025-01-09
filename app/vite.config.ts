@@ -91,7 +91,7 @@ const config = async ({ mode }) => {
     build: {
       outDir: "build",
       target: "esnext",
-      // sourcemap: true,
+      sourcemap: true,
     },
     server: {
       open: true,
