@@ -38,7 +38,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     []
   );
 
-  const [storedValues, setStoredValues] = useState({
+  const [responseBodies, setResponseBodies] = useState({
     static: "{}",
     code: ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"],
     local_file: "",
@@ -49,12 +49,12 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
 
   const onChangeResponseType = useCallback(
     (responseBodyType) => {
-      setStoredValues((prev) => ({
+      setResponseBodies((prev) => ({
         ...prev,
         [pair.response.type]: pair.response.value,
       }));
 
-      const value = storedValues[responseBodyType];
+      const value = responseBodies[responseBodyType];
       dispatch(
         globalActions.updateRulePairAtGivenPath({
           pairIndex,
@@ -67,7 +67,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
         })
       );
     },
-    [dispatch, pair.response.type, pair.response.value, pairIndex, storedValues]
+    [dispatch, pair.response.type, pair.response.value, pairIndex, responseBodies]
   );
 
   const handleFileSelectCallback = (selectedFile) => {
@@ -273,33 +273,25 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             </Tooltip>
           </Row>
         </Radio>
-        <PremiumFeature
-          features={[FeatureLimitType.dynamic_response_body]}
-          featureName="Dynamic Response Body"
-          popoverPlacement="top"
-          onContinue={() => onChangeResponseType(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE)}
-          source="dynamic_response_body"
-        >
-          <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
-            <Row align="middle">
-              Dynamic (JavaScript){isPremiumFeature ? <PremiumIcon featureType="dynamic_response_body" /> : null}{" "}
-              <Tooltip
-                title={
-                  <>
-                    Write JavaScript code to modify the existing response body.{" "}
-                    {/* <a href={LINKS.REQUESTLY_RESPONSE_RULE_DOCS} target="_blank" rel="noreferrer">
-                        Click here
-                      </a>{" "}
-                      to know more. */}
-                  </>
-                }
-                overlayClassName="rq-tooltip"
-              >
-                <MdInfoOutline className="response-body-type-info-icon" />
-              </Tooltip>
-            </Row>
-          </Radio>
-        </PremiumFeature>
+        <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
+          <Row align="middle">
+            Dynamic (JavaScript){isPremiumFeature ? <PremiumIcon featureType="dynamic_response_body" /> : null}{" "}
+            <Tooltip
+              title={
+                <>
+                  Write JavaScript code to modify the existing response body.{" "}
+                  {/* <a href={LINKS.REQUESTLY_RESPONSE_RULE_DOCS} target="_blank" rel="noreferrer">
+                      Click here
+                    </a>{" "}
+                    to know more. */}
+                </>
+              }
+              overlayClassName="rq-tooltip"
+            >
+              <MdInfoOutline className="response-body-type-info-icon" />
+            </Tooltip>
+          </Row>
+        </Radio>
         {getAppDetails().app_mode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
           isFeatureCompatible(FEATURES.RESPONSE_MAP_LOCAL) ? (
             <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE}>Local File</Radio>
