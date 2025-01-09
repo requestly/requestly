@@ -1,8 +1,9 @@
-import React, { createContext, useCallback, useContext, useEffect } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TabsLayout, TabsLayoutContextInterface } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { getActiveTab, getTabs, tabsLayoutActions } from "store/slices/tabs-layout";
+import { TabsProps } from "antd";
 
 const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
   tabs: [],
@@ -12,6 +13,8 @@ const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
   openTab: (tabId: TabsLayout.Tab["id"], tabDetails?: Partial<TabsLayout.Tab>) => {},
   updateTab: (tabId: TabsLayout.Tab["id"], updatedTabData?: Partial<TabsLayout.Tab>) => {},
   replaceTab: (tabId: TabsLayout.Tab["id"], newTabData?: Partial<TabsLayout.Tab>) => {},
+  onTabsEdit: (e: React.MouseEvent | React.KeyboardEvent | string, action: "add" | "remove") => {},
+  updateAddTabBtnCallback: (cb: () => void) => {},
   tabOutletElementsMap: undefined,
 });
 
@@ -25,6 +28,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
   const dispatch = useDispatch();
   const tabs = useSelector(getTabs(id));
   const activeTab = useSelector(getActiveTab(id));
+  const [addTabBtnCallback, setAddTabBtnCallback] = useState(() => () => {});
 
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
@@ -150,7 +154,31 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
     [tabs, activeTab?.id, updateActivetab, dispatch, id]
   );
 
-  const value = { activeTab, tabs, openTab, closeTab, deleteTabs, updateTab, replaceTab, tabOutletElementsMap };
+  const onTabsEdit: TabsProps["onEdit"] = useCallback(
+    (event, action) => {
+      if (action === "add") {
+        addTabBtnCallback?.();
+      }
+    },
+    [addTabBtnCallback]
+  );
+
+  const updateAddTabBtnCallback = useCallback((cb: () => void) => {
+    setAddTabBtnCallback(() => cb);
+  }, []);
+
+  const value = {
+    activeTab,
+    tabs,
+    openTab,
+    closeTab,
+    deleteTabs,
+    updateTab,
+    replaceTab,
+    onTabsEdit,
+    updateAddTabBtnCallback,
+    tabOutletElementsMap,
+  };
 
   return <TabsLayoutContext.Provider value={value}>{children}</TabsLayoutContext.Provider>;
 };

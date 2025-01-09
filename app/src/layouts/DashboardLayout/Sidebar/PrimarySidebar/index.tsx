@@ -84,18 +84,6 @@ export const PrimarySidebar: React.FC = () => {
         display: true,
         activeColor: "var(--http-rules)",
       },
-      // {
-      //   id: 6,
-      //   title: "API Security & Testing",
-      //   path: PATHS.API_SECURITY_TESTING.INDEX,
-      //   icon: (
-      //     <span className="icon-with-badge">
-      //       <WolfSafeIcon /> <RQBadge badgeText="NEW" />
-      //     </span>
-      //   ),
-      //   display: true,
-      //   activeColor: "var(--session-recording)",
-      // },
       {
         id: 4,
         title: "Sessions",
