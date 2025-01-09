@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
-  const { tabs, activeTab, openTab, closeTab, onTabsEdit } = useTabsLayoutContext();
+  const { tabs, activeTab, openTab, closeTab, updateTab, onTabsEdit } = useTabsLayoutContext();
 
   const hasUnsavedChanges = tabs.some((tab) => tab.hasUnsavedChanges);
 
@@ -40,10 +40,18 @@ export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
       key: tab.id,
       closable: false,
       label: (
-        <div title={tab.title} className="tab-title-container">
+        <div
+          title={tab.title}
+          className="tab-title-container"
+          onDoubleClick={() => {
+            if (tab.isPreview) {
+              updateTab(tab.id, { isPreview: false });
+            }
+          }}
+        >
           <div className="tab-title">
             {tabIcon ? <div className="icon">{tabIcon}</div> : null}
-            <div className="title">{tab.title}</div>
+            <div className="title">{tab.isPreview ? <i>{tab.title}</i> : tab.title}</div>
           </div>
 
           <div className="tab-actions">
