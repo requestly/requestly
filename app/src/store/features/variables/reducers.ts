@@ -73,8 +73,8 @@ const removeVariableFromEnvironment = (
   delete state.environments[action.payload.ownerId][action.payload.environmentId].variables[action.payload.key];
 };
 
-const removeEnvironment = (state: InitialState, action: PayloadAction<{ environmentId: string }>) => {
-  delete state.environments[action.payload.environmentId];
+const removeEnvironment = (state: InitialState, action: PayloadAction<{ environmentId: string; ownerId: string }>) => {
+  delete state.environments[action.payload.ownerId][action.payload.environmentId];
 };
 
 const updateEnvironmentName = (
