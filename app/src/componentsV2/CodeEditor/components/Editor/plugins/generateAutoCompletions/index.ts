@@ -22,7 +22,7 @@ export function generateCompletionSource(
         from: match.from + lengthOfStartingChars,
         to: match.to,
         options: completions,
-        filter: false,
+        filter: true,
       } as CompletionResult;
     }
   };
