@@ -1,70 +1,45 @@
-import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { Radio, Select } from "antd";
-import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../../types";
-import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
-import { KeyValueTable } from "./components/KeyValueTable/KeyValueTable";
-import { EnvironmentVariables } from "backend/environment/types";
-import { useDebounce } from "hooks/useDebounce";
+import React, { useMemo, useState } from "react";
+import { RQAPI, RequestContentType } from "../../../../../../types";
+import { FormBody } from "./renderers/form-body-renderer";
+import { JsonBody } from "./renderers/json-body-renderer";
+import { RawBody } from "./renderers/raw-body-renderer";
+import { RequestBodyContext, RequestBodyStateManager } from "./request-body-state-manager";
+import { RequestBodyProps } from "./request-body-types";
 
-interface Props {
-  body: RQAPI.RequestBody;
+function parseSingleModeBody(params: {
   contentType: RequestContentType;
-  variables: EnvironmentVariables;
-  setRequestEntry: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
-  setContentType: (contentType: RequestContentType) => void;
+  body: RQAPI.RequestBody;
+}): RQAPI.RequestBodyContainer {
+  const { contentType, body } = params;
+  switch (contentType) {
+    case RequestContentType.FORM:
+      return {
+        form: body as RQAPI.RequestFormBody,
+      };
+    case RequestContentType.JSON:
+      return {
+        text: body as RQAPI.RequestJsonBody,
+      };
+    case RequestContentType.RAW:
+      return {
+        text: body as RQAPI.RequestRawBody,
+      };
+  }
 }
 
-const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequestEntry, setContentType }) => {
-  const [textBody, setTextBody] = useState<string>(
-    RequestContentType.RAW === contentType || RequestContentType.JSON === contentType ? (body as string) : ""
-  );
-  const [formBody, setFormBody] = useState<KeyValuePair[]>(
-    RequestContentType.FORM === contentType ? (body as KeyValuePair[]) : []
-  );
-
-  /*
-  when switching between RAW,JSON & Form , setContentype reinitalizes the request body as an empty string, array
-  useEffect synchronizes the request body with the parent (setRequestEntry) whenever request body is saved & contentType is changed.
-  */
-  useEffect(() => {
-    let updatedBody: string | KeyValuePair[];
-
-    if (contentType === RequestContentType.RAW || contentType === RequestContentType.JSON) {
-      updatedBody = textBody;
-    } else if (contentType === RequestContentType.FORM) {
-      updatedBody = formBody;
-    }
-
-    setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: updatedBody } }));
-  }, [contentType, textBody, formBody, setRequestEntry]);
-
-  const handleTextChange = useDebounce(
-    useCallback(
-      (value: string) => {
-        setTextBody(value);
-        setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body: value } }));
-      },
-      [setRequestEntry]
-    ),
-    500,
-    { leading: true, trailing: true }
-  );
-
-  const handleFormChange = useCallback(
-    (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => {
-      setRequestEntry((prev) => {
-        const updatedEntry = updaterFn(prev);
-        setFormBody(updatedEntry.request.body as KeyValuePair[]);
-        return {
-          ...prev,
-          request: {
-            ...prev.request,
-            body: updatedEntry.request.body,
-          },
-        };
-      });
-    },
-    [setRequestEntry]
+const RequestBody: React.FC<RequestBodyProps> = (props) => {
+  const { contentType, variables, setRequestEntry, setContentType } = props;
+  const [requestBodyStateManager] = useState(
+    () =>
+      new RequestBodyStateManager(
+        props.mode === "multiple"
+          ? props.bodyContainer
+          : parseSingleModeBody({
+              contentType,
+              body: props.body,
+            })
+      )
   );
 
   /*
@@ -73,53 +48,18 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
   const bodyEditor = useMemo(() => {
     switch (contentType) {
       case RequestContentType.JSON:
-        return (
-          <CodeEditor
-            key={contentType}
-            language={EditorLanguage.JSON}
-            defaultValue={textBody as string}
-            value={textBody as string}
-            handleChange={handleTextChange}
-            prettifyOnInit={true}
-            isResizable={false}
-            hideCharacterCount
-            analyticEventProperties={{ source: "api_client" }}
-            envVariables={variables}
-          />
-        );
+        return <JsonBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
 
       case RequestContentType.FORM:
-        return (
-          <KeyValueTable
-            pairType={KeyValueFormType.FORM}
-            data={formBody as KeyValuePair[]}
-            setKeyValuePairs={handleFormChange}
-            variables={variables}
-          />
-        );
+        return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
 
       default:
-        return (
-          <CodeEditor
-            key={contentType}
-            language={null}
-            defaultValue={textBody as string}
-            value={textBody as string}
-            handleChange={handleTextChange}
-            isResizable={false}
-            hideCharacterCount
-            analyticEventProperties={{ source: "api_client" }}
-            envVariables={variables}
-            config={{
-              enablePrettify: false,
-            }}
-          />
-        );
+        return <RawBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
     }
-  }, [contentType, variables, formBody, handleFormChange, handleTextChange, textBody]);
+  }, [contentType, variables, setRequestEntry]);
 
   /*
-  In select, label is used is 'Text' & RequestContentType.RAW is used as value since we have RAW, JSON, Form as types, 
+  In select, label is used is 'Text' & RequestContentType.RAW is used as value since we have RAW, JSON, Form as types,
   we are considering RAW & Json as 'Text'
   */
   return (
@@ -149,7 +89,7 @@ const RequestBody: React.FC<Props> = ({ body, contentType, variables, setRequest
           />
         ) : null}
       </div>
-      {bodyEditor}
+      <RequestBodyContext.Provider value={{ requestBodyStateManager }}>{bodyEditor}</RequestBodyContext.Provider>
     </div>
   );
 };
