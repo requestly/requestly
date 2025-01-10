@@ -90,7 +90,10 @@
           border-bottom: 2px solid var(--requestly-color-primary, #004eeb);
 
           .tab-title {
-            color: var(--requestly-color-text-default);
+            .icon,
+            .title {
+              color: var(--requestly-color-text-default);
+            }
           }
         }
       }
@@ -127,6 +130,7 @@
   .tab-title-container {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
     flex-wrap: nowrap;
     overflow: hidden;
@@ -134,8 +138,26 @@
     position: relative;
 
     .tab-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .icon {
+      display: flex;
+      width: 12px;
+      height: 14px;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--requestly-color-text-subtle, #bbb);
+    }
+
+    .title {
       text-align: center;
-      flex-grow: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
