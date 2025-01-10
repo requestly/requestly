@@ -10,7 +10,7 @@ import {
   isApiCollection,
   isApiRequest,
   filterRecordsBySearch,
-  updateActiveKeys,
+  getRecordIdsToBeExpanded,
 } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/ExportCollectionsModal";
@@ -108,7 +108,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
   useEffect(() => {
     const id = requestId || collectionId;
-    setExpandedRecordIds((prev: RQAPI.Record["id"][]) => union(prev, updateActiveKeys(apiClientRecords, id, prev)));
+    setExpandedRecordIds((prev: RQAPI.Record["id"][]) =>
+      union(prev, getRecordIdsToBeExpanded(id, prev, apiClientRecords))
+    );
   }, [collectionId, requestId, apiClientRecords]);
 
   return (
