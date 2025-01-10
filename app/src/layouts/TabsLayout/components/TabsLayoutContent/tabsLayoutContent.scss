@@ -138,6 +138,7 @@
     position: relative;
 
     .tab-title {
+      user-select: none;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -156,7 +157,6 @@
       }
 
       .title {
-        user-select: none;
         text-align: center;
         overflow: hidden;
         text-overflow: ellipsis;
