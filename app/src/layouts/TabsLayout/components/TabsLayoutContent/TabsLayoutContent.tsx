@@ -4,7 +4,7 @@ import { Tabs, TabsProps } from "antd";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { RQButton } from "lib/design-system-v2/components";
 import { unstable_useBlocker } from "react-router-dom";
-import { getIconTypeFromTabUrl, getTabIcon } from "./utils";
+import { getTabIconFromUrl } from "./utils";
 import "./tabsLayoutContent.scss";
 
 interface Props {
@@ -34,8 +34,7 @@ export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
   });
 
   const items: TabsProps["items"] = tabs.map((tab) => {
-    const iconType = getIconTypeFromTabUrl(tab.url);
-    const tabIcon = getTabIcon(iconType);
+    const tabIcon = getTabIconFromUrl(tab.url);
 
     return {
       key: tab.id,

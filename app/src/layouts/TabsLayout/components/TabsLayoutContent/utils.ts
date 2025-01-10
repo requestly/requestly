@@ -1,7 +1,7 @@
 import { TabsLayout } from "../../types";
 import { tabIcons } from "./constants";
 
-export const getIconTypeFromTabUrl = (url: string) => {
+const getIconTypeFromTabUrl = (url: string) => {
   if (url.includes("request")) {
     return TabsLayout.IconType.REQUEST;
   } else if (url.includes("collection")) {
@@ -11,6 +11,11 @@ export const getIconTypeFromTabUrl = (url: string) => {
   }
 };
 
-export const getTabIcon = (iconType: TabsLayout.IconType) => {
+const getTabIcon = (iconType: TabsLayout.IconType) => {
   return tabIcons[iconType] ?? null;
+};
+
+export const getTabIconFromUrl = (url: string) => {
+  const iconType = getIconTypeFromTabUrl(url);
+  return getTabIcon(iconType);
 };
