@@ -121,7 +121,6 @@ export const PricingModal: React.FC<PricingModalProps> = ({
 
     return () => {
       window.removeEventListener("resize", checkIfScrollable);
-      tableRef.current.removeEventListener("scroll", checkIfScrollable);
     };
   }, []);
 
