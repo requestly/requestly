@@ -10,11 +10,14 @@ import { trackJoinBillingTeamReminderViewed } from "features/settings/analytics"
 import APP_CONSTANTS from "config/constants";
 import { openEmailClientWithDefaultEmailBody } from "utils/Misc";
 import { globalActions } from "store/slices/global/slice";
+import { RQButton } from "lib/design-system-v2/components";
+import LINKS from "config/constants/sub/links";
 import "../../index.scss";
 
 export const RequestBillingTeamAccessReminder = () => {
   const dispatch = useDispatch();
   const joinTeamReminder = useFeatureValue("join_team_reminder", null);
+  const isDomainBlocked = useFeatureValue("blocked_commercial_license_domain", false);
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -24,11 +27,20 @@ export const RequestBillingTeamAccessReminder = () => {
   const emailBody = `Hey Requestly Team\n\n We'd like to setup a new Billing Team. Could you please assist with the next step here?\n\nThanks\n${user?.details?.profile?.displayName}`;
 
   const availableBillingTeams = useMemo(() => {
+    if (isDomainBlocked) {
+      return [];
+    }
     if (billingTeams) {
-      return billingTeams.filter((team) => Object.keys(team.members).length > 1 && !team?.isAcceleratorTeam);
+      return billingTeams.filter(
+        (team) =>
+          Object.keys(team.members).length > 1 &&
+          !team?.isAcceleratorTeam &&
+          (team?.subscriptionDetails?.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE ||
+            team?.subscriptionDetails?.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.PAST_DUE)
+      );
     }
     return [];
-  }, [billingTeams]);
+  }, [billingTeams, isDomainBlocked]);
 
   useEffect(() => {
     if (isModalVisible) {
@@ -45,7 +57,9 @@ export const RequestBillingTeamAccessReminder = () => {
 
       if (currentDate >= persistenceDate) {
         setIsModalClosable(false);
-        setIsModalVisible(true);
+        setTimeout(() => {
+          setIsModalVisible(true);
+        }, 4000);
         return;
       }
 
@@ -53,7 +67,9 @@ export const RequestBillingTeamAccessReminder = () => {
         return;
       }
       if (currentDate >= reminderStartDate) {
-        setIsModalVisible(true);
+        setTimeout(() => {
+          setIsModalVisible(true);
+        }, 4000);
       }
     } else setIsModalVisible(false);
   }, [joinTeamReminder, user.details?.isPremium, user.loggedIn]);
@@ -69,14 +85,6 @@ export const RequestBillingTeamAccessReminder = () => {
   const handleOpenPricingModal = () => {
     dispatch(globalActions.toggleActiveModal({ modalName: "pricingModal" }));
   };
-
-  if (!billingTeams?.length) {
-    return null;
-  }
-
-  if (!availableBillingTeams?.length) {
-    return null;
-  }
 
   return (
     <Modal
@@ -94,42 +102,66 @@ export const RequestBillingTeamAccessReminder = () => {
       title="Get a license to continue using Requestly"
       footer={null}
     >
-      <Col>
-        <div className="text-white">
-          {billingTeams?.length > 1 ? (
-            <>
-              To continue using Requestly, you need a license. We have found the following billing teams in your
-              Organization. If you are part of one of these teams, you can request access to a license.
-            </>
-          ) : (
-            <>
-              To continue using Requestly, you need a license. We have found the following billing team in your
-              Organization. If you are part of this team, you can request access to a license.
-            </>
-          )}
-        </div>
-        <div className="mt-8 billing-teams-card-wrapper">
-          {availableBillingTeams?.map((team: BillingTeamDetails) => {
-            if (
-              team?.subscriptionDetails?.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE ||
-              team?.subscriptionDetails?.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.PAST_DUE
-            ) {
-              return <BillingTeamCard key={team.id} team={team} />;
-            }
-            return null;
-          })}
-        </div>
-      </Col>
-      <div className="text-white mt-24">
-        You can purchase individual license for yourself{" "}
-        <a href="#" onClick={handleOpenPricingModal}>
-          here
-        </a>
-        . Want to setup a new billing team? please write to us at{" "}
-        <a href={openEmailClientWithDefaultEmailBody("enterprise.support@requestly.io", emailSubject, emailBody)}>
-          enterprise.support@requestly.io
-        </a>
-      </div>
+      {availableBillingTeams?.length ? (
+        <>
+          <Col>
+            <div className="text-white">
+              {availableBillingTeams?.length > 1 ? (
+                <>
+                  To continue using Requestly, you need a license. We have found the following billing teams in your
+                  Organization. If you are part of one of these teams, you can request access to a license.
+                </>
+              ) : (
+                <>
+                  To continue using Requestly, you need a license. We have found the following billing team in your
+                  Organization. If you are part of this team, you can request access to a license.
+                </>
+              )}
+            </div>
+            <div className="mt-8 billing-teams-card-wrapper">
+              {availableBillingTeams?.map((team: BillingTeamDetails) => (
+                <BillingTeamCard key={team.id} team={team} />
+              ))}
+            </div>
+          </Col>
+          <div className="text-white mt-24">
+            You can purchase individual license for yourself{" "}
+            <a href="#" onClick={handleOpenPricingModal}>
+              here
+            </a>{" "}
+            or set up team billing by contacting us at{" "}
+            <a href={openEmailClientWithDefaultEmailBody("enterprise.support@requestly.io", emailSubject, emailBody)}>
+              enterprise.support@requestly.io
+            </a>
+            . For any queries, you can schedule a call with our team{" "}
+            <a href={LINKS.CALENDLY_LINK} target="_blank" rel="noreferrer">
+              here
+            </a>
+            .
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="text-white">
+            Requestly's free plan is limited to non-commercial use. To continue using Requestly within your
+            organization, please upgrade to a paid plan. You can purchase licenses directly or set up team billing by
+            contacting us at{" "}
+            <a href={openEmailClientWithDefaultEmailBody("enterprise.support@requestly.io", emailSubject, emailBody)}>
+              enterprise.support@requestly.io
+            </a>
+            . For any queries, you can schedule a call with our team{" "}
+            <a href={LINKS.CALENDLY_LINK} target="_blank" rel="noreferrer">
+              here
+            </a>
+            .
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <RQButton className="mt-8" style={{ marginRight: "14px" }} onClick={handleOpenPricingModal} type="primary">
+              See plans
+            </RQButton>
+          </div>
+        </>
+      )}
     </Modal>
   );
 };

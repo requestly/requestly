@@ -23,6 +23,7 @@ interface Props {
   onAuthUpdate: (authOptions: RQAPI.AuthOptions) => any;
   rootLevelRecord: Boolean;
   variables: EnvironmentVariables;
+  authorizationViewActions?: React.ReactElement;
 }
 
 const AuthorizationView: React.FC<Props> = ({
@@ -31,6 +32,7 @@ const AuthorizationView: React.FC<Props> = ({
   rootLevelRecord,
   wrapperClass = "",
   variables,
+  authorizationViewActions,
 }) => {
   const [selectedForm, setSelectedForm] = useState(
     defaultValues?.currentAuthType || (rootLevelRecord ? AUTHORIZATION_TYPES.NO_AUTH : AUTHORIZATION_TYPES.INHERIT)
@@ -86,7 +88,7 @@ const AuthorizationView: React.FC<Props> = ({
             <div
               className="clear-icon"
               onClick={() => {
-                onAuthUpdate({ currentAuthType: AUTHORIZATION_TYPES.NO_AUTH });
+                onAuthUpdate(getAuthOptions(formValues, AUTHORIZATION_TYPES.NO_AUTH));
                 setSelectedForm(AUTHORIZATION_TYPES.NO_AUTH);
               }}
             >
@@ -94,6 +96,7 @@ const AuthorizationView: React.FC<Props> = ({
               <span>{LABEL_TEXT.CLEAR}</span>
             </div>
           )}
+          {authorizationViewActions}
         </div>
       </div>
       <div className="form-and-description">
