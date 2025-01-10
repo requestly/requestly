@@ -163,6 +163,7 @@ export const PricingFeatures: PlanFeatures = {
         {
           title: "Complete access to the API client",
           enabled: true,
+          tooltip: "Get complimentary access to API Client Professional Plan.",
         },
         {
           title: "Upto 10 collaborators. No limits on number of projects.",
@@ -171,6 +172,7 @@ export const PricingFeatures: PlanFeatures = {
         {
           title: "Collection runner limits",
           enabled: true,
+          tooltip: "100 collection runs per month ",
         },
         {
           title: "Git Integration",
@@ -191,7 +193,7 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "Secret Management",
+          title: "Integration with Secret Managers",
           enabled: true,
         },
       ],
