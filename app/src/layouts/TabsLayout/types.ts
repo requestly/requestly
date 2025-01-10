@@ -18,6 +18,12 @@ export namespace TabsLayout {
     hasUnsavedChanges: boolean;
     timeStamp: number;
   }
+
+  export enum IconType {
+    REQUEST = "request",
+    COLLECTION = "collection",
+    ENVIORNMENT_VARIABLE = "environment_variable",
+  }
 }
 
 export interface TabsLayoutContextInterface {
