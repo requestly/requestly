@@ -1,4 +1,4 @@
-import { useCallback, useContext } from "react";
+import React, { useCallback, useContext } from "react";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { EnvironmentVariables } from "backend/environment/types";
 import { useDebounce } from "hooks/useDebounce";
@@ -8,8 +8,9 @@ import { RequestBodyProps } from "../request-body-types";
 export function JsonBody(props: {
   environmentVariables: EnvironmentVariables;
   setRequestEntry: RequestBodyProps["setRequestEntry"];
+  editorOptions: React.ReactNode;
 }) {
-  const { environmentVariables, setRequestEntry } = props;
+  const { environmentVariables, setRequestEntry, editorOptions } = props;
 
   const { requestBodyStateManager } = useContext(RequestBodyContext);
   const { text, setText } = useTextBody(requestBodyStateManager);
@@ -30,17 +31,20 @@ export function JsonBody(props: {
   );
 
   return (
-    <CodeEditor
-      key={"json_body"}
-      language={EditorLanguage.JSON}
-      defaultValue={text}
-      value={text}
-      handleChange={handleTextChange}
-      prettifyOnInit={true}
-      isResizable={false}
-      hideCharacterCount
-      analyticEventProperties={{ source: "api_client" }}
-      envVariables={environmentVariables}
-    />
+    <div className="api-client-code-editor-container api-request-body-editor-container">
+      <CodeEditor
+        key={"json_body"}
+        language={EditorLanguage.JSON}
+        defaultValue={text}
+        value={text}
+        handleChange={handleTextChange}
+        prettifyOnInit={true}
+        isResizable={false}
+        hideCharacterCount
+        analyticEventProperties={{ source: "api_client" }}
+        envVariables={environmentVariables}
+        toolbarOptions={{ title: "", options: [editorOptions] }}
+      />
+    </div>
   );
 }

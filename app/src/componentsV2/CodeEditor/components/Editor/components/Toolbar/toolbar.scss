@@ -33,10 +33,15 @@
     }
 
     .code-editor-custom-options-block {
+      .ant-radio-wrapper {
+        span {
+          position: relative;
+          bottom: 2px;
+        }
+      }
+
       .code-editor-custom-option span {
         font-size: var(--requestly-font-size-xs);
-        position: relative;
-        bottom: 2px;
       }
     }
   }
