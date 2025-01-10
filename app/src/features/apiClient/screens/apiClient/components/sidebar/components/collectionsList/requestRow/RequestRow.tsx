@@ -130,6 +130,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab }) => {
           className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
           onClick={() => {
             openTab(record.id, {
+              isPreview: true,
               title: record.name || record.data.request?.url,
               url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`,
             });
