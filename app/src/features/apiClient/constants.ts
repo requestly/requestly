@@ -23,4 +23,4 @@ export const POSTMAN_FIELD_MAPPING = {
   },
 };
 
-export const SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY = "active_collection_keys";
+export const SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY = "expanded_record_ids";
