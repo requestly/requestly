@@ -4,6 +4,13 @@
   overflow: scroll;
   scroll-behavior: smooth;
 
+  &.api-client {
+    justify-content: center;
+    .plan-card {
+      max-width: 310px;
+    }
+  }
+
   &::-webkit-scrollbar {
     display: none;
   }

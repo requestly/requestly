@@ -91,7 +91,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     if (
       planName === PRICING.PLAN_NAMES.BASIC ||
       planName === PRICING.PLAN_NAMES.PROFESSIONAL ||
-      planName === PRICING.PLAN_NAMES.LITE
+      planName === PRICING.PLAN_NAMES.LITE ||
+      planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE ||
+      planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL
     )
       return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price * quantity} annually`;
     return null;
@@ -175,26 +177,29 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             <Typography.Text className="plan-price">
               ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
             </Typography.Text>
-            {product === PRICING.PRODUCTS.HTTP_RULES &&
+            {((product === PRICING.PRODUCTS.HTTP_RULES &&
               planName !== PRICING.PLAN_NAMES.FREE &&
               planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
-              planName !== PRICING.PLAN_NAMES.LITE && (
-                <Space>
-                  <InputNumber
-                    style={{ width: "65px", height: "30px", display: "flex", alignItems: "center" }}
-                    size="small"
-                    type="number"
-                    min={1}
-                    max={1000}
-                    maxLength={4}
-                    defaultValue={1}
-                    value={quantity}
-                    onChange={(value: number) => {
-                      handleQuantityChange(value);
-                    }}
-                  />
-                </Space>
-              )}
+              planName !== PRICING.PLAN_NAMES.LITE) ||
+              (product === PRICING.PRODUCTS.API_CLIENT &&
+                (planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL ||
+                  planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE))) && (
+              <Space>
+                <InputNumber
+                  style={{ width: "65px", height: "30px", display: "flex", alignItems: "center" }}
+                  size="small"
+                  type="number"
+                  min={1}
+                  max={1000}
+                  maxLength={4}
+                  defaultValue={1}
+                  value={quantity}
+                  onChange={(value: number) => {
+                    handleQuantityChange(value);
+                  }}
+                />
+              </Space>
+            )}
             <div className="caption text-white">
               {planName !== PRICING.PLAN_NAMES.FREE && (
                 <div>{planName === PRICING.PLAN_NAMES.LITE ? "/ month" : "member / month"}</div>

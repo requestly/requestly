@@ -368,6 +368,19 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     return <p className="only-annual-text">Available only as an annual plan</p>;
   }
 
+  if (product === PRICING.PRODUCTS.API_CLIENT && columnPlanName !== PRICING.PLAN_NAMES.FREE) {
+    return (
+      <RQButton
+        onClick={() => {
+          onButtonClick(CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION);
+        }}
+        type="primary"
+      >
+        Start free trial
+      </RQButton>
+    );
+  }
+
   return (
     <>
       <Space size={8}>

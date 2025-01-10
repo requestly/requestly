@@ -155,6 +155,61 @@ export const PricingFeatures: PlanFeatures = {
       ],
     },
   },
+  [PRICING.PRODUCTS.API_CLIENT]: {
+    free: {
+      planTitle: "Free",
+      heading: "Starter plan",
+      features: [
+        {
+          title: "Complete access to the API client",
+          enabled: true,
+        },
+        {
+          title: "Upto 10 collaborators. No limits on number of projects.",
+          enabled: true,
+        },
+        {
+          title: "Collection runner limits",
+          enabled: true,
+        },
+        {
+          title: "Git Integration",
+          enabled: true,
+        },
+      ],
+    },
+    [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: {
+      planTitle: "Professional",
+      heading: "For collaboration in teams",
+      features: [
+        {
+          title: "Unlimited collaborators",
+          enabled: true,
+        },
+        {
+          title: "Unlimited collection runs",
+          enabled: true,
+        },
+        {
+          title: "Secret Management",
+          enabled: true,
+        },
+      ],
+    },
+    [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: {
+      planTitle: "Enterprise",
+      features: [
+        {
+          title: "Role-based access control",
+          enabled: true,
+        },
+        {
+          title: "SSO, SLA, Insurance, Invoice-based pricing, SOC2 Reports",
+          enabled: true,
+        },
+      ],
+    },
+  },
   [PRICING.PRODUCTS.SESSION_REPLAY]: {
     free: {
       planTitle: "Free",
