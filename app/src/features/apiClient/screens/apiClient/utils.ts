@@ -447,7 +447,7 @@ export const updateActiveKeys = (records: RQAPI.Record[], id: RQAPI.Record["id"]
     return activeKeys;
   }
 
-  function getParentIds(data: RQAPI.Record[], targetId: RQAPI.Record["id"]) {
+  const getParentIds = (data: RQAPI.Record[], targetId: RQAPI.Record["id"]) => {
     const idToCollectionMap = data.reduce((collectionIdMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>, item) => {
       collectionIdMap[item.id] = item.collectionId || "";
       return collectionIdMap;
@@ -462,7 +462,7 @@ export const updateActiveKeys = (records: RQAPI.Record[], id: RQAPI.Record["id"]
     }
 
     return parentIds;
-  }
+  };
 
   const activeKeysCopy = [...activeKeys];
 
