@@ -94,7 +94,6 @@ export const PricingModal: React.FC<PricingModalProps> = ({
     if (tableRef.current) {
       const isScrollable = tableRef.current.scrollWidth > tableRef.current.clientWidth;
       setIsTableScrollable(isScrollable);
-      console.log(tableRef.current.scrollLeft, "scrollLeft");
       if (tableRef.current.scrollLeft) {
         setIsTableScrolledToRight(true);
       }
