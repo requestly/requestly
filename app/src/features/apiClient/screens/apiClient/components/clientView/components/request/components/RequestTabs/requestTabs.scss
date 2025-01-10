@@ -33,12 +33,14 @@
 
     .api-request-body-options {
       display: flex;
-      justify-content: space-between;
       align-items: center;
 
       .beautify-code {
         height: 22px;
         padding: 0;
+      }
+      .api-request-body-options-select {
+        margin-left: 0;
       }
     }
 
