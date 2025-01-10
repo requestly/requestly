@@ -17,6 +17,7 @@ import { useParams } from "react-router-dom";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { isEmpty } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
+import { SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY } from "features/apiClient/constants";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -88,8 +89,8 @@ export const CollectionRow: React.FC<Props> = ({
       }
       updateActiveKeys(activeKeysCopy);
       isEmpty(activeKeysCopy)
-        ? sessionStorage.removeItem("active_collection_keys")
-        : sessionStorage.setItem("active_collection_keys", activeKeysCopy);
+        ? sessionStorage.removeItem(SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY)
+        : sessionStorage.setItem(SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY, activeKeysCopy);
     },
     [record, activeKeys]
   );

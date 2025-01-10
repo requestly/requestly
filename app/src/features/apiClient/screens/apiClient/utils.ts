@@ -2,7 +2,7 @@ import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionA
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
 import { KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
-import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
+import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
 import { forEach, isEmpty, split, unionBy } from "lodash";
@@ -413,7 +413,7 @@ export const filterRecordsBySearch = (records: RQAPI.Record[], searchValue: stri
 };
 
 export const clearActiveKeysFromSession = (keysToBeDeleted: string[]) => {
-  const activeKeys = sessionStorage.getItem("active_collection_keys", []);
+  const activeKeys = sessionStorage.getItem(SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY, []);
 
   if (keysToBeDeleted.length === 0) {
     return;
@@ -425,7 +425,7 @@ export const clearActiveKeysFromSession = (keysToBeDeleted: string[]) => {
     if (!keysToBeDeleted.includes(key)) updatedActiveKeys.push(key);
   });
 
-  sessionStorage.setItem("active_collection_keys", updatedActiveKeys);
+  sessionStorage.setItem(SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY, updatedActiveKeys);
 };
 
 /**
@@ -447,62 +447,30 @@ export const updateActiveKeys = (records: RQAPI.Record[], id: RQAPI.Record["id"]
     return activeKeys;
   }
 
-  /**
-   * Finds all parent IDs for a given record/collection using Depth First Search (DFS).
-   *
-   * @description This method uses a stack-based approach for DFS to avoid recursion
-   * and identify all parent IDs related to the given start ID. The getRelatedId function
-   * is used to retrieve the parent-child relationships.
-   *
-   * @param records - Array of API client records.
-   * @param startId - The ID to start searching for parent IDs.
-   * @param getRelatedId - A function that determines the related ID (parent or child)
-   *                       based on the current record and ID.
-   *
-   * @returns An array of parent IDs.
-   */
-  function getParents(
-    records: RQAPI.Record[],
-    startId: RQAPI.Record["id"],
-    getRelatedId: (record: RQAPI.Record, currentId: RQAPI.Record["id"]) => RQAPI.Record["id"]
-  ) {
-    const relatedIds: RQAPI.Record["id"][] = [];
-    const visited = new Set();
-    const stack = [startId];
+  function getParentIds(data: RQAPI.Record[], targetId: RQAPI.Record["id"]) {
+    const idToCollectionMap = data.reduce((collectionIdMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>, item) => {
+      collectionIdMap[item.id] = item.collectionId || "";
+      return collectionIdMap;
+    }, {});
 
-    while (stack.length > 0) {
-      const currentId = stack.pop();
+    const parentIds = [];
 
-      // Skip if the current ID has already been visited.
-      if (visited.has(currentId)) continue;
-
-      visited.add(currentId);
-
-      // Iterate over records to find related IDs (parents).
-      records.forEach((record) => {
-        const relatedId = getRelatedId(record, currentId);
-        if (relatedId) {
-          relatedIds.push(relatedId);
-          stack.push(relatedId);
-        }
-      });
+    let currentId = idToCollectionMap[targetId];
+    while (currentId) {
+      parentIds.push(currentId);
+      currentId = idToCollectionMap[currentId];
     }
 
-    return relatedIds;
+    return parentIds;
   }
 
-  // Create a copy of the activeKeys array to avoid mutating the original array.
   const activeKeysCopy = [...activeKeys];
 
-  // Retrieve all parent IDs of the given ID.
-  const parents = getParents(records, id, (record, currentId) => {
-    return record.id === currentId ? record.collectionId : null;
-  });
+  const parents = getParentIds(records, id);
 
   // Include the original ID itself as an active key.
   parents.push(id);
 
-  // Add each parent ID to the active keys array, avoiding duplicates.
   parents.forEach((parent) => {
     if (!activeKeysCopy.includes(parent)) {
       activeKeysCopy.push(parent);
