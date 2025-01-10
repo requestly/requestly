@@ -22,7 +22,7 @@ import { sessionStorage } from "utils/sessionStorage";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
 import "./collectionsList.scss";
 import { union } from "lodash";
-import { SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY } from "features/apiClient/constants";
+import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -37,7 +37,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const { isLoadingApiClientRecords, apiClientRecords, isRecordBeingCreated } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [activeKeys, setActiveKeys] = useState(sessionStorage.getItem(SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY, []));
+  const [expandedRecordIds, setExpandedRecordIds] = useState(
+    sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, [])
+  );
   const [searchValue, setSearchValue] = useState("");
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
@@ -106,7 +108,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
   useEffect(() => {
     const id = requestId || collectionId;
-    setActiveKeys((prev: RQAPI.Record["id"][]) => union(prev, updateActiveKeys(apiClientRecords, id, prev)));
+    setExpandedRecordIds((prev: RQAPI.Record["id"][]) => union(prev, updateActiveKeys(apiClientRecords, id, prev)));
   }, [collectionId, requestId, apiClientRecords]);
 
   return (
@@ -127,8 +129,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     key={record.id}
                     record={record}
                     onNewClick={onNewClick}
-                    activeKeys={activeKeys}
-                    updateActiveKeys={setActiveKeys}
+                    expandedRecordIds={expandedRecordIds}
+                    setExpandedRecordIds={setExpandedRecordIds}
                     onExportClick={handleExportCollection}
                   />
                 );

@@ -17,15 +17,15 @@ import { useParams } from "react-router-dom";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { isEmpty } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
-import { SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY } from "features/apiClient/constants";
+import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 
 interface Props {
   record: RQAPI.CollectionRecord;
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
   onExportClick: (collection: RQAPI.CollectionRecord) => void;
   openTab: TabsLayoutContextInterface["openTab"];
-  updateActiveKeys: (keys: RQAPI.Record["id"][]) => void;
-  activeKeys: string[];
+  setExpandedRecordIds: (keys: RQAPI.Record["id"][]) => void;
+  expandedRecordIds: string[];
 }
 
 export const CollectionRow: React.FC<Props> = ({
@@ -33,11 +33,11 @@ export const CollectionRow: React.FC<Props> = ({
   onNewClick,
   onExportClick,
   openTab,
-  activeKeys,
-  updateActiveKeys,
+  expandedRecordIds,
+  setExpandedRecordIds,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [activeKey, setActiveKey] = useState(activeKeys?.includes(record.id) ? record.id : null);
+  const [activeKey, setActiveKey] = useState(expandedRecordIds?.includes(record.id) ? record.id : null);
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
@@ -81,23 +81,23 @@ export const CollectionRow: React.FC<Props> = ({
 
   const collapseChangeHandler = useCallback(
     (keys: RQAPI.Record["id"][]) => {
-      let activeKeysCopy = [...activeKeys];
+      let activeKeysCopy = [...expandedRecordIds];
       if (isEmpty(keys)) {
         activeKeysCopy = activeKeysCopy.filter((key) => key !== record.id);
       } else if (!activeKeysCopy.includes(record.id)) {
         activeKeysCopy.push(record.id);
       }
-      updateActiveKeys(activeKeysCopy);
+      setExpandedRecordIds(activeKeysCopy);
       isEmpty(activeKeysCopy)
-        ? sessionStorage.removeItem(SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY)
-        : sessionStorage.setItem(SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY, activeKeysCopy);
+        ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
+        : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, activeKeysCopy);
     },
-    [record, activeKeys]
+    [record, expandedRecordIds]
   );
 
   useEffect(() => {
-    setActiveKey(activeKeys?.includes(record.id) ? record.id : null);
-  }, [activeKeys, record.id]);
+    setActiveKey(expandedRecordIds?.includes(record.id) ? record.id : null);
+  }, [expandedRecordIds, record.id]);
 
   useEffect(() => {
     /* Temporary Change-> To remove previous key from session storage 
@@ -220,8 +220,8 @@ export const CollectionRow: React.FC<Props> = ({
                       record={apiRecord}
                       onNewClick={onNewClick}
                       onExportClick={onExportClick}
-                      activeKeys={activeKeys}
-                      updateActiveKeys={updateActiveKeys}
+                      expandedRecordIds={expandedRecordIds}
+                      setExpandedRecordIds={setExpandedRecordIds}
                     />
                   );
                 }

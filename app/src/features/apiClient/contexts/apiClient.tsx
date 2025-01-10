@@ -16,7 +16,7 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { trackCreateEnvironmentClicked } from "../screens/environment/analytics";
 import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { clearActiveKeysFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
+import { clearExpandedRecordIdsFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
 
 interface ApiClientContextInterface {
@@ -180,7 +180,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const onDeleteRecords = useCallback(
     (recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
       deleteTabs(recordIdsToBeDeleted);
-      clearActiveKeysFromSession(recordIdsToBeDeleted);
+      clearExpandedRecordIdsFromSession(recordIdsToBeDeleted);
 
       setApiClientRecords((prev) => {
         return prev.filter((record) => {

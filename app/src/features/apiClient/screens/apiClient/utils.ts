@@ -2,7 +2,7 @@ import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionA
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
 import { KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
-import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY } from "../../constants";
+import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
 import { forEach, isEmpty, split, unionBy } from "lodash";
@@ -412,8 +412,8 @@ export const filterRecordsBySearch = (records: RQAPI.Record[], searchValue: stri
   return records.filter((record) => matchingRecords.has(record.id));
 };
 
-export const clearActiveKeysFromSession = (keysToBeDeleted: string[]) => {
-  const activeKeys = sessionStorage.getItem(SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY, []);
+export const clearExpandedRecordIdsFromSession = (keysToBeDeleted: string[]) => {
+  const activeKeys = sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, []);
 
   if (keysToBeDeleted.length === 0) {
     return;
@@ -425,22 +425,9 @@ export const clearActiveKeysFromSession = (keysToBeDeleted: string[]) => {
     if (!keysToBeDeleted.includes(key)) updatedActiveKeys.push(key);
   });
 
-  sessionStorage.setItem(SESSION_STORAGE_ACTIVE_COLLECTIONS_KEY, updatedActiveKeys);
+  sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, updatedActiveKeys);
 };
 
-/**
- * Updates the activeKeys array to include the parent IDs of the given ID.
- *
- * @description This method ensures that collections are expanded in the sidebar
- * when switching tabs. It achieves this by identifying all parent IDs of the
- * current tab's ID and adding them to the `activeKeys` array.
- *
- * @param records - Array of API client records.
- * @param id - The ID of the record whose parent IDs need to be found.
- * @param activeKeys - Array of IDs that are already active (expanded) in the sidebar.
- *
- * @returns The updated activeKeys array, including all parent IDs.
- */
 export const updateActiveKeys = (records: RQAPI.Record[], id: RQAPI.Record["id"], activeKeys: RQAPI.Record["id"][]) => {
   // If the provided ID is null or undefined, return the existing active keys.
   if (!id) {
@@ -466,12 +453,12 @@ export const updateActiveKeys = (records: RQAPI.Record[], id: RQAPI.Record["id"]
 
   const activeKeysCopy = [...activeKeys];
 
-  const parents = getParentIds(records, id);
+  const parentIds = getParentIds(records, id);
 
   // Include the original ID itself as an active key.
-  parents.push(id);
+  parentIds.push(id);
 
-  parents.forEach((parent) => {
+  parentIds.forEach((parent) => {
     if (!activeKeysCopy.includes(parent)) {
       activeKeysCopy.push(parent);
     }
