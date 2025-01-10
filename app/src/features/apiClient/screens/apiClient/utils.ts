@@ -445,13 +445,17 @@ const getParentIds = (data: RQAPI.Record[], targetId: RQAPI.Record["id"]) => {
   return parentIds;
 };
 
-export const updateActiveKeys = (records: RQAPI.Record[], id: RQAPI.Record["id"], activeKeys: RQAPI.Record["id"][]) => {
+export const getRecordIdsToBeExpanded = (
+  id: RQAPI.Record["id"],
+  expandedKeys: RQAPI.Record["id"][],
+  records: RQAPI.Record[]
+) => {
   // If the provided ID is null or undefined, return the existing active keys.
   if (!id) {
-    return activeKeys;
+    return expandedKeys;
   }
 
-  const activeKeysCopy = [...activeKeys];
+  const expandedKeysCopy = [...expandedKeys];
 
   const parentIds = getParentIds(records, id);
 
@@ -459,10 +463,10 @@ export const updateActiveKeys = (records: RQAPI.Record[], id: RQAPI.Record["id"]
   parentIds.push(id);
 
   parentIds.forEach((parent) => {
-    if (!activeKeysCopy.includes(parent)) {
-      activeKeysCopy.push(parent);
+    if (!expandedKeysCopy.includes(parent)) {
+      expandedKeysCopy.push(parent);
     }
   });
 
-  return activeKeysCopy;
+  return expandedKeysCopy;
 };
