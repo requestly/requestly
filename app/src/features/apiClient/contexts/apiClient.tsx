@@ -291,7 +291,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setIsRecordBeingCreated(recordType);
           trackCreateEnvironmentClicked(analyticEventSource);
           return addNewEnvironment("New Environment")
-            .then((newEnvironment: { id: string; name: string }) => {
+            .then((newEnvironment: { id: string; name: string; isGlobal: boolean }) => {
               setIsRecordBeingCreated(null);
               openTab(newEnvironment?.id, {
                 title: newEnvironment?.name,

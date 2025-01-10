@@ -10,6 +10,7 @@ import { RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import {
   trackImportApiCollectionsClicked,
+  trackImportFromBrunoClicked,
   trackImportFromPostmanClicked,
   trackNewCollectionClicked,
   trackNewRequestClicked,
@@ -22,9 +23,10 @@ import { ImportCollectionsModal } from "../../../modals/importCollectionsModal/I
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import { SiPostman } from "@react-icons/all-files/si/SiPostman";
+import { SiBruno } from "@react-icons/all-files/si/SiBruno";
 import { PostmanImporterModal } from "../../../modals/postmanImporterModal/PostmanImporterModal";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
-
+import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
 interface Props {
   activeTab: ApiClientSidebarTabKey;
   // TODO: FIX THIS
@@ -51,6 +53,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const [isImportCollectionsModalOpen, setIsImportCollectionsModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
+  const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
 
   const importItems: DropdownProps["menu"]["items"] = useMemo(
     () => [
@@ -130,6 +133,32 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             );
           } else {
             setIsPostmanImporterModalOpen(true);
+          }
+        },
+      },
+      {
+        key: "4",
+        label: (
+          <div className="new-btn-option">
+            <SiBruno /> Bruno Collections and Variables
+          </div>
+        ),
+        onClick: () => {
+          trackImportFromBrunoClicked();
+          if (!user.loggedIn) {
+            dispatch(
+              globalActions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  eventSource: "api_client_sidebar",
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                  warningMessage: `Please log in to import Bruno exports`,
+                },
+              })
+            );
+          } else {
+            setIsBrunoImporterModalOpen(true);
           }
         },
       },
@@ -283,6 +312,9 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           isOpen={isPostmanImporterModalOpen}
           onClose={() => setIsPostmanImporterModalOpen(false)}
         />
+      )}
+      {isBrunoImporterModalOpen && (
+        <BrunoImporterModal isOpen={isBrunoImporterModalOpen} onClose={() => setIsBrunoImporterModalOpen(false)} />
       )}
     </>
   );
