@@ -428,28 +428,28 @@ export const clearExpandedRecordIdsFromSession = (keysToBeDeleted: string[]) => 
   sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, updatedActiveKeys);
 };
 
+const getParentIds = (data: RQAPI.Record[], targetId: RQAPI.Record["id"]) => {
+  const idToCollectionMap = data.reduce((collectionIdMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>, item) => {
+    collectionIdMap[item.id] = item.collectionId || "";
+    return collectionIdMap;
+  }, {});
+
+  const parentIds = [];
+
+  let currentId = idToCollectionMap[targetId];
+  while (currentId) {
+    parentIds.push(currentId);
+    currentId = idToCollectionMap[currentId];
+  }
+
+  return parentIds;
+};
+
 export const updateActiveKeys = (records: RQAPI.Record[], id: RQAPI.Record["id"], activeKeys: RQAPI.Record["id"][]) => {
   // If the provided ID is null or undefined, return the existing active keys.
   if (!id) {
     return activeKeys;
   }
-
-  const getParentIds = (data: RQAPI.Record[], targetId: RQAPI.Record["id"]) => {
-    const idToCollectionMap = data.reduce((collectionIdMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>, item) => {
-      collectionIdMap[item.id] = item.collectionId || "";
-      return collectionIdMap;
-    }, {});
-
-    const parentIds = [];
-
-    let currentId = idToCollectionMap[targetId];
-    while (currentId) {
-      parentIds.push(currentId);
-      currentId = idToCollectionMap[currentId];
-    }
-
-    return parentIds;
-  };
 
   const activeKeysCopy = [...activeKeys];
 
