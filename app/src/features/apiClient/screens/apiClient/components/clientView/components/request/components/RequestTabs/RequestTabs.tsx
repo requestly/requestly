@@ -77,8 +77,18 @@ const RequestTabs: React.FC<Props> = ({
         label: (
           <LabelWithCount label="Body" count={requestEntry.request.body ? 1 : 0} showDot={isRequestBodySupported} />
         ),
-        children: (
+        children: requestEntry.request.bodyContainer ? (
           <RequestBody
+            mode="multiple"
+            bodyContainer={requestEntry.request.bodyContainer}
+            contentType={requestEntry.request.contentType}
+            setRequestEntry={setRequestEntry}
+            setContentType={setContentType}
+            variables={variables}
+          />
+        ) : (
+          <RequestBody
+            mode="single"
             body={requestEntry.request.body}
             contentType={requestEntry.request.contentType}
             setRequestEntry={setRequestEntry}
