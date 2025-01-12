@@ -7,6 +7,16 @@
   margin: 8px 16px;
   max-height: 24px;
 
+  .ant-skeleton {
+    opacity: 0.6;
+    max-width: 250px;
+
+    .ant-skeleton-input {
+      height: 16px;
+      border-radius: 4px;
+    }
+  }
+
   .rq-breadcrumb-item,
   .rq-breadcrumb-separator {
     flex-shrink: 0;
