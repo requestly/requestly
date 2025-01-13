@@ -146,7 +146,7 @@ export const ImportFromResourceOverride: React.FC<ImportFromResourceOverrideProp
       appMode,
       rules: rulesToImport,
       status: false,
-      groupName: `resoure-override-${generateObjectId()}`,
+      groupName: `resource-override-${generateObjectId()}`,
       onSuccess: () => {},
       onError: () => {
         setValidationError("Something went wrong while importing your settings! Try again.");
