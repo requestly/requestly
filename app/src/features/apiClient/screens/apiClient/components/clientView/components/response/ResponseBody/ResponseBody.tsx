@@ -96,7 +96,6 @@ const ResponseBody: React.FC<Props> = ({
           language={editorLanguage}
           isReadOnly
           prettifyOnInit={false}
-          prettifyOnRender={true}
           toolbarOptions={{
             title: "",
             options: [bodyPreviewModeOptions],

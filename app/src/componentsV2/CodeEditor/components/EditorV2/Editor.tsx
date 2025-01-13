@@ -39,7 +39,6 @@ interface EditorProps {
   handleChange?: (value: string) => void;
   analyticEventProperties?: AnalyticEventProperties;
   prettifyOnInit?: boolean;
-  prettifyOnRender?: boolean;
   envVariables?: EnvironmentVariables;
   config?: {
     enablePrettify?: boolean;
@@ -58,7 +57,6 @@ const Editor: React.FC<EditorProps> = ({
   id = "",
   analyticEventProperties = {},
   prettifyOnInit = false,
-  prettifyOnRender = false,
   envVariables,
   config = { enablePrettify: true },
 }) => {
@@ -76,9 +74,6 @@ const Editor: React.FC<EditorProps> = ({
   const toastOverlay = useMemo(() => allEditorToast[id], [allEditorToast, id]); // todo: rename
   const [isCodePrettified, setIsCodePrettified] = useState(prettifyOnInit);
   const isDefaultPrettificationDone = useRef(false);
-  //const [formattedValue, setFormattedValue] = useState(value);
-
-  console.log("ping");
 
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
@@ -122,14 +117,12 @@ const Editor: React.FC<EditorProps> = ({
 
   const editorRefCallback = (editor: ReactCodeMirrorRef) => {
     if (!editorRef.current && editor?.editor && editor?.state && editor?.view) {
-      editorRef.current = editor; // Store the fully initialized editor instance\
-      console.log("Editor initialized");
+      editorRef.current = editor;
       setIsEditorInitialized(true);
     }
   };
 
   const updateContent = useCallback((prettifiedCode: string) => {
-    console.log("DBG ref value", editorRef.current);
     if (editorRef.current?.view) {
       const view = editorRef.current.view;
       const transaction = view.state.update({
@@ -143,10 +136,7 @@ const Editor: React.FC<EditorProps> = ({
     if (config?.enablePrettify) {
       if (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT) {
         const prettified = prettifyCode(value, language);
-        console.log("prettifed code", prettified.code);
         updateContent(prettified.code);
-      } else {
-        console.log("cannot be prettified");
       }
     }
   }, [config?.enablePrettify, language, value, updateContent]);
@@ -155,39 +145,11 @@ const Editor: React.FC<EditorProps> = ({
     if (isEditorInitialized && !isDefaultPrettificationDone.current) {
       applyPrettification();
       isDefaultPrettificationDone.current = true;
+    } else if (!prettifyOnInit) {
+      //on render
+      applyPrettification();
     }
-  }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification]);
-
-  // useEffect(() => {
-  //   if (prettifyOnInit && !isDefaultPrettificationDone.current) {
-  //     if (editorRef.current?.view) {
-  //       console.log("Editor ready; applying prettification");
-  //       applyPrettification();
-  //       isDefaultPrettificationDone.current = true;
-  //     } else {
-  //       console.warn("Editor not ready during initial prettification; retrying...");
-  //       const interval = setInterval(() => {
-  //         if (editorRef.current?.view) {
-  //           console.log("Editor ready on retry; applying prettification");
-  //           applyPrettification();
-  //           isDefaultPrettificationDone.current = true;
-  //           clearInterval(interval);
-  //         }
-  //       },);
-  //       return () => clearInterval(interval);
-  //     }
-  //   }
-  //   else if(prettifyOnRender){
-  //     applyPrettification();
-  //   }
-  // }, [prettifyOnInit, applyPrettification, prettifyOnRender]);
-
-  // useEffect(() => {
-  //   if (prettifyOnRender) {
-  //     console.log("render called");
-  //     applyPrettification();
-  //   }
-  // }, [prettifyOnRender, applyPrettification]);
+  }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit]);
 
   const handleEditorClose = useCallback(
     (id: string) => {
@@ -257,7 +219,7 @@ const Editor: React.FC<EditorProps> = ({
           code={value}
           isFullScreen={isFullScreen}
           onCodeFormat={(formattedCode: string) => {
-            handleChange(formattedCode);
+            updateContent(formattedCode);
           }}
           isCodePrettified={isCodePrettified}
           setIsCodePrettified={setIsCodePrettified}
@@ -281,7 +243,6 @@ const Editor: React.FC<EditorProps> = ({
             width="100%"
             readOnly={isReadOnly}
             value={value ?? ""}
-            //defaultValue={defaultValue}
             onChange={debouncedhandleEditorBodyChange}
             theme={vscodeDark}
             extensions={[editorLanguage, customKeyBinding, EditorView.lineWrapping].filter(Boolean)}
@@ -305,8 +266,7 @@ const Editor: React.FC<EditorProps> = ({
         code={value}
         isFullScreen={isFullScreen}
         onCodeFormat={(formattedCode: string) => {
-          //setFormattedValue(formattedCode);
-          handleChange(formattedCode);
+          updateContent(formattedCode);
         }}
         isCodePrettified={isCodePrettified}
         setIsCodePrettified={setIsCodePrettified}
@@ -351,7 +311,6 @@ const Editor: React.FC<EditorProps> = ({
             width="100%"
             readOnly={isReadOnly}
             value={value ?? ""}
-            //defaultValue={defaultValue}
             onChange={debouncedhandleEditorBodyChange}
             theme={vscodeDark}
             extensions={[
@@ -382,7 +341,9 @@ const Editor: React.FC<EditorProps> = ({
               <div className="editor-popup-container ant-input" onMouseLeave={() => setHoveredVariable(null)}>
                 {hoveredVariable && (
                   <EditorPopover
-                    editorRef={editorRef}
+                    editorRef={{
+                      current: editorRef.current?.editor ?? null,
+                    }}
                     hoveredVariable={hoveredVariable}
                     popupPosition={popupPosition}
                     variables={envVariables}

@@ -1,5 +1,5 @@
 import React, { useCallback, useContext } from "react";
-import CodeEditor from "componentsV2/CodeEditor";
+import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
 import { EnvironmentVariables } from "backend/environment/types";
 import { useDebounce } from "hooks/useDebounce";
 import { RequestBodyContext, useTextBody } from "../request-body-state-manager";
@@ -32,10 +32,9 @@ export function RawBody(props: {
 
   return (
     <div className="api-client-code-editor-container api-request-body-editor-container">
-      <CodeEditor
+      <Editor
         key={"raw_body"}
         language={null}
-        defaultValue={text}
         value={text}
         handleChange={handleTextChange}
         isResizable={false}
