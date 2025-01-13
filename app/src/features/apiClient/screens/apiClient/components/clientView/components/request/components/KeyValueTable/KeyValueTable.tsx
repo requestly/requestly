@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import type { TableProps } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -27,16 +27,14 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
     }),
     []
   );
-  const [internalState, setInternalState] = useState(() => (data.length ? data : [createEmptyPair()]));
-
-  useEffect(() => {
-    onChange(internalState);
-  }, [internalState, onChange]);
+  const memoizedData: KeyValuePair[] = useMemo(() => (data.length ? data : [createEmptyPair()]), [
+    data,
+    createEmptyPair,
+  ]);
 
   const handleUpdateRequestPairs = useCallback(
     (pair: KeyValuePair, action: "add" | "update" | "delete") => {
-      console.log("whaaat?");
-      let keyValuePairs = [...internalState];
+      let keyValuePairs = [...memoizedData];
 
       if (pair) {
         switch (action) {
@@ -62,10 +60,9 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         }
       }
 
-      setInternalState(keyValuePairs);
-      // return keyValuePairs;
+      onChange(keyValuePairs);
     },
-    [internalState]
+    [onChange, memoizedData]
   );
 
   const handleUpdatePair = useCallback(
@@ -86,12 +83,6 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
     },
     [handleUpdateRequestPairs]
   );
-
-  useEffect(() => {
-    if (data.length === 0) {
-      // handleAddPair();
-    }
-  }, [data, handleAddPair]);
 
   const columns = useMemo(() => {
     return [
@@ -166,7 +157,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
       showHeader={false}
       rowKey="id"
       columns={columns as ColumnTypes}
-      data={internalState}
+      data={memoizedData}
       locale={{ emptyText: `No query params found` }}
       components={{
         body: {
