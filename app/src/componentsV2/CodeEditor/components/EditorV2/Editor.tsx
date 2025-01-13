@@ -70,6 +70,7 @@ const Editor: React.FC<EditorProps> = ({
   const [hoveredVariable, setHoveredVariable] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const isFullScreenModeOnboardingCompleted = useSelector(getIsCodeEditorFullScreenModeOnboardingCompleted);
+  const [isEditorInitialized, setIsEditorInitialized] = useState(false);
 
   const allEditorToast = useSelector(getAllEditorToast);
   const toastOverlay = useMemo(() => allEditorToast[id], [allEditorToast, id]); // todo: rename
@@ -120,20 +121,15 @@ const Editor: React.FC<EditorProps> = ({
   }, [language]);
 
   const editorRefCallback = (editor: ReactCodeMirrorRef) => {
-    if (!editorRef.current) {
+    if (!editorRef.current && editor?.editor && editor?.state && editor?.view) {
       editorRef.current = editor; // Store the fully initialized editor instance\
       console.log("Editor initialized");
-
-      if (prettifyOnInit && !isDefaultPrettificationDone.current) {
-        console.log("Init run");
-        applyPrettification();
-        isDefaultPrettificationDone.current = true;
-      }
+      setIsEditorInitialized(true);
     }
   };
 
   const updateContent = useCallback((prettifiedCode: string) => {
-    console.log("ref value", editorRef.current);
+    console.log("DBG ref value", editorRef.current);
     if (editorRef.current?.view) {
       const view = editorRef.current.view;
       const transaction = view.state.update({
@@ -154,6 +150,13 @@ const Editor: React.FC<EditorProps> = ({
       }
     }
   }, [config?.enablePrettify, language, value, updateContent]);
+
+  useEffect(() => {
+    if (isEditorInitialized && !isDefaultPrettificationDone.current) {
+      applyPrettification();
+      isDefaultPrettificationDone.current = true;
+    }
+  }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification]);
 
   // useEffect(() => {
   //   if (prettifyOnInit && !isDefaultPrettificationDone.current) {
@@ -179,12 +182,12 @@ const Editor: React.FC<EditorProps> = ({
   //   }
   // }, [prettifyOnInit, applyPrettification, prettifyOnRender]);
 
-  useEffect(() => {
-    if (prettifyOnRender) {
-      console.log("render called");
-      applyPrettification();
-    }
-  }, [prettifyOnRender, applyPrettification]);
+  // useEffect(() => {
+  //   if (prettifyOnRender) {
+  //     console.log("render called");
+  //     applyPrettification();
+  //   }
+  // }, [prettifyOnRender, applyPrettification]);
 
   const handleEditorClose = useCallback(
     (id: string) => {
@@ -342,7 +345,9 @@ const Editor: React.FC<EditorProps> = ({
           )}
           <CodeMirror
             ref={editorRefCallback}
-            className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""}`}
+            className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""} ${
+              !isEditorInitialized ? "not-visible" : ""
+            }`}
             width="100%"
             readOnly={isReadOnly}
             value={value ?? ""}
