@@ -1,7 +1,7 @@
 import React, { ReactElement, memo, useCallback, useMemo, useState } from "react";
 import { Radio, RadioChangeEvent, Spin, Tooltip } from "antd";
 import { trackRawResponseViewed } from "modules/analytics/events/features/apiClient";
-import Editor from "componentsV2/CodeEditor/components/Editor/Editor";
+import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
 import { getEditorLanguageFromContentType } from "componentsV2/CodeEditor";
 import "./responseBody.scss";
 import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
@@ -92,10 +92,11 @@ const ResponseBody: React.FC<Props> = ({
       <div className="api-response-body-editor-container">
         <Editor
           value={responseText}
-          defaultValue={responseText}
+          //defaultValue={responseText}
           language={editorLanguage}
           isReadOnly
-          prettifyOnInit={true}
+          prettifyOnInit={false}
+          prettifyOnRender={true}
           toolbarOptions={{
             title: "",
             options: [bodyPreviewModeOptions],

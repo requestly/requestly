@@ -33,7 +33,7 @@ export function RawBody(props: {
     <CodeEditor
       key={"raw_body"}
       language={null}
-      defaultValue={text}
+      //defaultValue={text}
       value={text}
       handleChange={handleTextChange}
       isResizable={false}

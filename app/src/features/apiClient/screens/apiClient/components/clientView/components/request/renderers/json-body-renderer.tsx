@@ -33,10 +33,11 @@ export function JsonBody(props: {
     <CodeEditor
       key={"json_body"}
       language={EditorLanguage.JSON}
-      defaultValue={text}
+      //defaultValue={text}
       value={text}
       handleChange={handleTextChange}
       prettifyOnInit={true}
+      prettifyOnRender={false}
       isResizable={false}
       hideCharacterCount
       analyticEventProperties={{ source: "api_client" }}
