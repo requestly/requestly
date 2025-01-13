@@ -108,6 +108,7 @@ const RequestTabs: React.FC<Props> = ({
             defaultValues={requestEntry.auth}
             onAuthUpdate={handleAuthChange}
             rootLevelRecord={!collectionId}
+            variables={variables}
           />
         ),
       },

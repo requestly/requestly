@@ -12,9 +12,8 @@ import "./collectionView.scss";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
-import AuthorizationView from "../request/components/AuthorizationView";
-import { debounce } from "lodash";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
+import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -52,6 +51,7 @@ export const CollectionView = () => {
     },
     [collection, onSaveRecord, teamId, user.details?.profile?.uid]
   );
+
   const tabItems = useMemo(() => {
     return [
       {
@@ -68,10 +68,9 @@ export const CollectionView = () => {
         label: "Authorization",
         key: TAB_KEYS.AUTHORIZATION,
         children: (
-          <AuthorizationView
-            wrapperClass="collection-auth"
-            defaultValues={collection?.data?.auth}
-            onAuthUpdate={debounce(updateCollectionAuthData, 500)}
+          <CollectionAuthorizationView
+            authOptions={collection?.data?.auth}
+            updateAuthData={updateCollectionAuthData}
             rootLevelRecord={!collection?.collectionId}
           />
         ),

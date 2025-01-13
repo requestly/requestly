@@ -13,12 +13,17 @@ import rehypeRaw from "rehype-raw";
 import { ButtonType } from "antd/lib/button";
 import { capitalize } from "lodash";
 import { redirectToUrl } from "utils/RedirectionUtils";
-import { getCompanyNameFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getCompanyNameFromEmail, getPrettyPlanName, isCompanyEmail } from "utils/FormattingHelper";
 import LINKS from "config/constants/sub/links";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { trackAppBannerDismissed, trackAppNotificationBannerViewed, trackAppBannerCtaClicked } from "./analytics";
 import { RequestBillingTeamAccessModal } from "features/settings";
 import "./appNotificationBanner.scss";
+import { trackCheckoutInitiated } from "modules/analytics/events/misc/business/checkout";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { toast } from "utils/Toast";
+import { PlanStatus, PlanType } from "features/settings/components/BillingTeam/types";
+import { PRICING } from "features/pricing/constants/pricing";
 
 enum BANNER_TYPE {
   WARNING = "warning",
@@ -30,6 +35,7 @@ enum BANNER_ACTIONS {
   CONTACT_US = "contact_us",
   REQUEST_ACCESS = "request_access",
   REDIRECT_TO_ACCELERATOR_FORM = "redirect_to_accelerator_form",
+  CONVERT_TO_ANNUAL_PLAN = "convert_to_annual_plan",
 }
 
 enum BANNER_ID {
@@ -37,6 +43,7 @@ enum BANNER_ID {
   COMMERCIAL_LICENSE = "commercial_license",
   REQUEST_TEAM_ACCESS = "request_team_access",
   BLACK_FRIDAY = "black_friday",
+  CONVERT_TO_ANNUAL_PLAN = "convert_to_annual_plan",
 }
 
 interface Banner {
@@ -56,6 +63,8 @@ export const AppNotificationBanner = () => {
   const user = useSelector(getUserAuthDetails);
   const lastAppBannerDismissTs = useSelector(getAppNotificationBannerDismissTs);
   const banners = useFeatureValue("app_banner", []);
+  const firebaseFunction = getFunctions();
+
   const newBanners = banners.filter((banner: Banner) => banner.createdTs > (lastAppBannerDismissTs || 0));
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [isRequestAccessModalOpen, setIsRequestAccessModalOpen] = useState(false);
@@ -97,8 +106,43 @@ export const AppNotificationBanner = () => {
           redirectToUrl(LINKS.ACCELERATOR_PROGRAM_FORM_LINK, true);
         },
       },
+      [BANNER_ACTIONS.CONVERT_TO_ANNUAL_PLAN]: {
+        label: "See details",
+        type: "primary",
+        onClick: () => {
+          const manageSubscription = httpsCallable(firebaseFunction, "subscription-manageSubscription");
+          manageSubscription({
+            planName: user?.details?.planDetails?.planName,
+            duration: "annually",
+            portalFlowType: "update_subscription",
+            monthlyConversionToAnnual: true,
+          })
+            .then((res: any) => {
+              if (res?.data?.success) {
+                window.location.href = res?.data?.data?.portalUrl;
+
+                trackCheckoutInitiated({
+                  plan_name: user?.details?.planDetails?.planName,
+                  duration: "annually",
+                  currency: "usd",
+                  quantity: user?.details?.planDetails?.subscription?.quantity,
+                  source: "monthly_to_annual_conversion",
+                });
+              }
+            })
+            .catch((err) => {
+              toast.error("Error in converting to annual plan. Please contact support contact@requestly.io");
+              // trackCheckoutFailedEvent(quantity, source);
+            });
+        },
+      },
     };
-  }, [dispatch]);
+  }, [
+    dispatch,
+    firebaseFunction,
+    user?.details?.planDetails?.planName,
+    user?.details?.planDetails?.subscription?.quantity,
+  ]);
 
   const renderBannerText = useCallback(
     (bannerId: string, text: string) => {
@@ -119,18 +163,23 @@ export const AppNotificationBanner = () => {
           const companyName = getCompanyNameFromEmail(user?.details?.profile?.email) || "";
           return `Dear ${companyName} user, ${text}`;
         }
+        case BANNER_ID.CONVERT_TO_ANNUAL_PLAN: {
+          return `You're on the ${getPrettyPlanName(
+            user?.details?.planDetails?.planName
+          )} Monthly plan. Switch to the annual plan and save over 40% on your annual spends with our New Year Deal.`;
+        }
         default:
           return text;
       }
     },
-    [user?.details?.profile?.email]
+    [user?.details?.planDetails?.planName, user?.details?.profile?.email]
   );
 
   const checkBannerVisibility = useCallback(
     (bannerId: string) => {
       switch (bannerId) {
         case BANNER_ID.COMMERCIAL_LICENSE: {
-          if (!user.details?.isPremium) {
+          if (!user?.details?.isPremium) {
             dispatch(globalActions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
@@ -142,16 +191,47 @@ export const AppNotificationBanner = () => {
           } else return false;
         }
         case BANNER_ID.ACCELERATOR_PROGRAM: {
-          if (!user.details?.isPremium && !billingTeams?.length && user.loggedIn) {
+          if (!user?.details?.isPremium && !billingTeams?.length && user?.loggedIn) {
             dispatch(globalActions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
         }
         case BANNER_ID.BLACK_FRIDAY: {
-          if (!user.details?.isPremium) {
+          if (!user?.details?.isPremium) {
             dispatch(globalActions.updateIsAppBannerVisible(true));
             return true;
           } else return false;
+        }
+        case BANNER_ID.CONVERT_TO_ANNUAL_PLAN: {
+          if (!user?.details?.isPremium || user?.details?.planDetails?.status !== PlanStatus.ACTIVE) {
+            return false;
+          }
+
+          // Check if annual plan
+          if (user?.details?.planDetails?.subscription?.duration === PRICING.DURATION.ANNUALLY) {
+            return false;
+          }
+
+          // Handle individual plan
+          if (user?.details?.planDetails?.type === PlanType.INDIVIDUAL) {
+            dispatch(globalActions.updateIsAppBannerVisible(true));
+            return true;
+          }
+
+          // Handle team plan
+          const isTeamOwner = billingTeams?.some(
+            (team) =>
+              user?.details?.profile?.uid in team.members &&
+              !team.isAcceleratorTeam &&
+              team.owner === user?.details?.profile?.uid
+          );
+
+          if (isTeamOwner) {
+            dispatch(globalActions.updateIsAppBannerVisible(true));
+            return true;
+          }
+
+          return false;
         }
         default: {
           dispatch(globalActions.updateIsAppBannerVisible(true));
@@ -159,7 +239,16 @@ export const AppNotificationBanner = () => {
         }
       }
     },
-    [billingTeams, user?.details?.profile?.uid, user.details?.isPremium, dispatch, user.loggedIn]
+    [
+      user?.details?.isPremium,
+      user?.details?.profile?.uid,
+      user?.details?.planDetails?.status,
+      user?.details?.planDetails?.subscription?.duration,
+      user?.details?.planDetails?.type,
+      user?.loggedIn,
+      dispatch,
+      billingTeams,
+    ]
   );
 
   const getBannerClassName = (bannerType: string) => {
@@ -216,8 +305,8 @@ export const AppNotificationBanner = () => {
                   <RQButton
                     type={bannerActionButtons[action]?.type as ButtonType}
                     onClick={() => {
-                      trackAppBannerCtaClicked(banner?.id, action);
                       bannerActionButtons[action].onClick();
+                      trackAppBannerCtaClicked(banner?.id, action);
                     }}
                   >
                     {capitalize(bannerActionButtons[action]?.label)}
