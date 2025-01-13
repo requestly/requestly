@@ -74,7 +74,7 @@ export const getPlanName = (planDetails) => {
     return PRICING.PLAN_NAMES.FREE;
   }
 
-  if (!isPremiumUser(planDetails)) {
+  if (!isPremiumUser(planDetails) && isPremiumPlan(planDetails.planId)) {
     return PRICING.PLAN_NAMES.FREE;
   }
 
