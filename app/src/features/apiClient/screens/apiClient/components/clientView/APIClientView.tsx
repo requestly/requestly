@@ -98,13 +98,21 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse), isAnimating);
-  const { updateTab } = useTabsLayoutContext();
+  const { updateTab, activeTab } = useTabsLayoutContext();
 
   useEffect(() => {
     const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
 
     updateTab(tabId, { hasUnsavedChanges: hasUnsavedChanges });
   }, [updateTab, isCreateMode, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
+
+  useEffect(() => {
+    const tabId = apiEntryDetails?.id;
+
+    if (activeTab?.id === tabId && hasUnsavedChanges) {
+      updateTab(tabId, { isPreview: false });
+    }
+  }, [updateTab, activeTab?.id, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
 
   useEffect(() => {
     if (apiEntry) {
@@ -192,6 +200,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, []);
 
   const onSendButtonClick = useCallback(() => {
+    updateTab(apiEntryDetails?.id, { isPreview: false });
+
     if (!entry.request.url) {
       return;
     }
@@ -285,6 +295,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
+    updateTab,
     apiClientRecords,
     apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
@@ -407,6 +418,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         layout={SheetLayout.SPLIT}
         bottomSheet={
           <ApiClientBottomSheet
+            key={requestId}
             response={entry.response}
             isLoading={isLoadingResponse}
             isFailed={isFailed}
@@ -416,12 +428,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           />
         }
         minSize={35}
+        initialSizes={[60, 40]}
       >
         <div className="api-client-body">
           <Skeleton loading={isAnimating} active>
             <div className="api-client-header">
               <Space.Compact className="api-client-url-container">
                 <Select
+                  popupClassName="api-request-method-selector"
                   className="api-request-method-selector"
                   options={requestMethodOptions}
                   value={entry.request.method}
@@ -471,6 +485,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               ) : null}
             </div>
             <RequestTabs
+              key={requestId}
               collectionId={apiEntryDetails?.collectionId}
               requestEntry={entry}
               setRequestEntry={setRequestEntry}

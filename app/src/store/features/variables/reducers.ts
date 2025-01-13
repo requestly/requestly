@@ -15,9 +15,10 @@ const addNewEnvironment = (
   action: PayloadAction<{
     id: string;
     name: string;
+    ownerId: string;
   }>
 ) => {
-  state.environments[action.payload.id] = {
+  state.environments[action.payload.ownerId][action.payload.id] = {
     id: action.payload.id,
     variables: {},
     name: action.payload.name,
@@ -37,9 +38,13 @@ const setAllEnvironmentData = (
   state: InitialState,
   action: PayloadAction<{
     environmentMap: EnvironmentMap;
+    ownerId: string;
   }>
 ) => {
-  state.environments = action.payload.environmentMap;
+  state.environments = {
+    ...state.environments,
+    [action.payload.ownerId]: action.payload.environmentMap,
+  };
 };
 
 const updateEnvironmentData = (
@@ -47,12 +52,13 @@ const updateEnvironmentData = (
   action: PayloadAction<{
     newVariables: EnvironmentVariables;
     environmentId: string;
+    ownerId: string;
     environmentName?: string;
   }>
 ) => {
-  state.environments[action.payload.environmentId].variables = action.payload.newVariables;
+  state.environments[action.payload.ownerId][action.payload.environmentId].variables = action.payload.newVariables;
   if (action.payload.environmentName) {
-    state.environments[action.payload.environmentId].name = action.payload.environmentName;
+    state.environments[action.payload.ownerId][action.payload.environmentId].name = action.payload.environmentName;
   }
 };
 
@@ -61,20 +67,21 @@ const removeVariableFromEnvironment = (
   action: PayloadAction<{
     key: string;
     environmentId: string;
+    ownerId: string;
   }>
 ) => {
-  delete state.environments[action.payload.environmentId].variables[action.payload.key];
+  delete state.environments[action.payload.ownerId][action.payload.environmentId].variables[action.payload.key];
 };
 
-const removeEnvironment = (state: InitialState, action: PayloadAction<{ environmentId: string }>) => {
-  delete state.environments[action.payload.environmentId];
+const removeEnvironment = (state: InitialState, action: PayloadAction<{ environmentId: string; ownerId: string }>) => {
+  delete state.environments[action.payload.ownerId][action.payload.environmentId];
 };
 
 const updateEnvironmentName = (
   state: InitialState,
-  action: PayloadAction<{ environmentId: string; newName: string }>
+  action: PayloadAction<{ environmentId: string; newName: string; ownerId: string }>
 ) => {
-  state.environments[action.payload.environmentId].name = action.payload.newName;
+  state.environments[action.payload.ownerId][action.payload.environmentId].name = action.payload.newName;
 };
 
 const setCollectionVariables = (
