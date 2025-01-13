@@ -25,6 +25,7 @@ import {
   trackRulesImportFailed,
   trackRulesImportCompleted,
   trackCharlesSettingsImportStarted,
+  trackResourceOverrideSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import "./importRules.scss";
@@ -353,6 +354,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
                     size="small"
                     onClick={() => {
                       setIsImportFromResourceOverrideModalOpen(true);
+                      trackResourceOverrideSettingsImportStarted(SOURCE.UPLOAD_RULES);
                     }}
                   >
                     <img src={ResourceOverrideIcon} width={11} height={10} alt="Resource override icon" />

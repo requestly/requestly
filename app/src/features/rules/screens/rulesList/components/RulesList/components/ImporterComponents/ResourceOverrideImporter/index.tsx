@@ -22,6 +22,13 @@ import "../importer-components.css";
 import { parseRulesFromResourceOverride } from "modules/rule-adapters/resource-override-rule-adapters/parseRulesFromResourceOverride";
 import { Rule } from "features/rules/index";
 import { generateObjectId } from "utils/FormattingHelper";
+import {
+  trackResourceOverrideSettingsImportComplete,
+  trackResourceOverrideSettingsImportDocsClicked,
+  trackResourceOverrideSettingsImportFailed,
+  trackResourceOverrideSettingsImportViewed,
+  trackResourceOverrideSettingsParsed,
+} from "modules/analytics/events/features/rules";
 
 const validExportSteps = [
   {
@@ -35,8 +42,21 @@ const validExportSteps = [
   },
 ];
 
-const ResourceOverrideLink = ({ title }: { title: string }) => (
-  <a target="_blank" rel="noreferrer" href={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_RESOURCE_OVERRIDE}>
+const ResourceOverrideLink = ({
+  title,
+  linkClickSrc,
+  importTriggerSrc,
+}: {
+  title: string;
+  linkClickSrc: string;
+  importTriggerSrc: string;
+}) => (
+  <a
+    target="_blank"
+    rel="noreferrer"
+    href={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_RESOURCE_OVERRIDE}
+    onClick={() => trackResourceOverrideSettingsImportDocsClicked(linkClickSrc, importTriggerSrc)}
+  >
     {title} <HiOutlineExternalLink className="external-icon-link" />
   </a>
 );
@@ -56,7 +76,9 @@ export const ImportFromResourceOverrideModal: React.FC<ModalProps> = ({
   isBackButtonVisible,
   onBackButtonClick,
 }) => {
-  useEffect(() => {}, [triggeredBy]);
+  useEffect(() => {
+    trackResourceOverrideSettingsImportViewed(triggeredBy);
+  }, [triggeredBy]);
 
   return (
     <Modal
@@ -78,6 +100,9 @@ export const ImportFromResourceOverrideModal: React.FC<ModalProps> = ({
 };
 
 export const ImportFromResourceOverrideWrapperView: React.FC = () => {
+  useEffect(() => {
+    trackResourceOverrideSettingsImportViewed("TOP_LEVEL_ROUTE");
+  }, []);
   return (
     <div className="importer-wrapper">
       <ImportFromResourceOverride />
@@ -115,6 +140,7 @@ export const ImportFromResourceOverride: React.FC<ImportFromResourceOverrideProp
 
     reader.onerror = () => {
       setValidationError("Could not process the selected file! Try again.");
+      trackResourceOverrideSettingsImportFailed("error reading the imported file");
     };
 
     reader.onload = () => {
@@ -125,6 +151,7 @@ export const ImportFromResourceOverride: React.FC<ImportFromResourceOverrideProp
         // stop parsing for wrong file format
         setIsDataProcessing(false);
         setValidationError("Failed to parse resource override settings file.");
+        trackResourceOverrideSettingsImportFailed("wrong file format");
         return;
       }
       try {
@@ -132,8 +159,13 @@ export const ImportFromResourceOverride: React.FC<ImportFromResourceOverrideProp
         setIsDataProcessing(false);
         setRulesToImport(convertedRules);
         setIsParseComplete(true);
+        trackResourceOverrideSettingsParsed(
+          convertedRules?.length,
+          convertedRules?.map((rule) => rule.ruleType)
+        );
       } catch (e) {
         setIsDataProcessing(false);
+        trackResourceOverrideSettingsImportFailed(e.message);
         setValidationError("Failed to parse resource override settings file.");
       }
     };
@@ -150,6 +182,7 @@ export const ImportFromResourceOverride: React.FC<ImportFromResourceOverrideProp
       onSuccess: () => {},
       onError: () => {
         setValidationError("Something went wrong while importing your settings! Try again.");
+        trackResourceOverrideSettingsImportFailed("error on saving the parsed rules in storage");
       },
     });
     dispatch(
@@ -162,6 +195,10 @@ export const ImportFromResourceOverride: React.FC<ImportFromResourceOverrideProp
     navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
     callback?.();
     setIsLoading(false);
+    trackResourceOverrideSettingsImportComplete(
+      rulesToImport?.length,
+      rulesToImport?.map((rule) => rule.ruleType)
+    );
   };
 
   const handleResetImport = () => {

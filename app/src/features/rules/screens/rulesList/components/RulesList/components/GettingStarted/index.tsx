@@ -24,6 +24,7 @@ import {
   trackRulesImportStarted,
   trackUploadRulesButtonClicked,
   trackCharlesSettingsImportStarted,
+  trackResourceOverrideSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import { ImportFromModheaderModal } from "../ImporterComponents/ModheaderImporter/ImportFromModheaderModal";
 import emptyInbox from "./empty-inbox.svg";
@@ -309,6 +310,7 @@ export const GettingStarted: React.FC = () => {
                   onClick={() => {
                     toggleImportResourceOverrideRulesModal();
                     trackRulesEmptyStateClicked("import_resource_override");
+                    trackResourceOverrideSettingsImportStarted(SOURCE.GETTING_STARTED);
                   }}
                 >
                   Import from Resource Override
