@@ -16,7 +16,6 @@ import { getValueAsPromise } from "./FirebaseActions";
 import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUtils";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
-import { variablesActions } from "store/features/variables/slice";
 import { tabsLayoutActions } from "store/slices/tabs-layout";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
@@ -89,7 +88,6 @@ export const switchWorkspace = async (
     await StorageService(appMode).clearDB();
   }
 
-  dispatch(variablesActions.resetState());
   dispatch(tabsLayoutActions.resetState());
 
   // Just in case
