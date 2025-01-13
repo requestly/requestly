@@ -4,7 +4,8 @@ import { EditorState, Prec } from "@codemirror/state";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { EditorPopover } from "componentsV2/CodeEditor/components/Editor/components/PopOver";
 import "componentsV2/CodeEditor/components/Editor/components/PopOver/popover.scss";
-
+import generateCompletionsForVariables from "componentsV2/CodeEditor/components/Editor/plugins/generateAutoCompletions";
+import "./singleLineEditor.scss";
 interface RQSingleLineEditorProps {
   defaultValue?: string;
   className?: string;
@@ -118,6 +119,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
             },
             variables
           ),
+          generateCompletionsForVariables(variables),
           cmPlaceHolder(placeholder ?? "Input here"),
         ],
       }),

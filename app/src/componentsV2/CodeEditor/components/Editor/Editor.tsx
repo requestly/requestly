@@ -26,6 +26,7 @@ import { EditorPopover } from "./components/PopOver";
 import "./editor.scss";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/PopOver/popover.scss";
+import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 interface EditorProps {
   value: string;
   defaultValue: string; // required in the special case of rules where value and default value need to stay in sync
@@ -337,6 +338,7 @@ const Editor: React.FC<EditorProps> = ({
                     envVariables
                   )
                 : null,
+              generateCompletionsForVariables(envVariables),
             ].filter(Boolean)}
             basicSetup={{
               highlightActiveLine: false,

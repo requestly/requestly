@@ -1,4 +1,4 @@
-import { useCallback, useContext } from "react";
+import React, { useCallback, useContext } from "react";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { EnvironmentVariables } from "backend/environment/types";
 import { useDebounce } from "hooks/useDebounce";
@@ -8,8 +8,9 @@ import { RequestBodyProps } from "../request-body-types";
 export function JsonBody(props: {
   environmentVariables: EnvironmentVariables;
   setRequestEntry: RequestBodyProps["setRequestEntry"];
+  editorOptions: React.ReactNode;
 }) {
-  const { environmentVariables, setRequestEntry } = props;
+  const { environmentVariables, setRequestEntry, editorOptions } = props;
 
   const { requestBodyStateManager } = useContext(RequestBodyContext);
   const { text, setText } = useTextBody(requestBodyStateManager);
