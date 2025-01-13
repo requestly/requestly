@@ -92,7 +92,6 @@ const ResponseBody: React.FC<Props> = ({
       <div className="api-client-code-editor-container api-response-body-editor-container">
         <Editor
           value={responseText}
-          //defaultValue={responseText}
           language={editorLanguage}
           isReadOnly
           prettifyOnInit={false}
