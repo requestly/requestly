@@ -254,9 +254,21 @@ export const GettingStarted: React.FC = () => {
               </Button>
             </AuthConfirmationPopover>
 
+            <Button
+              type="link"
+              className="link-btn templates-btn"
+              icon={<HiOutlineTemplate className="anticon" />}
+              onClick={() => {
+                trackRulesEmptyStateClicked("templates");
+                navigate(PATHS.RULES.TEMPLATES.ABSOLUTE);
+              }}
+            >
+              Start with templates
+            </Button>
+
             {/* TODO: make desktop only */}
             {isCharlesImportFeatureFlagOn ? (
-              <>
+              <div className="third-party-imports">
                 <Button
                   type="link"
                   className="link-btn"
@@ -301,20 +313,8 @@ export const GettingStarted: React.FC = () => {
                 >
                   Import from Resource Override
                 </Button>
-              </>
+              </div>
             ) : null}
-
-            <Button
-              type="link"
-              className="link-btn templates-btn"
-              icon={<HiOutlineTemplate className="anticon" />}
-              onClick={() => {
-                trackRulesEmptyStateClicked("templates");
-                navigate(PATHS.RULES.TEMPLATES.ABSOLUTE);
-              }}
-            >
-              Start with templates
-            </Button>
           </div>
 
           <div className="ask-ai-container">
