@@ -13,63 +13,30 @@ import {
 } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
-import { parseRulesFromCharlesXML } from "modules/rule-adapters/charles-rule-adapters/parseRulesFromCharlesXML";
 import { createNewGroupAndSave } from "modules/rule-adapters/utils";
-import {
-  CharlesRuleImportErrorMessage,
-  ParsedRulesFromChalres,
-} from "modules/rule-adapters/charles-rule-adapters/types";
 import PATHS from "config/constants/sub/paths";
 import LINKS from "config/constants/sub/links";
-import {
-  trackCharlesSettingsParsed,
-  trackCharlesSettingsImportFailed,
-  trackCharlesSettingsImportComplete,
-  trackCharlesSettingsImportDocsClicked,
-  trackCharlesSettingsImportViewed,
-} from "modules/analytics/events/features/rules";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { copyToClipBoard } from "utils/Misc";
 import "../importer-components.css";
+import { parseRulesFromResourceOverride } from "modules/rule-adapters/resource-override-rule-adapters/parseRulesFromResourceOverride";
+import { Rule } from "features/rules/index";
+import { generateObjectId } from "utils/FormattingHelper";
 
 const validExportSteps = [
   {
-    step: `Click on "Tools" in the top Menu bar in Charles Proxy`,
+    step: `Open Resource Override Dashboard by clicking on resource override icon in extentions tab`,
   },
   {
-    step: `Click on "Import/Export Settings" from the dropdown`,
+    step: `Click on "options" in the top right buttons from the dashboard`,
   },
   {
-    step: `Click on "Export" tab`,
-  },
-  {
-    step: `Select settings that you need to export and click "Export"`,
-  },
-  {
-    step: `Steps to be followed in Requestly:`,
-    additionalSteps: [
-      {
-        step: `Click "Import settings from Charles Proxy" to continue.`,
-      },
-    ],
+    step: `Click on "Save Rules"`,
   },
 ];
 
-const CharlesDocsLink = ({
-  title,
-  linkClickSrc,
-  importTriggerSrc,
-}: {
-  title: string;
-  linkClickSrc: string;
-  importTriggerSrc: string;
-}) => (
-  <a
-    target="_blank"
-    rel="noreferrer"
-    href={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}
-    onClick={() => trackCharlesSettingsImportDocsClicked(linkClickSrc, importTriggerSrc)}
-  >
+const ResourceOverrideLink = ({ title }: { title: string }) => (
+  <a target="_blank" rel="noreferrer" href={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_RESOURCE_OVERRIDE}>
     {title} <HiOutlineExternalLink className="external-icon-link" />
   </a>
 );
@@ -82,16 +49,14 @@ interface ModalProps {
   onBackButtonClick?: () => void;
 }
 
-export const ImportFromCharlesModal: React.FC<ModalProps> = ({
+export const ImportFromResourceOverrideModal: React.FC<ModalProps> = ({
   isOpen,
   toggle,
   triggeredBy,
   isBackButtonVisible,
   onBackButtonClick,
 }) => {
-  useEffect(() => {
-    trackCharlesSettingsImportViewed(triggeredBy);
-  }, [triggeredBy]);
+  useEffect(() => {}, [triggeredBy]);
 
   return (
     <Modal
@@ -102,7 +67,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({
       className="import-from-importer-modal custom-rq-modal"
       width={550}
     >
-      <ImportFromCharles
+      <ImportFromResourceOverride
         source={triggeredBy}
         callback={() => toggle()}
         isBackButtonVisible={isBackButtonVisible}
@@ -112,26 +77,22 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({
   );
 };
 
-export const ImportFromCharlesWrapperView: React.FC = () => {
-  useEffect(() => {
-    trackCharlesSettingsImportViewed("TOP_LEVEL_ROUTE");
-  }, []);
-
+export const ImportFromResourceOverrideWrapperView: React.FC = () => {
   return (
     <div className="importer-wrapper">
-      <ImportFromCharles />
+      <ImportFromResourceOverride />
     </div>
   );
 };
 
-interface ImportFromCharlesProps {
+interface ImportFromResourceOverrideProps {
   source?: string | null; // null indicates this is not mounted inside modal
   callback?: () => void;
   isBackButtonVisible?: boolean;
   onBackButtonClick?: () => void;
 }
 
-export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
+export const ImportFromResourceOverride: React.FC<ImportFromResourceOverrideProps> = ({
   source = null,
   callback,
   isBackButtonVisible,
@@ -142,8 +103,8 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
   const [isParseComplete, setIsParseComplete] = useState<boolean>(false);
-  const [rulesToImport, setRulesToImport] = useState<ParsedRulesFromChalres>({});
-  const [validationError, setValidationError] = useState<CharlesRuleImportErrorMessage | string | null>(null);
+  const [rulesToImport, setRulesToImport] = useState<Rule[]>();
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const appMode = useSelector(getAppMode);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
@@ -154,99 +115,75 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
 
     reader.onerror = () => {
       setValidationError("Could not process the selected file! Try again.");
-      trackCharlesSettingsImportFailed("error reading the imported file");
     };
 
     reader.onload = () => {
-      const fileContent = reader.result;
+      const fileContent = reader.result as string;
       setIsDataProcessing(true);
 
-      if (!file.type.includes("xml")) {
+      if (!file.type.includes("json")) {
         // stop parsing for wrong file format
         setIsDataProcessing(false);
-        setValidationError("Failed to parse Charles proxy settings file.");
-        trackCharlesSettingsImportFailed("wrong file format");
-
+        setValidationError("Failed to parse resource override settings file.");
         return;
       }
-      parseRulesFromCharlesXML(fileContent as string)
-        .then((importedRules: ParsedRulesFromChalres) => {
-          setIsDataProcessing(false);
-          setRulesToImport(importedRules);
-          setIsParseComplete(true);
-          trackCharlesSettingsParsed(
-            importedRules?.parsedRuleTypes?.length,
-            importedRules?.parsedRuleTypes,
-            importedRules?.otherRuleTypesCount
-          );
-        })
-        .catch((error) => {
-          setValidationError(error.message);
-          trackCharlesSettingsImportFailed(error.message);
-          setIsDataProcessing(false);
-        });
+      try {
+        const convertedRules = parseRulesFromResourceOverride(JSON.parse(fileContent));
+        setIsDataProcessing(false);
+        setRulesToImport(convertedRules);
+        setIsParseComplete(true);
+      } catch (e) {
+        setIsDataProcessing(false);
+        setValidationError("Failed to parse resource override settings file.");
+      }
     };
     reader.readAsText(file);
   };
 
-  const handleCharlesRulesImport = () => {
+  const handleResuorceOverrideRulesImport = async () => {
     setIsLoading(true);
-
-    const rulesImportPromises = rulesToImport?.groups?.map((group) => {
-      return createNewGroupAndSave({
-        appMode,
-        rules: group.rules,
-        status: group.status,
-        groupName: group.name,
-        onSuccess: () => {},
-        onError: () => {
-          setValidationError("Something went wrong while importing your settings! Try again.");
-          trackCharlesSettingsImportFailed("error on saving the parsed rules in storage");
-        }, // TODO: validations
-      });
+    await createNewGroupAndSave({
+      appMode,
+      rules: rulesToImport,
+      status: false,
+      groupName: `resoure-override-${generateObjectId()}`,
+      onSuccess: () => {},
+      onError: () => {
+        setValidationError("Something went wrong while importing your settings! Try again.");
+      },
     });
-
-    Promise.all(rulesImportPromises)
-      .then(() => {
-        dispatch(
-          //@ts-ignore
-          globalActions.updateRefreshPendingStatus({
-            type: "rules",
-            newValue: !isRulesListRefreshPending,
-          })
-        );
-
-        trackCharlesSettingsImportComplete(rulesToImport?.parsedRuleTypes?.length, rulesToImport?.parsedRuleTypes);
-        navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
-        callback?.();
+    dispatch(
+      //@ts-ignore
+      globalActions.updateRefreshPendingStatus({
+        type: "rules",
+        newValue: !isRulesListRefreshPending,
       })
-      .finally(() => setIsLoading(false));
+    );
+    navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
+    callback?.();
+    setIsLoading(false);
   };
 
   const handleResetImport = () => {
     setValidationError(null);
     setIsParseComplete(false);
-    setRulesToImport({});
+    setRulesToImport([]);
   };
 
-  const isParsedRulesExist = useMemo(() => !!rulesToImport?.parsedRuleTypes?.length, [
-    rulesToImport?.parsedRuleTypes?.length,
-  ]);
+  const isParsedRulesExist = useMemo(() => !!rulesToImport?.length, [rulesToImport?.length]);
 
   return (
     <>
       <div className="importer-container">
         <Row justify={"space-between"} className="importer-header">
           <Col className="importer-heading">
-            {isBackButtonVisible && (
-              <ArrowLeftOutlined size={16} className="charles-import-back-icon" onClick={onBackButtonClick} />
-            )}
-            Import Charles Proxy settings
+            {isBackButtonVisible && <ArrowLeftOutlined size={16} onClick={onBackButtonClick} />}
+            Import Resource Override settings
           </Col>
           <Col
             className="importer-share-container"
             onClick={() =>
-              copyToClipBoard(window.origin + PATHS.IMPORT_FROM_CHARLES.ABSOLUTE, "URL copied to clipboard")
+              copyToClipBoard(window.origin + PATHS.IMPORT_FROM_RESOURCE_OVERRIDE.ABSOLUTE, "URL copied to clipboard")
             }
           >
             <LinkOutlined className="icon__wrapper" />
@@ -262,19 +199,19 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
               onFilesDrop(files);
             }}
             isProcessing={isDataProcessing}
-            title="Drag and drop your Charles export file to upload"
-            subtitle="Accepted file formats: CSV, Trace test file, and XML"
+            title="Drag and drop your Resource Override export file to upload"
+            subtitle="Accepted file formats: JSON"
             selectorButtonTitle={isParseComplete || validationError ? "Try another file" : "Select file"}
           />
         )}
 
-        {isParseComplete && isParsedRulesExist && rulesToImport?.otherRuleTypesCount > 0 && (
+        {isParseComplete && isParsedRulesExist && rulesToImport?.length > 0 && (
           <div className="importer-warning-banner">
             <div className="importer-warning-banner-text">
               <WarningOutlined className="importer-warning-icon" /> A few settings are not supported.
             </div>
             <div className="importer-warning-docs-link">
-              <CharlesDocsLink
+              <ResourceOverrideLink
                 title="Learn more about it here"
                 linkClickSrc="all_settings_unsupported_screen"
                 importTriggerSrc={source}
@@ -293,20 +230,20 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
                       <CheckCircleOutlined className="check-outlined-icon" /> Successfully parsed below settings:
                     </div>
                     <ul>
-                      {rulesToImport.parsedRuleTypes.map((ruleType) => (
-                        <li key={ruleType}>{ruleType}</li>
+                      {rulesToImport.map((rule) => (
+                        <li key={rule.id}>{rule.ruleType}</li>
                       ))}
                     </ul>
                   </Space>
                 )}
-                {!isParsedRulesExist && rulesToImport?.otherRuleTypesCount > 0 && (
+                {!isParsedRulesExist && rulesToImport?.length > 0 && (
                   <>
                     <div className="info-link-container">
                       <InfoCircleOutlined />
                       {"Uploaded settings are not supported."}
                     </div>
                     <div className="doc-link-container">
-                      <CharlesDocsLink
+                      <ResourceOverrideLink
                         title="Learn more about it here"
                         linkClickSrc="all_settings_unsupported_screen"
                         importTriggerSrc={source}
@@ -321,7 +258,9 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
                   <InfoCircleOutlined />
                   Invalid settings file.
                 </Row>
-                <Row className="validation-subheading">Follow below steps to export settings from Charles:</Row>
+                <Row className="validation-subheading">
+                  Follow below steps to export settings from Resource Override:
+                </Row>
                 <ol>
                   {validExportSteps.map(({ step, additionalSteps = [] }, index) => (
                     <>
@@ -348,7 +287,7 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
               type="primary"
               loading={isLoading}
               onClick={() => {
-                if (isParsedRulesExist) handleCharlesRulesImport();
+                if (isParsedRulesExist) handleResuorceOverrideRulesImport();
                 else handleResetImport();
               }}
             >
@@ -359,8 +298,8 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
       </div>
 
       <div className="importer-footer">
-        To export your rules from Charles,{"  "}
-        <Link target="_blank" rel="noreferrer" to={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}>
+        To export your rules from Resource Override,{"  "}
+        <Link target="_blank" rel="noreferrer" to={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_RESOURCE_OVERRIDE}>
           Follow these steps
           <div className="icon__wrapper">
             <HiOutlineExternalLink />

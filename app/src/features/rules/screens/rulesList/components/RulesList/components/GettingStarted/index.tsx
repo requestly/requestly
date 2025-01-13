@@ -5,6 +5,7 @@ import { Button, Divider, Tooltip } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import CharlesIcon from "assets/icons/charlesIcon.svg?react";
 import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
+import ResourceOverrideIcon from "assets/icons/resourceOverrideIcon.png";
 import { ImportFromCharlesModal } from "../ImporterComponents/CharlesImporter";
 import { ImportRulesModal } from "../../../../../../modals/ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -42,6 +43,7 @@ import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
 import "./gettingStarted.scss";
+import { ImportFromResourceOverrideModal } from "../ImporterComponents/ResourceOverrideImporter";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -58,6 +60,7 @@ export const GettingStarted: React.FC = () => {
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
   const [isImportModheaderRulesModalActive, setIsImportModheaderRulesModalActive] = useState(false);
+  const [isImportResourceOverrideRulesModalActive, setIsImportResourceOverrideRulesModalActive] = useState(false);
   const isRedirectFromCreateRulesRoute = useIsRedirectFromCreateRulesRoute();
   const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(isRedirectFromCreateRulesRoute || false);
 
@@ -80,6 +83,9 @@ export const GettingStarted: React.FC = () => {
   };
   const toggleImportModheaderRulesModal = () => {
     setIsImportModheaderRulesModalActive((prev) => !prev);
+  };
+  const toggleImportResourceOverrideRulesModal = () => {
+    setIsImportResourceOverrideRulesModalActive((prev) => !prev);
   };
 
   const handleNewRuleClick = (source: string) => {
@@ -276,6 +282,25 @@ export const GettingStarted: React.FC = () => {
                 >
                   Import from ModHeader
                 </Button>
+                <Button
+                  type="link"
+                  className="link-btn"
+                  icon={
+                    <img
+                      src={ResourceOverrideIcon}
+                      width={11}
+                      height={10}
+                      alt="Resource override icon"
+                      className="anticon"
+                    />
+                  }
+                  onClick={() => {
+                    toggleImportResourceOverrideRulesModal();
+                    trackRulesEmptyStateClicked("import_resource_override");
+                  }}
+                >
+                  Import from Resource Override
+                </Button>
               </>
             ) : null}
 
@@ -326,6 +351,13 @@ export const GettingStarted: React.FC = () => {
         <ImportFromModheaderModal
           isOpen={isImportModheaderRulesModalActive}
           toggle={toggleImportModheaderRulesModal}
+          triggeredBy={SOURCE.GETTING_STARTED}
+        />
+      ) : null}
+      {isImportResourceOverrideRulesModalActive ? (
+        <ImportFromResourceOverrideModal
+          isOpen={isImportResourceOverrideRulesModalActive}
+          toggle={toggleImportResourceOverrideRulesModal}
           triggeredBy={SOURCE.GETTING_STARTED}
         />
       ) : null}
