@@ -94,7 +94,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
   const handleAddNewRow = useCallback((dataSource: EnvironmentVariableTableRow[]) => {
     const newData = {
-      id: dataSource.length + 1,
+      id: dataSource.length,
       key: "",
       type: EnvironmentVariableType.String,
       localValue: "",

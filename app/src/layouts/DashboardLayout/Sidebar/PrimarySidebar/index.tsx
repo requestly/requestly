@@ -59,25 +59,33 @@ export const PrimarySidebar: React.FC = () => {
       },
       {
         id: 1,
+        title: "API client",
+        path: PATHS.API_CLIENT.INDEX,
+        icon: (
+          <span className="icon-with-badge">
+            <ApiOutlined />
+            <RQBadge badgeText="NEW" />
+          </span>
+        ),
+        display: true,
+        activeColor: "var(--api-client)",
+      },
+      {
+        id: 2,
         title: "Network traffic",
         path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
         icon: <NetworkTrafficIcon />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       },
       {
-        id: 2,
+        id: 3,
         title: "Network inspector",
         path: PATHS.NETWORK_INSPECTOR.RELATIVE,
-        icon: (
-          <span className="icon-with-badge">
-            <NetworkTrafficInspectorIcon /> <RQBadge badgeText="NEW" />
-          </span>
-        ),
-
+        icon: <NetworkTrafficInspectorIcon />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
       },
       {
-        id: 3,
+        id: 4,
         title: "HTTP Rules",
         path: PATHS.RULES.INDEX,
         icon: <HttpRulesIcon />,
@@ -85,7 +93,15 @@ export const PrimarySidebar: React.FC = () => {
         activeColor: "var(--http-rules)",
       },
       {
-        id: 4,
+        id: 5,
+        title: "Mock server",
+        path: PATHS.MOCK_SERVER.INDEX,
+        icon: <MockServerIcon />,
+        display: true,
+        activeColor: "var(--mock-server)",
+      },
+      {
+        id: 6,
         title: "Sessions",
         path: PATHS.SESSIONS.INDEX,
         icon: (
@@ -102,27 +118,11 @@ export const PrimarySidebar: React.FC = () => {
         display: true,
         activeColor: "var(--session-recording)",
       },
-      {
-        id: 5,
-        title: "Mock server",
-        path: PATHS.MOCK_SERVER.INDEX,
-        icon: <MockServerIcon />,
-        display: true,
-        activeColor: "var(--mock-server)",
-      },
-      {
-        id: 6,
-        title: "API client",
-        path: PATHS.API_CLIENT.INDEX,
-        icon: <ApiOutlined />,
-        display: true,
-        activeColor: "var(--api-client)",
-      },
     ];
 
     if (isDesktopSessionsCompatible) {
-      items[4] = {
-        id: 4,
+      items[6] = {
+        id: 6,
         title: "Desktop Sessions",
         path: PATHS.SESSIONS.DESKTOP.INDEX,
         icon: (

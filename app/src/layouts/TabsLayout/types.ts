@@ -16,7 +16,18 @@ export namespace TabsLayout {
      */
     title: string;
     hasUnsavedChanges: boolean;
+
+    /**
+     * If true, indicates a preview tab
+     */
+    isPreview?: boolean;
     timeStamp: number;
+  }
+
+  export enum IconType {
+    REQUEST = "request",
+    COLLECTION = "collection",
+    ENVIORNMENT_VARIABLE = "environment_variable",
   }
 }
 
