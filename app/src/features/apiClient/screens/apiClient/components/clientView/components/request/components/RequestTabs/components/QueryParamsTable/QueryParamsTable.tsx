@@ -18,11 +18,11 @@ export const QueryParamsTable: React.FC<QueryParamsTableProps> = ({ requestEntry
         request: {
           ...prev.request,
           queryParams: updatedPairs,
-          ...syncQueryParams(updatedPairs, requestEntry.request.url, QueryParamSyncType.URL),
+          ...syncQueryParams(updatedPairs, prev.request.url, QueryParamSyncType.URL),
         },
       }));
     },
-    [setRequestEntry, requestEntry.request.url]
+    [setRequestEntry]
   );
 
   return (
