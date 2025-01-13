@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import type { TableProps } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -18,9 +18,25 @@ interface KeyValueTableProps {
 }
 
 export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, onChange }) => {
+  const createEmptyPair = useCallback(
+    () => ({
+      id: Date.now(),
+      key: "",
+      value: "",
+      isEnabled: true,
+    }),
+    []
+  );
+  const [internalState, setInternalState] = useState(() => (data.length ? data : [createEmptyPair()]));
+
+  useEffect(() => {
+    onChange(internalState);
+  }, [internalState, onChange]);
+
   const handleUpdateRequestPairs = useCallback(
     (pair: KeyValuePair, action: "add" | "update" | "delete") => {
-      let keyValuePairs = [...data];
+      console.log("whaaat?");
+      let keyValuePairs = [...internalState];
 
       if (pair) {
         switch (action) {
@@ -46,43 +62,34 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         }
       }
 
-      return keyValuePairs;
+      setInternalState(keyValuePairs);
+      // return keyValuePairs;
     },
-    [data]
+    [internalState]
   );
 
   const handleUpdatePair = useCallback(
     (pair: KeyValuePair) => {
-      onChange(handleUpdateRequestPairs(pair, "update"));
+      handleUpdateRequestPairs(pair, "update");
     },
-    [handleUpdateRequestPairs, onChange]
-  );
-
-  const createEmptyPair = useCallback(
-    () => ({
-      id: Date.now(),
-      key: "",
-      value: "",
-      isEnabled: true,
-    }),
-    []
+    [handleUpdateRequestPairs]
   );
 
   const handleAddPair = useCallback(() => {
     const newPair = createEmptyPair();
-    onChange(handleUpdateRequestPairs(newPair, "add"));
-  }, [onChange, createEmptyPair, handleUpdateRequestPairs]);
+    handleUpdateRequestPairs(newPair, "add");
+  }, [createEmptyPair, handleUpdateRequestPairs]);
 
   const handleDeletePair = useCallback(
     (pair: KeyValuePair) => {
-      onChange(handleUpdateRequestPairs(pair, "delete"));
+      handleUpdateRequestPairs(pair, "delete");
     },
-    [handleUpdateRequestPairs, onChange]
+    [handleUpdateRequestPairs]
   );
 
   useEffect(() => {
     if (data.length === 0) {
-      handleAddPair();
+      // handleAddPair();
     }
   }, [data, handleAddPair]);
 
@@ -159,7 +166,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
       showHeader={false}
       rowKey="id"
       columns={columns as ColumnTypes}
-      data={data}
+      data={internalState}
       locale={{ emptyText: `No query params found` }}
       components={{
         body: {

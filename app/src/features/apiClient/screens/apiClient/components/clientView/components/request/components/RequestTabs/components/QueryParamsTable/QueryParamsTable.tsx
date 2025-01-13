@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { EnvironmentVariables } from "backend/environment/types";
 import { KeyValuePair, QueryParamSyncType, RQAPI } from "features/apiClient/types";
 import { KeyValueTable } from "../../../KeyValueTable/KeyValueTable";
@@ -11,16 +11,19 @@ interface QueryParamsTableProps {
 }
 
 export const QueryParamsTable: React.FC<QueryParamsTableProps> = ({ requestEntry, variables, setRequestEntry }) => {
-  const handleUpdateQueryParams = (updatedPairs: KeyValuePair[]) => {
-    setRequestEntry((prev) => ({
-      ...prev,
-      request: {
-        ...prev.request,
-        queryParams: updatedPairs,
-        ...syncQueryParams(updatedPairs, requestEntry.request.url, QueryParamSyncType.URL),
-      },
-    }));
-  };
+  const handleUpdateQueryParams = useCallback(
+    (updatedPairs: KeyValuePair[]) => {
+      setRequestEntry((prev) => ({
+        ...prev,
+        request: {
+          ...prev.request,
+          queryParams: updatedPairs,
+          ...syncQueryParams(updatedPairs, requestEntry.request.url, QueryParamSyncType.URL),
+        },
+      }));
+    },
+    [setRequestEntry, requestEntry.request.url]
+  );
 
   return (
     <KeyValueTable data={requestEntry.request.queryParams} variables={variables} onChange={handleUpdateQueryParams} />
