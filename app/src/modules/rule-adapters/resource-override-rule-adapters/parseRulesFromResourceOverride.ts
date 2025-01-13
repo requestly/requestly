@@ -53,9 +53,9 @@ type Config = {
 export const parseRulesFromResourceOverride = (resourceOverrideData: Config): Rule[] => {
   const requestlyExport: any[] = [];
 
-  resourceOverrideData.data.forEach((resource) => {
+  resourceOverrideData.data?.forEach((resource) => {
     const matchUrl = resource.matchUrl;
-    resource.rules.forEach((rule) => {
+    resource.rules?.forEach((rule) => {
       const requestlyRule: any = {
         createdBy: "",
         creationDate: Date.now(),
@@ -106,12 +106,12 @@ export const parseRulesFromResourceOverride = (resourceOverrideData: Config): Ru
           {
             id: `${generateObjectId()}`,
             modifications: {
-              Request: rule.requestRules.split(";").map((header) => {
+              Request: rule.requestRules.split(";")?.map((header) => {
                 if (!header) return;
-                const operation = header?.split(" ")[1];
+                const operation = header?.split(" ")[0];
                 const type = operation === "set" ? "Modify" : operation === "remove" ? "Remove" : undefined;
-                const headerkey = header?.split(" ")[2]?.replace(":", "");
-                const value = header?.split(" ")[3];
+                const headerkey = header?.split(" ")[1]?.replace(":", "");
+                const value = header?.split(" ")[2];
                 return {
                   header: headerkey,
                   id: `${generateObjectId()}`,
@@ -119,12 +119,12 @@ export const parseRulesFromResourceOverride = (resourceOverrideData: Config): Ru
                   value: value ? value : "",
                 };
               }),
-              Response: rule.responseRules.split(";").map((header) => {
+              Response: rule.responseRules.split(";")?.map((header) => {
                 if (!header) return;
-                const operation = header?.split(" ")[1];
+                const operation = header?.split(" ")[0];
                 const type = operation === "set" ? "Modify" : operation === "remove" ? "Remove" : undefined;
-                const headerkey = header?.split(" ")[2]?.replace(":", "");
-                const value = header?.split(" ")[3];
+                const headerkey = header?.split(" ")[1]?.replace(":", "");
+                const value = header?.split(" ")[2];
                 return {
                   header: headerkey,
                   id: `${generateObjectId()}`,
@@ -151,7 +151,7 @@ export const parseRulesFromResourceOverride = (resourceOverrideData: Config): Ru
         // New fix
         const matches = matchURL.match(/\*+/g);
         const variableObj: any = {};
-        matches.forEach((i, index) => {
+        matches?.forEach((i, index) => {
           if (!variableObj[i]) variableObj[i] = index + 2;
         });
         const replaceURL = rule.replace.replace(/\*+/g, (match) => `$${variableObj[match] || match}`);
