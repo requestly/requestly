@@ -1,0 +1,9 @@
+.popup-option {
+  background-color: var(--requestly-color-surface-0);
+  color: var(--requestly-color-text-default);
+  padding: 0;
+  font-size: var(--requestly-font-size-xs);
+  line-height: var(--requestly-font-line-height-xs);
+  box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
+  z-index: 10;
+}
