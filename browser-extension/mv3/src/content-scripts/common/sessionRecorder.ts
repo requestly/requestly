@@ -1,5 +1,7 @@
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { SessionRecordingConfig } from "common/types";
+import config from "common/config";
+import { CLIENT_MESSAGES, CUSTOM_ELEMENTS, EXTENSION_MESSAGES, STORAGE_KEYS } from "common/constants";
+import { getRecord } from "common/storage";
 
 type SendResponseCallback = (payload: unknown) => void;
 
@@ -23,6 +25,9 @@ const sessionRecorderState: SessionRecorderState = {
   recordingStartTime: null,
   showWidget: false,
 };
+
+let isDraftSessionLoadedInIframe = false;
+let isListenersInitialized = false;
 
 export const initSessionRecording = () => {
   chrome.runtime.onMessage.addListener((message) => {
@@ -84,8 +89,9 @@ const sendStartRecordingEvent = async (sessionRecordingConfig: SessionRecordingC
 
   const isIFrame = isIframe();
 
-  if (!isIFrame) {
+  if (!isIFrame && !isListenersInitialized) {
     addListeners();
+    isListenersInitialized = true;
   }
   sendMessageToClient("startRecording", {
     relayEventsToTop: isIFrame,
@@ -110,6 +116,7 @@ const sendStartRecordingEvent = async (sessionRecordingConfig: SessionRecordingC
     sessionRecorderState.recordingStartTime = recordingStartTime;
     hideAutoModeWidget();
   }
+  injectDraftSessionViewer();
 };
 
 const addListeners = () => {
@@ -134,13 +141,22 @@ const addListeners = () => {
 
       case CLIENT_MESSAGES.STOP_RECORDING:
         sendMessageToClient("stopRecording", null);
+        break;
+
+      case CLIENT_MESSAGES.VIEW_RECORDING:
+        if (isDraftSessionLoadedInIframe) {
+          viewDraftSession();
+        } else {
+          window.open(`${config.WEB_URL}/sessions/draft/${message.tabId}`, "_blank");
+        }
+        break;
     }
 
     return false;
   });
 
   window.addEventListener("message", function (event) {
-    if (event.source !== window || event.data.source !== "requestly:client") {
+    if (event.data.source !== "requestly:client") {
       return;
     }
 
@@ -173,6 +189,14 @@ const addListeners = () => {
       chrome.runtime.sendMessage({
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
       });
+    } else if (event.data.action === "draftSessionSaveClicked") {
+      hideDraftSessionViewer();
+      showPostSessionSaveWidget();
+    } else if (event.data.action === "draftSessionSaved") {
+      const { payload } = event.data;
+      showDraftSessionSavedWidget(payload.sessionId);
+    } else if (event.data.action === "draftSessionViewerLoaded") {
+      isDraftSessionLoadedInIframe = true;
     }
   });
 
@@ -307,4 +331,77 @@ const showToast = () => {
   }
 
   document.documentElement.appendChild(rqToast);
+};
+
+const injectDraftSessionViewer = async () => {
+  const exisitingSessionViewer = document.querySelector(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
+  if (exisitingSessionViewer) {
+    exisitingSessionViewer.remove();
+  }
+  const postSaveSessionWidget = document.querySelector(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
+  if (postSaveSessionWidget) {
+    postSaveSessionWidget.remove();
+  }
+
+  const refreshToken: string = await getRecord(STORAGE_KEYS.REFRESH_TOKEN);
+  const activeWorkspaceId: string = await getRecord(STORAGE_KEYS.ACTIVE_WORKSPACE_ID);
+
+  const newSessionViewer = document.createElement(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
+  newSessionViewer.classList.add("rq-element");
+
+  const iframeUrlParams = new URLSearchParams();
+  if (refreshToken) iframeUrlParams.set("refreshToken", refreshToken);
+  if (activeWorkspaceId) iframeUrlParams.set("workspaceId", activeWorkspaceId);
+
+  newSessionViewer.setAttribute(
+    "session-src",
+    `${config.WEB_URL}/iframe/sessions/draft/iframe?${iframeUrlParams.toString()}`
+  );
+
+  document.documentElement.appendChild(newSessionViewer);
+};
+
+const viewDraftSession = () => {
+  sendMessageToClient("getSessionData", null, (session) => {
+    const draftSessionViewer = document.querySelector(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
+    draftSessionViewer.dispatchEvent(
+      new CustomEvent("view-draft-session", {
+        detail: {
+          session,
+        },
+      })
+    );
+  });
+};
+
+const hideDraftSessionViewer = () => {
+  const draftSessionViewer = document.querySelector(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
+  if (draftSessionViewer) {
+    draftSessionViewer.dispatchEvent(new CustomEvent("hide-draft-session-viewer"));
+  }
+};
+
+const showPostSessionSaveWidget = () => {
+  const widget = document.querySelector(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
+  if (widget) {
+    widget.remove();
+  }
+
+  const postSessionSaveWidget = document.createElement(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
+  postSessionSaveWidget.classList.add("rq-element");
+  document.documentElement.appendChild(postSessionSaveWidget);
+
+  postSessionSaveWidget.addEventListener("view-saved-session-clicked", (event: CustomEvent) => {
+    const sessionURL = `${config.WEB_URL}/sessions/saved/${event.detail.sessionId}`;
+    window.open(sessionURL, "_blank");
+  });
+
+  postSessionSaveWidget.addEventListener("close-post-session-save-widget-clicked", () => {
+    postSessionSaveWidget.remove();
+  });
+};
+
+const showDraftSessionSavedWidget = (sessionId: string) => {
+  const postSessionSaveWidget = document.querySelector(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
+  postSessionSaveWidget.dispatchEvent(new CustomEvent("show-draft-session-saved-widget", { detail: { sessionId } }));
 };
