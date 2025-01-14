@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import type { TableProps } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -18,9 +18,23 @@ interface KeyValueTableProps {
 }
 
 export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, onChange }) => {
+  const createEmptyPair = useCallback(
+    () => ({
+      id: Date.now(),
+      key: "",
+      value: "",
+      isEnabled: true,
+    }),
+    []
+  );
+  const memoizedData: KeyValuePair[] = useMemo(() => (data.length ? data : [createEmptyPair()]), [
+    data,
+    createEmptyPair,
+  ]);
+
   const handleUpdateRequestPairs = useCallback(
     (pair: KeyValuePair, action: "add" | "update" | "delete") => {
-      let keyValuePairs = [...data];
+      let keyValuePairs = [...memoizedData];
 
       if (pair) {
         switch (action) {
@@ -46,45 +60,29 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         }
       }
 
-      return keyValuePairs;
+      onChange(keyValuePairs);
     },
-    [data]
+    [onChange, memoizedData]
   );
 
   const handleUpdatePair = useCallback(
     (pair: KeyValuePair) => {
-      onChange(handleUpdateRequestPairs(pair, "update"));
+      handleUpdateRequestPairs(pair, "update");
     },
-    [handleUpdateRequestPairs, onChange]
-  );
-
-  const createEmptyPair = useCallback(
-    () => ({
-      id: Date.now(),
-      key: "",
-      value: "",
-      isEnabled: true,
-    }),
-    []
+    [handleUpdateRequestPairs]
   );
 
   const handleAddPair = useCallback(() => {
     const newPair = createEmptyPair();
-    onChange(handleUpdateRequestPairs(newPair, "add"));
-  }, [onChange, createEmptyPair, handleUpdateRequestPairs]);
+    handleUpdateRequestPairs(newPair, "add");
+  }, [createEmptyPair, handleUpdateRequestPairs]);
 
   const handleDeletePair = useCallback(
     (pair: KeyValuePair) => {
-      onChange(handleUpdateRequestPairs(pair, "delete"));
+      handleUpdateRequestPairs(pair, "delete");
     },
-    [handleUpdateRequestPairs, onChange]
+    [handleUpdateRequestPairs]
   );
-
-  useEffect(() => {
-    if (data.length === 0) {
-      handleAddPair();
-    }
-  }, [data, handleAddPair]);
 
   const columns = useMemo(() => {
     return [
@@ -159,7 +157,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
       showHeader={false}
       rowKey="id"
       columns={columns as ColumnTypes}
-      data={data}
+      data={memoizedData}
       locale={{ emptyText: `No query params found` }}
       components={{
         body: {
