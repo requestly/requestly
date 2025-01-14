@@ -89,7 +89,7 @@ const ResponseBody: React.FC<Props> = ({
     const editorLanguage = getEditorLanguageFromContentType(contentTypeHeader);
 
     return (
-      <div className="api-response-body-editor-container">
+      <div className="api-client-code-editor-container api-response-body-editor-container">
         <Editor
           value={responseText}
           defaultValue={responseText}

@@ -172,6 +172,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       updateTab(apiClientRecord.id, {
         title: apiClientRecord.name,
         hasUnsavedChanges: false,
+        isPreview: false,
       });
     },
     [updateTab]
