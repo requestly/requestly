@@ -40,3 +40,7 @@ export const trackCheckoutCompleted = (is_user_on_trial = false) => {
 
   trackEvent(BUSINESS.CHECKOUT.CHECKOUT_COMPLETED, params);
 };
+
+export const trackUpgradeToAnnualRouteOpened = (params) => {
+  trackEvent("upgrade_to_annual_route_opened", params);
+};

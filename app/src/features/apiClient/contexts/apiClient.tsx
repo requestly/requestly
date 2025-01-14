@@ -16,7 +16,7 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { trackCreateEnvironmentClicked } from "../screens/environment/analytics";
 import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { createBlankApiRecord } from "../screens/apiClient/utils";
+import { clearExpandedRecordIdsFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
 import { deleteRecord, getAllRecords, setRecord, setRecords } from "./slice";
 
@@ -102,14 +102,31 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
 
-  const { openTab, deleteTabs, updateTab, replaceTab } = useTabsLayoutContext();
+  const { openTab, deleteTabs, updateTab, replaceTab, updateAddTabBtnCallback } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
+
+  const openDraftRequest = useCallback(() => {
+    const requestId = generateDocumentId("apis");
+
+    openTab(requestId, {
+      title: "Untitled request",
+      url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?create=true`,
+    });
+  }, [openTab]);
 
   useEffect(() => {
     if (!user.loggedIn) {
       dispatch(setRecords({}));
     }
   }, [user.loggedIn, dispatch]);
+
+  useEffect(() => {
+    if (!user.loggedIn) {
+      return;
+    }
+
+    updateAddTabBtnCallback(openDraftRequest);
+  }, [user.loggedIn, updateAddTabBtnCallback, openDraftRequest]);
 
   // TODO: Create modal context
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -163,6 +180,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       updateTab(updatedRecord.id, {
         title: updatedRecord.name,
         hasUnsavedChanges: false,
+        isPreview: false,
       });
     },
     [updateTab, dispatch]
@@ -171,6 +189,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const onDeleteRecords = useCallback(
     (recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
       deleteTabs(recordIdsToBeDeleted);
+
+      clearExpandedRecordIdsFromSession(recordIdsToBeDeleted);
       dispatch(deleteRecord(recordIdsToBeDeleted));
     },
 
@@ -240,15 +260,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   }, []);
 
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);
-
-  const openDraftRequest = useCallback(() => {
-    const requestId = generateDocumentId("apis");
-
-    openTab(requestId, {
-      title: "Untitled request",
-      url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?create=true`,
-    });
-  }, [openTab]);
 
   const onNewClick = useCallback(
     async (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId = "") => {

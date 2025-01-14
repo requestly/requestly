@@ -19,7 +19,7 @@ import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { trackAppBannerDismissed, trackAppNotificationBannerViewed, trackAppBannerCtaClicked } from "./analytics";
 import { RequestBillingTeamAccessModal } from "features/settings";
 import "./appNotificationBanner.scss";
-import { trackCheckoutInitiated } from "modules/analytics/events/misc/business/checkout";
+import { trackCheckoutFailedEvent, trackCheckoutInitiated } from "modules/analytics/events/misc/business/checkout";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { PlanStatus, PlanType } from "features/settings/components/BillingTeam/types";
@@ -131,9 +131,12 @@ export const AppNotificationBanner = () => {
                 });
               }
             })
-            .catch((err) => {
+            .catch(() => {
               toast.error("Error in converting to annual plan. Please contact support contact@requestly.io");
-              // trackCheckoutFailedEvent(quantity, source);
+              trackCheckoutFailedEvent(
+                user?.details?.planDetails?.subscription?.quantity,
+                "monthly_to_annual_conversion"
+              );
             });
         },
       },
