@@ -1,6 +1,8 @@
 import React, { useContext } from "react";
 import { Checkbox, Form, FormInstance } from "antd";
-import { KeyValuePair } from "features/apiClient/types";
+import { KeyValueFormType, KeyValuePair } from "features/apiClient/types";
+import { trackEnableKeyValueToggled } from "modules/analytics/events/features/apiClient";
+import Logger from "lib/logger";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 import { EnvironmentVariables } from "backend/environment/types";
 
@@ -26,6 +28,7 @@ interface EditableCellProps {
   editable: boolean;
   dataIndex: keyof KeyValuePair;
   record: KeyValuePair;
+  pairtype: KeyValueFormType;
   variables: EnvironmentVariables;
   handleUpdatePair: (record: KeyValuePair) => void;
 }
@@ -36,6 +39,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
   children,
   dataIndex,
   record,
+  pairtype,
   variables,
   handleUpdatePair,
   ...restProps
@@ -46,8 +50,8 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
     try {
       const values = await form.validateFields();
       handleUpdatePair({ ...record, ...values });
-    } catch (error) {
-      console.error("Error saving key-value pair", error);
+    } catch (errInfo) {
+      Logger.log(pairtype, " KeyValueTable: Save failed:", errInfo);
     }
   };
 
@@ -65,6 +69,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
             onChange={(e) => {
               form.setFieldsValue({ [dataIndex]: e.target.checked });
               save();
+              trackEnableKeyValueToggled(e.target.checked, pairtype);
             }}
           />
         ) : (

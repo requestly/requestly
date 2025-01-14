@@ -1,15 +1,14 @@
 import { Tabs, TabsProps, Tag } from "antd";
 import React, { memo, useEffect, useMemo, useState } from "react";
-import { RQAPI, RequestContentType } from "../../../../../../../../types";
+import { KeyValueFormType, RQAPI, RequestContentType } from "../../../../../../../../types";
 import RequestBody from "../../RequestBody";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
+import { KeyValueTable } from "../KeyValueTable/KeyValueTable";
 import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEditor";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
 import AuthorizationView from "../AuthorizationView";
-import { QueryParamsTable } from "./components/QueryParamsTable/QueryParamsTable";
-import { HeadersTable } from "./components/HeadersTable/HeadersTable";
 
 enum Tab {
   QUERY_PARAMS = "query_params",
@@ -65,7 +64,12 @@ const RequestTabs: React.FC<Props> = ({
           <LabelWithCount label="Query Params" count={sanitizeKeyValuePairs(requestEntry.request.queryParams).length} />
         ),
         children: (
-          <QueryParamsTable requestEntry={requestEntry} setRequestEntry={setRequestEntry} variables={variables} />
+          <KeyValueTable
+            data={requestEntry.request.queryParams}
+            setKeyValuePairs={setRequestEntry}
+            pairType={KeyValueFormType.QUERY_PARAMS}
+            variables={variables}
+          />
         ),
       },
       {
@@ -98,10 +102,11 @@ const RequestTabs: React.FC<Props> = ({
         key: Tab.HEADERS,
         label: <LabelWithCount label="Headers" count={sanitizeKeyValuePairs(requestEntry.request.headers).length} />,
         children: (
-          <HeadersTable
-            headers={requestEntry.request.headers}
+          <KeyValueTable
+            data={requestEntry.request.headers}
+            setKeyValuePairs={setRequestEntry}
+            pairType={KeyValueFormType.HEADERS}
             variables={variables}
-            setRequestEntry={setRequestEntry}
           />
         ),
       },
