@@ -122,14 +122,15 @@ const Editor: React.FC<EditorProps> = ({
     }
   };
 
-  const updateContent = useCallback((prettifiedCode: string) => {
-    if (editorRef.current?.view) {
-      const view = editorRef.current.view;
-      const transaction = view.state.update({
-        changes: { from: 0, to: view.state.doc.length, insert: prettifiedCode },
-      });
-      view.dispatch(transaction);
+  const updateContent = useCallback((code: string) => {
+    const view = editorRef.current?.view;
+    if (!view) {
+      return null;
     }
+    const transaction = view.state.update({
+      changes: { from: 0, to: view.state.doc.length, insert: code },
+    });
+    view.dispatch(transaction);
   }, []);
 
   const applyPrettification = useCallback(() => {
@@ -142,12 +143,13 @@ const Editor: React.FC<EditorProps> = ({
   }, [config?.enablePrettify, language, value, updateContent]);
 
   useEffect(() => {
-    if (isEditorInitialized && !isDefaultPrettificationDone.current) {
-      applyPrettification();
-      isDefaultPrettificationDone.current = true;
-    } else if (!prettifyOnInit) {
-      //on render
-      applyPrettification();
+    if (isEditorInitialized) {
+      if (!isDefaultPrettificationDone.current && prettifyOnInit) {
+        applyPrettification();
+        isDefaultPrettificationDone.current = true;
+      } else if (!prettifyOnInit) {
+        applyPrettification();
+      }
     }
   }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit]);
 
@@ -198,6 +200,83 @@ const Editor: React.FC<EditorProps> = ({
     []
   );
 
+  const toolbar = (
+    <CodeEditorToolbar
+      language={language}
+      code={value}
+      isFullScreen={isFullScreen}
+      onCodeFormat={(formattedCode: string) => {
+        updateContent(formattedCode);
+      }}
+      isCodePrettified={isCodePrettified}
+      setIsCodePrettified={setIsCodePrettified}
+      handleFullScreenToggle={handleFullScreenToggle}
+      customOptions={toolbarOptions}
+      enablePrettify={config.enablePrettify}
+    />
+  );
+
+  const editor = (
+    <CodeMirror
+      ref={editorRefCallback}
+      className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""} ${
+        !isEditorInitialized ? "not-visible" : ""
+      }`}
+      width="100%"
+      readOnly={isReadOnly}
+      value={value ?? ""}
+      onChange={debouncedhandleEditorBodyChange}
+      theme={vscodeDark}
+      extensions={[
+        editorLanguage,
+        customKeyBinding,
+        EditorView.lineWrapping,
+        envVariables
+          ? highlightVariablesPlugin(
+              {
+                setHoveredVariable,
+                setPopupPosition,
+              },
+              envVariables
+            )
+          : null,
+      ].filter(Boolean)}
+      basicSetup={{
+        highlightActiveLine: false,
+        bracketMatching: true,
+        closeBrackets: true,
+        allowMultipleSelections: true,
+      }}
+      data-enable-grammarly="false"
+      data-gramm_editor="false"
+      data-gramm="false"
+    >
+      {envVariables && (
+        <div className="editor-popup-container ant-input" onMouseLeave={() => setHoveredVariable(null)}>
+          {hoveredVariable && (
+            <EditorPopover
+              editorRef={{
+                current: editorRef.current?.editor ?? null,
+              }}
+              hoveredVariable={hoveredVariable}
+              popupPosition={popupPosition}
+              variables={envVariables}
+            />
+          )}
+        </div>
+      )}
+    </CodeMirror>
+  );
+
+  const toastContainer = toastOverlay && (
+    <EditorToastContainer
+      message={toastOverlay.message}
+      type={toastOverlay.type}
+      onClose={() => handleEditorClose(toastOverlay.id)}
+      isVisible={toastOverlay}
+      autoClose={toastOverlay.autoClose}
+    />
+  );
   return isFullScreen ? (
     <>
       <Modal
@@ -214,66 +293,14 @@ const Editor: React.FC<EditorProps> = ({
         maskStyle={{ background: "var(--requestly-color-surface-0, #212121)" }}
         footer={<div className="code-editor-character-count">{getByteSize(value)} characters</div>}
       >
-        <CodeEditorToolbar
-          language={language}
-          code={value}
-          isFullScreen={isFullScreen}
-          onCodeFormat={(formattedCode: string) => {
-            updateContent(formattedCode);
-          }}
-          isCodePrettified={isCodePrettified}
-          setIsCodePrettified={setIsCodePrettified}
-          handleFullScreenToggle={handleFullScreenToggle}
-          customOptions={toolbarOptions}
-          enablePrettify={config.enablePrettify}
-        />
-
-        <>
-          {toastOverlay && (
-            <EditorToastContainer
-              message={toastOverlay.message}
-              type={toastOverlay.type}
-              onClose={() => handleEditorClose(toastOverlay.id)}
-              isVisible={toastOverlay}
-              autoClose={toastOverlay.autoClose}
-            />
-          )}
-          <CodeMirror
-            className="code-editor"
-            width="100%"
-            readOnly={isReadOnly}
-            value={value ?? ""}
-            onChange={debouncedhandleEditorBodyChange}
-            theme={vscodeDark}
-            extensions={[editorLanguage, customKeyBinding, EditorView.lineWrapping].filter(Boolean)}
-            basicSetup={{
-              highlightActiveLine: false,
-              bracketMatching: true,
-              closeBrackets: true,
-              allowMultipleSelections: true,
-            }}
-            data-enable-grammarly="false"
-            data-gramm_editor="false"
-            data-gramm="false"
-          />
-        </>
+        {toolbar}
+        {toastContainer}
+        {editor}
       </Modal>
     </>
   ) : (
     <>
-      <CodeEditorToolbar
-        language={language}
-        code={value}
-        isFullScreen={isFullScreen}
-        onCodeFormat={(formattedCode: string) => {
-          updateContent(formattedCode);
-        }}
-        isCodePrettified={isCodePrettified}
-        setIsCodePrettified={setIsCodePrettified}
-        handleFullScreenToggle={handleFullScreenToggle}
-        customOptions={toolbarOptions}
-        enablePrettify={config?.enablePrettify}
-      />
+      {toolbar}
       <ResizableBox
         height={editorHeight}
         width={Infinity}
@@ -293,66 +320,8 @@ const Editor: React.FC<EditorProps> = ({
           marginBottom: isResizable ? "25px" : 0,
         }}
       >
-        <>
-          {toastOverlay && (
-            <EditorToastContainer
-              message={toastOverlay.message}
-              type={toastOverlay.type}
-              onClose={() => handleEditorClose(toastOverlay.id)}
-              isVisible={toastOverlay}
-              autoClose={toastOverlay.autoClose}
-            />
-          )}
-          <CodeMirror
-            ref={editorRefCallback}
-            className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""} ${
-              !isEditorInitialized ? "not-visible" : ""
-            }`}
-            width="100%"
-            readOnly={isReadOnly}
-            value={value ?? ""}
-            onChange={debouncedhandleEditorBodyChange}
-            theme={vscodeDark}
-            extensions={[
-              editorLanguage,
-              customKeyBinding,
-              EditorView.lineWrapping,
-              envVariables
-                ? highlightVariablesPlugin(
-                    {
-                      setHoveredVariable,
-                      setPopupPosition,
-                    },
-                    envVariables
-                  )
-                : null,
-            ].filter(Boolean)}
-            basicSetup={{
-              highlightActiveLine: false,
-              bracketMatching: true,
-              closeBrackets: true,
-              allowMultipleSelections: true,
-            }}
-            data-enable-grammarly="false"
-            data-gramm_editor="false"
-            data-gramm="false"
-          >
-            {envVariables && (
-              <div className="editor-popup-container ant-input" onMouseLeave={() => setHoveredVariable(null)}>
-                {hoveredVariable && (
-                  <EditorPopover
-                    editorRef={{
-                      current: editorRef.current?.editor ?? null,
-                    }}
-                    hoveredVariable={hoveredVariable}
-                    popupPosition={popupPosition}
-                    variables={envVariables}
-                  />
-                )}
-              </div>
-            )}
-          </CodeMirror>
-        </>
+        {toastContainer}
+        {editor}
       </ResizableBox>
     </>
   );
