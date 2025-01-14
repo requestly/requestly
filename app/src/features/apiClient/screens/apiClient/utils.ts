@@ -305,7 +305,7 @@ export const syncQueryParams = (
       const updatedUrl = queryParamsToURLString(queryParams, url);
 
       // Dont sync if URL is same
-      if (updatedUrl !== url) {
+      if (updatedUrl !== url || !isEmpty(updatedQueryParams)) {
         const combinedParams = unionBy(queryParams, updatedQueryParams, "id");
         const deduplicatedParams: KeyValuePair[] = [];
         const seenPairs = new Set();
