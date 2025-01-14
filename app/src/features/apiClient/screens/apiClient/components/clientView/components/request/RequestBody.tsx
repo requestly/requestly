@@ -6,6 +6,7 @@ import { JsonBody } from "./renderers/json-body-renderer";
 import { RawBody } from "./renderers/raw-body-renderer";
 import { RequestBodyContext, RequestBodyStateManager } from "./request-body-state-manager";
 import { RequestBodyProps } from "./request-body-types";
+import "./requestBody.scss";
 
 function parseSingleModeBody(params: {
   contentType: RequestContentType;
@@ -42,28 +43,8 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
       )
   );
 
-  /*
-  Added key prop in codeEditor to force re-render the component when contentType changes
-  */
-  const bodyEditor = useMemo(() => {
-    switch (contentType) {
-      case RequestContentType.JSON:
-        return <JsonBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
-
-      case RequestContentType.FORM:
-        return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
-
-      default:
-        return <RawBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
-    }
-  }, [contentType, variables, setRequestEntry]);
-
-  /*
-  In select, label is used is 'Text' & RequestContentType.RAW is used as value since we have RAW, JSON, Form as types,
-  we are considering RAW & Json as 'Text'
-  */
-  return (
-    <div className="api-request-body">
+  const requestBodyOptions = useMemo(() => {
+    return (
       <div className="api-request-body-options">
         <Radio.Group
           onChange={(e) => setContentType(e.target.value === "text" ? RequestContentType.RAW : e.target.value)}
@@ -78,6 +59,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
 
         {contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? (
           <Select
+            popupClassName="api-request-body-options-list"
             className="api-request-body-options-select"
             value={contentType}
             options={[
@@ -89,6 +71,41 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
           />
         ) : null}
       </div>
+    );
+  }, [contentType, setContentType]);
+
+  const bodyEditor = useMemo(() => {
+    switch (contentType) {
+      case RequestContentType.JSON:
+        return (
+          <JsonBody
+            environmentVariables={variables}
+            setRequestEntry={setRequestEntry}
+            editorOptions={requestBodyOptions}
+          />
+        );
+
+      case RequestContentType.FORM:
+        return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
+
+      default:
+        return (
+          <RawBody
+            environmentVariables={variables}
+            setRequestEntry={setRequestEntry}
+            editorOptions={requestBodyOptions}
+          />
+        );
+    }
+  }, [contentType, variables, setRequestEntry, requestBodyOptions]);
+
+  /*
+  In select, label is used is 'Text' & RequestContentType.RAW is used as value since we have RAW, JSON, Form as types,
+  we are considering RAW & Json as 'Text'
+  */
+  return (
+    <div className="api-request-body">
+      {contentType === RequestContentType.FORM ? requestBodyOptions : null}
       <RequestBodyContext.Provider value={{ requestBodyStateManager }}>{bodyEditor}</RequestBodyContext.Provider>
     </div>
   );

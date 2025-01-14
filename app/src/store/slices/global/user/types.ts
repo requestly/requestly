@@ -21,13 +21,15 @@ export interface UserAuth {
     planDetails?: {
       planId: string;
       status: string;
-      type: string;
+      type: "team" | "individual";
       planName: string;
       subscription: {
         cancelAtPeriodEnd: boolean;
         endDate: string;
         startDate: string;
         id: string;
+        duration: "annually" | "monthly";
+        quantity: number;
       };
     };
     organization?: any;
