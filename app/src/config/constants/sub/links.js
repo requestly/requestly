@@ -80,6 +80,8 @@ const LINKS = {
   REQUESTLY_PRIVACY_POLICY: "https://requestly.com/privacy",
   // Terms and Conditions
   REQUESTLY_TERMS_AND_CONDITIONS: "https://requestly.com/terms/",
+  //Privacy Statement
+  REQUESTLY_PRIVACY_STATEMENT: "https://requestly.com/privacy/",
   //Contact Us
   CONTACT_US: "mailto:" + GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL,
   // Contact Us Page

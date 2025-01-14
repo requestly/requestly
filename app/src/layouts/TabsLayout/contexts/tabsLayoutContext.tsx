@@ -82,30 +82,6 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
     [tabs, activeTab?.id, updateActivetab, dispatch, id]
   );
 
-  const openTab = useCallback(
-    (tabId: TabsLayout.Tab["id"], tabDetails?: Partial<TabsLayout.Tab>) => {
-      const tab = tabs.find((item) => item.id === tabId);
-
-      if (tab) {
-        updateActivetab(tab);
-        return;
-      }
-
-      const newTabDetails = {
-        ...(tabDetails ?? {}),
-        id: tabId,
-        title: tabDetails?.title || "Untitled",
-        isSaved: false,
-        hasUnsavedChanges: false,
-        timeStamp: Date.now(),
-      } as TabsLayout.Tab;
-
-      dispatch(tabsLayoutActions.addTab({ featureId: id, tab: newTabDetails }));
-      updateActivetab(newTabDetails);
-    },
-    [tabs, updateActivetab, dispatch, id]
-  );
-
   const updateTab = useCallback(
     (tabId: TabsLayout.Tab["id"], updatedTabData?: Partial<TabsLayout.Tab>) => {
       if (!tabId) {
@@ -126,6 +102,41 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
       }
     },
     [activeTab, updateTab, updateActivetab]
+  );
+
+  const openTab = useCallback(
+    (tabId: TabsLayout.Tab["id"], tabDetails?: Partial<TabsLayout.Tab>) => {
+      const tab = tabs.find((item) => item.id === tabId);
+
+      if (tab) {
+        updateActivetab(tab);
+        return;
+      }
+
+      const newTabDetails = {
+        ...(tabDetails ?? {}),
+        id: tabId,
+        title: tabDetails?.title || "Untitled",
+        isPreview: tabDetails?.isPreview ?? false,
+        hasUnsavedChanges: false,
+        timeStamp: Date.now(),
+      } as TabsLayout.Tab;
+
+      if (tabDetails?.isPreview) {
+        // Find existing preview tab if any
+        const tab = tabs.find((item) => item.isPreview);
+
+        if (tab) {
+          updateTab(tab.id, newTabDetails);
+          updateActivetab(newTabDetails);
+          return;
+        }
+      }
+
+      dispatch(tabsLayoutActions.addTab({ featureId: id, tab: newTabDetails }));
+      updateActivetab(newTabDetails);
+    },
+    [tabs, updateTab, updateActivetab, dispatch, id]
   );
 
   const deleteTabs = useCallback(
