@@ -158,7 +158,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
       rowKey="id"
       columns={columns as ColumnTypes}
       data={memoizedData}
-      locale={{ emptyText: `No query params found` }}
+      locale={{ emptyText: `No entries found` }}
       components={{
         body: {
           row: EditableRow,
