@@ -113,7 +113,8 @@ export const matchResourceTypeFilter = (
 };
 
 export const getNetworkResourceType = (networkEvent: NetworkEvent) => {
-  const mimeType = networkEvent.response.content.mimeType;
+  const mimeType = networkEvent?.response?.content?.mimeType;
+  if(!mimeType) return NetworkResourceType.OTHER;
   if (mimeType.startsWith("text/html")) return NetworkResourceType.DOC;
   if (mimeType.startsWith("text/css")) return NetworkResourceType.CSS;
   if (mimeType.startsWith("image/")) return NetworkResourceType.IMG;
