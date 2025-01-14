@@ -1,5 +1,5 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { KeyValueFormType, KeyValuePair, RQAPI } from "features/apiClient/types";
+import { KeyValuePair } from "features/apiClient/types";
 import { useCallback, useContext } from "react";
 import { RequestBodyContext, useFormBody } from "../request-body-state-manager";
 import { RequestBodyProps } from "../request-body-types";
@@ -15,15 +15,14 @@ export function FormBody(props: {
   const { formBody, setFormBody } = useFormBody(requestBodyStateManager);
 
   const handleFormChange = useCallback(
-    (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => {
+    (updatedPairs: KeyValuePair[]) => {
       setRequestEntry((prev) => {
-        const updatedEntry = updaterFn(prev);
-        setFormBody(updatedEntry.request.body as KeyValuePair[]);
+        setFormBody(updatedPairs);
         return {
           ...prev,
           request: {
             ...prev.request,
-            body: updatedEntry.request.body,
+            body: updatedPairs,
             bodyContainer: requestBodyStateManager.serialize(),
           },
         };
@@ -32,12 +31,5 @@ export function FormBody(props: {
     [setRequestEntry, setFormBody, requestBodyStateManager]
   );
 
-  return (
-    <KeyValueTable
-      pairType={KeyValueFormType.FORM}
-      data={formBody}
-      setKeyValuePairs={handleFormChange}
-      variables={environmentVariables}
-    />
-  );
+  return <KeyValueTable data={formBody} variables={environmentVariables} onChange={handleFormChange} />;
 }
