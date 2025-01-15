@@ -15,6 +15,8 @@ const generateUrlPattern = (urlString, includePort = true) => {
     if (includePort) {
       return `${webUrlObj.protocol}//${webUrlObj.host}/*`;
     } else {
+      // host must not include port number for firefox, safari
+      // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Match_patterns
       return `${webUrlObj.protocol}//${webUrlObj.hostname}/*`;
     }
   } catch (error) {
