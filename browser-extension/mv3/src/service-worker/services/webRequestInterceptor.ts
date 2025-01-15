@@ -6,9 +6,13 @@ import { isUrlInBlockList, isExtensionEnabled } from "../../utils";
 import { Variable, onVariableChange } from "../variable";
 
 const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails) => {
+  // Firefox and Safari do not have documentLifecycle
   // @ts-ignore
-  if (details?.documentLifecycle !== "active" && details?.documentLifecycle !== "prerender") {
-    return;
+  if (details?.documentLifecyle) {
+    // @ts-ignore
+    if (details?.documentLifecycle !== "active" && details?.documentLifecycle !== "prerender") {
+      return;
+    }
   }
 
   let isMainOrPrerenderedFrame =
