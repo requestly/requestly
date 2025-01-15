@@ -26,7 +26,6 @@ import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsLi
 import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
 import { InitImplicitWidgetConfigHandler } from "components/features/rules/TestThisRule";
 import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
-import { useFetchIncentivizationDetails } from "features/incentivization/hooks";
 import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
@@ -49,7 +48,6 @@ const App: React.FC = () => {
 
   submitAppDetailAttributes();
   useAppUpdateChecker();
-  useFetchIncentivizationDetails();
 
   if (!isEmpty(window.location.hash)) {
     //Support legacy URL formats
