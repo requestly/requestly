@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Skeleton } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { VariablesList } from "../VariablesList/VariablesList";
@@ -7,30 +7,47 @@ import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader"
 import PATHS from "config/constants/sub/paths";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
-import "./environmentView.scss";
 import { EnvironmentVariables } from "backend/environment/types";
+import { toast } from "utils/Toast";
+import { useHasUnsavedChanges } from "hooks";
+import "./environmentView.scss";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 
 export const EnvironmentView = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const {
     isEnvironmentsLoading,
     getEnvironmentName,
     getAllEnvironments,
     getEnvironmentVariables,
     setVariables,
-    removeVariable,
   } = useEnvironmentManager();
+  const { updateTab, tabs } = useTabsLayoutContext();
   const { envId } = useParams();
-  const [persistedEnvId] = useState<string>(envId);
+  const [persistedEnvId, setPersistedEnvId] = useState<string>(envId);
 
   const user = useSelector(getUserAuthDetails);
   const [searchValue, setSearchValue] = useState<string>("");
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const environmentName = getEnvironmentName(persistedEnvId);
-  const variables = getEnvironmentVariables(persistedEnvId);
+  const environmentVariables = getEnvironmentVariables(persistedEnvId);
+  const isNewEnv = searchParams.has("new");
 
-  const { tabs } = useTabsLayoutContext();
+  useEffect(() => {
+    if (isNewEnv) {
+      setPersistedEnvId(envId);
+    }
+  }, [isNewEnv, envId]);
+
+  const [envVariables, setEnvVariables] = useState<EnvironmentVariables>(environmentVariables);
+
+  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(envVariables);
+
+  useEffect(() => {
+    updateTab(envId, { hasUnsavedChanges: hasUnsavedChanges });
+  }, [updateTab, envId, hasUnsavedChanges]);
 
   useEffect(() => {
     if (!isEnvironmentsLoading) {
@@ -61,12 +78,20 @@ export const EnvironmentView = () => {
     tabs.length,
   ]);
 
-  const handleSetVariables = async (variables: EnvironmentVariables) => {
-    return setVariables(persistedEnvId, variables);
-  };
-
-  const handleRemoveVariable = async (key: string) => {
-    return removeVariable(persistedEnvId, key);
+  const handleSaveVariables = async () => {
+    setIsSaving(true);
+    return setVariables(persistedEnvId, envVariables)
+      .then(() => {
+        toast.success("Variables updated successfully");
+        resetChanges();
+      })
+      .catch((error) => {
+        toast.error("Failed to update variables");
+        console.error("Failed to updated variables: ", error);
+      })
+      .finally(() => {
+        setIsSaving(false);
+      });
   };
 
   return (
@@ -81,13 +106,11 @@ export const EnvironmentView = () => {
               onSearchValueChange={setSearchValue}
               currentEnvironmentName={environmentName}
               environmentId={persistedEnvId}
+              onSave={handleSaveVariables}
+              hasUnsavedChanges={hasUnsavedChanges}
+              isSaving={isSaving}
             />
-            <VariablesList
-              searchValue={searchValue}
-              variables={variables}
-              setVariables={handleSetVariables}
-              removeVariable={handleRemoveVariable}
-            />
+            <VariablesList searchValue={searchValue} variables={envVariables} onVariablesChange={setEnvVariables} />
           </>
         )}
       </div>

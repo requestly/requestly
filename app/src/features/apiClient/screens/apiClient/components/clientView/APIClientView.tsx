@@ -44,7 +44,7 @@ import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet
 import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { getCollectionVariables } from "store/features/variables/selectors";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 
@@ -70,6 +70,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
   const collectionVariables = useSelector(getCollectionVariables);
+  const [searchParams] = useSearchParams();
+  const isCreateMode = searchParams.has("create");
+  const { requestId } = useParams();
 
   const { toggleBottomSheet } = useBottomSheetContext();
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
@@ -95,11 +98,21 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse), isAnimating);
-  const { updateTab } = useTabsLayoutContext();
+  const { updateTab, activeTab } = useTabsLayoutContext();
 
   useEffect(() => {
-    updateTab(apiEntryDetails?.id, { hasUnsavedChanges: hasUnsavedChanges });
-  }, [updateTab, apiEntryDetails?.id, hasUnsavedChanges]);
+    const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
+
+    updateTab(tabId, { hasUnsavedChanges: hasUnsavedChanges });
+  }, [updateTab, isCreateMode, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
+
+  useEffect(() => {
+    const tabId = apiEntryDetails?.id;
+
+    if (activeTab?.id === tabId && hasUnsavedChanges) {
+      updateTab(tabId, { isPreview: false });
+    }
+  }, [updateTab, activeTab?.id, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
 
   useEffect(() => {
     if (apiEntry) {
@@ -110,7 +123,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       setRequestName("");
     }
 
-    animationTimerRef.current = setTimeout(() => setIsAnimating(false), 600);
+    animationTimerRef.current = setTimeout(() => setIsAnimating(false), 800);
 
     return () => {
       clearTimeout(animationTimerRef.current);
@@ -187,6 +200,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, []);
 
   const onSendButtonClick = useCallback(() => {
+    updateTab(apiEntryDetails?.id, { isPreview: false });
+
     if (!entry.request.url) {
       return;
     }
@@ -280,6 +295,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
+    updateTab,
     apiClientRecords,
     apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
@@ -307,10 +323,20 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.name = requestName;
     }
 
-    const result = await upsertApiRecord(uid, record, teamId);
+    const args: Parameters<typeof upsertApiRecord> = [uid, record, teamId];
+
+    if (isCreateMode) {
+      args.push(requestId);
+      record.name = requestName;
+    }
+
+    const result = await upsertApiRecord(...args);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
-      onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
+      onSaveRecord(
+        { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
+        isCreateMode ? "replace" : "open"
+      );
       trackRequestRenamed("breadcrumb");
       setRequestName("");
 
@@ -332,10 +358,19 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.id = apiEntryDetails?.id;
     }
 
-    const result = await upsertApiRecord(uid, record, teamId);
+    const args: Parameters<typeof upsertApiRecord> = [uid, record, teamId];
+
+    if (isCreateMode) {
+      args.push(requestId);
+    }
+
+    const result = await upsertApiRecord(...args);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
-      onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
+      onSaveRecord(
+        { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
+        isCreateMode ? "replace" : "open"
+      );
       setEntry({ ...result.data.data, response: entry.response });
       resetChanges();
       trackRequestSaved("api_client_view");
@@ -345,7 +380,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
 
     setIsRequestSaving(false);
-  }, [entry, apiEntryDetails, onSaveRecord, setEntry, teamId, uid, resetChanges]);
+  }, [entry, apiEntryDetails, onSaveRecord, setEntry, teamId, uid, resetChanges, isCreateMode, requestId]);
 
   const cancelRequest = useCallback(() => {
     abortControllerRef.current?.abort();
@@ -369,6 +404,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       <div className="api-client-header-container">
         {user.loggedIn && !openInModal ? (
           <RQBreadcrumb
+            loading={isAnimating}
             placeholder="New Request"
             recordName={apiEntryDetails?.name}
             onRecordNameUpdate={setRequestName}
@@ -382,6 +418,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         layout={SheetLayout.SPLIT}
         bottomSheet={
           <ApiClientBottomSheet
+            key={requestId}
             response={entry.response}
             isLoading={isLoadingResponse}
             isFailed={isFailed}
@@ -391,12 +428,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           />
         }
         minSize={35}
+        initialSizes={[60, 40]}
       >
         <div className="api-client-body">
           <Skeleton loading={isAnimating} active>
             <div className="api-client-header">
               <Space.Compact className="api-client-url-container">
                 <Select
+                  popupClassName="api-request-method-selector"
                   className="api-request-method-selector"
                   options={requestMethodOptions}
                   value={entry.request.method}
@@ -446,6 +485,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               ) : null}
             </div>
             <RequestTabs
+              key={requestId}
               collectionId={apiEntryDetails?.collectionId}
               requestEntry={entry}
               setRequestEntry={setRequestEntry}

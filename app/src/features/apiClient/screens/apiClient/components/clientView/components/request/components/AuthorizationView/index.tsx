@@ -12,17 +12,28 @@ import { MdClear } from "@react-icons/all-files/md/MdClear";
 import { AUTHORIZATION_TYPES } from "./types";
 import { AUTH_OPTIONS } from "./types/form";
 import { RQAPI } from "features/apiClient/types";
+import { EnvironmentVariables } from "backend/environment/types";
 
 interface Props {
+  wrapperClass?: string;
   defaultValues: {
     currentAuthType?: AUTHORIZATION_TYPES;
     authOptions?: AUTH_OPTIONS;
   };
   onAuthUpdate: (authOptions: RQAPI.AuthOptions) => any;
   rootLevelRecord: Boolean;
+  variables: EnvironmentVariables;
+  authorizationViewActions?: React.ReactElement;
 }
 
-const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootLevelRecord }) => {
+const AuthorizationView: React.FC<Props> = ({
+  defaultValues,
+  onAuthUpdate,
+  rootLevelRecord,
+  wrapperClass = "",
+  variables,
+  authorizationViewActions,
+}) => {
   const [selectedForm, setSelectedForm] = useState(
     defaultValues?.currentAuthType || (rootLevelRecord ? AUTHORIZATION_TYPES.NO_AUTH : AUTHORIZATION_TYPES.INHERIT)
   );
@@ -60,7 +71,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootL
   const debouncedOnChange = debounce(onChangeHandler, 500);
 
   return (
-    <div className="authorization-view">
+    <div className={`authorization-view ${wrapperClass}`}>
       <div className="type-of-authorization">
         <div className="form-selector">
           <label>{LABEL_TEXT.AUTHORIZATION_TYPE_LABEL}</label>
@@ -77,7 +88,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootL
             <div
               className="clear-icon"
               onClick={() => {
-                onAuthUpdate({ currentAuthType: AUTHORIZATION_TYPES.NO_AUTH });
+                onAuthUpdate(getAuthOptions(formValues, AUTHORIZATION_TYPES.NO_AUTH));
                 setSelectedForm(AUTHORIZATION_TYPES.NO_AUTH);
               }}
             >
@@ -85,6 +96,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootL
               <span>{LABEL_TEXT.CLEAR}</span>
             </div>
           )}
+          {authorizationViewActions}
         </div>
       </div>
       <div className="form-and-description">
@@ -99,6 +111,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate, rootL
               formType={selectedForm}
               onChangeHandler={debouncedOnChange}
               formvalues={formValues[selectedForm] || {}}
+              variables={variables}
             />
           </div>
         )}

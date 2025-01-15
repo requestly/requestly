@@ -36,5 +36,9 @@ export const KEYBOARD_SHORTCUTS: Record<
       hotKey: navigator.platform.match("Mac") ? "meta+s" : "ctrl+s",
       description: "Save request",
     },
+    SAVE_ENVIRONMENT: {
+      hotKey: navigator.platform.match("Mac") ? "meta+s" : "ctrl+s",
+      description: "Save environment",
+    },
   },
 };

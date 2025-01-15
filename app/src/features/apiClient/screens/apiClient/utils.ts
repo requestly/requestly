@@ -2,10 +2,11 @@ import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionA
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
 import { KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
-import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
+import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
 import { forEach, isEmpty, split, unionBy } from "lodash";
+import { sessionStorage } from "utils/sessionStorage";
 
 export const makeRequest = async (
   appMode: string,
@@ -143,9 +144,15 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
   try {
     const requestJsonString = curlconverter.toJsonString(curl);
     const requestJson = JSON.parse(requestJsonString);
-    // console.log("converted", {curl, requestJson});
 
-    const queryParams = generateKeyValuePairsFromJson(requestJson.queries);
+    const queryParamsFromJson = generateKeyValuePairsFromJson(requestJson.queries);
+    /*
+      cURL converter is not able to parse query params from url for some cURL requests
+      so parsing it manually from URL and populating queryParams property
+    */
+    const requestUrlParams = new URL(requestJson.url).searchParams;
+    const paramsFromUrl = generateKeyValuePairsFromJson(Object.fromEntries(requestUrlParams.entries()));
+
     const headers = filterHeadersToImport(generateKeyValuePairsFromJson(requestJson.headers));
     const contentType = getContentTypeFromRequestHeaders(headers);
     let body: RQAPI.RequestBody;
@@ -158,10 +165,13 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
       body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
     }
 
+    // remove query params from url
+    const requestUrl = requestJson.url.split("?")[0];
+
     const request: RQAPI.Request = {
-      url: requestJson.url,
+      url: requestUrl,
       method: requestJson.method.toUpperCase() as RequestMethod,
-      queryParams,
+      queryParams: queryParamsFromJson.length ? queryParamsFromJson : paramsFromUrl,
       headers,
       contentType,
       body: body ?? null,
@@ -267,7 +277,7 @@ export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString:
     return inputString;
   }
   const baseUrl = split(inputString, "?")[0];
-  const enabledParams = queryParams.filter((param) => param.isEnabled);
+  const enabledParams = queryParams.filter((param) => param.isEnabled ?? true);
 
   const queryString = enabledParams
     .map(({ key, value }) => {
@@ -293,7 +303,7 @@ export const syncQueryParams = (
 
   switch (type) {
     case QueryParamSyncType.SYNC: {
-      const updatedUrl = queryParamsToURLString(updatedQueryParams, url);
+      const updatedUrl = queryParamsToURLString(queryParams, url);
 
       // Dont sync if URL is same
       if (updatedUrl !== url) {
@@ -319,7 +329,7 @@ export const syncQueryParams = (
 
       // Adding disabled key value pairs
       queryParams.forEach((queryParam, index) => {
-        if (!queryParam.isEnabled) {
+        if (!(queryParam.isEnabled ?? true)) {
           updatedQueryParamsCopy.splice(index, 0, queryParam);
         }
       });
@@ -341,4 +351,122 @@ export const syncQueryParams = (
         url,
       };
   }
+};
+
+export const filterRecordsBySearch = (records: RQAPI.Record[], searchValue: string): RQAPI.Record[] => {
+  if (!searchValue) return records;
+
+  const search = searchValue.toLowerCase();
+  const matchingRecords = new Set<string>();
+
+  const childrenMap = new Map<string, Set<string>>();
+  const parentMap = new Map<string, string>();
+
+  records.forEach((record) => {
+    if (record.collectionId) {
+      parentMap.set(record.id, record.collectionId);
+      if (!childrenMap.has(record.collectionId)) {
+        childrenMap.set(record.collectionId, new Set());
+      }
+      childrenMap.get(record.collectionId).add(record.id);
+    }
+  });
+
+  // Add all children records of a collection
+  const addChildrenRecords = (collectionId: string) => {
+    const children = childrenMap.get(collectionId) || new Set();
+    children.forEach((childId) => {
+      matchingRecords.add(childId);
+      if (childrenMap.has(childId)) {
+        addChildrenRecords(childId);
+      }
+    });
+  };
+
+  // Add all parent collections of a record
+  const addParentCollections = (recordId: string) => {
+    const parentId = parentMap.get(recordId);
+    if (parentId) {
+      matchingRecords.add(parentId);
+      addParentCollections(parentId);
+    }
+  };
+
+  // First pass: direct matches and their children
+  records.forEach((record) => {
+    if (record.name.toLowerCase().includes(search)) {
+      matchingRecords.add(record.id);
+
+      // If collection matches, add all children records
+      if (isApiCollection(record)) {
+        addChildrenRecords(record.id);
+      }
+    }
+  });
+
+  // Second pass: add parent collections
+  matchingRecords.forEach((id) => {
+    addParentCollections(id);
+  });
+
+  return records.filter((record) => matchingRecords.has(record.id));
+};
+
+export const clearExpandedRecordIdsFromSession = (keysToBeDeleted: string[]) => {
+  const activeKeys = sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, []);
+
+  if (keysToBeDeleted.length === 0) {
+    return;
+  }
+
+  const updatedActiveKeys: string[] = [];
+
+  activeKeys.forEach((key: string) => {
+    if (!keysToBeDeleted.includes(key)) updatedActiveKeys.push(key);
+  });
+
+  sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, updatedActiveKeys);
+};
+
+const getParentIds = (data: RQAPI.Record[], targetId: RQAPI.Record["id"]) => {
+  const idToCollectionMap = data.reduce((collectionIdMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>, item) => {
+    collectionIdMap[item.id] = item.collectionId || "";
+    return collectionIdMap;
+  }, {});
+
+  const parentIds = [];
+
+  let currentId = idToCollectionMap[targetId];
+  while (currentId) {
+    parentIds.push(currentId);
+    currentId = idToCollectionMap[currentId];
+  }
+
+  return parentIds;
+};
+
+export const getRecordIdsToBeExpanded = (
+  id: RQAPI.Record["id"],
+  expandedKeys: RQAPI.Record["id"][],
+  records: RQAPI.Record[]
+) => {
+  // If the provided ID is null or undefined, return the existing active keys.
+  if (!id) {
+    return expandedKeys;
+  }
+
+  const expandedKeysCopy = [...expandedKeys];
+
+  const parentIds = getParentIds(records, id);
+
+  // Include the original ID itself as an active key.
+  parentIds.push(id);
+
+  parentIds.forEach((parent) => {
+    if (!expandedKeysCopy.includes(parent)) {
+      expandedKeysCopy.push(parent);
+    }
+  });
+
+  return expandedKeysCopy;
 };
