@@ -56,6 +56,14 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       return capitalize(PRICING.PLAN_NAMES.FREE);
     }
 
+    if (planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL) {
+      return capitalize(PRICING.PLAN_NAMES.FREE);
+    }
+
+    if (planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE) {
+      return capitalize(PRICING.PLAN_NAMES.PROFESSIONAL);
+    }
+
     const index = pricingPlansOrder.indexOf(planName);
     return capitalize(pricingPlansOrder[index - 1]);
   };

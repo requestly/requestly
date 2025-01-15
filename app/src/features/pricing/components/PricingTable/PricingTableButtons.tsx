@@ -26,6 +26,7 @@ const CTA_ONCLICK_FUNCTIONS = {
   CHECKOUT: "checkout",
   USE_NOW: "use-now",
   CONTACT_US: "contact-us",
+  ADD_PLAN: "add-plan",
   SIGNUP: "signup",
 };
 
@@ -40,6 +41,7 @@ enum CTA_CONFIG_SELECTORS {
   UPGRADE = "upgrade",
   ALREADY_INCLUDED = "already-included",
   TRIAL_ACTIVE = "trial-active",
+  ADD_PLAN = "add-plan",
 }
 
 const CTA_BUTTONS_CONFIG = {
@@ -103,6 +105,12 @@ const CTA_BUTTONS_CONFIG = {
     onClick: CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION,
     visible: true,
   },
+  [CTA_CONFIG_SELECTORS.ADD_PLAN]: {
+    text: "Upgrade",
+    tag: "",
+    onClick: CTA_ONCLICK_FUNCTIONS.ADD_PLAN,
+    visible: true,
+  },
 };
 
 // Maps userPlanName -> columnPlanName -> buttonConfig
@@ -120,14 +128,14 @@ const pricingButtonsMap: Record<string, any> = {
       [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.CURRENT_PLAN],
       [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
       [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
-      [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
+      [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.ADD_PLAN],
     },
     [PRICING.PLAN_NAMES.BASIC]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.NOT_VISIBLE],
       [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
       [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.CURRENT_PLAN],
       [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
-      [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
+      [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.ADD_PLAN],
     },
     [PRICING.PLAN_NAMES.PROFESSIONAL]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.NOT_VISIBLE],
@@ -138,8 +146,8 @@ const pricingButtonsMap: Record<string, any> = {
     },
     [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.NOT_VISIBLE],
-      [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
-      [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
+      [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.ADD_PLAN],
+      [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.ADD_PLAN],
       [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
       [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.CURRENT_PLAN],
     },
@@ -316,6 +324,39 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         });
         break;
       }
+      case CTA_ONCLICK_FUNCTIONS.ADD_PLAN: {
+        Modal.confirm({
+          title: "Confirm Plan Upgrade",
+          content: `Would you like to get access to ${getPrettyPlanName(
+            columnPlanName
+          )} plan along with your current ${getPrettyPlanName(userPlanName)} plan.`,
+          okText: "Yes",
+          okType: "primary",
+          cancelText: "No",
+          onOk: () => {
+            setIsConfirmationModalOpen(true);
+            setIsConfirmationModalLoading(true);
+            const requestAddPlan = httpsCallable(firebaseFunction, "premiumNotifications-requestAddPlan");
+            requestAddPlan({
+              currentPlan: userPlanName,
+              planToSwitch: columnPlanName,
+              currentPlanType: userPlanType,
+            })
+              .catch(() => {
+                toast.error("Error in adding plan access. Please contact support");
+                setIsConfirmationModalOpen(false);
+              })
+              .finally(() => {
+                setIsConfirmationModalLoading(false);
+                setIsButtonLoading(false);
+              });
+          },
+          onCancel: () => {
+            setIsButtonLoading(false);
+          },
+        });
+        break;
+      }
       case CTA_ONCLICK_FUNCTIONS.CONTACT_US: {
         setIsContactUsModalOpen(true);
         break;
@@ -371,7 +412,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         }}
         type="primary"
       >
-        Schedule a call
+        Contact us
       </RQButton>
     );
   }

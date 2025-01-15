@@ -58,8 +58,6 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       <ContactUsModal
         isOpen={isContactUsModalOpen}
         onCancel={() => setIsContactUsModalOpen(false)}
-        heading="Get In Touch"
-        subHeading="Learn about the benefits & pricing of team plan"
         source="pricing_table"
       />
     </>
