@@ -33,14 +33,14 @@ interface EditorProps {
   isReadOnly?: boolean;
   height?: number;
   isResizable?: boolean;
-  id?: string;
+  scriptId?: string;
   toolbarOptions?: EditorCustomToolbar;
   hideCharacterCount?: boolean;
   handleChange?: (value: string) => void;
   analyticEventProperties?: AnalyticEventProperties;
   prettifyOnInit?: boolean;
   envVariables?: EnvironmentVariables;
-  config?: {
+  showOptions?: {
     enablePrettify?: boolean;
   };
 }
@@ -54,11 +54,11 @@ const Editor: React.FC<EditorProps> = ({
   hideCharacterCount = false,
   handleChange = () => {},
   toolbarOptions,
-  id = "",
+  scriptId = "",
   analyticEventProperties = {},
   prettifyOnInit = false,
   envVariables,
-  config = { enablePrettify: true },
+  showOptions = { enablePrettify: true },
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -71,7 +71,7 @@ const Editor: React.FC<EditorProps> = ({
   const [isEditorInitialized, setIsEditorInitialized] = useState(false);
 
   const allEditorToast = useSelector(getAllEditorToast);
-  const toastOverlay = useMemo(() => allEditorToast[id], [allEditorToast, id]); // todo: rename
+  const toastOverlay = useMemo(() => allEditorToast[scriptId], [allEditorToast, scriptId]); // todo: rename
   const [isCodePrettified, setIsCodePrettified] = useState(prettifyOnInit);
   const isDefaultPrettificationDone = useRef(false);
 
@@ -134,13 +134,13 @@ const Editor: React.FC<EditorProps> = ({
   }, []);
 
   const applyPrettification = useCallback(() => {
-    if (config?.enablePrettify) {
+    if (showOptions?.enablePrettify) {
       if (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT) {
         const prettified = prettifyCode(value, language);
         updateContent(prettified.code);
       }
     }
-  }, [config?.enablePrettify, language, value, updateContent]);
+  }, [showOptions?.enablePrettify, language, value, updateContent]);
 
   useEffect(() => {
     if (isEditorInitialized) {
@@ -154,9 +154,9 @@ const Editor: React.FC<EditorProps> = ({
   }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit]);
 
   const handleEditorClose = useCallback(
-    (id: string) => {
+    (scriptId: string) => {
       // @ts-expect-error
-      dispatch(globalActions.removeToastForEditor({ id }));
+      dispatch(globalActions.removeToastForEditor({ scriptId }));
     },
     [dispatch]
   );
@@ -212,7 +212,7 @@ const Editor: React.FC<EditorProps> = ({
       setIsCodePrettified={setIsCodePrettified}
       handleFullScreenToggle={handleFullScreenToggle}
       customOptions={toolbarOptions}
-      enablePrettify={config.enablePrettify}
+      enablePrettify={showOptions.enablePrettify}
     />
   );
 
@@ -272,7 +272,7 @@ const Editor: React.FC<EditorProps> = ({
     <EditorToastContainer
       message={toastOverlay.message}
       type={toastOverlay.type}
-      onClose={() => handleEditorClose(toastOverlay.id)}
+      onClose={() => handleEditorClose(toastOverlay.scriptId)}
       isVisible={toastOverlay}
       autoClose={toastOverlay.autoClose}
     />

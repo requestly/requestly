@@ -41,7 +41,7 @@ export function RawBody(props: {
         hideCharacterCount
         analyticEventProperties={{ source: "api_client" }}
         envVariables={environmentVariables}
-        config={{
+        showOptions={{
           enablePrettify: false,
         }}
         toolbarOptions={{ title: "", options: [editorOptions] }}
