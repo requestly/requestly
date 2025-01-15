@@ -9,10 +9,16 @@ import { browser, WEB_URL, OTHER_WEB_URLS } from "../config/dist/config.build.js
 const OUTPUT_DIR = "dist";
 const isProductionBuildMode = process.env.BUILD_MODE === "production";
 
-const generateUrlPattern = (urlString) => {
+const generateUrlPattern = (urlString, includePort = true) => {
   try {
     const webUrlObj = new URL(urlString);
-    return `${webUrlObj.protocol}//${webUrlObj.host}/*`;
+    if (includePort) {
+      return `${webUrlObj.protocol}//${webUrlObj.host}/*`;
+    } else {
+      // host must not include port number for firefox, safari
+      // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Match_patterns
+      return `${webUrlObj.protocol}//${webUrlObj.hostname}/*`;
+    }
   } catch (error) {
     console.error(`Invalid URL: ${urlString}`, error);
     return null;
@@ -27,7 +33,9 @@ const processManifest = (content) => {
 
   const { content_scripts: contentScripts } = manifestJson;
 
-  const webURLPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern); // remove null entries
+  const webURLPatterns = [WEB_URL, ...OTHER_WEB_URLS]
+    .map((pattern) => generateUrlPattern(pattern, browser === "chrome"))
+    .filter((pattern) => !!pattern); // remove null entries
 
   contentScripts[0].matches = webURLPatterns;
   contentScripts[1].exclude_matches = webURLPatterns;

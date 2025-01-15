@@ -33,14 +33,14 @@ export const forwardHeadersOnRedirect = async (tabId: number, requestDetails: AJ
         requestHeaders: ignoredHeaderValues.map((header: { name: string; value: string }) => ({
           header: header.name,
           value: header.value,
-          operation: chrome.declarativeNetRequest.HeaderOperation.SET,
+          operation: "set" as chrome.declarativeNetRequest.HeaderOperation,
         })),
-        type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+        type: "modifyHeaders" as chrome.declarativeNetRequest.RuleActionType,
       },
       condition: {
         // Exact URL is not used because for replace rules, a marker query param is added which changes the URL so exact URL doesn't match
         urlFilter: `|${redirectedUrl}`,
-        resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
+        resourceTypes: ["xmlhttprequest" as chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
         tabIds: [tabId],
         requestMethods: [requestDetails.method.toLowerCase() as chrome.declarativeNetRequest.RequestMethod],
         excludedInitiatorDomains: ["requestly.io", "requestly.com"],
