@@ -1,4 +1,7 @@
+import { RecordStatus, RecordType } from "./base";
 import { Group } from "./group";
-import { Rule } from "./rule";
+import { Rule, RuleType } from "./rule";
 
-export type RuleItem = Group | Rule;
+type StorageRecord = Group | Rule;
+
+export { StorageRecord, Rule, Group, RecordType, RuleType, RecordStatus };

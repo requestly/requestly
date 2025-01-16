@@ -4,6 +4,7 @@ import { BaseItem, RecordType } from "./base";
 export interface BaseRule extends BaseItem {
   objectType: RecordType.RULE;
   ruleType: RuleType;
+  groupId?: string;
 }
 
 export type Rule =
