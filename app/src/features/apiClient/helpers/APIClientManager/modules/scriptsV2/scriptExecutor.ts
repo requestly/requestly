@@ -19,12 +19,34 @@ export class ScriptExecutor {
         script,
         initialState,
         proxy((key: string, value: any) => {
-          console.log("State update:", key, value);
+          console.log("preRequestState update:", key, value);
           onStateUpdate(key, value);
         })
       );
     } catch (error) {
-      console.error("Script execution error:", error);
+      console.error("preRequest script execution error:", error);
+      throw error;
+    } finally {
+      this.cleanup();
+    }
+  }
+
+  public async executePostResponseScript(
+    script: string,
+    initialState: any,
+    onStateUpdate: (key: string, value: any) => void
+  ): Promise<void> {
+    try {
+      await this.workerApi.executePostResponseScript(
+        script,
+        initialState,
+        proxy((key: string, value: any) => {
+          console.log("postResponseState update:", key, value);
+          onStateUpdate(key, value);
+        })
+      );
+    } catch (error) {
+      console.error("postResponse script execution error:", error);
       throw error;
     } finally {
       this.cleanup();
