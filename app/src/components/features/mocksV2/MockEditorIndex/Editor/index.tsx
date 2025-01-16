@@ -119,13 +119,6 @@ const MockEditor: React.FC<Props> = ({
     setLatency(0);
   };
 
-  // useEffect(() => {
-  //   console.log("DBG: headersString", headersString);
-  //   return () => {
-  //     console.log("DBG: Unmounted");
-  //   }
-  // }, [headersString])
-
   const createMockEditorData = useCallback(() => {
     let headersDict: { [key: string]: string } = {};
     try {
