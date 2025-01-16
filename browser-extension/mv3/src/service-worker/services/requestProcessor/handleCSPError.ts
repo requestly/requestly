@@ -7,19 +7,19 @@ export const handleCSPError = async (tabId: number, requestDetails: AJAXRequestD
     requestDetails.initiator,
     {
       action: {
-        type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+        type: "modifyHeaders" as chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
         responseHeaders: [
           {
             header: "Content-Security-Policy",
-            operation: chrome.declarativeNetRequest.HeaderOperation.REMOVE,
+            operation: "remove" as chrome.declarativeNetRequest.HeaderOperation.REMOVE,
           },
         ],
       },
       condition: {
         urlFilter: requestDetails.initiator,
         resourceTypes: [
-          chrome.declarativeNetRequest.ResourceType.SUB_FRAME,
-          chrome.declarativeNetRequest.ResourceType.MAIN_FRAME,
+          "sub_frame" as chrome.declarativeNetRequest.ResourceType.SUB_FRAME,
+          "main_frame" as chrome.declarativeNetRequest.ResourceType.MAIN_FRAME,
         ],
         tabIds: [tabId],
         excludedInitiatorDomains: ["requestly.io", "requestly.com"],
