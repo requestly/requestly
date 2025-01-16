@@ -32,7 +32,7 @@ export const EnvironmentView = () => {
   const [searchValue, setSearchValue] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const environmentName = getEnvironmentName(persistedEnvId);
-  const environmentVariables = getEnvironmentVariables(persistedEnvId);
+  const variables = getEnvironmentVariables(persistedEnvId);
   const isNewEnv = searchParams.has("new");
 
   useEffect(() => {
@@ -41,9 +41,9 @@ export const EnvironmentView = () => {
     }
   }, [isNewEnv, envId]);
 
-  const [envVariables, setEnvVariables] = useState<EnvironmentVariables>(environmentVariables);
+  const [pendingVariables, setPendingVariables] = useState<EnvironmentVariables>(variables);
 
-  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(envVariables);
+  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
 
   useEffect(() => {
     updateTab(envId, { hasUnsavedChanges: hasUnsavedChanges });
@@ -80,7 +80,7 @@ export const EnvironmentView = () => {
 
   const handleSaveVariables = async () => {
     setIsSaving(true);
-    return setVariables(persistedEnvId, envVariables)
+    return setVariables(persistedEnvId, pendingVariables)
       .then(() => {
         toast.success("Variables updated successfully");
         resetChanges();
@@ -110,7 +110,7 @@ export const EnvironmentView = () => {
               hasUnsavedChanges={hasUnsavedChanges}
               isSaving={isSaving}
             />
-            <VariablesList searchValue={searchValue} variables={envVariables} onVariablesChange={setEnvVariables} />
+            <VariablesList searchValue={searchValue} variables={variables} onVariablesChange={setPendingVariables} />
           </>
         )}
       </div>
