@@ -19,9 +19,10 @@ const config = async ({ mode }) => {
 
   return defineConfig({
     define: {
-      global: "window",
+      global: "globalThis",
       "process.env": loadEnv(mode, process.cwd(), ""),
     },
+    worker: {},
     plugins: [
       nodePolyfills(),
 
