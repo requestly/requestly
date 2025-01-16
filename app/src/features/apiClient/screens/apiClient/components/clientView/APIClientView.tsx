@@ -47,6 +47,8 @@ import { getCollectionVariables } from "store/features/variables/selectors";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { ScriptExecutor } from "features/apiClient/helpers/APIClientManager/modules/scriptsV2/scriptExecutor";
+import PreRequestScriptWorkload from "features/apiClient/helpers/APIClientManager/modules/scriptsV2/workloads/preRequestWorkload?worker";
 
 interface Props {
   openInModal?: boolean;
@@ -77,7 +79,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const { toggleBottomSheet } = useBottomSheetContext();
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
-  const { getVariablesWithPrecedence } = environmentManager;
+  const {
+    getVariablesWithPrecedence,
+    setVariables,
+    setCollectionVariables,
+    getCurrentEnvironment,
+    getGlobalVariables,
+    getCurrentEnvironmentVariables,
+  } = environmentManager;
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
     apiEntryDetails?.collectionId,
     getVariablesWithPrecedence,
@@ -199,7 +208,33 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const onSendButtonClick = useCallback(() => {
+  const handleUpdatesFromScript = useCallback(
+    (key: string, value: any) => {
+      switch (key) {
+        case "environment": {
+          console.log("DBG currentENV updated");
+          const currentEnvironment = getCurrentEnvironment();
+          setVariables(currentEnvironment.currentEnvironmentId, value);
+          break;
+        }
+
+        case "global": {
+          console.log("DBG global updated");
+          setVariables("global", value);
+          break;
+        }
+
+        case "collectionVariables": {
+          console.log("DBG collectionVariables updated");
+          setCollectionVariables(value, apiEntryDetails?.collectionId);
+          break;
+        }
+      }
+    },
+    [getCurrentEnvironment, setVariables, setCollectionVariables, apiEntryDetails?.collectionId]
+  );
+
+  const onSendButtonClick = useCallback(async () => {
     updateTab(apiEntryDetails?.id, { isPreview: false });
 
     if (!entry.request.url) {
@@ -230,82 +265,94 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    executeAPIRequest(
-      appMode,
-      apiClientRecords,
-      sanitizedEntry,
-      {
-        id: apiEntryDetails?.id,
-        collectionId: apiEntryDetails?.collectionId,
-      },
-      environmentManager,
-      collectionVariables[apiEntryDetails?.collectionId]?.variables || {},
-      abortControllerRef.current.signal
-    )
-      .then((executedEntry) => {
-        const response = executedEntry.response;
-        // TODO: Add an entry in history
-        const entryWithResponse = { ...entry, response };
-        const renderedEntryWithResponse = { ...executedEntry, response };
+    const scriptExecutor = new ScriptExecutor(PreRequestScriptWorkload);
+    const globalVariables = getGlobalVariables();
+    const environmentVariables = getCurrentEnvironmentVariables();
+    const collectionVariables = getVariablesWithPrecedence(apiEntryDetails?.collectionId);
 
-        if (response) {
-          setEntry(entryWithResponse);
-          trackResponseLoaded({
-            type: getContentTypeFromResponseHeaders(response.headers),
-            time: Math.round(response.time / 1000),
-          });
-          trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
-          trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
-        } else {
-          const erroredEntry = entry as RQAPI.RequestErrorEntry;
+    console.log("DBG preRequestscript starting");
+    const preRequestResult = await scriptExecutor.executePreRequestScript(
+      sanitizedEntry.scripts.preRequest,
+      { global: globalVariables, environment: environmentVariables, collectionVariables },
+      handleUpdatesFromScript
+    );
+    console.log("DBG preRequestscript executed", preRequestResult);
 
-          setIsFailed(true);
-          setError(erroredEntry?.error ?? null);
-          if (erroredEntry?.error) {
-            Sentry.withScope((scope) => {
-              scope.setTag("error_type", "api_request_failure");
-              scope.setContext("request_details", {
-                url: sanitizedEntry.request.url,
-                method: sanitizedEntry.request.method,
-                headers: sanitizedEntry.request.headers,
-                queryParams: sanitizedEntry.request.queryParams,
-              });
-              scope.setFingerprint(["api_request_error", sanitizedEntry.request.method, erroredEntry.error.source]);
-              Sentry.captureException(
-                new Error(`API Request Failed: ${erroredEntry.error.message || "Unknown error"}`)
-              );
-            });
-          }
-          trackRequestFailed();
-          trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
-          trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
-        }
-        notifyApiRequestFinished?.(renderedEntryWithResponse);
-      })
-      .catch(() => {
-        if (abortControllerRef.current?.signal.aborted) {
-          setIsRequestCancelled(true);
-        }
-      })
-      .finally(() => {
-        abortControllerRef.current = null;
-        setIsLoadingResponse(false);
-      });
+    // executeAPIRequest(
+    //   appMode,
+    //   apiClientRecords,
+    //   sanitizedEntry,
+    //   {
+    //     id: apiEntryDetails?.id,
+    //     collectionId: apiEntryDetails?.collectionId,
+    //   },
+    //   environmentManager,
+    //   collectionVariables[apiEntryDetails?.collectionId]?.variables || {},
+    //   abortControllerRef.current.signal
+    // )
+    //   .then((executedEntry) => {
+    //     const response = executedEntry.response;
+    //     // TODO: Add an entry in history
+    //     const entryWithResponse = { ...entry, response };
+    //     const renderedEntryWithResponse = { ...executedEntry, response };
+
+    //     if (response) {
+    //       setEntry(entryWithResponse);
+    //       trackResponseLoaded({
+    //         type: getContentTypeFromResponseHeaders(response.headers),
+    //         time: Math.round(response.time / 1000),
+    //       });
+    //       trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
+    //       trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
+    //     } else {
+    //       const erroredEntry = entry as RQAPI.RequestErrorEntry;
+
+    //       setIsFailed(true);
+    //       setError(erroredEntry?.error ?? null);
+    //       if (erroredEntry?.error) {
+    //         Sentry.withScope((scope) => {
+    //           scope.setTag("error_type", "api_request_failure");
+    //           scope.setContext("request_details", {
+    //             url: sanitizedEntry.request.url,
+    //             method: sanitizedEntry.request.method,
+    //             headers: sanitizedEntry.request.headers,
+    //             queryParams: sanitizedEntry.request.queryParams,
+    //           });
+    //           scope.setFingerprint(["api_request_error", sanitizedEntry.request.method, erroredEntry.error.source]);
+    //           Sentry.captureException(
+    //             new Error(`API Request Failed: ${erroredEntry.error.message || "Unknown error"}`)
+    //           );
+    //         });
+    //       }
+    //       trackRequestFailed();
+    //       trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
+    //       trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
+    //     }
+    //     notifyApiRequestFinished?.(renderedEntryWithResponse);
+    //   })
+    //   .catch(() => {
+    //     if (abortControllerRef.current?.signal.aborted) {
+    //       setIsRequestCancelled(true);
+    //     }
+    //   })
+    //   .finally(() => {
+    //     abortControllerRef.current = null;
+    //     setIsLoadingResponse(false);
+    //   });
 
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
     updateTab,
-    apiClientRecords,
     apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
-    appMode,
     dispatch,
     entry,
-    environmentManager,
-    notifyApiRequestFinished,
     toggleBottomSheet,
-    collectionVariables,
+    handleUpdatesFromScript,
+    getGlobalVariables,
+    getCurrentEnvironmentVariables,
+    getVariablesWithPrecedence,
   ]);
 
   const handleRecordNameUpdate = async () => {
