@@ -180,7 +180,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         </Row>
       )}
       {planPrice !== undefined && (
-        <Row align="middle" className="items-center plan-price-row mt-8">
+        <Row align="middle" className="items-center plan-price-row">
           <Space size="small">
             <Typography.Text className="plan-price">
               ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
@@ -223,7 +223,10 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           </Typography.Text>
         </Row>
       )}
-      <Row className="mt-8" style={{ display: getPricingPlanAnnualBillingSubtitle(planName) ? "flex" : "none" }}>
+      <Row
+        className="annual-bill mt-8"
+        style={{ display: getPricingPlanAnnualBillingSubtitle(planName) ? "flex" : "none" }}
+      >
         <Typography.Text type="secondary">
           {duration === PRICING.DURATION.MONTHLY
             ? planName === PRICING.PLAN_NAMES.LITE
@@ -234,7 +237,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       </Row>
       <Row
         style={{
-          marginTop: planName === PRICING.PLAN_NAMES.FREE ? "54px" : "24px",
+          marginTop: planName === PRICING.PLAN_NAMES.FREE ? "44px" : "32px",
         }}
       >
         <PricingTableButtons
@@ -253,7 +256,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         {planDetails.features.map((feature: any, index: number) => {
           if (isOpenedFromModal && feature.visibleInPricingPageOnly) return null;
           return (
-            <div className="text-left plan-feature-item" key={index}>
+            <div className={`text-left plan-feature-item ${feature.tooltip ? "underlined" : ""}`} key={index}>
               {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />}{" "}
               <Tooltip title={feature?.tooltip} color="var(--black)">
                 <span className={`${feature?.tooltip ? "plan-feature-underline" : ""}`}>{feature.title}</span>

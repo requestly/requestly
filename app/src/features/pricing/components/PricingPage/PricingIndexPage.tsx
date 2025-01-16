@@ -47,7 +47,6 @@ export const PricingIndexPage = () => {
             <Row justify="center" className="display-row-center w-full mt-24" gutter={24}>
               <Col className="display-row-center plan-duration-switch-container">
                 <Switch
-                  size="small"
                   checked={duration === PRICING.DURATION.ANNUALLY}
                   onChange={(checked) => {
                     setDuration(checked ? PRICING.DURATION.ANNUALLY : PRICING.DURATION.MONTHLY);
