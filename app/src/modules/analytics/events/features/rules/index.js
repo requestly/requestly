@@ -55,8 +55,6 @@ export const trackCharlesSettingsImportDocsClicked = (source, trigger) => {
   trackEvent(CHARLES_SETTINGS.DOCS_CLICKED, params);
 };
 
-// Resource override
-
 export const trackResourceOverrideSettingsImportViewed = (source) => {
   trackEvent(RESOURCE_OVERRIDE_SETTINGS.VIEWED, { source });
 };

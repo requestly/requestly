@@ -5,7 +5,7 @@ import { Button, Divider, Tooltip } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import CharlesIcon from "assets/icons/charlesIcon.svg?react";
 import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
-import ResourceOverrideIcon from "assets/icons/resourceOverrideIcon.png";
+import ResourceOverrideIcon from "assets/icons/resourceOverrideIcon.webp";
 import { ImportFromCharlesModal } from "../ImporterComponents/CharlesImporter";
 import { ImportRulesModal } from "../../../../../../modals/ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -257,7 +257,7 @@ export const GettingStarted: React.FC = () => {
 
             <Button
               type="link"
-              className="link-btn templates-btn"
+              className="link-btn"
               icon={<HiOutlineTemplate className="anticon" />}
               onClick={() => {
                 trackRulesEmptyStateClicked("templates");

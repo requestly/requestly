@@ -99,7 +99,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({
       centered
       onCancel={toggle}
       footer={null}
-      className="import-from-importer-modal custom-rq-modal"
+      className="importer-modal custom-rq-modal"
       width={550}
     >
       <ImportFromCharles

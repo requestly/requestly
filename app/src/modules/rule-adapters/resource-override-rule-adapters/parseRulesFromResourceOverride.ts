@@ -1,7 +1,6 @@
 import { Rule } from "features/rules/index";
 import { generateObjectId } from "utils/FormattingHelper";
-
-type RuleType = "fileInject" | "headerRule" | "normalOverride" | "fileOverride";
+import { getBaseRule } from "../../../../../common/rule-processor/tests/helpers/MockObjects";
 
 type FileInjectRule = {
   type: "fileInject";
@@ -56,20 +55,13 @@ export const parseRulesFromResourceOverride = (resourceOverrideData: Config): Ru
   resourceOverrideData.data?.forEach((resource) => {
     const matchUrl = resource.matchUrl;
     resource.rules?.forEach((rule) => {
-      const requestlyRule: any = {
-        createdBy: "",
+      const requestlyRule: any = getBaseRule({
         creationDate: Date.now(),
-        currentOwner: "",
         lastModifiedBy: "",
         modificationDate: Date.now(),
-        description: "",
-        extensionRules: [],
-        objectType: "rule",
         schemaVersion: "4.0.0",
-        status: "Active",
         groupId: "",
-        isSample: false,
-      };
+      });
 
       if (rule.type === "fileInject") {
         requestlyRule.name = `${rule.fileName}-${Math.random().toString().slice(2, 15)}`;

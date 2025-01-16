@@ -20,7 +20,7 @@ import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExtern
 import { copyToClipBoard } from "utils/Misc";
 import "../importer-components.css";
 import { parseRulesFromResourceOverride } from "modules/rule-adapters/resource-override-rule-adapters/parseRulesFromResourceOverride";
-import { Rule } from "features/rules/index";
+import { Rule } from "types";
 import { generateObjectId } from "utils/FormattingHelper";
 import {
   trackResourceOverrideSettingsImportComplete,
@@ -86,7 +86,7 @@ export const ImportFromResourceOverrideModal: React.FC<ModalProps> = ({
       centered
       onCancel={toggle}
       footer={null}
-      className="import-from-importer-modal custom-rq-modal"
+      className="importer-modal custom-rq-modal"
       width={550}
     >
       <ImportFromResourceOverride
@@ -208,7 +208,6 @@ export const ImportFromResourceOverride: React.FC<ImportFromResourceOverrideProp
   };
 
   const isParsedRulesExist = useMemo(() => !!rulesToImport?.length, [rulesToImport?.length]);
-
   return (
     <>
       <div className="importer-container">

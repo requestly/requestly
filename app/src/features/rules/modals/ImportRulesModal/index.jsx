@@ -8,7 +8,7 @@ import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
 import CharlesIcon from "assets/icons/charlesIcon.svg?react";
 import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
-import ResourceOverrideIcon from "assets/icons/resourceOverrideIcon.png";
+import ResourceOverrideIcon from "assets/icons/resourceOverrideIcon.webp";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAllRules } from "store/features/rules/selectors";
