@@ -19,17 +19,10 @@ export class LocalScopeManager {
   }
 
   public get(key: string): any {
-    if (!this.has(key)) {
-      throw new Error(`Key "${key}" not found in local scope`);
-    }
     return this.state[key];
   }
 
   public getAll(): any {
     return { ...this.state };
-  }
-
-  private has(key: string): boolean {
-    return key in this.state;
   }
 }
