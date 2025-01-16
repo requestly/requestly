@@ -23,10 +23,6 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "API Client",
-          enabled: true,
-        },
-        {
           title: "Non-Commercial Use Only",
           enabled: true,
         },
@@ -210,7 +206,19 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "SSO, SLA, Insurance, Invoice-based pricing, SOC2 Reports",
+          title: "SSO & SAML",
+          enabled: true,
+        },
+        {
+          title: "SLAs (Service Uptime, Insurance)",
+          enabled: true,
+        },
+        {
+          title: "SOC2 Reports",
+          enabled: true,
+        },
+        {
+          title: "Pay by invoice",
           enabled: true,
         },
       ],
