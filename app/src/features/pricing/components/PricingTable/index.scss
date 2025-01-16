@@ -66,8 +66,8 @@
   min-width: 310px;
   height: auto;
   padding: 48px 24px;
-  border-radius: var(--border-radius-sm);
-  border: 1px solid var(--requestly-color-white-t-20);
+  border-radius: var(--border-radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   background: var(--requestly-color-background);
 }
 
@@ -145,6 +145,7 @@
   text-decoration-style: dashed;
   text-underline-offset: 4px;
   color: var(--requestly-color-warning-200);
+  opacity: 0.7;
 }
 
 .disabled-col {
