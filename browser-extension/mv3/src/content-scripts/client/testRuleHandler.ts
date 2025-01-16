@@ -4,6 +4,7 @@ import rulesStorageService from "../../rulesStorageService";
 import { getRecord } from "common/storage";
 import { Rule } from "common/types";
 import RuleExecutionHandler from "./ruleExecutionHandler";
+import { cloneDetails } from "../utils";
 
 let implicitTestRuleFlowEnabled = false;
 let explicitTestRuleFlowEnabled = false;
@@ -110,11 +111,14 @@ const notifyRuleAppliedToExplicitWidget = (ruleId: string) => {
     }
 
     explicitTestRuleWidget.dispatchEvent(
-      new CustomEvent("new-rule-applied", {
-        detail: {
-          appliedRuleId: ruleId,
-        },
-      })
+      new CustomEvent(
+        "new-rule-applied",
+        cloneDetails({
+          detail: {
+            appliedRuleId: ruleId,
+          },
+        })
+      )
     );
   }
 };
@@ -172,13 +176,16 @@ const notifyRuleAppliedToImplicitWidget = async (rule: Rule) => {
 
   if (implicitTestRuleWidget) {
     implicitTestRuleWidget.dispatchEvent(
-      new CustomEvent("new-rule-applied", {
-        detail: {
-          appliedRuleId: rule.id,
-          appliedRuleName: ruleName,
-          appliedRuleType: ruleType,
-        },
-      })
+      new CustomEvent(
+        "new-rule-applied",
+        cloneDetails({
+          detail: {
+            appliedRuleId: rule.id,
+            appliedRuleName: ruleName,
+            appliedRuleType: ruleType,
+          },
+        })
+      )
     );
     implicitTestRuleWidget.style.display = "block";
   }
