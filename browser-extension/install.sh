@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-npm i -g web-ext
-
 echo -e "\n***** Installing analytics vendor's dependencies *****"
 cd ../../common/analytics-vendors
 rm -rf node_modules
