@@ -61,7 +61,7 @@ interface RecordMetaData {
 export interface RuleRecord extends RecordMetaData {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   groupId?: GroupRecord["id"];
   objectType: RecordType.RULE;
   status: RecordStatus;
