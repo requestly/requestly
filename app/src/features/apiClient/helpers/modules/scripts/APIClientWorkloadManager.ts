@@ -14,15 +14,15 @@ export class APIClientWorkloadManager {
     }
 
     console.log("!!!debug", "exeecute called", workload);
-    const workerItem = await this.workerPool.getWorker();
+    const worker = await this.workerPool.acquire();
 
-    const result = await workerItem.worker.work(workload);
+    const result = await worker.work(workload);
 
-    workerItem.worker.postMessage({
+    worker.postMessage({
       action: "data",
       workload,
     });
-    // this.workerPool.release(workerItem);
+    this.workerPool.release(worker);
 
     return result;
   }

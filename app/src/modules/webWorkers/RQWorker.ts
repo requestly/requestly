@@ -1,8 +1,12 @@
-class RQWebWorker {
+abstract class RQWorker {
+  abstract work(workload: any): {} | Error;
+}
+
+class RQWebWorker implements RQWorker {
   private worker: Worker;
-  constructor(workerFactory: new () => Worker) {
-    console.log("!!!debug", "RQwebworker", workerFactory);
-    this.worker = new workerFactory();
+  constructor(workerModule: new () => Worker) {
+    console.log("!!!debug", "RQwebworker", workerModule);
+    this.worker = new workerModule();
     this.worker.onerror = (error) => {
       console.error("Worker error:", error);
     };
