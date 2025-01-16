@@ -5,7 +5,7 @@ import { Group as NewGroup, Rule as NewRule } from "features/rules/types/rules";
 import { StorageService } from "init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { generateObjectId } from "utils/FormattingHelper";
-import { StorageRecord } from "features/rules/types/rules";
+import { StorageRecord } from "@requestly/shared/types/entities/rules";
 
 export const createSharedList = async (
   appMode: string,
