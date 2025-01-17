@@ -2,8 +2,10 @@ import { expose } from "comlink";
 import { LocalScopeManager, StateUpdateCallback } from "modules/worker/localScopeManager";
 import { RQ } from "../sandbox/RQ";
 
+let localScope: LocalScopeManager;
+
 const executeScript = (script: string, initialState: any, callback: StateUpdateCallback) => {
-  const localScope = new LocalScopeManager(initialState, callback);
+  localScope = new LocalScopeManager(initialState, callback);
 
   const sandbox = {
     rq: new RQ(localScope),
@@ -25,4 +27,11 @@ const executeScript = (script: string, initialState: any, callback: StateUpdateC
   scriptFunction(sandbox.rq);
 };
 
-expose({ executeScript });
+const syncSnapshot = () => {
+  if (!localScope) {
+    return undefined;
+  }
+  return localScope.getAll();
+};
+
+expose({ executeScript, syncSnapshot });
