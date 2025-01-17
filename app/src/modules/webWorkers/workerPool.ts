@@ -1,8 +1,8 @@
-import { RQScriptWebWorker, RQWorker } from "features/apiClient/helpers/modules/scripts/RQScriptWebWorker";
+import { RQWorker } from "features/apiClient/helpers/modules/scriptsV2/worker/interface/RQWorker";
 
-export class WorkerPool<T extends RQScriptWebWorker> {
+export class WorkerPool<T extends RQWorker> {
   private allWorkers = new Map<
-    RQWorker,
+    T,
     {
       isAvailable: boolean;
     }
@@ -10,9 +10,7 @@ export class WorkerPool<T extends RQScriptWebWorker> {
   private MAX_WORKERS = 15;
   private pendingQueue: ((worker: T) => void)[] = [];
 
-  constructor(private workerModule: new () => T) {
-    console.log("!!!debug", "workerPool const", typeof this.workerModule);
-  }
+  constructor(private workerModule: new () => T) {}
 
   private async removeWorker(worker: T) {
     await worker.terminate();
@@ -22,9 +20,12 @@ export class WorkerPool<T extends RQScriptWebWorker> {
 
   private spawnNewWorker() {
     const worker = new this.workerModule();
-    worker.addEventListener("error", (event) => {
+    worker.onErrorCallback(() => {
       this.removeWorker(worker);
     });
+    // worker.addEventListener("error", (event) => {
+    //   this.removeWorker(worker);
+    // });
     this.allWorkers.set(worker, { isAvailable: false });
     return worker;
   }

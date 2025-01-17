@@ -30,7 +30,7 @@ const executeScript = (script: string, initialState: any, callback: StateUpdateC
 
 const syncSnapshot = async (onStateUpdate: (key: string, value: any) => void) => {
   if (!localScope) {
-    return undefined;
+    return;
   }
   const localState = localScope.getAll();
   for (const key in localState) {

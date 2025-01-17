@@ -46,7 +46,7 @@ import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcut
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
-import { ScriptExecutor } from "features/apiClient/helpers/APIClientManager/modules/scriptsV2/scriptExecutor";
+import { ScriptExecutor } from "features/apiClient/helpers/modules/scriptsV2/scriptExecutor";
 import ExecuteScriptWorkload from "features/apiClient/helpers/APIClientManager/modules/scriptsV2/workloads/executeScript?worker";
 import { RequestExecutor } from "features/apiClient/helpers/requestExecutor";
 interface Props {
@@ -87,10 +87,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     getCurrentEnvironmentVariables,
     renderVariables,
   } = environmentManager;
-  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
-    apiEntryDetails?.collectionId,
-    getVariablesWithPrecedence,
-  ]);
+  const currentEnvironmentVariables = useMemo(
+    () => getVariablesWithPrecedence(apiEntryDetails?.collectionId),
+    [apiEntryDetails?.collectionId, getVariablesWithPrecedence]
+  );
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>({ ...(apiEntry ?? getEmptyAPIEntry()) });
@@ -323,36 +323,27 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    const preScriptExecutor = new ScriptExecutor(ExecuteScriptWorkload);
-    const globalVariables = getGlobalVariables();
-    const environmentVariables = getCurrentEnvironmentVariables();
-    const collectionVariables = getVariablesWithPrecedence(apiEntryDetails?.collectionId);
+    requestExecutor.updateApiRecords(apiClientRecords);
+    requestExecutor.updateEntryDetails({
+      ...sanitizedEntry,
+      id: apiEntryDetails?.id,
+      collectionId: apiEntryDetails?.collectionId,
+    });
 
-    console.log("DBG preRequestscript starting");
-    const preRequestResult = await preScriptExecutor.executePreRequestScript(
-      sanitizedEntry.scripts.preRequest,
-      {
-        global: globalVariables,
-        environment: environmentVariables,
-        collectionVariables,
-        request: sanitizedEntry.request,
-        response: {},
-      },
-      handleUpdatesFromScript
-    );
-    console.log("DBG preRequestscript executed", preRequestResult);
+    requestExecutor
+      .execute()
 
-    await executeAPIRequest(
-      appMode,
-      apiClientRecords,
-      sanitizedEntry,
-      {
-        id: apiEntryDetails?.id,
-        collectionId: apiEntryDetails?.collectionId,
-      },
-      environmentManager,
-      abortControllerRef.current.signal
-    )
+      // await executeAPIRequest(
+      //   appMode,
+      //   apiClientRecords,
+      //   sanitizedEntry,
+      //   {
+      //     id: apiEntryDetails?.id,
+      //     collectionId: apiEntryDetails?.collectionId,
+      //   },
+      //   environmentManager,
+      //   abortControllerRef.current.signal
+      // )
       .then((executedEntry) => {
         const response = executedEntry.response;
         // TODO: Add an entry in history
@@ -403,38 +394,18 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         setIsLoadingResponse(false);
       });
 
-    const postScriptExecutor = new ScriptExecutor(ExecuteScriptWorkload);
-    console.log("DBG preRequestscript starting");
-    const postResponseResult = await postScriptExecutor.executePostResponseScript(
-      sanitizedEntry.scripts.postResponse,
-      {
-        global: globalVariables,
-        environment: environmentVariables,
-        collectionVariables,
-        request: sanitizedEntry.request,
-        response: {},
-      },
-      handleUpdatesFromScript
-    );
-    console.log("DBG postResponsescript executed", postResponseResult);
-
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
     updateTab,
     apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
-    dispatch,
     entry,
     toggleBottomSheet,
-    handleUpdatesFromScript,
-    getGlobalVariables,
-    getCurrentEnvironmentVariables,
-    getVariablesWithPrecedence,
-    environmentManager,
+    requestExecutor,
     apiClientRecords,
+    dispatch,
     notifyApiRequestFinished,
-    appMode,
   ]);
 
   const handleRecordNameUpdate = async () => {
@@ -619,7 +590,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               </Space.Compact>
               <RQButton
                 showHotKeyText
-                onClick={onSendButtonClickV2}
+                onClick={onSendButtonClick}
                 hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
                 type="primary"
                 className="text-bold"

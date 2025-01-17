@@ -1,9 +1,14 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { addUrlSchemeIfMissing, makeRequest } from "../screens/apiClient/utils";
 import { RQAPI } from "../types";
-import { APIClientWorkloadManager } from "./modules/scripts/APIClientWorkloadManager";
+import { APIClientWorkloadManager } from "./modules/scriptsV2/workload-manager/APIClientWorkloadManager";
 import { processAuthForEntry, updateRequestWithAuthOptions } from "./auth";
-import { PostResponseScriptWorkload, PreRequestScriptWorkload } from "./modules/scripts/scriptWorkload";
+import {
+  PostResponseScriptWorkload,
+  PreRequestScriptWorkload,
+  WorkResultType,
+} from "./modules/scriptsV2/workload-manager/workLoadTypes";
+import { notification } from "antd";
 
 type EntryDetails = RQAPI.Entry & { id: RQAPI.Record["id"]; collectionId: RQAPI.Record["collectionId"] };
 type InternalFunctions = {
@@ -79,7 +84,7 @@ export class RequestExecutor {
   async executePreRequestScript() {
     const initialSnapshot = this.buildInitialSnapshot();
 
-    await this.workloadManager.execute(
+    return this.workloadManager.execute(
       new PreRequestScriptWorkload(
         this.entryDetails.scripts.preRequest,
         { ...initialSnapshot, request: this.entryDetails.request },
@@ -93,7 +98,7 @@ export class RequestExecutor {
   async executePostResponseScript() {
     const initialSnapshot = this.buildInitialSnapshot();
 
-    await this.workloadManager.execute(
+    return this.workloadManager.execute(
       new PostResponseScriptWorkload(
         this.entryDetails.scripts.postResponse,
         { ...initialSnapshot, request: this.entryDetails.request, response: this.entryDetails.response },
@@ -107,13 +112,34 @@ export class RequestExecutor {
   async execute() {
     this.prepareRequest();
 
-    await this.executePreRequestScript();
+    const preRequestScriptResult = await this.executePreRequestScript();
+
+    if (preRequestScriptResult.type === WorkResultType.ERROR) {
+      return {
+        ...this.entryDetails,
+        error:{
+          source:"Pre-Request Script",
+          name: preRequestScriptResult.error.name,
+          message: preRequestScriptResult.error.message
+        }
+      }
+    }
 
     this.entryDetails.request.url = addUrlSchemeIfMissing(this.entryDetails.request.url);
 
     const response = await makeRequest(this.appMode, this.entryDetails.request);
     this.entryDetails.response = response;
 
-    await this.executePostResponseScript();
+    const responseScriptResult = await this.executePostResponseScript();
+
+    if (responseScriptResult.type === WorkResultType.ERROR) {
+      notification.error({
+        message: "Something went wrong in post-response script!",
+        description: `${responseScriptResult.error.name}: ${responseScriptResult.error.message}`,
+        placement: "bottomRight",
+      });
+    }
+
+    return this.entryDetails;
   }
 }

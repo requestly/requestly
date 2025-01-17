@@ -1,30 +1,44 @@
 import { proxy, Remote, wrap } from "comlink";
-import ScriptExecutor from "../../APIClientManager/modules/scriptsV2/workloads/executeScript?worker";
-
-type EventListener = (evt: Event) => void;
-
-export abstract class RQWorker {
-  abstract work(workload: any): {} | Error;
-  abstract terminate(): void;
-}
+import ScriptExecutor from "../../worker/scriptExecutionWorker?worker";
+import { RQWorker } from "../interface/RQWorker";
+import { WorkResult, WorkResultType, WorkErrorType } from "../../workload-manager/workLoadTypes";
 
 export class RQScriptWebWorker implements RQWorker {
   private worker: Worker;
   private proxyWorker: Remote<{ type: "TODO" }>;
   private onStateUpdate: (key: string, value: any) => void;
+  // public onErrorCallback: () => void;
   constructor() {
     this.worker = new ScriptExecutor();
+    // this.worker.addEventListener("error", this.onErrorCallback);
     this.proxyWorker = wrap<{ type: "TODO" }>(this.worker);
     this.worker.onerror = (error) => {
       console.error("Worker error:", error);
     };
   }
+  onErrorCallback(onError: EventListener): void {
+    this.worker.addEventListener("error", onError);
+  }
 
-  async work(workload: any) {
+  async work(workload: any): Promise<WorkResult> {
     //handle by comlink
     this.onStateUpdate = workload.onStateUpdate;
-    await this.proxyWorker.executeScript(workload.script, workload.initialState, proxy(workload.onStateUpdate));
-    console.log("!!!debug", "worker.work called", workload, typeof this.worker.postMessage);
+    try {
+      await this.proxyWorker.executeScript(workload.script, workload.initialState, proxy(workload.onStateUpdate));
+      console.log("!!!debug", "worker.work called", workload, typeof this.worker.postMessage);
+      return {
+        type: WorkResultType.SUCCESS,
+      };
+    } catch (error) {
+      return {
+        type: WorkResultType.ERROR,
+        error: {
+          type: WorkErrorType.UNEXPECTED,
+          name: error.name,
+          message: error.message,
+        },
+      };
+    }
     // How to ensure that every worker exposed should have tthe execute method?
     // this.proxyWorker.execute()
   }
