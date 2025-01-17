@@ -48,6 +48,8 @@ import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { getAllRecords } from "features/apiClient/contexts/slice";
+import { isEmpty } from "lodash";
+
 
 interface Props {
   openInModal?: boolean;
@@ -120,7 +122,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (apiEntry) {
       setEntry({
         ...apiEntry,
-        request: { ...apiEntry.request, ...syncQueryParams(apiEntry.request.queryParams, apiEntry.request.url) },
+        request: {
+          ...apiEntry.request,
+          ...syncQueryParams(
+            apiEntry.request.queryParams,
+            apiEntry.request.url,
+            isEmpty(apiEntry.request.queryParams) ? QueryParamSyncType.TABLE : QueryParamSyncType.SYNC
+          ),
+        },
       });
       setRequestName("");
     }
