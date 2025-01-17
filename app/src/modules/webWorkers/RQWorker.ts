@@ -1,12 +1,16 @@
+import { Remote, wrap } from "comlink";
+
 abstract class RQWorker {
   abstract work(workload: any): {} | Error;
 }
 
 class RQWebWorker implements RQWorker {
   private worker: Worker;
+  private proxyWorker: Remote<any>;
   constructor(workerModule: new () => Worker) {
     console.log("!!!debug", "RQwebworker", workerModule);
     this.worker = new workerModule();
+    this.proxyWorker = wrap<any>(this.worker);
     this.worker.onerror = (error) => {
       console.error("Worker error:", error);
     };
@@ -15,10 +19,12 @@ class RQWebWorker implements RQWorker {
   async work(workload: any) {
     //handle by comlink
     console.log("!!!debug", "worker.work called", workload, typeof this.worker.postMessage);
+    // How to ensure that every worker exposed should have tthe execute method?
+    // this.proxyWorker.execute()
   }
 
-  postMessage(message: any) {
-    return this.worker.postMessage(message);
+  async sync() {
+    // this.proxyWorker.sync();
   }
 
   terminate() {

@@ -18,10 +18,6 @@ export class APIClientWorkloadManager {
 
     const result = await worker.work(workload);
 
-    worker.postMessage({
-      action: "data",
-      workload,
-    });
     this.workerPool.release(worker);
 
     return result;
