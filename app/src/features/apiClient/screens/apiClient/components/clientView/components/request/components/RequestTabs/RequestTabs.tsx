@@ -14,7 +14,7 @@ import { useDeepLinkState } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 
-enum Tab {
+export enum RequestTab {
   QUERY_PARAMS = "query_params",
   BODY = "body",
   HEADERS = "headers",
@@ -49,7 +49,7 @@ const RequestTabs: React.FC<Props> = ({
   handleAuthChange,
 }) => {
   const { activeTab, updateTab } = useTabsLayoutContext();
-  const [selectedTab, setSelectedTab] = useDeepLinkState({ tab: Tab.QUERY_PARAMS });
+  const [selectedTab, setSelectedTab] = useDeepLinkState({ tab: RequestTab.QUERY_PARAMS });
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
@@ -59,8 +59,8 @@ const RequestTabs: React.FC<Props> = ({
       return;
     }
 
-    if (selectedTab.tab === Tab.BODY && !supportsRequestBody(requestEntry.request.method)) {
-      setSelectedTab({ tab: Tab.QUERY_PARAMS });
+    if (selectedTab.tab === RequestTab.BODY && !supportsRequestBody(requestEntry.request.method)) {
+      setSelectedTab({ tab: RequestTab.QUERY_PARAMS });
     }
   }, [requestId, activeTab?.id, requestEntry.request.method, selectedTab.tab, setSelectedTab]);
 
@@ -70,7 +70,7 @@ const RequestTabs: React.FC<Props> = ({
 
     const items = [
       {
-        key: Tab.QUERY_PARAMS,
+        key: RequestTab.QUERY_PARAMS,
         label: (
           <LabelWithCount label="Query Params" count={sanitizeKeyValuePairs(requestEntry.request.queryParams).length} />
         ),
@@ -79,7 +79,7 @@ const RequestTabs: React.FC<Props> = ({
         ),
       },
       {
-        key: Tab.BODY,
+        key: RequestTab.BODY,
         label: (
           <LabelWithCount label="Body" count={requestEntry.request.body ? 1 : 0} showDot={isRequestBodySupported} />
         ),
@@ -105,7 +105,7 @@ const RequestTabs: React.FC<Props> = ({
         disabled: !isRequestBodySupported,
       },
       {
-        key: Tab.HEADERS,
+        key: RequestTab.HEADERS,
         label: <LabelWithCount label="Headers" count={sanitizeKeyValuePairs(requestEntry.request.headers).length} />,
         children: (
           <HeadersTable
@@ -116,7 +116,7 @@ const RequestTabs: React.FC<Props> = ({
         ),
       },
       {
-        key: Tab.AUTHORIZATION,
+        key: RequestTab.AUTHORIZATION,
         label: <LabelWithCount label="Authorization" />,
         children: (
           <AuthorizationView
@@ -131,7 +131,7 @@ const RequestTabs: React.FC<Props> = ({
 
     if (isScriptsSupported) {
       items.push({
-        key: Tab.SCRIPTS,
+        key: RequestTab.SCRIPTS,
         label: (
           <LabelWithCount
             label="Scripts"
@@ -150,7 +150,7 @@ const RequestTabs: React.FC<Props> = ({
     <Tabs
       className="api-request-tabs"
       activeKey={selectedTab.tab}
-      onChange={(tab: Tab) => {
+      onChange={(tab: RequestTab) => {
         setSelectedTab({ tab: tab });
 
         if (!requestId) {
