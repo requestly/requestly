@@ -41,10 +41,10 @@ export const getRuleConfigInEditMode = (rule) => {
 /**
  *
  * @param {string} appMode
- * @param {import("features/rules/types/rules").Rule["id"][]} selectedRuleIds
+ * @param {import("@requestly/shared/types/entities/rules").Rule["id"][]} selectedRuleIds
  * @returns {Promise<{
- *  rules: import("features/rules/types/rules").Rule[],
- *  groups: import("features/rules/types/rules").Group[]
+ *  rules: import("@requestly/shared/types/entities/rules").Rule[],
+ *  groups: import("@requestly/shared/types/entities/rules").Group[]
  * }>}
  */
 export const getRulesAndGroupsFromRuleIds = (appMode, selectedRuleIds) => {

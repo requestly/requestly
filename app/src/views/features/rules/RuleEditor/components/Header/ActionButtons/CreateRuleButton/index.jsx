@@ -37,7 +37,7 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { globalActions } from "store/slices/global/slice";
 import { IncentivizeEvent } from "features/incentivization/types";
-import { RuleType } from "features/rules";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import Logger from "../../../../../../../../../../common/logger";
 import { IncentivizationModal } from "store/features/incentivization/types";

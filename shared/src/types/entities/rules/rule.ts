@@ -30,7 +30,7 @@ export namespace RedirectRule {
     destination: string;
   }
 
-  enum RedirectDestinationType {
+  export enum RedirectDestinationType {
     URL = "url",
     MAP_LOCAL = "map_local",
     MOCK_OR_FILE_PICKER = "mock_or_file_picker",
@@ -59,7 +59,7 @@ export namespace QueryParamRule {
     modifications: QueryParamRuleModification[];
   }
 
-  enum QueryParamModificationType {
+  export enum QueryParamModificationType {
     ADD = "Add",
     REMOVE = "Remove",
     REMOVE_ALL = "Remove All",
@@ -102,8 +102,8 @@ export namespace HeaderRule {
 
   interface HeadersRulePair extends BaseRulePair {
     modifications: {
-      Request: HeadersRuleModificationData[];
-      Response: HeadersRuleModificationData[];
+      Request?: HeadersRuleModificationData[];
+      Response?: HeadersRuleModificationData[];
     };
   }
 
@@ -114,7 +114,7 @@ export namespace HeaderRule {
     value: string;
   }
 
-  enum HeaderRuleActionType {
+  export enum HeaderRuleActionType {
     ADD = "Add",
     REMOVE = "Remove",
     MODIFY = "Modify",
@@ -166,15 +166,16 @@ export namespace ResponseRule {
       value: string;
       resourceType?: ResponseRuleResourceType;
       statusCode?: string;
+      statusText?: String;
     };
   }
 
-  enum ResponseRuleBodyType {
+  export enum ResponseRuleBodyType {
     CODE = "code",
     STATIC = "static",
   }
 
-  enum ResponseRuleResourceType {
+  export enum ResponseRuleResourceType {
     UNKNOWN = "unknown",
     REST_API = "restApi",
     GRAPHQL_API = "graphqlApi",
@@ -202,18 +203,18 @@ export namespace ScriptRule {
     // todo: add attributes array
   }
 
-  enum ScriptType {
+  export enum ScriptType {
     JS = "js",
     CSS = "css",
   }
 
-  enum ScriptLoadTime {
+  export enum ScriptLoadTime {
     BEFORE_PAGE_LOAD = "beforePageLoad",
     AFTER_PAGE_LOAD = "afterPageLoad",
     AS_SOON_AS_POSSIBLE = "asSoonAsPossible",
   }
 
-  enum ScriptValueType {
+  export enum ScriptValueType {
     URL = "url",
     CODE = "code",
   }
@@ -238,29 +239,29 @@ interface BaseRulePair {
   source: RulePairSource;
 }
 
-interface RulePairSource {
+export interface RulePairSource {
   key: RuleSourceKey;
   operator: RuleSourceOperator;
   value: string;
-  filters: RuleSourceFilter[];
+  filters?: RuleSourceFilter[]; // FIX: This should not be an array
 }
 
-interface RuleSourceFilter {
-  pageUrl: {
+export interface RuleSourceFilter {
+  pageUrl?: {
     operator: RuleSourceOperator;
     value: string;
   };
-  requestMethod: HttpRequestMethod[];
-  resourceType: ResourceType[];
+  requestMethod?: HttpRequestMethod[];
+  resourceType?: ResourceType[];
 }
 
-enum RuleSourceKey {
+export enum RuleSourceKey {
   URL = "Url",
   HOST = "host",
   PATH = "path",
 }
 
-enum RuleSourceOperator {
+export enum RuleSourceOperator {
   EQUALS = "Equals",
   CONTAINS = "Contains",
   MATCHES = "Matches",
