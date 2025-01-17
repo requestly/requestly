@@ -16,10 +16,14 @@ import OtherWaysToMakePurchase from "./components/OtherWaysToMakePurchase";
 import PricingFAQs from "./components/FAQs";
 import PricingPageFooter from "./components/PricingPageFooter";
 import EnterpriseRequestBanner from "./components/EnterpriseRequestBanner";
+import ProductSwitcher from "../ProductSwitcher";
 import "./pricingIndexPage.scss";
+import { kebabCase } from "lodash";
 
 export const PricingIndexPage = () => {
   const navigate = useNavigate();
+
+  const [activeProduct, setActiveProduct] = useState(PRICING.PRODUCTS.HTTP_RULES);
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
 
   return (
@@ -39,10 +43,10 @@ export const PricingIndexPage = () => {
             <div className="pricing-page-description">
               More than half of Fortune 500 companies already use Requestly
             </div>
+            <ProductSwitcher activeProduct={activeProduct} setActiveProduct={setActiveProduct} />
             <Row justify="center" className="display-row-center w-full mt-24" gutter={24}>
               <Col className="display-row-center plan-duration-switch-container">
                 <Switch
-                  size="small"
                   checked={duration === PRICING.DURATION.ANNUALLY}
                   onChange={(checked) => {
                     setDuration(checked ? PRICING.DURATION.ANNUALLY : PRICING.DURATION.MONTHLY);
@@ -54,10 +58,10 @@ export const PricingIndexPage = () => {
                 </span>
               </Col>
             </Row>
-            <div className="pricing-page-table-wrapper">
-              <PricingTable duration={duration} source={SOURCE.PRICING_PAGE} />
+            <div className={`pricing-page-table-wrapper ${kebabCase(activeProduct)}`}>
+              <PricingTable duration={duration} source={SOURCE.PRICING_PAGE} product={activeProduct} />
             </div>
-            <EnterprisePlanCard />
+            <EnterprisePlanCard product={activeProduct} />
             <CompaniesSection />
             <StatsCard />
             <OtherWaysToMakePurchase />

@@ -1,4 +1,4 @@
-.import-from-charles-modal .ant-modal-body .rq-modal-content:last-child {
+.importer-modal .ant-modal-body .rq-modal-content:last-child {
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
 }
@@ -119,7 +119,7 @@
   font-weight: var(--requestly-font-weight-medium);
 }
 
-.import-from-charles-modal .importer-footer {
+.importer-modal .importer-footer {
   color: var(--requestly-color-text-subtle);
   font-size: var(--requestly-font-size-xs);
   text-align: center;
