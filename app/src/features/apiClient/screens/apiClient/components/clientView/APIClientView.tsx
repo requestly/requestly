@@ -241,63 +241,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     [getCurrentEnvironment, setVariables, setCollectionVariables, apiEntryDetails?.collectionId]
   );
 
-  const onSendButtonClickV2 = useCallback(() => {
-    updateTab(apiEntryDetails?.id, { isPreview: false });
-
-    if (!entry.request.url) {
-      return;
-    }
-    if (!isExtensionInstalled() && !isDesktopMode()) {
-      /* SHOW INSTALL EXTENSION MODAL */
-      const modalProps = {
-        heading: "Install browser Extension to use the API Client",
-        subHeading:
-          "A minimalistic API Client for front-end developers to test their APIs and fast-track their web development lifecycle. Add custom Headers and Query Params to test your APIs.",
-        eventPage: "api_client",
-      };
-      dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
-      trackInstallExtensionDialogShown({ src: "api_client" });
-      return;
-    }
-
-    toggleBottomSheet(true);
-
-    const sanitizedEntry = sanitizeEntry(entry);
-    sanitizedEntry.response = null;
-
-    abortControllerRef.current = new AbortController();
-
-    // const requestExecutor = new RequestExecutor(
-    //   appMode,
-    //   { ...sanitizedEntry, id: apiEntryDetails?.id, collectionId: apiEntryDetails?.collectionId },
-    //   apiClientRecords,
-    //   {
-    //     getEnvironmentVariables: () => getCurrentEnvironmentVariables(),
-    //     getCollectionVariables: (collectionId: string) => getCollectionVariables(collectionId),
-    //     getGlobalVariables: () => getGlobalVariables(),
-    //     renderVariables,
-    //     onStateUpdate: handleUpdatesFromScript,
-    //   }
-    // );
-
-    requestExecutor.updateEntryDetails({
-      ...sanitizedEntry,
-      id: apiEntryDetails?.id,
-      collectionId: apiEntryDetails?.collectionId,
-    });
-    requestExecutor.updateApiRecords(apiClientRecords);
-    requestExecutor.execute();
-  }, [
-    apiClientRecords,
-    apiEntryDetails?.collectionId,
-    apiEntryDetails?.id,
-    dispatch,
-    entry,
-    requestExecutor,
-    toggleBottomSheet,
-    updateTab,
-  ]);
-
   const onSendButtonClick = useCallback(async () => {
     updateTab(apiEntryDetails?.id, { isPreview: false });
 
