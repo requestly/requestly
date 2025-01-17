@@ -46,6 +46,8 @@ import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { RequestExecutor } from "features/apiClient/helpers/requestExecutor";
+import { isEmpty } from "lodash";
+
 interface Props {
   openInModal?: boolean;
   apiEntry?: RQAPI.Entry;
@@ -84,10 +86,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     getCurrentEnvironmentVariables,
     renderVariables,
   } = environmentManager;
-  const currentEnvironmentVariables = useMemo(
-    () => getVariablesWithPrecedence(apiEntryDetails?.collectionId),
-    [apiEntryDetails?.collectionId, getVariablesWithPrecedence]
-  );
+  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
+    apiEntryDetails?.collectionId,
+    getVariablesWithPrecedence,
+  ]);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>({ ...(apiEntry ?? getEmptyAPIEntry()) });
@@ -125,7 +127,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     if (apiEntry) {
       setEntry({
         ...apiEntry,
-        request: { ...apiEntry.request, ...syncQueryParams(apiEntry.request.queryParams, apiEntry.request.url) },
+        request: {
+          ...apiEntry.request,
+          ...syncQueryParams(
+            apiEntry.request.queryParams,
+            apiEntry.request.url,
+            isEmpty(apiEntry.request.queryParams) ? QueryParamSyncType.TABLE : QueryParamSyncType.SYNC
+          ),
+        },
       });
       setRequestName("");
     }

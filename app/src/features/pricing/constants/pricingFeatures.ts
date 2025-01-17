@@ -23,10 +23,6 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "API Client",
-          enabled: true,
-        },
-        {
           title: "Non-Commercial Use Only",
           enabled: true,
         },
@@ -102,6 +98,11 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
+          title: "Complete access to the API client",
+          enabled: true,
+          tooltip: "Get complimentary access to API Client Professional Plan.",
+        },
+        {
           title: "Collaborate with teammates",
           enabled: true,
         },
@@ -150,6 +151,74 @@ export const PricingFeatures: PlanFeatures = {
         },
         {
           title: "Priority Support - Slack Connect, Email, Chat",
+          enabled: true,
+        },
+      ],
+    },
+  },
+  [PRICING.PRODUCTS.API_CLIENT]: {
+    free: {
+      planTitle: "Free",
+      heading: "Starter plan",
+      features: [
+        {
+          title: "Complete access to the API client",
+          enabled: true,
+        },
+        {
+          title: "Upto 10 collaborators. No limits on number of projects.",
+          enabled: true,
+        },
+        {
+          title: "Collection runner limits",
+          enabled: true,
+          tooltip: "100 collection runs per month ",
+        },
+        {
+          title: "Git Integration",
+          enabled: true,
+        },
+      ],
+    },
+    [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: {
+      planTitle: "Professional",
+      heading: "For collaboration in teams",
+      features: [
+        {
+          title: "Unlimited collaborators",
+          enabled: true,
+        },
+        {
+          title: "Unlimited collection runs",
+          enabled: true,
+        },
+        {
+          title: "Integration with Secret Managers",
+          enabled: true,
+        },
+      ],
+    },
+    [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: {
+      planTitle: "Enterprise",
+      features: [
+        {
+          title: "Role-based access control",
+          enabled: true,
+        },
+        {
+          title: "SSO & SAML",
+          enabled: true,
+        },
+        {
+          title: "SLAs (Service Uptime, Insurance)",
+          enabled: true,
+        },
+        {
+          title: "SOC2 Reports",
+          enabled: true,
+        },
+        {
+          title: "Pay by invoice",
           enabled: true,
         },
       ],
