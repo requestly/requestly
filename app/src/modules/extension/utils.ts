@@ -258,9 +258,10 @@ const migratePageURLtoPageDomain = (
 
     //For backward compatibility until MV3 is release
     if (!isExtensionManifestVersion3() && sourceFilters?.pageDomains?.length > 0) {
-      sourceFilters.pageUrl = {};
-      sourceFilters.pageUrl.value = sourceFilters.pageDomains[0];
-      sourceFilters.pageUrl.operator = RuleSourceOperator.CONTAINS;
+      sourceFilters.pageUrl = {
+        value: sourceFilters.pageDomains[0],
+        operator: RuleSourceOperator.CONTAINS,
+      };
     }
 
     return migrationLog;
