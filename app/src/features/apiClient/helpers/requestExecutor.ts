@@ -1,20 +1,34 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { makeRequest } from "../screens/apiClient/utils";
+import { addUrlSchemeIfMissing, makeRequest } from "../screens/apiClient/utils";
 import { RQAPI } from "../types";
 import { APIClientWorkloadManager } from "./modules/scripts/APIClientWorkloadManager";
 import { processAuthForEntry, updateRequestWithAuthOptions } from "./auth";
+import { PostResponseScriptWorkload, PreRequestScriptWorkload } from "./modules/scripts/scriptWorkload";
+
+type EntryDetails = RQAPI.Entry & { id: RQAPI.Record["id"]; collectionId: RQAPI.Record["collectionId"] };
+type InternalFunctions = {
+  getEnvironmentVariables(): EnvironmentVariables;
+  getCollectionVariables(collectionId: string): EnvironmentVariables;
+  getGlobalVariables(): EnvironmentVariables;
+  // getVariablesWithPrecedence(collectionId: string): EnvironmentVariables;
+  renderVariables(
+    request: RQAPI.Request,
+    collectionId: string
+  ): {
+    renderedTemplate: RQAPI.Request;
+  };
+};
 
 export class RequestExecutor {
+  private workloadManager: APIClientWorkloadManager;
   constructor(
     private appMode: string,
-    private snapshot: {
-      environmentVariables: EnvironmentVariables;
-      collectionVariables: EnvironmentVariables;
-      globalVariables: EnvironmentVariables;
-    },
-    private entryDetails: RQAPI.Entry & { id: RQAPI.Record["id"]; collectionId: RQAPI.Record["collectionId"] },
-    private apiRecords: RQAPI.Record[]
-  ) {}
+    private entryDetails: EntryDetails,
+    private apiRecords: RQAPI.Record[],
+    private internalFunctions: InternalFunctions
+  ) {
+    this.workloadManager = new APIClientWorkloadManager();
+  }
 
   private prepareRequest() {
     this.entryDetails.request.queryParams = [];
@@ -25,45 +39,72 @@ export class RequestExecutor {
       queryParams
     );
 
+    const { renderVariables } = this.internalFunctions;
+
     // Process request configuration with environment variables
-    const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
-    const renderedRequestDetails = environmentManager.renderVariables(updatedEntry.request, entryDetails.collectionId);
+    const renderedRequestDetails = renderVariables(this.entryDetails.request, this.entryDetails.collectionId);
     let renderedRequest = renderedRequestDetails.renderedTemplate;
-    let response: RQAPI.Response | null = null;
+    this.entryDetails.request = renderedRequest;
+    return renderedRequest;
   }
 
-  updateSnapshot(
-    environmentVariables: EnvironmentVariables,
-    collectionVariables: EnvironmentVariables,
-    globalVariables: EnvironmentVariables
-  ) {
-    this.snapshot = {
-      environmentVariables,
-      collectionVariables,
-      globalVariables,
+  private buildInitialSnapshot() {
+    const globalVariables = this.internalFunctions.getGlobalVariables();
+    const collectionVariables = this.internalFunctions.getCollectionVariables(this.entryDetails.collectionId);
+    const environmentVariables = this.internalFunctions.getEnvironmentVariables();
+
+    return {
+      global: globalVariables,
+      collection: collectionVariables,
+      environment: environmentVariables,
+      request: this.entryDetails.request,
+      response: this.entryDetails.response ?? null,
     };
   }
 
-  async execute(entry: RQAPI.Entry) {
+  updateEntryDetails(entryDetails: EntryDetails) {
+    this.entryDetails = entryDetails;
+  }
+
+  updateApiRecords(apiRecords: RQAPI.Record[]) {
+    this.apiRecords = apiRecords;
+  }
+
+  updateInternalFunctions(internalFunctions: InternalFunctions) {
+    this.internalFunctions = internalFunctions;
+  }
+
+  async executePreRequestScript() {
+    const initialSnapshot = this.buildInitialSnapshot();
+
+    await this.workloadManager.execute(
+      new PreRequestScriptWorkload(this.entryDetails.scripts.preRequest, this.entryDetails.request, initialSnapshot)
+    );
+  }
+
+  async executePostResponseScript() {
+    const initialSnapshot = this.buildInitialSnapshot();
+
+    await this.workloadManager.execute(
+      new PostResponseScriptWorkload(
+        this.entryDetails.scripts.postResponse,
+        this.entryDetails.request,
+        this.entryDetails.response,
+        initialSnapshot
+      )
+    );
+  }
+
+  async execute() {
     this.prepareRequest();
 
-    const workloadManager = new APIClientWorkloadManager();
+    await this.executePreRequestScript();
 
-    try {
-      workloadManager.execute(getPreRequestScriptWorkload(entry));
+    this.entryDetails.request.url = addUrlSchemeIfMissing(this.entryDetails.request.url);
 
-      const response = await makeRequest(this.appMode, entry.request);
+    const response = await makeRequest(this.appMode, this.entryDetails.request);
+    this.entryDetails.response = response;
 
-      // console.log("!!!debug", "make response", response);
-
-      workloadManager.execute(
-        getPostResponseScriptWorkload({
-          ...entry,
-          response: response,
-        })
-      );
-    } catch (e) {
-      console.log("!!!debug", "err", e);
-    }
+    await this.executePostResponseScript();
   }
 }
