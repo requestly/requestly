@@ -564,3 +564,7 @@ export const navigateBack = (navigate, location, fallback) => {
     fallback();
   }
 };
+
+export const redirectToProductSpecificPricing = (navigate, product) => {
+  navigate(`${PATHS.PRICING.RELATIVE}?product=${product}`);
+};
