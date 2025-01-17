@@ -18,9 +18,11 @@ import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { clearExpandedRecordIdsFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
-import { deleteRecord, getAllRecords, setRecord, setRecords } from "./slice";
+import { deleteRecord, getAllRecords, getRecordsList, setRecord, setRecords } from "./slice";
 
 interface ApiClientContextInterface {
+  apiClientRecords: Record<RQAPI.Record["id"], RQAPI.Record>;
+  apiRecordsList: RQAPI.Record[];
   isLoadingApiClientRecords: boolean;
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
@@ -52,6 +54,8 @@ interface ApiClientContextInterface {
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
+  apiClientRecords: {},
+  apiRecordsList: [],
   isLoadingApiClientRecords: false,
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
@@ -93,6 +97,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const dispatch = useDispatch();
   const apiClientRecords = useSelector(getAllRecords);
+  const apiRecordsList = useSelector(getRecordsList);
 
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(false);
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
@@ -319,6 +324,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   );
 
   const value = {
+    apiClientRecords,
+    apiRecordsList,
     isLoadingApiClientRecords,
     onNewRecord,
     onRemoveRecord,

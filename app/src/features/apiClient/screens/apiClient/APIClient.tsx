@@ -7,8 +7,6 @@ import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { getApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
 import "./apiClient.scss";
-import { useSelector } from "react-redux";
-import { getAllRecords } from "features/apiClient/contexts/slice";
 
 interface Props {}
 
@@ -16,8 +14,7 @@ export const APIClient: React.FC<Props> = React.memo(() => {
   const location = useLocation();
   const { requestId } = useParams();
   const [searchParams] = useSearchParams();
-  const apiClientRecords = useSelector(getAllRecords);
-  const { history, selectedHistoryIndex, addToHistory } = useApiClientContext();
+  const { apiClientRecords, history, selectedHistoryIndex, addToHistory } = useApiClientContext();
 
   const [persistedRequestId, setPersistedRequestId] = useState<string>(() => requestId);
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
