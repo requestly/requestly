@@ -353,6 +353,13 @@ const useEnvironmentManager = () => {
     return activeOwnerEnvironments[globalEnvironmentData?.id]?.variables ?? {};
   }, [activeOwnerEnvironments, globalEnvironmentData?.id]);
 
+  const getCurrentCollectionVariables = useCallback(
+    (collectionId: string): EnvironmentVariables => {
+      return collectionVariables[collectionId]?.variables ?? {};
+    },
+    [collectionVariables]
+  );
+
   const getAllEnvironments = useCallback(() => {
     const environments = activeOwnerEnvironments;
     return Object.keys(environments).map((key) => {
@@ -482,6 +489,7 @@ const useEnvironmentManager = () => {
     getGlobalVariables,
     setCollectionVariables,
     removeCollectionVariable,
+    getCollectionVariables: getCurrentCollectionVariables,
   };
 };
 
