@@ -20,7 +20,7 @@ export class WorkerPool<T extends RQWorker> {
 
   private spawnNewWorker() {
     const worker = new this.workerModule();
-    worker.onErrorCallback(() => {
+    worker.setOnErrorCallback(() => {
       this.removeWorker(worker);
     });
     // worker.addEventListener("error", (event) => {

@@ -2,30 +2,30 @@ import { proxy, Remote, wrap } from "comlink";
 import ScriptExecutor from "../../worker/scriptExecutionWorker?worker";
 import { RQWorker } from "../interface/RQWorker";
 import { WorkResult, WorkResultType, WorkErrorType } from "../../workload-manager/workLoadTypes";
+import { ScriptExecutionWorker } from "../scriptExecutionWorker";
 
 export class RQScriptWebWorker implements RQWorker {
   private worker: Worker;
-  private proxyWorker: Remote<{ type: "TODO" }>;
+  private proxyWorker: Remote<ScriptExecutionWorker>;
   private onStateUpdate: (key: string, value: any) => void;
-  // public onErrorCallback: () => void;
+
   constructor() {
     this.worker = new ScriptExecutor();
     // this.worker.addEventListener("error", this.onErrorCallback);
-    this.proxyWorker = wrap<{ type: "TODO" }>(this.worker);
+    this.proxyWorker = wrap<ScriptExecutionWorker>(this.worker);
     this.worker.onerror = (error) => {
       console.error("Worker error:", error);
     };
   }
-  onErrorCallback(onError: EventListener): void {
+
+  setOnErrorCallback(onError: EventListener): void {
     this.worker.addEventListener("error", onError);
   }
 
   async work(workload: any): Promise<WorkResult> {
-    //handle by comlink
     this.onStateUpdate = workload.onStateUpdate;
     try {
       await this.proxyWorker.executeScript(workload.script, workload.initialState, proxy(workload.onStateUpdate));
-      console.log("!!!debug", "worker.work called", workload, typeof this.worker.postMessage);
       return {
         type: WorkResultType.SUCCESS,
       };
@@ -39,14 +39,7 @@ export class RQScriptWebWorker implements RQWorker {
         },
       };
     }
-    // How to ensure that every worker exposed should have tthe execute method?
-    // this.proxyWorker.execute()
   }
-
-  // async sync() {
-  //   // this.proxyWorker.sync();
-  //   await this.proxyWorker.syncSnapshot(proxy(this.onStateUpdate));
-  // }
 
   async terminate() {
     await this.proxyWorker.syncSnapshot(proxy(this.onStateUpdate));
