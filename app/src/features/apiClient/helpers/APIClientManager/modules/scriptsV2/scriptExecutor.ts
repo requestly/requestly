@@ -15,7 +15,7 @@ export class ScriptExecutor {
     onStateUpdate: (key: string, value: any) => void
   ): Promise<void> {
     try {
-      await this.workerApi.executePreRequestScript(
+      await this.workerApi.executeScript(
         script,
         initialState,
         proxy((key: string, value: any) => {
@@ -37,7 +37,7 @@ export class ScriptExecutor {
     onStateUpdate: (key: string, value: any) => void
   ): Promise<void> {
     try {
-      await this.workerApi.executePostResponseScript(
+      await this.workerApi.executeScript(
         script,
         initialState,
         proxy((key: string, value: any) => {
