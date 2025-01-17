@@ -5,7 +5,6 @@ import { WorkResult } from "./workLoadTypes";
 export class APIClientWorkloadManager {
   private workerPool: WorkerPool<RQScriptWebWorker>;
   constructor() {
-    console.log("!!!debug", "workloadmanager called");
     this.workerPool = new WorkerPool<RQScriptWebWorker>(RQScriptWebWorker);
   }
 

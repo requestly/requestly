@@ -114,8 +114,6 @@ export class RequestExecutor {
 
     const preRequestScriptResult = await this.executePreRequestScript();
 
-    console.log("!!!debug", "sahi preRequestScriptResult", preRequestScriptResult);
-
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
       return {
         ...this.entryDetails,

@@ -6,7 +6,6 @@ export class ScriptExecutionWorker {
   private localScope: LocalScopeManager;
 
   executeScript(script: string, initialState: any, callback: StateUpdateCallback) {
-    console.log("!!!debug", "executeScript called", script, initialState, callback);
     this.localScope = new LocalScopeManager(initialState, callback);
 
     const sandbox = {
@@ -21,7 +20,6 @@ export class ScriptExecutionWorker {
       ${script}
       `
     );
-    console.log("!!!debug", "scriptFunction called", sandbox.rq);
     scriptFunction(sandbox.rq);
   }
 
