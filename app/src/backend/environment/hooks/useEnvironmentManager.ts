@@ -290,8 +290,8 @@ const useEnvironmentManager = () => {
       });
 
       // Function to get all parent collection variables recursively
-      const getParentVariables = (collectionId: string) => {
-        const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+      const getParentVariables = (collectionId: RQAPI.CollectionRecord["id"]) => {
+        const collection = apiClientRecords[collectionId];
         if (!collection) return;
 
         // Add current collection's variables
@@ -418,8 +418,8 @@ const useEnvironmentManager = () => {
   );
 
   const setCollectionVariables = useCallback(
-    async (variables: EnvironmentVariables, collectionId: string) => {
-      const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+    async (variables: EnvironmentVariables, collectionId: RQAPI.CollectionRecord["id"]) => {
+      const collection = apiClientRecords[collectionId] as RQAPI.CollectionRecord;
 
       if (!collection) {
         throw new Error("Collection not found");
@@ -443,8 +443,8 @@ const useEnvironmentManager = () => {
   );
 
   const removeCollectionVariable = useCallback(
-    async (key: string, collectionId: string) => {
-      const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+    async (key: string, collectionId: RQAPI.CollectionRecord["id"]) => {
+      const collection = apiClientRecords[collectionId] as RQAPI.CollectionRecord;
 
       if (!collection) {
         throw new Error("Collection not found");

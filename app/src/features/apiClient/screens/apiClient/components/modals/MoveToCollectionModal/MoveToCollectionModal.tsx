@@ -22,20 +22,20 @@ interface Props {
 }
 
 export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordToMove }) => {
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const { apiRecordsList, onSaveRecord } = useApiClientContext();
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector(getUserAuthDetails);
   const team = useSelector(getCurrentlyActiveWorkspace);
 
   const collectionOptions = useMemo(() => {
-    return apiClientRecords
+    return apiRecordsList
       .filter((record) => record.type === RQAPI.RecordType.COLLECTION)
       .map((record) => ({
         label: record.name,
         value: record.id,
       }));
-  }, [apiClientRecords]);
+  }, [apiRecordsList]);
 
   const createNewCollection = useCallback(async () => {
     const collectionToBeCreated: Partial<RQAPI.CollectionRecord> = {

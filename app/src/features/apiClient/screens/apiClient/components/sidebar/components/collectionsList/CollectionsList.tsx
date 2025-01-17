@@ -34,7 +34,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const { collectionId, requestId } = useParams();
   const location = useLocation();
   const { openTab, tabs } = useTabsLayoutContext();
-  const { isLoadingApiClientRecords, apiClientRecords, isRecordBeingCreated } = useApiClientContext();
+  const { apiRecordsList, isLoadingApiClientRecords, isRecordBeingCreated } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [expandedRecordIds, setExpandedRecordIds] = useState(
@@ -42,7 +42,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   );
   const [searchValue, setSearchValue] = useState("");
 
-  const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
+  const prepareRecordsToRender = useCallback((records: ReadonlyArray<RQAPI.Record>) => {
     const updatedRecords = convertFlatRecordsToNestedRecords(records);
 
     updatedRecords.sort((recordA, recordB) => {
@@ -63,10 +63,10 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   }, []);
 
   const updatedRecords = useMemo(() => {
-    const filteredRecords = filterRecordsBySearch(apiClientRecords, searchValue);
+    const filteredRecords = filterRecordsBySearch(apiRecordsList, searchValue);
     const recordsToRender = prepareRecordsToRender(filteredRecords);
     return recordsToRender;
-  }, [apiClientRecords, prepareRecordsToRender, searchValue]);
+  }, [apiRecordsList, prepareRecordsToRender, searchValue]);
 
   const handleExportCollection = useCallback((collection: RQAPI.CollectionRecord) => {
     setCollectionsToExport((prev) => [...prev, collection]);
@@ -109,20 +109,20 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   useEffect(() => {
     const id = requestId || collectionId;
     setExpandedRecordIds((prev: RQAPI.Record["id"][]) =>
-      union(prev, getRecordIdsToBeExpanded(id, prev, apiClientRecords))
+      union(prev, getRecordIdsToBeExpanded(id, prev, apiRecordsList))
     );
-  }, [collectionId, requestId, apiClientRecords]);
+  }, [collectionId, requestId, apiRecordsList]);
 
   return (
     <>
-      {apiClientRecords.length > 0 && <SidebarListHeader onSearch={setSearchValue} />}
+      {apiRecordsList.length > 0 && <SidebarListHeader onSearch={setSearchValue} />}
       <div className="collections-list-container">
         <div className="collections-list-content">
           {isLoadingApiClientRecords ? (
             <div className="api-client-sidebar-placeholder">
               <Typography.Text type="secondary">Loading...</Typography.Text>
             </div>
-          ) : updatedRecords.count > 0 ? (
+          ) : apiRecordsList.length > 0 ? (
             <div className="collections-list">
               {updatedRecords.collections.map((record) => {
                 return (

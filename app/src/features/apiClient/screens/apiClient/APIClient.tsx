@@ -50,7 +50,7 @@ export const APIClient: React.FC<Props> = React.memo(() => {
       return;
     }
 
-    const record = apiClientRecords.find((rec) => rec.id === persistedRequestId);
+    const record = apiClientRecords[persistedRequestId];
 
     if (!record) {
       return;

@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
@@ -18,9 +18,11 @@ import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { clearExpandedRecordIdsFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
+import { deleteRecord, getAllRecords, getRecordsList, setRecord, setRecords } from "./slice";
 
 interface ApiClientContextInterface {
-  apiClientRecords: RQAPI.Record[];
+  apiClientRecords: Record<RQAPI.Record["id"], RQAPI.Record>;
+  apiRecordsList: RQAPI.Record[];
   isLoadingApiClientRecords: boolean;
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
@@ -52,7 +54,8 @@ interface ApiClientContextInterface {
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
-  apiClientRecords: [],
+  apiClientRecords: {},
+  apiRecordsList: [],
   isLoadingApiClientRecords: false,
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
@@ -92,8 +95,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
+  const dispatch = useDispatch();
+  const apiClientRecords = useSelector(getAllRecords);
+  const apiRecordsList = useSelector(getRecordsList);
+
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(false);
-  const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
@@ -115,9 +121,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   useEffect(() => {
     if (!user.loggedIn) {
-      setApiClientRecords([]);
+      dispatch(setRecords({}));
     }
-  }, [user.loggedIn]);
+  }, [user.loggedIn, dispatch]);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -139,64 +145,68 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     getApiRecords(uid, teamId)
       .then((result) => {
         if (result.success) {
-          setApiClientRecords(result.data);
+          const recordsMap = result.data.reduce(
+            (acc: Record<RQAPI.Record["id"], RQAPI.Record>, record: RQAPI.Record) => {
+              acc[record.id] = record;
+              return acc;
+            },
+            {}
+          );
+          dispatch(setRecords(recordsMap));
         }
       })
       .catch((error) => {
-        setApiClientRecords([]);
+        dispatch(setRecords({}));
         Logger.error("Error loading api records!", error);
       })
       .finally(() => {
         setIsLoadingApiClientRecords(false);
       });
-  }, [uid, teamId]);
+  }, [uid, teamId, dispatch]);
 
-  const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-    setApiClientRecords((prev) => {
-      return [...prev, { ...apiClientRecord }];
-    });
-  }, []);
+  const onNewRecord = useCallback(
+    (apiClientRecord: RQAPI.Record) => {
+      dispatch(setRecord(apiClientRecord));
+    },
+    [dispatch]
+  );
 
-  const onRemoveRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-    setApiClientRecords((prev) => {
-      return prev.filter((record) => record.id !== apiClientRecord.id);
-    });
-  }, []);
+  const onRemoveRecord = useCallback(
+    (apiClientRecord: RQAPI.Record) => {
+      dispatch(deleteRecord(apiClientRecord));
+    },
+    [dispatch]
+  );
 
   const onUpdateRecord = useCallback(
-    (apiClientRecord: RQAPI.Record) => {
-      setApiClientRecords((prev) => {
-        return prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record));
-      });
+    (updatedRecord: RQAPI.Record) => {
+      dispatch(setRecord(updatedRecord));
 
-      updateTab(apiClientRecord.id, {
-        title: apiClientRecord.name,
+      updateTab(updatedRecord.id, {
+        title: updatedRecord.name,
         hasUnsavedChanges: false,
         isPreview: false,
       });
     },
-    [updateTab]
+    [updateTab, dispatch]
   );
 
   const onDeleteRecords = useCallback(
     (recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
       deleteTabs(recordIdsToBeDeleted);
-      clearExpandedRecordIdsFromSession(recordIdsToBeDeleted);
 
-      setApiClientRecords((prev) => {
-        return prev.filter((record) => {
-          return !recordIdsToBeDeleted.includes(record.id);
-        });
-      });
+      clearExpandedRecordIdsFromSession(recordIdsToBeDeleted);
+      dispatch(deleteRecord(recordIdsToBeDeleted));
     },
-    [deleteTabs]
+
+    [deleteTabs, dispatch]
   );
 
   const onSaveRecord = useCallback(
     (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open") => {
-      const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
+      const existingRecord = apiClientRecords[apiClientRecord.id];
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
-      if (isRecordExist) {
+      if (existingRecord) {
         onUpdateRecord(apiClientRecord);
         replaceTab(apiClientRecord.id, {
           title: apiClientRecord.name,
@@ -293,7 +303,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setIsRecordBeingCreated(recordType);
           trackCreateEnvironmentClicked(analyticEventSource);
           return addNewEnvironment("New Environment")
-            .then((newEnvironment: { id: string; name: string }) => {
+            .then((newEnvironment: { id: string; name: string; isGlobal: boolean }) => {
               setIsRecordBeingCreated(null);
               openTab(newEnvironment?.id, {
                 title: newEnvironment?.name,
@@ -315,6 +325,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const value = {
     apiClientRecords,
+    apiRecordsList,
     isLoadingApiClientRecords,
     onNewRecord,
     onRemoveRecord,

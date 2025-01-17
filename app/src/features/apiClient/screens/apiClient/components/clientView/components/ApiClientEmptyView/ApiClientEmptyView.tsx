@@ -12,10 +12,10 @@ import APP_CONSTANTS from "config/constants";
 import { useState } from "react";
 import { toast } from "utils/Toast";
 import "./apiClientEmptyView.scss";
+import * as _ from "lodash";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
-
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
@@ -23,7 +23,7 @@ export const ApiClientEmptyView = () => {
 
   const [isRecordCreating, setIsRecordCreating] = useState(null);
 
-  const isEmpty = apiClientRecords.length === 0;
+  const isEmpty = _.isEmpty(apiClientRecords);
 
   const handleNewRecordClick = (recordType: RQAPI.RecordType) => {
     if (!user.loggedIn) {
