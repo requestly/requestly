@@ -1,6 +1,6 @@
-import { RQWorker } from "./RQWorker";
+import { RQScriptWebWorker, RQWorker } from "features/apiClient/helpers/modules/scripts/RQScriptWebWorker";
 
-export class WorkerPool {
+export class WorkerPool<T extends RQScriptWebWorker> {
   private allWorkers = new Map<
     RQWorker,
     {
@@ -8,20 +8,20 @@ export class WorkerPool {
     }
   >();
   private MAX_WORKERS = 15;
-  private pendingQueue: ((worker: RQWorker) => void)[] = [];
+  private pendingQueue: ((worker: T) => void)[] = [];
 
-  constructor(private workerModule: new () => Worker) {
+  constructor(private workerModule: new () => T) {
     console.log("!!!debug", "workerPool const", typeof this.workerModule);
   }
 
-  private removeWorker(worker: RQWorker) {
+  private removeWorker(worker: T) {
     worker.terminate();
     this.allWorkers.delete(worker);
     //
   }
 
   private spawnNewWorker() {
-    const worker = new RQWorker(this.workerModule);
+    const worker = new this.workerModule();
     worker.addEventListener("error", (event) => {
       this.removeWorker(worker);
     });
@@ -29,18 +29,18 @@ export class WorkerPool {
     return worker;
   }
 
-  async acquire(): Promise<RQWorker> {
+  async acquire() {
     if (this.allWorkers.size < this.MAX_WORKERS) {
       const worker = this.spawnNewWorker();
       return worker;
     }
 
-    return new Promise<RQWorker>((resolve) => {
+    return new Promise<T>((resolve) => {
       this.pendingQueue.push(resolve);
     });
   }
 
-  async release(worker: RQWorker) {
+  async release(worker: T) {
     if (this.pendingQueue.length > 0) {
       const receiver = this.pendingQueue.shift();
       receiver(worker);
