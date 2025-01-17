@@ -32,7 +32,7 @@ export const ExportCollectionsModal: React.FC<ExportCollectionsModalProps> = ({ 
   const [isApiRecordsProcessed, setIsApiRecordsProcessed] = useState(false);
   const [exportData, setExportData] = useState<ExportData>({ variables: [], records: [] });
   const [isExportVariablesChecked, setIsExportVariablesChecked] = useState(true);
-  const { getVariableData } = useEnvironmentManager();
+  const { getVariableData } = useEnvironmentManager({ enableEffects: false });
 
   const handleExport = useCallback(() => {
     const dataToExport = { schema_version: COLLECTIONS_SCHEMA_VERSION, ...exportData };
