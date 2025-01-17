@@ -22,7 +22,6 @@ const config = async ({ mode }) => {
       global: "globalThis",
       "process.env": loadEnv(mode, process.cwd(), ""),
     },
-    worker: {},
     plugins: [
       nodePolyfills(),
 
