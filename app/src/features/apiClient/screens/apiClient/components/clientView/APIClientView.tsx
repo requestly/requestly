@@ -87,10 +87,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     getCurrentEnvironmentVariables,
     renderVariables,
   } = environmentManager;
-  const currentEnvironmentVariables = useMemo(
-    () => getVariablesWithPrecedence(apiEntryDetails?.collectionId),
-    [apiEntryDetails?.collectionId, getVariablesWithPrecedence]
-  );
+  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
+    apiEntryDetails?.collectionId,
+    getVariablesWithPrecedence,
+  ]);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>({ ...(apiEntry ?? getEmptyAPIEntry()) });
@@ -359,7 +359,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
           trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
         } else {
-          const erroredEntry = entry as RQAPI.RequestErrorEntry;
+          const erroredEntry = executedEntry as RQAPI.RequestErrorEntry;
 
           setIsFailed(true);
           setError(erroredEntry?.error ?? null);
