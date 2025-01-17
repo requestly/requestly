@@ -1,16 +1,17 @@
 import { Remote, wrap } from "comlink";
+import ScriptExecutor from "../../APIClientManager/modules/scriptsV2/scriptExecutor?worker";
 
-abstract class RQWorker {
+export abstract class RQWorker {
   abstract work(workload: any): {} | Error;
+  abstract terminate(): void;
 }
 
-class RQWebWorker implements RQWorker {
+export class RQScriptWebWorker implements RQWorker {
   private worker: Worker;
-  private proxyWorker: Remote<any>;
-  constructor(workerModule: new () => Worker) {
-    console.log("!!!debug", "RQwebworker", workerModule);
-    this.worker = new workerModule();
-    this.proxyWorker = wrap<any>(this.worker);
+  private proxyWorker: Remote<{ type: "TODO" }>;
+  constructor() {
+    this.worker = new ScriptExecutor();
+    this.proxyWorker = wrap<{ type: "TODO" }>(this.worker);
     this.worker.onerror = (error) => {
       console.error("Worker error:", error);
     };
@@ -39,5 +40,3 @@ class RQWebWorker implements RQWorker {
     this.worker.removeEventListener(type, listener);
   }
 }
-
-export { RQWebWorker as RQWorker };

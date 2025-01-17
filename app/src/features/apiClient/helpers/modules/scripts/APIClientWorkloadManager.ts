@@ -1,11 +1,11 @@
 import { WorkerPool } from "modules/webWorkers/workerPool";
-import ScriptWorker from "./ScriptWorker?worker";
+import { RQScriptWebWorker } from "./RQScriptWebWorker";
 
 export class APIClientWorkloadManager {
-  private workerPool: WorkerPool;
+  private workerPool: WorkerPool<RQScriptWebWorker>;
   constructor() {
     console.log("!!!debug", "workloadmanager called");
-    this.workerPool = new WorkerPool(ScriptWorker);
+    this.workerPool = new WorkerPool<RQScriptWebWorker>(RQScriptWebWorker);
   }
 
   async execute(workload: any) {
