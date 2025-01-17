@@ -15,7 +15,6 @@ export class WorkerPool<T extends RQWorker> {
   private async removeWorker(worker: T) {
     await worker.terminate();
     this.allWorkers.delete(worker);
-    //
   }
 
   private spawnNewWorker() {
@@ -23,9 +22,6 @@ export class WorkerPool<T extends RQWorker> {
     worker.setOnErrorCallback(() => {
       this.removeWorker(worker);
     });
-    // worker.addEventListener("error", (event) => {
-    //   this.removeWorker(worker);
-    // });
     this.allWorkers.set(worker, { isAvailable: false });
     return worker;
   }
@@ -48,7 +44,6 @@ export class WorkerPool<T extends RQWorker> {
       return;
     }
 
-    //Comlink to sync everything
     await this.removeWorker(worker);
   }
 }

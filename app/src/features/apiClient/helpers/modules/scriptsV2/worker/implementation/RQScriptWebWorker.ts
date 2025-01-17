@@ -11,7 +11,6 @@ export class RQScriptWebWorker implements RQWorker {
 
   constructor() {
     this.worker = new ScriptExecutor();
-    // this.worker.addEventListener("error", this.onErrorCallback);
     this.proxyWorker = wrap<ScriptExecutionWorker>(this.worker);
     this.worker.onerror = (error) => {
       console.error("Worker error:", error);

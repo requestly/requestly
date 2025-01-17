@@ -330,10 +330,7 @@ const useEnvironmentManager = () => {
       const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
       const renderedTemplate = renderTemplate(template, variablesWithPrecedence);
 
-      return {
-        renderedTemplate,
-        variables: variablesWithPrecedence,
-      };
+      return renderedTemplate;
     },
     [getVariablesWithPrecedence]
   );

@@ -16,13 +16,7 @@ type InternalFunctions = {
   getCollectionVariables(collectionId: string): EnvironmentVariables;
   getGlobalVariables(): EnvironmentVariables;
   onStateUpdate(key: string, value: any): void;
-  // getVariablesWithPrecedence(collectionId: string): EnvironmentVariables;
-  renderVariables(
-    request: RQAPI.Request,
-    collectionId: string
-  ): {
-    renderedTemplate: RQAPI.Request;
-  };
+  renderVariables(request: RQAPI.Request, collectionId: string): RQAPI.Request;
 };
 
 export class RequestExecutor {
@@ -49,10 +43,8 @@ export class RequestExecutor {
     const { renderVariables } = this.internalFunctions;
 
     // Process request configuration with environment variables
-    const renderedRequestDetails = renderVariables(this.entryDetails.request, this.entryDetails.collectionId);
-    let renderedRequest = renderedRequestDetails.renderedTemplate;
+    const renderedRequest = renderVariables(this.entryDetails.request, this.entryDetails.collectionId);
     this.entryDetails.request = renderedRequest;
-    return renderedRequest;
   }
 
   private buildInitialSnapshot() {
