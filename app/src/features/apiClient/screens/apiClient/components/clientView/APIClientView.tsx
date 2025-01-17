@@ -47,9 +47,7 @@ import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { ScriptExecutor } from "features/apiClient/helpers/APIClientManager/modules/scriptsV2/scriptExecutor";
-import PreRequestScriptWorkload from "features/apiClient/helpers/APIClientManager/modules/scriptsV2/workloads/preRequestWorkload?worker";
-import PostResponseScriptWorkload from "features/apiClient/helpers/APIClientManager/modules/scriptsV2/workloads/postResponseWorkload?worker";
-
+import ExecuteScriptWorkload from "features/apiClient/helpers/APIClientManager/modules/scriptsV2/workloads/executeScript?worker";
 interface Props {
   openInModal?: boolean;
   apiEntry?: RQAPI.Entry;
@@ -264,7 +262,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    const preScriptExecutor = new ScriptExecutor(PreRequestScriptWorkload);
+    const preScriptExecutor = new ScriptExecutor(ExecuteScriptWorkload);
     const globalVariables = getGlobalVariables();
     const environmentVariables = getCurrentEnvironmentVariables();
     const collectionVariables = getVariablesWithPrecedence(apiEntryDetails?.collectionId);
@@ -344,7 +342,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         setIsLoadingResponse(false);
       });
 
-    const postScriptExecutor = new ScriptExecutor(PostResponseScriptWorkload);
+    const postScriptExecutor = new ScriptExecutor(ExecuteScriptWorkload);
     console.log("DBG preRequestscript starting");
     const postResponseResult = await postScriptExecutor.executePostResponseScript(
       sanitizedEntry.scripts.postResponse,
