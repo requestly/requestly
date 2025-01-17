@@ -69,6 +69,12 @@
   border-radius: var(--border-radius-md);
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: var(--requestly-color-background);
+
+  .plan-card-middle-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 175px;
+  }
 }
 
 .plan-name.ant-typography {
@@ -131,21 +137,13 @@
     align-self: flex-start;
     margin-top: 2px;
   }
-
-  &.underlined {
-    img {
-      filter: brightness(0) saturate(100%) invert(83%) sepia(75%) saturate(837%) hue-rotate(320deg) brightness(102%)
-        contrast(101%);
-    }
-  }
 }
 
 .plan-feature-underline {
   text-decoration-line: underline;
   text-decoration-style: dashed;
   text-underline-offset: 4px;
-  color: var(--requestly-color-warning-200);
-  opacity: 0.7;
+  color: var(--requestly-color-text-subtle);
 }
 
 .disabled-col {
