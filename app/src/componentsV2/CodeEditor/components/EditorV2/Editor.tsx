@@ -69,18 +69,25 @@ const Editor: React.FC<EditorProps> = ({
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const isFullScreenModeOnboardingCompleted = useSelector(getIsCodeEditorFullScreenModeOnboardingCompleted);
   const [isEditorInitialized, setIsEditorInitialized] = useState(false);
-
   const allEditorToast = useSelector(getAllEditorToast);
   const toastOverlay = useMemo(() => allEditorToast[scriptId], [allEditorToast, scriptId]); // todo: rename
   const [isCodePrettified, setIsCodePrettified] = useState(prettifyOnInit);
   const isDefaultPrettificationDone = useRef(false);
+  const [editorContent, setEditorContent] = useState(value);
 
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
   };
 
   const handleFullScreenToggle = () => {
-    setIsFullScreen((prev) => !prev);
+    setIsFullScreen((prev) => {
+      // onfullscreen setting the updated value in fullscreen too
+      const newFullscreen = !prev;
+      if (newFullscreen) {
+        setEditorContent(value);
+      }
+      return newFullscreen;
+    });
 
     if (!isFullScreen) {
       trackCodeEditorExpandedClick(analyticEventProperties);
@@ -122,25 +129,26 @@ const Editor: React.FC<EditorProps> = ({
     }
   };
 
-  const updateContent = useCallback((code: string) => {
-    const view = editorRef.current?.view;
-    if (!view) {
-      return null;
-    }
-    const transaction = view.state.update({
-      changes: { from: 0, to: view.state.doc.length, insert: code },
-    });
-    view.dispatch(transaction);
-  }, []);
+  // const updateContent = useCallback((code: string) => {
+  //   const view = editorRef.current?.view;
+  //   if (!view) {
+  //     return null;
+  //   }
+  //   const transaction = view.state.update({
+  //     changes: { from: 0, to: view.state.doc.length, insert: code },
+  //   });
+  //   view.dispatch(transaction);
+  // }, []);
 
   const applyPrettification = useCallback(() => {
     if (showOptions?.enablePrettify) {
       if (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT) {
         const prettified = prettifyCode(value, language);
-        updateContent(prettified.code);
+        //updateContent(prettified.code);
+        setEditorContent(prettified.code);
       }
     }
-  }, [showOptions?.enablePrettify, language, value, updateContent]);
+  }, [showOptions?.enablePrettify, language, value]);
 
   useEffect(() => {
     if (isEditorInitialized) {
@@ -151,7 +159,7 @@ const Editor: React.FC<EditorProps> = ({
         applyPrettification();
       }
     }
-  }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit]);
+  }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit, isFullScreen]);
 
   const handleEditorClose = useCallback(
     (scriptId: string) => {
@@ -161,7 +169,7 @@ const Editor: React.FC<EditorProps> = ({
     [dispatch]
   );
 
-  const debouncedhandleEditorBodyChange = useDebounce(handleChange, 800);
+  const debouncedhandleEditorBodyChange = useDebounce(handleChange, 200);
 
   const customKeyBinding = useMemo(
     () =>
@@ -203,10 +211,11 @@ const Editor: React.FC<EditorProps> = ({
   const toolbar = (
     <CodeEditorToolbar
       language={language}
-      code={value}
+      code={editorContent}
       isFullScreen={isFullScreen}
       onCodeFormat={(formattedCode: string) => {
-        updateContent(formattedCode);
+        //updateContent(formattedCode);
+        setEditorContent(formattedCode);
       }}
       isCodePrettified={isCodePrettified}
       setIsCodePrettified={setIsCodePrettified}
@@ -215,7 +224,6 @@ const Editor: React.FC<EditorProps> = ({
       enablePrettify={showOptions.enablePrettify}
     />
   );
-
   const editor = (
     <CodeMirror
       ref={editorRefCallback}
@@ -224,7 +232,7 @@ const Editor: React.FC<EditorProps> = ({
       }`}
       width="100%"
       readOnly={isReadOnly}
-      value={value ?? ""}
+      value={editorContent ?? ""}
       onChange={debouncedhandleEditorBodyChange}
       theme={vscodeDark}
       extensions={[
