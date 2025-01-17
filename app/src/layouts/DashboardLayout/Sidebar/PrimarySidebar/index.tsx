@@ -59,6 +59,28 @@ export const PrimarySidebar: React.FC = () => {
       },
       {
         id: 1,
+        title: "Network traffic",
+        path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
+        icon: <NetworkTrafficIcon />,
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
+      },
+      {
+        id: 2,
+        title: "Network inspector",
+        path: PATHS.NETWORK_INSPECTOR.RELATIVE,
+        icon: <NetworkTrafficInspectorIcon />,
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
+      },
+      {
+        id: 3,
+        title: "HTTP Rules",
+        path: PATHS.RULES.INDEX,
+        icon: <HttpRulesIcon />,
+        display: true,
+        activeColor: "var(--http-rules)",
+      },
+      {
+        id: 4,
         title: "API client",
         path: PATHS.API_CLIENT.INDEX,
         icon: (
@@ -69,28 +91,6 @@ export const PrimarySidebar: React.FC = () => {
         ),
         display: true,
         activeColor: "var(--api-client)",
-      },
-      {
-        id: 2,
-        title: "Network traffic",
-        path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
-        icon: <NetworkTrafficIcon />,
-        display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
-      },
-      {
-        id: 3,
-        title: "Network inspector",
-        path: PATHS.NETWORK_INSPECTOR.RELATIVE,
-        icon: <NetworkTrafficInspectorIcon />,
-        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
-      },
-      {
-        id: 4,
-        title: "HTTP Rules",
-        path: PATHS.RULES.INDEX,
-        icon: <HttpRulesIcon />,
-        display: true,
-        activeColor: "var(--http-rules)",
       },
       {
         id: 5,
