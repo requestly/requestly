@@ -48,7 +48,7 @@
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
-          font-size: var(--requestly-font-size-xs);
+          font-size: 12px;
           color: var(--requestly-color-text-default);
         }
         .request-options {
@@ -140,7 +140,7 @@
             white-space: nowrap;
             text-overflow: ellipsis;
             font-style: normal;
-            font-size: var(--requestly-font-size-xs);
+            font-size: 12px;
             font-weight: var(--requestly-font-weight-medium);
             font-weight: var(--requestly-font-weight-normal);
             line-height: var(--line-height-xs, 15px);
