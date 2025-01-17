@@ -18,7 +18,7 @@ export class APIClientWorkloadManager {
 
     const result = await worker.work(workload);
 
-    this.workerPool.release(worker);
+    await this.workerPool.release(worker);
 
     return result;
   }

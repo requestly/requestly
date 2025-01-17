@@ -49,11 +49,13 @@ export class RQ implements SandboxAPI {
     this.collectionVariables = new VariableScope(localScope, "collectionVariables");
     this.request = localScope.get("request");
     let originalResponse = localScope.get("response");
-    this.response = {
-      ...originalResponse,
-      code: originalResponse.status,
-      status: originalResponse.statusText,
-      responseTime: originalResponse.time,
-    };
+    this.response = originalResponse
+      ? {
+          ...originalResponse,
+          code: originalResponse.status,
+          status: originalResponse.statusText,
+          responseTime: originalResponse.time,
+        }
+      : undefined;
   }
 }

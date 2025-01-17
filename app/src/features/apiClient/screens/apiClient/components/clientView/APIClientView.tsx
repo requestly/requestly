@@ -48,6 +48,7 @@ import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { ScriptExecutor } from "features/apiClient/helpers/APIClientManager/modules/scriptsV2/scriptExecutor";
 import ExecuteScriptWorkload from "features/apiClient/helpers/APIClientManager/modules/scriptsV2/workloads/executeScript?worker";
+import { RequestExecutor } from "features/apiClient/helpers/requestExecutor";
 interface Props {
   openInModal?: boolean;
   apiEntry?: RQAPI.Entry;
@@ -82,7 +83,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setCollectionVariables,
     getCurrentEnvironment,
     getGlobalVariables,
+    getCollectionVariables,
     getCurrentEnvironmentVariables,
+    renderVariables,
   } = environmentManager;
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
     apiEntryDetails?.collectionId,
@@ -96,6 +99,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
+  const [requestExecutor, setRequestExecutor] = useState<RequestExecutor | null>(null);
 
   const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(true);
@@ -230,6 +234,63 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     },
     [getCurrentEnvironment, setVariables, setCollectionVariables, apiEntryDetails?.collectionId]
   );
+
+  const onSendButtonClickV2 = useCallback(() => {
+    updateTab(apiEntryDetails?.id, { isPreview: false });
+
+    if (!entry.request.url) {
+      return;
+    }
+    if (!isExtensionInstalled() && !isDesktopMode()) {
+      /* SHOW INSTALL EXTENSION MODAL */
+      const modalProps = {
+        heading: "Install browser Extension to use the API Client",
+        subHeading:
+          "A minimalistic API Client for front-end developers to test their APIs and fast-track their web development lifecycle. Add custom Headers and Query Params to test your APIs.",
+        eventPage: "api_client",
+      };
+      dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
+      trackInstallExtensionDialogShown({ src: "api_client" });
+      return;
+    }
+
+    toggleBottomSheet(true);
+
+    const sanitizedEntry = sanitizeEntry(entry);
+    sanitizedEntry.response = null;
+
+    abortControllerRef.current = new AbortController();
+
+    // const requestExecutor = new RequestExecutor(
+    //   appMode,
+    //   { ...sanitizedEntry, id: apiEntryDetails?.id, collectionId: apiEntryDetails?.collectionId },
+    //   apiClientRecords,
+    //   {
+    //     getEnvironmentVariables: () => getCurrentEnvironmentVariables(),
+    //     getCollectionVariables: (collectionId: string) => getCollectionVariables(collectionId),
+    //     getGlobalVariables: () => getGlobalVariables(),
+    //     renderVariables,
+    //     onStateUpdate: handleUpdatesFromScript,
+    //   }
+    // );
+
+    requestExecutor.updateEntryDetails({
+      ...sanitizedEntry,
+      id: apiEntryDetails?.id,
+      collectionId: apiEntryDetails?.collectionId,
+    });
+    requestExecutor.updateApiRecords(apiClientRecords);
+    requestExecutor.execute();
+  }, [
+    apiClientRecords,
+    apiEntryDetails?.collectionId,
+    apiEntryDetails?.id,
+    dispatch,
+    entry,
+    requestExecutor,
+    toggleBottomSheet,
+    updateTab,
+  ]);
 
   const onSendButtonClick = useCallback(async () => {
     updateTab(apiEntryDetails?.id, { isPreview: false });
@@ -467,6 +528,31 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     (evt.target as HTMLInputElement).blur();
   }, []);
 
+  useEffect(() => {
+    if (!requestExecutor) {
+      setRequestExecutor(new RequestExecutor(appMode, null, apiClientRecords, null));
+    }
+  }, [apiClientRecords, appMode, requestExecutor]);
+
+  useEffect(() => {
+    if (requestExecutor) {
+      requestExecutor.updateInternalFunctions({
+        getCollectionVariables,
+        getEnvironmentVariables: getCurrentEnvironmentVariables,
+        getGlobalVariables,
+        onStateUpdate: handleUpdatesFromScript,
+        renderVariables,
+      });
+    }
+  }, [
+    getCurrentEnvironmentVariables,
+    getCollectionVariables,
+    getGlobalVariables,
+    handleUpdatesFromScript,
+    renderVariables,
+    requestExecutor,
+  ]);
+
   return isExtensionEnabled ? (
     <div className="api-client-view">
       <div className="api-client-header-container">
@@ -533,7 +619,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               </Space.Compact>
               <RQButton
                 showHotKeyText
-                onClick={onSendButtonClick}
+                onClick={onSendButtonClickV2}
                 hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
                 type="primary"
                 className="text-bold"
