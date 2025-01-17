@@ -2,8 +2,6 @@ import { WorkerPool } from "modules/webWorkers/workerPool";
 import { RQScriptWebWorker } from "../worker/implementation/RQScriptWebWorker";
 import { WorkResult } from "./workLoadTypes";
 
-
-
 export class APIClientWorkloadManager {
   private workerPool: WorkerPool<RQScriptWebWorker>;
   constructor() {
@@ -16,7 +14,6 @@ export class APIClientWorkloadManager {
       throw new Error("Workload is empty");
     }
 
-    console.log("!!!debug", "exeecute called", workload);
     const worker = await this.workerPool.acquire();
 
     const result = await worker.work(workload);

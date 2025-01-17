@@ -114,15 +114,17 @@ export class RequestExecutor {
 
     const preRequestScriptResult = await this.executePreRequestScript();
 
+    console.log("!!!debug", "sahi preRequestScriptResult", preRequestScriptResult);
+
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
       return {
         ...this.entryDetails,
-        error:{
-          source:"Pre-Request Script",
+        error: {
+          source: "Pre-Request Script",
           name: preRequestScriptResult.error.name,
-          message: preRequestScriptResult.error.message
-        }
-      }
+          message: preRequestScriptResult.error.message,
+        },
+      };
     }
 
     this.entryDetails.request.url = addUrlSchemeIfMissing(this.entryDetails.request.url);
