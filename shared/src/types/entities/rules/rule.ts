@@ -5,6 +5,11 @@ export interface BaseRule extends BaseItem {
   objectType: RecordType.RULE;
   ruleType: RuleType;
   groupId?: string;
+  schemaVersion?: string;
+
+  // Determines if the rule is imported
+  isModHeaderImport?: boolean;
+  isCharlesImport?: boolean;
 }
 
 export type Rule =
@@ -43,7 +48,7 @@ export namespace ReplaceRule {
     pairs: ReplaceRulePair[];
   }
 
-  interface ReplaceRulePair extends BaseRulePair {
+  export interface ReplaceRulePair extends BaseRulePair {
     from: string;
     to: string;
   }
@@ -55,7 +60,7 @@ export namespace QueryParamRule {
     pairs: QueryParamRulePair[];
   }
 
-  interface QueryParamRulePair extends BaseRulePair {
+  export interface QueryParamRulePair extends BaseRulePair {
     modifications: QueryParamRuleModification[];
   }
 
@@ -65,7 +70,7 @@ export namespace QueryParamRule {
     REMOVE_ALL = "Remove All",
   }
 
-  interface QueryParamRuleModification {
+  export interface QueryParamRuleModification {
     id?: string;
     param: string;
     value: string;
@@ -90,7 +95,7 @@ export namespace DelayRule {
   }
 
   interface DelayRulePair extends BaseRulePair {
-    delay: number;
+    delay: string; // FIX to number. Legacy issue
   }
 }
 
@@ -100,14 +105,14 @@ export namespace HeaderRule {
     pairs: HeadersRulePair[];
   }
 
-  interface HeadersRulePair extends BaseRulePair {
+  export interface HeadersRulePair extends BaseRulePair {
     modifications: {
       Request?: HeadersRuleModificationData[];
       Response?: HeadersRuleModificationData[];
     };
   }
 
-  interface HeadersRuleModificationData {
+  export interface HeadersRuleModificationData {
     id?: string;
     header: string;
     type: HeaderRuleActionType;
@@ -140,7 +145,7 @@ export namespace RequestRule {
     pairs: RequestRulePair[];
   }
 
-  interface RequestRulePair extends BaseRulePair {
+  export interface RequestRulePair extends BaseRulePair {
     request: {
       type: RequestRuleBodyType;
       value: string;
@@ -160,7 +165,7 @@ export namespace ResponseRule {
     pairs: ResponseRulePair[];
   }
 
-  interface ResponseRulePair extends BaseRulePair {
+  export interface ResponseRulePair extends BaseRulePair {
     response: {
       type: ResponseRuleBodyType;
       value: string;
@@ -187,6 +192,8 @@ export namespace ScriptRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.SCRIPT;
     pairs: ScriptRulePair[];
+
+    removeCSPHeader?: boolean;
   }
 
   interface ScriptRulePair extends BaseRulePair {
@@ -253,6 +260,8 @@ export interface RuleSourceFilter {
   };
   requestMethod?: HttpRequestMethod[];
   resourceType?: ResourceType[];
+  pageDomains?: string[];
+  requestPayload?: { key: string; value: string; operator: RuleSourceOperator };
 }
 
 export enum RuleSourceKey {

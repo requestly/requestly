@@ -12,6 +12,11 @@ import {
   RulePairSource,
   HeaderRule,
   QueryParamRule,
+  RequestRule,
+  ReplaceRule,
+  CancelRule,
+  DelayRule,
+  UserAgentRule,
 } from "./rule";
 
 type StorageRecord = Group | Rule;
@@ -32,4 +37,9 @@ export {
   RuleSourceKey,
   RuleSourceOperator,
   QueryParamRule,
+  RequestRule,
+  ReplaceRule,
+  CancelRule,
+  DelayRule,
+  UserAgentRule,
 };

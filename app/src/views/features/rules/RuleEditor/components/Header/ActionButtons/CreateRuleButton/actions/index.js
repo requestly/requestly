@@ -5,7 +5,6 @@ import { isValidUrl } from "../../../../../../../../../utils/FormattingHelper";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { cloneDeep, inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { ResponseRuleResourceType } from "types/rules";
 import { parseHTMLString, getHTMLNodeName, validateHTMLTag, removeUrlAttribute } from "./insertScriptValidators";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
@@ -13,6 +12,7 @@ import { countCapturingGroups } from "modules/extension/mv3RuleParser/utils";
 import { RE2JS } from "re2js";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import { EditorLanguage } from "componentsV2/CodeEditor";
+import { ResponseRule } from "@requestly/shared/types/entities/rules";
 
 /**
  * In case of a few rules, input from the rule editor does not directly map to rule schema.
@@ -426,7 +426,7 @@ export const validateRule = (rule, dispatch, appMode) => {
       }
       // graphql operation data shouldn't be empty
       else if (
-        pair.response?.resourceType === ResponseRuleResourceType.GRAPHQL_API &&
+        pair.response?.resourceType === ResponseRule.ResponseRuleResourceType.GRAPHQL_API &&
         !isEmpty(pair.source?.filters?.[0]?.requestPayload) &&
         (!pair.source.filters[0].requestPayload.key || !pair.source.filters[0].requestPayload.value)
       ) {

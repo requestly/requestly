@@ -11,9 +11,9 @@ import PATHS from "config/constants/sub/paths";
 // import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { copyToClipBoard } from "utils/Misc";
 import { parseRulesFromModheader } from "modules/rule-adapters/modheader-rule-adapters/parseRulesFromModheader";
-import { Group, Rule } from "types";
 import { addRulesAndGroupsToStorage } from "components/features/rules/ImportRulesModal/actions";
 import "../importer-components.css";
+import { Group, Rule } from "@requestly/shared/types/entities/rules";
 
 const validExportSteps = [
   {

@@ -1,8 +1,8 @@
-import { RedirectRule } from "../../../types/rules";
+import { RedirectRule } from "@requestly/shared/types/entities/rules";
 import { ExtensionRule, ExtensionRuleAction, RuleActionType } from "../types";
 import { parseConditionFromSource } from "./utils";
 
-const parseRedirectRule = (rule: RedirectRule): ExtensionRule[] => {
+const parseRedirectRule = (rule: RedirectRule.Record): ExtensionRule[] => {
   const rulePairs = rule.pairs.filter((pair) => {
     if (pair?.destination?.startsWith("file://")) {
       return false;

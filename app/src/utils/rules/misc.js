@@ -3,10 +3,10 @@ import { StorageService } from "../../init";
 //CONSTANTS
 import APP_CONSTANTS from "../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { RedirectDestinationType } from "types/rules";
 import Logger from "lib/logger";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 import { isRule } from "features/rules";
+import { RedirectRule } from "@requestly/shared/types/entities/rules";
 
 const { RULE_TYPES_CONFIG, RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 const GROUP_DETAILS = RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS;
@@ -171,7 +171,7 @@ export const isDesktopOnlyRule = (rule) => {
     const pairs = rule?.pairs;
     return pairs.some(
       ({ destinationType, destination }) =>
-        destinationType === RedirectDestinationType.MAP_LOCAL || destination?.startsWith("file://")
+        destinationType === RedirectRule.RedirectDestinationType.MAP_LOCAL || destination?.startsWith("file://")
     );
   }
 };

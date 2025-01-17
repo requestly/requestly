@@ -1,4 +1,3 @@
-import { Rule, RulePairSource, RuleType, SourceFilter, SourceKey, SourceOperator } from "types";
 import { parseDNRRules } from "./mv3RuleParser";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { StorageService } from "init";
@@ -10,6 +9,14 @@ import {
 } from "modules/analytics/events/migrations";
 import Logger from "lib/logger";
 import * as semver from "semver";
+import {
+  Rule,
+  RulePairSource,
+  RuleSourceFilter,
+  RuleSourceKey,
+  RuleSourceOperator,
+  RuleType,
+} from "@requestly/shared/types/entities/rules";
 
 const MV3_MIGRATION_DATA = "mv3MigrationData";
 
@@ -203,9 +210,9 @@ const migratePathOperator = (
   type: RuleMigrationChange;
   oldSource: RulePairSource;
 } => {
-  if (source.key === SourceKey.PATH) {
-    source.operator = SourceOperator.CONTAINS;
-    source.key = SourceKey.URL;
+  if (source.key === RuleSourceKey.PATH) {
+    source.operator = RuleSourceOperator.CONTAINS;
+    source.key = RuleSourceKey.URL;
 
     return {
       type: RuleMigrationChange.SOURCE_PATH_MIGRATED,
@@ -224,8 +231,7 @@ const migratePageURLtoPageDomain = (
 } => {
   if (source.filters) {
     const sourceFilters =
-      //@ts-ignore
-      Array.isArray(source.filters) && source.filters.length ? source.filters[0] : (source.filters as SourceFilter);
+      Array.isArray(source.filters) && source.filters.length ? source.filters[0] : (source.filters as RuleSourceFilter);
 
     let migrationLog = null;
     let pageDomains: string[];
@@ -254,7 +260,7 @@ const migratePageURLtoPageDomain = (
     if (!isExtensionManifestVersion3() && sourceFilters?.pageDomains?.length > 0) {
       sourceFilters.pageUrl = {};
       sourceFilters.pageUrl.value = sourceFilters.pageDomains[0];
-      sourceFilters.pageUrl.operator = SourceOperator.CONTAINS;
+      sourceFilters.pageUrl.operator = RuleSourceOperator.CONTAINS;
     }
 
     return migrationLog;

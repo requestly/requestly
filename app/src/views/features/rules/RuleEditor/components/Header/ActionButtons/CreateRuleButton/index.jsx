@@ -31,13 +31,12 @@ import {
   trackRuleSaveClicked,
 } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
-import { ResponseRuleResourceType } from "types/rules";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { globalActions } from "store/slices/global/slice";
 import { IncentivizeEvent } from "features/incentivization/types";
-import { RuleType } from "@requestly/shared/types/entities/rules";
+import { ResponseRule, RuleType } from "@requestly/shared/types/entities/rules";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import Logger from "../../../../../../../../../../common/logger";
 import { IncentivizationModal } from "store/features/incentivization/types";
@@ -315,7 +314,7 @@ const CreateRuleButton = ({
           if (finalRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
             const resourceType = finalRuleData?.pairs?.[0]?.response?.resourceType;
 
-            if (resourceType && resourceType !== ResponseRuleResourceType.UNKNOWN) {
+            if (resourceType && resourceType !== ResponseRule.ResponseRuleResourceType.UNKNOWN) {
               trackRuleResourceTypeSelected(GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE, snakeCase(resourceType));
             }
           }

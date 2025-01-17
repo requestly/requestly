@@ -1,11 +1,11 @@
 import { get } from "lodash";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
-import { RuleType, HeadersRule, Status } from "types";
 import { getSourcesData, getHeaders, getGroupName } from "../../utils";
 import { CharlesRuleType, NoCachingRule, ParsedRule, SourceUrl } from "../types";
 import { headersConfig } from "./headers-config";
+import { HeaderRule, RecordStatus, RuleType } from "@requestly/shared/types/entities/rules";
 
-export const noCachingRuleAdapter = (rules: NoCachingRule): ParsedRule<HeadersRule> => {
+export const noCachingRuleAdapter = (rules: NoCachingRule): ParsedRule<HeaderRule.Record> => {
   const locations = get(rules, "selectedHostsTool.locations.locationPatterns.locationMatch") as SourceUrl[];
 
   if (!rules || !locations) {
@@ -15,13 +15,13 @@ export const noCachingRuleAdapter = (rules: NoCachingRule): ParsedRule<HeadersRu
   const sources = getSourcesData(locations);
   const { requestHeaders, responseHeaders } = getHeaders(headersConfig);
   const exportedRules = sources.map(({ value, status, operator }) => {
-    const rule = getNewRule(RuleType.HEADERS) as HeadersRule;
+    const rule = getNewRule(RuleType.HEADERS) as HeaderRule.Record;
 
     return {
       ...rule,
       name: `${value}`,
       isCharlesImport: true,
-      status: status ? Status.ACTIVE : Status.INACTIVE,
+      status: status ? RecordStatus.ACTIVE : RecordStatus.INACTIVE,
       pairs: [
         {
           ...rule.pairs[0],
