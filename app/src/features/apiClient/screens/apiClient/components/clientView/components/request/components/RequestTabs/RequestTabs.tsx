@@ -10,6 +10,8 @@ import "./requestTabs.scss";
 import AuthorizationView from "../AuthorizationView";
 import { QueryParamsTable } from "./components/QueryParamsTable/QueryParamsTable";
 import { HeadersTable } from "./components/HeadersTable/HeadersTable";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
+import PATHS from "config/constants/sub/paths";
 
 enum Tab {
   QUERY_PARAMS = "query_params",
@@ -30,6 +32,7 @@ const LabelWithCount: React.FC<{ label: string; count?: number; showDot?: boolea
 
 interface Props {
   requestEntry: RQAPI.Entry;
+  requestId: RQAPI.ApiRecord["id"];
   collectionId: string;
   setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
@@ -38,6 +41,7 @@ interface Props {
 
 const RequestTabs: React.FC<Props> = ({
   requestEntry,
+  requestId,
   collectionId,
   setRequestEntry,
   setContentType,
@@ -47,6 +51,7 @@ const RequestTabs: React.FC<Props> = ({
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
+  const { updateTab } = useTabsLayoutContext();
 
   useEffect(() => {
     if (selectedTab === Tab.BODY && !supportsRequestBody(requestEntry.request.method)) {
@@ -140,7 +145,10 @@ const RequestTabs: React.FC<Props> = ({
     <Tabs
       className="api-request-tabs"
       activeKey={selectedTab}
-      onChange={(tab: Tab) => setSelectedTab(tab)}
+      onChange={(tab: Tab) => {
+        setSelectedTab(tab);
+        updateTab(requestId, { url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?tab=${tab}` });
+      }}
       items={tabItems}
       size="small"
     />
