@@ -191,6 +191,19 @@ export const isApiCollection = (record: RQAPI.Record) => {
   return record?.type === RQAPI.RecordType.COLLECTION;
 };
 
+const sortRecords = (records: RQAPI.Record[]) => {
+  return records.sort((a, b) => a.name.localeCompare(b.name));
+};
+
+const sortNestedRecords = (records: RQAPI.Record[]) => {
+  records.forEach((record) => {
+    if (isApiCollection(record)) {
+      record.data.children = sortRecords(record.data.children);
+      sortNestedRecords(record.data.children);
+    }
+  });
+};
+
 export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
   const recordsCopy = [...records];
   const recordsMap: Record<string, RQAPI.Record> = {};
@@ -219,6 +232,7 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
     }
   });
 
+  sortNestedRecords(updatedRecords);
   return updatedRecords;
 };
 
