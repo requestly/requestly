@@ -18,6 +18,10 @@ export const getPlanNameFromId = (planId) => {
       return PRICING.PLAN_NAMES.BASIC_V2;
     case PRICING.PLAN_NAMES.ENTERPRISE:
       return PRICING.PLAN_NAMES.ENTERPRISE;
+    case PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL:
+      return PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL;
+    case PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE:
+      return PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE;
     default:
       return PRICING.PLAN_NAMES.PROFESSIONAL;
   }
@@ -70,7 +74,7 @@ export const getPlanName = (planDetails) => {
     return PRICING.PLAN_NAMES.FREE;
   }
 
-  if (!isPremiumUser(planDetails)) {
+  if (!isPremiumUser(planDetails) && isPremiumPlan(planDetails.planId)) {
     return PRICING.PLAN_NAMES.FREE;
   }
 
