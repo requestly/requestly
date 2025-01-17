@@ -2,7 +2,7 @@ import { expose } from "comlink";
 import { LocalScopeManager, StateUpdateCallback } from "modules/worker/localScopeManager";
 import { RQ } from "../sandbox/RQ";
 
-const executePreRequestScript = (script: string, initialState: any, callback: StateUpdateCallback) => {
+const executeScript = (script: string, initialState: any, callback: StateUpdateCallback) => {
   const localScope = new LocalScopeManager(initialState, callback);
 
   const sandbox = {
@@ -14,11 +14,15 @@ const executePreRequestScript = (script: string, initialState: any, callback: St
     "rq",
     `
     "use strict";
+    try {
       ${script}
+    } catch (error) {
+      throw error;
+    }
     `
   );
 
   scriptFunction(sandbox.rq);
 };
 
-expose({ executePreRequestScript });
+expose({ executeScript });
