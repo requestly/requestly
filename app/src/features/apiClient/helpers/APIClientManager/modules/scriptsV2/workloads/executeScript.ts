@@ -5,6 +5,7 @@ import { RQ } from "../sandbox/RQ";
 let localScope: LocalScopeManager;
 
 const executeScript = (script: string, initialState: any, callback: StateUpdateCallback) => {
+  console.log("!!!debug", "executeScript called", script, initialState, callback);
   localScope = new LocalScopeManager(initialState, callback);
 
   const sandbox = {
@@ -23,15 +24,18 @@ const executeScript = (script: string, initialState: any, callback: StateUpdateC
     }
     `
   );
-
+  console.log("!!!debug", "scriptFunction called", sandbox.rq);
   scriptFunction(sandbox.rq);
 };
 
-const syncSnapshot = () => {
+const syncSnapshot = async (onStateUpdate: (key: string, value: any) => void) => {
   if (!localScope) {
     return undefined;
   }
-  return localScope.getAll();
+  const localState = localScope.getAll();
+  for (const key in localState) {
+    onStateUpdate(key, localState[key]);
+  }
 };
 
 expose({ executeScript, syncSnapshot });

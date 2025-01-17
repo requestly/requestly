@@ -10,6 +10,7 @@ type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
   getCollectionVariables(collectionId: string): EnvironmentVariables;
   getGlobalVariables(): EnvironmentVariables;
+  onStateUpdate(key: string, value: any): void;
   // getVariablesWithPrecedence(collectionId: string): EnvironmentVariables;
   renderVariables(
     request: RQAPI.Request,
@@ -31,6 +32,7 @@ export class RequestExecutor {
   }
 
   private prepareRequest() {
+    console.log("DBG", this.entryDetails, this.apiRecords);
     this.entryDetails.request.queryParams = [];
     const { headers, queryParams } = processAuthForEntry(this.entryDetails, this.entryDetails, this.apiRecords);
     this.entryDetails.request.headers = updateRequestWithAuthOptions(this.entryDetails.request.headers, headers);
@@ -78,7 +80,13 @@ export class RequestExecutor {
     const initialSnapshot = this.buildInitialSnapshot();
 
     await this.workloadManager.execute(
-      new PreRequestScriptWorkload(this.entryDetails.scripts.preRequest, this.entryDetails.request, initialSnapshot)
+      new PreRequestScriptWorkload(
+        this.entryDetails.scripts.preRequest,
+        { ...initialSnapshot, request: this.entryDetails.request },
+        (key: string, value: any) => {
+          this.internalFunctions.onStateUpdate(key, value);
+        }
+      )
     );
   }
 
@@ -88,9 +96,10 @@ export class RequestExecutor {
     await this.workloadManager.execute(
       new PostResponseScriptWorkload(
         this.entryDetails.scripts.postResponse,
-        this.entryDetails.request,
-        this.entryDetails.response,
-        initialSnapshot
+        { ...initialSnapshot, request: this.entryDetails.request, response: this.entryDetails.response },
+        (key: string, value: any) => {
+          this.internalFunctions.onStateUpdate(key, value);
+        }
       )
     );
   }

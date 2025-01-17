@@ -14,8 +14,8 @@ export class WorkerPool<T extends RQScriptWebWorker> {
     console.log("!!!debug", "workerPool const", typeof this.workerModule);
   }
 
-  private removeWorker(worker: T) {
-    worker.terminate();
+  private async removeWorker(worker: T) {
+    await worker.terminate();
     this.allWorkers.delete(worker);
     //
   }
@@ -48,6 +48,6 @@ export class WorkerPool<T extends RQScriptWebWorker> {
     }
 
     //Comlink to sync everything
-    this.removeWorker(worker);
+    await this.removeWorker(worker);
   }
 }

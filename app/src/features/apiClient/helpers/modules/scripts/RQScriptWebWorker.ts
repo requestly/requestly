@@ -1,5 +1,7 @@
-import { Remote, wrap } from "comlink";
-import ScriptExecutor from "../../APIClientManager/modules/scriptsV2/scriptExecutor?worker";
+import { proxy, Remote, wrap } from "comlink";
+import ScriptExecutor from "../../APIClientManager/modules/scriptsV2/workloads/executeScript?worker";
+
+type EventListener = (evt: Event) => void;
 
 export abstract class RQWorker {
   abstract work(workload: any): {} | Error;
@@ -9,6 +11,7 @@ export abstract class RQWorker {
 export class RQScriptWebWorker implements RQWorker {
   private worker: Worker;
   private proxyWorker: Remote<{ type: "TODO" }>;
+  private onStateUpdate: (key: string, value: any) => void;
   constructor() {
     this.worker = new ScriptExecutor();
     this.proxyWorker = wrap<{ type: "TODO" }>(this.worker);
@@ -19,16 +22,20 @@ export class RQScriptWebWorker implements RQWorker {
 
   async work(workload: any) {
     //handle by comlink
+    this.onStateUpdate = workload.onStateUpdate;
+    await this.proxyWorker.executeScript(workload.script, workload.initialState, proxy(workload.onStateUpdate));
     console.log("!!!debug", "worker.work called", workload, typeof this.worker.postMessage);
     // How to ensure that every worker exposed should have tthe execute method?
     // this.proxyWorker.execute()
   }
 
-  async sync() {
-    // this.proxyWorker.sync();
-  }
+  // async sync() {
+  //   // this.proxyWorker.sync();
+  //   await this.proxyWorker.syncSnapshot(proxy(this.onStateUpdate));
+  // }
 
-  terminate() {
+  async terminate() {
+    await this.proxyWorker.syncSnapshot(proxy(this.onStateUpdate));
     return this.worker.terminate();
   }
 
