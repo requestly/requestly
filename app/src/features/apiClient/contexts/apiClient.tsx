@@ -18,6 +18,8 @@ import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { clearExpandedRecordIdsFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
+import { useSearchParams } from "react-router-dom";
+import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -92,6 +94,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
+  const [searchParams] = useSearchParams();
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(false);
   const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
@@ -196,11 +199,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open") => {
       const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
+      const requestTab = searchParams.get("tab") || RequestTab.QUERY_PARAMS;
+
       if (isRecordExist) {
         onUpdateRecord(apiClientRecord);
         replaceTab(apiClientRecord.id, {
           title: apiClientRecord.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}`,
+          url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?tab=${requestTab}`,
         });
       } else {
         onNewRecord(apiClientRecord);
@@ -208,7 +213,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         if (onSaveTabAction === "replace") {
           replaceTab(apiClientRecord.id, {
             title: apiClientRecord.name,
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}`,
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?tab=${requestTab}`,
           });
           return;
         }
@@ -222,7 +227,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [apiClientRecords, onUpdateRecord, onNewRecord, openTab, replaceTab]
+    [apiClientRecords, onUpdateRecord, onNewRecord, openTab, replaceTab, searchParams]
   );
 
   const updateRecordToBeDeleted = useCallback((record: RQAPI.Record) => {
