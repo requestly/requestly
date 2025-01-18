@@ -36,8 +36,8 @@ let unsubscribeGlobalVariablesListener: () => void = null;
 // higher precedence is given to environment variables
 const VARIABLES_PRECEDENCE_ORDER = ["ENVIRONMENT", "COLLECTION"];
 
-const useEnvironmentManager = (options = { enableEffects: true }) => {
-  const { enableEffects = true } = options;
+const useEnvironmentManager = (options = { initFetchers: true }) => {
+  const { initFetchers = true } = options;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [isEnvironmentsDataLoaded, setIsEnvironmentsDataLoaded] = useState(false);
@@ -90,7 +90,7 @@ const useEnvironmentManager = (options = { enableEffects: true }) => {
   );
 
   useEffect(() => {
-    if (ownerId && enableEffects) {
+    if (ownerId && initFetchers) {
       setIsLoading(true);
       setIsEnvironmentsDataLoaded(false);
       fetchAllEnvironmentDetails(ownerId)
@@ -133,10 +133,10 @@ const useEnvironmentManager = (options = { enableEffects: true }) => {
     // }
     // Disabled otherwise infinite loop if allEnvironmentData is included here, allEnvironmentData should be fetched only once
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ownerId, dispatch, addNewEnvironment, setCurrentEnvironment, currentEnvironmentId, enableEffects]);
+  }, [ownerId, dispatch, addNewEnvironment, setCurrentEnvironment, currentEnvironmentId, initFetchers]);
 
   useEffect(() => {
-    if (ownerId && currentEnvironmentId && enableEffects) {
+    if (ownerId && currentEnvironmentId && initFetchers) {
       unsubscribeListener?.();
       unsubscribeListener = attachEnvironmentVariableListener(ownerId, currentEnvironmentId, (environmentData) => {
         const mergedVariables = mergeLocalAndSyncVariables(
@@ -161,10 +161,10 @@ const useEnvironmentManager = (options = { enableEffects: true }) => {
 
     // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentEnvironmentId, dispatch, ownerId, enableEffects]);
+  }, [currentEnvironmentId, dispatch, ownerId, initFetchers]);
 
   useEffect(() => {
-    if (ownerId && globalEnvironmentData?.id && enableEffects) {
+    if (ownerId && globalEnvironmentData?.id && initFetchers) {
       unsubscribeGlobalVariablesListener?.();
       unsubscribeGlobalVariablesListener = attachEnvironmentVariableListener(
         ownerId,
@@ -192,10 +192,10 @@ const useEnvironmentManager = (options = { enableEffects: true }) => {
 
     // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalEnvironmentData?.id, ownerId, enableEffects]);
+  }, [globalEnvironmentData?.id, ownerId, initFetchers]);
 
   useEffect(() => {
-    if (ownerId && enableEffects) {
+    if (ownerId && initFetchers) {
       unsubscribeCollectionListener?.();
       unsubscribeCollectionListener = attachCollectionVariableListener(ownerId, (collectionDetails) => {
         Object.keys(collectionDetails).forEach((collectionId) => {
@@ -213,7 +213,7 @@ const useEnvironmentManager = (options = { enableEffects: true }) => {
     };
     // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ownerId, enableEffects]);
+  }, [ownerId, initFetchers]);
 
   useEffect(() => {
     if (!user.loggedIn) {
