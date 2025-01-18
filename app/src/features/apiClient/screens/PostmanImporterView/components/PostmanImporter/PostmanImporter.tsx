@@ -51,7 +51,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
 
-  const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ enableEffects: false });
+  const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ initFetchers: false });
   const { onSaveRecord } = useApiClientContext();
 
   const collectionsCount = useRef(0);
