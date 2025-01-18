@@ -164,93 +164,95 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         planName === PRICING.PLAN_NAMES.LITE && duration === PRICING.DURATION.MONTHLY ? "disabled-col" : ""
       }`}
     >
-      <Space size={8}>
-        <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
-        {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">MOST VALUE</span>}
-      </Space>
-      {planName === PRICING.PLAN_NAMES.ENTERPRISE && (
-        <Row align="middle" className="items-center plan-price-row mt-8">
-          <Space size={0}>
-            <span className="text-bold">Starts at</span>
-            <Typography.Text className="plan-price enterprice-plan-price">$59</Typography.Text>
-            <div className="caption">
-              <Typography.Text>member / month</Typography.Text>
-            </div>
-          </Space>
-        </Row>
-      )}
-      {planPrice !== undefined && (
-        <Row align="middle" className="items-center plan-price-row">
-          <Space size="small">
-            <Typography.Text className="plan-price">
-              ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
-            </Typography.Text>
-            {((product === PRICING.PRODUCTS.HTTP_RULES &&
-              planName !== PRICING.PLAN_NAMES.FREE &&
-              planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
-              planName !== PRICING.PLAN_NAMES.LITE) ||
-              (product === PRICING.PRODUCTS.API_CLIENT &&
-                (planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL ||
-                  planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE))) && (
-              <Space>
-                <InputNumber
-                  style={{ width: "65px", height: "30px", display: "flex", alignItems: "center" }}
-                  size="small"
-                  type="number"
-                  min={1}
-                  max={1000}
-                  maxLength={4}
-                  defaultValue={1}
-                  value={quantity}
-                  onChange={(value: number) => {
-                    handleQuantityChange(value);
-                  }}
-                />
-              </Space>
-            )}
-            <div className="caption text-white">
-              {planName !== PRICING.PLAN_NAMES.FREE && (
-                <div>{planName === PRICING.PLAN_NAMES.LITE ? "/ month" : "member / month"}</div>
+      <div className="plan-card-middle-section">
+        <Space size={8}>
+          <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
+          {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">MOST VALUE</span>}
+        </Space>
+        {planName === PRICING.PLAN_NAMES.ENTERPRISE && (
+          <Row align="middle" className="items-center plan-price-row mt-8">
+            <Space size={0}>
+              <span className="text-bold">Starts at</span>
+              <Typography.Text className="plan-price enterprice-plan-price">$59</Typography.Text>
+              <div className="caption">
+                <Typography.Text>member / month</Typography.Text>
+              </div>
+            </Space>
+          </Row>
+        )}
+        {planPrice !== undefined && (
+          <Row align="middle" className="items-center plan-price-row">
+            <Space size="small">
+              <Typography.Text className="plan-price">
+                ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
+              </Typography.Text>
+              {((product === PRICING.PRODUCTS.HTTP_RULES &&
+                planName !== PRICING.PLAN_NAMES.FREE &&
+                planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
+                planName !== PRICING.PLAN_NAMES.LITE) ||
+                (product === PRICING.PRODUCTS.API_CLIENT &&
+                  (planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL ||
+                    planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE))) && (
+                <Space>
+                  <InputNumber
+                    style={{ width: "65px", height: "30px", display: "flex", alignItems: "center" }}
+                    size="small"
+                    type="number"
+                    min={1}
+                    max={1000}
+                    maxLength={4}
+                    defaultValue={1}
+                    value={quantity}
+                    onChange={(value: number) => {
+                      handleQuantityChange(value);
+                    }}
+                  />
+                </Space>
               )}
-            </div>
-          </Space>
-        </Row>
-      )}
-      {planDetails?.planDescription && (
-        <Row>
-          <Typography.Text type="secondary" className="plan-description">
-            {planDetails.planDescription}
+              <div className="caption text-white">
+                {planName !== PRICING.PLAN_NAMES.FREE && (
+                  <div>{planName === PRICING.PLAN_NAMES.LITE ? "/ month" : "member / month"}</div>
+                )}
+              </div>
+            </Space>
+          </Row>
+        )}
+        {planDetails?.planDescription && (
+          <Row>
+            <Typography.Text type="secondary" className="plan-description">
+              {planDetails.planDescription}
+            </Typography.Text>
+          </Row>
+        )}
+        <Row
+          className="annual-bill mt-8"
+          style={{ display: getPricingPlanAnnualBillingSubtitle(planName) ? "flex" : "none" }}
+        >
+          <Typography.Text type="secondary">
+            {duration === PRICING.DURATION.MONTHLY
+              ? planName === PRICING.PLAN_NAMES.LITE
+                ? getPricingPlanAnnualBillingSubtitle(planName) || ""
+                : "Billed monthly"
+              : getPricingPlanAnnualBillingSubtitle(planName) || ""}
           </Typography.Text>
         </Row>
-      )}
-      <Row
-        className="annual-bill mt-8"
-        style={{ display: getPricingPlanAnnualBillingSubtitle(planName) ? "flex" : "none" }}
-      >
-        <Typography.Text type="secondary">
-          {duration === PRICING.DURATION.MONTHLY
-            ? planName === PRICING.PLAN_NAMES.LITE
-              ? getPricingPlanAnnualBillingSubtitle(planName) || ""
-              : "Billed monthly"
-            : getPricingPlanAnnualBillingSubtitle(planName) || ""}
-        </Typography.Text>
-      </Row>
-      <Row
-        style={{
-          marginTop: planName === PRICING.PLAN_NAMES.FREE ? "44px" : "32px",
-        }}
-      >
-        <PricingTableButtons
-          key={planName + duration}
-          columnPlanName={planName}
-          product={product}
-          duration={duration}
-          source={source}
-          quantity={quantity}
-          setIsContactUsModalOpen={setIsContactUsModalOpen}
-          disabled={disbaleUpgradeButton}
-        />
-      </Row>
+        <Row
+          style={{
+            marginTop: "auto",
+          }}
+        >
+          <PricingTableButtons
+            key={planName + duration}
+            columnPlanName={planName}
+            product={product}
+            duration={duration}
+            source={source}
+            quantity={quantity}
+            setIsContactUsModalOpen={setIsContactUsModalOpen}
+            disabled={disbaleUpgradeButton}
+          />
+        </Row>
+      </div>
       <>{renderFeaturesListHeader(planName)}</>
       <Space direction="vertical" className="plan-features-list">
         {planDetails.features.map((feature: any, index: number) => {
