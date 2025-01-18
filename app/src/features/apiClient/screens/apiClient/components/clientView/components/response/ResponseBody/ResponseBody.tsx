@@ -91,10 +91,10 @@ const ResponseBody: React.FC<Props> = ({
     return (
       <div className="api-client-code-editor-container api-response-body-editor-container">
         <Editor
+          prettifyOnInit
           value={responseText}
           language={editorLanguage}
           isReadOnly
-          prettifyOnInit={false}
           toolbarOptions={{
             title: "",
             options: [bodyPreviewModeOptions],
@@ -115,7 +115,7 @@ const ResponseBody: React.FC<Props> = ({
           </RQButton>
         </div>
       ) : null}
-      {responseText ? (
+      {responseText && !isLoading ? (
         <div className="api-response-body-content">
           {preview && responseMode === ResponseMode.PREVIEW ? (
             preview

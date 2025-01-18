@@ -27,6 +27,7 @@ import "./editor.scss";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/PopOver/popover.scss";
 import { useDebounce } from "hooks/useDebounce";
+import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 interface EditorProps {
   value: string;
   language: EditorLanguage | null;
@@ -44,7 +45,6 @@ interface EditorProps {
     enablePrettify?: boolean;
   };
 }
-
 const Editor: React.FC<EditorProps> = ({
   value,
   language,
@@ -71,24 +71,15 @@ const Editor: React.FC<EditorProps> = ({
   const [isEditorInitialized, setIsEditorInitialized] = useState(false);
   const allEditorToast = useSelector(getAllEditorToast);
   const toastOverlay = useMemo(() => allEditorToast[scriptId], [allEditorToast, scriptId]); // todo: rename
-  const [isCodePrettified, setIsCodePrettified] = useState(prettifyOnInit);
+  const [isCodePrettified, setIsCodePrettified] = useState(false);
   const isDefaultPrettificationDone = useRef(false);
-  const [editorContent, setEditorContent] = useState(value);
 
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
   };
 
-  const handleFullScreenToggle = () => {
-    setIsFullScreen((prev) => {
-      // onfullscreen setting the updated value in fullscreen too
-      const newFullscreen = !prev;
-      if (newFullscreen) {
-        setEditorContent(value);
-      }
-      return newFullscreen;
-    });
-
+  const handleFullScreenToggle = useCallback(() => {
+    setIsFullScreen((prev) => !prev);
     if (!isFullScreen) {
       trackCodeEditorExpandedClick(analyticEventProperties);
 
@@ -105,7 +96,7 @@ const Editor: React.FC<EditorProps> = ({
     } else {
       trackCodeEditorCollapsedClick(analyticEventProperties);
     }
-  };
+  }, [analyticEventProperties, dispatch, isFullScreen, isFullScreenModeOnboardingCompleted, location?.pathname]);
 
   const editorLanguage = useMemo(() => {
     switch (language) {
@@ -122,44 +113,49 @@ const Editor: React.FC<EditorProps> = ({
     }
   }, [language]);
 
+  // To initialize the editor
   const editorRefCallback = (editor: ReactCodeMirrorRef) => {
-    if (!editorRef.current && editor?.editor && editor?.state && editor?.view) {
+    if (editor?.editor && editor?.state && editor?.view) {
       editorRef.current = editor;
       setIsEditorInitialized(true);
     }
   };
 
-  // const updateContent = useCallback((code: string) => {
-  //   const view = editorRef.current?.view;
-  //   if (!view) {
-  //     return null;
-  //   }
-  //   const transaction = view.state.update({
-  //     changes: { from: 0, to: view.state.doc.length, insert: code },
-  //   });
-  //   view.dispatch(transaction);
-  // }, []);
+  const updateContent = useCallback((code: string) => {
+    const view = editorRef.current?.view;
+    if (!view) {
+      return null;
+    }
+    const transaction = view.state.update({
+      changes: { from: 0, to: view.state.doc.length, insert: code },
+    });
+    view.dispatch(transaction);
+  }, []);
 
   const applyPrettification = useCallback(() => {
     if (showOptions?.enablePrettify) {
       if (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT) {
         const prettified = prettifyCode(value, language);
-        //updateContent(prettified.code);
-        setEditorContent(prettified.code);
+        setIsCodePrettified(true);
+        updateContent(prettified.code);
       }
     }
-  }, [showOptions?.enablePrettify, language, value]);
+  }, [showOptions?.enablePrettify, language, value, updateContent]);
 
   useEffect(() => {
     if (isEditorInitialized) {
       if (!isDefaultPrettificationDone.current && prettifyOnInit) {
         applyPrettification();
         isDefaultPrettificationDone.current = true;
-      } else if (!prettifyOnInit) {
-        applyPrettification();
       }
     }
   }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit, isFullScreen]);
+
+  // Reinitializing the fullscreen editor
+  useEffect(() => {
+    isDefaultPrettificationDone.current = false;
+    setIsEditorInitialized(false);
+  }, [isFullScreen]);
 
   const handleEditorClose = useCallback(
     (scriptId: string) => {
@@ -208,22 +204,34 @@ const Editor: React.FC<EditorProps> = ({
     []
   );
 
-  const toolbar = (
-    <CodeEditorToolbar
-      language={language}
-      code={editorContent}
-      isFullScreen={isFullScreen}
-      onCodeFormat={(formattedCode: string) => {
-        //updateContent(formattedCode);
-        setEditorContent(formattedCode);
-      }}
-      isCodePrettified={isCodePrettified}
-      setIsCodePrettified={setIsCodePrettified}
-      handleFullScreenToggle={handleFullScreenToggle}
-      customOptions={toolbarOptions}
-      enablePrettify={showOptions.enablePrettify}
-    />
+  const toolbar = useMemo(
+    () => (
+      <CodeEditorToolbar
+        language={language}
+        code={value}
+        isFullScreen={isFullScreen}
+        onCodeFormat={(formattedCode: string) => {
+          updateContent(formattedCode);
+        }}
+        isCodePrettified={isCodePrettified}
+        setIsCodePrettified={setIsCodePrettified}
+        handleFullScreenToggle={handleFullScreenToggle}
+        customOptions={toolbarOptions}
+        enablePrettify={showOptions.enablePrettify}
+      />
+    ),
+    [
+      handleFullScreenToggle,
+      isCodePrettified,
+      isFullScreen,
+      language,
+      showOptions.enablePrettify,
+      toolbarOptions,
+      updateContent,
+      value,
+    ]
   );
+
   const editor = (
     <CodeMirror
       ref={editorRefCallback}
@@ -232,7 +240,7 @@ const Editor: React.FC<EditorProps> = ({
       }`}
       width="100%"
       readOnly={isReadOnly}
-      value={editorContent ?? ""}
+      value={value ?? ""}
       onChange={debouncedhandleEditorBodyChange}
       theme={vscodeDark}
       extensions={[
@@ -248,6 +256,7 @@ const Editor: React.FC<EditorProps> = ({
               envVariables
             )
           : null,
+        generateCompletionsForVariables(envVariables),
       ].filter(Boolean)}
       basicSetup={{
         highlightActiveLine: false,
