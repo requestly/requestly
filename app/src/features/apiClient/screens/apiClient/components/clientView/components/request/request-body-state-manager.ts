@@ -12,8 +12,8 @@ export class RequestBodyStateManager {
 
   constructor(params: RQAPI.RequestBodyContainer) {
     // defaults are set since some databases like firestore don't handle "undefined"
-    this.text = params.text || "";
-    this.form = params.form || [];
+    this.text = params?.text || "";
+    this.form = params?.form || [];
   }
 
   setText(text: string) {
