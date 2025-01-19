@@ -46,13 +46,20 @@ export type WorkResult = {
 );
 
 export enum WorkErrorType {
-  UNEXPECTED = "UNEXPECTED",
+  SCRIPT_EXECUTION_FAILED = "SCRIPT_EXECUTION_FAILED",
+  SCRIPT_PENDING_WORK_FLUSHING_FAILED = "SCRIPT_PENDING_WORK_FLUSHING_FAILED",
 }
 
 export type WorkError = {
   type: WorkErrorType;
-} & {
-  type: WorkErrorType.UNEXPECTED;
-  message: string;
-  name: string;
-};
+} & (
+  | {
+      type: WorkErrorType.SCRIPT_EXECUTION_FAILED;
+      message: string;
+      name: string;
+    }
+  | {
+      type: WorkErrorType.SCRIPT_PENDING_WORK_FLUSHING_FAILED;
+      message: string;
+    }
+);
