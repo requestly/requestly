@@ -220,8 +220,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       switch (key) {
         case "environment": {
           console.log("DBG currentENV updated");
-          const currentEnvironment = getCurrentEnvironment();
-          setVariables(currentEnvironment.currentEnvironmentId, value);
+          const currentEnvironment = getCurrentEnvironment() as {
+            currentEnvironmentName?: string;
+            currentEnvironmentId?: string;
+          };
+          if (currentEnvironment.currentEnvironmentId) {
+            setVariables(currentEnvironment.currentEnvironmentId, value);
+          }
           break;
         }
 
