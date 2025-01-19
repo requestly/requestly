@@ -1,4 +1,10 @@
-export class PreRequestScriptWorkload {
+export interface ScriptWorkload {
+  readonly script: string;
+  readonly initialState: any;
+  readonly onStateUpdate: (key: string, value: any) => void;
+}
+
+export class PreRequestScriptWorkload implements ScriptWorkload {
   constructor(
     readonly script: string,
     readonly initialState: any,
@@ -6,7 +12,7 @@ export class PreRequestScriptWorkload {
   ) {}
 }
 
-export class PostResponseScriptWorkload {
+export class PostResponseScriptWorkload implements ScriptWorkload {
   constructor(
     readonly script: string,
     readonly initialState: any,

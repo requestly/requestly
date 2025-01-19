@@ -1,4 +1,4 @@
-import { LocalScopeManager } from "modules/worker/localScopeManager";
+import { LocalScope } from "modules/localScope";
 import { SandboxAPI } from "./types";
 import { VariableScope } from "./variableScope";
 import { RQAPI } from "features/apiClient/types";
@@ -43,7 +43,7 @@ export class RQ implements SandboxAPI {
   public vault = createInfiniteChainable("vault");
   public visualizer = createInfiniteChainable("visualizer");
 
-  constructor(localScope: LocalScopeManager) {
+  constructor(localScope: LocalScope) {
     this.environment = new VariableScope(localScope, "environment");
     this.globals = new VariableScope(localScope, "global");
     this.collectionVariables = new VariableScope(localScope, "collectionVariables");

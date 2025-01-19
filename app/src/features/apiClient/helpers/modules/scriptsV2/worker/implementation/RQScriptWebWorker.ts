@@ -1,27 +1,28 @@
 import { proxy, Remote, wrap } from "comlink";
-import ScriptExecutor from "../../worker/scriptExecutionWorker?worker";
+
 import { RQWorker } from "../interface/RQWorker";
-import { WorkResult, WorkResultType, WorkErrorType } from "../../workload-manager/workLoadTypes";
-import { ScriptExecutionWorker } from "../scriptExecutionWorker";
+import { WorkResult, WorkResultType, WorkErrorType, ScriptWorkload } from "../../workload-manager/workLoadTypes";
+import { ScriptExecutionWorkerInterface } from "../scriptExecutionWorker/scriptExecutionWorkerInterface";
+import ScriptExecutionWorker from "../scriptExecutionWorker/scriptExecutionWorker?worker";
 
 export class RQScriptWebWorker implements RQWorker {
   private worker: Worker;
-  private proxyWorker: Remote<ScriptExecutionWorker>;
+  private proxyWorker: Remote<ScriptExecutionWorkerInterface>;
   private onStateUpdate: (key: string, value: any) => void;
 
   constructor() {
-    this.worker = new ScriptExecutor();
-    this.proxyWorker = wrap<ScriptExecutionWorker>(this.worker);
+    this.worker = new ScriptExecutionWorker();
+    this.proxyWorker = wrap(this.worker);
     this.worker.onerror = (error) => {
       console.error("Worker error:", error);
     };
   }
 
-  setOnErrorCallback(onError: EventListener): void {
+  setOnErrorCallback(onError: (evt: Event) => void): void {
     this.worker.addEventListener("error", onError);
   }
 
-  async work(workload: any): Promise<WorkResult> {
+  async work(workload: ScriptWorkload): Promise<WorkResult> {
     this.onStateUpdate = workload.onStateUpdate;
     try {
       await this.proxyWorker.executeScript(workload.script, workload.initialState, proxy(workload.onStateUpdate));
@@ -43,13 +44,5 @@ export class RQScriptWebWorker implements RQWorker {
   async terminate() {
     await this.proxyWorker.syncSnapshot(proxy(this.onStateUpdate));
     return this.worker.terminate();
-  }
-
-  addEventListener(type: string, listener: EventListener) {
-    this.worker.addEventListener(type, listener);
-  }
-
-  removeEventListener(type: string, listener: EventListener) {
-    this.worker.removeEventListener(type, listener);
   }
 }

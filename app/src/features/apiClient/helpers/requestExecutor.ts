@@ -75,7 +75,6 @@ export class RequestExecutor {
 
   async executePreRequestScript() {
     const initialSnapshot = this.buildInitialSnapshot();
-
     return this.workloadManager.execute(
       new PreRequestScriptWorkload(
         this.entryDetails.scripts.preRequest,

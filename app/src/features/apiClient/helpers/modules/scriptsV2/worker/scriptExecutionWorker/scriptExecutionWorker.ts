@@ -1,16 +1,13 @@
 import { expose } from "comlink";
-import { LocalScopeManager, StateUpdateCallback } from "modules/worker/localScopeManager";
-import { RQ } from "../sandbox/RQ";
+import { RQ } from "../../sandbox/RQ";
+import { LocalScope, StateUpdateCallback } from "modules/localScope";
+import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
 
-export class ScriptExecutionWorker {
-  private localScope: LocalScopeManager;
+export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
+  private localScope: LocalScope;
 
   executeScript(script: string, initialState: any, callback: StateUpdateCallback) {
-    this.localScope = new LocalScopeManager(initialState, callback);
-
-    const sandbox = {
-      rq: new RQ(this.localScope),
-    };
+    this.localScope = new LocalScope(initialState, callback);
 
     // eslint-disable-next-line no-new-func
     const scriptFunction = new Function(
@@ -20,7 +17,7 @@ export class ScriptExecutionWorker {
       ${script}
       `
     );
-    scriptFunction(sandbox.rq);
+    scriptFunction(new RQ(this.localScope));
   }
 
   syncSnapshot(onStateUpdate: (key: string, value: any) => void) {
