@@ -1,14 +1,15 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { addUrlSchemeIfMissing, makeRequest } from "../screens/apiClient/utils";
-import { RQAPI } from "../types";
-import { APIClientWorkloadManager } from "./modules/scriptsV2/workload-manager/APIClientWorkloadManager";
-import { processAuthForEntry, updateRequestWithAuthOptions } from "./auth";
+import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
+import { RQAPI } from "../../types";
+import { APIClientWorkloadManager } from "../modules/scriptsV2/workload-manager/APIClientWorkloadManager";
+import { processAuthForEntry, updateRequestWithAuthOptions } from "../auth";
 import {
   PostResponseScriptWorkload,
   PreRequestScriptWorkload,
   WorkResultType,
-} from "./modules/scriptsV2/workload-manager/workLoadTypes";
+} from "../modules/scriptsV2/workload-manager/workLoadTypes";
 import { notification } from "antd";
+import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshot";
 
 type EntryDetails = RQAPI.Entry & { id: RQAPI.Record["id"]; collectionId: RQAPI.Record["collectionId"] };
 type InternalFunctions = {
@@ -47,7 +48,7 @@ export class RequestExecutor {
     this.entryDetails.request = renderedRequest;
   }
 
-  private buildInitialSnapshot() {
+  private buildBaseSnapshot(): BaseSnapshot {
     const globalVariables = this.internalFunctions.getGlobalVariables();
     const collectionVariables = this.internalFunctions.getCollectionVariables(this.entryDetails.collectionId);
     const environmentVariables = this.internalFunctions.getEnvironmentVariables();
@@ -56,8 +57,25 @@ export class RequestExecutor {
       global: globalVariables,
       collection: collectionVariables,
       environment: environmentVariables,
+    };
+  }
+
+  private buildPreRequestSnapshot(): SnapshotForPreRequest {
+    return {
+      ...this.buildBaseSnapshot(),
       request: this.entryDetails.request,
-      response: this.entryDetails.response ?? null,
+    };
+  }
+
+  private buildPostResponseSnapshot(): SnapshotForPostResponse {
+    const response = this.entryDetails.response;
+    if (!response) {
+      throw new Error("Can not build post response snapshot without response!");
+    }
+    return {
+      ...this.buildBaseSnapshot(),
+      request: this.entryDetails.request,
+      response,
     };
   }
 
@@ -74,11 +92,10 @@ export class RequestExecutor {
   }
 
   async executePreRequestScript() {
-    const initialSnapshot = this.buildInitialSnapshot();
     return this.workloadManager.execute(
       new PreRequestScriptWorkload(
         this.entryDetails.scripts.preRequest,
-        { ...initialSnapshot, request: this.entryDetails.request },
+        this.buildPreRequestSnapshot(),
         async (key: string, value: any) => {
           this.internalFunctions.onStateUpdate(key, value);
         }
@@ -87,12 +104,10 @@ export class RequestExecutor {
   }
 
   async executePostResponseScript() {
-    const initialSnapshot = this.buildInitialSnapshot();
-
     return this.workloadManager.execute(
       new PostResponseScriptWorkload(
         this.entryDetails.scripts.postResponse,
-        { ...initialSnapshot, request: this.entryDetails.request, response: this.entryDetails.response },
+        this.buildPostResponseSnapshot(),
         async (key: string, value: any) => {
           this.internalFunctions.onStateUpdate(key, value);
         }

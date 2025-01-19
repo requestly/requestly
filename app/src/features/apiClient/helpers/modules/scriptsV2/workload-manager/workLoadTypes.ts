@@ -1,17 +1,31 @@
+import {
+  BaseSnapshot,
+  SnapshotForPostResponse,
+  SnapshotForPreRequest,
+} from "features/apiClient/helpers/requestExecutor/snapshot";
+
 export type StateUpdateCallback = (key: string, value: any) => Promise<void>;
 
-export interface ScriptWorkload {
+export interface ScriptWorkload<T extends BaseSnapshot = BaseSnapshot> {
   readonly script: string;
-  readonly initialState: any;
+  readonly initialState: T;
   readonly onStateUpdate: StateUpdateCallback;
 }
 
-export class PreRequestScriptWorkload implements ScriptWorkload {
-  constructor(readonly script: string, readonly initialState: any, readonly onStateUpdate: StateUpdateCallback) {}
+export class PreRequestScriptWorkload implements ScriptWorkload<SnapshotForPreRequest> {
+  constructor(
+    readonly script: string,
+    readonly initialState: SnapshotForPreRequest,
+    readonly onStateUpdate: StateUpdateCallback
+  ) {}
 }
 
-export class PostResponseScriptWorkload implements ScriptWorkload {
-  constructor(readonly script: string, readonly initialState: any, readonly onStateUpdate: StateUpdateCallback) {}
+export class PostResponseScriptWorkload implements ScriptWorkload<SnapshotForPostResponse> {
+  constructor(
+    readonly script: string,
+    readonly initialState: SnapshotForPostResponse,
+    readonly onStateUpdate: StateUpdateCallback
+  ) {}
 }
 
 export enum WorkResultType {
