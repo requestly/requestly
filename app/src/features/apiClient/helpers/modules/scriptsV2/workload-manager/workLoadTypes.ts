@@ -1,23 +1,17 @@
+export type StateUpdateCallback = (key: string, value: any) => Promise<void>;
+
 export interface ScriptWorkload {
   readonly script: string;
   readonly initialState: any;
-  readonly onStateUpdate: (key: string, value: any) => void;
+  readonly onStateUpdate: StateUpdateCallback;
 }
 
 export class PreRequestScriptWorkload implements ScriptWorkload {
-  constructor(
-    readonly script: string,
-    readonly initialState: any,
-    readonly onStateUpdate: (key: string, value: any) => void
-  ) {}
+  constructor(readonly script: string, readonly initialState: any, readonly onStateUpdate: StateUpdateCallback) {}
 }
 
 export class PostResponseScriptWorkload implements ScriptWorkload {
-  constructor(
-    readonly script: string,
-    readonly initialState: any,
-    readonly onStateUpdate: (key: string, value: any) => void
-  ) {}
+  constructor(readonly script: string, readonly initialState: any, readonly onStateUpdate: StateUpdateCallback) {}
 }
 
 export enum WorkResultType {

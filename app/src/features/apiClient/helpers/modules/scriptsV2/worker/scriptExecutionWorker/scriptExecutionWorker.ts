@@ -1,7 +1,8 @@
 import { expose } from "comlink";
 import { RQ } from "../../sandbox/RQ";
-import { LocalScope, StateUpdateCallback } from "modules/localScope";
+import { LocalScope } from "modules/localScope";
 import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
+import { StateUpdateCallback } from "../../workload-manager/workLoadTypes";
 
 export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
   private localScope: LocalScope;
@@ -20,14 +21,9 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
     scriptFunction(new RQ(this.localScope));
   }
 
-  syncSnapshot(onStateUpdate: (key: string, value: any) => void) {
-    if (!this.localScope) {
-      return;
-    }
-    const localState = this.localScope.getAll();
-    for (const key in localState) {
-      onStateUpdate(key, localState[key]);
-    }
+  async flushPendingWork() {
+    const pendingWork = this.localScope.getPendingCallbackExecutions();
+    await Promise.all(pendingWork);
   }
 }
 

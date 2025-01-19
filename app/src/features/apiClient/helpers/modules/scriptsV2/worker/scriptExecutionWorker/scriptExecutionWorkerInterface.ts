@@ -1,6 +1,6 @@
-import { StateUpdateCallback } from "modules/localScope";
+import { StateUpdateCallback } from "../../workload-manager/workLoadTypes";
 
 export interface ScriptExecutionWorkerInterface {
   executeScript(script: string, initialState: any, callback: StateUpdateCallback): void;
-  syncSnapshot(onStateUpdate: (key: string, value: any) => void): void;
+  flushPendingWork(): Promise<void>;
 }
