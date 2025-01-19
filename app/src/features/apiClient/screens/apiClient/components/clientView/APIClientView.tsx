@@ -45,7 +45,7 @@ import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcut
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
-import { RequestExecutor } from "features/apiClient/helpers/requestExecutor";
+import { RequestExecutor } from "features/apiClient/helpers/requestExecutor/requestExecutor";
 import { isEmpty } from "lodash";
 
 interface Props {
