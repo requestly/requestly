@@ -21,7 +21,7 @@ export class RQScriptWebWorker implements RQWorker {
     this.internalWorker.addEventListener("error", onError);
   }
 
-  async work(workload: ScriptWorkload): Promise<WorkResult> {
+  private async executeScript(workload: ScriptWorkload): Promise<WorkResult> {
     try {
       await this.scriptWorker.executeScript(workload.script, workload.initialState, proxy(workload.onStateUpdate));
       return {
@@ -31,7 +31,7 @@ export class RQScriptWebWorker implements RQWorker {
       return {
         type: WorkResultType.ERROR,
         error: {
-          type: WorkErrorType.UNEXPECTED,
+          type: WorkErrorType.SCRIPT_EXECUTION_FAILED,
           name: error.name,
           message: error.message,
         },
@@ -39,12 +39,33 @@ export class RQScriptWebWorker implements RQWorker {
     }
   }
 
-  async terminate() {
+  private async flushPendingWork(): Promise<WorkResult> {
     try {
       await this.scriptWorker.flushPendingWork();
-    } catch (e) {
-      console.error("Could not flush pending work of worker. Encountered error:", e);
+      return {
+        type: WorkResultType.SUCCESS,
+      };
+    } catch (error) {
+      console.error("Could not flush pending work of worker. Encountered error:", error);
+      return {
+        type: WorkResultType.ERROR,
+        error: {
+          type: WorkErrorType.SCRIPT_PENDING_WORK_FLUSHING_FAILED,
+          message: error.message,
+        },
+      };
     }
+  }
+
+  async work(workload: ScriptWorkload): Promise<WorkResult> {
+    const scriptExecutionWorkResult = await this.executeScript(workload);
+    if (scriptExecutionWorkResult.type === WorkResultType.ERROR) {
+      return scriptExecutionWorkResult;
+    }
+    return this.flushPendingWork();
+  }
+
+  terminate() {
     return this.internalWorker.terminate();
   }
 }
