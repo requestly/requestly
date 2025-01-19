@@ -79,7 +79,7 @@ export class RequestExecutor {
       new PreRequestScriptWorkload(
         this.entryDetails.scripts.preRequest,
         { ...initialSnapshot, request: this.entryDetails.request },
-        (key: string, value: any) => {
+        async (key: string, value: any) => {
           this.internalFunctions.onStateUpdate(key, value);
         }
       )
@@ -93,7 +93,7 @@ export class RequestExecutor {
       new PostResponseScriptWorkload(
         this.entryDetails.scripts.postResponse,
         { ...initialSnapshot, request: this.entryDetails.request, response: this.entryDetails.response },
-        (key: string, value: any) => {
+        async (key: string, value: any) => {
           this.internalFunctions.onStateUpdate(key, value);
         }
       )

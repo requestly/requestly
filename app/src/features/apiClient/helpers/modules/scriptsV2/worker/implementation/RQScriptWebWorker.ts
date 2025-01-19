@@ -6,26 +6,24 @@ import { ScriptExecutionWorkerInterface } from "../scriptExecutionWorker/scriptE
 import ScriptExecutionWorker from "../scriptExecutionWorker/scriptExecutionWorker?worker";
 
 export class RQScriptWebWorker implements RQWorker {
-  private worker: Worker;
-  private proxyWorker: Remote<ScriptExecutionWorkerInterface>;
-  private onStateUpdate: (key: string, value: any) => void;
+  private internalWorker: Worker;
+  private scriptWorker: Remote<ScriptExecutionWorkerInterface>;
 
   constructor() {
-    this.worker = new ScriptExecutionWorker();
-    this.proxyWorker = wrap(this.worker);
-    this.worker.onerror = (error) => {
+    this.internalWorker = new ScriptExecutionWorker();
+    this.scriptWorker = wrap(this.internalWorker);
+    this.internalWorker.onerror = (error) => {
       console.error("Worker error:", error);
     };
   }
 
   setOnErrorCallback(onError: (evt: Event) => void): void {
-    this.worker.addEventListener("error", onError);
+    this.internalWorker.addEventListener("error", onError);
   }
 
   async work(workload: ScriptWorkload): Promise<WorkResult> {
-    this.onStateUpdate = workload.onStateUpdate;
     try {
-      await this.proxyWorker.executeScript(workload.script, workload.initialState, proxy(workload.onStateUpdate));
+      await this.scriptWorker.executeScript(workload.script, workload.initialState, proxy(workload.onStateUpdate));
       return {
         type: WorkResultType.SUCCESS,
       };
@@ -42,7 +40,11 @@ export class RQScriptWebWorker implements RQWorker {
   }
 
   async terminate() {
-    await this.proxyWorker.syncSnapshot(proxy(this.onStateUpdate));
-    return this.worker.terminate();
+    try {
+      await this.scriptWorker.flushPendingWork();
+    } catch (e) {
+      console.error("Could not flush pending work of worker. Encountered error:", e);
+    }
+    return this.internalWorker.terminate();
   }
 }

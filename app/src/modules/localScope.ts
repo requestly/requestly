@@ -1,6 +1,7 @@
-export type StateUpdateCallback = (key: string, value: any) => void;
+import { StateUpdateCallback } from "features/apiClient/helpers/modules/scriptsV2/workload-manager/workLoadTypes";
 
 export class LocalScope {
+  private pendingCallbackExecutions: Promise<any>[] = [];
   private state: any;
   private callback: StateUpdateCallback;
 
@@ -15,7 +16,8 @@ export class LocalScope {
     }
 
     this.state[key] = value;
-    this.callback(key, value);
+    const pendingCallbackExecution = this.callback(key, value);
+    this.pendingCallbackExecutions.push(pendingCallbackExecution);
   }
 
   public get(key: string): any {
@@ -24,5 +26,9 @@ export class LocalScope {
 
   public getAll(): any {
     return this.state;
+  }
+
+  public getPendingCallbackExecutions() {
+    return this.pendingCallbackExecutions;
   }
 }
