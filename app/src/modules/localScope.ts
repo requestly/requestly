@@ -1,6 +1,6 @@
 export type StateUpdateCallback = (key: string, value: any) => void;
 
-export class LocalScopeManager {
+export class LocalScope {
   private state: any;
   private callback: StateUpdateCallback;
 
@@ -23,6 +23,6 @@ export class LocalScopeManager {
   }
 
   public getAll(): any {
-    return { ...this.state };
+    return this.state;
   }
 }

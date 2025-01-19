@@ -1,8 +1,8 @@
-import { LocalScopeManager } from "modules/worker/localScopeManager";
+import { LocalScope } from "modules/localScope";
 
 export class VariableScope {
   constructor(
-    private localScope: LocalScopeManager,
+    private localScope: LocalScope,
     private variableScopeName: "environment" | "global" | "collectionVariables"
   ) {}
 
