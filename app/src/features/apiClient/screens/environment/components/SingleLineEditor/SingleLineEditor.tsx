@@ -4,7 +4,7 @@ import { EditorState, Prec } from "@codemirror/state";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { EditorPopover } from "componentsV2/CodeEditor/components/Editor/components/PopOver";
 import "componentsV2/CodeEditor/components/Editor/components/PopOver/popover.scss";
-import generateCompletionsForVariables from "componentsV2/CodeEditor/components/Editor/plugins/generateAutoCompletions";
+import generateCompletionsForVariables from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
 import "./singleLineEditor.scss";
 interface RQSingleLineEditorProps {
   defaultValue?: string;
