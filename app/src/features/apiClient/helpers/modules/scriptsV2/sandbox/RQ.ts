@@ -57,5 +57,26 @@ export class RQ implements SandboxAPI {
           responseTime: originalResponse.time,
         }
       : undefined;
+
+    Object.setPrototypeOf(this.request, {
+      toJSON: () => ({
+        method: this.request.method,
+        url: this.request.url,
+        body: this.request.body,
+      }),
+    });
+
+    if (this.response) {
+      Object.setPrototypeOf(this.response, {
+        toJSON() {
+          return {
+            ...this,
+            body: this.body,
+          };
+        },
+        json: () => this.response.body,
+        text: () => this.response.body,
+      });
+    }
   }
 }
