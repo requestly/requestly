@@ -547,6 +547,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             </div>
             <RequestTabs
               key={requestId}
+              requestId={apiEntryDetails?.id}
               collectionId={apiEntryDetails?.collectionId}
               requestEntry={entry}
               setRequestEntry={setRequestEntry}

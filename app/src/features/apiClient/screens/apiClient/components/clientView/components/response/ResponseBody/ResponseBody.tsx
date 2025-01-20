@@ -1,7 +1,7 @@
 import React, { ReactElement, memo, useCallback, useMemo, useState } from "react";
 import { Radio, RadioChangeEvent, Spin, Tooltip } from "antd";
 import { trackRawResponseViewed } from "modules/analytics/events/features/apiClient";
-import Editor from "componentsV2/CodeEditor/components/Editor/Editor";
+import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
 import { getEditorLanguageFromContentType } from "componentsV2/CodeEditor";
 import "./responseBody.scss";
 import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
@@ -91,11 +91,10 @@ const ResponseBody: React.FC<Props> = ({
     return (
       <div className="api-client-code-editor-container api-response-body-editor-container">
         <Editor
+          prettifyOnInit
           value={responseText}
-          defaultValue={responseText}
           language={editorLanguage}
           isReadOnly
-          prettifyOnInit={true}
           toolbarOptions={{
             title: "",
             options: [bodyPreviewModeOptions],
@@ -116,7 +115,7 @@ const ResponseBody: React.FC<Props> = ({
           </RQButton>
         </div>
       ) : null}
-      {responseText ? (
+      {responseText && !isLoading ? (
         <div className="api-response-body-content">
           {preview && responseMode === ResponseMode.PREVIEW ? (
             preview
