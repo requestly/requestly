@@ -23,13 +23,10 @@ type InternalFunctions = {
 export class RequestExecutor {
   // private workloadManager: APIClientWorkloadManager;
   private abortController: AbortController;
-  constructor(
-    private appMode: string,
-    private workloadManager: APIClientWorkloadManager,
-    private entryDetails: EntryDetails,
-    private apiRecords: RQAPI.Record[],
-    private internalFunctions: InternalFunctions
-  ) {}
+  private entryDetails: EntryDetails;
+  private apiRecords: RQAPI.Record[];
+  private internalFunctions: InternalFunctions;
+  constructor(private appMode: string, private workloadManager: APIClientWorkloadManager) {}
 
   private prepareRequest() {
     this.abortController = new AbortController();
@@ -53,6 +50,10 @@ export class RequestExecutor {
     const collectionVariables = this.internalFunctions.getCollectionVariables(this.entryDetails.collectionId);
     const environmentVariables = this.internalFunctions.getEnvironmentVariables();
 
+    console.log("!!!debug", "variables", {
+      environmentVariables,
+      collectionVariables,
+    });
     return {
       global: globalVariables,
       collection: collectionVariables,
@@ -88,6 +89,8 @@ export class RequestExecutor {
   }
 
   updateInternalFunctions(internalFunctions: InternalFunctions) {
+    console.log("!!!debug", "updateInternal function", internalFunctions.getEnvironmentVariables());
+
     this.internalFunctions = internalFunctions;
   }
 
