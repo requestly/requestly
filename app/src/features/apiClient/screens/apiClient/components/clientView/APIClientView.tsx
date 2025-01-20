@@ -216,8 +216,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, []);
 
   const handleUpdatesFromExecutionWorker = useCallback(
-    (state: any) => {
-      Object.keys(state).forEach((key) => {
+    async (state: any) => {
+      for (const key in state) {
         if (key === "environment") {
           const currentEnvironment = getCurrentEnvironment() as {
             currentEnvironmentName?: string;
@@ -225,16 +225,16 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           };
           if (currentEnvironment.currentEnvironmentId) {
             console.log("!!!debug", "setter", state[key]);
-            setVariables(currentEnvironment.currentEnvironmentId, state[key]);
+            await setVariables(currentEnvironment.currentEnvironmentId, state[key]);
           }
         }
         if (key === "global") {
-          setVariables("global", state[key]);
+          await setVariables("global", state[key]);
         }
         if (key === "collectionVariables") {
-          setCollectionVariables(state[key], apiEntryDetails?.collectionId);
+          await setCollectionVariables(state[key], apiEntryDetails?.collectionId);
         }
-      });
+      }
     },
     [getCurrentEnvironment, setVariables, setCollectionVariables, apiEntryDetails?.collectionId]
   );
