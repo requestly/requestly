@@ -16,7 +16,7 @@ type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
   getCollectionVariables(collectionId: string): EnvironmentVariables;
   getGlobalVariables(): EnvironmentVariables;
-  postScriptExecutionCallback(state: any): void;
+  postScriptExecutionCallback(state: any): Promise<void>;
   renderVariables(request: RQAPI.Request, collectionId: string): RQAPI.Request;
 };
 
@@ -100,7 +100,7 @@ export class RequestExecutor {
         this.entryDetails.scripts.preRequest,
         this.buildPreRequestSnapshot(),
         async (state: any) => {
-          this.internalFunctions.postScriptExecutionCallback(state);
+          await this.internalFunctions.postScriptExecutionCallback(state);
         }
       ),
       this.abortController.signal
@@ -113,7 +113,7 @@ export class RequestExecutor {
         this.entryDetails.scripts.postResponse,
         this.buildPostResponseSnapshot(),
         async (state: any) => {
-          this.internalFunctions.postScriptExecutionCallback(state);
+          await this.internalFunctions.postScriptExecutionCallback(state);
         }
       ),
       this.abortController.signal
