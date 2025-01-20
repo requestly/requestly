@@ -27,7 +27,6 @@ const NetworkContainer: React.FC = () => {
 
   useEffect(() => {
     chrome.devtools.network.onRequestFinished.addListener((networkEvent: NetworkEvent) => {
-
       enrichNetworkEvent(networkEvent);
       const rqNetworkEvent: RQNetworkEvent = {
         ...networkEvent,
