@@ -1,5 +1,5 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { RQAPI } from "../../../../types";
+import { RQAPI } from "../../../types";
 import { requestWorkerFunction, responseWorkerFunction } from "./workerScripts";
 import { ScriptExecutedPayload } from "./types";
 import { isEmpty } from "lodash";

@@ -41,12 +41,11 @@ import { RQSingleLineEditor } from "features/apiClient/screens/environment/compo
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
-import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
-import { getCollectionVariables } from "store/features/variables/selectors";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { RequestExecutor } from "features/apiClient/helpers/requestExecutor/requestExecutor";
 import { isEmpty } from "lodash";
 
 interface Props {
@@ -70,7 +69,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
-  const collectionVariables = useSelector(getCollectionVariables);
   const [searchParams] = useSearchParams();
   const isCreateMode = searchParams.has("create");
   const { requestId } = useParams();
@@ -78,7 +76,16 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const { toggleBottomSheet } = useBottomSheetContext();
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
-  const { getVariablesWithPrecedence } = environmentManager;
+  const {
+    getVariablesWithPrecedence,
+    setVariables,
+    setCollectionVariables,
+    getCurrentEnvironment,
+    getGlobalVariables,
+    getCollectionVariables,
+    getCurrentEnvironmentVariables,
+    renderVariables,
+  } = environmentManager;
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
     apiEntryDetails?.collectionId,
     getVariablesWithPrecedence,
@@ -91,6 +98,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
+  const [requestExecutor, setRequestExecutor] = useState<RequestExecutor | null>(null);
 
   const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(true);
@@ -207,7 +215,30 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const onSendButtonClick = useCallback(() => {
+  const handleUpdatesFromExecutionWorker = useCallback(
+    (state: any) => {
+      Object.keys(state).forEach((key) => {
+        if (key === "environment") {
+          const currentEnvironment = getCurrentEnvironment() as {
+            currentEnvironmentName?: string;
+            currentEnvironmentId?: string;
+          };
+          if (currentEnvironment.currentEnvironmentId) {
+            setVariables(currentEnvironment.currentEnvironmentId, state[key]);
+          }
+        }
+        if (key === "global") {
+          setVariables("global", state[key]);
+        }
+        if (key === "collectionVariables") {
+          setCollectionVariables(state[key], apiEntryDetails?.collectionId);
+        }
+      });
+    },
+    [getCurrentEnvironment, setVariables, setCollectionVariables, apiEntryDetails?.collectionId]
+  );
+
+  const onSendButtonClick = useCallback(async () => {
     updateTab(apiEntryDetails?.id, { isPreview: false });
 
     if (!entry.request.url) {
@@ -238,18 +269,27 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    executeAPIRequest(
-      appMode,
-      apiClientRecords,
-      sanitizedEntry,
-      {
-        id: apiEntryDetails?.id,
-        collectionId: apiEntryDetails?.collectionId,
-      },
-      environmentManager,
-      collectionVariables[apiEntryDetails?.collectionId]?.variables || {},
-      abortControllerRef.current.signal
-    )
+    requestExecutor.updateApiRecords(apiClientRecords);
+    requestExecutor.updateEntryDetails({
+      ...sanitizedEntry,
+      id: apiEntryDetails?.id,
+      collectionId: apiEntryDetails?.collectionId,
+    });
+
+    requestExecutor
+      .execute()
+
+      // await executeAPIRequest(
+      //   appMode,
+      //   apiClientRecords,
+      //   sanitizedEntry,
+      //   {
+      //     id: apiEntryDetails?.id,
+      //     collectionId: apiEntryDetails?.collectionId,
+      //   },
+      //   environmentManager,
+      //   abortControllerRef.current.signal
+      // )
       .then((executedEntry) => {
         const response = executedEntry.response;
         // TODO: Add an entry in history
@@ -265,7 +305,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
           trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
         } else {
-          const erroredEntry = entry as RQAPI.RequestErrorEntry;
+          const erroredEntry = executedEntry as RQAPI.RequestErrorEntry;
 
           setIsFailed(true);
           setError(erroredEntry?.error ?? null);
@@ -304,16 +344,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
     updateTab,
-    apiClientRecords,
     apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
-    appMode,
-    dispatch,
     entry,
-    environmentManager,
-    notifyApiRequestFinished,
     toggleBottomSheet,
-    collectionVariables,
+    requestExecutor,
+    apiClientRecords,
+    dispatch,
+    notifyApiRequestFinished,
   ]);
 
   const handleRecordNameUpdate = async () => {
@@ -406,6 +444,31 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
     (evt.target as HTMLInputElement).blur();
   }, []);
+
+  useEffect(() => {
+    if (!requestExecutor) {
+      setRequestExecutor(new RequestExecutor(appMode, null, apiClientRecords, null));
+    }
+  }, [apiClientRecords, appMode, requestExecutor]);
+
+  useEffect(() => {
+    if (requestExecutor) {
+      requestExecutor.updateInternalFunctions({
+        getCollectionVariables,
+        getEnvironmentVariables: getCurrentEnvironmentVariables,
+        getGlobalVariables,
+        postScriptExecutionCallback: handleUpdatesFromExecutionWorker,
+        renderVariables,
+      });
+    }
+  }, [
+    getCurrentEnvironmentVariables,
+    getCollectionVariables,
+    getGlobalVariables,
+    handleUpdatesFromExecutionWorker,
+    renderVariables,
+    requestExecutor,
+  ]);
 
   return isExtensionEnabled ? (
     <div className="api-client-view">
