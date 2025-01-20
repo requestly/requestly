@@ -4,19 +4,19 @@ import {
   SnapshotForPreRequest,
 } from "features/apiClient/helpers/requestExecutor/snapshot";
 
-export type StateUpdateCallback = (key: string, value: any) => Promise<void>;
+export type SyncLocalDumpCallback = (state: any) => Promise<void>;
 
 export interface ScriptWorkload<T extends BaseSnapshot = BaseSnapshot> {
   readonly script: string;
   readonly initialState: T;
-  readonly onStateUpdate: StateUpdateCallback;
+  readonly postScriptExecutionCallback: SyncLocalDumpCallback;
 }
 
 export class PreRequestScriptWorkload implements ScriptWorkload<SnapshotForPreRequest> {
   constructor(
     readonly script: string,
     readonly initialState: SnapshotForPreRequest,
-    readonly onStateUpdate: StateUpdateCallback
+    readonly postScriptExecutionCallback: SyncLocalDumpCallback
   ) {}
 }
 
@@ -24,7 +24,7 @@ export class PostResponseScriptWorkload implements ScriptWorkload<SnapshotForPos
   constructor(
     readonly script: string,
     readonly initialState: SnapshotForPostResponse,
-    readonly onStateUpdate: StateUpdateCallback
+    readonly postScriptExecutionCallback: SyncLocalDumpCallback
   ) {}
 }
 

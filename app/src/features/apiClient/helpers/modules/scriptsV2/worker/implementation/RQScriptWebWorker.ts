@@ -1,7 +1,13 @@
 import { proxy, Remote, wrap } from "comlink";
 
 import { RQWorker } from "../interface/RQWorker";
-import { WorkResult, WorkResultType, WorkErrorType, ScriptWorkload } from "../../workload-manager/workLoadTypes";
+import {
+  WorkResult,
+  WorkResultType,
+  WorkErrorType,
+  ScriptWorkload,
+  SyncLocalDumpCallback,
+} from "../../workload-manager/workLoadTypes";
 import { ScriptExecutionWorkerInterface } from "../scriptExecutionWorker/scriptExecutionWorkerInterface";
 import ScriptExecutionWorker from "../scriptExecutionWorker/scriptExecutionWorker?worker";
 
@@ -23,7 +29,7 @@ export class RQScriptWebWorker implements RQWorker {
 
   private async executeScript(workload: ScriptWorkload): Promise<WorkResult> {
     try {
-      await this.scriptWorker.executeScript(workload.script, workload.initialState, proxy(workload.onStateUpdate));
+      await this.scriptWorker.executeScript(workload.script, workload.initialState);
       return {
         type: WorkResultType.SUCCESS,
       };
@@ -39,9 +45,9 @@ export class RQScriptWebWorker implements RQWorker {
     }
   }
 
-  private async flushPendingWork(): Promise<WorkResult> {
+  private async flushPendingWork(callback: SyncLocalDumpCallback): Promise<WorkResult> {
     try {
-      await this.scriptWorker.flushPendingWork();
+      await this.scriptWorker.syncLocalDump(proxy(callback));
       return {
         type: WorkResultType.SUCCESS,
       };
@@ -62,7 +68,7 @@ export class RQScriptWebWorker implements RQWorker {
     if (scriptExecutionWorkResult.type === WorkResultType.ERROR) {
       return scriptExecutionWorkResult;
     }
-    return this.flushPendingWork();
+    return this.flushPendingWork(workload.postScriptExecutionCallback);
   }
 
   terminate() {
