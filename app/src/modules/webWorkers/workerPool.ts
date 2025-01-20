@@ -1,20 +1,16 @@
 import { RQWorker } from "features/apiClient/helpers/modules/scriptsV2/worker/interface/RQWorker";
+import { TaskAbortedError } from "modules/errors";
 
 export class WorkerPool<T extends RQWorker> {
-  private allWorkers = new Map<
-    T,
-    {
-      isAvailable: boolean;
-    }
-  >();
+  private busyWorkers = new Set<T>();
   private MAX_WORKERS = 15;
-  private pendingQueue: ((worker: T) => void)[] = [];
+  private pendingQueue = new Set<(worker: T) => void>();
 
   constructor(private workerModule: new () => T) {}
 
-  private async removeWorker(worker: T) {
-    await worker.terminate();
-    this.allWorkers.delete(worker);
+  private removeWorker(worker: T) {
+    worker.terminate();
+    this.busyWorkers.delete(worker);
   }
 
   private spawnNewWorker() {
@@ -22,28 +18,42 @@ export class WorkerPool<T extends RQWorker> {
     worker.setOnErrorCallback(() => {
       this.removeWorker(worker);
     });
-    this.allWorkers.set(worker, { isAvailable: false });
+    this.busyWorkers.add(worker);
     return worker;
   }
 
-  async acquire() {
-    if (this.allWorkers.size < this.MAX_WORKERS) {
+  async acquire(abortSignal: AbortSignal) {
+    if (this.busyWorkers.size < this.MAX_WORKERS) {
+      if (abortSignal.aborted) {
+        throw new TaskAbortedError();
+      }
       const worker = this.spawnNewWorker();
       return worker;
     }
 
-    return new Promise<T>((resolve) => {
-      this.pendingQueue.push(resolve);
+    return new Promise<T>((resolve, reject) => {
+      const abortListener = () => {
+        abortSignal.removeEventListener("abort", abortListener);
+        this.pendingQueue.delete(resolve);
+        reject(new TaskAbortedError());
+      };
+
+      abortSignal.addEventListener("abort", abortListener);
+
+      this.pendingQueue.add(resolve);
     });
   }
 
-  async release(worker: T) {
-    if (this.pendingQueue.length > 0) {
-      const receiver = this.pendingQueue.shift();
-      receiver(worker);
+  release(worker: T) {
+    this.removeWorker(worker);
+
+    if (this.pendingQueue.size === 0) {
       return;
     }
 
-    await this.removeWorker(worker);
+    const receiver = this.pendingQueue.values().next().value;
+    this.pendingQueue.delete(receiver);
+    const newWorker = this.spawnNewWorker();
+    receiver(newWorker);
   }
 }

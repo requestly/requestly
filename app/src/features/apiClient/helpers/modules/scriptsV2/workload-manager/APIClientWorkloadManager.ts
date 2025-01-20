@@ -1,6 +1,7 @@
 import { WorkerPool } from "modules/webWorkers/workerPool";
 import { RQScriptWebWorker } from "../worker/implementation/RQScriptWebWorker";
-import { ScriptWorkload, WorkResult } from "./workLoadTypes";
+import { ScriptWorkload, WorkErrorType, WorkResult, WorkResultType } from "./workLoadTypes";
+import { buildAbortErrorObject, TaskAbortedError } from "modules/errors";
 
 export class APIClientWorkloadManager {
   private workerPool: WorkerPool<RQScriptWebWorker>;
@@ -8,15 +9,49 @@ export class APIClientWorkloadManager {
     this.workerPool = new WorkerPool<RQScriptWebWorker>(RQScriptWebWorker);
   }
 
-  async execute(workload: ScriptWorkload): Promise<WorkResult> {
-    if (!workload) {
-      throw new Error("Workload is empty");
+  async execute(workload: ScriptWorkload, abortSignal: AbortSignal): Promise<WorkResult> {
+    return new Promise<WorkResult>((resolve) => {
+      this.executeWorkload(workload, resolve, abortSignal);
+    });
+  }
+
+  private async executeWorkload(
+    workload: ScriptWorkload,
+    resolve: (result: WorkResult) => void,
+    abortSignal: AbortSignal
+  ): Promise<void> {
+    if (abortSignal.aborted) {
+      resolve(buildAbortErrorObject(new TaskAbortedError()));
     }
 
-    const worker = await this.workerPool.acquire();
-    const result = await worker.work(workload);
-    await this.workerPool.release(worker);
+    try {
+      const worker = await this.workerPool.acquire(abortSignal);
 
-    return result;
+      const abortListener = () => {
+        abortSignal.removeEventListener("abort", abortListener);
+        this.workerPool.release(worker);
+        resolve(buildAbortErrorObject(new TaskAbortedError()));
+      };
+
+      abortSignal.addEventListener("abort", abortListener);
+
+      const result = await worker.work(workload);
+      this.workerPool.release(worker);
+
+      return resolve(result);
+    } catch (error) {
+      if (error instanceof TaskAbortedError) {
+        resolve(error.getWorkError());
+      } else {
+        resolve({
+          type: WorkResultType.ERROR,
+          error: {
+            type: WorkErrorType.SCRIPT_EXECUTION_FAILED,
+            name: error.name,
+            message: error.message,
+          },
+        });
+      }
+    }
   }
 }

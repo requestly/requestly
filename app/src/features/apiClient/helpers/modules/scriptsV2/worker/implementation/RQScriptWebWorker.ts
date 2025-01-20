@@ -58,6 +58,7 @@ export class RQScriptWebWorker implements RQWorker {
         error: {
           type: WorkErrorType.SCRIPT_PENDING_WORK_FLUSHING_FAILED,
           message: error.message,
+          name: error.name,
         },
       };
     }
