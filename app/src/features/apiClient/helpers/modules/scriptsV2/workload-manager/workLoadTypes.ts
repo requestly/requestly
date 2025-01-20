@@ -49,6 +49,7 @@ export enum WorkErrorType {
   UNKNOWN = "UNKNOWN",
   SCRIPT_EXECUTION_FAILED = "SCRIPT_EXECUTION_FAILED",
   SCRIPT_PENDING_WORK_FLUSHING_FAILED = "SCRIPT_PENDING_WORK_FLUSHING_FAILED",
+  EXECUTION_ABORTED = "EXECUTION_ABORTED",
 }
 
 export type WorkError = {
@@ -62,6 +63,12 @@ export type WorkError = {
   | {
       type: WorkErrorType.SCRIPT_PENDING_WORK_FLUSHING_FAILED;
       message: string;
+      name: string;
+    }
+  | {
+      type: WorkErrorType.EXECUTION_ABORTED;
+      message: string;
+      name: string;
     }
 );
 

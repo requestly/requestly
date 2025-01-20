@@ -21,17 +21,18 @@ type InternalFunctions = {
 };
 
 export class RequestExecutor {
-  private workloadManager: APIClientWorkloadManager;
+  // private workloadManager: APIClientWorkloadManager;
+  private abortController: AbortController;
   constructor(
     private appMode: string,
+    private workloadManager: APIClientWorkloadManager,
     private entryDetails: EntryDetails,
     private apiRecords: RQAPI.Record[],
     private internalFunctions: InternalFunctions
-  ) {
-    this.workloadManager = new APIClientWorkloadManager();
-  }
+  ) {}
 
   private prepareRequest() {
+    this.abortController = new AbortController();
     this.entryDetails.request.queryParams = [];
     const { headers, queryParams } = processAuthForEntry(this.entryDetails, this.entryDetails, this.apiRecords);
     this.entryDetails.request.headers = updateRequestWithAuthOptions(this.entryDetails.request.headers, headers);
@@ -98,7 +99,8 @@ export class RequestExecutor {
         async (state: any) => {
           this.internalFunctions.postScriptExecutionCallback(state);
         }
-      )
+      ),
+      this.abortController.signal
     );
   }
 
@@ -110,12 +112,14 @@ export class RequestExecutor {
         async (state: any) => {
           this.internalFunctions.postScriptExecutionCallback(state);
         }
-      )
+      ),
+      this.abortController.signal
     );
   }
 
   async execute() {
     this.prepareRequest();
+    console.log("!!!debug", "after prep", this.entryDetails);
 
     const preRequestScriptResult = await this.executePreRequestScript();
 
@@ -123,7 +127,7 @@ export class RequestExecutor {
       return {
         ...this.entryDetails,
         error: {
-          source: "Pre-Request Script",
+          source: "Pre-request script",
           name: preRequestScriptResult.error.name,
           message: preRequestScriptResult.error.message,
         },
@@ -132,8 +136,19 @@ export class RequestExecutor {
 
     this.entryDetails.request.url = addUrlSchemeIfMissing(this.entryDetails.request.url);
 
-    const response = await makeRequest(this.appMode, this.entryDetails.request);
-    this.entryDetails.response = response;
+    try {
+      const response = await makeRequest(this.appMode, this.entryDetails.request, this.abortController.signal);
+      this.entryDetails.response = response;
+    } catch (e) {
+      return {
+        ...this.entryDetails,
+        error: {
+          source: "request",
+          name: e.name,
+          message: e.message,
+        },
+      };
+    }
 
     const responseScriptResult = await this.executePostResponseScript();
 
@@ -146,5 +161,9 @@ export class RequestExecutor {
     }
 
     return this.entryDetails;
+  }
+
+  abort() {
+    this.abortController.abort();
   }
 }
