@@ -33,7 +33,10 @@ function varCompletionSource(envVariables: EnvironmentVariables): CompletionSour
   const varCompletions = Object.keys(envVariables).map((key) => {
     return {
       label: key,
-      detail: (envVariables[key].localValue ?? envVariables[key].syncValue) as string,
+      detail:
+        envVariables[key].type === "secret"
+          ? "•".repeat(String(envVariables[key].localValue ?? envVariables[key].syncValue).length)
+          : ((envVariables[key].localValue ?? envVariables[key].syncValue) as string),
       type: envVariables[key].localValue ? "local variable" : "sync variable",
     } as Completion;
   });
