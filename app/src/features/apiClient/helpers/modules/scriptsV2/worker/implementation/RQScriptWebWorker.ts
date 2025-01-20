@@ -6,7 +6,8 @@ import {
   WorkResultType,
   WorkErrorType,
   ScriptWorkload,
-  SyncLocalDumpCallback,
+  ScriptExecutionError,
+  ScriptPendingWorkFlushingError,
 } from "../../workload-manager/workLoadTypes";
 import { ScriptExecutionWorkerInterface } from "../scriptExecutionWorker/scriptExecutionWorkerInterface";
 import ScriptExecutionWorker from "../scriptExecutionWorker/scriptExecutionWorker?worker";
@@ -27,48 +28,46 @@ export class RQScriptWebWorker implements RQWorker {
     this.internalWorker.addEventListener("error", onError);
   }
 
-  private async executeScript(workload: ScriptWorkload): Promise<WorkResult> {
+  async work(workload: ScriptWorkload): Promise<WorkResult> {
     try {
-      await this.scriptWorker.executeScript(workload.script, workload.initialState);
+      await this.scriptWorker.executeScript(
+        workload.script,
+        workload.initialState,
+        proxy(workload.postScriptExecutionCallback)
+      );
       return {
         type: WorkResultType.SUCCESS,
       };
     } catch (error) {
+      if (error instanceof ScriptExecutionError) {
+        return {
+          type: WorkResultType.ERROR,
+          error: {
+            type: WorkErrorType.SCRIPT_EXECUTION_FAILED,
+            name: error.name,
+            message: error.message,
+          },
+        };
+      }
+      if (error instanceof ScriptPendingWorkFlushingError) {
+        return {
+          type: WorkResultType.ERROR,
+          error: {
+            type: WorkErrorType.SCRIPT_PENDING_WORK_FLUSHING_FAILED,
+            name: error.name,
+            message: error.message,
+          },
+        };
+      }
       return {
         type: WorkResultType.ERROR,
         error: {
-          type: WorkErrorType.SCRIPT_EXECUTION_FAILED,
+          type: WorkErrorType.UNKNOWN,
           name: error.name,
           message: error.message,
         },
       };
     }
-  }
-
-  private async flushPendingWork(callback: SyncLocalDumpCallback): Promise<WorkResult> {
-    try {
-      await this.scriptWorker.syncLocalDump(proxy(callback));
-      return {
-        type: WorkResultType.SUCCESS,
-      };
-    } catch (error) {
-      console.error("Could not flush pending work of worker. Encountered error:", error);
-      return {
-        type: WorkResultType.ERROR,
-        error: {
-          type: WorkErrorType.SCRIPT_PENDING_WORK_FLUSHING_FAILED,
-          message: error.message,
-        },
-      };
-    }
-  }
-
-  async work(workload: ScriptWorkload): Promise<WorkResult> {
-    const scriptExecutionWorkResult = await this.executeScript(workload);
-    if (scriptExecutionWorkResult.type === WorkResultType.ERROR) {
-      return scriptExecutionWorkResult;
-    }
-    return this.flushPendingWork(workload.postScriptExecutionCallback);
   }
 
   terminate() {
