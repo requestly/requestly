@@ -74,7 +74,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const { requestId } = useParams();
 
   const { toggleBottomSheet } = useBottomSheetContext();
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, apiClientWorkloadManager } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const {
     getVariablesWithPrecedence,
@@ -100,7 +100,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [requestExecutor, setRequestExecutor] = useState<RequestExecutor | null>(null);
 
-  const abortControllerRef = useRef<AbortController>(null);
+  // const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(true);
   const animationTimerRef = useRef<NodeJS.Timeout>();
   const { response, ...entryWithoutResponse } = entry;
@@ -262,13 +262,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     const sanitizedEntry = sanitizeEntry(entry);
     sanitizedEntry.response = null;
 
-    abortControllerRef.current = new AbortController();
-
     setIsFailed(false);
     setError(null);
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
-
+    setEntry(sanitizedEntry);
+    console.log("!!!debug", "sanitized entry", sanitizedEntry);
     requestExecutor.updateApiRecords(apiClientRecords);
     requestExecutor.updateEntryDetails({
       ...sanitizedEntry,
@@ -278,18 +277,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     requestExecutor
       .execute()
-
-      // await executeAPIRequest(
-      //   appMode,
-      //   apiClientRecords,
-      //   sanitizedEntry,
-      //   {
-      //     id: apiEntryDetails?.id,
-      //     collectionId: apiEntryDetails?.collectionId,
-      //   },
-      //   environmentManager,
-      //   abortControllerRef.current.signal
-      // )
       .then((executedEntry) => {
         const response = executedEntry.response;
         // TODO: Add an entry in history
@@ -330,13 +317,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         }
         notifyApiRequestFinished?.(renderedEntryWithResponse);
       })
-      .catch(() => {
-        if (abortControllerRef.current?.signal.aborted) {
-          setIsRequestCancelled(true);
-        }
+      .catch((e) => {
+        console.log("!!!debug", "catch for the api request", e);
+        // if (abortControllerRef.current?.signal.aborted) {
+        //   setIsRequestCancelled(true);
+        // }
       })
       .finally(() => {
-        abortControllerRef.current = null;
+        // abortControllerRef.current = null;
         setIsLoadingResponse(false);
       });
 
@@ -429,9 +417,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, [entry, apiEntryDetails, onSaveRecord, setEntry, teamId, uid, resetChanges, isCreateMode, requestId]);
 
   const cancelRequest = useCallback(() => {
-    abortControllerRef.current?.abort();
+    // abortControllerRef.current?.abort();
+    requestExecutor.abort();
     trackAPIRequestCancelled();
-  }, []);
+  }, [requestExecutor]);
 
   const handleAuthChange = useCallback((authOptions: RQAPI.AuthOptions) => {
     setEntry((prevEntry) => {
@@ -447,9 +436,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   useEffect(() => {
     if (!requestExecutor) {
-      setRequestExecutor(new RequestExecutor(appMode, null, apiClientRecords, null));
+      setRequestExecutor(new RequestExecutor(appMode, apiClientWorkloadManager, null, apiClientRecords, null));
     }
-  }, [apiClientRecords, appMode, requestExecutor]);
+  }, [apiClientRecords, apiClientWorkloadManager, appMode, requestExecutor]);
 
   useEffect(() => {
     if (requestExecutor) {
