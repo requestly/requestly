@@ -66,7 +66,7 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
           maxFiles={1}
           onFilesDrop={handleFileDrop}
           isProcessing={processingStatus === "processing"}
-          title="Browse or Drop your Requestly collections or environments export files here"
+          title="Drop your Requestly collections or environments export files here"
           subtitle="Accepted file formats: JSON"
           selectorButtonTitle={error ? "Try another file" : "Select file"}
         />
