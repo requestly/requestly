@@ -224,6 +224,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             currentEnvironmentId?: string;
           };
           if (currentEnvironment.currentEnvironmentId) {
+            console.log("!!!debug", "setter", state[key]);
             setVariables(currentEnvironment.currentEnvironmentId, state[key]);
           }
         }
@@ -436,7 +437,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   useEffect(() => {
     if (!requestExecutor) {
-      setRequestExecutor(new RequestExecutor(appMode, apiClientWorkloadManager, null, apiClientRecords, null));
+      setRequestExecutor(new RequestExecutor(appMode, apiClientWorkloadManager));
     }
   }, [apiClientRecords, apiClientWorkloadManager, appMode, requestExecutor]);
 

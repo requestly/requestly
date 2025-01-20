@@ -46,7 +46,7 @@ export class APIClientWorkloadManager {
         resolve({
           type: WorkResultType.ERROR,
           error: {
-            type: WorkErrorType.SCRIPT_EXECUTION_FAILED,
+            type: WorkErrorType.UNKNOWN,
             name: error.name,
             message: error.message,
           },

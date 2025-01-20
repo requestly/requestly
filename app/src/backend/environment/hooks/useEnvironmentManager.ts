@@ -142,6 +142,10 @@ const useEnvironmentManager = () => {
           activeOwnerEnvironments[environmentData.id]?.variables ?? {},
           environmentData.variables
         );
+        console.log("!!!debug", "merged", {
+          mergedVariables,
+          local: activeOwnerEnvironments[environmentData.id]?.variables ?? {},
+        });
         dispatch(
           variablesActions.updateEnvironmentData({
             newVariables: mergedVariables,
@@ -239,6 +243,7 @@ const useEnvironmentManager = () => {
         })
       );
 
+      console.log("!!!debug", "new var", newVariablesWithSyncvalues);
       return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariablesWithSyncvalues)
         .then(() => {
           dispatch(
@@ -343,6 +348,9 @@ const useEnvironmentManager = () => {
   );
 
   const getCurrentEnvironmentVariables = useCallback((): EnvironmentVariables => {
+    console.log("!!!debug", "curr env variables gettter", {
+      var: activeOwnerEnvironments[currentEnvironmentId]?.variables ?? {},
+    });
     return activeOwnerEnvironments[currentEnvironmentId]?.variables ?? {};
   }, [currentEnvironmentId, activeOwnerEnvironments]);
 
