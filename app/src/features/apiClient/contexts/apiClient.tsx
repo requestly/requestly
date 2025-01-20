@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -18,6 +18,7 @@ import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { clearExpandedRecordIdsFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
+import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workload-manager/APIClientWorkloadManager";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -49,6 +50,7 @@ interface ApiClientContextInterface {
   onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise<void>;
 
   setIsImportModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  apiClientWorkloadManager: APIClientWorkloadManager;
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
@@ -80,6 +82,8 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise.resolve(),
 
   setIsImportModalOpen: () => {},
+
+  apiClientWorkloadManager: new APIClientWorkloadManager(),
 });
 
 interface ApiClientProviderProps {
@@ -313,6 +317,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     [openTab, openDraftRequest, addNewEnvironment, teamId, uid, onSaveRecord]
   );
 
+  const workloadManager = useMemo(() => new APIClientWorkloadManager(), []);
+
   const value = {
     apiClientRecords,
     isLoadingApiClientRecords,
@@ -342,6 +348,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     onImportClick,
     onImportRequestModalClose,
     onNewClick,
+    apiClientWorkloadManager: workloadManager,
   };
 
   return <ApiClientContext.Provider value={value}>{children}</ApiClientContext.Provider>;
