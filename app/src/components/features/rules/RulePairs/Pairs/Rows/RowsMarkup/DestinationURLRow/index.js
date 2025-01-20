@@ -125,7 +125,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     setDestinationTypePopupVisible(true);
   };
 
-  const handleDestinationTypeChange = () => {
+  const handleDestinationTypeChange = (destinationPopupSelection) => {
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
@@ -136,7 +136,6 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
         },
       })
     );
-
     setDestinationType(destinationPopupSelection);
   };
 
@@ -346,18 +345,58 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
         <Col span={24}>
           <Row className="redirect-destination-container">
             <Col span={24} className="destination-options">
-              <Popconfirm
-                title="This will clear the existing changes"
-                okText="Confirm"
-                cancelText="Cancel"
-                onConfirm={() => {
-                  handleDestinationTypeChange();
-                  setDestinationTypePopupVisible(false);
-                }}
-                onCancel={() => setDestinationTypePopupVisible(false)}
-                open={destinationTypePopupVisible}
-              >
-                <Radio.Group value={destinationType} onChange={showPopup} disabled={isInputDisabled}>
+              {pair.destination ? (
+                <Popconfirm
+                  title="This will clear the existing changes"
+                  okText="Confirm"
+                  cancelText="Cancel"
+                  onConfirm={() => {
+                    handleDestinationTypeChange(destinationPopupSelection);
+                    setDestinationTypePopupVisible(false);
+                  }}
+                  onCancel={() => setDestinationTypePopupVisible(false)}
+                  open={destinationTypePopupVisible}
+                >
+                  <Radio.Group value={destinationType} onChange={showPopup} disabled={isInputDisabled}>
+                    <Radio value={RedirectDestinationType.URL}>Another URL</Radio>
+                    <MoreInfo
+                      trigger={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
+                      tooltipOpenedCallback={() => trackDesktopActionInterestCaptured("map_local")}
+                      analyticsContext="map_local"
+                      source={currentlySelectedRuleConfig.TYPE}
+                      text={
+                        <>
+                          Map Local file option is available only in desktop app.{" "}
+                          <a
+                            href={LINKS.REQUESTLY_DOWNLOAD_PAGE}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="tooltip-link"
+                            onClick={() => trackMoreInfoClicked("map_local", currentlySelectedRuleConfig.TYPE)}
+                          >
+                            Download now
+                          </a>
+                        </>
+                      }
+                    >
+                      <Radio
+                        value={RedirectDestinationType.MAP_LOCAL}
+                        disabled={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
+                      >
+                        Local file
+                      </Radio>
+                    </MoreInfo>
+                    <Radio value={RedirectDestinationType.MOCK_OR_FILE_PICKER}>Pick from Files/Mock server</Radio>
+                  </Radio.Group>
+                </Popconfirm>
+              ) : (
+                <Radio.Group
+                  value={destinationType}
+                  onChange={(e) => {
+                    handleDestinationTypeChange(e.target.value);
+                  }}
+                  disabled={isInputDisabled}
+                >
                   <Radio value={RedirectDestinationType.URL}>Another URL</Radio>
                   <MoreInfo
                     trigger={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
@@ -388,7 +427,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                   </MoreInfo>
                   <Radio value={RedirectDestinationType.MOCK_OR_FILE_PICKER}>Pick from Files/Mock server</Radio>
                 </Radio.Group>
-              </Popconfirm>
+              )}
             </Col>
             <Col span={24} className="destination-action">
               {renderDestinationRow()}
