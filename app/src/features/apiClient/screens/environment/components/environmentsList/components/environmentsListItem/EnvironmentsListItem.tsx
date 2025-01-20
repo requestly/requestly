@@ -19,7 +19,7 @@ interface EnvironmentsListItemProps {
     name: string;
     isGlobal?: boolean;
   };
-
+  onExportClick: (environment: { id: string; name: string }) => void;
   openTab: TabsLayoutContextInterface["openTab"];
 }
 
@@ -27,9 +27,10 @@ export enum EnvironmentMenuKey {
   RENAME = "rename",
   DUPLICATE = "duplicate",
   DELETE = "delete",
+  EXPORT = "export",
 }
 
-export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ environment, openTab }) => {
+export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ environment, openTab, onExportClick }) => {
   const navigate = useNavigate();
   const { envId } = useParams();
   const {
@@ -118,6 +119,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
         onClick: () => setIsRenameInputVisible(true),
       },
       { key: EnvironmentMenuKey.DUPLICATE, label: "Duplicate", onClick: () => handleEnvironmentDuplicate() },
+      { key: EnvironmentMenuKey.EXPORT, label: "Export", onClick: () => onExportClick(environment) },
       { key: EnvironmentMenuKey.DELETE, label: "Delete", danger: true, onClick: () => handleEnvironmentDelete() },
     ];
   }, [handleEnvironmentDuplicate, handleEnvironmentDelete]);

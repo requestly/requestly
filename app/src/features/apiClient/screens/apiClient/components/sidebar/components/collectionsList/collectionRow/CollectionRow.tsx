@@ -54,14 +54,14 @@ export const CollectionRow: React.FC<Props> = ({
             setIsEditMode(true);
           },
         },
-        // {
-        //   key: "1",
-        //   label: <div>Export</div>,
-        //   onClick: (itemInfo) => {
-        //     itemInfo.domEvent?.stopPropagation?.();
-        //     onExportClick(record);
-        //   },
-        // },
+        {
+          key: "1",
+          label: <div>Export</div>,
+          onClick: (itemInfo) => {
+            itemInfo.domEvent?.stopPropagation?.();
+            onExportClick(record);
+          },
+        },
         {
           key: "2",
           label: <div>Delete</div>,

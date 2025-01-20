@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { ImportCollectionsModal } from "../../../modals/importCollectionsModal/ImportCollectionsModal";
+import { ImportModal } from "../../../modals/importModal/ImportModal";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import { SiPostman } from "@react-icons/all-files/si/SiPostman";
@@ -49,7 +49,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const [isImportCollectionsModalOpen, setIsImportCollectionsModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
 
   const importItems: DropdownProps["menu"]["items"] = useMemo(
@@ -85,7 +85,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         label: (
           <div className="new-btn-option">
             <BsCollection />
-            Requestly Collection
+            Requestly Collection and Environments
           </div>
         ),
         onClick: () => {
@@ -103,7 +103,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             );
           } else {
             trackImportApiCollectionsClicked();
-            setIsImportCollectionsModalOpen(true);
+            setIsImportModalOpen(true);
           }
         },
       },
@@ -272,12 +272,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         {user.loggedIn && <EnvironmentSwitcher />}
       </div>
 
-      {isImportCollectionsModalOpen && (
-        <ImportCollectionsModal
-          isOpen={isImportCollectionsModalOpen}
-          onClose={() => setIsImportCollectionsModalOpen(false)}
-        />
-      )}
+      {isImportModalOpen && <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />}
       {isPostmanImporterModalOpen && (
         <PostmanImporterModal
           isOpen={isPostmanImporterModalOpen}
