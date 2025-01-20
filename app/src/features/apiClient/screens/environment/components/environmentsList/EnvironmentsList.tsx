@@ -18,13 +18,22 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { SidebarPlaceholderItem } from "features/apiClient/screens/apiClient/components/sidebar/components/SidebarPlaceholderItem/SidebarPlaceholderItem";
 import "./environmentsList.scss";
 import { isGlobalEnvironment } from "../../utils";
+import { ExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ExportModal";
+import { EnvironmentData } from "backend/environment/types";
 
 export const EnvironmentsList = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const user = useSelector(getUserAuthDetails);
-  const { getAllEnvironments, addNewEnvironment, setCurrentEnvironment } = useEnvironmentManager();
+  const {
+    getAllEnvironments,
+    addNewEnvironment,
+    setCurrentEnvironment,
+    getEnvironmentVariables,
+  } = useEnvironmentManager();
   const [searchValue, setSearchValue] = useState("");
+  const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const { setIsRecordBeingCreated, isRecordBeingCreated } = useApiClientContext();
 
   const { openTab, replaceTab } = useTabsLayoutContext();
@@ -96,6 +105,15 @@ export const EnvironmentsList = () => {
     return createNewEnvironment();
   }, [user.loggedIn, dispatch, createNewEnvironment]);
 
+  const handleExportEnvironments = useCallback(
+    (environment: { id: string; name: string }) => {
+      const variables = getEnvironmentVariables(environment.id);
+      setEnvironmentsToExport([{ ...environment, variables }]);
+      setIsExportModalOpen(true);
+    },
+    [getEnvironmentVariables]
+  );
+
   return (
     <div style={{ height: "inherit" }}>
       {environments?.length === 0 ? (
@@ -119,14 +137,22 @@ export const EnvironmentsList = () => {
                   .filter((env) => isGlobalEnvironment(env.id))
                   .map((environment) =>
                     environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
-                      <EnvironmentsListItem openTab={openTab} environment={environment} />
+                      <EnvironmentsListItem
+                        openTab={openTab}
+                        environment={environment}
+                        onExportClick={handleExportEnvironments}
+                      />
                     ) : null
                   )}
                 {filteredEnvironments
                   .filter((env) => !isGlobalEnvironment(env.id))
                   .map((environment) =>
                     environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
-                      <EnvironmentsListItem openTab={openTab} environment={environment} />
+                      <EnvironmentsListItem
+                        openTab={openTab}
+                        environment={environment}
+                        onExportClick={handleExportEnvironments}
+                      />
                     ) : null
                   )}
                 <div className="mt-8">
@@ -137,6 +163,16 @@ export const EnvironmentsList = () => {
               </>
             )}
           </div>
+          {isExportModalOpen && (
+            <ExportModal
+              exportType="ENV"
+              environments={environmentsToExport}
+              isOpen={isExportModalOpen}
+              onClose={() => {
+                setIsExportModalOpen(false);
+              }}
+            />
+          )}
         </>
       )}
     </div>
