@@ -1,6 +1,6 @@
 import { expose } from "comlink";
 import { RQ } from "../../sandbox/RQ";
-import { LocalScope } from "modules/localScope";
+import { LocalScope } from "../../../../../../../modules/localScope";
 import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
 import {
   ScriptExecutionError,
