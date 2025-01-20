@@ -2,13 +2,13 @@ import { expose } from "comlink";
 import { RQ } from "../../sandbox/RQ";
 import { LocalScope } from "modules/localScope";
 import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
-import { StateUpdateCallback } from "../../workload-manager/workLoadTypes";
+import { SyncLocalDumpCallback } from "../../workload-manager/workLoadTypes";
 
 export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
   private localScope: LocalScope;
 
-  executeScript(script: string, initialState: any, callback: StateUpdateCallback) {
-    this.localScope = new LocalScope(initialState, callback);
+  executeScript(script: string, initialState: any) {
+    this.localScope = new LocalScope(initialState);
 
     // eslint-disable-next-line no-new-func
     const scriptFunction = new Function(
@@ -21,9 +21,12 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
     scriptFunction(new RQ(this.localScope));
   }
 
-  async flushPendingWork() {
-    const pendingWork = this.localScope.getPendingCallbackExecutions();
-    await Promise.all(pendingWork);
+  async syncLocalDump(callback: SyncLocalDumpCallback) {
+    if (!this.localScope.getIsStateMutated()) {
+      return;
+    }
+    const dump = this.localScope.getAll();
+    callback(dump);
   }
 }
 

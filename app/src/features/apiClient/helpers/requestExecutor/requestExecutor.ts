@@ -16,7 +16,7 @@ type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
   getCollectionVariables(collectionId: string): EnvironmentVariables;
   getGlobalVariables(): EnvironmentVariables;
-  onStateUpdate(key: string, value: any): void;
+  postScriptExecutionCallback(state: any): void;
   renderVariables(request: RQAPI.Request, collectionId: string): RQAPI.Request;
 };
 
@@ -32,7 +32,6 @@ export class RequestExecutor {
   }
 
   private prepareRequest() {
-    console.log("DBG", this.entryDetails, this.apiRecords);
     this.entryDetails.request.queryParams = [];
     const { headers, queryParams } = processAuthForEntry(this.entryDetails, this.entryDetails, this.apiRecords);
     this.entryDetails.request.headers = updateRequestWithAuthOptions(this.entryDetails.request.headers, headers);
@@ -96,8 +95,8 @@ export class RequestExecutor {
       new PreRequestScriptWorkload(
         this.entryDetails.scripts.preRequest,
         this.buildPreRequestSnapshot(),
-        async (key: string, value: any) => {
-          this.internalFunctions.onStateUpdate(key, value);
+        async (state: any) => {
+          this.internalFunctions.postScriptExecutionCallback(state);
         }
       )
     );
@@ -108,8 +107,8 @@ export class RequestExecutor {
       new PostResponseScriptWorkload(
         this.entryDetails.scripts.postResponse,
         this.buildPostResponseSnapshot(),
-        async (key: string, value: any) => {
-          this.internalFunctions.onStateUpdate(key, value);
+        async (state: any) => {
+          this.internalFunctions.postScriptExecutionCallback(state);
         }
       )
     );

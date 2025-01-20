@@ -1,23 +1,21 @@
-import { StateUpdateCallback } from "features/apiClient/helpers/modules/scriptsV2/workload-manager/workLoadTypes";
-
 export class LocalScope {
-  private pendingCallbackExecutions: Promise<any>[] = [];
   private state: any;
-  private callback: StateUpdateCallback;
+  private isStateMutated: boolean;
 
-  constructor(initialState: any, callback: StateUpdateCallback) {
+  constructor(initialState: any) {
     this.state = { ...initialState };
-    this.callback = callback;
+    this.isStateMutated = false;
   }
 
   public set(key: string, value: any): void {
     if (!key) {
       throw new Error("Key cannot be empty");
     }
+    if (!this.isStateMutated) {
+      this.isStateMutated = true;
+    }
 
     this.state[key] = value;
-    const pendingCallbackExecution = this.callback(key, value);
-    this.pendingCallbackExecutions.push(pendingCallbackExecution);
   }
 
   public get(key: string): any {
@@ -28,7 +26,7 @@ export class LocalScope {
     return this.state;
   }
 
-  public getPendingCallbackExecutions() {
-    return this.pendingCallbackExecutions;
+  public getIsStateMutated(): boolean {
+    return this.isStateMutated;
   }
 }

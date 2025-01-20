@@ -215,33 +215,25 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const handleUpdatesFromScript = useCallback(
-    (key: string, value: any) => {
-      switch (key) {
-        case "environment": {
-          console.log("DBG currentENV updated");
+  const handleUpdatesFromExecutionWorker = useCallback(
+    (state: any) => {
+      Object.keys(state).forEach((key) => {
+        if (key === "environment") {
           const currentEnvironment = getCurrentEnvironment() as {
             currentEnvironmentName?: string;
             currentEnvironmentId?: string;
           };
           if (currentEnvironment.currentEnvironmentId) {
-            setVariables(currentEnvironment.currentEnvironmentId, value);
+            setVariables(currentEnvironment.currentEnvironmentId, state[key]);
           }
-          break;
         }
-
-        case "global": {
-          console.log("DBG global updated");
-          setVariables("global", value);
-          break;
+        if (key === "global") {
+          setVariables("global", state[key]);
         }
-
-        case "collectionVariables": {
-          console.log("DBG collectionVariables updated");
-          setCollectionVariables(value, apiEntryDetails?.collectionId);
-          break;
+        if (key === "collectionVariables") {
+          setCollectionVariables(state[key], apiEntryDetails?.collectionId);
         }
-      }
+      });
     },
     [getCurrentEnvironment, setVariables, setCollectionVariables, apiEntryDetails?.collectionId]
   );
@@ -465,7 +457,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         getCollectionVariables,
         getEnvironmentVariables: getCurrentEnvironmentVariables,
         getGlobalVariables,
-        onStateUpdate: handleUpdatesFromScript,
+        postScriptExecutionCallback: handleUpdatesFromExecutionWorker,
         renderVariables,
       });
     }
@@ -473,7 +465,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     getCurrentEnvironmentVariables,
     getCollectionVariables,
     getGlobalVariables,
-    handleUpdatesFromScript,
+    handleUpdatesFromExecutionWorker,
     renderVariables,
     requestExecutor,
   ]);

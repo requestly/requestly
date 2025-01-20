@@ -1,6 +1,6 @@
-import { StateUpdateCallback } from "../../workload-manager/workLoadTypes";
+import { SyncLocalDumpCallback } from "../../workload-manager/workLoadTypes";
 
 export interface ScriptExecutionWorkerInterface {
-  executeScript(script: string, initialState: any, callback: StateUpdateCallback): void;
-  flushPendingWork(): Promise<void>;
+  executeScript(script: string, initialState: any): void;
+  syncLocalDump(callback: SyncLocalDumpCallback): void;
 }
