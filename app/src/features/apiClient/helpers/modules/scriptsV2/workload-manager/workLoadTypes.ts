@@ -46,20 +46,35 @@ export type WorkResult = {
 );
 
 export enum WorkErrorType {
+  UNKNOWN = "UNKNOWN",
   SCRIPT_EXECUTION_FAILED = "SCRIPT_EXECUTION_FAILED",
   SCRIPT_PENDING_WORK_FLUSHING_FAILED = "SCRIPT_PENDING_WORK_FLUSHING_FAILED",
 }
 
 export type WorkError = {
   type: WorkErrorType;
+  name: string;
 } & (
   | {
-      type: WorkErrorType.SCRIPT_EXECUTION_FAILED;
+      type: WorkErrorType.SCRIPT_EXECUTION_FAILED | WorkErrorType.UNKNOWN;
       message: string;
-      name: string;
     }
   | {
       type: WorkErrorType.SCRIPT_PENDING_WORK_FLUSHING_FAILED;
       message: string;
     }
 );
+
+export class ScriptExecutionError extends Error {
+  constructor(error: Error) {
+    super(error.message);
+    this.name = "ScriptExecutionError";
+  }
+}
+
+export class ScriptPendingWorkFlushingError extends Error {
+  constructor(error: Error) {
+    super(error.message);
+    this.name = "ScriptPendingWorkFlushingError";
+  }
+}
