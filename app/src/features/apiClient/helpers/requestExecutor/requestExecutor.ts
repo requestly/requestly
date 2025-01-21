@@ -99,9 +99,7 @@ export class RequestExecutor {
       new PreRequestScriptWorkload(
         this.entryDetails.scripts.preRequest,
         this.buildPreRequestSnapshot(),
-        async (state: any) => {
-          await this.internalFunctions.postScriptExecutionCallback(state);
-        }
+        this.internalFunctions.postScriptExecutionCallback
       ),
       this.abortController.signal
     );
@@ -112,9 +110,7 @@ export class RequestExecutor {
       new PostResponseScriptWorkload(
         this.entryDetails.scripts.postResponse,
         this.buildPostResponseSnapshot(),
-        async (state: any) => {
-          await this.internalFunctions.postScriptExecutionCallback(state);
-        }
+        this.internalFunctions.postScriptExecutionCallback
       ),
       this.abortController.signal
     );
