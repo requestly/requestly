@@ -42,7 +42,7 @@ export type HeadersConfig<
   T = {
     value: string;
     header: string;
-    type: HeaderRule.HeaderRuleActionType;
+    type: HeaderRule.ModificationType;
   }
 > = {
   requestHeaders: T[];

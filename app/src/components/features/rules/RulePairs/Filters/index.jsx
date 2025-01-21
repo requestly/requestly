@@ -77,9 +77,7 @@ const Filters = (props) => {
   }, [currentlySelectedRuleData.ruleType]);
 
   const hasLegacyPayloadFilter = () => {
-    return (
-      ResponseRule.ResponseRuleResourceType.UNKNOWN === currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType
-    );
+    return ResponseRule.ResourceType.UNKNOWN === currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
   };
 
   const isRequestPayloadFilterCompatible = isResponseRule && hasLegacyPayloadFilter();
@@ -141,13 +139,13 @@ const Filters = (props) => {
   LOG_ANALYTICS.KEY = () => {
     debouncedTrackPayloadKeyModifiedEvent(
       currentlySelectedRuleData.ruleType,
-      snakeCase(ResponseRule.ResponseRuleResourceType.UNKNOWN)
+      snakeCase(ResponseRule.ResourceType.UNKNOWN)
     );
   };
   LOG_ANALYTICS.VALUE = () => {
     debouncedTrackPayloadValueModifiedEvent(
       currentlySelectedRuleData.ruleType,
-      snakeCase(ResponseRule.ResponseRuleResourceType.UNKNOWN)
+      snakeCase(ResponseRule.ResourceType.UNKNOWN)
     );
   };
 

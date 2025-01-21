@@ -37,7 +37,7 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
   const requestPayloadFilter = currentlySelectedRuleData.pairs?.[0].source?.filters?.[0]?.requestPayload;
 
   const updateResourceType = useCallback(
-    (resourceType: ResponseRule.ResponseRuleResourceType, clearGraphqlRequestPayload = false) => {
+    (resourceType: ResponseRule.ResourceType, clearGraphqlRequestPayload = false) => {
       const pairIndex = 0; // response rule will only have one pair
       const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
 
@@ -68,18 +68,18 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
     if (isNewResponseRule) return;
 
     // legacy rules will have "unknown" resource type
-    updateResourceType(ResponseRule.ResponseRuleResourceType.UNKNOWN);
+    updateResourceType(ResponseRule.ResourceType.UNKNOWN);
   }, [isNewResponseRule, requestPayloadFilter, updateResourceType]);
 
-  const handleResourceTypeChange = (type: ResponseRule.ResponseRuleResourceType) => {
-    const clearGraphqlRequestPayload = type !== ResponseRule.ResponseRuleResourceType.GRAPHQL_API;
+  const handleResourceTypeChange = (type: ResponseRule.ResourceType) => {
+    const clearGraphqlRequestPayload = type !== ResponseRule.ResourceType.GRAPHQL_API;
 
     updateResourceType(type, clearGraphqlRequestPayload);
   };
 
   const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.graphql_resource_type);
 
-  return isNewResponseRule && responseRuleResourceType !== ResponseRule.ResponseRuleResourceType.UNKNOWN ? (
+  return isNewResponseRule && responseRuleResourceType !== ResponseRule.ResourceType.UNKNOWN ? (
     <div className="resource-types-container" data-tour-id="rule-editor-response-resource-type">
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
@@ -87,28 +87,27 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
           disabled={isSampleRule}
           value={responseRuleResourceType}
           onChange={(e) => {
-            if (e.target.value !== ResponseRule.ResponseRuleResourceType.GRAPHQL_API)
-              handleResourceTypeChange(e.target.value);
+            if (e.target.value !== ResponseRule.ResourceType.GRAPHQL_API) handleResourceTypeChange(e.target.value);
           }}
         >
-          <Radio value={ResponseRule.ResponseRuleResourceType.REST_API}>REST API</Radio>
+          <Radio value={ResponseRule.ResourceType.REST_API}>REST API</Radio>
           <PremiumFeature
             features={[FeatureLimitType.graphql_resource_type]}
             featureName="GraphQL API"
             popoverPlacement="top"
             onContinue={() => {
-              handleResourceTypeChange(ResponseRule.ResponseRuleResourceType.GRAPHQL_API);
+              handleResourceTypeChange(ResponseRule.ResourceType.GRAPHQL_API);
             }}
             source="graphql_resource_type"
           >
-            <Radio value={ResponseRule.ResponseRuleResourceType.GRAPHQL_API} className="graphql-radio-item">
+            <Radio value={ResponseRule.ResourceType.GRAPHQL_API} className="graphql-radio-item">
               <Row align="middle">
                 GraphQL API {isPremiumFeature ? <PremiumIcon featureType="graphql_resource_type" /> : null}
               </Row>
             </Radio>
           </PremiumFeature>
           {isDesktop ? (
-            <Radio value={ResponseRule.ResponseRuleResourceType.STATIC}>HTML / JS / CSS</Radio>
+            <Radio value={ResponseRule.ResourceType.STATIC}>HTML / JS / CSS</Radio>
           ) : (
             <Tooltip
               overlayClassName="response-rule-resource-type-tooltip"
@@ -119,7 +118,7 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
                 </span>
               }
             >
-              <Radio disabled={!isDesktop} value={ResponseRule.ResponseRuleResourceType.STATIC}>
+              <Radio disabled={!isDesktop} value={ResponseRule.ResourceType.STATIC}>
                 HTML / JS / CSS
                 <QuestionCircleOutlined className="resource-disable-option-info-icon" />
               </Radio>

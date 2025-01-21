@@ -27,7 +27,7 @@ export const mapRemoteAdapter = (rules: MapRemoteRule): ParsedRule => {
           ...rule.pairs[0],
           id: generateObjectId(),
           destination: destination.value,
-          destinationType: RedirectRule.RedirectDestinationType.URL,
+          destinationType: RedirectRule.DestinationType.URL,
           source: { ...rule.pairs[0].source, value: source.value, operator: source.operator },
         },
       ],

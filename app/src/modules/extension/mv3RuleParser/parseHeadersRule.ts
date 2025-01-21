@@ -25,23 +25,20 @@ const APPEND_SUPPORTED_HEADERS = [
   "x-forwarded-for",
 ];
 
-const parseHeaders = (
-  headers: HeaderRule.HeadersRuleModificationData[],
-  headerType: "Request" | "Response"
-): ModifyHeaderInfo[] => {
+const parseHeaders = (headers: HeaderRule.Modification[], headerType: "Request" | "Response"): ModifyHeaderInfo[] => {
   return headers
     .map((header) => {
       if (header.value === "rq_request_initiator_origin()") {
         return null;
       }
 
-      if (header.type === HeaderRule.HeaderRuleActionType.REMOVE) {
+      if (header.type === HeaderRule.ModificationType.REMOVE) {
         return {
           header: header.header,
           operation: "remove" as HeadersRuleOperation,
         };
       } else if (
-        header.type === HeaderRule.HeaderRuleActionType.ADD &&
+        header.type === HeaderRule.ModificationType.ADD &&
         (headerType === "Response" ||
           (headerType === "Request" && APPEND_SUPPORTED_HEADERS.includes(header.header.toLowerCase()))) // Append is supported only for specific request headers
       ) {

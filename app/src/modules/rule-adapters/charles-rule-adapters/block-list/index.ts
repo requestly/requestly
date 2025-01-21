@@ -23,7 +23,7 @@ const generate403ResponseRule = (sourceUrl: string, status: boolean, operator: s
           type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,
           statusCode: "403",
           statusText: "Forbidden",
-          resourceType: ResponseRule.ResponseRuleResourceType.REST_API,
+          resourceType: ResponseRule.ResourceType.REST_API,
           value: RULE_TYPES_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE].RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE,
         },
       },

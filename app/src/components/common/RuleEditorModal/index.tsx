@@ -108,7 +108,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
         const pair = prefilledRule.pairs[0];
         const sourceFilters = pair.source.filters;
         if (GQLDetails?.operationName) {
-          pair.response.resourceType = ResponseRule.ResponseRuleResourceType.GRAPHQL_API;
+          pair.response.resourceType = ResponseRule.ResourceType.GRAPHQL_API;
           pair.source.filters = [
             ...sourceFilters,
             {
@@ -121,7 +121,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
           ];
           prefilledRule.pairs[0] = pair;
         } else if (GQLDetails?.query) {
-          pair.response.resourceType = ResponseRule.ResponseRuleResourceType.GRAPHQL_API;
+          pair.response.resourceType = ResponseRule.ResourceType.GRAPHQL_API;
           pair.source.filters = [
             ...sourceFilters,
             {

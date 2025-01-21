@@ -5,22 +5,22 @@ export const headersConfig = {
   requestHeaders: [
     {
       header: Header.PRAGMA,
-      type: HeaderRule.HeaderRuleActionType.ADD,
+      type: HeaderRule.ModificationType.ADD,
       value: HeaderValue.NO_CACHE,
     },
     {
       header: Header.CACHE_CONTROL,
-      type: HeaderRule.HeaderRuleActionType.ADD,
+      type: HeaderRule.ModificationType.ADD,
       value: HeaderValue.NO_CACHE,
     },
     {
       header: Header.IF_MODIFIED_SINCE,
-      type: HeaderRule.HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
       value: HeaderValue.UNKNOWN,
     },
     {
       header: Header.IF_NONE_MATCH,
-      type: HeaderRule.HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
       value: HeaderValue.UNKNOWN,
     },
   ],
@@ -29,21 +29,21 @@ export const headersConfig = {
     {
       header: Header.CACHE_CONTROL,
       value: HeaderValue.NO_CACHE,
-      type: HeaderRule.HeaderRuleActionType.ADD,
+      type: HeaderRule.ModificationType.ADD,
     },
     {
       header: Header.EXPIRES,
-      type: HeaderRule.HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
       value: HeaderValue.UNKNOWN,
     },
     {
       header: Header.LAST_MODIFIED,
-      type: HeaderRule.HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
       value: HeaderValue.UNKNOWN,
     },
     {
       header: Header.ETAG,
-      type: HeaderRule.HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
       value: HeaderValue.UNKNOWN,
     },
   ],

@@ -30,7 +30,7 @@ export const createModifyHeaderRule = (pair: RewriteRulePair, source: SourceData
     ...getHeadersData(pair),
     active: pair.active,
     whereToApply: getWhereToApplyRule(pair),
-    actionType: rewriteRuleActionTypes[pair.ruleType] as HeaderRule.HeaderRuleActionType,
+    actionType: rewriteRuleActionTypes[pair.ruleType] as HeaderRule.ModificationType,
   };
 
   const newRule = getNewRule(RuleType.HEADERS) as HeaderRule.Record;
@@ -61,7 +61,7 @@ export const createModifyQueryParamRule = (pair: RewriteRulePair, source: Source
     ...getQueryParamsData(pair),
     active: pair.active,
     ruleType: RuleType.QUERYPARAM,
-    actionType: rewriteRuleActionTypes[pair.ruleType] as QueryParamRule.QueryParamModificationType,
+    actionType: rewriteRuleActionTypes[pair.ruleType] as QueryParamRule.ModificationType,
   };
 
   const newRule = getNewRule(RuleType.QUERYPARAM) as QueryParamRule.Record;
@@ -101,7 +101,7 @@ export const createModifyStatusRule = (pair: RewriteRulePair, source: SourceData
           //@ts-ignore
           statusText: statusCodes[pair.newValue],
           type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,
-          resourceType: ResponseRule.ResponseRuleResourceType.REST_API,
+          resourceType: ResponseRule.ResourceType.REST_API,
           value: RULE_TYPES_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE].RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE,
         },
       },
@@ -201,7 +201,7 @@ export const createModifyBodyRule = (pair: RewriteRulePair, source: SourceData) 
           response: {
             ...responseRule.pairs[0].response,
             type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,
-            resourceType: ResponseRule.ResponseRuleResourceType.REST_API,
+            resourceType: ResponseRule.ResourceType.REST_API,
             value: updatedResponseBody,
           },
         },
@@ -245,7 +245,7 @@ export const createModifyBodyRule = (pair: RewriteRulePair, source: SourceData) 
           response: {
             ...responseRule.pairs[0].response,
             type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,
-            resourceType: ResponseRule.ResponseRuleResourceType.REST_API,
+            resourceType: ResponseRule.ResourceType.REST_API,
             value: updatedResponseBody,
           },
         },

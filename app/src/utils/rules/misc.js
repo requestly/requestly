@@ -171,7 +171,7 @@ export const isDesktopOnlyRule = (rule) => {
     const pairs = rule?.pairs;
     return pairs.some(
       ({ destinationType, destination }) =>
-        destinationType === RedirectRule.RedirectDestinationType.MAP_LOCAL || destination?.startsWith("file://")
+        destinationType === RedirectRule.DestinationType.MAP_LOCAL || destination?.startsWith("file://")
     );
   }
 };

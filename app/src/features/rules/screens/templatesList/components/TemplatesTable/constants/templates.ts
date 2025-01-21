@@ -38,7 +38,7 @@ const templateRecords: TemplateRecord[] = [
         pairs: [
           {
             destination: "http://localhost:8000/scripts/main.js",
-            destinationType: RedirectRule.RedirectDestinationType.URL,
+            destinationType: RedirectRule.DestinationType.URL,
             id: "9h8ir",
             source: {
               key: RuleSourceKey.URL,
@@ -124,22 +124,22 @@ const templateRecords: TemplateRecord[] = [
               Response: [
                 {
                   header: "Access-Control-Allow-Origin",
-                  type: HeaderRule.HeaderRuleActionType.ADD,
+                  type: HeaderRule.ModificationType.ADD,
                   value: "rq_request_initiator_origin()",
                 },
                 {
                   header: "Access-Control-Allow-Methods",
-                  type: HeaderRule.HeaderRuleActionType.ADD,
+                  type: HeaderRule.ModificationType.ADD,
                   value: "*",
                 },
                 {
                   header: "Access-Control-Allow-Headers",
-                  type: HeaderRule.HeaderRuleActionType.ADD,
+                  type: HeaderRule.ModificationType.ADD,
                   value: "*",
                 },
                 {
                   header: "Access-Control-Allow-Credentials",
-                  type: HeaderRule.HeaderRuleActionType.ADD,
+                  type: HeaderRule.ModificationType.ADD,
                   value: "true",
                 },
               ],
@@ -190,7 +190,7 @@ const templateRecords: TemplateRecord[] = [
                 {
                   header: "Authorization",
                   id: "5jipq",
-                  type: HeaderRule.HeaderRuleActionType.ADD,
+                  type: HeaderRule.ModificationType.ADD,
                   value: "Bearer your_custom_token",
                 },
               ],
@@ -232,9 +232,9 @@ const templateRecords: TemplateRecord[] = [
           {
             id: "qvgs0",
             response: {
-              resourceType: ResponseRule.ResponseRuleResourceType.REST_API,
+              resourceType: ResponseRule.ResourceType.REST_API,
               statusCode: "",
-              type: ResponseRule.ResponseRuleBodyType.STATIC,
+              type: ResponseRule.BodyType.STATIC,
               value: '{"userId":2,"status":"response modified!"}',
             },
             source: {
@@ -278,7 +278,7 @@ const templateRecords: TemplateRecord[] = [
               Response: [
                 {
                   header: "content-security-policy",
-                  type: HeaderRule.HeaderRuleActionType.REMOVE,
+                  type: HeaderRule.ModificationType.REMOVE,
                   value: "",
                 },
               ],
@@ -324,10 +324,10 @@ const templateRecords: TemplateRecord[] = [
           {
             id: "qoa22",
             response: {
-              resourceType: ResponseRule.ResponseRuleResourceType.REST_API,
+              resourceType: ResponseRule.ResourceType.REST_API,
               statusCode: "404",
               statusText: "Not Found",
-              type: ResponseRule.ResponseRuleBodyType.STATIC,
+              type: ResponseRule.BodyType.STATIC,
               value: "{}",
             },
             source: {
@@ -366,9 +366,9 @@ const templateRecords: TemplateRecord[] = [
           {
             id: "hwm11",
             response: {
-              resourceType: ResponseRule.ResponseRuleResourceType.REST_API,
+              resourceType: ResponseRule.ResourceType.REST_API,
               statusCode: "",
-              type: ResponseRule.ResponseRuleBodyType.STATIC,
+              type: ResponseRule.BodyType.STATIC,
               value: '{"featureFlag1":true,"featureFlag2":false,"featureFlag3":true}',
             },
             source: {
@@ -411,13 +411,13 @@ const templateRecords: TemplateRecord[] = [
                 {
                   header: "X-Forwarded-For",
                   id: "abijp",
-                  type: HeaderRule.HeaderRuleActionType.ADD,
+                  type: HeaderRule.ModificationType.ADD,
                   value: "203.0.113.195",
                 },
                 {
                   header: "CF-IPCountry",
                   id: "3qfpw",
-                  type: HeaderRule.HeaderRuleActionType.ADD,
+                  type: HeaderRule.ModificationType.ADD,
                   value: "US",
                 },
               ],
@@ -559,7 +559,7 @@ const templateRecords: TemplateRecord[] = [
               {
                 actionWhenParamExists: "Overwrite",
                 param: "share",
-                type: QueryParamRule.QueryParamModificationType.ADD,
+                type: QueryParamRule.ModificationType.ADD,
                 value: "1",
                 id: "mlcns",
               },

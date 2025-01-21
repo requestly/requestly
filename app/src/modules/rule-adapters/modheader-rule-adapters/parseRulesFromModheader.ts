@@ -92,8 +92,8 @@ const parseHeaders = (modheaderProfile: ModheaderProfile): Rule => {
     value: header.value,
     type:
       header.appendMode === false && header.sendEmptyHeader
-        ? HeaderRule.HeaderRuleActionType.REMOVE
-        : HeaderRule.HeaderRuleActionType.ADD,
+        ? HeaderRule.ModificationType.REMOVE
+        : HeaderRule.ModificationType.ADD,
   }));
 
   const responseHeaders = modheaderProfile.respHeaders?.map((header) => ({
@@ -101,8 +101,8 @@ const parseHeaders = (modheaderProfile: ModheaderProfile): Rule => {
     value: header.value,
     type:
       header.appendMode === false && header.sendEmptyHeader
-        ? HeaderRule.HeaderRuleActionType.REMOVE
-        : HeaderRule.HeaderRuleActionType.ADD,
+        ? HeaderRule.ModificationType.REMOVE
+        : HeaderRule.ModificationType.ADD,
   }));
 
   const newHeaderRule = getNewRule(RuleType.HEADERS) as HeaderRule.Record;
@@ -141,7 +141,7 @@ const parseCSPHeaders = (modheaderProfile: ModheaderProfile): Rule => {
     {
       header: "Content-Security-Policy",
       value: cspValueString,
-      type: HeaderRule.HeaderRuleActionType.ADD,
+      type: HeaderRule.ModificationType.ADD,
     },
   ];
 
@@ -168,7 +168,7 @@ const parseCookieHeaders = (modheaderProfile: ModheaderProfile): Rule => {
     {
       header: "Cookie",
       value: cookieString,
-      type: HeaderRule.HeaderRuleActionType.ADD,
+      type: HeaderRule.ModificationType.ADD,
     },
   ];
 

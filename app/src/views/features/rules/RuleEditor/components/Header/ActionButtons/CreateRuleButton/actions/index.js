@@ -426,7 +426,7 @@ export const validateRule = (rule, dispatch, appMode) => {
       }
       // graphql operation data shouldn't be empty
       else if (
-        pair.response?.resourceType === ResponseRule.ResponseRuleResourceType.GRAPHQL_API &&
+        pair.response?.resourceType === ResponseRule.ResourceType.GRAPHQL_API &&
         !isEmpty(pair.source?.filters?.[0]?.requestPayload) &&
         (!pair.source.filters[0].requestPayload.key || !pair.source.filters[0].requestPayload.value)
       ) {

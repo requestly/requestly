@@ -52,7 +52,7 @@ const ResponseRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => 
           />
         </Col>
       </Row>
-      {responseRuleResourceType === ResponseRule.ResponseRuleResourceType.GRAPHQL_API && (
+      {responseRuleResourceType === ResponseRule.ResourceType.GRAPHQL_API && (
         <Row className="response-rule-inputs-row">
           <Col span={24}>
             <GraphqlRequestPayload

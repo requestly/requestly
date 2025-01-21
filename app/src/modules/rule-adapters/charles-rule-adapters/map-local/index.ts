@@ -26,7 +26,7 @@ export const mapLocalRuleAdapter = (rules: MapLocalRule): ParsedRule => {
           ...rule.pairs[0],
           id: generateObjectId(),
           destination: `file://${destination}`,
-          destinationType: RedirectRule.RedirectDestinationType.MAP_LOCAL,
+          destinationType: RedirectRule.DestinationType.MAP_LOCAL,
           source: { ...rule.pairs[0].source, value: source.value, operator: source.operator },
         },
       ],

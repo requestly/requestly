@@ -15,7 +15,7 @@ export type HeaderAction = Partial<{
   active: boolean;
   ruleType: RuleType;
   whereToApply: WhereToApplyRule;
-  actionType: HeaderRule.HeaderRuleActionType;
+  actionType: HeaderRule.ModificationType;
 }>;
 
 export type QueryParamAction = Partial<{
@@ -23,6 +23,6 @@ export type QueryParamAction = Partial<{
   value: string;
   active: boolean;
   ruleType: RuleType;
-  actionType: QueryParamRule.QueryParamModificationType;
+  actionType: QueryParamRule.ModificationType;
   actionWhenParamExists: string;
 }>;

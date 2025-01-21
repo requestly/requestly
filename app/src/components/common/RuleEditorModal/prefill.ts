@@ -44,7 +44,7 @@ const prefillResponseRuleData = <T extends ResponseRule.Record>(data: unknown, n
   const updatedResponseData: Partial<ResponseRule.Pair["response"]> = {
     // @ts-ignore
     value: data?.response?.body ?? "",
-    resourceType: ResponseRule.ResponseRuleResourceType.REST_API,
+    resourceType: ResponseRule.ResourceType.REST_API,
   };
 
   return {

@@ -2,7 +2,7 @@ import { QueryParamRule } from "@requestly/shared/types/entities/rules";
 import { ExtensionRule, ExtensionRuleAction, QueryParamRuleTransform, RuleActionType } from "../types";
 import { parseConditionFromSource } from "./utils";
 
-const parseQueryParams = (modifications: QueryParamRule.QueryParamRuleModification[]): QueryParamRuleTransform => {
+const parseQueryParams = (modifications: QueryParamRule.Modification[]): QueryParamRuleTransform => {
   const transform: QueryParamRuleTransform = {
     queryTransform: {
       addOrReplaceParams: [],
@@ -11,12 +11,12 @@ const parseQueryParams = (modifications: QueryParamRule.QueryParamRuleModificati
   };
 
   for (const modification of modifications) {
-    if (modification.type === QueryParamRule.QueryParamModificationType.ADD) {
+    if (modification.type === QueryParamRule.ModificationType.ADD) {
       transform.queryTransform.addOrReplaceParams.push({
         key: modification.param,
         value: modification.value,
       });
-    } else if (modification.type === QueryParamRule.QueryParamModificationType.REMOVE) {
+    } else if (modification.type === QueryParamRule.ModificationType.REMOVE) {
       transform.queryTransform.removeParams.push(modification.param);
     } else {
       // case remove all

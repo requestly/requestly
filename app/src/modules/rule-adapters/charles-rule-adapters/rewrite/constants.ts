@@ -3,17 +3,17 @@ import { RewriteRuleActionType } from "./types";
 
 export const rewriteRuleActionTypes: Record<
   number,
-  RewriteRuleActionType | HeaderRule.HeaderRuleActionType | QueryParamRule.QueryParamModificationType
+  RewriteRuleActionType | HeaderRule.ModificationType | QueryParamRule.ModificationType
 > = {
-  1: HeaderRule.HeaderRuleActionType.ADD,
-  2: HeaderRule.HeaderRuleActionType.REMOVE,
-  3: HeaderRule.HeaderRuleActionType.MODIFY,
+  1: HeaderRule.ModificationType.ADD,
+  2: HeaderRule.ModificationType.REMOVE,
+  3: HeaderRule.ModificationType.MODIFY,
   4: RewriteRuleActionType.HOST,
   5: RewriteRuleActionType.PATH,
   6: RewriteRuleActionType.URL,
   7: RewriteRuleActionType.BODY,
-  8: QueryParamRule.QueryParamModificationType.ADD,
-  9: QueryParamRule.QueryParamModificationType.ADD,
-  10: QueryParamRule.QueryParamModificationType.REMOVE,
+  8: QueryParamRule.ModificationType.ADD,
+  9: QueryParamRule.ModificationType.ADD,
+  10: QueryParamRule.ModificationType.REMOVE,
   11: RewriteRuleActionType.STATUS,
 };

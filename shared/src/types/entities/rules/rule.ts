@@ -31,11 +31,11 @@ export namespace RedirectRule {
   }
 
   interface Pair extends BaseRulePair {
-    destinationType?: RedirectDestinationType;
+    destinationType?: DestinationType;
     destination: string;
   }
 
-  export enum RedirectDestinationType {
+  export enum DestinationType {
     URL = "url",
     MAP_LOCAL = "map_local",
     MOCK_OR_FILE_PICKER = "mock_or_file_picker",
@@ -61,21 +61,21 @@ export namespace QueryParamRule {
   }
 
   export interface Pair extends BaseRulePair {
-    modifications: QueryParamRuleModification[];
+    modifications: Modification[];
   }
 
-  export enum QueryParamModificationType {
+  export enum ModificationType {
     ADD = "Add",
     REMOVE = "Remove",
     REMOVE_ALL = "Remove All",
   }
 
-  export interface QueryParamRuleModification {
+  export interface Modification {
     id?: string;
     param: string;
     value: string;
     actionWhenParamExists?: string;
-    type: QueryParamModificationType;
+    type: ModificationType;
   }
 }
 
@@ -107,19 +107,19 @@ export namespace HeaderRule {
 
   export interface Pair extends BaseRulePair {
     modifications: {
-      Request?: HeadersRuleModificationData[];
-      Response?: HeadersRuleModificationData[];
+      Request?: Modification[];
+      Response?: Modification[];
     };
   }
 
-  export interface HeadersRuleModificationData {
+  export interface Modification {
     id?: string;
     header: string;
-    type: HeaderRuleActionType;
+    type: ModificationType;
     value: string;
   }
 
-  export enum HeaderRuleActionType {
+  export enum ModificationType {
     ADD = "Add",
     REMOVE = "Remove",
     MODIFY = "Modify",
@@ -147,13 +147,13 @@ export namespace RequestRule {
 
   export interface Pair extends BaseRulePair {
     request: {
-      type: RequestRuleBodyType;
+      type: BodyType;
       value: string;
       statusCode?: string;
     };
   }
 
-  enum RequestRuleBodyType {
+  enum BodyType {
     CODE = "code",
     STATIC = "static",
   }
@@ -167,20 +167,20 @@ export namespace ResponseRule {
 
   export interface Pair extends BaseRulePair {
     response: {
-      type: ResponseRuleBodyType;
+      type: BodyType;
       value: string;
-      resourceType?: ResponseRuleResourceType;
+      resourceType?: ResourceType;
       statusCode?: string;
       statusText?: String;
     };
   }
 
-  export enum ResponseRuleBodyType {
+  export enum BodyType {
     CODE = "code",
     STATIC = "static",
   }
 
-  export enum ResponseRuleResourceType {
+  export enum ResourceType {
     UNKNOWN = "unknown",
     REST_API = "restApi",
     GRAPHQL_API = "graphqlApi",

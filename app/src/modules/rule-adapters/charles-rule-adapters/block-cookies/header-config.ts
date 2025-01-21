@@ -6,7 +6,7 @@ export const headersConfig = {
     {
       header: Header.COOKIE,
       value: HeaderValue.UNKNOWN,
-      type: HeaderRule.HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
     },
   ],
 
@@ -14,7 +14,7 @@ export const headersConfig = {
     {
       header: Header.SET_COOKIE,
       value: HeaderValue.UNKNOWN,
-      type: HeaderRule.HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
     },
   ],
 };

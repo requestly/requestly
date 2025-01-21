@@ -20,14 +20,14 @@ export const getWhereToApplyRule = (pair: RewriteRulePair): WhereToApplyRule => 
 export const getModificationRuleName = (
   key: string = "",
   value: string = "",
-  type: HeaderRule.HeaderRuleActionType | QueryParamRule.QueryParamModificationType
+  type: HeaderRule.ModificationType | QueryParamRule.ModificationType
 ): string => {
   switch (type) {
-    case HeaderRule.HeaderRuleActionType.ADD:
-    case HeaderRule.HeaderRuleActionType.MODIFY || QueryParamRule.QueryParamModificationType.ADD:
+    case HeaderRule.ModificationType.ADD:
+    case HeaderRule.ModificationType.MODIFY || QueryParamRule.ModificationType.ADD:
       return `${type} ${key}: ${value}`;
 
-    case HeaderRule.HeaderRuleActionType.REMOVE || QueryParamRule.QueryParamModificationType.REMOVE:
+    case HeaderRule.ModificationType.REMOVE || QueryParamRule.ModificationType.REMOVE:
       return `${type} ${key}`;
 
     default:
@@ -37,13 +37,13 @@ export const getModificationRuleName = (
 
 export const getHeadersData = (pair: RewriteRulePair) => {
   switch (rewriteRuleActionTypes[pair.ruleType]) {
-    case HeaderRule.HeaderRuleActionType.ADD:
+    case HeaderRule.ModificationType.ADD:
       return { header: pair.newHeader || pair.matchHeader, value: pair.newValue };
 
-    case HeaderRule.HeaderRuleActionType.REMOVE:
+    case HeaderRule.ModificationType.REMOVE:
       return { header: pair.matchHeader };
 
-    case HeaderRule.HeaderRuleActionType.MODIFY:
+    case HeaderRule.ModificationType.MODIFY:
       return { header: pair.matchHeader, value: pair.newValue };
 
     default:
@@ -53,10 +53,10 @@ export const getHeadersData = (pair: RewriteRulePair) => {
 
 export const getQueryParamsData = (pair: RewriteRulePair) => {
   switch (rewriteRuleActionTypes[pair.ruleType]) {
-    case QueryParamRule.QueryParamModificationType.ADD:
+    case QueryParamRule.ModificationType.ADD:
       return { param: pair.newHeader || pair.matchHeader, value: pair.newValue };
 
-    case QueryParamRule.QueryParamModificationType.REMOVE:
+    case QueryParamRule.ModificationType.REMOVE:
       return { param: pair.matchHeader };
 
     default:

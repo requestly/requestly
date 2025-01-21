@@ -314,7 +314,7 @@ const CreateRuleButton = ({
           if (finalRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
             const resourceType = finalRuleData?.pairs?.[0]?.response?.resourceType;
 
-            if (resourceType && resourceType !== ResponseRule.ResponseRuleResourceType.UNKNOWN) {
+            if (resourceType && resourceType !== ResponseRule.ResourceType.UNKNOWN) {
               trackRuleResourceTypeSelected(GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE, snakeCase(resourceType));
             }
           }

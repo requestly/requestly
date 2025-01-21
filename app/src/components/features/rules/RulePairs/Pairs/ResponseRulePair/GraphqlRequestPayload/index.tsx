@@ -90,7 +90,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     setGqlOperationFilter((prev) => ({ ...prev, key: newPayloadKey }));
     debouncedTrackPayloadKeyModifiedEvent(
       currentlySelectedRuleData.ruleType,
-      snakeCase(ResponseRule.ResponseRuleResourceType.GRAPHQL_API)
+      snakeCase(ResponseRule.ResourceType.GRAPHQL_API)
     );
   };
 
@@ -105,7 +105,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     setGqlOperationFilter((prev) => ({ ...prev, operator }));
     trackRequestPayloadOperatorFilterModifiedEvent(
       currentlySelectedRuleData.ruleType,
-      snakeCase(ResponseRule.ResponseRuleResourceType.GRAPHQL_API)
+      snakeCase(ResponseRule.ResourceType.GRAPHQL_API)
     );
   };
 
@@ -122,7 +122,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     setGqlOperationFilter((prev) => ({ ...prev, value: newPayloadValue }));
     debouncedTrackPayloadValueModifiedEvent(
       currentlySelectedRuleData.ruleType,
-      snakeCase(ResponseRule.ResponseRuleResourceType.GRAPHQL_API)
+      snakeCase(ResponseRule.ResourceType.GRAPHQL_API)
     );
   };
 
