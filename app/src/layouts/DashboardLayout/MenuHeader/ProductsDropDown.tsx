@@ -194,6 +194,7 @@ const ProductsDropDown: React.FC<{}> = () => {
         trigger={["click"]}
         overlay={<Products toggleDropDown={handleDropDownBtnClick} />}
         onVisibleChange={toggleDropDown}
+        className="no-drag"
       >
         <Button type="text" onClick={toggleDropDown}>
           Products <DownOutlined className="down-icon" />

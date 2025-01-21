@@ -23,6 +23,28 @@
   height: 100%;
   max-height: var(--app-header-height);
   border-bottom: 1px solid var(--border-dark);
+
+  &.app-mode-desktop {
+    -webkit-app-region: drag;
+
+    &.app-mode-desktop-macOS {
+      padding-left: 65px;
+    }
+
+    &.app-mode-desktop-Windows {
+      // TODO: TO be added when we add frameless option in Windows
+      // padding-right: 65px;
+    }
+
+    &.app-mode-desktop-Linux {
+      // TODO: TO be added when we add frameless option in Linux
+      // padding-right: 65px;
+    }
+  }
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
 }
 
 .app-sidebar {

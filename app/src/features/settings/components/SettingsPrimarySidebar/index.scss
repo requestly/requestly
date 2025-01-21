@@ -4,6 +4,10 @@
   background: var(--surface-0_5);
   border-right: 1px solid var(--surface-2);
   height: 100vh;
+
+  &.app-mode-desktop {
+    padding-top: 40px;
+  }
 }
 
 .settings-primary-sidebar-title-icon {
