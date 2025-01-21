@@ -1,12 +1,10 @@
-import { RuleRecord, RuleType } from "features/rules/types/rules";
+import { Rule } from "@requestly/shared/types/entities/rules";
 
-interface TemplateRuleDefinition extends RuleRecord {
-  ruleType: RuleType;
-  pairs: any[];
+type TemplateRuleDefinition = Rule & {
   isSample?: boolean;
   preserveCookie?: boolean;
   version?: number;
-}
+};
 
 export type TemplateData = {
   targetAppMode: string[];

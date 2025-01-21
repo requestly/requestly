@@ -1,8 +1,8 @@
-import { DelayRule } from "../../../types/rules";
+import { DelayRule } from "@requestly/shared/types/entities/rules";
 import { ExtensionResourceType, ExtensionRule, RuleActionType } from "../types";
 import { parseConditionFromSource } from "./utils";
 
-const parseDelayRule = (rule: DelayRule): ExtensionRule[] => {
+const parseDelayRule = (rule: DelayRule.Record): ExtensionRule[] => {
   return rule.pairs.map(
     (rulePair): ExtensionRule => {
       return {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { StorageRecord } from "features/rules/types/rules";
 import DuplicateRecordModal from "components/features/rules/DuplicateRuleModal";
 import { useRulesModalsContext } from "features/rules/context/modals";
+import { StorageRecord } from "@requestly/shared/types/entities/rules";
 
 export const DuplicateRecordModalWrapper: React.FC = () => {
   const { setOpenDuplicateRecordModalAction } = useRulesModalsContext();
