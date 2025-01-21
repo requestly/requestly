@@ -51,7 +51,12 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
       }
 
-      // If types are the same, sort by creation date
+      // If types are the same, sort lexicographically by name
+      if (recordA.name.toLowerCase() !== recordB.name.toLowerCase()) {
+        return recordA.name.toLowerCase() < recordB.name.toLowerCase() ? -1 : 1;
+      }
+
+      // If names are the same, sort by creation date
       return recordA.createdTs - recordB.createdTs;
     });
 
