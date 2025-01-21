@@ -18,15 +18,15 @@
     "url": "https://requestly.com/"
   },
   "scripts": {
-    "build": "vite build",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
-    "start": "vite",
     "test": "vitest --passWithNoTests",
     "lint": "eslint --fix --ext .js,.jsx .",
-    "dev": "concurrently --killOthers 'cd ../shared && npm run watch' 'REACT_APP_ENV=DEV npm start'",
-    "emulated-dev": "concurrently --killOthers 'cd ../shared && npm run watch' 'REACT_APP_ENV=EMULATOR npm start'",
+    "type-check": "tsc --noEmit",
+    "build": "vite build",
     "preview": "npm run build && vite preview",
-    "type-check": "tsc --noEmit"
+    "start": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'vite'",
+    "dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=DEV npm start'",
+    "emulated-dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=EMULATOR npm start'"
   },
   "browserslist": [
     ">0.2%",
