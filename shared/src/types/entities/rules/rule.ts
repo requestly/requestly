@@ -27,10 +27,10 @@ export type Rule =
 export namespace RedirectRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.REDIRECT;
-    pairs: RedirectRulePair[];
+    pairs: Pair[];
   }
 
-  interface RedirectRulePair extends BaseRulePair {
+  interface Pair extends BaseRulePair {
     destinationType?: RedirectDestinationType;
     destination: string;
   }
@@ -45,10 +45,10 @@ export namespace RedirectRule {
 export namespace ReplaceRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.REPLACE;
-    pairs: ReplaceRulePair[];
+    pairs: Pair[];
   }
 
-  export interface ReplaceRulePair extends BaseRulePair {
+  export interface Pair extends BaseRulePair {
     from: string;
     to: string;
   }
@@ -57,10 +57,10 @@ export namespace ReplaceRule {
 export namespace QueryParamRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.QUERYPARAM;
-    pairs: QueryParamRulePair[];
+    pairs: Pair[];
   }
 
-  export interface QueryParamRulePair extends BaseRulePair {
+  export interface Pair extends BaseRulePair {
     modifications: QueryParamRuleModification[];
   }
 
@@ -82,19 +82,19 @@ export namespace QueryParamRule {
 export namespace CancelRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.CANCEL;
-    pairs: CancelRulePair[];
+    pairs: Pair[];
   }
 
-  type CancelRulePair = BaseRulePair;
+  type Pair = BaseRulePair;
 }
 
 export namespace DelayRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.DELAY;
-    pairs: DelayRulePair[];
+    pairs: Pair[];
   }
 
-  interface DelayRulePair extends BaseRulePair {
+  interface Pair extends BaseRulePair {
     delay: string; // FIX to number. Legacy issue
   }
 }
@@ -102,10 +102,10 @@ export namespace DelayRule {
 export namespace HeaderRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.HEADERS;
-    pairs: HeadersRulePair[];
+    pairs: Pair[];
   }
 
-  export interface HeadersRulePair extends BaseRulePair {
+  export interface Pair extends BaseRulePair {
     modifications: {
       Request?: HeadersRuleModificationData[];
       Response?: HeadersRuleModificationData[];
@@ -129,10 +129,10 @@ export namespace HeaderRule {
 export namespace UserAgentRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.USERAGENT;
-    pairs: UserAgentRulePair[];
+    pairs: Pair[];
   }
 
-  interface UserAgentRulePair extends BaseRulePair {
+  interface Pair extends BaseRulePair {
     userAgent: string;
     env?: string;
     envType?: "browser" | "device" | "custom";
@@ -142,10 +142,10 @@ export namespace UserAgentRule {
 export namespace RequestRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.REQUEST;
-    pairs: RequestRulePair[];
+    pairs: Pair[];
   }
 
-  export interface RequestRulePair extends BaseRulePair {
+  export interface Pair extends BaseRulePair {
     request: {
       type: RequestRuleBodyType;
       value: string;
@@ -162,10 +162,10 @@ export namespace RequestRule {
 export namespace ResponseRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.RESPONSE;
-    pairs: ResponseRulePair[];
+    pairs: Pair[];
   }
 
-  export interface ResponseRulePair extends BaseRulePair {
+  export interface Pair extends BaseRulePair {
     response: {
       type: ResponseRuleBodyType;
       value: string;
@@ -191,12 +191,12 @@ export namespace ResponseRule {
 export namespace ScriptRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.SCRIPT;
-    pairs: ScriptRulePair[];
+    pairs: Pair[];
 
     removeCSPHeader?: boolean;
   }
 
-  interface ScriptRulePair extends BaseRulePair {
+  interface Pair extends BaseRulePair {
     scripts: ScriptRuleModifications[];
   }
 

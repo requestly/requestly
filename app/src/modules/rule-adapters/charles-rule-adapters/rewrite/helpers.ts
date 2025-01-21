@@ -69,7 +69,7 @@ export const getHeaderModifications = ({
   value = "",
   actionType,
   whereToApply,
-}: HeaderAction): Partial<HeaderRule.HeadersRulePair["modifications"]> => {
+}: HeaderAction): Partial<HeaderRule.Pair["modifications"]> => {
   const getConfig = () => [{ id: generateObjectId(), header, value, type: actionType }];
 
   switch (whereToApply) {
@@ -95,6 +95,6 @@ export const getQueryParamModifications = ({
   param,
   value = "",
   actionType,
-}: QueryParamAction): Partial<QueryParamRule.QueryParamRulePair["modifications"]> => {
+}: QueryParamAction): Partial<QueryParamRule.Pair["modifications"]> => {
   return [{ id: generateObjectId(), param, value, type: actionType, actionWhenParamExists: "Overwrite" }];
 };

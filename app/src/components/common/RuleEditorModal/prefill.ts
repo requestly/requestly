@@ -23,7 +23,7 @@ const updateRulePairSource = <T extends Rule>(data: any, rule: T): T => {
 
 const prefillRequestRuleData = <T extends RequestRule.Record>(data: unknown, newRule: T): T => {
   const updatedRule = updateRulePairSource(data, newRule);
-  const updatedRequestData: Partial<RequestRule.RequestRulePair["request"]> = {
+  const updatedRequestData: Partial<RequestRule.Pair["request"]> = {
     // @ts-ignore
     value: data?.request?.body ?? "",
   };
@@ -41,7 +41,7 @@ const prefillRequestRuleData = <T extends RequestRule.Record>(data: unknown, new
 
 const prefillResponseRuleData = <T extends ResponseRule.Record>(data: unknown, newRule: T): T => {
   const updatedRule = updateRulePairSource(data, newRule);
-  const updatedResponseData: Partial<ResponseRule.ResponseRulePair["response"]> = {
+  const updatedResponseData: Partial<ResponseRule.Pair["response"]> = {
     // @ts-ignore
     value: data?.response?.body ?? "",
     resourceType: ResponseRule.ResponseRuleResourceType.REST_API,

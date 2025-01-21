@@ -10,7 +10,7 @@ import {
 import Logger from "../../../../../common/logger";
 import { ReplaceRule, RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 
-const getReplaceMatchingRegex = (rulePair: ReplaceRule.ReplaceRulePair): ExtensionRuleCondition => {
+const getReplaceMatchingRegex = (rulePair: ReplaceRule.Pair): ExtensionRuleCondition => {
   if (!rulePair.source.value) {
     const regexCondition = parseConditionFromSource(rulePair.source, true, false);
     return {
@@ -36,7 +36,7 @@ const getReplaceMatchingRegex = (rulePair: ReplaceRule.ReplaceRulePair): Extensi
   }
 };
 
-const getReplacementExtensionRule = (rulePair: ReplaceRule.ReplaceRulePair): ExtensionRule => {
+const getReplacementExtensionRule = (rulePair: ReplaceRule.Pair): ExtensionRule => {
   const commonExtensionCondition = parseConditionFromSource(rulePair.source, true, false);
   const fromRegex = parseRegex(rulePair.from);
   let replacementRegex = "";
@@ -75,7 +75,7 @@ const getReplacementExtensionRule = (rulePair: ReplaceRule.ReplaceRulePair): Ext
   };
 };
 
-const generateReplaceExtensionRules = (rulePair: ReplaceRule.ReplaceRulePair): ExtensionRule[] => {
+const generateReplaceExtensionRules = (rulePair: ReplaceRule.Pair): ExtensionRule[] => {
   // Case 1 and 2 - Replace from in URL source condition
   // Edgecase: Will not replace `from` if not present in the source condition url
   if (
