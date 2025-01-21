@@ -336,8 +336,8 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                       <>
                         <Checkbox checked={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
                         <span className="ml-2 text-gray">
-                          Any verified user from <span className="text-white">{userEmailDomain}</span> can join this
-                          workspace
+                          Any verified user from <span className="text-white">{userEmailDomain}</span>, or related
+                          domain, can join this workspace
                         </span>
                       </>
                     )}
