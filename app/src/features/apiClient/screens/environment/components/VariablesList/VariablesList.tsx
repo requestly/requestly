@@ -78,6 +78,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
         const allVariables = variableRows.reduce((acc, variable) => {
           if (variable.key) {
             acc[variable.key] = {
+              id: variable.id,
               type: variable.type,
               syncValue: variable.syncValue,
               localValue: variable.localValue,
@@ -94,7 +95,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
   const handleAddNewRow = useCallback((dataSource: EnvironmentVariableTableRow[]) => {
     const newData = {
-      id: dataSource.length + 1,
+      id: dataSource.length,
       key: "",
       type: EnvironmentVariableType.String,
       localValue: "",
@@ -150,15 +151,15 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
   useEffect(() => {
     if (variables) {
-      const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(
-        ([key, value], index) => ({
-          id: index,
+      const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables)
+        .map(([key, value], index) => ({
+          id: value.id ?? index,
           key,
           type: value.type,
           localValue: value.localValue,
           syncValue: value.syncValue,
-        })
-      );
+        }))
+        .sort((a, b) => a.id - b.id);
       if (formattedDataSource.length === 0) {
         formattedDataSource.push({
           id: 0,
