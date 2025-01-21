@@ -17,8 +17,11 @@ import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
 import SupportPanel from "components/misc/SupportPanel";
 import { useDesktopAppConnection } from "hooks/useDesktopAppConnection";
-import "./DashboardLayout.css";
+import "./DashboardLayout.scss";
 import { ConnectedToDesktopView } from "./ConnectedToDesktopView/ConnectedToDesktopView";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { getAppMode } from "store/selectors";
+import { getUserOS } from "utils/Misc";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -27,6 +30,7 @@ const DashboardLayout = () => {
   const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
   const user = useSelector(getUserAuthDetails);
   const { isDesktopAppConnected } = useDesktopAppConnection();
+  const appMode = useSelector(getAppMode);
 
   initializeOneTap();
 
@@ -68,7 +72,11 @@ const DashboardLayout = () => {
       <AppNotificationBanner />
       <PlanExpiredBanner />
       <div className="app-layout app-dashboard-layout">
-        <div className="app-header">
+        <div
+          className={`app-header ${
+            appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? `app-mode-desktop app-mode-desktop-${getUserOS()}` : ""
+          }`}
+        >
           {" "}
           <MenuHeader />
         </div>
