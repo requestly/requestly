@@ -80,7 +80,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
     <Dropdown
       overlay={menu}
       trigger={["click"]}
-      className="workspace-selector-dropdown"
+      className="workspace-selector-dropdown no-drag"
       onOpenChange={handleWorkspaceDropdownClick}
     >
       <div className="cursor-pointer items-center">
