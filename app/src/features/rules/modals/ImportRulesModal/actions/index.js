@@ -5,7 +5,7 @@ import { generateObjectId } from "utils/FormattingHelper";
 import Logger from "lib/logger";
 import { runRuleMigrations } from "utils/rules/ruleMigrations";
 import APP_CONSTANTS from "config/constants";
-import { RecordStatus } from "features/rules";
+import { RecordStatus } from "@requestly/shared/types/entities/rules";
 import { migrateRuleToMV3 } from "modules/extension/utils";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;

@@ -1,7 +1,7 @@
 import { trackEvent } from "modules/analytics";
 import { PRICING } from "../constants";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
-import { RuleType } from "types";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 type ViewPricingPlansClickSource = "crown" | "my_profile" | "feature_limiter_banner" | "workspace_upgrade";
 

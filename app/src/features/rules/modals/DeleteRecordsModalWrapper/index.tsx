@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import DeleteRulesModal from "components/features/rules/DeleteRulesModal";
-import { StorageRecord } from "features/rules/types/rules";
 import { useRulesModalsContext } from "features/rules/context/modals";
+import { StorageRecord } from "@requestly/shared/types/entities/rules";
 
 interface Props {}
 

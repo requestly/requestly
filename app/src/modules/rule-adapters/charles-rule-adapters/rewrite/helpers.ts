@@ -2,7 +2,7 @@ import { RewriteRulePair, WhereToApplyRule } from "../types";
 import { rewriteRuleActionTypes } from "./constants";
 import { HeaderAction, QueryParamAction } from "./types";
 import { generateObjectId } from "utils/FormattingHelper";
-import { HeaderRuleActionType, HeadersRulePair, QueryParamModificationType, QueryParamRulePair } from "types";
+import { HeaderRule, QueryParamRule } from "@requestly/shared/types/entities/rules";
 
 export const getWhereToApplyRule = (pair: RewriteRulePair): WhereToApplyRule => {
   if (pair.matchRequest && pair.matchResponse) {
@@ -20,14 +20,14 @@ export const getWhereToApplyRule = (pair: RewriteRulePair): WhereToApplyRule => 
 export const getModificationRuleName = (
   key: string = "",
   value: string = "",
-  type: HeaderRuleActionType | QueryParamModificationType
+  type: HeaderRule.ModificationType | QueryParamRule.ModificationType
 ): string => {
   switch (type) {
-    case HeaderRuleActionType.ADD:
-    case HeaderRuleActionType.MODIFY || QueryParamModificationType.ADD:
+    case HeaderRule.ModificationType.ADD:
+    case HeaderRule.ModificationType.MODIFY || QueryParamRule.ModificationType.ADD:
       return `${type} ${key}: ${value}`;
 
-    case HeaderRuleActionType.REMOVE || QueryParamModificationType.REMOVE:
+    case HeaderRule.ModificationType.REMOVE || QueryParamRule.ModificationType.REMOVE:
       return `${type} ${key}`;
 
     default:
@@ -37,13 +37,13 @@ export const getModificationRuleName = (
 
 export const getHeadersData = (pair: RewriteRulePair) => {
   switch (rewriteRuleActionTypes[pair.ruleType]) {
-    case HeaderRuleActionType.ADD:
+    case HeaderRule.ModificationType.ADD:
       return { header: pair.newHeader || pair.matchHeader, value: pair.newValue };
 
-    case HeaderRuleActionType.REMOVE:
+    case HeaderRule.ModificationType.REMOVE:
       return { header: pair.matchHeader };
 
-    case HeaderRuleActionType.MODIFY:
+    case HeaderRule.ModificationType.MODIFY:
       return { header: pair.matchHeader, value: pair.newValue };
 
     default:
@@ -53,10 +53,10 @@ export const getHeadersData = (pair: RewriteRulePair) => {
 
 export const getQueryParamsData = (pair: RewriteRulePair) => {
   switch (rewriteRuleActionTypes[pair.ruleType]) {
-    case QueryParamModificationType.ADD:
+    case QueryParamRule.ModificationType.ADD:
       return { param: pair.newHeader || pair.matchHeader, value: pair.newValue };
 
-    case QueryParamModificationType.REMOVE:
+    case QueryParamRule.ModificationType.REMOVE:
       return { param: pair.matchHeader };
 
     default:
@@ -69,7 +69,7 @@ export const getHeaderModifications = ({
   value = "",
   actionType,
   whereToApply,
-}: HeaderAction): Partial<HeadersRulePair["modifications"]> => {
+}: HeaderAction): Partial<HeaderRule.Pair["modifications"]> => {
   const getConfig = () => [{ id: generateObjectId(), header, value, type: actionType }];
 
   switch (whereToApply) {
@@ -95,6 +95,6 @@ export const getQueryParamModifications = ({
   param,
   value = "",
   actionType,
-}: QueryParamAction): Partial<QueryParamRulePair["modifications"]> => {
+}: QueryParamAction): Partial<QueryParamRule.Pair["modifications"]> => {
   return [{ id: generateObjectId(), param, value, type: actionType, actionWhenParamExists: "Overwrite" }];
 };
