@@ -23,8 +23,8 @@
     "start": "vite",
     "test": "vitest --passWithNoTests",
     "lint": "eslint --fix --ext .js,.jsx .",
-    "dev": "REACT_APP_ENV=DEV npm start",
-    "emulated-dev": "REACT_APP_ENV=EMULATOR npm start",
+    "dev": "concurrently --killOthers 'cd ../shared && npm run watch' 'REACT_APP_ENV=DEV npm start'",
+    "emulated-dev": "concurrently --killOthers 'cd ../shared && npm run watch' 'REACT_APP_ENV=EMULATOR npm start'",
     "preview": "npm run build && vite preview",
     "type-check": "tsc --noEmit"
   },
@@ -160,6 +160,7 @@
     "@types/uuid": "^9.0.0",
     "@types/xml2js": "^0.4.11",
     "@vitejs/plugin-react": "^4.2.1",
+    "concurrently": "^9.1.2",
     "esbuild": "0.20.1",
     "eslint": "^8.57.0",
     "eslint-config-react-app": "^7.0.1",

@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rimraf ./dist && rollup -c --bundleConfigAsCjs"
+    "build": "rimraf ./dist && rollup -c --bundleConfigAsCjs",
+    "watch": "npm run build -- --watch"
   },
   "author": "",
   "devDependencies": {
