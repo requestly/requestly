@@ -1,9 +1,9 @@
-import { Rule, SourceOperator } from "types";
 import { HeadersConfig, SourceUrl, Location, CharlesRuleType, SourceData } from "./charles-rule-adapters/types";
 import { generateObjectId } from "utils/FormattingHelper";
 import { StorageService } from "init";
 import { createNewGroup } from "components/features/rules/ChangeRuleGroupModal/actions";
 import { trim } from "lodash";
+import { Rule, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 
 const checkIfWildCardPresent = (value: string | number): boolean => {
   // e.g: for port if it contains wildcard then its a string else number
@@ -42,7 +42,7 @@ export const getLocation = (location: Location) => {
 
   return {
     value: updatedUrl,
-    operator: isWildCardPresent ? SourceOperator.MATCHES : SourceOperator.CONTAINS,
+    operator: isWildCardPresent ? RuleSourceOperator.MATCHES : RuleSourceOperator.CONTAINS,
   };
 };
 

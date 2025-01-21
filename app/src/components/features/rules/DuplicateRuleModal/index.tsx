@@ -19,11 +19,12 @@ import APP_CONSTANTS from "config/constants";
 import { RQButton } from "lib/design-system/components";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
-import { Group, isGroup, isRule, RecordStatus, StorageRecord, Rule } from "features/rules";
 import { getAllRulesOfGroup } from "utils/rules/misc";
 import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
 import "./duplicateRuleModal.scss";
+import { Group, RecordStatus, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
+import { isGroup, isRule } from "features/rules";
 
 interface Props {
   isOpen: boolean;

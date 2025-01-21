@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
-import { RuleType } from "types";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import LINKS from "config/constants/sub/links";
 import { ExampleType, UseCaseExample } from "./types";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 export const RULE_DETAILS: Record<
   RuleType,

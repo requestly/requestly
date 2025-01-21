@@ -1,5 +1,4 @@
 import React, { createContext, useCallback, useContext } from "react";
-import { Group, RecordStatus, Rule, StorageRecord } from "features/rules/types/rules";
 import {
   trackNewRuleButtonClicked,
   trackRulePinToggled,
@@ -29,6 +28,7 @@ import { RuleTableRecord } from "../screens/rulesList/components/RulesList/compo
 import { updateGroupOfSelectedRules } from "components/features/rules/ChangeRuleGroupModal/actions";
 import { getAllRulesOfGroup } from "utils/rules/misc";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import { Group, RecordStatus, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
 
 // FIXME: Make all bulk actions async to handle loading state properly
 type RulesActionContextType = {

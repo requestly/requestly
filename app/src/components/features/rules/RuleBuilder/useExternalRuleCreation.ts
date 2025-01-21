@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Rule } from "types/rules";
 import { setCurrentlySelectedRule } from "./actions";
 import APP_CONSTANTS from "../../../../config/constants";
 import { getCurrentlySelectedRuleData } from "store/selectors";
+import { Rule } from "@requestly/shared/types/entities/rules";
 
 const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 const REQUESTLY_POST_MESSAGE_AUTHOR = "requestly";

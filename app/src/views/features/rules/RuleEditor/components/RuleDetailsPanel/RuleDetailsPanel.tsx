@@ -1,5 +1,4 @@
 import React, { ReactNode, useEffect } from "react";
-import { RuleType } from "types";
 import { Button } from "antd";
 import { MdMenuBook } from "@react-icons/all-files/md/MdMenuBook";
 import { MdOutlineFactCheck } from "@react-icons/all-files/md/MdOutlineFactCheck";
@@ -21,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { ExampleType, UseCaseExample } from "./types";
 import "./RuleDetailsPanel.scss";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 export type RuleDetails = {
   type: RuleType | string;
