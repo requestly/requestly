@@ -122,7 +122,7 @@ export default function HeaderText() {
   const renderProxyInfo = () => {
     return (
       <>
-        <Col className="hidden-on-small-screen desktop-app-proxy-info-container">
+        <Col className="hidden-on-small-screen desktop-app-proxy-info-container no-drag">
           <DesktopAppProxyInfo />
         </Col>
       </>
