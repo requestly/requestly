@@ -7,7 +7,6 @@ import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined } from "@a
 import { isValidRegex } from "utils/rules/misc";
 import { isValidUrl } from "utils/FormattingHelper";
 import { isEqual } from "lodash";
-import { RulePairSource, SourceOperator } from "types";
 import { SessionRecordingPageSource } from "types/sessionRecording";
 //@ts-ignore
 import { RULE_PROCESSOR } from "@requestly/requestly-core";
@@ -19,6 +18,7 @@ import {
   trackURLConditionSourceModified,
 } from "modules/analytics/events/features/testUrlModal";
 import "./index.scss";
+import { RulePairSource, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 
 type Source = RulePairSource | SessionRecordingPageSource;
 
@@ -28,7 +28,7 @@ interface ModalProps {
   analyticsContext: Record<string, string>;
   originalSource: Source;
   defaultTestURL?: string;
-  onClose: (operator: SourceOperator) => void;
+  onClose: (operator: RuleSourceOperator) => void;
   onSave: (newSource: Source) => void;
 }
 
@@ -54,8 +54,8 @@ export const TestURLModal: React.FC<ModalProps> = ({
 
   const renderMatchedGroups = useCallback(() => {
     if (
-      updatedSource.operator === SourceOperator.MATCHES ||
-      updatedSource.operator === SourceOperator.WILDCARD_MATCHES
+      updatedSource.operator === RuleSourceOperator.MATCHES ||
+      updatedSource.operator === RuleSourceOperator.WILDCARD_MATCHES
     ) {
       return (
         <div className="group-match-wrapper">
@@ -73,7 +73,7 @@ export const TestURLModal: React.FC<ModalProps> = ({
   }, [matchedGroups, updatedSource.operator]);
 
   const renderResult = useCallback(() => {
-    if (updatedSource.operator === SourceOperator.MATCHES && !isValidRegex(updatedSource.value)) {
+    if (updatedSource.operator === RuleSourceOperator.MATCHES && !isValidRegex(updatedSource.value)) {
       return (
         <>
           <CloseCircleOutlined className="danger" />
@@ -167,7 +167,7 @@ export const TestURLModal: React.FC<ModalProps> = ({
     >
       <div className="test-url-modal-header">
         <Typography.Title level={4}>
-          Test and apply {updatedSource.operator === SourceOperator.MATCHES ? "Regex" : "Wildcard"} condition
+          Test and apply {updatedSource.operator === RuleSourceOperator.MATCHES ? "Regex" : "Wildcard"} condition
         </Typography.Title>
         <Typography.Text className="text-gray">
           Check if your request URL matches the rule condition you specified.{" "}

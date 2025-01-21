@@ -1,5 +1,5 @@
+import { HeaderRule, QueryParamRule, RuleType } from "@requestly/shared/types/entities/rules";
 import { WhereToApplyRule } from "../types";
-import { HeaderRuleActionType, QueryParamModificationType, RuleType } from "types";
 
 export enum RewriteRuleActionType {
   URL = "url",
@@ -15,7 +15,7 @@ export type HeaderAction = Partial<{
   active: boolean;
   ruleType: RuleType;
   whereToApply: WhereToApplyRule;
-  actionType: HeaderRuleActionType;
+  actionType: HeaderRule.ModificationType;
 }>;
 
 export type QueryParamAction = Partial<{
@@ -23,6 +23,6 @@ export type QueryParamAction = Partial<{
   value: string;
   active: boolean;
   ruleType: RuleType;
-  actionType: QueryParamModificationType;
+  actionType: QueryParamRule.ModificationType;
   actionWhenParamExists: string;
 }>;

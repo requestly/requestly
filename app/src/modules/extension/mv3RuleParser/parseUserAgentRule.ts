@@ -1,10 +1,10 @@
-import { UserAgentRule } from "../../../types/rules";
+import { UserAgentRule } from "@requestly/shared/types/entities/rules";
 import { ExtensionRule, ExtensionRuleAction, HeadersRuleOperation, RuleActionType } from "../types";
 import { parseConditionFromSource } from "./utils";
 
 const USER_AGENT_HEADER = "User-Agent";
 
-const parseUserAgentRule = (rule: UserAgentRule): ExtensionRule[] => {
+const parseUserAgentRule = (rule: UserAgentRule.Record): ExtensionRule[] => {
   return rule.pairs.map(
     (rulePair): ExtensionRule => {
       const condition = parseConditionFromSource(rulePair.source);
