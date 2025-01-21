@@ -106,6 +106,15 @@ export const RULES = {
     IMPORT_COMPLETE: "charles_settings_import_completed",
     DOCS_CLICKED: "charles_settings_import_docs_clicked",
   },
+
+  RESOURCE_OVERRIDE_SETTINGS: {
+    VIEWED: "resource_override_settings_import_viewed",
+    IMPORT_STARTED: "resource_override_settings_import_started",
+    PARSED: "resource_override_settings_parsed",
+    IMPORT_FAILED: "resource_override_settings_import_failed",
+    IMPORT_COMPLETE: "resource_override_settings_import_completed",
+    DOCS_CLICKED: "resource_override_settings_import_docs_clicked",
+  },
 };
 
 // TODO: cleanup

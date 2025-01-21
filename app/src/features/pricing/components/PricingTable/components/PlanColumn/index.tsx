@@ -56,6 +56,14 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       return capitalize(PRICING.PLAN_NAMES.FREE);
     }
 
+    if (planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL) {
+      return capitalize(PRICING.PLAN_NAMES.FREE);
+    }
+
+    if (planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE) {
+      return capitalize(PRICING.PLAN_NAMES.PROFESSIONAL);
+    }
+
     const index = pricingPlansOrder.indexOf(planName);
     return capitalize(pricingPlansOrder[index - 1]);
   };
@@ -91,7 +99,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     if (
       planName === PRICING.PLAN_NAMES.BASIC ||
       planName === PRICING.PLAN_NAMES.PROFESSIONAL ||
-      planName === PRICING.PLAN_NAMES.LITE
+      planName === PRICING.PLAN_NAMES.LITE ||
+      planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE ||
+      planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL
     )
       return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price * quantity} annually`;
     return null;
@@ -154,31 +164,35 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         planName === PRICING.PLAN_NAMES.LITE && duration === PRICING.DURATION.MONTHLY ? "disabled-col" : ""
       }`}
     >
-      <Space size={8}>
-        <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
-        {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">MOST VALUE</span>}
-      </Space>
-      {planName === PRICING.PLAN_NAMES.ENTERPRISE && (
-        <Row align="middle" className="items-center plan-price-row mt-8">
-          <Space size={0}>
-            <span className="text-bold">Starts at</span>
-            <Typography.Text className="plan-price enterprice-plan-price">$59</Typography.Text>
-            <div className="caption">
-              <Typography.Text>member / month</Typography.Text>
-            </div>
-          </Space>
-        </Row>
-      )}
-      {planPrice !== undefined && (
-        <Row align="middle" className="items-center plan-price-row mt-8">
-          <Space size="small">
-            <Typography.Text className="plan-price">
-              ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
-            </Typography.Text>
-            {product === PRICING.PRODUCTS.HTTP_RULES &&
-              planName !== PRICING.PLAN_NAMES.FREE &&
-              planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
-              planName !== PRICING.PLAN_NAMES.LITE && (
+      <div className="plan-card-middle-section">
+        <Space size={8}>
+          <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
+          {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">MOST VALUE</span>}
+        </Space>
+        {planName === PRICING.PLAN_NAMES.ENTERPRISE && (
+          <Row align="middle" className="items-center plan-price-row mt-8">
+            <Space size={0}>
+              <span className="text-bold">Starts at</span>
+              <Typography.Text className="plan-price enterprice-plan-price">$59</Typography.Text>
+              <div className="caption">
+                <Typography.Text>member / month</Typography.Text>
+              </div>
+            </Space>
+          </Row>
+        )}
+        {planPrice !== undefined && (
+          <Row align="middle" className="items-center plan-price-row">
+            <Space size="small">
+              <Typography.Text className="plan-price">
+                ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
+              </Typography.Text>
+              {((product === PRICING.PRODUCTS.HTTP_RULES &&
+                planName !== PRICING.PLAN_NAMES.FREE &&
+                planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
+                planName !== PRICING.PLAN_NAMES.LITE) ||
+                (product === PRICING.PRODUCTS.API_CLIENT &&
+                  (planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL ||
+                    planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE))) && (
                 <Space>
                   <InputNumber
                     style={{ width: "65px", height: "30px", display: "flex", alignItems: "center" }}
@@ -195,52 +209,56 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                   />
                 </Space>
               )}
-            <div className="caption text-white">
-              {planName !== PRICING.PLAN_NAMES.FREE && (
-                <div>{planName === PRICING.PLAN_NAMES.LITE ? "/ month" : "member / month"}</div>
-              )}
-            </div>
-          </Space>
-        </Row>
-      )}
-      {planDetails?.planDescription && (
-        <Row>
-          <Typography.Text type="secondary" className="plan-description">
-            {planDetails.planDescription}
+              <div className="caption text-white">
+                {planName !== PRICING.PLAN_NAMES.FREE && (
+                  <div>{planName === PRICING.PLAN_NAMES.LITE ? "/ month" : "member / month"}</div>
+                )}
+              </div>
+            </Space>
+          </Row>
+        )}
+        {planDetails?.planDescription && (
+          <Row>
+            <Typography.Text type="secondary" className="plan-description">
+              {planDetails.planDescription}
+            </Typography.Text>
+          </Row>
+        )}
+        <Row
+          className="annual-bill mt-8"
+          style={{ display: getPricingPlanAnnualBillingSubtitle(planName) ? "flex" : "none" }}
+        >
+          <Typography.Text type="secondary">
+            {duration === PRICING.DURATION.MONTHLY
+              ? planName === PRICING.PLAN_NAMES.LITE
+                ? getPricingPlanAnnualBillingSubtitle(planName) || ""
+                : "Billed monthly"
+              : getPricingPlanAnnualBillingSubtitle(planName) || ""}
           </Typography.Text>
         </Row>
-      )}
-      <Row className="mt-8" style={{ display: getPricingPlanAnnualBillingSubtitle(planName) ? "flex" : "none" }}>
-        <Typography.Text type="secondary">
-          {duration === PRICING.DURATION.MONTHLY
-            ? planName === PRICING.PLAN_NAMES.LITE
-              ? getPricingPlanAnnualBillingSubtitle(planName) || ""
-              : "Billed monthly"
-            : getPricingPlanAnnualBillingSubtitle(planName) || ""}
-        </Typography.Text>
-      </Row>
-      <Row
-        style={{
-          marginTop: planName === PRICING.PLAN_NAMES.FREE ? "54px" : "24px",
-        }}
-      >
-        <PricingTableButtons
-          key={planName + duration}
-          columnPlanName={planName}
-          product={product}
-          duration={duration}
-          source={source}
-          quantity={quantity}
-          setIsContactUsModalOpen={setIsContactUsModalOpen}
-          disabled={disbaleUpgradeButton}
-        />
-      </Row>
+        <Row
+          style={{
+            marginTop: "auto",
+          }}
+        >
+          <PricingTableButtons
+            key={planName + duration}
+            columnPlanName={planName}
+            product={product}
+            duration={duration}
+            source={source}
+            quantity={quantity}
+            setIsContactUsModalOpen={setIsContactUsModalOpen}
+            disabled={disbaleUpgradeButton}
+          />
+        </Row>
+      </div>
       <>{renderFeaturesListHeader(planName)}</>
       <Space direction="vertical" className="plan-features-list">
         {planDetails.features.map((feature: any, index: number) => {
           if (isOpenedFromModal && feature.visibleInPricingPageOnly) return null;
           return (
-            <div className="text-left plan-feature-item" key={index}>
+            <div className={`text-left plan-feature-item ${feature.tooltip ? "underlined" : ""}`} key={index}>
               {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />}{" "}
               <Tooltip title={feature?.tooltip} color="var(--black)">
                 <span className={`${feature?.tooltip ? "plan-feature-underline" : ""}`}>{feature.title}</span>

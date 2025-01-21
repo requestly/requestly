@@ -1,7 +1,7 @@
 import { trackEvent } from "modules/analytics";
 import { RULES } from "../constants";
 
-const { IMPORT, CHARLES_SETTINGS } = RULES;
+const { IMPORT, CHARLES_SETTINGS, RESOURCE_OVERRIDE_SETTINGS } = RULES;
 
 export const trackUploadRulesButtonClicked = (source) => {
   const params = { source };
@@ -53,4 +53,33 @@ export const trackCharlesSettingsImportComplete = (settings_count, setting_types
 export const trackCharlesSettingsImportDocsClicked = (source, trigger) => {
   const params = { source, import_trigger: trigger };
   trackEvent(CHARLES_SETTINGS.DOCS_CLICKED, params);
+};
+
+export const trackResourceOverrideSettingsImportViewed = (source) => {
+  trackEvent(RESOURCE_OVERRIDE_SETTINGS.VIEWED, { source });
+};
+
+export const trackResourceOverrideSettingsImportStarted = (source) => {
+  const params = { source };
+  trackEvent(RESOURCE_OVERRIDE_SETTINGS.IMPORT_STARTED, params);
+};
+
+export const trackResourceOverrideSettingsImportFailed = (cause) => {
+  const params = { cause };
+  trackEvent(RESOURCE_OVERRIDE_SETTINGS.IMPORT_FAILED, params);
+};
+
+export const trackResourceOverrideSettingsParsed = (settings_count, setting_types, not_supported_rule_types_count) => {
+  const params = { settings_count, setting_types, not_supported_rule_types_count };
+  trackEvent(RESOURCE_OVERRIDE_SETTINGS.PARSED, params);
+};
+
+export const trackResourceOverrideSettingsImportComplete = (settings_count, setting_types) => {
+  const params = { settings_count, setting_types };
+  trackEvent(RESOURCE_OVERRIDE_SETTINGS.IMPORT_COMPLETE, params);
+};
+
+export const trackResourceOverrideSettingsImportDocsClicked = (source, trigger) => {
+  const params = { source, import_trigger: trigger };
+  trackEvent(RESOURCE_OVERRIDE_SETTINGS.DOCS_CLICKED, params);
 };

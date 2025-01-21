@@ -4,9 +4,15 @@ import securityIllustration from "./assets/security.svg";
 import checkIcon from "assets/img/icons/common/check.svg";
 import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import React from "react";
 import "./enterprisePlanCard.scss";
+import { PRICING } from "features/pricing/constants/pricing";
 
-export const EnterprisePlanCard = () => {
+interface Props {
+  product?: string;
+}
+
+export const EnterprisePlanCard: React.FC<Props> = ({ product = PRICING.PRODUCTS.HTTP_RULES }) => {
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
   const features = [
     "Unlimited everything",
@@ -18,6 +24,10 @@ export const EnterprisePlanCard = () => {
     "Pay by invoice",
     "Priority Support - Slack Connect, Email, Chat",
   ];
+
+  if (product === PRICING.PRODUCTS.API_CLIENT) {
+    return null;
+  }
 
   return (
     <>
