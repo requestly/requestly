@@ -78,8 +78,10 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           defaultValues.localValue = true;
           break;
         case EnvironmentVariableType.Number:
-          defaultValues.syncValue = 0;
-          defaultValues.localValue = 0;
+          if (prevType !== EnvironmentVariableType.Secret) {
+            defaultValues.syncValue = 0;
+            defaultValues.localValue = 0;
+          }
           break;
         case EnvironmentVariableType.String:
           if (prevType !== EnvironmentVariableType.Secret) {
@@ -88,7 +90,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           }
           break;
         case EnvironmentVariableType.Secret:
-          if (prevType !== EnvironmentVariableType.String) {
+          if (prevType !== EnvironmentVariableType.String && prevType !== EnvironmentVariableType.Number) {
             defaultValues.syncValue = "";
             defaultValues.localValue = "";
           }
