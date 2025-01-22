@@ -260,18 +260,22 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     toggleBottomSheet(true);
 
-    const sanitizedEntry = sanitizeEntry(entry);
-    sanitizedEntry.response = null;
+    // const sanitizedEntry = sanitizeEntry(entry);
+    // sanitizedEntry.response = null;
 
     setIsFailed(false);
     setError(null);
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
-    setEntry(sanitizedEntry);
-    console.log("!!!debug", "sanitized entry", sanitizedEntry);
+
+    setEntry((entry) => ({
+      ...entry,
+      response: null,
+      error: null,
+    }));
     requestExecutor.updateApiRecords(apiClientRecords);
     requestExecutor.updateEntryDetails({
-      ...sanitizedEntry,
+      ...sanitizeEntry(entry),
       id: apiEntryDetails?.id,
       collectionId: apiEntryDetails?.collectionId,
     });
@@ -301,12 +305,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             Sentry.withScope((scope) => {
               scope.setTag("error_type", "api_request_failure");
               scope.setContext("request_details", {
-                url: sanitizedEntry.request.url,
-                method: sanitizedEntry.request.method,
-                headers: sanitizedEntry.request.headers,
-                queryParams: sanitizedEntry.request.queryParams,
+                url: entryWithResponse.request.url,
+                method: entryWithResponse.request.method,
+                headers: entryWithResponse.request.headers,
+                queryParams: entryWithResponse.request.queryParams,
               });
-              scope.setFingerprint(["api_request_error", sanitizedEntry.request.method, erroredEntry.error.source]);
+              scope.setFingerprint(["api_request_error", entryWithResponse.request.method, erroredEntry.error.source]);
               Sentry.captureException(
                 new Error(`API Request Failed: ${erroredEntry.error.message || "Unknown error"}`)
               );
