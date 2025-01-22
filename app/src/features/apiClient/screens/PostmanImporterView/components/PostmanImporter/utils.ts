@@ -1,4 +1,4 @@
-import { EnvironmentVariableValue } from "backend/environment/types";
+import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { generateDocumentId } from "backend/utils";
 import { POSTMAN_AUTH_TYPES_MAPPING, POSTMAN_FIELD_MAPPING } from "features/apiClient/constants";
@@ -37,18 +37,25 @@ export const getUploadedPostmanFileType = (fileContent: PostmanCollectionExport 
 export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExport) => {
   const isGlobalEnvironment = fileContent?._postman_variable_scope === "globals";
 
-  const variables = fileContent.values.reduce((acc: Record<string, EnvironmentVariableValue>, variable: any) => {
-    // dont add variables with empty key
-    if (!variable.key) {
-      return acc;
-    }
+  const variables = fileContent.values.reduce(
+    (acc: Record<string, EnvironmentVariableValue>, variable: any, index: number) => {
+      // dont add variables with empty key
+      if (!variable.key) {
+        return acc;
+      }
 
-    acc[variable.key] = {
-      syncValue: variable.value,
-      type: variable.type === "secret" ? "secret" : "string",
-    };
-    return acc;
-  }, {});
+      acc[variable.key] = {
+        id: index,
+        syncValue: variable.value,
+        type:
+          variable.type === EnvironmentVariableType.Secret
+            ? EnvironmentVariableType.Secret
+            : EnvironmentVariableType.String,
+      };
+      return acc;
+    },
+    {}
+  );
 
   return {
     name: fileContent.name,
@@ -170,10 +177,14 @@ const createCollectionRecord = (
 ): Partial<RQAPI.CollectionRecord> => {
   const collectionVariables: Record<string, EnvironmentVariableValue> = {};
   if (variables) {
-    variables.forEach((variable: any) => {
+    variables.forEach((variable: any, index: number) => {
       collectionVariables[variable.key] = {
+        id: index,
         syncValue: variable.value,
-        type: variable.type === "secret" ? "secret" : "string",
+        type:
+          variable.type === EnvironmentVariableType.Secret
+            ? EnvironmentVariableType.Secret
+            : EnvironmentVariableType.String,
       };
     });
   }
@@ -254,13 +265,20 @@ export const processPostmanVariablesData = (
     return null;
   }
 
-  const variables = fileContent.variable.reduce((acc: Record<string, EnvironmentVariableValue>, variable: any) => {
-    acc[variable.key] = {
-      syncValue: variable.value,
-      type: variable.type === "secret" ? "secret" : "string",
-    };
-    return acc;
-  }, {});
+  const variables = fileContent.variable.reduce(
+    (acc: Record<string, EnvironmentVariableValue>, variable: any, index: number) => {
+      acc[variable.key] = {
+        id: index,
+        syncValue: variable.value,
+        type:
+          variable.type === EnvironmentVariableType.String
+            ? EnvironmentVariableType.Secret
+            : EnvironmentVariableType.String,
+      };
+      return acc;
+    },
+    {}
+  );
 
   return variables;
 };

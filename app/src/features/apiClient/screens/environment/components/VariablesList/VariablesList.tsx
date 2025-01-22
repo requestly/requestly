@@ -75,10 +75,10 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
         variableRows.splice(index, 1, updatedRow);
         setDataSource(variableRows);
 
-        const allVariables = variableRows.reduce((acc, variable) => {
+        const allVariables = variableRows.reduce((acc, variable, index) => {
           if (variable.key) {
             acc[variable.key] = {
-              id: variable.id,
+              id: variable.id ?? index,
               type: variable.type,
               syncValue: variable.syncValue,
               localValue: variable.localValue,
@@ -109,9 +109,10 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
       const newData = id ? dataSource.filter((item) => item.id !== id) : dataSource.slice(0, -1);
       setDataSource(newData);
 
-      const remainingVariables = newData.reduce((acc, variable) => {
+      const remainingVariables = newData.reduce((acc, variable, index) => {
         if (variable.key) {
           acc[variable.key] = {
+            id: variable.id ?? index,
             type: variable.type,
             syncValue: variable.syncValue,
             localValue: variable.localValue,
@@ -152,14 +153,20 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
   useEffect(() => {
     if (variables) {
       const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables)
-        .map(([key, value], index) => ({
-          id: value.id ?? index,
+        .map(([key, value]) => ({
+          id: value.id,
           key,
           type: value.type,
           localValue: value.localValue,
           syncValue: value.syncValue,
         }))
-        .sort((a, b) => a.id - b.id);
+        .sort((a, b) => {
+          if (a.id !== undefined && b.id !== undefined) {
+            return a.id - b.id; // Sort by id if both ids are defined
+          }
+
+          return a.key.localeCompare(b.key); // Otherwise, sort lexicographically by key
+        });
       if (formattedDataSource.length === 0) {
         formattedDataSource.push({
           id: 0,
