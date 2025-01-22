@@ -1,9 +1,9 @@
 import React from "react";
 import { Col, Select, Input } from "antd";
 import { capitalize } from "lodash";
-import { RulePairSource, SourceKey, SourceOperator } from "types/rules";
 import { SessionRecordingPageSource } from "types";
 import "./index.scss";
+import { RulePairSource, RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 
 type Source = RulePairSource | SessionRecordingPageSource;
 
@@ -30,8 +30,8 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
             onSourceChange({ ...source, key: value });
           }}
         >
-          {Object.entries(SourceKey).map(([key, value]) =>
-            value === SourceKey.PATH ? null : (
+          {Object.entries(RuleSourceKey).map(([key, value]) =>
+            value === RuleSourceKey.PATH ? null : (
               <Select.Option key={value} value={value}>
                 {capitalize(value)}
               </Select.Option>
@@ -47,11 +47,11 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
             onSourceChange({ ...source, operator: value });
           }}
         >
-          {Object.entries(SourceOperator).map(([key, value]) => (
+          {Object.entries(RuleSourceOperator).map(([key, value]) => (
             <Select.Option key={key} value={value}>
-              {value === SourceOperator.WILDCARD_MATCHES
+              {value === RuleSourceOperator.WILDCARD_MATCHES
                 ? "Wildcard"
-                : value === SourceOperator.MATCHES
+                : value === RuleSourceOperator.MATCHES
                 ? "RegEx"
                 : value}
             </Select.Option>

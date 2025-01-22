@@ -47,7 +47,7 @@ import { getCollectionVariables } from "store/features/variables/selectors";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
-import { REQUEST_METHOD_COLORS } from "../../../../../../constants";
+import { isEmpty } from "lodash";
 
 interface Props {
   openInModal?: boolean;
@@ -99,7 +99,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse), isAnimating);
-  const { updateTab } = useTabsLayoutContext();
+  const { updateTab, activeTab } = useTabsLayoutContext();
 
   useEffect(() => {
     const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
@@ -108,10 +108,25 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, [updateTab, isCreateMode, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
 
   useEffect(() => {
+    const tabId = apiEntryDetails?.id;
+
+    if (activeTab?.id === tabId && hasUnsavedChanges) {
+      updateTab(tabId, { isPreview: false });
+    }
+  }, [updateTab, activeTab?.id, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
+
+  useEffect(() => {
     if (apiEntry) {
       setEntry({
         ...apiEntry,
-        request: { ...apiEntry.request, ...syncQueryParams(apiEntry.request.queryParams, apiEntry.request.url) },
+        request: {
+          ...apiEntry.request,
+          ...syncQueryParams(
+            apiEntry.request.queryParams,
+            apiEntry.request.url,
+            isEmpty(apiEntry.request.queryParams) ? QueryParamSyncType.TABLE : QueryParamSyncType.SYNC
+          ),
+        },
       });
       setRequestName("");
     }
@@ -193,6 +208,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, []);
 
   const onSendButtonClick = useCallback(() => {
+    updateTab(apiEntryDetails?.id, { isPreview: false });
+
     if (!entry.request.url) {
       return;
     }
@@ -287,6 +304,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
+    updateTab,
     apiClientRecords,
     apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
@@ -478,6 +496,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             </div>
             <RequestTabs
               key={requestId}
+              requestId={apiEntryDetails?.id}
               collectionId={apiEntryDetails?.collectionId}
               requestEntry={entry}
               setRequestEntry={setRequestEntry}

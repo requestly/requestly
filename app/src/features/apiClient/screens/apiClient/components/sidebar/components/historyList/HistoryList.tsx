@@ -38,7 +38,7 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
       {!dismissNote && (
         <div className="storage-communication-note">
           <img src={shieldIcon} alt="secured" />
-          <p> Your history is stored in your browser’s local storage for better privacy & control.</p>
+          <p> Your history is stored in your device's local storage for better privacy & control.</p>
           <TfiClose onClick={() => setDismissNote(true)} />
         </div>
       )}

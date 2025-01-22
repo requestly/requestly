@@ -6,8 +6,8 @@ import { COLLECTION_NAME } from "./constants";
 import { createFile } from "services/firebaseStorageService";
 import { RecordingOptions, SessionRecordingMetadata, Visibility } from "views/features/sessions/SessionViewer/types";
 import { getOwnerId } from "backend/utils";
-import { RuleType } from "types";
 import { getAppFlavour } from "utils/AppUtils";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 export const saveRecording = async (
   uid: string,

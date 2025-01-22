@@ -1,6 +1,5 @@
 import { isGroup, isRule } from "features/rules/utils";
 import { RuleTableRecord } from "../types";
-import { Rule, StorageRecord, RecordStatus, Group, RecordType } from "features/rules";
 import Logger from "lib/logger";
 import { getTemplates } from "backend/rules";
 import { User } from "types";
@@ -8,6 +7,7 @@ import { addRulesAndGroupsToStorage, processDataToImport } from "features/rules/
 import { AppMode } from "utils/syncing/SyncUtils";
 import { localSampleRules, sampleRuleDetails } from "../../../constants";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
+import { Group, RecordStatus, RecordType, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
 
 // Assumes that if groupId is present then it's a rule
 export const isRecordWithGroupId = (record: StorageRecord): record is Rule => {

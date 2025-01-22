@@ -128,7 +128,7 @@ export default function HeaderUser() {
             overlayClassName="header-profile-dropdown"
             menu={{ items: menuPropItems }}
             placement="bottomLeft"
-            className="header-profile-dropdown-trigger"
+            className="header-profile-dropdown-trigger no-drag"
             onOpenChange={(open) => {
               open && trackHeaderClicked("user_menu");
             }}
@@ -161,7 +161,7 @@ export default function HeaderUser() {
             <Button
               style={{ fontWeight: 500 }}
               type="primary"
-              className="layout-header-signup-btn"
+              className="layout-header-signup-btn no-drag"
               onClick={(e) => {
                 e.preventDefault();
                 dispatch(

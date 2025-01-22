@@ -16,7 +16,10 @@ const RouterError: React.FC<Props> = () => {
   useEffect(() => {
     console.log("RouterError", error);
     trackErrorBoundaryShown(error.toString(), "");
-    Sentry.captureException(error);
+    Sentry.withScope((scope) => {
+      scope.setTag("errorType", "react-router");
+      Sentry.captureException(error);
+    });
   }, [error]);
 
   return (

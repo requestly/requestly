@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rimraf ./dist && rollup -c --bundleConfigAsCjs"
+    "build": "rimraf ./dist && rollup -c --bundleConfigAsCjs",
+    "watch": "npm run build -- --watch"
   },
   "author": "",
   "devDependencies": {
@@ -21,30 +22,30 @@
     "dist"
   ],
   "exports": {
-    "./constants": {
-      "types": "./dist/constants/index.d.ts",
-      "require": "./dist/constants/index.cjs.js",
-      "import": "./dist/constants/index.esm.js"
+    "./constants/*": {
+      "types": "./dist/constants/*/index.d.ts",
+      "require": "./dist/constants/*/index.cjs.js",
+      "import": "./dist/constants/*/index.esm.js"
     },
-    "./helpers": {
-      "types": "./dist/helpers/index.d.ts",
-      "require": "./dist/helpers/index.cjs.js",
-      "import": "./dist/helpers/index.esm.js"
+    "./helpers/*": {
+      "types": "./dist/helpers/*/index.d.ts",
+      "require": "./dist/helpers/*/index.cjs.js",
+      "import": "./dist/helpers/*/index.esm.js"
     },
-    "./lib": {
-      "types": "./dist/lib/index.d.ts",
-      "require": "./dist/lib/index.cjs.js",
-      "import": "./dist/lib/index.esm.js"
+    "./lib/*": {
+      "types": "./dist/lib/*/index.d.ts",
+      "require": "./dist/lib/*/index.cjs.js",
+      "import": "./dist/lib/*/index.esm.js"
     },
-    "./modules": {
-      "types": "./dist/modules/index.d.ts",
-      "require": "./dist/modules/index.cjs.js",
-      "import": "./dist/modules/index.esm.js"
+    "./modules/*": {
+      "types": "./dist/modules/*/index.d.ts",
+      "require": "./dist/modules/*/index.cjs.js",
+      "import": "./dist/modules/*/index.esm.js"
     },
-    "./types": {
-      "types": "./dist/types/index.d.ts",
-      "require": "./dist/types/index.cjs.js",
-      "import": "./dist/types/index.esm.js"
+    "./types/*": {
+      "types": "./dist/types/*/index.d.ts",
+      "require": "./dist/types/*/index.cjs.js",
+      "import": "./dist/types/*/index.esm.js"
     },
     ".": {
       "require": "./dist/index.cjs.js",
