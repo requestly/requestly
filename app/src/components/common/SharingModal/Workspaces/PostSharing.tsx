@@ -13,6 +13,7 @@ import mailSuccessImg from "assets/images/illustrations/mail-success.svg";
 import { PostShareViewData, WorkspaceSharingTypes } from "../types";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import "./index.scss";
+import { toast } from "utils/Toast";
 
 interface PostSharingProps {
   postShareViewData: PostShareViewData;
@@ -45,9 +46,16 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
       appMode,
       null,
       "sharing_modal"
-    ).then(() => {
-      toggleModal();
-    });
+    )
+      .then(() => {
+        toggleModal();
+      })
+      .catch(() => {
+        toggleModal();
+        toast.error(
+          "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
+        );
+      });
   }, [appMode, dispatch, isWorkspaceMode, toggleModal, postShareViewData]);
 
   const postSharingViews = useMemo(() => {
