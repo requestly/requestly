@@ -440,8 +440,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const handleTestResultRefresh = useCallback(async () => {
     try {
       requestExecutor.updateEntryDetails({
-        ...sanitizeEntry(entry),
-        id: apiEntryDetails?.id,
+        entry: sanitizeEntry(entry),
+        recordId: apiEntryDetails?.id,
         collectionId: apiEntryDetails?.collectionId,
       });
 

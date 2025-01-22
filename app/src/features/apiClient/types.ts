@@ -104,8 +104,7 @@ export namespace RQAPI {
     auth?: AuthOptions;
   }
 
-  export interface RequestErrorEntry {
-    request: RQAPI.Request;
+  export interface RequestErrorEntry extends Entry {
     response: null;
     error: {
       source: string;
