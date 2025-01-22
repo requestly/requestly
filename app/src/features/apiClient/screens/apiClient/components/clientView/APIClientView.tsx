@@ -281,7 +281,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       .execute()
       .then(({ executedEntry, testResults }) => {
         const response = executedEntry.response;
-        // TODO: Add an entry in history
         const entryWithResponse = { ...entry, response, testResults };
         const completeRenderedEntry = { ...executedEntry, response, testResults };
 
