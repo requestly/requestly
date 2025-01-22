@@ -9,7 +9,7 @@ import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
-import { isAppOpenedInIframe } from "utils/AppUtils";
+import { isAppOpenedInIframe, isDesktopMode } from "utils/AppUtils";
 import { AppNotificationBanner } from "../../componentsV2/AppNotificationBanner";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { globalActions } from "store/slices/global/slice";
@@ -19,9 +19,9 @@ import SupportPanel from "components/misc/SupportPanel";
 import { useDesktopAppConnection } from "hooks/useDesktopAppConnection";
 import "./DashboardLayout.scss";
 import { ConnectedToDesktopView } from "./ConnectedToDesktopView/ConnectedToDesktopView";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getAppMode } from "store/selectors";
 import { getUserOS } from "utils/Misc";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -30,7 +30,6 @@ const DashboardLayout = () => {
   const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
   const user = useSelector(getUserAuthDetails);
   const { isDesktopAppConnected } = useDesktopAppConnection();
-  const appMode = useSelector(getAppMode);
 
   initializeOneTap();
 
@@ -74,7 +73,9 @@ const DashboardLayout = () => {
       <div className="app-layout app-dashboard-layout">
         <div
           className={`app-header ${
-            appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? `app-mode-desktop app-mode-desktop-${getUserOS()}` : ""
+            isDesktopMode() && isFeatureCompatible(FEATURES.FRAMELESS_DESKTOP_APP)
+              ? `app-mode-desktop app-mode-desktop-${getUserOS()}`
+              : ""
           }`}
         >
           {" "}
