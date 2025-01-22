@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchSharedListData } from "../../sharedLists/utils";
 import Logger from "../../../../../../../common/logger";
-import { Group, Rule } from "types";
+import { Group, Rule } from "@requestly/shared/types/entities/rules";
 
 interface Props {
   sharedListId: string;
