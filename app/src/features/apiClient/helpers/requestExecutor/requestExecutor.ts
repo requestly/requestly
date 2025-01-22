@@ -10,6 +10,7 @@ import {
 } from "../modules/scriptsV2/workload-manager/workLoadTypes";
 import { notification } from "antd";
 import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshot";
+import { TestResult } from "../modules/scriptsV2/sandbox/types";
 
 type EntryDetails = RQAPI.Entry & { id: RQAPI.Record["id"]; collectionId: RQAPI.Record["collectionId"] };
 type InternalFunctions = {
@@ -50,10 +51,6 @@ export class RequestExecutor {
     const collectionVariables = this.internalFunctions.getCollectionVariables(this.entryDetails.collectionId);
     const environmentVariables = this.internalFunctions.getEnvironmentVariables();
 
-    console.log("!!!debug", "variables", {
-      environmentVariables,
-      collectionVariables,
-    });
     return {
       global: globalVariables,
       collection: collectionVariables,
@@ -89,28 +86,22 @@ export class RequestExecutor {
   }
 
   updateInternalFunctions(internalFunctions: InternalFunctions) {
-    console.log("!!!debug", "updateInternal function", internalFunctions.getEnvironmentVariables());
-
     this.internalFunctions = internalFunctions;
   }
 
-  async executePreRequestScript() {
+  async executePreRequestScript(callback: (state: any) => Promise<void> = () => Promise.resolve()) {
     return this.workloadManager.execute(
-      new PreRequestScriptWorkload(
-        this.entryDetails.scripts.preRequest,
-        this.buildPreRequestSnapshot(),
-        this.internalFunctions.postScriptExecutionCallback
-      ),
+      new PreRequestScriptWorkload(this.entryDetails.scripts.preRequest, this.buildPreRequestSnapshot(), callback),
       this.abortController.signal
     );
   }
 
-  async executePostResponseScript() {
+  async executePostResponseScript(callback: (state: any) => Promise<void> = () => Promise.resolve()) {
     return this.workloadManager.execute(
       new PostResponseScriptWorkload(
         this.entryDetails.scripts.postResponse,
         this.buildPostResponseSnapshot(),
-        this.internalFunctions.postScriptExecutionCallback
+        callback
       ),
       this.abortController.signal
     );
@@ -118,9 +109,9 @@ export class RequestExecutor {
 
   async execute() {
     this.prepareRequest();
-    console.log("!!!debug", "after prep", this.entryDetails);
-
-    const preRequestScriptResult = await this.executePreRequestScript();
+    const preRequestScriptResult = await this.executePreRequestScript(
+      this.internalFunctions.postScriptExecutionCallback
+    );
 
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
       return {
@@ -149,7 +140,9 @@ export class RequestExecutor {
       };
     }
 
-    const responseScriptResult = await this.executePostResponseScript();
+    const responseScriptResult = await this.executePostResponseScript(
+      this.internalFunctions.postScriptExecutionCallback
+    );
 
     if (responseScriptResult.type === WorkResultType.ERROR) {
       notification.error({
@@ -157,9 +150,45 @@ export class RequestExecutor {
         description: `${responseScriptResult.error.name}: ${responseScriptResult.error.message}`,
         placement: "bottomRight",
       });
+
+      return {
+        executedEntry: this.entryDetails,
+      };
     }
 
-    return this.entryDetails;
+    return {
+      executedEntry: this.entryDetails,
+      testResults: [
+        ...(preRequestScriptResult.testExecutionResults || []),
+        ...(responseScriptResult.testExecutionResults || []),
+      ],
+    };
+  }
+
+  async rerun() {
+    const preRequestScriptResult = await this.executePreRequestScript();
+    if (preRequestScriptResult.type === WorkResultType.ERROR) {
+      return {
+        testResults: [] as TestResult[],
+        error: preRequestScriptResult.error,
+      };
+    }
+
+    const responseScriptResult = await this.executePostResponseScript();
+
+    if (responseScriptResult.type === WorkResultType.ERROR) {
+      return {
+        testResults: [],
+        error: responseScriptResult.error,
+      };
+    }
+
+    return {
+      testResults: [
+        ...(preRequestScriptResult.testExecutionResults || []),
+        ...(responseScriptResult.testExecutionResults || []),
+      ],
+    };
   }
 
   abort() {

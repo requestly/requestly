@@ -35,8 +35,10 @@ export class RQScriptWebWorker implements RQWorker {
         workload.initialState,
         proxy(workload.postScriptExecutionCallback)
       );
+      const testExecutionResults = await this.scriptWorker.getTestExecutionResults();
       return {
         type: WorkResultType.SUCCESS,
+        testExecutionResults,
       };
     } catch (error) {
       if (error instanceof ScriptExecutionError) {

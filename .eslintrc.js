@@ -1,6 +1,7 @@
 module.exports = {
   globals: {
     NodeJS: true,
+    Chai: true,
   },
   ignorePatterns: [
     "node_modules",

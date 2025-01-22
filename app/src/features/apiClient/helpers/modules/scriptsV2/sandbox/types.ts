@@ -1,6 +1,11 @@
 import { VariableValueType } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 
+export interface TestFunction {
+  (testName: string, testFn: () => void): void;
+  skip: (testName: string) => void;
+}
+
 export interface SandboxAPI {
   request: RQAPI.Request;
   response: RQAPI.Response;
@@ -19,6 +24,7 @@ export interface SandboxAPI {
     get(key: string): any;
     unset(key: string): void;
   };
+  test: TestFunction;
   cookies: any;
   execution: any;
   expect: any;
@@ -26,8 +32,33 @@ export interface SandboxAPI {
   iterationData: any;
   require: any;
   sendRequest: any;
-  test: any;
   variables: any;
   vault: any;
   visualizer: any;
 }
+
+export enum TestStatus {
+  PASSED = "passed",
+  FAILED = "failed",
+  SKIPPED = "skipped",
+}
+
+export interface BaseTestResult {
+  name: string;
+  status: TestStatus;
+}
+
+export interface PassedTestResult extends BaseTestResult {
+  status: TestStatus.PASSED;
+}
+
+export interface FailedTestResult extends BaseTestResult {
+  status: TestStatus.FAILED;
+  error: string;
+}
+
+export interface SkippedTestResult extends BaseTestResult {
+  status: TestStatus.SKIPPED;
+}
+
+export type TestResult = PassedTestResult | FailedTestResult | SkippedTestResult;

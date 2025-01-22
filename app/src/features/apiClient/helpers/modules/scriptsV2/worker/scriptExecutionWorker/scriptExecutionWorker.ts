@@ -5,13 +5,15 @@ import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface
 import {
   ScriptExecutionError,
   ScriptPendingWorkFlushingError,
-  SyncLocalDumpCallback,
+  ScriptWorkloadCallback,
 } from "../../workload-manager/workLoadTypes";
+import { TestResult } from "../../sandbox/types";
 
 export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
   private localScope: LocalScope;
+  private testResults: TestResult[] = [];
 
-  async executeScript(script: string, initialState: any, callback: SyncLocalDumpCallback) {
+  async executeScript(script: string, initialState: any, callback: ScriptWorkloadCallback) {
     this.localScope = new LocalScope(initialState);
 
     // eslint-disable-next-line no-new-func
@@ -23,7 +25,7 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
       `
     );
     try {
-      scriptFunction(new RQ(this.localScope));
+      scriptFunction(new RQ(this.localScope, this.testResults));
     } catch (error) {
       throw new ScriptExecutionError(error);
     }
@@ -34,7 +36,11 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
     }
   }
 
-  private async syncLocalDump(callback: SyncLocalDumpCallback) {
+  async getTestExecutionResults() {
+    return this.testResults;
+  }
+
+  private async syncLocalDump(callback: ScriptWorkloadCallback) {
     if (!this.localScope.getIsStateMutated()) {
       return;
     }

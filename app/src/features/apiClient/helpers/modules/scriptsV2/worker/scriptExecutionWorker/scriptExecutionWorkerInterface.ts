@@ -1,5 +1,7 @@
-import { SyncLocalDumpCallback } from "../../workload-manager/workLoadTypes";
+import { TestResult } from "../../sandbox/types";
+import { ScriptWorkloadCallback } from "../../workload-manager/workLoadTypes";
 
 export interface ScriptExecutionWorkerInterface {
-  executeScript(script: string, initialState: any, callback: SyncLocalDumpCallback): Promise<void>;
+  executeScript(script: string, initialState: any, callback: ScriptWorkloadCallback): Promise<void>;
+  getTestExecutionResults(): Promise<TestResult[]>;
 }

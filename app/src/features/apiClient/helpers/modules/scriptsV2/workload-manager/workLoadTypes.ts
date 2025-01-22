@@ -3,20 +3,21 @@ import {
   SnapshotForPostResponse,
   SnapshotForPreRequest,
 } from "features/apiClient/helpers/requestExecutor/snapshot";
+import { TestResult } from "../sandbox/types";
 
-export type SyncLocalDumpCallback = (state: any) => Promise<void>;
+export type ScriptWorkloadCallback = (state: any) => Promise<void>;
 
 export interface ScriptWorkload<T extends BaseSnapshot = BaseSnapshot> {
   readonly script: string;
   readonly initialState: T;
-  readonly postScriptExecutionCallback: SyncLocalDumpCallback;
+  readonly postScriptExecutionCallback: ScriptWorkloadCallback;
 }
 
 export class PreRequestScriptWorkload implements ScriptWorkload<SnapshotForPreRequest> {
   constructor(
     readonly script: string,
     readonly initialState: SnapshotForPreRequest,
-    readonly postScriptExecutionCallback: SyncLocalDumpCallback
+    readonly postScriptExecutionCallback: ScriptWorkloadCallback
   ) {}
 }
 
@@ -24,7 +25,7 @@ export class PostResponseScriptWorkload implements ScriptWorkload<SnapshotForPos
   constructor(
     readonly script: string,
     readonly initialState: SnapshotForPostResponse,
-    readonly postScriptExecutionCallback: SyncLocalDumpCallback
+    readonly postScriptExecutionCallback: ScriptWorkloadCallback
   ) {}
 }
 
@@ -36,13 +37,8 @@ export enum WorkResultType {
 export type WorkResult = {
   type: WorkResultType;
 } & (
-  | {
-      type: WorkResultType.SUCCESS;
-    }
-  | {
-      type: WorkResultType.ERROR;
-      error: WorkError;
-    }
+  | { type: WorkResultType.SUCCESS; testExecutionResults: TestResult[] }
+  | { type: WorkResultType.ERROR; error: WorkError }
 );
 
 export enum WorkErrorType {

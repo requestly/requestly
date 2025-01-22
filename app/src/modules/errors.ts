@@ -1,5 +1,6 @@
 import {
   WorkErrorType,
+  WorkResult,
   WorkResultType,
 } from "features/apiClient/helpers/modules/scriptsV2/workload-manager/workLoadTypes";
 
@@ -14,7 +15,7 @@ export class TaskAbortedError extends Error {
   }
 }
 
-export const buildAbortErrorObject = (error: Error) => {
+export const buildAbortErrorObject = (error: Error): WorkResult => {
   return {
     type: WorkResultType.ERROR,
     error: {

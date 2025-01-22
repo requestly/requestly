@@ -224,7 +224,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             currentEnvironmentId?: string;
           };
           if (currentEnvironment.currentEnvironmentId) {
-            console.log("!!!debug", "setter", state[key]);
             await setVariables(currentEnvironment.currentEnvironmentId, state[key]);
           }
         }
@@ -268,7 +267,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
     setEntry(sanitizedEntry);
-    console.log("!!!debug", "sanitized entry", sanitizedEntry);
     requestExecutor.updateApiRecords(apiClientRecords);
     requestExecutor.updateEntryDetails({
       ...sanitizedEntry,
@@ -278,7 +276,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     requestExecutor
       .execute()
-      .then((executedEntry) => {
+      .then(({ executedEntry, testResults }) => {
+        console.log("!!!debug", "testResults", testResults);
         const response = executedEntry.response;
         // TODO: Add an entry in history
         const entryWithResponse = { ...entry, response };
@@ -319,7 +318,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         notifyApiRequestFinished?.(renderedEntryWithResponse);
       })
       .catch((e) => {
-        console.log("!!!debug", "catch for the api request", e);
         // if (abortControllerRef.current?.signal.aborted) {
         //   setIsRequestCancelled(true);
         // }

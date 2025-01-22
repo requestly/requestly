@@ -1,7 +1,9 @@
 import { LocalScope } from "modules/localScope";
-import { SandboxAPI } from "./types";
+import { SandboxAPI, TestFunction, TestResult } from "./types";
 import { VariableScope } from "./variableScope";
 import { RQAPI } from "features/apiClient/types";
+import { expect } from "chai";
+import { TestExecutor } from "./testExecutor";
 
 // unsupported methods
 const createInfiniteChainable = (methodName: string) => {
@@ -29,24 +31,37 @@ export class RQ implements SandboxAPI {
   public environment: VariableScope;
   public globals: VariableScope;
   public collectionVariables: VariableScope;
+  public expect: Chai.ExpectStatic;
+  public test: TestFunction;
 
   // Add other sandbox properties
   public cookies = createInfiniteChainable("cookie");
   public execution = createInfiniteChainable("execution");
-  public expect = createInfiniteChainable("expect");
   public info = createInfiniteChainable("info");
   public iterationData = createInfiniteChainable("iterationData");
   public require = createInfiniteChainable("require");
   public sendRequest = createInfiniteChainable("sendRequest");
-  public test = createInfiniteChainable("test");
   public variables = createInfiniteChainable("variables");
   public vault = createInfiniteChainable("vault");
   public visualizer = createInfiniteChainable("visualizer");
 
-  constructor(localScope: LocalScope) {
+  constructor(localScope: LocalScope, private testResults: TestResult[]) {
     this.environment = new VariableScope(localScope, "environment");
     this.globals = new VariableScope(localScope, "global");
     this.collectionVariables = new VariableScope(localScope, "collectionVariables");
+    this.expect = expect;
+    this.test = Object.assign(
+      (testName: string, testFn: () => void) => {
+        const result = new TestExecutor().execute(testName, testFn);
+        this.testResults.push(result);
+      },
+      {
+        skip: (testName: string) => {
+          const result = new TestExecutor().skip(testName);
+          this.testResults.push(result);
+        },
+      }
+    );
     this.request = localScope.get("request");
     let originalResponse = localScope.get("response");
     this.response = originalResponse
