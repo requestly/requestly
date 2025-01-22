@@ -224,7 +224,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             currentEnvironmentId?: string;
           };
           if (currentEnvironment.currentEnvironmentId) {
-            console.log("!!!debug", "setter", state[key]);
             await setVariables(currentEnvironment.currentEnvironmentId, state[key]);
           }
         }
@@ -322,14 +321,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         }
         notifyApiRequestFinished?.(renderedEntryWithResponse);
       })
-      .catch((e) => {
-        console.log("!!!debug", "catch for the api request", e);
-        // if (abortControllerRef.current?.signal.aborted) {
-        //   setIsRequestCancelled(true);
-        // }
-      })
       .finally(() => {
-        // abortControllerRef.current = null;
         setIsLoadingResponse(false);
       });
 
