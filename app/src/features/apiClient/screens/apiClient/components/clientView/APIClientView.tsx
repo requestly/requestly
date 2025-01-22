@@ -259,23 +259,21 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     toggleBottomSheet(true);
 
-    // const sanitizedEntry = sanitizeEntry(entry);
-    // sanitizedEntry.response = null;
-
     setIsFailed(false);
     setError(null);
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
-
+    //Need to change the response and error to null
     setEntry((entry) => ({
       ...entry,
       response: null,
       error: null,
     }));
+
     requestExecutor.updateApiRecords(apiClientRecords);
     requestExecutor.updateEntryDetails({
-      ...sanitizeEntry(entry),
-      id: apiEntryDetails?.id,
+      entry: sanitizeEntry(entry),
+      recordId: apiEntryDetails?.id,
       collectionId: apiEntryDetails?.collectionId,
     });
 
