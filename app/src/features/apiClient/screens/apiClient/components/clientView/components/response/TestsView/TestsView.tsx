@@ -1,17 +1,18 @@
 import React, { useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { EmptyTestsView } from "./components/EmptyTestsView/EmptyTestsView";
-import { TestResult } from "./components/TestResult/TestResult";
+import { TestResultItem } from "./components/TestResult/TestResult";
 import { Badge, Radio, Spin } from "antd";
 import { MdRefresh } from "@react-icons/all-files/md/MdRefresh";
 import { RQButton } from "lib/design-system-v2/components";
 import { useTheme } from "styled-components";
+import { TestResult } from "features/apiClient/helpers/modules/scriptsV2/sandbox/types";
 import "./testsView.scss";
 
 interface TestsViewProps {
   isLoading: boolean;
   onCancelRequest: () => void;
-  testResults: RQAPI.TestResult[];
+  testResults: TestResult[];
 }
 
 type TestsFilter = RQAPI.TestResult["status"] | "all";
@@ -83,7 +84,7 @@ export const TestsView: React.FC<TestsViewProps> = ({ isLoading, onCancelRequest
 
       <div className="test-results-list">
         {filteredTestResults.map((testResult) => (
-          <TestResult testResult={testResult} />
+          <TestResultItem testResult={testResult} />
         ))}
       </div>
     </div>

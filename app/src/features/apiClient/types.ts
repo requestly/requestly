@@ -1,6 +1,7 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { AUTH_OPTIONS } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/form";
 import { AUTHORIZATION_TYPES } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
+import { TestResult } from "./helpers/modules/scriptsV2/sandbox/types";
 
 export enum RequestMethod {
   GET = "GET",
@@ -90,11 +91,6 @@ export namespace RQAPI {
     statusText: string;
     time: number;
     redirectedUrl: string;
-  }
-
-  export interface TestResult {
-    status: "passed" | "failed" | "skipped";
-    message: string;
   }
 
   export interface Entry {

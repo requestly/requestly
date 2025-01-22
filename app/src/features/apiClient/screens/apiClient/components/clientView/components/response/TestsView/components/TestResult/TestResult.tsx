@@ -1,28 +1,31 @@
 import React from "react";
-import { RQAPI } from "features/apiClient/types";
 import { upperCase } from "lodash";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { FaRegCircle } from "@react-icons/all-files/fa/FaRegCircle";
+import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/sandbox/types";
 
 interface TestResultProps {
-  testResult: RQAPI.TestResult;
+  testResult: TestResult;
 }
 
-export const TestResult: React.FC<TestResultProps> = ({ testResult }) => {
+export const TestResultItem: React.FC<TestResultProps> = ({ testResult }) => {
   return (
     <div className="test-result-item">
       <div className={`test-result-item-status-badge ${testResult.status}`}>
-        {testResult.status === "passed" ? (
+        {testResult.status === TestStatus.PASSED ? (
           <MdCheckCircleOutline />
-        ) : testResult.status === "failed" ? (
+        ) : testResult.status === TestStatus.FAILED ? (
           <MdInfoOutline />
         ) : (
           <FaRegCircle />
         )}
         {upperCase(testResult.status)}
       </div>
-      <div className="test-result-item-message">{testResult.message}</div>
+      <div className="test-result-item-message">
+        {testResult.name}
+        {testResult.status === TestStatus.FAILED ? ` | ${testResult.error}` : ""}
+      </div>
     </div>
   );
 };

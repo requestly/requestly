@@ -25,7 +25,7 @@ import { useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { CONTENT_TYPE_HEADER, DUMMY_TEST_RESULT } from "../../../../constants";
+import { CONTENT_TYPE_HEADER } from "../../../../constants";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import "./apiClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
@@ -284,13 +284,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       .then(({ executedEntry, testResults }) => {
         console.log("!!!debug", "testResults", testResults);
         const response = executedEntry.response;
-        const testResults = DUMMY_TEST_RESULT;
         // TODO: Add an entry in history
-        const postExecutionEntry = { ...entry, response, testResults };
+        const entryWithResponse = { ...entry, response, testResults };
         const completeRenderedEntry = { ...executedEntry, response, testResults };
 
         if (response) {
-          setEntry(postExecutionEntry);
+          setEntry(entryWithResponse);
           trackResponseLoaded({
             type: getContentTypeFromResponseHeaders(response.headers),
             time: Math.round(response.time / 1000),
