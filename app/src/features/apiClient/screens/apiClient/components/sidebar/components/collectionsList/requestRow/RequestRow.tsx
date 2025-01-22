@@ -3,7 +3,7 @@ import { Typography, Dropdown, MenuProps } from "antd";
 import PATHS from "config/constants/sub/paths";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RQAPI } from "features/apiClient/types";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -20,7 +20,6 @@ import {
   trackDuplicateRequestSuccessful,
   trackMoveRequestToCollectionClicked,
 } from "modules/analytics/events/features/apiClient";
-import { redirectToRequest } from "utils/RedirectionUtils";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 
 interface Props {
@@ -34,7 +33,6 @@ export const RequestRow: React.FC<Props> = ({ record, openTab }) => {
   const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const team = useSelector(getCurrentlyActiveWorkspace);
-  const navigate = useNavigate();
 
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
@@ -49,7 +47,6 @@ export const RequestRow: React.FC<Props> = ({ record, openTab }) => {
             throw new Error("Failed to duplicate request");
           }
           onSaveRecord(result.data);
-          redirectToRequest(navigate, result.data.id);
           toast.success("Request duplicated successfully");
           trackDuplicateRequestSuccessful();
         })
@@ -59,7 +56,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab }) => {
           trackDuplicateRequestFailed();
         });
     },
-    [team?.id, user?.details?.profile?.uid, onSaveRecord, navigate]
+    [team?.id, user?.details?.profile?.uid, onSaveRecord]
   );
 
   const getRequestOptions = useCallback((): MenuProps["items"] => {
@@ -130,6 +127,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab }) => {
           className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
           onClick={() => {
             openTab(record.id, {
+              isPreview: true,
               title: record.name || record.data.request?.url,
               url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`,
             });

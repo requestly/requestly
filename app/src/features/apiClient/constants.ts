@@ -54,3 +54,4 @@ export const DUMMY_TEST_RESULT: RQAPI.TestResult[] = [
     message: "Convert XML body to JSON data",
   },
 ];
+export const SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY = "expanded_record_ids";

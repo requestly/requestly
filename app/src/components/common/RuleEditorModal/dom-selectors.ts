@@ -1,4 +1,4 @@
-import { RuleType } from "types";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 /**
  * @description Used to focus rule editor fields.

@@ -10,7 +10,7 @@ import "./apiClient.scss";
 
 interface Props {}
 
-export const APIClient: React.FC<Props> = () => {
+export const APIClient: React.FC<Props> = React.memo(() => {
   const location = useLocation();
   const { requestId } = useParams();
   const [searchParams] = useSearchParams();
@@ -57,9 +57,9 @@ export const APIClient: React.FC<Props> = () => {
     }
 
     setSelectedEntryDetails((prev) => {
-      return prev?.id === record?.id
+      return prev?.id === record?.id && persistedRequestId === prev?.id
         ? ({ ...(prev ?? {}), name: record?.name, collectionId: record?.collectionId } as RQAPI.ApiRecord)
-        : (record as RQAPI.ApiRecord);
+        : prev;
     });
   }, [persistedRequestId, apiClientRecords]);
 
@@ -107,7 +107,7 @@ export const APIClient: React.FC<Props> = () => {
       <div className="api-client-container-content">
         <APIClientView
           // TODO: Fix - "apiEntry" is used for history, remove this prop and derive everything from "apiEntryDetails"
-          key={persistedRequestId}
+          // key={persistedRequestId}
           apiEntry={entryDetails?.data}
           apiEntryDetails={entryDetails}
           notifyApiRequestFinished={handleAppRequestFinished}
@@ -115,4 +115,4 @@ export const APIClient: React.FC<Props> = () => {
       </div>
     </BottomSheetProvider>
   );
-};
+});

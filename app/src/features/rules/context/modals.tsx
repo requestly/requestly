@@ -2,8 +2,8 @@
  * Contains all the common modals and state
  */
 
+import { Group, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
 import React, { createContext, useContext, useState } from "react";
-import { Group, Rule, StorageRecord } from "../types/rules";
 
 type RulesModalsContextType = {
   openCreateGroupModalAction: () => void;

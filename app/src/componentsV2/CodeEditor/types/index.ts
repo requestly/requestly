@@ -1,6 +1,6 @@
+import { RuleType } from "@requestly/shared/types/entities/rules";
 import { MockType } from "components/features/mocksV2/types";
 import { ReactNode } from "react";
-import { RuleType } from "types";
 
 export enum EditorLanguage {
   JAVASCRIPT = "javascript",
