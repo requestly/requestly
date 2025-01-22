@@ -7,14 +7,16 @@ import { BottomSheet } from "componentsV2/BottomSheet";
 import StatusLine from "../StatusLine";
 import { Tag } from "antd";
 import { TestsView } from "../TestsView/TestsView";
+import { TestResult } from "features/apiClient/helpers/modules/scriptsV2/sandbox/types";
 
 interface Props {
   response: RQAPI.Response;
-  testResults: RQAPI.TestResult[];
+  testResults: TestResult[];
   isLoading: boolean;
   isFailed: boolean;
   isRequestCancelled: boolean;
   onCancelRequest: () => void;
+  handleTestResultRefresh: () => Promise<void>;
   error?: RQAPI.RequestErrorEntry["error"];
 }
 
@@ -29,6 +31,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   testResults,
   isLoading,
   isFailed,
+  handleTestResultRefresh,
   isRequestCancelled,
   onCancelRequest,
   error,
@@ -71,10 +74,27 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
       {
         key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
         label: <>Tests {testResults?.length ? <Tag className="count">{testResults?.length}</Tag> : null}</>,
-        children: <TestsView testResults={testResults} isLoading={isLoading} onCancelRequest={onCancelRequest} />,
+        children: (
+          <TestsView
+            testResults={testResults}
+            isLoading={isLoading}
+            onCancelRequest={onCancelRequest}
+            handleTestResultRefresh={handleTestResultRefresh}
+          />
+        ),
       },
     ];
-  }, [response?.body, response?.headers, contentTypeHeader, isLoading, isFailed, onCancelRequest, error, testResults]);
+  }, [
+    response?.body,
+    response?.headers,
+    contentTypeHeader,
+    isLoading,
+    isFailed,
+    onCancelRequest,
+    error,
+    testResults,
+    handleTestResultRefresh,
+  ]);
 
   return <BottomSheet items={bottomSheetTabItems} disableDocking utilities={<StatusLine response={response} />} />;
 };

@@ -166,6 +166,7 @@ export class RequestExecutor {
   }
 
   async rerun() {
+    console.log("rerun");
     const preRequestScriptResult = await this.executePreRequestScript();
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
       return {

@@ -1,32 +1,41 @@
-import React, { useMemo, useState } from "react";
-import { RQAPI } from "features/apiClient/types";
+import React, { useCallback, useMemo, useState } from "react";
 import { EmptyTestsView } from "./components/EmptyTestsView/EmptyTestsView";
 import { TestResultItem } from "./components/TestResult/TestResult";
 import { Badge, Radio, Spin } from "antd";
 import { MdRefresh } from "@react-icons/all-files/md/MdRefresh";
 import { RQButton } from "lib/design-system-v2/components";
 import { useTheme } from "styled-components";
-import { TestResult } from "features/apiClient/helpers/modules/scriptsV2/sandbox/types";
+import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/sandbox/types";
 import "./testsView.scss";
 
 interface TestsViewProps {
   isLoading: boolean;
   onCancelRequest: () => void;
+  handleTestResultRefresh: () => Promise<void>;
   testResults: TestResult[];
 }
 
-type TestsFilter = RQAPI.TestResult["status"] | "all";
+type TestsFilter = TestResult["status"] | "all";
 
-export const TestsView: React.FC<TestsViewProps> = ({ isLoading, onCancelRequest, testResults }) => {
+export const TestsView: React.FC<TestsViewProps> = ({
+  isLoading,
+  onCancelRequest,
+  testResults,
+  handleTestResultRefresh,
+}) => {
   const theme = useTheme();
   const [testsFilter, setTestsFilter] = useState<TestsFilter>("all");
+
+  const handleRefresh = useCallback(async () => {
+    await handleTestResultRefresh();
+  }, [handleTestResultRefresh]);
 
   const testCounts = useMemo(() => {
     return {
       all: testResults?.length,
-      passed: testResults?.filter((test) => test.status === "passed").length,
-      failed: testResults?.filter((test) => test.status === "failed").length,
-      skipped: testResults?.filter((test) => test.status === "skipped").length,
+      passed: testResults?.filter((test) => test.status === TestStatus.PASSED).length,
+      failed: testResults?.filter((test) => test.status === TestStatus.FAILED).length,
+      skipped: testResults?.filter((test) => test.status === TestStatus.SKIPPED).length,
     };
   }, [testResults]);
 
@@ -64,20 +73,36 @@ export const TestsView: React.FC<TestsViewProps> = ({ isLoading, onCancelRequest
             size="small"
           >
             <Radio.Button value="all">
-              All <Badge size="small" count={testCounts.all} color={theme.colors["white-t-10"]} />
+              All{" "}
+              {testCounts.all ? <Badge size="small" count={testCounts.all} color={theme.colors["white-t-10"]} /> : null}
             </Radio.Button>
             <Radio.Button value="passed">
-              Passed <Badge size="small" count={testCounts.passed} color={theme.colors["white-t-10"]} />
+              Passed{" "}
+              {testCounts.passed ? (
+                <Badge size="small" count={testCounts.passed} color={theme.colors["white-t-10"]} />
+              ) : null}
             </Radio.Button>
             <Radio.Button value="failed">
-              Failed <Badge size="small" count={testCounts.failed} color={theme.colors["white-t-10"]} />
+              Failed{" "}
+              {testCounts.failed ? (
+                <Badge size="small" count={testCounts.failed} color={theme.colors["white-t-10"]} />
+              ) : null}
             </Radio.Button>
             <Radio.Button value="skipped">
-              Skipped <Badge size="small" count={testCounts.skipped} color={theme.colors["white-t-10"]} />
+              Skipped{" "}
+              {testCounts.skipped ? (
+                <Badge size="small" count={testCounts.skipped} color={theme.colors["white-t-10"]} />
+              ) : null}
             </Radio.Button>
           </Radio.Group>
         </div>
-        <RQButton className="tests-refresh-btn" size="small" type="transparent" icon={<MdRefresh />}>
+        <RQButton
+          className="tests-refresh-btn"
+          size="small"
+          type="transparent"
+          icon={<MdRefresh />}
+          onClick={handleRefresh}
+        >
           Refresh
         </RQButton>
       </div>

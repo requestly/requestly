@@ -282,7 +282,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     requestExecutor
       .execute()
       .then(({ executedEntry, testResults }) => {
-        console.log("!!!debug", "testResults", testResults);
         const response = executedEntry.response;
         // TODO: Add an entry in history
         const entryWithResponse = { ...entry, response, testResults };
@@ -440,6 +439,26 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     (evt.target as HTMLInputElement).blur();
   }, []);
 
+  const handleTestResultRefresh = useCallback(async () => {
+    try {
+      requestExecutor.updateEntryDetails({
+        ...sanitizeEntry(entry),
+        id: apiEntryDetails?.id,
+        collectionId: apiEntryDetails?.collectionId,
+      });
+
+      const result = await requestExecutor.rerun();
+      if (result?.testResults) {
+        setEntry((entry) => ({
+          ...entry,
+          testResults: result.testResults,
+        }));
+      }
+    } catch (error) {
+      toast.error("Something went wrong while refreshing test results");
+    }
+  }, [requestExecutor, apiEntryDetails?.id, apiEntryDetails?.collectionId, entry]);
+
   useEffect(() => {
     if (!requestExecutor) {
       setRequestExecutor(new RequestExecutor(appMode, apiClientWorkloadManager));
@@ -491,6 +510,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             isFailed={isFailed}
             isRequestCancelled={isRequestCancelled}
             onCancelRequest={cancelRequest}
+            handleTestResultRefresh={handleTestResultRefresh}
             error={error}
           />
         }
