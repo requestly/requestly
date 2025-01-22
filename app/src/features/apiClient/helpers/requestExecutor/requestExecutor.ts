@@ -22,7 +22,6 @@ type InternalFunctions = {
 };
 
 export class RequestExecutor {
-  // private workloadManager: APIClientWorkloadManager;
   private abortController: AbortController;
   private entryDetails: EntryDetails;
   private apiRecords: RQAPI.Record[];
@@ -32,6 +31,7 @@ export class RequestExecutor {
   private prepareRequest() {
     this.abortController = new AbortController();
     this.entryDetails.request.queryParams = [];
+
     const { headers, queryParams } = processAuthForEntry(this.entryDetails, this.entryDetails, this.apiRecords);
     this.entryDetails.request.headers = updateRequestWithAuthOptions(this.entryDetails.request.headers, headers);
     this.entryDetails.request.queryParams = updateRequestWithAuthOptions(

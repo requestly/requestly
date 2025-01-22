@@ -143,7 +143,6 @@ const useEnvironmentManager = (options = { initFetchers: true }) => {
           activeOwnerEnvironments[environmentData.id]?.variables ?? {},
           environmentData.variables
         );
-
         dispatch(
           variablesActions.updateEnvironmentData({
             newVariables: mergedVariables,
