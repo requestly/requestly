@@ -20,7 +20,7 @@ type InternalFunctions = {
   renderVariables(request: RQAPI.Request, collectionId: string): RQAPI.Request;
 };
 
-export class RequestExecutor {
+export class ApiClientExecutor {
   private abortController: AbortController;
   private entryDetails: RQAPI.Entry;
   private collectionId: RQAPI.Record["collectionId"];

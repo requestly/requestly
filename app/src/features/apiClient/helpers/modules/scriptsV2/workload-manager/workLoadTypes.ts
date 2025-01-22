@@ -2,7 +2,7 @@ import {
   BaseSnapshot,
   SnapshotForPostResponse,
   SnapshotForPreRequest,
-} from "features/apiClient/helpers/requestExecutor/snapshot";
+} from "features/apiClient/helpers/apiClientExecutor/snapshot";
 import { TestResult } from "../sandbox/types";
 
 export type ScriptWorkloadCallback = (state: any) => Promise<void>;
