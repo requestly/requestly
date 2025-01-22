@@ -1,11 +1,11 @@
 import { getRulesAndGroupsFromRuleIds } from "utils/rules/misc";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { SharedLinkVisibility, SharedListData } from "./types";
-import { Group as NewGroup, Rule as NewRule } from "features/rules/types/rules";
+import { Rule as NewRule, Group as NewGroup } from "@requestly/shared/types/entities/rules";
 import { StorageService } from "init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { generateObjectId } from "utils/FormattingHelper";
-import { StorageRecord } from "features/rules/types/rules";
+import { StorageRecord } from "@requestly/shared/types/entities/rules";
 
 export const createSharedList = async (
   appMode: string,

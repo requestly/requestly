@@ -8,7 +8,7 @@ import {
 import { ReducerKeys } from "store/constants";
 import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
 import { IncentivizationModal, IncentivizationModals } from "./types";
-import { RuleType } from "types";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 const initialState = {
   milestones: {} as Milestones,

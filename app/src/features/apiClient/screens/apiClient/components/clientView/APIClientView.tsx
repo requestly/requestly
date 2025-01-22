@@ -25,7 +25,7 @@ import { useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { CONTENT_TYPE_HEADER } from "../../../../constants";
+import { CONTENT_TYPE_HEADER, DUMMY_TEST_RESULT } from "../../../../constants";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import "./apiClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
@@ -284,12 +284,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       .then(({ executedEntry, testResults }) => {
         console.log("!!!debug", "testResults", testResults);
         const response = executedEntry.response;
+        const testResults = DUMMY_TEST_RESULT;
         // TODO: Add an entry in history
-        const entryWithResponse = { ...entry, response };
-        const renderedEntryWithResponse = { ...executedEntry, response };
+        const postExecutionEntry = { ...entry, response, testResults };
+        const completeRenderedEntry = { ...executedEntry, response, testResults };
 
         if (response) {
-          setEntry(entryWithResponse);
+          setEntry(postExecutionEntry);
           trackResponseLoaded({
             type: getContentTypeFromResponseHeaders(response.headers),
             time: Math.round(response.time / 1000),
@@ -320,7 +321,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
           trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
         }
-        notifyApiRequestFinished?.(renderedEntryWithResponse);
+        notifyApiRequestFinished?.(completeRenderedEntry);
       })
       .catch((e) => {
         setIsFailed(true);
@@ -486,6 +487,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           <ApiClientBottomSheet
             key={requestId}
             response={entry.response}
+            testResults={entry.testResults}
             isLoading={isLoadingResponse}
             isFailed={isFailed}
             isRequestCancelled={isRequestCancelled}

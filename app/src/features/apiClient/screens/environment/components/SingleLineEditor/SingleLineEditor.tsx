@@ -1,10 +1,11 @@
 import React, { useRef, useEffect, useState } from "react";
 import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
 import { EditorState, Prec } from "@codemirror/state";
+import { history, historyKeymap } from "@codemirror/commands";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { EditorPopover } from "componentsV2/CodeEditor/components/Editor/components/PopOver";
 import "componentsV2/CodeEditor/components/Editor/components/PopOver/popover.scss";
-import generateCompletionsForVariables from "componentsV2/CodeEditor/components/Editor/plugins/generateAutoCompletions";
+import generateCompletionsForVariables from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
 import "./singleLineEditor.scss";
 interface RQSingleLineEditorProps {
   defaultValue?: string;
@@ -61,6 +62,8 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
       state: EditorState.create({
         doc: defaultValue ?? "",
         extensions: [
+          history(),
+          keymap.of(historyKeymap),
           Prec.highest(
             keymap.of([
               {

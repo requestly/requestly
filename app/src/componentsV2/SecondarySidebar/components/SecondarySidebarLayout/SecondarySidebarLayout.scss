@@ -1,11 +1,15 @@
 .secondary-sidebar-layout-container {
   height: 100%;
   display: flex;
+  background-color: var(--requestly-color-surface-1);
+  overflow: hidden;
+  padding: 8px;
 
   .secondary-sidebar-content-container {
     background-color: var(--requestly-color-background);
     flex-grow: 1;
     height: 100%;
     overflow: auto !important;
+    border-radius: 10px;
   }
 }

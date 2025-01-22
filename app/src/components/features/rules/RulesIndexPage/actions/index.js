@@ -9,13 +9,13 @@ const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GR
  * Handle Rules whose Groups are missing!
  *
  * @param {{
- *  rules: import("features/rules/types/rules").Rule[],
- *  groups: import("features/rules/types/rules").Group[],
+ *  rules: import("@requestly/shared/types/entities/rules").Rule[],
+ *  groups: import("@requestly/shared/types/entities/rules").Group[],
  *  appMode: string
  * }}
  * @returns {Promise<{
  *  success: boolean,
- *  updatedRules: import("features/rules/types/rules").Rule[]
+ *  updatedRules: import("@requestly/shared/types/entities/rules").Rule[]
  * }>}
  */
 export const isGroupsSanitizationPassed = async ({ rules = [], groups = [], appMode }) => {

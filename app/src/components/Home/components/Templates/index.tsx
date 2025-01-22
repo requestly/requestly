@@ -10,12 +10,12 @@ import {
   trackHomeViewAllTemplatesClicked,
   trackTemplatesScrolled,
 } from "components/Home/analytics";
-import { RuleType } from "types";
 import PATHS from "config/constants/sub/paths";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { IoIosArrowDropright } from "@react-icons/all-files/io/IoIosArrowDropright";
 import { IoIosArrowDropleft } from "@react-icons/all-files/io/IoIosArrowDropleft";
 import "./index.scss";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 export const Templates: React.FC = () => {
   const scrollContainerRef = useRef(null);
