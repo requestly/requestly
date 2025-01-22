@@ -23,6 +23,14 @@ const createInfiniteChainable = (methodName: string) => {
   return new Proxy(() => {}, handler);
 };
 
+const jsonifyObject = (objectString: unknown) => {
+  if (objectString && typeof objectString === "object") {
+    return objectString;
+  }
+
+  return JSON.parse(objectString as string);
+};
+
 export class RQ implements SandboxAPI {
   public request: RQAPI.Request;
   public response: RQAPI.Response;
@@ -62,7 +70,7 @@ export class RQ implements SandboxAPI {
       toJSON: () => ({
         method: this.request.method,
         url: this.request.url,
-        body: this.request.body,
+        body: jsonifyObject(this.request.body),
       }),
     });
 
@@ -71,10 +79,10 @@ export class RQ implements SandboxAPI {
         toJSON() {
           return {
             ...this,
-            body: this.body,
+            body: jsonifyObject(this.body),
           };
         },
-        json: () => this.response.body,
+        json: () => jsonifyObject(this.response.body),
         text: () => this.response.body,
       });
     }
