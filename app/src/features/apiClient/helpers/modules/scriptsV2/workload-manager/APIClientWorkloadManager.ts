@@ -38,7 +38,7 @@ export class APIClientWorkloadManager {
       const result = await worker.work(workload);
       this.workerPool.release(worker);
 
-      return resolve(result);
+      resolve(result);
     } catch (error) {
       if (error instanceof TaskAbortedError) {
         resolve(error.getWorkError());

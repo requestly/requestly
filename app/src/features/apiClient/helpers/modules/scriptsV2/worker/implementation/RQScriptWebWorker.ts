@@ -39,7 +39,7 @@ export class RQScriptWebWorker implements RQWorker {
         type: WorkResultType.SUCCESS,
       };
     } catch (error) {
-      if (error instanceof ScriptExecutionError) {
+      if (error.name === ScriptExecutionError.name) {
         return {
           type: WorkResultType.ERROR,
           error: {
@@ -49,7 +49,7 @@ export class RQScriptWebWorker implements RQWorker {
           },
         };
       }
-      if (error instanceof ScriptPendingWorkFlushingError) {
+      if (error.name === ScriptPendingWorkFlushingError.name) {
         return {
           type: WorkResultType.ERROR,
           error: {

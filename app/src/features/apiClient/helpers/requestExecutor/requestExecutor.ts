@@ -10,6 +10,11 @@ import {
 } from "../modules/scriptsV2/workload-manager/workLoadTypes";
 import { notification } from "antd";
 import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshot";
+import {
+  trackScriptExecutionCompleted,
+  trackScriptExecutionFailed,
+  trackScriptExecutionStarted,
+} from "../modules/scriptsV2/analytics";
 
 type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
@@ -124,9 +129,19 @@ export class RequestExecutor {
   async execute() {
     this.prepareRequest();
 
+    trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
     const preRequestScriptResult = await this.executePreRequestScript();
 
+    if (preRequestScriptResult.type === WorkResultType.SUCCESS) {
+      trackScriptExecutionCompleted(RQAPI.ScriptType.PRE_REQUEST);
+    }
+
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
+      trackScriptExecutionFailed(
+        RQAPI.ScriptType.PRE_REQUEST,
+        preRequestScriptResult.error.type,
+        preRequestScriptResult.error.message
+      );
       return {
         ...this.entryDetails,
         error: {
@@ -153,9 +168,19 @@ export class RequestExecutor {
       };
     }
 
+    trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
     const responseScriptResult = await this.executePostResponseScript();
 
+    if (responseScriptResult.type === WorkResultType.SUCCESS) {
+      trackScriptExecutionCompleted(RQAPI.ScriptType.POST_RESPONSE);
+    }
+
     if (responseScriptResult.type === WorkResultType.ERROR) {
+      trackScriptExecutionFailed(
+        RQAPI.ScriptType.POST_RESPONSE,
+        responseScriptResult.error.type,
+        responseScriptResult.error.message
+      );
       notification.error({
         message: "Something went wrong in post-response script!",
         description: `${responseScriptResult.error.name}: ${responseScriptResult.error.message}`,

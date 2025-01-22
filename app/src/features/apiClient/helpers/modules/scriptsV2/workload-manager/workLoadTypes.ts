@@ -73,15 +73,17 @@ export type WorkError = {
 );
 
 export class ScriptExecutionError extends Error {
+  static name = "ScriptExecutionError";
   constructor(error: Error) {
     super(error.message);
-    this.name = "ScriptExecutionError";
+    this.name = ScriptExecutionError.name;
   }
 }
 
 export class ScriptPendingWorkFlushingError extends Error {
+  static name = "ScriptExecutionError";
   constructor(error: Error) {
     super(error.message);
-    this.name = "ScriptPendingWorkFlushingError";
+    this.name = ScriptPendingWorkFlushingError.name;
   }
 }
