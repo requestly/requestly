@@ -1,6 +1,6 @@
 // @ts-nocheck
+import { RuleType } from "@requestly/shared/types/entities/rules";
 import LINKS from "config/constants/sub/links";
-import { RuleType } from "types";
 import { RuleDetails } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
 
 export const sampleRuleDetails: Record<string, { id: string; demoLink: string; details: RuleDetails }> = {

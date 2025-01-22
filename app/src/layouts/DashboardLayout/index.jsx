@@ -9,7 +9,7 @@ import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
-import { isAppOpenedInIframe } from "utils/AppUtils";
+import { isAppOpenedInIframe, isDesktopMode } from "utils/AppUtils";
 import { AppNotificationBanner } from "../../componentsV2/AppNotificationBanner";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { globalActions } from "store/slices/global/slice";
@@ -17,8 +17,11 @@ import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
 import SupportPanel from "components/misc/SupportPanel";
 import { useDesktopAppConnection } from "hooks/useDesktopAppConnection";
-import "./DashboardLayout.css";
+import "./DashboardLayout.scss";
 import { ConnectedToDesktopView } from "./ConnectedToDesktopView/ConnectedToDesktopView";
+import { getUserOS } from "utils/Misc";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -68,7 +71,13 @@ const DashboardLayout = () => {
       <AppNotificationBanner />
       <PlanExpiredBanner />
       <div className="app-layout app-dashboard-layout">
-        <div className="app-header">
+        <div
+          className={`app-header ${
+            isDesktopMode() && isFeatureCompatible(FEATURES.FRAMELESS_DESKTOP_APP)
+              ? `app-mode-desktop app-mode-desktop-${getUserOS()}`
+              : ""
+          }`}
+        >
           {" "}
           <MenuHeader />
         </div>
