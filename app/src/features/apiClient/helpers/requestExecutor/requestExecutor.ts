@@ -12,7 +12,6 @@ import { notification } from "antd";
 import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshot";
 import { TestResult } from "../modules/scriptsV2/sandbox/types";
 
-type EntryDetails = RQAPI.Entry & { id: RQAPI.Record["id"]; collectionId: RQAPI.Record["collectionId"] };
 type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
   getCollectionVariables(collectionId: string): EnvironmentVariables;
@@ -23,7 +22,9 @@ type InternalFunctions = {
 
 export class RequestExecutor {
   private abortController: AbortController;
-  private entryDetails: EntryDetails;
+  private entryDetails: RQAPI.Entry;
+  private collectionId: RQAPI.Record["collectionId"];
+  private recordId: RQAPI.Record["id"];
   private apiRecords: RQAPI.Record[];
   private internalFunctions: InternalFunctions;
   constructor(private appMode: string, private workloadManager: APIClientWorkloadManager) {}
@@ -32,7 +33,11 @@ export class RequestExecutor {
     this.abortController = new AbortController();
     this.entryDetails.request.queryParams = [];
 
-    const { headers, queryParams } = processAuthForEntry(this.entryDetails, this.entryDetails, this.apiRecords);
+    const { headers, queryParams } = processAuthForEntry(
+      this.entryDetails,
+      { id: this.recordId, collectionId: this.collectionId },
+      this.apiRecords
+    );
     this.entryDetails.request.headers = updateRequestWithAuthOptions(this.entryDetails.request.headers, headers);
     this.entryDetails.request.queryParams = updateRequestWithAuthOptions(
       this.entryDetails.request.queryParams,
@@ -42,13 +47,13 @@ export class RequestExecutor {
     const { renderVariables } = this.internalFunctions;
 
     // Process request configuration with environment variables
-    const renderedRequest = renderVariables(this.entryDetails.request, this.entryDetails.collectionId);
+    const renderedRequest = renderVariables(this.entryDetails.request, this.collectionId);
     this.entryDetails.request = renderedRequest;
   }
 
   private buildBaseSnapshot(): BaseSnapshot {
     const globalVariables = this.internalFunctions.getGlobalVariables();
-    const collectionVariables = this.internalFunctions.getCollectionVariables(this.entryDetails.collectionId);
+    const collectionVariables = this.internalFunctions.getCollectionVariables(this.collectionId);
     const environmentVariables = this.internalFunctions.getEnvironmentVariables();
 
     return {
@@ -77,8 +82,14 @@ export class RequestExecutor {
     };
   }
 
-  updateEntryDetails(entryDetails: EntryDetails) {
-    this.entryDetails = entryDetails;
+  updateEntryDetails(entryDetails: {
+    entry: RQAPI.Entry;
+    collectionId: RQAPI.Record["collectionId"];
+    recordId: RQAPI.Record["id"];
+  }) {
+    this.entryDetails = entryDetails.entry;
+    this.collectionId = entryDetails.collectionId;
+    this.recordId = entryDetails.recordId;
   }
 
   updateApiRecords(apiRecords: RQAPI.Record[]) {
