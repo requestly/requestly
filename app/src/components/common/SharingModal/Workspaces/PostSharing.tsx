@@ -50,7 +50,8 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
       .then(() => {
         toggleModal();
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error(error);
         toggleModal();
         toast.error(
           "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."

@@ -351,6 +351,7 @@ const WorkspaceSelector = () => {
         setIsModalOpen(false);
       })
       .catch((error) => {
+        console.error(error);
         setIsModalOpen(false);
         toast.error(
           "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
