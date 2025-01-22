@@ -22,7 +22,7 @@
   grid-area: header;
   height: 100%;
   max-height: var(--app-header-height);
-  border-bottom: 1px solid var(--border-dark);
+  background-color: var(--requestly-color-surface-0);
 
   &.app-mode-desktop {
     -webkit-app-region: drag;
@@ -51,11 +51,15 @@
   grid-area: sidebar;
   width: 100%;
   max-width: var(--app-sidebar-width);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .app-main-content {
   grid-area: main;
   overflow: auto !important;
+  background-color: var(--requestly-color-surface-1);
+  border: 1px solid var(--border-dark);
+  border-radius: 10px 0px 0px 10px;
 }
 
 .app-footer {
@@ -67,7 +71,6 @@
 .app-main-content,
 #dashboardMainContent {
   height: 100%;
-  background-color: var(--requestly-color-background);
 }
 
 .app-layout .ant-layout-footer {
