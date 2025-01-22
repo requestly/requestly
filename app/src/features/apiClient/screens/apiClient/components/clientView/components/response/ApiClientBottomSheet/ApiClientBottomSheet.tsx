@@ -46,6 +46,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
             isFailed={isFailed}
             onCancelRequest={onCancelRequest}
             error={error}
+            analyticEventProperties={{ source: "api_client" }}
           />
         ),
       },

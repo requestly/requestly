@@ -7,19 +7,15 @@ import { json } from "@codemirror/lang-json";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
-import { EditorLanguage, EditorCustomToolbar, AnalyticEventProperties } from "componentsV2/CodeEditor/types";
+import { EditorLanguage, EditorCustomToolbar } from "componentsV2/CodeEditor/types";
 import { ResizableBox } from "react-resizable";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
-import { getAllEditorToast, getIsCodeEditorFullScreenModeOnboardingCompleted } from "store/selectors";
+import { getAllEditorToast } from "store/selectors";
 import { EditorToastContainer } from "../EditorToast/EditorToastContainer";
 import { getByteSize } from "utils/FormattingHelper";
 import CodeEditorToolbar from "./components/Toolbar/Toolbar";
 import { Modal } from "antd";
-import { toast } from "utils/Toast";
-import { useLocation } from "react-router-dom";
-import PATHS from "config/constants/sub/paths";
-import { trackCodeEditorCollapsedClick, trackCodeEditorExpandedClick } from "../analytics";
 import { EnvironmentVariables } from "backend/environment/types";
 import { highlightVariablesPlugin } from "features/apiClient/screens/environment/components/SingleLineEditor/plugins/highlightVariables";
 import { EditorPopover } from "./components/PopOver";
@@ -38,12 +34,13 @@ interface EditorProps {
   toolbarOptions?: EditorCustomToolbar;
   hideCharacterCount?: boolean;
   handleChange?: (value: string) => void;
-  analyticEventProperties?: AnalyticEventProperties;
   prettifyOnInit?: boolean;
   envVariables?: EnvironmentVariables;
   showOptions?: {
     enablePrettify?: boolean;
   };
+  isFullScreen?: boolean;
+  handleFullScreenToggle?: () => void;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -55,19 +52,17 @@ const Editor: React.FC<EditorProps> = ({
   handleChange = () => {},
   toolbarOptions,
   scriptId = "",
-  analyticEventProperties = {},
   prettifyOnInit = false,
   envVariables,
   showOptions = { enablePrettify: true },
+  isFullScreen = false,
+  handleFullScreenToggle = () => {},
 }) => {
-  const location = useLocation();
   const dispatch = useDispatch();
   const editorRef = useRef<ReactCodeMirrorRef | null>(null);
   const [editorHeight, setEditorHeight] = useState(height);
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [hoveredVariable, setHoveredVariable] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
-  const isFullScreenModeOnboardingCompleted = useSelector(getIsCodeEditorFullScreenModeOnboardingCompleted);
   const [isEditorInitialized, setIsEditorInitialized] = useState(false);
   const allEditorToast = useSelector(getAllEditorToast);
   const toastOverlay = useMemo(() => allEditorToast[scriptId], [allEditorToast, scriptId]); // todo: rename
@@ -77,26 +72,6 @@ const Editor: React.FC<EditorProps> = ({
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
   };
-
-  const handleFullScreenToggle = useCallback(() => {
-    setIsFullScreen((prev) => !prev);
-    if (!isFullScreen) {
-      trackCodeEditorExpandedClick(analyticEventProperties);
-
-      if (!isFullScreenModeOnboardingCompleted) {
-        // TODO: @rohanmathur to remove this check after adding shortcut in mocks save button
-        const isRuleEditor = location?.pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
-
-        if (isRuleEditor) {
-          toast.info(`Use '⌘+S' or 'ctrl+S' to save the rule`, 3);
-          // @ts-ignore
-          dispatch(globalActions.updateIsCodeEditorFullScreenModeOnboardingCompleted(true));
-        }
-      }
-    } else {
-      trackCodeEditorCollapsedClick(analyticEventProperties);
-    }
-  }, [analyticEventProperties, dispatch, isFullScreen, isFullScreenModeOnboardingCompleted, location?.pathname]);
 
   const editorLanguage = useMemo(() => {
     switch (language) {
@@ -301,7 +276,7 @@ const Editor: React.FC<EditorProps> = ({
         open={isFullScreen}
         destroyOnClose
         onCancel={() => {
-          setIsFullScreen(false);
+          handleFullScreenToggle();
         }}
         closable={false}
         closeIcon={null}

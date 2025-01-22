@@ -11,6 +11,8 @@ export function JsonBody(props: {
   environmentVariables: EnvironmentVariables;
   setRequestEntry: RequestBodyProps["setRequestEntry"];
   editorOptions: React.ReactNode;
+  isFullScreen: boolean;
+  handleFullScreenToggle: () => void;
 }) {
   const { environmentVariables, setRequestEntry, editorOptions } = props;
 
@@ -42,9 +44,10 @@ export function JsonBody(props: {
         prettifyOnInit={true}
         isResizable={false}
         hideCharacterCount
-        analyticEventProperties={{ source: "api_client" }}
         envVariables={environmentVariables}
         toolbarOptions={{ title: "", options: [editorOptions] }}
+        isFullScreen={props.isFullScreen}
+        handleFullScreenToggle={props.handleFullScreenToggle}
       />
     </div>
   );

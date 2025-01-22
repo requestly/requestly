@@ -9,6 +9,8 @@ export function RawBody(props: {
   environmentVariables: EnvironmentVariables;
   setRequestEntry: RequestBodyProps["setRequestEntry"];
   editorOptions: React.ReactNode;
+  isFullScreen: boolean;
+  handleFullScreenToggle: () => void;
 }) {
   const { environmentVariables, setRequestEntry, editorOptions } = props;
 
@@ -39,12 +41,13 @@ export function RawBody(props: {
         handleChange={handleTextChange}
         isResizable={false}
         hideCharacterCount
-        analyticEventProperties={{ source: "api_client" }}
         envVariables={environmentVariables}
         showOptions={{
           enablePrettify: false,
         }}
         toolbarOptions={{ title: "", options: [editorOptions] }}
+        isFullScreen={props.isFullScreen}
+        handleFullScreenToggle={props.handleFullScreenToggle}
       />
     </div>
   );
