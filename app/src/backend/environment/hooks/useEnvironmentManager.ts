@@ -331,10 +331,7 @@ const useEnvironmentManager = (options = { initFetchers: true }) => {
       const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
       const renderedTemplate = renderTemplate(template, variablesWithPrecedence);
 
-      return {
-        renderedTemplate,
-        variables: variablesWithPrecedence,
-      };
+      return renderedTemplate;
     },
     [getVariablesWithPrecedence]
   );
@@ -353,6 +350,13 @@ const useEnvironmentManager = (options = { initFetchers: true }) => {
   const getGlobalVariables = useCallback((): EnvironmentVariables => {
     return activeOwnerEnvironments[globalEnvironmentData?.id]?.variables ?? {};
   }, [activeOwnerEnvironments, globalEnvironmentData?.id]);
+
+  const getCurrentCollectionVariables = useCallback(
+    (collectionId: string): EnvironmentVariables => {
+      return collectionVariables[collectionId]?.variables ?? {};
+    },
+    [collectionVariables]
+  );
 
   const getAllEnvironments = useCallback(() => {
     const environments = activeOwnerEnvironments;
@@ -469,6 +473,7 @@ const useEnvironmentManager = (options = { initFetchers: true }) => {
     getGlobalVariables,
     setCollectionVariables,
     removeCollectionVariable,
+    getCollectionVariables: getCurrentCollectionVariables,
   };
 };
 

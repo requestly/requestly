@@ -39,6 +39,7 @@ import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/h
 import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { toast } from "utils/Toast";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -80,7 +81,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
     <Dropdown
       overlay={menu}
       trigger={["click"]}
-      className="workspace-selector-dropdown"
+      className="workspace-selector-dropdown no-drag"
       onOpenChange={handleWorkspaceDropdownClick}
     >
       <div className="cursor-pointer items-center">
@@ -344,10 +345,18 @@ const WorkspaceSelector = () => {
       appMode,
       undefined,
       "workspaces_dropdown"
-    ).then(() => {
-      if (!isModalOpen) showSwitchWorkspaceSuccessToast(team.name);
-      setIsModalOpen(false);
-    });
+    )
+      .then(() => {
+        if (!isModalOpen) showSwitchWorkspaceSuccessToast(team.name);
+        setIsModalOpen(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        setIsModalOpen(false);
+        toast.error(
+          "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
+        );
+      });
   };
 
   const unauthenticatedUserMenu = (

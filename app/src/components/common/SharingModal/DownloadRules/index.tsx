@@ -10,8 +10,8 @@ import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
 import { unselectAllRecords } from "components/features/rules/actions";
 import { getAllRecords } from "store/features/rules/selectors";
-import { StorageRecord } from "features/rules/types/rules";
 import "./DownloadRules.css";
+import { StorageRecord } from "@requestly/shared/types/entities/rules";
 
 interface DownloadRulesProps {
   selectedRules: StorageRecord["id"][];
