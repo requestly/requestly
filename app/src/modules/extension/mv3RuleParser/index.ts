@@ -1,4 +1,4 @@
-import { Rule, RuleType } from "../../../types/rules";
+import { Rule, RuleType } from "@requestly/shared/types/entities/rules";
 import { ExtensionRule } from "../types";
 import parseCancelRule from "./parseCancelRule";
 import parseDelayRule from "./parseDelayRule";

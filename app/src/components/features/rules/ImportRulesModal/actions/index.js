@@ -7,7 +7,7 @@ import { setIdsOfSingleRulePairs } from "../../../../../utils/rules/set-ids-of-r
 import { generateObjectId } from "../../../../../utils/FormattingHelper";
 import Logger from "lib/logger";
 import { runRuleMigrations } from "utils/rules/ruleMigrations";
-import { RecordStatus } from "features/rules";
+import { RecordStatus } from "@requestly/shared/types/entities/rules";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 

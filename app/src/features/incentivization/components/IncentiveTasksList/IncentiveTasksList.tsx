@@ -37,7 +37,6 @@ import {
 } from "features/incentivization/analytics";
 import { RQButton } from "lib/design-system/components";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization/analytics/constants";
-import { RuleType } from "types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import PATHS from "config/constants/sub/paths";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
@@ -48,6 +47,7 @@ import { useIsNewUserForIncentivization } from "features/incentivization/hooks/u
 import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivization/constants";
 import { NewRuleButton } from "./components/NewRuleButton/NewRuleButton";
 import "./incentiveTasksList.scss";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 interface IncentiveTasksListProps {
   source: string;

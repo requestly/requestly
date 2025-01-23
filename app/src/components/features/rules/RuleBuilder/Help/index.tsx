@@ -8,7 +8,6 @@ import "react-medium-image-zoom/dist/styles.css";
 import { RQCollapse } from "lib/design-system/components/RQCollapse";
 import LeftArrow from "assets/icons/left-arrow.svg?react";
 import RightArrow from "assets/icons/right-arrow.svg?react";
-import { RuleType } from "types/rules";
 import { TocItem, ExternalLink } from "./types";
 import { snakeCase } from "lodash";
 import APP_CONSTANTS from "config/constants";
@@ -28,6 +27,7 @@ import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDet
 import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { useSelector } from "react-redux";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 const externalLinks: ExternalLink[] = [
   {

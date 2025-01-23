@@ -79,6 +79,7 @@ const MenuHeader = () => {
                   rel="noreferrer"
                   href={LINKS.YOUTUBE_TUTORIALS}
                   onClick={() => trackTopbarClicked("tutorials")}
+                  className="no-drag"
                 >
                   Tutorials
                 </a>
@@ -101,14 +102,14 @@ const MenuHeader = () => {
                 {appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
                 user?.details?.planDetails?.status === "canceled" &&
                 isPlanExpiredBannerClosed ? (
-                  <div className="hidden-on-small-screen">
+                  <div className="hidden-on-small-screen no-drag">
                     <PlanExpiredBadge />
                   </div>
                 ) : null}
-                <Col className="hidden-on-small-screen">{gitHubStarButton}</Col>
+                <Col className="hidden-on-small-screen no-drag">{gitHubStarButton}</Col>
                 <RQButton
                   type="default"
-                  className="header-search-btn"
+                  className="header-search-btn no-drag"
                   onClick={() => dispatch(globalActions.updateIsCommandBarOpen(true))}
                 >
                   <div>
@@ -118,7 +119,7 @@ const MenuHeader = () => {
                 </RQButton>
 
                 <RQButton
-                  className="ask-ai-btn"
+                  className="ask-ai-btn no-drag"
                   onClick={() => {
                     trackAskAIClicked("app_header");
                     dispatch(globalActions.updateRequestBot({ isActive: true, modelType: "app" }));
@@ -130,12 +131,12 @@ const MenuHeader = () => {
                   </div>
                 </RQButton>
 
-                <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
+                <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen no-drag" />
 
                 {(appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
                   (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
                     user?.details?.planDetails?.status !== "canceled")) && (
-                  <Col>
+                  <Col className="no-drag">
                     <PremiumPlanBadge />
                   </Col>
                 )}
@@ -145,7 +146,7 @@ const MenuHeader = () => {
                   <Tooltip title={<span className="text-gray text-sm">Settings</span>}>
                     <Button
                       type="text"
-                      className="header-icon-btn"
+                      className="header-icon-btn no-drag"
                       icon={<Settings />}
                       onClick={() => {
                         trackHeaderClicked("settings");
