@@ -302,11 +302,15 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setIsRecordBeingCreated(recordType);
           trackCreateEnvironmentClicked(analyticEventSource);
           return addNewEnvironment("New Environment")
-            .then((newEnvironment: { id: string; name: string }) => {
+            .then((args) => {
+              if(!args) {
+                return;
+              }
+              const { id, name } = args;
               setIsRecordBeingCreated(null);
-              openTab(newEnvironment?.id, {
-                title: newEnvironment?.name,
-                url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${newEnvironment?.id}?new`,
+              openTab(id, {
+                title: name,
+                url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${id}?new`,
               });
             })
             .catch((error) => {
