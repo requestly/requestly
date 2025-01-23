@@ -31,9 +31,7 @@ export const ImportCollectionsModal: React.FC<Props> = ({ isOpen, onClose }) => 
   const user = useSelector(getUserAuthDetails);
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const { setVariables, getCurrentEnvironmentVariables, getAllEnvironments } = useEnvironmentManager({
-    enableEffects: false,
-  });
+  const { setVariables, getCurrentEnvironmentVariables, getAllEnvironments } = useEnvironmentManager();
   const { onSaveRecord } = useApiClientContext();
 
   const [isDataProcessing, setIsDataProcessing] = useState(false);
