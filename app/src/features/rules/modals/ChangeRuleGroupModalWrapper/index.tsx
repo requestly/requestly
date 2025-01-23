@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ChangeRuleGroupModal from "components/features/rules/ChangeRuleGroupModal";
-import { Rule } from "features/rules/types/rules";
+import { Rule } from "@requestly/shared/types/entities/rules";
 import { useRulesModalsContext } from "features/rules/context/modals";
 
 interface Props {}

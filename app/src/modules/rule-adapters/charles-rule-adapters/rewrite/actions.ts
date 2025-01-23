@@ -1,16 +1,3 @@
-import {
-  Status,
-  RuleType,
-  ReplaceRule,
-  HeadersRule,
-  RequestRule,
-  ResponseRule,
-  QueryParamRule,
-  SourceOperator,
-  HeaderRuleActionType,
-  ResponseRuleResourceType,
-  QueryParamModificationType,
-} from "types";
 import { RewriteRulePair, SourceData } from "../types";
 import {
   getHeadersData,
@@ -27,22 +14,32 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { RewriteRuleActionType } from "./types";
 import { statusCodes } from "config/constants/sub/statusCode";
+import {
+  HeaderRule,
+  QueryParamRule,
+  RecordStatus,
+  ReplaceRule,
+  RequestRule,
+  ResponseRule,
+  RuleSourceOperator,
+  RuleType,
+} from "@requestly/shared/types/entities/rules";
 
 export const createModifyHeaderRule = (pair: RewriteRulePair, source: SourceData) => {
   const headerAction = {
     ...getHeadersData(pair),
     active: pair.active,
     whereToApply: getWhereToApplyRule(pair),
-    actionType: rewriteRuleActionTypes[pair.ruleType] as HeaderRuleActionType,
+    actionType: rewriteRuleActionTypes[pair.ruleType] as HeaderRule.ModificationType,
   };
 
-  const newRule = getNewRule(RuleType.HEADERS) as HeadersRule;
+  const newRule = getNewRule(RuleType.HEADERS) as HeaderRule.Record;
   const modifications = getHeaderModifications(headerAction);
 
   const ruleToBeImported = {
     ...newRule,
     isCharlesImport: true,
-    status: headerAction.active ? Status.ACTIVE : Status.INACTIVE,
+    status: headerAction.active ? RecordStatus.ACTIVE : RecordStatus.INACTIVE,
     name: getModificationRuleName(headerAction.header, headerAction.value, headerAction.actionType),
     pairs: [
       {
@@ -64,15 +61,15 @@ export const createModifyQueryParamRule = (pair: RewriteRulePair, source: Source
     ...getQueryParamsData(pair),
     active: pair.active,
     ruleType: RuleType.QUERYPARAM,
-    actionType: rewriteRuleActionTypes[pair.ruleType] as QueryParamModificationType,
+    actionType: rewriteRuleActionTypes[pair.ruleType] as QueryParamRule.ModificationType,
   };
 
-  const newRule = getNewRule(RuleType.QUERYPARAM) as QueryParamRule;
+  const newRule = getNewRule(RuleType.QUERYPARAM) as QueryParamRule.Record;
 
   const ruleToBeImported = {
     ...newRule,
     isCharlesImport: true,
-    status: queryParamAction.active ? Status.ACTIVE : Status.INACTIVE,
+    status: queryParamAction.active ? RecordStatus.ACTIVE : RecordStatus.INACTIVE,
     name: getModificationRuleName(queryParamAction.param, queryParamAction.value, queryParamAction.actionType),
     pairs: [
       {
@@ -87,13 +84,13 @@ export const createModifyQueryParamRule = (pair: RewriteRulePair, source: Source
 };
 
 export const createModifyStatusRule = (pair: RewriteRulePair, source: SourceData) => {
-  const newRule = getNewRule(RuleType.RESPONSE) as ResponseRule;
+  const newRule = getNewRule(RuleType.RESPONSE) as ResponseRule.Record;
 
   const ruleToBeImported = {
     ...newRule,
     isCharlesImport: true,
     name: `Modify status code to ${pair.newValue}`,
-    status: pair.active ? Status.ACTIVE : Status.INACTIVE,
+    status: pair.active ? RecordStatus.ACTIVE : RecordStatus.INACTIVE,
     pairs: [
       {
         ...newRule.pairs[0],
@@ -104,7 +101,7 @@ export const createModifyStatusRule = (pair: RewriteRulePair, source: SourceData
           //@ts-ignore
           statusText: statusCodes[pair.newValue],
           type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,
-          resourceType: ResponseRuleResourceType.REST_API,
+          resourceType: ResponseRule.ResourceType.REST_API,
           value: RULE_TYPES_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE].RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE,
         },
       },
@@ -127,20 +124,20 @@ const getReplaceRuleNamePrefix = (type: RewriteRulePair["ruleType"]) => {
 };
 
 export const createReplaceRule = (pair: RewriteRulePair, source: SourceData) => {
-  const newRule = getNewRule(RuleType.REPLACE) as ReplaceRule;
+  const newRule = getNewRule(RuleType.REPLACE) as ReplaceRule.Record;
 
   const ruleToBeImported = {
     ...newRule,
     isCharlesImport: true,
     name: `${getReplaceRuleNamePrefix(pair.ruleType)} ${pair.matchValue} -> ${pair.newValue}`,
-    status: pair.active ? Status.ACTIVE : Status.INACTIVE,
+    status: pair.active ? RecordStatus.ACTIVE : RecordStatus.INACTIVE,
     pairs: [
       {
         ...newRule.pairs[0],
         source: {
           ...newRule.pairs[0].source,
           value: source.value,
-          operator: pair.matchValueRegex ? SourceOperator.MATCHES : SourceOperator.CONTAINS,
+          operator: pair.matchValueRegex ? RuleSourceOperator.MATCHES : RuleSourceOperator.CONTAINS,
         },
         from: pair.matchValue,
         to: pair.newValue,
@@ -171,14 +168,14 @@ export const createModifyBodyRule = (pair: RewriteRulePair, source: SourceData) 
   const updatedResponseBody = getUpdatedBody(defaultResponseBody, pair, "response");
 
   if (pair.matchRequest && pair.matchResponse) {
-    const requestRule = getNewRule(RuleType.REQUEST) as RequestRule;
-    const responseRule = getNewRule(RuleType.RESPONSE) as ResponseRule;
+    const requestRule = getNewRule(RuleType.REQUEST) as RequestRule.Record;
+    const responseRule = getNewRule(RuleType.RESPONSE) as ResponseRule.Record;
 
     const updatedRequestRule = {
       ...requestRule,
       isCharlesImport: true,
       name: `Modify request body`,
-      status: pair.active ? Status.ACTIVE : Status.INACTIVE,
+      status: pair.active ? RecordStatus.ACTIVE : RecordStatus.INACTIVE,
       pairs: [
         {
           ...requestRule.pairs[0],
@@ -196,7 +193,7 @@ export const createModifyBodyRule = (pair: RewriteRulePair, source: SourceData) 
       ...responseRule,
       isCharlesImport: true,
       name: `Modify response body`,
-      status: pair.active ? Status.ACTIVE : Status.INACTIVE,
+      status: pair.active ? RecordStatus.ACTIVE : RecordStatus.INACTIVE,
       pairs: [
         {
           ...responseRule.pairs[0],
@@ -204,7 +201,7 @@ export const createModifyBodyRule = (pair: RewriteRulePair, source: SourceData) 
           response: {
             ...responseRule.pairs[0].response,
             type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,
-            resourceType: ResponseRuleResourceType.REST_API,
+            resourceType: ResponseRule.ResourceType.REST_API,
             value: updatedResponseBody,
           },
         },
@@ -213,13 +210,13 @@ export const createModifyBodyRule = (pair: RewriteRulePair, source: SourceData) 
 
     return [updatedRequestRule, updatedResponseRule];
   } else if (pair.matchRequest) {
-    const requestRule = getNewRule(RuleType.REQUEST) as RequestRule;
+    const requestRule = getNewRule(RuleType.REQUEST) as RequestRule.Record;
 
     const updatedRequestRule = {
       ...requestRule,
       isCharlesImport: true,
       name: `Modify request body`,
-      status: pair.active ? Status.ACTIVE : Status.INACTIVE,
+      status: pair.active ? RecordStatus.ACTIVE : RecordStatus.INACTIVE,
       pairs: [
         {
           ...requestRule.pairs[0],
@@ -234,13 +231,13 @@ export const createModifyBodyRule = (pair: RewriteRulePair, source: SourceData) 
     };
     return updatedRequestRule;
   } else {
-    const responseRule = getNewRule(RuleType.RESPONSE) as ResponseRule;
+    const responseRule = getNewRule(RuleType.RESPONSE) as ResponseRule.Record;
 
     const updatedResponseRule = {
       ...responseRule,
       isCharlesImport: true,
       name: `Modify response body`,
-      status: pair.active ? Status.ACTIVE : Status.INACTIVE,
+      status: pair.active ? RecordStatus.ACTIVE : RecordStatus.INACTIVE,
       pairs: [
         {
           ...responseRule.pairs[0],
@@ -248,7 +245,7 @@ export const createModifyBodyRule = (pair: RewriteRulePair, source: SourceData) 
           response: {
             ...responseRule.pairs[0].response,
             type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,
-            resourceType: ResponseRuleResourceType.REST_API,
+            resourceType: ResponseRule.ResourceType.REST_API,
             value: updatedResponseBody,
           },
         },

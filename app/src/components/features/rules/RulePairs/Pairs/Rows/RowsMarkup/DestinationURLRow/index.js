@@ -6,7 +6,6 @@ import { getCurrentlySelectedRuleConfig } from "store/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { InfoTag } from "components/misc/InfoTag";
 import { MoreInfo } from "components/misc/MoreInfo";
-import { RedirectDestinationType } from "types/rules";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import isEmpty from "is-empty";
 import { isValidUrl } from "utils/FormattingHelper";
@@ -30,6 +29,7 @@ import { MockPickerModal } from "features/mocks/modals";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.css";
+import { RedirectRule } from "@requestly/shared/types/entities/rules";
 
 const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
   const dispatch = useDispatch();
@@ -107,16 +107,16 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
 
   const getDestinationTypeForExistingRule = (destination) => {
     if (destination.startsWith("file://")) {
-      return RedirectDestinationType.MAP_LOCAL;
+      return RedirectRule.DestinationType.MAP_LOCAL;
     } else if (
       /* check for both new and old mocks */
       destination.includes("requestly.dev/api/mockv2/") ||
       destination.includes("requestly.me") ||
       destination.includes("requestly.tech/api/mockv2/")
     ) {
-      return RedirectDestinationType.MOCK_OR_FILE_PICKER;
+      return RedirectRule.DestinationType.MOCK_OR_FILE_PICKER;
     } else {
-      return RedirectDestinationType.URL;
+      return RedirectRule.DestinationType.URL;
     }
   };
 
@@ -304,11 +304,11 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
 
   const renderDestinationRow = () => {
     switch (pair.destinationType) {
-      case RedirectDestinationType.URL:
+      case RedirectRule.DestinationType.URL:
         return renderRedirectURLInput();
-      case RedirectDestinationType.MOCK_OR_FILE_PICKER:
+      case RedirectRule.DestinationType.MOCK_OR_FILE_PICKER:
         return renderMockOrFilePicker();
-      case RedirectDestinationType.MAP_LOCAL:
+      case RedirectRule.DestinationType.MAP_LOCAL:
         return renderLocalFileSelector();
       default:
         return renderRedirectURLInput();
@@ -358,7 +358,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                   open={destinationTypePopupVisible}
                 >
                   <Radio.Group value={destinationType} onChange={showPopup} disabled={isInputDisabled}>
-                    <Radio value={RedirectDestinationType.URL}>Another URL</Radio>
+                    <Radio value={RedirectRule.DestinationType.URL}>Another URL</Radio>
                     <MoreInfo
                       trigger={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
                       tooltipOpenedCallback={() => trackDesktopActionInterestCaptured("map_local")}
@@ -380,13 +380,13 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                       }
                     >
                       <Radio
-                        value={RedirectDestinationType.MAP_LOCAL}
+                        value={RedirectRule.DestinationType.MAP_LOCAL}
                         disabled={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
                       >
                         Local file
                       </Radio>
                     </MoreInfo>
-                    <Radio value={RedirectDestinationType.MOCK_OR_FILE_PICKER}>Pick from Files/Mock server</Radio>
+                    <Radio value={RedirectRule.DestinationType.MOCK_OR_FILE_PICKER}>Pick from Files/Mock server</Radio>
                   </Radio.Group>
                 </Popconfirm>
               ) : (

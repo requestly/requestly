@@ -16,12 +16,12 @@ export const makeRequest = async (
   return new Promise((resolve, reject) => {
     if (signal) {
       if (signal.aborted) {
-        reject();
+        reject(new Error("Request aborted"));
       }
 
       const abortListener = () => {
         signal.removeEventListener("abort", abortListener);
-        reject();
+        reject(new Error("Request aborted"));
       };
       signal.addEventListener("abort", abortListener);
     }
@@ -191,6 +191,19 @@ export const isApiCollection = (record: RQAPI.Record) => {
   return record?.type === RQAPI.RecordType.COLLECTION;
 };
 
+const sortRecords = (records: RQAPI.Record[]) => {
+  return records.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+};
+
+const sortNestedRecords = (records: RQAPI.Record[]) => {
+  records.forEach((record) => {
+    if (isApiCollection(record)) {
+      record.data.children = sortRecords(record.data.children);
+      sortNestedRecords(record.data.children);
+    }
+  });
+};
+
 export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
   const recordsCopy = [...records];
   const recordsMap: Record<string, RQAPI.Record> = {};
@@ -219,6 +232,7 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
     }
   });
 
+  sortNestedRecords(updatedRecords);
   return updatedRecords;
 };
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal } from "antd";
 import RuleBuilder from "../../../../../../components/features/rules/RuleBuilder";
-import { Rule } from "types";
+import { Rule } from "@requestly/shared/types/entities/rules";
 
 interface SharedListViewerModalProps {
   rule: Rule;

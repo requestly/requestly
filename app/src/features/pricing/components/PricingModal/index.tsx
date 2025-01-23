@@ -15,6 +15,7 @@ import { redirectToUrl } from "utils/RedirectionUtils";
 import { trackCheckoutFailedEvent, trackCheckoutInitiated } from "modules/analytics/events/misc/business/checkout";
 import { PricingModalFooterBanner } from "./components/FooterBanner";
 import "./index.scss";
+import ProductSwitcher from "../ProductSwitcher";
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -43,7 +44,9 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   const [isCheckoutScreenVisible, setIsCheckoutScreenVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isTableScrolledToRight, setIsTableScrolledToRight] = useState(false);
+  const [isTableScrollable, setIsTableScrollable] = useState(false);
   const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false);
+  const [activeProduct, setActiveProduct] = useState(PRICING.PRODUCTS.HTTP_RULES);
 
   const tableRef = useRef(null);
 
@@ -87,6 +90,14 @@ export const PricingModal: React.FC<PricingModalProps> = ({
     [duration, toggleModal, source, quantity]
   );
 
+  const checkIfScrollable = useCallback(() => {
+    if (tableRef.current) {
+      const isScrollable = tableRef.current.scrollWidth > tableRef.current.clientWidth;
+      setIsTableScrollable(isScrollable);
+      tableRef.current.scrollLeft ? setIsTableScrolledToRight(true) : setIsTableScrolledToRight(false);
+    }
+  }, [tableRef.current]);
+
   useEffect(() => {
     if (selectedPlan && quantity && !isCheckoutCompleted && !isCheckoutScreenVisible) {
       setIsCheckoutScreenVisible(true);
@@ -98,6 +109,21 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   useEffect(() => {
     if (!isCheckoutScreenVisible) trackPricingModalPlansViewed(source);
   }, [isCheckoutScreenVisible, source]);
+
+  useEffect(() => {
+    checkIfScrollable();
+
+    window.addEventListener("resize", checkIfScrollable);
+    tableRef.current.addEventListener("scroll", checkIfScrollable);
+
+    return () => {
+      window.removeEventListener("resize", checkIfScrollable);
+    };
+  }, []);
+
+  useEffect(() => {
+    checkIfScrollable();
+  }, [activeProduct]);
 
   return (
     <Modal
@@ -142,6 +168,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
             <Row className="display-row-center" style={{ paddingTop: "1rem" }}>
               <Typography.Title level={4}>{title}</Typography.Title>
             </Row>
+            <ProductSwitcher isOpenedFromModal activeProduct={activeProduct} setActiveProduct={setActiveProduct} />
             <Row justify="center" className="display-row-center w-full mt-8" gutter={24}>
               <Col className="display-row-center plan-duration-switch-container">
                 <Switch
@@ -156,27 +183,34 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                 </span>
               </Col>
             </Row>
-            {isTableScrolledToRight ? (
-              <div className="pricing-modal-left-inset-shadow">
-                <IoIosArrowDropleft
-                  onClick={() => {
-                    tableRef.current.scrollLeft = 0;
-                    setIsTableScrolledToRight(false);
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="pricing-modal-right-inset-shadow">
-                <IoIosArrowDropright
-                  onClick={() => {
-                    tableRef.current.scrollLeft = tableRef.current.scrollWidth;
-                    setIsTableScrolledToRight(true);
-                  }}
-                />
-              </div>
-            )}
+            {isTableScrollable &&
+              (isTableScrolledToRight ? (
+                <div className="pricing-modal-left-inset-shadow">
+                  <IoIosArrowDropleft
+                    onClick={() => {
+                      tableRef.current.scrollLeft = 0;
+                      setIsTableScrolledToRight(false);
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="pricing-modal-right-inset-shadow">
+                  <IoIosArrowDropright
+                    onClick={() => {
+                      tableRef.current.scrollLeft = tableRef.current.scrollWidth;
+                      setIsTableScrolledToRight(true);
+                    }}
+                  />
+                </div>
+              ))}
 
-            <PricingTable duration={duration} isOpenedFromModal tableRef={tableRef} source={source} />
+            <PricingTable
+              duration={duration}
+              isOpenedFromModal
+              tableRef={tableRef}
+              source={source}
+              product={activeProduct}
+            />
             <CompaniesSection />
             <PricingModalFooterBanner />
           </>
