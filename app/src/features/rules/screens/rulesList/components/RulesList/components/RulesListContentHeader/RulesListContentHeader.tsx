@@ -3,7 +3,7 @@ import { RiFolderAddLine } from "@react-icons/all-files/ri/RiFolderAddLine";
 import { Badge, Dropdown, Tooltip } from "antd";
 import AuthPopoverButton from "components/features/rules/RulesListContainer/RulesTable/AuthPopoverButtons";
 import { ContentListHeader, ContentListHeaderProps, FilterType } from "componentsV2/ContentList";
-import { RecordStatus, StorageRecord } from "features/rules/types/rules";
+import { RecordStatus, StorageRecord } from "@requestly/shared/types/entities/rules";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import React, { useMemo, useState } from "react";
 import { isRule } from "features/rules/utils";

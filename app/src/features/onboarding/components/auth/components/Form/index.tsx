@@ -29,6 +29,7 @@ import { AuthWarningBanner } from "./components/AuthWarningBanner";
 import { isDisposableEmail } from "utils/AuthUtils";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { getAppFlavour } from "utils/AppUtils";
+import LINKS from "config/constants/sub/links";
 import "./index.scss";
 
 interface AuthFormProps {
@@ -342,6 +343,17 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign in" : "Sign up now"}
         </span>
       </Row>
+      <div className="auth-form-footer">
+        By clicking {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}, Continue
+        with Single Sign-on (SSO) or Continue you agree to our{" "}
+        <a href={LINKS.REQUESTLY_TERMS_AND_CONDITIONS} target="_blank" rel="noreferrer">
+          Terms and Conditions
+        </a>{" "}
+        and{" "}
+        <a href={LINKS.REQUESTLY_PRIVACY_STATEMENT} target="_blank" rel="noreferrer">
+          Privacy Statement
+        </a>
+      </div>
     </>
   ) : (
     <div className="w-full">

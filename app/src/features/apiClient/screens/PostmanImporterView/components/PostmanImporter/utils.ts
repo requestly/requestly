@@ -1,8 +1,8 @@
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { generateDocumentId } from "backend/utils";
-import { AUTHORIZATION_TYPES } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
-import { POSTMAN_AUTH_TYPES_MAPPING } from "features/apiClient/constants";
+import { POSTMAN_AUTH_TYPES_MAPPING, POSTMAN_FIELD_MAPPING } from "features/apiClient/constants";
+import { AUTHORIZATION_TYPES } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 
 interface PostmanCollectionExport {
   info: {
@@ -82,22 +82,22 @@ const processScripts = (item: any) => {
   return scripts;
 };
 
-const processAuthorizationOptions = (item = {}) => {
-  try {
-    const auth = {};
-    const authType = POSTMAN_AUTH_TYPES_MAPPING[item.type] ?? AUTHORIZATION_TYPES.NO_AUTH;
-    auth.currentAuthType = authType;
-    auth[authType] = {};
+const processAuthorizationOptions = (
+  item: Record<string, any> = {},
+  parentCollectionId?: string
+): RQAPI.AuthOptions => {
+  const currentAuthType =
+    POSTMAN_AUTH_TYPES_MAPPING[item?.type] ??
+    (parentCollectionId ? AUTHORIZATION_TYPES.INHERIT : AUTHORIZATION_TYPES.NO_AUTH);
 
-    const authOptionsArray = item[item?.type] || [];
-    authOptionsArray.forEach((option) => {
-      auth[authType][option.key] = option.value;
-    });
+  const auth: RQAPI.AuthOptions = { currentAuthType, [currentAuthType]: {} };
 
-    return auth;
-  } catch (error) {
-    return {};
-  }
+  const authOptions = item[item?.type] || [];
+  authOptions.forEach((option: Record<string, any>) => {
+    auth[currentAuthType][POSTMAN_FIELD_MAPPING.get(option.key)] = POSTMAN_FIELD_MAPPING.get(option.value);
+  });
+
+  return auth;
 };
 
 const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.ApiRecord> => {
@@ -154,7 +154,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
         body: requestBody,
         contentType,
       },
-      auth: processAuthorizationOptions(request.auth),
+      auth: processAuthorizationOptions(request.auth, parentCollectionId),
       scripts: processScripts(item),
     },
   };
@@ -162,8 +162,11 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
 
 const createCollectionRecord = (
   name: string,
+  description: string,
   id = generateDocumentId("apis"),
-  variables?: any[]
+  variables?: any[],
+  auth?: any,
+  parentCollectionId?: string
 ): Partial<RQAPI.CollectionRecord> => {
   const collectionVariables: Record<string, EnvironmentVariableValue> = {};
   if (variables) {
@@ -174,12 +177,15 @@ const createCollectionRecord = (
       };
     });
   }
+
   return {
     id,
     name,
+    description,
     deleted: false,
     data: {
       variables: collectionVariables,
+      auth: processAuthorizationOptions(auth, parentCollectionId),
     },
     type: RQAPI.RecordType.COLLECTION,
   };
@@ -201,7 +207,14 @@ export const processPostmanCollectionData = (
     items.forEach((item) => {
       if (item.item?.length) {
         // This is a sub-collection
-        const subCollection = createCollectionRecord(item.name, generateDocumentId("apis"));
+        const subCollection = createCollectionRecord(
+          item.name,
+          item.description || "",
+          generateDocumentId("apis"),
+          [],
+          item.auth,
+          parentCollectionId
+        );
         subCollection.collectionId = parentCollectionId;
         result.collections.push(subCollection);
 
@@ -218,7 +231,13 @@ export const processPostmanCollectionData = (
   };
 
   const rootCollectionId = generateDocumentId("apis");
-  const rootCollection = createCollectionRecord(fileContent.info.name, rootCollectionId, fileContent.variable);
+  const rootCollection = createCollectionRecord(
+    fileContent.info.name,
+    fileContent.info?.description || "",
+    rootCollectionId,
+    fileContent.variable,
+    fileContent.auth
+  );
   rootCollection.collectionId = "";
   const processedItems = processItems(fileContent.item, rootCollectionId);
 

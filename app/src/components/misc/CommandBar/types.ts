@@ -1,5 +1,5 @@
+import { Rule } from "@requestly/shared/types/entities/rules";
 import { ReactNode } from "react";
-import { Rule } from "types";
 
 export enum CommandItemType {
   DIVIDER,

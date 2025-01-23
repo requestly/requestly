@@ -8,8 +8,6 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
-import { redirectToRequest } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
 import {
   trackMoveRequestToCollectionFailed,
   trackMoveRequestToCollectionSuccessful,
@@ -25,7 +23,6 @@ interface Props {
 }
 
 export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordToMove }) => {
-  const navigate = useNavigate();
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +44,9 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       name: selectedCollection?.label,
       type: RQAPI.RecordType.COLLECTION,
       deleted: false,
-      data: {},
+      data: {
+        variables: {},
+      },
     };
     const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToBeCreated, activeWorkspaceId);
     if (newCollection.success) {
@@ -66,12 +65,11 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         trackMoveRequestToCollectionSuccessful(isNewCollection ? "new_collection" : "existing_collection");
         toast.success("Request moved to collection successfully");
         onSaveRecord(result.data);
-        redirectToRequest(navigate, result.data.id);
       } else {
         throw new Error("Failed to move request to collection");
       }
     },
-    [user?.details?.profile?.uid, activeWorkspaceId, onSaveRecord, recordToMove, navigate]
+    [user?.details?.profile?.uid, activeWorkspaceId, onSaveRecord, recordToMove]
   );
 
   const handleRecordMove = useCallback(async () => {

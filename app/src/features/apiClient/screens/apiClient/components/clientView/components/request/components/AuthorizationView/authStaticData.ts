@@ -1,6 +1,8 @@
 import noAuth from "./assets/no-auth.svg";
+import inheritAuth from "./assets/inherit-auth.svg";
 
 export const AUTHORIZATION_TYPES = {
+  INHERIT: "INHERIT",
   NO_AUTH: "NO_AUTH",
   API_KEY: "API_KEY",
   BEARER_TOKEN: "BEARER_TOKEN",
@@ -8,6 +10,7 @@ export const AUTHORIZATION_TYPES = {
 };
 
 export const AUTHORIZATION_TYPES_META = [
+  { label: "Inherit from Parent", value: AUTHORIZATION_TYPES.INHERIT },
   { label: "No Auth", value: AUTHORIZATION_TYPES.NO_AUTH },
   { label: "API Key", value: AUTHORIZATION_TYPES.API_KEY },
   { label: "Bearer Token", value: AUTHORIZATION_TYPES.BEARER_TOKEN },
@@ -39,6 +42,13 @@ export const AUTHORIZATION_FORM_DATA = {
 };
 
 export const AUTHORIZATION_STATIC_DATA = {
+  [AUTHORIZATION_TYPES.INHERIT]: {
+    description: {
+      img: inheritAuth,
+      heading: "Inherits authorization from the parent collection.",
+      subHeading: "This request will use its parent collection’s auth token when you send the request.",
+    },
+  },
   [AUTHORIZATION_TYPES.NO_AUTH]: {
     description: {
       img: noAuth,
@@ -76,7 +86,7 @@ export const AUTHORIZATION_STATIC_DATA = {
       note: "Store your key in a variable for enhanced security.",
       externalLink: "https://docs.requestly.com/general/api-client/authorization/authorization-types#bearer-tokens",
       steps: [
-        { value: "In the Authorization tab, choose Beare Token from the dropdown." },
+        { value: "In the Authorization tab, choose Bearer Token from the dropdown." },
         { value: "Enter your token value in the token field." },
       ],
     },
@@ -92,7 +102,7 @@ export const AUTHORIZATION_STATIC_DATA = {
       steps: [
         { value: "In the Authorization tab, choose Basic Auth from the dropdown." },
         { value: "Enter your API username in username field" },
-        { value: "Enter your API pawo in pawo field" },
+        { value: "Enter your API password in password field" },
       ],
     },
   },

@@ -9,7 +9,6 @@ import { HomepageEmptyCard } from "../EmptyCard";
 import { m, AnimatePresence } from "framer-motion";
 import { RQButton } from "lib/design-system/components";
 import { redirectToRuleEditor, redirectToTemplates } from "utils/RedirectionUtils";
-import { Rule, RuleType } from "types";
 import rulesIcon from "../../assets/rules.svg";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 // @ts-ignore
@@ -29,6 +28,7 @@ import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/compon
 import "./rulesCard.scss";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import clientRuleStorageService from "services/clientStorageService/features/rule";
+import { Rule, RuleType } from "@requestly/shared/types/entities/rules";
 
 export const RulesCard: React.FC = () => {
   const MAX_RULES_TO_SHOW = 3;

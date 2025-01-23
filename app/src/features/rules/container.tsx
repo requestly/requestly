@@ -42,7 +42,7 @@ const RulesFeatureContainer = () => {
                 /Rule with id \d+ was skipped as the "regexFilter" value exceeded the 2KB memory.*/
               ) ? (
                 <span>
-                  We are facing some limitations due to chrome API changes. Please try the solution mentioned{" "}
+                  Due to Chrome API(MV3) limitations, rules can't be greater than 2KB. Please try a solution mentioned{" "}
                   <a href="https://github.com/requestly/requestly/issues/1797" target="_blank" rel="noreferrer">
                     here.
                   </a>

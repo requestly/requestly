@@ -3,9 +3,9 @@ import { BlockCookiesRule, CharlesRuleType, ParsedRule } from "../types";
 import { getGroupName, getHeaders, getSourcesData } from "../../utils";
 import { headersConfig } from "./header-config";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
-import { HeadersRule, RuleType, Status } from "types";
+import { HeaderRule, RecordStatus, RuleType } from "@requestly/shared/types/entities/rules";
 
-export const blockCookiesRuleAdapter = (rules: BlockCookiesRule): ParsedRule<HeadersRule> => {
+export const blockCookiesRuleAdapter = (rules: BlockCookiesRule): ParsedRule<HeaderRule.Record> => {
   const locations = get(rules, "selectedHostsTool.locations.locationPatterns.locationMatch");
 
   if (!rules || !locations) {
@@ -15,12 +15,12 @@ export const blockCookiesRuleAdapter = (rules: BlockCookiesRule): ParsedRule<Hea
   const sources = getSourcesData(locations);
   const { requestHeaders, responseHeaders } = getHeaders(headersConfig);
   const exportedRules = sources.map(({ value, status, operator }) => {
-    const rule = getNewRule(RuleType.HEADERS) as HeadersRule;
+    const rule = getNewRule(RuleType.HEADERS) as HeaderRule.Record;
     return {
       ...rule,
       name: `${value}`,
       isCharlesImport: true,
-      status: status ? Status.ACTIVE : Status.INACTIVE,
+      status: status ? RecordStatus.ACTIVE : RecordStatus.INACTIVE,
       pairs: [
         {
           ...rule.pairs[0],

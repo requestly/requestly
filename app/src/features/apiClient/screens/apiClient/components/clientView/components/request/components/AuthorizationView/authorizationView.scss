@@ -1,12 +1,15 @@
 .authorization-view {
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  height: calc(100% - 45px);
+  height: 100%;
   overflow: scroll;
+
+  &.collection-auth {
+    border-bottom: 0;
+  }
 
   .form-and-description {
     display: flex;
-    height: calc(100% - 45px);
 
     &.no-auth {
       .form-view {
@@ -56,6 +59,7 @@
             background: none;
             font-size: 13px;
             line-height: 20px;
+            padding: 4px 6px;
           }
 
           label,
@@ -80,7 +84,7 @@
         max-width: 100%;
 
         img {
-          margin-top: 40px;
+          margin-top: 72px;
           margin-bottom: 16px;
         }
 
@@ -159,6 +163,10 @@
     .form-selector {
       display: flex;
       align-items: center;
+
+      .authorization-save-btn {
+        margin-left: auto;
+      }
 
       .clear-icon {
         cursor: pointer;

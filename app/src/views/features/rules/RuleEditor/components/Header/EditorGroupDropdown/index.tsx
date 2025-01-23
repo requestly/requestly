@@ -11,11 +11,11 @@ import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackGroupChangedEvent, trackGroupCreatedEvent } from "features/rules/analytics";
-import { Group } from "types/rules";
 import Logger from "lib/logger";
 import { RQButton } from "lib/design-system-v2/components";
 import "./EditorGroupDropdown.css";
 import clientRuleStorageService from "services/clientStorageService/features/rule";
+import { Group } from "@requestly/shared/types/entities/rules";
 
 const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 

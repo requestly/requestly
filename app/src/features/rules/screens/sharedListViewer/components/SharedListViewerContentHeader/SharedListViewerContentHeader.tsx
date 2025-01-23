@@ -20,12 +20,12 @@ import {
 } from "../../analytics";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { Group, Rule } from "types";
 import { globalActions } from "store/slices/global/slice";
 import Logger from "lib/logger";
 import "./sharedListViewerContentHeader.scss";
 import APP_CONSTANTS from "config/constants";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
+import { Group, Rule } from "@requestly/shared/types/entities/rules";
 
 interface ContentHeaderProps {
   searchValue: string;
