@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Row, Col, Input, Radio, Popconfirm, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
@@ -125,19 +125,22 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     setDestinationTypePopupVisible(true);
   };
 
-  const handleDestinationTypeChange = (destinationPopupSelection) => {
-    dispatch(
-      globalActions.updateRulePairAtGivenPath({
-        pairIndex,
-        triggerUnsavedChangesIndication: false,
-        updates: {
-          destination: "",
-          destinationType: destinationPopupSelection,
-        },
-      })
-    );
-    setDestinationType(destinationPopupSelection);
-  };
+  const handleDestinationTypeChange = useCallback(
+    (destinationPopupSelection) => {
+      dispatch(
+        globalActions.updateRulePairAtGivenPath({
+          pairIndex,
+          triggerUnsavedChangesIndication: false,
+          updates: {
+            destination: "",
+            destinationType: destinationPopupSelection,
+          },
+        })
+      );
+      setDestinationType(destinationPopupSelection);
+    },
+    [pairIndex, dispatch]
+  );
 
   const renderRedirectURLInput = () => {
     return (
@@ -397,7 +400,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                   }}
                   disabled={isInputDisabled}
                 >
-                  <Radio value={RedirectDestinationType.URL}>Another URL</Radio>
+                  <Radio value={RedirectRule.DestinationType.URL}>Another URL</Radio>
                   <MoreInfo
                     trigger={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
                     tooltipOpenedCallback={() => trackDesktopActionInterestCaptured("map_local")}
@@ -419,13 +422,13 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                     }
                   >
                     <Radio
-                      value={RedirectDestinationType.MAP_LOCAL}
+                      value={RedirectRule.DestinationType.MAP_LOCAL}
                       disabled={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
                     >
                       Local file
                     </Radio>
                   </MoreInfo>
-                  <Radio value={RedirectDestinationType.MOCK_OR_FILE_PICKER}>Pick from Files/Mock server</Radio>
+                  <Radio value={RedirectRule.DestinationType.MOCK_OR_FILE_PICKER}>Pick from Files/Mock server</Radio>
                 </Radio.Group>
               )}
             </Col>
