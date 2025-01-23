@@ -84,10 +84,6 @@ export const EditableCell: React.FC<EditableCellProps> = ({
               currentValue.syncValue = isNaN(previousValue.syncValue) ? 0 : Number(previousValue.syncValue);
               currentValue.localValue = isNaN(previousValue.localValue) ? 0 : Number(previousValue.localValue);
               break;
-            default:
-              currentValue.syncValue = isNaN(currentValue.syncValue) ? 0 : Number(currentValue.syncValue);
-              currentValue.localValue = isNaN(currentValue.localValue) ? 0 : Number(currentValue.localValue);
-              break;
           }
           break;
         case EnvironmentVariableType.String:
@@ -97,7 +93,6 @@ export const EditableCell: React.FC<EditableCellProps> = ({
               currentValue.localValue = String(previousValue.localValue);
               break;
           }
-
           break;
         case EnvironmentVariableType.Secret:
           currentValue.syncValue = String(previousValue.syncValue);
