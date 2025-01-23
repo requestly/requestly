@@ -108,6 +108,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse), isAnimating);
   const { updateTab, activeTab } = useTabsLayoutContext();
+  const unsavedEntryRef = useRef<{ [tabId: string]: RQAPI.Entry }>({});
 
   useEffect(() => {
     const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
@@ -146,74 +147,108 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     };
   }, [apiEntry]);
 
-  const setUrl = useCallback((url: string) => {
-    setEntry((entry) => ({
-      ...entry,
-      request: {
-        ...entry.request,
-        url,
-        ...syncQueryParams(entry.request.queryParams, url, QueryParamSyncType.TABLE),
-      },
-    }));
-  }, []);
+  const setUrl = useCallback(
+    (url: string) => {
+      setEntry((entry) => {
+        const newEntry = {
+          ...entry,
+          request: {
+            ...entry.request,
+            url,
+            ...syncQueryParams(entry.request.queryParams, url, QueryParamSyncType.TABLE),
+          },
+        };
+        if (apiEntryDetails?.id) {
+          // map the unsaved entry to current entry id (or tab opened)
+          unsavedEntryRef.current[apiEntryDetails.id] = newEntry;
+        }
+        return newEntry;
+      });
+    },
+    [apiEntryDetails?.id]
+  );
 
-  const setMethod = useCallback((method: RequestMethod) => {
-    setEntry((entry) => {
-      const newEntry: RQAPI.Entry = {
-        ...entry,
-        request: {
-          ...entry.request,
-          method,
-        },
-      };
+  const setMethod = useCallback(
+    (method: RequestMethod) => {
+      setEntry((entry) => {
+        const newEntry: RQAPI.Entry = {
+          ...entry,
+          request: {
+            ...entry.request,
+            method,
+          },
+        };
 
-      if (!supportsRequestBody(method)) {
-        newEntry.request.body = null;
-        newEntry.request.headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
-        newEntry.request.contentType = RequestContentType.RAW;
-      }
-      return newEntry;
-    });
-  }, []);
+        if (!supportsRequestBody(method)) {
+          newEntry.request.body = null;
+          newEntry.request.headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
+          newEntry.request.contentType = RequestContentType.RAW;
+        }
+        if (apiEntryDetails?.id) {
+          // map the unsaved entry to current entry id (or tab opened)
+          unsavedEntryRef.current[apiEntryDetails.id] = newEntry;
+        }
+        return newEntry;
+      });
+    },
+    [apiEntryDetails?.id]
+  );
 
   const setRequestEntry = useCallback((updater: (prev: RQAPI.Entry) => RQAPI.Entry) => {
     setEntry((prev) => updater(prev));
   }, []);
 
-  const setContentType = useCallback((contentType: RequestContentType) => {
-    setEntry((entry) => {
-      const newEntry: RQAPI.Entry = {
-        ...entry,
-        request: {
-          ...entry.request,
-          body: contentType === RequestContentType.FORM ? [] : "",
-          contentType,
-        },
-      };
+  const setContentType = useCallback(
+    (contentType: RequestContentType) => {
+      setEntry((entry) => {
+        const newEntry: RQAPI.Entry = {
+          ...entry,
+          request: {
+            ...entry.request,
+            body: contentType === RequestContentType.FORM ? [] : "",
+            contentType,
+          },
+        };
 
-      const headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
+        const headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
 
-      let contentTypeHeader = headers.find((header) => !header.key && !header.value); // reuse empty header
-      if (!contentTypeHeader) {
-        contentTypeHeader = getEmptyPair();
-        headers.push(contentTypeHeader);
+        let contentTypeHeader = headers.find((header) => !header.key && !header.value); // reuse empty header
+        if (!contentTypeHeader) {
+          contentTypeHeader = getEmptyPair();
+          headers.push(contentTypeHeader);
+        }
+
+        contentTypeHeader.key = CONTENT_TYPE_HEADER;
+        contentTypeHeader.value = contentType;
+        newEntry.request.headers = headers;
+
+        if (contentType === RequestContentType.JSON) {
+          newEntry.request.body = "{}";
+        } else if (contentType === RequestContentType.FORM) {
+          newEntry.request.body = [];
+        } else {
+          newEntry.request.body = "";
+        }
+
+        if (apiEntryDetails?.id) {
+          // map the unsaved entry to current entry id (or tab opened)
+          unsavedEntryRef.current[apiEntryDetails.id] = newEntry;
+        }
+        return newEntry;
+      });
+    },
+    [apiEntryDetails?.id]
+  );
+
+  // apply the unsaved changes to the current tab
+  useEffect(() => {
+    if (activeTab?.id === apiEntryDetails?.id) {
+      const unsavedChanges = unsavedEntryRef.current[activeTab.id];
+      if (unsavedChanges) {
+        setEntry(unsavedChanges);
       }
-
-      contentTypeHeader.key = CONTENT_TYPE_HEADER;
-      contentTypeHeader.value = contentType;
-      newEntry.request.headers = headers;
-
-      if (contentType === RequestContentType.JSON) {
-        newEntry.request.body = "{}";
-      } else if (contentType === RequestContentType.FORM) {
-        newEntry.request.body = [];
-      } else {
-        newEntry.request.body = "";
-      }
-
-      return newEntry;
-    });
-  }, []);
+    }
+  }, [activeTab, apiEntryDetails?.id]);
 
   const handleUpdatesFromExecutionWorker = useCallback(
     async (state: any) => {
