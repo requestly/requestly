@@ -39,6 +39,9 @@ import {
   isSharedWorkspace,
 } from "features/workspaces/utils";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { toast } from "utils/Toast";
+
+const { PATHS } = APP_CONSTANTS;
 
 export const isWorkspacesFeatureEnabled = (email) => {
   if (!email) return false;
@@ -68,7 +71,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
     <Dropdown
       overlay={menu}
       trigger={["click"]}
-      className="workspace-selector-dropdown"
+      className="workspace-selector-dropdown no-drag"
       onOpenChange={handleWorkspaceDropdownClick}
     >
       <div className="cursor-pointer items-center">
@@ -266,8 +269,16 @@ const WorkspaceSelector = () => {
 
   const handleWorkspaceSwitch = async (team) => {
     setIsModalOpen(true);
-    switchWorkspace(team.id);
-    setIsModalOpen(false);
+    switchWorkspace(team.id)
+      .then(() => {
+        setIsModalOpen(false);
+      })
+      .catch((err) => {
+        setIsModalOpen(false);
+        toast.error(
+          "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
+        );
+      });
   };
 
   const unauthenticatedUserMenu = (

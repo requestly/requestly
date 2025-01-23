@@ -23,8 +23,6 @@ import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import { SiPostman } from "@react-icons/all-files/si/SiPostman";
 import { PostmanImporterModal } from "../../../modals/postmanImporterModal/PostmanImporterModal";
-import { useLocation } from "react-router-dom";
-import PATHS from "config/constants/sub/paths";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 
 interface Props {
@@ -50,7 +48,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   onClearHistory,
 }) => {
   const dispatch = useDispatch();
-  const location = useLocation();
   const user = useSelector(getUserAuthDetails);
   const [isImportCollectionsModalOpen, setIsImportCollectionsModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
@@ -65,8 +62,23 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             cURL
           </div>
         ),
-        onClick: onImportClick,
-        disabled: location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.INDEX),
+        onClick: () => {
+          if (!user.loggedIn) {
+            dispatch(
+              globalActions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  eventSource: "api_client_sidebar",
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                  warningMessage: `Please log in to import a cURL request`,
+                },
+              })
+            );
+          } else {
+            onImportClick();
+          }
+        },
       },
       {
         key: "2",
@@ -76,7 +88,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             Requestly Collection
           </div>
         ),
-        disabled: location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.INDEX),
         onClick: () => {
           if (!user.loggedIn) {
             dispatch(
@@ -100,16 +111,30 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         key: "3",
         label: (
           <div className="new-btn-option">
-            <SiPostman /> Postman Collection
+            <SiPostman /> Postman Collections and Environments
           </div>
         ),
         onClick: () => {
           trackImportFromPostmanClicked();
-          setIsPostmanImporterModalOpen(true);
+          if (!user.loggedIn) {
+            dispatch(
+              globalActions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  eventSource: "api_client_sidebar",
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                  warningMessage: `Please log in to import Postman collections`,
+                },
+              })
+            );
+          } else {
+            setIsPostmanImporterModalOpen(true);
+          }
         },
       },
     ],
-    [user.loggedIn, dispatch, location.pathname, onImportClick]
+    [user.loggedIn, dispatch, onImportClick]
   );
 
   const items: DropdownProps["menu"]["items"] = [

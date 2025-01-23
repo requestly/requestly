@@ -134,9 +134,9 @@ Start working on individual modules:
 
 ## 🙏 Contributing
 
-Read our [contributing guide](./CONTRIBUTING.md) to learn about how to propose bugfixes and improvements, and how the development process works.
+Currently, while Requestly is open source, we are not accepting pull requests. As a startup with a small team, our focus is on moving quickly and we currently lack the resources and documentation needed to actively support an open-source community. This will probably change in the future.
 
-For **payment/billing related issues**, feel free to contact us at [contact@requestly.io](mailto:contact@requestly.io).
+If you are still interested, read our [contributing guide](./CONTRIBUTING.md) to learn about how to propose bugfixes and improvements, and how the development process works.
 
 ## 🎯 Our Mission
 

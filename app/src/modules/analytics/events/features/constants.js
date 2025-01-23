@@ -106,6 +106,15 @@ export const RULES = {
     IMPORT_COMPLETE: "charles_settings_import_completed",
     DOCS_CLICKED: "charles_settings_import_docs_clicked",
   },
+
+  RESOURCE_OVERRIDE_SETTINGS: {
+    VIEWED: "resource_override_settings_import_viewed",
+    IMPORT_STARTED: "resource_override_settings_import_started",
+    PARSED: "resource_override_settings_parsed",
+    IMPORT_FAILED: "resource_override_settings_import_failed",
+    IMPORT_COMPLETE: "resource_override_settings_import_completed",
+    DOCS_CLICKED: "resource_override_settings_import_docs_clicked",
+  },
 };
 
 // TODO: cleanup
@@ -296,9 +305,4 @@ export const TEMPLATES = {
 
 export const ECOSYSTEM = {
   ECOSYSTEM_FEATURE_CLICKED: "ecosystem_feature_clicked",
-};
-
-export const API_SECURITY_TESTING = {
-  API_SECURITY_TESTING_LANDING_PAGE_VIEWED: "api_security_landing_page_viewed",
-  API_SECURITY_TESTING_START_PRESSED: "api_security_start_pressed",
 };

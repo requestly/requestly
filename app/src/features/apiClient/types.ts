@@ -32,6 +32,12 @@ export enum KeyValueFormType {
   FORM = "form",
 }
 
+export enum QueryParamSyncType {
+  SYNC = "sync",
+  URL = "url",
+  TABLE = "table",
+}
+
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
 
 export namespace RQAPI {
@@ -52,7 +58,15 @@ export namespace RQAPI {
     POST_RESPONSE = "postResponse",
   }
 
-  export type RequestBody = string | KeyValuePair[]; // in case of form data, body will be key-value pairs
+  export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody; // in case of form data, body will be key-value pairs
+  export type RequestJsonBody = string;
+  export type RequestRawBody = string;
+  export type RequestFormBody = KeyValuePair[];
+
+  export type RequestBodyContainer = {
+    text?: string;
+    form?: KeyValuePair[];
+  };
 
   export type AuthOptions<T extends AUTHORIZATION_TYPES = AUTHORIZATION_TYPES> = {
     currentAuthType: T;
@@ -65,6 +79,7 @@ export namespace RQAPI {
     method: RequestMethod;
     headers: KeyValuePair[];
     body?: RequestBody;
+    bodyContainer?: RequestBodyContainer;
     contentType?: RequestContentType;
   }
 

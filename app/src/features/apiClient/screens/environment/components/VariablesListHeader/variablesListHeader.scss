@@ -20,8 +20,13 @@
     }
   }
 
+  .variables-list-action-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .variables-list-search-input {
-    margin-top: 8px;
     width: 200px;
     padding: 0 12px;
     background: transparent;

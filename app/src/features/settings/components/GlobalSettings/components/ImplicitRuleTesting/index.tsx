@@ -33,6 +33,8 @@ export const ImplicitRuleTesting = () => {
 
   useEffect(() => {
     getImplicitRuleTestingWidgetConfig(appMode).then((data) => {
+      if (!data) return;
+
       setEnabledRuleTypes(data.ruleTypes);
       setWidgetVisibility(data.visibility);
       if (data?.enabled) {

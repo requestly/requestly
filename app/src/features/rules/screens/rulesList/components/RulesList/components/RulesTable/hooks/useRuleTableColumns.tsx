@@ -4,7 +4,7 @@ import moment from "moment";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { RuleTableRecord } from "../types";
 import { getAllRecordsMap } from "store/features/rules/selectors";
-import { Group, RecordStatus, Rule } from "features/rules/types/rules";
+import { Group, RecordStatus, Rule } from "@requestly/shared/types/entities/rules";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { UserAvatar } from "componentsV2/UserAvatar";
 import { MdOutlineShare } from "@react-icons/all-files/md/MdOutlineShare";

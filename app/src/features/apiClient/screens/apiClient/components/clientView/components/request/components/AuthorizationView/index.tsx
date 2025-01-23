@@ -11,32 +11,53 @@ import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineE
 import { MdClear } from "@react-icons/all-files/md/MdClear";
 import { AUTHORIZATION_TYPES } from "./types";
 import { AUTH_OPTIONS } from "./types/form";
+import { RQAPI } from "features/apiClient/types";
+import { EnvironmentVariables } from "backend/environment/types";
 
 interface Props {
+  wrapperClass?: string;
   defaultValues: {
     currentAuthType?: AUTHORIZATION_TYPES;
     authOptions?: AUTH_OPTIONS;
   };
-  onAuthUpdate: (
-    currentAuthType: AUTHORIZATION_TYPES,
-    updatedKey?: string,
-    updatedValue?: string,
-    formValues?: any
-  ) => any;
+  onAuthUpdate: (authOptions: RQAPI.AuthOptions) => any;
+  rootLevelRecord: Boolean;
+  variables: EnvironmentVariables;
+  authorizationViewActions?: React.ReactElement;
 }
 
-const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => {
-  const [selectedForm, setSelectedForm] = useState(defaultValues?.currentAuthType || AUTHORIZATION_TYPES.NO_AUTH);
+const AuthorizationView: React.FC<Props> = ({
+  defaultValues,
+  onAuthUpdate,
+  rootLevelRecord,
+  wrapperClass = "",
+  variables,
+  authorizationViewActions,
+}) => {
+  const [selectedForm, setSelectedForm] = useState(
+    defaultValues?.currentAuthType || (rootLevelRecord ? AUTHORIZATION_TYPES.NO_AUTH : AUTHORIZATION_TYPES.INHERIT)
+  );
   const [formValues, setFormValues] = useState<Record<string, any>>(defaultValues || {});
+
+  const getAuthOptions = (
+    previousFormValues: Record<string, any>,
+    currentAuthType: AUTHORIZATION_TYPES,
+    updatedValue?: string,
+    updatedId?: string
+  ) => {
+    const authOptions = {
+      currentAuthType,
+      [currentAuthType]: {
+        ...previousFormValues[currentAuthType],
+        ...(updatedId || updatedValue ? { [updatedId]: updatedValue } : {}),
+      },
+    };
+    return authOptions;
+  };
 
   const onChangeHandler = (value: string, id: string) => {
     setFormValues((prevValues) => {
-      const authOptions = {
-        currentAuthType: selectedForm,
-        [selectedForm]: { ...prevValues[selectedForm], ...(id || value ? { [id]: value } : {}) },
-      };
-
-      onAuthUpdate(authOptions);
+      onAuthUpdate(getAuthOptions(prevValues, selectedForm, value, id));
       return {
         ...prevValues,
         [selectedForm]: {
@@ -50,7 +71,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => 
   const debouncedOnChange = debounce(onChangeHandler, 500);
 
   return (
-    <div className="authorization-view">
+    <div className={`authorization-view ${wrapperClass}`}>
       <div className="type-of-authorization">
         <div className="form-selector">
           <label>{LABEL_TEXT.AUTHORIZATION_TYPE_LABEL}</label>
@@ -59,17 +80,15 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => 
             value={selectedForm}
             onChange={(value) => {
               setSelectedForm(value);
-              if (value === AUTHORIZATION_TYPES.NO_AUTH) {
-                onAuthUpdate({ currentAuthType: value });
-              }
+              onAuthUpdate(getAuthOptions(formValues, value));
             }}
             options={AUTHORIZATION_TYPES_META}
           />
-          {selectedForm !== AUTHORIZATION_TYPES.NO_AUTH && (
+          {![AUTHORIZATION_TYPES.NO_AUTH, AUTHORIZATION_TYPES.INHERIT].includes(selectedForm) && (
             <div
               className="clear-icon"
               onClick={() => {
-                onAuthUpdate({ currentAuthType: AUTHORIZATION_TYPES.NO_AUTH });
+                onAuthUpdate(getAuthOptions(formValues, AUTHORIZATION_TYPES.NO_AUTH));
                 setSelectedForm(AUTHORIZATION_TYPES.NO_AUTH);
               }}
             >
@@ -77,6 +96,7 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => 
               <span>{LABEL_TEXT.CLEAR}</span>
             </div>
           )}
+          {authorizationViewActions}
         </div>
       </div>
       <div className="form-and-description">
@@ -91,13 +111,16 @@ const AuthorizationView: React.FC<Props> = ({ defaultValues, onAuthUpdate }) => 
               formType={selectedForm}
               onChangeHandler={debouncedOnChange}
               formvalues={formValues[selectedForm] || {}}
+              variables={variables}
             />
           </div>
         )}
         {!isEmpty(AUTHORIZATION_STATIC_DATA[selectedForm]?.description) && (
           <Description
             data={AUTHORIZATION_STATIC_DATA[selectedForm]?.description}
-            wrapperClass={`${selectedForm === AUTHORIZATION_TYPES.NO_AUTH ? "no-auth" : ""}`}
+            wrapperClass={`${
+              [AUTHORIZATION_TYPES.NO_AUTH, AUTHORIZATION_TYPES.INHERIT].includes(selectedForm) ? "no-auth" : ""
+            }`}
           />
         )}
       </div>

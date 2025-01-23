@@ -70,3 +70,16 @@
   color: var(--requestly-color-subtle);
   margin-top: 8px;
 }
+
+.source-filter-icon-container .badge-active {
+  color: var(--requestly-color-primary-300);
+}
+
+.source-filter-icon-container .badge-active .ant-badge {
+  color: var(--requestly-color-neutral-100);
+  background-color: var(--requestly-color-primary-500);
+  border-radius: 4px;
+  font-size: var(--requestly-font-size-xs);
+  padding: 2px 4px;
+  line-height: var(--requestly-font-line-height-sm);
+}

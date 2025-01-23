@@ -11,8 +11,6 @@ const ApiClientFeatureContainer: React.FC = () => {
       <ApiClientProvider>
         <div className="api-client-container">
           <APIClientSidebar />
-
-          {/* TODO: Improve Outlet prop */}
           <TabsLayoutContainer.TabsLayoutContent Outlet={(props: any) => <Outlet {...props} />} />
         </div>
       </ApiClientProvider>

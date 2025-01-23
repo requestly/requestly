@@ -8,21 +8,23 @@ import { useCallback } from "react";
 import { EnvironmentVariableType } from "backend/environment/types";
 
 interface Props {
-  handleSaveVariable: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
-  handleDeleteVariable: (key: string) => void;
+  handleVariableChange: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
+  handleDeleteVariable: (key: number) => void;
   visibleSecretsRowIds: number[];
   updateVisibleSecretsRowIds: (id: number) => void;
   recordsCount: number;
+  duplicateKeyIndices?: Set<number>;
 }
 
 type ColumnTypes = Exclude<TableProps<EnvironmentVariableTableRow>["columns"], undefined>;
 
 export const useVariablesListColumns = ({
-  handleSaveVariable,
+  handleVariableChange,
   handleDeleteVariable,
   visibleSecretsRowIds,
   updateVisibleSecretsRowIds,
   recordsCount,
+  duplicateKeyIndices,
 }: Props) => {
   const checkIsSecretHidden = useCallback(
     (recordId: number) => {
@@ -40,7 +42,8 @@ export const useVariablesListColumns = ({
         editable: true,
         dataIndex: "key",
         title: "Key",
-        handleSaveVariable,
+        handleVariableChange,
+        duplicateKeyIndices,
       }),
     },
     {
@@ -52,7 +55,7 @@ export const useVariablesListColumns = ({
         editable: true,
         dataIndex: "type",
         title: "Type",
-        handleSaveVariable,
+        handleVariableChange,
         options: ["string", "number", "boolean", "secret"],
       }),
     },
@@ -74,7 +77,7 @@ export const useVariablesListColumns = ({
         editable: true,
         dataIndex: "syncValue",
         title: "Sync Value",
-        handleSaveVariable,
+        handleVariableChange,
         isSecret: checkIsSecretHidden(record.id),
       }),
     },
@@ -96,7 +99,7 @@ export const useVariablesListColumns = ({
         editable: true,
         dataIndex: "localValue",
         title: "Local Value",
-        handleSaveVariable,
+        handleVariableChange,
         isSecret: checkIsSecretHidden(record.id),
       }),
     },
@@ -123,7 +126,7 @@ export const useVariablesListColumns = ({
                 type="transparent"
                 size="small"
                 className="delete-variable-btn"
-                onClick={() => handleDeleteVariable(record.key)}
+                onClick={() => handleDeleteVariable(record.id)}
               />
             )}
           </div>

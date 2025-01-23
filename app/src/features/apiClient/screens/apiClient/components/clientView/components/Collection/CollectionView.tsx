@@ -1,67 +1,56 @@
-import { Result, Tabs } from "antd";
+import { Result, Skeleton, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { useCallback, useMemo } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { VariablesList } from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
 import { RQAPI } from "features/apiClient/types";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { upsertApiRecord } from "backend/apiClient";
-import { EnvironmentVariables } from "backend/environment/types";
+import { useSelector } from "react-redux";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
-import { variablesActions } from "store/features/variables/slice";
-import { getCollectionVariables } from "store/features/variables/selectors";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import "./collectionView.scss";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { upsertApiRecord } from "backend/apiClient";
+import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
+import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
   VARIABLES: "variables",
+  AUTHORIZATION: "authorization",
 };
 
 export const CollectionView = () => {
-  const dispatch = useDispatch();
   const { collectionId } = useParams();
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords } = useApiClientContext();
   const { replaceTab } = useTabsLayoutContext();
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const collectionVariables = useSelector(getCollectionVariables);
   const location = useLocation();
 
-  const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+  const collection = useMemo(() => {
+    return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
+  }, [apiClientRecords, collectionId]);
 
-  const handleSetVariables = useCallback(
-    async (variables: EnvironmentVariables) => {
-      const updatedVariables = Object.fromEntries(
-        Object.entries(variables).map(([key, value]) => {
-          const { localValue, ...rest } = value;
-          return [key, rest];
+  const updateCollectionAuthData = useCallback(
+    async (newAuthOptions: RQAPI.AuthOptions) => {
+      const record = {
+        ...collection,
+        data: {
+          ...collection?.data,
+          auth: newAuthOptions,
+        },
+      };
+      return upsertApiRecord(user.details?.profile?.uid, record, activeWorkspaceId)
+        .then((result) => {
+          // fix-me: to verify new change are broadcasted to child entries that are open in tabs
+          onSaveRecord(result.data);
         })
-      );
-      const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
-      return upsertApiRecord(user.details?.profile?.uid, record, activeWorkspaceId).then((result) => {
-        onSaveRecord(result.data);
-        dispatch(variablesActions.setCollectionVariables({ collectionId, variables }));
-      });
+        .catch(console.error);
     },
-    [collection, activeWorkspaceId, user.details?.profile?.uid, onSaveRecord, dispatch, collectionId]
-  );
-
-  const handleRemoveVariable = useCallback(
-    async (key: string) => {
-      const updatedVariables = { ...collection?.data?.variables };
-      delete updatedVariables[key];
-      const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
-      return upsertApiRecord(user.details?.profile?.uid, record, activeWorkspaceId).then((result) => {
-        onSaveRecord(result.data);
-      });
-    },
-    [collection, activeWorkspaceId, user.details?.profile?.uid, onSaveRecord]
+    [collection, onSaveRecord, activeWorkspaceId, user.details?.profile?.uid]
   );
 
   const tabItems = useMemo(() => {
@@ -74,16 +63,21 @@ export const CollectionView = () => {
       {
         label: "Variables",
         key: TAB_KEYS.VARIABLES,
+        children: <CollectionsVariablesView collection={collection} />,
+      },
+      {
+        label: "Authorization",
+        key: TAB_KEYS.AUTHORIZATION,
         children: (
-          <VariablesList
-            variables={collectionVariables[collectionId]?.variables || {}}
-            setVariables={handleSetVariables}
-            removeVariable={handleRemoveVariable}
+          <CollectionAuthorizationView
+            authOptions={collection?.data?.auth}
+            updateAuthData={updateCollectionAuthData}
+            rootLevelRecord={!collection?.collectionId}
           />
         ),
       },
     ];
-  }, [handleRemoveVariable, handleSetVariables, collectionVariables, collectionId, collection]);
+  }, [collection, updateCollectionAuthData]);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
@@ -99,6 +93,14 @@ export const CollectionView = () => {
     },
     [collection, activeWorkspaceId, user.details?.profile?.uid, onSaveRecord, replaceTab]
   );
+
+  if (isLoadingApiClientRecords) {
+    return (
+      <div className="collection-view-container__loading">
+        <Skeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="collection-view-container">

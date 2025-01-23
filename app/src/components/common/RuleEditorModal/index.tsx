@@ -26,10 +26,9 @@ import { prefillRuleData } from "./prefill";
 import { generateRuleDescription, getEventObject } from "./utils";
 import { getRuleConfigInEditMode } from "utils/rules/misc";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
-import { ResponseRuleResourceType, Rule, Status } from "types";
+import { RecordStatus, Rule, ResponseRule, RuleType, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
 import ShareRuleButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/ShareRuleButton";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./RuleEditorModal.css";
 import clientRuleStorageService from "services/clientStorageService/features/rule";
 
@@ -100,35 +99,35 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
         ...prefillRuleData(ruleData, newRule),
         name: `${ruleType}_untitled`,
         description: generateRuleDescription(ruleType, ruleData),
-        status: Status.ACTIVE,
+        status: RecordStatus.ACTIVE,
       };
 
-      if (ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
+      if (ruleType === RuleType.RESPONSE && prefilledRule.ruleType === RuleType.RESPONSE) {
         // Handling prefill for graphql resource type response rule
         const { GQLDetails } = ruleData.metadata || {};
         const pair = prefilledRule.pairs[0];
         const sourceFilters = pair.source.filters;
         if (GQLDetails?.operationName) {
-          pair.response.resourceType = ResponseRuleResourceType.GRAPHQL_API;
+          pair.response.resourceType = ResponseRule.ResourceType.GRAPHQL_API;
           pair.source.filters = [
             ...sourceFilters,
             {
               requestPayload: {
                 key: "operationName",
-                operator: GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS,
+                operator: RuleSourceOperator.EQUALS,
                 value: GQLDetails.operationName,
               },
             },
           ];
           prefilledRule.pairs[0] = pair;
         } else if (GQLDetails?.query) {
-          pair.response.resourceType = ResponseRuleResourceType.GRAPHQL_API;
+          pair.response.resourceType = ResponseRule.ResourceType.GRAPHQL_API;
           pair.source.filters = [
             ...sourceFilters,
             {
               requestPayload: {
                 key: "query",
-                operator: GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS,
+                operator: RuleSourceOperator.CONTAINS,
                 value: GQLDetails.query,
               },
             },

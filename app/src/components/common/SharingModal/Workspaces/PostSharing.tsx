@@ -9,6 +9,7 @@ import { PostShareViewData, WorkspaceSharingTypes } from "../types";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import "./index.scss";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { toast } from "utils/Toast";
 
 interface PostSharingProps {
   postShareViewData: PostShareViewData;
@@ -27,6 +28,9 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
   const handleSwitchWorkspace = useCallback(() => {
     switchWorkspace(postShareViewData.targetTeamData.teamId, "sharing_modal").then(() => {
       toggleModal();
+      toast.error(
+        "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
+      );
     });
   }, [switchWorkspace, postShareViewData.targetTeamData.teamId, toggleModal]);
 
