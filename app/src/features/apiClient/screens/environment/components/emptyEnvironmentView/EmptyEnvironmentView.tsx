@@ -10,8 +10,6 @@ import { redirectToNewEnvironment } from "utils/RedirectionUtils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import APP_CONSTANTS from "config/constants";
 import { globalActions } from "store/slices/global/slice";
-import { MdDisplaySettings } from "@react-icons/all-files/md/MdDisplaySettings";
-import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import { Skeleton } from "antd";
 import { EnvironmentAnalyticsSource } from "../../types";
 import "./emptyEnvironmentView.scss";
