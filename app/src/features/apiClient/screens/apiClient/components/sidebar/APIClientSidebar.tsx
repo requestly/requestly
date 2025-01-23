@@ -18,8 +18,9 @@ import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import "./apiClientSidebar.scss";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 interface Props {}
 
@@ -31,7 +32,7 @@ export enum ApiClientSidebarTabKey {
 
 const APIClientSidebar: React.FC<Props> = () => {
   const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const { requestId, collectionId } = useParams();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
@@ -168,7 +169,7 @@ const APIClientSidebar: React.FC<Props> = () => {
           data: apiEntry,
         };
 
-        const result = await upsertApiRecord(user.details?.profile?.uid, record, team?.id);
+        const result = await upsertApiRecord(user.details?.profile?.uid, record, activeWorkspaceId);
 
         if (result.success) {
           onSaveRecord(result.data);
@@ -185,7 +186,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         setIsLoading(false);
       }
     },
-    [user.details?.profile?.uid, user?.loggedIn, team?.id, onSaveRecord, setIsImportModalOpen]
+    [user.details?.profile?.uid, user?.loggedIn, activeWorkspaceId, onSaveRecord, setIsImportModalOpen]
   );
 
   return (
