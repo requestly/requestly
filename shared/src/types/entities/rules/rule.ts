@@ -1,4 +1,4 @@
-import { HttpRequestMethod, ResourceType } from "@/types/common/network";
+import { HttpRequestMethod, ResourceType } from "~/types/common/network";
 import { BaseItem, RecordType } from "./base";
 
 export interface BaseRule extends BaseItem {
