@@ -11,6 +11,11 @@ import {
 import { notification } from "antd";
 import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshot";
 import { TestResult } from "../modules/scriptsV2/sandbox/types";
+import {
+  trackScriptExecutionCompleted,
+  trackScriptExecutionFailed,
+  trackScriptExecutionStarted,
+} from "../modules/scriptsV2/analytics";
 
 type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
@@ -156,6 +161,19 @@ export class ApiClientExecutor {
     );
 
     if (responseScriptResult.type === WorkResultType.ERROR) {
+      trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
+    }
+
+    if (responseScriptResult.type === WorkResultType.SUCCESS) {
+      trackScriptExecutionCompleted(RQAPI.ScriptType.POST_RESPONSE);
+    }
+
+    if (responseScriptResult.type === WorkResultType.ERROR) {
+      trackScriptExecutionFailed(
+        RQAPI.ScriptType.POST_RESPONSE,
+        responseScriptResult.error.type,
+        responseScriptResult.error.message
+      );
       notification.error({
         message: "Something went wrong in post-response script!",
         description: `${responseScriptResult.error.name}: ${responseScriptResult.error.message}`,

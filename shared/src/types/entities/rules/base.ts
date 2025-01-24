@@ -22,9 +22,9 @@ export interface BaseItem extends StorageEntity {
   isReadOnly?: boolean;
 
   /** Deprecated in SyncingV2 **/
-  createdBy: string;
-  creationDate: number;
-  currentOwner: string;
-  lastModifiedBy: string;
-  modificationDate: number;
+  createdBy?: string;
+  creationDate?: number;
+  currentOwner?: string;
+  lastModifiedBy?: string;
+  modificationDate?: number;
 }
