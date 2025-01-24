@@ -51,7 +51,7 @@ export class RQScriptWebWorker implements RQWorker {
           },
         };
       }
-      if (error instanceof ScriptPendingWorkFlushingError) {
+      if (error.name === ScriptPendingWorkFlushingError.name) {
         return {
           type: WorkResultType.ERROR,
           error: {
