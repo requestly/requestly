@@ -7,6 +7,7 @@ import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
 import { forEach, isEmpty, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
+import { HarRequest } from "httpsnippet";
 
 export const makeRequest = async (
   appMode: string,
@@ -483,4 +484,32 @@ export const getRecordIdsToBeExpanded = (
   });
 
   return expandedKeysCopy;
+};
+
+export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.Request): HarRequest => {
+  const harRequest: HarRequest = {
+    method: apiRequest.method,
+    url: apiRequest.url,
+    headers: apiRequest.headers.map(({ key, value }) => ({ name: key, value })),
+    queryString: apiRequest.queryParams.map(({ key, value }) => ({ name: key, value })),
+    httpVersion: "HTTP/1.1",
+    cookies: [],
+    bodySize: -1,
+    headersSize: -1,
+    postData: {
+      mimeType: apiRequest.contentType,
+    },
+  };
+
+  if (supportsRequestBody(apiRequest.method)) {
+    if (apiRequest.contentType === RequestContentType.JSON) {
+      harRequest.postData.text = apiRequest.body as string;
+    } else if (apiRequest.contentType === RequestContentType.FORM) {
+      harRequest.postData.params = (apiRequest.body as KeyValuePair[]).map(({ key, value }) => ({ name: key, value }));
+    } else {
+      harRequest.postData.text = apiRequest.body as string;
+    }
+  }
+
+  return harRequest;
 };

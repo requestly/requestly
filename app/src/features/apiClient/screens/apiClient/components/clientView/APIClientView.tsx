@@ -47,6 +47,8 @@ import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { RequestExecutor } from "features/apiClient/helpers/requestExecutor/requestExecutor";
 import { isEmpty } from "lodash";
+import { RQModal } from "lib/design-system/components";
+import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
 
 interface Props {
   openInModal?: boolean;
@@ -108,6 +110,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse), isAnimating);
   const { updateTab, activeTab } = useTabsLayoutContext();
+
+  const [copyAsModalOpen, setCopyAsModalOpen] = useState(false);
 
   useEffect(() => {
     const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
@@ -528,6 +532,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               >
                 Send
               </RQButton>
+              <RQButton onClick={() => setCopyAsModalOpen(true)}>Copy as</RQButton>
               {user.loggedIn && !openInModal ? (
                 <RQButton
                   showHotKeyText
@@ -551,6 +556,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           </Skeleton>
         </div>
       </BottomSheetLayout>
+      <CopyAsModal apiRequest={apiEntry?.request} open={copyAsModalOpen} onClose={() => setCopyAsModalOpen(false)} />
     </div>
   ) : (
     <div className="w-full">
