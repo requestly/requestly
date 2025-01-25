@@ -3,7 +3,7 @@ import { upperCase } from "lodash";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { FaRegCircle } from "@react-icons/all-files/fa/FaRegCircle";
-import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/sandbox/types";
+import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 
 interface TestResultProps {
   testResult: TestResult;

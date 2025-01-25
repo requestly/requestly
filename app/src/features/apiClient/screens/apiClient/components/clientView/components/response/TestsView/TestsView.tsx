@@ -5,8 +5,8 @@ import { Badge, Radio, Spin } from "antd";
 import { MdRefresh } from "@react-icons/all-files/md/MdRefresh";
 import { RQButton } from "lib/design-system-v2/components";
 import { useTheme } from "styled-components";
-import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/sandbox/types";
 import "./testsView.scss";
+import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 
 interface TestsViewProps {
   isLoading: boolean;

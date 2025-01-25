@@ -7,7 +7,7 @@ import { BottomSheet } from "componentsV2/BottomSheet";
 import StatusLine from "../StatusLine";
 import { Tag } from "antd";
 import { TestsView } from "../TestsView/TestsView";
-import { TestResult } from "features/apiClient/helpers/modules/scriptsV2/sandbox/types";
+import { TestResult } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 
 interface Props {
   response: RQAPI.Response;

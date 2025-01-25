@@ -437,13 +437,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   const handleTestResultRefresh = useCallback(async () => {
     try {
-      requestExecutor.updateEntryDetails({
+      apiClientExecutor.updateEntryDetails({
         entry: sanitizeEntry(entry),
         recordId: apiEntryDetails?.id,
         collectionId: apiEntryDetails?.collectionId,
       });
 
-      const result = await requestExecutor.rerun();
+      const result = await apiClientExecutor.rerun();
       if (result?.testResults) {
         setEntry((entry) => ({
           ...entry,
@@ -453,7 +453,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     } catch (error) {
       toast.error("Something went wrong while refreshing test results");
     }
-  }, [requestExecutor, apiEntryDetails?.id, apiEntryDetails?.collectionId, entry]);
+  }, [apiClientExecutor, apiEntryDetails?.id, apiEntryDetails?.collectionId, entry]);
 
   useEffect(() => {
     if (!apiClientExecutor) {
