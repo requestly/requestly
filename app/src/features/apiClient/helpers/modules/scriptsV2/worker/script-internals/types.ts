@@ -1,6 +1,12 @@
 import { VariableValueType } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 
+export type LocalScopeResponse = RQAPI.Response & {
+  code: number;
+  status: string;
+  responseTime: number;
+};
+
 export interface TestFunction {
   (testName: string, testFn: () => void): void;
   skip: (testName: string) => void;

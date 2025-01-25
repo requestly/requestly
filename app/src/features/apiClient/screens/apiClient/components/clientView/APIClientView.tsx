@@ -45,7 +45,7 @@ import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcut
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
-import { RequestExecutor } from "features/apiClient/helpers/requestExecutor/requestExecutor";
+import { apiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
 import { isEmpty } from "lodash";
 
 interface Props {
@@ -98,7 +98,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
-  const [requestExecutor, setRequestExecutor] = useState<RequestExecutor | null>(null);
+  const [requestExecutor, setRequestExecutor] = useState<apiClientExecutor | null>(null);
 
   // const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(true);
@@ -439,7 +439,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   useEffect(() => {
     if (!requestExecutor) {
-      setRequestExecutor(new RequestExecutor(appMode, apiClientWorkloadManager));
+      setRequestExecutor(new apiClientExecutor(appMode, apiClientWorkloadManager));
     }
   }, [apiClientRecords, apiClientWorkloadManager, appMode, requestExecutor]);
 

@@ -1,13 +1,13 @@
 import { expose } from "comlink";
-import { RQ } from "../../sandbox/RQ";
-import { LocalScope } from "../../../../../../../modules/localScope";
-import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
 import {
   ScriptExecutionError,
   ScriptPendingWorkFlushingError,
   ScriptWorkloadCallback,
-} from "../../workload-manager/workLoadTypes";
-import { TestResult } from "../../sandbox/types";
+} from "../../../workloadManager/workLoadTypes";
+import { RQ } from "../RQmethods";
+import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
+import { LocalScope } from "modules/localScope";
+import { TestResult } from "../types";
 
 export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
   private localScope: LocalScope;
