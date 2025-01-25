@@ -8,9 +8,9 @@ import {
   ScriptWorkload,
   ScriptExecutionError,
   ScriptPendingWorkFlushingError,
-} from "../../workload-manager/workLoadTypes";
-import { ScriptExecutionWorkerInterface } from "../scriptExecutionWorker/scriptExecutionWorkerInterface";
-import ScriptExecutionWorker from "../scriptExecutionWorker/scriptExecutionWorker?worker";
+} from "../../workloadManager/workLoadTypes";
+import { ScriptExecutionWorkerInterface } from "../script-internals/scriptExecutionWorker/scriptExecutionWorkerInterface";
+import ScriptExecutionWorker from "../script-internals/scriptExecutionWorker/scriptExecutionWorker?worker";
 
 export class RQScriptWebWorker implements RQWorker {
   private internalWorker: Worker;

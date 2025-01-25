@@ -1,5 +1,5 @@
-import { TestResult } from "../../sandbox/types";
-import { ScriptWorkloadCallback } from "../../workload-manager/workLoadTypes";
+import { ScriptWorkloadCallback } from "../../../workloadManager/workLoadTypes";
+import { TestResult } from "../types";
 
 export interface ScriptExecutionWorkerInterface {
   executeScript(script: string, initialState: any, callback: ScriptWorkloadCallback): Promise<void>;

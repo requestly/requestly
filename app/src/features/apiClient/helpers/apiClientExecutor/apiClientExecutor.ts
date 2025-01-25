@@ -1,16 +1,16 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
 import { RQAPI } from "../../types";
-import { APIClientWorkloadManager } from "../modules/scriptsV2/workload-manager/APIClientWorkloadManager";
+import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { processAuthForEntry, updateRequestWithAuthOptions } from "../auth";
 import {
   PostResponseScriptWorkload,
   PreRequestScriptWorkload,
   WorkResultType,
-} from "../modules/scriptsV2/workload-manager/workLoadTypes";
+} from "../modules/scriptsV2/workloadManager/workLoadTypes";
 import { notification } from "antd";
 import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshot";
-import { TestResult } from "../modules/scriptsV2/sandbox/types";
+import { TestResult } from "../modules/scriptsV2/worker/script-internals/types";
 import {
   trackScriptExecutionCompleted,
   trackScriptExecutionFailed,
@@ -25,7 +25,7 @@ type InternalFunctions = {
   renderVariables(request: RQAPI.Request, collectionId: string): RQAPI.Request;
 };
 
-export class ApiClientExecutor {
+export class apiClientExecutor {
   private abortController: AbortController;
   private entryDetails: RQAPI.Entry;
   private collectionId: RQAPI.Record["collectionId"];
