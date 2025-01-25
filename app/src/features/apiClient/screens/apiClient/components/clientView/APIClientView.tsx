@@ -45,7 +45,7 @@ import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcut
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
-import { apiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
+import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
 import { isEmpty } from "lodash";
 
 interface Props {
@@ -98,7 +98,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
-  const [requestExecutor, setRequestExecutor] = useState<apiClientExecutor | null>(null);
+  const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
 
   // const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(true);
@@ -270,14 +270,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       error: null,
     }));
 
-    requestExecutor.updateApiRecords(apiClientRecords);
-    requestExecutor.updateEntryDetails({
+    apiClientExecutor.updateApiRecords(apiClientRecords);
+    apiClientExecutor.updateEntryDetails({
       entry: sanitizeEntry(entry),
       recordId: apiEntryDetails?.id,
       collectionId: apiEntryDetails?.collectionId,
     });
 
-    requestExecutor
+    apiClientExecutor
       .execute()
       .then(({ executedEntry, testResults }) => {
         const response = executedEntry.response;
@@ -338,7 +338,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     apiEntryDetails?.collectionId,
     entry,
     toggleBottomSheet,
-    requestExecutor,
+    apiClientExecutor,
     apiClientRecords,
     dispatch,
     notifyApiRequestFinished,
@@ -419,10 +419,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, [entry, apiEntryDetails, onSaveRecord, setEntry, teamId, uid, resetChanges, isCreateMode, requestId]);
 
   const cancelRequest = useCallback(() => {
-    // abortControllerRef.current?.abort();
-    requestExecutor.abort();
+    apiClientExecutor.abort();
     trackAPIRequestCancelled();
-  }, [requestExecutor]);
+  }, [apiClientExecutor]);
 
   const handleAuthChange = useCallback((authOptions: RQAPI.AuthOptions) => {
     setEntry((prevEntry) => {
@@ -457,14 +456,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, [requestExecutor, apiEntryDetails?.id, apiEntryDetails?.collectionId, entry]);
 
   useEffect(() => {
-    if (!requestExecutor) {
-      setRequestExecutor(new apiClientExecutor(appMode, apiClientWorkloadManager));
+    if (!apiClientExecutor) {
+      setApiClientExecutor(new ApiClientExecutor(appMode, apiClientWorkloadManager));
     }
-  }, [apiClientRecords, apiClientWorkloadManager, appMode, requestExecutor]);
+  }, [apiClientRecords, apiClientWorkloadManager, appMode, apiClientExecutor]);
 
   useEffect(() => {
-    if (requestExecutor) {
-      requestExecutor.updateInternalFunctions({
+    if (apiClientExecutor) {
+      apiClientExecutor.updateInternalFunctions({
         getCollectionVariables,
         getEnvironmentVariables: getCurrentEnvironmentVariables,
         getGlobalVariables,
@@ -478,7 +477,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     getGlobalVariables,
     handleUpdatesFromExecutionWorker,
     renderVariables,
-    requestExecutor,
+    apiClientExecutor,
   ]);
 
   return isExtensionEnabled ? (
