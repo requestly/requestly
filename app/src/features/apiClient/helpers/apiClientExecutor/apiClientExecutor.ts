@@ -9,7 +9,7 @@ import {
   WorkResultType,
 } from "../modules/scriptsV2/workloadManager/workLoadTypes";
 import { notification } from "antd";
-import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshot";
+import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshotTypes";
 import { TestResult } from "../modules/scriptsV2/worker/script-internals/types";
 import {
   trackScriptExecutionCompleted,
@@ -25,7 +25,7 @@ type InternalFunctions = {
   renderVariables(request: RQAPI.Request, collectionId: string): RQAPI.Request;
 };
 
-export class apiClientExecutor {
+export class ApiClientExecutor {
   private abortController: AbortController;
   private entryDetails: RQAPI.Entry;
   private collectionId: RQAPI.Record["collectionId"];
