@@ -17,17 +17,17 @@ export class AssertionHandler {
     throw new AssertionError(errorMessage);
   };
 
-  checkStatus = (expected: number | string | string[], checkEquality: boolean) => {
+  checkStatus = (expectedValue: number | string | string[], checkEquality: boolean) => {
     const actualCode = this.response.code;
-    if (typeof expected === "number") {
+    if (typeof expectedValue === "number") {
       try {
-        verify(expected, actualCode, checkEquality);
+        verify(expectedValue, actualCode, checkEquality);
       } catch {
-        this.throwAssertionError(expected, actualCode, checkEquality, "response code");
+        this.throwAssertionError(expectedValue, actualCode, checkEquality, "response code");
       }
     } else {
       const actualInitialDigit = actualCode.toString()[0];
-      const expectedValues = Array.isArray(expected) ? expected : [expected];
+      const expectedValues = Array.isArray(expectedValue) ? expectedValue : [expectedValue];
 
       expectedValues.forEach((status) => {
         const expectedInitialDigit = status[0];
@@ -40,31 +40,33 @@ export class AssertionHandler {
     }
   };
 
-  haveBody = (expected: string, checkEquality: boolean) => {
+  haveBody = (expectedValue: string, checkEquality: boolean) => {
     try {
-      verify(this.response.body, expected, checkEquality);
+      verify(this.response.body, expectedValue, checkEquality);
     } catch {
-      this.throwAssertionError(expected, this.response.body, checkEquality, "response body");
+      this.throwAssertionError(expectedValue, this.response.body, checkEquality, "response body");
     }
   };
 
-  haveStatus = (expected: number | string, checkEquality: boolean) => {
-    const actualValue = typeof expected === "string" ? this.response.status : this.response.code;
+  haveStatus = (expectedValue: number | string, checkEquality: boolean) => {
+    const actualValue = typeof expectedValue === "string" ? this.response.status : this.response.code;
 
     try {
-      verify(actualValue, expected, checkEquality);
+      verify(actualValue, expectedValue, checkEquality);
     } catch {
-      this.throwAssertionError(expected, actualValue, checkEquality, "response status");
+      this.throwAssertionError(expectedValue, actualValue, checkEquality, "response status");
     }
   };
 
-  haveHeader = (expected: string, checkEquality: boolean) => {
-    const isHeaderFound = this.response.headers.some((header) => header.key.toLowerCase() === expected.toLowerCase());
+  haveHeader = (expectedValue: string, checkEquality: boolean) => {
+    const isHeaderFound = this.response.headers.some(
+      (header) => header.key.toLowerCase() === expectedValue.toLowerCase()
+    );
     try {
       verify(isHeaderFound, true, checkEquality);
     } catch (e) {
       const condition = checkEquality ? "to have" : "to not have";
-      throw new AssertionError(`Expected response ${condition} header with key '${expected}'.`);
+      throw new AssertionError(`Expected response ${condition} header with key '${expectedValue}'.`);
     }
   };
 }

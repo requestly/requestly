@@ -160,9 +160,9 @@ export class RQ implements SandboxAPI {
     const haveHeader = this.assertionHandler.haveHeader.bind(this);
 
     return {
-      body: (expected: string) => haveBody(expected, isEqualityCheck),
-      status: (expected: number | string) => haveStatus(expected, isEqualityCheck),
-      header: (expected: string) => haveHeader(expected, isEqualityCheck),
+      body: (expectedValue: string) => haveBody(expectedValue, isEqualityCheck),
+      status: (expectedValue: number | string) => haveStatus(expectedValue, isEqualityCheck),
+      header: (expectedValue: string) => haveHeader(expectedValue, isEqualityCheck),
     };
   }
 }
