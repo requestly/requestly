@@ -11,7 +11,6 @@ export const useAppLanguage = () => {
     const observer = new MutationObserver(() => {
       const newLang = document.documentElement.lang;
       if (newLang !== currentLanguage) {
-        console.log("newLang", newLang);
         dispatch(globalActions.updateAppLanguage(newLang));
       }
     });
