@@ -21,7 +21,6 @@ export const useAppLanguage = () => {
       attributeFilter: ["lang"],
     });
 
-    // Cleanup observer on component unmount
     return () => observer.disconnect();
   }, [currentLanguage, dispatch]);
 };
