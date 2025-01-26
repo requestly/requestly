@@ -4,6 +4,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { capitalize } from "lodash";
 import { KEY_ICONS } from "../../../../constants";
 import "./RQButton.scss";
+import { useSelector } from "react-redux";
+import { getAppLanguage } from "store/selectors";
 
 type RQButtonSize = "small" | "default" | "large";
 
@@ -92,7 +94,9 @@ interface RQCustomButton
   extends React.ForwardRefExoticComponent<RQButtonProps & React.RefAttributes<HTMLButtonElement>> {}
 
 export const RQButton: RQCustomButton = React.forwardRef<HTMLButtonElement, RQButtonProps>(function Button(props, ref) {
-  if (props.hotKey) {
+  const appLanguage = useSelector(getAppLanguage);
+
+  if (props.hotKey && appLanguage === "en") {
     return <ButtonWithHotkey ref={ref} {...props} />;
   }
 
