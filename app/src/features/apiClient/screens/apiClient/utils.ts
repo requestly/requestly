@@ -7,7 +7,7 @@ import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
 import { forEach, isEmpty, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
-import { HarRequest } from "httpsnippet";
+import { Request as HarRequest } from "har-format";
 
 export const makeRequest = async (
   appMode: string,
@@ -496,18 +496,24 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.Request): HarReq
     cookies: [],
     bodySize: -1,
     headersSize: -1,
-    postData: {
-      mimeType: apiRequest.contentType,
-    },
   };
 
   if (supportsRequestBody(apiRequest.method)) {
-    if (apiRequest.contentType === RequestContentType.JSON) {
-      harRequest.postData.text = apiRequest.body as string;
-    } else if (apiRequest.contentType === RequestContentType.FORM) {
-      harRequest.postData.params = (apiRequest.body as KeyValuePair[]).map(({ key, value }) => ({ name: key, value }));
-    } else {
-      harRequest.postData.text = apiRequest.body as string;
+    if (apiRequest?.contentType === RequestContentType.RAW) {
+      harRequest.postData = {
+        mimeType: RequestContentType.RAW,
+        text: apiRequest.body as string,
+      };
+    } else if (apiRequest?.contentType === RequestContentType.JSON) {
+      harRequest.postData = {
+        mimeType: RequestContentType.JSON,
+        text: apiRequest.body as string,
+      };
+    } else if (apiRequest?.contentType === RequestContentType.FORM) {
+      harRequest.postData = {
+        mimeType: RequestContentType.FORM,
+        params: (apiRequest.body as KeyValuePair[]).map(({ key, value }) => ({ name: key, value })),
+      };
     }
   }
 

@@ -47,7 +47,6 @@ import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { RequestExecutor } from "features/apiClient/helpers/requestExecutor/requestExecutor";
 import { isEmpty } from "lodash";
-import { RQModal } from "lib/design-system/components";
 import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
 
 interface Props {
@@ -556,7 +555,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           </Skeleton>
         </div>
       </BottomSheetLayout>
-      <CopyAsModal apiRequest={apiEntry?.request} open={copyAsModalOpen} onClose={() => setCopyAsModalOpen(false)} />
+      {copyAsModalOpen ? (
+        <CopyAsModal apiRequest={entry?.request} open={copyAsModalOpen} onClose={() => setCopyAsModalOpen(false)} />
+      ) : null}
     </div>
   ) : (
     <div className="w-full">

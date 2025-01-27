@@ -1,9 +1,10 @@
-import { RQAPI } from "features/apiClient/types";
-import { HarRequest, HTTPSnippet } from "httpsnippet";
+import { RequestContentType, RQAPI } from "features/apiClient/types";
+import { Request as HarRequest } from "har-format";
+import { HTTPSnippet, availableTargets } from "httpsnippet";
 import { RQModal } from "lib/design-system/components";
 import { useCallback, useEffect, useState } from "react";
 import { apiRequestToHarRequestAdapter } from "../../../utils";
-import { Select } from "antd";
+import { Select, Typography } from "antd";
 
 interface CopyAsModalProps {
   open: boolean;
@@ -11,46 +12,56 @@ interface CopyAsModalProps {
   apiRequest: RQAPI.Request;
 }
 
-const CopyAsModal = (props: CopyAsModalProps) => {
-  const [harRequest, setHarRequest] = useState<HarRequest>();
-  const [clientId, setClientId] = useState<string>();
+type TargetId = ReturnType<typeof availableTargets>[number]["key"];
+type ClientId = ReturnType<typeof availableTargets>[number]["clients"][number]["key"];
 
+const { Paragraph } = Typography;
+
+const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
+  const [harRequest, setHarRequest] = useState<HarRequest>();
+  const [snippetTypeId, setSnippetTypeId] = useState<string>("shell-curl");
   useEffect(() => {
-    if (!props.apiRequest) {
+    if (!apiRequest) {
       return;
     }
-    const harRequest = apiRequestToHarRequestAdapter(props.apiRequest);
-    setHarRequest(harRequest);
-  }, [props.apiRequest]);
 
-  const getConvertedString = useCallback(() => {
+    const harRequest = apiRequestToHarRequestAdapter(apiRequest);
+    setHarRequest(harRequest);
+  }, [apiRequest]);
+
+  const getSnippet = useCallback(() => {
     if (!harRequest) {
       return;
     }
 
     console.log({ harRequest });
-    const httpsnippet = new HTTPSnippet(harRequest);
-    let convertedString = "";
-    if (clientId === "axios") {
-      convertedString = httpsnippet.convert("javascript", "axios") as string;
-    } else if (clientId === "curl") {
-      convertedString = httpsnippet.convert("shell", "curl") as string;
-    } else if (clientId === "python-requests") {
-      convertedString = httpsnippet.convert("python", "requests") as string;
-    }
+    const httpsnippet = new HTTPSnippet({ postData: { mimeType: RequestContentType.RAW }, ...harRequest });
+    let convertedString = httpsnippet.convert(
+      snippetTypeId.split("-")[0] as TargetId,
+      snippetTypeId.split("-")[1] as ClientId,
+      {}
+    );
 
     console.log({ convertedString });
     return convertedString;
-  }, [clientId, harRequest]);
+  }, [snippetTypeId, harRequest]);
 
   return (
-    <RQModal open={props.open} onCancel={props.onClose} destroyOnClose>
-      <Select onChange={(value) => setClientId(value)}>
-        <Select.Option value="curl">cURL</Select.Option>
-        <Select.Option value="axios">Axios</Select.Option>
-        <Select.Option value="python-requests">Python Requests</Select.Option>
+    <RQModal open={open} onCancel={onClose} destroyOnClose>
+      <Select onChange={(value) => setSnippetTypeId(value)} value={snippetTypeId}>
+        {availableTargets().map((target) => {
+          return target.clients.map((client) => {
+            return (
+              <Select.Option value={`${target.key}-${client.key}`}>{`${target.title} - ${client.title}`}</Select.Option>
+            );
+          });
+        })}
       </Select>
-      <div className="rq-modal-content">{getConvertedString()}</div>
+      <div className="rq-modal-content">
+        <Paragraph style={{ whiteSpace: "pre" }} copyable code>
+          {getSnippet()}
+        </Paragraph>
+      </div>
     </RQModal>
   );
 };
