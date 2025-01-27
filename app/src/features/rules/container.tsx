@@ -42,7 +42,7 @@ const RulesFeatureContainer = () => {
                 /Rule with id \d+ was skipped as the "regexFilter" value exceeded the 2KB memory.*/
               ) ? (
                 <span>
-                  We are facing some limitations due to chrome API changes. Please try the solution mentioned{" "}
+                  Due to Chrome API(MV3) limitations, rules can't be greater than 2KB. Please try a solution mentioned{" "}
                   <a href="https://github.com/requestly/requestly/issues/1797" target="_blank" rel="noreferrer">
                     here.
                   </a>
@@ -62,7 +62,7 @@ const RulesFeatureContainer = () => {
         .then((ruleDetails) => {
           const sourceCondition = ruleDetails?.pairs?.[0]?.source;
           trackErrorInSavingDNR({
-            rule_type: message.rqRuleId.split("_")[0],
+            rule_type: message.rqRuleId?.split("_")[0],
             rule_id: message.rqRuleId,
             error: message.error.replace(/Rule with id \d+/g, "Rule with id"),
             is_migration_triggered: window.location.search.includes("updatedToMv3"),

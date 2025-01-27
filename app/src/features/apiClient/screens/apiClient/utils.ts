@@ -2,10 +2,11 @@ import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionA
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
 import { KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
-import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../../constants";
+import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
 import { forEach, isEmpty, split, unionBy } from "lodash";
+import { sessionStorage } from "utils/sessionStorage";
 
 export const makeRequest = async (
   appMode: string,
@@ -15,12 +16,12 @@ export const makeRequest = async (
   return new Promise((resolve, reject) => {
     if (signal) {
       if (signal.aborted) {
-        reject();
+        reject(new Error("Request aborted"));
       }
 
       const abortListener = () => {
         signal.removeEventListener("abort", abortListener);
-        reject();
+        reject(new Error("Request aborted"));
       };
       signal.addEventListener("abort", abortListener);
     }
@@ -190,6 +191,19 @@ export const isApiCollection = (record: RQAPI.Record) => {
   return record?.type === RQAPI.RecordType.COLLECTION;
 };
 
+const sortRecords = (records: RQAPI.Record[]) => {
+  return records.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+};
+
+const sortNestedRecords = (records: RQAPI.Record[]) => {
+  records.forEach((record) => {
+    if (isApiCollection(record)) {
+      record.data.children = sortRecords(record.data.children);
+      sortNestedRecords(record.data.children);
+    }
+  });
+};
+
 export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
   const recordsCopy = [...records];
   const recordsMap: Record<string, RQAPI.Record> = {};
@@ -218,6 +232,7 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
     }
   });
 
+  sortNestedRecords(updatedRecords);
   return updatedRecords;
 };
 
@@ -409,4 +424,63 @@ export const filterRecordsBySearch = (records: RQAPI.Record[], searchValue: stri
   });
 
   return records.filter((record) => matchingRecords.has(record.id));
+};
+
+export const clearExpandedRecordIdsFromSession = (keysToBeDeleted: string[]) => {
+  const activeKeys = sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, []);
+
+  if (keysToBeDeleted.length === 0) {
+    return;
+  }
+
+  const updatedActiveKeys: string[] = [];
+
+  activeKeys.forEach((key: string) => {
+    if (!keysToBeDeleted.includes(key)) updatedActiveKeys.push(key);
+  });
+
+  sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, updatedActiveKeys);
+};
+
+const getParentIds = (data: RQAPI.Record[], targetId: RQAPI.Record["id"]) => {
+  const idToCollectionMap = data.reduce((collectionIdMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>, item) => {
+    collectionIdMap[item.id] = item.collectionId || "";
+    return collectionIdMap;
+  }, {});
+
+  const parentIds = [];
+
+  let currentId = idToCollectionMap[targetId];
+  while (currentId) {
+    parentIds.push(currentId);
+    currentId = idToCollectionMap[currentId];
+  }
+
+  return parentIds;
+};
+
+export const getRecordIdsToBeExpanded = (
+  id: RQAPI.Record["id"],
+  expandedKeys: RQAPI.Record["id"][],
+  records: RQAPI.Record[]
+) => {
+  // If the provided ID is null or undefined, return the existing active keys.
+  if (!id) {
+    return expandedKeys;
+  }
+
+  const expandedKeysCopy = [...expandedKeys];
+
+  const parentIds = getParentIds(records, id);
+
+  // Include the original ID itself as an active key.
+  parentIds.push(id);
+
+  parentIds.forEach((parent) => {
+    if (!expandedKeysCopy.includes(parent)) {
+      expandedKeysCopy.push(parent);
+    }
+  });
+
+  return expandedKeysCopy;
 };

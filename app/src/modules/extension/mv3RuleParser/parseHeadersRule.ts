@@ -1,4 +1,4 @@
-import { HeadersRule, HeaderRuleActionType, HeadersRuleModificationData } from "../../../types/rules";
+import { HeaderRule } from "@requestly/shared/types/entities/rules";
 import { ExtensionRule, ExtensionRuleAction, HeadersRuleOperation, ModifyHeaderInfo, RuleActionType } from "../types";
 import { parseConditionFromSource } from "./utils";
 
@@ -25,23 +25,20 @@ const APPEND_SUPPORTED_HEADERS = [
   "x-forwarded-for",
 ];
 
-const parseHeaders = (
-  headers: HeadersRuleModificationData[],
-  headerType: "Request" | "Response"
-): ModifyHeaderInfo[] => {
+const parseHeaders = (headers: HeaderRule.Modification[], headerType: "Request" | "Response"): ModifyHeaderInfo[] => {
   return headers
     .map((header) => {
       if (header.value === "rq_request_initiator_origin()") {
         return null;
       }
 
-      if (header.type === HeaderRuleActionType.REMOVE) {
+      if (header.type === HeaderRule.ModificationType.REMOVE) {
         return {
           header: header.header,
           operation: "remove" as HeadersRuleOperation,
         };
       } else if (
-        header.type === HeaderRuleActionType.ADD &&
+        header.type === HeaderRule.ModificationType.ADD &&
         (headerType === "Response" ||
           (headerType === "Request" && APPEND_SUPPORTED_HEADERS.includes(header.header.toLowerCase()))) // Append is supported only for specific request headers
       ) {
@@ -61,7 +58,7 @@ const parseHeaders = (
     .filter(Boolean);
 };
 
-const parseHeadersRule = (rule: HeadersRule): ExtensionRule[] => {
+const parseHeadersRule = (rule: HeaderRule.Record): ExtensionRule[] => {
   return rule.pairs
     .map(
       (rulePair): ExtensionRule => {

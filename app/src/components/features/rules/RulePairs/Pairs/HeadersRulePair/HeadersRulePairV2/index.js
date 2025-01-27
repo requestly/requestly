@@ -42,7 +42,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
   const stableGetEmptyModification = useCallback(getEmptyModification, [ruleDetails.EMPTY_MODIFICATION_FORMAT]);
 
   useEffect(() => {
-    if (!pair.modifications.Request?.length && pair.modifications.Response?.length) {
+    if (!pair.modifications?.Request?.length && pair.modifications?.Response?.length) {
       setActiveTab("Response");
     }
   }, [pair.modifications]);
@@ -65,7 +65,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
                 <span>
                   {`${modificationType} Headers`}
                   <Badge
-                    count={pair.modifications[modificationType]?.length}
+                    count={pair.modifications?.[modificationType]?.length}
                     size="small"
                     style={{ margin: "0 5px" }}
                   />

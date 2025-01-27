@@ -8,7 +8,6 @@ import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types"
 import { RQNetworkTable, RQNetworkTableProps } from "lib/design-system/components/RQNetworkTable";
 import { APIClient, APIClientRequest } from "features/apiClient/components/common/APIClient";
 import RuleEditorModal from "components/common/RuleEditorModal";
-import { RuleType } from "types";
 import { copyToClipBoard } from "utils/Misc";
 import { snakeCase } from "lodash";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
@@ -17,6 +16,7 @@ import {
   trackSessionRecordingNetworkLogContextMenuOpen,
   trackSessionRecordingNetworkLogContextMenuOptionClicked,
 } from "modules/analytics/events/features/sessionRecording";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 interface Props {
   startTime: number;

@@ -130,5 +130,6 @@ export const updateRequestWithAuthOptions = (data: KeyValuePair[], dataToAdd: Ke
 
   const filterDataWithKeys = dataToAdd.filter((data) => data.key);
 
-  return unionBy(data, filterDataWithKeys, "type");
+  // Mergin using key so that headers/queryparams aren't appended multiple times
+  return unionBy(data, filterDataWithKeys, (item) => item?.key?.toLowerCase());
 };

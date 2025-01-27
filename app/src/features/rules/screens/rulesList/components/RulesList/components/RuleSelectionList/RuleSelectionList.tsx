@@ -4,7 +4,6 @@ import { Divider } from "antd";
 import { NavLink, useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
-import { RuleType } from "types";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumFeature } from "features/pricing";
@@ -13,6 +12,7 @@ import { TooltipPlacement } from "antd/lib/tooltip";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 import { PaidFeatureNudgeViewedSource } from "modules/analytics/events/common/pricing";
 import "./RuleSelectionList.scss";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 export interface RuleSelectionListProps {
   /** Analytics event source */

@@ -41,13 +41,12 @@ import { RQSingleLineEditor } from "features/apiClient/screens/environment/compo
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
-import { executeAPIRequest } from "features/apiClient/helpers/APIClientManager";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
-import { getCollectionVariables } from "store/features/variables/selectors";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
-import { REQUEST_METHOD_COLORS } from "../../../../../../constants";
+import { RequestExecutor } from "features/apiClient/helpers/requestExecutor/requestExecutor";
+import { isEmpty } from "lodash";
 
 interface Props {
   openInModal?: boolean;
@@ -70,19 +69,27 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
-  const collectionVariables = useSelector(getCollectionVariables);
   const [searchParams] = useSearchParams();
   const isCreateMode = searchParams.has("create");
   const { requestId } = useParams();
 
   const { toggleBottomSheet } = useBottomSheetContext();
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, apiClientWorkloadManager } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
-  const { getVariablesWithPrecedence } = environmentManager;
-  const currentEnvironmentVariables = useMemo(
-    () => getVariablesWithPrecedence(apiEntryDetails?.collectionId),
-    [apiEntryDetails?.collectionId, getVariablesWithPrecedence]
-  );
+  const {
+    getVariablesWithPrecedence,
+    setVariables,
+    setCollectionVariables,
+    getCurrentEnvironment,
+    getGlobalVariables,
+    getCollectionVariables,
+    getCurrentEnvironmentVariables,
+    renderVariables,
+  } = environmentManager;
+  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
+    apiEntryDetails?.collectionId,
+    getVariablesWithPrecedence,
+  ]);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>({ ...(apiEntry ?? getEmptyAPIEntry()) });
@@ -91,15 +98,16 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
+  const [requestExecutor, setRequestExecutor] = useState<RequestExecutor | null>(null);
 
-  const abortControllerRef = useRef<AbortController>(null);
+  // const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(true);
   const animationTimerRef = useRef<NodeJS.Timeout>();
   const { response, ...entryWithoutResponse } = entry;
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse), isAnimating);
-  const { updateTab } = useTabsLayoutContext();
+  const { updateTab, activeTab } = useTabsLayoutContext();
 
   useEffect(() => {
     const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
@@ -108,10 +116,25 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, [updateTab, isCreateMode, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
 
   useEffect(() => {
+    const tabId = apiEntryDetails?.id;
+
+    if (activeTab?.id === tabId && hasUnsavedChanges) {
+      updateTab(tabId, { isPreview: false });
+    }
+  }, [updateTab, activeTab?.id, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
+
+  useEffect(() => {
     if (apiEntry) {
       setEntry({
         ...apiEntry,
-        request: { ...apiEntry.request, ...syncQueryParams(apiEntry.request.queryParams, apiEntry.request.url) },
+        request: {
+          ...apiEntry.request,
+          ...syncQueryParams(
+            apiEntry.request.queryParams,
+            apiEntry.request.url,
+            isEmpty(apiEntry.request.queryParams) ? QueryParamSyncType.TABLE : QueryParamSyncType.SYNC
+          ),
+        },
       });
       setRequestName("");
     }
@@ -192,7 +215,32 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     });
   }, []);
 
-  const onSendButtonClick = useCallback(() => {
+  const handleUpdatesFromExecutionWorker = useCallback(
+    async (state: any) => {
+      for (const key in state) {
+        if (key === "environment") {
+          const currentEnvironment = getCurrentEnvironment() as {
+            currentEnvironmentName?: string;
+            currentEnvironmentId?: string;
+          };
+          if (currentEnvironment.currentEnvironmentId) {
+            await setVariables(currentEnvironment.currentEnvironmentId, state[key]);
+          }
+        }
+        if (key === "global") {
+          await setVariables("global", state[key]);
+        }
+        if (key === "collectionVariables") {
+          await setCollectionVariables(state[key], apiEntryDetails?.collectionId);
+        }
+      }
+    },
+    [getCurrentEnvironment, setVariables, setCollectionVariables, apiEntryDetails?.collectionId]
+  );
+
+  const onSendButtonClick = useCallback(async () => {
+    updateTab(apiEntryDetails?.id, { isPreview: false });
+
     if (!entry.request.url) {
       return;
     }
@@ -211,28 +259,26 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     toggleBottomSheet(true);
 
-    const sanitizedEntry = sanitizeEntry(entry);
-    sanitizedEntry.response = null;
-
-    abortControllerRef.current = new AbortController();
-
     setIsFailed(false);
     setError(null);
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
+    //Need to change the response and error to null
+    setEntry((entry) => ({
+      ...entry,
+      response: null,
+      error: null,
+    }));
 
-    executeAPIRequest(
-      appMode,
-      apiClientRecords,
-      sanitizedEntry,
-      {
-        id: apiEntryDetails?.id,
-        collectionId: apiEntryDetails?.collectionId,
-      },
-      environmentManager,
-      collectionVariables[apiEntryDetails?.collectionId]?.variables || {},
-      abortControllerRef.current.signal
-    )
+    requestExecutor.updateApiRecords(apiClientRecords);
+    requestExecutor.updateEntryDetails({
+      entry: sanitizeEntry(entry),
+      recordId: apiEntryDetails?.id,
+      collectionId: apiEntryDetails?.collectionId,
+    });
+
+    requestExecutor
+      .execute()
       .then((executedEntry) => {
         const response = executedEntry.response;
         // TODO: Add an entry in history
@@ -248,7 +294,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
           trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
         } else {
-          const erroredEntry = entry as RQAPI.RequestErrorEntry;
+          const erroredEntry = executedEntry as RQAPI.RequestErrorEntry;
 
           setIsFailed(true);
           setError(erroredEntry?.error ?? null);
@@ -256,12 +302,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             Sentry.withScope((scope) => {
               scope.setTag("error_type", "api_request_failure");
               scope.setContext("request_details", {
-                url: sanitizedEntry.request.url,
-                method: sanitizedEntry.request.method,
-                headers: sanitizedEntry.request.headers,
-                queryParams: sanitizedEntry.request.queryParams,
+                url: entryWithResponse.request.url,
+                method: entryWithResponse.request.method,
+                headers: entryWithResponse.request.headers,
+                queryParams: entryWithResponse.request.queryParams,
               });
-              scope.setFingerprint(["api_request_error", sanitizedEntry.request.method, erroredEntry.error.source]);
+              scope.setFingerprint(["api_request_error", entryWithResponse.request.method, erroredEntry.error.source]);
               Sentry.captureException(
                 new Error(`API Request Failed: ${erroredEntry.error.message || "Unknown error"}`)
               );
@@ -273,29 +319,22 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         }
         notifyApiRequestFinished?.(renderedEntryWithResponse);
       })
-      .catch(() => {
-        if (abortControllerRef.current?.signal.aborted) {
-          setIsRequestCancelled(true);
-        }
-      })
       .finally(() => {
-        abortControllerRef.current = null;
         setIsLoadingResponse(false);
       });
 
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
-    apiClientRecords,
+    updateTab,
     apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
-    appMode,
-    dispatch,
     entry,
-    environmentManager,
-    notifyApiRequestFinished,
     toggleBottomSheet,
-    collectionVariables,
+    requestExecutor,
+    apiClientRecords,
+    dispatch,
+    notifyApiRequestFinished,
   ]);
 
   const handleRecordNameUpdate = async () => {
@@ -373,9 +412,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, [entry, apiEntryDetails, onSaveRecord, setEntry, teamId, uid, resetChanges, isCreateMode, requestId]);
 
   const cancelRequest = useCallback(() => {
-    abortControllerRef.current?.abort();
+    // abortControllerRef.current?.abort();
+    requestExecutor.abort();
     trackAPIRequestCancelled();
-  }, []);
+  }, [requestExecutor]);
 
   const handleAuthChange = useCallback((authOptions: RQAPI.AuthOptions) => {
     setEntry((prevEntry) => {
@@ -388,6 +428,31 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
     (evt.target as HTMLInputElement).blur();
   }, []);
+
+  useEffect(() => {
+    if (!requestExecutor) {
+      setRequestExecutor(new RequestExecutor(appMode, apiClientWorkloadManager));
+    }
+  }, [apiClientRecords, apiClientWorkloadManager, appMode, requestExecutor]);
+
+  useEffect(() => {
+    if (requestExecutor) {
+      requestExecutor.updateInternalFunctions({
+        getCollectionVariables,
+        getEnvironmentVariables: getCurrentEnvironmentVariables,
+        getGlobalVariables,
+        postScriptExecutionCallback: handleUpdatesFromExecutionWorker,
+        renderVariables,
+      });
+    }
+  }, [
+    getCurrentEnvironmentVariables,
+    getCollectionVariables,
+    getGlobalVariables,
+    handleUpdatesFromExecutionWorker,
+    renderVariables,
+    requestExecutor,
+  ]);
 
   return isExtensionEnabled ? (
     <div className="api-client-view">
@@ -476,6 +541,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             </div>
             <RequestTabs
               key={requestId}
+              requestId={apiEntryDetails?.id}
               collectionId={apiEntryDetails?.collectionId}
               requestEntry={entry}
               setRequestEntry={setRequestEntry}

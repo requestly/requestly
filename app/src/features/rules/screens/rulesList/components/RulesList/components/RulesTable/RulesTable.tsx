@@ -5,7 +5,6 @@ import { Empty } from "antd";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { recordsToContentTableDataAdapter } from "./utils";
 import { isRule, isGroup } from "features/rules/utils";
-import { RecordStatus, RecordType, StorageRecord } from "features/rules/types/rules";
 import { RuleTableRecord } from "./types";
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
 import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
@@ -33,6 +32,8 @@ import { useRulesActionContext } from "features/rules/context/actions";
 import { globalActions } from "store/slices/global/slice";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import "./rulesTable.css";
+
+import { RecordType, RecordStatus, StorageRecord } from "@requestly/shared/types/entities/rules";
 
 interface Props {
   records: StorageRecord[];

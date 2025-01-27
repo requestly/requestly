@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -10,6 +10,7 @@ import {
   isApiCollection,
   isApiRequest,
   filterRecordsBySearch,
+  getRecordIdsToBeExpanded,
 } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/ExportCollectionsModal";
@@ -20,6 +21,8 @@ import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceho
 import { sessionStorage } from "utils/sessionStorage";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
 import "./collectionsList.scss";
+import { union } from "lodash";
+import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -28,13 +31,16 @@ interface Props {
 
 export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated }) => {
   const navigate = useNavigate();
+  const { collectionId, requestId } = useParams();
   const location = useLocation();
   const { openTab, tabs } = useTabsLayoutContext();
   const { isLoadingApiClientRecords, apiClientRecords, isRecordBeingCreated } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [expandedRecordIds, setExpandedRecordIds] = useState(
+    sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, [])
+  );
   const [searchValue, setSearchValue] = useState("");
-  const [collapsedKeys] = useState(sessionStorage.getItem("collapsed_collection_keys", []));
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const updatedRecords = convertFlatRecordsToNestedRecords(records);
@@ -45,7 +51,12 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
       }
 
-      // If types are the same, sort by creation date
+      // If types are the same, sort lexicographically by name
+      if (recordA.name.toLowerCase() !== recordB.name.toLowerCase()) {
+        return recordA.name.toLowerCase() < recordB.name.toLowerCase() ? -1 : 1;
+      }
+
+      // If names are the same, sort by creation date
       return recordA.createdTs - recordB.createdTs;
     });
 
@@ -100,6 +111,13 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     }
   }, [updatedRecords.requests, isLoadingApiClientRecords, openTab, location.pathname, tabs.length]);
 
+  useEffect(() => {
+    const id = requestId || collectionId;
+    setExpandedRecordIds((prev: RQAPI.Record["id"][]) =>
+      union(prev, getRecordIdsToBeExpanded(id, prev, apiClientRecords))
+    );
+  }, [collectionId, requestId, apiClientRecords]);
+
   return (
     <>
       {apiClientRecords.length > 0 && <SidebarListHeader onSearch={setSearchValue} />}
@@ -118,7 +136,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     key={record.id}
                     record={record}
                     onNewClick={onNewClick}
-                    collapsedKeys={collapsedKeys}
+                    expandedRecordIds={expandedRecordIds}
+                    setExpandedRecordIds={setExpandedRecordIds}
                     onExportClick={handleExportCollection}
                   />
                 );
