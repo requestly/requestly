@@ -1,5 +1,5 @@
 import { LocalScope } from "modules/localScope";
-import { LocalScopeResponse, SandboxAPI, TestFunction, TestResult } from "./types";
+import { LocalScopeRequest, LocalScopeResponse, SandboxAPI, TestFunction, TestResult } from "./types";
 import { VariableScope } from "./variableScope";
 import { RQAPI } from "features/apiClient/types";
 import { expect } from "chai";
@@ -36,7 +36,7 @@ const jsonifyObject = (objectString: unknown) => {
 };
 
 export class RQ implements SandboxAPI {
-  public request: RQAPI.Request;
+  public request: LocalScopeRequest;
   public response: LocalScopeResponse;
   public environment: VariableScope;
   public globals: VariableScope;
@@ -55,7 +55,6 @@ export class RQ implements SandboxAPI {
   public vault = createInfiniteChainable("vault");
   public visualizer = createInfiniteChainable("visualizer");
 
-  private jsonResponseBody: Response;
   private assertionHandler: AssertionHandler;
 
   constructor(localScope: LocalScope, private testResults: TestResult[]) {
@@ -63,7 +62,15 @@ export class RQ implements SandboxAPI {
     this.globals = new VariableScope(localScope, "global");
     this.collectionVariables = new VariableScope(localScope, "collectionVariables");
     this.expect = expect;
-    this.test = Object.assign(
+    this.test = this.createTestObject();
+    this.request = this.createRequestObject(localScope.get("request"));
+    this.response = this.createResponseObject(localScope.get("response"));
+
+    this.assertionHandler = new AssertionHandler(this.response);
+  }
+
+  private createTestObject(): TestFunction {
+    return Object.assign(
       (testName: string, testFn: () => void) => {
         const result = new TestExecutor().execute(testName, testFn);
         this.testResults.push(result);
@@ -75,38 +82,42 @@ export class RQ implements SandboxAPI {
         },
       }
     );
-    this.request = localScope.get("request");
-    let originalResponse = localScope.get("response");
-    this.response = originalResponse
-      ? {
-          ...originalResponse,
-          code: originalResponse.status,
-          status: originalResponse.statusText,
-          responseTime: originalResponse.time,
-        }
-      : undefined;
-    if (this.response) {
-      this.jsonResponseBody = jsonifyObject(this.response.body);
+  }
+
+  private createRequestObject(originalRequest: RQAPI.Request): LocalScopeRequest {
+    return Object.create(
+      {
+        toJSON: () => ({
+          method: originalRequest.method,
+          url: originalRequest.url,
+          body: jsonifyObject(originalRequest.body),
+        }),
+      },
+      Object.getOwnPropertyDescriptors(originalRequest)
+    );
+  }
+
+  private createResponseObject(originalResponse: RQAPI.Response): LocalScopeResponse {
+    if (!originalResponse) {
+      return (this.response = undefined);
     }
-    this.assertionHandler = new AssertionHandler(this.response);
 
-    Object.setPrototypeOf(this.request, {
-      toJSON: () => ({
-        method: this.request.method,
-        url: this.request.url,
-        body: jsonifyObject(this.request.body),
-      }),
-    });
+    const responseProperties = {
+      ...originalResponse,
+      code: originalResponse.status,
+      status: originalResponse.statusText,
+      responseTime: originalResponse.time,
+    };
 
-    if (this.response) {
-      Object.setPrototypeOf(this.response, {
+    return Object.create(
+      {
         toJSON: () => {
           return {
-            ...this.response,
-            body: this.jsonResponseBody,
+            ...responseProperties,
+            body: jsonifyObject(originalResponse.body),
           };
         },
-        json: () => this.jsonResponseBody,
+        json: () => jsonifyObject(originalResponse.body),
         text: () => this.response.body,
         to: {
           be: this.createBeAssertions(true),
@@ -116,8 +127,9 @@ export class RQ implements SandboxAPI {
             have: this.createHaveAssertions(false),
           },
         },
-      });
-    }
+      },
+      Object.getOwnPropertyDescriptors(responseProperties)
+    );
   }
 
   private createBeAssertions(isEqualityCheck: boolean) {
