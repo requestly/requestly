@@ -3,6 +3,7 @@ import { LocalScopeResponse, SandboxAPI, TestFunction, TestResult } from "./type
 import { VariableScope } from "./variableScope";
 import { RQAPI } from "features/apiClient/types";
 import { expect } from "chai";
+import { Options as AjvOptions } from "ajv";
 import { TestExecutor } from "./testExecutor";
 import { AssertionHandler } from "./assertionHandler";
 
@@ -158,11 +159,13 @@ export class RQ implements SandboxAPI {
     const haveBody = this.assertionHandler.haveBody.bind(this);
     const haveStatus = this.assertionHandler.haveStatus.bind(this);
     const haveHeader = this.assertionHandler.haveHeader.bind(this);
+    const haveJsonSchema = this.assertionHandler.haveJsonSchema.bind(this);
 
     return {
       body: (expectedValue: string) => haveBody(expectedValue, isEqualityCheck),
       status: (expectedValue: number | string) => haveStatus(expectedValue, isEqualityCheck),
       header: (expectedValue: string) => haveHeader(expectedValue, isEqualityCheck),
+      jsonSchema: (schema: string, ajvOptions: AjvOptions) => haveJsonSchema(schema, isEqualityCheck, ajvOptions),
     };
   }
 }

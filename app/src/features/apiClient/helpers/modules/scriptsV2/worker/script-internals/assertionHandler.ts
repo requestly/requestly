@@ -1,5 +1,6 @@
 import { LocalScopeResponse } from "./types";
 import { verify } from "./utils";
+import Ajv, { Options as AjvOptions } from "ajv";
 
 export class AssertionHandler {
   constructor(private response: LocalScopeResponse) {}
@@ -69,6 +70,34 @@ export class AssertionHandler {
       throw new AssertionError(`Expected response ${condition} header with key '${expectedValue}'.`);
     }
   };
+
+  haveJsonSchema(expected: any, checkEquality: true): void;
+  // eslint-disable-next-line no-dupe-class-members
+  haveJsonSchema(expected: any, checkEquality: true, config?: AjvOptions): void;
+  // eslint-disable-next-line no-dupe-class-members
+  haveJsonSchema(expected: any, checkEquality: boolean, config?: AjvOptions): void {
+    const ajv = new Ajv(config || { allErrors: true });
+    const validate = ajv.compile(expected);
+    let parsedBody;
+
+    try {
+      parsedBody = typeof this.response.body === "string" ? JSON.parse(this.response.body) : this.response.body;
+    } catch (e) {
+      throw new AssertionError("Response body is not valid JSON");
+    }
+
+    const isValid = validate(parsedBody);
+    try {
+      verify(isValid, true, checkEquality);
+    } catch {
+      const errors = validate.errors?.map((err) => `${err.schemaPath} ${err.message}`).join(", ");
+      throw new AssertionError(
+        `Expected response body ${checkEquality ? "to match" : "to not match"} JSON schema${
+          errors ? `: ${errors}` : ""
+        }`
+      );
+    }
+  }
 }
 
 class AssertionError extends Error {
