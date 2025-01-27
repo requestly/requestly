@@ -24,5 +24,6 @@ module.exports = {
   plugins: ["prettier"],
   rules: {
     "no-unused-vars": "off",
+    "no-dupe-class-members": "off",
   },
 };
