@@ -75,6 +75,8 @@ export const AppNotificationBanner = () => {
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [isRequestAccessModalOpen, setIsRequestAccessModalOpen] = useState(false);
 
+  const BILLING_TEAM_PLAN_REMINDER_END_DATE = 1738434600000;
+
   const bannerActionButtons = useMemo(() => {
     return {
       [BANNER_ACTIONS.UPGRADE]: {
@@ -213,8 +215,11 @@ export const AppNotificationBanner = () => {
           } else return false;
         }
         case BANNER_ID.BILLING_TEAM_PLAN_REMINDER: {
-          const billingTeam = billingTeams?.find((team) => team.id === newBanners[0]?.billingId);
-          if (billingTeam && new Date(user.details?.planDetails?.subscription?.endDate).getTime() <= 1738434600000) {
+          const billingTeam = billingTeams?.find((team) => team?.id === newBanners[0]?.billingId);
+          if (
+            billingTeam &&
+            new Date(user.details?.planDetails?.subscription?.endDate).getTime() <= BILLING_TEAM_PLAN_REMINDER_END_DATE
+          ) {
             return true;
           }
           return false;
