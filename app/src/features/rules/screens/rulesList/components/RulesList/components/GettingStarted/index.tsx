@@ -5,6 +5,7 @@ import { Button, Divider, Tooltip } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import CharlesIcon from "assets/icons/charlesIcon.svg?react";
 import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
+import ResourceOverrideIcon from "assets/icons/resourceOverrideIcon.webp";
 import { ImportFromCharlesModal } from "../ImporterComponents/CharlesImporter";
 import { ImportRulesModal } from "../../../../../../modals/ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -23,6 +24,7 @@ import {
   trackRulesImportStarted,
   trackUploadRulesButtonClicked,
   trackCharlesSettingsImportStarted,
+  trackResourceOverrideSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import { ImportFromModheaderModal } from "../ImporterComponents/ModheaderImporter/ImportFromModheaderModal";
 import emptyInbox from "./empty-inbox.svg";
@@ -31,7 +33,6 @@ import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOut
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { HiOutlineTemplate } from "@react-icons/all-files/hi/HiOutlineTemplate";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
-import { RuleType } from "types";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { RuleSelectionListDrawer } from "../RuleSelectionListDrawer/RuleSelectionListDrawer";
 import { trackAskAIClicked } from "features/requestBot";
@@ -42,6 +43,8 @@ import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
 import "./gettingStarted.scss";
+import { RuleType } from "@requestly/shared/types/entities/rules";
+import { ImportFromResourceOverrideModal } from "../ImporterComponents/ResourceOverrideImporter";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -58,6 +61,7 @@ export const GettingStarted: React.FC = () => {
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
   const [isImportModheaderRulesModalActive, setIsImportModheaderRulesModalActive] = useState(false);
+  const [isImportResourceOverrideRulesModalActive, setIsImportResourceOverrideRulesModalActive] = useState(false);
   const isRedirectFromCreateRulesRoute = useIsRedirectFromCreateRulesRoute();
   const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(isRedirectFromCreateRulesRoute || false);
 
@@ -80,6 +84,9 @@ export const GettingStarted: React.FC = () => {
   };
   const toggleImportModheaderRulesModal = () => {
     setIsImportModheaderRulesModalActive((prev) => !prev);
+  };
+  const toggleImportResourceOverrideRulesModal = () => {
+    setIsImportResourceOverrideRulesModalActive((prev) => !prev);
   };
 
   const handleNewRuleClick = (source: string) => {
@@ -248,9 +255,21 @@ export const GettingStarted: React.FC = () => {
               </Button>
             </AuthConfirmationPopover>
 
+            <Button
+              type="link"
+              className="link-btn"
+              icon={<HiOutlineTemplate className="anticon" />}
+              onClick={() => {
+                trackRulesEmptyStateClicked("templates");
+                navigate(PATHS.RULES.TEMPLATES.ABSOLUTE);
+              }}
+            >
+              Start with templates
+            </Button>
+
             {/* TODO: make desktop only */}
             {isCharlesImportFeatureFlagOn ? (
-              <>
+              <div className="third-party-imports">
                 <Button
                   type="link"
                   className="link-btn"
@@ -276,20 +295,28 @@ export const GettingStarted: React.FC = () => {
                 >
                   Import from ModHeader
                 </Button>
-              </>
+                <Button
+                  type="link"
+                  className="link-btn"
+                  icon={
+                    <img
+                      src={ResourceOverrideIcon}
+                      width={11}
+                      height={10}
+                      alt="Resource override icon"
+                      className="anticon"
+                    />
+                  }
+                  onClick={() => {
+                    toggleImportResourceOverrideRulesModal();
+                    trackRulesEmptyStateClicked("import_resource_override");
+                    trackResourceOverrideSettingsImportStarted(SOURCE.GETTING_STARTED);
+                  }}
+                >
+                  Import from Resource Override
+                </Button>
+              </div>
             ) : null}
-
-            <Button
-              type="link"
-              className="link-btn templates-btn"
-              icon={<HiOutlineTemplate className="anticon" />}
-              onClick={() => {
-                trackRulesEmptyStateClicked("templates");
-                navigate(PATHS.RULES.TEMPLATES.ABSOLUTE);
-              }}
-            >
-              Start with templates
-            </Button>
           </div>
 
           <div className="ask-ai-container">
@@ -326,6 +353,13 @@ export const GettingStarted: React.FC = () => {
         <ImportFromModheaderModal
           isOpen={isImportModheaderRulesModalActive}
           toggle={toggleImportModheaderRulesModal}
+          triggeredBy={SOURCE.GETTING_STARTED}
+        />
+      ) : null}
+      {isImportResourceOverrideRulesModalActive ? (
+        <ImportFromResourceOverrideModal
+          isOpen={isImportResourceOverrideRulesModalActive}
+          toggle={toggleImportResourceOverrideRulesModal}
           triggeredBy={SOURCE.GETTING_STARTED}
         />
       ) : null}

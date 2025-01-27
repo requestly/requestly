@@ -90,6 +90,9 @@
 body {
   margin: 0;
   background-color: var(--background);
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
 }
 
 ul,

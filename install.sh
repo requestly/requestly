@@ -11,7 +11,6 @@ echo -e "\n***** Installing and Building @requestly/shared module *****"
 cd ./shared
 rm -rf node_modules
 sh ./install.sh
-sh ./build.sh
 cd ..
 
 echo -e "\n***** Installing React app dependencies *****"

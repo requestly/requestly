@@ -7,7 +7,7 @@ import { getAppMode } from "store/selectors";
 import { isEqual } from "lodash";
 import { toast } from "utils/Toast";
 import { PageSourceRow } from "./components/PageSourceRow";
-import { SessionRecordingPageSource, SourceKey, SourceOperator } from "types";
+import { SessionRecordingPageSource } from "types";
 import { AutoRecordingMode, SessionRecordingConfig } from "features/sessionBook";
 import { generateObjectId } from "utils/FormattingHelper";
 import { isExtensionInstalled } from "actions/ExtensionActions";
@@ -21,18 +21,19 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./sessionsSettings.css";
+import { RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 
 const emptyPageSourceData: SessionRecordingPageSource = {
   value: "",
-  key: SourceKey.URL,
-  operator: SourceOperator.CONTAINS,
+  key: RuleSourceKey.URL,
+  operator: RuleSourceOperator.CONTAINS,
   isActive: true,
 };
 
 const allPagesSourceData = {
   value: "*",
-  key: SourceKey.URL,
-  operator: SourceOperator.WILDCARD_MATCHES,
+  key: RuleSourceKey.URL,
+  operator: RuleSourceOperator.WILDCARD_MATCHES,
 };
 
 export const defaultSessionRecordingConfig: SessionRecordingConfig = {
@@ -54,9 +55,9 @@ export const SessionsSettings: React.FC = () => {
   const getPageSourceLabel = useCallback((source: SessionRecordingPageSource): string => {
     const upperCasedSourceKey = source.key.toUpperCase();
 
-    if (source.operator === SourceOperator.MATCHES) {
+    if (source.operator === RuleSourceOperator.MATCHES) {
       return `${upperCasedSourceKey} matches regex: ${source.value}`;
-    } else if (source.operator === SourceOperator.WILDCARD_MATCHES) {
+    } else if (source.operator === RuleSourceOperator.WILDCARD_MATCHES) {
       return `${upperCasedSourceKey} matches wildcard: ${source.value}`;
     } else {
       return `${upperCasedSourceKey} ${source.operator.toLowerCase()}: ${source.value}`;

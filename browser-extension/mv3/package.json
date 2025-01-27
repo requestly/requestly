@@ -25,6 +25,7 @@
     "build:common": "cd ../common && npm run build && cd ../mv3",
     "prebuild": "npm ls",
     "watch": "rm -rf dist && rollup -cw",
+    "start:firefox": "web-ext run -s dist",
     "test": "playwright test",
     "pretest": "npm run build",
     "release": "sh scripts/release-extension.sh",
@@ -43,6 +44,7 @@
     "rollup": "^2.79.1",
     "rollup-plugin-copy": "^3.4.0",
     "tslib": "^2.4.0",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "web-ext": "^8.3.0"
   }
 }

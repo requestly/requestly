@@ -46,7 +46,7 @@ export const handleInitiatorDomainFunction = async (
     ruleAction.requestHeaders = Object.entries(headerKeyValueMap.Request).map(([header, value]) => ({
       header,
       value,
-      operation: chrome.declarativeNetRequest.HeaderOperation.SET,
+      operation: "set" as chrome.declarativeNetRequest.HeaderOperation.SET,
     }));
   }
 
@@ -54,7 +54,7 @@ export const handleInitiatorDomainFunction = async (
     ruleAction.responseHeaders = Object.entries(headerKeyValueMap.Response).map(([header, value]) => ({
       header,
       value,
-      operation: chrome.declarativeNetRequest.HeaderOperation.SET,
+      operation: "set" as chrome.declarativeNetRequest.HeaderOperation.SET,
     }));
   }
 
@@ -68,11 +68,11 @@ export const handleInitiatorDomainFunction = async (
     {
       action: {
         ...ruleAction,
-        type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+        type: "modifyHeaders" as chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
       },
       condition: {
         urlFilter: `|${requestDetails.url}|`,
-        resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
+        resourceTypes: ["xmlhttprequest" as chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
         tabIds: [tabId],
         requestMethods:
           matchedPair?.source?.filters?.[0]?.requestMethod?.map(
