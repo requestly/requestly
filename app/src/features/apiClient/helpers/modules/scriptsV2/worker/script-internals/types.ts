@@ -7,6 +7,10 @@ export type LocalScopeResponse = RQAPI.Response & {
   responseTime: number;
 };
 
+export type ExecutionArtifacts = {
+  testResults: TestResult[];
+};
+
 export interface TestFunction {
   (testName: string, testFn: () => void): void;
   skip: (testName: string) => void;

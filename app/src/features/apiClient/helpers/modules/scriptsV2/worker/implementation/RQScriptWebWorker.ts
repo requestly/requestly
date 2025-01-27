@@ -30,15 +30,14 @@ export class RQScriptWebWorker implements RQWorker {
 
   async work(workload: ScriptWorkload): Promise<WorkResult> {
     try {
-      await this.scriptWorker.executeScript(
+      const artifacts = await this.scriptWorker.executeScript(
         workload.script,
         workload.initialState,
         proxy(workload.postScriptExecutionCallback)
       );
-      const testExecutionResults = await this.scriptWorker.getTestExecutionResults();
       return {
         type: WorkResultType.SUCCESS,
-        testExecutionResults,
+        testExecutionResults: artifacts.testResults,
       };
     } catch (error) {
       if (error instanceof ScriptExecutionError) {

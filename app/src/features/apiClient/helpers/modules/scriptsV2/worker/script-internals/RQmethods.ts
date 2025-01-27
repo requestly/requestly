@@ -3,6 +3,7 @@ import { LocalScopeResponse, SandboxAPI, TestFunction, TestResult } from "./type
 import { VariableScope } from "./variableScope";
 import { RQAPI } from "features/apiClient/types";
 import { expect } from "chai";
+import { Options as AjvOptions } from "ajv";
 import { TestExecutor } from "./testExecutor";
 import { AssertionHandler } from "./assertionHandler";
 
@@ -98,22 +99,21 @@ export class RQ implements SandboxAPI {
     });
 
     if (this.response) {
-      const self = this;
       Object.setPrototypeOf(this.response, {
-        toJSON() {
+        toJSON: () => {
           return {
-            ...this,
-            body: self.jsonResponseBody,
+            ...this.response,
+            body: this.jsonResponseBody,
           };
         },
-        json: () => self.jsonResponseBody,
+        json: () => this.jsonResponseBody,
         text: () => this.response.body,
         to: {
-          be: self.createBeAssertions(true),
-          have: self.createHaveAssertions(true),
+          be: this.createBeAssertions(true),
+          have: this.createHaveAssertions(true),
           not: {
-            be: self.createBeAssertions(false),
-            have: self.createHaveAssertions(false),
+            be: this.createBeAssertions(false),
+            have: this.createHaveAssertions(false),
           },
         },
       });
@@ -121,8 +121,6 @@ export class RQ implements SandboxAPI {
   }
 
   private createBeAssertions(isEqualityCheck: boolean) {
-    const checkStatus = this.assertionHandler.checkStatus.bind(this);
-
     const statusCodes = {
       accepted: 202,
       badRequest: 400,
@@ -145,7 +143,7 @@ export class RQ implements SandboxAPI {
         (acc, [key, code]) => ({
           ...acc,
           [key]: {
-            get: () => checkStatus(code, isEqualityCheck),
+            get: () => this.assertionHandler.checkStatus(code, isEqualityCheck),
             enumerable: true,
           },
         }),
@@ -155,14 +153,14 @@ export class RQ implements SandboxAPI {
   }
 
   private createHaveAssertions(isEqualityCheck: boolean) {
-    const haveBody = this.assertionHandler.haveBody.bind(this);
-    const haveStatus = this.assertionHandler.haveStatus.bind(this);
-    const haveHeader = this.assertionHandler.haveHeader.bind(this);
-
     return {
-      body: (expectedValue: string) => haveBody(expectedValue, isEqualityCheck),
-      status: (expectedValue: number | string) => haveStatus(expectedValue, isEqualityCheck),
-      header: (expectedValue: string) => haveHeader(expectedValue, isEqualityCheck),
+      body: (expectedValue: string) => this.assertionHandler.haveBody(expectedValue, isEqualityCheck),
+      status: (expectedValue: number | string) => this.assertionHandler.haveStatus(expectedValue, isEqualityCheck),
+      header: (expectedValue: string) => this.assertionHandler.haveHeader(expectedValue, isEqualityCheck),
+      jsonSchema: (schema: string, ajvOptions: AjvOptions) =>
+        this.assertionHandler.haveJsonSchema(schema, isEqualityCheck, ajvOptions),
+      jsonBody: (expectedValue: string | object, value?: any) =>
+        this.assertionHandler.haveJsonBody(expectedValue, isEqualityCheck, value),
     };
   }
 }

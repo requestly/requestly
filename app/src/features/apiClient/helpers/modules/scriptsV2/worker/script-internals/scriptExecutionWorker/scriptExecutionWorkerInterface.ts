@@ -1,7 +1,6 @@
 import { ScriptWorkloadCallback } from "../../../workloadManager/workLoadTypes";
-import { TestResult } from "../types";
+import { ExecutionArtifacts } from "../types";
 
 export interface ScriptExecutionWorkerInterface {
-  executeScript(script: string, initialState: any, callback: ScriptWorkloadCallback): Promise<void>;
-  getTestExecutionResults(): Promise<TestResult[]>;
+  executeScript(script: string, initialState: any, callback: ScriptWorkloadCallback): Promise<ExecutionArtifacts>;
 }

@@ -31,13 +31,12 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
     }
     try {
       await this.syncLocalDump(callback);
+      return {
+        testResults: this.testResults,
+      };
     } catch (error) {
       throw new ScriptPendingWorkFlushingError(error);
     }
-  }
-
-  async getTestExecutionResults() {
-    return this.testResults;
   }
 
   private async syncLocalDump(callback: ScriptWorkloadCallback) {
