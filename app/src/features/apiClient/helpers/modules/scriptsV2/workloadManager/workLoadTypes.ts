@@ -77,7 +77,7 @@ export class ScriptExecutionError extends Error {
 }
 
 export class ScriptPendingWorkFlushingError extends Error {
-  static name = "ScriptExecutionError";
+  static name = "ScriptPendingWorkFlushingError";
   constructor(error: Error) {
     super(error.message);
     this.name = ScriptPendingWorkFlushingError.name;

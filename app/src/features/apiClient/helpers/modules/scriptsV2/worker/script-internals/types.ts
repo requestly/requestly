@@ -1,11 +1,64 @@
 import { VariableValueType } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
+import { Options as AjvOptions } from "ajv";
 
-export type LocalScopeResponse = RQAPI.Response & {
-  code: number;
-  status: string;
-  responseTime: number;
+interface StatusAssertions {
+  accepted: void;
+  badRequest: void;
+  clientError: void;
+  error: void;
+  forbidden: void;
+  info: void;
+  notFound: void;
+  ok: void;
+  rateLimited: void;
+  redirection: void;
+  serverError: void;
+  success: void;
+  unauthorized: void;
+}
+
+export type LocalScopeRequest = RQAPI.Request & {
+  toJSON: () => {
+    method: string;
+    url: string;
+    body: object;
+  };
 };
+
+export type LocalScopeResponse =
+  | (RQAPI.Response & {
+      code: number;
+      status: string;
+      responseTime: number;
+      toJSON: () => {
+        body: object;
+        [key: string]: any;
+      };
+      json: () => object;
+      text: () => string;
+      to: {
+        be: StatusAssertions;
+        have: {
+          body: (expectedValue: string) => void;
+          status: (expectedValue: number | string) => void;
+          header: (expectedValue: string) => void;
+          jsonSchema: (schema: any, ajvOptions?: AjvOptions) => void;
+          jsonBody: (path?: string, value?: any) => void;
+        };
+        not: {
+          be: StatusAssertions;
+          have: {
+            body: (expectedValue: string) => void;
+            status: (expectedValue: number | string) => void;
+            header: (expectedValue: string) => void;
+            jsonSchema: (schema: any, ajvOptions?: AjvOptions) => void;
+            jsonBody: (path?: string, value?: any) => void;
+          };
+        };
+      };
+    })
+  | undefined;
 
 export type ExecutionArtifacts = {
   testResults: TestResult[];
@@ -17,8 +70,8 @@ export interface TestFunction {
 }
 
 export interface SandboxAPI {
-  request: RQAPI.Request;
-  response: RQAPI.Response;
+  request: LocalScopeRequest;
+  response: LocalScopeResponse;
   environment: {
     set(key: string, value: VariableValueType): void;
     get(key: string): any;
@@ -35,9 +88,9 @@ export interface SandboxAPI {
     unset(key: string): void;
   };
   test: TestFunction;
+  expect: Chai.ExpectStatic;
   cookies: any;
   execution: any;
-  expect: any;
   info: any;
   iterationData: any;
   require: any;

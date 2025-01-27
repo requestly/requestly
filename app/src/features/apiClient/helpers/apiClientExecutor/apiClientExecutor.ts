@@ -105,14 +105,14 @@ export class ApiClientExecutor {
     this.internalFunctions = internalFunctions;
   }
 
-  async executePreRequestScript(callback: (state: any) => Promise<void> = () => Promise.resolve()) {
+  async executePreRequestScript(callback: (state: any) => Promise<void>) {
     return this.workloadManager.execute(
       new PreRequestScriptWorkload(this.entryDetails.scripts.preRequest, this.buildPreRequestSnapshot(), callback),
       this.abortController.signal
     );
   }
 
-  async executePostResponseScript(callback: (state: any) => Promise<void> = () => Promise.resolve()) {
+  async executePostResponseScript(callback: (state: any) => Promise<void>) {
     return this.workloadManager.execute(
       new PostResponseScriptWorkload(
         this.entryDetails.scripts.postResponse,
@@ -125,11 +125,18 @@ export class ApiClientExecutor {
 
   async execute() {
     this.prepareRequest();
+
+    trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
     const preRequestScriptResult = await this.executePreRequestScript(
       this.internalFunctions.postScriptExecutionCallback
     );
 
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
+      trackScriptExecutionFailed(
+        RQAPI.ScriptType.PRE_REQUEST,
+        preRequestScriptResult.error.type,
+        preRequestScriptResult.error.message
+      );
       return {
         ...this.entryDetails,
         error: {
@@ -159,13 +166,10 @@ export class ApiClientExecutor {
       };
     }
 
+    trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
     const responseScriptResult = await this.executePostResponseScript(
       this.internalFunctions.postScriptExecutionCallback
     );
-
-    if (responseScriptResult.type === WorkResultType.ERROR) {
-      trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
-    }
 
     if (responseScriptResult.type === WorkResultType.SUCCESS) {
       trackScriptExecutionCompleted(RQAPI.ScriptType.POST_RESPONSE);
@@ -198,7 +202,7 @@ export class ApiClientExecutor {
   }
 
   async rerun() {
-    const preRequestScriptResult = await this.executePreRequestScript();
+    const preRequestScriptResult = await this.executePreRequestScript(async () => {});
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
       return {
         testResults: [] as TestResult[],
@@ -206,7 +210,7 @@ export class ApiClientExecutor {
       };
     }
 
-    const responseScriptResult = await this.executePostResponseScript();
+    const responseScriptResult = await this.executePostResponseScript(async () => {});
 
     if (responseScriptResult.type === WorkResultType.ERROR) {
       return {
