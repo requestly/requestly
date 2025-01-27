@@ -2,6 +2,18 @@ import { LocalScopeResponse } from "./types";
 import { verify } from "./utils";
 import Ajv, { Options as AjvOptions } from "ajv";
 
+interface HaveJsonBodyType {
+  (): void;
+  (expected: any, checkEquality: boolean): void;
+  (expected: string, checkEquality: boolean): void;
+  (expected: any, checkEquality: boolean, value: any): void;
+}
+
+interface HaveJsonSchemaType {
+  (expected: any, checkEquality: boolean): void;
+  (expected: any, checkEquality: boolean, config: AjvOptions): void;
+}
+
 export class AssertionHandler {
   constructor(private response: LocalScopeResponse) {}
 
@@ -71,11 +83,65 @@ export class AssertionHandler {
     }
   };
 
-  haveJsonSchema(expected: any, checkEquality: true): void;
-  // eslint-disable-next-line no-dupe-class-members
-  haveJsonSchema(expected: any, checkEquality: true, config?: AjvOptions): void;
-  // eslint-disable-next-line no-dupe-class-members
-  haveJsonSchema(expected: any, checkEquality: boolean, config?: AjvOptions): void {
+  haveJsonBody: HaveJsonBodyType = (expected?: any, checkEquality?: boolean, value?: any): void => {
+    let parsedBody: any;
+    try {
+      parsedBody = typeof this.response.body === "string" ? JSON.parse(this.response.body) : this.response.body;
+    } catch (e) {
+      throw new AssertionError("Response body is not valid JSON");
+    }
+
+    if (expected === undefined) {
+      return;
+    }
+    if (typeof expected === "object") {
+      let expectedJsonString;
+      try {
+        expectedJsonString = JSON.stringify(expected);
+      } catch (e) {
+        throw new AssertionError("Expected response body is not a valid JSON");
+      }
+      try {
+        verify(expectedJsonString, this.response.body, checkEquality);
+      } catch (e) {
+        this.throwAssertionError(expectedJsonString, this.response.body, checkEquality, "response body");
+      }
+    }
+
+    if (typeof expected === "string") {
+      const pathParts = expected.split(".");
+      let current = parsedBody;
+
+      for (const part of pathParts) {
+        if (current === undefined || current === null || !(part in current)) {
+          if (checkEquality) {
+            throw new AssertionError(`Expected property '${expected}' to be found in response body`);
+          }
+        }
+        try {
+          current = current[part];
+        } catch (e) {
+          if (!checkEquality) {
+            throw new AssertionError(`Expected property '${expected}' to be not found in response body`);
+          }
+        }
+      }
+
+      if (!checkEquality && value === undefined && current !== undefined) {
+        throw new AssertionError(`Expected property '${expected}' to be not found in response body`);
+      }
+
+      if (value !== undefined) {
+        try {
+          verify(current, value, checkEquality);
+        } catch (e) {
+          this.throwAssertionError(JSON.stringify(value), current, checkEquality, `property '${expected}'`);
+        }
+      }
+    }
+  };
+
+  haveJsonSchema: HaveJsonSchemaType = (expected: any, checkEquality: boolean, config?: AjvOptions): void => {
     const ajv = new Ajv(config || { allErrors: true });
     const validate = ajv.compile(expected);
     let parsedBody;
@@ -90,14 +156,9 @@ export class AssertionHandler {
     try {
       verify(isValid, true, checkEquality);
     } catch {
-      const errors = validate.errors?.map((err) => `${err.schemaPath} ${err.message}`).join(", ");
-      throw new AssertionError(
-        `Expected response body ${checkEquality ? "to match" : "to not match"} JSON schema${
-          errors ? `: ${errors}` : ""
-        }`
-      );
+      throw new AssertionError(`Expected response body ${checkEquality ? "to match" : "to not match"} JSON schema`);
     }
-  }
+  };
 }
 
 class AssertionError extends Error {

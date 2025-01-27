@@ -156,16 +156,18 @@ export class RQ implements SandboxAPI {
   }
 
   private createHaveAssertions(isEqualityCheck: boolean) {
-    const haveBody = this.assertionHandler.haveBody.bind(this);
-    const haveStatus = this.assertionHandler.haveStatus.bind(this);
-    const haveHeader = this.assertionHandler.haveHeader.bind(this);
-    const haveJsonSchema = this.assertionHandler.haveJsonSchema.bind(this);
+    const haveBody = this.assertionHandler.haveBody;
+    const haveStatus = this.assertionHandler.haveStatus;
+    const haveHeader = this.assertionHandler.haveHeader;
+    const haveJsonSchema = this.assertionHandler.haveJsonSchema;
+    const haveJsonBody = this.assertionHandler.haveJsonBody;
 
     return {
       body: (expectedValue: string) => haveBody(expectedValue, isEqualityCheck),
       status: (expectedValue: number | string) => haveStatus(expectedValue, isEqualityCheck),
       header: (expectedValue: string) => haveHeader(expectedValue, isEqualityCheck),
       jsonSchema: (schema: string, ajvOptions: AjvOptions) => haveJsonSchema(schema, isEqualityCheck, ajvOptions),
+      jsonBody: (expectedValue: string | object, value?: any) => haveJsonBody(expectedValue, isEqualityCheck, value),
     };
   }
 }
