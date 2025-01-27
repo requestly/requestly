@@ -214,7 +214,7 @@ export const AppNotificationBanner = () => {
         }
         case BANNER_ID.BILLING_TEAM_PLAN_REMINDER: {
           const billingTeam = billingTeams?.find((team) => team.id === newBanners[0]?.billingId);
-          if (billingTeam) {
+          if (billingTeam && new Date(user.details?.planDetails?.subscription?.endDate).getTime() <= 1738434600000) {
             return true;
           }
           return false;
@@ -272,6 +272,7 @@ export const AppNotificationBanner = () => {
       dispatch,
       billingTeams,
       newBanners,
+      user?.details?.planDetails?.subscription?.endDate,
     ]
   );
 
