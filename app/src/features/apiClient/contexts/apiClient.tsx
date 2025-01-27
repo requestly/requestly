@@ -16,11 +16,16 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { trackCreateEnvironmentClicked } from "../screens/environment/analytics";
 import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { clearExpandedRecordIdsFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
+import {
+  clearExpandedRecordIdsFromSession,
+  createBlankApiRecord,
+  handleImportSampleCollections,
+} from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workload-manager/APIClientWorkloadManager";
 import { useSearchParams } from "react-router-dom";
 import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
+import { sessionStorage } from "utils/sessionStorage";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -136,27 +141,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   // TODO: Create modal context
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (!uid) {
-      return;
-    }
-
-    setIsLoadingApiClientRecords(true);
-    getApiRecords(uid, teamId)
-      .then((result) => {
-        if (result.success) {
-          setApiClientRecords(result.data);
-        }
-      })
-      .catch((error) => {
-        setApiClientRecords([]);
-        Logger.error("Error loading api records!", error);
-      })
-      .finally(() => {
-        setIsLoadingApiClientRecords(false);
-      });
-  }, [uid, teamId]);
 
   const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
     setApiClientRecords((prev) => {
@@ -323,6 +307,38 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   );
 
   const workloadManager = useMemo(() => new APIClientWorkloadManager(), []);
+  useEffect(() => {
+    if (!uid) {
+      return;
+    }
+
+    const fetchApiRecords = async () => {
+      setIsLoadingApiClientRecords(true);
+      try {
+        const result = await getApiRecords(uid, teamId);
+        if (result.success) {
+          const importExampleCollections = sessionStorage.getItem("exampleCollections", false);
+          console.log(importExampleCollections);
+          if (!importExampleCollections) {
+            const importedRecords = await handleImportSampleCollections(uid, teamId, result.data);
+            console.log(importedRecords);
+            setApiClientRecords(importedRecords);
+            sessionStorage.setItem("exampleCollections", true);
+          } else {
+            setApiClientRecords(result.data);
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        setApiClientRecords([]);
+        Logger.error("Error loading api records!", error);
+      } finally {
+        setIsLoadingApiClientRecords(false);
+      }
+    };
+
+    fetchApiRecords();
+  }, [uid, teamId]);
 
   const value = {
     apiClientRecords,

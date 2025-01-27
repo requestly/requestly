@@ -64,7 +64,9 @@ const processScripts = (item: any) => {
   };
 
   const migratePostmanScripts = (postmanScript: string) => {
-    return postmanScript.replace(/pm\./g, "rq."); // Replace all occurrences of 'pm.' with 'rq.'
+    if (postmanScript) {
+      return postmanScript?.replace(/pm\./g, "rq."); // Replace all occurrences of 'pm.' with 'rq.'
+    }
   };
 
   if (!item.event?.length) {
@@ -73,9 +75,9 @@ const processScripts = (item: any) => {
 
   item.event.forEach((event: any) => {
     if (event.listen === "prerequest") {
-      scripts.preRequest = migratePostmanScripts(event.script.exec.join("\n"));
+      scripts.preRequest = migratePostmanScripts(event.script?.exec?.join("\n"));
     } else if (event.listen === "test") {
-      scripts.postResponse = migratePostmanScripts(event.script.exec.join("\n"));
+      scripts.postResponse = migratePostmanScripts(event.script?.exec?.join("\n"));
     }
   });
 
