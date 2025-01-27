@@ -40,7 +40,7 @@ export class RQScriptWebWorker implements RQWorker {
         testExecutionResults: artifacts.testResults,
       };
     } catch (error) {
-      if (error instanceof ScriptExecutionError) {
+      if (error.name === ScriptExecutionError.name) {
         return {
           type: WorkResultType.ERROR,
           error: {
