@@ -502,7 +502,6 @@ export const handleImportSampleCollections = async (uid: string, teamId: string,
       savedRecords.push(newCollection.data);
       return newCollection.data.id;
     } catch (error) {
-      console.log(error, "error");
       Logger.error("Error importing sample collection:", error);
       return null;
     }
@@ -520,7 +519,6 @@ export const handleImportSampleCollections = async (uid: string, teamId: string,
       const newApi = await upsertApiRecord(uid, updatedApi, teamId, updatedApi.id);
       savedRecords.push(newApi.data);
     } catch (error) {
-      console.log(error, "error");
       Logger.error("Error importing API:", error);
     }
   };

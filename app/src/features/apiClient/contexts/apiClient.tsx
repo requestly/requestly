@@ -318,10 +318,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         const result = await getApiRecords(uid, teamId);
         if (result.success) {
           const importExampleCollections = sessionStorage.getItem("exampleCollections", false);
-          console.log(importExampleCollections);
+
           if (!importExampleCollections) {
             const importedRecords = await handleImportSampleCollections(uid, teamId, result.data);
-            console.log(importedRecords);
+
             setApiClientRecords(importedRecords);
             sessionStorage.setItem("exampleCollections", true);
           } else {
@@ -329,7 +329,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           }
         }
       } catch (error) {
-        console.log(error);
         setApiClientRecords([]);
         Logger.error("Error loading api records!", error);
       } finally {
