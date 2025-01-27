@@ -60,7 +60,7 @@ export namespace Bruno {
     | BodyType<"formUrlEncoded", Param[]>
     | BodyType<"multipartForm", Param[]>;
 
-  export type AuthMode = "none" | "basic" | "bearer" | "digest";
+  export type AuthMode = "none" | "basic" | "bearer";
 
   type AuthType<T extends AuthMode, V> = {
     mode: T;
@@ -69,7 +69,6 @@ export namespace Bruno {
   export type Auth =
     | AuthType<"basic", { username: string; password: string }>
     | AuthType<"bearer", { token: string }>
-    | AuthType<"digest", { username: string; password: string }>
     | AuthType<"none", never>;
 
   export interface Variable extends FieldValue {
