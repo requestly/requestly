@@ -35,14 +35,6 @@ const processAuthorizationOptions = (auth?: Bruno.Auth, parentCollectionId?: str
           password: auth.basic?.password || "",
         },
       };
-    case "digest":
-      return {
-        currentAuthType: AUTHORIZATION_TYPES.BASIC_AUTH,
-        [AUTHORIZATION_TYPES.BASIC_AUTH]: {
-          username: auth.digest?.username || "",
-          password: auth.digest?.password || "",
-        },
-      };
     case "none":
       return { currentAuthType: AUTHORIZATION_TYPES.NO_AUTH };
     default:
@@ -105,7 +97,7 @@ const createApiRecord = (item: Bruno.Item, parentCollectionId: string): OmitDBFi
         body: requestBody,
         contentType,
       },
-      auth: processAuthorizationOptions(request.auth),
+      auth: processAuthorizationOptions(request.auth, parentCollectionId),
       scripts: processBrunoScripts(request),
     },
   };
@@ -147,7 +139,7 @@ const createCollectionRecord = (
     type: RQAPI.RecordType.COLLECTION,
     data: {
       variables,
-      auth: processAuthorizationOptions(auth),
+      auth: processAuthorizationOptions(auth, parentCollectionId),
     },
   };
 };
