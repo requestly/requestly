@@ -5,6 +5,7 @@ import { RQModal } from "lib/design-system/components";
 import { useCallback, useEffect, useState } from "react";
 import { apiRequestToHarRequestAdapter } from "../../../utils";
 import { Select, Typography } from "antd";
+import "./copyAsModal.scss";
 
 interface CopyAsModalProps {
   open: boolean;
@@ -47,7 +48,14 @@ const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
   }, [snippetTypeId, harRequest]);
 
   return (
-    <RQModal open={open} onCancel={onClose} destroyOnClose>
+    <RQModal
+      width={320}
+      open={open}
+      maskClosable={false}
+      destroyOnClose={true}
+      className="copy-as-modal"
+      onCancel={onClose}
+    >
       <Select onChange={(value) => setSnippetTypeId(value)} value={snippetTypeId}>
         {availableTargets().map((target) => {
           return target.clients.map((client) => {
@@ -57,11 +65,7 @@ const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
           });
         })}
       </Select>
-      <div className="rq-modal-content">
-        <Paragraph style={{ whiteSpace: "pre" }} copyable code>
-          {getSnippet()}
-        </Paragraph>
-      </div>
+      <div className="snippet-container">{getSnippet()}</div>
     </RQModal>
   );
 };
