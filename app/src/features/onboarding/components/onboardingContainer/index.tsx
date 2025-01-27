@@ -91,9 +91,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
               <img src={RQLogo} alt="requestly logo" style={{ width: "90px" }} />
             </Col>
 
-            {step === ONBOARDING_STEPS.PERSONA ||
-            disableSkip ||
-            (step === ONBOARDING_STEPS.AUTH && onboardingVariation === "variant3") ? null : (
+            {step === ONBOARDING_STEPS.PERSONA || disableSkip ? null : (
               <Col>
                 <RQButton type="default" className="onboarding-skip-button" onClick={handleSkip}>
                   Skip for now <MdOutlineArrowForward style={{ fontSize: "1rem" }} />
