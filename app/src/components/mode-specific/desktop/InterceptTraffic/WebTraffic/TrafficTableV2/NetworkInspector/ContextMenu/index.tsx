@@ -4,7 +4,6 @@ import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
 import { copyToClipBoard } from "../../../../../../../../utils/Misc";
 import { globalActions } from "store/slices/global/slice";
-import { RuleType } from "types";
 import { getIsTrafficTableTourCompleted } from "store/selectors";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import {
@@ -20,6 +19,7 @@ import { getLogResponseById } from "store/features/desktop-traffic-table/selecto
 import "./index.css";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 interface ContextMenuProps {
   log: any;
@@ -135,7 +135,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
     if (isFeatureCompatible(FEATURES.API_CLIENT)) {
       menuItems.splice(2, 0, {
         key: "replay_request",
-        label: <BetaBadge text="Edit and Replay" />,
+        label: "Edit and Replay",
         onClick: () => {
           trackTrafficTableDropdownClicked("replay_request");
           trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_DROPDOWN_CLICKED);

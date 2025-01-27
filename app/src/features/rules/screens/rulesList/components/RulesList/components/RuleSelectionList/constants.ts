@@ -1,6 +1,6 @@
 import React from "react";
-import { RuleType } from "types";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 enum RuleCategories {
   URL_REWRITES = "urlRewrites",

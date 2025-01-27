@@ -7,6 +7,18 @@ export const cleanupEndpoint = (endpoint: string) => {
   return cleanedEndpoint;
 };
 
+export const validateHeaders = (headers: { [key: string]: string }) => {
+  const ACCEPTED_CONTENT_TYPES = ["application/json", "text/plain"];
+  if (!Object.keys(headers).length) return null;
+
+  const contentType = headers["Content-Type"] || headers["content-type"];
+
+  if (contentType && !ACCEPTED_CONTENT_TYPES.includes(contentType)) {
+    return "Only application/json or text/plain are allowed as content-type";
+  }
+  return null;
+};
+
 export const validateEndpoint = (endpoint: string, messagePrefix = "Endpoint") => {
   if (!endpoint) {
     return `${messagePrefix} is required`;

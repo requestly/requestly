@@ -1,4 +1,3 @@
-import { RuleType } from "types";
 import RedirectRulePair from "./RedirectRulePair";
 import CancelRulePair from "./CancelRulePair";
 import ReplaceRulePair from "./ReplaceRulePair";
@@ -9,6 +8,7 @@ import ResponseRulePair from "./ResponseRulePair";
 import RequestRulePair from "./RequestRulePair";
 import UserAgentRulePair from "./UserAgentRulePair";
 import DelayRulePair from "./DelayRulePair";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 export const rulePairComponents = {
   [RuleType.REDIRECT]: RedirectRulePair,

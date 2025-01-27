@@ -6,7 +6,7 @@ import { StorageService } from "init";
 import { useDispatch } from "react-redux";
 import { isGroupsSanitizationPassed } from "components/features/rules/RulesIndexPage/actions";
 import { recordsActions } from "store/features/rules/slice";
-import { Group, RecordStatus, RecordType, Rule } from "features/rules/types/rules";
+import { Group, RecordStatus, RecordType, Rule } from "@requestly/shared/types/entities/rules";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";

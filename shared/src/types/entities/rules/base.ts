@@ -20,4 +20,11 @@ export interface BaseItem extends StorageEntity {
 
   isSample?: boolean;
   isReadOnly?: boolean;
+
+  /** Deprecated in SyncingV2 **/
+  createdBy?: string;
+  creationDate?: number;
+  currentOwner?: string;
+  lastModifiedBy?: string;
+  modificationDate?: number;
 }

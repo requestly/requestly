@@ -1,4 +1,4 @@
-import { StorageRecord } from "features/rules/types/rules";
+import { StorageRecord } from "@requestly/shared/types/entities/rules";
 
 export type RuleTableRecord = StorageRecord & {
   children?: StorageRecord[];
