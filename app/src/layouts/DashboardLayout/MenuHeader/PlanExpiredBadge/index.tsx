@@ -2,7 +2,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { getPlanNameFromId } from "utils/PremiumUtils";
-import { capitalize } from "lodash";
 import { Badge } from "antd";
 import { trackRenewNowClicked } from "modules/analytics/events/misc/monetizationExperiment";
 import "./index.scss";
