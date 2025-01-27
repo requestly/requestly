@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 import { BottomSheetPlacement } from "../types";
 import {
   trackBottomSheetToggled,
@@ -22,6 +22,10 @@ export const BottomSheetProvider: React.FC<{
 }> = ({ children, defaultPlacement, isSheetOpenByDefault = false }) => {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(isSheetOpenByDefault);
   const [sheetPlacement, setSheetPlacement] = useState(defaultPlacement);
+
+  useEffect(() => {
+    setSheetPlacement(defaultPlacement);
+  }, [defaultPlacement]);
 
   const toggleBottomSheet = (isOpen?: boolean) => {
     if (isOpen) {
