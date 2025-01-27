@@ -2,11 +2,19 @@ import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionA
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
 import { KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
-import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
+import {
+  CONTENT_TYPE_HEADER,
+  DEMO_API_URL,
+  EXAMPLE_COLLECTIONS,
+  SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY,
+} from "../../constants";
 import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
 import { forEach, isEmpty, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
+import Logger from "lib/logger";
+import { batchWrite } from "backend/utils";
+import { processRqImportData } from "./components/modals/importCollectionsModal/utils";
 
 export const makeRequest = async (
   appMode: string,
@@ -483,4 +491,40 @@ export const getRecordIdsToBeExpanded = (
   });
 
   return expandedKeysCopy;
+};
+
+export const handleImportSampleCollections = async (uid: string, teamId: string, savedRecords: RQAPI.Record[]) => {
+  const { apis, collections } = processRqImportData(EXAMPLE_COLLECTIONS, uid, true);
+
+  const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
+    try {
+      const newCollection = await upsertApiRecord(uid, collection, teamId, collection.id);
+      savedRecords.push(newCollection.data);
+      return newCollection.data.id;
+    } catch (error) {
+      console.log(error, "error");
+      Logger.error("Error importing sample collection:", error);
+      return null;
+    }
+  };
+
+  // Utility function to handle batch writes for collections
+  const handleApiWrites = async (api: RQAPI.ApiRecord) => {
+    const newCollectionId = collections.find((collection) => collection.id === api.collectionId)?.id;
+    if (!newCollectionId) {
+      throw new Error(`Failed to find new collection ID for API: ${api.name || api.id}`);
+    }
+
+    const updatedApi = { ...api, collectionId: newCollectionId };
+    try {
+      const newApi = await upsertApiRecord(uid, updatedApi, teamId, updatedApi.id);
+      savedRecords.push(newApi.data);
+    } catch (error) {
+      console.log(error, "error");
+      Logger.error("Error importing API:", error);
+    }
+  };
+
+  await Promise.all([batchWrite(25, collections, handleCollectionWrites), batchWrite(25, apis, handleApiWrites)]);
+  return savedRecords;
 };
