@@ -36,6 +36,7 @@ enum BANNER_ACTIONS {
   REQUEST_ACCESS = "request_access",
   REDIRECT_TO_ACCELERATOR_FORM = "redirect_to_accelerator_form",
   CONVERT_TO_ANNUAL_PLAN = "convert_to_annual_plan",
+  SEE_PLANS = "see_plans",
 }
 
 enum BANNER_ID {
@@ -44,6 +45,7 @@ enum BANNER_ID {
   REQUEST_TEAM_ACCESS = "request_team_access",
   BLACK_FRIDAY = "black_friday",
   CONVERT_TO_ANNUAL_PLAN = "convert_to_annual_plan",
+  BILLING_TEAM_PLAN_REMINDER = "billing_team_plan_reminder",
 }
 
 interface Banner {
@@ -66,9 +68,14 @@ export const AppNotificationBanner = () => {
   const banners = useFeatureValue("app_banner", []);
   const firebaseFunction = getFunctions();
 
-  const newBanners = banners.filter((banner: Banner) => banner.createdTs > (lastAppBannerDismissTs || 0));
+  const newBanners = useMemo(
+    () => banners.filter((banner: Banner) => banner.createdTs > (lastAppBannerDismissTs || 0)),
+    [banners, lastAppBannerDismissTs]
+  );
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [isRequestAccessModalOpen, setIsRequestAccessModalOpen] = useState(false);
+
+  const BILLING_TEAM_PLAN_REMINDER_END_DATE = 1738434600000;
 
   const bannerActionButtons = useMemo(() => {
     return {
@@ -105,6 +112,13 @@ export const AppNotificationBanner = () => {
         type: "primary",
         onClick: () => {
           redirectToUrl(LINKS.ACCELERATOR_PROGRAM_FORM_LINK, true);
+        },
+      },
+      [BANNER_ACTIONS.SEE_PLANS]: {
+        label: "See plans",
+        type: "primary",
+        onClick: () => {
+          dispatch(globalActions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
         },
       },
       [BANNER_ACTIONS.CONVERT_TO_ANNUAL_PLAN]: {
@@ -200,6 +214,16 @@ export const AppNotificationBanner = () => {
             return true;
           } else return false;
         }
+        case BANNER_ID.BILLING_TEAM_PLAN_REMINDER: {
+          const billingTeam = billingTeams?.find((team) => team.id === newBanners[0]?.billingId);
+          if (
+            billingTeam &&
+            new Date(user.details?.planDetails?.subscription?.endDate).getTime() <= BILLING_TEAM_PLAN_REMINDER_END_DATE
+          ) {
+            return true;
+          }
+          return false;
+        }
         case BANNER_ID.BLACK_FRIDAY: {
           if (!user?.details?.isPremium) {
             dispatch(globalActions.updateIsAppBannerVisible(true));
@@ -252,6 +276,8 @@ export const AppNotificationBanner = () => {
       user?.loggedIn,
       dispatch,
       billingTeams,
+      newBanners,
+      user?.details?.planDetails?.subscription?.endDate,
     ]
   );
 
