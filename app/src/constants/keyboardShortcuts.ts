@@ -7,16 +7,12 @@ export const KEY_ICONS: Record<string, string> = {
   meta: "⌘",
 };
 
-export const KEYBOARD_SHORTCUTS: Record<
-  Feature,
-  Record<
-    string,
-    {
-      hotKey: string;
-      description: string;
-    }
-  >
-> = {
+export type KEYBOARD_SHORTCUT = {
+  hotKey: string;
+  description: string;
+};
+
+export const KEYBOARD_SHORTCUTS: Record<Feature, Record<string, KEYBOARD_SHORTCUT>> = {
   [Feature.RULES]: {
     EDITOR_BACK: {
       hotKey: "esc",
