@@ -1,9 +1,9 @@
-import { SourceKey, SourceOperator } from "./rules";
+import { RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 
 export type SessionRecordingPageSource = {
   id?: string;
-  key: SourceKey;
+  key: RuleSourceKey;
   value: string;
   isActive: boolean;
-  operator: SourceOperator;
+  operator: RuleSourceOperator;
 };

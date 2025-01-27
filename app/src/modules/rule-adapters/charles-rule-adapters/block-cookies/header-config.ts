@@ -1,4 +1,4 @@
-import { HeaderRuleActionType } from "types";
+import { HeaderRule } from "@requestly/shared/types/entities/rules";
 import { Header, HeaderValue } from "../types";
 
 export const headersConfig = {
@@ -6,7 +6,7 @@ export const headersConfig = {
     {
       header: Header.COOKIE,
       value: HeaderValue.UNKNOWN,
-      type: HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
     },
   ],
 
@@ -14,7 +14,7 @@ export const headersConfig = {
     {
       header: Header.SET_COOKIE,
       value: HeaderValue.UNKNOWN,
-      type: HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
     },
   ],
 };

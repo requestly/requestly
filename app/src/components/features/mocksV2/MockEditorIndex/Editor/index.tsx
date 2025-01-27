@@ -8,7 +8,7 @@ import { MockEditorHeader } from "./Header";
 import { Tabs } from "antd";
 import APP_CONSTANTS from "config/constants";
 import React, { ReactNode, useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import { FileType, MockType, RQMockCollection } from "../../types";
@@ -16,7 +16,7 @@ import type { TabsProps } from "antd";
 import { generateFinalUrl } from "../../utils";
 import { requestMethodDropdownOptions } from "../constants";
 import { MockEditorDataSchema, RequestMethod, ValidationErrors } from "../types";
-import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateStatusCode } from "../utils";
+import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateHeaders, validateStatusCode } from "../utils";
 import "./index.css";
 import { trackMockEditorOpened, trackTestMockClicked } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -28,8 +28,10 @@ import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import MockLogs from "./BottomSheet/MockLogs";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
+// @ts-expect-error growthbook-react does not provide types
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { ExportMocksModalWrapper } from "features/mocks/modals";
+import { globalActions } from "store/slices/global/slice";
 
 interface Props {
   isNew?: boolean;
@@ -56,6 +58,7 @@ const MockEditor: React.FC<Props> = ({
   onClose = () => {},
   mockType,
 }) => {
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const username = user?.details?.username;
 
@@ -82,6 +85,7 @@ const MockEditor: React.FC<Props> = ({
     name: null,
     statusCode: null,
     endpoint: null,
+    headers: null,
   });
 
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
@@ -115,14 +119,16 @@ const MockEditor: React.FC<Props> = ({
     setLatency(0);
   };
 
-  const createMockEditorData = () => {
+  const createMockEditorData = useCallback(() => {
     let headersDict: { [key: string]: string } = {};
     try {
       headersDict = JSON.parse(headersString);
     } catch (err) {
       // TODO: Improve this toast message
       toast.error("Error while parsing headers. Creating with empty headers");
+      setErrors((prev) => ({ ...prev, headers: "Error while parsing headers" }));
       headersDict = {};
+      return;
     }
 
     const cleanedEndpoint = cleanupEndpoint(endpoint);
@@ -146,48 +152,83 @@ const MockEditor: React.FC<Props> = ({
     };
 
     return tempMockData;
-  };
+  }, [
+    id,
+    type,
+    fileType,
+    name,
+    desc,
+    method,
+    latency,
+    endpoint,
+    statusCode,
+    contentType,
+    headersString,
+    body,
+    mockData.responseId,
+    password,
+  ]);
 
-  const validateMockEditorData = (data: MockEditorDataSchema): boolean => {
-    const updatedErrors: ValidationErrors = {};
-    let focusedInvalidFieldRef = null;
+  const validateMockEditorData = useCallback(
+    (data: MockEditorDataSchema): boolean => {
+      if (!data) return false;
+      const updatedErrors: ValidationErrors = {};
+      let focusedInvalidFieldRef = null;
 
-    if (!data.name) {
-      updatedErrors.name = `${mockType === MockType.FILE ? "File" : "Mock"} name is required`;
-    }
-    const statusCodeValidationError = validateStatusCode(data.statusCode.toString());
-    if (statusCodeValidationError) {
-      updatedErrors.statusCode = statusCodeValidationError;
-      if (!focusedInvalidFieldRef) focusedInvalidFieldRef = statusCodeRef;
-    }
+      if (!data.name) {
+        updatedErrors.name = `${mockType === MockType.FILE ? "File" : "Mock"} name is required`;
+      }
+      const statusCodeValidationError = validateStatusCode(data.statusCode.toString());
+      if (statusCodeValidationError) {
+        updatedErrors.statusCode = statusCodeValidationError;
+        if (!focusedInvalidFieldRef) focusedInvalidFieldRef = statusCodeRef;
+      }
 
-    // TODO: Add more validations here for special characters, //, etc.
-    const endpointValidationError = validateEndpoint(data.endpoint);
-    if (endpointValidationError) {
-      updatedErrors.endpoint = endpointValidationError;
-      if (!focusedInvalidFieldRef) focusedInvalidFieldRef = endpointRef;
-    }
+      const headersValidationError = validateHeaders(data.headers);
+      if (headersValidationError) {
+        updatedErrors.headers = headersValidationError;
+      }
 
-    // No errors found.
-    if (Object.keys(updatedErrors).length === 0) {
-      setErrors(updatedErrors);
-      return true;
-    }
-    focusedInvalidFieldRef?.current?.focus({ cursor: "end" });
-    setErrors(updatedErrors);
-    return false;
-  };
+      // TODO: Add more validations here for special characters, //, etc.
+      const endpointValidationError = validateEndpoint(data.endpoint);
+      if (endpointValidationError) {
+        updatedErrors.endpoint = endpointValidationError;
+        if (!focusedInvalidFieldRef) focusedInvalidFieldRef = endpointRef;
+      }
 
-  const handleOnSave = () => {
+      // No errors found.
+      if (Object.keys(updatedErrors).length === 0) {
+        setErrors((prev) => ({ ...prev, ...updatedErrors }));
+        return true;
+      }
+      focusedInvalidFieldRef?.current?.focus({ cursor: "end" });
+      setErrors((prev) => ({ ...prev, ...updatedErrors }));
+      return false;
+    },
+    [mockType]
+  );
+
+  const handleOnSave = useCallback(() => {
     const finalMockData = createMockEditorData();
     const success = validateMockEditorData(finalMockData);
 
     if (success) {
       onSave(finalMockData);
     } else {
-      toast.error("Please fix the highlighted fields");
+      if (errors.headers) {
+        // @ts-expect-error since the actions file is not typed
+        dispatch(
+          globalActions.triggerToastForEditor({
+            id: `headers-${id}`,
+            message: errors.headers,
+            type: "error",
+          })
+        );
+      } else {
+        toast.error("Please fix the highlighted fields");
+      }
     }
-  };
+  }, [onSave, errors, createMockEditorData, validateMockEditorData, id, dispatch]);
 
   const handleTest = useCallback(() => {
     setIsTestModalOpen(true);
@@ -332,6 +373,7 @@ const MockEditor: React.FC<Props> = ({
       <Row className="editor-row">
         <Col span={24}>
           <CodeEditor
+            id={`headers-${id}`} // used to show error toasts created because header invalidation
             isResizable
             height={220}
             value={headersString}
@@ -343,7 +385,7 @@ const MockEditor: React.FC<Props> = ({
         </Col>
       </Row>
     );
-  }, [headersString, type]);
+  }, [headersString, type, id]);
 
   const renderBodyRow = useCallback((): ReactNode => {
     return (

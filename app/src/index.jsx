@@ -30,6 +30,9 @@ root.render(
           <PageError error={error} componentStack={componentStack} resetError={resetError} />
         )}
         showDialog
+        beforeCapture={(scope) => {
+          scope.setTag("errorType", "app");
+        }}
       >
         <HotkeysProvider>
           {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? <SessionBearApp /> : <App />}

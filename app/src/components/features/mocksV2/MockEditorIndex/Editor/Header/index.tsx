@@ -15,7 +15,7 @@ interface HeaderProps {
   mockType: string;
   savingInProgress: boolean;
   handleClose: Function;
-  handleSave: Function;
+  handleSave: () => void;
   handleTest: () => void;
   setPassword: (password: string) => void;
   password: string;
@@ -127,7 +127,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
           >
             Cancel
           </RQButton>
-          <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={() => handleSave()}>
+          <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={handleSave}>
             {isNewMock ? (savingInProgress ? "Creating" : "Create") : savingInProgress ? "Saving" : "Save"}
           </RQButton>
         </Col>

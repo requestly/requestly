@@ -16,7 +16,7 @@
 
 .onboarding-auth-mode-switch-wrapper {
   font-size: var(--requestly-font-size-sm, 13px);
-  color: var(--text-light);
+  color: var(--requestly-color-text-subtle);
 
   .onboarding-auth-mode-switcher {
     text-decoration: underline;
@@ -143,4 +143,10 @@
   font-weight: var(--requestly-font-weight-normal);
   line-height: var(--requestly-font-line-height-xs);
   margin-top: 8px;
+}
+
+.auth-form-footer {
+  font-size: var(--requestly-font-size-xs);
+  color: var(--requestly-color-text-placeholder);
+  margin-top: 20px;
 }

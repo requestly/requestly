@@ -1,15 +1,14 @@
-import { getNewGroup, getNewRule } from "components/features/rules/RuleBuilder/actions";
 import {
   Group,
-  HeaderRuleActionType,
-  HeadersRule,
+  HeaderRule,
   RedirectRule,
   Rule,
+  RuleSourceFilter,
+  RuleSourceKey,
+  RuleSourceOperator,
   RuleType,
-  SourceFilter,
-  SourceKey,
-  SourceOperator,
-} from "types";
+} from "@requestly/shared/types/entities/rules";
+import { getNewGroup, getNewRule } from "components/features/rules/RuleBuilder/actions";
 
 interface ModheaderProfile {
   title: string;
@@ -66,11 +65,11 @@ export const parseRulesFromModheader = (modheaderProfiles: ModheaderProfile[]): 
 
 const parseRedirectRules = (modheaderProfile: ModheaderProfile): Rule[] => {
   const redirectRules = modheaderProfile.urlReplacements?.map((redirect: any) => {
-    const newRedirectRule = getNewRule(RuleType.REDIRECT) as RedirectRule;
+    const newRedirectRule = getNewRule(RuleType.REDIRECT) as RedirectRule.Record;
     const newRedirectRulePair = newRedirectRule.pairs[0];
     newRedirectRulePair.source = {
-      key: SourceKey.URL,
-      operator: SourceOperator.CONTAINS,
+      key: RuleSourceKey.URL,
+      operator: RuleSourceOperator.CONTAINS,
       value: redirect.name,
       filters: parseFilters(modheaderProfile),
     };
@@ -92,17 +91,21 @@ const parseHeaders = (modheaderProfile: ModheaderProfile): Rule => {
     header: header.name,
     value: header.value,
     type:
-      header.appendMode === false && header.sendEmptyHeader ? HeaderRuleActionType.REMOVE : HeaderRuleActionType.ADD,
+      header.appendMode === false && header.sendEmptyHeader
+        ? HeaderRule.ModificationType.REMOVE
+        : HeaderRule.ModificationType.ADD,
   }));
 
   const responseHeaders = modheaderProfile.respHeaders?.map((header) => ({
     header: header.name,
     value: header.value,
     type:
-      header.appendMode === false && header.sendEmptyHeader ? HeaderRuleActionType.REMOVE : HeaderRuleActionType.ADD,
+      header.appendMode === false && header.sendEmptyHeader
+        ? HeaderRule.ModificationType.REMOVE
+        : HeaderRule.ModificationType.ADD,
   }));
 
-  const newHeaderRule = getNewRule(RuleType.HEADERS) as HeadersRule;
+  const newHeaderRule = getNewRule(RuleType.HEADERS) as HeaderRule.Record;
   newHeaderRule.name = `[Headers]`;
   newHeaderRule.isModHeaderImport = true;
 
@@ -128,7 +131,7 @@ const parseCSPHeaders = (modheaderProfile: ModheaderProfile): Rule => {
     return null;
   }
 
-  const newHeaderRule = getNewRule(RuleType.HEADERS) as HeadersRule;
+  const newHeaderRule = getNewRule(RuleType.HEADERS) as HeaderRule.Record;
   newHeaderRule.name = `[CSP Header]`;
   newHeaderRule.isModHeaderImport = true;
 
@@ -138,7 +141,7 @@ const parseCSPHeaders = (modheaderProfile: ModheaderProfile): Rule => {
     {
       header: "Content-Security-Policy",
       value: cspValueString,
-      type: HeaderRuleActionType.ADD,
+      type: HeaderRule.ModificationType.ADD,
     },
   ];
 
@@ -156,7 +159,7 @@ const parseCookieHeaders = (modheaderProfile: ModheaderProfile): Rule => {
     return null;
   }
 
-  const newHeaderRule = getNewRule(RuleType.HEADERS) as HeadersRule;
+  const newHeaderRule = getNewRule(RuleType.HEADERS) as HeaderRule.Record;
   newHeaderRule.name = `[Cookie Header]`;
   newHeaderRule.isModHeaderImport = true;
 
@@ -165,7 +168,7 @@ const parseCookieHeaders = (modheaderProfile: ModheaderProfile): Rule => {
     {
       header: "Cookie",
       value: cookieString,
-      type: HeaderRuleActionType.ADD,
+      type: HeaderRule.ModificationType.ADD,
     },
   ];
 
@@ -179,15 +182,15 @@ const parseSourceConditions = (modheaderProfile: ModheaderProfile) => {
 
   if (!firstEnabledCondition) {
     return {
-      key: SourceKey.URL,
-      operator: SourceOperator.CONTAINS,
+      key: RuleSourceKey.URL,
+      operator: RuleSourceOperator.CONTAINS,
       value: "",
     };
   }
 
   return {
-    key: SourceKey.URL,
-    operator: SourceOperator.MATCHES,
+    key: RuleSourceKey.URL,
+    operator: RuleSourceOperator.MATCHES,
     value: `/${firstEnabledCondition.urlRegex}/`,
   };
 };
@@ -196,7 +199,7 @@ const parseFilters = (modheaderProfile: ModheaderProfile) => {
   const resourceFilters = modheaderProfile.resourceFilters?.find((filter) => filter.enabled);
   const requestMethodFilters = modheaderProfile.requestMethodFilters?.find((filter) => filter.enabled);
 
-  const sourceFilters: SourceFilter = {};
+  const sourceFilters: RuleSourceFilter = {};
   if (resourceFilters) {
     sourceFilters.resourceType = resourceFilters.resourceType;
   }
