@@ -5,10 +5,9 @@ import { AuthDescriptionData, AuthDescriptionStep } from "./types";
 import React from "react";
 interface DescriptionProps {
   data: AuthDescriptionData;
-  wrapperClass: string;
 }
 
-const Description: React.FC<DescriptionProps> = ({ data, wrapperClass = "" }) => {
+const Description: React.FC<DescriptionProps> = ({ data }) => {
   const { img, heading, subHeading, note, externalLink, steps = [] } = data;
 
   const renderSteps = (descriptionSteps: AuthDescriptionStep[]) => {
@@ -27,8 +26,8 @@ const Description: React.FC<DescriptionProps> = ({ data, wrapperClass = "" }) =>
   };
 
   return (
-    <div className={`auth-description ${wrapperClass}`}>
-      {img && <img src={img} alt="auth" />}
+    <div className={`auth-description no-auth`}>
+      {img && <img src={img} alt="auth" width={80} height={80} />}
       <h1>{heading}</h1>
       <h2>{subHeading}</h2>
       {!isEmpty(steps) && <ul>{renderSteps(steps)}</ul>}
