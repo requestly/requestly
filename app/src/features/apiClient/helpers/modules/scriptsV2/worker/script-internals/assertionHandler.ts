@@ -1,3 +1,4 @@
+import { get as lodashGet } from "lodash";
 import { LocalScopeResponse } from "./types";
 import { verify } from "./utils";
 import Ajv, { Options as AjvOptions } from "ajv";
@@ -66,86 +67,62 @@ export class AssertionHandler {
     }
   }
 
-  haveJsonBody(): void;
-  haveJsonBody(expectedValue: string, isEqualityCheck: boolean): void;
-  haveJsonBody(expectedValue: any, isEqualityCheck: boolean, value: any): void;
-  haveJsonBody(expectedValue: any, isEqualityCheck: boolean): void;
-  haveJsonBody(expectedValue?: any, isEqualityCheck?: boolean, value?: any): void {
-    let parsedBody: any;
-    try {
-      parsedBody = typeof this.response.body === "string" ? JSON.parse(this.response.body) : this.response.body;
-    } catch (e) {
-      throw new AssertionError("Response body is not valid JSON");
-    }
-
-    if (expectedValue === undefined) {
-      return;
-    }
-    if (typeof expectedValue === "object") {
-      let expectedJsonString;
+  haveJsonBody(): boolean;
+  // haveJsonBody(path: object, isEqualityCheck: boolean): void; //TODO: pass for all use case
+  haveJsonBody(path: string, isEqualityCheck: boolean): void;
+  haveJsonBody(path: string, isEqualityCheck: boolean, value: any): void;
+  haveJsonBody(path?: string, isEqualityCheck?: boolean, value?: any): void | boolean {
+    if (path === undefined) {
       try {
-        expectedJsonString = JSON.stringify(expectedValue);
+        this.response.json();
       } catch {
-        throw new AssertionError("Expected response body is not a valid JSON");
-      }
-      try {
-        verify(expectedJsonString, this.response.body, isEqualityCheck);
-      } catch {
-        this.throwAssertionError(expectedJsonString, this.response.body, isEqualityCheck, "response body");
+        this.throwAssertionError(
+          "a valid JSON",
+          `${isEqualityCheck ? "invalid JSON" : "valid JSON"}`,
+          isEqualityCheck,
+          "response body"
+        );
       }
     }
 
-    if (typeof expectedValue === "string") {
-      const pathParts = expectedValue.split(".");
-      let current = parsedBody;
+    if (typeof path === "string") {
+      const responseBody = this.response.json();
+      const pathValue = lodashGet(responseBody, path);
 
-      for (const part of pathParts) {
-        if (current === undefined || current === null || !(part in current)) {
-          if (isEqualityCheck) {
-            throw new AssertionError(`Expected property '${expectedValue}' to be found in response body`);
-          }
-        }
+      if (typeof value !== "undefined") {
         try {
-          current = current[part];
+          verify(pathValue, value, isEqualityCheck);
         } catch {
-          if (!isEqualityCheck) {
-            throw new AssertionError(`Expected property '${expectedValue}' to be not found in response body`);
-          }
+          throw new AssertionError(
+            `Expected response body json at '${path}' to ${!isEqualityCheck ? "not " : ""}have ${JSON.stringify(
+              value
+            )}, but got ${JSON.stringify(pathValue)}`
+          );
         }
-      }
-
-      if (!isEqualityCheck && value === undefined && current !== undefined) {
-        throw new AssertionError(`Expected property '${expectedValue}' to be not found in response body`);
-      }
-
-      if (value !== undefined) {
+      } else {
+        const isPathValueExists = !!pathValue;
         try {
-          verify(current, value, isEqualityCheck);
+          verify(isPathValueExists, true, isEqualityCheck);
         } catch {
-          this.throwAssertionError(JSON.stringify(value), current, isEqualityCheck, `property '${expectedValue}'`);
+          throw new AssertionError(
+            `Expected property '${path}' to be ${!isEqualityCheck ? "not " : ""}found in response body.`
+          );
         }
       }
     }
   }
 
-  haveJsonSchema(expectedValue: any, isEqualityCheck: boolean): void;
-  haveJsonSchema(expectedValue: any, isEqualityCheck: boolean, config: AjvOptions): void;
-  haveJsonSchema(expectedValue: any, isEqualityCheck: boolean, config?: AjvOptions): void {
+  haveJsonSchema(expectedSchema: any, isEqualityCheck: boolean): void;
+  haveJsonSchema(expectedSchema: any, isEqualityCheck: boolean, config: AjvOptions): void;
+  haveJsonSchema(expectedSchema: any, isEqualityCheck: boolean, config?: AjvOptions): void {
     const ajv = new Ajv(config || { allErrors: true });
-    const validate = ajv.compile(expectedValue);
-    let parsedBody;
+    const validate = ajv.compile(expectedSchema);
 
-    try {
-      parsedBody = typeof this.response.body === "string" ? JSON.parse(this.response.body) : this.response.body;
-    } catch {
-      throw new AssertionError("Response body is not valid JSON");
-    }
-
-    const isValid = validate(parsedBody);
+    const isValid = validate(this.response.json());
     try {
       verify(isValid, true, isEqualityCheck);
     } catch {
-      throw new AssertionError(`Expected response body ${isEqualityCheck ? "to match" : "to not match"} JSON schema`);
+      throw new AssertionError(`Expected response body ${isEqualityCheck ? "to match" : "to not match"} JSON schema.`);
     }
   }
 }

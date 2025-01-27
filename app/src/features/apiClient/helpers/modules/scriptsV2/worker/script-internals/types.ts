@@ -43,8 +43,8 @@ export type LocalScopeResponse =
           body: (expectedValue: string) => void;
           status: (expectedValue: number | string) => void;
           header: (expectedValue: string) => void;
-          jsonSchema: (schema: string, ajvOptions?: AjvOptions) => void;
-          jsonBody: (expectedValue?: string | object, value?: any) => void;
+          jsonSchema: (schema: any, ajvOptions?: AjvOptions) => void;
+          jsonBody: (path?: string, value?: any) => void;
         };
         not: {
           be: StatusAssertions;
@@ -52,8 +52,8 @@ export type LocalScopeResponse =
             body: (expectedValue: string) => void;
             status: (expectedValue: number | string) => void;
             header: (expectedValue: string) => void;
-            jsonSchema: (schema: string, ajvOptions?: AjvOptions) => void;
-            jsonBody: (expectedValue?: string | object, value?: any) => void;
+            jsonSchema: (schema: any, ajvOptions?: AjvOptions) => void;
+            jsonBody: (path?: string, value?: any) => void;
           };
         };
       };

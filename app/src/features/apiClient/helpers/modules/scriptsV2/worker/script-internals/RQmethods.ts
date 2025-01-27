@@ -32,7 +32,11 @@ const jsonifyObject = (objectString: unknown) => {
     return objectString;
   }
 
-  return JSON.parse(objectString as string);
+  try {
+    return JSON.parse(objectString as string);
+  } catch {
+    throw Error("Invalid JSON");
+  }
 };
 
 export class RQ implements SandboxAPI {
@@ -169,10 +173,9 @@ export class RQ implements SandboxAPI {
       body: (expectedValue: string) => this.assertionHandler.haveBody(expectedValue, isEqualityCheck),
       status: (expectedValue: number | string) => this.assertionHandler.haveStatus(expectedValue, isEqualityCheck),
       header: (expectedValue: string) => this.assertionHandler.haveHeader(expectedValue, isEqualityCheck),
-      jsonSchema: (schema: string, ajvOptions: AjvOptions) =>
+      jsonSchema: (schema: any, ajvOptions?: AjvOptions) =>
         this.assertionHandler.haveJsonSchema(schema, isEqualityCheck, ajvOptions),
-      jsonBody: (expectedValue: string | object, value?: any) =>
-        this.assertionHandler.haveJsonBody(expectedValue, isEqualityCheck, value),
+      jsonBody: (path?: string, value?: any) => this.assertionHandler.haveJsonBody(path, isEqualityCheck, value),
     };
   }
 }
