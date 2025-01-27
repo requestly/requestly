@@ -61,20 +61,8 @@ export const AUTHORIZATION_STATIC_DATA = {
     description: {
       heading: "API Key",
       subHeading:
-        "API Key authentication allows you to send a key-value pair to the API for verification. Here’s how to set it up:",
-      note: "Store your key in a variable for enhanced security.",
+        "API Key authentication allows you to securely send a key-value pair to the API, enabling it to verify and authorize your request.",
       externalLink: "https://docs.requestly.com/general/api-client/authorization/authorization-types#api-key",
-      steps: [
-        { value: "In the Authorization tab, choose API Key from the dropdown." },
-        { value: "Enter your key name and value in the respective fields." },
-        {
-          value: "Choose where to include the key:",
-          steps: [
-            { value: "Header: Adds the key to the request headers." },
-            { value: "Query Params: Adds the key as a query parameter." },
-          ],
-        },
-      ],
     },
   },
   [AUTHORIZATION_TYPES.BEARER_TOKEN]: {
@@ -82,13 +70,8 @@ export const AUTHORIZATION_STATIC_DATA = {
     description: {
       heading: "Bearer Token",
       subHeading:
-        "Bearer tokens enable requests to authenticate using an access key, such as a JSON Web Token (JWT). The token is a text string, included in the request header. Here’s how to set it up:",
-      note: "Store your key in a variable for enhanced security.",
+        "Bearer Tokens let you securely authenticate requests using an access key, such as a JSON Web Token (JWT).",
       externalLink: "https://docs.requestly.com/general/api-client/authorization/authorization-types#bearer-tokens",
-      steps: [
-        { value: "In the Authorization tab, choose Bearer Token from the dropdown." },
-        { value: "Enter your token value in the token field." },
-      ],
     },
   },
   [AUTHORIZATION_TYPES.BASIC_AUTH]: {
@@ -96,14 +79,8 @@ export const AUTHORIZATION_STATIC_DATA = {
     description: {
       heading: "Basic Auth",
       subHeading:
-        "Basic authentication involves sending a verified username and password with your request. In the request Authorization tab, select Basic Auth from the Auth Type dropdown list. Here’s how to set it up:",
-      note: "Store your key in a variable for enhanced security.",
+        "Basic Authentication lets you securely send a verified username and password with your request for verification purposes.",
       externalLink: "https://docs.requestly.com/general/api-client/authorization/authorization-types#basic-auth",
-      steps: [
-        { value: "In the Authorization tab, choose Basic Auth from the dropdown." },
-        { value: "Enter your API username in username field" },
-        { value: "Enter your API password in password field" },
-      ],
     },
   },
 };
