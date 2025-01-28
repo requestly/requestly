@@ -272,8 +272,8 @@ export const processPostmanVariablesData = (
         syncValue: variable.value,
         type:
           variable.type === EnvironmentVariableType.String
-            ? EnvironmentVariableType.Secret
-            : EnvironmentVariableType.String,
+            ? EnvironmentVariableType.String
+            : EnvironmentVariableType.Secret,
       };
       return acc;
     },

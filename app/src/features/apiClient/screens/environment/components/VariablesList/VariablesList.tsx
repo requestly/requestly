@@ -106,9 +106,11 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
   const handleDeleteVariable = useCallback(
     async (id: number) => {
-      const newData = id
-        ? dataSource.filter((item) => item.id !== id).map((record, index) => ({ ...record, id: index }))
-        : dataSource.slice(0, -1);
+      if (!id) {
+        return;
+      }
+      const newData = dataSource.filter((item) => item.id !== id).map((record, index) => ({ ...record, id: index }));
+
       setDataSource(newData);
 
       const remainingVariables = newData.reduce((acc, variable, index) => {
