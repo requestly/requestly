@@ -104,14 +104,28 @@ export namespace RQAPI {
     auth?: AuthOptions;
   }
 
-  export interface RequestErrorEntry extends Entry {
-    response: null;
-    error: {
-      source: string;
-      message: Error["message"];
-      name: Error["name"];
-    };
+  export enum ExecutionStatus {
+    SUCCESS = "success",
+    ERROR = "error",
   }
+
+  export type ExecutionResult =
+    | {
+        executedEntry: RQAPI.Entry;
+        status: "success";
+        error?: never;
+      }
+    | {
+        executedEntry: RQAPI.Entry & {
+          response: null;
+        };
+        status: "error";
+        error: {
+          source: string;
+          name: Error["name"];
+          message: Error["message"];
+        };
+      };
 
   export interface Collection {
     children?: Record[];

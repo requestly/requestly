@@ -7,6 +7,7 @@ import {
   PostResponseScriptWorkload,
   PreRequestScriptWorkload,
   WorkResultType,
+  WorkError,
 } from "../modules/scriptsV2/workloadManager/workLoadTypes";
 import { notification } from "antd";
 import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshotTypes";
@@ -35,6 +36,8 @@ export class ApiClientExecutor {
   constructor(private appMode: string, private workloadManager: APIClientWorkloadManager) {}
 
   private prepareRequest() {
+    this.entryDetails.response = null;
+    this.entryDetails.testResults = [];
     this.abortController = new AbortController();
     this.entryDetails.request.queryParams = [];
 
@@ -123,7 +126,7 @@ export class ApiClientExecutor {
     );
   }
 
-  async execute() {
+  async execute(): Promise<RQAPI.ExecutionResult> {
     this.prepareRequest();
 
     trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
@@ -137,8 +140,13 @@ export class ApiClientExecutor {
         preRequestScriptResult.error.type,
         preRequestScriptResult.error.message
       );
+
       return {
-        ...this.entryDetails,
+        executedEntry: {
+          ...this.entryDetails,
+          response: null,
+        },
+        status: RQAPI.ExecutionStatus.ERROR,
         error: {
           source: "Pre-request script",
           name: preRequestScriptResult.error.name,
@@ -153,11 +161,12 @@ export class ApiClientExecutor {
       const response = await makeRequest(this.appMode, this.entryDetails.request, this.abortController.signal);
       this.entryDetails.response = response;
       if (!response) {
-        return this.entryDetails;
+        throw Error("Failed to send the request. Please check if the URL is valid");
       }
     } catch (e) {
       return {
-        ...this.entryDetails,
+        status: RQAPI.ExecutionStatus.ERROR,
+        executedEntry: { ...this.entryDetails, response: null },
         error: {
           source: "request",
           name: e.name,
@@ -188,20 +197,27 @@ export class ApiClientExecutor {
       });
 
       return {
+        status: RQAPI.ExecutionStatus.SUCCESS,
         executedEntry: this.entryDetails,
       };
     }
 
     return {
-      executedEntry: this.entryDetails,
-      testResults: [
-        ...(preRequestScriptResult.testExecutionResults || []),
-        ...(responseScriptResult.testExecutionResults || []),
-      ],
+      status: RQAPI.ExecutionStatus.SUCCESS,
+      executedEntry: {
+        ...this.entryDetails,
+        testResults: [
+          ...(preRequestScriptResult.testExecutionResults || []),
+          ...(responseScriptResult.testExecutionResults || []),
+        ],
+      },
     };
   }
 
-  async rerun() {
+  async rerun(): Promise<{
+    testResults: TestResult[];
+    error?: WorkError;
+  }> {
     const preRequestScriptResult = await this.executePreRequestScript(async () => {});
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
       return {

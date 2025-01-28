@@ -94,7 +94,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>({ ...(apiEntry ?? getEmptyAPIEntry()) });
   const [isFailed, setIsFailed] = useState(false);
-  const [error, setError] = useState<RQAPI.RequestErrorEntry["error"]>(null);
+  const [error, setError] = useState<RQAPI.ExecutionResult["error"]>(null);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
@@ -277,59 +277,56 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       collectionId: apiEntryDetails?.collectionId,
     });
 
-    apiClientExecutor
-      .execute()
-      .then(({ executedEntry, testResults }) => {
-        const response = executedEntry.response;
-        const entryWithResponse = { ...entry, response, testResults };
-        const completeRenderedEntry = { ...executedEntry, response, testResults };
+    try {
+      const apiClientExecutionResult = await apiClientExecutor.execute();
+      const { executedEntry } = apiClientExecutionResult;
+      const entryWithResponse = {
+        ...entry,
+        response: executedEntry.response,
+        testResults: executedEntry.testResults,
+      };
+      setEntry(entryWithResponse);
 
-        if (response) {
-          setEntry(entryWithResponse);
-          trackResponseLoaded({
-            type: getContentTypeFromResponseHeaders(response.headers),
-            time: Math.round(response.time / 1000),
-          });
-          trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
-          trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
-        } else {
-          const erroredEntry = executedEntry as RQAPI.RequestErrorEntry;
-
-          setIsFailed(true);
-          setError(erroredEntry?.error ?? null);
-          if (erroredEntry?.error) {
-            Sentry.withScope((scope) => {
-              scope.setTag("error_type", "api_request_failure");
-              scope.setContext("request_details", {
-                url: entryWithResponse.request.url,
-                method: entryWithResponse.request.method,
-                headers: entryWithResponse.request.headers,
-                queryParams: entryWithResponse.request.queryParams,
-              });
-              scope.setFingerprint(["api_request_error", entryWithResponse.request.method, erroredEntry.error.source]);
-              Sentry.captureException(
-                new Error(`API Request Failed: ${erroredEntry.error.message || "Unknown error"}`)
-              );
-            });
-          }
-          trackRequestFailed();
-          trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
-          trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
-        }
-        notifyApiRequestFinished?.(completeRenderedEntry);
-      })
-      .catch((e) => {
-        setIsFailed(true);
-        setError({
-          source: "request",
-          name: e.name,
-          message: e.message,
+      if (apiClientExecutionResult.status === "success") {
+        trackResponseLoaded({
+          type: getContentTypeFromResponseHeaders(executedEntry.response.headers),
+          time: Math.round(executedEntry.response.time / 1000),
         });
-      })
-      .finally(() => {
-        setIsLoadingResponse(false);
-      });
+        trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
+        trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
+      } else if (apiClientExecutionResult.status === "error") {
+        const { error } = apiClientExecutionResult;
+        setIsFailed(true);
+        setError(error ?? null);
+        if (error) {
+          Sentry.withScope((scope) => {
+            scope.setTag("error_type", "api_request_failure");
+            scope.setContext("request_details", {
+              url: entryWithResponse.request.url,
+              method: entryWithResponse.request.method,
+              headers: entryWithResponse.request.headers,
+              queryParams: entryWithResponse.request.queryParams,
+            });
+            scope.setFingerprint(["api_request_error", entryWithResponse.request.method, error.source]);
+            Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
+          });
+        }
+        trackRequestFailed();
+        trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
+        trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
+      }
 
+      notifyApiRequestFinished?.(executedEntry);
+    } catch (e) {
+      setIsFailed(true);
+      setError({
+        source: "request",
+        name: e.name,
+        message: e.message,
+      });
+    } finally {
+      setIsLoadingResponse(false);
+    }
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
