@@ -2,10 +2,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { getPlanNameFromId } from "utils/PremiumUtils";
-import { capitalize } from "lodash";
 import { Badge } from "antd";
 import { trackRenewNowClicked } from "modules/analytics/events/misc/monetizationExperiment";
 import "./index.scss";
+import { getPrettyPlanName } from "utils/FormattingHelper";
 
 export const PlanExpiredBadge = () => {
   const dispatch = useDispatch();
@@ -29,7 +29,7 @@ export const PlanExpiredBadge = () => {
         <span>
           <Badge status="error" />
         </span>
-        <span>{capitalize(getPlanNameFromId(user?.details?.planDetails?.planId))} plan expired</span>
+        <span>{getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planId))} plan expired</span>
       </div>
       {/* TEMPORARILY HIDDEN AS HEADER IS OVERPOPULATED WITH MANY BUTTONS  */}
       {/* <RQButton
