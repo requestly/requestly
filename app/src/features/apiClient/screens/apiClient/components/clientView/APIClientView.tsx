@@ -565,7 +565,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               >
                 <RQButton
                   type="transparent"
-                  className="more-rule-actions-btn"
+                  className="more-api-request-actions-button"
                   icon={<MdOutlineMoreHoriz />}
                   onClick={(e) => {
                     e.stopPropagation();
