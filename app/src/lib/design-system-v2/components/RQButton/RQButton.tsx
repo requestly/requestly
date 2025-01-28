@@ -96,6 +96,7 @@ interface RQCustomButton
 export const RQButton: RQCustomButton = React.forwardRef<HTMLButtonElement, RQButtonProps>(function Button(props, ref) {
   const appLanguage = useSelector(getAppLanguage);
 
+  // Only showing hotkey for english language as hotkeys behave differently in other languages and keyboard layouts
   if (props.hotKey && appLanguage === "en") {
     return <ButtonWithHotkey ref={ref} {...props} />;
   }

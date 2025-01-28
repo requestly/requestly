@@ -1,16 +1,14 @@
 import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { getAppLanguage } from "store/selectors";
+import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 
-export const useAppLanguage = () => {
+export const useAppLanguageObserver = () => {
   const dispatch = useDispatch();
-  const currentLanguage = useSelector(getAppLanguage);
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
-      const newLang = document.documentElement.lang;
-      if (newLang !== currentLanguage) {
+      if (document) {
+        const newLang = document.documentElement.lang;
         dispatch(globalActions.updateAppLanguage(newLang));
       }
     });
@@ -22,5 +20,5 @@ export const useAppLanguage = () => {
     });
 
     return () => observer.disconnect();
-  }, [currentLanguage, dispatch]);
+  }, [dispatch]);
 };

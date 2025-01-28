@@ -30,7 +30,7 @@ import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { useAppLanguage } from "hooks/useAppLanguage";
+import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -45,7 +45,7 @@ const App: React.FC = () => {
   useIsExtensionEnabled();
   useBillingTeamsListener();
   useEnvironmentManager();
-  useAppLanguage();
+  useAppLanguageObserver();
   // useInitializeNewUserSessionRecordingConfig();
 
   submitAppDetailAttributes();
