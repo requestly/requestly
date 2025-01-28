@@ -6,7 +6,7 @@ import { formatJSONString } from "utils/CodeEditorUtils";
 import { globalActions } from "store/slices/global/slice";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
-import { RuleType } from "features/rules";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();

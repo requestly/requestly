@@ -1,7 +1,9 @@
+export type VariableValueType = string | number | boolean;
+
 export interface EnvironmentVariableValue {
-  localValue?: string | number | boolean;
-  syncValue?: string | number | boolean;
-  type: EnvironmentVariableType;
+  localValue?: VariableValueType;
+  syncValue?: VariableValueType;
+  type: VariableValueType;
   id: number;
 }
 

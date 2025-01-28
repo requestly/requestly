@@ -1,4 +1,4 @@
-import { HeaderRuleActionType, Rule, SourceOperator } from "types";
+import { HeaderRule, Rule, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 
 export enum CharlesRuleImportErrorMessage {
   EMPTY_FILE = "Imported file is empty!",
@@ -42,7 +42,7 @@ export type HeadersConfig<
   T = {
     value: string;
     header: string;
-    type: HeaderRuleActionType;
+    type: HeaderRule.ModificationType;
   }
 > = {
   requestHeaders: T[];
@@ -65,7 +65,7 @@ export type SourceUrl = {
 export type SourceData = {
   value: string;
   status: boolean;
-  operator: SourceOperator;
+  operator: RuleSourceOperator;
 };
 
 export type ParsedRule<T = Rule> =

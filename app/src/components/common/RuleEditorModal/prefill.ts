@@ -1,21 +1,18 @@
 import {
-  Rule,
-  RuleType,
-  SourceKey,
-  SourceOperator,
-  RulePairSource,
-  ResponseRule,
-  ResponseRulePair,
-  ResponseRuleResourceType,
   RequestRule,
-  RequestRulePair,
-} from "types";
+  ResponseRule,
+  Rule,
+  RulePairSource,
+  RuleSourceKey,
+  RuleSourceOperator,
+  RuleType,
+} from "@requestly/shared/types/entities/rules";
 
 const updateRulePairSource = <T extends Rule>(data: any, rule: T): T => {
   const source: RulePairSource = {
     value: data?.url ?? "",
-    key: SourceKey.URL,
-    operator: SourceOperator.EQUALS,
+    key: RuleSourceKey.URL,
+    operator: RuleSourceOperator.EQUALS,
   };
 
   return {
@@ -24,9 +21,9 @@ const updateRulePairSource = <T extends Rule>(data: any, rule: T): T => {
   };
 };
 
-const prefillRequestRuleData = <T extends RequestRule>(data: unknown, newRule: T): T => {
+const prefillRequestRuleData = <T extends RequestRule.Record>(data: unknown, newRule: T): T => {
   const updatedRule = updateRulePairSource(data, newRule);
-  const updatedRequestData: Partial<RequestRulePair["request"]> = {
+  const updatedRequestData: Partial<RequestRule.Pair["request"]> = {
     // @ts-ignore
     value: data?.request?.body ?? "",
   };
@@ -42,12 +39,12 @@ const prefillRequestRuleData = <T extends RequestRule>(data: unknown, newRule: T
   };
 };
 
-const prefillResponseRuleData = <T extends ResponseRule>(data: unknown, newRule: T): T => {
+const prefillResponseRuleData = <T extends ResponseRule.Record>(data: unknown, newRule: T): T => {
   const updatedRule = updateRulePairSource(data, newRule);
-  const updatedResponseData: Partial<ResponseRulePair["response"]> = {
+  const updatedResponseData: Partial<ResponseRule.Pair["response"]> = {
     // @ts-ignore
     value: data?.response?.body ?? "",
-    resourceType: ResponseRuleResourceType.REST_API,
+    resourceType: ResponseRule.ResourceType.REST_API,
   };
 
   return {

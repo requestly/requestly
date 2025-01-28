@@ -1,5 +1,4 @@
 import { escapeRegExp } from "lodash";
-import { ReplaceRule, ReplaceRulePair, SourceKey, SourceOperator } from "../../../types/rules";
 import { ExtensionRule, ExtensionRuleCondition, RuleActionType } from "../types";
 import {
   convertRegexSubstitutionStringToDNRSubstitutionString,
@@ -9,8 +8,9 @@ import {
   parseRegex,
 } from "./utils";
 import Logger from "../../../../../common/logger";
+import { ReplaceRule, RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 
-const getReplaceMatchingRegex = (rulePair: ReplaceRulePair): ExtensionRuleCondition => {
+const getReplaceMatchingRegex = (rulePair: ReplaceRule.Pair): ExtensionRuleCondition => {
   if (!rulePair.source.value) {
     const regexCondition = parseConditionFromSource(rulePair.source, true, false);
     return {
@@ -36,7 +36,7 @@ const getReplaceMatchingRegex = (rulePair: ReplaceRulePair): ExtensionRuleCondit
   }
 };
 
-const getReplacementExtensionRule = (rulePair: ReplaceRulePair): ExtensionRule => {
+const getReplacementExtensionRule = (rulePair: ReplaceRule.Pair): ExtensionRule => {
   const commonExtensionCondition = parseConditionFromSource(rulePair.source, true, false);
   const fromRegex = parseRegex(rulePair.from);
   let replacementRegex = "";
@@ -75,12 +75,13 @@ const getReplacementExtensionRule = (rulePair: ReplaceRulePair): ExtensionRule =
   };
 };
 
-const generateReplaceExtensionRules = (rulePair: ReplaceRulePair): ExtensionRule[] => {
+const generateReplaceExtensionRules = (rulePair: ReplaceRule.Pair): ExtensionRule[] => {
   // Case 1 and 2 - Replace from in URL source condition
   // Edgecase: Will not replace `from` if not present in the source condition url
   if (
-    rulePair.source.key === SourceKey.URL &&
-    (rulePair.source.operator === SourceOperator.CONTAINS || rulePair.source.operator === SourceOperator.EQUALS) &&
+    rulePair.source.key === RuleSourceKey.URL &&
+    (rulePair.source.operator === RuleSourceOperator.CONTAINS ||
+      rulePair.source.operator === RuleSourceOperator.EQUALS) &&
     rulePair.source.value.includes(rulePair.from)
   ) {
     Logger.log("Replace Rule: Case 1 and 2");
@@ -88,7 +89,7 @@ const generateReplaceExtensionRules = (rulePair: ReplaceRulePair): ExtensionRule
     let regexSubstitution = "";
     let currentSubstitutionIndex = 1;
 
-    if (rulePair.source.operator === SourceOperator.CONTAINS) {
+    if (rulePair.source.operator === RuleSourceOperator.CONTAINS) {
       regexFilter = `(.*?)`;
       regexSubstitution = `\\${currentSubstitutionIndex++}`;
     }
@@ -112,10 +113,10 @@ const generateReplaceExtensionRules = (rulePair: ReplaceRulePair): ExtensionRule
       }
     });
 
-    if (rulePair.source.operator === SourceOperator.CONTAINS) {
+    if (rulePair.source.operator === RuleSourceOperator.CONTAINS) {
       regexFilter = regexFilter + `(.*)`;
       regexSubstitution = regexSubstitution + `\\${currentSubstitutionIndex++}`;
-    } else if (rulePair.source.operator === SourceOperator.EQUALS) {
+    } else if (rulePair.source.operator === RuleSourceOperator.EQUALS) {
       regexFilter = `^${regexFilter}$`;
     }
 
@@ -195,7 +196,7 @@ const generateReplaceExtensionRules = (rulePair: ReplaceRulePair): ExtensionRule
   }
 };
 
-const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
+const parseReplaceRule = (rule: ReplaceRule.Record): ExtensionRule[] => {
   const extensionRules: ExtensionRule[] = [];
 
   rule.pairs.forEach((rulePair, pairIndex) => {

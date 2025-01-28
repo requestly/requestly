@@ -1,9 +1,15 @@
-import { HttpRequestMethod, ResourceType } from "@/types/common/network";
+import { HttpRequestMethod, ResourceType } from "~/types/common/network";
 import { BaseItem, RecordType } from "./base";
 
 export interface BaseRule extends BaseItem {
   objectType: RecordType.RULE;
   ruleType: RuleType;
+  groupId?: string;
+  schemaVersion?: string;
+
+  // Determines if the rule is imported
+  isModHeaderImport?: boolean;
+  isCharlesImport?: boolean;
 }
 
 export type Rule =
@@ -21,15 +27,15 @@ export type Rule =
 export namespace RedirectRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.REDIRECT;
-    pairs: RedirectRulePair[];
+    pairs: Pair[];
   }
 
-  interface RedirectRulePair extends BaseRulePair {
-    destinationType?: RedirectDestinationType;
+  interface Pair extends BaseRulePair {
+    destinationType?: DestinationType;
     destination: string;
   }
 
-  enum RedirectDestinationType {
+  export enum DestinationType {
     URL = "url",
     MAP_LOCAL = "map_local",
     MOCK_OR_FILE_PICKER = "mock_or_file_picker",
@@ -39,10 +45,10 @@ export namespace RedirectRule {
 export namespace ReplaceRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.REPLACE;
-    pairs: ReplaceRulePair[];
+    pairs: Pair[];
   }
 
-  interface ReplaceRulePair extends BaseRulePair {
+  export interface Pair extends BaseRulePair {
     from: string;
     to: string;
   }
@@ -51,69 +57,69 @@ export namespace ReplaceRule {
 export namespace QueryParamRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.QUERYPARAM;
-    pairs: QueryParamRulePair[];
+    pairs: Pair[];
   }
 
-  interface QueryParamRulePair extends BaseRulePair {
-    modifications: QueryParamRuleModification[];
+  export interface Pair extends BaseRulePair {
+    modifications: Modification[];
   }
 
-  enum QueryParamModificationType {
+  export enum ModificationType {
     ADD = "Add",
     REMOVE = "Remove",
     REMOVE_ALL = "Remove All",
   }
 
-  interface QueryParamRuleModification {
+  export interface Modification {
     id?: string;
     param: string;
     value: string;
     actionWhenParamExists?: string;
-    type: QueryParamModificationType;
+    type: ModificationType;
   }
 }
 
 export namespace CancelRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.CANCEL;
-    pairs: CancelRulePair[];
+    pairs: Pair[];
   }
 
-  type CancelRulePair = BaseRulePair;
+  type Pair = BaseRulePair;
 }
 
 export namespace DelayRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.DELAY;
-    pairs: DelayRulePair[];
+    pairs: Pair[];
   }
 
-  interface DelayRulePair extends BaseRulePair {
-    delay: number;
+  interface Pair extends BaseRulePair {
+    delay: string; // FIX to number. Legacy issue
   }
 }
 
 export namespace HeaderRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.HEADERS;
-    pairs: HeadersRulePair[];
+    pairs: Pair[];
   }
 
-  interface HeadersRulePair extends BaseRulePair {
+  export interface Pair extends BaseRulePair {
     modifications: {
-      Request: HeadersRuleModificationData[];
-      Response: HeadersRuleModificationData[];
+      Request?: Modification[];
+      Response?: Modification[];
     };
   }
 
-  interface HeadersRuleModificationData {
+  export interface Modification {
     id?: string;
     header: string;
-    type: HeaderRuleActionType;
+    type: ModificationType;
     value: string;
   }
 
-  enum HeaderRuleActionType {
+  export enum ModificationType {
     ADD = "Add",
     REMOVE = "Remove",
     MODIFY = "Modify",
@@ -123,10 +129,10 @@ export namespace HeaderRule {
 export namespace UserAgentRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.USERAGENT;
-    pairs: UserAgentRulePair[];
+    pairs: Pair[];
   }
 
-  interface UserAgentRulePair extends BaseRulePair {
+  interface Pair extends BaseRulePair {
     userAgent: string;
     env?: string;
     envType?: "browser" | "device" | "custom";
@@ -136,18 +142,18 @@ export namespace UserAgentRule {
 export namespace RequestRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.REQUEST;
-    pairs: RequestRulePair[];
+    pairs: Pair[];
   }
 
-  interface RequestRulePair extends BaseRulePair {
+  export interface Pair extends BaseRulePair {
     request: {
-      type: RequestRuleBodyType;
+      type: BodyType;
       value: string;
       statusCode?: string;
     };
   }
 
-  enum RequestRuleBodyType {
+  enum BodyType {
     CODE = "code",
     STATIC = "static",
   }
@@ -156,24 +162,25 @@ export namespace RequestRule {
 export namespace ResponseRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.RESPONSE;
-    pairs: ResponseRulePair[];
+    pairs: Pair[];
   }
 
-  interface ResponseRulePair extends BaseRulePair {
+  export interface Pair extends BaseRulePair {
     response: {
-      type: ResponseRuleBodyType;
+      type: BodyType;
       value: string;
-      resourceType?: ResponseRuleResourceType;
+      resourceType?: ResourceType;
       statusCode?: string;
+      statusText?: String;
     };
   }
 
-  enum ResponseRuleBodyType {
+  export enum BodyType {
     CODE = "code",
     STATIC = "static",
   }
 
-  enum ResponseRuleResourceType {
+  export enum ResourceType {
     UNKNOWN = "unknown",
     REST_API = "restApi",
     GRAPHQL_API = "graphqlApi",
@@ -184,10 +191,12 @@ export namespace ResponseRule {
 export namespace ScriptRule {
   export interface Record extends BaseRule {
     ruleType: RuleType.SCRIPT;
-    pairs: ScriptRulePair[];
+    pairs: Pair[];
+
+    removeCSPHeader?: boolean;
   }
 
-  interface ScriptRulePair extends BaseRulePair {
+  interface Pair extends BaseRulePair {
     scripts: ScriptRuleModifications[];
   }
 
@@ -201,18 +210,18 @@ export namespace ScriptRule {
     // todo: add attributes array
   }
 
-  enum ScriptType {
+  export enum ScriptType {
     JS = "js",
     CSS = "css",
   }
 
-  enum ScriptLoadTime {
+  export enum ScriptLoadTime {
     BEFORE_PAGE_LOAD = "beforePageLoad",
     AFTER_PAGE_LOAD = "afterPageLoad",
     AS_SOON_AS_POSSIBLE = "asSoonAsPossible",
   }
 
-  enum ScriptValueType {
+  export enum ScriptValueType {
     URL = "url",
     CODE = "code",
   }
@@ -237,29 +246,31 @@ interface BaseRulePair {
   source: RulePairSource;
 }
 
-interface RulePairSource {
+export interface RulePairSource {
   key: RuleSourceKey;
   operator: RuleSourceOperator;
   value: string;
-  filters: RuleSourceFilter[];
+  filters?: RuleSourceFilter[]; // FIX: This should not be an array
 }
 
-interface RuleSourceFilter {
-  pageUrl: {
+export interface RuleSourceFilter {
+  pageUrl?: {
     operator: RuleSourceOperator;
     value: string;
   };
-  requestMethod: HttpRequestMethod[];
-  resourceType: ResourceType[];
+  requestMethod?: HttpRequestMethod[];
+  resourceType?: ResourceType[];
+  pageDomains?: string[];
+  requestPayload?: { key: string; value: string; operator: RuleSourceOperator };
 }
 
-enum RuleSourceKey {
+export enum RuleSourceKey {
   URL = "Url",
   HOST = "host",
   PATH = "path",
 }
 
-enum RuleSourceOperator {
+export enum RuleSourceOperator {
   EQUALS = "Equals",
   CONTAINS = "Contains",
   MATCHES = "Matches",

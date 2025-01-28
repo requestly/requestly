@@ -20,7 +20,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import LINKS from "config/constants/sub/links";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
-import { RuleType } from "features/rules";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import "./ResponseBodyRow.css";
 
@@ -303,8 +303,15 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   return (
     <Col span={24} data-tour-id="code-editor" key={rowIndex}>
       {/* <div className="subtitle response-body-row-header">Response Body</div> */}
-      {renderFileSelector()}
-      {pair.response.type !== GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE ? (
+      {pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE ? (
+        <div className="response-rule-local-file-content">
+          <div className="response-rule-local-file-content-header">
+            Response Body
+            {EditorRadioGroupOptions}
+          </div>
+          <div className="response-rule-local-file-content-body">{renderFileSelector()}</div>
+        </div>
+      ) : (
         <>
           <Row
             span={24}
@@ -349,7 +356,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             </Row>
           ) : null}
         </>
-      ) : null}
+      )}
     </Col>
   );
 };
