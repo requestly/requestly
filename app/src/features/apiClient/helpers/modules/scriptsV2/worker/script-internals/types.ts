@@ -26,6 +26,12 @@ export type LocalScopeRequest = RQAPI.Request & {
   };
 };
 
+interface HaveJsonBody {
+  jsonBody(): void;
+  jsonBody(path: string): void;
+  jsonBody(path: string, value: any): void;
+}
+
 export type LocalScopeResponse =
   | (RQAPI.Response & {
       code: number;
@@ -44,7 +50,7 @@ export type LocalScopeResponse =
           status: (expectedValue: number | string) => void;
           header: (expectedValue: string) => void;
           jsonSchema: (schema: any, ajvOptions?: AjvOptions) => void;
-          jsonBody: (path?: string, value?: any) => void;
+          jsonBody: HaveJsonBody;
         };
         not: {
           be: StatusAssertions;
@@ -53,7 +59,7 @@ export type LocalScopeResponse =
             status: (expectedValue: number | string) => void;
             header: (expectedValue: string) => void;
             jsonSchema: (schema: any, ajvOptions?: AjvOptions) => void;
-            jsonBody: (path?: string, value?: any) => void;
+            jsonBody: HaveJsonBody;
           };
         };
       };
