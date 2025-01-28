@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { Avatar, Col, Dropdown, Popconfirm, Row, Table, Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { getBillingTeamMembers, getBillingTeamById } from "store/features/billing/selectors";
@@ -35,6 +36,7 @@ interface Props {
 
 export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
   const { billingId } = useParams();
+  const isDomainWithCustomInfo = useFeatureValue("domain_with_custom_admin_info");
   const user = useSelector(getUserAuthDetails);
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
   const billingTeamDetails = useSelector(getBillingTeamById(billingId));
@@ -181,7 +183,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
   const getMemberRoleTag = useCallback(
     (role: BillingTeamRoles) => {
       if (
-        (billingTeamDetails?.isAcceleratorTeam && role === BillingTeamRoles.Manager) ||
+        ((billingTeamDetails?.isAcceleratorTeam || isDomainWithCustomInfo) && role === BillingTeamRoles.Manager) ||
         role === BillingTeamRoles.Admin
       ) {
         return (
@@ -200,7 +202,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
       }
       return null;
     },
-    [billingTeamDetails?.isAcceleratorTeam]
+    [billingTeamDetails?.isAcceleratorTeam, isDomainWithCustomInfo]
   );
 
   const columns = useMemo(
