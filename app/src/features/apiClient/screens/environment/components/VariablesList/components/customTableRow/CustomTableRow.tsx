@@ -1,10 +1,9 @@
 import { Form, FormInstance, Input, InputNumber, Select, Tooltip } from "antd";
-import React, { useCallback, useContext, useRef, useEffect, useState } from "react";
+import React, { useCallback, useContext, useRef, useEffect } from "react";
 import { EnvironmentVariableTableRow } from "../../VariablesList";
 import { EnvironmentVariableType } from "backend/environment/types";
 import Logger from "lib/logger";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
-import { isEmpty } from "lodash";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -50,7 +49,6 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 }) => {
   const form = useContext(EditableContext)!;
   const inputRef = useRef(null);
-  const [previousValues, setPreviousValues] = useState<{ [key: string]: any }>({});
 
   const convertValueByType = useCallback((value: any, type: EnvironmentVariableType) => {
     if (value === undefined) {
@@ -68,43 +66,40 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   }, []);
 
   const handleTypeChange = useCallback(
-    (newType: EnvironmentVariableType, prevType: EnvironmentVariableType) => {
-      const previousValue = previousValues[prevType] || {};
-      const currentValue = previousValues[newType] || {};
+    (value: EnvironmentVariableType, prevType: EnvironmentVariableType) => {
+      const defaultValues = {
+        syncValue: record.syncValue,
+        localValue: record.localValue,
+      };
 
-      switch (newType) {
+      switch (value) {
         case EnvironmentVariableType.Boolean:
-          currentValue.syncValue = Boolean(previousValue.syncValue);
-          currentValue.localValue = Boolean(previousValue.localValue);
+          defaultValues.syncValue = true;
+          defaultValues.localValue = true;
           break;
         case EnvironmentVariableType.Number:
-          switch (prevType) {
-            case EnvironmentVariableType.Secret:
-            case EnvironmentVariableType.String:
-              currentValue.syncValue = isNaN(previousValue.syncValue) ? 0 : Number(previousValue.syncValue);
-              currentValue.localValue = isNaN(previousValue.localValue) ? 0 : Number(previousValue.localValue);
-              break;
+          if (prevType !== EnvironmentVariableType.Secret) {
+            defaultValues.syncValue = 0;
+            defaultValues.localValue = 0;
           }
           break;
         case EnvironmentVariableType.String:
-          switch (prevType) {
-            case EnvironmentVariableType.Secret:
-              currentValue.syncValue = String(previousValue.syncValue);
-              currentValue.localValue = String(previousValue.localValue);
-              break;
+          if (prevType !== EnvironmentVariableType.Secret) {
+            defaultValues.syncValue = "";
+            defaultValues.localValue = "";
           }
           break;
         case EnvironmentVariableType.Secret:
-          currentValue.syncValue = String(previousValue.syncValue);
-          currentValue.localValue = String(previousValue.localValue);
-          break;
-        default:
+          if (prevType !== EnvironmentVariableType.String && prevType !== EnvironmentVariableType.Number) {
+            defaultValues.syncValue = "";
+            defaultValues.localValue = "";
+          }
           break;
       }
 
-      handleVariableChange({ ...record, type: newType, ...currentValue }, "type");
+      handleVariableChange({ ...record, type: value, ...defaultValues }, "type");
     },
-    [record, handleVariableChange, previousValues]
+    [record, handleVariableChange]
   );
 
   const handleValueChange = useCallback(async () => {
@@ -189,15 +184,6 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       form.setFieldsValue({ [dataIndex]: record[dataIndex] });
     }
   }, [form, record, dataIndex, editable]);
-
-  useEffect(() => {
-    if (!isEmpty(record)) {
-      setPreviousValues((prev) => ({
-        ...prev,
-        [record.type]: { syncValue: record.syncValue, localValue: record.localValue },
-      }));
-    }
-  }, [record]);
 
   if (!editable) {
     return <td {...restProps}>{children}</td>;
