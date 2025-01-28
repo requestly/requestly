@@ -12,6 +12,7 @@ import * as rulesActions from "../../features/rulesActions";
 import * as appModeSpecificActions from "../../features/appModeSpecificActions";
 import * as editorToastActions from "../../features/editorToastActions";
 import * as requestBotActions from "../../features/requestBotActions";
+import * as miscActions from "../../features/miscActions";
 
 // Refractored
 import modalsCaseReducers from "./modals/case-reducers";
@@ -31,6 +32,7 @@ const globalSlice = createSlice({
     ...appModeSpecificActions,
     ...editorToastActions,
     ...requestBotActions,
+    ...miscActions,
   },
 });
 

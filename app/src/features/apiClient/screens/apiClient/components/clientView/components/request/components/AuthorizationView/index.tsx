@@ -5,7 +5,6 @@ import AuthorizationForm from "./AuthorizationForm";
 import Description from "./Description";
 import { AUTHORIZATION_FORM_DATA, AUTHORIZATION_STATIC_DATA, AUTHORIZATION_TYPES_META } from "./authStaticData";
 import React from "react";
-import "./authorizationView.scss";
 import { LABEL_TEXT } from "./authConstants";
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { MdClear } from "@react-icons/all-files/md/MdClear";
@@ -13,6 +12,8 @@ import { AUTHORIZATION_TYPES } from "./types";
 import { AUTH_OPTIONS } from "./types/form";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentVariables } from "backend/environment/types";
+import { HelpPanel } from "./HelpPanel";
+import "./authorizationView.scss";
 
 interface Props {
   wrapperClass?: string;
@@ -115,14 +116,14 @@ const AuthorizationView: React.FC<Props> = ({
             />
           </div>
         )}
-        {!isEmpty(AUTHORIZATION_STATIC_DATA[selectedForm]?.description) && (
-          <Description
-            data={AUTHORIZATION_STATIC_DATA[selectedForm]?.description}
-            wrapperClass={`${
-              [AUTHORIZATION_TYPES.NO_AUTH, AUTHORIZATION_TYPES.INHERIT].includes(selectedForm) ? "no-auth" : ""
-            }`}
-          />
-        )}
+
+        {!isEmpty(AUTHORIZATION_STATIC_DATA[selectedForm]?.description) ? (
+          [AUTHORIZATION_TYPES.NO_AUTH, AUTHORIZATION_TYPES.INHERIT].includes(selectedForm) ? (
+            <Description data={AUTHORIZATION_STATIC_DATA[selectedForm]?.description} />
+          ) : (
+            <HelpPanel data={AUTHORIZATION_STATIC_DATA[selectedForm]?.description} />
+          )
+        ) : null}
       </div>
     </div>
   );
