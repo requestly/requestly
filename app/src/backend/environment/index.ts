@@ -54,9 +54,9 @@ export const updateEnvironmentVariablesInDB = async (
   variables: EnvironmentVariables
 ) => {
   const newVariables = Object.fromEntries(
-    Object.entries(variables).map(([key, value], index) => [
+    Object.entries(variables).map(([key, value]) => [
       key,
-      { syncValue: value.syncValue, type: value.type, id: value.id ?? index },
+      { syncValue: value.syncValue, type: value.type, id: value.id },
     ])
   );
 
