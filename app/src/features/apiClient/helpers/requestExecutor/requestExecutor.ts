@@ -157,6 +157,9 @@ export class RequestExecutor {
     try {
       const response = await makeRequest(this.appMode, this.entryDetails.request, this.abortController.signal);
       this.entryDetails.response = response;
+      if (!response) {
+        return this.entryDetails;
+      }
     } catch (e) {
       return {
         ...this.entryDetails,
