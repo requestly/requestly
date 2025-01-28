@@ -59,8 +59,8 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
       switch (value) {
         case EnvironmentVariableType.Boolean:
-          defaultValues.syncValue = Boolean(defaultValues.syncValue);
-          defaultValues.localValue = Boolean(defaultValues.localValue);
+          defaultValues.syncValue = Boolean(defaultValues.syncValue ?? true);
+          defaultValues.localValue = Boolean(defaultValues.localValue ?? true);
           break;
         case EnvironmentVariableType.Number:
           defaultValues.syncValue = isNaN(defaultValues.syncValue as number) ? 0 : Number(defaultValues.syncValue);
@@ -68,8 +68,8 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
           break;
         case EnvironmentVariableType.String:
-          defaultValues.syncValue = String(defaultValues.syncValue);
-          defaultValues.localValue = String(defaultValues.localValue);
+          defaultValues.syncValue = String(defaultValues.syncValue ?? "");
+          defaultValues.localValue = String(defaultValues.localValue ?? "");
 
           break;
         default:
