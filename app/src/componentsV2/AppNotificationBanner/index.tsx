@@ -215,7 +215,9 @@ export const AppNotificationBanner = () => {
           } else return false;
         }
         case BANNER_ID.BILLING_TEAM_PLAN_REMINDER: {
-          const billingTeam = billingTeams?.find((team) => team.id === newBanners[0]?.billingId);
+          const billingTeam = billingTeams?.find(
+            (team) => team.id === newBanners[0]?.billingId && user.details?.profile?.uid in team.members
+          );
           if (
             billingTeam &&
             new Date(user.details?.planDetails?.subscription?.endDate).getTime() <= BILLING_TEAM_PLAN_REMINDER_END_DATE
