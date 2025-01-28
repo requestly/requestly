@@ -18,7 +18,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { SidebarPlaceholderItem } from "features/apiClient/screens/apiClient/components/sidebar/components/SidebarPlaceholderItem/SidebarPlaceholderItem";
 import "./environmentsList.scss";
 import { isGlobalEnvironment } from "../../utils";
-import { ExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ExportModal";
+import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { EnvironmentData } from "backend/environment/types";
 
 export const EnvironmentsList = () => {
@@ -137,11 +137,7 @@ export const EnvironmentsList = () => {
                   .filter((env) => isGlobalEnvironment(env.id))
                   .map((environment) =>
                     environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
-                      <EnvironmentsListItem
-                        openTab={openTab}
-                        environment={environment}
-                        onExportClick={handleExportEnvironments}
-                      />
+                      <EnvironmentsListItem openTab={openTab} environment={environment} />
                     ) : null
                   )}
                 {filteredEnvironments
@@ -164,8 +160,8 @@ export const EnvironmentsList = () => {
             )}
           </div>
           {isExportModalOpen && (
-            <ExportModal
-              exportType="ENV"
+            <ApiClientExportModal
+              exportType="environment"
               environments={environmentsToExport}
               isOpen={isExportModalOpen}
               onClose={() => {

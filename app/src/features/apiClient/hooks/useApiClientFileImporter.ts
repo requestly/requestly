@@ -28,7 +28,11 @@ type ProcessedData = {
 
 type ProcessingStatus = "idle" | "processing" | "processed";
 
-const useFileImporter = (importer: string = "RQ") => {
+export enum ImporterTypes {
+  RQ = "RQ",
+}
+
+const useApiClientFileImporter = (importer: ImporterTypes) => {
   const processors: Record<string, (content: any, uid: string) => any> = {
     RQ: processRqImportData,
     // Add other importers as needed
@@ -53,38 +57,70 @@ const useFileImporter = (importer: string = "RQ") => {
 
   const { environments = [], collections = [], apis = [], recordsCount = 0 } = processedFileData;
 
-  const processFile = useCallback(
-    async (file: File): Promise<void> => {
+  const processFiles = useCallback(
+    (files: File[]) => {
       setProcessingStatus("processing");
-      if (!file.type.includes("json")) {
-        setError("Invalid file format. Please select a valid JSON export file.");
-        return;
-      }
+      setError(null);
 
-      const reader = new FileReader();
-      reader.onerror = () => setError("Failed to import the selected file.");
-      reader.onabort = () => setError("Processing aborted");
+      const processFiles = files.map((file) => {
+        return new Promise((resolve, reject) => {
+          if (!file.type.includes("json")) {
+            throw new Error("Invalid file format. Please select a valid JSON export file.");
+          }
+          const reader = new FileReader();
 
-      reader.onload = () => {
-        try {
-          const content = JSON.parse(reader.result as string);
-          const processor = processors[importer];
-          if (!processor) {
-            throw new Error(`Unsupported importer: ${importer}`);
+          reader.onerror = () => setError("Failed to import the selected file.");
+          reader.onabort = () => setError("Processing aborted");
+
+          reader.onload = () => {
+            try {
+              const content = JSON.parse(reader.result as string);
+              const processor = processors[importer];
+
+              if (!processor) {
+                throw new Error(`Unsupported importer: ${importer}`);
+              }
+
+              const processedData = processor(content, uid);
+              resolve(processedData);
+            } catch (error) {
+              Logger.error("Error processing file:", error);
+              reject(error);
+            }
+          };
+          reader.readAsText(file);
+        });
+      });
+
+      Promise.allSettled(processFiles)
+        .then((results) => {
+          const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
+          if (hasProcessingAllFilesFailed) {
+            throw new Error("Could not process the selected files!, Please check if the files are valid export files.");
           }
 
-          const result = processor(content, uid);
-          setProcessingStatus("processed");
-          setProcessedFileData(result);
-        } catch (error) {
-          setProcessingStatus("idle");
-          setError(error.message);
-        }
-      };
+          results.forEach((result: any) => {
+            if (result.status === "fulfilled") {
+              setProcessedFileData((prev) => {
+                prev.collections.push(...result.value.collections);
+                prev.apis.push(...result.value.apis);
+                prev.environments.push(...result.value.environments);
+                prev.recordsCount = prev.recordsCount + result.value.count;
+                return prev;
+              });
+            } else {
+              console.error("Error processing file:", result.reason);
+            }
+          });
 
-      reader.readAsText(file);
+          setProcessingStatus("processed");
+        })
+        .catch((error) => {
+          setError(error.message);
+          setProcessingStatus("idle");
+        });
     },
-    [processors, importer, uid]
+    [error, processors, importer, uid]
   );
 
   const handleImportEnvironments = useCallback(async (): Promise<number> => {
@@ -237,7 +273,7 @@ const useFileImporter = (importer: string = "RQ") => {
     setProcessedFileData({ apis: [], environments: [], collections: [], recordsCount: 0 });
   };
 
-  return { isImporting, error, processFile, handleImportData, resetImportData, processingStatus };
+  return { isImporting, error, processFiles, handleImportData, resetImportData, processingStatus };
 };
 
-export default useFileImporter;
+export default useApiClientFileImporter;

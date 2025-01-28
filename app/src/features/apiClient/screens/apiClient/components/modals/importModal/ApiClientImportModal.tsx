@@ -5,27 +5,26 @@ import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOut
 import { RQButton } from "lib/design-system-v2/components";
 import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
 import {} from "modules/analytics/events/features/apiClient";
-import "./importModal.scss";
-import useFileImporter from "hooks/useFileImporter";
+import "./apiClientImportModal.scss";
+import useApiClientFileImporter, { ImporterTypes } from "features/apiClient/hooks/useApiClientFileImporter";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const ImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
+export const ApiClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const {
     isImporting,
     error,
-    processFile,
+    processFiles,
     handleImportData,
     resetImportData,
     processingStatus = "processed",
-  } = useFileImporter("RQ");
+  } = useApiClientFileImporter(ImporterTypes.RQ);
 
   const handleFileDrop = (files: File[]) => {
-    const file = files[0];
-    processFile(file);
+    processFiles(files);
   };
 
   return (
@@ -63,7 +62,7 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
         </div>
       ) : (
         <FilePicker
-          maxFiles={1}
+          maxFiles={1000}
           onFilesDrop={handleFileDrop}
           isProcessing={processingStatus === "processing"}
           title="Drop your Requestly collections or environments export files here"

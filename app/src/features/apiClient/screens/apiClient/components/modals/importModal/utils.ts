@@ -47,11 +47,15 @@ export const processRqImportData = (
   const oldToNewIdMap: Record<string, string> = {};
 
   collections.forEach((collection: RQAPI.CollectionRecord) => {
-    const collectionToImport = { ...collection, name: `(Imported) ${collection.name}` };
-    delete collectionToImport.id;
+    const oldId = collection.id;
+    delete collection.id;
     const newId = generateDocumentId("apis");
-    collectionToImport.id = newId;
-    oldToNewIdMap[collection.id] = newId;
+    collection.id = newId;
+    oldToNewIdMap[oldId] = newId;
+  });
+
+  collections.forEach((collection: RQAPI.CollectionRecord) => {
+    const collectionToImport = { ...collection, name: `(Imported) ${collection.name}` };
     if (collectionToImport.collectionId) {
       const oldCollectionId = collectionToImport.collectionId;
       delete collectionToImport.collectionId;

@@ -19,7 +19,7 @@ interface EnvironmentsListItemProps {
     name: string;
     isGlobal?: boolean;
   };
-  onExportClick: (environment: { id: string; name: string }) => void;
+  onExportClick?: (environment: { id: string; name: string }) => void;
   openTab: TabsLayoutContextInterface["openTab"];
 }
 

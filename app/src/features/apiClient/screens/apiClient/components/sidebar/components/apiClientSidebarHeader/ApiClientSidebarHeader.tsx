@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { ImportModal } from "../../../modals/importModal/ImportModal";
+import { ApiClientImportModal } from "../../../modals/importModal/ApiClientImportModal";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import { SiPostman } from "@react-icons/all-files/si/SiPostman";
@@ -272,7 +272,9 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         {user.loggedIn && <EnvironmentSwitcher />}
       </div>
 
-      {isImportModalOpen && <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />}
+      {isImportModalOpen && (
+        <ApiClientImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
+      )}
       {isPostmanImporterModalOpen && (
         <PostmanImporterModal
           isOpen={isPostmanImporterModalOpen}
