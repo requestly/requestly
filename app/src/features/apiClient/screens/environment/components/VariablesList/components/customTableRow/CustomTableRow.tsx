@@ -51,7 +51,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   const inputRef = useRef(null);
 
   const handleTypeChange = useCallback(
-    (value: EnvironmentVariableType, prevType: EnvironmentVariableType) => {
+    (value: EnvironmentVariableType) => {
       const defaultValues = {
         syncValue: record.syncValue,
         localValue: record.localValue,
@@ -93,12 +93,9 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   }, [dataIndex, handleVariableChange, record, form]);
 
   const handleChange = useCallback(
-    (
-      value: string | number | boolean | EnvironmentVariableType,
-      prevValue?: string | number | boolean | EnvironmentVariableType
-    ) => {
+    (value: string | number | boolean | EnvironmentVariableType) => {
       if (dataIndex === "type") {
-        handleTypeChange(value as EnvironmentVariableType, prevValue as EnvironmentVariableType);
+        handleTypeChange(value as EnvironmentVariableType);
       } else {
         handleValueChange();
       }
@@ -171,7 +168,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         {dataIndex === "type" ? (
           <Select
             className="w-full"
-            onChange={(value) => handleChange(value as EnvironmentVariableType, record.type)}
+            onChange={(value) => handleChange(value as EnvironmentVariableType)}
             value={record.type}
           >
             {options?.map((option) => (
