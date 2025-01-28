@@ -65,7 +65,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
                 <span>
                   {`${modificationType} Headers`}
                   <Badge
-                    count={pair.modifications[modificationType]?.length}
+                    count={pair.modifications?.[modificationType]?.length}
                     size="small"
                     style={{ margin: "0 5px" }}
                   />

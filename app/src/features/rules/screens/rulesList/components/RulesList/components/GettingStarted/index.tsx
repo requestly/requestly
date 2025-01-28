@@ -33,7 +33,6 @@ import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOut
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { HiOutlineTemplate } from "@react-icons/all-files/hi/HiOutlineTemplate";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
-import { RuleType } from "types";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { RuleSelectionListDrawer } from "../RuleSelectionListDrawer/RuleSelectionListDrawer";
 import { trackAskAIClicked } from "features/requestBot";
@@ -44,6 +43,7 @@ import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
 import "./gettingStarted.scss";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 import { ImportFromResourceOverrideModal } from "../ImporterComponents/ResourceOverrideImporter";
 
 const { PATHS } = APP_CONSTANTS;

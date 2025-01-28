@@ -94,7 +94,9 @@ export const SettingsPrimarySidebar: React.FC = () => {
   );
 
   return (
-    <Col className="settings-primary-sidebar">
+    <Col
+      className={`settings-primary-sidebar ${appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? "app-mode-desktop" : ""}`}
+    >
       <Row align="middle" gutter={6}>
         <Col>
           <IoMdArrowBack

@@ -17,13 +17,13 @@ import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import { SharedLinkVisibility } from "./types";
 import Logger from "lib/logger";
 import { getAllRecords } from "store/features/rules/selectors";
-import { StorageRecord } from "features/rules/types/rules";
 import { trackSharedListCreatedEvent } from "modules/analytics/events/features/sharedList";
 import { trackSharedListUrlCopied } from "features/rules/screens/sharedLists";
 import EmailInputWithDomainBasedSuggestions from "../EmailInputWithDomainBasedSuggestions";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import "./index.css";
+import { StorageRecord } from "@requestly/shared/types/entities/rules";
 
 interface ShareLinkProps {
   selectedRules: StorageRecord["id"][];

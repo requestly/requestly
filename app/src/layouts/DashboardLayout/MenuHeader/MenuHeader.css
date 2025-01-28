@@ -7,8 +7,7 @@
   display: flex;
   align-items: center;
   padding: 9px 12px;
-  border-bottom: 1px solid var(--border-dark);
-  background-color: var(--body-background);
+  background-color: inherit;
 }
 
 .layout-header.ant-layout-header .ant-row {
