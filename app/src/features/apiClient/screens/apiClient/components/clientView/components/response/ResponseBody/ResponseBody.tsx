@@ -8,17 +8,6 @@ import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyRespo
 import { RQButton } from "lib/design-system-v2/components";
 import { IoMdCopy } from "@react-icons/all-files/io/IoMdCopy";
 import { RQAPI } from "features/apiClient/types";
-import { getIsCodeEditorFullScreenModeOnboardingCompleted } from "store/selectors";
-import { toast } from "utils/Toast";
-import { useLocation } from "react-router-dom";
-import PATHS from "config/constants/sub/paths";
-import {
-  trackCodeEditorCollapsedClick,
-  trackCodeEditorExpandedClick,
-} from "../../../../../../../../../componentsV2/CodeEditor/components/analytics";
-import { useDispatch, useSelector } from "react-redux";
-import { AnalyticEventProperties } from "componentsV2/CodeEditor/types";
-import { globalActions } from "store/slices/global/slice";
 
 interface Props {
   responseText: string;
@@ -27,7 +16,6 @@ interface Props {
   isFailed: boolean;
   onCancelRequest: () => void;
   error?: RQAPI.RequestErrorEntry["error"];
-  analyticEventProperties: AnalyticEventProperties;
 }
 
 enum ResponseMode {
@@ -50,41 +38,14 @@ const ResponseBody: React.FC<Props> = ({
   isFailed,
   onCancelRequest,
   error,
-  analyticEventProperties,
 }) => {
   const [responseMode, setResponseMode] = useState(ResponseMode.PREVIEW);
   const [isResponseCopied, setIsResponseCopied] = useState(false);
 
   const [isResponseBodyFullScreen, setIsResponseBodyFullScreen] = useState(false);
-  const isFullScreenModeOnboardingCompleted = useSelector(getIsCodeEditorFullScreenModeOnboardingCompleted);
-  const location = useLocation();
-  const dispatch = useDispatch();
-
-  const handleResponseBodyFullScreenToggle = useCallback(() => {
+  const handleFullscreenChange = () => {
     setIsResponseBodyFullScreen((prev) => !prev);
-    if (!isResponseBodyFullScreen) {
-      trackCodeEditorExpandedClick(analyticEventProperties);
-
-      if (!isFullScreenModeOnboardingCompleted) {
-        // TODO: @rohanmathur to remove this check after adding shortcut in mocks save button
-        const isRuleEditor = location?.pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
-
-        if (isRuleEditor) {
-          toast.info(`Use '⌘+S' or 'ctrl+S' to save the rule`, 3);
-          // @ts-ignore
-          dispatch(globalActions.updateIsCodeEditorFullScreenModeOnboardingCompleted(true));
-        }
-      }
-    } else {
-      trackCodeEditorCollapsedClick(analyticEventProperties);
-    }
-  }, [
-    analyticEventProperties,
-    dispatch,
-    isFullScreenModeOnboardingCompleted,
-    isResponseBodyFullScreen,
-    location?.pathname,
-  ]);
+  };
 
   const onResponseModeChange = useCallback((e: RadioChangeEvent) => {
     const responseMode: ResponseMode = e.target.value;
@@ -144,17 +105,11 @@ const ResponseBody: React.FC<Props> = ({
             options: [bodyPreviewModeOptions],
           }}
           isFullScreen={isResponseBodyFullScreen}
-          handleFullScreenToggle={handleResponseBodyFullScreenToggle}
+          onFullscreenChange={handleFullscreenChange}
         />
       </div>
     );
-  }, [
-    contentTypeHeader,
-    responseText,
-    bodyPreviewModeOptions,
-    isResponseBodyFullScreen,
-    handleResponseBodyFullScreenToggle,
-  ]);
+  }, [contentTypeHeader, responseText, bodyPreviewModeOptions, isResponseBodyFullScreen]);
 
   return (
     <div className="api-client-response-body">

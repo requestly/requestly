@@ -100,7 +100,6 @@ const RequestTabs: React.FC<Props> = ({
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
             variables={variables}
-            analyticEventProperties={{ source: "api_client" }}
           />
         ),
         disabled: !isRequestBodySupported,
