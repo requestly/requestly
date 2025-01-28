@@ -16,10 +16,10 @@
     color: var(--requestly-color-error-300);
   }
   & .#{$class}[title="HEAD"] {
-    color: var(--requestly-color-success-100);
+    color: #5fd7de;
   }
   & .#{$class}[title="OPTIONS"] {
-    color: var(--requestly-color-warning-100);
+    color: #f335ec;
   }
 }
 
