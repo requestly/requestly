@@ -16,12 +16,12 @@ export const makeRequest = async (
   return new Promise((resolve, reject) => {
     if (signal) {
       if (signal.aborted) {
-        reject();
+        reject(new Error("Request aborted"));
       }
 
       const abortListener = () => {
         signal.removeEventListener("abort", abortListener);
-        reject();
+        reject(new Error("Request aborted"));
       };
       signal.addEventListener("abort", abortListener);
     }
