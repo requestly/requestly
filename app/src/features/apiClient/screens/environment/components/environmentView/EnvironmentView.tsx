@@ -12,9 +12,9 @@ import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
 import "./environmentView.scss";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
-import { ExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ExportModal";
 import { isEmpty } from "lodash";
 import { isGlobalEnvironment } from "../../utils";
+import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 
 export const EnvironmentView = () => {
   const navigate = useNavigate();
@@ -121,8 +121,8 @@ export const EnvironmentView = () => {
             />
             <VariablesList searchValue={searchValue} variables={variables} onVariablesChange={setPendingVariables} />
             {isExportModalOpen && (
-              <ExportModal
-                exportType="ENV"
+              <ApiClientExportModal
+                exportType="environment"
                 environments={[{ id: envId, name: environmentName, variables }]}
                 isOpen={isExportModalOpen}
                 onClose={() => {
