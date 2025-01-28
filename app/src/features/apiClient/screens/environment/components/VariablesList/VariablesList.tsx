@@ -155,8 +155,8 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
   useEffect(() => {
     if (variables) {
       const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables)
-        .map(([key, value]) => ({
-          id: value.id,
+        .map(([key, value], index) => ({
+          id: value.id ?? index,
           key,
           type: value.type,
           localValue: value.localValue,
