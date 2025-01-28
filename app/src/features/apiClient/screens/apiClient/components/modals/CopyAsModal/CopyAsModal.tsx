@@ -1,11 +1,12 @@
 import { RequestContentType, RQAPI } from "features/apiClient/types";
 import { Request as HarRequest } from "har-format";
-import { HTTPSnippet, availableTargets } from "httpsnippet";
+import { HTTPSnippet, availableTargets } from "@readme/httpsnippet";
 import { RQModal } from "lib/design-system/components";
 import { useCallback, useEffect, useState } from "react";
 import { apiRequestToHarRequestAdapter } from "../../../utils";
-import { Select, Typography } from "antd";
+import { Select } from "antd";
 import "./copyAsModal.scss";
+import CopyButton from "components/misc/CopyButton";
 
 interface CopyAsModalProps {
   open: boolean;
@@ -15,8 +16,6 @@ interface CopyAsModalProps {
 
 type TargetId = ReturnType<typeof availableTargets>[number]["key"];
 type ClientId = ReturnType<typeof availableTargets>[number]["clients"][number]["key"];
-
-const { Paragraph } = Typography;
 
 const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
   const [harRequest, setHarRequest] = useState<HarRequest>();
@@ -35,37 +34,49 @@ const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
       return;
     }
 
-    console.log({ harRequest });
-    const httpsnippet = new HTTPSnippet({ postData: { mimeType: RequestContentType.RAW }, ...harRequest });
-    let convertedString = httpsnippet.convert(
-      snippetTypeId.split("-")[0] as TargetId,
-      snippetTypeId.split("-")[1] as ClientId,
-      {}
-    );
+    let snippet: any = "";
+    try {
+      const httpsnippet = new HTTPSnippet({ postData: { mimeType: RequestContentType.RAW }, ...harRequest });
+      snippet = httpsnippet.convert(
+        snippetTypeId.split("-")[0] as TargetId,
+        snippetTypeId.split("-")[1] as ClientId,
+        {}
+      );
+    } catch (err) {
+      snippet = "Some error occured while generating snippet.";
+    }
 
-    console.log({ convertedString });
-    return convertedString;
+    return snippet;
   }, [snippetTypeId, harRequest]);
 
   return (
     <RQModal
-      width={320}
+      width={500}
       open={open}
       maskClosable={false}
       destroyOnClose={true}
       className="copy-as-modal"
       onCancel={onClose}
     >
-      <Select onChange={(value) => setSnippetTypeId(value)} value={snippetTypeId}>
-        {availableTargets().map((target) => {
-          return target.clients.map((client) => {
-            return (
-              <Select.Option value={`${target.key}-${client.key}`}>{`${target.title} - ${client.title}`}</Select.Option>
-            );
-          });
-        })}
-      </Select>
-      <div className="snippet-container">{getSnippet()}</div>
+      <div className="snippet-container">
+        <div className="snippet-actions">
+          <Select showSearch onChange={(value) => setSnippetTypeId(value)} value={snippetTypeId}>
+            {availableTargets().map((target) => {
+              return target.clients.map((client) => {
+                return (
+                  <Select.Option
+                    value={`${target.key}-${client.key}`}
+                  >{`${target.title} - ${client.title}`}</Select.Option>
+                );
+              });
+            })}
+          </Select>
+          <CopyButton copyText={getSnippet()} />
+        </div>
+        <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }} className="snippet-content">
+          {getSnippet()}
+        </div>
+      </div>
     </RQModal>
   );
 };

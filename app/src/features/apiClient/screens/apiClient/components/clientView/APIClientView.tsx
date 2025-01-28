@@ -1,4 +1,4 @@
-import { Select, Skeleton, Space } from "antd";
+import { Dropdown, Row, Select, Skeleton, Space } from "antd";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
@@ -48,6 +48,7 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { RequestExecutor } from "features/apiClient/helpers/requestExecutor/requestExecutor";
 import { isEmpty } from "lodash";
 import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
+import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 
 interface Props {
   openInModal?: boolean;
@@ -531,7 +532,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               >
                 Send
               </RQButton>
-              <RQButton onClick={() => setCopyAsModalOpen(true)}>Copy as</RQButton>
               {user.loggedIn && !openInModal ? (
                 <RQButton
                   showHotKeyText
@@ -542,6 +542,36 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   Save
                 </RQButton>
               ) : null}
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: 0,
+                      onClick: () => {
+                        requestExecutor.updateApiRecords(apiClientRecords);
+                        requestExecutor.updateEntryDetails({
+                          entry: sanitizeEntry(entry),
+                          recordId: apiEntryDetails?.id,
+                          collectionId: apiEntryDetails?.collectionId,
+                        });
+                        setCopyAsModalOpen(true);
+                      },
+                      label: <Row>Copy As</Row>,
+                    },
+                  ],
+                }}
+                trigger={["click"]}
+                overlayClassName="rule-more-actions-dropdown"
+              >
+                <RQButton
+                  type="transparent"
+                  className="more-rule-actions-btn"
+                  icon={<MdOutlineMoreHoriz />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                />
+              </Dropdown>
             </div>
             <RequestTabs
               key={requestId}
@@ -556,7 +586,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         </div>
       </BottomSheetLayout>
       {copyAsModalOpen ? (
-        <CopyAsModal apiRequest={entry?.request} open={copyAsModalOpen} onClose={() => setCopyAsModalOpen(false)} />
+        <CopyAsModal
+          apiRequest={requestExecutor.prepareRequest()}
+          open={copyAsModalOpen}
+          onClose={() => setCopyAsModalOpen(false)}
+        />
       ) : null}
     </div>
   ) : (
