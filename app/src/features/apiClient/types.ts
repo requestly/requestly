@@ -1,6 +1,7 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { AUTH_OPTIONS } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/form";
 import { AUTHORIZATION_TYPES } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
+import { TestResult } from "./helpers/modules/scriptsV2/worker/script-internals/types";
 
 export enum RequestMethod {
   GET = "GET",
@@ -95,6 +96,7 @@ export namespace RQAPI {
   export interface Entry {
     request: Request;
     response?: Response;
+    testResults?: TestResult[];
     scripts?: {
       preRequest: string;
       postResponse: string;
@@ -102,8 +104,7 @@ export namespace RQAPI {
     auth?: AuthOptions;
   }
 
-  export interface RequestErrorEntry {
-    request: RQAPI.Request;
+  export interface RequestErrorEntry extends Entry {
     response: null;
     error: {
       source: string;

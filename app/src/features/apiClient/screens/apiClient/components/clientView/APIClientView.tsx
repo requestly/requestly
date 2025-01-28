@@ -281,9 +281,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       .execute()
       .then(({ executedEntry, testResults }) => {
         const response = executedEntry.response;
-        // TODO: Add an entry in history
-        const entryWithResponse = { ...entry, response };
-        const renderedEntryWithResponse = { ...executedEntry, response };
+        const entryWithResponse = { ...entry, response, testResults };
+        const completeRenderedEntry = { ...executedEntry, response, testResults };
 
         if (response) {
           setEntry(entryWithResponse);
@@ -317,7 +316,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
           trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
         }
-        notifyApiRequestFinished?.(renderedEntryWithResponse);
+        notifyApiRequestFinished?.(completeRenderedEntry);
       })
       .catch((e) => {
         setIsFailed(true);
@@ -436,6 +435,26 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     (evt.target as HTMLInputElement).blur();
   }, []);
 
+  const handleTestResultRefresh = useCallback(async () => {
+    try {
+      apiClientExecutor.updateEntryDetails({
+        entry: sanitizeEntry(entry),
+        recordId: apiEntryDetails?.id,
+        collectionId: apiEntryDetails?.collectionId,
+      });
+
+      const result = await apiClientExecutor.rerun();
+      if (result?.testResults) {
+        setEntry((entry) => ({
+          ...entry,
+          testResults: result.testResults,
+        }));
+      }
+    } catch (error) {
+      toast.error("Something went wrong while refreshing test results");
+    }
+  }, [apiClientExecutor, apiEntryDetails?.id, apiEntryDetails?.collectionId, entry]);
+
   useEffect(() => {
     if (!apiClientExecutor) {
       setApiClientExecutor(new ApiClientExecutor(appMode, apiClientWorkloadManager));
@@ -482,10 +501,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           <ApiClientBottomSheet
             key={requestId}
             response={entry.response}
+            testResults={entry.testResults}
             isLoading={isLoadingResponse}
             isFailed={isFailed}
             isRequestCancelled={isRequestCancelled}
             onCancelRequest={cancelRequest}
+            handleTestResultRefresh={handleTestResultRefresh}
             error={error}
           />
         }
