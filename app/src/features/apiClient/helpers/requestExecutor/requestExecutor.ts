@@ -33,7 +33,7 @@ export class RequestExecutor {
   private internalFunctions: InternalFunctions;
   constructor(private appMode: string, private workloadManager: APIClientWorkloadManager) {}
 
-  private prepareRequest() {
+  prepareRequest() {
     this.abortController = new AbortController();
     this.entryDetails.request.queryParams = [];
 
@@ -53,6 +53,7 @@ export class RequestExecutor {
     // Process request configuration with environment variables
     const renderedRequest = renderVariables(this.entryDetails.request, this.collectionId);
     this.entryDetails.request = renderedRequest;
+    return renderedRequest;
   }
 
   private buildBaseSnapshot(): BaseSnapshot {
