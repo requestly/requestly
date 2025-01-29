@@ -1,4 +1,4 @@
-import { Select, Skeleton, Space } from "antd";
+import { Dropdown, Row, Select, Skeleton, Space } from "antd";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
@@ -47,6 +47,8 @@ import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { RequestExecutor } from "features/apiClient/helpers/requestExecutor/requestExecutor";
 import { isEmpty } from "lodash";
+import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
+import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 
 interface Props {
   openInModal?: boolean;
@@ -108,6 +110,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse), isAnimating);
   const { updateTab, activeTab } = useTabsLayoutContext();
+
+  const [copyAsModalOpen, setCopyAsModalOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -551,6 +555,36 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   Save
                 </RQButton>
               ) : null}
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: 0,
+                      onClick: () => {
+                        requestExecutor.updateApiRecords(apiClientRecords);
+                        requestExecutor.updateEntryDetails({
+                          entry: sanitizeEntry(entry),
+                          recordId: apiEntryDetails?.id,
+                          collectionId: apiEntryDetails?.collectionId,
+                        });
+                        setCopyAsModalOpen(true);
+                      },
+                      label: <Row>Copy As</Row>,
+                    },
+                  ],
+                }}
+                trigger={["click"]}
+                overlayClassName="rule-more-actions-dropdown"
+              >
+                <RQButton
+                  type="transparent"
+                  className="more-api-request-actions-button"
+                  icon={<MdOutlineMoreHoriz />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                />
+              </Dropdown>
             </div>
             <RequestTabs
               key={requestId}
@@ -564,6 +598,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           </Skeleton>
         </div>
       </BottomSheetLayout>
+      {copyAsModalOpen ? (
+        <CopyAsModal
+          apiRequest={requestExecutor.prepareRequest()}
+          open={copyAsModalOpen}
+          onClose={() => setCopyAsModalOpen(false)}
+        />
+      ) : null}
     </div>
   ) : (
     <div className="w-full">
