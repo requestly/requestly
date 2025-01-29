@@ -233,10 +233,13 @@ const useEnvironmentManager = (options = { initFetchers: true }) => {
   const setVariables = useCallback(
     async (environmentId: string, variables: EnvironmentVariables) => {
       const newVariablesWithSyncvalues: EnvironmentVariables = Object.fromEntries(
-        Object.entries(variables).map(([key, value]) => {
+        Object.entries(variables).map(([key, value], index) => {
           const typeToSaveInDB =
             value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
-          return [key.trim(), { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB }];
+          return [
+            key.trim(),
+            { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB, id: value.id ?? index },
+          ];
         })
       );
 
