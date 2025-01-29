@@ -8,7 +8,7 @@ import { RQAPI } from "features/apiClient/types";
 interface EmptyResponseViewProps {
   isFailed: boolean;
   emptyDescription: string;
-  error?: RQAPI.ExecutionResult["error"];
+  error?: RQAPI.ExecutionError;
 }
 export const EmptyResponsePlaceholder: React.FC<EmptyResponseViewProps> = ({ isFailed, emptyDescription, error }) => {
   return (

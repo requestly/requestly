@@ -109,23 +109,31 @@ export namespace RQAPI {
     ERROR = "error",
   }
 
-  export type ExecutionResult =
-    | {
+  export type ExecutionError = {
+    source: string;
+    name: Error["name"];
+    message: Error["message"];
+  };
+
+  export type ExecutionResult = {
+        status: ExecutionStatus.SUCCESS;
         executedEntry: RQAPI.Entry;
-        status: "success";
-        error?: never;
       }
     | {
-        executedEntry: RQAPI.Entry & {
-          response: null;
-        };
-        status: "error";
-        error: {
-          source: string;
-          name: Error["name"];
-          message: Error["message"];
-        };
+        status: ExecutionStatus.ERROR;
+        executedEntry: RQAPI.Entry;
+        error: ExecutionError;
       };
+
+export type RerunResult = {
+  status: ExecutionStatus.SUCCESS,
+  artifacts: {
+    testResults: TestResult[],
+  }
+} | {
+  status: ExecutionStatus.ERROR,
+  error: ExecutionError,
+}
 
   export interface Collection {
     children?: Record[];

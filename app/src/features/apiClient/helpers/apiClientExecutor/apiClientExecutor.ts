@@ -7,11 +7,9 @@ import {
   PostResponseScriptWorkload,
   PreRequestScriptWorkload,
   WorkResultType,
-  WorkError,
 } from "../modules/scriptsV2/workloadManager/workLoadTypes";
 import { notification } from "antd";
 import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshotTypes";
-import { TestResult } from "../modules/scriptsV2/worker/script-internals/types";
 import {
   trackScriptExecutionCompleted,
   trackScriptExecutionFailed,
@@ -144,7 +142,6 @@ export class ApiClientExecutor {
       return {
         executedEntry: {
           ...this.entryDetails,
-          response: null,
         },
         status: RQAPI.ExecutionStatus.ERROR,
         error: {
@@ -160,13 +157,15 @@ export class ApiClientExecutor {
     try {
       const response = await makeRequest(this.appMode, this.entryDetails.request, this.abortController.signal);
       this.entryDetails.response = response;
+
+      // This should be returned normally, encapsulated by WorkResult
       if (!response) {
         throw Error("Failed to send the request. Please check if the URL is valid");
       }
     } catch (e) {
       return {
         status: RQAPI.ExecutionStatus.ERROR,
-        executedEntry: { ...this.entryDetails, response: null },
+        executedEntry: { ...this.entryDetails },
         error: {
           source: "request",
           name: e.name,
@@ -214,15 +213,15 @@ export class ApiClientExecutor {
     };
   }
 
-  async rerun(): Promise<{
-    testResults: TestResult[];
-    error?: WorkError;
-  }> {
+  async rerun(): Promise<RQAPI.RerunResult> {
     const preRequestScriptResult = await this.executePreRequestScript(async () => {});
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
       return {
-        testResults: [] as TestResult[],
-        error: preRequestScriptResult.error,
+        status: RQAPI.ExecutionStatus.ERROR,
+        error: {
+          source: "Rerun Pre-request script",  
+          ...preRequestScriptResult.error,
+        },
       };
     }
 
@@ -230,16 +229,22 @@ export class ApiClientExecutor {
 
     if (responseScriptResult.type === WorkResultType.ERROR) {
       return {
-        testResults: [],
-        error: responseScriptResult.error,
+        status: RQAPI.ExecutionStatus.ERROR,
+        error: {
+          source: "Rerun Pre-request script",  
+          ...responseScriptResult.error,
+        },
       };
     }
 
     return {
-      testResults: [
-        ...(preRequestScriptResult.testExecutionResults || []),
-        ...(responseScriptResult.testExecutionResults || []),
-      ],
+      status: RQAPI.ExecutionStatus.SUCCESS,
+      artifacts: {
+        testResults: [
+          ...(preRequestScriptResult.testExecutionResults || []),
+          ...(responseScriptResult.testExecutionResults || []),
+        ],
+      },
     };
   }
 

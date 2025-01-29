@@ -17,7 +17,7 @@ interface Props {
   isRequestCancelled: boolean;
   onCancelRequest: () => void;
   handleTestResultRefresh: () => Promise<void>;
-  error?: RQAPI.ExecutionResult["error"];
+  error?: RQAPI.ExecutionError;
 }
 
 const BOTTOM_SHEET_TAB_KEYS = {

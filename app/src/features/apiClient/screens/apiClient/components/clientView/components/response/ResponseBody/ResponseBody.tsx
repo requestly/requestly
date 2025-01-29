@@ -15,7 +15,7 @@ interface Props {
   isLoading: boolean;
   isFailed: boolean;
   onCancelRequest: () => void;
-  error?: RQAPI.ExecutionResult["error"];
+  error?: RQAPI.ExecutionError;
 }
 
 enum ResponseMode {

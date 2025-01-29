@@ -94,7 +94,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>({ ...(apiEntry ?? getEmptyAPIEntry()) });
   const [isFailed, setIsFailed] = useState(false);
-  const [error, setError] = useState<RQAPI.ExecutionResult["error"]>(null);
+  const [error, setError] = useState<RQAPI.ExecutionError>(null);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
@@ -280,7 +280,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     try {
       const apiClientExecutionResult = await apiClientExecutor.execute();
       const { executedEntry } = apiClientExecutionResult;
-      const entryWithResponse = {
+      const entryWithResponse: RQAPI.Entry = {
         ...entry,
         response: executedEntry.response,
         testResults: executedEntry.testResults,
@@ -441,11 +441,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       });
 
       const result = await apiClientExecutor.rerun();
-      if (result?.testResults) {
+      if (result.status === RQAPI.ExecutionStatus.SUCCESS) {
         setEntry((entry) => ({
           ...entry,
-          testResults: result.testResults,
+          testResults: result.artifacts.testResults,
         }));
+      } else {
+        setError(result.error);
       }
     } catch (error) {
       toast.error("Something went wrong while refreshing test results");
