@@ -1,5 +1,6 @@
 import noAuth from "./assets/no-auth.svg";
 import inheritAuth from "./assets/inherit-auth.svg";
+import { AUTH_FORM_FIELD_TYPES } from "./types";
 
 export const AUTHORIZATION_TYPES = {
   INHERIT: "INHERIT",
@@ -19,11 +20,11 @@ export const AUTHORIZATION_TYPES_META = [
 
 export const AUTHORIZATION_FORM_DATA = {
   [AUTHORIZATION_TYPES.API_KEY]: [
-    { id: "key", type: "RQ_SINGLE_LINE_EDITOR", label: "Key", placeholder: "Key" },
-    { id: "value", type: "RQ_SINGLE_LINE_EDITOR", label: "Value", placeholder: "Value" },
+    { id: "key", type: AUTH_FORM_FIELD_TYPES.INPUT, label: "Key", placeholder: "Key" },
+    { id: "value", type: AUTH_FORM_FIELD_TYPES.INPUT, label: "Value", placeholder: "Value" },
     {
       id: "addTo",
-      type: "SELECT",
+      type: AUTH_FORM_FIELD_TYPES.SELECT,
       label: "Add to",
       options: [
         { label: "Header", value: "HEADER" },
@@ -33,11 +34,11 @@ export const AUTHORIZATION_FORM_DATA = {
     },
   ],
   [AUTHORIZATION_TYPES.BEARER_TOKEN]: [
-    { id: "bearer", type: "RQ_SINGLE_LINE_EDITOR", label: "Token", placeholder: "Token" },
+    { id: "bearer", type: AUTH_FORM_FIELD_TYPES.INPUT, label: "Token", placeholder: "Token" },
   ],
   [AUTHORIZATION_TYPES.BASIC_AUTH]: [
-    { id: "username", type: "RQ_SINGLE_LINE_EDITOR", label: "Username", placeholder: "Username" },
-    { id: "password", type: "RQ_SINGLE_LINE_EDITOR", label: "Password", placeholder: "Password" },
+    { id: "username", type: AUTH_FORM_FIELD_TYPES.INPUT, label: "Username", placeholder: "Username" },
+    { id: "password", type: AUTH_FORM_FIELD_TYPES.INPUT, label: "Password", placeholder: "Password" },
   ],
 };
 

@@ -90,17 +90,17 @@ const processScripts = (item: any) => {
 };
 
 const processAuthorizationOptions = (
-  item: Record<string, any> = {},
+  item: { type?: keyof typeof POSTMAN_AUTH_TYPES_MAPPING; [key: string]: any } = {},
   parentCollectionId?: string
 ): RQAPI.AuthOptions => {
   const currentAuthType =
-    POSTMAN_AUTH_TYPES_MAPPING[item?.type] ??
+    POSTMAN_AUTH_TYPES_MAPPING[item?.type as keyof typeof POSTMAN_AUTH_TYPES_MAPPING] ??
     (parentCollectionId ? AUTHORIZATION_TYPES.INHERIT : AUTHORIZATION_TYPES.NO_AUTH);
 
   const auth: RQAPI.AuthOptions = { currentAuthType, [currentAuthType]: {} };
 
   const authOptions = item[item?.type] || [];
-  authOptions.forEach((option: Record<string, any>) => {
+  authOptions.forEach((option: { key: string; value: string }) => {
     auth[currentAuthType][POSTMAN_FIELD_MAPPING.get(option.key)] = POSTMAN_FIELD_MAPPING.get(option.value);
   });
 

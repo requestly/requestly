@@ -8,7 +8,7 @@ import React from "react";
 import { LABEL_TEXT } from "./authConstants";
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { MdClear } from "@react-icons/all-files/md/MdClear";
-import { AUTHORIZATION_TYPES } from "./types";
+import { AuthFormData, AUTHORIZATION_TYPES } from "./types";
 import { AUTH_OPTIONS } from "./types/form";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentVariables } from "backend/environment/types";
@@ -108,7 +108,7 @@ const AuthorizationView: React.FC<Props> = ({
               <span>{LABEL_TEXT.INFO_TEXT}</span>
             </p>
             <AuthorizationForm
-              formData={AUTHORIZATION_FORM_DATA[selectedForm] || []}
+              formData={AUTHORIZATION_FORM_DATA[selectedForm] as AuthFormData}
               formType={selectedForm}
               onChangeHandler={debouncedOnChange}
               formvalues={formValues[selectedForm] || {}}
