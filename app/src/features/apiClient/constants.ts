@@ -1,4 +1,4 @@
-import { AUTHORIZATION_TYPES } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
+import { AUTHORIZATION_TYPES } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 
 export const CONTENT_TYPE_HEADER = "Content-Type";
 
