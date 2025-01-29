@@ -1,4 +1,4 @@
 {
   "storageType": "local",
-  "contextMenuContexts": ["all"]
+  "contextMenuContexts": ["browser_action"]
 }

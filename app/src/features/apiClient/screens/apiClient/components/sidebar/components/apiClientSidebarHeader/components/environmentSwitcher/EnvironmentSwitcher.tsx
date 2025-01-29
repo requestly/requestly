@@ -54,7 +54,7 @@ export const EnvironmentSwitcher = () => {
       }));
   }, [environments, setCurrentEnvironment, currentEnvironmentId, navigate, location.pathname, openTab]);
 
-  if (environments.length === 0) {
+  if (environments.length === 0 || (environments.length === 1 && isGlobalEnvironment(environments[0].id))) {
     return (
       <div className="no-environment-container">
         <MdHorizontalSplit /> No environment

@@ -22,7 +22,7 @@ export enum NetworkResourceType {
   OTHER = "other",
 }
 
-export type NetworkEvent = chrome.devtools.network.Request & {
+export type NetworkEvent = Omit<chrome.devtools.network.Request, "_resourceType"> & {
   _resourceType?: NetworkResourceType;
 };
 export type NetworkRequest = Request;

@@ -1,4 +1,5 @@
 import { PricingPlansType } from "../types";
+import { PRICING } from "./pricing";
 
 export const PricingPlans: PricingPlansType = {
   free: {
@@ -81,6 +82,34 @@ export const PricingPlans: PricingPlansType = {
       annually: {
         usd: {
           price: 120,
+        },
+      },
+    },
+  },
+  [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: {
+    plans: {
+      monthly: {
+        usd: {
+          price: 7,
+        },
+      },
+      annually: {
+        usd: {
+          price: 70,
+        },
+      },
+    },
+  },
+  [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: {
+    plans: {
+      monthly: {
+        usd: {
+          price: 10,
+        },
+      },
+      annually: {
+        usd: {
+          price: 100,
         },
       },
     },

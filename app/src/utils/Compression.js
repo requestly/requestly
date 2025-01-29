@@ -1,6 +1,6 @@
+import { RuleType } from "@requestly/shared/types/entities/rules";
 import { isRule } from "features/rules";
 import pako from "pako";
-import { RuleType } from "types";
 
 function decompressString(compressedString) {
   try {

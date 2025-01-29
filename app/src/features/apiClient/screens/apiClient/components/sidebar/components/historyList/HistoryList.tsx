@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import placeholderImage from "../../../../../../../../assets/images/illustrations/empty-sheets-dark.svg";
 import { RQAPI } from "features/apiClient/types";
 import { Timeline, Typography } from "antd";
@@ -7,6 +7,8 @@ import { trackRequestSelectedFromHistory } from "modules/analytics/events/featur
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
+import shieldIcon from "./assets/shield-icon.svg";
 import PATHS from "config/constants/sub/paths";
 
 interface Props {
@@ -17,6 +19,7 @@ interface Props {
 
 export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, onSelectionFromHistory }) => {
   const { openTab } = useTabsLayoutContext();
+  const [dismissNote, setDismissNote] = useState(false);
 
   const onHistoryLinkClick = useCallback(
     (index: number) => {
@@ -32,6 +35,13 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
 
   return history?.length ? (
     <>
+      {!dismissNote && (
+        <div className="storage-communication-note">
+          <img src={shieldIcon} alt="secured" />
+          <p> Your history is stored in your device's local storage for better privacy & control.</p>
+          <TfiClose onClick={() => setDismissNote(true)} />
+        </div>
+      )}
       <Timeline reverse className="api-history-list-container" mode="left">
         <Timeline.Item key="end" color="gray">
           <div className="api-history-row">

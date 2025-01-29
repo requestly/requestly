@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
+import { Prec } from "@codemirror/state";
+import { keymap } from "@codemirror/view";
 import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
 import { html } from "@codemirror/lang-html";
@@ -24,9 +26,10 @@ import { EditorPopover } from "./components/PopOver";
 import "./editor.scss";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/PopOver/popover.scss";
+import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 interface EditorProps {
   value: string;
-  defaultValue?: string; // required in the special case of rules where value and default value need to stay in sync
+  defaultValue: string; // required in the special case of rules where value and default value need to stay in sync
   language: EditorLanguage | null;
   isReadOnly?: boolean;
   height?: number;
@@ -145,11 +148,10 @@ const Editor: React.FC<EditorProps> = ({
       if (prettifyOnInit && (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT)) {
         const prettifiedCode = prettifyCode(value, language);
         setEditorContent(prettifiedCode.code);
-        handleChange(prettifiedCode.code);
         isDefaultPrettificationDone.current = true;
       }
     }
-  }, [prettifyOnInit, language]);
+  }, [prettifyOnInit, language, value]);
 
   const handleEditorClose = useCallback(
     (id: string) => {
@@ -165,6 +167,43 @@ const Editor: React.FC<EditorProps> = ({
       handleChange(value);
     },
     [handleChange]
+  );
+
+  const customKeyBinding = useMemo(
+    () =>
+      Prec.highest(
+        keymap.of([
+          {
+            key: "Mod-s",
+            run: (view) => {
+              const event = new KeyboardEvent("keydown", {
+                key: "s",
+                metaKey: navigator.platform.includes("Mac"),
+                ctrlKey: !navigator.platform.includes("Mac"),
+                bubbles: true,
+                cancelable: true,
+              });
+              view.dom.dispatchEvent(event);
+              return true;
+            },
+          },
+          {
+            key: "Mod-Enter",
+            run: (view) => {
+              const event = new KeyboardEvent("keydown", {
+                key: "Enter",
+                metaKey: navigator.platform.includes("Mac"),
+                ctrlKey: !navigator.platform.includes("Mac"),
+                bubbles: true,
+                cancelable: true,
+              });
+              view.dom.dispatchEvent(event);
+              return true;
+            },
+          },
+        ])
+      ),
+    []
   );
 
   return isFullScreen ? (
@@ -215,7 +254,7 @@ const Editor: React.FC<EditorProps> = ({
             defaultValue={defaultValue}
             onChange={handleEditorBodyChange}
             theme={vscodeDark}
-            extensions={[editorLanguage, EditorView.lineWrapping].filter(Boolean)}
+            extensions={[editorLanguage, customKeyBinding, EditorView.lineWrapping].filter(Boolean)}
             basicSetup={{
               highlightActiveLine: false,
               bracketMatching: true,
@@ -288,6 +327,7 @@ const Editor: React.FC<EditorProps> = ({
             theme={vscodeDark}
             extensions={[
               editorLanguage,
+              customKeyBinding,
               EditorView.lineWrapping,
               envVariables
                 ? highlightVariablesPlugin(
@@ -298,6 +338,7 @@ const Editor: React.FC<EditorProps> = ({
                     envVariables
                   )
                 : null,
+              generateCompletionsForVariables(envVariables),
             ].filter(Boolean)}
             basicSetup={{
               highlightActiveLine: false,

@@ -23,6 +23,7 @@ import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationE
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { tabsLayoutActions } from "store/slices/tabs-layout";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -95,6 +96,7 @@ export default function HeaderUser() {
               );
 
               dispatch(incentivizationActions.resetState());
+              dispatch(tabsLayoutActions.resetState());
             })
             .finally(() => setLoading(false));
         },
@@ -126,7 +128,7 @@ export default function HeaderUser() {
             overlayClassName="header-profile-dropdown"
             menu={{ items: menuPropItems }}
             placement="bottomLeft"
-            className="header-profile-dropdown-trigger"
+            className="header-profile-dropdown-trigger no-drag"
             onOpenChange={(open) => {
               open && trackHeaderClicked("user_menu");
             }}
@@ -159,7 +161,7 @@ export default function HeaderUser() {
             <Button
               style={{ fontWeight: 500 }}
               type="primary"
-              className="layout-header-signup-btn"
+              className="layout-header-signup-btn no-drag"
               onClick={(e) => {
                 e.preventDefault();
                 dispatch(

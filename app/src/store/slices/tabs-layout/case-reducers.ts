@@ -35,4 +35,8 @@ export const setTabs: CaseReducer<TabsLayoutState, PayloadAction<{ featureId: st
 ) => {
   const { featureId, tabs } = action.payload;
   state[featureId].tabs = tabs;
+
+  if (tabs.length === 0) {
+    state[featureId].activeTab = null;
+  }
 };

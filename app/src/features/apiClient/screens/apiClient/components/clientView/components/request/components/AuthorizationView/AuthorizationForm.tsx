@@ -1,20 +1,21 @@
 import { Select } from "antd";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 import { AuthFormField, SingleLineEditorField, SelectField, AUTH_FORM_FIELD_TYPES, AuthFormData } from "./types";
 import React from "react";
+import { EnvironmentVariables } from "backend/environment/types";
 
 interface AuthorizationFormProps {
   formData: AuthFormData;
   formType: string;
   onChangeHandler: (value: string, id: string) => void;
   formvalues: Record<string, any>;
+  variables: EnvironmentVariables;
 }
 
 const getFields = (
   field: AuthFormField,
   index: number,
-  currentEnvironmentVariables: Record<string, any>,
+  currentEnvironmentVariables: EnvironmentVariables,
   formType: string,
   onChangeHandler: (value: string, id: string) => void,
   value: any
@@ -49,24 +50,20 @@ const getFields = (
   }
 };
 
-const AuthorizationForm: React.FC<AuthorizationFormProps> = ({ formData, formType, onChangeHandler, formvalues }) => {
-  const { getCurrentEnvironmentVariables } = useEnvironmentManager();
-  const currentEnvironmentVariables = getCurrentEnvironmentVariables();
-
+const AuthorizationForm: React.FC<AuthorizationFormProps> = ({
+  formData,
+  formType,
+  onChangeHandler,
+  formvalues,
+  variables,
+}) => {
   return (
     <div className="form">
       {formData.map((formField, index) => (
         <div className="field-group" key={formField.id || index}>
           <label>{formField.label}</label>
           <div className="field">
-            {getFields(
-              formField,
-              index,
-              currentEnvironmentVariables,
-              formType,
-              onChangeHandler,
-              formvalues[formField.id]
-            )}
+            {getFields(formField, index, variables, formType, onChangeHandler, formvalues[formField.id])}
           </div>
         </div>
       ))}

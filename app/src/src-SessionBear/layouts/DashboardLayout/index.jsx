@@ -4,7 +4,7 @@ import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import DashboardContent from "layouts/DashboardLayout/DashboardContent";
-import "../../../layouts/DashboardLayout/DashboardLayout.css";
+import "../../../layouts/DashboardLayout/DashboardLayout.scss";
 
 const DashboardLayout = () => {
   const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();

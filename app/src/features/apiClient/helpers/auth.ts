@@ -1,5 +1,5 @@
 import { isEmpty, unionBy } from "lodash";
-import { AUTHORIZATION_TYPES } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
+import { AUTHORIZATION_TYPES } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 import { KeyValuePair, RQAPI } from "../types";
 
@@ -11,9 +11,22 @@ export const processAuthForEntry = (
   },
   allRecords: RQAPI.Record[]
 ) => {
-  let authOptions = entry.auth;
-  if (entry.auth.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
-    authOptions = inheritAuth(entry, entryDetails, allRecords);
+  const entryCopy = JSON.parse(JSON.stringify(entry)); // Deep Copy
+
+  let authOptions = entryCopy.auth;
+
+  if (isEmpty(authOptions)) {
+    let currentAuthType = "";
+    if (entryDetails.collectionId) {
+      currentAuthType = AUTHORIZATION_TYPES.INHERIT;
+    } else {
+      currentAuthType = AUTHORIZATION_TYPES.NO_AUTH;
+    }
+    entryCopy.auth = { currentAuthType };
+  }
+
+  if (entryCopy.auth.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
+    authOptions = inheritAuth(entryCopy, entryDetails, allRecords);
   }
 
   if (!authOptions) {
@@ -41,7 +54,7 @@ function inheritAuth(
     return null;
   }
   let parentAuthData = parentRecord.data.auth;
-  if (parentAuthData.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
+  if (!isEmpty(parentAuthData) && parentAuthData.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
     const parentDetails = {
       id: parentRecord.id,
       collectionId: parentRecord.collectionId,
@@ -117,5 +130,6 @@ export const updateRequestWithAuthOptions = (data: KeyValuePair[], dataToAdd: Ke
 
   const filterDataWithKeys = dataToAdd.filter((data) => data.key);
 
-  return unionBy(data, filterDataWithKeys, "type");
+  // Mergin using key so that headers/queryparams aren't appended multiple times
+  return unionBy(data, filterDataWithKeys, (item) => item?.key?.toLowerCase());
 };

@@ -6,10 +6,10 @@ import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import ResponseBodyRow from "../Rows/RowsMarkup/ResponseBodyRow";
 import ResponseStatusCodeRow from "../Rows/RowsMarkup/ResponseStatusCodeRow";
 import GraphqlRequestPayload from "./GraphqlRequestPayload";
-import { ResponseRuleResourceType } from "types/rules";
 import getObjectValue from "../../Filters/actions/getObjectValue";
 import APP_CONSTANTS from "config/constants";
 import "./ResponseRulePair.css";
+import { ResponseRule } from "@requestly/shared/types/entities/rules";
 
 const {
   PATH_FROM_PAIR: { SOURCE_REQUEST_PAYLOAD_KEY, SOURCE_REQUEST_PAYLOAD_VALUE, SOURCE_REQUEST_PAYLOAD_OPERATOR },
@@ -52,7 +52,7 @@ const ResponseRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => 
           />
         </Col>
       </Row>
-      {responseRuleResourceType === ResponseRuleResourceType.GRAPHQL_API && (
+      {responseRuleResourceType === ResponseRule.ResourceType.GRAPHQL_API && (
         <Row className="response-rule-inputs-row">
           <Col span={24}>
             <GraphqlRequestPayload

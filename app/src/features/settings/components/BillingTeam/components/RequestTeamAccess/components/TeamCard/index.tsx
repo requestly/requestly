@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useSelector } from "react-redux";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { Col } from "antd";
 import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
 import { getBillingTeamMemberById } from "store/features/billing/selectors";
@@ -18,6 +19,7 @@ interface Props {
 export const BillingTeamCard: React.FC<Props> = ({ team }) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [isRequestSuccess, setIsRequestSuccess] = useState(false);
+  const isDomainWithCustomInfo = useFeatureValue("domain_with_custom_admin_info");
 
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(team?.id, team?.owner));
 
@@ -46,12 +48,15 @@ export const BillingTeamCard: React.FC<Props> = ({ team }) => {
   return (
     <Col className="billing-team-card">
       <div>
-        <div className="text-white text-bold">{team.name}</div>
-        <div className="text-gray caption">{Object.keys(team.members).length} members</div>
+        <div className="billing-team-card-title">{team.name}</div>
+        <div className="billing-team-card-description">{Object.keys(team.members).length} members</div>
       </div>
       <div>
-        <div className="text-gray">Billing manager</div>
-        <div className="text-white">{teamOwnerDetails?.displayName}</div>
+        <div>
+          <span className="billing-team-card-title">{teamOwnerDetails?.displayName}</span>{" "}
+          <span className="billing-team-card-role"> - {isDomainWithCustomInfo ? "Admin" : "Billing manager"}</span>
+        </div>
+        <div className="billing-team-card-description">{teamOwnerDetails?.email}</div>
       </div>
       <div className="display-flex items-center flex-end billing-team-card-request-btn-wrapper">
         {isRequestSuccess ? (
@@ -59,7 +64,7 @@ export const BillingTeamCard: React.FC<Props> = ({ team }) => {
             <MdCheck /> Request sent
           </div>
         ) : (
-          <RQButton type="default" loading={isRequesting} onClick={handleRequestAccess}>
+          <RQButton type="primary" loading={isRequesting} onClick={handleRequestAccess}>
             Request access
           </RQButton>
         )}
