@@ -71,6 +71,9 @@ const LINKS = {
   REQUESTLY_NETWORK_INSPECTOR_DOCS:
     "https://docs.requestly.com/guides/inspect-traffic-and-apply-modifications-from-chrome-devtools-using-requestly",
 
+  /** API Client docs */
+  REQUESTLY_API_CLIENT_DOCS: "https://docs.requestly.com/general/api-client/overview",
+
   /** LANDING PAGES **/
 
   // Home

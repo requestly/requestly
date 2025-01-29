@@ -71,9 +71,10 @@ export const mergeLocalAndSyncVariables = (
   newVariables: EnvironmentVariables
 ) => {
   const updatedVariables: EnvironmentVariables = Object.fromEntries(
-    Object.entries(newVariables).map(([key, value]) => {
+    Object.entries(newVariables).map(([key, value], index) => {
       const prevValue = currentVariables[key];
       const updatedValue = {
+        id: value.id ?? prevValue?.id ?? index,
         localValue: value.localValue ?? prevValue?.localValue,
         syncValue: value.syncValue ?? prevValue?.syncValue,
         type: value.type,

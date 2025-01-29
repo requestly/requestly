@@ -1,10 +1,11 @@
 import React, { useMemo } from "react";
 import { RQAPI } from "../../../../../../types";
-import { Button, Popover, Space } from "antd";
+import { Popover, Space } from "antd";
 import PropertyRow from "./PropertyRow/PropertyRow";
 import { statusCodes } from "config/constants/sub/statusCode";
 import NetworkStatusField from "components/misc/NetworkStatusField";
 import { NodeIndexOutlined } from "@ant-design/icons";
+import { RQButton } from "lib/design-system-v2/components";
 
 interface Props {
   response: RQAPI.Response;
@@ -16,10 +17,18 @@ const StatusLine: React.FC<Props> = ({ response }) => {
       const ms = Math.ceil(response.time);
 
       if (ms < 1000) {
-        return `${ms} ms`;
+        return (
+          <>
+            {ms} <i>ms</i>
+          </>
+        );
       }
 
-      return `${(ms / 1000).toFixed(3)} s`;
+      return (
+        <>
+          {(ms / 1000).toFixed(3)} <i>s</i>
+        </>
+      );
     }
 
     return "";
@@ -35,12 +44,12 @@ const StatusLine: React.FC<Props> = ({ response }) => {
   }
 
   return (
-    <Space className="api-response-status-line">
+    <Space className="api-response-status-line" size={0}>
       {response.redirectedUrl && (
         <Popover content={response.redirectedUrl}>
-          <Button type="link" icon={<NodeIndexOutlined />}>
+          <RQButton type="transparent" size="small" icon={<NodeIndexOutlined />}>
             Redirected
-          </Button>
+          </RQButton>
         </Popover>
       )}
       <PropertyRow
