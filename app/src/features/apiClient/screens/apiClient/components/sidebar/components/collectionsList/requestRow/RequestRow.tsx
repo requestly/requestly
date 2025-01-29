@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from "react";
 import { Typography, Dropdown, MenuProps } from "antd";
 import PATHS from "config/constants/sub/paths";
-import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
-import { RQAPI } from "features/apiClient/types";
+import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
+import { RequestMethod, RQAPI } from "features/apiClient/types";
 import { NavLink } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
@@ -137,9 +137,14 @@ export const RequestRow: React.FC<Props> = ({ record, openTab }) => {
           <Typography.Text
             strong
             className="request-method"
-            style={{ color: REQUEST_METHOD_COLORS[record.data.request?.method] }}
+            style={{
+              color: REQUEST_METHOD_COLORS[record.data.request?.method],
+              backgroundColor: REQUEST_METHOD_BACKGROUND_COLORS[record.data.request?.method],
+            }}
           >
-            {record.data.request?.method}
+            {[RequestMethod.OPTIONS, RequestMethod.DELETE].includes(record.data.request?.method)
+              ? record.data.request?.method.slice(0, 3)
+              : record.data.request?.method}
           </Typography.Text>
           <div className="request-url">{record.name || record.data.request?.url}</div>
 

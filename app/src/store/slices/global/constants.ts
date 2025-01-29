@@ -162,6 +162,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
 
   // country of current user
   country: "",
+  appLanguage: "en",
 
   initializations: {
     auth: false,
