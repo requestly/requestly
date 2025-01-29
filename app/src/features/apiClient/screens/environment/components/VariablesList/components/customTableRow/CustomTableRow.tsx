@@ -1,9 +1,9 @@
-import { Form, FormInstance, Input, InputNumber, Select } from "antd";
-import React, { useCallback, useContext, useMemo, useRef, useEffect } from "react";
+import { Form, FormInstance, Input, InputNumber, Select, Tooltip } from "antd";
+import React, { useCallback, useContext, useRef, useEffect } from "react";
 import { EnvironmentVariableTableRow } from "../../VariablesList";
 import { EnvironmentVariableType } from "backend/environment/types";
-import debounce from "lodash/debounce";
 import Logger from "lib/logger";
+import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -18,9 +18,10 @@ interface EditableCellProps {
   children: React.ReactNode;
   dataIndex: keyof EnvironmentVariableTableRow;
   record: EnvironmentVariableTableRow;
-  handleSaveVariable: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
+  handleVariableChange: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
   isSecret?: boolean;
   options?: string[];
+  duplicateKeyIndices?: Set<number>;
 }
 
 export const EditableRow = ({ index, ...props }: { index: number }) => {
@@ -40,65 +41,66 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   children,
   dataIndex,
   record,
-  handleSaveVariable,
+  handleVariableChange,
   options,
   isSecret,
+  duplicateKeyIndices,
   ...restProps
 }) => {
   const form = useContext(EditableContext)!;
   const inputRef = useRef(null);
 
-  const convertValueByType = useCallback((value: any, type: EnvironmentVariableType) => {
-    if (value === undefined) {
-      return "";
-    }
-    switch (type) {
-      case EnvironmentVariableType.Number:
-        return Number(value);
-      case EnvironmentVariableType.Boolean:
-        return Boolean(value);
-      case EnvironmentVariableType.String:
-      default:
-        return String(value);
-    }
-  }, []);
+  const handleTypeChange = useCallback(
+    (value: EnvironmentVariableType) => {
+      const defaultValues = {
+        syncValue: record.syncValue,
+        localValue: record.localValue,
+      };
 
-  const handleSaveCellValue = useCallback(async () => {
+      switch (value) {
+        case EnvironmentVariableType.Boolean:
+          defaultValues.syncValue = Boolean(defaultValues.syncValue ?? true);
+          defaultValues.localValue = Boolean(defaultValues.localValue ?? true);
+          break;
+        case EnvironmentVariableType.Number:
+          defaultValues.syncValue = isNaN(defaultValues.syncValue as number) ? 0 : Number(defaultValues.syncValue);
+          defaultValues.localValue = isNaN(defaultValues.localValue as number) ? 0 : Number(defaultValues.localValue);
+
+          break;
+        case EnvironmentVariableType.String:
+          defaultValues.syncValue = String(defaultValues.syncValue ?? "");
+          defaultValues.localValue = String(defaultValues.localValue ?? "");
+
+          break;
+        default:
+          break;
+      }
+
+      handleVariableChange({ ...record, type: value, ...defaultValues }, "type");
+    },
+    [record, handleVariableChange]
+  );
+
+  const handleValueChange = useCallback(async () => {
     try {
       const values = await form.validateFields();
       const updatedRecord = { ...record, ...values };
 
-      updatedRecord.syncValue = convertValueByType(updatedRecord.syncValue, updatedRecord.type);
-      updatedRecord.localValue = convertValueByType(updatedRecord.localValue, updatedRecord.type);
-
-      handleSaveVariable(updatedRecord, dataIndex);
+      handleVariableChange(updatedRecord, dataIndex);
     } catch (errInfo) {
       Logger.log("Save failed:", errInfo);
     }
-  }, [form, record, handleSaveVariable, convertValueByType, dataIndex]);
-
-  const debouncedSave = useMemo(() => debounce(handleSaveCellValue, 1000), [handleSaveCellValue]);
+  }, [dataIndex, handleVariableChange, record, form]);
 
   const handleChange = useCallback(
-    (value: string | number | boolean) => {
+    (value: string | number | boolean | EnvironmentVariableType) => {
       if (dataIndex === "type") {
-        const defaultValues = {
-          syncValue: record.syncValue,
-          localValue: record.localValue,
-        };
-        if (value === EnvironmentVariableType.Boolean) {
-          defaultValues.syncValue = true;
-          defaultValues.localValue = true;
-        } else if (value === EnvironmentVariableType.Number) {
-          defaultValues.syncValue = 0;
-          defaultValues.localValue = 0;
-        }
-        handleSaveVariable({ ...record, [dataIndex]: value, ...defaultValues }, dataIndex);
+        handleTypeChange(value as EnvironmentVariableType);
       } else {
-        debouncedSave();
+        handleValueChange();
       }
     },
-    [dataIndex, debouncedSave, handleSaveVariable, record]
+    [dataIndex, handleTypeChange, handleValueChange]
   );
 
   const getPlaceholderText = useCallback((dataIndex: string) => {
@@ -141,7 +143,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         );
       case EnvironmentVariableType.Boolean:
         return (
-          <Select onChange={handleChange} value={record[dataIndex]} placeholder="Select value">
+          <Select onChange={(value) => handleChange(value)} value={record[dataIndex]} placeholder="Select value">
             <Select.Option value={true}>True</Select.Option>
             <Select.Option value={false}>False</Select.Option>
           </Select>
@@ -161,7 +163,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   }
 
   return (
-    <td {...restProps}>
+    <td {...restProps} style={{ position: "relative" }}>
       <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={record?.[dataIndex]}>
         {dataIndex === "type" ? (
           <Select
@@ -180,6 +182,15 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             ref={inputRef}
             onChange={(e) => handleChange(e.target.value)}
             placeholder={getPlaceholderText(dataIndex)}
+            suffix={
+              duplicateKeyIndices?.has(record.id) ? (
+                <Tooltip title="This variable has been overwritten by a duplicate key." color="#000">
+                  <MdOutlineWarningAmber className="warning" />
+                </Tooltip>
+              ) : (
+                <></>
+              )
+            }
           />
         ) : (
           renderValueInputByType()

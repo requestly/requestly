@@ -1,7 +1,10 @@
+export type VariableValueType = string | number | boolean;
+
 export interface EnvironmentVariableValue {
-  localValue?: string | number | boolean;
-  syncValue: string | number | boolean;
-  type: string | number | boolean;
+  localValue?: VariableValueType;
+  syncValue?: VariableValueType;
+  type: VariableValueType;
+  id: number;
 }
 
 export type EnvironmentVariables = Record<string, EnvironmentVariableValue>;

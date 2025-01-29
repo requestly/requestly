@@ -37,7 +37,9 @@ export const TeamPlanDetailsPopover: React.FC<Props> = ({ planDetails, closePopo
       <Col className="team-plan-popover-body">
         <Col className="text-white text-bold">What's included in your plan</Col>
         <Col>
-          {PricingFeatures[PRICING.PRODUCTS.HTTP_RULES][planName].features.map((feature) => (
+          {PricingFeatures[planName.includes("api-client") ? PRICING.PRODUCTS.API_CLIENT : PRICING.PRODUCTS.HTTP_RULES][
+            planName
+          ].features.map((feature) => (
             <Row align="middle" className="team-plan-popover-feature">
               <MdCheck />
               <Col className="team-plan-popover-feature-name">{feature.title}</Col>

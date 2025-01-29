@@ -23,8 +23,6 @@ import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import { SiPostman } from "@react-icons/all-files/si/SiPostman";
 import { PostmanImporterModal } from "../../../modals/postmanImporterModal/PostmanImporterModal";
-import { useLocation } from "react-router-dom";
-import PATHS from "config/constants/sub/paths";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 
 interface Props {
@@ -50,7 +48,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   onClearHistory,
 }) => {
   const dispatch = useDispatch();
-  const location = useLocation();
   const user = useSelector(getUserAuthDetails);
   const [isImportCollectionsModalOpen, setIsImportCollectionsModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
@@ -82,7 +79,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             onImportClick();
           }
         },
-        disabled: location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.INDEX),
       },
       {
         key: "2",
@@ -92,7 +88,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             Requestly Collection
           </div>
         ),
-        disabled: location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.INDEX),
         onClick: () => {
           if (!user.loggedIn) {
             dispatch(
@@ -116,7 +111,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         key: "3",
         label: (
           <div className="new-btn-option">
-            <SiPostman /> Postman Collection
+            <SiPostman /> Postman Collections and Environments
           </div>
         ),
         onClick: () => {
@@ -139,7 +134,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         },
       },
     ],
-    [user.loggedIn, dispatch, location.pathname, onImportClick]
+    [user.loggedIn, dispatch, onImportClick]
   );
 
   const items: DropdownProps["menu"]["items"] = [

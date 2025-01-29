@@ -17,6 +17,7 @@ interface EnvironmentsListItemProps {
   environment: {
     id: string;
     name: string;
+    isGlobal?: boolean;
   };
 
   openTab: TabsLayoutContextInterface["openTab"];
@@ -83,16 +84,18 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
     toast.loading("Deleting environment...");
     deleteEnvironment(environment.id)
       .then(() => {
+        closeTab(environment.id);
         toast.success("Environment deleted successfully");
         const availableEnvironments = allEnvironments.filter((env) => env.id !== environment.id);
         const isActiveEnvironmentBeingDeleted = environment.id === currentEnvironmentId;
         if (availableEnvironments.length && (envId === environment.id || isActiveEnvironmentBeingDeleted)) {
-          redirectToEnvironment(navigate, availableEnvironments[0].id);
           if (isActiveEnvironmentBeingDeleted) {
-            setCurrentEnvironment(availableEnvironments[0].id);
+            if (availableEnvironments.length > 1) {
+              const nonGlobalEnvironments = availableEnvironments.filter((env) => !isGlobalEnvironment(env.id));
+              setCurrentEnvironment(nonGlobalEnvironments[0].id);
+            }
           }
         }
-        closeTab(environment.id);
       })
       .catch(() => {
         toast.error("Failed to delete environment");
@@ -101,7 +104,6 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
     environment.id,
     deleteEnvironment,
     allEnvironments,
-    navigate,
     envId,
     currentEnvironmentId,
     setCurrentEnvironment,
@@ -161,7 +163,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
                 <span>
                   Global variables are accessible across the workspace and editable by all the workspace members.{" "}
                   <Link
-                    to="https://docs.requestly.com/general/api-client/environments-and-variables/add-and-use-variables"
+                    to="https://docs.requestly.com/general/api-client/environments-and-variables#global-variables"
                     target="_blank"
                   >
                     Learn more.
@@ -184,7 +186,11 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
           showArrow={false}
         >
           <span>
-            {environment.id === currentEnvironmentId ? <MdOutlineCheckCircle className="active-env-icon" /> : ""}
+            {environment.id === currentEnvironmentId && !isGlobalEnvironment(environment.id) ? (
+              <MdOutlineCheckCircle className="active-env-icon" />
+            ) : (
+              ""
+            )}
           </span>
         </Tooltip>
       </div>

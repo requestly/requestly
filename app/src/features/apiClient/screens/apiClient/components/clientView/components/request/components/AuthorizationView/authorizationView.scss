@@ -1,11 +1,17 @@
 .authorization-view {
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  height: calc(100% - 45px);
+  height: 100%;
   overflow: scroll;
+
+  &.collection-auth {
+    border-bottom: 0;
+  }
 
   .form-and-description {
     display: flex;
+    flex-direction: column;
+    padding: 16px;
     height: calc(100% - 45px);
 
     &.no-auth {
@@ -17,7 +23,6 @@
     .form-view {
       max-width: 680px;
       flex: 1;
-      padding: 16px;
 
       .info-text {
         color: #8f8f8f;
@@ -56,6 +61,7 @@
             background: none;
             font-size: 13px;
             line-height: 20px;
+            padding: 4px 6px;
           }
 
           label,
@@ -80,8 +86,10 @@
         max-width: 100%;
 
         img {
-          margin-top: 40px;
+          margin-top: 72px;
           margin-bottom: 16px;
+          width: 80px;
+          height: 80px;
         }
 
         h1 {
@@ -138,16 +146,39 @@
         color: #bbbbbb;
         margin-bottom: 8px;
       }
+    }
+
+    .auth-help-panel {
+      margin: auto;
+      max-width: 500px;
+      width: 100%;
+      display: flex;
+      padding: var(--space-5, 12px);
+      gap: var(--space-4, 8px);
+      align-self: stretch;
+      border-radius: 8px;
+      border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+      background: var(--requestly-color-surface-0, #212121);
+
+      .sub-heading {
+        color: var(--requestly-color-text-subtle, #bbb);
+        font-size: var(--requestly-font-size-xs, 11px);
+        line-height: var(--requestly-font-line-height-sm);
+      }
+
+      .info-icon {
+        margin-top: 2px;
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+        color: var(--requestly-color-text-subtle, #bbb);
+      }
 
       .link-text {
-        line-height: 15px;
-        font-size: 11px;
-        display: flex;
-        align-items: center;
-        color: #639ff9;
-        span {
-          margin-left: 4px;
-        }
+        display: inline-block;
+        margin-left: 4px;
+        text-decoration: underline;
+        color: var(--requestly-color-primary-text, #639ff9);
       }
     }
   }
@@ -159,6 +190,10 @@
     .form-selector {
       display: flex;
       align-items: center;
+
+      .authorization-save-btn {
+        margin-left: auto;
+      }
 
       .clear-icon {
         cursor: pointer;

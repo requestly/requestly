@@ -22,10 +22,10 @@ import {
   trackPageDomainsFilterModifiedEvent,
 } from "modules/analytics/events/common/rules/filters";
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
-import { ResponseRuleResourceType } from "types/rules";
 import { debounce, snakeCase } from "lodash";
 import { globalActions } from "store/slices/global/slice";
 import LINKS from "config/constants/sub/links";
+import { ResponseRule } from "@requestly/shared/types/entities/rules";
 
 const { Link } = Typography;
 
@@ -77,7 +77,7 @@ const Filters = (props) => {
   }, [currentlySelectedRuleData.ruleType]);
 
   const hasLegacyPayloadFilter = () => {
-    return ResponseRuleResourceType.UNKNOWN === currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
+    return ResponseRule.ResourceType.UNKNOWN === currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
   };
 
   const isRequestPayloadFilterCompatible = isResponseRule && hasLegacyPayloadFilter();
@@ -139,13 +139,13 @@ const Filters = (props) => {
   LOG_ANALYTICS.KEY = () => {
     debouncedTrackPayloadKeyModifiedEvent(
       currentlySelectedRuleData.ruleType,
-      snakeCase(ResponseRuleResourceType.UNKNOWN)
+      snakeCase(ResponseRule.ResourceType.UNKNOWN)
     );
   };
   LOG_ANALYTICS.VALUE = () => {
     debouncedTrackPayloadValueModifiedEvent(
       currentlySelectedRuleData.ruleType,
-      snakeCase(ResponseRuleResourceType.UNKNOWN)
+      snakeCase(ResponseRule.ResourceType.UNKNOWN)
     );
   };
 

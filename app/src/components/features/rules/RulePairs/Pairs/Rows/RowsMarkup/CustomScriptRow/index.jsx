@@ -15,7 +15,7 @@ import { getDefaultScriptRender, createRenderedScript } from "./utils";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { MockPickerModal } from "features/mocks/modals";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
-import { RuleType } from "features/rules";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 const { Text } = Typography;
 

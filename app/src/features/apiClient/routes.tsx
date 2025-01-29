@@ -4,7 +4,6 @@ import ApiClientFeatureContainer from "./container";
 import { APIClient } from "./screens/apiClient/APIClient";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { EnvironmentView } from "./screens/environment/components/environmentView/EnvironmentView";
-import { EnvironmentContainer } from "./screens/environment/container";
 import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImporterView";
 import { TabOutletHOC } from "layouts/TabsLayout/hoc/TabOutletHOC";
 import { CollectionView } from "./screens/apiClient/components/clientView/components/Collection/CollectionView";
@@ -70,28 +69,22 @@ export const apiClientRoutes: RouteObject[] = [
         },
       },
       {
-        path: PATHS.API_CLIENT.ENVIRONMENTS.INDEX,
+        path: PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE + "/:envId",
         element: (
           <TabOutletHOC>
-            <EnvironmentContainer />
+            <EnvironmentView />
           </TabOutletHOC>
         ),
-        children: [
-          {
-            index: true,
-            element: <Navigate to={PATHS.API_CLIENT.RELATIVE} />,
+        handle: {
+          breadcrumb: {
+            label: "Environments",
+            isEditable: true,
           },
-          {
-            path: PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE + "/:envId",
-            element: <EnvironmentView />,
-            handle: {
-              breadcrumb: {
-                label: "Environments",
-                isEditable: true,
-              },
-            },
-          },
-        ],
+        },
+      },
+      {
+        path: PATHS.API_CLIENT.ENVIRONMENTS.INDEX,
+        element: <Navigate to={PATHS.API_CLIENT.RELATIVE} />,
       },
       {
         path: PATHS.API_CLIENT.IMPORT_FROM_POSTMAN.RELATIVE,

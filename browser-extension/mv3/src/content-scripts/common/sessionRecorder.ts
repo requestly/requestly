@@ -1,5 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { SessionRecordingConfig } from "common/types";
+import { cloneDetails } from "../utils";
 
 type SendResponseCallback = (payload: unknown) => void;
 
@@ -234,12 +235,15 @@ const showManualModeRecordingWidget = () => {
   const currentRecordingTime = recordingTime <= recordingLimitInMilliseconds ? recordingTime : null;
 
   widget.dispatchEvent(
-    new CustomEvent("show", {
-      detail: {
-        currentRecordingTime,
-        position: sessionRecorderState.widgetPosition,
-      },
-    })
+    new CustomEvent(
+      "show",
+      cloneDetails({
+        detail: {
+          currentRecordingTime,
+          position: sessionRecorderState.widgetPosition,
+        },
+      })
+    )
   );
 };
 
@@ -273,11 +277,14 @@ const showAutoModeRecordingWidget = () => {
   }
 
   widget.dispatchEvent(
-    new CustomEvent("show", {
-      detail: {
-        position: sessionRecorderState.widgetPosition,
-      },
-    })
+    new CustomEvent(
+      "show",
+      cloneDetails({
+        detail: {
+          position: sessionRecorderState.widgetPosition,
+        },
+      })
+    )
   );
 };
 

@@ -16,7 +16,6 @@ import { getValueAsPromise } from "./FirebaseActions";
 import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUtils";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
-import { variablesActions } from "store/features/variables/slice";
 import { tabsLayoutActions } from "store/slices/tabs-layout";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
@@ -35,10 +34,7 @@ export const switchWorkspace = async (
 ) => {
   const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
   let needToMergeRecords = false;
-
-  const refreshToken = await StorageService(appMode).getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN);
   await StorageService(appMode).waitForAllTransactions();
-
   if (teamId !== null) {
     // We are switching to a given workspace, not clearing the workspace (switching to private)
     const { isSyncEnabled, isWorkspaceMode } = currentSyncingState;
@@ -89,7 +85,6 @@ export const switchWorkspace = async (
     await StorageService(appMode).clearDB();
   }
 
-  dispatch(variablesActions.resetState());
   dispatch(tabsLayoutActions.resetState());
 
   // Just in case
@@ -109,15 +104,6 @@ export const switchWorkspace = async (
       membersCount: teamMembersCount,
     })
   );
-
-  StorageService(appMode).saveRecord({
-    [GLOBAL_CONSTANTS.STORAGE_KEYS.ACTIVE_WORKSPACE_ID]: teamId,
-  });
-
-  // SWITCHNG WORKSPACE CLEARS THE EXTENSION STORAGE
-  StorageService(appMode).saveRecord({
-    [GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN]: refreshToken,
-  });
 
   //Refresh Rules List
   dispatch(globalActions.updateHardRefreshPendingStatus({ type: "rules" }));

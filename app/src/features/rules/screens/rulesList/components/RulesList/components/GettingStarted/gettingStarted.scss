@@ -145,10 +145,13 @@
     .getting-started-actions {
       display: flex;
       align-items: center;
-      gap: 32px;
-
-      .templates-btn {
-        margin-left: auto;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      .third-party-imports {
+        width: 100%;
+        display: flex;
+        align-items: start;
+        flex-direction: column;
       }
     }
 
