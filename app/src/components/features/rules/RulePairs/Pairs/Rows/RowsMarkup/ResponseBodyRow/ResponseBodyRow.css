@@ -37,3 +37,26 @@
 .serve-without-request-setting .ant-checkbox-wrapper {
   font-size: var(--requestly-font-size-sm);
 }
+
+.response-rule-local-file-content {
+  margin-top: 8px;
+}
+.response-rule-local-file-content .response-body-type-radio-group .ant-radio-wrapper {
+  font-size: var(--requestly-font-size-xs);
+  margin: 0;
+}
+.response-rule-local-file-content .response-body-type-radio-group .ant-radio {
+  transform: scale(0.9);
+}
+.response-rule-local-file-content .response-rule-local-file-content-header {
+  color: var(--requestly-color-text-placeholder);
+  font-size: var(--requestly-font-size-xs);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.response-rule-local-file-content .response-rule-local-file-content-body {
+  font-size: var(--requestly-font-size-xs);
+  margin-top: 5px;
+}

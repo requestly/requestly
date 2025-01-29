@@ -31,6 +31,7 @@ import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useWorkspaceManager } from "features/workspaces/hooks/useWorkspaceManager";
 import useClientStorageService from "services/clientStorageService/hooks/useClientStorageService";
+import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -48,6 +49,7 @@ const App: React.FC = () => {
   useIsExtensionEnabled();
   useBillingTeamsListener();
   useEnvironmentManager();
+  useAppLanguageObserver();
   // useInitializeNewUserSessionRecordingConfig();
 
   submitAppDetailAttributes();

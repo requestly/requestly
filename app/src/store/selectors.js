@@ -184,6 +184,10 @@ export const getUserCountry = (state) => {
   return getGlobalState(state)["country"];
 };
 
+export const getAppLanguage = (state) => {
+  return getGlobalState(state)["appLanguage"];
+};
+
 export const getAuthInitialization = (state) => {
   return getGlobalState(state)["initializations"]["auth"];
 };
