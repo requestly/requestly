@@ -6,7 +6,7 @@ import {
 } from "../../../workloadManager/workLoadTypes";
 import { RQ } from "../RQmethods";
 import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
-import { LocalScope } from "modules/localScope";
+import { LocalScope } from "../../../../../../../../modules/localScope";
 import { TestResult } from "../types";
 
 export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
