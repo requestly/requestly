@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useContext, useCallback } from "react";
 import { BottomSheetPlacement } from "../types";
 import {
   trackBottomSheetToggled,
@@ -23,10 +23,6 @@ export const BottomSheetProvider: React.FC<{
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(isSheetOpenByDefault);
   const [sheetPlacement, setSheetPlacement] = useState(defaultPlacement);
 
-  useEffect(() => {
-    setSheetPlacement(defaultPlacement);
-  }, [defaultPlacement]);
-
   const toggleBottomSheet = (isOpen?: boolean) => {
     if (isOpen) {
       setIsBottomSheetOpen(isOpen);
@@ -36,19 +32,23 @@ export const BottomSheetProvider: React.FC<{
       trackBottomSheetToggled(!isBottomSheetOpen);
     }
   };
-  const toggleSheetPlacement = (placement?: BottomSheetPlacement) => {
-    if (placement) {
-      setSheetPlacement(placement);
-      return;
-    }
-    if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
-      setSheetPlacement(BottomSheetPlacement.RIGHT);
-      trackViewBottomSheetOnRightClicked();
-    } else {
-      setSheetPlacement(BottomSheetPlacement.BOTTOM);
-      trackViewBottomSheetOnBottomClicked();
-    }
-  };
+
+  const toggleSheetPlacement = useCallback(
+    (placement?: BottomSheetPlacement) => {
+      if (placement) {
+        setSheetPlacement(placement);
+        return;
+      }
+      if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
+        setSheetPlacement(BottomSheetPlacement.RIGHT);
+        trackViewBottomSheetOnRightClicked();
+      } else {
+        setSheetPlacement(BottomSheetPlacement.BOTTOM);
+        trackViewBottomSheetOnBottomClicked();
+      }
+    },
+    [sheetPlacement]
+  );
 
   return (
     <BottomSheetContext.Provider
