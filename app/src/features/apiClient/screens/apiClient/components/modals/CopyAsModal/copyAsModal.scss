@@ -18,6 +18,9 @@
     .snippet-content {
       padding: 0px 8px 8px 8px;
       font-family: var(--requestly-font-family-code);
+
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
     .snippet-actions {

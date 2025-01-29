@@ -31,7 +31,7 @@ const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
 
   const getSnippet = useCallback(() => {
     if (!harRequest) {
-      return;
+      return "Some error occured while generating snippet.";
     }
 
     let snippet: any = "";
@@ -73,9 +73,7 @@ const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
           </Select>
           <CopyButton copyText={getSnippet()} />
         </div>
-        <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }} className="snippet-content">
-          {getSnippet()}
-        </div>
+        <div className="snippet-content">{getSnippet()}</div>
       </div>
     </RQModal>
   );
