@@ -4,6 +4,7 @@ export interface EnvironmentVariableValue {
   localValue?: VariableValueType;
   syncValue?: VariableValueType;
   type: VariableValueType;
+  id: number;
 }
 
 export type EnvironmentVariables = Record<string, EnvironmentVariableValue>;
