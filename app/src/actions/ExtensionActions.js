@@ -18,6 +18,10 @@ export function isExtensionInstalled() {
   return !!getExtensionVersion();
 }
 
+export const isSafariExtension = () => {
+  return !!document.documentElement.getAttribute("rq-is-safari");
+};
+
 export function isSessionBearExtensionInstalled() {
   return document.documentElement.getAttribute("rq-ext-name") === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR;
 }

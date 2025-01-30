@@ -27,6 +27,7 @@ import { SidebarToggleButton } from "componentsV2/SecondarySidebar/components/Si
 import APP_CONSTANTS from "config/constants";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import "./PrimarySidebar.css";
+import { isSafariExtension } from "actions/ExtensionActions";
 
 export const PrimarySidebar: React.FC = () => {
   const { pathname } = useLocation();
@@ -55,7 +56,7 @@ export const PrimarySidebar: React.FC = () => {
         title: "Home",
         path: PATHS.HOME.RELATIVE,
         icon: <HomeOutlined />,
-        display: appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariExtension(),
       },
       {
         id: 1,
@@ -69,7 +70,7 @@ export const PrimarySidebar: React.FC = () => {
         title: "Network inspector",
         path: PATHS.NETWORK_INSPECTOR.RELATIVE,
         icon: <NetworkTrafficInspectorIcon />,
-        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariExtension(),
       },
       {
         id: 3,
