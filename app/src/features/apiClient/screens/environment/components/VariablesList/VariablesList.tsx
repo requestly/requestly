@@ -106,7 +106,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
   const handleDeleteVariable = useCallback(
     async (id: number) => {
-      if (typeof id === "undefined") {
+      if (isNaN(id)) {
         return;
       }
       const newData = dataSource.filter((item) => item.id !== id).map((record, index) => ({ ...record, id: index }));
