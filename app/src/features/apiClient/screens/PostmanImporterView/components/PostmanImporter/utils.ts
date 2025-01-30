@@ -313,12 +313,7 @@ export const processOnlyLostRecords = (fileContent: any) => {
 
   function traverseItems(items: any[]) {
     items.forEach((item: any) => {
-      if (
-        item.request &&
-        item.request.method === "POST" &&
-        item.request.body &&
-        item.request.body.mode === "urlencoded"
-      ) {
+      if (item.request && item.request.method === "POST" && item.request.body.mode === "urlencoded") {
         result.apis.push(createApiRecord(item, rootCollectionId));
       }
 
