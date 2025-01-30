@@ -261,10 +261,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess, pat
         const failedEnvironments = processedFileData.environments.length - importedEnvironments;
         const failedCollections = collectionsCount.current - importedCollections;
 
-        // if (!importedEnvironments && !importedCollections) {
-        //   toast.error("Failed to import Postman data");
-        //   return;
-        // }
+        if (!importedEnvironments && !importedCollections) {
+          toast.error("Failed to import Postman data");
+          return;
+        }
 
         const hasFailures = failedEnvironments > 0 || failedCollections > 0;
         const hasSuccesses = importedEnvironments > 0 || importedCollections > 0;
