@@ -50,23 +50,8 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   const form = useContext(EditableContext)!;
   const inputRef = useRef(null);
 
-  const convertValueByType = useCallback((value: any, type: EnvironmentVariableType) => {
-    if (value === undefined) {
-      return "";
-    }
-    switch (type) {
-      case EnvironmentVariableType.Number:
-        return Number(value);
-      case EnvironmentVariableType.Boolean:
-        return Boolean(value);
-      case EnvironmentVariableType.String:
-      default:
-        return String(value);
-    }
-  }, []);
-
   const handleTypeChange = useCallback(
-    (value: EnvironmentVariableType, prevType: EnvironmentVariableType) => {
+    (value: EnvironmentVariableType) => {
       const defaultValues = {
         syncValue: record.syncValue,
         localValue: record.localValue,
@@ -74,24 +59,20 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
       switch (value) {
         case EnvironmentVariableType.Boolean:
-          defaultValues.syncValue = true;
-          defaultValues.localValue = true;
+          defaultValues.syncValue = Boolean(defaultValues.syncValue ?? true);
+          defaultValues.localValue = Boolean(defaultValues.localValue ?? true);
           break;
         case EnvironmentVariableType.Number:
-          defaultValues.syncValue = 0;
-          defaultValues.localValue = 0;
+          defaultValues.syncValue = isNaN(defaultValues.syncValue as number) ? 0 : Number(defaultValues.syncValue);
+          defaultValues.localValue = isNaN(defaultValues.localValue as number) ? 0 : Number(defaultValues.localValue);
+
           break;
         case EnvironmentVariableType.String:
-          if (prevType !== EnvironmentVariableType.Secret) {
-            defaultValues.syncValue = "";
-            defaultValues.localValue = "";
-          }
+          defaultValues.syncValue = String(defaultValues.syncValue ?? "");
+          defaultValues.localValue = String(defaultValues.localValue ?? "");
+
           break;
-        case EnvironmentVariableType.Secret:
-          if (prevType !== EnvironmentVariableType.String) {
-            defaultValues.syncValue = "";
-            defaultValues.localValue = "";
-          }
+        default:
           break;
       }
 
@@ -105,22 +86,16 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       const values = await form.validateFields();
       const updatedRecord = { ...record, ...values };
 
-      updatedRecord.syncValue = convertValueByType(updatedRecord.syncValue, updatedRecord.type);
-      updatedRecord.localValue = convertValueByType(updatedRecord.localValue, updatedRecord.type);
-
       handleVariableChange(updatedRecord, dataIndex);
     } catch (errInfo) {
       Logger.log("Save failed:", errInfo);
     }
-  }, [dataIndex, handleVariableChange, record, convertValueByType, form]);
+  }, [dataIndex, handleVariableChange, record, form]);
 
   const handleChange = useCallback(
-    (
-      value: string | number | boolean | EnvironmentVariableType,
-      prevValue?: string | number | boolean | EnvironmentVariableType
-    ) => {
+    (value: string | number | boolean | EnvironmentVariableType) => {
       if (dataIndex === "type") {
-        handleTypeChange(value as EnvironmentVariableType, prevValue as EnvironmentVariableType);
+        handleTypeChange(value as EnvironmentVariableType);
       } else {
         handleValueChange();
       }
@@ -193,7 +168,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         {dataIndex === "type" ? (
           <Select
             className="w-full"
-            onChange={(value) => handleChange(value as EnvironmentVariableType, record.type)}
+            onChange={(value) => handleChange(value as EnvironmentVariableType)}
             value={record.type}
           >
             {options?.map((option) => (

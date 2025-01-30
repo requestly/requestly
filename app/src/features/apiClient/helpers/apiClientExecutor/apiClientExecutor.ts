@@ -33,7 +33,7 @@ export class ApiClientExecutor {
   private internalFunctions: InternalFunctions;
   constructor(private appMode: string, private workloadManager: APIClientWorkloadManager) {}
 
-  private prepareRequest() {
+  prepareRequest() {
     this.entryDetails.response = null;
     this.entryDetails.testResults = [];
     this.abortController = new AbortController();
@@ -55,6 +55,7 @@ export class ApiClientExecutor {
     // Process request configuration with environment variables
     const renderedRequest = renderVariables(this.entryDetails.request, this.collectionId);
     this.entryDetails.request = renderedRequest;
+    return renderedRequest;
   }
 
   private buildBaseSnapshot(): BaseSnapshot {
@@ -219,7 +220,7 @@ export class ApiClientExecutor {
       return {
         status: RQAPI.ExecutionStatus.ERROR,
         error: {
-          source: "Rerun Pre-request script",  
+          source: "Rerun Pre-request script",
           ...preRequestScriptResult.error,
         },
       };
@@ -231,7 +232,7 @@ export class ApiClientExecutor {
       return {
         status: RQAPI.ExecutionStatus.ERROR,
         error: {
-          source: "Rerun Pre-request script",  
+          source: "Rerun Pre-request script",
           ...responseScriptResult.error,
         },
       };

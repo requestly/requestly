@@ -1,4 +1,4 @@
-import { EnvironmentVariableValue } from "backend/environment/types";
+import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { generateDocumentId } from "backend/utils";
 import { POSTMAN_AUTH_TYPES_MAPPING, POSTMAN_FIELD_MAPPING } from "features/apiClient/constants";
@@ -37,18 +37,25 @@ export const getUploadedPostmanFileType = (fileContent: PostmanCollectionExport 
 export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExport) => {
   const isGlobalEnvironment = fileContent?._postman_variable_scope === "globals";
 
-  const variables = fileContent.values.reduce((acc: Record<string, EnvironmentVariableValue>, variable: any) => {
-    // dont add variables with empty key
-    if (!variable.key) {
-      return acc;
-    }
+  const variables = fileContent.values.reduce(
+    (acc: Record<string, EnvironmentVariableValue>, variable: any, index: number) => {
+      // dont add variables with empty key
+      if (!variable.key) {
+        return acc;
+      }
 
-    acc[variable.key] = {
-      syncValue: variable.value,
-      type: variable.type === "secret" ? "secret" : "string",
-    };
-    return acc;
-  }, {});
+      acc[variable.key] = {
+        id: index,
+        syncValue: variable.value,
+        type:
+          variable.type === EnvironmentVariableType.Secret
+            ? EnvironmentVariableType.Secret
+            : EnvironmentVariableType.String,
+      };
+      return acc;
+    },
+    {}
+  );
 
   return {
     name: fileContent.name,
@@ -123,7 +130,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
   let contentType: RequestContentType | null = null;
   let requestBody: string | KeyValuePair[] | null = null;
 
-  const { mode, raw, formdata, options } = request.body || {};
+  const { mode, raw, formdata, options, urlencoded } = request.body || {};
 
   if (mode === "raw") {
     requestBody = raw;
@@ -137,6 +144,14 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
         value: formData.value,
         isEnabled: true,
       })) || [];
+  } else if (mode === "urlencoded") {
+    contentType = RequestContentType.FORM;
+    requestBody = urlencoded.map((data: { key: string; value: string }) => ({
+      id: Date.now() + Math.random(),
+      key: data.key,
+      value: data.value,
+      isEnabled: true,
+    }));
   }
 
   return {
@@ -170,10 +185,14 @@ const createCollectionRecord = (
 ): Partial<RQAPI.CollectionRecord> => {
   const collectionVariables: Record<string, EnvironmentVariableValue> = {};
   if (variables) {
-    variables.forEach((variable: any) => {
+    variables.forEach((variable: any, index: number) => {
       collectionVariables[variable.key] = {
+        id: index,
         syncValue: variable.value,
-        type: variable.type === "secret" ? "secret" : "string",
+        type:
+          variable.type === EnvironmentVariableType.Secret
+            ? EnvironmentVariableType.Secret
+            : EnvironmentVariableType.String,
       };
     });
   }
@@ -254,13 +273,64 @@ export const processPostmanVariablesData = (
     return null;
   }
 
-  const variables = fileContent.variable.reduce((acc: Record<string, EnvironmentVariableValue>, variable: any) => {
-    acc[variable.key] = {
-      syncValue: variable.value,
-      type: variable.type === "secret" ? "secret" : "string",
-    };
-    return acc;
-  }, {});
+  const variables = fileContent.variable.reduce(
+    (acc: Record<string, EnvironmentVariableValue>, variable: any, index: number) => {
+      acc[variable.key] = {
+        id: index,
+        syncValue: variable.value,
+        type:
+          variable.type === EnvironmentVariableType.Secret
+            ? EnvironmentVariableType.Secret
+            : EnvironmentVariableType.String,
+      };
+      return acc;
+    },
+    {}
+  );
 
   return variables;
+};
+
+export const processOnlyLostRecords = (fileContent: any) => {
+  if (!fileContent.info?.name) {
+    throw new Error("Invalid collection file: missing name");
+  }
+  const result = {
+    collections: [] as Partial<RQAPI.CollectionRecord>[],
+    apis: [] as Partial<RQAPI.ApiRecord>[],
+  };
+
+  const rootCollectionId = generateDocumentId("apis");
+  const rootCollection = createCollectionRecord(
+    `${fileContent.info.name}-Lost Requests`,
+    fileContent.info?.description || "",
+    rootCollectionId,
+    fileContent.variable,
+    fileContent.auth
+  );
+  rootCollection.collectionId = "";
+  result.collections.push(rootCollection);
+
+  function traverseItems(items: any[]) {
+    items.forEach((item: any) => {
+      if (
+        item.request &&
+        item.request.method === "POST" &&
+        item.request.body &&
+        item.request.body.mode === "urlencoded"
+      ) {
+        result.apis.push(createApiRecord(item, rootCollectionId));
+      }
+
+      if (item.item) {
+        traverseItems(item.item);
+      }
+    });
+  }
+
+  if (fileContent.item) {
+    traverseItems(fileContent.item);
+  }
+
+  return result;
 };

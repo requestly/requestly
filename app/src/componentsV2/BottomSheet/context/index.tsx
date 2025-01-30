@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useCallback } from "react";
 import { BottomSheetPlacement } from "../types";
 import {
   trackBottomSheetToggled,
@@ -32,19 +32,23 @@ export const BottomSheetProvider: React.FC<{
       trackBottomSheetToggled(!isBottomSheetOpen);
     }
   };
-  const toggleSheetPlacement = (placement?: BottomSheetPlacement) => {
-    if (placement) {
-      setSheetPlacement(placement);
-      return;
-    }
-    if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
-      setSheetPlacement(BottomSheetPlacement.RIGHT);
-      trackViewBottomSheetOnRightClicked();
-    } else {
-      setSheetPlacement(BottomSheetPlacement.BOTTOM);
-      trackViewBottomSheetOnBottomClicked();
-    }
-  };
+
+  const toggleSheetPlacement = useCallback(
+    (placement?: BottomSheetPlacement) => {
+      if (placement) {
+        setSheetPlacement(placement);
+        return;
+      }
+      if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
+        setSheetPlacement(BottomSheetPlacement.RIGHT);
+        trackViewBottomSheetOnRightClicked();
+      } else {
+        setSheetPlacement(BottomSheetPlacement.BOTTOM);
+        trackViewBottomSheetOnBottomClicked();
+      }
+    },
+    [sheetPlacement]
+  );
 
   return (
     <BottomSheetContext.Provider
