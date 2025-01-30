@@ -2,13 +2,12 @@ import React from "react";
 import { Col, Row, Space, Typography } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import "./safariLimitedSupportView.scss";
-import Icon from "./Frame.svg?react";
 
 export const SafariLimitedSupportView: React.FC = () => {
   return (
     <div className="safari-limited-support-container">
       <div className="safari-limited-support-icon">
-        <Icon />
+        <img src="/assets/img/frame.svg" alt="" />
       </div>
       <Col>
         <Space direction="vertical" size={"large"}>

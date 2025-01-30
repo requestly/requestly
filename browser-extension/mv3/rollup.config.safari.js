@@ -89,7 +89,7 @@ export default [
     plugins: commonPlugins,
   },
   {
-    input: "src/content-scripts/client/index.ts",
+    input: "src/content-scripts/client/index.safari.ts",
     output: {
       file: `${OUTPUT_DIR}/client.cs.js`,
       format: "iife",
