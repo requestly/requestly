@@ -181,10 +181,7 @@ export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
   let appTabs: chrome.tabs.Tab[] = [];
 
   for (const webURL of webURLs) {
-    const url = new URL(webURL);
-    //TODO@nafees87n add a method to restrict to port
-    const tabURL = `${url.protocol}//${url.hostname}`;
-    const tabs = await chrome.tabs.query({ url: tabURL + "/*" });
+    const tabs = await chrome.tabs.query({ url: webURL + "/*" });
     appTabs = [...appTabs, ...tabs];
   }
 

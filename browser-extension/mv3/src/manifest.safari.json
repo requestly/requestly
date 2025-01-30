@@ -39,6 +39,5 @@
     "extension_pages": "script-src 'self'; script-src-elem 'self'; object-src 'self'"
   },
   "permissions": ["contextMenus", "storage", "tabs", "webNavigation"],
-  "host_permissions": ["<all_urls>"],
-  "commands": {}
+  "host_permissions": ["<all_urls>"]
 }

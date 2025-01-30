@@ -17,10 +17,10 @@ const ALL_RESOURCE_TYPES: chrome.declarativeNetRequest.ResourceType[] = [
   "script" as chrome.declarativeNetRequest.ResourceType.SCRIPT,
   "image" as chrome.declarativeNetRequest.ResourceType.IMAGE,
   "font" as chrome.declarativeNetRequest.ResourceType.FONT,
-  // "object" as chrome.declarativeNetRequest.ResourceType.OBJECT,
+  "object" as chrome.declarativeNetRequest.ResourceType.OBJECT,
   "xmlhttprequest" as chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST,
   "ping" as chrome.declarativeNetRequest.ResourceType.PING,
-  // "csp_report" as chrome.declarativeNetRequest.ResourceType.CSP_REPORT,
+  "csp_report" as chrome.declarativeNetRequest.ResourceType.CSP_REPORT,
   "media" as chrome.declarativeNetRequest.ResourceType.MEDIA,
   "websocket" as chrome.declarativeNetRequest.ResourceType.WEBSOCKET,
   "other" as chrome.declarativeNetRequest.ResourceType.OTHER,
@@ -98,7 +98,7 @@ const addExtensionRules = async (): Promise<void> => {
     if (extensionRules?.length) {
       extensionRules.forEach((extensionRule) => {
         if (!extensionRule.condition.resourceTypes?.length) {
-          extensionRule.condition.resourceTypes = ALL_RESOURCE_TYPES as chrome.declarativeNetRequest.ResourceType[];
+          extensionRule.condition.resourceTypes = ALL_RESOURCE_TYPES;
         }
 
         if (extensionRule.condition.resourceTypes?.length && extensionRule.condition.excludedResourceTypes?.length) {
@@ -107,9 +107,6 @@ const addExtensionRules = async (): Promise<void> => {
           );
         }
 
-        // delete extensionRule.condition.isUrlFilterCaseSensitive;
-        // delete extensionRule.condition.excludedInitiatorDomains;
-        // delete extensionRule.condition.excludedRequestDomains;
         extensionRule.condition.excludedInitiatorDomains.push(...blockedDomains);
         extensionRule.condition.excludedRequestDomains.push(...blockedDomains);
 
@@ -127,8 +124,6 @@ const addExtensionRules = async (): Promise<void> => {
   if (config.logLevel === "debug") {
     console.log("Setting extension rules from requestly rules", parsedExtensionRules, enabledRules);
   }
-
-  console.log("!!!debug", "parsed extension rules", { parsedExtensionRules });
 
   await updateDynamicRules({
     addRules: parsedExtensionRules,
