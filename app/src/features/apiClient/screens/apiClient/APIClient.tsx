@@ -18,21 +18,8 @@ export const APIClient: React.FC<Props> = React.memo(() => {
 
   const [persistedRequestId, setPersistedRequestId] = useState<string>(() => requestId);
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
-  const [windowSize, setWindowSize] = useState(window.innerWidth);
   const isHistoryPath = location.pathname.includes("history");
   const isNewRequest = searchParams.has("new");
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize(window.innerWidth);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
 
   useEffect(() => {
     if (isNewRequest) {
@@ -116,10 +103,8 @@ export const APIClient: React.FC<Props> = React.memo(() => {
     [addToHistory, isHistoryPath]
   );
 
-  const bottomSheetPlacement = windowSize < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
-
   return (
-    <BottomSheetProvider defaultPlacement={bottomSheetPlacement} isSheetOpenByDefault={true}>
+    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT} isSheetOpenByDefault={true}>
       <div className="api-client-container-content">
         <APIClientView
           // TODO: Fix - "apiEntry" is used for history, remove this prop and derive everything from "apiEntryDetails"
