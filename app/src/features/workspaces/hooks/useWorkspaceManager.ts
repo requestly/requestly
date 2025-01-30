@@ -136,6 +136,7 @@ export const useWorkspaceManager = () => {
         }
 
         setTimeout(() => {
+          // FIXME: Incase of infinite loop, add a terminating condition and show someking of modal for the fix.
           return initialWorkspacesSelector(run + 1);
         }, 100);
       } else {
