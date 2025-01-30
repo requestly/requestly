@@ -165,7 +165,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         },
       },
     ],
-    [user.loggedIn, dispatch, onImportClick]
+    [user.loggedIn, dispatch, onImportClick, showImportLostRequestsOption]
   );
 
   const items: DropdownProps["menu"]["items"] = [
