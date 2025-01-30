@@ -18,7 +18,7 @@ import { WorkspaceOnboardingView } from "../teams";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
-import { useFeatureValue } from "@growthbook/growthbook-react";
+// import { useFeatureValue } from "@growthbook/growthbook-react";
 import "./index.scss";
 
 interface OnboardingProps {
@@ -30,7 +30,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const { step, disableSkip } = useSelector(getAppOnboardingDetails);
-  const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
+  // const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
 
   const handleSkip = () => {
     trackAppOnboardingSkipped(step);
@@ -91,9 +91,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
               <img src={RQLogo} alt="requestly logo" style={{ width: "90px" }} />
             </Col>
 
-            {step === ONBOARDING_STEPS.PERSONA ||
-            disableSkip ||
-            (step === ONBOARDING_STEPS.AUTH && onboardingVariation === "variant3") ? null : (
+            {step === ONBOARDING_STEPS.PERSONA || disableSkip ? null : (
               <Col>
                 <RQButton type="default" className="onboarding-skip-button" onClick={handleSkip}>
                   Skip for now <MdOutlineArrowForward style={{ fontSize: "1rem" }} />
