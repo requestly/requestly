@@ -25,8 +25,11 @@ export const useAvailableWorkspacesListener = () => {
     if (!uid) {
       console.log("[useAvailableTeamsListener] User not logged in");
       dispatch(workspaceActions.setAllWorkspaces([LoggedOutWorkspace]));
-      dispatch(workspaceActions.setWorkspacesFetched(true));
-      return;
+      dispatch(workspaceActions.setWorkspacesUpdatedAt(Date.now()));
+      return () => {
+        dispatch(workspaceActions.setAllWorkspaces([]));
+        dispatch(workspaceActions.setWorkspacesUpdatedAt(0));
+      };
     }
 
     try {
@@ -66,11 +69,13 @@ export const useAvailableWorkspacesListener = () => {
 
         // FIXME-syncing: private workspace should not be hardcoded like this here. It should automatically get fetched from db
         dispatch(workspaceActions.setAllWorkspaces([...records]));
-        dispatch(workspaceActions.setWorkspacesFetched(true));
+        dispatch(workspaceActions.setWorkspacesUpdatedAt(Date.now()));
       });
 
       return () => {
         console.log("[useAvailableWorkspacesListener] Unsubscribing Workspaces Listener");
+        dispatch(workspaceActions.setAllWorkspaces([]));
+        dispatch(workspaceActions.setWorkspacesUpdatedAt(0));
         unsub?.();
       };
     } catch (error) {

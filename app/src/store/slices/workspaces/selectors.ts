@@ -18,6 +18,6 @@ export const getActiveWorkspaceIds = (state: RootState) => {
   return sliceRootState(state).activeWorkspaceIds;
 };
 
-export const getIsWorkspacesFetched = (state: RootState) => sliceRootState(state).isWorkspacesFetched;
+export const getWorkspacesUpdatedAt = (state: RootState) => sliceRootState(state).workspacesUpdatedAt;
 
 export const getActiveWorkspacesMembers = (state: RootState) => sliceRootState(state).activeWorkspacesMembers;

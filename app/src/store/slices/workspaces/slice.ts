@@ -5,7 +5,7 @@ import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync
 
 export interface WorkspaceSliceState {
   allWorkspaces?: EntityState<Workspace>;
-  isWorkspacesFetched?: boolean;
+  workspacesUpdatedAt?: number;
   activeWorkspaceIds?: string[];
   activeWorkspacesMembers?: Record<string, any>;
 }
@@ -19,7 +19,7 @@ export const workspacesEntityAdapter = createEntityAdapter<Workspace>({
 
 const initialState: WorkspaceSliceState = {
   allWorkspaces: workspacesEntityAdapter.getInitialState(),
-  isWorkspacesFetched: false,
+  workspacesUpdatedAt: 0,
   activeWorkspaceIds: [],
   activeWorkspacesMembers: {},
 };
@@ -33,8 +33,8 @@ const slice = createSlice({
     setAllWorkspaces: (state: WorkspaceSliceState, action: PayloadAction<Workspace[]>) => {
       workspacesEntityAdapter.setAll(state.allWorkspaces, action.payload);
     },
-    setWorkspacesFetched: (state: WorkspaceSliceState, action: PayloadAction<boolean>) => {
-      state.isWorkspacesFetched = action.payload;
+    setWorkspacesUpdatedAt: (state: WorkspaceSliceState, action: PayloadAction<number>) => {
+      state.workspacesUpdatedAt = action.payload;
     },
 
     setActiveWorkspaceIds: (state: WorkspaceSliceState, action: PayloadAction<string[]>) => {
