@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Tooltip } from "antd";
+import { Popconfirm, Tooltip } from "antd";
 import { getAppMode, getIsSecondarySidebarCollapsed, getNetworkSessionSaveInProgress } from "store/selectors";
 import { ApiOutlined, HomeOutlined } from "@ant-design/icons";
 import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
@@ -28,6 +28,7 @@ import APP_CONSTANTS from "config/constants";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import "./PrimarySidebar.css";
 import { isSafariExtension } from "actions/ExtensionActions";
+import { SafariComingSoonTooltip } from "componentsV2/SafariExtension/SafariComingSoonTooltip";
 
 export const PrimarySidebar: React.FC = () => {
   const { pathname } = useLocation();
@@ -76,7 +77,11 @@ export const PrimarySidebar: React.FC = () => {
         id: 3,
         title: "HTTP Rules",
         path: PATHS.RULES.INDEX,
-        icon: <HttpRulesIcon />,
+        icon: (
+          <SafariComingSoonTooltip isVisible={isSafariExtension()}>
+            <HttpRulesIcon />
+          </SafariComingSoonTooltip>
+        ),
         display: true,
         activeColor: "var(--http-rules)",
       },
