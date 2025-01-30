@@ -28,10 +28,8 @@
   ],
   "action": {
     "default_icon": "resources/images/128x128.png",
-    "default_title": "__MSG_extIconTitle__",
-    "default_popup": "popup/popup.html"
+    "default_title": "__MSG_extIconTitle__"
   },
-  "devtools_page": "devtools/devtools.html",
   "icons": {
     "16": "resources/images/16x16.png",
     "48": "resources/images/48x48.png",
