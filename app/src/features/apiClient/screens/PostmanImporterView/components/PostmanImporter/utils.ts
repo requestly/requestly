@@ -130,7 +130,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
   let contentType: RequestContentType | null = null;
   let requestBody: string | KeyValuePair[] | null = null;
 
-  const { mode, raw, formdata, options } = request.body || {};
+  const { mode, raw, formdata, options, urlencoded } = request.body || {};
 
   if (mode === "raw") {
     requestBody = raw;
@@ -144,6 +144,14 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
         value: formData.value,
         isEnabled: true,
       })) || [];
+  } else if (mode === "urlencoded") {
+    contentType = RequestContentType.FORM;
+    requestBody = urlencoded.map((data: { key: string; value: string }) => ({
+      id: Date.now() + Math.random(),
+      key: data.key,
+      value: data.value,
+      isEnabled: true,
+    }));
   }
 
   return {
