@@ -44,7 +44,7 @@ const App: React.FC = () => {
   useGeoLocation();
   useIsExtensionEnabled();
   useBillingTeamsListener();
-  useEnvironmentManager();
+  useEnvironmentManager({ manageGlobalEnv: true });
   useAppLanguageObserver();
   // useInitializeNewUserSessionRecordingConfig();
 
