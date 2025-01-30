@@ -93,7 +93,7 @@ export const sanitizeKeyValuePairs = (keyValuePairs: KeyValuePair[], removeDisab
       ...pair,
       isEnabled: pair.isEnabled ?? true,
     }))
-    .filter((pair) => pair.key.length > 0 && (!removeDisabledKeys || pair.isEnabled));
+    .filter((pair) => pair.key?.length > 0 && (!removeDisabledKeys || pair.isEnabled));
 };
 
 export const supportsRequestBody = (method: RequestMethod): boolean => {
@@ -103,7 +103,7 @@ export const supportsRequestBody = (method: RequestMethod): boolean => {
 export const generateKeyValuePairsFromJson = (json: Record<string, string> = {}): KeyValuePair[] => {
   return Object.entries(json || {}).map(([key, value, isEnabled = true]) => {
     return {
-      key,
+      key: key || "",
       value,
       id: Math.random(),
       isEnabled,
