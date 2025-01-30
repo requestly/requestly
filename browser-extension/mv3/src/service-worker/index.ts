@@ -1,4 +1,3 @@
-import config from "common/config";
 import { initClientHandler, initClientSideCaching } from "./services/clientHandler";
 import { registerCommands } from "./services/commands";
 import { initContextMenu } from "./services/contextMenu";
@@ -19,9 +18,4 @@ import { initWebRequestInterceptor } from "./services/webRequestInterceptor";
   initContextMenu();
   initWebRequestInterceptor();
   initDevtoolsListener();
-  chrome.action.onClicked.addListener(() => {
-    chrome.tabs.create({
-      url: `${config.WEB_URL}/api-client?source=popup`,
-    });
-  });
 })();

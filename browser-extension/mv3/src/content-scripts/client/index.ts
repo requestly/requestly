@@ -5,7 +5,6 @@ import { initPageScriptMessageListener } from "./pageScriptMessageListener";
 import { initTestRuleHandler } from "./testRuleHandler";
 import { initExtensionMessageListener } from "../common/extensionMessageListener";
 
-console.log("!!!debug", "client script loaded");
 if (document.doctype?.name === "html" || document.contentType?.includes("html")) {
   initExtensionMessageListener();
   getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true).then((isExtensionStatusEnabled) => {
