@@ -1,5 +1,5 @@
 import { Har, HarEntry, HarHeaderEntry, HarRequest, HarResponse, HeaderMap, RQNetworkLog } from "./types";
-import { HTTPSnippet } from "httpsnippet";
+import { HTTPSnippet } from "@readme/httpsnippet";
 import { v4 as uuidv4 } from "uuid";
 import { getGraphQLDetails } from "./utils";
 import { cloneDeep } from "lodash";
