@@ -35,18 +35,6 @@ const processManifest = (content) => {
   contentScripts[0].matches = webURLPatterns;
   contentScripts[1].exclude_matches = webURLPatterns;
 
-  if (!isProductionBuildMode) {
-    manifestJson.commands = {
-      ...manifestJson.commands,
-      reload: {
-        description: "Reload extension in development mode",
-        suggested_key: {
-          default: "Alt+T",
-        },
-      },
-    };
-  }
-
   return JSON.stringify(manifestJson, null, 2);
 };
 
