@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect, useRef } from "react";
-import { getActiveWorkspaceIds, getAllWorkspaces, getIsWorkspacesFetched } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceIds, getAllWorkspaces, getWorkspacesUpdatedAt } from "store/slices/workspaces/selectors";
 import { useAvailableWorkspacesListener } from "./useAvailableWorkspacesListener";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { workspaceManager } from "../helpers/workspaceManager";
@@ -20,13 +20,15 @@ export const useWorkspaceManager = () => {
   const _workspaces = useRef(workspaces);
   const appMode = useSelector(getAppMode);
 
-  const isWorkspacesFetched = useSelector(getIsWorkspacesFetched);
+  const workspacesUpdatedAt = useSelector(getWorkspacesUpdatedAt);
+  const _workspacesUpdatedAt = useRef(workspacesUpdatedAt);
 
-  const isFirstInitDone = useRef(false);
-  // const [isFirstInitDone, setIsFirstInitDone] = useState(false);
+  const isInitialWorkspacesSelected = useRef(false);
+  // const [isInitialWorkspacesSelected, setisInitialWorkspacesSelected] = useState(false);
 
   // This is only a cache. Only used for first init.
   const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
+  const _activeWorkspaceIds = useRef(activeWorkspaceIds);
 
   useAvailableWorkspacesListener();
   useActiveWorkspacesMembersListener();
@@ -34,73 +36,149 @@ export const useWorkspaceManager = () => {
   useEffect(() => {
     console.log("[useWorkspaceManager] workspaceManager updater", { workspaces, userId, appMode });
     _userId.current = userId;
-    _workspaces.current = workspaces;
     workspaceManager.init(dispatch, workspaces, userId, appMode);
+    // _workspacesUpdatedAt.current = workspacesUpdatedAt;
+    // _workspaces.current = workspaces;
     console.log("[useWorkspaceManager] workspaceManager updater userid set", { userId });
-  }, [dispatch, workspaces, userId, appMode]);
+  }, [dispatch, workspaces, userId, appMode, workspacesUpdatedAt]);
+
+  useEffect(() => {
+    console.log("[useWorkspaceManager] workspaceManager updater activeWorkspaceIds", { activeWorkspaceIds });
+    _activeWorkspaceIds.current = activeWorkspaceIds;
+  }, [activeWorkspaceIds]);
+
+  useEffect(() => {
+    console.log("[useWorkspaceManager] workspaceManager updater workspacesUpdatedAt", { workspacesUpdatedAt });
+    _workspacesUpdatedAt.current = workspacesUpdatedAt;
+    _workspaces.current = workspaces;
+  }, [workspaces, workspacesUpdatedAt]);
 
   // Updates workspaceManager with latest data about workspace
   const fetchUnattemptedWorkspaceId = useCallback(() => {
-    if (!_userId.current) {
-      return LOGGED_OUT_WORKSPACE_ID;
-    } else {
-      // return a previously non attempted workspace
-      // If everything finished, then show a modal
-      return _workspaces.current?.[0]?.id;
-    }
+    console.log("[useWorkspaceManager].fetchUnattemptedWorkspaceId", { userId: _userId.current });
+    // if (!_userId.current) {
+    //   return LOGGED_OUT_WORKSPACE_ID;
+    // } else {
+    // return a previously non attempted workspace
+    // If everything finished, then show a modal
+    return _workspaces.current?.[0]?.id;
+    // }
   }, []);
 
-  const initialWorkspacesSelector = useCallback(() => {
-    dispatch(globalActions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: false }));
-    console.log("[useWorkspaceManager].initialWorkspacesSelector", { isFirstInitDone: isFirstInitDone.current });
-    if (!isFirstInitDone.current) {
-      // Cached Workspaces
-      if (activeWorkspaceIds.length > 0) {
-        console.log("[useWorkspaceManager].initialWorkspacesSelector cached ActiveWorkspaces", {
-          isFirstInitDone: isFirstInitDone.current,
-          activeWorkspaceIds,
-        });
-        isFirstInitDone.current = true;
-        workspaceManager.initActiveWorkspaces(activeWorkspaceIds);
-      } else {
-        console.log("[useWorkspaceManager].initialWorkspacesSelector No cached ActiveWorkspaces", {
-          isFirstInitDone: isFirstInitDone.current,
-          isWorkspacesFetched,
-        });
-        if (isWorkspacesFetched) {
-          // What happens if this returns undefined?
-          const newActiveWorkspaceid = fetchUnattemptedWorkspaceId();
-          const newActiveWorkspaceIds = [];
-          if (newActiveWorkspaceid) {
-            newActiveWorkspaceIds.push(newActiveWorkspaceid);
-          }
+  const initialWorkspacesSelector = useCallback(
+    async (run: number) => {
+      console.log("[useWorkspaceManager.initialWorkspacesSelector]", {
+        isInitialWorkspacesSelected: isInitialWorkspacesSelected.current,
+        activeWorkspaceIds: _activeWorkspaceIds.current,
+        workspaces: _workspaces.current,
+        run,
+      });
 
-          // Incase [] is returned, it will be handled else by showing a modal.
-          isFirstInitDone.current = true;
-          workspaceManager.initActiveWorkspaces(newActiveWorkspaceIds);
+      dispatch(globalActions.toggleActiveModal({ modalName: "workspaceLoadingModal", newValue: true }));
+
+      if (!isInitialWorkspacesSelected.current) {
+        console.log("[useWorkspaceManager.initialWorkspacesSelector] Selection started", {
+          isInitialWorkspacesSelected,
+          run,
+        });
+
+        // Workspaces Fetched
+        // _workspaces.current.length > 0 can cause issues as it is cached copy. Remove and use server version only in case of issues
+        if (_workspacesUpdatedAt.current || _workspaces.current.length > 0) {
+          console.log("[useWorkspaceManager.initialWorkspacesSelector] Workspaces Fetched", {
+            isInitialWorkspacesSelected,
+            run,
+          });
+
+          // Cached Workspaces Previously
+          if (_activeWorkspaceIds.current.length > 0) {
+            console.log("[useWorkspaceManager.initialWorkspacesSelector] Init using existing cached activeWorkspaces", {
+              _activeWorkspaceIds: _activeWorkspaceIds.current,
+              run,
+            });
+            isInitialWorkspacesSelected.current = true;
+            await workspaceManager.initActiveWorkspaces(_activeWorkspaceIds.current);
+            // FIXME: Might be case due to some permission issues, no workspace is init. In this case switchWorkspaceModal will popup.
+            // We should show some issue with workspace. Please select one
+          } else {
+            console.log("[useWorkspaceManager.initialWorkspacesSelector] Init using all workspaces", {
+              _workspace: _workspaces.current,
+              workspacesUpdatedAt: _workspacesUpdatedAt.current,
+              run,
+            });
+            const newActiveWorkspaceId = fetchUnattemptedWorkspaceId();
+            if (newActiveWorkspaceId) {
+              console.log(
+                "[useWorkspaceManager.initialWorkspacesSelector]  Init using all workspaces - Found a workspace",
+                {
+                  newActiveWorkspaceId,
+                  run,
+                }
+              );
+              isInitialWorkspacesSelected.current = true;
+              await workspaceManager.initActiveWorkspaces([newActiveWorkspaceId]);
+              // FIXME: Might be case due to some permission issues, no workspace is init. In this case switchWorkspaceModal will popup.
+              // We should show some issue with workspace. Please select one
+            } else {
+              console.log(
+                "[useWorkspaceManager.initialWorkspacesSelector]  Init using all workspaces - No workspace found",
+                {
+                  run,
+                }
+              );
+            }
+          }
+        } else {
+          console.log("[useWorkspaceManager.initialWorkspacesSelector] Workspaces not fetched", {
+            _workspacesUpdatedAt: _workspacesUpdatedAt.current,
+            run,
+          });
+        }
+
+        setTimeout(() => {
+          return initialWorkspacesSelector(run + 1);
+        }, 100);
+      } else {
+        console.log("[useWorkspaceManager.initialWorkspacesSelector] Selection already done", {
+          isInitialWorkspacesSelected,
+          run,
+        });
+
+        if (_activeWorkspaceIds.current.length === 0) {
+          console.log("[useWorkspaceManager.initialWorkspacesSelector] No active workspaces", {
+            _activeWorkspaceIds: _activeWorkspaceIds.current,
+            run,
+          });
+
+          dispatch(globalActions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: true }));
+        } else {
+          console.log("[useWorkspaceManager.initialWorkspacesSelector] Active workspaces found", {
+            _activeWorkspaceIds: _activeWorkspaceIds.current,
+            run,
+          });
+          dispatch(globalActions.toggleActiveModal({ modalName: "workspaceLoadingModal", newValue: false }));
+          dispatch(globalActions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: false }));
         }
       }
-    } else {
-      if (activeWorkspaceIds.length === 0) {
-        console.log("[useWorkspaceManager].initialWorkspacesSelector . Cant select Workspace automatically", {
-          isFirstInitDone,
-        });
-
-        dispatch(globalActions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: true }));
-      }
-    }
-  }, [activeWorkspaceIds, dispatch, fetchUnattemptedWorkspaceId, isWorkspacesFetched]);
-
-  useEffect(initialWorkspacesSelector, [initialWorkspacesSelector]);
+    },
+    [dispatch, fetchUnattemptedWorkspaceId]
+  );
 
   useEffect(() => {
+    initialWorkspacesSelector(0);
+
     return () => {
       console.log("[useWorkspaceManager] userId changed. unmount. resetActiveWorkspaces");
       dispatch(workspaceActions.resetState());
       workspaceManager.resetActiveWorkspaces();
-      isFirstInitDone.current = false;
+
+      // Reset to default states (before the useEffects triggers)
+      isInitialWorkspacesSelected.current = false;
+      _activeWorkspaceIds.current = [];
+      _workspaces.current = [];
+      _workspacesUpdatedAt.current = 0;
     };
-  }, [dispatch, userId]);
+  }, [dispatch, initialWorkspacesSelector, userId]);
 
   return {};
 };
