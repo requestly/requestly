@@ -421,7 +421,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
         isCreateMode ? "replace" : "open"
       );
-      setEntry({ ...result.data.data, response: entry.response });
+      setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
       resetChanges();
       trackRequestSaved("api_client_view");
       toast.success("Request saved!");
