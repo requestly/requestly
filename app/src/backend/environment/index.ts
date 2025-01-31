@@ -54,7 +54,10 @@ export const updateEnvironmentVariablesInDB = async (
   variables: EnvironmentVariables
 ) => {
   const newVariables = Object.fromEntries(
-    Object.entries(variables).map(([key, value]) => [key, { syncValue: value.syncValue, type: value.type }])
+    Object.entries(variables).map(([key, value]) => [
+      key,
+      { syncValue: value.syncValue, type: value.type, id: value.id },
+    ])
   );
 
   return updateDoc(getDocPath(ownerId, environmentId), {
