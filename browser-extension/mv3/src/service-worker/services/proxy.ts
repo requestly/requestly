@@ -17,9 +17,10 @@ export const applyProxy = async (proxyDetails: ProxyDetails) => {
   if (isApplied) {
     return;
   }
+  const blockedDomains = await getBlockedDomains();
+  const blockedSubDomains = blockedDomains.map((domain) => `*.${domain}`);
 
-  const blockedDomains = (await getBlockedDomains()).map((domain) => `*.${domain}`);
-  const bypassList = [...blockedDomains, ...RQBypassList];
+  const bypassList = [...blockedDomains, ...blockedSubDomains, ...RQBypassList];
 
   return (
     chrome.proxy.settings
