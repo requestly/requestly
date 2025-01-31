@@ -8,7 +8,6 @@ import APP_CONSTANTS from "../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "../../../../utils/CompatibilityUtils";
 import DataCollection from "./components/DataCollection";
-import RulesSyncing from "./components/RulesSyncing";
 import { ImplicitRuleTesting } from "./components/ImplicitRuleTesting";
 import "./index.scss";
 import { BlockList } from "./components/BlockListSettings/BlockListSettings";
@@ -33,10 +32,7 @@ export const GlobalSettings = () => {
         <p className="text-gray text-sm settings-caption">
           Please enable the following settings to get the best experience
         </p>
-        <div>
-          <RulesSyncing />
-          {user?.loggedIn ? <DataCollection /> : null}
-        </div>
+        <div>{user?.loggedIn ? <DataCollection /> : null}</div>
         {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && isImplicitTestThisRuleCompatible ? (
           <ImplicitRuleTesting />
         ) : null}
