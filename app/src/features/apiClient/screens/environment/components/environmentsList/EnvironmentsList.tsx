@@ -31,7 +31,10 @@ export const EnvironmentsList = () => {
 
   const environments = useMemo(() => getAllEnvironments(), [getAllEnvironments]);
   const filteredEnvironments = useMemo(
-    () => environments.filter((environment) => environment.name?.toLowerCase().includes(searchValue?.toLowerCase())),
+    () =>
+      environments
+        .filter((environment) => environment.name?.toLowerCase().includes(searchValue?.toLowerCase()))
+        .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())),
     [environments, searchValue]
   );
 
