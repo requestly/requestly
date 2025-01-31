@@ -1,6 +1,7 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { AUTH_OPTIONS } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/form";
 import { AUTHORIZATION_TYPES } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
+import { TestResult } from "./helpers/modules/scriptsV2/worker/script-internals/types";
 
 export enum RequestMethod {
   GET = "GET",
@@ -95,6 +96,7 @@ export namespace RQAPI {
   export interface Entry {
     request: Request;
     response?: Response;
+    testResults?: TestResult[];
     scripts?: {
       preRequest: string;
       postResponse: string;
@@ -102,15 +104,36 @@ export namespace RQAPI {
     auth?: AuthOptions;
   }
 
-  export interface RequestErrorEntry {
-    request: RQAPI.Request;
-    response: null;
-    error: {
-      source: string;
-      message: Error["message"];
-      name: Error["name"];
-    };
+  export enum ExecutionStatus {
+    SUCCESS = "success",
+    ERROR = "error",
   }
+
+  export type ExecutionError = {
+    source: string;
+    name: Error["name"];
+    message: Error["message"];
+  };
+
+  export type ExecutionResult = {
+        status: ExecutionStatus.SUCCESS;
+        executedEntry: RQAPI.Entry;
+      }
+    | {
+        status: ExecutionStatus.ERROR;
+        executedEntry: RQAPI.Entry;
+        error: ExecutionError;
+      };
+
+export type RerunResult = {
+  status: ExecutionStatus.SUCCESS,
+  artifacts: {
+    testResults: TestResult[],
+  }
+} | {
+  status: ExecutionStatus.ERROR,
+  error: ExecutionError,
+}
 
   export interface Collection {
     children?: Record[];

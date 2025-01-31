@@ -25,7 +25,7 @@ const KeyboardShortcut: React.FC<KEYBOARD_SHORTCUT> = ({ hotKey, description }) 
 interface EmptyResponseViewProps {
   isFailed: boolean;
   emptyDescription: string;
-  error?: RQAPI.RequestErrorEntry["error"];
+  error?: RQAPI.ExecutionError;
 }
 export const EmptyResponsePlaceholder: React.FC<EmptyResponseViewProps> = ({ isFailed, emptyDescription, error }) => {
   return (
