@@ -222,6 +222,7 @@ export const AppNotificationBanner = () => {
             billingTeam &&
             new Date(user.details?.planDetails?.subscription?.endDate).getTime() <= BILLING_TEAM_PLAN_REMINDER_END_DATE
           ) {
+            dispatch(globalActions.updateIsAppBannerVisible(true));
             return true;
           }
           return false;
