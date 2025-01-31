@@ -166,6 +166,8 @@ export const initFetchInterceptor = (debug) => {
           requestData,
         };
 
+        const responseClone = fetchedResponse.clone();
+
         if (fetchedResponse) {
           const fetchedResponseData = await fetchedResponse.text();
           const responseType = fetchedResponse.headers.get("content-type");
@@ -182,7 +184,7 @@ export const initFetchInterceptor = (debug) => {
         customResponse = getFunctionFromCode(responseModification.value, "response")(evaluatorArgs);
 
         if (typeof customResponse === "undefined") {
-          return fetchedResponse;
+          return responseClone;
         }
 
         // evaluator might return us Object but response.value is string
