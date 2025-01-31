@@ -1,6 +1,7 @@
 module.exports = {
   globals: {
     NodeJS: true,
+    Chai: true,
   },
   ignorePatterns: [
     "node_modules",
@@ -23,5 +24,6 @@ module.exports = {
   plugins: ["prettier"],
   rules: {
     "no-unused-vars": "off",
+    "no-dupe-class-members": "off",
   },
 };
