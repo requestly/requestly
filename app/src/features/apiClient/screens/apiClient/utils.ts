@@ -193,7 +193,14 @@ export const isApiCollection = (record: RQAPI.Record) => {
 };
 
 const sortRecords = (records: RQAPI.Record[]) => {
-  return records.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+  return records.sort((a, b) => {
+    // Sort by type first
+    const typeComparison = a.type.localeCompare(b.type);
+    if (typeComparison !== 0) return typeComparison;
+
+    // If types are the same, sort alphabetically by name
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+  });
 };
 
 const sortNestedRecords = (records: RQAPI.Record[]) => {
