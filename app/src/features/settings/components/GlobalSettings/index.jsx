@@ -23,11 +23,13 @@ export const GlobalSettings = () => {
     []
   );
 
-  if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
+  if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+    if (!isExtensionInstalled()) {
+      return <InstallExtensionCTA heading="Requestly Extension Settings" eventPage="settings_page" />;
+    }
     if (isSafariExtension()) {
       return <SafariLimitedSupportView />;
     }
-    return <InstallExtensionCTA heading="Requestly Extension Settings" eventPage="settings_page" />;
   }
 
   return (
