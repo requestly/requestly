@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getLastVisitedPath } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
 
-const usePathFeatureTracker = () => {
+const useLastFeatureTracker = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
@@ -22,4 +22,4 @@ const usePathFeatureTracker = () => {
   }, [dispatch, location.pathname]);
 };
 
-export default usePathFeatureTracker;
+export default useLastFeatureTracker;
