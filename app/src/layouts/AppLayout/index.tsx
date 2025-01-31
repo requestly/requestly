@@ -31,6 +31,7 @@ import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
+import usePathFeatureTracker from "hooks/usePathFeatureTracker";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -39,7 +40,7 @@ const App: React.FC = () => {
     // Load features asynchronously when the app renders
     growthbook.loadFeatures({ autoRefresh: true });
   }, []);
-
+  usePathFeatureTracker();
   usePreLoadRemover();
   useGeoLocation();
   useIsExtensionEnabled();

@@ -216,6 +216,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
       isJoinWorkspaceCardVisible: true,
       isManageBillingTeamAlertVisible: true,
       isSupportChatOpened: false,
+      lastVisitedPath: "/",
     },
     nonPersist: {
       networkSessionSaveInProgress: false, // todo: check if requried
