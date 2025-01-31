@@ -7,7 +7,7 @@ import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineK
 import type { MenuProps } from "antd";
 import { trackShareModalWorkspaceDropdownClicked } from "modules/analytics/events/misc/sharing";
 import { getActiveWorkspaceIds, getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 import { Workspace } from "features/workspaces/types";
 
 interface Props {
@@ -44,8 +44,10 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
     [availableWorkspaces]
   );
 
+  const filteredWorkspaces = sortedWorkspaces.filter((workspace: Workspace) => !isPersonalWorkspace(workspace?.id));
+
   const menuItems: MenuProps["items"] = useMemo(() => {
-    return sortedWorkspaces
+    return filteredWorkspaces
       .slice(defaultActiveWorkspaces || 0)
       .map((workspace: Workspace, index: number) => {
         if (!defaultActiveWorkspaces && workspace?.id === activeWorkspace?.id) return null;
@@ -55,7 +57,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
         };
       })
       .filter(Boolean);
-  }, [sortedWorkspaces, activeWorkspace?.id, onTransferClick, defaultActiveWorkspaces, isLoading]);
+  }, [filteredWorkspaces, activeWorkspace?.id, onTransferClick, defaultActiveWorkspaces, isLoading]);
 
   const chooseOtherWorkspaceItem = (
     <div className="workspace-share-menu-item-card workspace-share-menu-dropdown">
@@ -82,7 +84,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
       {defaultActiveWorkspaces ? (
         <>
           <div className="mt-1">
-            {sortedWorkspaces.slice(0, defaultActiveWorkspaces).map((workspace: Workspace, index: number) => (
+            {filteredWorkspaces.slice(0, defaultActiveWorkspaces).map((workspace: Workspace, index: number) => (
               <WorkspaceItem
                 isLoading={isLoading}
                 workspace={workspace}
@@ -91,7 +93,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
               />
             ))}
           </div>
-          {sortedWorkspaces.length > defaultActiveWorkspaces && (
+          {filteredWorkspaces.length > defaultActiveWorkspaces && (
             <Dropdown
               menu={{ items: menuItems }}
               placement="bottom"
