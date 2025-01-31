@@ -30,6 +30,7 @@ export const getPrettyPlanName = (planName) => {
   if (planName === PRICING.PLAN_NAMES.ENTERPRISE) return "Enterprise";
   if (planName === PRICING.PLAN_NAMES.BASIC_V2) return "Basic";
   if (planName === PRICING.PLAN_NAMES.LITE) return "Lite";
+  if (planName === PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT) return "Professional (Student Program)";
   if (planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL) return "API Client Professional";
   if (planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE) return "API Client Enterprise";
 
