@@ -290,3 +290,47 @@ export const processPostmanVariablesData = (
 
   return variables;
 };
+
+export const processOnlyLostRecords = (fileContent: any) => {
+  if (!fileContent.info?.name) {
+    throw new Error("Invalid collection file: missing name");
+  }
+  const result = {
+    collections: [] as Partial<RQAPI.CollectionRecord>[],
+    apis: [] as Partial<RQAPI.ApiRecord>[],
+  };
+
+  const rootCollectionId = generateDocumentId("apis");
+  const rootCollection = createCollectionRecord(
+    `${fileContent.info.name}-Lost Requests`,
+    fileContent.info?.description || "",
+    rootCollectionId,
+    fileContent.variable,
+    fileContent.auth
+  );
+  rootCollection.collectionId = "";
+  result.collections.push(rootCollection);
+
+  function traverseItems(items: any[]) {
+    items.forEach((item: any) => {
+      if (
+        item.request &&
+        item.request.method === "POST" &&
+        item.request.body &&
+        item.request.body.mode === "urlencoded"
+      ) {
+        result.apis.push(createApiRecord(item, rootCollectionId));
+      }
+
+      if (item.item) {
+        traverseItems(item.item);
+      }
+    });
+  }
+
+  if (fileContent.item) {
+    traverseItems(fileContent.item);
+  }
+
+  return result;
+};
