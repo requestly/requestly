@@ -19,7 +19,7 @@ export const ShareInWorkspaces: React.FC<ShareInWorkspaceProps> = ({
 }) => {
   const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
   const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
-  const isSharedWorkspaceMode = isPersonalWorkspace(activeWorkspaceId);
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
   const [postShareViewData, setPostShareViewData] = useState(null);
 
   return (

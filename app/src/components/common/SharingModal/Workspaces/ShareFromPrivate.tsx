@@ -146,7 +146,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
           style={{ backgroundColor: "#1E69FF" }}
         />
         <span className="workspace-card-description">
-          <div className="text-white">Private workspace</div>
+          <div className="text-white">Personal Workspace</div>
           <div className="text-gray">Not shared with anyone</div>
         </span>
       </Row>
