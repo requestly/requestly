@@ -1,15 +1,6 @@
 .status-light {
   display: inline-block;
 
-  &::before {
-    content: "";
-    display: inline-block;
-    height: 8px;
-    width: 8px;
-    border-radius: 50%;
-    margin-right: 5px;
-  }
-
   &.success::before {
     background-color: #268e6c;
   }

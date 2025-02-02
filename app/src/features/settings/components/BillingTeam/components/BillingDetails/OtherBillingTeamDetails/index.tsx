@@ -20,7 +20,7 @@ import "./index.scss";
 export const OtherBillingTeamDetails: React.FC = () => {
   const { billingId } = useParams();
   const user = useSelector(getUserAuthDetails);
-  const isDomainWithCustomInfo = useFeatureValue("domain_with_custom_admin_info");
+  const isDomainWithCustomInfo = useFeatureValue("domain_with_custom_admin_info", false);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const billingTeamDetails = useSelector(getBillingTeamById(billingId));
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId)) as Record<string, BillingTeamMember>;
