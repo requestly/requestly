@@ -24,6 +24,7 @@ import { trackCreateEnvironmentClicked } from "features/apiClient/screens/enviro
 import { SiPostman } from "@react-icons/all-files/si/SiPostman";
 import { PostmanImporterModal } from "../../../modals/postmanImporterModal/PostmanImporterModal";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -51,6 +52,11 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
+
+  // Only for lost requests patch
+  const [isLostRequestsImportModalOpen, setIsLostRequestsImportModalOpen] = useState(false);
+
+  const showImportLostRequestsOption = useFeatureIsOn("patch-lost-requests");
 
   const importItems: DropdownProps["menu"]["items"] = useMemo(
     () => [
@@ -133,8 +139,33 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           }
         },
       },
+      showImportLostRequestsOption && {
+        key: "4",
+        label: (
+          <div className="new-btn-option">
+            <SiPostman /> Import Lost Requests
+          </div>
+        ),
+        onClick: () => {
+          if (!user.loggedIn) {
+            dispatch(
+              globalActions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  eventSource: "api_client_sidebar",
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                  warningMessage: `Please log in to import Postman collections`,
+                },
+              })
+            );
+          } else {
+            setIsLostRequestsImportModalOpen(true);
+          }
+        },
+      },
     ],
-    [user.loggedIn, dispatch, onImportClick]
+    [user.loggedIn, dispatch, onImportClick, showImportLostRequestsOption]
   );
 
   const items: DropdownProps["menu"]["items"] = [
@@ -279,6 +310,13 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         <PostmanImporterModal
           isOpen={isPostmanImporterModalOpen}
           onClose={() => setIsPostmanImporterModalOpen(false)}
+        />
+      )}
+      {isLostRequestsImportModalOpen && (
+        <PostmanImporterModal
+          isOpen={isLostRequestsImportModalOpen}
+          onClose={() => setIsLostRequestsImportModalOpen(false)}
+          patchLostRecords={true}
         />
       )}
     </>

@@ -30,7 +30,7 @@ const NetworkStatusField: React.FC<Props> = ({ status, statusText }) => {
   return (
     <StatusLight type={statusLightType}>
       {status || "Failed"}
-      {statusText ? ` ${statusText}` : null}
+      <i>{statusText ? ` ${statusText}` : null}</i>
     </StatusLight>
   );
 };

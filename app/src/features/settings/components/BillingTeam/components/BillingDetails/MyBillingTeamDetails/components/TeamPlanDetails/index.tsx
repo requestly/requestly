@@ -18,7 +18,7 @@ import { TeamPlanActionButtons } from "./components/TeamPlanActionButtons";
 
 export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
   const user = useSelector(getUserAuthDetails);
-  const isDomainWithCustomInfo = useFeatureValue("domain_with_custom_admin_info");
+  const isDomainWithCustomInfo = useFeatureValue("domain_with_custom_admin_info", false);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeamDetails.id, billingTeamDetails.owner));
   const [isPlanDetailsPopoverVisible, setIsPlanDetailsPopoverVisible] = useState(false);
 

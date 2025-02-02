@@ -7,6 +7,7 @@ import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
 import { forEach, isEmpty, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
+import { Request as HarRequest } from "har-format";
 
 export const makeRequest = async (
   appMode: string,
@@ -92,7 +93,7 @@ export const sanitizeKeyValuePairs = (keyValuePairs: KeyValuePair[], removeDisab
       ...pair,
       isEnabled: pair.isEnabled ?? true,
     }))
-    .filter((pair) => pair.key.length > 0 && (!removeDisabledKeys || pair.isEnabled));
+    .filter((pair) => pair.key?.length > 0 && (!removeDisabledKeys || pair.isEnabled));
 };
 
 export const supportsRequestBody = (method: RequestMethod): boolean => {
@@ -102,7 +103,7 @@ export const supportsRequestBody = (method: RequestMethod): boolean => {
 export const generateKeyValuePairsFromJson = (json: Record<string, string> = {}): KeyValuePair[] => {
   return Object.entries(json || {}).map(([key, value, isEnabled = true]) => {
     return {
-      key,
+      key: key || "",
       value,
       id: Math.random(),
       isEnabled,
@@ -192,7 +193,14 @@ export const isApiCollection = (record: RQAPI.Record) => {
 };
 
 const sortRecords = (records: RQAPI.Record[]) => {
-  return records.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+  return records.sort((a, b) => {
+    // Sort by type first
+    const typeComparison = a.type.localeCompare(b.type);
+    if (typeComparison !== 0) return typeComparison;
+
+    // If types are the same, sort alphabetically by name
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+  });
 };
 
 const sortNestedRecords = (records: RQAPI.Record[]) => {
@@ -483,4 +491,38 @@ export const getRecordIdsToBeExpanded = (
   });
 
   return expandedKeysCopy;
+};
+
+export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.Request): HarRequest => {
+  const harRequest: HarRequest = {
+    method: apiRequest.method,
+    url: apiRequest.url,
+    headers: apiRequest.headers.map(({ key, value }) => ({ name: key, value })),
+    queryString: apiRequest.queryParams.map(({ key, value }) => ({ name: key, value })),
+    httpVersion: "HTTP/1.1",
+    cookies: [],
+    bodySize: -1,
+    headersSize: -1,
+  };
+
+  if (supportsRequestBody(apiRequest.method)) {
+    if (apiRequest?.contentType === RequestContentType.RAW) {
+      harRequest.postData = {
+        mimeType: RequestContentType.RAW,
+        text: apiRequest.body as string,
+      };
+    } else if (apiRequest?.contentType === RequestContentType.JSON) {
+      harRequest.postData = {
+        mimeType: RequestContentType.JSON,
+        text: apiRequest.body as string,
+      };
+    } else if (apiRequest?.contentType === RequestContentType.FORM) {
+      harRequest.postData = {
+        mimeType: RequestContentType.FORM,
+        params: (apiRequest.body as KeyValuePair[]).map(({ key, value }) => ({ name: key, value })),
+      };
+    }
+  }
+
+  return harRequest;
 };

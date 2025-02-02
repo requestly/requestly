@@ -102,8 +102,9 @@ export const APIClient: React.FC<Props> = React.memo(() => {
     },
     [addToHistory, isHistoryPath]
   );
+
   return (
-    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
+    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT} isSheetOpenByDefault={true}>
       <div className="api-client-container-content">
         <APIClientView
           // TODO: Fix - "apiEntry" is used for history, remove this prop and derive everything from "apiEntryDetails"
