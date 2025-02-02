@@ -56,7 +56,7 @@ export const ApiClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
         <div className="collections-parsed-container">
           <MdCheckCircleOutline className="collections-parse-result-icon success" />
           <div className="collections-parse-result-text">Data parsed successfully</div>
-          <RQButton type="primary" onClick={handleImportData.bind(this, onClose)} loading={isImporting}>
+          <RQButton type="primary" onClick={() => handleImportData(onClose)} loading={isImporting}>
             Import Data
           </RQButton>
         </div>
