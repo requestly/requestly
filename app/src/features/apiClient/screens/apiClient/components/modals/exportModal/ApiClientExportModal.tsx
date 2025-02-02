@@ -31,8 +31,10 @@ interface ExportEnvironmentsModalProps extends BaseModalProps {
 
 type ExportModalProps = ExportCollectionsModalProps | ExportEnvironmentsModalProps;
 
+type ExportRecord = Omit<RQAPI.Record, "createdBy" | "updatedBy" | "ownerId" | "createdTs" | "updatedTs">;
+
 export interface ExportData {
-  records?: RQAPI.Record[];
+  records?: ExportRecord[];
   environments?: EnvironmentData[];
 }
 
@@ -64,30 +66,22 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     }
   }, [exportData, collections, environments, onClose, fileInfo.label]);
 
-  const recordsToExport: { collections: RQAPI.CollectionRecord[]; apis: RQAPI.ApiRecord[] } = {
+  const recordsToExport: { collections: ExportRecord[]; apis: ExportRecord[] } = {
     collections: [],
     apis: [],
   };
 
   const sanitizeRecords = useCallback(
-    (
-      collection: RQAPI.CollectionRecord,
-      recordsToExport: { collections: RQAPI.CollectionRecord[]; apis: RQAPI.ApiRecord[] }
-    ) => {
-      const sanitizeRecord = (record: RQAPI.Record) => {
-        const sanitizedRecord: { [key: string]: any } = { ...record };
-        ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"].forEach((field) => {
-          delete sanitizedRecord[field];
-        });
-        return sanitizedRecord;
-      };
+    (collection: RQAPI.CollectionRecord, recordsToExport: { collections: ExportRecord[]; apis: ExportRecord[] }) => {
+      const sanitizeRecord = (record: RQAPI.Record): ExportRecord =>
+        omit(record, ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"]);
 
       recordsToExport.collections.push(
         sanitizeRecord({ ...collection, data: omit(collection.data, "children") }) as RQAPI.CollectionRecord
       );
       collection.data.children.forEach((record: RQAPI.Record) => {
         if (record.type === RQAPI.RecordType.API) {
-          recordsToExport.apis.push(sanitizeRecord(record) as RQAPI.ApiRecord);
+          recordsToExport.apis.push(sanitizeRecord(record) as ExportRecord);
         } else {
           sanitizeRecords(record, recordsToExport);
         }
@@ -114,7 +108,7 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     if (!isOpen || isApiRecordsProcessed) return;
 
     if (exportType === "collection") {
-      let processedRecords: RQAPI.Record[] = [];
+      let processedRecords: ExportRecord[] = [];
 
       collections.forEach((collection) => {
         const { collections: processedCollection, apis } = sanitizeRecords(collection, recordsToExport);

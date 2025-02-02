@@ -138,8 +138,8 @@ export const CollectionRow: React.FC<Props> = ({
             header={
               <div
                 className="collection-name-container"
-                onMouseEnter={setHoveredId.bind(this, record.id)}
-                onMouseLeave={setHoveredId.bind(this, "")}
+                onMouseEnter={() => setHoveredId(record.id)}
+                onMouseLeave={() => setHoveredId("")}
                 onClick={() => {
                   openTab(record.id, {
                     title: record.name || "New Collection",

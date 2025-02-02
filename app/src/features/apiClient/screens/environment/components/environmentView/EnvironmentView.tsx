@@ -116,7 +116,7 @@ export const EnvironmentView = () => {
               exportActions={{
                 showExport: isGlobalEnvironment(envId),
                 enableExport: !isEmpty(variables),
-                onExportClick: setIsExportModalOpen.bind(this, true),
+                onExportClick: () => setIsExportModalOpen(true),
               }}
             />
             <VariablesList searchValue={searchValue} variables={variables} onVariablesChange={setPendingVariables} />

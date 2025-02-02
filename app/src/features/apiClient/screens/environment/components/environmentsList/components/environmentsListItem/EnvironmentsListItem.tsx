@@ -119,7 +119,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
         onClick: () => setIsRenameInputVisible(true),
       },
       { key: EnvironmentMenuKey.DUPLICATE, label: "Duplicate", onClick: () => handleEnvironmentDuplicate() },
-      { key: EnvironmentMenuKey.EXPORT, label: "Export", onClick: () => onExportClick(environment) },
+      { key: EnvironmentMenuKey.EXPORT, label: "Export", onClick: () => onExportClick?.(environment) },
       { key: EnvironmentMenuKey.DELETE, label: "Delete", danger: true, onClick: () => handleEnvironmentDelete() },
     ];
   }, [handleEnvironmentDuplicate, handleEnvironmentDelete]);

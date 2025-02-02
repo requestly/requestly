@@ -43,7 +43,11 @@ export const EnvironmentsList = () => {
     () =>
       environments
         .filter((environment) => environment.name?.toLowerCase().includes(searchValue?.toLowerCase()))
-        .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())),
+        .sort((a, b) => {
+          if (a.id === "global") return -1;
+          if (b.id === "global") return 1;
+          return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+        }),
     [environments, searchValue]
   );
 
@@ -116,7 +120,7 @@ export const EnvironmentsList = () => {
     },
     [getEnvironmentVariables]
   );
-
+  console.log(filteredEnvironments, "filetered");
   return (
     <div style={{ height: "inherit" }}>
       {environments?.length === 0 ? (
@@ -136,24 +140,17 @@ export const EnvironmentsList = () => {
               <ListEmptySearchView message="No environments found. Try searching with a different name" />
             ) : (
               <>
-                {filteredEnvironments
-                  .filter((env) => isGlobalEnvironment(env.id))
-                  .map((environment) =>
-                    environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
-                      <EnvironmentsListItem openTab={openTab} environment={environment} />
-                    ) : null
-                  )}
-                {filteredEnvironments
-                  .filter((env) => !isGlobalEnvironment(env.id))
-                  .map((environment) =>
-                    environment.name?.toLowerCase().includes(searchValue?.toLowerCase()) ? (
-                      <EnvironmentsListItem
-                        openTab={openTab}
-                        environment={environment}
-                        onExportClick={handleExportEnvironments}
-                      />
-                    ) : null
-                  )}
+                {filteredEnvironments.map((environment) =>
+                  isGlobalEnvironment(environment.id) ? (
+                    <EnvironmentsListItem openTab={openTab} environment={environment} />
+                  ) : (
+                    <EnvironmentsListItem
+                      openTab={openTab}
+                      environment={environment}
+                      onExportClick={handleExportEnvironments}
+                    />
+                  )
+                )}
                 <div className="mt-8">
                   {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && (
                     <SidebarPlaceholderItem name="New Environment" />
