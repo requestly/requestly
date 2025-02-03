@@ -18,7 +18,7 @@ import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { clearExpandedRecordIdsFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
-import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workload-manager/APIClientWorkloadManager";
+import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { useSearchParams } from "react-router-dom";
 import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
 

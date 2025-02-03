@@ -38,6 +38,13 @@
       color: var(--text-default);
       letter-spacing: 0.15px;
       line-height: 30px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .ant-tag {
+        font-size: var(--requestly-font-size-xs);
+      }
     }
   }
 

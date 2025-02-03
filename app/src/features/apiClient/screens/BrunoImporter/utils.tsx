@@ -6,8 +6,8 @@ import { Bruno } from "./types";
 
 export const processBrunoScripts = (request: Bruno.Request) => {
   const scripts = {
-    preRequest: request?.script?.req || "",
-    postResponse: request?.script?.res || "",
+    preRequest: request?.script?.req?.replace(/bru\./g, "rq.") || "",
+    postResponse: request?.script?.res?.replace(/bru\./g, "rq.") || "",
   };
   return scripts;
 };
@@ -115,9 +115,10 @@ const createCollectionRecord = (
 ): Partial<RQAPI.CollectionRecord> => {
   const allVars = [...(vars?.res || []), ...(vars?.req || []), ...(additionalVars || [])];
 
-  const variables = allVars.reduce((acc, v) => {
+  const variables = allVars.reduce((acc, v, index) => {
     if (v.enabled && v.name) {
       const varValue: EnvironmentVariableValue = {
+        id: index,
         syncValue: v.value,
         type: v.type || "string",
       };
@@ -156,9 +157,10 @@ export const processBrunoCollectionData = (
 } => {
   const environments = (fileContent.environments || []).map((env) => ({
     name: env.name,
-    variables: env.variables.reduce((acc, variable) => {
+    variables: env.variables.reduce((acc, variable, index) => {
       if (variable.enabled) {
         acc[variable.name] = {
+          id: index,
           syncValue: variable.value,
           type: variable.type || "string",
         };
