@@ -4,8 +4,7 @@ import { Row, Button, Input, Space, Modal } from "antd";
 import { toast } from "utils/Toast.js";
 //SUB COMPONENTS
 import SpinnerColumn from "../../../misc/SpinnerColumn";
-//SERVICES
-import { StorageService } from "../../../../init";
+
 import { getAppMode, getIsRefreshRulesPending } from "../../../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { globalActions } from "store/slices/global/slice";
@@ -15,6 +14,7 @@ import { trackGroupRenamed } from "features/rules/analytics";
 
 import "./index.scss";
 import clientRuleStorageService from "services/clientStorageService/features/rule";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 
 const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
   //Load props
@@ -86,21 +86,19 @@ const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
     };
 
     Logger.log("Writing to storage in RenameGroupModal");
-    StorageService(appMode)
-      .saveRuleOrGroup(newGroup)
-      .then(async () => {
-        //Push Notify
-        toast.info(`Renamed Group`);
-        trackGroupRenamed();
-        //Refresh List
-        dispatch(
-          globalActions.updateRefreshPendingStatus({
-            type: "rules",
-            newValue: !isRulesListRefreshPending,
-          })
-        );
-        toggle();
-      });
+    syncingHelper.saveRuleOrGroup(newGroup).then(async () => {
+      //Push Notify
+      toast.info(`Renamed Group`);
+      trackGroupRenamed();
+      //Refresh List
+      dispatch(
+        globalActions.updateRefreshPendingStatus({
+          type: "rules",
+          newValue: !isRulesListRefreshPending,
+        })
+      );
+      toggle();
+    });
   };
 
   useEffect(() => {

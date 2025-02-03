@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Col, Input, Modal, Row, Select, Space } from "antd";
-import { StorageService } from "../../../../init";
 import { getAppMode, getIsRefreshRulesPending, getUserAttributes } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
@@ -25,6 +24,7 @@ import { getActiveWorkspaceIds, getAllWorkspaces } from "store/slices/workspaces
 import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { Group, RecordStatus, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
 import { isGroup, isRule } from "features/rules";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 
 interface Props {
   isOpen: boolean;
@@ -110,7 +110,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
       }
 
       try {
-        await StorageService(appMode).saveRuleOrGroup(newRule, {
+        await syncingHelper.saveRuleOrGroup(newRule, {
           workspaceId: selectedWorkspaceId,
         });
       } catch (err) {
@@ -137,7 +137,6 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
     }
   }, [
     record,
-    appMode,
     onDuplicate,
     close,
     navigate,
@@ -167,7 +166,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
       });
 
       Promise.all(duplicatedGroupRulesPromise).then((duplicatedGroupRules) => {
-        StorageService(appMode)
+        syncingHelper
           .saveMultipleRulesOrGroups([newGroup, ...duplicatedGroupRules], {
             workspaceId: selectedWorkspaceId,
           })

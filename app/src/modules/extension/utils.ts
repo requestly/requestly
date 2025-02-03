@@ -1,6 +1,5 @@
 import { parseDNRRules } from "./mv3RuleParser";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
-import { StorageService } from "init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import {
   trackMv3MigrationCompleted,
@@ -17,6 +16,7 @@ import {
   RuleSourceOperator,
   RuleType,
 } from "@requestly/shared/types/entities/rules";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 
 const MV3_MIGRATION_DATA = "mv3MigrationData";
 
@@ -91,10 +91,9 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
     const migrationPromises = [];
     for (let i = 0; i < migratedRules.length; i += MIGRATION_BATCH) {
       migrationPromises.push(
-        StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION).saveMultipleRulesOrGroups(
-          migratedRules.slice(i, i + MIGRATION_BATCH),
-          { workspaceId: workspaceId }
-        )
+        syncingHelper.saveMultipleRulesOrGroups(migratedRules.slice(i, i + MIGRATION_BATCH), {
+          workspaceId: workspaceId,
+        })
       );
     }
 
