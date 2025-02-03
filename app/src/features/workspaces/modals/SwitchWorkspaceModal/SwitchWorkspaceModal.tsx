@@ -38,7 +38,9 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
   };
 
   const handleSwitchWorkspaceClick = (workspace: Workspace) => {
-    switchWorkspace(workspace.id);
+    switchWorkspace(workspace.id).then(() => {
+      toggleModal();
+    });
   };
 
   return (
