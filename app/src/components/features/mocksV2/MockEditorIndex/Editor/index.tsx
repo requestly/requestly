@@ -27,7 +27,6 @@ import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import MockLogs from "./BottomSheet/MockLogs";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
-// @ts-expect-error growthbook-react does not provide types
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { ExportMocksModalWrapper } from "features/mocks/modals";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";

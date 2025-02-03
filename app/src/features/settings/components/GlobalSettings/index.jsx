@@ -36,9 +36,7 @@ export const GlobalSettings = () => {
         {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && isImplicitTestThisRuleCompatible ? (
           <ImplicitRuleTesting />
         ) : null}
-        {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && isFeatureCompatible(APP_CONSTANTS.FEATURES.BLOCK_LIST) && (
-          <BlockList />
-        )}
+        {isFeatureCompatible(APP_CONSTANTS.FEATURES.BLOCK_LIST) && <BlockList />}
       </div>
     </div>
   );

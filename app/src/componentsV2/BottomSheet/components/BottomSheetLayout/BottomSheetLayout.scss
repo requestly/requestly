@@ -2,6 +2,10 @@
   height: inherit;
   position: relative;
 
+  .ant-tabs {
+    height: 100%;
+  }
+
   &.drawer-layout {
     .bottom-sheet-container {
       position: absolute;
