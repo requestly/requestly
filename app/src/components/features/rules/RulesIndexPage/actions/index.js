@@ -1,6 +1,6 @@
 import APP_CONSTANTS from "config/constants";
-import { StorageService } from "init";
 import Logger from "lib/logger";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 
 const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
@@ -40,7 +40,7 @@ export const isGroupsSanitizationPassed = async ({ rules = [], groups = [], appM
 
           // Save the rule
           Logger.log("Writing to storage in RulesIndexPage actions");
-          StorageService(appMode).saveRuleOrGroup(ruleToSave);
+          syncingHelper.saveRuleOrGroup(ruleToSave);
           return ruleToSave;
         }
       } else {

@@ -1,5 +1,4 @@
 //EXTERNALS
-import { StorageService } from "../../../../../../../../init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { trackErrorInRuleCreation } from "modules/analytics/events/common/rules";
 import { cloneDeep } from "lodash";
@@ -13,6 +12,7 @@ import { HTML_ERRORS } from "../CreateRuleButton/actions/insertScriptValidators"
 import { globalActions } from "store/slices/global/slice";
 import { ToastType } from "componentsV2/CodeEditor/components/EditorToast/types";
 import { toast } from "utils/Toast";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 
 export const saveRule = async (appMode, dispatch, ruleObject) => {
   let ruleToSave = cloneDeep(ruleObject);
@@ -30,7 +30,7 @@ export const saveRule = async (appMode, dispatch, ruleObject) => {
 
   //Save the rule
   Logger.log("Writing to storage in saveRule");
-  await StorageService(appMode).saveRuleOrGroup(ruleToSave);
+  await syncingHelper.saveRuleOrGroup(ruleToSave);
   // const ruleSavePromises = [
   //   detectUnsettledPromise(StorageService(appMode).saveRuleOrGroup(ruleToSave), 10000),
   //   detectUnsettledPromise(StorageService(appMode).getRecord(ruleToSave.groupId), 10000),

@@ -58,8 +58,6 @@ import {
 } from "modules/analytics/events/common/auth/verifyOobcode";
 import { sanitizeDataForFirebase } from "utils/Misc";
 import Logger from "lib/logger";
-import { StorageService } from "init";
-import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import {
   trackLogoutAttempted,

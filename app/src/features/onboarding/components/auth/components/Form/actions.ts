@@ -19,7 +19,6 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { redirectToForgotPassword } from "utils/RedirectionUtils";
 import { getAuthErrorMessage, AuthTypes } from "components/authentication/utils";
 import posthog from "posthog-js";
-import { StorageService } from "init";
 import { isLocalStoragePresent } from "utils/AppUtils";
 import { clientStorageService } from "services/clientStorageService";
 import { workspaceActions } from "store/slices/workspaces/slice";

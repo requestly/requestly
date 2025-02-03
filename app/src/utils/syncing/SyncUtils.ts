@@ -12,9 +12,7 @@ import {
   trackSyncTriggered,
 } from "modules/analytics/events/features/syncing";
 import { SYNC_CONSTANTS } from "./syncConstants";
-import { StorageService } from "init";
 import Logger from "lib/logger";
-import APP_CONSTANTS from "config/constants";
 
 declare global {
   interface Window {
