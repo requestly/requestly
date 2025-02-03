@@ -48,7 +48,7 @@ const App: React.FC = () => {
 
   useIsExtensionEnabled();
   useBillingTeamsListener();
-  useEnvironmentManager();
+  useEnvironmentManager({ manageGlobalEnv: true });
   useAppLanguageObserver();
   // useInitializeNewUserSessionRecordingConfig();
 

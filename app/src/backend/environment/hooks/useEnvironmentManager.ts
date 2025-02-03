@@ -38,8 +38,13 @@ let unsubscribeGlobalVariablesListener: () => void = null;
 // higher precedence is given to environment variables
 const VARIABLES_PRECEDENCE_ORDER = ["ENVIRONMENT", "COLLECTION"];
 
-const useEnvironmentManager = (options = { initFetchers: true }) => {
-  const { initFetchers = true } = options;
+interface UseEnvironmentManagerOptions {
+  manageGlobalEnv?: boolean;
+  initFetchers?: boolean;
+}
+
+const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFetchers: true }) => {
+  const { initFetchers = true, manageGlobalEnv = false } = options;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [isEnvironmentsDataLoaded, setIsEnvironmentsDataLoaded] = useState(false);
@@ -102,6 +107,12 @@ const useEnvironmentManager = (options = { initFetchers: true }) => {
             );
           }
 
+          if (manageGlobalEnv) {
+            if (!environmentMap["global"]) {
+              addNewEnvironment("Global variables", true);
+            }
+          }
+
           const updatedEnvironmentMap: EnvironmentMap = {};
 
           if (!isEmpty(allEnvironmentData)) {
@@ -132,7 +143,15 @@ const useEnvironmentManager = (options = { initFetchers: true }) => {
     // }
     // Disabled otherwise infinite loop if allEnvironmentData is included here, allEnvironmentData should be fetched only once
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ownerId, dispatch, addNewEnvironment, setCurrentEnvironment, currentEnvironmentId, initFetchers]);
+  }, [
+    ownerId,
+    dispatch,
+    addNewEnvironment,
+    setCurrentEnvironment,
+    currentEnvironmentId,
+    initFetchers,
+    manageGlobalEnv,
+  ]);
 
   useEffect(() => {
     if (ownerId && currentEnvironmentId && initFetchers) {

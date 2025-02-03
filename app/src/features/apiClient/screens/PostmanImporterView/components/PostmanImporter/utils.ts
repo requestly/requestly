@@ -130,7 +130,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
   let contentType: RequestContentType | null = null;
   let requestBody: string | KeyValuePair[] | null = null;
 
-  const { mode, raw, formdata, options } = request.body || {};
+  const { mode, raw, formdata, options, urlencoded } = request.body || {};
 
   if (mode === "raw") {
     requestBody = raw;
@@ -144,6 +144,14 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
         value: formData.value,
         isEnabled: true,
       })) || [];
+  } else if (mode === "urlencoded") {
+    contentType = RequestContentType.FORM;
+    requestBody = urlencoded.map((data: { key: string; value: string }) => ({
+      id: Date.now() + Math.random(),
+      key: data.key,
+      value: data.value,
+      isEnabled: true,
+    }));
   }
 
   return {
@@ -281,4 +289,48 @@ export const processPostmanVariablesData = (
   );
 
   return variables;
+};
+
+export const processOnlyLostRecords = (fileContent: any) => {
+  if (!fileContent.info?.name) {
+    throw new Error("Invalid collection file: missing name");
+  }
+  const result = {
+    collections: [] as Partial<RQAPI.CollectionRecord>[],
+    apis: [] as Partial<RQAPI.ApiRecord>[],
+  };
+
+  const rootCollectionId = generateDocumentId("apis");
+  const rootCollection = createCollectionRecord(
+    `${fileContent.info.name}-Lost Requests`,
+    fileContent.info?.description || "",
+    rootCollectionId,
+    fileContent.variable,
+    fileContent.auth
+  );
+  rootCollection.collectionId = "";
+  result.collections.push(rootCollection);
+
+  function traverseItems(items: any[]) {
+    items.forEach((item: any) => {
+      if (
+        item.request &&
+        item.request.method === "POST" &&
+        item.request.body &&
+        item.request.body.mode === "urlencoded"
+      ) {
+        result.apis.push(createApiRecord(item, rootCollectionId));
+      }
+
+      if (item.item) {
+        traverseItems(item.item);
+      }
+    });
+  }
+
+  if (fileContent.item) {
+    traverseItems(fileContent.item);
+  }
+
+  return result;
 };

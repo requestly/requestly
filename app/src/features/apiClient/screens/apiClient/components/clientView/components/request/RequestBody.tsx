@@ -2,12 +2,10 @@ import { Radio, Select } from "antd";
 import React, { useMemo, useState } from "react";
 import { RQAPI, RequestContentType } from "../../../../../../types";
 import { FormBody } from "./renderers/form-body-renderer";
-import { JsonBody } from "./renderers/json-body-renderer";
 import { RawBody } from "./renderers/raw-body-renderer";
 import { RequestBodyContext, RequestBodyStateManager } from "./request-body-state-manager";
 import { RequestBodyProps } from "./request-body-types";
 import "./requestBody.scss";
-
 function parseSingleModeBody(params: {
   contentType: RequestContentType;
   body: RQAPI.RequestBody;
@@ -31,6 +29,7 @@ function parseSingleModeBody(params: {
 
 const RequestBody: React.FC<RequestBodyProps> = (props) => {
   const { contentType, variables, setRequestEntry, setContentType } = props;
+
   const [requestBodyStateManager] = useState(
     () =>
       new RequestBodyStateManager(
@@ -76,9 +75,11 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
 
   const bodyEditor = useMemo(() => {
     switch (contentType) {
+      case RequestContentType.RAW:
       case RequestContentType.JSON:
         return (
-          <JsonBody
+          <RawBody
+            contentType={contentType}
             environmentVariables={variables}
             setRequestEntry={setRequestEntry}
             editorOptions={requestBodyOptions}
@@ -89,13 +90,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
         return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
 
       default:
-        return (
-          <RawBody
-            environmentVariables={variables}
-            setRequestEntry={setRequestEntry}
-            editorOptions={requestBodyOptions}
-          />
-        );
+        return null;
     }
   }, [contentType, variables, setRequestEntry, requestBodyOptions]);
 

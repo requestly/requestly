@@ -42,7 +42,6 @@ import { PreviewType, networkSessionActions } from "store/features/network-sessi
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { trackHarFileOpened } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { trackLocalSessionRecordingOpened } from "modules/analytics/events/features/sessionRecording";
 import { clientStorageService } from "services/clientStorageService";
@@ -57,8 +56,6 @@ const AppModeInitializer = () => {
   const { appsList, isBackgroundProcessActive, isProxyServerRunning } = useSelector(getDesktopSpecificDetails);
   const hasConnectedAppBefore = useSelector(getHasConnectedApp);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isDesktopSessionsCompatible =
-    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
   const appsListRef = useRef(null);
   const hasMessageHandlersBeenSet = useRef(false);
@@ -248,7 +245,7 @@ const AppModeInitializer = () => {
             dispatch(networkSessionActions.setPreviewType(PreviewType.IMPORTED));
             dispatch(networkSessionActions.setSessionName(fileObj.name));
             trackHarFileOpened();
-            redirectToNetworkSession(navigate, undefined, isDesktopSessionsCompatible);
+            redirectToNetworkSession(navigate, undefined, false);
           }
         } else {
           console.log("unknown file type detected");

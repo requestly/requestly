@@ -19,7 +19,7 @@ interface Props {
 export const BillingTeamCard: React.FC<Props> = ({ team }) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [isRequestSuccess, setIsRequestSuccess] = useState(false);
-  const isDomainWithCustomInfo = useFeatureValue("domain_with_custom_admin_info");
+  const isDomainWithCustomInfo = useFeatureValue("domain_with_custom_admin_info", false);
 
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(team?.id, team?.owner));
 

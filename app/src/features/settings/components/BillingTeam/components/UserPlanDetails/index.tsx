@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { Col, Modal, Row, Space } from "antd";
+import { Col, Modal, Row, Space, Tag } from "antd";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { TeamPlanStatus } from "../TeamPlanStatus";
 import { RQButton } from "lib/design-system/components";
@@ -40,6 +40,7 @@ export const UserPlanDetails = () => {
   const [isCancelPlanModalOpen, setIsCancelPlanModalOpen] = useState(false);
   const { type } = user.details?.planDetails ?? {};
   const isIndividualPlanType = PlanType.INDIVIDUAL === type;
+  const hasProfessionalStudentPlan = user?.details?.planDetails?.planId === PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT;
 
   const getSubscriptionEndDateForAppsumo = useCallback((date = new Date()) => {
     const currentDate = date;
@@ -121,6 +122,10 @@ export const UserPlanDetails = () => {
       });
     };
 
+    if (hasProfessionalStudentPlan) {
+      return null;
+    }
+
     if (user?.details?.planDetails?.status === "trialing") {
       return (
         <RQButton size="small" type="text" className="cancel-plan-btn" onClick={showFreeTrailCancelMessage}>
@@ -176,16 +181,17 @@ export const UserPlanDetails = () => {
               <Col>{user?.details?.planDetails?.status !== PlanStatus.EXPIRED && renderPopConfirmation()}</Col>
             </Row>
             <Col className="user-plan-card-grid">
-              <div className="user-plan-card-grid-item">
+              <div className={`user-plan-card-grid-item ${hasProfessionalStudentPlan ? "display-row-center" : ""}`}>
                 <Space direction="vertical" size={8}>
                   {user?.details?.planDetails?.status === "trialing" ? (
                     <div>{trialDuration} days free trial</div>
                   ) : null}
                   <Row gutter={8} className="items-center">
                     <Col className="user-plan-card-plan-name">
-                      {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planName))} plan
+                      {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planName))} Plan{" "}
+                      {hasProfessionalStudentPlan ? <Tag color="green">Student Program</Tag> : ""}
                     </Col>
-                    {user?.details?.planDetails?.status !== "trialing" && (
+                    {user?.details?.planDetails?.status !== "trialing" && !hasProfessionalStudentPlan && (
                       <Col>
                         <RQButton
                           size="small"
@@ -220,8 +226,8 @@ export const UserPlanDetails = () => {
                     {user?.details?.planDetails?.status === "trialing" ? "Trial" : "Plan"} expire date
                   </div>
                   <div className="user-plan-date">
-                    {hasAppSumoSubscription
-                      ? "Lifetime"
+                    {hasAppSumoSubscription || hasProfessionalStudentPlan
+                      ? "Lifetime access"
                       : getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.endDate))}
                   </div>
                 </Space>
