@@ -12,6 +12,7 @@ import {
 
 import { MockEditorDataSchema } from "../MockEditorIndex/types";
 import { RQMockSchema, FileType } from "../types";
+import { isPersonalWorkspace } from "features/workspaces/utils";
 
 export const fileTypeColorMap = {
   [FileType.JS]: "#FFCA5F",
@@ -165,6 +166,12 @@ export const generateFinalUrl = ({
   password?: string;
   collectionPath?: string;
 }) => {
+  // For Backward Comptibility
+  // FIXME-syncing: Migrate these
+  if (isPersonalWorkspace(teamId)) {
+    teamId = null;
+  }
+
   return generateFinalUrlParts({ endpoint, uid, username, teamId, password, collectionPath }).url;
 };
 

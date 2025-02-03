@@ -4,6 +4,7 @@ import { isPersonalWorkspace } from "features/workspaces/utils";
 
 export const getOwnerId = (uid: string, teamId?: string) => {
   if (teamId) {
+    // For backward compatibility, we are using teamId as ownerId for team workspaces only
     // FIXME-syncing: Find a longterm fix for this. What should be the owner id of personal workspace?
     if (isPersonalWorkspace(teamId)) {
       return uid;
