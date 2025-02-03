@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { RQAPI } from "../../../../types";
 import { useParams } from "react-router-dom";
 import { Tabs, TabsProps, Tooltip } from "antd";
@@ -11,8 +11,6 @@ import { ApiClientSidebarHeader } from "./components/apiClientSidebarHeader/ApiC
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal, ImportRequestModal } from "../modals";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { getEmptyAPIEntry } from "../../utils";
 import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
@@ -38,17 +36,6 @@ const APIClientSidebar: React.FC<Props> = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { isImportModalOpen, onImportRequestModalClose, onSaveRecord, setIsImportModalOpen } = useApiClientContext();
-  const { addNewEnvironment, getAllEnvironments, isEnvironmentsDataLoaded } = useEnvironmentManager();
-  const environments = getAllEnvironments();
-  const isGlobalEnvironmentExists = useMemo(() => environments.some((env) => isGlobalEnvironment(env.id)), [
-    environments,
-  ]);
-
-  useEffect(() => {
-    if (!isGlobalEnvironmentExists && isEnvironmentsDataLoaded) {
-      addNewEnvironment("Global variables", true);
-    }
-  }, [addNewEnvironment, isGlobalEnvironmentExists, isEnvironmentsDataLoaded]);
 
   const {
     history,

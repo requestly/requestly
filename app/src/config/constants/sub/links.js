@@ -71,6 +71,9 @@ const LINKS = {
   REQUESTLY_NETWORK_INSPECTOR_DOCS:
     "https://docs.requestly.com/guides/inspect-traffic-and-apply-modifications-from-chrome-devtools-using-requestly",
 
+  /** API Client docs */
+  REQUESTLY_API_CLIENT_DOCS: "https://docs.requestly.com/general/api-client/overview",
+
   /** LANDING PAGES **/
 
   // Home
@@ -141,6 +144,8 @@ const LINKS = {
   CALENDLY_LINK: "https://calendly.com/requestly/sagar",
 
   ACCELERATOR_PROGRAM_FORM_LINK: "https://app.formbricks.com/s/cm1ewcpkt0000djs29ct7rpy2",
+
+  STUDENT_PROGRAM_DOC: "https://requestly.notion.site/Requestly-Student-Program-12dd193f3c998018ad45d31c784f3131",
 };
 
 export default LINKS;

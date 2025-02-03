@@ -11,7 +11,7 @@ interface Props {
   isLoading: boolean;
   isFailed: boolean;
   onCancelRequest: () => void;
-  error?: RQAPI.RequestErrorEntry["error"];
+  error?: RQAPI.ExecutionError;
 }
 
 const ResponseHeaders: React.FC<Props> = ({ headers, isLoading, isFailed, onCancelRequest, error }) => {

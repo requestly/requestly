@@ -15,6 +15,7 @@ export const upsertApiRecord = async (
   const sanitizedRecord = { ...record };
   if (sanitizedRecord.type === RQAPI.RecordType.API) {
     delete sanitizedRecord.data.response;
+    delete sanitizedRecord.data.testResults;
   }
 
   if (sanitizedRecord.type === RQAPI.RecordType.COLLECTION) {
