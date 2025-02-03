@@ -6,23 +6,24 @@ import { getPersonalWorkspaceId } from "../utils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import clientRuleStorageService from "services/clientStorageService/features/rule";
 import { tabsLayoutActions } from "store/slices/tabs-layout";
+import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
+import { useNavigate } from "react-router-dom";
 
 export const useWorkspaceHelpers = () => {
   const dispatch = useDispatch();
   const userId = useSelector(getUserAuthDetails)?.details?.profile?.uid;
+  const navigate = useNavigate();
 
   const switchToPersonalWorkspace = async () => {
     return switchWorkspace(getPersonalWorkspaceId(userId));
   };
 
   const switchWorkspace = async (workspaceId: string, source?: string) => {
-    // // TODO-Syncing: 1. Offload things that needs to be saved
-    // // 2. Clear
-    // StorageService(appMode).clearDB();
     if (!workspaceId) {
       console.error("Invalid workspaceId while switching", { workspaceId });
     }
 
+    redirectToWebAppHomePage(navigate);
     trackWorkspaceSwitched(source);
     console.log("[useWorkspaceHelpers.switchWorkspace]", { workspaceId });
     dispatch(variablesActions.resetState());
