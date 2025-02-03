@@ -128,7 +128,15 @@ class WorkspaceManager {
 
     //#region - syncing init
     await syncEngine.init(
-      [{ id: workspaceId, replication: this.workspaceMap[workspaceId]?.isSyncEnabled }],
+      [
+        {
+          id: workspaceId,
+          replication: {
+            enabled: this.workspaceMap[workspaceId]?.isSyncEnabled,
+            baseUrl: `http://localhost:8081/sync/workspaces`,
+          },
+        },
+      ],
       this.userId,
       this.userId
     );
