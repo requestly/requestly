@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Outlet } from "react-router-dom";
 import { ApiClientProvider } from "./contexts";
 import APIClientSidebar from "./screens/apiClient/components/sidebar/APIClientSidebar";
@@ -11,14 +11,20 @@ import mandatoryLoginIcon from "./assets/mandatory-login.svg";
 import { Typography } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { globalActions } from "store/slices/global/slice";
+import { redirectToUrl } from "utils/RedirectionUtils";
+import LINKS from "config/constants/sub/links";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const dispatch = useDispatch();
 
-  const handleSignUp = () => {
+  const handleSignUp = useCallback(() => {
     dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
-  };
+  }, [dispatch]);
+
+  const handleReadAnnouncementClick = useCallback(() => {
+    redirectToUrl(LINKS.API_CLIENT_LOCAL_FIRST_ANNOUNCEMENT, true);
+  }, []);
 
   return (
     <TabsLayoutContainer id="apiClient">
@@ -32,6 +38,9 @@ const ApiClientFeatureContainer: React.FC = () => {
               <NudgePrompt
                 icon={mandatoryLoginIcon}
                 buttons={[
+                  <RQButton type="secondary" onClick={handleReadAnnouncementClick}>
+                    Read announcement
+                  </RQButton>,
                   <RQButton type="primary" onClick={handleSignUp}>
                     Sign up to get started
                   </RQButton>,
