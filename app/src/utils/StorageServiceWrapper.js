@@ -6,7 +6,7 @@ import { getStorageHelper } from "../engines";
 import { processRecordsArrayIntoObject } from "./syncing/syncDataUtils";
 // import { doSyncRecords } from "./syncing/SyncUtils";
 import { generateObjectId } from "./FormattingHelper";
-import { RuleStorageModel } from "requestly-sync-engine";
+import { RuleStorageModel } from "lib/syncing";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 class StorageServiceWrapper {
