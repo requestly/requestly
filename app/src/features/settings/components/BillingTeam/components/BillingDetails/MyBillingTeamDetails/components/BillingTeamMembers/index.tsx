@@ -36,7 +36,7 @@ interface Props {
 
 export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
   const { billingId } = useParams();
-  const isDomainWithCustomInfo = useFeatureValue("domain_with_custom_admin_info");
+  const isDomainWithCustomInfo = useFeatureValue("domain_with_custom_admin_info", false);
   const user = useSelector(getUserAuthDetails);
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
   const billingTeamDetails = useSelector(getBillingTeamById(billingId));

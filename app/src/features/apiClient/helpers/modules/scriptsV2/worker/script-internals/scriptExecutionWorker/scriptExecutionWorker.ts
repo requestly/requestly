@@ -1,17 +1,19 @@
 import { expose } from "comlink";
-import { RQ } from "../../sandbox/RQ";
-import { LocalScope } from "../../../../../../../modules/localScope";
-import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
 import {
   ScriptExecutionError,
   ScriptPendingWorkFlushingError,
-  SyncLocalDumpCallback,
-} from "../../workload-manager/workLoadTypes";
+  ScriptWorkloadCallback,
+} from "../../../workloadManager/workLoadTypes";
+import { RQ } from "../RQmethods";
+import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
+import { LocalScope } from "../../../../../../../../modules/localScope";
+import { TestResult } from "../types";
 
 export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
   private localScope: LocalScope;
+  private testResults: TestResult[] = [];
 
-  async executeScript(script: string, initialState: any, callback: SyncLocalDumpCallback) {
+  async executeScript(script: string, initialState: any, callback: ScriptWorkloadCallback) {
     this.localScope = new LocalScope(initialState);
 
     // eslint-disable-next-line no-new-func
@@ -23,18 +25,21 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
       `
     );
     try {
-      scriptFunction(new RQ(this.localScope));
+      scriptFunction(new RQ(this.localScope, this.testResults));
     } catch (error) {
       throw new ScriptExecutionError(error);
     }
     try {
       await this.syncLocalDump(callback);
+      return {
+        testResults: this.testResults,
+      };
     } catch (error) {
       throw new ScriptPendingWorkFlushingError(error);
     }
   }
 
-  private async syncLocalDump(callback: SyncLocalDumpCallback) {
+  private async syncLocalDump(callback: ScriptWorkloadCallback) {
     if (!this.localScope.getIsStateMutated()) {
       return;
     }

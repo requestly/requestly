@@ -1,4 +1,4 @@
-import { Select, Skeleton, Space } from "antd";
+import { Dropdown, Row, Select, Skeleton, Space } from "antd";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
@@ -39,14 +39,16 @@ import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
-import { SheetLayout } from "componentsV2/BottomSheet/types";
+import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
-import { RequestExecutor } from "features/apiClient/helpers/requestExecutor/requestExecutor";
+import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
 import { isEmpty } from "lodash";
+import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
+import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 
 interface Props {
   openInModal?: boolean;
@@ -73,7 +75,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const isCreateMode = searchParams.has("create");
   const { requestId } = useParams();
 
-  const { toggleBottomSheet } = useBottomSheetContext();
+  const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
   const { apiClientRecords, onSaveRecord, apiClientWorkloadManager } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const {
@@ -94,11 +96,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>({ ...(apiEntry ?? getEmptyAPIEntry()) });
   const [isFailed, setIsFailed] = useState(false);
-  const [error, setError] = useState<RQAPI.RequestErrorEntry["error"]>(null);
+  const [error, setError] = useState<RQAPI.ExecutionError>(null);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
-  const [requestExecutor, setRequestExecutor] = useState<RequestExecutor | null>(null);
+  const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
 
   // const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(true);
@@ -108,6 +110,21 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse), isAnimating);
   const { updateTab, activeTab } = useTabsLayoutContext();
+
+  const [copyAsModalOpen, setCopyAsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
+      toggleSheetPlacement(bottomSheetPlacement);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [toggleSheetPlacement]);
 
   useEffect(() => {
     const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
@@ -270,59 +287,63 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       error: null,
     }));
 
-    requestExecutor.updateApiRecords(apiClientRecords);
-    requestExecutor.updateEntryDetails({
+    apiClientExecutor.updateApiRecords(apiClientRecords);
+    apiClientExecutor.updateEntryDetails({
       entry: sanitizeEntry(entry),
       recordId: apiEntryDetails?.id,
       collectionId: apiEntryDetails?.collectionId,
     });
 
-    requestExecutor
-      .execute()
-      .then((executedEntry) => {
-        const response = executedEntry.response;
-        // TODO: Add an entry in history
-        const entryWithResponse = { ...entry, response };
-        const renderedEntryWithResponse = { ...executedEntry, response };
+    try {
+      const apiClientExecutionResult = await apiClientExecutor.execute();
+      const { executedEntry } = apiClientExecutionResult;
+      const entryWithResponse: RQAPI.Entry = {
+        ...entry,
+        response: executedEntry.response,
+        testResults: executedEntry.testResults,
+      };
+      setEntry(entryWithResponse);
 
-        if (response) {
-          setEntry(entryWithResponse);
-          trackResponseLoaded({
-            type: getContentTypeFromResponseHeaders(response.headers),
-            time: Math.round(response.time / 1000),
-          });
-          trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
-          trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
-        } else {
-          const erroredEntry = executedEntry as RQAPI.RequestErrorEntry;
-
-          setIsFailed(true);
-          setError(erroredEntry?.error ?? null);
-          if (erroredEntry?.error) {
-            Sentry.withScope((scope) => {
-              scope.setTag("error_type", "api_request_failure");
-              scope.setContext("request_details", {
-                url: entryWithResponse.request.url,
-                method: entryWithResponse.request.method,
-                headers: entryWithResponse.request.headers,
-                queryParams: entryWithResponse.request.queryParams,
-              });
-              scope.setFingerprint(["api_request_error", entryWithResponse.request.method, erroredEntry.error.source]);
-              Sentry.captureException(
-                new Error(`API Request Failed: ${erroredEntry.error.message || "Unknown error"}`)
-              );
+      if (apiClientExecutionResult.status === "success") {
+        trackResponseLoaded({
+          type: getContentTypeFromResponseHeaders(executedEntry.response.headers),
+          time: Math.round(executedEntry.response.time / 1000),
+        });
+        trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
+        trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
+      } else if (apiClientExecutionResult.status === "error") {
+        const { error } = apiClientExecutionResult;
+        setIsFailed(true);
+        setError(error ?? null);
+        if (error) {
+          Sentry.withScope((scope) => {
+            scope.setTag("error_type", "api_request_failure");
+            scope.setContext("request_details", {
+              url: entryWithResponse.request.url,
+              method: entryWithResponse.request.method,
+              headers: entryWithResponse.request.headers,
+              queryParams: entryWithResponse.request.queryParams,
             });
-          }
-          trackRequestFailed();
-          trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
-          trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
+            scope.setFingerprint(["api_request_error", entryWithResponse.request.method, error.source]);
+            Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
+          });
         }
-        notifyApiRequestFinished?.(renderedEntryWithResponse);
-      })
-      .finally(() => {
-        setIsLoadingResponse(false);
-      });
+        trackRequestFailed();
+        trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
+        trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
+      }
 
+      notifyApiRequestFinished?.(executedEntry);
+    } catch (e) {
+      setIsFailed(true);
+      setError({
+        source: "request",
+        name: e.name,
+        message: e.message,
+      });
+    } finally {
+      setIsLoadingResponse(false);
+    }
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
@@ -331,7 +352,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     apiEntryDetails?.collectionId,
     entry,
     toggleBottomSheet,
-    requestExecutor,
+    apiClientExecutor,
     apiClientRecords,
     dispatch,
     notifyApiRequestFinished,
@@ -400,7 +421,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
         isCreateMode ? "replace" : "open"
       );
-      setEntry({ ...result.data.data, response: entry.response });
+      setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
       resetChanges();
       trackRequestSaved("api_client_view");
       toast.success("Request saved!");
@@ -412,10 +433,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, [entry, apiEntryDetails, onSaveRecord, setEntry, teamId, uid, resetChanges, isCreateMode, requestId]);
 
   const cancelRequest = useCallback(() => {
-    // abortControllerRef.current?.abort();
-    requestExecutor.abort();
+    apiClientExecutor.abort();
     trackAPIRequestCancelled();
-  }, [requestExecutor]);
+  }, [apiClientExecutor]);
 
   const handleAuthChange = useCallback((authOptions: RQAPI.AuthOptions) => {
     setEntry((prevEntry) => {
@@ -429,15 +449,37 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     (evt.target as HTMLInputElement).blur();
   }, []);
 
-  useEffect(() => {
-    if (!requestExecutor) {
-      setRequestExecutor(new RequestExecutor(appMode, apiClientWorkloadManager));
+  const handleTestResultRefresh = useCallback(async () => {
+    try {
+      apiClientExecutor.updateEntryDetails({
+        entry: sanitizeEntry(entry),
+        recordId: apiEntryDetails?.id,
+        collectionId: apiEntryDetails?.collectionId,
+      });
+
+      const result = await apiClientExecutor.rerun();
+      if (result.status === RQAPI.ExecutionStatus.SUCCESS) {
+        setEntry((entry) => ({
+          ...entry,
+          testResults: result.artifacts.testResults,
+        }));
+      } else {
+        setError(result.error);
+      }
+    } catch (error) {
+      toast.error("Something went wrong while refreshing test results");
     }
-  }, [apiClientRecords, apiClientWorkloadManager, appMode, requestExecutor]);
+  }, [apiClientExecutor, apiEntryDetails?.id, apiEntryDetails?.collectionId, entry]);
 
   useEffect(() => {
-    if (requestExecutor) {
-      requestExecutor.updateInternalFunctions({
+    if (!apiClientExecutor) {
+      setApiClientExecutor(new ApiClientExecutor(appMode, apiClientWorkloadManager));
+    }
+  }, [apiClientRecords, apiClientWorkloadManager, appMode, apiClientExecutor]);
+
+  useEffect(() => {
+    if (apiClientExecutor) {
+      apiClientExecutor.updateInternalFunctions({
         getCollectionVariables,
         getEnvironmentVariables: getCurrentEnvironmentVariables,
         getGlobalVariables,
@@ -451,7 +493,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     getGlobalVariables,
     handleUpdatesFromExecutionWorker,
     renderVariables,
-    requestExecutor,
+    apiClientExecutor,
   ]);
 
   return isExtensionEnabled ? (
@@ -475,10 +517,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           <ApiClientBottomSheet
             key={requestId}
             response={entry.response}
+            testResults={entry.testResults}
             isLoading={isLoadingResponse}
             isFailed={isFailed}
             isRequestCancelled={isRequestCancelled}
             onCancelRequest={cancelRequest}
+            handleTestResultRefresh={handleTestResultRefresh}
             error={error}
           />
         }
@@ -538,6 +582,36 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   Save
                 </RQButton>
               ) : null}
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: 0,
+                      onClick: () => {
+                        apiClientExecutor.updateApiRecords(apiClientRecords);
+                        apiClientExecutor.updateEntryDetails({
+                          entry: sanitizeEntry(entry),
+                          recordId: apiEntryDetails?.id,
+                          collectionId: apiEntryDetails?.collectionId,
+                        });
+                        setCopyAsModalOpen(true);
+                      },
+                      label: <Row>Copy As</Row>,
+                    },
+                  ],
+                }}
+                trigger={["click"]}
+                overlayClassName="rule-more-actions-dropdown"
+              >
+                <RQButton
+                  type="transparent"
+                  className="more-api-request-actions-button"
+                  icon={<MdOutlineMoreHoriz />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                />
+              </Dropdown>
             </div>
             <RequestTabs
               key={requestId}
@@ -551,6 +625,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           </Skeleton>
         </div>
       </BottomSheetLayout>
+      {copyAsModalOpen ? (
+        <CopyAsModal
+          apiRequest={apiClientExecutor.prepareRequest()}
+          open={copyAsModalOpen}
+          onClose={() => setCopyAsModalOpen(false)}
+        />
+      ) : null}
     </div>
   ) : (
     <div className="w-full">
