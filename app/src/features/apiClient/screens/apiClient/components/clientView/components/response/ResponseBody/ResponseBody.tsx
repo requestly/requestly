@@ -42,6 +42,11 @@ const ResponseBody: React.FC<Props> = ({
   const [responseMode, setResponseMode] = useState(ResponseMode.PREVIEW);
   const [isResponseCopied, setIsResponseCopied] = useState(false);
 
+  const [isResponseBodyFullScreen, setIsResponseBodyFullScreen] = useState(false);
+  const handleFullScreenChange = () => {
+    setIsResponseBodyFullScreen((prev) => !prev);
+  };
+
   const onResponseModeChange = useCallback((e: RadioChangeEvent) => {
     const responseMode: ResponseMode = e.target.value;
     setResponseMode(responseMode);
@@ -99,11 +104,12 @@ const ResponseBody: React.FC<Props> = ({
             title: "",
             options: [bodyPreviewModeOptions],
           }}
-          analyticEventProperties={{ source: "api_client" }}
+          isFullScreen={isResponseBodyFullScreen}
+          onFullScreenChange={handleFullScreenChange}
         />
       </div>
     );
-  }, [contentTypeHeader, responseText, bodyPreviewModeOptions]);
+  }, [contentTypeHeader, responseText, bodyPreviewModeOptions, isResponseBodyFullScreen]);
 
   return (
     <div className="api-client-response-body">
