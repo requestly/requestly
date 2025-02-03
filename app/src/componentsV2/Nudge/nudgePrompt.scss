@@ -1,0 +1,18 @@
+.nudge-prompt {
+  display: flex;
+  gap: var(--space-8, 24px);
+
+  &-icon {
+    align-self: start;
+  }
+
+  &-content {
+    width: 368px;
+  }
+
+  &-buttons {
+    display: flex;
+    gap: var(--space-8, 24px);
+    margin-top: var(--space-8, 24px);
+  }
+}
