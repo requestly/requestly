@@ -44,8 +44,8 @@ export const EnvironmentsList = () => {
       environments
         .filter((environment) => environment.name?.toLowerCase().includes(searchValue?.toLowerCase()))
         .sort((a, b) => {
-          if (a.id === "global") return -1;
-          if (b.id === "global") return 1;
+          if (isGlobalEnvironment(a.id)) return -1;
+          if (isGlobalEnvironment(b.id)) return 1;
           return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
         }),
     [environments, searchValue]
@@ -120,7 +120,7 @@ export const EnvironmentsList = () => {
     },
     [getEnvironmentVariables]
   );
-  console.log(filteredEnvironments, "filetered");
+
   return (
     <div style={{ height: "inherit" }}>
       {environments?.length === 0 ? (
