@@ -45,7 +45,7 @@ interface EditorProps {
     enablePrettify?: boolean;
   };
   isFullScreen?: boolean;
-  onFullscreenChange?: () => void;
+  onFullScreenChange?: () => void;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -62,7 +62,7 @@ const Editor: React.FC<EditorProps> = ({
   envVariables,
   showOptions = { enablePrettify: true },
   isFullScreen = false,
-  onFullscreenChange = () => {},
+  onFullScreenChange = () => {},
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -82,7 +82,7 @@ const Editor: React.FC<EditorProps> = ({
   };
 
   const handleFullScreenToggle = useCallback(() => {
-    onFullscreenChange();
+    onFullScreenChange();
     if (!isFullScreen) {
       trackCodeEditorExpandedClick(analyticEventProperties);
 
@@ -105,7 +105,7 @@ const Editor: React.FC<EditorProps> = ({
     isFullScreen,
     isFullScreenModeOnboardingCompleted,
     location?.pathname,
-    onFullscreenChange,
+    onFullScreenChange,
   ]);
 
   const editorLanguage = useMemo(() => {

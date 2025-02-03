@@ -43,7 +43,7 @@ const ResponseBody: React.FC<Props> = ({
   const [isResponseCopied, setIsResponseCopied] = useState(false);
 
   const [isResponseBodyFullScreen, setIsResponseBodyFullScreen] = useState(false);
-  const handleFullscreenChange = () => {
+  const handleFullScreenChange = () => {
     setIsResponseBodyFullScreen((prev) => !prev);
   };
 
@@ -105,7 +105,7 @@ const ResponseBody: React.FC<Props> = ({
             options: [bodyPreviewModeOptions],
           }}
           isFullScreen={isResponseBodyFullScreen}
-          onFullscreenChange={handleFullscreenChange}
+          onFullScreenChange={handleFullScreenChange}
         />
       </div>
     );

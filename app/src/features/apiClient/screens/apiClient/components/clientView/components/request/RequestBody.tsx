@@ -29,11 +29,6 @@ function parseSingleModeBody(params: {
 
 const RequestBody: React.FC<RequestBodyProps> = (props) => {
   const { contentType, variables, setRequestEntry, setContentType } = props;
-  const [isRequestBodyFullScreen, setIsRequestBodyFullScreen] = useState(false);
-
-  const handleFullscreenChange = () => {
-    setIsRequestBodyFullScreen((prev) => !prev);
-  };
 
   const [requestBodyStateManager] = useState(
     () =>
@@ -85,8 +80,6 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
         return (
           <RawBody
             contentType={contentType}
-            isFullScreen={isRequestBodyFullScreen}
-            onFullscreenChange={handleFullscreenChange}
             environmentVariables={variables}
             setRequestEntry={setRequestEntry}
             editorOptions={requestBodyOptions}
@@ -99,7 +92,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
       default:
         return null;
     }
-  }, [contentType, isRequestBodyFullScreen, variables, setRequestEntry, requestBodyOptions]);
+  }, [contentType, variables, setRequestEntry, requestBodyOptions]);
 
   /*
   In select, label is used is 'Text' & RequestContentType.RAW is used as value since we have RAW, JSON, Form as types,
