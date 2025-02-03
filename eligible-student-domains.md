@@ -13,6 +13,6 @@ The following domains are eligible for the student programme:
     ".ac.jp",
     ".ac.za",
     ".edu.br",
-    "student.alfa-college.nl"
+    ".alfa-college.nl"
   ]
 }
