@@ -13,7 +13,7 @@ import { trackRulesListLoaded } from "features/rules/analytics";
 import { migrateAllRulesToMV3 } from "modules/extension/utils";
 import { sendIndividualRuleTypesCountAttributes } from "../utils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { RuleStorageModel, syncEngine } from "requestly-sync-engine";
+import { RuleStorageModel, syncEngine } from "lib/syncing";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
 import clientRuleStorageService from "services/clientStorageService/features/rule";

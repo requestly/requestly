@@ -4,7 +4,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 import { Workspace } from "../types";
 import { workspaceActions } from "store/slices/workspaces/slice";
-import { RuleStorageModel, syncEngine } from "requestly-sync-engine";
+import { RuleStorageModel, syncEngine } from "lib/syncing";
 import { getActiveWorkspaceId, hasAccessToWorkspace } from "../utils";
 import { globalActions } from "store/slices/global/slice";
 

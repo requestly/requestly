@@ -132,6 +132,8 @@
     "remark-gfm": "^4.0.0",
     "rrweb": "2.0.0-alpha.14",
     "rrweb-player": "2.0.0-alpha.14",
+    "rxdb": "^16.4.0",
+    "rxjs": "^7.8.1",
     "semver": "^7.5.4",
     "styled-components": "^6.1.8",
     "ts-loader": "^9.3.0",
@@ -140,8 +142,7 @@
     "unique-names-generator": "^4.7.1",
     "uuid": "^8.3.2",
     "validator": "^13.7.0",
-    "xml2js": "^0.6.2",
-    "requestly-sync-engine": "^0.0.1"
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
