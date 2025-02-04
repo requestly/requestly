@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback, useState } from "react";
+import { useEffect, useMemo, useCallback, useState, useRef } from "react";
 import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -61,8 +61,17 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const activeOwnerEnvironments = useMemo(() => {
     return allEnvironmentData?.[ownerId] ?? {};
   }, [allEnvironmentData, ownerId]);
+  const activeOwnerEnvironmentsRef = useRef(activeOwnerEnvironments);
+  useEffect(() => {
+    activeOwnerEnvironmentsRef.current = activeOwnerEnvironments;
+  }, [activeOwnerEnvironments]);
 
   const globalEnvironmentData = useMemo(() => activeOwnerEnvironments?.["global"] || null, [activeOwnerEnvironments]);
+
+  const collectionVariablesRef = useRef(collectionVariables);
+  useEffect(() => {
+    collectionVariablesRef.current = collectionVariables;
+  }, [collectionVariables]);
 
   const setCurrentEnvironment = useCallback(
     (environmentId: string) => {
@@ -104,42 +113,38 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
           const updatedEnvironmentMap: EnvironmentMap = {};
 
-          if (!isEmpty(allEnvironmentData)) {
+          if (!isEmpty(activeOwnerEnvironmentsRef.current)) {
             Object.keys(environmentMap).forEach((key) => {
               updatedEnvironmentMap[key] = {
                 ...environmentMap[key],
-                ...allEnvironmentData[key],
                 variables: mergeLocalAndSyncVariables(
-                  activeOwnerEnvironments[key]?.variables ?? {},
+                  activeOwnerEnvironmentsRef.current[key]?.variables ?? {},
                   environmentMap[key].variables
                 ),
               };
             });
-            dispatch(variablesActions.setAllEnvironmentData({ environmentMap: updatedEnvironmentMap, ownerId }));
+            dispatch(variablesActions.updateAllEnvironmentData({ environmentMap: updatedEnvironmentMap, ownerId }));
           } else {
-            dispatch(variablesActions.setAllEnvironmentData({ environmentMap, ownerId }));
+            dispatch(variablesActions.updateAllEnvironmentData({ environmentMap, ownerId }));
           }
         })
         .catch((err) => {
           Logger.error("Error while fetching all environment variables", err);
-          dispatch(variablesActions.setAllEnvironmentData({ environmentMap: {}, ownerId }));
+          dispatch(variablesActions.updateAllEnvironmentData({ environmentMap: {}, ownerId }));
         })
         .finally(() => {
           setIsLoading(false);
           setIsEnvironmentsDataLoaded(true);
         });
     }
-    // }
-    // Disabled otherwise infinite loop if allEnvironmentData is included here, allEnvironmentData should be fetched only once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ownerId, dispatch, addNewEnvironment, setCurrentEnvironment, currentEnvironmentId, initFetchers]);
+  }, [currentEnvironmentId, dispatch, initFetchers, ownerId, setCurrentEnvironment]);
 
   useEffect(() => {
     if (ownerId && currentEnvironmentId && initFetchers) {
       unsubscribeListener?.();
       unsubscribeListener = attachEnvironmentVariableListener(ownerId, currentEnvironmentId, (environmentData) => {
         const mergedVariables = mergeLocalAndSyncVariables(
-          activeOwnerEnvironments[environmentData.id]?.variables ?? {},
+          activeOwnerEnvironmentsRef.current[environmentData.id]?.variables ?? {},
           environmentData.variables
         );
         dispatch(
@@ -157,20 +162,17 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     return () => {
       unsubscribeListener?.();
     };
-
-    // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentEnvironmentId, dispatch, ownerId, initFetchers]);
+  }, [currentEnvironmentId, dispatch, initFetchers, ownerId]);
 
   useEffect(() => {
-    if (ownerId && globalEnvironmentData?.id && initFetchers) {
+    if (ownerId && activeOwnerEnvironmentsRef.current?.["global"]?.id && initFetchers) {
       unsubscribeGlobalVariablesListener?.();
       unsubscribeGlobalVariablesListener = attachEnvironmentVariableListener(
         ownerId,
-        globalEnvironmentData.id,
+        activeOwnerEnvironmentsRef.current?.["global"]?.id,
         (environmentData) => {
           const mergedVariables = mergeLocalAndSyncVariables(
-            activeOwnerEnvironments[environmentData.id]?.variables ?? {},
+            activeOwnerEnvironmentsRef.current[environmentData.id]?.variables ?? {},
             environmentData.variables
           );
           dispatch(
@@ -188,10 +190,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     return () => {
       unsubscribeGlobalVariablesListener?.();
     };
-
-    // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalEnvironmentData?.id, ownerId, initFetchers]);
+  }, [ownerId, initFetchers, dispatch]);
 
   useEffect(() => {
     if (ownerId && initFetchers) {
@@ -199,7 +198,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       unsubscribeCollectionListener = attachCollectionVariableListener(ownerId, (collectionDetails) => {
         Object.keys(collectionDetails).forEach((collectionId) => {
           const mergedCollectionVariables = mergeLocalAndSyncVariables(
-            collectionVariables[collectionId]?.variables ?? {},
+            collectionVariablesRef.current[collectionId]?.variables ?? {},
             collectionDetails[collectionId].variables ?? {}
           );
           dispatch(variablesActions.setCollectionVariables({ collectionId, variables: mergedCollectionVariables }));
@@ -210,9 +209,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     return () => {
       unsubscribeCollectionListener?.();
     };
-    // Disabled otherwise infinite loop if allEnvironmentData is included here, listener should be attached once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ownerId, initFetchers]);
+  }, [ownerId, initFetchers, dispatch]);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -231,7 +228,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
   const setVariables = useCallback(
     async (environmentId: string, variables: EnvironmentVariables) => {
-      console.log("DBG setVariables 1", environmentId, variables);
       const newVariablesWithSyncvalues: EnvironmentVariables = Object.fromEntries(
         Object.entries(variables).map(([key, value], index) => {
           const typeToSaveInDB =
@@ -244,7 +240,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
           ];
         })
       );
-      console.log("DBG setVariables 2", newVariablesWithSyncvalues);
 
       return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariablesWithSyncvalues)
         .then(() => {
@@ -405,18 +400,20 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
   const duplicateEnvironment = useCallback(
     async (environmentId: string) => {
-      return duplicateEnvironmentInDB(ownerId, environmentId, activeOwnerEnvironments).then((newEnvironment) => {
-        dispatch(variablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name, ownerId }));
-        dispatch(
-          variablesActions.updateEnvironmentData({
-            newVariables: newEnvironment.variables,
-            environmentId: newEnvironment.id,
-            ownerId,
-          })
-        );
-      });
+      return duplicateEnvironmentInDB(ownerId, environmentId, activeOwnerEnvironmentsRef.current).then(
+        (newEnvironment) => {
+          dispatch(variablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name, ownerId }));
+          dispatch(
+            variablesActions.updateEnvironmentData({
+              newVariables: newEnvironment.variables,
+              environmentId: newEnvironment.id,
+              ownerId,
+            })
+          );
+        }
+      );
     },
-    [dispatch, activeOwnerEnvironments, ownerId]
+    [dispatch, ownerId]
   );
 
   const deleteEnvironment = useCallback(
