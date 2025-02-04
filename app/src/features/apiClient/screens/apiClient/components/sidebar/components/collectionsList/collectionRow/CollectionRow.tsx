@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { Collapse, Dropdown, MenuProps, Tooltip } from "antd";
+import { Checkbox, Collapse, Dropdown, MenuProps, Tooltip } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
@@ -26,6 +26,10 @@ interface Props {
   openTab: TabsLayoutContextInterface["openTab"];
   setExpandedRecordIds: (keys: RQAPI.Record["id"][]) => void;
   expandedRecordIds: string[];
+  setShowSelection: (arg: boolean) => void;
+  showSelection: boolean;
+  recordsSelectionHandler: (record: RQAPI.Record, event: React.ChangeEvent<HTMLInputElement>) => void;
+  selectedRecords: Set<RQAPI.Record["id"]>;
 }
 
 export const CollectionRow: React.FC<Props> = ({
@@ -35,6 +39,10 @@ export const CollectionRow: React.FC<Props> = ({
   openTab,
   expandedRecordIds,
   setExpandedRecordIds,
+  selectedRecords,
+  showSelection,
+  recordsSelectionHandler,
+  setShowSelection,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeKey, setActiveKey] = useState(expandedRecordIds?.includes(record.id) ? record.id : null);
@@ -68,7 +76,7 @@ export const CollectionRow: React.FC<Props> = ({
           danger: true,
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
-            updateRecordToBeDeleted(record);
+            updateRecordToBeDeleted([record]);
             setIsDeleteModalOpen(true);
           },
         },
@@ -76,7 +84,7 @@ export const CollectionRow: React.FC<Props> = ({
 
       return items;
     },
-    [setIsDeleteModalOpen, updateRecordToBeDeleted]
+    [setIsDeleteModalOpen, updateRecordToBeDeleted, onExportClick]
   );
 
   const collapseChangeHandler = useCallback(
@@ -92,7 +100,7 @@ export const CollectionRow: React.FC<Props> = ({
         ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
         : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, activeKeysCopy);
     },
-    [record, expandedRecordIds]
+    [record, expandedRecordIds, setExpandedRecordIds]
   );
 
   useEffect(() => {
@@ -125,10 +133,21 @@ export const CollectionRow: React.FC<Props> = ({
           ghost
           className="collections-list-item collection"
           expandIcon={({ isActive }) => {
-            return isActive ? (
-              <PiFolderOpen className="collection-expand-icon" />
-            ) : (
-              <MdOutlineFolder className="collection-expand-icon" />
+            return (
+              <>
+                {showSelection && (
+                  <Checkbox
+                    onClick={(event) => event.stopPropagation()}
+                    onChange={recordsSelectionHandler.bind(this, record)}
+                    checked={selectedRecords.has(record.id)}
+                  />
+                )}
+                {isActive ? (
+                  <PiFolderOpen className="collection-expand-icon" />
+                ) : (
+                  <MdOutlineFolder className="collection-expand-icon" />
+                )}
+              </>
             );
           }}
         >
@@ -189,6 +208,7 @@ export const CollectionRow: React.FC<Props> = ({
                     <RQButton
                       onClick={(e) => {
                         e.stopPropagation();
+                        setShowSelection(false);
                       }}
                       size="small"
                       type="transparent"
@@ -209,9 +229,19 @@ export const CollectionRow: React.FC<Props> = ({
                 onNewRecordClick={() => onNewClick("collection_row", RQAPI.RecordType.API, record.id)}
               />
             ) : (
-              record.data.children.map((apiRecord) => {
+              record.data.children?.map((apiRecord) => {
                 if (apiRecord.type === RQAPI.RecordType.API) {
-                  return <RequestRow key={apiRecord.id} record={apiRecord} openTab={openTab} />;
+                  return (
+                    <RequestRow
+                      key={apiRecord.id}
+                      record={apiRecord}
+                      openTab={openTab}
+                      showSelection={showSelection}
+                      recordsSelectionHandler={recordsSelectionHandler}
+                      selectedRecords={selectedRecords}
+                      setShowSelection={setShowSelection}
+                    />
+                  );
                 } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
                   return (
                     <CollectionRow
@@ -222,6 +252,10 @@ export const CollectionRow: React.FC<Props> = ({
                       onExportClick={onExportClick}
                       expandedRecordIds={expandedRecordIds}
                       setExpandedRecordIds={setExpandedRecordIds}
+                      showSelection={showSelection}
+                      selectedRecords={selectedRecords}
+                      recordsSelectionHandler={recordsSelectionHandler}
+                      setShowSelection={setShowSelection}
                     />
                   );
                 }

@@ -8,6 +8,7 @@ import { upsertApiRecord } from "backend/apiClient";
 import { forEach, isEmpty, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
+import { generateDocumentId } from "backend/utils";
 
 export const makeRequest = async (
   appMode: string,
@@ -241,7 +242,7 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
   });
 
   sortNestedRecords(updatedRecords);
-  return updatedRecords;
+  return { recordsMap, updatedRecords };
 };
 
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
@@ -525,4 +526,40 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.Request): HarReq
   }
 
   return harRequest;
+};
+
+export const filterOutChildrenRecords = (
+  selectedRecords: Set<RQAPI.Record["id"]>,
+  childParentMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>,
+  recordsMap: Record<RQAPI.Record["id"], RQAPI.Record>
+) =>
+  [...selectedRecords]
+    .filter((id) => !childParentMap[id] || !selectedRecords.has(childParentMap[id]))
+    .map((id) => recordsMap[id]);
+
+export const processRecordsForDuplication = (recordsToProcess: RQAPI.Record[], recordsToDuplicate: RQAPI.Record[]) => {
+  const processorFunc = (record: RQAPI.Record) => {
+    if (record.type === RQAPI.RecordType.COLLECTION) {
+      const collectionToDuplicate = { ...record, name: `(Copy) ${record.name}` } as RQAPI.CollectionRecord;
+      delete collectionToDuplicate.id;
+      const newId = generateDocumentId("apis");
+      collectionToDuplicate.id = newId;
+      recordsToDuplicate.push(collectionToDuplicate);
+      if (collectionToDuplicate.data.children) {
+        collectionToDuplicate.data.children.forEach((child) => {
+          const childToDuplicate = { ...child };
+          delete childToDuplicate.collectionId;
+          childToDuplicate.collectionId = newId;
+          processorFunc(childToDuplicate);
+        });
+      }
+    } else {
+      const requestToDuplicate = { ...record, name: `(Copy) ${record.name}` };
+      delete requestToDuplicate.id;
+      recordsToDuplicate.push(requestToDuplicate);
+    }
+  };
+  recordsToProcess.forEach((record) => {
+    processorFunc(record);
+  });
 };

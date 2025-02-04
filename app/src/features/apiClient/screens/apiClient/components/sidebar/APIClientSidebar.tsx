@@ -197,7 +197,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         />
       </div>
 
-      <DeleteApiRecordModal open={isDeleteModalOpen} record={recordToBeDeleted} onClose={onDeleteModalClose} />
+      <DeleteApiRecordModal open={isDeleteModalOpen} records={recordToBeDeleted} onClose={onDeleteModalClose} />
 
       <ImportRequestModal
         isRequestLoading={isLoading}
