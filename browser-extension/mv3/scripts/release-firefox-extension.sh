@@ -2,8 +2,6 @@
 
 set -e
 
-sh ../install.sh
-
 BROWSER=firefox ENV=prod npm run config
 BUILD_MODE='production' npm run build
 
