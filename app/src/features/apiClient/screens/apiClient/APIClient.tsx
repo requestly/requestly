@@ -20,6 +20,7 @@ export const APIClient: React.FC<Props> = React.memo(() => {
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
   const isHistoryPath = location.pathname.includes("history");
   const isNewRequest = searchParams.has("new");
+  const isCreateMode = searchParams.has("create");
 
   useEffect(() => {
     if (isNewRequest) {
@@ -65,6 +66,10 @@ export const APIClient: React.FC<Props> = React.memo(() => {
 
   const isRequestFetched = useRef(false);
   useEffect(() => {
+    if (isCreateMode) {
+      return;
+    }
+
     if (isRequestFetched.current) {
       return;
     }
@@ -89,7 +94,7 @@ export const APIClient: React.FC<Props> = React.memo(() => {
         Logger.error("Error loading api record", error);
       })
       .finally(() => {});
-  }, [persistedRequestId]);
+  }, [persistedRequestId, isCreateMode]);
 
   const entryDetails = useMemo(() => (isHistoryPath ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord, [
     isHistoryPath,
