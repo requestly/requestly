@@ -1,4 +1,4 @@
-import { collection, doc, getFirestore } from "firebase/firestore";
+import { collection, doc, getFirestore, writeBatch } from "firebase/firestore";
 import firebaseApp from "../firebase";
 
 export const getOwnerId = (uid: string, teamId?: string) => {
@@ -32,4 +32,20 @@ export const batchWrite = async (batchSize: number, items: any[], writeFunction:
     results.push(...batchResults);
   }
   return results;
+};
+
+export const firebaseBatchWrite = async (path: string, data: any[]) => {
+  const db = getFirestore(firebaseApp);
+  const batch = writeBatch(db);
+
+  try {
+    data.forEach((item) => {
+      const recordRef = doc(db, path, item.id);
+      batch.set(recordRef, item, { merge: true });
+    });
+
+    await batch.commit();
+  } catch (error) {
+    throw new Error(error);
+  }
 };
