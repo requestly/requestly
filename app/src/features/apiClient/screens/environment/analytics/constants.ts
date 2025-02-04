@@ -5,5 +5,6 @@ export const ENVIRONMENT = {
 
   CREATE_ENVIRONMENT_CLICKED: "create_environment_clicked",
   ENVIRONMENT_CREATED: "environment_created",
+  ENVIRONMENT_CREATED_IN_DB: "environment_created_in_db",
   ENVIRONMENT_SWITCHED: "environment_switched",
 };

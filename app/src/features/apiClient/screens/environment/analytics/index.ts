@@ -18,6 +18,10 @@ export const trackEnvironmentCreated = (num_environments: number, source: string
   trackEvent(ENVIRONMENT.ENVIRONMENT_CREATED, { num_environments, source });
 };
 
+export const trackEnvironmentCreatedInDB = (type: "global" | "non_global") => {
+  trackEvent(ENVIRONMENT.ENVIRONMENT_CREATED_IN_DB, { type });
+};
+
 export const trackEnvironmentSwitched = (num_environments: number) => {
   trackEvent(ENVIRONMENT.ENVIRONMENT_SWITCHED);
 };

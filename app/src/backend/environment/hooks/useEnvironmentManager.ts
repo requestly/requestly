@@ -12,7 +12,7 @@ import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
 import {
   attachEnvironmentVariableListener,
   removeEnvironmentVariableFromDB,
-  upsertEnvironmentInDB,
+  createNonGlobalEnvironmentInDB,
   updateEnvironmentVariablesInDB,
   fetchAllEnvironmentDetails,
   updateEnvironmentNameInDB,
@@ -37,12 +37,11 @@ let unsubscribeGlobalVariablesListener: () => void = null;
 const VARIABLES_PRECEDENCE_ORDER = ["ENVIRONMENT", "COLLECTION"];
 
 interface UseEnvironmentManagerOptions {
-  manageGlobalEnv?: boolean;
   initFetchers?: boolean;
 }
 
 const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFetchers: true }) => {
-  const { initFetchers = true, manageGlobalEnv = false } = options;
+  const { initFetchers } = options;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [isEnvironmentsDataLoaded, setIsEnvironmentsDataLoaded] = useState(false);
@@ -73,25 +72,20 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   );
 
   const addNewEnvironment = useCallback(
-    async (newEnvironmentName: string, isGlobal = false) => {
-      if (globalEnvironmentData?.id && isGlobal) {
-        throw new Error("Global environment already exists");
-      }
-      const docId = isGlobal ? "global" : undefined;
-      return upsertEnvironmentInDB(ownerId, newEnvironmentName, docId)
+    async (newEnvironmentName: string) => {
+      return createNonGlobalEnvironmentInDB(ownerId, newEnvironmentName)
         .then(({ id, name }) => {
           dispatch(variablesActions.addNewEnvironment({ id, name, ownerId }));
           return {
             id,
             name,
-            isGlobal,
           };
         })
         .catch((err) => {
           console.error("Error while setting environment in db", err);
         });
     },
-    [globalEnvironmentData?.id, ownerId, dispatch]
+    [ownerId, dispatch]
   );
 
   useEffect(() => {
@@ -106,12 +100,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
             setCurrentEnvironment(
               Object.keys(environmentMap).filter((key) => !isGlobalEnvironment(environmentMap[key].id))[0]
             );
-          }
-
-          if (manageGlobalEnv) {
-            if (!environmentMap["global"]) {
-              addNewEnvironment("Global variables", true);
-            }
           }
 
           const updatedEnvironmentMap: EnvironmentMap = {};
@@ -144,15 +132,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     // }
     // Disabled otherwise infinite loop if allEnvironmentData is included here, allEnvironmentData should be fetched only once
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    ownerId,
-    dispatch,
-    addNewEnvironment,
-    setCurrentEnvironment,
-    currentEnvironmentId,
-    initFetchers,
-    manageGlobalEnv,
-  ]);
+  }, [ownerId, dispatch, addNewEnvironment, setCurrentEnvironment, currentEnvironmentId, initFetchers]);
 
   useEffect(() => {
     if (ownerId && currentEnvironmentId && initFetchers) {
@@ -251,6 +231,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
   const setVariables = useCallback(
     async (environmentId: string, variables: EnvironmentVariables) => {
+      console.log("DBG setVariables 1", environmentId, variables);
       const newVariablesWithSyncvalues: EnvironmentVariables = Object.fromEntries(
         Object.entries(variables).map(([key, value], index) => {
           const typeToSaveInDB =
@@ -261,6 +242,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
           ];
         })
       );
+      console.log("DBG setVariables 2", newVariablesWithSyncvalues);
 
       return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariablesWithSyncvalues)
         .then(() => {
