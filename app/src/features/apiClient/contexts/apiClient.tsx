@@ -30,8 +30,8 @@ interface ApiClientContextInterface {
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => void;
   onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => void;
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => void;
-  recordToBeDeleted: RQAPI.Record;
-  updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => void;
+  recordToBeDeleted: RQAPI.Record[];
+  updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record[]) => void;
   isDeleteModalOpen: boolean;
   setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onDeleteModalClose: () => void;
@@ -64,7 +64,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => {},
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => {},
   recordToBeDeleted: null,
-  updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => {},
+  updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record[]) => {},
   isDeleteModalOpen: false,
   setIsDeleteModalOpen: () => {},
   onDeleteModalClose: () => {},
@@ -101,7 +101,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [searchParams] = useSearchParams();
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(false);
   const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
-  const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
+  const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record[]>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
 
@@ -234,7 +234,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     [apiClientRecords, onUpdateRecord, onNewRecord, openTab, replaceTab, searchParams]
   );
 
-  const updateRecordToBeDeleted = useCallback((record: RQAPI.Record) => {
+  const updateRecordToBeDeleted = useCallback((record: RQAPI.Record[]) => {
     setRecordToBeDeleted(record);
   }, []);
 
