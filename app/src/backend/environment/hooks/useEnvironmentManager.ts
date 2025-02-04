@@ -129,8 +129,9 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
           }
         })
         .catch((err) => {
+          console.log("!!!debug", "fetch all env details error", err);
           Logger.error("Error while fetching all environment variables", err);
-          dispatch(variablesActions.updateAllEnvironmentData({ environmentMap: {}, ownerId }));
+          // dispatch(variablesActions.updateAllEnvironmentData({ environmentMap: {}, ownerId }));
         })
         .finally(() => {
           setIsLoading(false);
