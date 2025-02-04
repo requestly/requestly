@@ -9,7 +9,7 @@ import { PRICING } from "features/pricing/constants/pricing";
 import { PricingPlans } from "features/pricing/constants/pricingPlans";
 import underlineIcon from "features/pricing/assets/yellow-highlight.svg";
 import checkIcon from "assets/img/icons/common/check.svg";
-import { trackPricingPlansQuantityChanged } from "features/pricing/analytics";
+import { trackGetFreeTrialClicked, trackPricingPlansQuantityChanged } from "features/pricing/analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import StudentPlanIcon from "../../../../assets/student-plan-icon.svg?react";
@@ -273,7 +273,14 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       {planName === PRICING.PLAN_NAMES.PROFESSIONAL ? (
         <div className="student-plan-footer">
           <StudentPlanIcon className="student-plan-icon" width={16} height={16} />
-          <a href="https://rqst.ly/accelerator-program" rel="noreferrer" target="_blank">
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://rqst.ly/accelerator-program"
+            onClick={() => {
+              trackGetFreeTrialClicked(source);
+            }}
+          >
             Try Requestly free for a year!
           </a>
           <Tooltip

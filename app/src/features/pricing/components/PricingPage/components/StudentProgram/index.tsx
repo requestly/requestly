@@ -1,5 +1,6 @@
 import React from "react";
 import StudentPlanIcon from "../../../../assets/student-plan-icon.svg?react";
+import { trackStudentProgramClicked } from "features/pricing/analytics";
 import "./studentProgram.scss";
 
 export const StudentProgram: React.FC = () => {
@@ -10,6 +11,9 @@ export const StudentProgram: React.FC = () => {
       <a
         target="_blank"
         rel="noreferrer"
+        onClick={() => {
+          trackStudentProgramClicked();
+        }}
         href="https://requestly.notion.site/Requestly-Student-Program-12dd193f3c998018ad45d31c784f3131"
       >
         Know more
