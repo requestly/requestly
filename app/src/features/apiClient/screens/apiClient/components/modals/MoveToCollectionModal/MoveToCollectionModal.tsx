@@ -15,6 +15,8 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import "./moveToCollectionModal.scss";
 import { isApiCollection } from "../../../utils";
+import { firebaseBatchWrite } from "backend/utils";
+import { isEmpty, omit } from "lodash";
 
 interface Props {
   recordsToMove: RQAPI.Record[];
@@ -34,13 +36,13 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
 
     for (const record of recordsToMove) {
       const stack = [record];
+      record.collectionId && exclusions.add(record.collectionId);
       while (stack.length) {
         const current = stack.pop();
         exclusions.add(current.id);
-        if (isApiCollection(current) && current.data?.children) {
+
+        if (isApiCollection(current) && !isEmpty(current.data?.children)) {
           stack.push(...current.data.children);
-        } else if (current.collectionId) {
-          exclusions.add(current.collectionId);
         }
       }
     }
@@ -74,18 +76,21 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
 
   const moveRecordsToCollection = useCallback(
     async (collectionId: string, isNewCollection: boolean) => {
-      const updatedRequests = recordsToMove.map((record) => ({ ...record, collectionId }));
-      const results = await Promise.all(
-        updatedRequests.map((request) => upsertApiRecord(user?.details?.profile?.uid, request, team?.id))
+      const updatedRequests = recordsToMove.map((record) =>
+        isApiCollection(record)
+          ? { ...record, collectionId, data: omit(record.data, "children") }
+          : { ...record, collectionId }
       );
 
-      const allSuccessful = results.every((result) => result.success);
+      try {
+        firebaseBatchWrite("apis", updatedRequests);
 
-      if (allSuccessful) {
         trackMoveRequestToCollectionSuccessful(isNewCollection ? "new_collection" : "existing_collection");
         toast.success("Requests moved to collection successfully");
-        results.forEach((result) => onSaveRecord(result.data));
-      } else {
+
+        updatedRequests.forEach((record) => onSaveRecord(record));
+      } catch (error) {
+        console.error("Error moving records: ", error);
         throw new Error("Failed to move some requests to collection");
       }
     },

@@ -5,7 +5,7 @@ import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
-import { forEach, isEmpty, split, unionBy } from "lodash";
+import { forEach, isEmpty, omit, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
 import { generateDocumentId } from "backend/utils";
@@ -537,29 +537,39 @@ export const filterOutChildrenRecords = (
     .filter((id) => !childParentMap[id] || !selectedRecords.has(childParentMap[id]))
     .map((id) => recordsMap[id]);
 
-export const processRecordsForDuplication = (recordsToProcess: RQAPI.Record[], recordsToDuplicate: RQAPI.Record[]) => {
-  const processorFunc = (record: RQAPI.Record) => {
+export const processRecordsForDuplication = (recordsToProcess: RQAPI.Record[]) => {
+  const recordsToDuplicate: RQAPI.Record[] = [];
+  const queue: RQAPI.Record[] = [...recordsToProcess];
+
+  while (queue.length > 0) {
+    const record = queue.shift()!;
+
     if (record.type === RQAPI.RecordType.COLLECTION) {
-      const collectionToDuplicate = { ...record, name: `(Copy) ${record.name}` } as RQAPI.CollectionRecord;
-      delete collectionToDuplicate.id;
       const newId = generateDocumentId("apis");
-      collectionToDuplicate.id = newId;
+
+      const collectionToDuplicate: RQAPI.CollectionRecord = Object.assign({}, record, {
+        id: newId,
+        name: `(Copy) ${record.name}`,
+        data: omit(record.data, "children"),
+      });
+
       recordsToDuplicate.push(collectionToDuplicate);
-      if (collectionToDuplicate.data.children) {
-        collectionToDuplicate.data.children.forEach((child) => {
-          const childToDuplicate = { ...child };
-          delete childToDuplicate.collectionId;
-          childToDuplicate.collectionId = newId;
-          processorFunc(childToDuplicate);
-        });
+
+      if (record.data.children?.length) {
+        const childrenToDuplicate = record.data.children.map((child) =>
+          Object.assign({}, child, { collectionId: newId })
+        );
+        queue.push(...childrenToDuplicate);
       }
     } else {
-      const requestToDuplicate = { ...record, name: `(Copy) ${record.name}` };
-      delete requestToDuplicate.id;
+      const requestToDuplicate: RQAPI.Record = Object.assign({}, record, {
+        id: generateDocumentId("apis"),
+        name: `(Copy) ${record.name}`,
+      });
+
       recordsToDuplicate.push(requestToDuplicate);
     }
-  };
-  recordsToProcess.forEach((record) => {
-    processorFunc(record);
-  });
+  }
+
+  return recordsToDuplicate;
 };

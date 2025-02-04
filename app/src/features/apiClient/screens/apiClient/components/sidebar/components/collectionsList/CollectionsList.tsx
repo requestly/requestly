@@ -32,6 +32,7 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";
+import { firebaseBatchWrite } from "backend/utils";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -67,6 +68,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
+    setShowSelection(false);
 
     updatedRecords.sort((recordA, recordB) => {
       // If different type, then keep collection first
@@ -133,20 +135,15 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       );
       switch (action) {
         case BulkActions.DUPLICATE: {
-          const recordsToDuplicate: RQAPI.Record[] = [];
-          processRecordsForDuplication(processedRecords, recordsToDuplicate);
+          const recordsToDuplicate = processRecordsForDuplication(processedRecords);
 
-          const results = await Promise.all(
-            recordsToDuplicate.map((request) =>
-              upsertApiRecord(user?.details?.profile?.uid, request, team?.id, request.id)
-            )
-          );
+          try {
+            firebaseBatchWrite("apis", recordsToDuplicate);
 
-          const allSuccessful = results.every((result) => result.success);
-          if (allSuccessful) {
             toast.success("Records Duplicated successfully");
-            results.forEach((result) => onSaveRecord(result.data, "none"));
-          } else {
+            recordsToDuplicate.forEach((record) => onSaveRecord(record, "none"));
+          } catch (error) {
+            console.error("Error Duplicating records: ", error);
             toast.error("Failed to duplicate some records");
           }
 
