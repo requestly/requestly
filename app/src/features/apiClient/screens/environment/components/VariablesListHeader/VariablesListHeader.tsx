@@ -30,7 +30,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   currentEnvironmentName = "New",
   hideBreadcrumb = false,
   onSave,
-  exportActions = {},
+  exportActions,
 }) => {
   const { renameEnvironment } = useEnvironmentManager();
   const { replaceTab } = useTabsLayoutContext();
@@ -68,11 +68,6 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           onChange={(e) => onSearchValueChange(e.target.value)}
         />
         <div className="variables-list-btn-actions-container">
-          {exportActions.showExport && (
-            <RQButton type="primary" onClick={exportActions.onExportClick} disabled={!exportActions.enableExport}>
-              Export
-            </RQButton>
-          )}
           <RQButton
             showHotKeyText
             hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
@@ -83,6 +78,11 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           >
             Save
           </RQButton>
+          {exportActions.showExport && (
+            <RQButton type="primary" onClick={exportActions.onExportClick} disabled={!exportActions.enableExport}>
+              Export
+            </RQButton>
+          )}
         </div>
       </div>
     </div>
