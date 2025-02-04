@@ -12,6 +12,9 @@ import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
 import "./environmentView.scss";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { isEmpty } from "lodash";
+import { isGlobalEnvironment } from "../../utils";
+import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 
 export const EnvironmentView = () => {
   const navigate = useNavigate();
@@ -42,6 +45,7 @@ export const EnvironmentView = () => {
   }, [isNewEnv, envId]);
 
   const [pendingVariables, setPendingVariables] = useState<EnvironmentVariables>(variables);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
 
@@ -109,8 +113,23 @@ export const EnvironmentView = () => {
               onSave={handleSaveVariables}
               hasUnsavedChanges={hasUnsavedChanges}
               isSaving={isSaving}
+              exportActions={{
+                showExport: isGlobalEnvironment(envId),
+                enableExport: !isEmpty(variables),
+                onExportClick: () => setIsExportModalOpen(true),
+              }}
             />
             <VariablesList searchValue={searchValue} variables={variables} onVariablesChange={setPendingVariables} />
+            {isExportModalOpen && (
+              <ApiClientExportModal
+                exportType="environment"
+                environments={[{ id: envId, name: environmentName, variables }]}
+                isOpen={isExportModalOpen}
+                onClose={() => {
+                  setIsExportModalOpen(false);
+                }}
+              />
+            )}
           </>
         )}
       </div>
