@@ -6,6 +6,7 @@ import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { generateObjectId } from "utils/FormattingHelper";
 import { StorageRecord } from "@requestly/shared/types/entities/rules";
 import syncingHelper from "lib/syncing/helpers/syncingHelper";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 export const createSharedList = async (
   appMode: string,
@@ -15,7 +16,7 @@ export const createSharedList = async (
   sharedListRecipients: unknown
 ) => {
   const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, rulesIdsToShare);
-  const currentWorkspaceId = window.currentlyActiveWorkspaceTeamId;
+  const currentWorkspaceId = getActiveWorkspaceId(window.activeWorkspaceIds);
 
   const updatedGroups: NewGroup[] = groups.map((group) => ({
     ...group,
