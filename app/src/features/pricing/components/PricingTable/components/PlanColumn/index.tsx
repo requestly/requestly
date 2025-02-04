@@ -12,6 +12,8 @@ import checkIcon from "assets/img/icons/common/check.svg";
 import { trackPricingPlansQuantityChanged } from "features/pricing/analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
+import StudentPlanIcon from "../../../../assets/student-plan-icon.svg?react";
+import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
 
 interface PlanColumnProps {
   planName: string;
@@ -267,6 +269,21 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           );
         })}
       </Space>
+
+      {planName === PRICING.PLAN_NAMES.PROFESSIONAL ? (
+        <div className="student-plan-footer">
+          <StudentPlanIcon className="student-plan-icon" width={16} height={16} />
+          <a href="https://rqst.ly/accelerator-program" rel="noreferrer" target="_blank">
+            Try Requestly free for a year!
+          </a>
+          <Tooltip
+            color="var(--black)"
+            title="Unlimited access, no cost, no commitment — perfect for individuals and teams evaluating their next API tool."
+          >
+            <MdOutlineHelpOutline className="info-icon" />
+          </Tooltip>
+        </div>
+      ) : null}
     </Col>
   );
 };
