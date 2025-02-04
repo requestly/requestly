@@ -235,10 +235,12 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       const newVariablesWithSyncvalues: EnvironmentVariables = Object.fromEntries(
         Object.entries(variables).map(([key, value], index) => {
           const typeToSaveInDB =
-            value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
+            value.type === EnvironmentVariableType.Secret
+              ? EnvironmentVariableType.Secret
+              : (typeof value.syncValue as EnvironmentVariableType);
           return [
             key.trim(),
-            { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB, id: value.id ?? index },
+            { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB, id: value.id },
           ];
         })
       );
@@ -437,12 +439,17 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       const updatedVariables = Object.fromEntries(
         Object.entries(variables).map(([key, value]) => {
           const typeToSave =
-            value.type === EnvironmentVariableType.Secret ? EnvironmentVariableType.Secret : typeof value.syncValue;
+            value.type === EnvironmentVariableType.Secret
+              ? EnvironmentVariableType.Secret
+              : (typeof value.syncValue as EnvironmentVariableType);
           const { localValue, ...rest } = value;
           return [key, { ...rest, type: typeToSave }];
         })
       );
-      const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
+      const record: RQAPI.CollectionRecord = {
+        ...collection,
+        data: { ...collection?.data, variables: updatedVariables },
+      };
       return upsertApiRecord(user.details?.profile?.uid, record, currentlyActiveWorkspace?.id).then((result) => {
         onSaveRecord(result.data);
         dispatch(variablesActions.setCollectionVariables({ collectionId, variables }));

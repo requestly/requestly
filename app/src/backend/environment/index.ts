@@ -17,6 +17,7 @@ import { EnvironmentData, EnvironmentMap, EnvironmentVariables } from "./types";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 import { trackEnvironmentCreatedInDB } from "features/apiClient/screens/environment/analytics";
 import { fetchLock } from "./fetch-lock";
+import { patchMissingIdInVariables } from "backend/apiClient/utils";
 
 const db = getFirestore(firebaseApp);
 
@@ -137,7 +138,14 @@ export const fetchAllEnvironmentDetails = async (ownerId: string) => {
     const environmentDetails: EnvironmentMap = {};
 
     snapshot.forEach((doc) => {
-      environmentDetails[doc.id] = { id: doc.id, ...doc.data() } as EnvironmentData;
+      const environmentData = doc.data() as Omit<EnvironmentData, "id">;
+      const doesIdExist = typeof Object.values(environmentData.variables)[0]?.id !== "undefined";
+
+      if (!doesIdExist) {
+        environmentData.variables = patchMissingIdInVariables(environmentData.variables);
+      }
+
+      environmentDetails[doc.id] = { id: doc.id, ...environmentData } as EnvironmentData;
     });
 
     if (!environmentDetails["global"]) {
