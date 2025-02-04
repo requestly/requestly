@@ -55,7 +55,6 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
     setIsDeleting(true);
 
     const recordIds = getAllIdsToDelete();
-    console.log(recordIds, "ids");
 
     const result = await deleteApiRecords(uid, recordIds, teamId);
     onDeleteRecords(recordIds);
