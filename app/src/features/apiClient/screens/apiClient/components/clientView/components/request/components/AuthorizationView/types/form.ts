@@ -1,14 +1,14 @@
-interface API_KEY_FORM_VALUES {
+export interface API_KEY_FORM_VALUES {
   key: string;
   value: string;
   addTo: "HEADER" | "QUERY";
 }
 
-interface BEARER_TOKEN_FORM_VALUES {
+export interface BEARER_TOKEN_FORM_VALUES {
   bearer: string;
 }
 
-interface BASIC_AUTH_FORM_VALUES {
+export interface BASIC_AUTH_FORM_VALUES {
   username: string;
   password: string;
 }
