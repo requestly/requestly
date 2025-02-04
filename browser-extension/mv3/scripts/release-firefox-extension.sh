@@ -20,10 +20,10 @@ cd web-ext-artifacts
 XPI_FILE=`ls | grep \.xpi$`
 VERSION=`echo $XPI_FILE | sed 's/.*-\(.*\).xpi/\1/'`
 
-cp $XPI_FILE ../../builds/requestly-firefox-v$VERSION.xpi
+cp $XPI_FILE ../../builds/firefox/requestly-firefox-v$VERSION.xpi
 rm -rf web-ext-artifacts
 cd ../..
-cp -f builds/requestly-firefox-v$VERSION.xpi ../../app/public/firefox/builds/requestly-latest.xpi
+cp -f builds/firefox/requestly-firefox-v$VERSION.xpi ../../app/public/firefox/builds/requestly-latest.xpi
 
 echo "INFO: Requestly firefox release build created."
 
