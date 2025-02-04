@@ -169,6 +169,7 @@ class SyncWorkspace {
     });
     this.replicationState[SyncEntityType.RULE_DATA]?.cancel();
     this.replicationState[SyncEntityType.RULE_METADATA]?.cancel();
+    this.database.close();
     console.log("[SyncWorkspace.disconnect] Done", this.workspaceId);
   }
 
