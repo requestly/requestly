@@ -3,7 +3,7 @@ export type VariableValueType = string | number | boolean;
 export interface EnvironmentVariableValue {
   localValue?: VariableValueType;
   syncValue?: VariableValueType;
-  type: EnvironmentVariableType;
+  type: VariableValueType;
   id: number;
 }
 
