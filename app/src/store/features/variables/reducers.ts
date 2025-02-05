@@ -34,7 +34,7 @@ const setCurrentEnvironment = (
   state.currentEnvironment = action.payload.environmentId;
 };
 
-const updateAllEnvironmentData = (
+const setAllEnvironmentData = (
   state: InitialState,
   action: PayloadAction<{
     environmentMap: EnvironmentMap;
@@ -98,7 +98,7 @@ const environmentVariablesReducerFunctions = {
   addNewEnvironment,
   resetState,
   removeVariableFromEnvironment,
-  updateAllEnvironmentData,
+  setAllEnvironmentData,
   setCurrentEnvironment,
   updateEnvironmentData,
   removeEnvironment,
