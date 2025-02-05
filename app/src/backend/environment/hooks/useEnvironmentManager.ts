@@ -9,17 +9,7 @@ import {
 import { variablesActions } from "store/features/variables/slice";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
-import {
-  attachEnvironmentVariableListener,
-  removeEnvironmentVariableFromDB,
-  createNonGlobalEnvironmentInDB,
-  updateEnvironmentVariablesInDB,
-  fetchAllEnvironmentDetails,
-  updateEnvironmentNameInDB,
-  duplicateEnvironmentInDB,
-  deleteEnvironmentFromDB,
-  attachCollectionVariableListener,
-} from "..";
+import { attachEnvironmentVariableListener, fetchAllEnvironmentDetails, attachCollectionVariableListener } from "..";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import { isEmpty } from "lodash";
@@ -28,6 +18,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { upsertApiRecord } from "backend/apiClient/upsertApiRecord";
+import { ApiClientCloudRepository } from "features/apiClient/helpers/modules/sync/cloud";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -58,6 +49,10 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     [currentlyActiveWorkspace.id, user?.details?.profile?.uid]
   );
 
+  const syncRepository = useMemo(() => {
+    return new ApiClientCloudRepository(ownerId).environmentVariablesRepository;
+  }, [ownerId]);
+
   const activeOwnerEnvironments = useMemo(() => {
     return allEnvironmentData?.[ownerId] ?? {};
   }, [allEnvironmentData, ownerId]);
@@ -82,7 +77,8 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
   const addNewEnvironment = useCallback(
     async (newEnvironmentName: string) => {
-      return createNonGlobalEnvironmentInDB(ownerId, newEnvironmentName)
+      return syncRepository
+        .createNonGlobalEnvironment(newEnvironmentName)
         .then(({ id, name }) => {
           dispatch(variablesActions.addNewEnvironment({ id, name, ownerId }));
           return {
@@ -91,10 +87,11 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
           };
         })
         .catch((err) => {
+          toast.error("Error while creating a new environment");
           console.error("Error while setting environment in db", err);
         });
     },
-    [ownerId, dispatch]
+    [ownerId, dispatch, syncRepository]
   );
 
   useEffect(() => {
@@ -239,39 +236,35 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
           ];
         })
       );
-
-      return updateEnvironmentVariablesInDB(ownerId, environmentId, newVariablesWithSyncvalues)
-        .then(() => {
-          dispatch(
-            variablesActions.updateEnvironmentData({
-              newVariables: newVariablesWithSyncvalues,
-              environmentId,
-              ownerId,
-            })
-          );
-        })
-        .catch((err) => {
-          toast.error("Error while setting environment variables.");
-          Logger.error("Error while setting environment variables in db", err);
-          console.error("Error while setting environment variables in db", err);
-        });
+      try {
+        await syncRepository.updateEnvironment(environmentId, { variables: newVariablesWithSyncvalues });
+        dispatch(
+          variablesActions.updateEnvironmentData({
+            newVariables: newVariablesWithSyncvalues,
+            environmentId,
+            ownerId,
+          })
+        );
+      } catch (err) {
+        toast.error("Error while setting environment variables.");
+        Logger.error("Error while setting environment variables in db", err);
+        console.error("Error while setting environment variables in db", err);
+      }
     },
-    [ownerId, dispatch]
+    [ownerId, dispatch, syncRepository]
   );
 
   const removeVariable = useCallback(
     async (environmentId: string, key: string) => {
-      return removeEnvironmentVariableFromDB(ownerId, { environmentId, key })
-        .then(() => {
-          dispatch(variablesActions.removeVariableFromEnvironment({ key, environmentId, ownerId }));
-        })
-        .catch((err) => {
-          toast.error("Error while removing environment variables.");
-          Logger.error("Error while removing environment variables from db", err);
-          console.error("Error while removing environment variables from db", err);
-        });
+      try {
+        await syncRepository.removeVariableFromEnvironment(environmentId, key);
+        dispatch(variablesActions.removeVariableFromEnvironment({ key, environmentId, ownerId }));
+      } catch (err) {
+        toast.error("Error while removing environment variables.");
+        Logger.error("Error while removing environment variables from db", err);
+      }
     },
-    [ownerId, dispatch]
+    [ownerId, dispatch, syncRepository]
   );
 
   const getVariablesWithPrecedence = useCallback(
@@ -377,17 +370,22 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
   const renameEnvironment = useCallback(
     async (environmentId: string, newName: string) => {
-      return updateEnvironmentNameInDB(ownerId, environmentId, newName).then(() => {
+      try {
+        await syncRepository.updateEnvironment(environmentId, { name: newName });
         dispatch(variablesActions.updateEnvironmentName({ environmentId, newName, ownerId }));
-      });
+      } catch (err) {
+        toast.error("Error while renaming environment");
+        console.error("Error while renaming environment", err);
+      }
     },
-    [ownerId, dispatch]
+    [ownerId, dispatch, syncRepository]
   );
 
   const duplicateEnvironment = useCallback(
     async (environmentId: string) => {
-      return duplicateEnvironmentInDB(ownerId, environmentId, activeOwnerEnvironmentsRef.current).then(
-        (newEnvironment) => {
+      return syncRepository
+        .duplicateEnvironment(environmentId, activeOwnerEnvironmentsRef.current)
+        .then((newEnvironment) => {
           dispatch(variablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name, ownerId }));
           dispatch(
             variablesActions.updateEnvironmentData({
@@ -396,19 +394,22 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
               ownerId,
             })
           );
-        }
-      );
+        });
     },
-    [dispatch, ownerId]
+    [dispatch, ownerId, syncRepository]
   );
 
   const deleteEnvironment = useCallback(
     async (environmentId: string) => {
-      return deleteEnvironmentFromDB(ownerId, environmentId).then(() => {
+      try {
+        await syncRepository.deleteEnvironment(environmentId);
         dispatch(variablesActions.removeEnvironment({ environmentId, ownerId }));
-      });
+      } catch (err) {
+        toast.error("Error while deleting environment");
+        console.error("Error while deleting environment", err);
+      }
     },
-    [ownerId, dispatch]
+    [ownerId, dispatch, syncRepository]
   );
 
   const setCollectionVariables = useCallback(
