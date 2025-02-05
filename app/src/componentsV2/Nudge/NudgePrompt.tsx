@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import "./nudgePrompt.scss";
 
 interface NudgeProps {
-  icon: any;
+  icon: string;
   children: ReactNode;
   buttons: ReactNode[];
 }

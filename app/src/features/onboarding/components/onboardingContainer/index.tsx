@@ -18,7 +18,6 @@ import { WorkspaceOnboardingView } from "../teams";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
-// import { useFeatureValue } from "@growthbook/growthbook-react";
 import "./index.scss";
 
 interface OnboardingProps {
@@ -30,7 +29,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const { step, disableSkip } = useSelector(getAppOnboardingDetails);
-  // const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
 
   const handleSkip = () => {
     trackAppOnboardingSkipped(step);
