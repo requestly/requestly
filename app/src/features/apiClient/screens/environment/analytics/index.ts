@@ -18,6 +18,7 @@ export const trackEnvironmentCreated = (num_environments: number, source: string
   trackEvent(ENVIRONMENT.ENVIRONMENT_CREATED, { num_environments, source });
 };
 
+
 export const trackEnvironmentCreatedInDB = (environmentId: string, type: "global" | "non_global") => {
   trackEvent(ENVIRONMENT.ENVIRONMENT_CREATED_IN_DB, { environmentId, type });
 };
@@ -26,12 +27,12 @@ export const trackEnvironmentUpdatedInDB = (environmentId: string, type: "global
   trackEvent(ENVIRONMENT.ENVIRONMENT_UPDATED_IN_DB, { environmentId, type });
 };
 
-export const trackEnvironmentDeletedFromDB = (environmentId: string) => {
-  trackEvent(ENVIRONMENT.ENVIRONMENT_DELETED_FROM_DB, { environmentId });
+export const trackEnvironmentDeletedFromDB = (environmentId: string, ) => {
+  trackEvent(ENVIRONMENT.ENVIRONMENT_DELETED_FROM_DB, {environmentId});
 };
 
-export const trackEnvironmentsFetchedFromDB = () => {
-  trackEvent(ENVIRONMENT.ENVIRONMENTS_FETCHED_FROM_DB);
+export const trackEnvironmentFetchedFromDB = () => {
+  trackEvent(ENVIRONMENT.ENVIRONMENT_FETCHED_FROM_DB);
 };
 
 export const trackEnvironmentSwitched = (num_environments: number) => {
