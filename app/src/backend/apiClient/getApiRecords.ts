@@ -14,13 +14,14 @@ function patchCollectionVariablesMissingId(params: { success: boolean; data: RQA
     .filter((p) => p.type === RQAPI.RecordType.COLLECTION)
     .forEach((collection) => {
       let variables = collection.data.variables;
-      const doesIdExist = typeof Object.values(variables)[0]?.id !== "undefined";
+      if (variables) {
+        const doesIdExist = typeof Object.values(variables)[0]?.id !== "undefined";
 
-      if (!doesIdExist) {
-        variables = patchMissingIdInVariables(variables);
+        if (!doesIdExist) {
+          variables = patchMissingIdInVariables(variables);
+        }
       }
     });
-
   return params;
 }
 
