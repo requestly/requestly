@@ -115,7 +115,8 @@ export namespace RQAPI {
     message: Error["message"];
   };
 
-  export type ExecutionResult = {
+  export type ExecutionResult =
+    | {
         status: ExecutionStatus.SUCCESS;
         executedEntry: RQAPI.Entry;
       }
@@ -125,15 +126,17 @@ export namespace RQAPI {
         error: ExecutionError;
       };
 
-export type RerunResult = {
-  status: ExecutionStatus.SUCCESS,
-  artifacts: {
-    testResults: TestResult[],
-  }
-} | {
-  status: ExecutionStatus.ERROR,
-  error: ExecutionError,
-}
+  export type RerunResult =
+    | {
+        status: ExecutionStatus.SUCCESS;
+        artifacts: {
+          testResults: TestResult[];
+        };
+      }
+    | {
+        status: ExecutionStatus.ERROR;
+        error: ExecutionError;
+      };
 
   export interface Collection {
     children?: Record[];
