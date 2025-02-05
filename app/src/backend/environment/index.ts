@@ -13,9 +13,14 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { EnvironmentData, EnvironmentMap, EnvironmentVariables } from "./types";
+import { EnvironmentData, EnvironmentMap } from "./types";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
-import { trackEnvironmentCreatedInDB, trackEnvironmentDeletedFromDB, trackEnvironmentsFetchedFromDB, trackEnvironmentUpdatedInDB } from "features/apiClient/screens/environment/analytics";
+import {
+  trackEnvironmentCreatedInDB,
+  trackEnvironmentDeletedFromDB,
+  trackEnvironmentsFetchedFromDB,
+  trackEnvironmentUpdatedInDB,
+} from "features/apiClient/screens/environment/analytics";
 import { fetchLock } from "./fetch-lock";
 import { patchMissingIdInVariables } from "backend/apiClient/utils";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
@@ -44,22 +49,22 @@ export const createNonGlobalEnvironmentInDB = async (
   });
 };
 
-export const updateEnvironmentVariablesInDB = async (
+export const updateEnvironmentInDB = async (
   ownerId: string,
   environmentId: string,
-  variables: EnvironmentVariables
+  updates: Partial<Pick<EnvironmentData, "name" | "variables">>
 ) => {
-  const newVariables = Object.fromEntries(
-    Object.entries(variables).map(([key, value]) => [
-      key,
-      { syncValue: value.syncValue, type: value.type, id: value.id },
-    ])
-  );
+  if (updates.variables) {
+    // Transform variables to the required format if present
+    updates.variables = Object.fromEntries(
+      Object.entries(updates.variables).map(([key, value]) => [
+        key,
+        { syncValue: value.syncValue, type: value.type, id: value.id },
+      ])
+    );
+  }
 
-  await updateDoc(getDocPath(ownerId, environmentId), {
-    variables: newVariables,
-  });
-
+  await updateDoc(getDocPath(ownerId, environmentId), updates);
   trackEnvironmentUpdatedInDB(environmentId, isGlobalEnvironment(environmentId) ? "global" : "non_global");
 };
 
@@ -74,7 +79,10 @@ export const removeEnvironmentVariableFromDB = async (
     [`variables.${payload.key}`]: deleteField(),
   });
 
-  trackEnvironmentUpdatedInDB(payload.environmentId, isGlobalEnvironment(payload.environmentId) ? "global" : "non_global");
+  trackEnvironmentUpdatedInDB(
+    payload.environmentId,
+    isGlobalEnvironment(payload.environmentId) ? "global" : "non_global"
+  );
 };
 
 export const attachEnvironmentVariableListener = (
@@ -164,14 +172,6 @@ export const fetchAllEnvironmentDetails = async (ownerId: string) => {
   }
 };
 
-export const updateEnvironmentNameInDB = async (ownerId: string, environmentId: string, newName: string) => {
-  await updateDoc(getDocPath(ownerId, environmentId), {
-    name: newName,
-  });
-
-  trackEnvironmentUpdatedInDB(environmentId, isGlobalEnvironment(environmentId) ? "global" : "non_global");
-};
-
 export const duplicateEnvironmentInDB = async (
   ownerId: string,
   environmentId: string,
@@ -183,7 +183,7 @@ export const duplicateEnvironmentInDB = async (
   }
 
   const newEnvironment = await createNonGlobalEnvironmentInDB(ownerId, `${environmentToDuplicate.name} Copy`);
-  return updateEnvironmentVariablesInDB(ownerId, newEnvironment.id, environmentToDuplicate.variables).then(() => {
+  return updateEnvironmentInDB(ownerId, newEnvironment.id, { variables: environmentToDuplicate.variables }).then(() => {
     return { ...newEnvironment, variables: environmentToDuplicate.variables };
   });
 };
