@@ -16,7 +16,7 @@ interface VariablesListHeaderProps {
   hasUnsavedChanges: boolean;
   hideBreadcrumb?: boolean;
   isSaving: boolean;
-  exportActions: { showExport: boolean; enableExport: boolean; onExportClick: () => void };
+  exportActions?: { showExport: boolean; enableExport: boolean; onExportClick: () => void };
   onSearchValueChange: (value: string) => void;
   onSave: () => Promise<void>;
 }
