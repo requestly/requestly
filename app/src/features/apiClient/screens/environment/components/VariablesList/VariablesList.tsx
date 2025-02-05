@@ -19,7 +19,7 @@ interface VariablesListProps {
   onVariablesChange: (variables: EnvironmentVariables) => void;
 }
 
-export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string; id: number };
+export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string };
 
 export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", variables, onVariablesChange }) => {
   const dispatch = useDispatch();
@@ -77,15 +77,11 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
         const allVariables = variableRows.reduce((acc, variable, index) => {
           if (variable.key) {
-            acc[variable.key] = {
-              id: variable.id ?? index,
-              type: variable.type,
-              syncValue: variable.syncValue,
-              localValue: variable.localValue,
-            };
+            const { key, ...newVariable } = variable;
+            acc[variable.key] = newVariable;
           }
           return acc;
-        }, {});
+        }, {} as EnvironmentVariables);
 
         onVariablesChange(allVariables);
       }
@@ -115,15 +111,11 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
       const remainingVariables = newData.reduce((acc, variable, index) => {
         if (variable.key) {
-          acc[variable.key] = {
-            id: variable.id ?? index,
-            type: variable.type,
-            syncValue: variable.syncValue,
-            localValue: variable.localValue,
-          };
+          const { key, ...newVariable } = variable;
+          acc[variable.key] = newVariable;
         }
         return acc;
-      }, {});
+      }, {} as EnvironmentVariables);
 
       onVariablesChange(remainingVariables);
 
@@ -158,18 +150,14 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
     if (variables) {
       const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables)
         .map(([key, value], index) => ({
-          id: value.id ?? index,
           key,
           type: value.type,
           localValue: value.localValue,
           syncValue: value.syncValue,
+          id: value.id,
         }))
         .sort((a, b) => {
-          if (a.id !== undefined && b.id !== undefined) {
-            return a.id - b.id; // Sort by id if both ids are defined
-          }
-
-          return a.key.localeCompare(b.key); // Otherwise, sort lexicographically by key
+          return a.id - b.id; // Sort by id if both ids are defined
         });
       if (formattedDataSource.length === 0) {
         formattedDataSource.push({
