@@ -5,7 +5,6 @@ import { batchWrite } from "backend/utils";
 import { upsertApiRecord } from "backend/apiClient";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "features/apiClient/types";
@@ -16,6 +15,8 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { processRqImportData } from "features/apiClient/screens/apiClient/components/modals/importModal/utils";
 import { EnvironmentVariableValue } from "backend/environment/types";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 const BATCH_SIZE = 25;
 
@@ -50,7 +51,8 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
 
   const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ initFetchers: false });
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
+  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
   const { onSaveRecord } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
@@ -158,7 +160,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
         const newCollection = await upsertApiRecord(
           user?.details?.profile?.uid,
           collection,
-          workspace?.id,
+          activeWorkspaceId,
           collection.id
         );
         onSaveRecord(newCollection.data, "none");
@@ -180,7 +182,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
 
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
-        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
+        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, activeWorkspaceId, updatedApi.id);
         onSaveRecord(newApi.data, "none");
       } catch (error) {
         failedCollectionsCount++;
@@ -204,7 +206,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
     }
 
     return importedCollectionsCount;
-  }, [user, workspace, onSaveRecord, collections, apis]);
+  }, [user, activeWorkspaceId, onSaveRecord, collections, apis]);
 
   const handleImportData = useCallback(
     async (onSuccess: () => void) => {

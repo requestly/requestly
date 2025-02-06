@@ -8,7 +8,6 @@ import { RQAPI } from "features/apiClient/types";
 import { upsertApiRecord } from "backend/apiClient";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { Row } from "antd";
@@ -26,6 +25,8 @@ import {
   trackImportFromBrunoFailed,
   trackImportFromBrunoStarted,
 } from "modules/analytics/events/features/apiClient";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 interface BrunoImporterProps {
   onSuccess?: () => void;
@@ -48,7 +49,8 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
   }>({ collections: [], apis: [], environments: [] });
 
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
+  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
   const { onSaveRecord } = useApiClientContext();
   const { addNewEnvironment, setVariables } = useEnvironmentManager();
 
@@ -135,7 +137,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
         const newCollection = await upsertApiRecord(
           user?.details?.profile?.uid,
           collection,
-          workspace?.id,
+          activeWorkspaceId,
           collection.id
         );
         onSaveRecord(newCollection.data, "none");
@@ -156,7 +158,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
-        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
+        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, activeWorkspaceId, updatedApi.id);
         onSaveRecord(newApi.data, "none");
       } catch (error) {
         failedCollectionsCount++;
@@ -174,7 +176,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
     }
 
     return importedCollectionsCount;
-  }, [processedFileData, user?.details?.profile?.uid, workspace?.id, onSaveRecord]);
+  }, [processedFileData, user?.details?.profile?.uid, activeWorkspaceId, onSaveRecord]);
 
   const handleImportEnvironments = useCallback(async () => {
     let importedEnvCount = 0;
