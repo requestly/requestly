@@ -163,7 +163,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess, pat
           }
         });
     },
-    [importError]
+    [importError, patchLostRecords]
   );
 
   const handleImportEnvironments = useCallback(async () => {

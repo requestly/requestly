@@ -119,22 +119,32 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
         <Popconfirm
           zIndex={10010}
           disabled={!isExceedingLimits || !features || disabled || !isUpgradePopoverEnabled}
-          overlayClassName={`premium-feature-popover ${!user.loggedIn ? "premium-popover-bottom-padding" : ""}`}
+          overlayClassName={`premium-feature-popover`}
           autoAdjustOverflow
           showArrow={false}
           placement={popoverPlacement}
-          okText="See upgrade plans"
+          okText={user.loggedIn ? "See upgrade plans" : "Sign up"}
           cancelText={isIncentivizationEnabled ? "Upgrade for free" : null}
           cancelButtonProps={{ style: { display: isIncentivizationEnabled ? "inline-flex" : "none" } }}
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
-            dispatch(
-              globalActions.toggleActiveModal({
-                modalName: "pricingModal",
-                newValue: true,
-                newProps: { source },
-              })
-            );
+            if (user.loggedIn) {
+              dispatch(
+                globalActions.toggleActiveModal({
+                  modalName: "pricingModal",
+                  newValue: true,
+                  newProps: { source },
+                })
+              );
+            } else {
+              dispatch(
+                globalActions.toggleActiveModal({
+                  modalName: "authModal",
+                  newValue: true,
+                  newProps: { source },
+                })
+              );
+            }
           }}
           onCancel={handlePopoverSecondaryAction}
           title={
@@ -142,16 +152,20 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
               <Typography.Title level={4}>
                 {isBreachingLimit
                   ? `${capitalize(user?.details?.planDetails?.planName) || "Free"} plan limits reached!`
-                  : "Premium feature"}
+                  : `Premium feature`}
               </Typography.Title>
               <Typography.Text>
                 {isBreachingLimit
-                  ? `You've exceeded the usage limits of the ${
-                      user?.details?.planDetails?.planName || "free"
-                    } plan. Consider upgrading for uninterrupted usage.`
-                  : ` ${
-                      featureName ?? "This feature"
-                    } is a part of our paid offering. Consider upgrading for uninterrupted usage.`}
+                  ? `You've exceeded the usage limits of the ${user?.details?.planDetails?.planName || "free"} plan. ${
+                      user.loggedIn
+                        ? "Consider upgrading for uninterrupted usage."
+                        : "Sign up to get free 30 days trial."
+                    }`
+                  : ` ${featureName ?? "This feature"} is a premium feature. ${
+                      user.loggedIn
+                        ? "Consider upgrading for uninterrupted usage."
+                        : "Sign up to get free 30 days trial."
+                    }`}
               </Typography.Text>
               {/* {!user.loggedIn && <div className="no-cc-text caption text-gray text-bold">No credit card required!</div>} */}
             </>

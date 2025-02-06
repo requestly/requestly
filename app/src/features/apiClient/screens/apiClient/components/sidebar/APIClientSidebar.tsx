@@ -178,7 +178,7 @@ const APIClientSidebar: React.FC<Props> = () => {
 
   return (
     <>
-      <div className="api-client-sidebar">
+      <div className={`api-client-sidebar ${user.loggedIn ? "" : "api-client-sidebar-disabled"}`}>
         <ApiClientSidebarHeader
           activeTab={activeKey}
           history={history}
