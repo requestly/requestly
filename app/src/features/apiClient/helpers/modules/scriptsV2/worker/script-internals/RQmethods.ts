@@ -109,7 +109,7 @@ export class RQ implements SandboxAPI {
     const responseProperties = {
       ...originalResponse,
       code: originalResponse.status,
-      status: (status as { [key: number]: string })[originalResponse.status],
+      status: (status as { [key: number]: string })[originalResponse.status], // type casting is necessary otherwise ts complains that type number cannot be used to index status
       responseTime: originalResponse.time,
     };
 
