@@ -3,6 +3,27 @@ import { collection, getDocs, getFirestore, query, where } from "firebase/firest
 import { getOwnerId } from "backend/utils";
 import { RQAPI } from "features/apiClient/types";
 import Logger from "lib/logger";
+import { patchMissingIdInVariables } from "./utils";
+
+function patchCollectionVariablesMissingId(params: { success: boolean; data: RQAPI.Record[] }) {
+  if (!params.success) {
+    return params;
+  }
+
+  params.data
+    .filter((p) => p.type === RQAPI.RecordType.COLLECTION)
+    .forEach((collection) => {
+      let variables = collection.data.variables;
+      if (variables) {
+        const doesIdExist = typeof Object.values(variables)[0]?.id !== "undefined";
+
+        if (!doesIdExist) {
+          variables = patchMissingIdInVariables(variables);
+        }
+      }
+    });
+  return params;
+}
 
 export const getApiRecords = async (
   uid: string,
@@ -14,7 +35,7 @@ export const getApiRecords = async (
 
   const ownerId = getOwnerId(uid, teamId);
   const result = await getApiRecordsFromFirebase(ownerId);
-  return result;
+  return patchCollectionVariablesMissingId(result);
 };
 
 const getApiRecordsFromFirebase = async (ownerId: string): Promise<{ success: boolean; data: RQAPI.Record[] }> => {

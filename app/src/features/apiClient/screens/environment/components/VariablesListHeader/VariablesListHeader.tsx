@@ -16,6 +16,7 @@ interface VariablesListHeaderProps {
   hasUnsavedChanges: boolean;
   hideBreadcrumb?: boolean;
   isSaving: boolean;
+  exportActions?: { showExport: boolean; enableExport: boolean; onExportClick: () => void };
   onSearchValueChange: (value: string) => void;
   onSave: () => Promise<void>;
 }
@@ -29,6 +30,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   currentEnvironmentName = "New",
   hideBreadcrumb = false,
   onSave,
+  exportActions,
 }) => {
   const { renameEnvironment } = useEnvironmentManager();
   const { replaceTab } = useTabsLayoutContext();
@@ -76,6 +78,11 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           >
             Save
           </RQButton>
+          {exportActions?.showExport && (
+            <RQButton type="primary" onClick={exportActions?.onExportClick} disabled={!exportActions?.enableExport}>
+              Export
+            </RQButton>
+          )}
         </div>
       </div>
     </div>

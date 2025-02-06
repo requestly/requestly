@@ -28,7 +28,6 @@ import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
 import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useWorkspaceManager } from "features/workspaces/hooks/useWorkspaceManager";
 import useClientStorageService from "services/clientStorageService/hooks/useClientStorageService";
 import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
@@ -48,7 +47,6 @@ const App: React.FC = () => {
 
   useIsExtensionEnabled();
   useBillingTeamsListener();
-  useEnvironmentManager({ manageGlobalEnv: true });
   useAppLanguageObserver();
   // useInitializeNewUserSessionRecordingConfig();
 

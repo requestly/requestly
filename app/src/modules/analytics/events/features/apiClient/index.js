@@ -141,6 +141,26 @@ export const trackImportFromPostmanStarted = (num_collections, num_environments)
   trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_STARTED, { num_collections, num_environments });
 };
 
+export const trackImportFromBrunoClicked = () => {
+  trackEvent(API_CLIENT.IMPORT_FROM_BRUNO_CLICKED);
+};
+
+export const trackImportFromBrunoCompleted = (num_collections, num_environments) => {
+  trackEvent(API_CLIENT.IMPORT_FROM_BRUNO_COMPLETED, { num_collections, num_environments });
+};
+
+export const trackImportFromBrunoFailed = (num_collections, num_environments) => {
+  trackEvent(API_CLIENT.IMPORT_FROM_BRUNO_FAILED, { num_collections, num_environments });
+};
+
+export const trackImportFromBrunoDataProcessed = (num_collections, num_environments) => {
+  trackEvent(API_CLIENT.IMPORT_FROM_BRUNO_DATA_PROCESSED, { num_collections, num_environments });
+};
+
+export const trackImportFromBrunoStarted = (num_collections, num_environments) => {
+  trackEvent(API_CLIENT.IMPORT_FROM_BRUNO_STARTED, { num_collections, num_environments });
+};
+
 export const trackDuplicateRequestClicked = () => {
   trackEvent(API_CLIENT.DUPLICATE_REQUEST_CLICKED);
 };
