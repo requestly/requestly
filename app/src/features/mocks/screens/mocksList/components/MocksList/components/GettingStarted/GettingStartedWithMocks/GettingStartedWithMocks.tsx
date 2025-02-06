@@ -8,7 +8,6 @@ import { AiOutlineCloudUpload } from "@react-icons/all-files/ai/AiOutlineCloudUp
 import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";
 import { FiArrowUpRight } from "@react-icons/all-files/fi/FiArrowUpRight";
 import { LuImport } from "@react-icons/all-files/lu/LuImport";
-import noMocksIcon from "../../../../../../../../../assets/img/icons/common/no-mocks.svg";
 import { SOURCE } from "modules/analytics/events/common/constants.js";
 import { MockType } from "components/features/mocksV2/types";
 import "./gettingStartedWithMocks.scss";
@@ -96,7 +95,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
           </p> */}
         </div>
         <div className="empty-mocks-hero-container">
-          <img src={noMocksIcon} alt="no mocks" className="no-mocks-icon" />
+          <img src={"/media/mocks/no-mocks.svg"} alt="no mocks" className="no-mocks-icon" />
           <div className="empty-mocks-heading">{renderNoMocksText()}</div>
           <p className="empty-mocks-description">{renderDescription()}</p>
           <div className="btns-container">

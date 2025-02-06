@@ -256,7 +256,7 @@ const AppSumoModal: React.FC = () => {
       <>
         <div className="rq-modal-content appsumo-modal">
           <div>
-            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
+            <img alt="smile" width="48px" height="44px" src="/media/common/smiles.svg" />
           </div>
           <div className="header mt-16">Please enter your AppSumo code</div>
           <p className="text-gray">Unlock lifetime deal for SessionBook Plus</p>

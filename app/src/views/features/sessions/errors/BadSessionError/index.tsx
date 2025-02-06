@@ -1,7 +1,6 @@
 import React from "react";
 import ProCard from "@ant-design/pro-card";
 import { Col, Row } from "antd";
-import img from "../../../../../assets/images/pages/error/403.svg";
 
 const BadSessionError = () => {
   return (
@@ -11,7 +10,12 @@ const BadSessionError = () => {
           <Col span={24}>
             <Row justify="center">
               <Col>
-                <img className="hp-position-relative hp-d-block hp-m-auto" src={img} alt="403" height={300} />
+                <img
+                  className="hp-position-relative hp-d-block hp-m-auto"
+                  src={"/media/common/403.svg"}
+                  alt="403"
+                  height={300}
+                />
               </Col>
             </Row>
           </Col>

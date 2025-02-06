@@ -10,8 +10,6 @@ import WorkspaceSelector from "layouts/DashboardLayout/MenuHeader/WorkspaceSelec
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import "layouts/DashboardLayout/MenuHeader/MenuHeader.css";
-import SessionBearLogo from "../../assets/sessionBearLogoFull.svg";
-import SessionBearSmallLogo from "../../assets/sessionBearLogoSmall.svg";
 import "./index.css";
 
 const { Header } = Layout;
@@ -33,10 +31,18 @@ const MenuHeader = () => {
               }}
             >
               <Col className="sessionbear-header-logo">
-                <img onClick={() => redirectToRoot(navigate)} src={SessionBearLogo} alt="SessionBear logo" />
+                <img
+                  onClick={() => redirectToRoot(navigate)}
+                  src={"/media/common/sessionBearLogoFull.svg"}
+                  alt="SessionBear logo"
+                />
               </Col>
               <Col className="sessionbear-header-mini-logo">
-                <img onClick={() => redirectToRoot(navigate)} src={SessionBearSmallLogo} alt="SessionBear logo" />
+                <img
+                  onClick={() => redirectToRoot(navigate)}
+                  src={"/media/common/sessionBearLogoSmall.svg"}
+                  alt="SessionBear logo"
+                />
               </Col>
               <Col className={appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ? "extension" : "desktop"}>
                 <div className="header-left-section">

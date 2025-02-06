@@ -3,7 +3,6 @@ import { Col, Modal } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { MdOutlineCancel } from "@react-icons/all-files/md/MdOutlineCancel";
-import upgradeIcon from "../../../../../../../assets/upgrade.svg";
 import { PRICING } from "features/pricing";
 import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
@@ -115,7 +114,11 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
           getPlanNameFromId(subscriptionDetails?.plan) === PRICING.PLAN_NAMES.PROFESSIONAL &&
           planStatus === PlanStatus.ACTIVE
         ) && (
-          <RQButton type="primary" onClick={handleUpgradePlan} icon={<img src={upgradeIcon} alt="upgrade" />}>
+          <RQButton
+            type="primary"
+            onClick={handleUpgradePlan}
+            icon={<img src={"/media/settings/upgrade.svg"} alt="upgrade" />}
+          >
             {planStatus === PlanStatus.EXPIRED ? "Renew plan" : "Upgrade plan"}
           </RQButton>
         )}

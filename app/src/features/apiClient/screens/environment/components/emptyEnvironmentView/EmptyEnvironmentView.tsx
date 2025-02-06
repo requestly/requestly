@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import emptyEnvironmentViewImage from "../../assets/emptyEnvironment.svg";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
@@ -59,7 +58,7 @@ export const EmptyEnvironmentView = () => {
       ) : (
         <>
           <div className="empty-environment-view-content">
-            <img src={emptyEnvironmentViewImage} alt="empty environment" />
+            <img src={"/media/apiClient/emptyEnvironment.svg"} alt="empty environment" />
             <div className="empty-environment-view-title">No environment created yet</div>
             <p>You haven't set up an environment yet. Once you create one, it'll appear here.</p>
             <RQButton type="primary" onClick={handleCreateNewEnvironment}>

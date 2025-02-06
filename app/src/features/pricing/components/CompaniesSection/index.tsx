@@ -1,16 +1,12 @@
 import { Col, Row, Space, Typography } from "antd";
-import atlassianLogo from "../../assets/atlassian.svg";
-import indeedLogo from "../../assets/indeed.svg";
-import verizonLogo from "../../assets/verizon.svg";
-import zalandoLogo from "../../assets/zalando.svg";
 import "./index.scss";
 
 export const CompaniesSection = () => {
   const companies = [
-    { src: atlassianLogo, alt: "atlassian" },
-    { src: indeedLogo, alt: "indeed" },
-    { src: verizonLogo, alt: "verizon" },
-    { src: zalandoLogo, alt: "zalando" },
+    { src: "/media/pricing/atlassian.svg", alt: "atlassian" },
+    { src: "/media/common/indeed.svg", alt: "indeed" },
+    { src: "/media/common/verizon.svg", alt: "verizon" },
+    { src: "/media/pricing/zalando.svg", alt: "zalando" },
   ];
 
   return (

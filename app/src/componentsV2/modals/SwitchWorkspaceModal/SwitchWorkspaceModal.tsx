@@ -102,7 +102,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
           </ul>
         ) : (
           <div className="title teams-empty-message">
-            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
+            <img alt="smile" width="48px" height="44px" src="/media/common/smiles.svg" />
             <div>You don't have any workspaces!</div>
           </div>
         )}

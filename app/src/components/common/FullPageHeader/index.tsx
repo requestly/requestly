@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { Layout, Col, Row } from "antd";
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
-import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import "./index.css";
 
 interface HeaderProps {
@@ -19,7 +18,7 @@ export const FullPageHeader: React.FC<HeaderProps> = ({ showUserHeader = false, 
         <Col>
           <img
             className="logo"
-            src={RQLogo}
+            src={"/media/common/rq_logo_full.svg"}
             alt="requestly logo"
             onClick={() => (doRedirectOnLogoClick ? redirectToRules(navigate) : {})}
           />
