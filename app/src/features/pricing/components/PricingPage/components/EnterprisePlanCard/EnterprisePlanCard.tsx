@@ -41,7 +41,7 @@ export const EnterprisePlanCard: React.FC<Props> = ({ product = PRICING.PRODUCTS
                 {features.slice(0, 4).map((feature, index) => {
                   return (
                     <div key={index} className="enterprise-plan-feature">
-                      <img src={"/media/common/check.svg"} alt="check icon" /> {feature}
+                      <img src={"/assets/media/common/check.svg"} alt="check icon" /> {feature}
                     </div>
                   );
                 })}
@@ -50,7 +50,7 @@ export const EnterprisePlanCard: React.FC<Props> = ({ product = PRICING.PRODUCTS
                 {features.slice(4, 8).map((feature, index) => {
                   return (
                     <div key={index} className="enterprise-plan-feature">
-                      <img src={"/media/common/check.svg"} alt="check icon" />
+                      <img src={"/assets/media/common/check.svg"} alt="check icon" />
                       {feature}
                     </div>
                   );
@@ -65,7 +65,7 @@ export const EnterprisePlanCard: React.FC<Props> = ({ product = PRICING.PRODUCTS
             </RQButton>
           </div>
           <div className="enterprise-plan-img-container">
-            <img src={"/media/pricing/security.svg"} alt="security" />
+            <img src={"/assets/media/pricing/security.svg"} alt="security" />
           </div>
         </div>
         {/* <div className="enterprise-plan-card-footer">

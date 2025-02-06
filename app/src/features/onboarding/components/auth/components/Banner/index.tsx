@@ -31,13 +31,13 @@ export const OnboardingAuthBanner = () => {
           <>
             Let’s build a{" "}
             <span className="banner-title-highlight">
-              bug-free <img src={"/media/common/yellow-highlight.svg"} alt="highlight" />
+              bug-free <img src={"/assets/media/common/yellow-highlight.svg"} alt="highlight" />
             </span>{" "}
             product
           </>
         ) : (
           <span className="banner-title-highlight">
-            Why Sign Up ? <img src={"/media/common/yellow-highlight.svg"} alt="highlight" />
+            Why Sign Up ? <img src={"/assets/media/common/yellow-highlight.svg"} alt="highlight" />
           </span>
         )}
       </Typography.Title>

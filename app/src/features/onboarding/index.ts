@@ -1,5 +1,5 @@
 //import groupSvg from "./assets/group.svg";
-export const groupSvg = "/media/onboarding/group.svg";
+export const groupSvg = "/assets/media/onboarding/group.svg";
 export { Onboarding } from "./components/onboardingContainer";
 export { shouldShowOnboarding } from "./utils";
 // export { groupSvg };

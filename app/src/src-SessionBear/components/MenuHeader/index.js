@@ -33,14 +33,14 @@ const MenuHeader = () => {
               <Col className="sessionbear-header-logo">
                 <img
                   onClick={() => redirectToRoot(navigate)}
-                  src={"/media/common/sessionBearLogoFull.svg"}
+                  src={"/assets/media/common/sessionBearLogoFull.svg"}
                   alt="SessionBear logo"
                 />
               </Col>
               <Col className="sessionbear-header-mini-logo">
                 <img
                   onClick={() => redirectToRoot(navigate)}
-                  src={"/media/common/sessionBearLogoSmall.svg"}
+                  src={"/assets/media/common/sessionBearLogoSmall.svg"}
                   alt="SessionBear logo"
                 />
               </Col>

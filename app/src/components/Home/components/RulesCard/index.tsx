@@ -85,7 +85,7 @@ export const RulesCard: React.FC = () => {
             <Col span={16}>
               <Row gutter={8} align="middle">
                 <Col>
-                  <img width={16} height={16} src={"/media/components/rules.svg"} alt="rules" />
+                  <img width={16} height={16} src={"/assets/media/components/rules.svg"} alt="rules" />
                 </Col>
                 <Col className="text-white primary-card-header">HTTP Rules</Col>
               </Row>
@@ -145,7 +145,7 @@ export const RulesCard: React.FC = () => {
       ) : (
         <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <HomepageEmptyCard
-            icon={"/media/components/rules.svg"}
+            icon={"/assets/media/components/rules.svg"}
             title="HTTP Rules"
             description="Create rules to modify HTTP requests and responses."
             primaryButton={

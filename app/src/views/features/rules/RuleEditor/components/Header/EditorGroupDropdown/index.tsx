@@ -212,7 +212,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
               width={10}
               height={6}
               alt="down arrow"
-              src="/media/common/downArrow.svg" // TODO: Use react-icons
+              src="/assets/media/common/downArrow.svg" // TODO: Use react-icons
             />
           </span>
         </RQButton>

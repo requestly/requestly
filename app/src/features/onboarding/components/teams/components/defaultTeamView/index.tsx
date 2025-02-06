@@ -21,7 +21,7 @@ export const DefaultTeamView = () => {
           <Space direction="vertical" align="center">
             <Row align="middle" justify="center">
               <Row justify="center" align="middle">
-                <img src={"/media/onboarding/group.svg"} alt="group" />
+                <img src={"/assets/media/onboarding/group.svg"} alt="group" />
               </Row>
               <Typography.Title level={5} className="text-center text-white getting-started-default-team-title">
                 Collaborate better with the team using workspaces

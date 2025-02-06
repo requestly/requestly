@@ -73,7 +73,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           <Col>
             <span>
               All you need
-              <img src={"/media/common/yellow-highlight.svg"} alt="highlight" />
+              <img src={"/assets/media/common/yellow-highlight.svg"} alt="highlight" />
             </span>{" "}
             to get started
           </Col>
@@ -81,7 +81,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         {planName !== PRICING.PLAN_NAMES.FREE && (
           <Col>
             <span>
-              Everything <img src={"/media/common/yellow-highlight.svg"} alt="highlight" />
+              Everything <img src={"/assets/media/common/yellow-highlight.svg"} alt="highlight" />
             </span>{" "}
             in {getHeaderPlanName()} plan +
           </Col>
@@ -257,7 +257,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           if (isOpenedFromModal && feature.visibleInPricingPageOnly) return null;
           return (
             <div className={`text-left plan-feature-item ${feature.tooltip ? "underlined" : ""}`} key={index}>
-              {feature.enabled ? <img src={"/media/common/check.svg"} alt="check" /> : <CloseOutlined />}{" "}
+              {feature.enabled ? <img src={"/assets/media/common/check.svg"} alt="check" /> : <CloseOutlined />}{" "}
               <Tooltip title={feature?.tooltip} color="var(--black)">
                 <span className={`${feature?.tooltip ? "plan-feature-underline" : ""}`}>{feature.title}</span>
               </Tooltip>

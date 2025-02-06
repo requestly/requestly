@@ -90,7 +90,7 @@ export const DeleteRecordsModal: React.FC<Props> = ({ visible, records, toggleMo
 
   return (
     <RQModal open={visible} destroyOnClose={true} onCancel={handleCancel} className="delete-mock-modal">
-      <img width={32} height={32} src={"/media/common/delete.svg"} alt="Delete collection" className="icon" />
+      <img width={32} height={32} src={"/assets/media/common/delete.svg"} alt="Delete collection" className="icon" />
       <div className="header">Delete {recordType.toLowerCase()}?</div>
       <div className="description">
         This action will permanently delete this {recordType.toLowerCase()}. <br /> Are you sure you want to delete?

@@ -170,7 +170,7 @@ export const GettingStarted: React.FC = () => {
                   <img
                     width={72}
                     height={72}
-                    src={"/media/rules/empty-inbox.svg"}
+                    src={"/assets/media/rules/empty-inbox.svg"}
                     alt="empty-rules"
                     className="empty-rules"
                   />

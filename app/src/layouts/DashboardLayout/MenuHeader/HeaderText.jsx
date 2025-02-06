@@ -102,7 +102,7 @@ export default function HeaderText() {
         <Col>
           <Link to="/">
             <img
-              src={"/media/common/rq_logo_full.svg"}
+              src={"/assets/media/common/rq_logo_full.svg"}
               style={{
                 boxSizing: "border-box",
                 display: "inline-block",

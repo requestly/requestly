@@ -22,7 +22,7 @@ const GroupMenuItem: React.FC<GroupMenuItemProps> = ({ id = "", name, currentGro
             width="9px"
             height="7px"
             alt="selected"
-            src="/media/common/tick.svg"
+            src="/assets/media/common/tick.svg"
             className="editor-group-selected-icon"
           />
         )}

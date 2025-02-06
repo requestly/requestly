@@ -79,7 +79,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
       destroyOnClose={true}
       className="delete-api-record-modal"
     >
-      <img width={32} height={32} src={"/media/common/delete.svg"} alt="Delete" className="icon" />
+      <img width={32} height={32} src={"/assets/media/common/delete.svg"} alt="Delete" className="icon" />
       <div className="header">{header}</div>
       <div className="description">{description}</div>
 

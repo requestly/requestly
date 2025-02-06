@@ -300,7 +300,7 @@ export const UserPlanDetails = () => {
                   <Col>
                     <RQButton
                       className="user-plan-upgrade-card-btn"
-                      icon={<img src={"/media/settings/upgrade.svg"} alt="upgrade" />}
+                      icon={<img src={"/assets/media/settings/upgrade.svg"} alt="upgrade" />}
                       type="primary"
                       onClick={() => {
                         dispatch(

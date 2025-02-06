@@ -61,13 +61,13 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
   const postSharingViews = useMemo(() => {
     return {
       [WorkspaceSharingTypes.NEW_WORKSPACE_CREATED]: {
-        header: <img src={"/media/components/mail-success.svg"} alt="mail sent" width={60} />,
+        header: <img src={"/assets/media/components/mail-success.svg"} alt="mail sent" width={60} />,
         message: "New Workspace created and Teammates invited!",
         ctaText: "Switch to the new workspace",
         action: handleSwitchWorkspace,
       },
       [WorkspaceSharingTypes.USERS_INVITED]: {
-        header: <img src={"/media/components/mail-success.svg"} alt="mail sent" width={60} />,
+        header: <img src={"/assets/media/components/mail-success.svg"} alt="mail sent" width={60} />,
         message: "Email invites sent!",
         ctaText: "Invite more users",
         action: () => {

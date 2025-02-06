@@ -43,7 +43,7 @@ export const BillingInvoiceCard: React.FC = () => {
   return (
     <Col className="billing-teams-primary-card billing-team-invoice-card">
       <div className="billing-team-invoice-card-body">
-        <img src={"/media/settings/invoice.svg"} alt="invoice" />
+        <img src={"/assets/media/settings/invoice.svg"} alt="invoice" />
         <div className="text-bold text-white billing-invoice-card-title">Get your invoice via email</div>
         <div className="text-bold text-white billing-invoice-card-description">
           We will send invoice to your registered email address, {user?.details?.profile?.email}.

@@ -31,14 +31,20 @@ const PricingPageFooter: React.FC = () => {
         <img className="backed-by" width={880} height={142} src={backedBy} alt="Backed by the best" />
       </div>
       <div className="footer">
-        <img className="mascot" width={290} height={208} src={"/media/pricing/mascot.svg"} alt="Requestly mascot" />
+        <img
+          className="mascot"
+          width={290}
+          height={208}
+          src={"/assets/media/pricing/mascot.svg"}
+          alt="Requestly mascot"
+        />
         <div className="header">
           <div className="rq-logo-container">
             <img
               className="rq-logo"
               width={200}
               height={48}
-              src={"/media/common/rq_logo_full.svg"}
+              src={"/assets/media/common/rq_logo_full.svg"}
               alt="Requestly logo"
             />
             <div className="caption">
@@ -56,8 +62,14 @@ const PricingPageFooter: React.FC = () => {
                 window.open(LINKS.CHROME_EXTENSION, "_blank");
               }}
             >
-              <img width={17} height={17} src={"/media/pricing/chrome.svg"} alt="Chrome" className="chrome-logo" /> Add
-              to chrome
+              <img
+                width={17}
+                height={17}
+                src={"/assets/media/pricing/chrome.svg"}
+                alt="Chrome"
+                className="chrome-logo"
+              />{" "}
+              Add to chrome
             </Button>
           </div>
         </div>
@@ -183,13 +195,13 @@ const PricingPageFooter: React.FC = () => {
             <div className="socials">
               <span className="follow-us">Follow us on</span>
               <Link href="https://medium.com/requestly" target="_blank">
-                <img width={48} height={48} src={"/media/pricing/medium-logo.svg"} alt="Medium logo" />
+                <img width={48} height={48} src={"/assets/media/pricing/medium-logo.svg"} alt="Medium logo" />
               </Link>
               <Link href="https://twitter.com/requestlyio?lang=en" target="_blank">
-                <img width={48} height={48} src={"/media/pricing/twitter-logo.svg"} alt="Twitter logo" />
+                <img width={48} height={48} src={"/assets/media/pricing/twitter-logo.svg"} alt="Twitter logo" />
               </Link>
               <Link href="https://www.linkedin.com/company/requestly" target="_blank">
-                <img width={48} height={48} src={"/media/pricing/linkedin-logo.svg"} alt="LinkedIn logo" />
+                <img width={48} height={48} src={"/assets/media/pricing/linkedin-logo.svg"} alt="LinkedIn logo" />
               </Link>
             </div>
           </div>

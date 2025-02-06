@@ -3,10 +3,10 @@ import "./index.scss";
 
 export const CompaniesSection = () => {
   const companies = [
-    { src: "/media/pricing/atlassian.svg", alt: "atlassian" },
-    { src: "/media/common/indeed.svg", alt: "indeed" },
-    { src: "/media/common/verizon.svg", alt: "verizon" },
-    { src: "/media/pricing/zalando.svg", alt: "zalando" },
+    { src: "/assets/media/pricing/atlassian.svg", alt: "atlassian" },
+    { src: "/assets/media/common/indeed.svg", alt: "indeed" },
+    { src: "/assets/media/common/verizon.svg", alt: "verizon" },
+    { src: "/assets/media/pricing/zalando.svg", alt: "zalando" },
   ];
 
   return (

@@ -58,7 +58,7 @@ export const EmptyEnvironmentView = () => {
       ) : (
         <>
           <div className="empty-environment-view-content">
-            <img src={"/media/apiClient/emptyEnvironment.svg"} alt="empty environment" />
+            <img src={"/assets/media/apiClient/emptyEnvironment.svg"} alt="empty environment" />
             <div className="empty-environment-view-title">No environment created yet</div>
             <p>You haven't set up an environment yet. Once you create one, it'll appear here.</p>
             <RQButton type="primary" onClick={handleCreateNewEnvironment}>

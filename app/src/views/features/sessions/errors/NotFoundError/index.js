@@ -18,7 +18,7 @@ const NotFoundError = () => {
               <Col>
                 <img
                   className="hp-position-relative hp-d-block hp-m-auto"
-                  src={"/media/views/404.svg"}
+                  src={"/assets/media/views/404.svg"}
                   alt="403"
                   style={{ maxHeight: "30vh" }}
                 />

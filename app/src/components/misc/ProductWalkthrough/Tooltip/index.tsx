@@ -28,7 +28,7 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
           className={`tour-tooltip-pointer tour-tooltip-pointer-${
             step.pointerPlacement.includes("bottom") ? "bottom" : "top"
           } tour-tooltip-pointer-${step.pointerPlacement}`}
-          src={"/media/components/tooltip-pointer.svg"}
+          src={"/assets/media/components/tooltip-pointer.svg"}
           alt="tooltip pointer"
         />
       )}
@@ -53,7 +53,7 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
               "Finish"
             ) : (
               <>
-                Next <img alt="back" width="14px" height="12px" src="/media/common/leftArrow.svg" />
+                Next <img alt="back" width="14px" height="12px" src="/assets/media/common/leftArrow.svg" />
               </>
             ))}
         </Button>

@@ -21,8 +21,8 @@ const DesktopAppError = () => {
                 className="hp-position-relative hp-d-block hp-m-auto"
                 src={
                   appTheme === APP_CONSTANTS.THEMES.DARK
-                    ? "/media/views/modular-coding-dark.svg"
-                    : "/media/views/modular-coding.svg"
+                    ? "/assets/media/views/modular-coding-dark.svg"
+                    : "/assets/media/views/modular-coding.svg"
                 }
                 alt="403"
                 style={{ maxHeight: "30vh" }}

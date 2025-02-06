@@ -54,7 +54,10 @@ export const ApiClientEmptyView = () => {
 
   return (
     <div className="api-client-empty-view-container">
-      <img src={isEmpty ? "/media/apiClient/emptyView.svg" : "/media/apiClient/defaultView.svg"} alt="empty-view" />
+      <img
+        src={isEmpty ? "/assets/media/apiClient/emptyView.svg" : "/assets/media/apiClient/defaultView.svg"}
+        alt="empty-view"
+      />
       <div>
         <div className="api-client-empty-view-header">
           {isEmpty ? "No API requests created yet." : "Pick up where you left off or start fresh."}

@@ -83,9 +83,13 @@ export const AuthScreen: React.FC<Props> = ({
             }`}
           >
             {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
-              <img src={"/media/common/sessionBearLogoFull.svg"} alt="SessionBear logo" style={{ width: "165px" }} />
+              <img
+                src={"/assets/media/common/sessionBearLogoFull.svg"}
+                alt="SessionBear logo"
+                style={{ width: "165px" }}
+              />
             ) : (
-              <img src={"/media/common/rq_logo_full.svg"} alt="Requestly logo" style={{ width: "133px" }} />
+              <img src={"/assets/media/common/rq_logo_full.svg"} alt="Requestly logo" style={{ width: "133px" }} />
             )}
             <m.div transition={{ type: "linear" }} layout className="onboarding-auth-form-wrapper">
               <AuthForm
