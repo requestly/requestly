@@ -12,7 +12,7 @@ import checkIcon from "assets/img/icons/common/check.svg";
 import { trackGetFreeTrialClicked, trackPricingPlansQuantityChanged } from "features/pricing/analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
-import StudentPlanIcon from "../../../../assets/student-plan-icon.svg?react";
+import GiftIcon from "../../../../assets/gift-icon.svg?react";
 import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
 
 interface PlanColumnProps {
@@ -272,7 +272,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
 
       {planName === PRICING.PLAN_NAMES.PROFESSIONAL ? (
         <div className="student-plan-footer">
-          <StudentPlanIcon className="student-plan-icon" width={16} height={16} />
+          <GiftIcon className="gift-plan-icon" width={16} height={16} />
           <a
             target="_blank"
             rel="noreferrer"
