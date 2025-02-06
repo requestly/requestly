@@ -24,6 +24,12 @@ export namespace TabsLayout {
     timeStamp: number;
   }
 
+  export interface OpenTabArgs {
+    title: string;
+    url: string;
+    isPreview?: boolean;
+  }
+
   export enum IconType {
     REQUEST = "request",
     COLLECTION = "collection",
@@ -36,7 +42,8 @@ export interface TabsLayoutContextInterface {
   activeTab: TabsLayout.Tab;
   closeTab: (tabId: TabsLayout.Tab["id"]) => void;
   deleteTabs: (tabIds: TabsLayout.Tab["id"][]) => void;
-  openTab: (tabId: TabsLayout.Tab["id"], tabDetails?: Partial<TabsLayout.Tab>) => void;
+  switchToTab: (tabId: TabsLayout.Tab["id"]) => void;
+  openTab: (tabId: TabsLayout.Tab["id"], tabDetails: TabsLayout.OpenTabArgs) => void;
   updateTab: (tabId: TabsLayout.Tab["id"], updatedTabData?: Partial<TabsLayout.Tab>) => void;
   replaceTab: (tabId: TabsLayout.Tab["id"], newTabData?: Partial<TabsLayout.Tab>) => void;
   onTabsEdit: TabsProps["onEdit"];
