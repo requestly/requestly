@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import emptyCardImage from "../../../../../../assets/empty-card.svg";
 import { RQButton } from "lib/design-system-v2/components";
 import APP_CONSTANTS from "config/constants";
 import { useDispatch, useSelector } from "react-redux";
@@ -57,7 +56,13 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
   return (
     <div className="empty-state-container">
-      <img className="empty-card-image" width={40} height={40} src={emptyCardImage} alt="Empty collection list" />
+      <img
+        className="empty-card-image"
+        width={40}
+        height={40}
+        src={"/media/apiClient/empty-card.svg"}
+        alt="Empty collection list"
+      />
       <div className="empty-message">{message}</div>
 
       <RQButton loading={isLoading} size="small" className="new-record-btn" onClick={handleOnClick}>

@@ -1,7 +1,5 @@
 import leaImg from "../assets/images/pages/pricing-page/lea.jpeg";
 import piersImg from "../assets/images/pages/pricing-page/piers.jpeg";
-import fifteenGiftsLogo from "../assets/images/pages/pricing-page/15gifts.svg";
-import w3cLogo from "../assets/images/pages/pricing-page/w3c.svg";
 
 export const customerStoryData = [
   {
@@ -10,7 +8,7 @@ export const customerStoryData = [
     mugshot: leaImg,
     testimonial:
       "I absolutely love Requestly in my development process. Definitely, my most essential tool after a browser & a text editor!",
-    companyLogo: w3cLogo,
+    companyLogo: "/media/utils/w3c.svg",
     companyName: "W3C",
   },
   {
@@ -19,7 +17,7 @@ export const customerStoryData = [
     mugshot: piersImg,
     testimonial:
       "Requestly is a game-changer for us. It started with one person and now the entire team uses Requestly to test our Staging code on production customers & non-customer sites. We more confidently ship product updates now.",
-    companyLogo: fifteenGiftsLogo,
+    companyLogo: "/media/utils/15gifts.svg",
     companyName: "15Gifts",
   },
 ];

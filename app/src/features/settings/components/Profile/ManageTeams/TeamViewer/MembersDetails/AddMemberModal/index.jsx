@@ -255,7 +255,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
               ) : (
                 <>
                   <div>
-                    <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
+                    <img alt="smile" width="48px" height="44px" src="/media/common/smiles.svg" />
                   </div>
                   <div className="header add-member-modal-header">
                     Invite people to {currentTeamId ? `${teamDetails?.name}` : ""} workspace

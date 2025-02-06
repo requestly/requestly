@@ -10,7 +10,6 @@ import { getLongFormatDateString } from "utils/DateTimeUtils";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { MdDiversity1 } from "@react-icons/all-files/md/MdDiversity1";
-import UpgradeIcon from "../../assets/upgrade.svg";
 import { globalActions } from "store/slices/global/slice";
 import { PRICING } from "features/pricing";
 import Logger from "lib/logger";
@@ -301,7 +300,7 @@ export const UserPlanDetails = () => {
                   <Col>
                     <RQButton
                       className="user-plan-upgrade-card-btn"
-                      icon={<img src={UpgradeIcon} alt="upgrade" />}
+                      icon={<img src={"/media/settings/upgrade.svg"} alt="upgrade" />}
                       type="primary"
                       onClick={() => {
                         dispatch(

@@ -7,8 +7,6 @@ import { CloseOutlined } from "@ant-design/icons";
 import { capitalize } from "lodash";
 import { PRICING } from "features/pricing/constants/pricing";
 import { PricingPlans } from "features/pricing/constants/pricingPlans";
-import underlineIcon from "features/pricing/assets/yellow-highlight.svg";
-import checkIcon from "assets/img/icons/common/check.svg";
 import { trackPricingPlansQuantityChanged } from "features/pricing/analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
@@ -75,7 +73,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           <Col>
             <span>
               All you need
-              <img src={underlineIcon} alt="highlight" />
+              <img src={"/media/common/yellow-highlight.svg"} alt="highlight" />
             </span>{" "}
             to get started
           </Col>
@@ -83,7 +81,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         {planName !== PRICING.PLAN_NAMES.FREE && (
           <Col>
             <span>
-              Everything <img src={underlineIcon} alt="highlight" />
+              Everything <img src={"/media/common/yellow-highlight.svg"} alt="highlight" />
             </span>{" "}
             in {getHeaderPlanName()} plan +
           </Col>
@@ -259,7 +257,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           if (isOpenedFromModal && feature.visibleInPricingPageOnly) return null;
           return (
             <div className={`text-left plan-feature-item ${feature.tooltip ? "underlined" : ""}`} key={index}>
-              {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />}{" "}
+              {feature.enabled ? <img src={"/media/common/check.svg"} alt="check" /> : <CloseOutlined />}{" "}
               <Tooltip title={feature?.tooltip} color="var(--black)">
                 <span className={`${feature?.tooltip ? "plan-feature-underline" : ""}`}>{feature.title}</span>
               </Tooltip>

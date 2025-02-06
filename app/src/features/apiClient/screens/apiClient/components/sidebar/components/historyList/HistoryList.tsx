@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from "react";
-import placeholderImage from "../../../../../../../../assets/images/illustrations/empty-sheets-dark.svg";
 import { RQAPI } from "features/apiClient/types";
 import { Timeline, Typography } from "antd";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../constants";
@@ -8,7 +7,6 @@ import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/Analytics
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
-import shieldIcon from "./assets/shield-icon.svg";
 import PATHS from "config/constants/sub/paths";
 
 interface Props {
@@ -37,7 +35,7 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
     <>
       {!dismissNote && (
         <div className="storage-communication-note">
-          <img src={shieldIcon} alt="secured" />
+          <img src={"/media/apiClient/shield-icon.svg"} alt="secured" />
           <p> Your history is stored in your device's local storage for better privacy & control.</p>
           <TfiClose onClick={() => setDismissNote(true)} />
         </div>
@@ -79,7 +77,7 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
     </>
   ) : (
     <div className="api-client-sidebar-placeholder">
-      <img src={placeholderImage} alt="empty" />
+      <img src={"/media/apiClient/empty-sheets-dark.svg"} alt="empty" />
       <Typography.Text type="secondary">API requests you send will appear here.</Typography.Text>
     </div>
   );

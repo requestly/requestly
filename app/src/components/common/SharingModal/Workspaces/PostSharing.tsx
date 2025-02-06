@@ -9,7 +9,6 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { FaRegCopy } from "@react-icons/all-files/fa/FaRegCopy";
 import { LockOutlined } from "@ant-design/icons";
-import mailSuccessImg from "assets/images/illustrations/mail-success.svg";
 import { PostShareViewData, WorkspaceSharingTypes } from "../types";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import "./index.scss";
@@ -62,13 +61,13 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
   const postSharingViews = useMemo(() => {
     return {
       [WorkspaceSharingTypes.NEW_WORKSPACE_CREATED]: {
-        header: <img src={mailSuccessImg} alt="mail sent" width={60} />,
+        header: <img src={"/media/components/mail-success.svg"} alt="mail sent" width={60} />,
         message: "New Workspace created and Teammates invited!",
         ctaText: "Switch to the new workspace",
         action: handleSwitchWorkspace,
       },
       [WorkspaceSharingTypes.USERS_INVITED]: {
-        header: <img src={mailSuccessImg} alt="mail sent" width={60} />,
+        header: <img src={"/media/components/mail-success.svg"} alt="mail sent" width={60} />,
         message: "Email invites sent!",
         ctaText: "Invite more users",
         action: () => {

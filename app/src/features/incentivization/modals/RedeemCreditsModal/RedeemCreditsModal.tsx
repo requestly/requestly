@@ -1,7 +1,6 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { Modal } from "antd";
 import { RQButton } from "lib/design-system/components";
-import emptyWallet from "./assets/empty_wallet.svg";
 // import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { UserMilestoneAndRewardDetails } from "features/incentivization/types";
 import { getTotalCredits } from "features/incentivization/utils";
@@ -222,7 +221,13 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
       {!creditsToBeRedeemed ? (
         <div className="credits-not-available">
           <div className="content">
-            <img width={100} height={100} className="empty-wallet" src={emptyWallet} alt="Empty wallet" />
+            <img
+              width={100}
+              height={100}
+              className="empty-wallet"
+              src={"/media/apiClient/empty_wallet.svg"}
+              alt="Empty wallet"
+            />
             <div className="title">No credits available!</div>
             <div className="description">
               You don't have any credits available now. Please complete your Requestly setup and get ${totalCredits}{" "}

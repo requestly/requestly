@@ -7,7 +7,6 @@ import { Avatar, Row, Divider } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
-import puzzleImg from "assets/images/illustrations/puzzle.svg";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import { duplicateRulesToTargetWorkspace } from "../actions";
@@ -175,7 +174,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
 
 const bannerToUseWorkspace = (
   <div className="no-available-team-hero-section">
-    <img src={puzzleImg} alt="puzzle" width={48} />
+    <img src={"/media/components/puzzle.svg"} alt="puzzle" width={48} />
     <div className="subheader mt-8">Don't just share, collaborate!</div>
     <div className="text-center text-gray" style={{ maxWidth: "340px" }}>
       Invite your friends & work together as a team share rules, recordings and more, collaborate in realtime.

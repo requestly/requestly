@@ -6,7 +6,6 @@ import { PricingTable } from "../PricingTable";
 import { PRICING } from "features/pricing/constants/pricing";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { redirectToRules } from "utils/RedirectionUtils";
-import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import { EnterprisePlanCard } from "./components/EnterprisePlanCard/EnterprisePlanCard";
 import { CompaniesSection } from "./components/CompaniesSection/CompaniesSection";
 import { StatsCard } from "./components/StatsCard/StatsCard";
@@ -31,7 +30,12 @@ export const PricingIndexPage = () => {
       <div className="pricing-page-container">
         <Layout.Header className="pricing-navbar">
           <div className="pricing-navbar-content">
-            <img className="logo" src={RQLogo} alt="requestly logo" onClick={() => redirectToRules(navigate)} />
+            <img
+              className="logo"
+              src={"/media/common/rq_logo_full.svg"}
+              alt="requestly logo"
+              onClick={() => redirectToRules(navigate)}
+            />
             <HeaderUser />
           </div>
         </Layout.Header>

@@ -13,8 +13,6 @@ import { m } from "framer-motion";
 import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useFeatureValue } from "@growthbook/growthbook-react";
-import RQLogo from "assets/img/brand/rq_logo_full.svg";
-import SessionBearLogo from "src-SessionBear/assets/sessionBearLogoFull.svg";
 import { CompaniesLogoBanner } from "./components/CompaniesLogoBanner";
 import { getAppFlavour } from "utils/AppUtils";
 import "./index.scss";
@@ -85,9 +83,9 @@ export const AuthScreen: React.FC<Props> = ({
             }`}
           >
             {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
-              <img src={SessionBearLogo} alt="SessionBear logo" style={{ width: "165px" }} />
+              <img src={"/media/common/sessionBearLogoFull.svg"} alt="SessionBear logo" style={{ width: "165px" }} />
             ) : (
-              <img src={RQLogo} alt="Requestly logo" style={{ width: "133px" }} />
+              <img src={"/media/common/rq_logo_full.svg"} alt="Requestly logo" style={{ width: "133px" }} />
             )}
             <m.div transition={{ type: "linear" }} layout className="onboarding-auth-form-wrapper">
               <AuthForm

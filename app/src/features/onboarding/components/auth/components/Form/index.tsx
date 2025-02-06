@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Divider, Row, Col, Tooltip, Button } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { AuthFormInput } from "./components/AuthFormInput";
-import googleLogo from "assets/icons/google.svg";
 // import { PersonaInput } from "../../../persona/components/PersonaInput";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import AUTH from "config/constants/sub/auth";
@@ -236,7 +235,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           loading={isGoogleSignInLoading}
           disabled={isLoading}
         >
-          <img src={googleLogo} alt="google" />
+          <img src={"/media/common/google.svg"} alt="google" />
           {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
         </RQButton>
         <Divider plain className="onboarding-auth-form-divider">
@@ -378,7 +377,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         loading={isGoogleSignInLoading}
         disabled={isLoading}
       >
-        <img src={googleLogo} alt="google" />
+        <img src={"/media/common/google.svg"} alt="google" />
         {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
       </RQButton>
       <Divider plain className="onboarding-auth-form-divider">
