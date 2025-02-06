@@ -63,7 +63,7 @@ export const PricingIndexPage = () => {
               <PricingTable duration={duration} source={SOURCE.PRICING_PAGE} product={activeProduct} />
             </div>
             <EnterprisePlanCard product={activeProduct} />
-            <StudentProgram />
+            <StudentProgram source={SOURCE.PRICING_PAGE} />
             <CompaniesSection />
             <StatsCard />
             <OtherWaysToMakePurchase />

@@ -1,6 +1,10 @@
 .pricing-modal-wrapper {
   height: calc(100% - 62px);
   overflow: auto;
+
+  .ant-typography.title {
+    margin: 0;
+  }
 }
 
 .pricing-modal-right-inset-shadow,
@@ -36,9 +40,12 @@
   max-height: 780px;
   overflow: hidden;
 
+  .plan-card {
+    padding: 24px;
+  }
+
   .pricing-table {
-    margin: 0 24px;
-    margin-top: 24px;
+    margin: 16px 24px 0 24px;
   }
 
   .ant-modal-body {
@@ -58,6 +65,11 @@
 
   .pricing-modal-close-icon {
     color: var(--white);
+  }
+
+  .student-program-nudge {
+    padding: 0;
+    margin-bottom: 0;
   }
 
   .checkout-embed-wrapper {

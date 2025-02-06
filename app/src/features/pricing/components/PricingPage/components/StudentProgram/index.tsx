@@ -3,7 +3,7 @@ import StudentPlanIcon from "../../../../assets/student-plan-icon.svg?react";
 import { trackStudentProgramClicked } from "features/pricing/analytics";
 import "./studentProgram.scss";
 
-export const StudentProgram: React.FC = () => {
+export const StudentProgram: React.FC<{ source: string }> = ({ source }) => {
   return (
     <div className="student-program-nudge">
       <StudentPlanIcon className="student-plan-icon" />
@@ -12,7 +12,7 @@ export const StudentProgram: React.FC = () => {
         target="_blank"
         rel="noreferrer"
         onClick={() => {
-          trackStudentProgramClicked();
+          trackStudentProgramClicked(source);
         }}
         href="https://requestly.com/student-program/"
       >
