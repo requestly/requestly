@@ -73,9 +73,9 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
           {isOpenedInIframe ? (
             <>
               {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
-                <img src={"/media/common/sessionBearLogoFull.svg"} alt="SessionBear Logo" width={150} />
+                <img src={"/assets/media/common/sessionBearLogoFull.svg"} alt="SessionBear Logo" width={150} />
               ) : (
-                <img src={"/media/common/rq_logo_full.svg"} alt="Requestly Logo" width={120} />
+                <img src={"/assets/media/common/rq_logo_full.svg"} alt="Requestly Logo" width={120} />
               )}
             </>
           ) : (

@@ -39,7 +39,7 @@ export const AuthFormHero = ({ currentTestimonialIndex, isOnboarding = false }) 
 
     return (
       <Col className="signup-modal-testimonial-wrapper">
-        <img src={"/media/components/quote.svg"} alt="quote" />
+        <img src={"/assets/media/components/quote.svg"} alt="quote" />
         <Row>
           <Typography.Text type="primary">{testimonials[currentTestimonialIndex].body}</Typography.Text>
         </Row>
@@ -70,7 +70,7 @@ export const AuthFormHero = ({ currentTestimonialIndex, isOnboarding = false }) 
         <Typography.Text type="primary" className="text-bold header">
           Use{" "}
           <span className="work-email-highlight-wrapper">
-            work email <img src={"/media/common/underline.svg"} alt="work email" />
+            work email <img src={"/assets/media/common/underline.svg"} alt="work email" />
           </span>{" "}
           to get access to
         </Typography.Text>

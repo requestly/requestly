@@ -235,7 +235,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           loading={isGoogleSignInLoading}
           disabled={isLoading}
         >
-          <img src={"/media/common/google.svg"} alt="google" />
+          <img src={"/assets/media/common/google.svg"} alt="google" />
           {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
         </RQButton>
         <Divider plain className="onboarding-auth-form-divider">
@@ -377,7 +377,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         loading={isGoogleSignInLoading}
         disabled={isLoading}
       >
-        <img src={"/media/common/google.svg"} alt="google" />
+        <img src={"/assets/media/common/google.svg"} alt="google" />
         {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
       </RQButton>
       <Divider plain className="onboarding-auth-form-divider">

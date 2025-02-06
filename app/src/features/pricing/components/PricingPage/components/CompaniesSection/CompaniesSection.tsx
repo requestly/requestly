@@ -2,11 +2,11 @@ import "./companiesSection.scss";
 
 export const CompaniesSection = () => {
   const companyLogos = [
-    "/media/common/indeed.svg",
-    "/media/pricing/amazon.svg",
-    "/media/pricing/atlassian.svg",
-    "/media/common/intuit.svg",
-    "/media/pricing/wix.svg",
+    "/assets/media/common/indeed.svg",
+    "/assets/media/pricing/amazon.svg",
+    "/assets/media/pricing/atlassian.svg",
+    "/assets/media/common/intuit.svg",
+    "/assets/media/pricing/wix.svg",
   ];
 
   return (

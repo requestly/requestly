@@ -10,12 +10,12 @@ export const HelpCard: React.FC = () => {
     () => [
       // TODO: Add links to the hrefs
       {
-        icon: <img src={"/media/components/info.svg"} alt="info" />,
+        icon: <img src={"/assets/media/components/info.svg"} alt="info" />,
         title: "What is Requestly?",
         href: "https://requestly.com/blog/what-is-requestly/",
       },
       {
-        icon: <img src={"/media/components/book.svg"} alt="community" />,
+        icon: <img src={"/assets/media/components/book.svg"} alt="community" />,
         title: "Read official documentation",
         href: "https://developers.requestly.io",
       },
@@ -25,12 +25,12 @@ export const HelpCard: React.FC = () => {
         href: "https://www.youtube.com/playlist?list=PLmHjVvTu_7ddFIIT9AkZ7p0lrC5gBuyb6",
       },
       {
-        icon: <img src={"/media/components/community.svg"} alt="community" />,
+        icon: <img src={"/assets/media/components/community.svg"} alt="community" />,
         title: "Community",
         href: "https://requestlycommunity.slack.com/ssb/redirect",
       },
       {
-        icon: <img src={"/media/components/call.svg"} alt="call" />,
+        icon: <img src={"/assets/media/components/call.svg"} alt="call" />,
         title: "Schedule a demo",
         href: "https://calendly.com/requestly/sagar",
       },

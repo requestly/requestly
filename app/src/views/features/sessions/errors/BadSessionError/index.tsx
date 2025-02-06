@@ -12,7 +12,7 @@ const BadSessionError = () => {
               <Col>
                 <img
                   className="hp-position-relative hp-d-block hp-m-auto"
-                  src={"/media/common/403.svg"}
+                  src={"/assets/media/common/403.svg"}
                   alt="403"
                   height={300}
                 />

@@ -17,7 +17,7 @@ const PageError: React.FC<Props> = ({ error, componentStack = "", resetError = n
 
   return (
     <div className="page-error-container">
-      <img src={"/media/components/fixing-bugs-dark.svg"} alt="error" />
+      <img src={"/assets/media/components/fixing-bugs-dark.svg"} alt="error" />
       <Typography.Text type="secondary" italic className="message">
         <>
           Something went wrong! Please contact the

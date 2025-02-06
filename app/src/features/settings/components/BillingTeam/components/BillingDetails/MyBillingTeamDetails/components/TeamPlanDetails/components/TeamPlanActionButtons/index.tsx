@@ -117,7 +117,7 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
           <RQButton
             type="primary"
             onClick={handleUpgradePlan}
-            icon={<img src={"/media/settings/upgrade.svg"} alt="upgrade" />}
+            icon={<img src={"/assets/media/settings/upgrade.svg"} alt="upgrade" />}
           >
             {planStatus === PlanStatus.EXPIRED ? "Renew plan" : "Upgrade plan"}
           </RQButton>

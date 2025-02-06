@@ -12,7 +12,7 @@ const MinimalLayout = () => {
       <Layout.Header className="minimal-layout-navbar">
         <img
           className="logo"
-          src={"/media/common/sessionBearLogoFull.svg"}
+          src={"/assets/media/common/sessionBearLogoFull.svg"}
           alt="requestly logo"
           onClick={() => redirectToRoot(navigate)}
         />

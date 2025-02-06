@@ -197,7 +197,7 @@ const AuthForm = ({
                     <span className="btn-inner--text">Github</span>
                   </Button> */}
             <RQButton className="btn-default text-bold w-full" onClick={handleGoogleSignInButtonClick}>
-              <img src={"/media/components/google.svg"} alt="google" className="auth-icons" />
+              <img src={"/assets/media/common/google.svg"} alt="google" className="auth-icons" />
               {MODE === AUTH_ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
             </RQButton>
           </>

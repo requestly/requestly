@@ -35,7 +35,7 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
     <>
       {!dismissNote && (
         <div className="storage-communication-note">
-          <img src={"/media/apiClient/shield-icon.svg"} alt="secured" />
+          <img src={"/assets/media/apiClient/shield-icon.svg"} alt="secured" />
           <p> Your history is stored in your device's local storage for better privacy & control.</p>
           <TfiClose onClick={() => setDismissNote(true)} />
         </div>
@@ -77,7 +77,7 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
     </>
   ) : (
     <div className="api-client-sidebar-placeholder">
-      <img src={"/media/apiClient/empty-sheets-dark.svg"} alt="empty" />
+      <img src={"/assets/media/apiClient/empty-sheets-dark.svg"} alt="empty" />
       <Typography.Text type="secondary">API requests you send will appear here.</Typography.Text>
     </div>
   );

@@ -22,7 +22,7 @@ const RouterError: React.FC<Props> = () => {
 
   return (
     <div className="page-error-container">
-      <img src={"/media/components/fixing-bugs-dark.svg"} alt="error" />
+      <img src={"/assets/media/components/fixing-bugs-dark.svg"} alt="error" />
       <Typography.Text type="secondary" italic className="message">
         <>
           [router-error] Something went wrong! Please contact the

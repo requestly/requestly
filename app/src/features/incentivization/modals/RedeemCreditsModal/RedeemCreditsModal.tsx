@@ -225,7 +225,7 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
               width={100}
               height={100}
               className="empty-wallet"
-              src={"/media/apiClient/empty_wallet.svg"}
+              src={"/assets/media/apiClient/empty_wallet.svg"}
               alt="Empty wallet"
             />
             <div className="title">No credits available!</div>

@@ -40,7 +40,7 @@ export const EmptyResponsePlaceholder: React.FC<EmptyResponseViewProps> = ({ isF
         ) : (
           <>
             <div className="empty-state">
-              <img src={"/media/apiClient/response-empty-state.svg"} alt="empty card" width={80} height={80} />
+              <img src={"/assets/media/apiClient/response-empty-state.svg"} alt="empty card" width={80} height={80} />
               <div className="api-client-empty-response-view__title">Nothing to see here!</div>
               <div className="api-client-empty-response-view__description">{emptyDescription}</div>
             </div>

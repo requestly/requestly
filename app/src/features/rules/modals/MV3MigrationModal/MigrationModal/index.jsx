@@ -15,7 +15,7 @@ import LINKS from "config/constants/sub/links";
 const Header = () => {
   return (
     <div className="modal-header">
-      <img src={"/media/rules/modalImage.svg"} alt="Requestly Logo" className="banner-img" width={150} />
+      <img src={"/assets/media/rules/modalImage.svg"} alt="Requestly Logo" className="banner-img" width={150} />
       <div className="header">
         <Typography.Text className="title">Important Changes to your HTTP Rules data</Typography.Text>
         <a

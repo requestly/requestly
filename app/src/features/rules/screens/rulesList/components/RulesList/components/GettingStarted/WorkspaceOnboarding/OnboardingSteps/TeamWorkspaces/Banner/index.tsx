@@ -12,7 +12,7 @@ export const WorkspaceOnboardingBanner = () => {
       <div className="onboarding-banner-title">Use Team workspace to use Requestly with your teammates 🚀</div>
       <div className="text-bold header" style={{ marginTop: "2.4rem" }}>
         <span className="work-email-highlight-wrapper">
-          Teams use <img src={"/media/common/underline.svg"} alt="work email" />
+          Teams use <img src={"/assets/media/common/underline.svg"} alt="work email" />
         </span>{" "}
         Requestly to create
       </div>

@@ -41,14 +41,14 @@ export const AUTHORIZATION_FORM_DATA = {
 export const AUTHORIZATION_STATIC_DATA = {
   [AUTHORIZATION_TYPES.INHERIT]: {
     description: {
-      img: "/media/apiClient/inherit-auth.svg",
+      img: "/assets/media/apiClient/inherit-auth.svg",
       heading: "Inherits authorization from the parent collection.",
       subHeading: "This request will use its parent collection’s auth token when you send the request.",
     },
   },
   [AUTHORIZATION_TYPES.NO_AUTH]: {
     description: {
-      img: "/media/apiClient/no-auth.svg",
+      img: "/assets/media/apiClient/no-auth.svg",
       heading: "No authorization type selected for this request.",
       subHeading: "Please select a authorization type above.",
     },

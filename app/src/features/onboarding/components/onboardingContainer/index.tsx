@@ -87,7 +87,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
         <div className="onboarding-modal-body">
           <Row justify="space-between" className="w-full onboarding-modal-header">
             <Col>
-              <img src={"/media/common/rq_logo_full.svg"} alt="requestly logo" style={{ width: "90px" }} />
+              <img src={"/assets/media/common/rq_logo_full.svg"} alt="requestly logo" style={{ width: "90px" }} />
             </Col>
 
             {step === ONBOARDING_STEPS.PERSONA ||

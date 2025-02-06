@@ -60,7 +60,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         className="empty-card-image"
         width={40}
         height={40}
-        src={"/media/apiClient/empty-card.svg"}
+        src={"/assets/media/apiClient/empty-card.svg"}
         alt="Empty collection list"
       />
       <div className="empty-message">{message}</div>

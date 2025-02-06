@@ -32,7 +32,7 @@ export const PricingIndexPage = () => {
           <div className="pricing-navbar-content">
             <img
               className="logo"
-              src={"/media/common/rq_logo_full.svg"}
+              src={"/assets/media/common/rq_logo_full.svg"}
               alt="requestly logo"
               onClick={() => redirectToRules(navigate)}
             />

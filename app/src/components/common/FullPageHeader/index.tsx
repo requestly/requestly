@@ -18,7 +18,7 @@ export const FullPageHeader: React.FC<HeaderProps> = ({ showUserHeader = false, 
         <Col>
           <img
             className="logo"
-            src={"/media/common/rq_logo_full.svg"}
+            src={"/assets/media/common/rq_logo_full.svg"}
             alt="requestly logo"
             onClick={() => (doRedirectOnLogoClick ? redirectToRules(navigate) : {})}
           />

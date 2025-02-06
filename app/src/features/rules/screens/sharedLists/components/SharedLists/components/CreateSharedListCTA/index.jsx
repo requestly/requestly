@@ -54,7 +54,7 @@ const CreateSharedListCTA = () => {
     <>
       <FeatureBanner
         title="Share Rules with other users"
-        bannerImg={"/media/common/file.svg"}
+        bannerImg={"/assets/media/common/file.svg"}
         bannerTitle="Shared lists"
         description={renderEmptyListDescription()}
       />

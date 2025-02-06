@@ -95,7 +95,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
           </p> */}
         </div>
         <div className="empty-mocks-hero-container">
-          <img src={"/media/mocks/no-mocks.svg"} alt="no mocks" className="no-mocks-icon" />
+          <img src={"/assets/media/mocks/no-mocks.svg"} alt="no mocks" className="no-mocks-icon" />
           <div className="empty-mocks-heading">{renderNoMocksText()}</div>
           <p className="empty-mocks-description">{renderDescription()}</p>
           <div className="btns-container">

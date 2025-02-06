@@ -34,7 +34,7 @@ const AuthModal = ({
     <>
       {closable && (
         <img
-          src={"/media/components/close.svg"}
+          src={"/assets/media/components/close.svg"}
           width={15}
           className="modal-close-icon"
           onClick={() => toggle()}

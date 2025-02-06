@@ -89,7 +89,7 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
       onCancel={handleCancel}
       className="delete-collection-modal"
     >
-      <img width={32} height={32} src={"/media/common/delete.svg"} alt="Delete collection" className="icon" />
+      <img width={32} height={32} src={"/assets/media/common/delete.svg"} alt="Delete collection" className="icon" />
       <div className="header">Delete this collection?</div>
       <div className="description">
         This will permanently delete this collection. <br />
