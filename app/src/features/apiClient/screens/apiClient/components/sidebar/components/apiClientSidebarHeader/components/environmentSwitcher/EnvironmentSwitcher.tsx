@@ -25,6 +25,7 @@ export const EnvironmentSwitcher = () => {
   const dropdownItems = useMemo(() => {
     return environments
       .filter((env) => !isGlobalEnvironment(env.id))
+      .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
       .map((environment) => ({
         key: environment.id,
         label: (
