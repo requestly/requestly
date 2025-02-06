@@ -6,6 +6,7 @@ import { expect } from "chai";
 import { Options as AjvOptions } from "ajv";
 import { TestExecutor } from "./testExecutor";
 import { AssertionHandler } from "./assertionHandler";
+import { status } from "http-status";
 
 // unsupported methods
 const createInfiniteChainable = (methodName: string) => {
@@ -105,11 +106,10 @@ export class RQ implements SandboxAPI {
     if (!originalResponse) {
       return (this.response = undefined);
     }
-
     const responseProperties = {
       ...originalResponse,
       code: originalResponse.status,
-      status: originalResponse.statusText,
+      status: (status as { [key: number]: string })[originalResponse.status],
       responseTime: originalResponse.time,
     };
 
