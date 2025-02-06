@@ -14,7 +14,7 @@ export const StudentProgram: React.FC = () => {
         onClick={() => {
           trackStudentProgramClicked();
         }}
-        href="https://requestly.notion.site/Requestly-Student-Program-12dd193f3c998018ad45d31c784f3131"
+        href="https://requestly.com/student-program/"
       >
         Know more
       </a>
