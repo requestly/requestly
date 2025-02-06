@@ -3,6 +3,7 @@ import { FormatType } from "./types";
 import { RequestMethod, RQAPI } from "features/apiClient/types";
 import { TabsLayout } from "layouts/TabsLayout";
 import { REQUEST_METHOD_COLORS, REQUEST_METHOD_BACKGROUND_COLORS } from "../../../../constants/requestMethodColors";
+import PATHS from "config/constants/sub/paths";
 
 const getRequestMethodIcon = (historyItem: RQAPI.Entry) => (
   <p
@@ -25,7 +26,7 @@ const formatContentList = (list: TabsLayout.Tab[] | RQAPI.Entry[], type: FormatT
         id: "history",
         title: history.request.url,
         icon: getRequestMethodIcon(history),
-        url: "/api-client/history",
+        url: PATHS.API_CLIENT.HISTORY.ABSOLUTE,
         hasUnsavedChanges: false,
         timeStamp: Date.now(),
       }));
