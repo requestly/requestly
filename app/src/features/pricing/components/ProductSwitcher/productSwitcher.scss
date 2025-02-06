@@ -10,16 +10,22 @@
 
   &.in-modal {
     margin-top: 16px;
-    max-width: 385px;
+    max-width: 450px;
     padding: 4px;
     gap: 6.5px;
     background: rgba(255, 255, 255, 0.06);
     align-items: center;
     margin-bottom: 18px;
+    flex-basis: auto;
 
     .product-details {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
       flex-grow: 1;
       padding: 8px 11px;
+      flex-basis: 48%;
 
       .product-text {
         padding: 0;
@@ -28,6 +34,7 @@
           margin-bottom: 0;
         }
       }
+
       img {
         width: 24px;
         height: 24px;
