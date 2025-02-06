@@ -270,7 +270,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         })}
       </Space>
 
-      {planName === PRICING.PLAN_NAMES.PROFESSIONAL ? (
+      {[PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE].includes(planName) ? (
         <div className="student-plan-footer">
           <GiftIcon className="gift-plan-icon" width={16} height={16} />
           <a
