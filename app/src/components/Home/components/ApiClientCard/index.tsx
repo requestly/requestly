@@ -63,7 +63,7 @@ const ApiClientCard = () => {
           type="primary"
           overlayClassName="more-options"
           onClick={() => {
-            navigate("/api-client", { state: { action: "create", type: "api" } });
+            navigate(PATHS.API_CLIENT.ABSOLUTE, { state: { action: "create", type: "api" } });
           }}
           menu={{ items }}
           trigger={["click"]}

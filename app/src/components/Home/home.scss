@@ -16,7 +16,7 @@
     max-width: 960px;
     align-items: center;
     line-height: 22px;
-    font-size: 16px;
+    font-size: var(--requestly-font-size-base);
     font-weight: 500;
     span {
       b {
@@ -66,7 +66,7 @@
       }
       p {
         line-height: 17px;
-        font-size: 11px;
+        font-size: var(--requestly-font-size-xs);
         font-weight: 400;
         color: var(--text-subtle);
         margin: 0;
@@ -109,11 +109,11 @@
     }
     p {
       line-height: 17px;
-      font-size: 11px;
+      font-size: var(--requestly-font-size-xs);
       margin: 0;
 
       span {
-        color: #8f8f8f;
+        color: var(--requestly-color-neutral-400);
       }
     }
   }
@@ -161,7 +161,7 @@
 
 .content-container {
   border-radius: 16px;
-  background: var(--alias-tokens-color-surface-0, #212121);
+  background: var(--requestly-color-neutral-900);
   padding: 24px;
   width: 456px;
 
