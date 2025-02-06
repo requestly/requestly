@@ -56,11 +56,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
         hasUnsavedChanges={hasUnsavedChanges}
         isSaving={isSaving}
       />
-      <VariablesList
-        variables={collectionVariables[collection.id]?.variables || {}}
-        onVariablesChange={setPendingVariables}
-        searchValue={searchValue}
-      />
+      <VariablesList variables={pendingVariables} onVariablesChange={setPendingVariables} searchValue={searchValue} />
     </div>
   );
 };

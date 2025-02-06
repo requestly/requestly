@@ -119,7 +119,11 @@ export const EnvironmentView = () => {
                 onExportClick: () => setIsExportModalOpen(true),
               }}
             />
-            <VariablesList searchValue={searchValue} variables={variables} onVariablesChange={setPendingVariables} />
+            <VariablesList
+              searchValue={searchValue}
+              variables={pendingVariables}
+              onVariablesChange={setPendingVariables}
+            />
             {isExportModalOpen && (
               <ApiClientExportModal
                 exportType="environment"
