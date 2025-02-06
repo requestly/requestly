@@ -1,9 +1,10 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TabsLayout, TabsLayoutContextInterface } from "../types";
-import { useDispatch, useSelector } from "react-redux";
-import { getActiveTab, getTabs, tabsLayoutActions } from "store/slices/tabs-layout";
+import { useDispatch } from "react-redux";
+import { tabsLayoutActions } from "store/slices/tabs-layout";
 import { TabsProps } from "antd";
+import { usePatchedTabs } from "./usePatchedTabs";
 
 const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
   tabs: [],
@@ -26,12 +27,12 @@ interface TabsLayoutProviderProps {
 export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children, id }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const tabs = useSelector(getTabs(id));
-  const activeTab = useSelector(getActiveTab(id));
   const [addTabBtnCallback, setAddTabBtnCallback] = useState(() => () => {});
 
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
+
+  const { tabs, activeTab } = usePatchedTabs(id);
 
   useEffect(() => {
     if (!activeTab) {
