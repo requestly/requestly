@@ -27,7 +27,7 @@ export const trackGetFreeTrialClicked = (source: string) => {
   trackEvent(PRICING_STUDENT_PROGRAM.PRICING_GET_FREE_TRIAL_CLICKED, params);
 };
 
-export const trackStudentProgramClicked = () => {
-  const params = {};
+export const trackStudentProgramClicked = (source: string) => {
+  const params = { source };
   trackEvent(PRICING_STUDENT_PROGRAM.PRICING_STUDENT_PROGRAM_CLICKED, params);
 };
