@@ -1,5 +1,5 @@
 .pricing-modal-wrapper {
-  height: calc(100% - 62px);
+  height: 100%;
   overflow: auto;
 
   .ant-typography.title {
@@ -41,7 +41,7 @@
   overflow: hidden;
 
   .plan-card {
-    padding: 24px;
+    padding-top: 24px;
 
     .plan-card-middle-section {
       .plan-name {
@@ -49,8 +49,12 @@
       }
     }
 
+    .plan-card-details {
+      padding-bottom: 13px;
+    }
+
     .plan-features-list {
-      margin-top: 32px;
+      margin-top: 18px;
     }
 
     .pro-basic-feature-title {

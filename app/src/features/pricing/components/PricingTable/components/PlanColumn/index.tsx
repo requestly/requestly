@@ -255,20 +255,23 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           />
         </Row>
       </div>
-      <>{renderFeaturesListHeader(planName)}</>
-      <Space direction="vertical" className="plan-features-list">
-        {planDetails.features.map((feature: any, index: number) => {
-          if (isOpenedFromModal && feature.visibleInPricingPageOnly) return null;
-          return (
-            <div className={`text-left plan-feature-item ${feature.tooltip ? "underlined" : ""}`} key={index}>
-              {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />}{" "}
-              <Tooltip title={feature?.tooltip} color="var(--black)">
-                <span className={`${feature?.tooltip ? "plan-feature-underline" : ""}`}>{feature.title}</span>
-              </Tooltip>
-            </div>
-          );
-        })}
-      </Space>
+
+      <div className="plan-card-details">
+        <>{renderFeaturesListHeader(planName)}</>
+        <Space direction="vertical" className="plan-features-list">
+          {planDetails.features.map((feature: any, index: number) => {
+            if (isOpenedFromModal && feature.visibleInPricingPageOnly) return null;
+            return (
+              <div className={`text-left plan-feature-item ${feature.tooltip ? "underlined" : ""}`} key={index}>
+                {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />}{" "}
+                <Tooltip title={feature?.tooltip} color="var(--black)">
+                  <span className={`${feature?.tooltip ? "plan-feature-underline" : ""}`}>{feature.title}</span>
+                </Tooltip>
+              </div>
+            );
+          })}
+        </Space>
+      </div>
 
       {[PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE].includes(planName) ? (
         <div className="student-plan-footer">
