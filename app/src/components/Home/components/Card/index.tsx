@@ -3,20 +3,28 @@ import { Link } from "react-router-dom";
 import { Spin } from "antd";
 import { HomepageEmptyCard } from "../EmptyCard";
 import { m, AnimatePresence } from "framer-motion";
-// @ts-ignore
 import { CardType } from "./types";
+import { Rule } from "@requestly/shared/types/entities/rules";
+import { TabsLayout } from "layouts/TabsLayout";
 
 interface CardProps {
   contentLoading?: boolean;
   wrapperClass?: string;
-  emptyCardOptions: any;
-  cardType: string;
+  emptyCardOptions: {
+    title: string;
+    description: string;
+    icon: string;
+    features: string[];
+    playIcon: { src: string; label: string; time: string };
+    primaryAction: React.ReactNode;
+  };
+  cardType: CardType;
   title: string;
   cardIcon?: string;
   bodyTitle?: string;
   actionButtons: React.ReactNode;
-  contentList?: Array<any>;
-  listItemClickHandler?: (listItem: any) => void;
+  contentList?: Rule[] | TabsLayout.Tab[];
+  listItemClickHandler?: (listItem: Rule | TabsLayout.Tab) => void;
   viewAllCta?: string;
   viewAllCtaLink?: string;
   viewAllCtaOnClick?: () => void;
@@ -37,7 +45,7 @@ export const Card: React.FC<CardProps> = ({
   viewAllCtaLink,
   viewAllCtaOnClick,
 }) => {
-  const MAX_RULES_TO_SHOW = 5;
+  const MAX_LIST_ITEMS_TO_SHOW = 5;
 
   if (contentLoading)
     return (
@@ -63,7 +71,7 @@ export const Card: React.FC<CardProps> = ({
             <div className="middle-section">
               <h2>{bodyTitle}</h2>
               <div className="list">
-                {contentList.slice(0, MAX_RULES_TO_SHOW).map((listItem: any, index: number) => (
+                {contentList.slice(0, MAX_LIST_ITEMS_TO_SHOW).map((listItem: any, index: number) => (
                   <div key={index} className="list-item" onClick={() => listItemClickHandler(listItem)}>
                     <div className="list-item-icon">{listItem.icon}</div>
                     <p className="item-title"> {listItem.title}</p>
@@ -72,7 +80,7 @@ export const Card: React.FC<CardProps> = ({
               </div>
             </div>
             <div className="footer-section">
-              {contentList.length > MAX_RULES_TO_SHOW && (
+              {contentList.length > MAX_LIST_ITEMS_TO_SHOW && (
                 <Link className="view-all-cta" to={viewAllCtaLink} onClick={viewAllCtaOnClick}>
                   {viewAllCta}
                 </Link>
