@@ -57,7 +57,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
     if (user?.loggedIn && isCompanyEmail(user?.details?.profile?.email) && user?.details?.profile?.isEmailVerified) {
       dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.TEAMS));
     } else {
-      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+      dispatch(globalActions.updateAppOnboardingCompleted());
     }
   }, [dispatch, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified, user?.loggedIn]);
 

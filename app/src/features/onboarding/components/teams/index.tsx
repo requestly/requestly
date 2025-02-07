@@ -53,7 +53,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
       if (res?.pendingInvites?.length > 0) setIsLoading(false);
       else {
         setIsLoading(false);
-        dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+        dispatch(globalActions.updateAppOnboardingCompleted());
       }
     },
     [dispatch]
@@ -67,7 +67,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
 
     if (!isCompanyEmail(user?.details?.profile?.email) || !user?.details?.profile?.isEmailVerified) {
       setIsLoading(false);
-      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+      dispatch(globalActions.updateAppOnboardingCompleted());
       return;
     }
 
