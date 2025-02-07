@@ -151,7 +151,7 @@ const PricingPageFooter: React.FC = () => {
                 <Link target="_blank" href="https://requestly.com/blog/">
                   Blog
                 </Link>
-                <Link target="_blank" href="https://developers.requestly.com/">
+                <Link target="_blank" href="https://docs.requestly.com/">
                   Documentation
                 </Link>
                 <Link
