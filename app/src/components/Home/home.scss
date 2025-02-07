@@ -31,6 +31,7 @@
   & .homepage-primary-cards-wrapper {
     gap: 48px;
     justify-content: center;
+    align-items: flex-start;
     margin-top: 40px;
 
     & > .ant-col {
@@ -248,6 +249,8 @@
 
   .footer-section {
     .view-all-cta {
+      display: block;
+      margin-top: 32px;
       line-height: 18px;
       font-size: 12px;
       color: var(--requestly-color-primary-text);
