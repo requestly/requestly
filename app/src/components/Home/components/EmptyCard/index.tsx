@@ -1,4 +1,6 @@
 import React, { ReactNode } from "react";
+import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
+import { RQButton, RQDropdown } from "lib/design-system/components";
 
 interface Props {
   icon: string | ReactNode;
@@ -7,9 +9,18 @@ interface Props {
   description?: string;
   primaryAction?: ReactNode;
   playIcon?: { src: string; label: string; time: string };
+  importDropdownOptions: any;
 }
 
-export const HomepageEmptyCard: React.FC<Props> = ({ icon, title, description, features, primaryAction, playIcon }) => {
+export const HomepageEmptyCard: React.FC<Props> = ({
+  icon,
+  title,
+  description,
+  features,
+  primaryAction,
+  playIcon,
+  importDropdownOptions,
+}) => {
   return (
     <>
       <div className="homepage-emptycard">
@@ -37,6 +48,16 @@ export const HomepageEmptyCard: React.FC<Props> = ({ icon, title, description, f
         </div>
       </div>
       <div className="action-section">{primaryAction}</div>
+      <div className="import-dropdown">
+        <span className="import-dropdown-label">Import from</span>
+        <RQDropdown menu={{ items: importDropdownOptions.menu }} trigger={["click"]}>
+          <RQButton>
+            <img src={importDropdownOptions.icon} alt={importDropdownOptions.label} />
+            {importDropdownOptions.label}
+            <MdOutlineKeyboardArrowDown />
+          </RQButton>
+        </RQDropdown>
+      </div>
     </>
   );
 };

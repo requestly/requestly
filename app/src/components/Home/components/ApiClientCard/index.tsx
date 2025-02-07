@@ -19,6 +19,14 @@ import "./apiClientCard.scss";
 import { Card } from "../Card";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { CardType } from "../Card/types";
+import { ImporterTypes } from "features/apiClient/types";
+import Postman from "./assets/postman-icon.svg?react";
+import RqIcon from "./assets/requestly-icon.svg?react";
+import importIcon from "./assets/import-icon.svg";
+import { SiBruno } from "@react-icons/all-files/si/SiBruno";
+import { RQDropdown } from "lib/design-system/components";
+import { RQButton } from "lib/design-system-v2/components";
+import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 
 interface CardOptions {
   contentList: TabsLayout.Tab[];
@@ -49,6 +57,43 @@ const ApiClientCard = () => {
     },
   ];
 
+  const IMPORT_OPTIONS = [
+    {
+      key: "1",
+      label: "Postman",
+      icon: <Postman />,
+      onClick: () =>
+        navigate(
+          PATHS.API_CLIENT.ABSOLUTE,
+          user?.details?.isLoggedIn ? { state: { modal: ImporterTypes.POSTMAN } } : {}
+        ),
+    },
+    {
+      key: "2",
+      label: "Bruno",
+      icon: <SiBruno />,
+      onClick: () =>
+        navigate(PATHS.API_CLIENT.ABSOLUTE, user?.details?.isLoggedIn ? { state: { modal: ImporterTypes.BRUNO } } : {}),
+    },
+    {
+      key: "3",
+      label: "cURL",
+      icon: <MdOutlineSyncAlt />,
+      onClick: () =>
+        navigate(PATHS.API_CLIENT.ABSOLUTE, user?.details?.isLoggedIn ? { state: { modal: ImporterTypes.CURL } } : {}),
+    },
+    {
+      key: "4",
+      label: "Requestly",
+      icon: <RqIcon />,
+      onClick: () =>
+        navigate(
+          PATHS.API_CLIENT.ABSOLUTE,
+          user?.details?.isLoggedIn ? { state: { modal: ImporterTypes.REQUESTLY } } : {}
+        ),
+    },
+  ];
+
   return (
     <Card
       wrapperClass={`${cardOptions?.type === FormatType.HISTORY ? "history-card" : ""} api-client-card`}
@@ -58,18 +103,26 @@ const ApiClientCard = () => {
       bodyTitle={cardOptions?.bodyTitle}
       contentList={isLoggedIn ? cardOptions?.contentList : []}
       actionButtons={
-        <DropdownButton
-          icon={<MdOutlineKeyboardArrowDown />}
-          type="primary"
-          overlayClassName="more-options"
-          onClick={() => {
-            navigate(PATHS.API_CLIENT.ABSOLUTE, { state: { action: "create", type: "api" } });
-          }}
-          menu={{ items }}
-          trigger={["click"]}
-        >
-          {"New Request"}
-        </DropdownButton>
+        <>
+          <RQDropdown menu={{ items: IMPORT_OPTIONS }} trigger={["click"]}>
+            <RQButton type="transparent" className="import-dropdown-trigger">
+              <MdOutlineFileUpload />
+              Import
+            </RQButton>
+          </RQDropdown>
+          <DropdownButton
+            icon={<MdOutlineKeyboardArrowDown />}
+            type="primary"
+            overlayClassName="more-options"
+            onClick={() => {
+              navigate("/api-client", { state: { action: "create", type: "api" } });
+            }}
+            menu={{ items }}
+            trigger={["click"]}
+          >
+            {"New Request"}
+          </DropdownButton>
+        </>
       }
       listItemClickHandler={(item: TabsLayout.Tab) => {
         navigate(item.url);
@@ -79,6 +132,7 @@ const ApiClientCard = () => {
       viewAllCtaLink={PATHS.API_CLIENT.ABSOLUTE}
       emptyCardOptions={{
         ...PRODUCT_FEATURES.API_CLIENT,
+        importDropdownOptions: { menu: IMPORT_OPTIONS, label: "Postman, Bruno & more", icon: importIcon },
         primaryAction: (
           <div className="new-request-cta" onClick={() => navigate(PATHS.API_CLIENT.ABSOLUTE)}>
             <MdOutlineSyncAlt /> Create or test an API

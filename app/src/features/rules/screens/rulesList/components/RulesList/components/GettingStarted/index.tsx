@@ -101,6 +101,27 @@ export const GettingStarted: React.FC = () => {
   };
 
   useEffect(() => {
+    if (state?.modal) {
+      switch (state?.modal) {
+        case "CHARLES":
+          toggleImportCharlesRulesModal();
+          break;
+        case "MOD_HEADER":
+          toggleImportModheaderRulesModal();
+          break;
+        case "RESOURCE_OVERRIDE":
+          toggleImportResourceOverrideRulesModal();
+          break;
+        case "REQUESTLY":
+          handleUploadRulesClick();
+          break;
+        default:
+          break;
+      }
+    }
+  }, [state?.modal]);
+
+  useEffect(() => {
     if (gettingStartedVideo.current) {
       gettingStartedVideo.current.addEventListener("play", () => {
         trackGettingStartedVideoPlayed();

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Dropdown, DropdownProps } from "antd";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -6,7 +6,7 @@ import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { ApiClientSidebarTabKey } from "../../APIClientSidebar";
-import { RQAPI } from "features/apiClient/types";
+import { ImporterTypes, RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import {
   trackImportApiCollectionsClicked,
@@ -28,6 +28,7 @@ import { PostmanImporterModal } from "../../../modals/postmanImporterModal/Postm
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useLocation } from "react-router-dom";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -52,6 +53,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   onClearHistory,
 }) => {
   const dispatch = useDispatch();
+  const { state } = useLocation();
   const user = useSelector(getUserAuthDetails);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
@@ -291,6 +293,24 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       },
     },
   ];
+
+  useEffect(() => {
+    if (state?.modal) {
+      switch (state?.modal) {
+        case ImporterTypes.BRUNO:
+          setIsBrunoImporterModalOpen(true);
+          break;
+        case ImporterTypes.POSTMAN:
+          setIsPostmanImporterModalOpen(true);
+          break;
+        case ImporterTypes.REQUESTLY:
+          setIsImportModalOpen(true);
+          break;
+        default:
+          break;
+      }
+    }
+  }, [state?.modal]);
 
   return (
     <>

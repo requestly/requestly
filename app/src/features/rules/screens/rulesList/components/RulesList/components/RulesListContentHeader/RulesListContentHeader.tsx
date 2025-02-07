@@ -5,7 +5,7 @@ import AuthPopoverButton from "components/features/rules/RulesListContainer/Rule
 import { ContentListHeader, ContentListHeaderProps, FilterType } from "componentsV2/ContentList";
 import { RecordStatus, StorageRecord } from "@requestly/shared/types/entities/rules";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { isRule } from "features/rules/utils";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -19,6 +19,7 @@ import { MdOutlineToggleOn } from "@react-icons/all-files/md/MdOutlineToggleOn";
 import { RuleSelectionList } from "../RuleSelectionList/RuleSelectionList";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
 import { RQButton } from "lib/design-system-v2/components";
+import { useLocation } from "react-router-dom";
 
 interface Props {
   searchValue: string;
@@ -29,6 +30,7 @@ interface Props {
 
 const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, filter, records }) => {
   const user = useSelector(getUserAuthDetails);
+  const { state } = useLocation();
   const debouncedTrackRulesListSearched = useDebounce(trackRulesListSearched, 500);
   const isRedirectFromCreateRulesRoute = useIsRedirectFromCreateRulesRoute();
   const [isRuleDropdownOpen, setIsRuleDropdownOpen] = useState(isRedirectFromCreateRulesRoute || false);
@@ -173,6 +175,12 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
     ],
     [records]
   );
+
+  useEffect(() => {
+    if (state?.modal === "REQUESTLY") {
+      importRecordsAction();
+    }
+  }, [state?.modal]);
 
   return (
     <ContentListHeader
