@@ -9,9 +9,11 @@ import { PRICING } from "features/pricing/constants/pricing";
 import { PricingPlans } from "features/pricing/constants/pricingPlans";
 import underlineIcon from "features/pricing/assets/yellow-highlight.svg";
 import checkIcon from "assets/img/icons/common/check.svg";
-import { trackPricingPlansQuantityChanged } from "features/pricing/analytics";
+import { trackGetFreeTrialClicked, trackPricingPlansQuantityChanged } from "features/pricing/analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
+import GiftIcon from "../../../../assets/gift-icon.svg?react";
+import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
 
 interface PlanColumnProps {
   planName: string;
@@ -253,20 +255,45 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           />
         </Row>
       </div>
-      <>{renderFeaturesListHeader(planName)}</>
-      <Space direction="vertical" className="plan-features-list">
-        {planDetails.features.map((feature: any, index: number) => {
-          if (isOpenedFromModal && feature.visibleInPricingPageOnly) return null;
-          return (
-            <div className={`text-left plan-feature-item ${feature.tooltip ? "underlined" : ""}`} key={index}>
-              {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />}{" "}
-              <Tooltip title={feature?.tooltip} color="var(--black)">
-                <span className={`${feature?.tooltip ? "plan-feature-underline" : ""}`}>{feature.title}</span>
-              </Tooltip>
-            </div>
-          );
-        })}
-      </Space>
+
+      <div className="plan-card-details">
+        <>{renderFeaturesListHeader(planName)}</>
+        <Space direction="vertical" className="plan-features-list">
+          {planDetails.features.map((feature: any, index: number) => {
+            if (isOpenedFromModal && feature.visibleInPricingPageOnly) return null;
+            return (
+              <div className={`text-left plan-feature-item ${feature.tooltip ? "underlined" : ""}`} key={index}>
+                {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />}{" "}
+                <Tooltip title={feature?.tooltip} color="var(--black)">
+                  <span className={`${feature?.tooltip ? "plan-feature-underline" : ""}`}>{feature.title}</span>
+                </Tooltip>
+              </div>
+            );
+          })}
+        </Space>
+      </div>
+
+      {[PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE].includes(planName) ? (
+        <div className="student-plan-footer">
+          <GiftIcon className="gift-plan-icon" width={16} height={16} />
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://rqst.ly/accelerator-program"
+            onClick={() => {
+              trackGetFreeTrialClicked(source);
+            }}
+          >
+            Get Requestly free for 1 year!
+          </a>
+          <Tooltip
+            color="var(--black)"
+            title="Unlimited access, no cost, no commitment — perfect for individuals and teams evaluating their next API tool."
+          >
+            <MdOutlineHelpOutline className="info-icon" />
+          </Tooltip>
+        </div>
+      ) : null}
     </Col>
   );
 };

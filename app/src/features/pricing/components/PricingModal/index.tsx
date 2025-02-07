@@ -16,6 +16,7 @@ import { trackCheckoutFailedEvent, trackCheckoutInitiated } from "modules/analyt
 import { PricingModalFooterBanner } from "./components/FooterBanner";
 import "./index.scss";
 import ProductSwitcher from "../ProductSwitcher";
+import { StudentProgram } from "../PricingPage/components/StudentProgram";
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -166,10 +167,12 @@ export const PricingModal: React.FC<PricingModalProps> = ({
         ) : (
           <>
             <Row className="display-row-center" style={{ paddingTop: "1rem" }}>
-              <Typography.Title level={4}>{title}</Typography.Title>
+              <Typography.Title level={4} className="title">
+                {title}
+              </Typography.Title>
             </Row>
             <ProductSwitcher isOpenedFromModal activeProduct={activeProduct} setActiveProduct={setActiveProduct} />
-            <Row justify="center" className="display-row-center w-full mt-8" gutter={24}>
+            <Row justify="center" className="display-row-center w-full" gutter={24}>
               <Col className="display-row-center plan-duration-switch-container">
                 <Switch
                   size="small"
@@ -211,6 +214,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
               source={source}
               product={activeProduct}
             />
+            <StudentProgram source={source} />
             <CompaniesSection />
             <PricingModalFooterBanner />
           </>
