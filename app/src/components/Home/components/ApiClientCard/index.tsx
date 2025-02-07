@@ -21,9 +21,9 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { CardType } from "../Card/types";
 import { ImporterTypes } from "features/apiClient/types";
 import Postman from "./assets/postman-icon.svg?react";
-import RqIcon from "./assets/requestly-icon.svg?react";
+import rqIcon from "./assets/requestly-icon.svg";
 import importIcon from "./assets/import-icon.svg";
-import { SiBruno } from "@react-icons/all-files/si/SiBruno";
+import brunoIcon from "./assets/burno-icon.png";
 import { RQDropdown } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
@@ -71,7 +71,7 @@ const ApiClientCard = () => {
     {
       key: "2",
       label: "Bruno",
-      icon: <SiBruno />,
+      icon: <img src={brunoIcon} alt="Bruno" />,
       onClick: () =>
         navigate(PATHS.API_CLIENT.ABSOLUTE, user?.details?.isLoggedIn ? { state: { modal: ImporterTypes.BRUNO } } : {}),
     },
@@ -85,7 +85,7 @@ const ApiClientCard = () => {
     {
       key: "4",
       label: "Requestly",
-      icon: <RqIcon />,
+      icon: <img src={rqIcon} alt="Requestly" />,
       onClick: () =>
         navigate(
           PATHS.API_CLIENT.ABSOLUTE,
