@@ -6,7 +6,7 @@ interface Props {
   features: string[];
   description?: string;
   primaryAction?: ReactNode;
-  playIcon?: { src: string; label: string; time: string };
+  playIcon?: { src: string; label: string; url: string };
 }
 
 export const HomepageEmptyCard: React.FC<Props> = ({ icon, title, description, features, primaryAction, playIcon }) => {
@@ -29,12 +29,10 @@ export const HomepageEmptyCard: React.FC<Props> = ({ icon, title, description, f
             <li>{feature}</li>
           ))}
         </ul>
-        <div className="play-icon">
+        <a className="play-icon" href={playIcon.url} target="__blank">
           <img src={playIcon.src} alt="Play" />
-          <p>
-            {playIcon.label} <span>{playIcon.time}</span>
-          </p>
-        </div>
+          <p>{playIcon.label}</p>
+        </a>
       </div>
       <div className="action-section">{primaryAction}</div>
     </>
