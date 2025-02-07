@@ -15,7 +15,7 @@ interface CardProps {
     description: string;
     icon: string;
     features: string[];
-    playIcon: { src: string; label: string; time: string };
+    playIcon: { src: string; label: string; url: string };
     primaryAction: React.ReactNode;
     importDropdownOptions: {
       label: string;
