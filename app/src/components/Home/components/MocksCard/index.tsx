@@ -134,7 +134,7 @@ export const MocksCard: React.FC = () => {
               className="homepage-empty-card-secondary-btn"
               onClick={() => {
                 trackHomeMockActionClicked("learn_more");
-                window.open("https://developers.requestly.io/mock-server/overview/", "_blank");
+                window.open("https://docs.requestly.com/general/mock-server/overview/", "_blank");
               }}
             >
               Learn more
