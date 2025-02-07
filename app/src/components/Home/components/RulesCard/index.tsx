@@ -74,7 +74,7 @@ export const RulesCard = () => {
       cardIcon={rulesIcon}
       contentLoading={isLoading || isRulesLoading}
       cardType={CardType.RULES}
-      listItemClickHandler={(item) => {
+      listItemClickHandler={(item: Rule) => {
         trackHomeRulesActionClicked("rule_name");
         trackRuleCreationWorkflowStartedEvent(item.ruleType, SOURCE.HOME_SCREEN);
         redirectToRuleEditor(navigate, item.id, SOURCE.HOME_SCREEN);
