@@ -9,16 +9,16 @@ export const PRODUCT_FEATURES = {
     description: "Intercept, debug and modify HTTP requests",
     icon: rulesIcon,
     features: [
-      "Monitor HTTP/S requests and responses easily.",
-      "Map local files or redirect URLs.",
-      "Modify XHR or Fetch responses quickly.",
+      "Map local files or redirect API/JS requests between environments..",
+      "Mock XHR & Fetch requests by stubbing API responses.",
+      "Modify URLs or swap hosts/domains.",
       "Customize request and response headers.",
-      "Update hostnames or modify URL strings.",
+      "Inject custom JavaScript or CSS into any website.",
     ],
     playIcon: {
       src: PlayIconRules,
       label: "See in action ",
-      time: "(2 mins)",
+      url: "https://www.youtube.com/playlist?list=PLmHjVvTu_7ddFIIT9AkZ7p0lrC5gBuyb6",
     },
   },
   API_CLIENT: {
@@ -26,16 +26,16 @@ export const PRODUCT_FEATURES = {
     description: "Design, manage, and test APIs easily",
     icon: apiClientIcon,
     features: [
-      "Send API requests and test endpoints easily.",
+      "Send API requests and test endpoints effortlessly.",
       "Execute cURL requests directly in the client.",
-      "Explore pre-built example collections quickly.",
-      "Import API end-points from cURL",
-      "One-click import from Postman and Insomnia",
+      "Organize requests into collections.",
+      "Use environments and variables for dynamic testing.",
+      "Collaborate seamlessly in team workspaces.",
     ],
     playIcon: {
       src: PlayIconApi,
       label: "See in action ",
-      time: "(4 mins)",
+      url: "https://www.youtube.com/watch?v=xrqmAffe86k",
     },
   },
 };

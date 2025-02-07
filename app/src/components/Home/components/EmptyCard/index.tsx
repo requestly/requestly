@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import { RQButton, RQDropdown } from "lib/design-system/components";
+import { DropDownProps } from "antd";
 
 interface Props {
   icon: string | ReactNode;
@@ -8,8 +9,12 @@ interface Props {
   features: string[];
   description?: string;
   primaryAction?: ReactNode;
-  playIcon?: { src: string; label: string; time: string };
-  importDropdownOptions: any;
+  playIcon?: { src: string; label: string; url: string };
+  importDropdownOptions: {
+    label: string;
+    icon: string;
+    menu: DropDownProps["menu"]["items"];
+  };
 }
 
 export const HomepageEmptyCard: React.FC<Props> = ({
@@ -40,12 +45,10 @@ export const HomepageEmptyCard: React.FC<Props> = ({
             <li>{feature}</li>
           ))}
         </ul>
-        <div className="play-icon">
+        <a className="play-icon" href={playIcon.url} target="__blank">
           <img src={playIcon.src} alt="Play" />
-          <p>
-            {playIcon.label} <span>{playIcon.time}</span>
-          </p>
-        </div>
+          <p>{playIcon.label}</p>
+        </a>
       </div>
       <div className="action-section">{primaryAction}</div>
       <div className="import-dropdown">

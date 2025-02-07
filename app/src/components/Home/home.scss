@@ -102,6 +102,8 @@
   .play-icon {
     display: flex;
     align-items: center;
+    text-decoration: none;
+    color: unset;
     img {
       height: 24px;
       width: auto;
@@ -111,10 +113,6 @@
       line-height: 17px;
       font-size: var(--requestly-font-size-xs);
       margin: 0;
-
-      span {
-        color: var(--requestly-color-neutral-400);
-      }
     }
   }
 }
