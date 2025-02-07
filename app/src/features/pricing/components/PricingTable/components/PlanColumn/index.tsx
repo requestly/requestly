@@ -284,7 +284,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
               trackGetFreeTrialClicked(source);
             }}
           >
-            Try Requestly free for a year!
+            Get Requestly free for 1 year!
           </a>
           <Tooltip
             color="var(--black)"
