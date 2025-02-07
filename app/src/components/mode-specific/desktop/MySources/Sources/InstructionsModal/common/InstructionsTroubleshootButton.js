@@ -14,7 +14,7 @@ const getTroubleshootLink = (appId) => {
     case "manual-setup":
       return "https://docs.requestly.com/desktop-app/setup/terminal";
     default:
-      return "https://docs.requestly.io/";
+      return "https://docs.requestly.com/";
   }
 };
 

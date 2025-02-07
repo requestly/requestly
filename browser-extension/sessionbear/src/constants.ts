@@ -72,8 +72,7 @@ export const STORAGE_KEYS = {
 };
 
 export const LINKS = {
-  REQUESTLY_EXTENSION_TROUBLESHOOTING:
-    "https://docs.requestly.io/browser-extension/chrome/category/troubleshooting?source=popup",
+  REQUESTLY_EXTENSION_TROUBLESHOOTING: "https://docs.requestly.com/guides/troubleshooting/rules-not-working",
 };
 
 export const CUSTOM_ELEMENTS = {
