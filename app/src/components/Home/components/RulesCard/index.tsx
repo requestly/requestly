@@ -33,7 +33,6 @@ import ResourceOverride from "./assets/resource-override-icon.svg?react";
 import Charles from "./assets/charles-icon.svg?react";
 import importIcon from "./assets/importIcon.svg";
 import "./rulesCard.scss";
-import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { RQButton } from "lib/design-system-v2/components";
 
 export const RulesCard = () => {
@@ -110,6 +109,7 @@ export const RulesCard = () => {
       cardIcon={rulesIcon}
       contentLoading={isLoading || isRulesLoading}
       cardType={CardType.RULES}
+      importOptions={{ menu: IMPORT_OPTIONS, label: "Charles, ModHeader, & more", icon: importIcon }}
       listItemClickHandler={(item: Rule) => {
         trackHomeRulesActionClicked("rule_name");
         trackRuleCreationWorkflowStartedEvent(item.ruleType, SOURCE.HOME_SCREEN);
@@ -119,38 +119,28 @@ export const RulesCard = () => {
       viewAllCtaLink={PATHS.RULES.MY_RULES.ABSOLUTE}
       viewAllCtaOnClick={() => trackHomeRulesActionClicked("view_all_rules")}
       actionButtons={
-        <>
+        <RuleSelectionListDrawer
+          open={isRulesDrawerOpen}
+          onClose={onRulesDrawerClose}
+          source={SOURCE.HOME_SCREEN}
+          onRuleItemClick={onRulesDrawerClose}
+        >
           <RQButton
-            type="transparent"
-            className="import-dropdown-trigger"
-            onClick={() => navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal: "REQUESTLY" } })}
-          >
-            <MdOutlineFileUpload />
-            Import
-          </RQButton>
-          <RuleSelectionListDrawer
-            open={isRulesDrawerOpen}
-            onClose={onRulesDrawerClose}
-            source={SOURCE.HOME_SCREEN}
-            onRuleItemClick={onRulesDrawerClose}
-          >
-            <RQButton
-              type="primary"
-              onClick={() => {
-                trackHomeRulesActionClicked("create_new_rule");
-                trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
+            type="primary"
+            onClick={() => {
+              trackHomeRulesActionClicked("create_new_rule");
+              trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
 
-                if (isExtensionInstalled()) {
-                  setIsRulesDrawerOpen(true);
-                } else {
-                  dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
-                }
-              }}
-            >
-              New Rule
-            </RQButton>
-          </RuleSelectionListDrawer>
-        </>
+              if (isExtensionInstalled()) {
+                setIsRulesDrawerOpen(true);
+              } else {
+                dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
+              }
+            }}
+          >
+            New Rule
+          </RQButton>
+        </RuleSelectionListDrawer>
       }
       title={"HTTP Rules"}
       bodyTitle="Recent rules"
@@ -162,7 +152,6 @@ export const RulesCard = () => {
       }))}
       emptyCardOptions={{
         ...PRODUCT_FEATURES.RULES,
-        importDropdownOptions: { menu: IMPORT_OPTIONS, label: "Charles, ModHeader, & more", icon: importIcon },
         primaryAction: (
           <RuleSelectionListDrawer
             open={isRulesDrawerOpen}

@@ -177,7 +177,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
   );
 
   useEffect(() => {
-    if (state?.modal === "REQUESTLY") {
+    if (state?.modal) {
       importRecordsAction();
     }
   }, [state?.modal]);
