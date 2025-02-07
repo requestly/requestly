@@ -24,9 +24,6 @@ import Postman from "./assets/postman-icon.svg?react";
 import rqIcon from "./assets/requestly-icon.svg";
 import importIcon from "./assets/import-icon.svg";
 import brunoIcon from "./assets/burno-icon.png";
-import { RQDropdown } from "lib/design-system/components";
-import { RQButton } from "lib/design-system-v2/components";
-import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 
 interface CardOptions {
   contentList: TabsLayout.Tab[];
@@ -100,29 +97,22 @@ const ApiClientCard = () => {
       cardType={CardType.API_CLIENT}
       title={"API Client"}
       cardIcon={apiClientIcon}
+      importOptions={{ menu: IMPORT_OPTIONS, label: "Postman, Bruno & more", icon: importIcon }}
       bodyTitle={cardOptions?.bodyTitle}
       contentList={isLoggedIn ? cardOptions?.contentList : []}
       actionButtons={
-        <>
-          <RQDropdown menu={{ items: IMPORT_OPTIONS }} trigger={["click"]}>
-            <RQButton type="transparent" className="import-dropdown-trigger">
-              <MdOutlineFileUpload />
-              Import
-            </RQButton>
-          </RQDropdown>
-          <DropdownButton
-            icon={<MdOutlineKeyboardArrowDown />}
-            type="primary"
-            overlayClassName="more-options"
-            onClick={() => {
-              navigate("/api-client", { state: { action: "create", type: "api" } });
-            }}
-            menu={{ items }}
-            trigger={["click"]}
-          >
-            {"New Request"}
-          </DropdownButton>
-        </>
+        <DropdownButton
+          icon={<MdOutlineKeyboardArrowDown />}
+          type="primary"
+          overlayClassName="more-options"
+          onClick={() => {
+            navigate("/api-client", { state: { action: "create", type: "api" } });
+          }}
+          menu={{ items }}
+          trigger={["click"]}
+        >
+          {"New Request"}
+        </DropdownButton>
       }
       listItemClickHandler={(item: TabsLayout.Tab) => {
         navigate(item.url);
@@ -132,7 +122,6 @@ const ApiClientCard = () => {
       viewAllCtaLink={PATHS.API_CLIENT.ABSOLUTE}
       emptyCardOptions={{
         ...PRODUCT_FEATURES.API_CLIENT,
-        importDropdownOptions: { menu: IMPORT_OPTIONS, label: "Postman, Bruno & more", icon: importIcon },
         primaryAction: (
           <div className="new-request-cta" onClick={() => navigate(PATHS.API_CLIENT.ABSOLUTE)}>
             <MdOutlineSyncAlt /> Create or test an API
