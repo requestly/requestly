@@ -144,7 +144,7 @@ RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
     case "Response":
       testRuleWidget.setAttribute(
         "rq-test-rule-text",
-        `Response Modifications will not show up in the browser network devtools due to technical contraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-response-body/">details</a>.`
+        `Response Modifications will not show up in the browser network devtools due to technical contraints. Checkout docs for more <a target="_blank" href="https://docs.requestly.com/general/http-rules/rule-types/modify-response-body/">details</a>.`
       );
       break;
     case "Headers":
@@ -154,7 +154,7 @@ RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
       responseHeaderExists &&
         testRuleWidget.setAttribute(
           "rq-test-rule-text",
-          `Response Header Modifications will not show up in the browser network devtools due to technical constraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-headers/">details</a>.`
+          `Response Header Modifications will not show up in the browser network devtools due to technical constraints. Checkout docs for more <a target="_blank" href="https://docs.requestly.com/general/http-rules/rule-types/modify-headers/">details</a>.`
         );
       break;
     default:
