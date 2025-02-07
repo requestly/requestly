@@ -27,7 +27,7 @@ import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { Card } from "../Card";
 import rulesIcon from "./assets/rules-icon.svg";
 import { CardType } from "../Card/types";
-import RqIcon from "./assets/requestly-icon.svg?react";
+import rqIcon from "./assets/requestly-icon.svg";
 import ModHeader from "./assets/mod-header-icon.svg?react";
 import ResourceOverride from "./assets/resource-override-icon.svg?react";
 import Charles from "./assets/charles-icon.svg?react";
@@ -75,7 +75,7 @@ export const RulesCard = () => {
     {
       key: "4",
       label: "Requestly",
-      icon: <RqIcon />,
+      icon: <img src={rqIcon} alt="Requestly" />,
       onClick: () =>
         user?.details?.isLoggedIn
           ? navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal: "REQUESTLY" } })
