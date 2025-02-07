@@ -129,6 +129,26 @@
   cursor: pointer;
 }
 
+.import-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+
+  &-label {
+    margin-right: 12px;
+  }
+
+  .ant-dropdown-trigger {
+    display: flex;
+    gap: 8px;
+    height: 40px;
+    border-radius: 8px;
+    line-height: 18px;
+    font-size: 12px;
+  }
+}
+
 .homepage-card-loader {
   width: 456px;
   height: 100%;
@@ -181,10 +201,20 @@
         margin: 0;
       }
     }
+
+    .action-buttons {
+      display: flex;
+
+      .import-dropdown-trigger {
+        margin-right: 4px;
+        &:hover {
+          background: none;
+        }
+      }
+    }
   }
 
   .middle-section {
-    margin-bottom: 32px;
     h2 {
       line-height: 18px;
       font-size: 12px;
@@ -250,6 +280,7 @@
 
   .footer-section {
     .view-all-cta {
+      margin-top: 32px;
       line-height: 18px;
       font-size: 12px;
       color: var(--requestly-color-primary-text);

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Spin } from "antd";
+import { DropDownProps, Spin } from "antd";
 import { HomepageEmptyCard } from "../EmptyCard";
 import { m, AnimatePresence } from "framer-motion";
 import { CardType } from "./types";
@@ -17,6 +17,11 @@ interface CardProps {
     features: string[];
     playIcon: { src: string; label: string; time: string };
     primaryAction: React.ReactNode;
+    importDropdownOptions: {
+      label: string;
+      icon: string;
+      menu: DropDownProps["menu"]["items"];
+    };
   };
   cardType: CardType;
   title: string;
