@@ -2,7 +2,7 @@ import { RxJsonSchema } from "rxdb";
 import { RuleDataSyncEntity } from "@requestly/shared/types/syncEntities/rules";
 
 export const ruleDataSchema: RxJsonSchema<RuleDataSyncEntity> = {
-  version: 0,
+  version: 1,
   primaryKey: "id",
   type: "object",
   properties: {

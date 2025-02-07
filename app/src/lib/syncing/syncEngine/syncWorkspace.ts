@@ -1,5 +1,6 @@
-import { createRxDatabase, deepEqual, RxCollection, RxDatabase } from "rxdb";
+import { addRxPlugin, createRxDatabase, deepEqual, RxCollection, RxDatabase } from "rxdb";
 import { getRxStorageDexie } from "rxdb/plugins/storage-dexie";
+import { RxDBMigrationSchemaPlugin } from "rxdb/plugins/migration-schema";
 import { replicateRxCollection, RxReplicationState } from "rxdb/plugins/replication";
 import { Observable, Subject, Subscription } from "rxjs";
 import { omit } from "lodash";
@@ -9,6 +10,7 @@ import { ruleMetadataSchema } from "./entities/ruleMetadata";
 import { SyncEntityType, syncTypeToEntityMap } from "@requestly/shared/types/syncEntities";
 import { ReplicationConfig } from "./types";
 
+addRxPlugin(RxDBMigrationSchemaPlugin);
 class SyncWorkspace {
   userId: string | undefined;
   authToken: string = "";
@@ -79,9 +81,19 @@ class SyncWorkspace {
     this.collections = await this.database.addCollections({
       [SyncEntityType.RULE_DATA]: {
         schema: ruleDataSchema,
+        migrationStrategies: {
+          1: function (oldDoc) {
+            return oldDoc;
+          },
+        },
       },
       [SyncEntityType.RULE_METADATA]: {
         schema: ruleMetadataSchema,
+        migrationStrategies: {
+          1: function (oldDoc) {
+            return oldDoc;
+          },
+        },
       },
     });
     // #endregion
