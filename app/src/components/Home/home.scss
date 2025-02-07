@@ -1,5 +1,5 @@
 .homepage-wrapper {
-  background: var(--surface-0);
+  background-color: var(--requestly-color-background);
   display: flex;
   justify-content: center;
   height: 100%;
@@ -46,6 +46,7 @@
 
 .homepage-emptycard {
   width: 456px;
+  height: 322px;
   display: flex;
   flex-direction: column;
   margin-bottom: 32px;
@@ -188,6 +189,7 @@
   background: var(--requestly-color-neutral-900);
   padding: 24px;
   width: 456px;
+  height: 393px;
 
   .header-content {
     display: flex;
