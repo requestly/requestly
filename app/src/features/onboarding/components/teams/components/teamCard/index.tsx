@@ -11,7 +11,6 @@ import Logger from "lib/logger";
 import { LoadingOutlined } from "@ant-design/icons";
 import { BiCheckCircle } from "@react-icons/all-files/bi/BiCheckCircle";
 import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
-import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { globalActions } from "store/slices/global/slice";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { isNull } from "lodash";
@@ -63,7 +62,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJo
             res?.data?.data?.invite?.metadata?.teamAccessCount
           );
         }
-        dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+        dispatch(globalActions.updateAppOnboardingCompleted());
       })
       .catch((e) => {
         Logger.error(e);
