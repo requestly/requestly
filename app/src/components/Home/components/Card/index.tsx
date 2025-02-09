@@ -20,14 +20,14 @@ interface CardProps {
   };
   cardType: CardType;
   title: string;
-  cardIcon?: string;
-  bodyTitle?: string;
+  cardIcon: string;
+  bodyTitle: string;
   actionButtons: React.ReactNode;
-  contentList?: Rule[] | TabsLayout.Tab[];
-  listItemClickHandler?: (listItem: Rule | TabsLayout.Tab) => void;
-  viewAllCta?: string;
-  viewAllCtaLink?: string;
-  viewAllCtaOnClick?: () => void;
+  contentList: Rule[] | TabsLayout.Tab[];
+  listItemClickHandler: (listItem: Rule | TabsLayout.Tab) => void;
+  viewAllCta: string;
+  viewAllCtaLink: string;
+  viewAllCtaOnClick: () => void;
 }
 
 export const Card: React.FC<CardProps> = ({

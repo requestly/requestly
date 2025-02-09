@@ -33,7 +33,6 @@ const formatContentList = (list: TabsLayout.Tab[] | RQAPI.Entry[], type: FormatT
 };
 
 export const getOptions = (list: TabsLayout.Tab[] | RQAPI.Entry[], type: FormatType) => {
-  console.log(list, "list");
   const bodyTitle = type === FormatType.HISTORY ? "API History" : "Recent Tabs";
   const contentList = formatContentList(list, type);
   return { bodyTitle, contentList, type };

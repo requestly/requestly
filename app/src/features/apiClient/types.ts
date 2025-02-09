@@ -39,6 +39,12 @@ export enum QueryParamSyncType {
   TABLE = "table",
 }
 
+export enum CreateType {
+  API = "api",
+  COLLECTION = "collection",
+  ENVIRONMENT = "environment",
+}
+
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
 
 export namespace RQAPI {
