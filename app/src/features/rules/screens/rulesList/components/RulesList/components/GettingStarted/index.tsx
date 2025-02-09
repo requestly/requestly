@@ -45,6 +45,7 @@ import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFrom
 import "./gettingStarted.scss";
 import { RuleType } from "@requestly/shared/types/entities/rules";
 import { ImportFromResourceOverrideModal } from "../ImporterComponents/ResourceOverrideImporter";
+import { ImporterTypes } from "components/Home/types";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -103,16 +104,16 @@ export const GettingStarted: React.FC = () => {
   useEffect(() => {
     if (state?.modal) {
       switch (state?.modal) {
-        case "CHARLES":
+        case ImporterTypes.CHARLES:
           toggleImportCharlesRulesModal();
           break;
-        case "MOD_HEADER":
+        case ImporterTypes.MOD_HEADER:
           toggleImportModheaderRulesModal();
           break;
-        case "RESOURCE_OVERRIDE":
+        case ImporterTypes.RESOURCE_OVERRIDE:
           toggleImportResourceOverrideRulesModal();
           break;
-        case "REQUESTLY":
+        case ImporterTypes.REQUESTLY:
           handleUploadRulesClick();
           break;
         default:
