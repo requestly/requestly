@@ -2,6 +2,7 @@ import rulesIcon from "../RulesCard/assets/rules-icon.svg";
 import apiClientIcon from "../ApiClientCard/assets/api-client-icon.svg";
 import PlayIconRules from "../RulesCard/assets/play-rules.gif";
 import PlayIconApi from "../ApiClientCard/assets/play-api.gif";
+import { trackHomeApisActionClicked, trackHomeRulesActionClicked } from "components/Home/analytics";
 
 export const PRODUCT_FEATURES = {
   RULES: {
@@ -19,6 +20,7 @@ export const PRODUCT_FEATURES = {
       src: PlayIconRules,
       label: "See in action ",
       url: "https://www.youtube.com/playlist?list=PLmHjVvTu_7ddFIIT9AkZ7p0lrC5gBuyb6",
+      onClick: () => trackHomeRulesActionClicked("see_in_action"),
     },
   },
   API_CLIENT: {
@@ -36,6 +38,7 @@ export const PRODUCT_FEATURES = {
       src: PlayIconApi,
       label: "See in action ",
       url: "https://www.youtube.com/watch?v=xrqmAffe86k",
+      onClick: () => trackHomeApisActionClicked("see_in_action"),
     },
   },
 };
