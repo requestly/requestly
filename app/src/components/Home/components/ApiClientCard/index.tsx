@@ -38,6 +38,7 @@ const ApiClientCard = () => {
 
   const createNewHandler = useCallback((type: CreateType) => {
     navigate(PATHS.API_CLIENT.ABSOLUTE, { state: { action: "create", type } });
+    trackHomeApisActionClicked(`new_${type}_clicked`);
   }, []);
 
   const items: MenuProps["items"] = [
@@ -80,6 +81,7 @@ const ApiClientCard = () => {
       listItemClickHandler={(item: TabsLayout.Tab) => {
         navigate(item.url);
         dispatch(tabsLayoutActions.setActiveTab({ featureId: "apiClient", tab: { ...item } }));
+        trackHomeApisActionClicked("recent_tab_clicked");
       }}
       viewAllCta={"View all APIs"}
       viewAllCtaLink={PATHS.API_CLIENT.ABSOLUTE}
@@ -87,7 +89,13 @@ const ApiClientCard = () => {
       emptyCardOptions={{
         ...PRODUCT_FEATURES.API_CLIENT,
         primaryAction: (
-          <div className="new-request-cta" onClick={() => navigate(PATHS.API_CLIENT.ABSOLUTE)}>
+          <div
+            className="new-request-cta"
+            onClick={() => {
+              navigate(PATHS.API_CLIENT.ABSOLUTE);
+              trackHomeApisActionClicked("create/send_first_api");
+            }}
+          >
             <MdOutlineSyncAlt /> Create or test an API
           </div>
         ),

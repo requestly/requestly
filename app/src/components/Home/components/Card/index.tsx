@@ -15,7 +15,7 @@ interface CardProps {
     description: string;
     icon: string;
     features: string[];
-    playIcon: { src: string; label: string; url: string };
+    playIcon: { src: string; label: string; url: string; onClick: () => void };
     primaryAction: React.ReactNode;
   };
   cardType: CardType;
