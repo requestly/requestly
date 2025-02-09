@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getTabs, tabsLayoutActions } from "store/slices/tabs-layout";
 import { isEmpty } from "lodash";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { getOptions } from "./utils";
 import { FormatType } from "./types";
 import { TabsLayout } from "layouts/TabsLayout";
@@ -24,6 +24,8 @@ import Postman from "./assets/postman-icon.svg?react";
 import rqIcon from "./assets/requestly-icon.svg";
 import importIcon from "./assets/import-icon.svg";
 import brunoIcon from "./assets/burno-icon.png";
+import { CreateType } from "features/apiClient/types";
+import { trackHomeApisActionClicked } from "components/Home/analytics";
 
 interface CardOptions {
   contentList: TabsLayout.Tab[];
@@ -39,18 +41,23 @@ const ApiClientCard = () => {
   const tabs = useSelector(getTabs("apiClient"));
   const [cardOptions] = useState<CardOptions>(!isEmpty(tabs) ? getOptions(tabs, FormatType.TABS) : null);
 
+  const createNewHandler = useCallback((type: CreateType) => {
+    navigate(PATHS.API_CLIENT.ABSOLUTE, { state: { action: "create", type } });
+    trackHomeApisActionClicked(`new_${type}_clicked`);
+  }, []);
+
   const items: MenuProps["items"] = [
     {
       icon: <CgStack />,
       label: "Collection",
       key: "1",
-      onClick: () => navigate(PATHS.API_CLIENT.ABSOLUTE, { state: { action: "create", type: "collection" } }),
+      onClick: () => createNewHandler(CreateType.COLLECTION),
     },
     {
       icon: <MdHorizontalSplit />,
       label: "Environment",
       key: "2",
-      onClick: () => navigate(PATHS.API_CLIENT.ABSOLUTE, { state: { action: "create", type: "environment" } }),
+      onClick: () => createNewHandler(CreateType.ENVIRONMENT),
     },
   ];
 
@@ -106,7 +113,7 @@ const ApiClientCard = () => {
           type="primary"
           overlayClassName="more-options"
           onClick={() => {
-            navigate("/api-client", { state: { action: "create", type: "api" } });
+            createNewHandler(CreateType.API);
           }}
           menu={{ items }}
           trigger={["click"]}
@@ -117,13 +124,21 @@ const ApiClientCard = () => {
       listItemClickHandler={(item: TabsLayout.Tab) => {
         navigate(item.url);
         dispatch(tabsLayoutActions.setActiveTab({ featureId: "apiClient", tab: { ...item } }));
+        trackHomeApisActionClicked("recent_tab_clicked");
       }}
       viewAllCta={"View all APIs"}
       viewAllCtaLink={PATHS.API_CLIENT.ABSOLUTE}
+      viewAllCtaOnClick={() => trackHomeApisActionClicked("view_all_apis")}
       emptyCardOptions={{
         ...PRODUCT_FEATURES.API_CLIENT,
         primaryAction: (
-          <div className="new-request-cta" onClick={() => navigate(PATHS.API_CLIENT.ABSOLUTE)}>
+          <div
+            className="new-request-cta"
+            onClick={() => {
+              navigate(PATHS.API_CLIENT.ABSOLUTE);
+              trackHomeApisActionClicked("create/send_first_api");
+            }}
+          >
             <MdOutlineSyncAlt /> Create or test an API
           </div>
         ),

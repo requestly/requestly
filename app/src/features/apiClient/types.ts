@@ -46,6 +46,12 @@ export enum ImporterTypes {
   CURL = "CURL",
 }
 
+export enum CreateType {
+  API = "api",
+  COLLECTION = "collection",
+  ENVIRONMENT = "environment",
+}
+
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
 
 export namespace RQAPI {

@@ -9,7 +9,7 @@ interface Props {
   features: string[];
   description?: string;
   primaryAction?: ReactNode;
-  playIcon?: { src: string; label: string; url: string };
+  playIcon: { src: string; label: string; url: string; onClick: () => void };
   importDropdownOptions: {
     label: string;
     icon: string;
@@ -45,7 +45,7 @@ export const HomepageEmptyCard: React.FC<Props> = ({
             <li>{feature}</li>
           ))}
         </ul>
-        <a className="play-icon" href={playIcon.url} target="__blank">
+        <a className="play-icon" href={playIcon.url} target="__blank" onClick={playIcon.onClick}>
           <img src={playIcon.src} alt="Play" />
           <p>{playIcon.label}</p>
         </a>
