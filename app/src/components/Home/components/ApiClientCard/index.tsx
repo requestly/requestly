@@ -46,6 +46,11 @@ const ApiClientCard = () => {
     trackHomeApisActionClicked(`new_${type}_clicked`);
   }, []);
 
+  const importTriggerHandler = useCallback((modal: ImporterTypes) => {
+    navigate(PATHS.API_CLIENT.ABSOLUTE, user?.details?.isLoggedIn ? { state: { modal } } : {});
+    trackHomeApisActionClicked(`${modal.toLowerCase()}_importer_clicked`);
+  }, []);
+
   const items: MenuProps["items"] = [
     {
       icon: <CgStack />,
@@ -66,35 +71,25 @@ const ApiClientCard = () => {
       key: "1",
       label: "Postman",
       icon: <Postman />,
-      onClick: () =>
-        navigate(
-          PATHS.API_CLIENT.ABSOLUTE,
-          user?.details?.isLoggedIn ? { state: { modal: ImporterTypes.POSTMAN } } : {}
-        ),
+      onClick: () => importTriggerHandler(ImporterTypes.POSTMAN),
     },
     {
       key: "2",
       label: "Bruno",
       icon: <img src={brunoIcon} alt="Bruno" />,
-      onClick: () =>
-        navigate(PATHS.API_CLIENT.ABSOLUTE, user?.details?.isLoggedIn ? { state: { modal: ImporterTypes.BRUNO } } : {}),
+      onClick: () => importTriggerHandler(ImporterTypes.BRUNO),
     },
     {
       key: "3",
       label: "cURL",
       icon: <MdOutlineSyncAlt />,
-      onClick: () =>
-        navigate(PATHS.API_CLIENT.ABSOLUTE, user?.details?.isLoggedIn ? { state: { modal: ImporterTypes.CURL } } : {}),
+      onClick: () => importTriggerHandler(ImporterTypes.CURL),
     },
     {
       key: "4",
       label: "Requestly",
       icon: <img src={rqIcon} alt="Requestly" />,
-      onClick: () =>
-        navigate(
-          PATHS.API_CLIENT.ABSOLUTE,
-          user?.details?.isLoggedIn ? { state: { modal: ImporterTypes.REQUESTLY } } : {}
-        ),
+      onClick: () => importTriggerHandler(ImporterTypes.REQUESTLY),
     },
   ];
 

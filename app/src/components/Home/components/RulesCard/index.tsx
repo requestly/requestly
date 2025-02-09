@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsRulesListLoading } from "store/selectors";
@@ -34,6 +34,7 @@ import Charles from "./assets/charles-icon.svg?react";
 import importIcon from "./assets/importIcon.svg";
 import "./rulesCard.scss";
 import { RQButton } from "lib/design-system-v2/components";
+import { ImporterTypes } from "components/Home/types";
 
 export const RulesCard = () => {
   const MAX_RULES_TO_SHOW = 5;
@@ -52,33 +53,42 @@ export const RulesCard = () => {
     setIsRulesDrawerOpen(false);
   };
 
+  const importTriggerHandler = useCallback(
+    (modal: ImporterTypes) => {
+      if (modal === ImporterTypes.REQUESTLY && !user?.details?.isLoggedIn) {
+        dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+      } else {
+        navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal } });
+        trackHomeRulesActionClicked(`${modal.toLowerCase()}_importer_clicked`);
+      }
+    },
+    [user?.details?.isLoggedIn]
+  );
+
   const IMPORT_OPTIONS = [
     {
       key: "1",
       label: "Charles Proxy",
       icon: <Charles />,
-      onClick: () => navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal: "CHARLES" } }),
+      onClick: () => importTriggerHandler(ImporterTypes.CHARLES),
     },
     {
       key: "2",
       label: "Resource Override",
       icon: <ResourceOverride />,
-      onClick: () => navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal: "RESOURCE_OVERRIDE" } }),
+      onClick: () => importTriggerHandler(ImporterTypes.RESOURCE_OVERRIDE),
     },
     {
       key: "3",
       label: "ModHeader",
       icon: <ModHeader />,
-      onClick: () => navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal: "MOD_HEADER" } }),
+      onClick: () => importTriggerHandler(ImporterTypes.MOD_HEADER),
     },
     {
       key: "4",
       label: "Requestly",
       icon: <img src={rqIcon} alt="Requestly" />,
-      onClick: () =>
-        user?.details?.isLoggedIn
-          ? navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal: "REQUESTLY" } })
-          : dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true })),
+      onClick: () => importTriggerHandler(ImporterTypes.REQUESTLY),
     },
   ];
 
