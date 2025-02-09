@@ -111,7 +111,7 @@ export const RulesCard = () => {
       cardType={CardType.RULES}
       importOptions={{ menu: IMPORT_OPTIONS, label: "Charles, ModHeader, & more", icon: importIcon }}
       listItemClickHandler={(item: Rule) => {
-        trackHomeRulesActionClicked("rule_name");
+        trackHomeRulesActionClicked("rule_clicked");
         trackRuleCreationWorkflowStartedEvent(item.ruleType, SOURCE.HOME_SCREEN);
         redirectToRuleEditor(navigate, item.id, SOURCE.HOME_SCREEN);
       }}
@@ -128,7 +128,7 @@ export const RulesCard = () => {
           <RQButton
             type="primary"
             onClick={() => {
-              trackHomeRulesActionClicked("create_new_rule");
+              trackHomeRulesActionClicked("new_rule_button");
               trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
 
               if (isExtensionInstalled()) {
@@ -164,7 +164,7 @@ export const RulesCard = () => {
             <div
               className="add-cta"
               onClick={() => {
-                trackHomeRulesActionClicked("create_new_rule");
+                trackHomeRulesActionClicked("create_first_rule");
                 trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
 
                 if (isExtensionInstalled()) {
