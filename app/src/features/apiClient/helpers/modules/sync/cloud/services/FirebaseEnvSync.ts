@@ -1,5 +1,5 @@
 import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
-import { EnvironmentInterface } from "../../interfaces";
+import { ApiClientCloudMeta, EnvironmentInterface } from "../../interfaces";
 import {
   createNonGlobalEnvironmentInDB,
   deleteEnvironmentFromDB,
@@ -7,36 +7,41 @@ import {
   removeEnvironmentVariableFromDB,
   updateEnvironmentInDB,
 } from "backend/environment";
+import { getOwnerId } from "backend/utils";
 
-export class FirebaseEnvSync implements EnvironmentInterface {
-  ownerId: string;
+export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta> {
+  meta: ApiClientCloudMeta;
 
-  constructor(ownerId: string) {
-    this.ownerId = ownerId;
+  constructor(metadata: ApiClientCloudMeta) {
+    this.meta = metadata;
+  }
+
+  private getPrimaryId() {
+    return getOwnerId(this.meta.uid, this.meta.teamId);
   }
 
   async deleteEnvironment(envId: string): Promise<void> {
-    await deleteEnvironmentFromDB(this.ownerId, envId);
+    await deleteEnvironmentFromDB(this.getPrimaryId(), envId);
   }
   async createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData> {
-    return createNonGlobalEnvironmentInDB(this.ownerId, environmentName);
+    return createNonGlobalEnvironmentInDB(this.getPrimaryId(), environmentName);
   }
   async createGlobalEnvironment(): Promise<EnvironmentData> {
-    return createNonGlobalEnvironmentInDB(this.ownerId, "Global Environment");
+    return createNonGlobalEnvironmentInDB(this.getPrimaryId(), "Global Environment");
   }
 
   async duplicateEnvironment(environmentId: string, allEnvironments: EnvironmentMap): Promise<EnvironmentData> {
-    return duplicateEnvironmentInDB(this.ownerId, environmentId, allEnvironments);
+    return duplicateEnvironmentInDB(this.getPrimaryId(), environmentId, allEnvironments);
   }
 
   async removeVariableFromEnvironment(environmentId: string, key: string): Promise<void> {
-    await removeEnvironmentVariableFromDB(this.ownerId, { environmentId, key });
+    await removeEnvironmentVariableFromDB(this.getPrimaryId(), { environmentId, key });
   }
 
   async updateEnvironment(
     environmentId: string,
     updates: Partial<Pick<EnvironmentData, "name" | "variables">>
   ): Promise<void> {
-    await updateEnvironmentInDB(this.ownerId, environmentId, updates);
+    await updateEnvironmentInDB(this.getPrimaryId(), environmentId, updates);
   }
 }

@@ -4,7 +4,6 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
-import { getApiRecord } from "backend/apiClient";
 import Logger from "lib/logger";
 import "./apiClient.scss";
 
@@ -14,7 +13,13 @@ export const APIClient: React.FC<Props> = React.memo(() => {
   const location = useLocation();
   const { requestId } = useParams();
   const [searchParams] = useSearchParams();
-  const { apiClientRecords, history, selectedHistoryIndex, addToHistory } = useApiClientContext();
+  const {
+    apiClientRecords,
+    history,
+    selectedHistoryIndex,
+    addToHistory,
+    apiClientSyncRepository,
+  } = useApiClientContext();
 
   const [persistedRequestId, setPersistedRequestId] = useState<string>(() => requestId);
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
@@ -78,8 +83,10 @@ export const APIClient: React.FC<Props> = React.memo(() => {
       return;
     }
 
-    getApiRecord(persistedRequestId)
+    apiClientSyncRepository
+      .getRecord(persistedRequestId)
       .then((result) => {
+        console.log("OLA", { result });
         if (result.success) {
           isRequestFetched.current = true;
 
@@ -94,7 +101,7 @@ export const APIClient: React.FC<Props> = React.memo(() => {
         Logger.error("Error loading api record", error);
       })
       .finally(() => {});
-  }, [persistedRequestId, isCreateMode]);
+  }, [persistedRequestId, isCreateMode, apiClientSyncRepository]);
 
   const entryDetails = useMemo(() => (isHistoryPath ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord, [
     isHistoryPath,

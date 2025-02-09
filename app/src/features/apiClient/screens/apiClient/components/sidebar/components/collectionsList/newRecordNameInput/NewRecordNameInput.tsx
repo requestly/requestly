@@ -1,10 +1,8 @@
 import React, { useCallback, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { Input } from "antd";
-import { upsertApiRecord } from "backend/apiClient";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { toast } from "utils/Toast";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -36,9 +34,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
-  const { onSaveRecord } = useApiClientContext();
+  const { onSaveRecord, apiClientSyncRepository } = useApiClientContext();
   const { replaceTab, updateTab } = useTabsLayoutContext();
 
   const defaultRecordName = recordType === RQAPI.RecordType.API ? "Untitled request" : "New collection";
@@ -74,7 +70,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       record.collectionId = newRecordCollectionId;
     }
 
-    const result = await upsertApiRecord(uid, record, teamId);
+    const result = await apiClientSyncRepository.createRecord(record);
 
     if (result.success) {
       onSaveRecord(result.data);
@@ -109,13 +105,13 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     recordType,
     recordName,
     uid,
-    teamId,
     onSaveRecord,
     defaultRecordName,
     analyticEventSource,
     newRecordCollectionId,
     onSuccess,
     replaceTab,
+    apiClientSyncRepository,
   ]);
 
   const updateRecord = useCallback(async () => {
@@ -136,7 +132,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       name: recordName,
     };
 
-    const result = await upsertApiRecord(uid, record, teamId);
+    const result = await apiClientSyncRepository.updateRecord(record);
 
     if (result.success) {
       // False is passed to not open the tab when renaming the record from sidebar
@@ -158,7 +154,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
     setIsLoading(false);
     onSuccess?.();
-  }, [recordType, recordToBeEdited, recordName, uid, teamId, onSaveRecord, onSuccess, updateTab]);
+  }, [recordType, recordToBeEdited, recordName, uid, onSaveRecord, onSuccess, updateTab, apiClientSyncRepository]);
 
   const onBlur = isEditMode ? updateRecord : saveNewRecord;
 

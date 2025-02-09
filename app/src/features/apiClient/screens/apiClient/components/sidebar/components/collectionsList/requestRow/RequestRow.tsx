@@ -8,10 +8,6 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
-import { upsertApiRecord } from "backend/apiClient";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import {
@@ -30,9 +26,12 @@ interface Props {
 export const RequestRow: React.FC<Props> = ({ record, openTab }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
-  const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
-  const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
+  const {
+    updateRecordToBeDeleted,
+    setIsDeleteModalOpen,
+    onSaveRecord,
+    apiClientSyncRepository,
+  } = useApiClientContext();
 
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
@@ -41,7 +40,8 @@ export const RequestRow: React.FC<Props> = ({ record, openTab }) => {
         name: `(Copy) ${record.name || record.data.request.url}`,
       };
       delete newRecord.id;
-      return upsertApiRecord(user?.details?.profile?.uid, newRecord, team?.id)
+      return apiClientSyncRepository
+        .createRecord(newRecord)
         .then((result) => {
           if (!result.success) {
             throw new Error("Failed to duplicate request");
@@ -56,7 +56,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab }) => {
           trackDuplicateRequestFailed();
         });
     },
-    [team?.id, user?.details?.profile?.uid, onSaveRecord]
+    [onSaveRecord, apiClientSyncRepository]
   );
 
   const getRequestOptions = useCallback((): MenuProps["items"] => {

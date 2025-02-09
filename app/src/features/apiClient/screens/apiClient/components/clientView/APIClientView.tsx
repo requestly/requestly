@@ -33,8 +33,6 @@ import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
@@ -68,15 +66,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
-  const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
   const [searchParams] = useSearchParams();
   const isCreateMode = searchParams.has("create");
   const { requestId } = useParams();
 
   const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
-  const { apiClientRecords, onSaveRecord, apiClientWorkloadManager } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, apiClientWorkloadManager, apiClientSyncRepository } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const {
     getVariablesWithPrecedence,
@@ -373,14 +368,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.name = requestName;
     }
 
-    const args: Parameters<typeof upsertApiRecord> = [uid, record, teamId];
+    const args: Parameters<typeof apiClientSyncRepository.updateRecord> = [record];
 
     if (isCreateMode) {
       args.push(requestId);
       record.name = requestName;
     }
 
-    const result = await upsertApiRecord(...args);
+    const result = await apiClientSyncRepository.updateRecord(...args);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
@@ -408,13 +403,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.id = apiEntryDetails?.id;
     }
 
-    const args: Parameters<typeof upsertApiRecord> = [uid, record, teamId];
+    const args: Parameters<typeof apiClientSyncRepository.updateRecord> = [record];
 
     if (isCreateMode) {
       args.push(requestId);
     }
 
-    const result = await upsertApiRecord(...args);
+    const result = await apiClientSyncRepository.updateRecord(...args);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
@@ -430,7 +425,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
 
     setIsRequestSaving(false);
-  }, [entry, apiEntryDetails, onSaveRecord, setEntry, teamId, uid, resetChanges, isCreateMode, requestId]);
+  }, [entry, apiEntryDetails, onSaveRecord, setEntry, resetChanges, isCreateMode, requestId, apiClientSyncRepository]);
 
   const cancelRequest = useCallback(() => {
     apiClientExecutor.abort();
