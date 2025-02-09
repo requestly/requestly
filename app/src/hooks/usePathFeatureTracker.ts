@@ -28,7 +28,7 @@ const useLastFeatureTracker = () => {
   }, [lastFeaturePath, location.pathname, navigate]);
 
   useEffect(() => {
-    const pathSegments = location.pathname.split("/").filter(Boolean);
+    const pathSegments = location.pathname.split("/")?.filter(Boolean);
     let featurePath = `/${pathSegments[0]}`;
 
     if (pathSegments[0] === "desktop" && pathSegments.length > 1) {
