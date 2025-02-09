@@ -71,12 +71,14 @@ export const Card: React.FC<CardProps> = ({
             <div className="middle-section">
               <h2>{bodyTitle}</h2>
               <div className="list">
-                {contentList.slice(0, MAX_LIST_ITEMS_TO_SHOW).map((listItem: any, index: number) => (
-                  <div key={index} className="list-item" onClick={() => listItemClickHandler(listItem)}>
-                    <div className="list-item-icon">{listItem.icon}</div>
-                    <p className="item-title"> {listItem.title}</p>
-                  </div>
-                ))}
+                {contentList
+                  .slice(0, MAX_LIST_ITEMS_TO_SHOW)
+                  .map((listItem: Rule & TabsLayout.Tab & { icon: string; title: string }, index: number) => (
+                    <div key={index} className="list-item" onClick={() => listItemClickHandler(listItem)}>
+                      <div className="list-item-icon">{listItem.icon}</div>
+                      <p className="item-title">{listItem.title}</p>
+                    </div>
+                  ))}
               </div>
             </div>
             <div className="footer-section">
