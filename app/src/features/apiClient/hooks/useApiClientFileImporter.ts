@@ -1,11 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { toast } from "utils/Toast";
 import Logger from "lib/logger";
 import { batchWrite } from "backend/utils";
-import { upsertApiRecord } from "backend/apiClient";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "features/apiClient/types";
@@ -33,11 +31,12 @@ export enum ImporterTypes {
 }
 
 const useApiClientFileImporter = (importer: ImporterTypes) => {
-  const processors: Record<string, (content: any, uid: string) => any> = {
-    RQ: processRqImportData,
-    // Add other importers as needed
-  };
-
+  const processors: Record<string, (content: any, uid: string) => any> = useMemo(() => {
+    return {
+      RQ: processRqImportData,
+      // Add other importers as needed
+    };
+  }, []);
   const [processedFileData, setProcessedFileData] = useState<ProcessedData>({
     apis: [],
     environments: [],
@@ -50,8 +49,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
 
   const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ initFetchers: false });
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const { onSaveRecord } = useApiClientContext();
+  const { onSaveRecord, apiClientSyncRepository } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 
@@ -120,7 +118,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
           setProcessingStatus("idle");
         });
     },
-    [error, processors, importer, uid]
+    [processors, importer, uid]
   );
 
   const handleImportEnvironments = useCallback(async (): Promise<number> => {
@@ -155,12 +153,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
     // Utility function to handle batch writes for collections
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
-        const newCollection = await upsertApiRecord(
-          user?.details?.profile?.uid,
-          collection,
-          workspace?.id,
-          collection.id
-        );
+        const newCollection = await apiClientSyncRepository.createRecordWithId(collection, collection.id);
         onSaveRecord(newCollection.data, "none");
         importedCollectionsCount++;
         return newCollection.data.id;
@@ -180,7 +173,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
 
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
-        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
+        const newApi = await apiClientSyncRepository.createRecordWithId(updatedApi, updatedApi.id);
         onSaveRecord(newApi.data, "none");
       } catch (error) {
         failedCollectionsCount++;
@@ -204,7 +197,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
     }
 
     return importedCollectionsCount;
-  }, [user, workspace, onSaveRecord, collections, apis]);
+  }, [onSaveRecord, collections, apis, apiClientSyncRepository]);
 
   const handleImportData = useCallback(
     async (onSuccess: () => void) => {
@@ -263,7 +256,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
         setIsImporting(false);
       }
     },
-    [collections, apis, environments, recordsCount]
+    [collections, environments, recordsCount, handleImportEnvironments, handleImportCollectionsAndApis]
   );
 
   const resetImportData = () => {

@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
-import { getApiRecords } from "backend/apiClient";
 import Logger from "lib/logger";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
@@ -21,6 +20,8 @@ import { generateDocumentId } from "backend/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { useSearchParams } from "react-router-dom";
 import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
+import { ApiClientCloudRepository } from "../helpers/modules/sync/cloud";
+import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -53,6 +54,7 @@ interface ApiClientContextInterface {
 
   setIsImportModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   apiClientWorkloadManager: APIClientWorkloadManager;
+  apiClientSyncRepository: ApiClientRecordsInterface<Record<any, any>>;
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
@@ -86,6 +88,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   setIsImportModalOpen: () => {},
 
   apiClientWorkloadManager: new APIClientWorkloadManager(),
+  apiClientSyncRepository: null,
 });
 
 interface ApiClientProviderProps {
@@ -110,6 +113,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const { openTab, deleteTabs, updateTab, replaceTab, updateAddTabBtnCallback } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
+
+  const apiClientSyncRepository = useMemo(
+    () => new ApiClientCloudRepository({ uid, teamId }).apiClientRecordsRepository,
+    [uid, teamId]
+  );
 
   const openDraftRequest = useCallback(() => {
     const requestId = generateDocumentId("apis");
@@ -143,7 +151,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     }
 
     setIsLoadingApiClientRecords(true);
-    getApiRecords(uid, teamId)
+    apiClientSyncRepository
+      .getAllRecords()
       .then((result) => {
         if (result.success) {
           setApiClientRecords(result.data);
@@ -156,7 +165,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       .finally(() => {
         setIsLoadingApiClientRecords(false);
       });
-  }, [uid, teamId]);
+  }, [apiClientSyncRepository, uid]);
 
   const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
     setApiClientRecords((prev) => {
@@ -354,6 +363,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     onImportRequestModalClose,
     onNewClick,
     apiClientWorkloadManager: workloadManager,
+    apiClientSyncRepository,
   };
 
   return <ApiClientContext.Provider value={value}>{children}</ApiClientContext.Provider>;

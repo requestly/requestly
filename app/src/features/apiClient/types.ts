@@ -172,4 +172,8 @@ export namespace RQAPI {
   }
 
   export type Record = ApiRecord | CollectionRecord;
+
+  export type RecordPromise = Promise<{ success: boolean; data: Record; message?: string }>;
+
+  export type RecordsPromise = Promise<{ success: boolean; data: Record[]; message?: string }>;
 }
