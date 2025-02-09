@@ -22,7 +22,7 @@ export const CompaniesSection = () => {
         <Col>
           <Space direction="horizontal" size={24}>
             {companies.map((company) => (
-              <img key={company.alt} src={company.src} alt={company.alt} />
+              <img className="company-logo" key={company.alt} src={company.src} alt={company.alt} />
             ))}
           </Space>
         </Col>

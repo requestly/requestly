@@ -1,16 +1,18 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TabsLayout, TabsLayoutContextInterface } from "../types";
-import { useDispatch, useSelector } from "react-redux";
-import { getActiveTab, getTabs, tabsLayoutActions } from "store/slices/tabs-layout";
+import { useDispatch } from "react-redux";
+import { tabsLayoutActions } from "store/slices/tabs-layout";
 import { TabsProps } from "antd";
+import { usePatchedTabs } from "./usePatchedTabs";
 
 const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
   tabs: [],
   activeTab: undefined,
   closeTab: (tabId: TabsLayout.Tab["id"]) => {},
+  switchToTab: (tabId: TabsLayout.Tab["id"]) => {},
   deleteTabs: (tabIds: TabsLayout.Tab["id"][]) => {},
-  openTab: (tabId: TabsLayout.Tab["id"], tabDetails?: Partial<TabsLayout.Tab>) => {},
+  openTab: (tabId: TabsLayout.Tab["id"], tabDetails: TabsLayout.OpenTabArgs) => {},
   updateTab: (tabId: TabsLayout.Tab["id"], updatedTabData?: Partial<TabsLayout.Tab>) => {},
   replaceTab: (tabId: TabsLayout.Tab["id"], newTabData?: Partial<TabsLayout.Tab>) => {},
   onTabsEdit: (e: React.MouseEvent | React.KeyboardEvent | string, action: "add" | "remove") => {},
@@ -26,12 +28,12 @@ interface TabsLayoutProviderProps {
 export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children, id }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const tabs = useSelector(getTabs(id));
-  const activeTab = useSelector(getActiveTab(id));
   const [addTabBtnCallback, setAddTabBtnCallback] = useState(() => () => {});
 
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
+
+  const { tabs, activeTab } = usePatchedTabs(id);
 
   useEffect(() => {
     if (!activeTab) {
@@ -104,23 +106,32 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
     [activeTab, updateTab, updateActivetab]
   );
 
-  const openTab = useCallback(
-    (tabId: TabsLayout.Tab["id"], tabDetails?: Partial<TabsLayout.Tab>) => {
+  const switchToTab = useCallback(
+    (tabId: TabsLayout.Tab["id"]) => {
       const tab = tabs.find((item) => item.id === tabId);
+      if (tab) {
+        updateActivetab(tab);
+      }
+    },
+    [tabs, updateActivetab]
+  );
 
+  const openTab = useCallback(
+    (tabId: TabsLayout.Tab["id"], tabDetails: TabsLayout.OpenTabArgs) => {
+      const tab = tabs.find((item) => item.id === tabId);
       if (tab) {
         updateActivetab(tab);
         return;
       }
 
-      const newTabDetails = {
-        ...(tabDetails ?? {}),
+      const newTabDetails: TabsLayout.Tab = {
         id: tabId,
-        title: tabDetails?.title || "Untitled",
-        isPreview: tabDetails?.isPreview ?? false,
+        title: tabDetails.title,
+        url: tabDetails.url,
+        isPreview: tabDetails.isPreview ?? false,
         hasUnsavedChanges: false,
         timeStamp: Date.now(),
-      } as TabsLayout.Tab;
+      };
 
       if (tabDetails?.isPreview) {
         // Find existing preview tab if any
@@ -182,6 +193,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
     activeTab,
     tabs,
     openTab,
+    switchToTab,
     closeTab,
     deleteTabs,
     updateTab,

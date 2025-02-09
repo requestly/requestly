@@ -40,7 +40,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://developers.requestly.io/http-rules/cancel-rule/", "blank");
+                window.open("https://docs.requestly.com/general/http-rules/rule-types/cancel-rule/", "blank");
               }}
             >
               View More
@@ -61,7 +61,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://developers.requestly.io/http-rules/replace-strings/", "blank");
+                window.open("https://docs.requestly.com/general/http-rules/rule-types/replace-strings", "blank");
               }}
             >
               View More
@@ -83,7 +83,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://developers.requestly.io/http-rules/modify-headers/", "blank");
+                window.open("https://docs.requestly.com/general/http-rules/rule-types/modify-headers", "blank");
               }}
             >
               View More
@@ -173,7 +173,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://developers.requestly.io/http-rules/modify-user-agents/", "blank");
+                window.open("https://docs.requestly.com/general/http-rules/rule-types/modify-user-agents/", "blank");
               }}
             >
               View More
