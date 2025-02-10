@@ -2,7 +2,6 @@ import { useSelector } from "react-redux";
 import { Col, Row } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { isPricingPage, isGoodbyePage } from "utils/PathUtils";
-import RQ_LOGO from "assets/img/brand/rq_logo_full.svg";
 import { getAppMode } from "store/selectors";
 import APP_CONSTANTS from "../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -103,7 +102,7 @@ export default function HeaderText() {
         <Col>
           <Link to="/">
             <img
-              src={RQ_LOGO}
+              src={"/assets/media/common/rq_logo_full.svg"}
               style={{
                 boxSizing: "border-box",
                 display: "inline-block",
