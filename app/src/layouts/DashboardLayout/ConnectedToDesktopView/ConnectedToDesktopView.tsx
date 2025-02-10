@@ -6,7 +6,7 @@ export const ConnectedToDesktopView = () => {
   return (
     <div className="desktop-app-connected-view">
       <img
-        src={"/assets/media/dashboard/connectedToDesktop.svg"}
+        src={"/assets/media/Dashboard/connectedToDesktop.svg"}
         alt="connected-to-desktop"
         className="connected-icon"
       />
