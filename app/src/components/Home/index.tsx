@@ -4,7 +4,7 @@ import { RulesCard } from "./components/RulesCard";
 import { IncentivesCard } from "./components/IncentivesCard/IncentivesCard";
 import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import ApiClientCard from "./components/ApiClientCard";
-import UserAvatar from "./assets/avatar.svg?react";
+import UserAvatar from "../../assets/images/illustrations/avatar.svg?react";
 import "./home.scss";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
