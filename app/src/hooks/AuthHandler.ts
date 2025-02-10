@@ -33,7 +33,14 @@ const AuthHandler: React.FC<{}> = () => {
   const onboardingDetails = useSelector(getAppOnboardingDetails);
 
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
-  const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
+  const getOrganizationUsers = useMemo(
+    () =>
+      httpsCallable<{ domain: string }, { total: number; users: unknown[] }>(
+        getFunctions(),
+        "users-getOrganizationUsers"
+      ),
+    []
+  );
 
   const nonBlockingOperations = useCallback(
     async (user: User) => {
