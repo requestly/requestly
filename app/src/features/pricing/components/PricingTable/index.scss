@@ -65,15 +65,54 @@
 .plan-card {
   min-width: 310px;
   height: auto;
-  padding: 48px 24px;
+  padding-top: 48px;
   border-radius: var(--border-radius-md);
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: var(--requestly-color-background);
+  position: relative;
 
   .plan-card-middle-section {
+    padding: 0 24px;
     display: flex;
     flex-direction: column;
     min-height: 175px;
+  }
+
+  .plan-card-details {
+    padding: 0 24px;
+    padding-bottom: 24px;
+  }
+
+  .student-plan-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6, 16px);
+    gap: 8px;
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+
+    color: var(--requestly-color-success-200, #6fdaa6);
+    font-size: var(--requestly-font-size-sm, 12px);
+    background: var(--requestly-color-success-800, #104b2f);
+
+    svg.gift-plan-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: var(--requestly-color-success-200, #6fdaa6);
+    }
+
+    a {
+      color: inherit;
+      line-height: 18px; /* 150% */
+    }
+
+    .info-icon {
+      width: 12px;
+      height: 14px;
+      flex-shrink: 0;
+    }
   }
 }
 

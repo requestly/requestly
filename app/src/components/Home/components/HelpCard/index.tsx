@@ -21,7 +21,7 @@ export const HelpCard: React.FC = () => {
       {
         icon: <img src={bookIcon} alt="community" />,
         title: "Read official documentation",
-        href: "https://developers.requestly.io",
+        href: "https://https://docs.requestly.com/",
       },
       {
         icon: <AiOutlineYoutube className="help-card-react-icon" />,
