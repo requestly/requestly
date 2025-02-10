@@ -1,14 +1,13 @@
-import rulesIcon from "../RulesCard/assets/rules-icon.svg";
-import apiClientIcon from "../ApiClientCard/assets/api-client-icon.svg";
-import PlayIconRules from "../RulesCard/assets/play-rules.gif";
-import PlayIconApi from "../ApiClientCard/assets/play-api.gif";
+import PlayIconRules from "../../../../assets/images/gifs/play-rules.gif";
+import PlayIconApi from "../../../../assets/images/gifs/play-api.gif";
 import { trackHomeApisActionClicked, trackHomeRulesActionClicked } from "components/Home/analytics";
+import { CardType } from "../Card/types";
 
 export const PRODUCT_FEATURES = {
-  RULES: {
+  [CardType.RULES]: {
     title: "HTTP Interceptor",
     description: "Intercept, debug and modify HTTP requests",
-    icon: rulesIcon,
+    icon: "/assets/img/rules/rules-icon.svg",
     features: [
       "Map local files or redirect API/JS requests between environments..",
       "Mock XHR & Fetch requests by stubbing API responses.",
@@ -23,10 +22,10 @@ export const PRODUCT_FEATURES = {
       onClick: () => trackHomeRulesActionClicked("see_in_action"),
     },
   },
-  API_CLIENT: {
+  [CardType.API_CLIENT]: {
     title: "API client",
     description: "Design, manage, and test APIs easily",
-    icon: apiClientIcon,
+    icon: "/assets/img/apiClient/api-client-icon.svg",
     features: [
       "Send API requests and test endpoints effortlessly.",
       "Execute cURL requests directly in the client.",
