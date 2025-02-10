@@ -27,6 +27,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/components/RulesList/components";
 import "./rulesCard.scss";
+// @ts-ignore
 import { Rule, RuleType } from "@requestly/shared/types/entities/rules";
 
 export const RulesCard: React.FC = () => {
@@ -126,7 +127,9 @@ export const RulesCard: React.FC = () => {
                     redirectToRuleEditor(navigate, rule.id, SOURCE.HOME_SCREEN);
                   }}
                 >
-                  <span className="homepage-rules-list-item-icon">{ruleIcons[rule.ruleType as RuleType]}</span>
+                  <span className="homepage-rules-list-item-icon">
+                    {ruleIcons[rule.ruleType as keyof typeof ruleIcons]}
+                  </span>
                   <div> {rule.name}</div>
                 </div>
               );

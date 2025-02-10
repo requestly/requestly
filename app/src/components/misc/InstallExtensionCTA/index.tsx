@@ -56,6 +56,7 @@ const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
   }, [eventPage]);
 
   const handleDownloadExtensionClick = () => {
+    // @ts-expect-error actions file is not typed
     dispatch(globalActions.updateExtensionInstallSource(window.location.pathname));
     setIsReloadPagePromptVisible(true);
     trackExtensionInstallationButtonClicked(eventPage);

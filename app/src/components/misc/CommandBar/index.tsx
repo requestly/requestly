@@ -40,11 +40,13 @@ export const CommandBar = () => {
     const down = (e: any) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
+        // @ts-expect-error actions file is not typed
         dispatch(globalActions.updateIsCommandBarOpen(!isCommandBarOpen));
       }
     };
     const exit = (e: any) => {
       if (e.key === "Escape") {
+        // @ts-expect-error actions file is not typed
         dispatch(globalActions.updateIsCommandBarOpen(false));
         trackCommandPaletteClosed();
       }
@@ -117,6 +119,7 @@ export const CommandBar = () => {
               item.action({ navigate, dispatch, user, appMode, rules });
               trackCommandPaletteOptionSelected(item.id.split(" ").join("_"));
               trackCommandPaletteClosed();
+              // @ts-expect-error actions file is not typed
               dispatch(globalActions.updateIsCommandBarOpen(false));
             }
 
@@ -154,6 +157,7 @@ export const CommandBar = () => {
         <div
           className="cmdk-overlay"
           onClick={() => {
+            // @ts-expect-error actions file is not typed
             dispatch(globalActions.updateIsCommandBarOpen(false));
             trackCommandPaletteClosed();
           }}

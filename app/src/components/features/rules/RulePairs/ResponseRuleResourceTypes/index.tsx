@@ -13,6 +13,7 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { PremiumFeature } from "features/pricing";
 import "./ResponseRuleResourceTypes.css";
+//@ts-ignore
 import { ResponseRule } from "@requestly/shared/types/entities/rules";
 
 const DownloadDesktopAppLink: React.FC = () => (

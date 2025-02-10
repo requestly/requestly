@@ -16,6 +16,7 @@ import {
 import "./GraphqlRequestPayload.css";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
+//@ts-ignore
 import { ResponseRule } from "@requestly/shared/types/entities/rules";
 
 const {
@@ -54,6 +55,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   useEffect(() => {
     if (gqlOperationFilter.key && gqlOperationFilter.value) {
       dispatch(
+        // @ts-expect-error since the actions file is not typed
         globalActions.updateRulePairAtGivenPath({
           pairIndex,
           triggerUnsavedChangesIndication: false,
@@ -81,6 +83,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     const newPayloadKey = e?.target?.value ?? "";
 
     dispatch(
+      // @ts-expect-error since the actions file is not typed
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: { [SOURCE_REQUEST_PAYLOAD_KEY]: newPayloadKey },
@@ -96,6 +99,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
 
   const handleRequestPayloadOperatorChange = (operator: string) => {
     dispatch(
+      // @ts-expect-error since the actions file is not typed
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: { [SOURCE_REQUEST_PAYLOAD_OPERATOR]: operator },
@@ -113,6 +117,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     const newPayloadValue = e?.target?.value ?? "";
 
     dispatch(
+      // @ts-expect-error since the actions file is not typed
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: { [SOURCE_REQUEST_PAYLOAD_VALUE]: newPayloadValue },

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCurrentlySelectedRule } from "./actions";
 import APP_CONSTANTS from "../../../../config/constants";
 import { getCurrentlySelectedRuleData } from "store/selectors";
+//@ts-ignore
 import { Rule } from "@requestly/shared/types/entities/rules";
 
 const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
