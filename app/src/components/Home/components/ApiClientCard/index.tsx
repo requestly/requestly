@@ -19,10 +19,7 @@ import { Card } from "../Card";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { CardType } from "../Card/types";
 import { ImporterTypes } from "features/apiClient/types";
-import Postman from "./assets/postman-icon.svg?react";
-import rqIcon from "./assets/requestly-icon.svg";
-import importIcon from "./assets/import-icon.svg";
-import brunoIcon from "./assets/burno-icon.png";
+import Postman from "../../../../assets/img/brand/postman-icon.svg?react";
 import { CreateType } from "features/apiClient/types";
 import { trackHomeApisActionClicked } from "components/Home/analytics";
 
@@ -75,7 +72,7 @@ const ApiClientCard = () => {
     {
       key: "2",
       label: "Bruno",
-      icon: <img src={brunoIcon} alt="Bruno" />,
+      icon: <img src={"/assets/img/brandLogos/bruno-icon.png"} alt="Bruno" />,
       onClick: () => importTriggerHandler(ImporterTypes.BRUNO),
     },
     {
@@ -87,7 +84,7 @@ const ApiClientCard = () => {
     {
       key: "4",
       label: "Requestly",
-      icon: <img src={rqIcon} alt="Requestly" />,
+      icon: <img src={"/assets/img/brandLogos/requestly-icon.svg"} alt="Requestly" />,
       onClick: () => importTriggerHandler(ImporterTypes.REQUESTLY),
     },
   ];
@@ -98,7 +95,11 @@ const ApiClientCard = () => {
       cardType={CardType.API_CLIENT}
       title={"API Client"}
       cardIcon={"/assets/img/apiClient/api-client-icon.svg"}
-      importOptions={{ menu: IMPORT_OPTIONS, label: "Postman, Bruno & more", icon: importIcon }}
+      importOptions={{
+        menu: IMPORT_OPTIONS,
+        label: "Postman, Bruno & more",
+        icon: "/assets/img/apiClient/import-icon.svg",
+      }}
       bodyTitle={cardOptions?.bodyTitle}
       contentList={isLoggedIn ? cardOptions?.contentList : []}
       actionButtons={
