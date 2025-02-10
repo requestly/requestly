@@ -7,8 +7,6 @@ import { CloseOutlined } from "@ant-design/icons";
 import { capitalize } from "lodash";
 import { PRICING } from "features/pricing/constants/pricing";
 import { PricingPlans } from "features/pricing/constants/pricingPlans";
-import underlineIcon from "features/pricing/assets/yellow-highlight.svg";
-import checkIcon from "assets/img/icons/common/check.svg";
 import { trackGetFreeTrialClicked, trackPricingPlansQuantityChanged } from "features/pricing/analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
@@ -263,7 +261,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             if (isOpenedFromModal && feature.visibleInPricingPageOnly) return null;
             return (
               <div className={`text-left plan-feature-item ${feature.tooltip ? "underlined" : ""}`} key={index}>
-                {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />}{" "}
+                {feature.enabled ? <img src={"/assets/media/common/check.svg"} alt="check" /> : <CloseOutlined />}{" "}
                 <Tooltip title={feature?.tooltip} color="var(--black)">
                   <span className={`${feature?.tooltip ? "plan-feature-underline" : ""}`}>{feature.title}</span>
                 </Tooltip>
