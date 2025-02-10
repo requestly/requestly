@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
-  const { tabs, activeTab, openTab, closeTab, updateTab, onTabsEdit } = useTabsLayoutContext();
+  const { tabs, activeTab, switchToTab, closeTab, updateTab, onTabsEdit } = useTabsLayoutContext();
 
   const hasUnsavedChanges = tabs.some((tab) => tab.hasUnsavedChanges);
 
@@ -85,7 +85,7 @@ export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
           items={items}
           onEdit={onTabsEdit}
           onChange={(activeTabId) => {
-            openTab(activeTabId);
+            switchToTab(activeTabId);
           }}
         />
       ) : (

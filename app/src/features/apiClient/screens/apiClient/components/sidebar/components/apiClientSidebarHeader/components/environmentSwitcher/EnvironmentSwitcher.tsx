@@ -25,6 +25,7 @@ export const EnvironmentSwitcher = () => {
   const dropdownItems = useMemo(() => {
     return environments
       .filter((env) => !isGlobalEnvironment(env.id))
+      .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
       .map((environment) => ({
         key: environment.id,
         label: (
@@ -45,7 +46,10 @@ export const EnvironmentSwitcher = () => {
         onClick: () => {
           setCurrentEnvironment(environment.id);
           if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
-            openTab(environment.id, { title: environment.name });
+            openTab(environment.id, {
+              title: environment.name,
+              url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environment.id}`,
+            });
             trackEnvironmentSwitched(environments.length);
             redirectToEnvironment(navigate, environment.id);
           }
