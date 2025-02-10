@@ -30,7 +30,7 @@ import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
-import useLastFeatureTracker from "hooks/usePathFeatureTracker";
+import useRedirectToLastFeature from "hooks/useRedirectToLastFeature";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -40,7 +40,7 @@ const App: React.FC = () => {
     growthbook.loadFeatures({ autoRefresh: true });
   }, []);
 
-  useLastFeatureTracker();
+  useRedirectToLastFeature();
   usePreLoadRemover();
   useGeoLocation();
   useIsExtensionEnabled();

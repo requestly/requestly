@@ -1,15 +1,15 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getLastVisitedPath } from "store/selectors";
+import { getLastFeaturePath } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
 import PATHS from "config/constants/sub/paths";
 
-const useLastFeatureTracker = () => {
+const useRedirectToLastFeature = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-  const lastFeaturePath = useSelector(getLastVisitedPath);
+  const storedFeaturePath = useSelector(getLastFeaturePath);
 
   const LAST_KNOWN_PATHS = new Set([
     PATHS.API_CLIENT.INDEX,
@@ -22,10 +22,10 @@ const useLastFeatureTracker = () => {
   ]);
 
   useEffect(() => {
-    if (location.pathname === "/" && lastFeaturePath && lastFeaturePath !== "/") {
-      navigate(lastFeaturePath, { replace: true });
+    if (location.pathname === "/" && storedFeaturePath && storedFeaturePath !== "/") {
+      navigate(storedFeaturePath, { replace: true });
     }
-  }, [lastFeaturePath, location.pathname, navigate]);
+  }, [storedFeaturePath, location.pathname, navigate]);
 
   useEffect(() => {
     const pathSegments = location.pathname.split("/")?.filter(Boolean);
@@ -35,9 +35,9 @@ const useLastFeatureTracker = () => {
       featurePath += `/${pathSegments[1]}`;
     }
     if (LAST_KNOWN_PATHS.has(featurePath)) {
-      dispatch(globalActions.updateLastVisitedPath(featurePath));
+      dispatch(globalActions.updateLastFeaturePath(featurePath));
     }
   }, [dispatch, location.pathname]);
 };
 
-export default useLastFeatureTracker;
+export default useRedirectToLastFeature;

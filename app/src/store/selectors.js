@@ -347,6 +347,6 @@ export const getIsSlackConnectButtonVisible = (state) => {
   return getGlobalState(state).misc.persist?.isSlackConnectButtonVisible;
 };
 
-export const getLastVisitedPath = (state) => {
-  return getGlobalState(state)?.misc?.persist?.lastVisitedPath || "/";
+export const getLastFeaturePath = (state) => {
+  return getGlobalState(state)?.misc?.persist?.lastFeaturePath || "/";
 };
