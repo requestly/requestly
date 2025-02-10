@@ -1,3 +1,4 @@
+//@ts-ignore
 import { RuleType } from "@requestly/shared/types/entities/rules";
 
 export const getEventObject = (name: string, value: string) => ({

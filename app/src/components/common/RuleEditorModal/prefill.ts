@@ -6,6 +6,7 @@ import {
   RuleSourceKey,
   RuleSourceOperator,
   RuleType,
+  //@ts-ignore
 } from "@requestly/shared/types/entities/rules";
 
 const updateRulePairSource = <T extends Rule>(data: any, rule: T): T => {

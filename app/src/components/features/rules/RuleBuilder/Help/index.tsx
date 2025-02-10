@@ -1,21 +1,13 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Button, Col, Row, Skeleton, Collapse, DrawerProps } from "antd";
-import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { YouTubePlayer } from "components/misc/YoutubeIframe";
-import { NotionRenderer } from "react-notion";
-import Zoom from "react-medium-image-zoom";
+import React, { useEffect, useRef, useState } from "react";
+import { Button, Col, Row, DrawerProps } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import "react-medium-image-zoom/dist/styles.css";
-import { RQCollapse } from "lib/design-system/components/RQCollapse";
 import LeftArrow from "assets/icons/left-arrow.svg?react";
 import RightArrow from "assets/icons/right-arrow.svg?react";
-import { TocItem, ExternalLink } from "./types";
-import { snakeCase } from "lodash";
+import { ExternalLink } from "./types";
 import APP_CONSTANTS from "config/constants";
-import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import {
-  trackDocsSidebarPrimaryCategoryClicked,
   trackDocsSidebarSecondaryCategoryClicked,
-  trackDocsSidebarDemovideoWatched,
   trackDocsSidebarContactUsClicked,
 } from "modules/analytics/events/common/rules";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
@@ -27,6 +19,7 @@ import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDet
 import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { useSelector } from "react-redux";
+//@ts-ignore
 import { RuleType } from "@requestly/shared/types/entities/rules";
 
 const externalLinks: ExternalLink[] = [
@@ -89,20 +82,20 @@ interface HelpProps {
 
 const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
   const [isDocsVisible, setIsDocsVisible] = useState<boolean>(false);
-  const [notionPageData, setNotionPageData] = useState(null);
-  const [tableOfContents, setTableOfContents] = useState(null);
+  const [_notionPageData, setNotionPageData] = useState(null);
+  const [_tableOfContents, setTableOfContents] = useState(null);
   const documentationListRef = useRef<HTMLDivElement | null>(null);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isSampleRule = currentlySelectedRuleData?.isSample;
 
-  const handleScrollToSection = useCallback((id: string) => {
-    const target = document.getElementById(id);
-    if (target) {
-      const { offsetTop } = target;
-      const parentContainer = target.parentNode.parentNode as HTMLElement;
-      parentContainer.scrollTop = offsetTop - 100;
-    }
-  }, []);
+  // const handleScrollToSection = useCallback((id: string) => {
+  //   const target = document.getElementById(id);
+  //   if (target) {
+  //     const { offsetTop } = target;
+  //     const parentContainer = target.parentNode.parentNode as HTMLElement;
+  //     parentContainer.scrollTop = offsetTop - 100;
+  //   }
+  // }, []);
 
   const toggleDocs = () => {
     if (isDocsVisible) {
@@ -115,15 +108,15 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
     setIsDocsVisible((prev) => !prev);
   };
 
-  const handleDemoVideoPlay = () => {
-    trackDocsSidebarDemovideoWatched(ruleType);
-  };
+  // const handleDemoVideoPlay = () => {
+  //   trackDocsSidebarDemovideoWatched(ruleType);
+  // };
 
-  const handleDocumentationListItemClick = (title: string, handler: () => void) => {
-    toggleDocs();
-    setTimeout(() => handler(), 0);
-    trackDocsSidebarPrimaryCategoryClicked(ruleType, snakeCase(title));
-  };
+  // const handleDocumentationListItemClick = (title: string, handler: () => void) => {
+  //   toggleDocs();
+  //   setTimeout(() => handler(), 0);
+  //   trackDocsSidebarPrimaryCategoryClicked(ruleType, snakeCase(title));
+  // };
 
   const updateDocTableOfContent = (data: any[]) => {
     if (data) {

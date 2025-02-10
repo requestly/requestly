@@ -36,7 +36,9 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
           },
         })
       );
+
       dispatch(
+        // @ts-expect-error actions file is not typed
         globalActions.updateHardRefreshPendingStatus({
           type: "rules",
         })

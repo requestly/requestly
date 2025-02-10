@@ -3,6 +3,7 @@ import { Col, Select, Input } from "antd";
 import { capitalize } from "lodash";
 import { SessionRecordingPageSource } from "types";
 import "./index.scss";
+//@ts-ignore
 import { RulePairSource, RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 
 type Source = RulePairSource | SessionRecordingPageSource;
@@ -32,8 +33,8 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
         >
           {Object.entries(RuleSourceKey).map(([key, value]) =>
             value === RuleSourceKey.PATH ? null : (
-              <Select.Option key={value} value={value}>
-                {capitalize(value)}
+              <Select.Option key={String(value)} value={value}>
+                {capitalize(String(value))}
               </Select.Option>
             )
           )}
@@ -53,7 +54,7 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
                 ? "Wildcard"
                 : value === RuleSourceOperator.MATCHES
                 ? "RegEx"
-                : value}
+                : String(value)}
             </Select.Option>
           ))}
         </Select>
