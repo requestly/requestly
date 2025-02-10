@@ -56,7 +56,7 @@ export type CollectionVariableMap = Record<string, { variables: EnvironmentVaria
 
 export namespace RQAPI {
   export type AnalyticsEventSource =
-    | "home-screen"
+    | "home_screen"
     | "collection_row"
     | "collection_list_empty_state"
     | "api_client_sidebar_header"

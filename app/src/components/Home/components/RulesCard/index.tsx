@@ -25,7 +25,7 @@ import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/compon
 import { Rule, RuleType } from "@requestly/shared/types/entities/rules";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { Card } from "../Card";
-import rulesIcon from "./assets/rules-icon.svg";
+import "./rulesCard.scss";
 import { CardType } from "../Card/types";
 import rqIcon from "./assets/requestly-icon.svg";
 import ModHeader from "./assets/mod-header-icon.svg?react";
@@ -116,7 +116,7 @@ export const RulesCard = () => {
 
   return (
     <Card
-      cardIcon={rulesIcon}
+      cardIcon={"/assets/img/rules/rules-icon.svg"}
       contentLoading={isLoading || isRulesLoading}
       cardType={CardType.RULES}
       importOptions={{ menu: IMPORT_OPTIONS, label: "Charles, ModHeader, & more", icon: importIcon }}

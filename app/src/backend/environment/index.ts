@@ -15,7 +15,12 @@ import {
 } from "firebase/firestore";
 import { EnvironmentData, EnvironmentMap, EnvironmentVariables } from "./types";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
-import { trackEnvironmentCreatedInDB, trackEnvironmentDeletedFromDB, trackEnvironmentsFetchedFromDB, trackEnvironmentUpdatedInDB } from "features/apiClient/screens/environment/analytics";
+import {
+  trackEnvironmentCreatedInDB,
+  trackEnvironmentDeletedFromDB,
+  trackEnvironmentsFetchedFromDB,
+  trackEnvironmentUpdatedInDB,
+} from "features/apiClient/screens/environment/analytics";
 import { fetchLock } from "./fetch-lock";
 import { patchMissingIdInVariables } from "backend/apiClient/utils";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
@@ -74,7 +79,10 @@ export const removeEnvironmentVariableFromDB = async (
     [`variables.${payload.key}`]: deleteField(),
   });
 
-  trackEnvironmentUpdatedInDB(payload.environmentId, isGlobalEnvironment(payload.environmentId) ? "global" : "non_global");
+  trackEnvironmentUpdatedInDB(
+    payload.environmentId,
+    isGlobalEnvironment(payload.environmentId) ? "global" : "non_global"
+  );
 };
 
 export const attachEnvironmentVariableListener = (
