@@ -101,7 +101,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const [locationState, setLocationState] = useState(location?.state);
-  const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(locationState?.action ? true : false);
+  const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(!!locationState?.action);
   const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
@@ -326,7 +326,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   useEffect(() => {
     if (!isLoadingApiClientRecords) {
-      locationState?.action === "create" && onNewClick("home-screen", locationState?.type);
+      locationState?.action === "create" && onNewClick("home_screen", locationState?.type);
       setLocationState({});
     }
   }, [isLoadingApiClientRecords]);

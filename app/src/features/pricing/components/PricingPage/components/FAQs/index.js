@@ -44,44 +44,6 @@ const PricingFAQs = () => {
       ),
     },
     {
-      question: <React.Fragment>Do individual developers need to pay for Requestly?</React.Fragment>,
-      answer: (
-        <React.Fragment>
-          No, developers working individually without a team are not required to pay for Requestly. The Free plan
-          provides liberal limits and includes many features you know and love, including capturing requests and
-          modifying requests, mocking APIs, SessionBook, and much more.
-        </React.Fragment>
-      ),
-    },
-    {
-      question: <React.Fragment>How can I remove limits from the Free plan?</React.Fragment>,
-      answer: (
-        <React.Fragment>
-          Requestly is an open-source platform. Downloading the source code from GitHub allows you to use the Free plan
-          without any limitations, but sharing and other collaboration features will be unavailable.
-        </React.Fragment>
-      ),
-    },
-    {
-      question: <React.Fragment>When should I switch to the Pro plan?</React.Fragment>,
-      answer: (
-        <React.Fragment>
-          Users should look forward to creating teams when there is a need for collaboration, as team workspaces provide
-          real-time modification of rules and synchronization within the team and thereby enhances the productivity of
-          teams.
-        </React.Fragment>
-      ),
-    },
-    {
-      question: <React.Fragment>Does unlimited really mean unlimited in the case of Pro plan?</React.Fragment>,
-      answer: (
-        <React.Fragment>
-          Yes. Rarely some things might get restricted due to storage or performance reasons. Please contact us in case
-          that happens.
-        </React.Fragment>
-      ),
-    },
-    {
       question: <>I want to modify only HTTP Headers, Is there a discounted plan for me?</>,
       answer: (
         <>

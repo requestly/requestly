@@ -1,5 +1,4 @@
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
-import apiClientIcon from "./assets/api-client-icon.svg";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { MenuProps } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -98,7 +97,7 @@ const ApiClientCard = () => {
       wrapperClass={`${cardOptions?.type === FormatType.HISTORY ? "history-card" : ""} api-client-card`}
       cardType={CardType.API_CLIENT}
       title={"API Client"}
-      cardIcon={apiClientIcon}
+      cardIcon={"/assets/img/apiClient/api-client-icon.svg"}
       importOptions={{ menu: IMPORT_OPTIONS, label: "Postman, Bruno & more", icon: importIcon }}
       bodyTitle={cardOptions?.bodyTitle}
       contentList={isLoggedIn ? cardOptions?.contentList : []}

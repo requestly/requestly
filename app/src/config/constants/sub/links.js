@@ -5,43 +5,43 @@ const LINKS = {
 
   // Download
   REQUESTLY_DOWNLOAD_PAGE: "https://requestly.com/downloads",
-  REQUESTLY_DOCS: "https://developers.requestly.io/",
+  REQUESTLY_DOCS: "https://docs.requestly.com/",
   //Docs - Using Rules
-  REQUESTLY_DOCS_USING_RULES: "https://docs.requestly.io/using-rules/",
+  REQUESTLY_DOCS_USING_RULES: "https://docs.requestly.com/general/http-rules/overview/",
   //Docs -Sharing Rules
-  REQUESTLY_DOCS_SHARING_RULES: "https://docs.requestly.io/managing-rules/sharing",
+  REQUESTLY_DOCS_SHARING_RULES: "https://docs.requestly.com/general/http-rules/sharing",
   //Docs - File Service
-  REQUESTLY_DOCS_FILES_SERVICE: "https://docs.requestly.io/library/introduction-to-library",
+  REQUESTLY_DOCS_FILES_SERVICE: "https://docs.requestly.com/general/mock-server/overview",
 
   // Docs - Premium Subscription
-  REQUESTLY_DOCS_PREMIUM_SUBSCRIPTION: "https://docs.requestly.io/premium-subscription",
+  REQUESTLY_DOCS_PREMIUM_SUBSCRIPTION: "https://docs.requestly.com/general/team/team-collaboration",
 
   // Docs - Premium Subscription
-  REQUESTLY_DOCS_TEAM_SUBSCRIPTION: "https://docs.requestly.io/premium-subscription#for-teams",
+  REQUESTLY_DOCS_TEAM_SUBSCRIPTION: "https://docs.requestly.com/general/team/team-collaboration",
 
   // Docs - Mock Server
-  REQUESTLY_DOCS_MOCK_SERVER: "https://docs.requestly.io/using-rules/mock-server",
+  REQUESTLY_DOCS_MOCK_SERVER: "https://docs.requestly.com/general/mock-server/overview",
 
   // Docs - Backup Data
-  REQUESTLY_DOCS_BACKUP_DATA: "https://docs.requestly.io/managing-rules/backup-and-restore",
+  REQUESTLY_DOCS_BACKUP_DATA: "https://docs.requestly.com/general/http-rules/sharing/download-rules",
 
   // Docs - Extension Troubleshooting
-  REQUESTLY_EXTENSION_TROUBLESHOOTING: "https://docs.requestly.io/troubleshooting",
+  REQUESTLY_EXTENSION_TROUBLESHOOTING: "https://docs.requestly.com/guides/troubleshooting/rules-not-working",
 
-  REQUESTLY_EXTENSION_RULES_NOT_WORKING:
-    "https://docs.requestly.io/browser-extension/chrome/troubleshooting/rules-not-working",
+  REQUESTLY_EXTENSION_RULES_NOT_WORKING: "https://docs.requestly.com/guides/troubleshooting/rules-not-working",
 
   // Docs - Mock GraphQL API response
-  REQUESTLY_DOCS_MOCK_GRAPHQL: "https://developers.requestly.io/http-rules/graphql-support",
+  REQUESTLY_DOCS_MOCK_GRAPHQL:
+    "https://docs.requestly.com/general/http-rules/advanced-usage/graphql-modify-request-response",
 
   // Docs - HTTP modifications
-  REQUESTLY_DOCS_HTTP_MODIFICATIONS: "https://docs.requestly.io/browser-extension/chrome/http-modifications/overview",
+  REQUESTLY_DOCS_HTTP_MODIFICATIONS: "https://docs.requestly.com/general/http-rules/overview",
 
   // Docs - Source Filters
   REQUESTLY_DOCS_SOURCE_FILTERS: "https://docs.requestly.com/general/http-rules/advanced-usage/advance-targeting",
 
   // Docs - Import rules from charles proxy
-  REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES: "https://developers.requestly.com/http-rules/import-from-charles/",
+  REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES: "https://docs.requestly.com/general/imports/charles-proxy",
 
   // Docs - Import Rules from resource override
   REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_RESOURCE_OVERRIDE: "https://docs.requestly.com/general/imports/resource-override",
@@ -50,20 +50,20 @@ const LINKS = {
   REQUESTLY_DOCS_TEST_URL_CONDITION:
     "https://docs.requestly.com/general/http-rules/others/http-rules-testing/test-url-condition",
 
-  REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE: "https://developers.requestly.io/sessions/architecture/",
+  REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE: "https://docs.requestly.com/security-privacy/sessions/",
 
-  REQUESTLY_API_DOCS: "https://developers.requestly.io/api/overview/",
+  REQUESTLY_API_DOCS: "https://docs.requestly.com/public-apis/overview/",
 
-  REQUESTLY_REDIRECT_RULE_DOCS: "https://developers.requestly.com/http-rules/map-local-url-redirect",
-  REQUESTLY_CANCEL_RULE_DOCS: "https://developers.requestly.com/http-rules/cancel-rule/",
-  REQUESTLY_DELAY_RULE_DOCS: "https://developers.requestly.com/http-rules/delay-request/",
-  REQUESTLY_HEADERS_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-headers/",
-  REQUESTLY_QUERYPARAM_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-query-params/",
-  REQUESTLY_REPLACE_RULE_DOCS: "https://developers.requestly.com/http-rules/replace-strings/",
-  REQUESTLY_REQUEST_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-request-body/",
-  REQUESTLY_RESPONSE_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-response-body/",
-  REQUESTLY_SCRIPT_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-dom-inject-scripts/",
-  REQUESTLY_USERAGENT_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-user-agents/",
+  REQUESTLY_REDIRECT_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/redirect-rule",
+  REQUESTLY_CANCEL_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/cancel-rule",
+  REQUESTLY_DELAY_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/delay-network-requests",
+  REQUESTLY_HEADERS_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/modify-headers/",
+  REQUESTLY_QUERYPARAM_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/modify-query-params",
+  REQUESTLY_REPLACE_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/replace-strings",
+  REQUESTLY_REQUEST_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/modify-request-body",
+  REQUESTLY_RESPONSE_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/modify-request-body",
+  REQUESTLY_SCRIPT_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/insert-scripts",
+  REQUESTLY_USERAGENT_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/modify-user-agents",
 
   REQUESTLY_HEADERS_RULE_FAQ_LINK:
     "https://docs.requestly.com/general/http-rules-(modify-traffic)/rule-types/modify-headers#faqs",
