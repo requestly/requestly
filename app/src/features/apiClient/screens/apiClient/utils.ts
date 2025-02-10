@@ -75,13 +75,15 @@ export const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => 
     },
   };
 
-  if (!supportsRequestBody(entry.request.method)) {
-    sanitizedEntry.request.body = null;
-  } else if (entry.request.contentType === RequestContentType.FORM) {
-    sanitizedEntry.request.body = sanitizeKeyValuePairs(
-      sanitizedEntry.request.body as KeyValuePair[],
-      removeDisabledKeys
-    );
+  if (entry.request.body != null) {
+    if (!supportsRequestBody(entry.request.method)) {
+      sanitizedEntry.request.body = null;
+    } else if (entry.request.contentType === RequestContentType.FORM) {
+      sanitizedEntry.request.body = sanitizeKeyValuePairs(
+        entry.request.body as RQAPI.RequestFormBody,
+        removeDisabledKeys
+      );
+    }
   }
 
   return sanitizedEntry;
