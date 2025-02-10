@@ -27,11 +27,9 @@ import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { Card } from "../Card";
 import "./rulesCard.scss";
 import { CardType } from "../Card/types";
-import rqIcon from "./assets/requestly-icon.svg";
-import ModHeader from "./assets/mod-header-icon.svg?react";
-import ResourceOverride from "./assets/resource-override-icon.svg?react";
-import Charles from "./assets/charles-icon.svg?react";
-import importIcon from "./assets/importIcon.svg";
+import ModHeader from "../../../../assets/img/brand/mod-header-icon.svg?react";
+import ResourceOverride from "../../../../assets/img/brand/resource-override-icon.svg?react";
+import Charles from "../../../../assets/img/brand/charles-icon.svg?react";
 import "./rulesCard.scss";
 import { RQButton } from "lib/design-system-v2/components";
 import { ImporterTypes } from "components/Home/types";
@@ -87,7 +85,7 @@ export const RulesCard = () => {
     {
       key: "4",
       label: "Requestly",
-      icon: <img src={rqIcon} alt="Requestly" />,
+      icon: <img src={"/assets/img/brandLogos/requestly-icon.svg"} alt="Requestly" />,
       onClick: () => importTriggerHandler(ImporterTypes.REQUESTLY),
     },
   ];
@@ -119,7 +117,11 @@ export const RulesCard = () => {
       cardIcon={"/assets/img/rules/rules-icon.svg"}
       contentLoading={isLoading || isRulesLoading}
       cardType={CardType.RULES}
-      importOptions={{ menu: IMPORT_OPTIONS, label: "Charles, ModHeader, & more", icon: importIcon }}
+      importOptions={{
+        menu: IMPORT_OPTIONS,
+        label: "Charles, ModHeader, & more",
+        icon: "/assets/img/rules/import-icon.svg",
+      }}
       listItemClickHandler={(item: Rule) => {
         trackHomeRulesActionClicked("rule_clicked");
         trackRuleCreationWorkflowStartedEvent(item.ruleType, SOURCE.HOME_SCREEN);
