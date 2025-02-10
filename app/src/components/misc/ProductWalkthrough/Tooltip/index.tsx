@@ -53,7 +53,7 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
               "Finish"
             ) : (
               <>
-                Next <img alt="back" width="14px" height="12px" src="/assets/media/common/leftArrow.svg" />
+                Next <img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />
               </>
             ))}
         </Button>
