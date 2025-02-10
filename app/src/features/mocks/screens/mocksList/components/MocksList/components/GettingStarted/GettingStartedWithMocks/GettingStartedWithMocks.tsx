@@ -149,8 +149,8 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
               <a
                 href={
                   mockType === MockType.API
-                    ? "https://docs.requestly.io/getting-started/features/mock-server"
-                    : "https://docs.requestly.io/getting-started/features/introduction"
+                    ? "https://docs.requestly.com/general/mock-server/create/create-mock-api"
+                    : "https://docs.requestly.com/general/mock-server/create/create-new-mock-file"
                 }
                 target="_blank"
                 rel="noreferrer"

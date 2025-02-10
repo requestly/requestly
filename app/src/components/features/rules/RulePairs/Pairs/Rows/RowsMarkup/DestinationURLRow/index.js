@@ -250,7 +250,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                             (using $1, $2, etc).
                             <br />
                             <a
-                              href="https://docs.requestly.com/general/http-rules/advanced-usage/rule-operators#regex-match-operator"
+                              href="https://docs.requestly.com/general/http-rules/advanced-usage/source-conditions#testing-url-with-wildcard-condition"
                               target="_blank"
                               rel="noreferrer"
                             >

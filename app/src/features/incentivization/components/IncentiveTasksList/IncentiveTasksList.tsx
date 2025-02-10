@@ -88,7 +88,11 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
           "Rules enable you to set conditions that trigger specific actions when met. Create a rule to apply desired network modifications. Use the testing widget to ensure it is correctly configured and functioning as expected.",
         icon: <MdPlaylistAdd />,
         helpLink: (
-          <a href="https://developers.requestly.com/create-first-rule/" target="_blank" rel="noreferrer">
+          <a
+            href="https://docs.requestly.com/general/getting-started/quick-start-guide#http-rules"
+            target="_blank"
+            rel="noreferrer"
+          >
             Learn how to create Rules
           </a>
         ),
@@ -114,7 +118,11 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
           "Rules enable you to set conditions that trigger specific actions when met. To apply desired network modifications",
         icon: <MdPlaylistAdd />,
         helpLink: (
-          <a href="https://developers.requestly.com/create-first-rule/" target="_blank" rel="noreferrer">
+          <a
+            href="https://docs.requestly.com/general/getting-started/quick-start-guide#http-rules"
+            target="_blank"
+            rel="noreferrer"
+          >
             Learn how to create Rules
           </a>
         ),
@@ -137,7 +145,11 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
           "Test your rule on a specific URL to see if it works as expected. You can test your rule on any website.",
         icon: <MdOutlineScience />,
         helpLink: (
-          <a href="https://developers.requestly.com/http-rules/test-this-rule/" target="_blank" rel="noreferrer">
+          <a
+            href="https://docs.requestly.com/general/http-rules/advanced-usage/test-rules/"
+            target="_blank"
+            rel="noreferrer"
+          >
             Learn how to test a rule
           </a>
         ),
@@ -172,7 +184,11 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         description: "Modify Response Rule allows you to debug & modify API responses on the fly",
         icon: <MdPlaylistAdd />,
         helpLink: (
-          <a href="https://developers.requestly.com/http-rules/modify-response-body/" target="_blank" rel="noreferrer">
+          <a
+            href="https://docs.requestly.com/general/http-rules/rule-types/modify-response-body"
+            target="_blank"
+            rel="noreferrer"
+          >
             Learn how to a create Response Rule
           </a>
         ),
@@ -213,7 +229,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         icon: <MdPlaylistAdd />,
         helpLink: (
           <a
-            href="https://developers.requestly.com/http-rules/map-local-url-redirect/"
+            href="https://docs.requestly.com/general/http-rules/rule-types/redirect-rule"
             target="_blank"
             rel="noreferrer"
           >
@@ -257,7 +273,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
           "A Team Workspace lets you collaborate with your team and work together in real-time on your rules, mocks and sessions.",
         icon: <MdOutlineDiversity1 />,
         helpLink: (
-          <a href="https://developers.requestly.com/workspace/using-workspace/" target="_blank" rel="noreferrer">
+          <a href="https://docs.requestly.com/general/team/team-collaboration" target="_blank" rel="noreferrer">
             Learn how to create Team Workspace
           </a>
         ),
@@ -299,7 +315,11 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
           "Generate a mock API endpoint to simulate your API without needing to configure a real API server.",
         icon: <MdOutlineDns />,
         helpLink: (
-          <a href="https://developers.requestly.com/mock-server/create-new-mock-api/" target="_blank" rel="noreferrer">
+          <a
+            href="https://docs.requestly.com/general/mock-server/create/create-mock-api"
+            target="_blank"
+            rel="noreferrer"
+          >
             Learn how to create API Mock
           </a>
         ),
@@ -329,7 +349,11 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
           "SessionBook allows you to capture, report, and debug errors. Easily capture mouse movements and screen recording along with network & console logs.",
         icon: <PiRecordFill />,
         helpLink: (
-          <a href="https://developers.requestly.com/sessions/record-session/" target="_blank" rel="noreferrer">
+          <a
+            href="https://docs.requestly.com/general/session-book/record-bug-reports#recording-sessions"
+            target="_blank"
+            rel="noreferrer"
+          >
             Learn how to record a session
           </a>
         ),

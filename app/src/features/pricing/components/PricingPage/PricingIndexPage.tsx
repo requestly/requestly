@@ -18,6 +18,7 @@ import EnterpriseRequestBanner from "./components/EnterpriseRequestBanner";
 import ProductSwitcher from "../ProductSwitcher";
 import "./pricingIndexPage.scss";
 import { kebabCase } from "lodash";
+import { StudentProgram } from "./components/StudentProgram";
 
 export const PricingIndexPage = () => {
   const navigate = useNavigate();
@@ -66,6 +67,7 @@ export const PricingIndexPage = () => {
               <PricingTable duration={duration} source={SOURCE.PRICING_PAGE} product={activeProduct} />
             </div>
             <EnterprisePlanCard product={activeProduct} />
+            <StudentProgram source={SOURCE.PRICING_PAGE} />
             <CompaniesSection />
             <StatsCard />
             <OtherWaysToMakePurchase />
