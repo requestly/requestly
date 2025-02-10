@@ -2,7 +2,6 @@ import React from "react";
 import { Space } from "antd";
 import { CloseCircleFilled } from "@ant-design/icons";
 import { RQAPI } from "features/apiClient/types";
-import emptyResponseIcon from "../../../../../../../assets/response-empty-state.svg";
 import LINKS from "config/constants/sub/links";
 import { KEY_ICONS, KEYBOARD_SHORTCUT, KEYBOARD_SHORTCUTS } from "../../../../../../../../../constants";
 import { capitalize } from "lodash";
@@ -41,7 +40,7 @@ export const EmptyResponsePlaceholder: React.FC<EmptyResponseViewProps> = ({ isF
         ) : (
           <>
             <div className="empty-state">
-              <img src={emptyResponseIcon} alt="empty card" width={80} height={80} />
+              <img src={"/assets/media/apiClient/response-empty-state.svg"} alt="empty card" width={80} height={80} />
               <div className="api-client-empty-response-view__title">Nothing to see here!</div>
               <div className="api-client-empty-response-view__description">{emptyDescription}</div>
             </div>
