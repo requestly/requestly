@@ -1,5 +1,3 @@
-import emptyViewIcon from "../../../../../../assets/emptyView.svg";
-import defaultViewIcon from "../../../../../../assets/defaultView.svg";
 import { RQButton } from "lib/design-system-v2/components";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { createBlankApiRecord } from "features/apiClient/screens/apiClient/utils";
@@ -56,7 +54,10 @@ export const ApiClientEmptyView = () => {
 
   return (
     <div className="api-client-empty-view-container">
-      <img src={isEmpty ? emptyViewIcon : defaultViewIcon} alt="empty-view" />
+      <img
+        src={isEmpty ? "/assets/media/apiClient/emptyView.svg" : "/assets/media/apiClient/defaultView.svg"}
+        alt="empty-view"
+      />
       <div>
         <div className="api-client-empty-view-header">
           {isEmpty ? "No API requests created yet." : "Pick up where you left off or start fresh."}

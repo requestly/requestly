@@ -10,7 +10,6 @@ import { HomepageEmptyCard } from "../EmptyCard";
 import { m, AnimatePresence } from "framer-motion";
 import { RQButton } from "lib/design-system/components";
 import { redirectToRuleEditor, redirectToTemplates } from "utils/RedirectionUtils";
-import rulesIcon from "../../assets/rules.svg";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { StorageService } from "init";
 // @ts-ignore
@@ -86,7 +85,7 @@ export const RulesCard: React.FC = () => {
             <Col span={16}>
               <Row gutter={8} align="middle">
                 <Col>
-                  <img width={16} height={16} src={rulesIcon} alt="rules" />
+                  <img width={16} height={16} src={"/assets/media/components/rules.svg"} alt="rules" />
                 </Col>
                 <Col className="text-white primary-card-header">HTTP Rules</Col>
               </Row>
@@ -146,7 +145,7 @@ export const RulesCard: React.FC = () => {
       ) : (
         <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <HomepageEmptyCard
-            icon={rulesIcon}
+            icon={"/assets/media/components/rules.svg"}
             title="HTTP Rules"
             description="Create rules to modify HTTP requests and responses."
             primaryButton={

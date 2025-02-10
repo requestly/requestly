@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation, useNavigate } from "react-router-dom";
 import { Col, Modal, Row } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import SessionBearLogo from "src-SessionBear/assets/sessionBearLogoFull.svg";
-import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import PATHS from "config/constants/sub/paths";
 import { RQButton } from "lib/design-system/components";
 import { SaveSessionButton } from "features/sessionBook/components/SaveSessionButton/SaveSessionButton";
@@ -75,9 +73,9 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
           {isOpenedInIframe ? (
             <>
               {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
-                <img src={SessionBearLogo} alt="SessionBear Logo" width={150} />
+                <img src={"/assets/media/common/sessionBearLogoFull.svg"} alt="SessionBear Logo" width={150} />
               ) : (
-                <img src={RQLogo} alt="Requestly Logo" width={120} />
+                <img src={"/assets/media/common/rq_logo_full.svg"} alt="Requestly Logo" width={120} />
               )}
             </>
           ) : (
