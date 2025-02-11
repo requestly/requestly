@@ -9,10 +9,12 @@ export const useCurrentWorkspaceUserRole = (): { role: TeamRole | undefined } =>
   const availableTeams = useSelector(getAvailableTeams) as Team[] | null;
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
-  const teamDetails = useMemo(() => availableTeams?.find((team) => team.id === currentlyActiveWorkspace.id), [
-    availableTeams,
-    currentlyActiveWorkspace.id,
-  ]);
+  const teamDetails = useMemo(
+    () => availableTeams?.find((team) => team.id === currentlyActiveWorkspace.id),
+    [availableTeams, currentlyActiveWorkspace.id]
+  );
+
+  return { role: TeamRole.read };
 
   if (!user.loggedIn) {
     return { role: undefined };
