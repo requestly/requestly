@@ -120,7 +120,7 @@ export const RulesCard = () => {
       importOptions={{
         menu: IMPORT_OPTIONS,
         label: "Charles, ModHeader, & more",
-        icon: "/assets/img/rules/import-icon.svg",
+        icon: "/assets/media/rules/import-icon.svg",
       }}
       listItemClickHandler={(item: Rule) => {
         trackHomeRulesActionClicked("rule_clicked");
