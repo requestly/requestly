@@ -15,8 +15,6 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { IoIosArrowDropright } from "@react-icons/all-files/io/IoIosArrowDropright";
 import { IoIosArrowDropleft } from "@react-icons/all-files/io/IoIosArrowDropleft";
 import "./index.scss";
-//@ts-ignore
-import { RuleType } from "@requestly/shared/types/entities/rules";
 
 export const Templates: React.FC = () => {
   const scrollContainerRef = useRef(null);

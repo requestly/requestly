@@ -27,8 +27,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/components/RulesList/components";
 import "./rulesCard.scss";
-// @ts-ignore
-import { Rule, RuleType } from "@requestly/shared/types/entities/rules";
+import { Rule } from "@requestly/shared/types/entities/rules";
 
 export const RulesCard: React.FC = () => {
   const MAX_RULES_TO_SHOW = 3;
