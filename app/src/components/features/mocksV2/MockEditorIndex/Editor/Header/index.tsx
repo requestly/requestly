@@ -79,7 +79,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
             <RQButton
               iconOnly
               type="text"
-              icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+              icon={<img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />}
               onClick={() => {
                 trackMockEditorClosed(mockType, "back_button");
                 handleClose();
@@ -107,7 +107,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
                   width={10}
                   height={6}
                   alt="down arrow"
-                  src="/assets/icons/downArrow.svg"
+                  src="/assets/media/common/down-arrow.svg"
                   className="mock-editor-options-trigger-icon"
                 />
               </span>

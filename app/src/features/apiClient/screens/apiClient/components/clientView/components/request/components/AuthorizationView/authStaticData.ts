@@ -1,6 +1,3 @@
-import noAuth from "./assets/no-auth.svg";
-import inheritAuth from "./assets/inherit-auth.svg";
-
 export const AUTHORIZATION_TYPES = {
   INHERIT: "INHERIT",
   NO_AUTH: "NO_AUTH",
@@ -44,14 +41,14 @@ export const AUTHORIZATION_FORM_DATA = {
 export const AUTHORIZATION_STATIC_DATA = {
   [AUTHORIZATION_TYPES.INHERIT]: {
     description: {
-      img: inheritAuth,
+      img: "/assets/media/apiClient/inherit-auth.svg",
       heading: "Inherits authorization from the parent collection.",
       subHeading: "This request will use its parent collection’s auth token when you send the request.",
     },
   },
   [AUTHORIZATION_TYPES.NO_AUTH]: {
     description: {
-      img: noAuth,
+      img: "/assets/media/apiClient/no-auth.svg",
       heading: "No authorization type selected for this request.",
       subHeading: "Please select a authorization type above.",
     },

@@ -173,7 +173,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
           </ul>
         ) : (
           <div className="title teams-invite-empty-message">
-            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
+            <img alt="smile" width="48px" height="44px" src="/assets/media/common/smiles.svg" />
             <div>You don't have any workspace invites!</div>
           </div>
         )}

@@ -1,11 +1,12 @@
 import React from "react";
 import { Col, Row, Typography } from "antd";
-import indeedLogo from "assets/img/icons/common/indeed.svg";
-import atntLogo from "assets/img/icons/common/atnt.svg";
-import verizonLogo from "assets/img/icons/common/verizon.svg";
-import intuitLogo from "assets/img/icons/common/intuit.svg";
 
-const companyLogos = [indeedLogo, atntLogo, verizonLogo, intuitLogo];
+const companyLogos = [
+  "/assets/media/common/indeed.svg",
+  "/assets/media/common/atnt.svg",
+  "/assets/media/common/verizon.svg",
+  "/assets/media/common/intuit.svg",
+];
 
 export const CompaniesLogoBanner: React.FC = () => {
   return (
