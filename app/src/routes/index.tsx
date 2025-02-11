@@ -24,6 +24,7 @@ import MinimalLayout from "layouts/MinimalLayout";
 import { paymentRoutes } from "./paymentRoutes";
 import { networkInspectorRoutes } from "features/networkInspector";
 import RouterError from "components/misc/PageError/RouterError";
+import { homeRoutes } from "./homeRoutes";
 
 export const routesV2: RouteObject[] = [
   /** Misc **/
@@ -44,6 +45,7 @@ export const routesV2: RouteObject[] = [
       />
     ),
     children: [
+      ...homeRoutes,
       /** App Dashboard - Normal Paths **/
       {
         path: "",
