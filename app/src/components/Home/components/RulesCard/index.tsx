@@ -70,7 +70,7 @@ export const RulesCard = () => {
 
   return (
     <Card
-      cardIcon={"/assets/img/rules/rules-icon.svg"}
+      cardIcon={"/assets/media/rules/rules-icon.svg"}
       contentLoading={isLoading || isRulesLoading}
       cardType={CardType.RULES}
       listItemClickHandler={(item: Rule) => {
