@@ -28,7 +28,6 @@ export const useWorkspaceHelpers = () => {
     console.log("[useWorkspaceHelpers.switchWorkspace]", { workspaceId });
     dispatch(variablesActions.resetState());
     dispatch(tabsLayoutActions.resetState());
-    await clientRuleStorageService.resetRulesAndGroups();
     return workspaceManager.initActiveWorkspaces([workspaceId]);
   };
 
