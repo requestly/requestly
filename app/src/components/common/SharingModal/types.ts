@@ -1,5 +1,4 @@
 import { Team } from "types";
-//@ts-ignore
 import { Group as NewGroup, Rule as NewRule } from "@requestly/shared/types/entities/rules";
 
 export enum SharingOptions {

@@ -14,7 +14,6 @@ import {
   ResponseRule,
   Rule,
   UserAgentRule,
-  //@ts-ignore
 } from "@requestly/shared/types/entities/rules";
 
 const tourTooltipPresets = {

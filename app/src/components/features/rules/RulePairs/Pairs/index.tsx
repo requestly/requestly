@@ -8,7 +8,6 @@ import ResponseRulePair from "./ResponseRulePair";
 import RequestRulePair from "./RequestRulePair";
 import UserAgentRulePair from "./UserAgentRulePair";
 import DelayRulePair from "./DelayRulePair";
-// @ts-ignore
 import { RuleType } from "@requestly/shared/types/entities/rules";
 
 export const rulePairComponents = {

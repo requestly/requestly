@@ -23,7 +23,6 @@ import { getAllRulesOfGroup } from "utils/rules/misc";
 import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
 import "./duplicateRuleModal.scss";
-//@ts-ignore
 import { Group, RecordStatus, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
 import { isGroup, isRule } from "features/rules";
 
@@ -177,7 +176,6 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
             if (isDuplicationInSameWorkspace) {
               toast.success("Duplicated the group successfully.");
               dispatch(
-                // @ts-ignore
                 globalActions.updateRefreshPendingStatus({
                   type: "rules",
                   newValue: !isRulesListRefreshPending,

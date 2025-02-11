@@ -160,10 +160,7 @@ const SupportPanel = () => {
               if (isPanelVisible) window?.$crisp?.push(["do", "chat:close"]);
               if (isRequestBotVisible) setIsRequestBotVisible(false);
               trackSupportOptionOpened();
-              dispatch(
-                // @ts-ignore
-                globalActions.updateIsSupportChatOpened(true)
-              );
+              dispatch(globalActions.updateIsSupportChatOpened(true));
             }}
           />
         </Badge>

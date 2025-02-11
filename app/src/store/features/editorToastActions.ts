@@ -8,13 +8,10 @@ interface toastOverlay {
   scriptId?: string;
 }
 
-interface Action {
-  payload: toastOverlay & {
-    toastOverlay?: toastOverlay;
-  };
-}
-
-export const removeToastForEditor = (prevState: GlobalSliceState, action: Action) => {
+export const removeToastForEditor = (
+  prevState: GlobalSliceState,
+  action: { payload: { id?: string; scriptId?: string } }
+) => {
   const editorId = action.payload.id;
   const newEditorToast = { ...prevState.editorToast };
   delete newEditorToast[editorId];
@@ -24,7 +21,10 @@ export const removeToastForEditor = (prevState: GlobalSliceState, action: Action
   };
 };
 
-export const triggerToastForEditor = (prevState: GlobalSliceState, action: Action) => {
+export const triggerToastForEditor = (
+  prevState: GlobalSliceState,
+  action: { payload: { id: string; message: string; type: string; toastOverlay?: toastOverlay } }
+) => {
   const editorId = action.payload.id;
   const toastOverlay = action.payload.toastOverlay!;
   return {

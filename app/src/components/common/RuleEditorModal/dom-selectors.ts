@@ -1,4 +1,3 @@
-// @ts-ignore
 import { RuleType } from "@requestly/shared/types/entities/rules";
 
 /**

@@ -9,8 +9,7 @@ import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 export const setUserPersona = (dispatch: any, value: string | OtherOption, clear: boolean, key: string) => {
-  // @ts-expect-error actions file is not typed
-  dispatch(globalActions.updateUserPersona({ value: clear ? "" : value, key }));
+  dispatch(globalActions.updateUserPersona({ value: clear ? "" : String(value), key }));
 };
 
 export const handleSurveyNavigation = (
@@ -37,12 +36,10 @@ export const handleSurveyNavigation = (
   if (isSurveyModal || index !== surveyLength - 1) {
     switch (currentPage) {
       case SurveyPage.GETTING_STARTED:
-        // @ts-expect-error actions file is not typed
         dispatch(globalActions.updatePersonaSurveyPage(SurveyPage.PERSONA));
         break;
 
       case SurveyPage.PERSONA:
-        // @ts-expect-error actions file is not typed
         dispatch(globalActions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
         break;
     }
@@ -50,7 +47,6 @@ export const handleSurveyNavigation = (
     if (isSurveyModal && index === surveyLength - 1) {
       if (isSharedListUser || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
         //don’t show recommendation screen for shared list users or desktop users
-        // @ts-expect-error actions file is not typed
         dispatch(globalActions.updateIsPersonaSurveyCompleted(true));
         return;
       }
