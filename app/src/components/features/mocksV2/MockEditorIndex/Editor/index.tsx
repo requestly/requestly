@@ -216,7 +216,6 @@ const MockEditor: React.FC<Props> = ({
     } else {
       if (errors.headers) {
         dispatch(
-          // @ts-expect-error since the actions file is not typed
           globalActions.triggerToastForEditor({
             id: `headers-${id}`,
             message: errors.headers,
