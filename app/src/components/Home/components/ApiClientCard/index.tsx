@@ -45,10 +45,13 @@ const ApiClientCard = () => {
     [navigate]
   );
 
-  const importTriggerHandler = useCallback((modal: ImporterTypes) => {
-    navigate(PATHS.API_CLIENT.ABSOLUTE, user?.details?.isLoggedIn ? { state: { modal } } : {});
-    trackHomeApisActionClicked(`${modal.toLowerCase()}_importer_clicked`);
-  }, []);
+  const importTriggerHandler = useCallback(
+    (modal: ImporterTypes) => {
+      navigate(PATHS.API_CLIENT.ABSOLUTE, user?.details?.isLoggedIn ? { state: { modal } } : {});
+      trackHomeApisActionClicked(`${modal.toLowerCase()}_importer_clicked`);
+    },
+    [navigate]
+  );
 
   const items: MenuProps["items"] = [
     {
@@ -101,7 +104,7 @@ const ApiClientCard = () => {
       importOptions={{
         menu: IMPORT_OPTIONS,
         label: "Postman, Bruno & more",
-        icon: "/assets/img/apiClient/import-icon.svg",
+        icon: "/assets/media/apiClient/import-icon.svg",
       }}
       bodyTitle={cardOptions?.bodyTitle}
       contentList={isLoggedIn ? cardOptions?.contentList : []}
