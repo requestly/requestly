@@ -55,7 +55,6 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   useEffect(() => {
     if (gqlOperationFilter.key && gqlOperationFilter.value) {
       dispatch(
-        // @ts-expect-error since the actions file is not typed
         globalActions.updateRulePairAtGivenPath({
           pairIndex,
           triggerUnsavedChangesIndication: false,
@@ -83,7 +82,6 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     const newPayloadKey = e?.target?.value ?? "";
 
     dispatch(
-      // @ts-expect-error since the actions file is not typed
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: { [SOURCE_REQUEST_PAYLOAD_KEY]: newPayloadKey },
@@ -99,7 +97,6 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
 
   const handleRequestPayloadOperatorChange = (operator: string) => {
     dispatch(
-      // @ts-expect-error since the actions file is not typed
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: { [SOURCE_REQUEST_PAYLOAD_OPERATOR]: operator },
@@ -117,7 +114,6 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     const newPayloadValue = e?.target?.value ?? "";
 
     dispatch(
-      // @ts-expect-error since the actions file is not typed
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: { [SOURCE_REQUEST_PAYLOAD_VALUE]: newPayloadValue },
