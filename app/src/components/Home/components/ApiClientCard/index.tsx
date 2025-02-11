@@ -37,10 +37,13 @@ const ApiClientCard = () => {
   const tabs = useSelector(getTabs("apiClient"));
   const [cardOptions] = useState<CardOptions>(!isEmpty(tabs) ? getOptions(tabs, FormatType.TABS) : null);
 
-  const createNewHandler = useCallback((type: CreateType) => {
-    navigate(PATHS.API_CLIENT.ABSOLUTE, { state: { action: "create", type } });
-    trackHomeApisActionClicked(`new_${type}_clicked`);
-  }, []);
+  const createNewHandler = useCallback(
+    (type: CreateType) => {
+      navigate(PATHS.API_CLIENT.ABSOLUTE, { state: { action: "create", type } });
+      trackHomeApisActionClicked(`new_${type}_clicked`);
+    },
+    [navigate]
+  );
 
   const importTriggerHandler = useCallback((modal: ImporterTypes) => {
     navigate(PATHS.API_CLIENT.ABSOLUTE, user?.details?.isLoggedIn ? { state: { modal } } : {});
@@ -94,7 +97,7 @@ const ApiClientCard = () => {
       wrapperClass={`${cardOptions?.type === FormatType.HISTORY ? "history-card" : ""} api-client-card`}
       cardType={CardType.API_CLIENT}
       title={"API Client"}
-      cardIcon={"/assets/img/apiClient/api-client-icon.svg"}
+      cardIcon={"/assets/media/apiClient/api-client-icon.svg"}
       importOptions={{
         menu: IMPORT_OPTIONS,
         label: "Postman, Bruno & more",

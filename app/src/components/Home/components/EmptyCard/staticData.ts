@@ -7,7 +7,7 @@ export const PRODUCT_FEATURES = {
   [CardType.RULES]: {
     title: "HTTP Interceptor",
     description: "Intercept, debug and modify HTTP requests",
-    icon: "/assets/img/rules/rules-icon.svg",
+    icon: "/assets/media/rules/rules-icon.svg",
     features: [
       "Map local files or redirect API/JS requests between environments..",
       "Mock XHR & Fetch requests by stubbing API responses.",
@@ -25,7 +25,7 @@ export const PRODUCT_FEATURES = {
   [CardType.API_CLIENT]: {
     title: "API client",
     description: "Design, manage, and test APIs easily",
-    icon: "/assets/img/apiClient/api-client-icon.svg",
+    icon: "/assets/media/apiClient/api-client-icon.svg",
     features: [
       "Send API requests and test endpoints effortlessly.",
       "Execute cURL requests directly in the client.",
