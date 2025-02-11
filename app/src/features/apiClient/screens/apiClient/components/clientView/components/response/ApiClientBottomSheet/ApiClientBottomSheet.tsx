@@ -8,6 +8,7 @@ import StatusLine from "../StatusLine";
 import { Tag } from "antd";
 import { TestsView } from "../TestsView/TestsView";
 import { TestResult } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
+import { ApiClientErrorPanel } from "../../errors/ApiClientErrorPanel";
 
 interface Props {
   response: RQAPI.Response;
@@ -96,5 +97,10 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
     handleTestResultRefresh,
   ]);
 
-  return <BottomSheet items={bottomSheetTabItems} disableDocking utilities={<StatusLine response={response} />} />;
+  return (
+    <>
+      <ApiClientErrorPanel />
+      <BottomSheet items={bottomSheetTabItems} disableDocking utilities={<StatusLine response={response} />} />
+    </>
+  );
 };
