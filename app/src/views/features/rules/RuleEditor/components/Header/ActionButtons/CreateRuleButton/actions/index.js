@@ -227,6 +227,15 @@ export const validateRule = (rule, dispatch, appMode) => {
   else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.HEADERS) {
     if (rule.version > 1) {
       rule.pairs.every((pair, index) => {
+        if (!pair.modifications) {
+          output = {
+            result: false,
+            message: `Please add atleast one header modification to the rule.`,
+            error: "missing modifications key in pair",
+          };
+          return false;
+        }
+
         if (pair.modifications.Request?.length === 0 && pair.modifications.Response?.length === 0) {
           output = {
             result: false,
