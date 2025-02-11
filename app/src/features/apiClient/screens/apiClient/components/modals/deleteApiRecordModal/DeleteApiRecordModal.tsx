@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { RQModal } from "lib/design-system/components";
-import deleteIcon from "../../../../../assets/delete.svg";
 import { RQButton } from "lib/design-system-v2/components";
 import { RQAPI } from "features/apiClient/types";
 import { isApiCollection } from "../../../utils";
@@ -100,7 +99,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
       destroyOnClose={true}
       className="delete-api-record-modal"
     >
-      <img width={32} height={32} src={deleteIcon} alt="Delete" className="icon" />
+      <img width={32} height={32} src={"/assets/media/common/delete.svg"} alt="Delete" className="icon" />
       <div className="header">{header}</div>
       <div className="description">{description}</div>
 

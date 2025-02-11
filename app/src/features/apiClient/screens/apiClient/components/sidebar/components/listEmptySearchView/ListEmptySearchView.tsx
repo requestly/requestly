@@ -1,5 +1,4 @@
 import React from "react";
-import emptySearchSvg from "../../assets/empty-search.svg";
 import "./listEmptySearchView.scss";
 
 interface ListEmptySearchViewProps {
@@ -9,7 +8,7 @@ interface ListEmptySearchViewProps {
 export const ListEmptySearchView: React.FC<ListEmptySearchViewProps> = ({ message }: ListEmptySearchViewProps) => {
   return (
     <div className="list-empty-search-view">
-      <img src={emptySearchSvg} alt="empty search" />
+      <img src={"/assets/media/apiClient/empty-search.svg"} alt="empty search" />
       <div className="list-empty-search-view-message">{message}</div>
     </div>
   );

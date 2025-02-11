@@ -38,7 +38,7 @@ const InviteMemberModal = ({ isOpen, teamId, emails, isAdmin, handleModalClose }
     <RQModal centered open={isOpen} onCancel={handleModalClose}>
       <div className="rq-modal-content">
         <div>
-          <img alt="oops" className="inivite-modal-oops-icon" src="/assets/img/workspaces/oops.svg" />
+          <img alt="oops" className="inivite-modal-oops-icon" src="/assets/media/settings/oops.svg" />
         </div>
         <div className="header invite-member-modal-header">Oops!</div>
         <p className="text-gray">{emails.join(", ")}</p>

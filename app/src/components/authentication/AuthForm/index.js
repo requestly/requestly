@@ -8,7 +8,6 @@ import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import { HiArrowLeft } from "@react-icons/all-files/hi/HiArrowLeft";
 
 //IMAGES
-import GoogleIcon from "../../../assets/img/icons/common/google.svg";
 // import AppleIconWhite from "../../../assets/img/icons/common/apple-white.svg";
 // import MicrosoftIcon from "../../../assets/img/icons/common/microsoft.svg";
 // import GithubIcon from "../../../assets/img/icons/common/github.svg";
@@ -198,7 +197,7 @@ const AuthForm = ({
                     <span className="btn-inner--text">Github</span>
                   </Button> */}
             <RQButton className="btn-default text-bold w-full" onClick={handleGoogleSignInButtonClick}>
-              <img src={GoogleIcon} alt="google" className="auth-icons" />
+              <img src={"/assets/media/common/google.svg"} alt="google" className="auth-icons" />
               {MODE === AUTH_ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
             </RQButton>
           </>
