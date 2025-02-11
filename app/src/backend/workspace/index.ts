@@ -20,7 +20,7 @@ export const getPendingInvites = async ({ email, domain }: { email: boolean; dom
     .then((res) => {
       return res?.data;
     })
-    .catch((e) => {
+    .catch((e): Invite[] => {
       console.log("error", e);
       return [];
     });
@@ -33,7 +33,7 @@ export const acceptTeamInvite = async (inviteId: string) => {
     .then((res: any) => {
       return res;
     })
-    .catch((e) => {
+    .catch((e): null => {
       return null;
     });
 };
