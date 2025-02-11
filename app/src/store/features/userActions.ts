@@ -139,11 +139,11 @@ export const updateProductTourCompleted = (
     };
   }
 ) => {
-  if (typeof prevState.misc.persist[action.payload.tour] === "object") {
-    if (action.payload.subTour) {
-      const tour = prevState.misc.persist[action.payload.tour] as Record<string, boolean>;
-      tour[action.payload.subTour] = true;
-    }
+  if (action.payload.tour === TOUR_TYPES.MISCELLANEOUS) {
+    prevState.misc.persist.isMiscTourCompleted = {
+      ...prevState.misc.persist.isMiscTourCompleted,
+      [action.payload.subTour]: true,
+    };
   } else {
     prevState.misc.persist[action.payload.tour] = true;
   }

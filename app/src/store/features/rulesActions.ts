@@ -3,7 +3,7 @@ import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { get, set } from "lodash";
 import { GlobalSliceState } from "store/slices/global/types";
-import { Group, QueryParamRule, Rule, ScriptRule } from "@requestly/shared/types/entities/rules";
+import { Group, QueryParamRule, RecordType, Rule, ScriptRule } from "@requestly/shared/types/entities/rules";
 
 export const updateLastBackupTimeStamp = (prevState: GlobalSliceState, action: { payload: string }) => {
   prevState.rules.lastBackupTimeStamp = action.payload;
@@ -134,8 +134,8 @@ export const closeCurrentlySelectedRuleDetailsPanel = (prevState: GlobalSliceSta
 
 export const updateRecord = (prevState: GlobalSliceState, action: { payload: Rule }) => {
   const ObjectTypeMap = {
-    [GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP]: "groups",
-    [GLOBAL_CONSTANTS.OBJECT_TYPES.RULE]: "rules",
+    [GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP as RecordType.GROUP]: "groups",
+    [GLOBAL_CONSTANTS.OBJECT_TYPES.RULE as RecordType.RULE]: "rules",
   };
   const recordType = ObjectTypeMap[action.payload.objectType] as "rules" | "groups";
 

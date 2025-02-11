@@ -69,6 +69,7 @@ export interface GlobalSliceState {
       isJoinWorkspaceCardVisible: boolean;
       isManageBillingTeamAlertVisible: boolean;
       isSupportChatOpened: boolean;
+      lastFeaturePath: string;
     };
     nonPersist: {
       networkSessionSaveInProgress: boolean;
