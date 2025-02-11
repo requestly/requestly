@@ -1,9 +1,16 @@
-// @ts-expect-error Expected to through an error since we haven't compiled this module with ts yet!
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
-/* TYPES */
-type ScriptLanguage = GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS | GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS;
-type ScriptType = GLOBAL_CONSTANTS.SCRIPT_TYPES.URL | GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE;
+/* TYPES todo: make enum */
+enum ScriptLanguage {
+  JS = "js",
+  CSS = "css",
+}
+
+enum ScriptType {
+  URL = "url",
+  CODE = "code",
+}
+
 type ScriptAttributes = {
   name: string;
   value: string;

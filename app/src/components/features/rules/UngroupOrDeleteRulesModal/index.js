@@ -15,7 +15,6 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { deleteTestReportByRuleId } from "../TestThisRule/utils/testReports";
-import { unselectAllRecords } from "../actions";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
@@ -71,7 +70,7 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
                 newValue: !isRulesListRefreshPending,
               })
             );
-            unselectAllRecords(dispatch);
+            dispatch(globalActions.clearSelectedRecords());
             // Notify user
             toast.success("Group deleted");
             toggle();

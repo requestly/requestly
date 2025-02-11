@@ -273,7 +273,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
       recordsStatusUpdateAction([record], newStatus, onSuccess);
     },
-    [updateRecordInStorage, userAttributes.num_active_rules, recordsStatusUpdateAction]
+    [recordsStatusUpdateAction]
   );
 
   const recordDuplicateAction = useCallback(
@@ -347,11 +347,10 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
       updateGroupOfSelectedRules(appMode, [record.id], groupId, user).then(() => {
         trackGroupChangedEvent("rules_list_drag_and_drop");
         onSuccess();
-        // @ts-ignore
         dispatch(globalActions.updateRefreshPendingStatus({ type: "rules", newValue: !isRulesListRefreshPending }));
       });
     },
-    [appMode, user, isRulesListRefreshPending]
+    [appMode, user, dispatch, isRulesListRefreshPending]
   );
 
   const groupShareAction = useCallback(
@@ -387,7 +386,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         );
       }
     },
-    [appMode, user, isRulesListRefreshPending]
+    [user.loggedIn, appMode, dispatch]
   );
 
   const value = {
