@@ -4,8 +4,6 @@ import { getActiveWorkspaceIds, getAllWorkspaces, getWorkspacesUpdatedAt } from 
 import { useAvailableWorkspacesListener } from "./useAvailableWorkspacesListener";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { workspaceManager } from "../helpers/workspaceManager";
-import { getAppMode } from "store/selectors";
-import { LOGGED_OUT_WORKSPACE_ID } from "../utils";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { globalActions } from "store/slices/global/slice";
 import { useActiveWorkspacesMembersListener } from "./useActiveWorkspacesMembersListener";
@@ -18,7 +16,6 @@ export const useWorkspaceManager = () => {
   const _userId = useRef(userId);
   const workspaces = useSelector(getAllWorkspaces);
   const _workspaces = useRef(workspaces);
-  const appMode = useSelector(getAppMode);
 
   const workspacesUpdatedAt = useSelector(getWorkspacesUpdatedAt);
   const _workspacesUpdatedAt = useRef(workspacesUpdatedAt);
@@ -34,13 +31,13 @@ export const useWorkspaceManager = () => {
   useActiveWorkspacesMembersListener();
 
   useEffect(() => {
-    console.log("[useWorkspaceManager] workspaceManager updater", { workspaces, userId, appMode });
+    console.log("[useWorkspaceManager] workspaceManager updater", { workspaces, userId });
     _userId.current = userId;
-    workspaceManager.init(dispatch, workspaces, userId, appMode);
+    workspaceManager.init(dispatch, workspaces, userId);
     // _workspacesUpdatedAt.current = workspacesUpdatedAt;
     // _workspaces.current = workspaces;
     console.log("[useWorkspaceManager] workspaceManager updater userid set", { userId });
-  }, [dispatch, workspaces, userId, appMode, workspacesUpdatedAt]);
+  }, [dispatch, workspaces, userId, workspacesUpdatedAt]);
 
   useEffect(() => {
     console.log("[useWorkspaceManager] workspaceManager updater activeWorkspaceIds", { activeWorkspaceIds });

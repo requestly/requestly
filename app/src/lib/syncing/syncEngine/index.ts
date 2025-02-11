@@ -20,8 +20,6 @@ class SyncEngine {
   authToken?: string = undefined;
   userId?: string = undefined;
 
-  constructor() {}
-
   async init(workspacesConfig: WorkspaceConfig[], userId?: string, authToken?: string) {
     if (this.initInProgress) {
       return;

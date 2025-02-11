@@ -16,7 +16,6 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RuleStorageModel, syncEngine } from "lib/syncing";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
-import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -82,45 +81,39 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
       sendIndividualRuleTypesCountAttributes(rules);
       trackRulesListLoaded(rules.length, activeRulesCount, activePremiumRules.length, groups.length);
     },
-    [appMode, dispatch, setIsLoading]
+    [appMode, dispatch, setIsLoading, activeWorkspaceId]
   );
 
   useEffect(() => {
-    // let subscription: any;
     async function initRulesListener() {
-      console.log("initRulesListener");
-      // TODO-Syncing: This is a temporary solution to wait for the sync engine to initialize
+      console.debug("[useFetchAndUpdateRules] initRulesListener", { activeWorkspaceId });
       if (!syncEngine.initialized) {
-        setTimeout(() => {
-          initRulesListener();
-        }, 1000);
+        // setTimeout(() => {
+        //   initRulesListener();
+        // }, 1000);
         return;
       }
       // FIXME-syncing: Improvements Required
-      console.log("subscribe RuleStorageModels", activeWorkspaceId);
+      console.debug("[useFetchAndUpdateRules] subscribe RuleStorageModels", activeWorkspaceId);
       unsubscribe = await RuleStorageModel.subscribe(async (ruleStorageModels: RuleStorageModel[]) => {
         let rulesAndGroups = ruleStorageModels.map((ruleStorageModel) => {
           return ruleStorageModel.data;
         });
-        console.log("!!!debug", { ruleStorageModels, rulesAndGroups });
+        console.debug("!!!debug", { ruleStorageModels, rulesAndGroups });
 
         let groups = rulesAndGroups.filter((val) => val.objectType === "group") as Group[];
         let rules = rulesAndGroups.filter((val) => val.objectType === "rule") as Rule[];
         updateRulesAndGroups(rules, groups);
-
-        // TODO-syncing: THese are triggered multiple times
-        await clientRuleStorageService.resetRulesAndGroups();
-        await clientRuleStorageService.saveMultipleRulesOrGroups(rulesAndGroups);
       });
     }
 
     let unsubscribe: (() => void) | undefined;
-    console.log("workspace changed", activeWorkspaceId, userId);
+    console.debug("[useFetchAndUpdateRules] active workspace changed", activeWorkspaceId, userId);
     initRulesListener();
 
     // Cleanup subscription on component unmount
     return () => {
-      console.log("[Debug] Unsubbing explicit subscribers");
+      console.debug("[useFetchAndUpdateRules] Unsubbing explicit subscribers");
       unsubscribe?.();
     };
   }, [userId, activeWorkspaceId, updateRulesAndGroups]);
