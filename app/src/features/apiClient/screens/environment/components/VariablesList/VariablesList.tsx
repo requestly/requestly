@@ -19,7 +19,7 @@ interface VariablesListProps {
   onVariablesChange: (variables: EnvironmentVariables) => void;
 }
 
-export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string; id: number };
+export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string };
 
 export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", variables, onVariablesChange }) => {
   const dispatch = useDispatch();
@@ -75,16 +75,13 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
         variableRows.splice(index, 1, updatedRow);
         setDataSource(variableRows);
 
-        const allVariables = variableRows.reduce((acc, variable) => {
+        const allVariables = variableRows.reduce((acc, variable, index) => {
           if (variable.key) {
-            acc[variable.key] = {
-              type: variable.type,
-              syncValue: variable.syncValue,
-              localValue: variable.localValue,
-            };
+            const { key, ...newVariable } = variable;
+            acc[variable.key] = newVariable;
           }
           return acc;
-        }, {});
+        }, {} as EnvironmentVariables);
 
         onVariablesChange(allVariables);
       }
@@ -94,7 +91,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
   const handleAddNewRow = useCallback((dataSource: EnvironmentVariableTableRow[]) => {
     const newData = {
-      id: dataSource.length + 1,
+      id: dataSource.length,
       key: "",
       type: EnvironmentVariableType.String,
       localValue: "",
@@ -105,19 +102,20 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
   const handleDeleteVariable = useCallback(
     async (id: number) => {
-      const newData = id ? dataSource.filter((item) => item.id !== id) : dataSource.slice(0, -1);
+      if (isNaN(id)) {
+        return;
+      }
+      const newData = dataSource.filter((item) => item.id !== id).map((record, index) => ({ ...record, id: index }));
+
       setDataSource(newData);
 
-      const remainingVariables = newData.reduce((acc, variable) => {
+      const remainingVariables = newData.reduce((acc, variable, index) => {
         if (variable.key) {
-          acc[variable.key] = {
-            type: variable.type,
-            syncValue: variable.syncValue,
-            localValue: variable.localValue,
-          };
+          const { key, ...newVariable } = variable;
+          acc[variable.key] = newVariable;
         }
         return acc;
-      }, {});
+      }, {} as EnvironmentVariables);
 
       onVariablesChange(remainingVariables);
 
@@ -150,15 +148,17 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
   useEffect(() => {
     if (variables) {
-      const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(
-        ([key, value], index) => ({
-          id: index,
+      const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables)
+        .map(([key, value], index) => ({
           key,
           type: value.type,
           localValue: value.localValue,
           syncValue: value.syncValue,
-        })
-      );
+          id: value.id,
+        }))
+        .sort((a, b) => {
+          return a.id - b.id; // Sort by id if both ids are defined
+        });
       if (formattedDataSource.length === 0) {
         formattedDataSource.push({
           id: 0,

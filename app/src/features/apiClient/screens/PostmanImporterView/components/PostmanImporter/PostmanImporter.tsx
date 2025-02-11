@@ -1,7 +1,12 @@
 import React, { useCallback, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { FilePicker } from "components/common/FilePicker";
-import { getUploadedPostmanFileType, processPostmanCollectionData, processPostmanEnvironmentData } from "./utils";
+import {
+  getUploadedPostmanFileType,
+  processOnlyLostRecords,
+  processPostmanCollectionData,
+  processPostmanEnvironmentData,
+} from "./utils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
@@ -32,13 +37,14 @@ type ProcessedData = {
 
 interface PostmanImporterProps {
   onSuccess?: () => void;
+  patchLostRecords?: Boolean;
 }
 
 type ProcessingStatus = "idle" | "processing" | "processed";
 
 const BATCH_SIZE = 25;
 
-export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) => {
+export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess, patchLostRecords = false }) => {
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState(null);
@@ -79,18 +85,29 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 throw new Error("Invalid file. Please upload valid Postman export files.");
               }
 
-              if (postmanFileType === "environment") {
-                const processedData = processPostmanEnvironmentData(fileContent);
-                resolve({ type: postmanFileType, data: processedData });
-              } else {
-                const processedApiRecords = processPostmanCollectionData(fileContent);
+              if (patchLostRecords) {
+                const records = processOnlyLostRecords(fileContent);
                 resolve({
                   type: postmanFileType,
                   data: {
                     type: postmanFileType,
-                    apiRecords: processedApiRecords,
+                    apiRecords: records,
                   },
                 });
+              } else {
+                if (postmanFileType === "environment") {
+                  const processedData = processPostmanEnvironmentData(fileContent);
+                  resolve({ type: postmanFileType, data: processedData });
+                } else {
+                  const processedApiRecords = processPostmanCollectionData(fileContent);
+                  resolve({
+                    type: postmanFileType,
+                    data: {
+                      type: postmanFileType,
+                      apiRecords: processedApiRecords,
+                    },
+                  });
+                }
               }
             } catch (error) {
               Logger.error("Error processing postman file:", error);
@@ -145,7 +162,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           }
         });
     },
-    [importError]
+    [importError, patchLostRecords]
   );
 
   const handleImportEnvironments = useCallback(async () => {

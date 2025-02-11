@@ -18,7 +18,7 @@ import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { clearExpandedRecordIdsFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
-import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workload-manager/APIClientWorkloadManager";
+import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { useSearchParams } from "react-router-dom";
 import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
 
@@ -302,15 +302,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setIsRecordBeingCreated(recordType);
           trackCreateEnvironmentClicked(analyticEventSource);
           return addNewEnvironment("New Environment")
-            .then((args) => {
-              if(!args) {
-                return;
-              }
-              const { id, name } = args;
+            .then((newEnvironment: { id: string; name: string; isGlobal: boolean }) => {
               setIsRecordBeingCreated(null);
-              openTab(id, {
-                title: name,
-                url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${id}?new`,
+              openTab(newEnvironment.id, {
+                title: newEnvironment.name,
+                url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${newEnvironment.id}?new`,
               });
             })
             .catch((error) => {

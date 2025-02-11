@@ -54,14 +54,14 @@ export const CollectionRow: React.FC<Props> = ({
             setIsEditMode(true);
           },
         },
-        // {
-        //   key: "1",
-        //   label: <div>Export</div>,
-        //   onClick: (itemInfo) => {
-        //     itemInfo.domEvent?.stopPropagation?.();
-        //     onExportClick(record);
-        //   },
-        // },
+        {
+          key: "1",
+          label: <div>Export</div>,
+          onClick: (itemInfo) => {
+            itemInfo.domEvent?.stopPropagation?.();
+            onExportClick(record);
+          },
+        },
         {
           key: "2",
           label: <div>Delete</div>,
@@ -138,8 +138,8 @@ export const CollectionRow: React.FC<Props> = ({
             header={
               <div
                 className="collection-name-container"
-                onMouseEnter={setHoveredId.bind(this, record.id)}
-                onMouseLeave={setHoveredId.bind(this, "")}
+                onMouseEnter={() => setHoveredId(record.id)}
+                onMouseLeave={() => setHoveredId("")}
                 onClick={() => {
                   openTab(record.id, {
                     title: record.name || "New Collection",

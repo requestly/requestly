@@ -482,7 +482,7 @@ const changeLogs: VersionedChangeLogs[] = [
       },
       {
         title: "Improved Advanced Request targeting based on HTTP Methods, Resource Types, Tab URL etc.",
-        link: "https://docs.requestly.io/getting-started/features/source-filters",
+        link: "https://docs.requestly.com/general/http-rules/advanced-usage/advance-filters",
       },
     ],
   },

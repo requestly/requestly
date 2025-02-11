@@ -2,6 +2,11 @@ import { isEmpty, unionBy } from "lodash";
 import { AUTHORIZATION_TYPES } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 import { KeyValuePair, RQAPI } from "../types";
+import {
+  API_KEY_FORM_VALUES,
+  BASIC_AUTH_FORM_VALUES,
+  BEARER_TOKEN_FORM_VALUES,
+} from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/form";
 
 export const processAuthForEntry = (
   entry: RQAPI.Entry,
@@ -97,17 +102,17 @@ const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
     case AUTHORIZATION_TYPES.NO_AUTH:
       break;
     case AUTHORIZATION_TYPES.BASIC_AUTH: {
-      const { username, password } = authOptions[currentAuthType];
+      const { username, password } = authOptions[currentAuthType] as BASIC_AUTH_FORM_VALUES;
       updateDataInState(headers, "Authorization", `Basic ${btoa(`${username || ""}:${password || ""}`)}`);
       break;
     }
     case AUTHORIZATION_TYPES.BEARER_TOKEN: {
-      const { bearer } = authOptions[currentAuthType];
+      const { bearer } = authOptions[currentAuthType] as BEARER_TOKEN_FORM_VALUES;
       updateDataInState(headers, "Authorization", `Bearer ${bearer}`);
       break;
     }
     case AUTHORIZATION_TYPES.API_KEY: {
-      const { key, value, addTo } = authOptions[currentAuthType];
+      const { key, value, addTo } = authOptions[currentAuthType] as API_KEY_FORM_VALUES;
 
       updateDataInState(addTo === "QUERY" ? queryParams : headers, key || "", value || "");
 
@@ -130,5 +135,6 @@ export const updateRequestWithAuthOptions = (data: KeyValuePair[], dataToAdd: Ke
 
   const filterDataWithKeys = dataToAdd.filter((data) => data.key);
 
-  return unionBy(data, filterDataWithKeys, "type");
+  // Mergin using key so that headers/queryparams aren't appended multiple times
+  return unionBy(data, filterDataWithKeys, (item) => item?.key?.toLowerCase());
 };

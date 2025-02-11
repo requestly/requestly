@@ -15,6 +15,7 @@ export const upsertApiRecord = async (
   const sanitizedRecord = { ...record };
   if (sanitizedRecord.type === RQAPI.RecordType.API) {
     delete sanitizedRecord.data.response;
+    delete sanitizedRecord.data.testResults;
   }
 
   if (sanitizedRecord.type === RQAPI.RecordType.COLLECTION) {
@@ -70,7 +71,7 @@ const createApiRecord = async (
     }
   } else {
     try {
-      const resultDocRef = await addDoc(rootApiRecordsCollectionRef, { ...newRecord })
+      const resultDocRef = await addDoc(rootApiRecordsCollectionRef, { ...newRecord });
       Logger.log(`Api document created ${resultDocRef.id}`);
       // TODO: Figure out why do we need this? Why update the id with its own id?
       updateDoc(resultDocRef, {
@@ -78,8 +79,7 @@ const createApiRecord = async (
       });
 
       return { success: true, data: { ...newRecord, id: resultDocRef.id } };
-    }
-    catch(err) {
+    } catch (err) {
       Logger.error("Error while creating api record", err);
       return { success: false, data: null };
     }
@@ -101,10 +101,10 @@ const updateApiRecord = async (
   } as RQAPI.Record;
 
   try {
-    await updateDoc(apiRecordDocRef, { ...updatedRecord })
+    await updateDoc(apiRecordDocRef, { ...updatedRecord });
     Logger.log(`Api document updated`);
     return { success: true, data: updatedRecord };
-  } catch(err) {
+  } catch (err) {
     Logger.error("Error while updating api record", err);
     return { success: false, data: null };
   }

@@ -184,6 +184,10 @@ export const getUserCountry = (state) => {
   return getGlobalState(state)["country"];
 };
 
+export const getAppLanguage = (state) => {
+  return getGlobalState(state)["appLanguage"];
+};
+
 export const getAuthInitialization = (state) => {
   return getGlobalState(state)["initializations"]["auth"];
 };
@@ -341,4 +345,8 @@ export const getBillingTeamNudgeLastSeenTs = (state) => {
 
 export const getIsSlackConnectButtonVisible = (state) => {
   return getGlobalState(state).misc.persist?.isSlackConnectButtonVisible;
+};
+
+export const getLastFeaturePath = (state) => {
+  return getGlobalState(state)?.misc?.persist?.lastFeaturePath || "/";
 };

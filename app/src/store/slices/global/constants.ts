@@ -158,6 +158,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
 
   // country of current user
   country: "",
+  appLanguage: "en",
 
   initializations: {
     auth: false,
@@ -215,6 +216,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
       isJoinWorkspaceCardVisible: true,
       isManageBillingTeamAlertVisible: true,
       isSupportChatOpened: false,
+      lastFeaturePath: "/",
     },
     nonPersist: {
       networkSessionSaveInProgress: false, // todo: check if requried

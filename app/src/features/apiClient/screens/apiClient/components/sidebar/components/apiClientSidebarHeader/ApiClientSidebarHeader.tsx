@@ -10,6 +10,7 @@ import { RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import {
   trackImportApiCollectionsClicked,
+  trackImportFromBrunoClicked,
   trackImportFromPostmanClicked,
   trackNewCollectionClicked,
   trackNewRequestClicked,
@@ -18,12 +19,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { ImportCollectionsModal } from "../../../modals/importCollectionsModal/ImportCollectionsModal";
+import { ApiClientImportModal } from "../../../modals/importModal/ApiClientImportModal";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import { SiPostman } from "@react-icons/all-files/si/SiPostman";
+import { SiBruno } from "@react-icons/all-files/si/SiBruno";
 import { PostmanImporterModal } from "../../../modals/postmanImporterModal/PostmanImporterModal";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
+import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -49,8 +53,14 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const [isImportCollectionsModalOpen, setIsImportCollectionsModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
+  const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
+
+  // Only for lost requests patch
+  const [isLostRequestsImportModalOpen, setIsLostRequestsImportModalOpen] = useState(false);
+
+  const showImportLostRequestsOption = useFeatureIsOn("patch-lost-requests");
 
   const importItems: DropdownProps["menu"]["items"] = useMemo(
     () => [
@@ -85,7 +95,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         label: (
           <div className="new-btn-option">
             <BsCollection />
-            Requestly Collection
+            Requestly Collection and Environments
           </div>
         ),
         onClick: () => {
@@ -103,7 +113,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             );
           } else {
             trackImportApiCollectionsClicked();
-            setIsImportCollectionsModalOpen(true);
+            setIsImportModalOpen(true);
           }
         },
       },
@@ -133,8 +143,59 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           }
         },
       },
+      {
+        key: "4",
+        label: (
+          <div className="new-btn-option">
+            <SiBruno /> Bruno Collections and Variables
+          </div>
+        ),
+        onClick: () => {
+          trackImportFromBrunoClicked();
+          if (!user.loggedIn) {
+            dispatch(
+              globalActions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  eventSource: "api_client_sidebar",
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                  warningMessage: `Please log in to import Bruno exports`,
+                },
+              })
+            );
+          } else {
+            setIsBrunoImporterModalOpen(true);
+          }
+        },
+      },
+      showImportLostRequestsOption && {
+        key: "5",
+        label: (
+          <div className="new-btn-option">
+            <SiPostman /> Import Lost Requests
+          </div>
+        ),
+        onClick: () => {
+          if (!user.loggedIn) {
+            dispatch(
+              globalActions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  eventSource: "api_client_sidebar",
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                  warningMessage: `Please log in to import Postman collections`,
+                },
+              })
+            );
+          } else {
+            setIsLostRequestsImportModalOpen(true);
+          }
+        },
+      },
     ],
-    [user.loggedIn, dispatch, onImportClick]
+    [user.loggedIn, dispatch, onImportClick, showImportLostRequestsOption]
   );
 
   const items: DropdownProps["menu"]["items"] = [
@@ -272,16 +333,23 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         {user.loggedIn && <EnvironmentSwitcher />}
       </div>
 
-      {isImportCollectionsModalOpen && (
-        <ImportCollectionsModal
-          isOpen={isImportCollectionsModalOpen}
-          onClose={() => setIsImportCollectionsModalOpen(false)}
-        />
+      {isImportModalOpen && (
+        <ApiClientImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
       )}
       {isPostmanImporterModalOpen && (
         <PostmanImporterModal
           isOpen={isPostmanImporterModalOpen}
           onClose={() => setIsPostmanImporterModalOpen(false)}
+        />
+      )}
+      {isBrunoImporterModalOpen && (
+        <BrunoImporterModal isOpen={isBrunoImporterModalOpen} onClose={() => setIsBrunoImporterModalOpen(false)} />
+      )}
+      {isLostRequestsImportModalOpen && (
+        <PostmanImporterModal
+          isOpen={isLostRequestsImportModalOpen}
+          onClose={() => setIsLostRequestsImportModalOpen(false)}
+          patchLostRecords={true}
         />
       )}
     </>

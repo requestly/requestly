@@ -13,7 +13,6 @@ import {
   getRecordIdsToBeExpanded,
 } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
-import { ExportCollectionsModal } from "../../../modals/exportCollectionsModal/ExportCollectionsModal";
 import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
@@ -23,6 +22,7 @@ import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
 import "./collectionsList.scss";
 import { union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
+import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -171,7 +171,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         </div>
       </div>
       {isExportModalOpen && (
-        <ExportCollectionsModal
+        <ApiClientExportModal
+          exportType="collection"
           collections={collectionsToExport}
           isOpen={isExportModalOpen}
           onClose={() => {
