@@ -165,7 +165,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               newRecordBtnText="New collection"
               message={searchValue ? "No collection or request found" : "No collections created yet"}
               onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.COLLECTION)}
-              recordType={RQAPI.RecordType.COLLECTION}
               analyticEventSource="collection_list_empty_state"
             />
           )}
