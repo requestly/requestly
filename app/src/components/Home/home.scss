@@ -46,6 +46,7 @@
 
 .homepage-emptycard {
   width: 456px;
+  height: 322px;
   display: flex;
   flex-direction: column;
   margin-bottom: 32px;
@@ -163,6 +164,7 @@
   background: var(--requestly-color-neutral-900);
   padding: 24px;
   width: 456px;
+  height: 393px;
 
   .header-content {
     display: flex;
@@ -180,10 +182,20 @@
         margin: 0;
       }
     }
+
+    .action-buttons {
+      display: flex;
+
+      .import-dropdown-trigger {
+        margin-right: 4px;
+        &:hover {
+          background: none;
+        }
+      }
+    }
   }
 
   .middle-section {
-    margin-bottom: 32px;
     h2 {
       line-height: 18px;
       font-size: 12px;
