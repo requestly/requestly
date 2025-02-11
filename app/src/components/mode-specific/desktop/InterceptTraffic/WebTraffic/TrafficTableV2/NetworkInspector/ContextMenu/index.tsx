@@ -17,7 +17,6 @@ import { getLogResponseById } from "store/features/desktop-traffic-table/selecto
 import "./index.css";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
-//@ts-ignore
 import { RuleType } from "@requestly/shared/types/entities/rules";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 
