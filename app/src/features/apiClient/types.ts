@@ -39,6 +39,13 @@ export enum QueryParamSyncType {
   TABLE = "table",
 }
 
+export enum ImporterTypes {
+  BRUNO = "BRUNO",
+  POSTMAN = "POSTMAN",
+  REQUESTLY = "REQUESTLY",
+  CURL = "CURL",
+}
+
 export enum CreateType {
   API = "api",
   COLLECTION = "collection",

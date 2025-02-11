@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsRulesListLoading } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useHasChanged } from "hooks";
-import { RQButton } from "lib/design-system/components";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { StorageService } from "init";
@@ -28,6 +27,12 @@ import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { Card } from "../Card";
 import "./rulesCard.scss";
 import { CardType } from "../Card/types";
+import ModHeader from "../../../../assets/img/brand/mod-header-icon.svg?react";
+import ResourceOverride from "../../../../assets/img/brand/resource-override-icon.svg?react";
+import Charles from "../../../../assets/img/brand/charles-icon.svg?react";
+import "./rulesCard.scss";
+import { RQButton } from "lib/design-system-v2/components";
+import { ImporterTypes } from "components/Home/types";
 
 export const RulesCard = () => {
   const MAX_RULES_TO_SHOW = 5;
@@ -45,6 +50,45 @@ export const RulesCard = () => {
   const onRulesDrawerClose = () => {
     setIsRulesDrawerOpen(false);
   };
+
+  const importTriggerHandler = useCallback(
+    (modal: ImporterTypes) => {
+      if (modal === ImporterTypes.REQUESTLY && !user?.details?.isLoggedIn) {
+        dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+      } else {
+        navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal } });
+        trackHomeRulesActionClicked(`${modal.toLowerCase()}_importer_clicked`);
+      }
+    },
+    [user?.details?.isLoggedIn]
+  );
+
+  const IMPORT_OPTIONS = [
+    {
+      key: "1",
+      label: "Charles Proxy",
+      icon: <Charles />,
+      onClick: () => importTriggerHandler(ImporterTypes.CHARLES),
+    },
+    {
+      key: "2",
+      label: "Resource Override",
+      icon: <ResourceOverride />,
+      onClick: () => importTriggerHandler(ImporterTypes.RESOURCE_OVERRIDE),
+    },
+    {
+      key: "3",
+      label: "ModHeader",
+      icon: <ModHeader />,
+      onClick: () => importTriggerHandler(ImporterTypes.MOD_HEADER),
+    },
+    {
+      key: "4",
+      label: "Requestly",
+      icon: <img src={"/assets/img/brandLogos/requestly-icon.svg"} alt="Requestly" />,
+      onClick: () => importTriggerHandler(ImporterTypes.REQUESTLY),
+    },
+  ];
 
   useEffect(() => {
     if (isExtensionInstalled() && !isRulesLoading) {
@@ -73,6 +117,11 @@ export const RulesCard = () => {
       cardIcon={"/assets/media/rules/rules-icon.svg"}
       contentLoading={isLoading || isRulesLoading}
       cardType={CardType.RULES}
+      importOptions={{
+        menu: IMPORT_OPTIONS,
+        label: "Charles, ModHeader, & more",
+        icon: "/assets/media/rules/import-icon.svg",
+      }}
       listItemClickHandler={(item: Rule) => {
         trackHomeRulesActionClicked("rule_clicked");
         trackRuleCreationWorkflowStartedEvent(item.ruleType, SOURCE.HOME_SCREEN);

@@ -18,6 +18,8 @@ import "./apiClientCard.scss";
 import { Card } from "../Card";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { CardType } from "../Card/types";
+import { ImporterTypes } from "features/apiClient/types";
+import Postman from "../../../../assets/img/brand/postman-icon.svg?react";
 import { CreateType } from "features/apiClient/types";
 import { trackHomeApisActionClicked } from "components/Home/analytics";
 
@@ -43,6 +45,14 @@ const ApiClientCard = () => {
     [navigate]
   );
 
+  const importTriggerHandler = useCallback(
+    (modal: ImporterTypes) => {
+      navigate(PATHS.API_CLIENT.ABSOLUTE, user?.details?.isLoggedIn ? { state: { modal } } : {});
+      trackHomeApisActionClicked(`${modal.toLowerCase()}_importer_clicked`);
+    },
+    [navigate]
+  );
+
   const items: MenuProps["items"] = [
     {
       icon: <CgStack />,
@@ -58,12 +68,44 @@ const ApiClientCard = () => {
     },
   ];
 
+  const IMPORT_OPTIONS = [
+    {
+      key: "1",
+      label: "Postman",
+      icon: <Postman />,
+      onClick: () => importTriggerHandler(ImporterTypes.POSTMAN),
+    },
+    {
+      key: "2",
+      label: "Bruno",
+      icon: <img src={"/assets/img/brandLogos/bruno-icon.png"} alt="Bruno" />,
+      onClick: () => importTriggerHandler(ImporterTypes.BRUNO),
+    },
+    {
+      key: "3",
+      label: "cURL",
+      icon: <MdOutlineSyncAlt />,
+      onClick: () => importTriggerHandler(ImporterTypes.CURL),
+    },
+    {
+      key: "4",
+      label: "Requestly",
+      icon: <img src={"/assets/img/brandLogos/requestly-icon.svg"} alt="Requestly" />,
+      onClick: () => importTriggerHandler(ImporterTypes.REQUESTLY),
+    },
+  ];
+
   return (
     <Card
       wrapperClass={`${cardOptions?.type === FormatType.HISTORY ? "history-card" : ""} api-client-card`}
       cardType={CardType.API_CLIENT}
       title={"API Client"}
       cardIcon={"/assets/media/apiClient/api-client-icon.svg"}
+      importOptions={{
+        menu: IMPORT_OPTIONS,
+        label: "Postman, Bruno & more",
+        icon: "/assets/media/apiClient/import-icon.svg",
+      }}
       bodyTitle={cardOptions?.bodyTitle}
       contentList={isLoggedIn ? cardOptions?.contentList : []}
       actionButtons={

@@ -1,11 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Spin } from "antd";
+import { DropDownProps, Spin } from "antd";
 import { HomepageEmptyCard } from "../EmptyCard";
 import { m, AnimatePresence } from "framer-motion";
 import { CardType } from "./types";
 import { Rule } from "@requestly/shared/types/entities/rules";
 import { TabsLayout } from "layouts/TabsLayout";
+import { RQDropdown } from "lib/design-system/components";
+import { RQButton } from "lib/design-system-v2/components";
+import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 
 interface CardProps {
   contentLoading?: boolean;
@@ -28,6 +31,11 @@ interface CardProps {
   viewAllCta: string;
   viewAllCtaLink: string;
   viewAllCtaOnClick: () => void;
+  importOptions: {
+    label: string;
+    icon: string;
+    menu: DropDownProps["menu"]["items"];
+  };
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -44,6 +52,7 @@ export const Card: React.FC<CardProps> = ({
   viewAllCta,
   viewAllCtaLink,
   viewAllCtaOnClick,
+  importOptions,
 }) => {
   const MAX_LIST_ITEMS_TO_SHOW = 5;
 
@@ -66,7 +75,15 @@ export const Card: React.FC<CardProps> = ({
                 <img src={cardIcon} alt={title} />
                 <h1>{title}</h1>
               </div>
-              <div className="action-buttons">{actionButtons}</div>
+              <div className="action-buttons">
+                <RQDropdown menu={{ items: importOptions.menu }} trigger={["click"]}>
+                  <RQButton type="transparent" className="import-dropdown-trigger">
+                    <MdOutlineFileUpload />
+                    Import
+                  </RQButton>
+                </RQDropdown>
+                {actionButtons}
+              </div>
             </div>
             <div className="middle-section">
               <h2>{bodyTitle}</h2>
@@ -92,7 +109,7 @@ export const Card: React.FC<CardProps> = ({
         </m.div>
       ) : (
         <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <HomepageEmptyCard {...emptyCardOptions} />
+          <HomepageEmptyCard {...emptyCardOptions} importDropdownOptions={importOptions} />
         </m.div>
       )}
     </AnimatePresence>
