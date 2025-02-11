@@ -1,4 +1,5 @@
 import APP_CONSTANTS from "config/constants";
+//@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { GlobalSliceState } from "./types";
 import appListJson from "../../initial-state/sub/appsList.json";
