@@ -49,7 +49,7 @@ export const updateIsSampleRulesImported = (prevState: GlobalSliceState, action:
 
 export const updateRefreshPendingStatus = (
   prevState: GlobalSliceState,
-  action: { payload: { newValue?: boolean; type: string } }
+  action: { payload: { newValue?: boolean; type: "rules" | "sharedLists" | "sessionRecordingConfig" } }
 ) => {
   prevState.pendingRefresh[action.payload.type] = action.payload.newValue
     ? action.payload.newValue
@@ -58,7 +58,7 @@ export const updateRefreshPendingStatus = (
 
 export const updateHardRefreshPendingStatus = (
   prevState: GlobalSliceState,
-  action: { payload: { type: string; newValue: boolean } }
+  action: { payload: { type: "rules"; newValue?: boolean } }
 ) => {
   prevState.pendingHardRefresh[action.payload.type] = action.payload.newValue
     ? action.payload.newValue

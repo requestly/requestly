@@ -16,7 +16,6 @@ import {
 import "./GraphqlRequestPayload.css";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
-//@ts-ignore
 import { ResponseRule } from "@requestly/shared/types/entities/rules";
 
 const {

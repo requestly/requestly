@@ -12,7 +12,7 @@
     "noUnusedLocals": true,
     "noImplicitAny": true,
     "noImplicitReturns": false,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "strict": false,
     "esModuleInterop": true,

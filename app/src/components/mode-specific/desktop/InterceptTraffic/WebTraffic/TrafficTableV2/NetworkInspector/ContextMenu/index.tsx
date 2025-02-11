@@ -12,14 +12,14 @@ import {
 } from "modules/analytics/events/desktopApp";
 import { trackWalkthroughCompleted } from "modules/analytics/events/misc/productWalkthrough";
 import FEATURES from "config/constants/sub/features";
-import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import BetaBadge from "components/misc/BetaBadge";
 import { getLogResponseById } from "store/features/desktop-traffic-table/selectors";
 import "./index.css";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
+//@ts-ignore
 import { RuleType } from "@requestly/shared/types/entities/rules";
+import { TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 
 interface ContextMenuProps {
   log: any;

@@ -60,7 +60,6 @@ export const JoinWorkspaceCard = () => {
           modalName: "joinWorkspaceModal",
           newValue: true,
           newProps: {
-            // @ts-expect-error actions file is not typed
             callback: () => dispatch(globalActions.updateJoinWorkspaceCardVisible(false)),
             source: "card_business_users",
           },
@@ -74,7 +73,6 @@ export const JoinWorkspaceCard = () => {
           newValue: true,
           newProps: {
             callback: () => {
-              // @ts-expect-error actions file is not typed
               dispatch(globalActions.updateJoinWorkspaceCardVisible(false));
             },
             source: "join_workspace_card",
@@ -142,7 +140,6 @@ export const JoinWorkspaceCard = () => {
               iconOnly
               icon={<CloseOutlined />}
               onClick={() => {
-                // @ts-expect-error actions file is not typed
                 dispatch(globalActions.updateJoinWorkspaceCardVisible(false));
                 trackWorkspaceOrganizationCardCancelled(getDomainFromEmail(user?.details?.profile?.email), cardCTA);
               }}

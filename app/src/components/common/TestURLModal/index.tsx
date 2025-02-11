@@ -18,7 +18,6 @@ import {
   trackURLConditionSourceModified,
 } from "modules/analytics/events/features/testUrlModal";
 import "./index.scss";
-//@ts-ignore
 import { RulePairSource, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 
 type Source = RulePairSource | SessionRecordingPageSource;

@@ -11,7 +11,6 @@ import { toast } from "utils/Toast";
 import { unselectAllRecords } from "components/features/rules/actions";
 import { getAllRecords } from "store/features/rules/selectors";
 import "./DownloadRules.css";
-//@ts-ignore
 import { StorageRecord } from "@requestly/shared/types/entities/rules";
 
 interface DownloadRulesProps {

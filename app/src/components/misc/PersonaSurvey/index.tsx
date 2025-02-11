@@ -39,7 +39,6 @@ const SkipButton = () => {
               modalName: "authModal",
               newProps: {
                 callback: () => {
-                  // @ts-expect-error actions file is not typed
                   dispatch(globalActions.updateIsPersonaSurveyCompleted(true));
                 },
                 authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
@@ -146,9 +145,7 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
     if (!(currentPage in SurveyConfig)) {
       if (isSurveyModal) {
         if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP)
-          // @ts-expect-error actions file is not typed
           dispatch(globalActions.updateIsPersonaSurveyCompleted(true));
-        // @ts-expect-error actions file is not typed
         else dispatch(globalActions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
       } else callback?.();
     }

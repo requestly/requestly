@@ -23,7 +23,6 @@ import EmailInputWithDomainBasedSuggestions from "../EmailInputWithDomainBasedSu
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import "./index.css";
-//@ts-ignore
 import { StorageRecord } from "@requestly/shared/types/entities/rules";
 
 interface ShareLinkProps {

@@ -27,7 +27,6 @@ import { prefillRuleData } from "./prefill";
 import { generateRuleDescription, getEventObject } from "./utils";
 import { getRuleConfigInEditMode } from "utils/rules/misc";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
-//@ts-ignore
 import { RecordStatus, Rule, ResponseRule, RuleType, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
 import ShareRuleButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/ShareRuleButton";

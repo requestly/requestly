@@ -3,7 +3,6 @@ import { Col, Select, Input } from "antd";
 import { capitalize } from "lodash";
 import { SessionRecordingPageSource } from "types";
 import "./index.scss";
-//@ts-ignore
 import { RulePairSource, RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 
 type Source = RulePairSource | SessionRecordingPageSource;

@@ -1,4 +1,3 @@
-//@ts-ignore
 import { Rule } from "@requestly/shared/types/entities/rules";
 import { CustomSteps, PointerPlacement } from "./types";
 
