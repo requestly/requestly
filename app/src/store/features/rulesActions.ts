@@ -1,4 +1,5 @@
 import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
+//@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { get, set } from "lodash";
 import { GlobalSliceState } from "store/slices/global/types";
