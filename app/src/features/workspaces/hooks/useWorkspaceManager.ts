@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getActiveWorkspaceIds, getAllWorkspaces, getWorkspacesUpdatedAt } from "store/slices/workspaces/selectors";
 import { useAvailableWorkspacesListener } from "./useAvailableWorkspacesListener";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -22,6 +22,8 @@ export const useWorkspaceManager = () => {
   const workspacesUpdatedAt = useSelector(getWorkspacesUpdatedAt);
   const _workspacesUpdatedAt = useRef(workspacesUpdatedAt);
 
+  const [firestoreAuthToken, setFirestoreAuthToken] = useState<string | undefined>(undefined);
+
   const isInitialWorkspacesSelected = useRef(false);
   // const [isInitialWorkspacesSelected, setisInitialWorkspacesSelected] = useState(false);
 
@@ -35,11 +37,11 @@ export const useWorkspaceManager = () => {
   useEffect(() => {
     console.log("[useWorkspaceManager] workspaceManager updater", { workspaces, userId });
     _userId.current = userId;
-    workspaceManager.init(dispatch, workspaces, userId);
+    workspaceManager.init(dispatch, workspaces, userId, firestoreAuthToken);
     // _workspacesUpdatedAt.current = workspacesUpdatedAt;
     // _workspaces.current = workspaces;
     console.log("[useWorkspaceManager] workspaceManager updater userid set", { userId });
-  }, [dispatch, workspaces, userId, workspacesUpdatedAt]);
+  }, [dispatch, workspaces, userId, workspacesUpdatedAt, firestoreAuthToken]);
 
   useEffect(() => {
     console.log("[useWorkspaceManager] workspaceManager updater activeWorkspaceIds", { activeWorkspaceIds });
@@ -171,6 +173,7 @@ export const useWorkspaceManager = () => {
       if (user) {
         idToken = await user?.getIdToken();
       }
+      setFirestoreAuthToken(idToken);
       workspaceManager.initAuthToken(idToken);
       console.debug("[useWorkspaceManager] workspaceManager updated id token", { idToken, user });
     });

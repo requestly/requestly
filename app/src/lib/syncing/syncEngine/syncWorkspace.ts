@@ -61,10 +61,32 @@ class SyncWorkspace {
     console.log("[SyncWorkspace.init] Start", {
       workspaceId: this.workspaceId,
       replication: this.replicationConfig,
+      userId: this.userId,
+      authToken: this.authToken,
     });
     await this.initRxDB();
     await this.connect();
     console.log("[SyncWorkspace.init] Done", { workspaceId: this.workspaceId });
+  }
+
+  async initAuthToken(authToken?: string) {
+    if (this.authToken === authToken) {
+      if (Object.keys(this.replicationState).length > 0) {
+        console.log("[SyncWorkspace.initAuthToken] Same authToken and replication setup done", {
+          oldAuthToken: this.authToken,
+          authToken,
+        });
+      } else {
+        console.log("[SyncWorkspace.initAuthToken] Same authToken but replication setup not done", { authToken });
+        this._setupReplication();
+      }
+    } else {
+      console.log("[SyncWorkspace.initAuthToken] Different authToken", { oldAuthToken: this.authToken, authToken });
+      // Auth Token Changed
+      this.authToken = authToken;
+      await this._stopReplication();
+      await this._setupReplication();
+    }
   }
 
   async initRxDB() {
@@ -163,18 +185,14 @@ class SyncWorkspace {
 
   async connect() {
     console.log("[SyncWorkspace.connect] Start", this.workspaceId);
-    await Promise.all(
-      Object.values(SyncEntityType).map(async (collectionType) => {
-        await this._setupReplication(collectionType);
-      })
-    );
+    await this._setupReplication();
     console.log("[SyncWorkspace.connect] Done");
   }
 
   async disconnect() {
     // Disconnect from the workspace for Sync
     console.log("[SyncWorkspace.disconnect] Start", this.workspaceId);
-    await this.stopReplication();
+    await this._stopReplication();
     this.database.close();
     console.log("[SyncWorkspace.disconnect] Done", this.workspaceId);
   }
@@ -188,14 +206,7 @@ class SyncWorkspace {
     });
     eventSource.onerror = (error) => {
       this.commonPullStream$.next("RESYNC");
-      this.pullStreamEventSource.close();
       console.log("[SyncWorkspace._setupReplication] PullStreamError", error);
-
-      // FIXME: This can stuck in infinite loop. Need to handle this.
-      // When authToken doesn't exist or is invalid, we need to retry setting up the SSE.
-      new Promise((resolve) => setTimeout(resolve, 1000)).then(() => {
-        this._createSSEEventSource();
-      });
     };
     eventSource.onmessage = (event) => {
       const eventData = JSON.parse(event.data);
@@ -244,11 +255,24 @@ class SyncWorkspace {
     return collectionStream$;
   }
 
-  async _setupReplication(entityType: SyncEntityType) {
+  async _setupReplication() {
+    await Promise.all(
+      Object.values(SyncEntityType).map(async (collectionType) => {
+        await this._setupReplicationForEntity(collectionType);
+      })
+    );
+  }
+
+  async _setupReplicationForEntity(entityType: SyncEntityType) {
     console.log("[SyncWorkspace._setupReplication]", { collectionType: entityType });
 
     if (!this.userId) {
       console.log("[SyncWorkspace._setupReplication]", "No userId. Skipping Replication");
+      return;
+    }
+
+    if (!this.authToken) {
+      console.log("[SyncWorkspace._setupReplication]", "No authToken. Skipping Replication");
       return;
     }
 
@@ -334,15 +358,19 @@ class SyncWorkspace {
     // replicationState.received$.subscribe(doc => console.log({ doc }));
   }
 
-  async stopReplication() {
+  async _stopReplication() {
     console.log("[SyncWorkspace.stopReplication]", this.workspaceId);
     this.pullStreamEventSource?.close();
+    this.pullStreamEventSource = undefined;
     this.commonPullStream$?.complete();
+    this.commonPullStream$ = undefined;
     Object.values(this.collectionPullStreamMap).forEach((collectionSubject) => {
       collectionSubject.complete();
     });
+    this.collectionPullStreamMap = {};
     this.replicationState[SyncEntityType.RULE_DATA]?.cancel();
     this.replicationState[SyncEntityType.RULE_METADATA]?.cancel();
+    this.replicationState = {};
     console.log("[SyncWorkspace.stopReplication] Done", this.workspaceId);
   }
 

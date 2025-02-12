@@ -43,11 +43,11 @@ class SyncEngine {
     console.log("[SyncEngine.init] Done");
   }
 
-  async initAuthToken(authToken: string) {
+  async initAuthToken(authToken?: string) {
     console.debug("[SyncEngine.initAuthToken]", { authToken });
     this.authToken = authToken;
     Object.values(this.syncWorkspacesMap).forEach((syncWorkspace) => {
-      syncWorkspace.authToken = authToken;
+      syncWorkspace.initAuthToken(authToken);
     });
   }
 
