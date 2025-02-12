@@ -24,9 +24,11 @@
   </a>
 </p>
 
-<h3 align="center">⚡ HTTP Interceptor for browsers </h2>
+<h2 align="center">Open-Source API Platform - Build, Test, Intercept & Mock APIs </h2>
 
-**Requestly was built to save developers time by intercepting and modifying HTTP Requests. It has now developed into an open-source alternative to Charles Proxy and Telerik Fiddler that works directly in browsers without VPN and proxy Issues. It is used by more than 200,000+ front-end developers and 11,000+ companies worldwide.**
+**Requestly is a powerful combination of a local HTTP Proxy and an API client with collaboration features. Requestly can be used directly in the browser as a Chrome Extension or installed as a desktop application.**
+
+<h3 align="center">⚡ A Local-first, beautiful & Powerful alternative to Postman, Insomina & Charles Proxy </h3>
 
 
 
