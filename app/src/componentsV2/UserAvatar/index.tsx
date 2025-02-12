@@ -1,20 +1,20 @@
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
 import { Tooltip, Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
+import { getActiveWorkspacesMembers } from "store/slices/workspaces/selectors";
 
 interface UserIconProps {
   uid?: string;
 }
 
 export const UserAvatar = ({ uid }: UserIconProps) => {
-  const currentlyActiveWorkspaceMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
+  const activeWorkspacesMembers = useSelector(getActiveWorkspacesMembers);
 
-  if (uid && currentlyActiveWorkspaceMembers[uid])
+  if (uid && activeWorkspacesMembers[uid])
     return (
       <>
-        <Tooltip title={currentlyActiveWorkspaceMembers[uid]?.displayName}>
-          <Avatar size={24} src={currentlyActiveWorkspaceMembers[uid]?.photoUrl} />
+        <Tooltip title={`${activeWorkspacesMembers[uid]?.displayName} (${activeWorkspacesMembers[uid]?.email})`}>
+          <Avatar size={24} src={activeWorkspacesMembers[uid]?.photoUrl} />
         </Tooltip>
       </>
     );

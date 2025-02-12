@@ -3,8 +3,9 @@ import { useSelector } from "react-redux";
 import { Button, Modal } from "antd";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { DeleteOutlined } from "@ant-design/icons";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 const DeleteConfirmationModal = ({
   isOpen,
@@ -16,7 +17,8 @@ const DeleteConfirmationModal = ({
   isDeletionInProgress,
 }) => {
   const user = useSelector(getUserAuthDetails);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
 
   const enableTrash = useFeatureIsOn("enable-trash");
 
@@ -42,7 +44,7 @@ const DeleteConfirmationModal = ({
         <div className="modal-body">
           <div className="py-3 text-center">
             <h3 className="heading">
-              {enableTrash && user.loggedIn && !isWorkspaceMode ? (
+              {enableTrash && user.loggedIn && !isSharedWorkspaceMode ? (
                 <>Are you sure you want to delete the selected rules/groups?</>
               ) : (
                 <>Are you sure you want to delete the selected rules/groups permanently?</>

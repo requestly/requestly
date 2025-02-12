@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Avatar, Col, Row, Skeleton, Spin, Tooltip, Typography } from "antd";
-import { getUniqueColorForUser, getUniqueColorForWorkspace } from "utils/teams";
+import { getUniqueColorForUser } from "utils/teams";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
 import { toast } from "utils/Toast";
@@ -17,6 +17,7 @@ import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules
 import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import "./teamsListItem.scss";
+import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 
 interface Props {
   inviteId?: string;

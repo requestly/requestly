@@ -33,7 +33,6 @@ import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -42,6 +41,8 @@ import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomShe
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
@@ -69,8 +70,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const [searchParams] = useSearchParams();
   const isCreateMode = searchParams.has("create");
   const { requestId } = useParams();
@@ -373,7 +373,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.name = requestName;
     }
 
-    const args: Parameters<typeof upsertApiRecord> = [uid, record, teamId];
+    const args: Parameters<typeof upsertApiRecord> = [uid, record, activeWorkspaceId];
 
     if (isCreateMode) {
       args.push(requestId);
@@ -408,7 +408,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.id = apiEntryDetails?.id;
     }
 
-    const args: Parameters<typeof upsertApiRecord> = [uid, record, teamId];
+    const args: Parameters<typeof upsertApiRecord> = [uid, record, activeWorkspaceId];
 
     if (isCreateMode) {
       args.push(requestId);
@@ -430,7 +430,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
 
     setIsRequestSaving(false);
-  }, [entry, apiEntryDetails, onSaveRecord, setEntry, teamId, uid, resetChanges, isCreateMode, requestId]);
+  }, [entry, apiEntryDetails, onSaveRecord, setEntry, activeWorkspaceId, uid, resetChanges, isCreateMode, requestId]);
 
   const cancelRequest = useCallback(() => {
     apiClientExecutor.abort();
