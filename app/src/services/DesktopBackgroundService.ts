@@ -47,3 +47,9 @@ export default class BackgroundServiceAdapter<MethodNames = string> {
     window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent(this.LIVE_EVENTS_CHANNEL);
   }
 }
+
+export abstract class Singleton<MethodNames = string> extends BackgroundServiceAdapter<MethodNames> {
+  static instance: BackgroundServiceAdapter;
+
+  static getInstance() {}
+}
