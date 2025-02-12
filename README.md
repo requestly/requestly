@@ -55,9 +55,17 @@ Collaborate with your colleagues using your preferred sync engine - Git, Google 
 **Team Workspaces** are great for seamless collaboration through Requestly sync engine.
 
 <p align="center">
-  <h3 align="center">⚡ A Local-first, beautiful & Powerful alternative to Postman, Insomina & Charles Proxy </h3>
-
   <img width="100%" alt="requestly-local-first-support" src="https://github.com/user-attachments/assets/f2436cd7-242d-4706-bc4c-04d9b9cfe991">
+</p>
+
+## REST API Client
+
+**Rest API Client** offers a local API playground to build and test your APIs. It supports features like API Collections, Environments, Environment Switcher, API Requests History with a beautiful and collaborative interface.
+
+<p align="center">
+  <h3 align="center">⚡ A Local-first, Beautiful & Powerful alternative to Postman & Insomina</h3>
+
+  <img width="100%" alt="requestly-api-client" src="https://github.com/user-attachments/assets/27a696f0-231a-4d88-a4c5-6ebed8f6ef71">
 </p>
 
 ### 👉 HTTP Rules (Intercept & Modify HTTPs Requests)
@@ -80,21 +88,6 @@ Different Modifications supported
 <p align="center">
   <a target="_blank" href="https://requestly.com/products/web-debugger">
     <img width="60%" alt="intercept_ _modify_https_requests_-_1280x800_5" src="https://github.com/requestly/requestly/assets/3108399/c69f0935-40d5-4b91-bd50-102696c55560">
-  </a>
-</p>
-
-### 👉 API Client
-
-Requestly offers a minimal, lightweight API client that works directly in the browser. It can help you 
-- Import cURL requests,
-- Send new requests, and
-- Quickly test API responses.
-- Integration with Mock Server to clone an API endpoint with the same response
-- Integration with Modify Response Rule to override the response body
-
-<p align="center">
-  <a target="_blank" href="https://requestly.com/products/api-client">
-    <img width="60%" alt="store_asset_-_api_client_-_1280x800_8" src="https://github.com/requestly/requestly/assets/3108399/d04e3116-665c-4e60-8a50-4ce50326c900">
   </a>
 </p>
 
