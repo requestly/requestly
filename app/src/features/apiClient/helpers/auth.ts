@@ -1,12 +1,12 @@
 import { isEmpty, unionBy } from "lodash";
-import { AUTHORIZATION_TYPES } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
-import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
+import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/AuthorizationForm/formStructure/types";
 import { KeyValuePair, RQAPI } from "../types";
 import {
   API_KEY_FORM_VALUES,
   BASIC_AUTH_FORM_VALUES,
   BEARER_TOKEN_FORM_VALUES,
 } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/form";
+import { Authorization } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 
 export const processAuthForEntry = (
   entry: RQAPI.Entry,
@@ -23,14 +23,14 @@ export const processAuthForEntry = (
   if (isEmpty(authOptions)) {
     let currentAuthType = "";
     if (entryDetails.collectionId) {
-      currentAuthType = AUTHORIZATION_TYPES.INHERIT;
+      currentAuthType = Authorization.Type.INHERIT;
     } else {
-      currentAuthType = AUTHORIZATION_TYPES.NO_AUTH;
+      currentAuthType = Authorization.Type.NO_AUTH;
     }
     entryCopy.auth = { currentAuthType };
   }
 
-  if (entryCopy.auth.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
+  if (entryCopy.auth.currentAuthType === Authorization.Type.INHERIT) {
     authOptions = inheritAuth(entryCopy, entryDetails, allRecords);
   }
 
@@ -59,7 +59,7 @@ function inheritAuth(
     return null;
   }
   let parentAuthData = parentRecord.data.auth;
-  if (!isEmpty(parentAuthData) && parentAuthData.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
+  if (!isEmpty(parentAuthData) && parentAuthData.currentAuthType === Authorization.Type.INHERIT) {
     const parentDetails = {
       id: parentRecord.id,
       collectionId: parentRecord.collectionId,
@@ -69,7 +69,7 @@ function inheritAuth(
   return parentAuthData;
 }
 
-const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
+const processAuthOptions = (authOptions: RQAPI.Auth) => {
   const headers: KeyValuePair[] = [];
   const queryParams: KeyValuePair[] = [];
 
@@ -97,22 +97,22 @@ const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
   };
 
   switch (currentAuthType) {
-    case AUTHORIZATION_TYPES.INHERIT:
+    case Authorization.Type.INHERIT:
       throw new Error("Inherit auth type should not be processed inside processAuthOptions");
-    case AUTHORIZATION_TYPES.NO_AUTH:
+    case Authorization.Type.NO_AUTH:
       break;
-    case AUTHORIZATION_TYPES.BASIC_AUTH: {
-      const { username, password } = authOptions[currentAuthType] as BASIC_AUTH_FORM_VALUES;
+    case Authorization.Type.BASIC_AUTH: {
+      const { username, password } = authOptions.authConfigStore[currentAuthType] as BASIC_AUTH_FORM_VALUES;
       updateDataInState(headers, "Authorization", `Basic ${btoa(`${username || ""}:${password || ""}`)}`);
       break;
     }
-    case AUTHORIZATION_TYPES.BEARER_TOKEN: {
-      const { bearer } = authOptions[currentAuthType] as BEARER_TOKEN_FORM_VALUES;
+    case Authorization.Type.BEARER_TOKEN: {
+      const { bearer } = authOptions.authConfigStore[currentAuthType] as BEARER_TOKEN_FORM_VALUES;
       updateDataInState(headers, "Authorization", `Bearer ${bearer}`);
       break;
     }
-    case AUTHORIZATION_TYPES.API_KEY: {
-      const { key, value, addTo } = authOptions[currentAuthType] as API_KEY_FORM_VALUES;
+    case Authorization.Type.API_KEY: {
+      const { key, value, addTo } = authOptions.authConfigStore[currentAuthType] as API_KEY_FORM_VALUES;
 
       updateDataInState(addTo === "QUERY" ? queryParams : headers, key || "", value || "");
 

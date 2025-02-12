@@ -34,7 +34,7 @@ export const CollectionView = () => {
   }, [apiClientRecords, collectionId]);
 
   const updateCollectionAuthData = useCallback(
-    async (newAuthOptions: RQAPI.AuthOptions) => {
+    async (newAuthOptions: RQAPI.Auth) => {
       const record = {
         ...collection,
         data: {
