@@ -2,7 +2,8 @@ import React from "react";
 import { RQAPI } from "features/apiClient/types";
 import LINKS from "config/constants/sub/links";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
-import "./emptyResponsePlaceholder.scss";
+import { MdOutlineRefresh } from "@react-icons/all-files/md/MdOutlineRefresh";
+import "./errorPlaceholder.scss";
 import { RQButton } from "lib/design-system-v2/components";
 
 export const ApiClientErrorPlaceholder: React.FC<{ error: RQAPI.ExecutionError; imageUrl: string }> = ({
@@ -20,7 +21,7 @@ export const ApiClientErrorPlaceholder: React.FC<{ error: RQAPI.ExecutionError; 
             {""}
             <span className="error-message">{error.message}</span>
           </div>
-          <RQButton>Try Again</RQButton>
+          <RQButton icon={<MdOutlineRefresh />}>Try Again</RQButton>
         </div>
 
         <a className="documentation-link" href={LINKS.REQUESTLY_API_CLIENT_DOCS} target="_blank" rel="noreferrer">
