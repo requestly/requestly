@@ -43,3 +43,8 @@ export interface TeamInviteMetadata extends Record<string, unknown> {
 export interface TeamInvite extends Invite {
   metadata: TeamInviteMetadata;
 }
+
+export enum WorkspaceType {
+  Team = "team",
+  Local = " local",
+}
