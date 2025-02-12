@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getLastUsedFeaturePath } from "store/selectors";
 import PATHS from "config/constants/sub/paths";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -13,10 +13,16 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 const RootComponent: React.FC = () => {
   const location = useLocation();
   const appMode = useSelector(getAppMode);
+  const storedFeaturePath = useSelector(getLastUsedFeaturePath);
 
   const isOpenedInDesktopMode = PATHS.ROOT === location.pathname && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
-  return <Navigate to={isOpenedInDesktopMode ? PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE : PATHS.HOME.ABSOLUTE} />;
+  if (location.pathname === PATHS.ROOT) {
+    if (storedFeaturePath && storedFeaturePath !== PATHS.ROOT) {
+      return <Navigate to={storedFeaturePath} />;
+    }
+    return <Navigate to={isOpenedInDesktopMode ? PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE : PATHS.HOME.ABSOLUTE} />;
+  }
 };
 
 export default RootComponent;

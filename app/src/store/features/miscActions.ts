@@ -5,6 +5,6 @@ export const updateAppLanguage = (prevState: any, action: PayloadAction<string>)
 };
 
 // TODO: MOVE OTHER MISC ACTIONS HERE
-export const updateLastFeaturePath = (prevState: any, action: PayloadAction<string>) => {
-  prevState.misc.persist.lastFeaturePath = action.payload;
+export const updateLastUsedFeaturePath = (prevState: any, action: PayloadAction<string>) => {
+  prevState.misc.persist.lastUsedFeaturePath = action.payload;
 };
