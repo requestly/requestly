@@ -12,6 +12,7 @@ import clientStorageSyncManager from "./clientStorageSyncManager";
 class WorkspaceManager {
   private _dispatch!: Dispatch<any>;
   private _userId?: string;
+  private _userAuthToken?: string;
   private _workspaceMap!: { [id: string]: Workspace };
   private _activeWorkspaceMap: {
     [id: string]: {
@@ -28,6 +29,18 @@ class WorkspaceManager {
     workspaces.forEach((workspace) => {
       this._workspaceMap[workspace.id] = workspace;
     });
+  }
+
+  initAuthToken(authToken: string) {
+    console.debug("[WorkspaceManager.initAuthToken]", { authToken });
+
+    if (!authToken) {
+      this._userAuthToken = undefined;
+      return;
+    }
+
+    this._userAuthToken = authToken;
+    syncEngine.initAuthToken(authToken);
   }
 
   async initActiveWorkspaces(workspaceIds: Workspace["id"][]) {
@@ -77,13 +90,13 @@ class WorkspaceManager {
         {
           id: workspaceId,
           replication: {
-            enabled: this._workspaceMap[workspaceId]?.isSyncEnabled,
+            enabled: this._workspaceMap[workspaceId]?.isSyncEnabled || true,
             baseUrl: `http://localhost:8081/sync/workspaces`,
           },
         },
       ],
       this._userId,
-      this._userId
+      this._userAuthToken
     );
 
     this._activeWorkspaceMap[workspaceId] = {
