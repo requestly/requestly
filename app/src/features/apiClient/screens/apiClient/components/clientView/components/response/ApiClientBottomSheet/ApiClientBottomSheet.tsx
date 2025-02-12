@@ -91,9 +91,15 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   }, [contentTypeHeader, error, handleTestResultRefresh, isFailed, isLoading, onCancelRequest, response, testResults]);
 
   return (
-    <>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+      }}
+    >
       <ApiClientErrorPanel />
       <BottomSheet items={bottomSheetTabItems} disableDocking utilities={<StatusLine response={response} />} />
-    </>
+    </div>
   );
 };
