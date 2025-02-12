@@ -1,0 +1,4 @@
+{
+  "storageType": "local",
+  "contextMenuContexts": ["browser_action"]
+}

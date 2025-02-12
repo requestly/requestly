@@ -11,7 +11,7 @@ import { GettingStarted } from "./components";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { isExtensionInstalled } from "actions/ExtensionActions";
+import { isExtensionInstalled, isSafariExtension } from "actions/ExtensionActions";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import MonitorMountedTime from "components/common/SentryMonitoring/MonitorMountedTime";
@@ -20,6 +20,7 @@ import RulesListContentHeader from "./components/RulesListContentHeader/RulesLis
 import { useSearchParams } from "react-router-dom";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import "./rulesList.scss";
+import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
 
 interface Props {}
 
@@ -56,6 +57,8 @@ const RulesList: React.FC<Props> = () => {
             eventPage="rules_page"
           />
         );
+      } else if (isSafariExtension()) {
+        return <SafariLimitedSupportView />;
       } else if (!isExtensionEnabled) {
         return <ExtensionDeactivationMessage />;
       }
