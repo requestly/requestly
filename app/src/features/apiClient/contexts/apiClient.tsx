@@ -304,9 +304,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           return addNewEnvironment("New Environment")
             .then((newEnvironment: { id: string; name: string; isGlobal: boolean }) => {
               setIsRecordBeingCreated(null);
-              openTab(newEnvironment?.id, {
-                title: newEnvironment?.name,
-                url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${newEnvironment?.id}?new`,
+              openTab(newEnvironment.id, {
+                title: newEnvironment.name,
+                url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${newEnvironment.id}?new`,
               });
             })
             .catch((error) => {

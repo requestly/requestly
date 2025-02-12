@@ -347,6 +347,6 @@ export const getIsSlackConnectButtonVisible = (state) => {
   return getGlobalState(state).misc.persist?.isSlackConnectButtonVisible;
 };
 
-export const getIsSyncingV2 = (state) => {
-  return getGlobalState(state).syncingV2;
+export const getLastFeaturePath = (state) => {
+  return getGlobalState(state)?.misc?.persist?.lastFeaturePath || "/";
 };

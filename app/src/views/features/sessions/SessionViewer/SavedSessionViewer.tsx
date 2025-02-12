@@ -227,7 +227,7 @@ const SavedSessionViewer: React.FC = () => {
               <RQButton
                 iconOnly
                 type="default"
-                icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+                icon={<img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />}
                 onClick={() => redirectToSessionRecordingHome(navigate, isDesktopSessionsCompatible)}
                 className="back-button"
               />

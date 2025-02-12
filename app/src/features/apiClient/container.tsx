@@ -7,7 +7,7 @@ import "./container.scss";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { NudgePrompt } from "componentsV2/Nudge/NudgePrompt";
-import mandatoryLoginIcon from "./assets/mandatory-login.svg";
+// import mandatoryLoginIcon from "./assets/mandatory-login.svg";
 import { Typography } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { globalActions } from "store/slices/global/slice";
@@ -36,7 +36,7 @@ const ApiClientFeatureContainer: React.FC = () => {
           ) : (
             <div className="api-client-logged-out-view">
               <NudgePrompt
-                icon={mandatoryLoginIcon}
+                icon={"/assets/media/apiClient/mandatory-login.svg"}
                 buttons={[
                   <RQButton type="secondary" onClick={handleReadAnnouncementClick}>
                     Read announcement

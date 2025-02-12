@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button, Row, Col } from "antd";
 import { LeftOutlined } from "@ant-design/icons";
-import graphic404 from "assets/images/pages/error/404.svg";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 
 const Error404 = () => {
@@ -15,7 +14,11 @@ const Error404 = () => {
               <div className="hp-position-relative hp-mt-sm-0 hp-mt-64 hp-mb-32">
                 <div className="hp-error-content-circle hp-bg-dark-100"></div>
 
-                <img className="hp-position-relative hp-d-block hp-m-auto" src={graphic404} alt="404" />
+                <img
+                  className="hp-position-relative hp-d-block hp-m-auto"
+                  src={"/assets/media/views/404.svg"}
+                  alt="404"
+                />
               </div>
 
               <h1 className="hp-error-content-title hp-mb-sm-0 hp-mb-8 hp-font-weight-300">404</h1>

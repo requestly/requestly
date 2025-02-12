@@ -60,7 +60,7 @@ const PinButton = ({ rule, isRuleEditorModal }) => {
                   alt="pin"
                   width="12px"
                   height="14px"
-                  src="/assets/icons/pin-filled.svg" // TODO: replace icon with react-icon
+                  src="/assets/media/components/pin-filled.svg" // TODO: replace icon with react-icon
                   style={{ width: "12px", height: "14px" }}
                 />
               ) : (
@@ -68,7 +68,7 @@ const PinButton = ({ rule, isRuleEditorModal }) => {
                   alt="pin"
                   width="12px"
                   height="14px"
-                  src="/assets/icons/pin-outlined.svg" // TODO: replace icon with react-icon
+                  src="/assets/media/components/pin-outlined.svg" // TODO: replace icon with react-icon
                   style={{ width: "12px", height: "14px" }}
                 />
               )

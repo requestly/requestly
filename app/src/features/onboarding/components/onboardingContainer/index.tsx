@@ -10,7 +10,6 @@ import { RecommendationsView } from "../recommendations";
 import { PersonaScreen } from "../persona/components/personaScreen";
 import { MdOutlineArrowForward } from "@react-icons/all-files/md/MdOutlineArrowForward";
 import { globalActions } from "store/slices/global/slice";
-import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import { trackAppOnboardingSkipped } from "features/onboarding/analytics";
 import { getAndUpdateInstallationDate } from "utils/Misc";
 import Logger from "lib/logger";
@@ -86,7 +85,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
         <div className="onboarding-modal-body">
           <Row justify="space-between" className="w-full onboarding-modal-header">
             <Col>
-              <img src={RQLogo} alt="requestly logo" style={{ width: "90px" }} />
+              <img src={"/assets/media/common/rq_logo_full.svg"} alt="requestly logo" style={{ width: "90px" }} />
             </Col>
 
             {step === ONBOARDING_STEPS.PERSONA || disableSkip ? null : (
