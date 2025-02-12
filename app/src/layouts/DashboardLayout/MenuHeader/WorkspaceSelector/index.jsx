@@ -40,6 +40,7 @@ import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { toast } from "utils/Toast";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -224,7 +225,7 @@ const WorkspaceSelector = () => {
   };
 
   const handleCreateNewWorkspaceRedirect = () => {
-    if (user.loggedIn) {
+    if (user.loggedIn || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "createWorkspaceModal",

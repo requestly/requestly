@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Input, Modal, Radio, Tag } from "antd";
+import { Checkbox, Input, Modal, Radio, Tag } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system-v2/components";
@@ -44,10 +44,10 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
   const availableTeams = useSelector(getAvailableTeams);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [workspaceName, setWorkspaceName] = useState("");
-  const [workspaceType, setWorkspaceType] = useState(WorkspaceType.Team);
+  const [workspaceType, setWorkspaceType] = useState(user.loggedIn ? WorkspaceType.Team : WorkspaceType.Local);
   const [folderPath, setFolderPath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isNotifyAllSelected] = useState(false);
+  const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
 
   const { claimIncentiveRewards } = useIncentiveActions();
 
@@ -247,6 +247,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
             onChange={(e) => setWorkspaceType(e.target.value)}
             options={[
               {
+                disabled: !user.loggedIn,
                 value: WorkspaceType.Team,
                 label: (
                   <div className="workspace-type-content">
@@ -255,6 +256,22 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
                       Team Workspaces enables real-time collaboration on rules, APIs, and mocks, ensuring seamless
                       teamwork.
                     </div>
+                    {workspaceType === WorkspaceType.Team ? (
+                      <div className="invite-all-domain-users-container">
+                        <Checkbox
+                          checked={isNotifyAllSelected}
+                          onChange={(e) => setIsNotifyAllSelected(e.target.checked)}
+                          style={{ alignSelf: "flex-start" }}
+                        />
+                        <span className="invite-all-domain-users-text">
+                          Notify all{" "}
+                          <span className="text-white text-bold">
+                            {getDomainFromEmail(user?.details?.profile?.email)}
+                          </span>{" "}
+                          users to join this workspace.
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
                 ),
               },
