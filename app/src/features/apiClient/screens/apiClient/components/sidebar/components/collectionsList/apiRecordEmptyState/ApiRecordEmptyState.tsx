@@ -1,8 +1,7 @@
 import React from "react";
 import { EmptyState, EmptyStateProps } from "../../emptyState/EmptyState";
-import { NewRecordNameInputProps } from "../newRecordNameInput/NewRecordNameInput";
 
-interface Props extends EmptyStateProps, Omit<NewRecordNameInputProps, "onSuccess"> {}
+interface Props extends EmptyStateProps {}
 
 export const ApiRecordEmptyState: React.FC<Props> = ({
   message,
