@@ -1,6 +1,6 @@
 import React from "react";
 import { LABEL_TEXT } from "./authConstants";
-import { AuthDescriptionData } from "./types";
+import { AuthDescriptionData } from "./AuthorizationForm/formStructure/types";
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 interface HelpPanelProps {
   data: AuthDescriptionData;

@@ -1,15 +1,15 @@
-import { AUTHORIZATION_TYPES } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/authStaticData";
+import { Authorization } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 
 export const CONTENT_TYPE_HEADER = "Content-Type";
 
 export const DEMO_API_URL = "https://app.requestly.io/echo";
 
 export const POSTMAN_AUTH_TYPES_MAPPING = {
-  inherit: AUTHORIZATION_TYPES.INHERIT,
-  noauth: AUTHORIZATION_TYPES.NO_AUTH,
-  apikey: AUTHORIZATION_TYPES.API_KEY,
-  bearer: AUTHORIZATION_TYPES.BEARER_TOKEN,
-  basic: AUTHORIZATION_TYPES.BASIC_AUTH,
+  inherit: Authorization.Type.INHERIT,
+  noauth: Authorization.Type.NO_AUTH,
+  apikey: Authorization.Type.API_KEY,
+  bearer: Authorization.Type.BEARER_TOKEN,
+  basic: Authorization.Type.BASIC_AUTH,
 };
 
 export const POSTMAN_FIELD_MAPPING = {
