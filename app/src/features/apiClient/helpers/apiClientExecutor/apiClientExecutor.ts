@@ -8,7 +8,6 @@ import {
   PreRequestScriptWorkload,
   WorkResultType,
 } from "../modules/scriptsV2/workloadManager/workLoadTypes";
-import { notification } from "antd";
 import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshotTypes";
 import {
   trackScriptExecutionCompleted,
@@ -190,15 +189,15 @@ export class ApiClientExecutor {
         responseScriptResult.error.type,
         responseScriptResult.error.message
       );
-      notification.error({
-        message: "Something went wrong in post-response script!",
-        description: `${responseScriptResult.error.name}: ${responseScriptResult.error.message}`,
-        placement: "bottomRight",
-      });
 
       return {
-        status: RQAPI.ExecutionStatus.SUCCESS,
+        status: RQAPI.ExecutionStatus.ERROR,
         executedEntry: this.entryDetails,
+        error: {
+          source: "Post-response script",
+          name: responseScriptResult.error.name,
+          message: responseScriptResult.error.message,
+        },
       };
     }
 

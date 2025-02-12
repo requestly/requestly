@@ -13,6 +13,7 @@ import { ApiClientLoader } from "../LoadingPlaceholder/ApiClientLoader";
 import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
 import { AbortError } from "../../errors/AbortError";
 import { RequestError } from "../../errors/RequestError";
+import "./apiclientBottomSheet.scss";
 
 interface Props {
   response: RQAPI.Response;
@@ -122,13 +123,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   ]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-      }}
-    >
+    <div className="api-client-sheet-panel-container">
       {response && error && !isRequestCancelled && <ApiClientErrorPanel error={error} />}
       <BottomSheet items={bottomSheetTabItems} disableDocking utilities={<StatusLine response={response} />} />
     </div>

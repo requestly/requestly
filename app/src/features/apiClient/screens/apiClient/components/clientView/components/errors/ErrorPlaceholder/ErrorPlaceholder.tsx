@@ -17,7 +17,7 @@ export const ApiClientErrorPlaceholder: React.FC<{
         <div className="api-client-error-placeholder-content">
           <img src={imageUrl} alt="Error card" width={80} height={80} />
           {showTitle && (
-            <div className="api-client-empty-response-view__title">{`Error while executing the ${error.source}`}</div>
+            <div className="api-client-error-placeholder-content__title">{`Error while executing the ${error.source}`}</div>
           )}
           <div className="error-container">
             <span className="error-name">{`${error.name}:`}</span>
