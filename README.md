@@ -80,28 +80,25 @@ Collaborate with your colleagues using your preferred sync engine - Git, Google 
   <img width="90%" alt="requestly-api-client-environments-support" src="https://github.com/user-attachments/assets/537c5aeb-2ba2-4726-bc84-fd5f5d84fe1a">
 </p>
 
-### 👉 HTTP Rules (Intercept & Modify HTTPs Requests)
-Intercept & Modify HTTPs requests & responses from browsers & mobile apps. 
-- 👉 Use the browser extension for capturing & modifying traffic from browsers
-- 👉 Use the desktop app for capturing & modifying traffic from mobile apps & other desktop apps.
+## HTTP Interceptor / HTTP Rules (Intercept & Modify HTTPs Requests)
+**[HTTP Rules](https://docs.requestly.com/general/http-interceptor/overview)** feature can be used to **Intercept, Monitor & Modify HTTPs requests & responses** from browsers & mobile apps.
+- Use the Chrome/Firefox/Edge extension for Intercepting & Modifying traffic from browsers
+- Use the desktop app for capturing & modifying traffic from browsers, mobile apps & other desktop apps.
 
-Different Modifications supported
-- Rewriting URLs (Map Local & Map Remote) e.g.
+<p align="center">
+  <h3 align="center">⚡ Intercept, Monitor & Modify HTTP Requests & Responses</h3>
+
+  <img width="90%" alt="requestly-http-interceptor" src="https://github.com/user-attachments/assets/e8cf00eb-54ff-404c-8652-eae36fceee18">
+</p>
+
+**Different Modifications supported**
+- Redirect URLs (Map Local & Map Remote) e.g.
     - Change Hostname, QueryParams, etc in the URL
     - Redirect traffic from one environment to another (e.g. production to dev)
     - Swap Tag Manager scripts from production to staging/dev environment
 - Modify HTTP Request & Response Headers
 - Modify API Request & Response body
-- Throttles & Blocking of Requests
 - Inject scripts on web pages
-
-<br/>
-
-<p align="center">
-  <a target="_blank" href="https://requestly.com/products/web-debugger">
-    <img width="60%" alt="intercept_ _modify_https_requests_-_1280x800_5" src="https://github.com/requestly/requestly/assets/3108399/c69f0935-40d5-4b91-bd50-102696c55560">
-  </a>
-</p>
 
 ### 👉 Mock Server (Create API Mocks in seconds)
 
