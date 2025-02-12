@@ -45,17 +45,10 @@ export enum BulkActions {
   EXPORT = "EXPORT",
 }
 
-export enum CreateType {
-  API = "api",
-  COLLECTION = "collection",
-  ENVIRONMENT = "environment",
-}
-
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
 
 export namespace RQAPI {
   export type AnalyticsEventSource =
-    | "home_screen"
     | "collection_row"
     | "collection_list_empty_state"
     | "api_client_sidebar_header"
