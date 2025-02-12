@@ -173,7 +173,7 @@
     "less": "^4.2.0",
     "sass": "^1.58.3",
     "source-map-loader": "^3.0.1",
-    "typescript": "^4.7.3",
+    "typescript": "^5.7.3",
     "vite": "^5.1.4",
     "vite-plugin-commonjs": "^0.10.1",
     "vite-plugin-node-polyfills": "^0.21.0",
