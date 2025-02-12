@@ -24,13 +24,15 @@
   </a>
 </p>
 
-<h2 align="center">Open-Source API Platform - Build, Test, Intercept & Mock APIs </h2>
+<h1 align="center">Open-Source API Platform - Build, Test, Intercept & Mock APIs </h1>
 
 **Requestly is a powerful combination of a local HTTP Proxy and an API client with collaboration features. Requestly can be used directly in the browser as a Chrome Extension or installed as a desktop application.**
 
-<h3 align="center">⚡ A Local-first, beautiful & Powerful alternative to Postman, Insomina & Charles Proxy </h3>
+<p align="center">
+  <h3 align="center">⚡ A Local-first, beautiful & Powerful alternative to Postman, Insomina & Charles Proxy </h3>
 
-
+  <img width="100%" alt="intercept_ _modify_https_requests_-_1280x800_5" src="https://github.com/user-attachments/assets/99d8eaee-13d0-4a02-a38a-ee4352c1344e">
+</p>
 
 ## 🏡 Getting Started
 - [🚀 What is Requestly?](#-what-is-requestly)
