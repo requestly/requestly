@@ -5,10 +5,6 @@ export const trackHomeRulesActionClicked = (action: string) => {
   trackEvent(HOMEPAGE.HOME_SCREEN_RULES_ACTION_CLICKED, { action });
 };
 
-export const trackHomeApisActionClicked = (action: string) => {
-  trackEvent(HOMEPAGE.HOME_SCREEN_API_ACTION_CLICKED, { action });
-};
-
 export const trackHomeWorkspaceActionClicked = (action: string) => {
   trackEvent(HOMEPAGE.HOME_SCREEN_WORKSPACE_ACTION_CLICKED, { action });
 };
