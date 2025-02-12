@@ -46,7 +46,7 @@
 - [🙏 Contributing](#-contributing)
 - [🎯 Our Mission](#-our-mission)
 
-## Local-first Solution (Local Workspaces)
+## A Local-first Solution (Local Workspaces)
 
 **Local Workspaces** is a simple, powerful, and privacy-friendly approach to building, testing & mocking your APIs. All your data is stored in the selected directory on your disk. You can also import all your API client files (requests, collections, environments) and codebase into VSCode and edit them directly in your IDE.
 
@@ -55,7 +55,9 @@ Collaborate with your colleagues using your preferred sync engine - Git, Google 
 **Team Workspaces** are great for seamless collaboration through Requestly sync engine.
 
 <p align="center">
-  <img width="100%" alt="requestly-local-first-support" src="https://github.com/user-attachments/assets/f2436cd7-242d-4706-bc4c-04d9b9cfe991">
+  <h3 align="center">⚡ Local and Team Workspaces</h3>
+
+  <img width="90%" alt="requestly-local-first-support" src="https://github.com/user-attachments/assets/f2436cd7-242d-4706-bc4c-04d9b9cfe991">
 </p>
 
 ## REST API Client
@@ -65,7 +67,7 @@ Collaborate with your colleagues using your preferred sync engine - Git, Google 
 <p align="center">
   <h3 align="center">⚡ A Local-first, Beautiful & Powerful alternative to Postman & Insomina</h3>
 
-  <img width="100%" alt="requestly-api-client" src="https://github.com/user-attachments/assets/27a696f0-231a-4d88-a4c5-6ebed8f6ef71">
+  <img width="90%" alt="requestly-api-client" src="https://github.com/user-attachments/assets/27a696f0-231a-4d88-a4c5-6ebed8f6ef71">
 </p>
 
 ### 👉 HTTP Rules (Intercept & Modify HTTPs Requests)
