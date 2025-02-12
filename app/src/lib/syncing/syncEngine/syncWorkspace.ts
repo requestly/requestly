@@ -106,8 +106,8 @@ class SyncWorkspace {
         // New Document
         if (!plainData?.createdAt || !plainData?.createdBy) {
           // TODO-syncing: Change this to userId;
-          plainData.createdBy = this.authToken;
-          plainData.updatedBy = this.authToken;
+          plainData.createdBy = this.userId;
+          plainData.updatedBy = this.userId;
           plainData.createdAt = Date.now();
           plainData.updatedAt = Date.now();
           console.log(`[SyncWorkspace.collections.${entityType}.preinsert] New`, { plainData });
@@ -147,7 +147,7 @@ class SyncWorkspace {
         }
 
         // Updated
-        plainData.updatedBy = this.authToken;
+        plainData.updatedBy = this.userId;
         plainData.updatedAt = Date.now();
         console.log(`[SyncWorkspace.collections.${entityType}.preSave] Updated`, { plainData });
       }, false);
@@ -174,33 +174,44 @@ class SyncWorkspace {
   async disconnect() {
     // Disconnect from the workspace for Sync
     console.log("[SyncWorkspace.disconnect] Start", this.workspaceId);
-    this.pullStreamEventSource?.close();
-    this.commonPullStream$?.complete();
-    Object.values(this.collectionPullStreamMap).forEach((collectionSubject) => {
-      collectionSubject.complete();
-    });
-    this.replicationState[SyncEntityType.RULE_DATA]?.cancel();
-    this.replicationState[SyncEntityType.RULE_METADATA]?.cancel();
+    await this.stopReplication();
     this.database.close();
     console.log("[SyncWorkspace.disconnect] Done", this.workspaceId);
   }
 
-  _setupCommonPullStream() {
-    console.log(`[SyncWorkspace._setupCommonPullStream] Start`);
+  _createSSEEventSource = () => {
+    console.log("[SyncWorkspace._createSSEEventSource]", this.workspaceId);
     const pullStreamUrl = `${this.replicationConfig?.baseUrl}/${this.workspaceId}/pull-stream/?authToken=${this.authToken}`;
 
-    const pullStream$ = new Subject();
     const eventSource = new EventSource(pullStreamUrl, {
       withCredentials: false,
     });
-    eventSource.onerror = () => pullStream$.next("RESYNC");
+    eventSource.onerror = (error) => {
+      this.commonPullStream$.next("RESYNC");
+      this.pullStreamEventSource.close();
+      console.log("[SyncWorkspace._setupReplication] PullStreamError", error);
+
+      // FIXME: This can stuck in infinite loop. Need to handle this.
+      // When authToken doesn't exist or is invalid, we need to retry setting up the SSE.
+      new Promise((resolve) => setTimeout(resolve, 1000)).then(() => {
+        this._createSSEEventSource();
+      });
+    };
     eventSource.onmessage = (event) => {
       const eventData = JSON.parse(event.data);
       console.log("[SyncWorkspace._setupReplication] commonPullStream onMessage", { eventData });
-      pullStream$.next(eventData);
+      this.commonPullStream$.next(eventData);
     };
-    this.commonPullStream$ = pullStream$;
     this.pullStreamEventSource = eventSource;
+  };
+
+  _setupCommonPullStream() {
+    console.log(`[SyncWorkspace._setupCommonPullStream] Start`);
+
+    const pullStream$ = new Subject();
+    this.commonPullStream$ = pullStream$;
+    this._createSSEEventSource();
+
     console.log(`[SyncWorkspace._setupCommonPullStream] End`);
   }
 
@@ -236,8 +247,8 @@ class SyncWorkspace {
   async _setupReplication(entityType: SyncEntityType) {
     console.log("[SyncWorkspace._setupReplication]", { collectionType: entityType });
 
-    if (!this.authToken) {
-      console.log("[SyncWorkspace._setupReplication]", "No authToken. Skipping Replication");
+    if (!this.userId) {
+      console.log("[SyncWorkspace._setupReplication]", "No userId. Skipping Replication");
       return;
     }
 
@@ -258,8 +269,9 @@ class SyncWorkspace {
     const pullUrl = `${this.replicationConfig.baseUrl}/${this.workspaceId}/pull/`;
 
     const collectionStream$ = this._createCollectionReplicationStream(entityType);
-    const authToken = this.authToken;
+    this.collectionPullStreamMap[entityType] = collectionStream$;
 
+    const self = this;
     this.replicationState[entityType] = replicateRxCollection({
       autoStart: false,
       collection: this.collections[entityType],
@@ -275,7 +287,7 @@ class SyncWorkspace {
             headers: {
               Accept: "application/json",
               "Content-Type": "application/json",
-              Authorization: authToken ?? "",
+              Authorization: self.authToken ?? "",
             },
             body: JSON.stringify({
               entityType,
@@ -300,7 +312,7 @@ class SyncWorkspace {
             `${pullUrl}?checkpointUpdatedAt=${updatedAt}&limit=${batchSize}&entityType=${entityType}`,
             {
               headers: {
-                Authorization: authToken ?? "",
+                Authorization: self.authToken ?? "",
               },
             }
           );
@@ -320,6 +332,18 @@ class SyncWorkspace {
     console.log("[SyncWorkspace._setupReplication] Starting Replication", { entityType });
     this.replicationState[entityType].start();
     // replicationState.received$.subscribe(doc => console.log({ doc }));
+  }
+
+  async stopReplication() {
+    console.log("[SyncWorkspace.stopReplication]", this.workspaceId);
+    this.pullStreamEventSource?.close();
+    this.commonPullStream$?.complete();
+    Object.values(this.collectionPullStreamMap).forEach((collectionSubject) => {
+      collectionSubject.complete();
+    });
+    this.replicationState[SyncEntityType.RULE_DATA]?.cancel();
+    this.replicationState[SyncEntityType.RULE_METADATA]?.cancel();
+    console.log("[SyncWorkspace.stopReplication] Done", this.workspaceId);
   }
 
   async subscribeToCollection(

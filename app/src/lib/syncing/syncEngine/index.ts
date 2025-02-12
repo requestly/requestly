@@ -43,6 +43,14 @@ class SyncEngine {
     console.log("[SyncEngine.init] Done");
   }
 
+  async initAuthToken(authToken: string) {
+    console.debug("[SyncEngine.initAuthToken]", { authToken });
+    this.authToken = authToken;
+    Object.values(this.syncWorkspacesMap).forEach((syncWorkspace) => {
+      syncWorkspace.authToken = authToken;
+    });
+  }
+
   async initWorkspace(workspaceConfig: WorkspaceConfig) {
     this.syncWorkspacesMap[workspaceConfig.id] = await SyncWorkspace.create(
       workspaceConfig.id,

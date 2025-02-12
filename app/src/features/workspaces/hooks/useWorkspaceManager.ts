@@ -7,6 +7,8 @@ import { workspaceManager } from "../helpers/workspaceManager";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { globalActions } from "store/slices/global/slice";
 import { useActiveWorkspacesMembersListener } from "./useActiveWorkspacesMembersListener";
+import { getAuth } from "firebase/auth";
+import firebaseApp from "firebase";
 
 export const useWorkspaceManager = () => {
   const dispatch = useDispatch();
@@ -164,11 +166,20 @@ export const useWorkspaceManager = () => {
 
   useEffect(() => {
     initialWorkspacesSelector(0);
+    const unsubAuthTokenListener = getAuth(firebaseApp).onIdTokenChanged(async (user) => {
+      let idToken = undefined;
+      if (user) {
+        idToken = await user?.getIdToken();
+      }
+      workspaceManager.initAuthToken(idToken);
+      console.debug("[useWorkspaceManager] workspaceManager updated id token", { idToken, user });
+    });
 
     return () => {
       console.log("[useWorkspaceManager] userId changed. unmount. resetActiveWorkspaces");
       dispatch(workspaceActions.resetState());
       workspaceManager.resetActiveWorkspaces();
+      unsubAuthTokenListener?.();
 
       // Reset to default states (before the useEffects triggers)
       isInitialWorkspacesSelected.current = false;
