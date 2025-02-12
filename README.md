@@ -70,6 +70,16 @@ Collaborate with your colleagues using your preferred sync engine - Git, Google 
   <img width="90%" alt="requestly-api-client" src="https://github.com/user-attachments/assets/27a696f0-231a-4d88-a4c5-6ebed8f6ef71">
 </p>
 
+## Environments
+
+**Environment** is a set of key-value pairs that can be used in API requests. Environments feature lets you manage variables across multiple environments with an easy environment selector. We support Global variables as well as Collection level variables. [Docs](https://docs.requestly.com/general/api-client/environments-and-variables)
+
+<p align="center">
+  <h3 align="center">⚡ Environments feature</h3>
+
+  <img width="90%" alt="requestly-api-client-environments-support" src="https://github.com/user-attachments/assets/537c5aeb-2ba2-4726-bc84-fd5f5d84fe1a">
+</p>
+
 ### 👉 HTTP Rules (Intercept & Modify HTTPs Requests)
 Intercept & Modify HTTPs requests & responses from browsers & mobile apps. 
 - 👉 Use the browser extension for capturing & modifying traffic from browsers
