@@ -37,7 +37,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
-  const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
+  const { updateRecordsToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const team = useSelector(getCurrentlyActiveWorkspace);
 
@@ -100,12 +100,12 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
         danger: true,
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
-          updateRecordToBeDeleted([record]);
+          updateRecordsToBeDeleted([record]);
           setIsDeleteModalOpen(true);
         },
       },
     ];
-  }, [record, updateRecordToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest]);
+  }, [record, updateRecordsToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest]);
 
   return (
     <>

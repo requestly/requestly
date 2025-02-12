@@ -22,7 +22,7 @@ import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceho
 import { sessionStorage } from "utils/sessionStorage";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
 import "./collectionsList.scss";
-import { isEmpty, union } from "lodash";
+import { head, isEmpty, union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
 import { toast } from "utils/Toast";
@@ -46,8 +46,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     apiClientRecords,
     isRecordBeingCreated,
     setIsDeleteModalOpen,
-    updateRecordToBeDeleted,
+    updateRecordsToBeDeleted,
     onSaveRecord,
+    onSaveBulkRecords,
   } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.Record[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -131,10 +132,10 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           const recordsToDuplicate = processRecordsForDuplication(processedRecords);
 
           try {
-            firebaseBatchWrite("apis", recordsToDuplicate);
+            const result = await firebaseBatchWrite("apis", recordsToDuplicate);
 
             toast.success("Records Duplicated successfully");
-            recordsToDuplicate.forEach((record) => onSaveRecord(record, "none"));
+            result.length === 1 ? onSaveRecord(head(result)) : onSaveBulkRecords(result);
           } catch (error) {
             console.error("Error Duplicating records: ", error);
             toast.error("Failed to duplicate some records");
@@ -145,7 +146,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
         case BulkActions.DELETE:
           setIsDeleteModalOpen(true);
-          updateRecordToBeDeleted(processedRecords);
+          updateRecordsToBeDeleted(processedRecords);
           break;
 
         case BulkActions.EXPORT:
@@ -162,7 +163,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           break;
       }
     },
-    [selectedRecords, onSaveRecord, updatedRecords]
+    [selectedRecords, onSaveRecord, updatedRecords, onSaveBulkRecords]
   );
 
   // Main toggle handler

@@ -48,7 +48,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [activeKey, setActiveKey] = useState(expandedRecordIds?.includes(record.id) ? record.id : null);
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
-  const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
+  const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
   const { collectionId } = useParams();
 
   const getCollectionOptions = useCallback(
@@ -76,7 +76,7 @@ export const CollectionRow: React.FC<Props> = ({
           danger: true,
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
-            updateRecordToBeDeleted([record]);
+            updateRecordsToBeDeleted([record]);
             setIsDeleteModalOpen(true);
           },
         },
@@ -84,7 +84,7 @@ export const CollectionRow: React.FC<Props> = ({
 
       return items;
     },
-    [setIsDeleteModalOpen, updateRecordToBeDeleted, onExportClick]
+    [setIsDeleteModalOpen, updateRecordsToBeDeleted, onExportClick]
   );
 
   const collapseChangeHandler = useCallback(

@@ -16,7 +16,7 @@ import {
 import "./moveToCollectionModal.scss";
 import { isApiCollection } from "../../../utils";
 import { firebaseBatchWrite } from "backend/utils";
-import { isEmpty, omit } from "lodash";
+import { head, isEmpty, omit } from "lodash";
 
 interface Props {
   recordsToMove: RQAPI.Record[];
@@ -25,7 +25,7 @@ interface Props {
 }
 
 export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, onSaveBulkRecords } = useApiClientContext();
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector(getUserAuthDetails);
@@ -83,12 +83,11 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       );
 
       try {
-        firebaseBatchWrite("apis", updatedRequests);
+        const result = await firebaseBatchWrite("apis", updatedRequests);
 
         trackMoveRequestToCollectionSuccessful(isNewCollection ? "new_collection" : "existing_collection");
         toast.success("Requests moved to collection successfully");
-
-        updatedRequests.forEach((record) => onSaveRecord(record));
+        result.length === 1 ? onSaveRecord(head(result)) : onSaveBulkRecords(result);
       } catch (error) {
         console.error("Error moving records: ", error);
         throw new Error("Failed to move some requests to collection");
