@@ -6,16 +6,19 @@ import { MdOutlineRefresh } from "@react-icons/all-files/md/MdOutlineRefresh";
 import "./errorPlaceholder.scss";
 import { RQButton } from "lib/design-system-v2/components";
 
-export const ApiClientErrorPlaceholder: React.FC<{ error: RQAPI.ExecutionError; imageUrl: string }> = ({
-  error,
-  imageUrl,
-}) => {
+export const ApiClientErrorPlaceholder: React.FC<{
+  error: RQAPI.ExecutionError;
+  imageUrl: string;
+  showTitle?: boolean;
+}> = ({ error, imageUrl, showTitle = true }) => {
   return (
     <>
       <div className="api-client-error-placeholder-container">
         <div className="api-client-error-placeholder-content">
           <img src={imageUrl} alt="Error card" width={80} height={80} />
-          <div className="api-client-empty-response-view__title">{`Error while executing the ${error.source}`}</div>
+          {showTitle && (
+            <div className="api-client-empty-response-view__title">{`Error while executing the ${error.source}`}</div>
+          )}
           <div className="error-container">
             <span className="error-name">{`${error.name}:`}</span>
             {""}

@@ -435,6 +435,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const cancelRequest = useCallback(() => {
     apiClientExecutor.abort();
     trackAPIRequestCancelled();
+    setIsRequestCancelled(true);
   }, [apiClientExecutor]);
 
   const handleAuthChange = useCallback((authOptions: RQAPI.AuthOptions) => {

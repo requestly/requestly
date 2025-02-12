@@ -11,6 +11,8 @@ import { TestResult } from "features/apiClient/helpers/modules/scriptsV2/worker/
 import { ApiClientErrorPanel } from "../../errors/ApiClientErrorPanel/ApiClientErrorPanel";
 import { ApiClientLoader } from "../LoadingPlaceholder/ApiClientLoader";
 import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
+import { AbortError } from "../../errors/AbortError";
+import { RequestError } from "../../errors/RequestError";
 
 interface Props {
   response: RQAPI.Response;
@@ -34,6 +36,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   testResults,
   isLoading,
   isFailed,
+  isRequestCancelled,
   handleTestResultRefresh,
   onCancelRequest,
   error,
@@ -73,6 +76,24 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
     }
 
     if (!response) {
+      if (isRequestCancelled) {
+        return baseTabItems.map((tabItem) => {
+          return {
+            ...tabItem,
+            children: <AbortError error={error} />,
+          };
+        });
+      }
+
+      if (isFailed) {
+        return baseTabItems.map((tabItem) => {
+          return {
+            ...tabItem,
+            children: <RequestError error={error} />,
+          };
+        });
+      }
+
       return baseTabItems.map((tabItem) => {
         return {
           ...tabItem,
@@ -88,7 +109,17 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
     }
 
     return baseTabItems;
-  }, [contentTypeHeader, error, handleTestResultRefresh, isFailed, isLoading, onCancelRequest, response, testResults]);
+  }, [
+    contentTypeHeader,
+    error,
+    handleTestResultRefresh,
+    isFailed,
+    isLoading,
+    isRequestCancelled,
+    onCancelRequest,
+    response,
+    testResults,
+  ]);
 
   return (
     <div
@@ -98,7 +129,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         height: "100%",
       }}
     >
-      <ApiClientErrorPanel />
+      {response && error && !isRequestCancelled && <ApiClientErrorPanel error={error} />}
       <BottomSheet items={bottomSheetTabItems} disableDocking utilities={<StatusLine response={response} />} />
     </div>
   );
