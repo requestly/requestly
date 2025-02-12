@@ -19,7 +19,7 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { clearExpandedRecordIdsFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
 
 interface ApiClientContextInterface {
@@ -99,9 +99,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const teamId = workspace?.id;
 
   const [searchParams] = useSearchParams();
-  const location = useLocation();
-  const [locationState, setLocationState] = useState(location?.state);
-  const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(!!locationState?.action);
+  const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(false);
   const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
   const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
@@ -323,13 +321,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     },
     [openTab, openDraftRequest, addNewEnvironment, teamId, uid, onSaveRecord]
   );
-
-  useEffect(() => {
-    if (!isLoadingApiClientRecords) {
-      locationState?.action === "create" && onNewClick("home_screen", locationState?.type);
-      setLocationState({});
-    }
-  }, [isLoadingApiClientRecords]);
 
   const workloadManager = useMemo(() => new APIClientWorkloadManager(), []);
 
