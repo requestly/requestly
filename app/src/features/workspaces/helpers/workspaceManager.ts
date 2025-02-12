@@ -22,23 +22,18 @@ class WorkspaceManager {
 
   initInProgress = false;
 
-  init(dispatch: Dispatch<any>, workspaces: Workspace[], userId?: string) {
+  init(dispatch: Dispatch<any>, workspaces: Workspace[], userId?: string, userAuthToken?: string) {
     this._dispatch = dispatch;
     this._userId = userId;
+    this._userAuthToken = userAuthToken;
     this._workspaceMap = {};
     workspaces.forEach((workspace) => {
       this._workspaceMap[workspace.id] = workspace;
     });
   }
 
-  initAuthToken(authToken: string) {
+  initAuthToken(authToken?: string) {
     console.debug("[WorkspaceManager.initAuthToken]", { authToken });
-
-    if (!authToken) {
-      this._userAuthToken = undefined;
-      return;
-    }
-
     this._userAuthToken = authToken;
     syncEngine.initAuthToken(authToken);
   }
