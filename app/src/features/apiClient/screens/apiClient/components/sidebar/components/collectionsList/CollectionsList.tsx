@@ -323,7 +323,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       {isExportModalOpen && (
         <ApiClientExportModal
           exportType="collection"
-          collectionsAndApis={collectionsToExport}
+          recordsToBeExported={collectionsToExport}
           isOpen={isExportModalOpen}
           onClose={() => {
             setCollectionsToExport([]);
