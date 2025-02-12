@@ -100,14 +100,20 @@ Collaborate with your colleagues using your preferred sync engine - Git, Google 
 - Modify API Request & Response body
 - Inject scripts on web pages
 
-### 👉 Mock Server (Create API Mocks in seconds)
+## API Mocking (Helps in building frontend faster without waiting for backend)
 
-Mock Server helps you quickly create API mocks. Especially helpful when APIs don't exist and you have to build a feature, just define the response you need and get an endpoint to be used in your code.
+Requestly offers a complete API Mocking solution. Using Requestly, you can 
+- [Create Local API Mocks](https://docs.requestly.com/general/api-mocking/api-mocking): Intercept the API Requests and return the new response
+- [Static & Dynamic Response Overrides](https://docs.requestly.com/general/http-rules/rule-types/modify-response-body): Override the API response received from server dynamically using simple JS 
+- [GraphQL Support](https://docs.requestly.com/general/http-rules/advanced-usage/graphql-modify-request-response): Override graphQL APIs by targeting on query, operationName
+- [Create Cloud-based API Mocks](https://docs.requestly.com/general/api-mocking/create-cloud-based-mocks): Create cloud-based API Mocks and get new endpoints for the mocks
+- [Bulk API Mocks](https://docs.requestly.com/general/sessions/record-api-sessions#bulk-mocking): Record API traffic & Serve the Mocks from the recorded Session
+- Mock APIs in e2e testing: Use Requestly in your e2e Cypress/Playwright/Selenium and mock the APIs in CI pipeline
 
 <p align="center">
-  <a target="_blank" href="https://requestly.com/products/mock-server">
-    <img width="60%" alt="mock_server_-_1280x800_4" src="https://github.com/requestly/requestly/assets/3108399/337b8251-3b62-4f87-825f-f3166417c7d5">
-  </a>
+  <h3 align="center">⚡ API Mocks - Build & Test your frontend faster without waiting for backend </h3>
+
+  <img width="90%" alt="requestly-api-mocking" src="https://github.com/user-attachments/assets/0e4db35b-2308-4b7e-a604-f6694bf22f59">
 </p>
 
 ### 👉 Sessions
