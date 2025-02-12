@@ -116,14 +116,24 @@ Requestly offers a complete API Mocking solution. Using Requestly, you can
   <img width="90%" alt="requestly-api-mocking" src="https://github.com/user-attachments/assets/0e4db35b-2308-4b7e-a604-f6694bf22f59">
 </p>
 
-### 👉 Sessions
+## 1-Click Imports
 
-Collaborate with other teammates and get Requestly sessions that contain video, console logs, network logs, and env details for faster troubleshooting.
+Requestly provides **[Importing Configuration]()** from the following tools
+
+API Clients
+- [Import from Postman](https://docs.requestly.com/general/imports/postman)
+- [Import from Insomnia](#) - Coming Soon
+- [Import from Bruno](#) - Coming Soon
+
+HTTP Interceptors
+- [Import from Charles Proxy](https://docs.requestly.com/general/imports/charles-proxy)
+- [Import from Resource Override](https://docs.requestly.com/general/imports/resource-override)
+- [Import from ModHeader](https://docs.requestly.com/general/imports/modheader)
 
 <p align="center">
-  <a target="_blank" href="https://requestly.com/products/session-book">
-  <img width="60%" alt="session_-_1280x800_5" src="https://github.com/requestly/requestly/assets/3108399/41375ad4-021e-490e-b488-1967cade727c">
-  </a>
+  <h3 align="center">⚡ Import from Postman, Insomnia, CharlesProxy, ModHeader, etc.</h3>
+
+  <img width="90%" alt="requestly-import-from-other-tools" src="">
 </p>
 
 
@@ -155,10 +165,6 @@ Start working on individual modules:
 Currently, while Requestly is open source, we are not accepting pull requests. As a startup with a small team, our focus is on moving quickly and we currently lack the resources and documentation needed to actively support an open-source community. This will probably change in the future.
 
 If you are still interested, read our [contributing guide](./CONTRIBUTING.md) to learn about how to propose bugfixes and improvements, and how the development process works.
-
-## 🎯 Our Mission
-
-Our mission is to help developers ship web and mobile apps faster and with confidence by giving them the tools to debug & resolve issues without external dependency.
 
 ## Contributors
 
@@ -201,7 +207,3 @@ Our mission is to help developers ship web and mobile apps faster and with confi
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
-
-## Special Mentions
-A big shoutout to these amazing Open Source projects that have helped make Requestly possible.
-- [rrweb](https://github.com/rrweb-io/rrweb)
