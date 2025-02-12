@@ -68,10 +68,6 @@ export const processRqImportData = (
     const apiToImport = { ...api };
     delete apiToImport.id;
     const newCollectionId = oldToNewIdMap[apiToImport.collectionId];
-    if (!newCollectionId) {
-      throw new Error(`Failed to find new collection ID for API: ${api.name || api.id}`);
-    }
-
     const updatedApi = { ...apiToImport, collectionId: newCollectionId };
     updatedApiRecordsToImport.apis.push(updatedApi);
   });
