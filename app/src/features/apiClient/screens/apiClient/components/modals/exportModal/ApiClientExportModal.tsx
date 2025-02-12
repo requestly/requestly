@@ -21,7 +21,7 @@ interface BaseModalProps {
 }
 
 interface ExportCollectionsModalProps extends BaseModalProps {
-  collectionsAndApis: RQAPI.Record[];
+  recordsToBeExported: RQAPI.Record[];
   exportType: "collection";
 }
 
@@ -42,7 +42,7 @@ export interface ExportData {
 const COLLECTIONS_SCHEMA_VERSION = "1.0.0";
 
 export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, exportType, ...props }) => {
-  const { collectionsAndApis = [] } = props as ExportCollectionsModalProps;
+  const { recordsToBeExported = [] } = props as ExportCollectionsModalProps;
   const { environments = [] } = props as ExportEnvironmentsModalProps;
 
   const [isApiRecordsProcessed, setIsApiRecordsProcessed] = useState(false);
@@ -65,7 +65,7 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     } catch (error) {
       trackExportApiCollectionsFailed(dataToExport.records?.length, dataToExport.environments?.length);
     }
-  }, [exportData, collectionsAndApis, environments, onClose, fileInfo.label]);
+  }, [exportData, recordsToBeExported, environments, onClose, fileInfo.label]);
 
   const recordsToExport: { collections: ExportRecord[]; apis: ExportRecord[] } = {
     collections: [],
@@ -111,7 +111,7 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     if (exportType === "collection") {
       let processedRecords: ExportRecord[] = [];
 
-      collectionsAndApis.forEach((record) => {
+      recordsToBeExported.forEach((record) => {
         if (isApiCollection(record)) {
           const { collections: processedCollection, apis } = sanitizeRecords(record, recordsToExport);
 
@@ -130,15 +130,15 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
       setExportData({ environments: processedEnvironments });
     }
     setIsApiRecordsProcessed(true);
-  }, [isOpen, collectionsAndApis, environments, isApiRecordsProcessed, sanitizeRecords, exportType]);
+  }, [isOpen, recordsToBeExported, environments, isApiRecordsProcessed, sanitizeRecords, exportType]);
 
   useEffect(() => {
     if (exportType === "collection") {
-      setFileInfo({ label: collectionsAndApis.length > 1 ? "Collections" : "Collection", type: "COL" });
+      setFileInfo({ label: recordsToBeExported.length > 1 ? "Collections" : "Collection", type: "COL" });
     } else if (exportType === "environment") {
       setFileInfo({ label: environments.length > 1 ? "Environments" : "Environment", type: "ENV" });
     }
-  }, [exportType, setFileInfo, collectionsAndApis.length, environments.length]);
+  }, [exportType, setFileInfo, recordsToBeExported.length, environments.length]);
 
   return (
     <Modal
@@ -163,7 +163,7 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
             <div className="export-details-item">
               <span className="export-details-item-label">{fileInfo.label}: </span>
               <span className="export-details-item-value">
-                {exportType === "environment" ? environments.length : collectionsAndApis?.length}
+                {exportType === "environment" ? environments.length : recordsToBeExported?.length}
               </span>
             </div>
           </div>
