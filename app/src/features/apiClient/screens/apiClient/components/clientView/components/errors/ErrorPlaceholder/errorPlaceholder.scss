@@ -1,4 +1,4 @@
-.api-client-empty-response-view {
+.api-client-error-placeholder-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -6,11 +6,34 @@
   padding: 32px;
   height: 100%;
 
-  .empty-state {
+  .api-client-error-placeholder-content {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    .error-container {
+      display: flex;
+      padding: var(--space-5, 12px) var(--space-6, 16px);
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-4, 8px);
+      align-self: stretch;
+      border-radius: 8px;
+      background: var(--requestly-color-background);
+      border: 1px solid var(--requestly-color-white-t-10);
+      font-size: 11px;
+      line-height: 18px;
+      letter-spacing: 0.25px;
+
+      .error-name {
+        color: var(--requestly-color-error-text);
+      }
+
+      .error-message {
+        color: var(--requestly-color-subtle);
+      }
+    }
   }
 
   img {
@@ -25,11 +48,6 @@
     font-size: var(--requestly-font-size-sm);
     color: var(--requestly-color-text-default);
     margin-top: 24px;
-  }
-
-  &__description {
-    font-size: var(--requestly-font-size-xs);
-    color: var(--requestly-color-text-subtle);
   }
 
   .documentation-link {

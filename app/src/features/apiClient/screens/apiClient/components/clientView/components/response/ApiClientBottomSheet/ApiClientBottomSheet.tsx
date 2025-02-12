@@ -8,7 +8,7 @@ import StatusLine from "../StatusLine";
 import { Tag } from "antd";
 import { TestsView } from "../TestsView/TestsView";
 import { TestResult } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
-import { ApiClientErrorPanel } from "../../errors/ApiClientErrorPanel";
+import { ApiClientErrorPanel } from "../../errors/ApiClientErrorPanel/ApiClientErrorPanel";
 
 interface Props {
   response: RQAPI.Response;
