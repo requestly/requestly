@@ -9,8 +9,8 @@ import { RQButton } from "lib/design-system-v2/components";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constants/keyboardShortcuts";
 
 interface Props {
-  authOptions: RQAPI.AuthOptions;
-  updateAuthData: (authOptions: RQAPI.AuthOptions) => any;
+  authOptions: RQAPI.Auth;
+  updateAuthData: (authOptions: RQAPI.Auth) => any;
   rootLevelRecord: Boolean;
 }
 
@@ -48,7 +48,7 @@ const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthD
       .finally(() => {
         setIsSaving(false);
       });
-  }, [authOptionsState]);
+  }, [authOptionsState, resetChanges, updateAuthData]);
 
   const AuthorizationViewActions = () => (
     <div className="authorization-save-btn">
