@@ -1,6 +1,8 @@
-import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
-import { ApiClientCloudMeta, EnvironmentInterface } from "../../interfaces";
+import { EnvironmentData, EnvironmentMap, VariableScope } from "backend/environment/types";
+import { ApiClientCloudMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import {
+  attachCollectionVariableListener,
+  attachEnvironmentVariableListener,
   createNonGlobalEnvironmentInDB,
   deleteEnvironmentFromDB,
   duplicateEnvironmentInDB,
@@ -43,5 +45,13 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
     updates: Partial<Pick<EnvironmentData, "name" | "variables">>
   ): Promise<void> {
     await updateEnvironmentInDB(this.getPrimaryId(), environmentId, updates);
+  }
+
+  attachListener(params: EnvironmentListenerParams) {
+    if (params.scope === VariableScope.COLLECTION) {
+      return attachCollectionVariableListener(this.getPrimaryId(), params.callback);
+    }
+
+    return attachEnvironmentVariableListener(this.getPrimaryId(), params.id, params.callback);
   }
 }

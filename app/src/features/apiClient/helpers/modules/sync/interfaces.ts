@@ -1,5 +1,5 @@
-import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
-import { RQAPI } from "features/apiClient/types";
+import { EnvironmentData, EnvironmentMap, VariableScope } from "backend/environment/types";
+import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
   meta: Meta;
@@ -12,6 +12,7 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
   ): Promise<void>;
   removeVariableFromEnvironment(environmentId: string, key: string): Promise<void>;
   duplicateEnvironment(environmentId: string, allEnvironments: EnvironmentMap): Promise<EnvironmentData>;
+  attachListener(params: EnvironmentListenerParams): () => any;
 }
 
 export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
@@ -22,7 +23,6 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   createRecordWithId(record: Partial<RQAPI.Record>, id: string): RQAPI.RecordPromise;
   updateRecord(record: Partial<RQAPI.Record>, id?: string): RQAPI.RecordPromise;
   deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }>;
-  // TODO: Add listeners
 }
 
 export interface ApiClientRepositoryInterface {
@@ -34,3 +34,7 @@ export type ApiClientCloudMeta = {
   uid: string;
   teamId: string;
 };
+
+export type EnvironmentListenerParams =
+  | { scope: VariableScope.COLLECTION; callback: (data: CollectionVariableMap) => void }
+  | { scope: Exclude<VariableScope, VariableScope.COLLECTION>; id: string; callback: (data: EnvironmentData) => void };
