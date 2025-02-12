@@ -2,7 +2,6 @@
   "name": "@requestly/shared",
   "version": "1.0.0",
   "description": "",
-  "types": "dist/types/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "run-s cleanup build-dist build-alias",
@@ -59,13 +58,6 @@
     ".": {
       "require": "./dist/index.cjs.js",
       "import": "./dist/index.esm.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "types/*": [
-        "dist/types/*/index.d.ts"
-      ]
     }
   }
 }
