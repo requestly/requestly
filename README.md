@@ -31,11 +31,11 @@
 <p align="center">
   <h3 align="center">⚡ A Local-first, beautiful & Powerful alternative to Postman, Insomina & Charles Proxy </h3>
 
-  <img width="100%" alt="intercept_ _modify_https_requests_-_1280x800_5" src="https://github.com/user-attachments/assets/99d8eaee-13d0-4a02-a38a-ee4352c1344e">
+  <img width="100%" alt="what-is-requestly" src="https://github.com/user-attachments/assets/99d8eaee-13d0-4a02-a38a-ee4352c1344e">
 </p>
 
 ## 🏡 Getting Started
-- [🚀 What is Requestly?](#-what-is-requestly)
+- [🖥️ A Local-first Solution]()
 - [✨ Features](#-features)
     - [HTTP Rules (Intercept & Modify HTTPs Requests)](#-http-rules-intercept--modify-https-requests)
     - [API Client](#-api-client)
@@ -46,13 +46,19 @@
 - [🙏 Contributing](#-contributing)
 - [🎯 Our Mission](#-our-mission)
 
-## 🚀 What is Requestly
+## Local-first Solution (Local Workspaces)
 
-Requestly is an Open-Source platform for front-end developers with essential tooling & integrations that helps them write, test & debug their code 10x faster. Requestly reduces dependency on backend devs and environments for development & testing needs. 
+**Local Workspaces** is a simple, powerful, and privacy-friendly approach to building, testing & mocking your APIs. All your data is stored in the selected directory on your disk. You can also import all your API client files (requests, collections, environments) and codebase into VSCode and edit them directly in your IDE.
 
-Using Requestly, devs can create mock, test, validate & override API responses, modify request & response headers, set up redirects (Map local, Map remote), and use Requestly sessions for faster debugging.
+Collaborate with your colleagues using your preferred sync engine - Git, Google Drive, iCloud, or nothing at all.
 
-## ✨ Features
+**Team Workspaces** are great for seamless collaboration through Requestly sync engine.
+
+<p align="center">
+  <h3 align="center">⚡ A Local-first, beautiful & Powerful alternative to Postman, Insomina & Charles Proxy </h3>
+
+  <img width="100%" alt="requestly-local-first-support" src="https://github.com/user-attachments/assets/f2436cd7-242d-4706-bc4c-04d9b9cfe991">
+</p>
 
 ### 👉 HTTP Rules (Intercept & Modify HTTPs Requests)
 Intercept & Modify HTTPs requests & responses from browsers & mobile apps. 
