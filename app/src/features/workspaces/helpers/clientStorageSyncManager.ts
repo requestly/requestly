@@ -114,8 +114,8 @@ class ClientStorageSyncManager {
       const rulesAndGroups = ruleStorageModels.map((ruleStorageModel) => {
         return ruleStorageModel.data;
       });
-      // Do we need this? It might be slow
-      // await clientRuleStorageService.resetRulesAndGroups();
+      // Needed so that deleted rules can be cleaned up
+      await clientRuleStorageService.resetRulesAndGroups();
       await clientRuleStorageService.saveMultipleRulesOrGroups(rulesAndGroups);
     });
     this.ruleSyncUnsub = unsub;
