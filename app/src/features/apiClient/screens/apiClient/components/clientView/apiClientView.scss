@@ -42,7 +42,9 @@
   .api-client-body {
     padding: 0 16px;
     padding-top: 8px;
+    padding-bottom: 12px;
     overflow: hidden;
+    position: static;
 
     .ant-tabs {
       .ant-tabs-nav-wrap {
