@@ -40,14 +40,17 @@ export const firebaseBatchWrite = async (path: string, data: any[]) => {
   const db = getFirestore(firebaseApp);
   const batch = writeBatch(db);
 
+  const updatedRecords: any[] = [];
   try {
     data.forEach((item) => {
       const updatedItem = updateRecordMetaData(item);
+      updatedRecords.push(updatedItem);
       const recordRef = doc(db, path, updatedItem.id);
       batch.set(recordRef, updatedItem, { merge: true });
     });
 
-    return batch.commit();
+    await batch.commit();
+    return updatedRecords;
   } catch (error) {
     throw new Error(error);
   }
