@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 export const Home: React.FC = () => {
   const isIncentivizationEnabled = useIsIncentivizationEnabled();
   const user = useSelector(getUserAuthDetails);
-  const displayName = user?.details?.profile?.displayName.split(" ")[0] ?? "Guest";
+  const displayName = user?.details?.profile?.displayName?.split(" ")[0] ?? "Guest";
 
   return (
     <Col className="homepage-wrapper">
