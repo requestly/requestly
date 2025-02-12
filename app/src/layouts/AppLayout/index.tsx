@@ -31,6 +31,7 @@ import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import { useWorkspaceManager } from "features/workspaces/hooks/useWorkspaceManager";
 import useClientStorageService from "services/clientStorageService/hooks/useClientStorageService";
 import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
+import useRedirectToLastFeature from "hooks/useRedirectToLastFeature";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -40,6 +41,7 @@ const App: React.FC = () => {
     growthbook.loadFeatures({ autoRefresh: true });
   }, []);
 
+  useRedirectToLastFeature();
   usePreLoadRemover();
   useGeoLocation();
 

@@ -1,0 +1,27 @@
+.student-program-nudge {
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8, 24px) 0px;
+  gap: var(--space-5, 12px);
+  color: var(--requestly-color-text-default);
+  font-size: var(--font-size-md, 14px);
+  line-height: var(--requestly-font-line-height-sm);
+  margin-top: 24px;
+  margin-bottom: 72px;
+  flex-wrap: wrap;
+
+  .student-plan-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--requestly-color-success);
+    flex-shrink: 0;
+  }
+
+  a {
+    flex-shrink: 0;
+    text-decoration-line: underline;
+    color: var(--requestly-color-success-200, #6fdaa6);
+  }
+}

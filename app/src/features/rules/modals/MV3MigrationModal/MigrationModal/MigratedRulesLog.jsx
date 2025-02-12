@@ -35,7 +35,7 @@ const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
           <li className="migrated-rule-description">
             <Popover content={<img src={pathContainsImg} width={200} alt="path-migration" />} trigger="hover">
               <a
-                href="https://developers.requestly.com/http-rules/map-local-url-redirect/#72394d506ece433288b806a0f2d80589"
+                href="https://docs.requestly.com/general/http-rules/rule-types/map-local"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -51,7 +51,11 @@ const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
               content={<img src={pageUrlSourceFilterImg} width={200} alt="page-url-source-filter-migration" />}
               trigger="hover"
             >
-              <a href="https://developers.requestly.com/http-rules/advance-targeting/" target="_blank" rel="noreferrer">
+              <a
+                href="https://docs.requestly.com/general/http-rules/advanced-usage/advance-filters/"
+                target="_blank"
+                rel="noreferrer"
+              >
                 <Typography.Text code>Page URL</Typography.Text>{" "}
               </a>
             </Popover>

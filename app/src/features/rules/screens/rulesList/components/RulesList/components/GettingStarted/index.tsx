@@ -27,7 +27,6 @@ import {
   trackResourceOverrideSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import { ImportFromModheaderModal } from "../ImporterComponents/ModheaderImporter/ImportFromModheaderModal";
-import emptyInbox from "./empty-inbox.svg";
 import { MdOutlineAddCircleOutline } from "@react-icons/all-files/md/MdOutlineAddCircleOutline";
 import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
@@ -169,7 +168,13 @@ export const GettingStarted: React.FC = () => {
             <div className="create-new-rule-content">
               <div className="no-rules">
                 <div className="empty-rules-image-container">
-                  <img width={72} height={72} src={emptyInbox} alt="empty-rules" className="empty-rules" />
+                  <img
+                    width={72}
+                    height={72}
+                    src={"/assets/media/rules/empty-inbox.svg"}
+                    alt="empty-rules"
+                    className="empty-rules"
+                  />
                   <div className="caption">No rules created yet</div>
                 </div>
 

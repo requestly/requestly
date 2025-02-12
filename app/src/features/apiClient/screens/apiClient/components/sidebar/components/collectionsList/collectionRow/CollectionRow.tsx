@@ -202,8 +202,6 @@ export const CollectionRow: React.FC<Props> = ({
             {record.data.children?.length === 0 ? (
               <ApiRecordEmptyState
                 analyticEventSource="collection_row"
-                recordType={RQAPI.RecordType.API}
-                newRecordCollectionId={record.id}
                 message="No requests created yet"
                 newRecordBtnText="New request"
                 onNewRecordClick={() => onNewClick("collection_row", RQAPI.RecordType.API, record.id)}
