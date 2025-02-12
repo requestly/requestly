@@ -26,10 +26,12 @@ interface Props {
   openTab: TabsLayoutContextInterface["openTab"];
   setExpandedRecordIds: (keys: RQAPI.Record["id"][]) => void;
   expandedRecordIds: string[];
-  setShowSelection: (arg: boolean) => void;
-  showSelection: boolean;
-  recordsSelectionHandler: (record: RQAPI.Record, event: React.ChangeEvent<HTMLInputElement>) => void;
-  selectedRecords: Set<RQAPI.Record["id"]>;
+  bulkActionOptions: {
+    showSelection: boolean;
+    selectedRecords: Set<RQAPI.Record["id"]>;
+    recordsSelectionHandler: (record: RQAPI.Record, event: React.ChangeEvent<HTMLInputElement>) => void;
+    setShowSelection: (arg: boolean) => void;
+  };
 }
 
 export const CollectionRow: React.FC<Props> = ({
@@ -39,11 +41,9 @@ export const CollectionRow: React.FC<Props> = ({
   openTab,
   expandedRecordIds,
   setExpandedRecordIds,
-  selectedRecords,
-  showSelection,
-  recordsSelectionHandler,
-  setShowSelection,
+  bulkActionOptions,
 }) => {
+  const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeKey, setActiveKey] = useState(expandedRecordIds?.includes(record.id) ? record.id : null);
   const [createNewField, setCreateNewField] = useState(null);
@@ -136,11 +136,12 @@ export const CollectionRow: React.FC<Props> = ({
             return (
               <>
                 {showSelection && (
-                  <Checkbox
-                    onClick={(event) => event.stopPropagation()}
-                    onChange={recordsSelectionHandler.bind(this, record)}
-                    checked={selectedRecords.has(record.id)}
-                  />
+                  <div onClick={(event) => event.stopPropagation()}>
+                    <Checkbox
+                      onChange={recordsSelectionHandler.bind(this, record)}
+                      checked={selectedRecords.has(record.id)}
+                    />
+                  </div>
                 )}
                 {isActive ? (
                   <PiFolderOpen className="collection-expand-icon" />
@@ -234,10 +235,7 @@ export const CollectionRow: React.FC<Props> = ({
                       key={apiRecord.id}
                       record={apiRecord}
                       openTab={openTab}
-                      showSelection={showSelection}
-                      recordsSelectionHandler={recordsSelectionHandler}
-                      selectedRecords={selectedRecords}
-                      setShowSelection={setShowSelection}
+                      bulkActionOptions={bulkActionOptions}
                     />
                   );
                 } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
@@ -250,10 +248,7 @@ export const CollectionRow: React.FC<Props> = ({
                       onExportClick={onExportClick}
                       expandedRecordIds={expandedRecordIds}
                       setExpandedRecordIds={setExpandedRecordIds}
-                      showSelection={showSelection}
-                      selectedRecords={selectedRecords}
-                      recordsSelectionHandler={recordsSelectionHandler}
-                      setShowSelection={setShowSelection}
+                      bulkActionOptions={bulkActionOptions}
                     />
                   );
                 }
