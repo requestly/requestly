@@ -42,8 +42,8 @@ export interface ExportData {
 const COLLECTIONS_SCHEMA_VERSION = "1.0.0";
 
 export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, exportType, ...props }) => {
-  const { collectionsAndApis } = props as ExportCollectionsModalProps;
-  const { environments } = props as ExportEnvironmentsModalProps;
+  const { collectionsAndApis = [] } = props as ExportCollectionsModalProps;
+  const { environments = [] } = props as ExportEnvironmentsModalProps;
 
   const [isApiRecordsProcessed, setIsApiRecordsProcessed] = useState(false);
   const [exportData, setExportData] = useState<ExportData>(

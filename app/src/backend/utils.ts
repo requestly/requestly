@@ -1,5 +1,6 @@
 import { collection, doc, getFirestore, writeBatch } from "firebase/firestore";
 import firebaseApp from "../firebase";
+import { updateRecordMetaData } from "./apiClient/utils";
 
 export const getOwnerId = (uid: string, teamId?: string) => {
   if (teamId) {
@@ -34,17 +35,19 @@ export const batchWrite = async (batchSize: number, items: any[], writeFunction:
   return results;
 };
 
+// TODO: Merge this with backend/api client core functions (upsertAPIRecord)
 export const firebaseBatchWrite = async (path: string, data: any[]) => {
   const db = getFirestore(firebaseApp);
   const batch = writeBatch(db);
 
   try {
     data.forEach((item) => {
-      const recordRef = doc(db, path, item.id);
-      batch.set(recordRef, item, { merge: true });
+      const updatedItem = updateRecordMetaData(item);
+      const recordRef = doc(db, path, updatedItem.id);
+      batch.set(recordRef, updatedItem, { merge: true });
     });
 
-    await batch.commit();
+    return batch.commit();
   } catch (error) {
     throw new Error(error);
   }

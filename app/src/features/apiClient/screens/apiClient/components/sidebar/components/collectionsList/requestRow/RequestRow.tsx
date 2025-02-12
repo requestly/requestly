@@ -25,20 +25,16 @@ import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 interface Props {
   record: RQAPI.ApiRecord;
   openTab: TabsLayoutContextInterface["openTab"];
-  showSelection: boolean;
-  recordsSelectionHandler: (record: RQAPI.Record, event: React.ChangeEvent<HTMLInputElement>) => void;
-  selectedRecords: Set<RQAPI.Record["id"]>;
-  setShowSelection: (arg: boolean) => void;
+  bulkActionOptions: {
+    showSelection: boolean;
+    selectedRecords: Set<RQAPI.Record["id"]>;
+    recordsSelectionHandler: (record: RQAPI.Record, event: React.ChangeEvent<HTMLInputElement>) => void;
+    setShowSelection: (arg: boolean) => void;
+  };
 }
 
-export const RequestRow: React.FC<Props> = ({
-  record,
-  openTab,
-  showSelection,
-  recordsSelectionHandler,
-  selectedRecords,
-  setShowSelection,
-}) => {
+export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions }) => {
+  const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
   const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();

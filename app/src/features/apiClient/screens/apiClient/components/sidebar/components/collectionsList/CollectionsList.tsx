@@ -25,10 +25,6 @@ import "./collectionsList.scss";
 import { isEmpty, union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
-import { upsertApiRecord } from "backend/apiClient";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";
@@ -42,9 +38,6 @@ interface Props {
 export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated }) => {
   const navigate = useNavigate();
   const { collectionId, requestId } = useParams();
-
-  const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
 
   const location = useLocation();
   const { openTab, tabs } = useTabsLayoutContext();
@@ -169,14 +162,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           break;
       }
     },
-    [
-      selectedRecords,
-      user?.details?.profile?.uid,
-      team?.id,
-      upsertApiRecord,
-      onSaveRecord,
-      updatedRecords.childParentMap,
-    ]
+    [selectedRecords, onSaveRecord, updatedRecords]
   );
 
   // Main toggle handler
@@ -295,10 +281,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     expandedRecordIds={expandedRecordIds}
                     setExpandedRecordIds={setExpandedRecordIds}
                     onExportClick={handleExportCollection}
-                    showSelection={showSelection}
-                    selectedRecords={selectedRecords}
-                    recordsSelectionHandler={recordsSelectionHandler}
-                    setShowSelection={setShowSelection}
+                    bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />
                 );
               })}
@@ -316,10 +299,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     key={record.id}
                     record={record}
                     openTab={openTab}
-                    showSelection={showSelection}
-                    recordsSelectionHandler={recordsSelectionHandler}
-                    selectedRecords={selectedRecords}
-                    setShowSelection={setShowSelection}
+                    bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />
                 );
               })}
