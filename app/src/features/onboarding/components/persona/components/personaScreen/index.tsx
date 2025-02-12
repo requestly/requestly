@@ -29,8 +29,6 @@ import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { IndustryInput } from "../IndustryInput";
 import "./index.scss";
-import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
 
 interface Props {
   isOpen: boolean;
@@ -38,7 +36,6 @@ interface Props {
 
 export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const [isLoading, setIsLoading] = useState(true);
@@ -60,14 +57,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
     if (user?.loggedIn && isCompanyEmail(user?.details?.profile?.email) && user?.details?.profile?.isEmailVerified) {
       dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.TEAMS));
     } else {
-      redirectToWebAppHomePage(navigate);
-      dispatch(globalActions.updateAppOnboardingCompleted());
-      dispatch(
-        globalActions.toggleActiveModal({
-          modalName: "appOnboardingModal",
-          newValue: false,
-        })
-      );
+      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
     }
   }, [dispatch, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified, user?.loggedIn]);
 

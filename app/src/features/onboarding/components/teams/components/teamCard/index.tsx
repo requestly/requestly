@@ -11,12 +11,11 @@ import Logger from "lib/logger";
 import { LoadingOutlined } from "@ant-design/icons";
 import { BiCheckCircle } from "@react-icons/all-files/bi/BiCheckCircle";
 import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
+import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { globalActions } from "store/slices/global/slice";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { isNull } from "lodash";
 import "./index.scss";
-import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
 
 interface TeamCardProps {
   invite: Invite & { metadata?: any };
@@ -26,7 +25,6 @@ interface TeamCardProps {
 
 export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJoiningTeamId }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [isJoining, setIsJoining] = useState<boolean>(false);
@@ -65,14 +63,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJo
             res?.data?.data?.invite?.metadata?.teamAccessCount
           );
         }
-        redirectToWebAppHomePage(navigate);
-        dispatch(globalActions.updateAppOnboardingCompleted());
-        dispatch(
-          globalActions.toggleActiveModal({
-            modalName: "appOnboardingModal",
-            newValue: false,
-          })
-        );
+        dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
       })
       .catch((e) => {
         Logger.error(e);
