@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useCallback, useState, useRef } from "react";
-import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
+import {
+  EnvironmentMap,
+  EnvironmentVariables,
+  EnvironmentVariableType,
+  EnvironmentVariableValue,
+  VariableScope,
+} from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllEnvironmentData,
@@ -9,7 +15,7 @@ import {
 import { variablesActions } from "store/features/variables/slice";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
-import { attachEnvironmentVariableListener, fetchAllEnvironmentDetails, attachCollectionVariableListener } from "..";
+import { fetchAllEnvironmentDetails } from "..";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import { isEmpty } from "lodash";
@@ -140,35 +146,10 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   useEffect(() => {
     if (ownerId && currentEnvironmentId && initFetchers) {
       unsubscribeListener?.();
-      unsubscribeListener = attachEnvironmentVariableListener(ownerId, currentEnvironmentId, (environmentData) => {
-        const mergedVariables = mergeLocalAndSyncVariables(
-          activeOwnerEnvironmentsRef.current[environmentData.id]?.variables ?? {},
-          environmentData.variables
-        );
-        dispatch(
-          variablesActions.updateEnvironmentData({
-            newVariables: mergedVariables,
-            environmentId: environmentData.id,
-            environmentName: environmentData.name,
-            ownerId,
-          })
-        );
-        setIsEnvironmentsDataLoaded(true);
-      });
-    }
-
-    return () => {
-      unsubscribeListener?.();
-    };
-  }, [currentEnvironmentId, dispatch, initFetchers, ownerId]);
-
-  useEffect(() => {
-    if (ownerId && activeOwnerEnvironmentsRef.current?.["global"]?.id && initFetchers) {
-      unsubscribeGlobalVariablesListener?.();
-      unsubscribeGlobalVariablesListener = attachEnvironmentVariableListener(
-        ownerId,
-        activeOwnerEnvironmentsRef.current?.["global"]?.id,
-        (environmentData) => {
+      unsubscribeListener = syncRepository.environmentVariablesRepository.attachListener({
+        scope: VariableScope.ENVIRONMENT,
+        id: currentEnvironmentId,
+        callback: (environmentData) => {
           const mergedVariables = mergeLocalAndSyncVariables(
             activeOwnerEnvironmentsRef.current[environmentData.id]?.variables ?? {},
             environmentData.variables
@@ -181,33 +162,65 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
               ownerId,
             })
           );
-        }
-      );
+          setIsEnvironmentsDataLoaded(true);
+        },
+      });
+    }
+
+    return () => {
+      unsubscribeListener?.();
+    };
+  }, [currentEnvironmentId, dispatch, initFetchers, ownerId, syncRepository]);
+
+  useEffect(() => {
+    if (ownerId && activeOwnerEnvironmentsRef.current?.["global"]?.id && initFetchers) {
+      unsubscribeGlobalVariablesListener?.();
+      unsubscribeGlobalVariablesListener = syncRepository.environmentVariablesRepository.attachListener({
+        scope: VariableScope.GLOBAL,
+        id: activeOwnerEnvironmentsRef.current?.["global"]?.id,
+        callback: (environmentData) => {
+          const mergedVariables = mergeLocalAndSyncVariables(
+            activeOwnerEnvironmentsRef.current[environmentData.id]?.variables ?? {},
+            environmentData.variables
+          );
+          dispatch(
+            variablesActions.updateEnvironmentData({
+              newVariables: mergedVariables,
+              environmentId: environmentData.id,
+              environmentName: environmentData.name,
+              ownerId,
+            })
+          );
+        },
+      });
     }
 
     return () => {
       unsubscribeGlobalVariablesListener?.();
     };
-  }, [ownerId, initFetchers, dispatch]);
+  }, [ownerId, initFetchers, dispatch, syncRepository]);
 
   useEffect(() => {
     if (ownerId && initFetchers) {
       unsubscribeCollectionListener?.();
-      unsubscribeCollectionListener = attachCollectionVariableListener(ownerId, (collectionDetails) => {
-        Object.keys(collectionDetails).forEach((collectionId) => {
-          const mergedCollectionVariables = mergeLocalAndSyncVariables(
-            collectionVariablesRef.current[collectionId]?.variables ?? {},
-            collectionDetails[collectionId].variables ?? {}
-          );
-          dispatch(variablesActions.setCollectionVariables({ collectionId, variables: mergedCollectionVariables }));
-        });
+      unsubscribeCollectionListener = syncRepository.environmentVariablesRepository.attachListener({
+        scope: VariableScope.COLLECTION,
+        callback: (collectionDetails) => {
+          Object.keys(collectionDetails).forEach((collectionId) => {
+            const mergedCollectionVariables = mergeLocalAndSyncVariables(
+              collectionVariablesRef.current[collectionId]?.variables ?? {},
+              collectionDetails[collectionId].variables ?? {}
+            );
+            dispatch(variablesActions.setCollectionVariables({ collectionId, variables: mergedCollectionVariables }));
+          });
+        },
       });
     }
 
     return () => {
       unsubscribeCollectionListener?.();
     };
-  }, [ownerId, initFetchers, dispatch]);
+  }, [ownerId, initFetchers, dispatch, syncRepository]);
 
   useEffect(() => {
     if (!user.loggedIn) {
