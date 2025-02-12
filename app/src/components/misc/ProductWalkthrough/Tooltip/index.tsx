@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 import { Button } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { CustomTooltipProps } from "../types";
-//@ts-ignore
 import "./index.css";
 
 export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
