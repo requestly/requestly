@@ -52,7 +52,7 @@ const isFormRequest = (
 };
 
 /* CORE */
-export async function getAPIResponse(apiRequest: Request): Promise<Response> {
+export async function getAPIResponse(apiRequest: Request): Promise<Response | { error: string }> {
   const method = apiRequest.method || "GET";
   const headers = new Headers();
   const body = apiRequest.body;
@@ -127,9 +127,8 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response> {
       redirectedUrl: response.url !== url ? response.url : "",
     };
   } catch (e) {
-    console.log("!!!debug", "ext errr", e);
-    console.log("!!!debug", "ext errr msg", e.message);
-    console.log("!!!debug", "ext errr cause", e.cause);
-    return null;
+    return {
+      error: e.message,
+    };
   }
 }

@@ -193,11 +193,6 @@ export class ApiClientExecutor {
     try {
       const response = await makeRequest(this.appMode, this.entryDetails.request, this.abortController.signal);
       this.entryDetails.response = response;
-
-      // This should be returned normally, encapsulated by WorkResult
-      if (!response) {
-        throw Error("Failed to send the request. Please check if the URL is valid.");
-      }
     } catch (e) {
       return {
         status: RQAPI.ExecutionStatus.ERROR,
