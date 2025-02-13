@@ -1,12 +1,17 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 import { globalActions } from "store/slices/global/slice";
 import PATHS from "config/constants/sub/paths";
+import { getAppMode, getLastUsedFeaturePath } from "store/selectors";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const useRedirectToLastFeature = () => {
   const dispatch = useDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
+  const storedFeaturePath = useSelector(getLastUsedFeaturePath);
+  const appMode = useSelector(getAppMode);
 
   const LAST_KNOWN_PATHS = new Set([
     PATHS.API_CLIENT.INDEX,
@@ -15,6 +20,20 @@ const useRedirectToLastFeature = () => {
     PATHS.NETWORK_INSPECTOR.INDEX,
     `/${PATHS.SESSIONS.INDEX}`,
   ]);
+
+  const isOpenedInDesktopMode = PATHS.ROOT === location.pathname && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+
+  useEffect(() => {
+    if (location.pathname === PATHS.ROOT) {
+      if (storedFeaturePath && storedFeaturePath !== PATHS.ROOT) {
+        navigate(storedFeaturePath, { replace: true });
+      } else {
+        isOpenedInDesktopMode
+          ? navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE, { replace: true })
+          : navigate(PATHS.HOME.ABSOLUTE, { replace: true });
+      }
+    }
+  }, [isOpenedInDesktopMode, location.pathname, navigate, storedFeaturePath]);
 
   useEffect(() => {
     const pathSegments = location.pathname.split("/")?.filter(Boolean);
