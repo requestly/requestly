@@ -14,6 +14,7 @@ import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyRespo
 import { AbortError } from "../../errors/AbortError";
 import { RequestError } from "../../errors/RequestError";
 import "./apiclientBottomSheet.scss";
+import { ApiClientWarningPanel } from "../../errors/ApiClientWarningPanel/ApiClientWarningPanel";
 
 interface Props {
   response: RQAPI.Response;
@@ -24,6 +25,7 @@ interface Props {
   onCancelRequest: () => void;
   handleTestResultRefresh: () => Promise<void>;
   error?: RQAPI.ExecutionError;
+  warning?: RQAPI.ExecutionWarning;
 }
 
 const BOTTOM_SHEET_TAB_KEYS = {
@@ -41,6 +43,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   handleTestResultRefresh,
   onCancelRequest,
   error,
+  warning,
 }) => {
   const contentTypeHeader = useMemo(() => {
     return response?.headers ? getContentTypeFromResponseHeaders(response.headers) : "";
@@ -125,6 +128,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   return (
     <div className="api-client-sheet-panel-container">
       {response && error && !isRequestCancelled && <ApiClientErrorPanel error={error} />}
+      {!error && warning && !isRequestCancelled && <ApiClientWarningPanel warning={warning} />}
       <div className="api-client-sheet-panel">
         <BottomSheet
           items={bottomSheetTabItems}

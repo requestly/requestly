@@ -15,13 +15,20 @@ import {
   trackScriptExecutionStarted,
 } from "../modules/scriptsV2/analytics";
 import { isMethodSupported, isOnline, isUrlProtocolValid, isUrlValid } from "./apiClientExecutorHelpers";
+import { isEmpty } from "lodash";
 
 type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
   getCollectionVariables(collectionId: string): EnvironmentVariables;
   getGlobalVariables(): EnvironmentVariables;
   postScriptExecutionCallback(state: any): Promise<void>;
-  renderVariables(request: RQAPI.Request, collectionId: string): RQAPI.Request;
+  renderVariables(
+    request: RQAPI.Request,
+    collectionId: string
+  ): {
+    renderedRequest: RQAPI.Request;
+    renderedVariables?: Record<string, unknown>;
+  };
 };
 
 export class ApiClientExecutor {
@@ -31,6 +38,7 @@ export class ApiClientExecutor {
   private recordId: RQAPI.Record["id"];
   private apiRecords: RQAPI.Record[];
   private internalFunctions: InternalFunctions;
+  private renderedVariables: Record<string, unknown> = {};
   constructor(private appMode: string, private workloadManager: APIClientWorkloadManager) {}
 
   prepareRequest() {
@@ -38,6 +46,7 @@ export class ApiClientExecutor {
     this.entryDetails.testResults = [];
     this.abortController = new AbortController();
     this.entryDetails.request.queryParams = [];
+    this.renderedVariables = {};
 
     const { headers, queryParams } = processAuthForEntry(
       this.entryDetails,
@@ -53,8 +62,9 @@ export class ApiClientExecutor {
     const { renderVariables } = this.internalFunctions;
 
     // Process request configuration with environment variables
-    const renderedRequest = renderVariables(this.entryDetails.request, this.collectionId);
+    const { renderedRequest, renderedVariables } = renderVariables(this.entryDetails.request, this.collectionId);
     this.entryDetails.request = renderedRequest;
+    this.renderedVariables = renderedVariables;
     return renderedRequest;
   }
 
@@ -109,6 +119,16 @@ export class ApiClientExecutor {
     if (!isUrlProtocolValid(this.entryDetails.request.url)) {
       throw new Error(`Invalid URL protocol: ${this.entryDetails.request.url}`);
     }
+  }
+
+  private getEmptyRenderedVariables(): string[] {
+    if (isEmpty(this.renderedVariables)) {
+      return [];
+    }
+
+    return Object.keys(this.renderedVariables).filter(
+      (key) => this.renderedVariables[key] === undefined || this.renderedVariables[key] === ""
+    );
   }
 
   updateEntryDetails(entryDetails: {
@@ -232,7 +252,7 @@ export class ApiClientExecutor {
       };
     }
 
-    return {
+    const executionResult: RQAPI.ExecutionResult = {
       status: RQAPI.ExecutionStatus.SUCCESS,
       executedEntry: {
         ...this.entryDetails,
@@ -242,6 +262,17 @@ export class ApiClientExecutor {
         ],
       },
     };
+
+    const emptyRenderedVariables = this.getEmptyRenderedVariables();
+
+    if (!isEmpty(emptyRenderedVariables)) {
+      executionResult.warning = {
+        message: `Following variables used in your request are empty`,
+        description: `${emptyRenderedVariables.map((varName) => `"${varName}"`).join(", ")}`,
+      };
+    }
+
+    return executionResult;
   }
 
   async rerun(): Promise<RQAPI.RerunResult> {
