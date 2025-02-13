@@ -43,6 +43,7 @@ export const defaultSessionRecordingConfig: SessionRecordingConfig = {
     isActive: false,
     mode: AutoRecordingMode.ALL_PAGES,
   },
+  captureHeaders: false,
 };
 
 export const SessionsSettings: React.FC = () => {
@@ -50,6 +51,9 @@ export const SessionsSettings: React.FC = () => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [config, setConfig] = useState<SessionRecordingConfig>({});
   const [showNewPageSource, setShowNewPageSource] = useState<boolean>(false);
+  const [isCaptureHeadersEnabled, setIsCaptureHeadersEnabled] = useState<boolean>(
+    defaultSessionRecordingConfig.captureHeaders
+  );
   const { autoRecording } = config;
 
   const getPageSourceLabel = useCallback((source: SessionRecordingPageSource): string => {
@@ -93,6 +97,9 @@ export const SessionsSettings: React.FC = () => {
     StorageService(appMode)
       .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
       .then((config) => {
+        if (config?.captureHeaders) {
+          setIsCaptureHeadersEnabled(true);
+        }
         if (!config || Object.keys(config).length === 0) return defaultSessionRecordingConfig;
 
         if (config.autoRecording) return config; // config already migrated
@@ -224,6 +231,14 @@ export const SessionsSettings: React.FC = () => {
     [config, handleSaveConfig]
   );
 
+  const handleCaptureHeadersToggle = useCallback(
+    (isChecked: boolean) => {
+      handleSaveConfig({ ...config, captureHeaders: isChecked }, true);
+      setIsCaptureHeadersEnabled(isChecked);
+    },
+    [config, handleSaveConfig]
+  );
+
   if (!isExtensionInstalled()) {
     return <InstallExtensionCTA eventPage="session_settings" />;
   }
@@ -310,6 +325,15 @@ export const SessionsSettings: React.FC = () => {
                 </div>
               </div>
             </Radio.Group>
+          </div>
+          <div className="capture-headers-setting-container">
+            <div className="capture-headers-setting-details">
+              <div className="heading">Capture Request & Response Headers</div>
+              <div className="capture-headers-setting-caption">
+                Capture request and response headers of the network requests made when recording a session.
+              </div>
+            </div>
+            <Switch checked={isCaptureHeadersEnabled} onChange={handleCaptureHeadersToggle} />
           </div>
         </Col>
       </div>
