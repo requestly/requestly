@@ -1,5 +1,15 @@
 .api-client-sheet-panel-container {
   display: flex;
   flex-direction: column;
-  height: 88%;
+  height: 99%;
+
+  .api-client-sheet-panel {
+    overflow-y: auto;
+    flex: 1;
+
+    .ant-tabs-extra-content {
+      margin-top: -6px;
+      margin-right: 4px;
+    }
+  }
 }
