@@ -35,16 +35,15 @@
 </p>
 
 ## 🏡 Getting Started
-- [🖥️ A Local-first Solution]()
-- [✨ Features](#-features)
-    - [HTTP Rules (Intercept & Modify HTTPs Requests)](#-http-rules-intercept--modify-https-requests)
-    - [API Client](#-api-client)
-    - [Mock Server (Create API Mocks in seconds)](#-mock-server-create-api-mocks-in-seconds)
-    - [Sessions for faster debugging](#-sessions)
-- [📕 Documentation](#-documentation)
+- [A Local-first Solution](#a-local-first-solution-local-workspaces)
+- [REST API Client](#rest-api-client)
+- [Environments](#environments)
+- [HTTP Interceptor - Intercept & Modify HTTP Requests](#http-interceptor--http-rules-intercept--modify-https-requests)
+- [API Mocking](#api-mocking-helps-in-building-frontend-faster-without-waiting-for-backend)
+- [1-Click Imports from Postman, Insomnia, Modheader, Charles Proxy, and Resource Override](#1-click-imports)
+- [Support Channels](#-best-in-class-support)
 - [👩‍💻 Development](#-development)
 - [🙏 Contributing](#-contributing)
-- [🎯 Our Mission](#-our-mission)
 
 ## A Local-first Solution (Local Workspaces)
 
