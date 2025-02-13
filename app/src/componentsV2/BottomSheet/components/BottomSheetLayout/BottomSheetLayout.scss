@@ -1,5 +1,5 @@
 .bottomsheet-layout-container {
-  height: inherit;
+  height: calc(100% - 55px);
   position: relative;
 
   .ant-tabs {
