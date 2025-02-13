@@ -6,7 +6,7 @@ import PATHS from "config/constants/sub/paths";
 import { getAppMode, getLastUsedFeaturePath } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
-const useRedirectToLastFeature = () => {
+const useRootPathRedirector = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
@@ -51,4 +51,4 @@ const useRedirectToLastFeature = () => {
   }, [dispatch, location.pathname]);
 };
 
-export default useRedirectToLastFeature;
+export default useRootPathRedirector;

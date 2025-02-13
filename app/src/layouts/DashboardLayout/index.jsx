@@ -22,7 +22,7 @@ import { ConnectedToDesktopView } from "./ConnectedToDesktopView/ConnectedToDesk
 import { getUserOS } from "utils/Misc";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import useRedirectToLastFeature from "hooks/useRedirectToLastFeature";
+import useRootPathRedirector from "hooks/useRootPathRedirector";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -32,7 +32,7 @@ const DashboardLayout = () => {
   const user = useSelector(getUserAuthDetails);
   const { isDesktopAppConnected } = useDesktopAppConnection();
 
-  useRedirectToLastFeature();
+  useRootPathRedirector();
   initializeOneTap();
 
   if (shouldShowOneTapPrompt()) {
