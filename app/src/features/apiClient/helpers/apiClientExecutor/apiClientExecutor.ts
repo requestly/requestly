@@ -14,6 +14,7 @@ import {
   trackScriptExecutionFailed,
   trackScriptExecutionStarted,
 } from "../modules/scriptsV2/analytics";
+import { isMethodSupported, isOnline, isUrlProtocolValid, isUrlValid } from "./apiClientExecutorHelpers";
 
 type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
@@ -88,6 +89,28 @@ export class ApiClientExecutor {
     };
   }
 
+  private preValidateRequest() {
+    if (!this.entryDetails.request.url) {
+      throw new Error("Request URL cannot be empty!");
+    }
+
+    if (!isOnline()) {
+      throw new Error("Looks like you are offline. Please check your network connection.");
+    }
+
+    if (!isMethodSupported(this.entryDetails.request.method)) {
+      throw new Error(`Unsupported request method: ${this.entryDetails.request.method}`);
+    }
+
+    if (!isUrlValid(this.entryDetails.request.url)) {
+      throw new Error(`Invalid URL: ${this.entryDetails.request.url}`);
+    }
+
+    if (!isUrlProtocolValid(this.entryDetails.request.url)) {
+      throw new Error(`Invalid URL protocol: ${this.entryDetails.request.url}`);
+    }
+  }
+
   updateEntryDetails(entryDetails: {
     entry: RQAPI.Entry;
     collectionId: RQAPI.Record["collectionId"];
@@ -126,6 +149,21 @@ export class ApiClientExecutor {
 
   async execute(): Promise<RQAPI.ExecutionResult> {
     this.prepareRequest();
+    this.entryDetails.request.url = addUrlSchemeIfMissing(this.entryDetails.request.url);
+
+    try {
+      this.preValidateRequest();
+    } catch (error) {
+      return {
+        executedEntry: { ...this.entryDetails },
+        status: RQAPI.ExecutionStatus.ERROR,
+        error: {
+          source: "request",
+          name: error.name,
+          message: error.message,
+        },
+      };
+    }
 
     trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
     const preRequestScriptResult = await this.executePreRequestScript(
@@ -152,15 +190,13 @@ export class ApiClientExecutor {
       };
     }
 
-    this.entryDetails.request.url = addUrlSchemeIfMissing(this.entryDetails.request.url);
-
     try {
       const response = await makeRequest(this.appMode, this.entryDetails.request, this.abortController.signal);
       this.entryDetails.response = response;
 
       // This should be returned normally, encapsulated by WorkResult
       if (!response) {
-        throw Error("Failed to send the request. Please check if the URL is valid");
+        throw Error("Failed to send the request. Please check if the URL is valid.");
       }
     } catch (e) {
       return {

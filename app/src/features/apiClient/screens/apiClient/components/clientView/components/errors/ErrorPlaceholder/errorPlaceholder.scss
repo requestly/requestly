@@ -29,6 +29,7 @@
 
       .error-name {
         color: var(--requestly-color-error-text);
+        align-self: flex-start;
       }
 
       .error-message {
