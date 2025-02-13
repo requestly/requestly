@@ -8,8 +8,6 @@ import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActi
 import { isValidUrl } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import { prefixUrlWithHttps } from "utils/URLUtils";
-import StartSessionRecordingGif from "features/sessionBook/screens/SessionsListScreen/assets/sessions-banner.gif";
-import SessionBearRecordingGif from "features/sessionBook/screens/SessionsListScreen/assets/SessionBear.gif";
 import {
   trackInstallExtensionDialogShown,
   trackOnboardingToSettingsNavigate,
@@ -226,8 +224,8 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
               <img
                 src={
                   appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR
-                    ? SessionBearRecordingGif
-                    : StartSessionRecordingGif
+                    ? "/assets/media/common/SessionBear.gif"
+                    : "/assets/media/common/sessions-banner.gif"
                 }
                 alt="How to start session recording"
                 className="demo-video"
