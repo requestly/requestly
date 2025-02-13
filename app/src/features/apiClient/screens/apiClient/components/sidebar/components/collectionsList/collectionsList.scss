@@ -27,11 +27,53 @@
       margin-top: 4px;
     }
 
+    .ant-collapse-expand-icon {
+      display: flex;
+      align-items: center;
+      .ant-checkbox-wrapper {
+        margin-left: -4px;
+        margin-right: 6px;
+      }
+    }
+
+    .ant-checkbox-wrapper {
+      margin-right: 2px;
+      .ant-checkbox-input {
+        width: 12px;
+        height: 12px;
+      }
+
+      .ant-checkbox-inner {
+        width: 12px;
+        height: 12px;
+
+        &::after {
+          width: 4px;
+          height: 7px;
+        }
+      }
+    }
+    .request-row {
+      display: flex;
+      align-items: center;
+      a {
+        width: 100%;
+      }
+    }
+
+    .collection-row {
+      display: flex;
+      align-items: start;
+    }
+
+    .empty-state-wrapper {
+      margin-bottom: 4px;
+    }
+
     .collections-list-item {
       display: flex;
       align-items: center;
       gap: 8px;
-
       cursor: pointer;
       padding: 2px 6px;
       border-radius: 4px;
@@ -176,6 +218,65 @@
           border-left: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
         }
       }
+    }
+  }
+}
+
+.actions-menu {
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: all 0.5s;
+  position: sticky;
+  bottom: 16px;
+  width: 264px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+  background: var(--requestly-color-neutral-800);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.16);
+
+  .actions {
+    display: flex;
+    width: 188px;
+    justify-content: space-between;
+
+    .action-item {
+      cursor: pointer;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      line-height: 13px;
+      font-size: 9px;
+      font-weight: 500;
+      border-radius: 2px;
+      width: 62px;
+      justify-content: center;
+      transition: all 0.5s;
+
+      &:hover {
+        background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+      }
+
+      span {
+        margin-left: 4px;
+      }
+
+      svg {
+        height: 14px;
+        width: auto;
+      }
+    }
+  }
+
+  .cancel-actions {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    gap: 5px;
+
+    svg {
+      cursor: pointer;
     }
   }
 }
