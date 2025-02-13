@@ -3,7 +3,6 @@ import PATHS from "config/constants/sub/paths";
 import { RulesContainer } from "views/containers/RulesContainer";
 import RuleEditor from "views/features/rules/RuleEditor";
 import { joinPaths } from "utils/PathUtils";
-import RootComponent from "components/redirects/RootComponent";
 
 // V2 Imports
 import RulesContainerV2 from "./container";
@@ -26,14 +25,6 @@ export const ruleRoutes: RouteObject[] = [
   {
     path: PATHS.MARKETPLACE.RELATIVE,
     element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE} />,
-  },
-  {
-    path: PATHS.ROOT,
-    element: <RootComponent />,
-  },
-  {
-    path: PATHS.INDEX_HTML,
-    element: <RootComponent />,
   },
   // New V2 Routes
   {
