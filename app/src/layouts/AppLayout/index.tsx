@@ -30,7 +30,6 @@ import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
-// import useRedirectToLastFeature from "hooks/useRedirectToLastFeature";
 
 const { PATHS } = APP_CONSTANTS;
 
