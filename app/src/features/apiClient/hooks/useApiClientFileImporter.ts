@@ -120,7 +120,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
           setProcessingStatus("idle");
         });
     },
-    [error, processors, importer, uid]
+    [processors, importer, uid]
   );
 
   const handleImportEnvironments = useCallback(async (): Promise<number> => {
@@ -174,14 +174,11 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
     // Utility function to handle batch writes for collections
     const handleApiWrites = async (api: RQAPI.ApiRecord) => {
       const newCollectionId = collections.find((collection) => collection.id === api.collectionId)?.id;
-      if (!newCollectionId) {
-        throw new Error(`Failed to find new collection ID for API: ${api.name || api.id}`);
-      }
-
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
         const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
         onSaveRecord(newApi.data, "none");
+        !newCollectionId && importedCollectionsCount++;
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing API:", error);
@@ -216,24 +213,26 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
           handleImportEnvironments(),
           handleImportCollectionsAndApis(),
         ]);
-
         const importedEnvironments = envResult.status === "fulfilled" ? envResult.value : 0;
-        const importedCollections = collResult.status === "fulfilled" ? collResult.value : 0;
+        const importedCollectionsAndApis = collResult.status === "fulfilled" ? collResult.value : 0;
 
         const failedEnvironments = environments.length - importedEnvironments;
-        const failedCollections = collections.length - importedCollections;
+        const failedCollectionsAndApis =
+          (collections.length ? collections.length : apis.length) - importedCollectionsAndApis;
 
-        if (!importedEnvironments && !importedCollections) {
+        if (!importedEnvironments && !importedCollectionsAndApis) {
           toast.error("Failed to import data");
           return;
         }
 
-        const hasFailures = failedEnvironments > 0 || failedCollections > 0;
-        const hasSuccesses = importedEnvironments > 0 || importedCollections > 0;
+        const hasFailures = failedEnvironments > 0 || failedCollectionsAndApis > 0;
+        const hasSuccesses = importedEnvironments > 0 || importedCollectionsAndApis > 0;
 
         if (hasFailures && hasSuccesses) {
           const failureMessage = [
-            failedCollections > 0 ? `${failedCollections} collection${failedCollections !== 1 ? "s" : ""}` : "",
+            failedCollectionsAndApis > 0
+              ? `${failedCollectionsAndApis} collection${failedCollectionsAndApis !== 1 ? "s" : ""}`
+              : "",
             failedEnvironments > 0 ? `${failedEnvironments} environment${failedEnvironments !== 1 ? "s" : ""}` : "",
           ]
             .filter(Boolean)
@@ -245,7 +244,9 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
 
         toast.success(
           `Successfully imported ${[
-            importedCollections > 0 ? `${importedCollections} collection${importedCollections !== 1 ? "s" : ""}` : "",
+            importedCollectionsAndApis > 0
+              ? `${importedCollectionsAndApis} collection${importedCollectionsAndApis !== 1 ? "s" : ""}`
+              : "",
             importedEnvironments > 0
               ? `${importedEnvironments} environment${importedEnvironments !== 1 ? "s" : ""}`
               : "",
@@ -263,7 +264,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
         setIsImporting(false);
       }
     },
-    [collections, apis, environments, recordsCount]
+    [collections, apis, environments, recordsCount, handleImportCollectionsAndApis, handleImportEnvironments]
   );
 
   const resetImportData = () => {
