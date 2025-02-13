@@ -17,7 +17,7 @@ const ExtensionDeactivationMessage = () => {
           <li>Refresh the page to start using Requestly again.</li>
         </ol>
 
-        <img width={628} height={235} src={"/assets/media/common/gif/resume_requestly.gif"} alt="resume requestly" />
+        <img width={628} height={235} src={"/assets/media/common/resume_requestly.gif"} alt="resume requestly" />
       </div>
     </Row>
   );

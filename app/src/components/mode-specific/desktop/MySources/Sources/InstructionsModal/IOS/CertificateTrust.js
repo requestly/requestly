@@ -5,7 +5,7 @@ import { IOS_DEVICES } from "./constants";
 const CertificateTrustInstructions = ({ device_id }) => {
   const renderGif = () => {
     if (device_id === IOS_DEVICES.IPHONE13_PRO) {
-      return <Image src={"/assets/media/components/gif/install-and-trust-ios-profile.gif"} />;
+      return <Image src={"/assets/media/components/install-and-trust-ios-profile.gif"} />;
     }
   };
 

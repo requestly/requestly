@@ -46,7 +46,7 @@ const ExistingBrowserInstructionModal: React.FC<{
               </List.Item>
             </List>
             <Row>
-              <Image src={"/assets/media/components/png/existing_browser_connection.png"} />
+              <Image src={"/assets/media/components/existing_browser_connection.png"} />
             </Row>
           </>
         ),
@@ -72,7 +72,7 @@ const ExistingBrowserInstructionModal: React.FC<{
   return (
     <>
       <InstructionsHeader
-        icon={window.location.origin + "/assets/media/components/png/chrome.png"}
+        icon={window.location.origin + "/assets/media/components/chrome.png"}
         heading="Connect Existing Browser Profile"
         description={
           <Col>

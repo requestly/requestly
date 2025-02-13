@@ -152,7 +152,7 @@ const CertsInstructions = () => {
                   </li>
                   <li>Import the certificate you downloaded in the previous step (RQProxyCA.pem)</li>
                 </ul>
-                <Image width={"100%"} src={"/assets/media/components/gif/install_win_cert.gif"} />
+                <Image width={"100%"} src={"/assets/media/components/install_win_cert.gif"} />
               </>
             }
           />
@@ -186,7 +186,7 @@ const CertsInstructions = () => {
                   <li>Click on "Import Items"</li>
                   <li>Import the cert you downloaded in the previous step (RQProxyCA.pem)</li>
                 </ul>
-                <Image width={"100%"} src={"/assets/media/components/gif/import_cert.gif"} />
+                <Image width={"100%"} src={"/assets/media/components/import_cert.gif"} />
               </>
             }
           />
@@ -201,7 +201,7 @@ const CertsInstructions = () => {
                   <li>In Trust Section, Select "Always Trust" for "When using this certificate" </li>
                   <li>Close the window (Admin permissions required)</li>
                 </ul>
-                <Image width={"100%"} src={"/assets/media/components/gif/trust_cert.gif"} />
+                <Image width={"100%"} src={"/assets/media/components/trust_cert.gif"} />
               </>
             }
           />

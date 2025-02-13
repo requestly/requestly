@@ -31,7 +31,7 @@ const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
         {ruleMigrationData.some((e) => e.type === RuleMigrationChange.SOURCE_PATH_MIGRATED) && (
           <li className="migrated-rule-description">
             <Popover
-              content={<img src={"/assets/media/rules/png/path-contains.png"} width={200} alt="path-migration" />}
+              content={<img src={"/assets/media/rules/path-contains.png"} width={200} alt="path-migration" />}
               trigger="hover"
             >
               <a
@@ -50,7 +50,7 @@ const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
             <Popover
               content={
                 <img
-                  src={"/assets/media/rules/png/source-filter-page-url.png"}
+                  src={"/assets/media/rules/source-filter-page-url.png"}
                   width={200}
                   alt="page-url-source-filter-migration"
                 />

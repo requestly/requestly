@@ -88,7 +88,7 @@ const ManualProxySetup = ({ setShowInstructions }) => {
         {macInstructions.map((step) => {
           return <List.Item.Meta title={step.title} description={step.description} />;
         })}
-        <Image src={"/assets/media/components/gif/trust_cert.gif"} />
+        <Image src={"/assets/media/components/trust_cert.gif"} />
       </>
     );
   };
@@ -99,7 +99,7 @@ const ManualProxySetup = ({ setShowInstructions }) => {
         {windowsInstructions.map((step) => {
           return <List.Item.Meta title={step.title} />;
         })}
-        <Image src={"/assets/media/components/gif/install_win_cert.gif"} />
+        <Image src={"/assets/media/components/install_win_cert.gif"} />
       </>
     );
   };
@@ -107,7 +107,7 @@ const ManualProxySetup = ({ setShowInstructions }) => {
   return (
     <>
       <InstructionsHeader
-        icon={window.location.origin + "/assets/media/components/png/package.png"}
+        icon={window.location.origin + "/assets/media/components/package.png"}
         heading="Setting up system proxy"
         description="Requestly requires your applications to send their network traffic through its local proxy server before
             going to the destination."

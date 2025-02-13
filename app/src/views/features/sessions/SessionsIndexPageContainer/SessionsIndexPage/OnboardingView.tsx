@@ -224,8 +224,8 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
               <img
                 src={
                   appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR
-                    ? "/assets/media/common/gif/SessionBear.gif"
-                    : "/assets/media/common/gif/sessions-banner.gif"
+                    ? "/assets/media/common/SessionBear.gif"
+                    : "/assets/media/common/sessions-banner.gif"
                 }
                 alt="How to start session recording"
                 className="demo-video"

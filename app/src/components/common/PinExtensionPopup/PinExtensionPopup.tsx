@@ -51,7 +51,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         ),
         image: {
           alt: "Activate/Deactivate rules",
-          src: "/assets/media/components/gif/activate-deactivate-rule.gif",
+          src: "/assets/media/components/activate-deactivate-rule.gif",
         },
       },
       {
@@ -64,7 +64,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         ),
         image: {
           alt: "Executed rules",
-          src: "/assets/media/components/gif/executed-rules.gif",
+          src: "/assets/media/components/executed-rules.gif",
         },
       },
       {
@@ -76,7 +76,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         ),
         image: {
           alt: "Record and replay session",
-          src: "/assets/media/components/gif/record-browser-activity.gif",
+          src: "/assets/media/components/record-browser-activity.gif",
         },
       },
       {
@@ -88,7 +88,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         ),
         image: {
           alt: "Pause requestly extension",
-          src: "/assets/media/components/gif/pause-rq.gif",
+          src: "/assets/media/components/pause-rq.gif",
         },
       },
     ],
@@ -126,7 +126,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
           fetchpriority="high"
           alt="Pin extension"
           className="pin-extension-gif"
-          src={"/assets/media/components/gif/pin-ext-guide.gif"}
+          src={"/assets/media/components/pin-ext-guide.gif"}
         />
 
         <div>

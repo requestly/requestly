@@ -4,7 +4,7 @@ import { ANDROID_DEVICES } from "./constants";
 const CertificateTrustInstructions = ({ device_id }) => {
   const renderGif = () => {
     if (device_id === ANDROID_DEVICES.ONEPLUS) {
-      return <Image src={"/assets/media/components/gif/certs_install.gif"} />;
+      return <Image src={"/assets/media/components/certs_install.gif"} />;
     }
   };
 

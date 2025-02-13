@@ -32,7 +32,7 @@ const JoinSlackButton = () => {
         <span className="icon__wrapper">
           <SlackIcon />
         </span>
-        <img src={"/assets/media/Dashboard/gif/Stars.gif"} alt="Star Animation" className="star-animation" />
+        <img src={"/assets/media/Dashboard/Stars.gif"} alt="Star Animation" className="star-animation" />
         <span className="link-title">Join Slack</span>
       </RQButton>
     </>

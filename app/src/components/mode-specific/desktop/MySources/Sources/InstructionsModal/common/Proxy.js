@@ -169,7 +169,7 @@ const ProxyInstructions = () => {
             description={
               <>
                 <br />
-                <Image width={"100%"} src={"/assets/media/components/gif/proxy_steps.gif"} />
+                <Image width={"100%"} src={"/assets/media/components/proxy_steps.gif"} />
               </>
             }
           />

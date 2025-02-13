@@ -85,7 +85,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               type: "mobile",
               name: device.id,
               description: device?.product,
-              icon: "/assets/media/components/png/android.png",
+              icon: "/assets/media/components/android.png",
               isActive: false,
               isScanned: true,
               comingSoon: false,

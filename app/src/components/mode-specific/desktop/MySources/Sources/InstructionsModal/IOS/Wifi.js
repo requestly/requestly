@@ -9,7 +9,7 @@ const WifiInstructions = ({ device_id }) => {
 
   const renderGif = () => {
     if (device_id === IOS_DEVICES.IPHONE13_PRO) {
-      return <Image src={"/assets/media/components/gif/configure-ios-proxy.gif"} />;
+      return <Image src={"/assets/media/components/configure-ios-proxy.gif"} />;
     }
   };
 

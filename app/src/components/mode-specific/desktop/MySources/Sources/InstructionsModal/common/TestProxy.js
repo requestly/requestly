@@ -33,13 +33,13 @@ const TestProxyInstructions = ({ device }) => {
       </List>
       <Row>
         <Col span={10} style={{ textAlign: "center" }}>
-          <Image src={"/assets/media/components/png/proxy_success.png"} />
+          <Image src={"/assets/media/components/proxy_success.png"} />
           <br />
           <CheckCircleTwoTone twoToneColor="#52c41a" /> Correct
         </Col>
         <Col span={2}></Col>
         <Col span={10} style={{ textAlign: "center" }}>
-          <Image src={"/assets/media/components/png/proxy_failure.png"} />
+          <Image src={"/assets/media/components/proxy_failure.png"} />
           <br />
           <CloseCircleTwoTone twoToneColor="#FF0000" /> Wrong
         </Col>

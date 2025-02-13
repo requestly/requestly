@@ -171,7 +171,7 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
             <Col span={12} className="banner-demo-video">
               <Row justify="end">
                 <img
-                  src={"/assets/media/common/gif/sessions-banner.gif"}
+                  src={"/assets/media/common/sessions-banner.gif"}
                   alt="How to start session recording"
                   className="demo-video"
                 />

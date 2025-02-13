@@ -9,7 +9,7 @@ const WifiInstructions = ({ device_id }) => {
 
   const renderGif = () => {
     if (device_id === ANDROID_DEVICES.ONEPLUS) {
-      return <Image src={"/assets/media/components/gif/wifi_settings.gif"} />;
+      return <Image src={"/assets/media/components/wifi_settings.gif"} />;
     }
   };
 

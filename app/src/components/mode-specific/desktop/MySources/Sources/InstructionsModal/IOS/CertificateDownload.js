@@ -4,7 +4,7 @@ import { IOS_DEVICES } from "./constants";
 const CertificateDownloadInstructions = ({ device_id }) => {
   const renderGif = () => {
     if (device_id === IOS_DEVICES.IPHONE13_PRO) {
-      return <Image src={"/assets/media/components/gif/download-ios-profile.gif"} />;
+      return <Image src={"/assets/media/components/download-ios-profile.gif"} />;
     }
   };
   return (
