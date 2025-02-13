@@ -8,11 +8,6 @@ import { PiCaretDownBold } from "@react-icons/all-files/pi/PiCaretDownBold";
 import { FiVideo } from "@react-icons/all-files/fi/FiVideo";
 import { FaToggleOff } from "@react-icons/all-files/fa6/FaToggleOff";
 import BlueUnderline from "./assets/blue-underline.svg?react";
-import pinExtensionGif from "./assets/pin-ext-guide.gif";
-import activateDeactivateRuleGif from "./assets/activate-deactivate-rule.gif";
-import executedRulesGif from "./assets/executed-rules.gif";
-import recordAndReplayGif from "./assets/record-browser-activity.gif";
-import pauseRequestlyGif from "./assets/pause-rq.gif";
 import {
   trackPinExtensionPopupClosed,
   trackPinExtensionPopupExpanded,
@@ -56,7 +51,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         ),
         image: {
           alt: "Activate/Deactivate rules",
-          src: activateDeactivateRuleGif,
+          src: "/assets/media/components/gif/activate-deactivate-rule.gif",
         },
       },
       {
@@ -69,7 +64,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         ),
         image: {
           alt: "Executed rules",
-          src: executedRulesGif,
+          src: "/assets/media/components/gif/executed-rules.gif",
         },
       },
       {
@@ -81,7 +76,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         ),
         image: {
           alt: "Record and replay session",
-          src: recordAndReplayGif,
+          src: "/assets/media/components/gif/record-browser-activity.gif",
         },
       },
       {
@@ -93,7 +88,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         ),
         image: {
           alt: "Pause requestly extension",
-          src: pauseRequestlyGif,
+          src: "/assets/media/components/gif/pause-rq.gif",
         },
       },
     ],
@@ -131,7 +126,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
           fetchpriority="high"
           alt="Pin extension"
           className="pin-extension-gif"
-          src={pinExtensionGif}
+          src={"/assets/media/components/gif/pin-ext-guide.gif"}
         />
 
         <div>
