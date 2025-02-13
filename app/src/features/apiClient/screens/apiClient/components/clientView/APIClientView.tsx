@@ -500,7 +500,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     <div className="api-client-view">
       <Skeleton
         className="header-skeleton"
-        loading={isAnimating}
+        loading={!isAnimating}
         active
         title={true}
         paragraph={{ rows: 1, width: "100%" }}
@@ -622,7 +622,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         initialSizes={[60, 40]}
       >
         <div className="api-client-body">
-          <Skeleton loading={isAnimating} active>
+          <Skeleton loading={!isAnimating} active className="body-skeleton">
             <RequestTabs
               key={requestId}
               requestId={apiEntryDetails?.id}
