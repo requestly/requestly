@@ -24,99 +24,126 @@
   </a>
 </p>
 
-<h3 align="center">⚡ HTTP Interceptor for browsers </h2>
+<h1 align="center">Open-Source API Platform - Build, Test, Intercept & Mock APIs </h1>
 
-**Requestly was built to save developers time by intercepting and modifying HTTP Requests. It has now developed into an open-source alternative to Charles Proxy and Telerik Fiddler that works directly in browsers without VPN and proxy Issues. It is used by more than 200,000+ front-end developers and 11,000+ companies worldwide.**
+**Requestly is a powerful combination of a local HTTP Proxy and an API client with collaboration features. Requestly can be used directly in the browser as a Chrome Extension or installed as a desktop application.**
 
+<p align="center">
+  <h3 align="center">⚡ A Local-first, Beautiful & Powerful alternative to Postman, Insomina & Charles Proxy ⚡</h3>
 
+  <img width="100%" alt="what-is-requestly" src="https://github.com/user-attachments/assets/99d8eaee-13d0-4a02-a38a-ee4352c1344e">
+</p>
 
 ## 🏡 Getting Started
-- [🚀 What is Requestly?](#-what-is-requestly)
-- [✨ Features](#-features)
-    - [HTTP Rules (Intercept & Modify HTTPs Requests)](#-http-rules-intercept--modify-https-requests)
-    - [API Client](#-api-client)
-    - [Mock Server (Create API Mocks in seconds)](#-mock-server-create-api-mocks-in-seconds)
-    - [Sessions for faster debugging](#-sessions)
-- [📕 Documentation](#-documentation)
+- [A Local-first Solution](#a-local-first-solution-local-workspaces)
+- [REST API Client](#rest-api-client)
+- [Environments](#environments)
+- [HTTP Interceptor - Intercept & Modify HTTP Requests](#http-interceptor--http-rules-intercept--modify-https-requests)
+- [API Mocking](#api-mocking-helps-in-building-frontend-faster-without-waiting-for-backend)
+- [1-Click Imports from Postman, Insomnia, Modheader, Charles Proxy, and Resource Override](#1-click-imports)
+- [Support Channels](#-best-in-class-support)
 - [👩‍💻 Development](#-development)
 - [🙏 Contributing](#-contributing)
-- [🎯 Our Mission](#-our-mission)
 
-## 🚀 What is Requestly
+## A Local-first Solution (Local Workspaces)
 
-Requestly is an Open-Source platform for front-end developers with essential tooling & integrations that helps them write, test & debug their code 10x faster. Requestly reduces dependency on backend devs and environments for development & testing needs. 
+**Local Workspaces** is a simple, powerful, and privacy-friendly approach to building, testing & mocking your APIs. All your data is stored in the selected directory on your disk. You can also import all your API client files (requests, collections, environments) and codebase into VSCode and edit them directly in your IDE.
 
-Using Requestly, devs can create mock, test, validate & override API responses, modify request & response headers, set up redirects (Map local, Map remote), and use Requestly sessions for faster debugging.
+Collaborate with your colleagues using your preferred sync engine - Git, Google Drive, iCloud, or nothing at all.
 
-## ✨ Features
+**Team Workspaces** are great for seamless collaboration through Requestly sync engine.
 
-### 👉 HTTP Rules (Intercept & Modify HTTPs Requests)
-Intercept & Modify HTTPs requests & responses from browsers & mobile apps. 
-- 👉 Use the browser extension for capturing & modifying traffic from browsers
-- 👉 Use the desktop app for capturing & modifying traffic from mobile apps & other desktop apps.
+<p align="center">
+  <h3 align="center">⚡ Local and Team Workspaces ⚡</h3>
 
-Different Modifications supported
-- Rewriting URLs (Map Local & Map Remote) e.g.
+  <img width="90%" alt="requestly-local-first-support" src="https://github.com/user-attachments/assets/f2436cd7-242d-4706-bc4c-04d9b9cfe991">
+</p>
+
+## REST API Client
+
+**[Rest API Client](https://docs.requestly.com/general/api-client/overview)** offers a local API playground to build and test your APIs. It supports features like API Collections, Environments, Environment Switcher, API Requests History with a beautiful and collaborative interface.
+
+<p align="center">
+  <h3 align="center">⚡ A Local-first, Beautiful & Powerful alternative to Postman & Insomina ⚡</h3>
+
+  <img width="90%" alt="requestly-api-client" src="https://github.com/user-attachments/assets/27a696f0-231a-4d88-a4c5-6ebed8f6ef71">
+</p>
+
+## Environments
+
+**Environment** is a set of key-value pairs that can be used in API requests. Environments feature lets you manage variables across multiple environments with an easy environment selector. We support Global variables as well as Collection level variables. [Docs](https://docs.requestly.com/general/api-client/environments-and-variables)
+
+<p align="center">
+  <h3 align="center">⚡ Environments feature ⚡</h3>
+
+  <img width="90%" alt="requestly-api-client-environments-support" src="https://github.com/user-attachments/assets/537c5aeb-2ba2-4726-bc84-fd5f5d84fe1a">
+</p>
+
+## HTTP Interceptor / HTTP Rules (Intercept & Modify HTTPs Requests)
+**[HTTP Rules](https://docs.requestly.com/general/http-interceptor/overview)** feature can be used to **Intercept, Monitor & Modify HTTPs requests & responses** from browsers & mobile apps.
+- Use the Chrome/Firefox/Edge extension for Intercepting & Modifying traffic from browsers
+- Use the desktop app for capturing & modifying traffic from browsers, mobile apps & other desktop apps.
+
+<p align="center">
+  <h3 align="center">⚡ Intercept, Monitor & Modify HTTP Requests & Responses ⚡</h3>
+
+  <img width="90%" alt="requestly-http-interceptor" src="https://github.com/user-attachments/assets/e8cf00eb-54ff-404c-8652-eae36fceee18">
+</p>
+
+**Different Modifications supported**
+- Redirect URLs (Map Local & Map Remote) e.g.
     - Change Hostname, QueryParams, etc in the URL
     - Redirect traffic from one environment to another (e.g. production to dev)
     - Swap Tag Manager scripts from production to staging/dev environment
 - Modify HTTP Request & Response Headers
 - Modify API Request & Response body
-- Throttles & Blocking of Requests
 - Inject scripts on web pages
 
-<br/>
+## API Mocking (Helps in building frontend faster without waiting for backend)
+
+Requestly offers a complete API Mocking solution. Using Requestly, you can 
+- [Create Local API Mocks](https://docs.requestly.com/general/api-mocking/api-mocking): Intercept the API Requests and return the new response
+- [Static & Dynamic Response Overrides](https://docs.requestly.com/general/http-rules/rule-types/modify-response-body): Override the API response received from server dynamically using simple JS 
+- [GraphQL Support](https://docs.requestly.com/general/http-rules/advanced-usage/graphql-modify-request-response): Override graphQL APIs by targeting on query, operationName
+- [Create Cloud-based API Mocks](https://docs.requestly.com/general/api-mocking/create-cloud-based-mocks): Create cloud-based API Mocks and get new endpoints for the mocks
+- [Bulk API Mocks](https://docs.requestly.com/general/sessions/record-api-sessions#bulk-mocking): Record API traffic & Serve the Mocks from the recorded Session
+- Mock APIs in e2e testing: Use Requestly in your e2e Cypress/Playwright/Selenium and mock the APIs in CI pipeline
 
 <p align="center">
-  <a target="_blank" href="https://requestly.com/products/web-debugger">
-    <img width="60%" alt="intercept_ _modify_https_requests_-_1280x800_5" src="https://github.com/requestly/requestly/assets/3108399/c69f0935-40d5-4b91-bd50-102696c55560">
-  </a>
+  <h3 align="center">⚡ API Mocks - Build & Test your frontend faster without waiting for backend ⚡</h3>
+
+  <img width="90%" alt="requestly-api-mocking" src="https://github.com/user-attachments/assets/0e4db35b-2308-4b7e-a604-f6694bf22f59">
 </p>
 
-### 👉 API Client
+## 1-Click Imports
 
-Requestly offers a minimal, lightweight API client that works directly in the browser. It can help you 
-- Import cURL requests,
-- Send new requests, and
-- Quickly test API responses.
-- Integration with Mock Server to clone an API endpoint with the same response
-- Integration with Modify Response Rule to override the response body
+Requestly provides **[Importing Configuration]()** from the following tools
 
-<p align="center">
-  <a target="_blank" href="https://requestly.com/products/api-client">
-    <img width="60%" alt="store_asset_-_api_client_-_1280x800_8" src="https://github.com/requestly/requestly/assets/3108399/d04e3116-665c-4e60-8a50-4ce50326c900">
-  </a>
-</p>
+API Clients
+- [Import from Postman](https://docs.requestly.com/general/imports/postman)
+- [Import from Insomnia](#) - Coming Soon
+- [Import from Bruno](#) - Coming Soon
 
-### 👉 Mock Server (Create API Mocks in seconds)
-
-Mock Server helps you quickly create API mocks. Especially helpful when APIs don't exist and you have to build a feature, just define the response you need and get an endpoint to be used in your code.
+HTTP Interceptors
+- [Import from Charles Proxy](https://docs.requestly.com/general/imports/charles-proxy)
+- [Import from Resource Override](https://docs.requestly.com/general/imports/resource-override)
+- [Import from ModHeader](https://docs.requestly.com/general/imports/modheader)
 
 <p align="center">
-  <a target="_blank" href="https://requestly.com/products/mock-server">
-    <img width="60%" alt="mock_server_-_1280x800_4" src="https://github.com/requestly/requestly/assets/3108399/337b8251-3b62-4f87-825f-f3166417c7d5">
-  </a>
-</p>
-
-### 👉 Sessions
-
-Collaborate with other teammates and get Requestly sessions that contain video, console logs, network logs, and env details for faster troubleshooting.
-
-<p align="center">
-  <a target="_blank" href="https://requestly.com/products/session-book">
-  <img width="60%" alt="session_-_1280x800_5" src="https://github.com/requestly/requestly/assets/3108399/41375ad4-021e-490e-b488-1967cade727c">
-  </a>
+  <h3 align="center">⚡ Import from Postman, Insomnia, CharlesProxy, ModHeader, etc. ⚡</h3>
 </p>
 
 
-## 📕 Documentation
+## 🤝 Best In-Class Support
 
-Please find our [documentation here](https://docs.requestly.com/). Our docs can help with
-- [Getting Started](https://docs.requestly.com/)
-- Product Documentation
-- FAQs
-- Troubleshooting
-- [Security & Privacy](https://docs.requestly.com/security-privacy/)
+<p align="center">
+  <h3 align="center">⚡ Requestly is known for best product, team and Best in-class support (4.3⭐️ in 1000+ reviews) ⚡</h3>
+</p>
+
+- [Documentation](https://docs.requestly.com/): Product Documentation and Understanding of different features
+- [Security & Privacy](https://docs.requestly.com/security-privacy/): Our Security & Privacy document
+- [Email contact@requestly.com](mailto:contact@requestly.com): Email Support
+- [StackOverflow Questions](https://stackoverflow.com/questions/tagged/requestly): Ask Questions on StackOverflow and add "Requestly" tag
 
 ## 👩‍💻 Development
 
@@ -137,10 +164,6 @@ Start working on individual modules:
 Currently, while Requestly is open source, we are not accepting pull requests. As a startup with a small team, our focus is on moving quickly and we currently lack the resources and documentation needed to actively support an open-source community. This will probably change in the future.
 
 If you are still interested, read our [contributing guide](./CONTRIBUTING.md) to learn about how to propose bugfixes and improvements, and how the development process works.
-
-## 🎯 Our Mission
-
-Our mission is to help developers ship web and mobile apps faster and with confidence by giving them the tools to debug & resolve issues without external dependency.
 
 ## Contributors
 
@@ -183,7 +206,3 @@ Our mission is to help developers ship web and mobile apps faster and with confi
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
-
-## Special Mentions
-A big shoutout to these amazing Open Source projects that have helped make Requestly possible.
-- [rrweb](https://github.com/rrweb-io/rrweb)
