@@ -264,7 +264,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       {apiClientRecords.length > 0 && (
         <SidebarListHeader onSearch={setSearchValue} multiSelectOptions={multiSelectOptions} />
       )}
-      <div className="collections-list-container">
+      <div className={`collections-list-container ${showSelection ? "selection-enabled" : ""}`}>
         <div className="collections-list-content">
           {isLoadingApiClientRecords ? (
             <div className="api-client-sidebar-placeholder">
