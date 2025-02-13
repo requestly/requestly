@@ -203,22 +203,22 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onSaveBulkRecords = useCallback(
     (records: RQAPI.Record[]) => {
-      const currentRecordsMap = new Map(apiClientRecords.map((record) => [record.id, record]));
-
-      records.forEach((record) => {
-        if (currentRecordsMap.has(record.id)) {
-          updateTab(record.id, {
-            title: record.name,
-            hasUnsavedChanges: false,
-            isPreview: false,
-          });
-        }
-        currentRecordsMap.set(record.id, record);
+      setApiClientRecords((previousRecords: RQAPI.Record[]) => {
+        const currentRecordsMap = new Map(previousRecords.map((record) => [record.id, record]));
+        records.forEach((record) => {
+          if (currentRecordsMap.has(record.id)) {
+            updateTab(record.id, {
+              title: record.name,
+              hasUnsavedChanges: false,
+              isPreview: false,
+            });
+          }
+          currentRecordsMap.set(record.id, record);
+        });
+        return Array.from(currentRecordsMap.values());
       });
-
-      setApiClientRecords(Array.from(currentRecordsMap.values()));
     },
-    [apiClientRecords, updateTab, setApiClientRecords]
+    [updateTab, setApiClientRecords]
   );
 
   const onSaveRecord = useCallback(
