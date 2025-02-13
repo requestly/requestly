@@ -10,7 +10,8 @@ export const ApiClientErrorPlaceholder: React.FC<{
   error: RQAPI.ExecutionError;
   imageUrl: string;
   showTitle?: boolean;
-}> = ({ error, imageUrl, showTitle = true }) => {
+  onRetry: () => void;
+}> = ({ error, imageUrl, showTitle = true, onRetry }) => {
   return (
     <>
       <div className="api-client-error-placeholder-container">
@@ -24,7 +25,9 @@ export const ApiClientErrorPlaceholder: React.FC<{
             {""}
             <span className="error-message">{error.message}</span>
           </div>
-          <RQButton icon={<MdOutlineRefresh />}>Try Again</RQButton>
+          <RQButton icon={<MdOutlineRefresh />} onClick={onRetry}>
+            Try Again
+          </RQButton>
         </div>
 
         <a className="documentation-link" href={LINKS.REQUESTLY_API_CLIENT_DOCS} target="_blank" rel="noreferrer">

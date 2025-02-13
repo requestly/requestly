@@ -4,6 +4,7 @@ import "./apiClientErrorPanel.scss";
 import { MdOutlineMenuBook } from "@react-icons/all-files/md/MdOutlineMenuBook";
 import { IoWarning } from "@react-icons/all-files/io5/IoWarning";
 import { RQAPI } from "features/apiClient/types";
+import LINKS from "config/constants/sub/links";
 
 export const ApiClientErrorPanel: React.FC<{
   error: RQAPI.ExecutionError;
@@ -26,7 +27,11 @@ export const ApiClientErrorPanel: React.FC<{
           <span className="error-message">{error.message}</span>
         </div>
         <div className="api-client-error-panel-actions">
-          <RQButton size="small" icon={<MdOutlineMenuBook />} />
+          <RQButton
+            size="small"
+            icon={<MdOutlineMenuBook />}
+            onClick={() => window.open(LINKS.REQUESTLY_API_CLIENT_DOCS, "_blank")}
+          />
         </div>
       </div>
     </div>

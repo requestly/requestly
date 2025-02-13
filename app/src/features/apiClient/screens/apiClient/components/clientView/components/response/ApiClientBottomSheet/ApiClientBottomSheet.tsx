@@ -24,6 +24,7 @@ interface Props {
   isRequestCancelled: boolean;
   onCancelRequest: () => void;
   handleTestResultRefresh: () => Promise<void>;
+  executeRequest: () => Promise<void>;
   error?: RQAPI.ExecutionError;
   warning?: RQAPI.ExecutionWarning;
 }
@@ -44,6 +45,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   onCancelRequest,
   error,
   warning,
+  executeRequest,
 }) => {
   const contentTypeHeader = useMemo(() => {
     return response?.headers ? getContentTypeFromResponseHeaders(response.headers) : "";
@@ -84,7 +86,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         return baseTabItems.map((tabItem) => {
           return {
             ...tabItem,
-            children: <AbortError error={error} />,
+            children: <AbortError error={error} onRetry={executeRequest} />,
           };
         });
       }
@@ -93,7 +95,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         return baseTabItems.map((tabItem) => {
           return {
             ...tabItem,
-            children: <RequestError error={error} />,
+            children: <RequestError error={error} onRetry={executeRequest} />,
           };
         });
       }
@@ -116,6 +118,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   }, [
     contentTypeHeader,
     error,
+    executeRequest,
     handleTestResultRefresh,
     isFailed,
     isLoading,

@@ -531,6 +531,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             handleTestResultRefresh={handleTestResultRefresh}
             error={error}
             warning={warning}
+            executeRequest={onSendButtonClick}
           />
         }
         minSize={35}

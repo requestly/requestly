@@ -4,6 +4,7 @@ import { MdOutlineMenuBook } from "@react-icons/all-files/md/MdOutlineMenuBook";
 import { IoWarning } from "@react-icons/all-files/io5/IoWarning";
 import { RQAPI } from "features/apiClient/types";
 import "./apiClientWarningPanel.scss";
+import LINKS from "config/constants/sub/links";
 
 export const ApiClientWarningPanel: React.FC<{
   warning: RQAPI.ExecutionWarning;
@@ -18,7 +19,11 @@ export const ApiClientWarningPanel: React.FC<{
       <div className="api-client-warning-panel-content">
         <div className="api-client-warning-panel-message">{warning.description}</div>
         <div className="api-client-error-panel-actions">
-          <RQButton size="small" icon={<MdOutlineMenuBook />} />
+          <RQButton
+            size="small"
+            icon={<MdOutlineMenuBook />}
+            onClick={() => window.open(LINKS.REQUESTLY_API_CLIENT_DOCS, "_blank")}
+          />
         </div>
       </div>
     </div>
