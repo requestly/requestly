@@ -29,7 +29,7 @@
 **Requestly is a powerful combination of a local HTTP Proxy and an API client with collaboration features. Requestly can be used directly in the browser as a Chrome Extension or installed as a desktop application.**
 
 <p align="center">
-  <h3 align="center">⚡ A Local-first, beautiful & Powerful alternative to Postman, Insomina & Charles Proxy </h3>
+  <h3 align="center">⚡ A Local-first, Beautiful & Powerful alternative to Postman, Insomina & Charles Proxy ⚡</h3>
 
   <img width="100%" alt="what-is-requestly" src="https://github.com/user-attachments/assets/99d8eaee-13d0-4a02-a38a-ee4352c1344e">
 </p>
@@ -55,17 +55,17 @@ Collaborate with your colleagues using your preferred sync engine - Git, Google 
 **Team Workspaces** are great for seamless collaboration through Requestly sync engine.
 
 <p align="center">
-  <h3 align="center">⚡ Local and Team Workspaces</h3>
+  <h3 align="center">⚡ Local and Team Workspaces ⚡</h3>
 
   <img width="90%" alt="requestly-local-first-support" src="https://github.com/user-attachments/assets/f2436cd7-242d-4706-bc4c-04d9b9cfe991">
 </p>
 
 ## REST API Client
 
-**Rest API Client** offers a local API playground to build and test your APIs. It supports features like API Collections, Environments, Environment Switcher, API Requests History with a beautiful and collaborative interface.
+**[Rest API Client](https://docs.requestly.com/general/api-client/overview)** offers a local API playground to build and test your APIs. It supports features like API Collections, Environments, Environment Switcher, API Requests History with a beautiful and collaborative interface.
 
 <p align="center">
-  <h3 align="center">⚡ A Local-first, Beautiful & Powerful alternative to Postman & Insomina</h3>
+  <h3 align="center">⚡ A Local-first, Beautiful & Powerful alternative to Postman & Insomina ⚡</h3>
 
   <img width="90%" alt="requestly-api-client" src="https://github.com/user-attachments/assets/27a696f0-231a-4d88-a4c5-6ebed8f6ef71">
 </p>
@@ -75,7 +75,7 @@ Collaborate with your colleagues using your preferred sync engine - Git, Google 
 **Environment** is a set of key-value pairs that can be used in API requests. Environments feature lets you manage variables across multiple environments with an easy environment selector. We support Global variables as well as Collection level variables. [Docs](https://docs.requestly.com/general/api-client/environments-and-variables)
 
 <p align="center">
-  <h3 align="center">⚡ Environments feature</h3>
+  <h3 align="center">⚡ Environments feature ⚡</h3>
 
   <img width="90%" alt="requestly-api-client-environments-support" src="https://github.com/user-attachments/assets/537c5aeb-2ba2-4726-bc84-fd5f5d84fe1a">
 </p>
@@ -86,7 +86,7 @@ Collaborate with your colleagues using your preferred sync engine - Git, Google 
 - Use the desktop app for capturing & modifying traffic from browsers, mobile apps & other desktop apps.
 
 <p align="center">
-  <h3 align="center">⚡ Intercept, Monitor & Modify HTTP Requests & Responses</h3>
+  <h3 align="center">⚡ Intercept, Monitor & Modify HTTP Requests & Responses ⚡</h3>
 
   <img width="90%" alt="requestly-http-interceptor" src="https://github.com/user-attachments/assets/e8cf00eb-54ff-404c-8652-eae36fceee18">
 </p>
@@ -111,7 +111,7 @@ Requestly offers a complete API Mocking solution. Using Requestly, you can
 - Mock APIs in e2e testing: Use Requestly in your e2e Cypress/Playwright/Selenium and mock the APIs in CI pipeline
 
 <p align="center">
-  <h3 align="center">⚡ API Mocks - Build & Test your frontend faster without waiting for backend </h3>
+  <h3 align="center">⚡ API Mocks - Build & Test your frontend faster without waiting for backend ⚡</h3>
 
   <img width="90%" alt="requestly-api-mocking" src="https://github.com/user-attachments/assets/0e4db35b-2308-4b7e-a604-f6694bf22f59">
 </p>
@@ -131,20 +131,20 @@ HTTP Interceptors
 - [Import from ModHeader](https://docs.requestly.com/general/imports/modheader)
 
 <p align="center">
-  <h3 align="center">⚡ Import from Postman, Insomnia, CharlesProxy, ModHeader, etc.</h3>
-
-  <img width="90%" alt="requestly-import-from-other-tools" src="">
+  <h3 align="center">⚡ Import from Postman, Insomnia, CharlesProxy, ModHeader, etc. ⚡</h3>
 </p>
 
 
-## 📕 Documentation
+## 🤝 Best In-Class Support
 
-Please find our [documentation here](https://docs.requestly.com/). Our docs can help with
-- [Getting Started](https://docs.requestly.com/)
-- Product Documentation
-- FAQs
-- Troubleshooting
-- [Security & Privacy](https://docs.requestly.com/security-privacy/)
+<p align="center">
+  <h3 align="center">⚡ Requestly is known for best product, team and Best in-class support (4.3⭐️ in 1000+ reviews) ⚡</h3>
+</p>
+
+- [Documentation](https://docs.requestly.com/): Product Documentation and Understanding of different features
+- [Security & Privacy](https://docs.requestly.com/security-privacy/): Our Security & Privacy document
+- [Email contact@requestly.com](mailto:contact@requestly.com): Email Support
+- [StackOverflow Questions](https://stackoverflow.com/questions/tagged/requestly): Ask Questions on StackOverflow and add "Requestly" tag
 
 ## 👩‍💻 Development
 
