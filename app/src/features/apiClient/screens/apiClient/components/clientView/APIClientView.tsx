@@ -104,7 +104,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   // const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(true);
-  const animationTimerRef = useRef<NodeJS.Timeout>();
+  const animationTimerRef = useRef<NodeJS.Timeout>(null);
   const { response, ...entryWithoutResponse } = entry;
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB

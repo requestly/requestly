@@ -34,15 +34,7 @@ export const routesV2: RouteObject[] = [
   {
     path: "",
     element: <AppLayout />,
-    errorElement: (
-      <RouterError
-        error={"route-error"}
-        componentStack={""}
-        resetError={() => {
-          window.location.reload();
-        }}
-      />
-    ),
+    errorElement: <RouterError />,
     children: [
       /** App Dashboard - Normal Paths **/
       {
