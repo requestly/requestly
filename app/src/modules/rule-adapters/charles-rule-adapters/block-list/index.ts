@@ -3,9 +3,8 @@ import { BlockListRule, CharlesRuleType, ParsedRule } from "../types";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { getGroupName, getSourcesData } from "../../utils";
-//@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { CancelRule, RecordStatus, ResponseRule, RuleType } from "@requestly/shared/types/entities/rules";
+import { CancelRule, RecordStatus, ResponseRule, Rule, RuleType } from "@requestly/shared/types/entities/rules";
 
 const generate403ResponseRule = (sourceUrl: string, status: boolean, operator: string) => {
   const rule = getNewRule(RuleType.RESPONSE) as ResponseRule.Record;
@@ -67,7 +66,7 @@ export const blockListRuleAdapter = (rules: BlockListRule): ParsedRule => {
     type: CharlesRuleType.BLOCK_LIST,
     groups: [
       {
-        rules: exportedRules,
+        rules: exportedRules as Rule[],
         status: isToolEnabled,
         name: getGroupName(CharlesRuleType.BLOCK_LIST),
       },

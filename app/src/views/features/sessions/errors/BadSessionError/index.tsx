@@ -2,7 +2,7 @@ import React from "react";
 import ProCard from "@ant-design/pro-card";
 import { Col, Row } from "antd";
 
-const BadSessionError = () => {
+const BadSessionError: React.FC = () => {
   return (
     <React.Fragment>
       <ProCard className="primary-card github-like-border">
