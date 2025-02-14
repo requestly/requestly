@@ -35,7 +35,7 @@ const AuthHandler: React.FC<{}> = () => {
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
   const getOrganizationUsers = useMemo(
     () =>
-      httpsCallable<{ domain: string; size?: number; start?: number }, { users: any[]; total: number }>(
+      httpsCallable<{ domain: string }, { total: number; users: unknown[] }>(
         getFunctions(),
         "users-getOrganizationUsers"
       ),
