@@ -16,24 +16,24 @@ export const getPendingInvites = async ({ email, domain }: { email: boolean; dom
     getFunctions(),
     "teams-getPendingTeamInvites"
   );
-  return getInvites({ email, domain })
-    .then((res) => {
-      return res?.data;
-    })
-    .catch((e): Invite[] => {
-      console.log("error", e);
-      return [];
-    });
+
+  try {
+    const res = await getInvites({ email, domain });
+    return res?.data;
+  } catch (e) {
+    return { pendingInvites: [], success: false };
+  }
 };
 
 export const acceptTeamInvite = async (inviteId: string) => {
-  const acceptInvite = httpsCallable(getFunctions(), "invites-acceptInvite");
+  const acceptInvite = httpsCallable<{ inviteId: string }, { invite: Invite; success: boolean }>(
+    getFunctions(),
+    "invites-acceptInvite"
+  );
 
-  return acceptInvite({ inviteId })
-    .then((res: any) => {
-      return res;
-    })
-    .catch((e): null => {
-      return null;
-    });
+  try {
+    return await acceptInvite({ inviteId });
+  } catch (error) {
+    return { success: false };
+  }
 };
