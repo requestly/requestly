@@ -10,7 +10,7 @@ import { PageSourceRow } from "./components/PageSourceRow";
 import { SessionRecordingPageSource } from "types";
 import { AutoRecordingMode, SessionRecordingConfig } from "features/sessionBook";
 import { generateObjectId } from "utils/FormattingHelper";
-import { isExtensionInstalled } from "actions/ExtensionActions";
+import { isExtensionInstalled, isSafariExtension } from "actions/ExtensionActions";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -22,6 +22,7 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./sessionsSettings.css";
 import { RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
+import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
 
 const emptyPageSourceData: SessionRecordingPageSource = {
   value: "",
@@ -226,6 +227,10 @@ export const SessionsSettings: React.FC = () => {
 
   if (!isExtensionInstalled()) {
     return <InstallExtensionCTA eventPage="session_settings" />;
+  }
+
+  if (isSafariExtension()) {
+    return <SafariLimitedSupportView />;
   }
 
   const isPageSourcesDisabled =
