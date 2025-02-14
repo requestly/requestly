@@ -52,7 +52,7 @@ export const saveRecording = async (
     .then((docRef) => {
       return docRef.id;
     })
-    .catch((err) => {
+    .catch((err): null => {
       return null;
     });
 

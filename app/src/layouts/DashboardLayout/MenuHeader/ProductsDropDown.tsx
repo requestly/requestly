@@ -65,7 +65,6 @@ interface ProductsProps extends MenuProps {
 
 const Products: React.FC<ProductsProps> = (props) => {
   const navigate = useNavigate();
-
   const isDesktopSessionsEnabled = useFeatureIsOn("desktop-sessions");
 
   const [isDesktopAppPromoModalOpen, setIsDesktopAppPromoModalOpen] = useState(false);
