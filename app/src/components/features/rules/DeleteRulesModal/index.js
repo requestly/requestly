@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteGroupsFromStorage, deleteRulesFromStorage } from "./actions";
-import { unselectAllRecords } from "../actions";
 import { toast } from "utils/Toast.js";
 import { addRecordsToTrash } from "utils/trash/TrashUtils";
 import DeleteConfirmationModal from "components/user/DeleteConfirmationModal";
@@ -39,7 +38,7 @@ const DeleteRulesModal = ({
     deleteTestReportByRuleId(appMode, ruleIdsToDelete);
   }, [appMode, ruleIdsToDelete]);
 
-  const postDeletionSteps = () => {
+  const postDeletionSteps = useCallback(() => {
     //Delete test reports for ruleIdsToDelete
     handleDeleteRuleTestReports();
     //Refresh List
@@ -61,16 +60,8 @@ const DeleteRulesModal = ({
     ruleDeletedCallback?.();
 
     //Unselect all rules
-    unselectAllRecords(dispatch);
-  };
-
-  const stablePostDeletionSteps = useCallback(postDeletionSteps, [
-    dispatch,
-    toggleDeleteRulesModal,
-    ruleDeletedCallback,
-    clearSearch,
-    handleDeleteRuleTestReports,
-  ]);
+    dispatch(globalActions.clearSelectedRecords());
+  }, [dispatch, toggleDeleteRulesModal, ruleDeletedCallback, clearSearch, handleDeleteRuleTestReports, rulesToDelete]);
 
   const handleDeleteRulesPermanently = useCallback(async () => {
     await deleteRulesFromStorage(appMode, ruleIdsToDelete, () => {
@@ -116,9 +107,9 @@ const DeleteRulesModal = ({
         appMode,
         groupIdsToDelete.filter((id) => id !== RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID)
       );
-      stablePostDeletionSteps();
+      postDeletionSteps();
     },
-    [handleRulesDeletion, stablePostDeletionSteps, appMode, groupIdsToDelete]
+    [handleRulesDeletion, postDeletionSteps, appMode, groupIdsToDelete]
   );
 
   return (
