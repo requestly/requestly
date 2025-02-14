@@ -13,7 +13,7 @@ const useGrowthBookIntegration = () => {
   const userAttributes = useSelector(getUserAttributes);
 
   const usePrevious = (value: any) => {
-    const ref = useRef<unknown>(undefined);
+    const ref = useRef(undefined);
     useEffect(() => {
       if (growthbookStatus?.initDone) {
         ref.current = value;
