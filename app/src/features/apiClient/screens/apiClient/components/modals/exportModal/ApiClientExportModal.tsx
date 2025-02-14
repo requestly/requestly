@@ -3,17 +3,13 @@ import { Modal } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { getFormattedDate } from "utils/DateTimeUtils";
-import {
-  trackExportApiCollectionsFailed,
-  trackExportApiCollectionsStarted,
-  trackExportApiCollectionsSuccessful,
-} from "modules/analytics/events/features/apiClient";
 import "./apiClientExportModal.scss";
 import fileDownload from "js-file-download";
 import { omit } from "lodash";
 import { EnvironmentData } from "backend/environment/types";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { isApiCollection } from "../../../utils";
+import { trackExportApiCollectionsFailed } from "modules/analytics/events/features/apiClient";
 
 interface BaseModalProps {
   isOpen: boolean;
@@ -54,15 +50,14 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
   const handleExport = useCallback(() => {
     const dataToExport = { schema_version: COLLECTIONS_SCHEMA_VERSION, ...exportData };
 
-    trackExportApiCollectionsStarted(dataToExport.records?.length, dataToExport.environments?.length);
     try {
       const fileContent = JSON.stringify(dataToExport, null, 2);
 
       const fileName = `RQ-${fileInfo.label}-export-${getFormattedDate("DD_MM_YYYY")}.json`;
       fileDownload(fileContent, fileName, "application/json");
       onClose();
-      trackExportApiCollectionsSuccessful(dataToExport.records?.length, dataToExport.environments?.length);
     } catch (error) {
+      console.error(error);
       trackExportApiCollectionsFailed(dataToExport.records?.length, dataToExport.environments?.length);
     }
   }, [exportData, recordsToBeExported, environments, onClose, fileInfo.label]);
