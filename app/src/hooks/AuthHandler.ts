@@ -70,14 +70,10 @@ const AuthHandler: React.FC<{}> = () => {
       }
 
       if (userData?.username) {
-        dispatch(
-          // @ts-ignore
-          globalActions.updateUsername({ username: userData.username })
-        );
+        dispatch(globalActions.updateUsername({ username: userData.username }));
       }
 
       dispatch(
-        // @ts-ignore
         globalActions.updateUserInfo({
           loggedIn: true,
           details: {

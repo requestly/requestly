@@ -14,7 +14,6 @@ import { getAllGroups, getAppMode, getCurrentlySelectedRuleData, getIsRefreshRul
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 //ACTIONS
 import { updateGroupOfSelectedRules, createNewGroup } from "./actions";
-// import { unselectAllRecords } from "../actions";
 import { trackGroupChangedEvent } from "features/rules/analytics";
 import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
 import Logger from "lib/logger";
@@ -78,7 +77,7 @@ const ChangeRuleGroupModal = (props) => {
         .then(() => {
           trackGroupChangedEvent("rules_list");
           toast.success(`${selectedRuleIds?.length > 1 ? "Rules" : "Rule"} moved to group successfully!`);
-          // unselectAllRecords(dispatch);
+          // dispatch(globalActions.clearSelectedRecords());
           props.onGroupChanged?.();
           props.clearSearch?.();
           //Refresh List
