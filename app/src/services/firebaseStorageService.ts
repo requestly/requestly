@@ -31,7 +31,7 @@ export const uploadFile = async (file: File, filePath: string): Promise<string |
     .then((snapshot) => {
       return snapshot.ref.fullPath;
     })
-    .catch((err) => {
+    .catch((): null => {
       return null;
     });
 
@@ -46,7 +46,7 @@ export const getFile = async (filePath: string) => {
     .then((blob) => {
       return blob;
     })
-    .catch((err) => {
+    .catch((): null => {
       return null;
     });
 
