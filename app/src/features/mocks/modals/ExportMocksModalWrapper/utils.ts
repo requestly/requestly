@@ -27,7 +27,7 @@ export const prepareMocksToExport = (mocks: RQMockSchema[]) => {
   });
 
   const fileName =
-    mocks.length === 1 ? `${mocks[0].name}` ?? "" : `requestly_mocks_export_${getFormattedDate("DD_MM_YYYY")}`;
+    mocks.length === 1 ? `${mocks[0].name ?? ""}` : `requestly_mocks_export_${getFormattedDate("DD_MM_YYYY")}`;
 
   return {
     fileName,
