@@ -4,7 +4,6 @@ import MigratedRules from "./MigratedRulesLog";
 
 import { Modal, Typography } from "antd";
 
-import BannerImage from "./modalImage.svg";
 import { RxExternalLink } from "@react-icons/all-files/rx/RxExternalLink";
 
 import "./modal.scss";
@@ -16,7 +15,7 @@ import LINKS from "config/constants/sub/links";
 const Header = () => {
   return (
     <div className="modal-header">
-      <img src={BannerImage} alt="Requestly Logo" className="banner-img" width={150} />
+      <img src={"/assets/media/rules/modalImage.svg"} alt="Requestly Logo" className="banner-img" width={150} />
       <div className="header">
         <Typography.Text className="title">Important Changes to your HTTP Rules data</Typography.Text>
         <a

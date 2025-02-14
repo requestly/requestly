@@ -5,9 +5,10 @@ import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
-import { forEach, isEmpty, split, unionBy } from "lodash";
+import { forEach, isEmpty, omit, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
+import { generateDocumentId } from "backend/utils";
 
 export const makeRequest = async (
   appMode: string,
@@ -75,13 +76,15 @@ export const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => 
     },
   };
 
-  if (!supportsRequestBody(entry.request.method)) {
-    sanitizedEntry.request.body = null;
-  } else if (entry.request.contentType === RequestContentType.FORM) {
-    sanitizedEntry.request.body = sanitizeKeyValuePairs(
-      sanitizedEntry.request.body as KeyValuePair[],
-      removeDisabledKeys
-    );
+  if (entry.request.body != null) {
+    if (!supportsRequestBody(entry.request.method)) {
+      sanitizedEntry.request.body = null;
+    } else if (entry.request.contentType === RequestContentType.FORM) {
+      sanitizedEntry.request.body = sanitizeKeyValuePairs(
+        entry.request.body as RQAPI.RequestFormBody,
+        removeDisabledKeys
+      );
+    }
   }
 
   return sanitizedEntry;
@@ -241,7 +244,7 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
   });
 
   sortNestedRecords(updatedRecords);
-  return updatedRecords;
+  return { recordsMap, updatedRecords };
 };
 
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
@@ -525,4 +528,50 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.Request): HarReq
   }
 
   return harRequest;
+};
+
+export const filterOutChildrenRecords = (
+  selectedRecords: Set<RQAPI.Record["id"]>,
+  childParentMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>,
+  recordsMap: Record<RQAPI.Record["id"], RQAPI.Record>
+) =>
+  [...selectedRecords]
+    .filter((id) => !childParentMap[id] || !selectedRecords.has(childParentMap[id]))
+    .map((id) => recordsMap[id]);
+
+export const processRecordsForDuplication = (recordsToProcess: RQAPI.Record[]) => {
+  const recordsToDuplicate: RQAPI.Record[] = [];
+  const queue: RQAPI.Record[] = [...recordsToProcess];
+
+  while (queue.length > 0) {
+    const record = queue.shift()!;
+
+    if (record.type === RQAPI.RecordType.COLLECTION) {
+      const newId = generateDocumentId("apis");
+
+      const collectionToDuplicate: RQAPI.CollectionRecord = Object.assign({}, record, {
+        id: newId,
+        name: `(Copy) ${record.name}`,
+        data: omit(record.data, "children"),
+      });
+
+      recordsToDuplicate.push(collectionToDuplicate);
+
+      if (record.data.children?.length) {
+        const childrenToDuplicate = record.data.children.map((child) =>
+          Object.assign({}, child, { collectionId: newId })
+        );
+        queue.push(...childrenToDuplicate);
+      }
+    } else {
+      const requestToDuplicate: RQAPI.Record = Object.assign({}, record, {
+        id: generateDocumentId("apis"),
+        name: `(Copy) ${record.name}`,
+      });
+
+      recordsToDuplicate.push(requestToDuplicate);
+    }
+  }
+
+  return recordsToDuplicate;
 };

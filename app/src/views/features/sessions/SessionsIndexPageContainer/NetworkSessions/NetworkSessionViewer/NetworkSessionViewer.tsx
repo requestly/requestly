@@ -138,7 +138,7 @@ export const NetworkSessionViewer: React.FC = () => {
             <RQButton
               iconOnly
               type="default"
-              icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+              icon={<img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />}
               onClick={() => {
                 trackNetworkSessionViewerBackClicked();
                 redirectToNetworkSessionHome(navigate, isDesktopSessionsCompatible);

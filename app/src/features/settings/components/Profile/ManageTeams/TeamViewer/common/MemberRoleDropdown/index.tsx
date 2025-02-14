@@ -45,7 +45,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
           <img
             alt="downoutlined"
             className={`dropdown-selected-icon ${isAdmin ? "" : "visibility-hidden"}`}
-            src="/assets/img/workspaces/tick.svg"
+            src="/assets/media/common/tick.svg"
           />
         </Menu.Item>
         <Menu.Item
@@ -61,7 +61,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
           <img
             alt="downoutlined"
             className={`dropdown-selected-icon ${!isAdmin ? "" : "visibility-hidden"}`}
-            src="/assets/img/workspaces/tick.svg"
+            src="/assets/media/common/tick.svg"
           />
         </Menu.Item>
       </Menu>
@@ -84,7 +84,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
               width="10px"
               height="6px"
               alt="downoutlined"
-              src="/assets/img/workspaces/downoutlined.svg"
+              src="/assets/media/settings/downoutlined.svg"
               className="dropdown-down-arrow-icon"
             />
           )}

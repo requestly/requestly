@@ -85,7 +85,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               type: "mobile",
               name: device.id,
               description: device?.product,
-              icon: "android.png",
+              icon: "/assets/media/components/android.png",
               isActive: false,
               isScanned: true,
               comingSoon: false,
@@ -437,7 +437,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                         type="link"
                         onClick={() => {
                           window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
-                            link: "https://developers.requestly.com/android-emulators/",
+                            link: "https://docs.requestly.com/general/http-interceptor/android-simulator-interception",
                           });
                         }}
                         icon={<InfoCircleFilled />}

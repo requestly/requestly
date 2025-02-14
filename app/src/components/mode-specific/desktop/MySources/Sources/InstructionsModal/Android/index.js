@@ -69,7 +69,7 @@ const AndroidInstructionModal = ({ setShowInstructions }) => {
   return (
     <>
       <InstructionsHeader
-        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/android.png"}
+        icon={window.location.origin + "/assets/media/components/android.png"}
         heading="Android setup"
         description="Note: Follow the below mentioned steps to complete the setup. Steps may vary depending upon your device. Select your device first."
         setShowInstructions={setShowInstructions}

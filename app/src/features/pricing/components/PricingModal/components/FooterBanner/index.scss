@@ -1,13 +1,8 @@
 .pricing-modal-footer-banner {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   width: 100%;
-  padding: 1rem 2rem;
+  padding: 4px 0 8px 0;
   border-bottom-left-radius: 1rem;
   border-bottom-right-radius: 1rem;
-  background: var(--blue-blue-600);
   z-index: 3;
   display: flex;
   justify-content: center;
@@ -20,24 +15,19 @@
   }
 
   &-text {
-    color: var(--text-default);
-    font-weight: 500;
-    letter-spacing: 0.25px;
+    color: var(--requestly-color-text-subtle, #bbb);
+    font-size: 12px;
+    line-height: 18px; /* 150% */
   }
 
-  &-btn.ant-btn.ant-btn-default {
-    border: 1px solid var(--text-default);
-    color: var(--text-default);
-    font-weight: 500;
-    background: transparent;
-    cursor: pointer;
-
-    &:hover,
-    &:focus,
-    &:active {
-      border: 1px solid var(--text-default) !important;
-      color: var(--text-default) !important;
-      background-color: var(--primary-light) !important;
-    }
+  &-link,
+  &-link:hover,
+  &-link:active,
+  &-link:focus {
+    font-size: 12px;
+    line-height: 18px;
+    text-decoration-line: underline;
+    text-decoration-style: solid;
+    color: var(--requestly-color-primary-300, #639ff9);
   }
 }

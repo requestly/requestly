@@ -110,10 +110,10 @@ export const PricingFeatures: PlanFeatures = {
           title: "Daily backups (Encrypted)",
           enabled: true,
         },
-        {
-          title: "Email + Chat Priority Support",
-          enabled: true,
-        },
+        // {
+        //   title: "Email + Chat Priority Support",
+        //   enabled: true,
+        // },
       ],
     },
     enterprise: {
@@ -149,10 +149,10 @@ export const PricingFeatures: PlanFeatures = {
           title: "Enterprise grade security & compliance (GDPR, SOC2)",
           enabled: true,
         },
-        {
-          title: "Priority Support - Slack Connect, Email, Chat",
-          enabled: true,
-        },
+        // {
+        //   title: "Priority Support - Slack Connect, Email, Chat",
+        //   enabled: true,
+        // },
       ],
     },
   },
