@@ -21,10 +21,11 @@ import { useNavigate } from "react-router-dom";
 import { redirectToApiClient } from "utils/RedirectionUtils";
 import { RQModal } from "lib/design-system/components";
 import {
-  trackImportFromBrunoCompleted,
-  trackImportFromBrunoDataProcessed,
-  trackImportFromBrunoFailed,
-  trackImportFromBrunoStarted,
+  trackImportFailed,
+  trackImportParsed,
+  trackImportParseFailed,
+  trackImportStarted,
+  trackImportSuccess,
 } from "modules/analytics/events/features/apiClient";
 
 interface BrunoImporterProps {
@@ -112,13 +113,14 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
             processedRecords.apis.push(...apis);
             processedRecords.environments.push(...environments);
             collectionsCount.current += collections.length;
+            trackImportParsed("bruno", processedRecords.collections.length, processedRecords.apis.length);
           }
         });
         setProcessedFileData(processedRecords);
         setProcessingStatus("processed");
-        trackImportFromBrunoDataProcessed(collectionsCount.current, processedRecords.environments.length);
       })
       .catch((error) => {
+        trackImportParseFailed("bruno", error.message);
         setImportError(error.message);
         setProcessingStatus("idle");
       });
@@ -198,7 +200,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
   const handleImportBrunoData = useCallback(() => {
     setIsImporting(true);
-    trackImportFromBrunoStarted(collectionsCount.current, processedFileData.environments.length);
+    trackImportStarted("bruno");
     Promise.all([handleImportEnvironments(), handleImportCollectionsAndApis()])
       .then(([importedEnvs, importedCollections]) => {
         if (importedCollections === 0 && importedEnvs === 0) {
@@ -214,13 +216,14 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
           .join(" and ");
 
         toast.success(`Successfully imported ${successMessage}`);
-        trackImportFromBrunoCompleted(importedCollections, importedEnvs);
+
+        trackImportSuccess("bruno", importedCollections);
         onSuccess?.();
       })
       .catch((error) => {
         Logger.error("Bruno data import failed:", error);
         setImportError("Something went wrong! Couldn't import Bruno data");
-        trackImportFromBrunoFailed(collectionsCount.current, processedFileData.environments.length);
+        trackImportFailed("bruno", JSON.stringify(error));
       })
       .finally(() => {
         setIsImporting(false);

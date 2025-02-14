@@ -18,7 +18,6 @@ import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 import {
   trackEnvironmentCreatedInDB,
   trackEnvironmentDeletedFromDB,
-  trackEnvironmentsFetchedFromDB,
   trackEnvironmentUpdatedInDB,
 } from "features/apiClient/screens/environment/analytics";
 import { fetchLock } from "./fetch-lock";
@@ -168,7 +167,6 @@ export const fetchAllEnvironmentDetails = async (ownerId: string) => {
     return environmentDetails;
   } finally {
     releaseLock();
-    trackEnvironmentsFetchedFromDB();
   }
 };
 

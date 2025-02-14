@@ -7,13 +7,14 @@ import { getApiRecords } from "backend/apiClient";
 import Logger from "lib/logger";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
+  trackEnvironmentClicked,
   trackHistoryCleared,
   trackImportCurlClicked,
   trackNewCollectionClicked,
   trackNewRequestClicked,
+  trackNewTabOpened,
 } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
-import { trackCreateEnvironmentClicked } from "../screens/environment/analytics";
 import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { clearExpandedRecordIdsFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
@@ -115,6 +116,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const openDraftRequest = useCallback(() => {
     const requestId = generateDocumentId("apis");
+    trackNewTabOpened();
 
     openTab(requestId, {
       title: "Untitled request",
@@ -322,7 +324,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
         case RQAPI.RecordType.ENVIRONMENT: {
           setIsRecordBeingCreated(recordType);
-          trackCreateEnvironmentClicked(analyticEventSource);
+          trackEnvironmentClicked();
           return addNewEnvironment("New Environment")
             .then((newEnvironment: { id: string; name: string; isGlobal: boolean }) => {
               setIsRecordBeingCreated(null);

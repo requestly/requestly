@@ -20,6 +20,7 @@ import "./environmentsList.scss";
 import { isGlobalEnvironment } from "../../utils";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { EnvironmentData } from "backend/environment/types";
+import { trackEnvironmentExported } from "modules/analytics/events/features/apiClient";
 
 export const EnvironmentsList = () => {
   const dispatch = useDispatch();
@@ -116,6 +117,7 @@ export const EnvironmentsList = () => {
     (environment: { id: string; name: string }) => {
       const variables = getEnvironmentVariables(environment.id);
       setEnvironmentsToExport([{ ...environment, variables }]);
+      trackEnvironmentExported();
       setIsExportModalOpen(true);
     },
     [getEnvironmentVariables]

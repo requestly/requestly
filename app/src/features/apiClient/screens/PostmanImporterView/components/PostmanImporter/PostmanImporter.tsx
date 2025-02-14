@@ -15,10 +15,11 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { Row } from "antd";
 import {
-  trackImportFromPostmanCompleted,
-  trackImportFromPostmanDataProcessed,
-  trackImportFromPostmanFailed,
-  trackImportFromPostmanStarted,
+  trackImportFailed,
+  trackImportParsed,
+  trackImportParseFailed,
+  trackImportStarted,
+  trackImportSuccess,
 } from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
 import "./postmanImporter.scss";
@@ -125,13 +126,13 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 processedRecords.variables = { ...processedRecords.variables, ...result.value.data.variables };
                 processedRecords.apiRecords.push(...collections, ...apis);
                 collectionsCount.current += collections.length;
+                trackImportParsed("postman", collections.length, apis.length);
               }
             } else {
+              trackImportParseFailed("postman");
               console.error("Error processing postman file:", result.reason);
             }
           });
-
-          trackImportFromPostmanDataProcessed(collectionsCount.current, processedRecords.environments.length);
 
           setProcessedFileData(processedRecords);
           setProcessingStatus("processed");
@@ -233,7 +234,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   }, [processedFileData.apiRecords, user?.details?.profile?.uid, workspace?.id, onSaveRecord]);
 
   const handleImportPostmanData = useCallback(() => {
-    trackImportFromPostmanStarted(collectionsCount.current, processedFileData.environments.length);
+    trackImportStarted("postman");
     setIsImporting(true);
     Promise.allSettled([handleImportEnvironments(), handleImportCollectionsAndApis()])
       .then((results) => {
@@ -276,12 +277,12 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         );
 
         onSuccess?.();
-        trackImportFromPostmanCompleted(importedCollections, importedEnvironments);
+        trackImportSuccess("postman", importedCollections);
       })
       .catch((error) => {
         Logger.error("Postman data import failed:", error);
         setImportError("Something went wrong!, Couldn't import Postman data");
-        trackImportFromPostmanFailed(collectionsCount.current, processedFileData.environments.length);
+        trackImportFailed("postman", JSON.stringify(error));
       })
       .finally(() => {
         setIsImporting(false);

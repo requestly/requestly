@@ -34,7 +34,7 @@ export const trackEnvironmentsFetchedFromDB = () => {
   trackEvent(ENVIRONMENT.ENVIRONMENTS_FETCHED_FROM_DB);
 };
 
-export const trackEnvironmentSwitched = (num_environments: number) => {
+export const trackEnvironmentSwitched = () => {
   trackEvent(ENVIRONMENT.ENVIRONMENT_SWITCHED);
 };
 

@@ -7,6 +7,7 @@ import { apiRequestToHarRequestAdapter } from "../../../utils";
 import { Select } from "antd";
 import "./copyAsModal.scss";
 import CopyButton from "components/misc/CopyButton";
+import { trackRequestCurlCopied } from "modules/analytics/events/features/apiClient";
 
 interface CopyAsModalProps {
   open: boolean;
@@ -42,6 +43,7 @@ const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
         snippetTypeId.split("-")[1] as ClientId,
         {}
       );
+      trackRequestCurlCopied();
     } catch (err) {
       snippet = "Some error occured while generating snippet.";
     }

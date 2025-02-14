@@ -20,6 +20,7 @@ import {
   trackInstallExtensionDialogShown,
   trackRequestSaved,
   trackRequestRenamed,
+  trackAPIRequestSent,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
@@ -257,6 +258,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   const onSendButtonClick = useCallback(async () => {
     updateTab(apiEntryDetails?.id, { isPreview: false });
+    trackAPIRequestSent({
+      has_scripts: Boolean(entry.scripts?.preRequest?.length),
+      auth_type: entry?.auth?.currentAuthType,
+    });
 
     if (!entry.request.url) {
       return;
@@ -328,7 +333,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
           });
         }
-        trackRequestFailed();
+        trackRequestFailed(error.message);
         trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
         trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
       }
@@ -423,7 +428,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       );
       setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
       resetChanges();
-      trackRequestSaved("api_client_view");
+      trackRequestSaved({
+        src: "api_client_view",
+        has_scripts: Boolean(entry.scripts?.preRequest?.length),
+        auth_type: entry?.auth?.currentAuthType,
+      });
       toast.success("Request saved!");
     } else {
       toast.error("Something went wrong!");
