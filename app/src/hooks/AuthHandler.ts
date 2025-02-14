@@ -33,7 +33,14 @@ const AuthHandler: React.FC<{}> = () => {
   const onboardingDetails = useSelector(getAppOnboardingDetails);
 
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
-  const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
+  const getOrganizationUsers = useMemo(
+    () =>
+      httpsCallable<{ domain: string; size?: number; start?: number }, { users: any[]; total: number }>(
+        getFunctions(),
+        "users-getOrganizationUsers"
+      ),
+    []
+  );
 
   const nonBlockingOperations = useCallback(
     async (user: User) => {
@@ -63,14 +70,10 @@ const AuthHandler: React.FC<{}> = () => {
       }
 
       if (userData?.username) {
-        dispatch(
-          // @ts-ignore
-          globalActions.updateUsername({ username: userData.username })
-        );
+        dispatch(globalActions.updateUsername({ username: userData.username }));
       }
 
       dispatch(
-        // @ts-ignore
         globalActions.updateUserInfo({
           loggedIn: true,
           details: {
