@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-//@ts-ignore : needed because rq-core type declaration is not present
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { CheckCircleOutlined, CloseOutlined, DownOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Alert, Popconfirm, Popover, Space, Tooltip, Typography } from "antd";

@@ -99,6 +99,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
       }
       setFetchingDevices(false);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]); // Don't add appsList as dependency
 
   const toggleCloseConfirmModal = () => {
@@ -373,6 +374,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         );
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [processingApps, handleActivateAppOnClick, handleDisconnectAppOnClick]
   );
 
