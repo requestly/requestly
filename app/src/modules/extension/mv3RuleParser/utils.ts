@@ -187,6 +187,8 @@ export const parseUrlParametersFromSourceV2 = (
   return null;
 };
 
+// This works because chrome.declarativeNetRequest.ResourceTypes have upper to lower case mapping for same keys.
+// This was needed because RuleSourceFilter has resourceType as XHR:"xmlhttprequest" while chrome.declarativeNetRequest.ResourceTypes has "XMLHttpRequest":"xmlhttprequest"
 const convertToExtensionResourceType = (resourceType: string): ExtensionResourceType => {
   return resourceType.toUpperCase() as ExtensionResourceType;
 };
