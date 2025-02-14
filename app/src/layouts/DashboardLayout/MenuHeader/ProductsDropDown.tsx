@@ -1,6 +1,3 @@
-// @ts-ignore // can't find types for requestly-core
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-
 import { Button, Card, Dropdown, MenuProps } from "antd";
 import { useNavigate } from "react-router-dom";
 import {
@@ -29,8 +26,6 @@ import {
   trackProductsDropDownBtnClicked,
   trackTopbarClicked,
 } from "modules/analytics/events/common/onboarding/header";
-import { useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import LINKS from "config/constants/sub/links";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
@@ -70,8 +65,6 @@ interface ProductsProps extends MenuProps {
 
 const Products: React.FC<ProductsProps> = (props) => {
   const navigate = useNavigate();
-
-  const appMode = useSelector(getAppMode);
   const isDesktopSessionsEnabled = useFeatureIsOn("desktop-sessions");
 
   const [isDesktopAppPromoModalOpen, setIsDesktopAppPromoModalOpen] = useState(false);
