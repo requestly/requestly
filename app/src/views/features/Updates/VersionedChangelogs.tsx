@@ -4,7 +4,7 @@ import changeLogs, { VERSION_NEXT } from "./changeLogs";
 import { getExtensionVersion } from "actions/ExtensionActions";
 import * as semver from "semver";
 
-const VersionedChangelogs: React.FC<{}> = () => {
+const VersionedChangelogs: React.FC = () => {
   const currentRequestlyVersion = getExtensionVersion() || "0.0.0";
 
   return (
