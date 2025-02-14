@@ -187,6 +187,10 @@ export const parseUrlParametersFromSourceV2 = (
   return null;
 };
 
+const convertToExtensionResourceType = (resourceType: string): ExtensionResourceType => {
+  return resourceType.toUpperCase() as ExtensionResourceType;
+};
+
 export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
   const condition: ExtensionRuleCondition = {};
   const filters =
@@ -201,7 +205,7 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
       requestMethods.add(method.toLowerCase() as ExtensionRequestMethod);
     });
     filter?.resourceType?.forEach((resourceType) => {
-      resourceTypes.add(resourceType as ExtensionResourceType);
+      resourceTypes.add(convertToExtensionResourceType(resourceType));
     });
     if (filter?.pageDomains?.length) {
       pageDomains = filter?.pageDomains;
