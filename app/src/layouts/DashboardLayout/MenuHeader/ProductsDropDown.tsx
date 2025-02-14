@@ -1,3 +1,4 @@
+import React, { useCallback, useMemo, useState } from "react";
 import { Button, Card, Dropdown, MenuProps } from "antd";
 import { useNavigate } from "react-router-dom";
 import {
@@ -18,7 +19,6 @@ import {
 } from "@ant-design/icons";
 
 import "./ProductsDropDown.scss";
-import React, { useCallback, useMemo, useState } from "react";
 import PATHS from "config/constants/sub/paths";
 import { DesktopAppPromoModal } from "./DesktopAppPromoModal";
 import {

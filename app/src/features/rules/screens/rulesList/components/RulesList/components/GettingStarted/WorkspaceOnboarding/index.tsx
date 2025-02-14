@@ -159,7 +159,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   useEffect(() => {
     if (user?.loggedIn) {
       getPendingInvites({ email: true, domain: true })
-        .then((res: any) => {
+        .then((res) => {
           setPendingInvites(res?.pendingInvites ?? []);
           dispatch(globalActions.updateWorkspaceOnboardingTeamDetails({ pendingInvites: res?.pendingInvites ?? [] }));
         })

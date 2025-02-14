@@ -15,6 +15,7 @@ import { isNull } from "lodash";
 import { trackAppOnboardingTeamsViewed, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import "./index.scss";
+import { Invite } from "types";
 
 interface WorkspaceOnboardingViewProps {
   isOpen: boolean;
@@ -48,7 +49,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
   );
 
   const handlePendingInvites = useCallback(
-    (res: any) => {
+    (res: { pendingInvites: Invite[]; success: boolean }) => {
       setPendingInvites(res?.pendingInvites ?? []);
       if (res?.pendingInvites?.length > 0) setIsLoading(false);
       else {
