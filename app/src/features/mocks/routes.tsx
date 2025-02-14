@@ -41,7 +41,6 @@ export const mockServerRoutes: RouteObject[] = [
       },
       {
         path: PATHS.FILE_SERVER_V2.EDIT.RELATIVE,
-        // @ts-ignore
         element: <ProtectedRoute component={MockEditorIndex} mockType={MockType.FILE} />,
       },
     ],

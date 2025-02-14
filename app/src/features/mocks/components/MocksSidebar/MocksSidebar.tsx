@@ -26,10 +26,8 @@ export const MocksSidebar: React.FC = () => {
 
   useEffect(() => {
     if (location.pathname.includes("editor")) {
-      // @ts-ignore
       dispatch(globalActions.updateSecondarySidebarCollapse(true));
     } else {
-      // @ts-ignore
       dispatch(globalActions.updateSecondarySidebarCollapse(false));
     }
   }, [dispatch, location]);
