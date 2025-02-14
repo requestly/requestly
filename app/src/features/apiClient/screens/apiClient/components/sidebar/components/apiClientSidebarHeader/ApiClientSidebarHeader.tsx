@@ -13,7 +13,6 @@ import {
   trackImportFromBrunoClicked,
   trackImportFromPostmanClicked,
   trackNewCollectionClicked,
-  trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
@@ -195,7 +194,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           return;
         }
 
-        trackNewRequestClicked("api_client_sidebar_header");
         onNewClick(RQAPI.RecordType.API);
       },
     },
