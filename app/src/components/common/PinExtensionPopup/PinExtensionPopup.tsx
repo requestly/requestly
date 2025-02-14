@@ -122,8 +122,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         <img
           width={338}
           height={196}
-          //@ts-ignore
-          fetchpriority="high"
+          fetchPriority="high"
           alt="Pin extension"
           className="pin-extension-gif"
           src={"/assets/media/components/pin-ext-guide.gif"}
