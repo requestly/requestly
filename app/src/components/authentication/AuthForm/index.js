@@ -48,7 +48,7 @@ const { ACTION_LABELS: AUTH_ACTION_LABELS, METHODS: AUTH_METHODS } = APP_CONSTAN
 const AuthForm = ({
   setAuthMode: SET_MODE,
   authMode: MODE,
-  authMethod: AUTH_METHOD,
+  authMethod: AUTH_METHOD = null,
   setPopoverVisible: SET_POPOVER = () => {},
   eventSource,
   callbacks,
