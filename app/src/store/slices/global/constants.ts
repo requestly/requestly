@@ -49,7 +49,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
     groupwiseRulesToPopulate: {},
     selectedRules: {},
     selectedGroups: {},
-    lastBackupTimeStamp: "",
+    lastBackupTimeStamp: 0,
     isRulesListLoading: false,
     isSampleRulesImported: false,
   },

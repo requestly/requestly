@@ -19,7 +19,7 @@ export interface RulesState {
   groupwiseRulesToPopulate: Record<string, Rule[]>;
   selectedRules: Record<string, Rule>;
   selectedGroups: Record<string, Group>;
-  lastBackupTimeStamp: string;
+  lastBackupTimeStamp: number;
   isRulesListLoading: boolean;
   isSampleRulesImported: boolean;
 }
