@@ -22,6 +22,10 @@
     <a target="_blank" href="https://status.requestly.io">
     <img alt="Status badge" src="https://uptime.betterstack.com/status-badges/v2/monitor/13j20.svg" />
   </a>
+  </a>
+    <a target="_blank" href="https://gurubase.io/g/requestly">
+    <img alt="Requestly Guru badge" src="https://img.shields.io/badge/Gurubase-Ask%20Requestly%20Guru-006BFF" />
+  </a>
 </p>
 
 <h1 align="center">Open-Source API Platform - Build, Test, Intercept & Mock APIs </h1>
