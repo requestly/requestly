@@ -1,6 +1,6 @@
 const IPC_TIMEOUT = 15000;
 
-export function rpcCall(namespace: string, method: string, ...args: any) {
+export function rpc(namespace: string, method: string, ...args: any) {
 	return new Promise((resolve, reject) => {
       setTimeout(() => {
         reject(
@@ -36,7 +36,7 @@ export default class BackgroundServiceAdapter {
   }
 
   protected invokeProcedureInBG(method: string, ...args: any): Promise<any> {
-		return rpcCall(this.RPC_CHANNEL_PREFIX, method, args);
+		return rpc(this.RPC_CHANNEL_PREFIX, method, args);
   }
 
   /*

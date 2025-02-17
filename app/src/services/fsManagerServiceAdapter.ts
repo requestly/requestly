@@ -1,5 +1,5 @@
 // import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import BackgroundServiceAdapter, { rpcCall } from "./DesktopBackgroundService";
+import BackgroundServiceAdapter, { rpc } from "./DesktopBackgroundService";
 // import FEATURES from "config/constants/sub/features";
 export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   static NAMESPACE = "local_sync";
@@ -33,5 +33,5 @@ class FsManagerServiceAdapterProvider {
 
 export const fsManagerServiceAdapterProvider = new FsManagerServiceAdapterProvider();
 export function createWorkspaceFolder(path: string) {
-	return rpcCall(FsManagerServiceAdapter.NAMESPACE, "createWorkspaceFolder", path);
+	return rpc(FsManagerServiceAdapter.NAMESPACE, "createWorkspaceFolder", path);
 }
