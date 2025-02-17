@@ -4,6 +4,7 @@ import { GlobalModals } from "./modals/types";
 import { RulesState } from "./rules/types";
 import { UserAuth } from "./user/types";
 import { SurveyPage } from "components/misc/PersonaSurvey/types";
+import { OnboardingSteps } from "features/rules/screens/rulesList/components/RulesList/components/GettingStarted/WorkspaceOnboarding/types";
 
 export interface GlobalSliceState {
   activeModals: GlobalModals;
@@ -31,13 +32,13 @@ export interface GlobalSliceState {
     useCases: any;
   };
   workspaceOnboarding: {
-    step: ONBOARDING_STEPS;
+    step: OnboardingSteps;
     isOnboardingCompleted: boolean;
     workspace: any;
   };
   appOnboarding: {
     step: ONBOARDING_STEPS;
-    persona: null;
+    persona: string;
     fullName: string;
     industry: string;
     disableSkip: boolean;
@@ -69,7 +70,7 @@ export interface GlobalSliceState {
       isJoinWorkspaceCardVisible: boolean;
       isManageBillingTeamAlertVisible: boolean;
       isSupportChatOpened: boolean;
-      lastFeaturePath: string;
+      lastUsedFeaturePath: string;
     };
     nonPersist: {
       networkSessionSaveInProgress: boolean;

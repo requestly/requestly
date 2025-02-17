@@ -5,6 +5,7 @@ import { GlobalSliceState } from "./types";
 import appListJson from "../../initial-state/sub/appsList.json";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { SurveyPage } from "components/misc/PersonaSurvey/types";
+import { OnboardingSteps } from "features/rules/screens/rulesList/components/RulesList/components/GettingStarted/WorkspaceOnboarding/types";
 
 const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   /* User */
@@ -177,7 +178,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   },
 
   workspaceOnboarding: {
-    step: ONBOARDING_STEPS.AUTH,
+    step: OnboardingSteps.AUTH,
     isOnboardingCompleted: false,
     workspace: {},
   },
