@@ -1,6 +1,5 @@
-//@ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseOutlined } from "@ant-design/icons";

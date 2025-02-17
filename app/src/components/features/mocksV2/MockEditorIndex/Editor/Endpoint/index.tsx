@@ -1,5 +1,5 @@
-import { Col, Input, Row } from "antd";
-import { forwardRef } from "react";
+import React, { forwardRef } from "react";
+import { Col, Input, InputRef, Row } from "antd";
 import { ValidationErrors } from "../../types";
 import { MockType } from "components/features/mocksV2/types";
 import { useSelector } from "react-redux";
@@ -33,7 +33,7 @@ const MockEditorEndpoint = forwardRef(
       collectionPath,
       isMockCollectionLoading = false,
     }: EndpointProps,
-    ref
+    ref: React.ForwardedRef<InputRef>
   ) => {
     const user = useSelector(getUserAuthDetails);
     const username = user?.details?.username;
@@ -61,7 +61,6 @@ const MockEditorEndpoint = forwardRef(
         <Row>
           <Col flex="1 0 auto">
             <Input
-              // @ts-ignore
               ref={ref}
               addonBefore={isMockCollectionLoading ? <LoadingOutlined /> : "/" + collectionPath}
               required

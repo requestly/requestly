@@ -6,7 +6,7 @@ import { sessionRecordingActions } from "store/features/session-recording/slice"
 import { Typography, Input, Row, Tooltip } from "antd";
 import { BiPencil } from "@react-icons/all-files/bi/BiPencil";
 import { updateSessionName } from "../api";
-// @ts-ignore
+//@ts-ignore
 import CopyToClipboard from "react-copy-to-clipboard";
 import ExportOutlined from "assets/icons/export-outlined.svg?react";
 import {

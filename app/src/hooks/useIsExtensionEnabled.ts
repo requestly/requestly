@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
-// @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Logger from "lib/logger";
 import APP_CONSTANTS from "config/constants";

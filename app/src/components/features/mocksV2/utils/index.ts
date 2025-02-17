@@ -1,4 +1,3 @@
-// @ts-ignore
 import { createMock } from "backend/mocks/createMock";
 import APP_CONSTANTS from "config/constants";
 import { isEnvBeta, isEnvDevWithBeta, isEnvEmulator } from "utils/EnvUtils";

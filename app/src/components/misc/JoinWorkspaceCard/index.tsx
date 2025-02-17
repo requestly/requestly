@@ -102,7 +102,7 @@ export const JoinWorkspaceCard = () => {
     }
 
     getPendingInvites({ email: true, domain: true })
-      .then((res: any) => {
+      .then((res) => {
         const domain = getDomainFromEmail(user?.details?.profile?.email);
         if (res?.pendingInvites && res.pendingInvites.length > 0) {
           const hasEmailInvites = res.pendingInvites.some((invite: Invite) => !invite.domains?.length);

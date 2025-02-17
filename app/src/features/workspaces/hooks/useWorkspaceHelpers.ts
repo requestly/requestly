@@ -4,7 +4,6 @@ import { trackWorkspaceSwitched } from "modules/analytics/events/common/teams";
 import { variablesActions } from "store/features/variables/slice";
 import { getPersonalWorkspaceId } from "../utils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import clientRuleStorageService from "services/clientStorageService/features/rule";
 import { tabsLayoutActions } from "store/slices/tabs-layout";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +17,7 @@ export const useWorkspaceHelpers = () => {
     return switchWorkspace(getPersonalWorkspaceId(userId));
   };
 
-  const switchWorkspace = async (workspaceId: string, source?: string) => {
+  const switchWorkspace = async (workspaceId?: string, source?: string) => {
     if (!workspaceId) {
       console.error("Invalid workspaceId while switching", { workspaceId });
     }

@@ -14,6 +14,7 @@ import { trackAppOnboardingTeamsViewed, trackAppOnboardingViewed } from "feature
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import "./index.scss";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { Invite } from "types";
 
 interface WorkspaceOnboardingViewProps {
   isOpen: boolean;
@@ -35,7 +36,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
   );
 
   const handlePendingInvites = useCallback(
-    (res: any) => {
+    (res: { pendingInvites: Invite[]; success: boolean }) => {
       setPendingInvites(res?.pendingInvites ?? []);
       if (res?.pendingInvites?.length > 0) setIsLoading(false);
       else {

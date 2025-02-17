@@ -201,7 +201,7 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
       requestMethods.add(method.toLowerCase() as ExtensionRequestMethod);
     });
     filter?.resourceType?.forEach((resourceType) => {
-      resourceTypes.add(resourceType as ExtensionResourceType);
+      resourceTypes.add((resourceType as unknown) as ExtensionResourceType);
     });
     if (filter?.pageDomains?.length) {
       pageDomains = filter?.pageDomains;

@@ -27,29 +27,23 @@ export const uploadFile = async (file: File, filePath: string): Promise<string |
   const storage = getStorage(firebaseApp);
   const storageRef = ref(storage, filePath);
 
-  const path = await uploadBytes(storageRef, file)
-    .then((snapshot) => {
-      return snapshot.ref.fullPath;
-    })
-    .catch((err) => {
-      return null;
-    });
-
-  return path;
+  try {
+    const path = await uploadBytes(storageRef, file);
+    return path.ref.fullPath;
+  } catch {
+    return null;
+  }
 };
 
 export const getFile = async (filePath: string) => {
   const storage = getStorage(firebaseApp);
   const storageRef = ref(storage, filePath);
 
-  const blob = await getBlob(storageRef)
-    .then((blob) => {
-      return blob;
-    })
-    .catch((err) => {
-      return null;
-    });
-
-  const data = new Blob([blob]).text();
-  return data;
+  try {
+    const blob = await getBlob(storageRef);
+    const data = new Blob([blob]).text();
+    return data;
+  } catch {
+    return null;
+  }
 };
