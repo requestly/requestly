@@ -3,7 +3,7 @@ import { Checkbox, Input, Modal, Radio, Tag } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system-v2/components";
-import { WorkspaceType } from "types";
+import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig, WorkspaceType } from "types";
 import { displayFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
@@ -44,7 +44,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
   const availableTeams = useSelector(getAvailableTeams);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [workspaceName, setWorkspaceName] = useState("");
-  const [workspaceType, setWorkspaceType] = useState(user.loggedIn ? WorkspaceType.Team : WorkspaceType.Local);
+  const [workspaceType, setWorkspaceType] = useState(user.loggedIn ? WorkspaceType.SHARED : WorkspaceType.LOCAL);
   const [folderPath, setFolderPath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
@@ -62,6 +62,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
           teamId: teamId,
           teamName: newTeamName,
           teamMembersCount: 1,
+          workspaceType,
         },
         dispatch,
         {
@@ -72,13 +73,15 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
         null,
         "create_workspace_modal"
       );
-      redirectToTeam(navigate, teamId, {
-        state: {
-          isNewTeam: !isNotifyAllSelected || !hasMembersInSameDomain,
-        },
-      });
+      if (workspaceType === WorkspaceType.SHARED) {
+        redirectToTeam(navigate, teamId, {
+          state: {
+            isNewTeam: !isNotifyAllSelected || !hasMembersInSameDomain,
+          },
+        });
+      }
     },
-    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.details?.isSyncEnabled]
+    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.details?.isSyncEnabled, workspaceType]
   );
 
   const handleIncentiveRewards = useCallback(
@@ -148,12 +151,20 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
     if (!workspaceName.length) return;
     setIsLoading(true);
     const functions = getFunctions();
-    const createTeam = httpsCallable(functions, "teams-createTeam");
+    const createTeam = httpsCallable<CreateTeamParams, { teamId: string }>(functions, "teams-createTeam");
     const createOrgTeamInvite = httpsCallable(functions, "invites-createOrganizationTeamInvite");
     const upsertTeamCommonInvite = httpsCallable(functions, "invites-upsertTeamCommonInvite");
 
+    const config =
+      workspaceType === WorkspaceType.LOCAL
+        ? ({ type: WorkspaceType.LOCAL, rootPath: folderPath } as LocalWorkspaceConfig)
+        : ({ type: WorkspaceType.SHARED } as SharedOrPrivateWorkspaceConfig);
+
     try {
-      const response: any = await createTeam({ teamName: workspaceName });
+      const response: any = await createTeam({
+        teamName: workspaceName,
+        config,
+      });
       const teamId = response.data.teamId;
 
       await handleIncentiveRewards(availableTeams?.length, dispatch);
@@ -162,7 +173,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
       toast.info("Workspace Created");
 
       let hasMembersInSameDomain = true;
-      if (isNotifyAllSelected) {
+      if (isNotifyAllSelected && workspaceType === WorkspaceType.SHARED) {
         try {
           const domain = getDomainFromEmail(user?.details?.profile?.email);
           hasMembersInSameDomain = await handleDomainInvitesCreation(
@@ -201,6 +212,8 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
     handleIncentiveRewards,
     handlePostTeamCreationStep,
     handleDomainInvitesCreation,
+    workspaceType,
+    folderPath,
   ]);
 
   return (
@@ -248,7 +261,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
             options={[
               {
                 disabled: !user.loggedIn,
-                value: WorkspaceType.Team,
+                value: WorkspaceType.SHARED,
                 label: (
                   <div className="workspace-type-content">
                     <div className="workspace-type-content_title">Team workspace</div>
@@ -256,7 +269,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
                       Team Workspaces enables real-time collaboration on rules, APIs, and mocks, ensuring seamless
                       teamwork.
                     </div>
-                    {workspaceType === WorkspaceType.Team ? (
+                    {workspaceType === WorkspaceType.SHARED ? (
                       <div className="invite-all-domain-users-container">
                         <Checkbox
                           checked={isNotifyAllSelected}
@@ -276,7 +289,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
                 ),
               },
               {
-                value: WorkspaceType.Local,
+                value: WorkspaceType.LOCAL,
                 disabled: appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
                 label: (
                   <div className="workspace-type-content">
@@ -287,7 +300,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
                       In a Local Workspace, your files are stored on your device. Currently, only API client files are
                       supported.
                     </div>
-                    {workspaceType === WorkspaceType.Local ? (
+                    {workspaceType === WorkspaceType.LOCAL ? (
                       <div className="folder-path-selector">
                         {folderPath.length ? (
                           <div className="selected-folder-container">
@@ -298,7 +311,12 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
                           </div>
                         ) : (
                           <>
-                            <RQButton block type="primary" onClick={() => displayFileSelector(folderSelectCallback)}>
+                            <RQButton
+                              disabled={appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP}
+                              block
+                              type="primary"
+                              onClick={() => displayFileSelector(folderSelectCallback)}
+                            >
                               Select a folder
                             </RQButton>
                             <div className="selector-description">A location to store your workspace data.</div>
