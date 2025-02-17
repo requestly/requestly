@@ -1,3 +1,4 @@
+import { PayloadAction } from "@reduxjs/toolkit";
 import { GlobalSliceState } from "store/slices/global/types";
 
 interface toastOverlay {
@@ -10,7 +11,7 @@ interface toastOverlay {
 
 export const removeToastForEditor = (
   prevState: GlobalSliceState,
-  action: { payload: { id?: string; scriptId?: string } }
+  action: PayloadAction<{ id?: string; scriptId?: string }>
 ) => {
   const editorId = action.payload.id;
   const newEditorToast = { ...prevState.editorToast };
@@ -23,7 +24,7 @@ export const removeToastForEditor = (
 
 export const triggerToastForEditor = (
   prevState: GlobalSliceState,
-  action: { payload: { id: string; message: string; type: string; toastOverlay?: toastOverlay } }
+  action: PayloadAction<{ id: string; message: string; type: string; toastOverlay?: toastOverlay }>
 ) => {
   const editorId = action.payload.id;
   const toastOverlay = action.payload.toastOverlay!;
