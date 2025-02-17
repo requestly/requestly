@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { Collapse, Dropdown, MenuProps, Tooltip } from "antd";
+import { Checkbox, Collapse, Dropdown, MenuProps, Tooltip } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
@@ -26,6 +26,12 @@ interface Props {
   openTab: TabsLayoutContextInterface["openTab"];
   setExpandedRecordIds: (keys: RQAPI.Record["id"][]) => void;
   expandedRecordIds: string[];
+  bulkActionOptions: {
+    showSelection: boolean;
+    selectedRecords: Set<RQAPI.Record["id"]>;
+    recordsSelectionHandler: (record: RQAPI.Record, event: React.ChangeEvent<HTMLInputElement>) => void;
+    setShowSelection: (arg: boolean) => void;
+  };
 }
 
 export const CollectionRow: React.FC<Props> = ({
@@ -35,12 +41,14 @@ export const CollectionRow: React.FC<Props> = ({
   openTab,
   expandedRecordIds,
   setExpandedRecordIds,
+  bulkActionOptions,
 }) => {
+  const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeKey, setActiveKey] = useState(expandedRecordIds?.includes(record.id) ? record.id : null);
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
-  const { updateRecordToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
+  const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
   const { collectionId } = useParams();
 
   const getCollectionOptions = useCallback(
@@ -68,7 +76,7 @@ export const CollectionRow: React.FC<Props> = ({
           danger: true,
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
-            updateRecordToBeDeleted(record);
+            updateRecordsToBeDeleted([record]);
             setIsDeleteModalOpen(true);
           },
         },
@@ -76,7 +84,7 @@ export const CollectionRow: React.FC<Props> = ({
 
       return items;
     },
-    [setIsDeleteModalOpen, updateRecordToBeDeleted]
+    [setIsDeleteModalOpen, updateRecordsToBeDeleted, onExportClick]
   );
 
   const collapseChangeHandler = useCallback(
@@ -92,7 +100,7 @@ export const CollectionRow: React.FC<Props> = ({
         ? sessionStorage.removeItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY)
         : sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, activeKeysCopy);
     },
-    [record, expandedRecordIds]
+    [record, expandedRecordIds, setExpandedRecordIds]
   );
 
   useEffect(() => {
@@ -125,10 +133,22 @@ export const CollectionRow: React.FC<Props> = ({
           ghost
           className="collections-list-item collection"
           expandIcon={({ isActive }) => {
-            return isActive ? (
-              <PiFolderOpen className="collection-expand-icon" />
-            ) : (
-              <MdOutlineFolder className="collection-expand-icon" />
+            return (
+              <>
+                {showSelection && (
+                  <div onClick={(event) => event.stopPropagation()}>
+                    <Checkbox
+                      onChange={recordsSelectionHandler.bind(this, record)}
+                      checked={selectedRecords.has(record.id)}
+                    />
+                  </div>
+                )}
+                {isActive ? (
+                  <PiFolderOpen className="collection-expand-icon" />
+                ) : (
+                  <MdOutlineFolder className="collection-expand-icon" />
+                )}
+              </>
             );
           }}
         >
@@ -189,6 +209,7 @@ export const CollectionRow: React.FC<Props> = ({
                     <RQButton
                       onClick={(e) => {
                         e.stopPropagation();
+                        setShowSelection(false);
                       }}
                       size="small"
                       type="transparent"
@@ -202,16 +223,21 @@ export const CollectionRow: React.FC<Props> = ({
             {record.data.children?.length === 0 ? (
               <ApiRecordEmptyState
                 analyticEventSource="collection_row"
-                recordType={RQAPI.RecordType.API}
-                newRecordCollectionId={record.id}
                 message="No requests created yet"
                 newRecordBtnText="New request"
                 onNewRecordClick={() => onNewClick("collection_row", RQAPI.RecordType.API, record.id)}
               />
             ) : (
-              record.data.children.map((apiRecord) => {
+              record.data.children?.map((apiRecord) => {
                 if (apiRecord.type === RQAPI.RecordType.API) {
-                  return <RequestRow key={apiRecord.id} record={apiRecord} openTab={openTab} />;
+                  return (
+                    <RequestRow
+                      key={apiRecord.id}
+                      record={apiRecord}
+                      openTab={openTab}
+                      bulkActionOptions={bulkActionOptions}
+                    />
+                  );
                 } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
                   return (
                     <CollectionRow
@@ -222,6 +248,7 @@ export const CollectionRow: React.FC<Props> = ({
                       onExportClick={onExportClick}
                       expandedRecordIds={expandedRecordIds}
                       setExpandedRecordIds={setExpandedRecordIds}
+                      bulkActionOptions={bulkActionOptions}
                     />
                   );
                 }

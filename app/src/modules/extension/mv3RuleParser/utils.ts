@@ -187,6 +187,12 @@ export const parseUrlParametersFromSourceV2 = (
   return null;
 };
 
+// This works because chrome.declarativeNetRequest.ResourceTypes have upper to lower case mapping for same keys.
+// This was needed because RuleSourceFilter has resourceType as XHR:"xmlhttprequest" while chrome.declarativeNetRequest.ResourceTypes has "XMLHttpRequest":"xmlhttprequest"
+const convertToExtensionResourceType = (resourceType: string): ExtensionResourceType => {
+  return resourceType.toUpperCase() as ExtensionResourceType;
+};
+
 export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
   const condition: ExtensionRuleCondition = {};
   const filters =
@@ -201,7 +207,7 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
       requestMethods.add(method.toLowerCase() as ExtensionRequestMethod);
     });
     filter?.resourceType?.forEach((resourceType) => {
-      resourceTypes.add(resourceType as ExtensionResourceType);
+      resourceTypes.add(convertToExtensionResourceType(resourceType));
     });
     if (filter?.pageDomains?.length) {
       pageDomains = filter?.pageDomains;

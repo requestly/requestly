@@ -3,7 +3,7 @@ import { RefObject, UIEventHandler, useEffect, useRef } from "react";
 const useAutoScrollableContainer = <T extends HTMLElement>(
   content: unknown
 ): [containerRef: RefObject<T>, onScroll: UIEventHandler<T>] => {
-  const containerRef = useRef<T>();
+  const containerRef = useRef<T>(null);
   const autoScrollRef = useRef<boolean>(true);
 
   const onScroll = () => {

@@ -10,26 +10,44 @@ import {
   trackMoveRequestToCollectionSuccessful,
 } from "modules/analytics/events/features/apiClient";
 import "./moveToCollectionModal.scss";
+import { isApiCollection } from "../../../utils";
+import { firebaseBatchWrite } from "backend/utils";
+import { head, isEmpty, omit } from "lodash";
 
 interface Props {
-  recordToMove: RQAPI.Record;
+  recordsToMove: RQAPI.Record[];
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordToMove }) => {
-  const { apiClientRecords, onSaveRecord, apiClientSyncRepository } = useApiClientContext();
+export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
+  const { apiClientRecords, onSaveRecord, onSaveBulkRecords, apiClientSyncRepository } = useApiClientContext();
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const collectionOptions = useMemo(() => {
+    const exclusions = new Set();
+
+    for (const record of recordsToMove) {
+      const stack = [record];
+      record.collectionId && exclusions.add(record.collectionId);
+      while (stack.length) {
+        const current = stack.pop();
+        exclusions.add(current.id);
+
+        if (isApiCollection(current) && !isEmpty(current.data?.children)) {
+          stack.push(...current.data.children);
+        }
+      }
+    }
+
     return apiClientRecords
-      .filter((record) => record.type === RQAPI.RecordType.COLLECTION)
+      .filter((record) => isApiCollection(record) && !exclusions.has(record.id))
       .map((record) => ({
         label: record.name,
         value: record.id,
       }));
-  }, [apiClientRecords]);
+  }, [apiClientRecords, recordsToMove]);
 
   const createNewCollection = useCallback(async () => {
     const collectionToBeCreated: Partial<RQAPI.CollectionRecord> = {
@@ -53,19 +71,27 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
     }
   }, [onSaveRecord, selectedCollection?.label, apiClientSyncRepository]);
 
-  const moveRecordToCollection = useCallback(
+  const moveRecordsToCollection = useCallback(
     async (collectionId: string, isNewCollection: boolean) => {
-      const updatedRequest = { ...recordToMove, collectionId };
-      const result = await apiClientSyncRepository.updateRecord(updatedRequest);
-      if (result.success) {
+      const updatedRequests = recordsToMove.map((record) =>
+        isApiCollection(record)
+          ? { ...record, collectionId, data: omit(record.data, "children") }
+          : { ...record, collectionId }
+      );
+
+      // TODO: use apiClient interface
+      try {
+        const result = await firebaseBatchWrite("apis", updatedRequests);
+
         trackMoveRequestToCollectionSuccessful(isNewCollection ? "new_collection" : "existing_collection");
-        toast.success("Request moved to collection successfully");
-        onSaveRecord(result.data);
-      } else {
-        throw new Error("Failed to move request to collection");
+        toast.success("Requests moved to collection successfully");
+        result.length === 1 ? onSaveRecord(head(result)) : onSaveBulkRecords(result);
+      } catch (error) {
+        console.error("Error moving records: ", error);
+        throw new Error("Failed to move some requests to collection");
       }
     },
-    [onSaveRecord, recordToMove, apiClientSyncRepository]
+    [onSaveRecord, recordsToMove, onSaveBulkRecords]
   );
 
   const handleRecordMove = useCallback(async () => {
@@ -74,7 +100,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       const collectionId = selectedCollection?.__isNew__ ? await createNewCollection() : selectedCollection.value;
 
       if (collectionId) {
-        await moveRecordToCollection(collectionId, selectedCollection?.__isNew__);
+        await moveRecordsToCollection(collectionId, selectedCollection?.__isNew__);
       }
     } catch (error) {
       console.error("Error moving request to collection:", error);
@@ -84,7 +110,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       setIsLoading(false);
       onClose();
     }
-  }, [selectedCollection, onClose, createNewCollection, moveRecordToCollection]);
+  }, [selectedCollection, onClose, createNewCollection, moveRecordsToCollection]);
 
   return (
     <Modal
@@ -103,9 +129,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         className="select-collection-group"
         classNamePrefix="select-collection-group"
         options={collectionOptions}
-        filterOption={(option, inputValue) =>
-          recordToMove.collectionId !== option.value && option.label.toLowerCase().includes(inputValue.toLowerCase())
-        }
+        filterOption={(option, inputValue) => option.label.toLowerCase().includes(inputValue.toLowerCase())}
         placeholder="Select or type collection name"
         theme={(theme) => ({
           ...theme,

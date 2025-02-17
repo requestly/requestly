@@ -6,7 +6,6 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { updateCollections } from "backend/mocks/updateCollections";
-import deleteIcon from "../../assets/delete.svg";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH } from "features/mocks/constants";
 import { deleteMocks } from "backend/mocks/deleteMocks";
@@ -90,7 +89,7 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
       onCancel={handleCancel}
       className="delete-collection-modal"
     >
-      <img width={32} height={32} src={deleteIcon} alt="Delete collection" className="icon" />
+      <img width={32} height={32} src={"/assets/media/common/delete.svg"} alt="Delete collection" className="icon" />
       <div className="header">Delete this collection?</div>
       <div className="description">
         This will permanently delete this collection. <br />

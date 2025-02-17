@@ -74,7 +74,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
               key={modificationType}
             >
               <Card bordered={false} className="headers-rule-pair-card">
-                {pair.modifications[modificationType]?.map((modification, modificationIndex) => (
+                {pair.modifications?.[modificationType]?.map((modification, modificationIndex) => (
                   <HeadersPairModificationRowV2
                     modification={modification}
                     modificationIndex={modificationIndex}
@@ -85,7 +85,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
                   />
                 ))}
                 <Row span={24} align="middle">
-                  {pair.modifications[modificationType]?.length ? (
+                  {pair.modifications?.[modificationType]?.length ? (
                     <Col
                       lg={{
                         offset: 3,
