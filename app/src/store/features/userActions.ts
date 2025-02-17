@@ -1,3 +1,4 @@
+import { PayloadAction } from "@reduxjs/toolkit";
 import { SurveyPage } from "components/misc/PersonaSurvey/types";
 import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
@@ -6,9 +7,7 @@ import { UserAuth } from "store/slices/global/user/types";
 
 export const updateUserInfo = (
   prevState: GlobalSliceState,
-  action: {
-    payload: { loggedIn: boolean; details: UserAuth["details"] };
-  }
+  action: PayloadAction<{ loggedIn: boolean; details: UserAuth["details"] }>
 ) => {
   prevState.user.loggedIn = action.payload.loggedIn;
   if (action.payload.details) {
@@ -23,7 +22,7 @@ export const updateUserInfo = (
 
 export const updateUserProfile = (
   prevState: GlobalSliceState,
-  action: { payload: { userProfile: UserAuth["details"]["profile"] } }
+  action: PayloadAction<{ userProfile: UserAuth["details"]["profile"] }>
 ) => {
   prevState.user.details.profile = action.payload.userProfile;
 
@@ -34,7 +33,7 @@ export const updateUserProfile = (
 
 export const updateUserPlanDetails = (
   prevState: GlobalSliceState,
-  action: { payload: { userPlanDetails: UserAuth["details"]["planDetails"]; isUserPremium: boolean } }
+  action: PayloadAction<{ userPlanDetails: UserAuth["details"]["planDetails"]; isUserPremium: boolean }>
 ) => {
   prevState.user.details.planDetails = action.payload.userPlanDetails;
   prevState.user.details.isPremium = action.payload.isUserPremium;
@@ -42,45 +41,48 @@ export const updateUserPlanDetails = (
 
 export const updateUserPreferences = (
   prevState: GlobalSliceState,
-  action: { payload: { key: keyof GlobalSliceState["userPreferences"]; value: boolean } }
+  action: PayloadAction<{ key: keyof GlobalSliceState["userPreferences"]; value: boolean }>
 ) => {
   prevState.userPreferences[action.payload.key] = action.payload.value;
 };
 
-export const updateSecondarySidebarCollapse = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updateSecondarySidebarCollapse = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   const isCollapsed = prevState.userPreferences.isSecondarySidebarCollapsed;
   prevState.userPreferences.isSecondarySidebarCollapsed = action.payload ?? !isCollapsed;
 };
 
-export const updateUsername = (prevState: GlobalSliceState, action: { payload: { username: string } }) => {
+export const updateUsername = (prevState: GlobalSliceState, action: PayloadAction<{ username: string }>) => {
   prevState.user.details.username = action.payload.username;
 };
 
-export const updateUserDisplayName = (prevState: GlobalSliceState, action: { payload: string }) => {
+export const updateUserDisplayName = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
   prevState.user.details.profile.displayName = action.payload;
 };
 
-export const updateUserLimitReached = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updateUserLimitReached = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.user.isLimitReached = action.payload;
 };
 
-export const updateOrganizationDetails = (prevState: GlobalSliceState, action: { payload: string }) => {
+export const updateOrganizationDetails = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
   prevState.user.details.organization = action.payload;
 };
 
 //Persona Survey actions
 export const setUserPersonaData = (
   prevState: GlobalSliceState,
-  action: { payload: GlobalSliceState["userPersona"] }
+  action: PayloadAction<GlobalSliceState["userPersona"]>
 ) => {
   prevState.userPersona = { ...prevState.userPersona, ...action.payload };
 };
 
-export const updateUserPersona = (prevState: GlobalSliceState, action: { payload: { key: string; value: string } }) => {
+export const updateUserPersona = (
+  prevState: GlobalSliceState,
+  action: PayloadAction<{ key: string; value: string }>
+) => {
   (prevState.userPersona as any)[action.payload.key] = action.payload.value;
 };
 
-export const updateSelectedPersonaUseCase = (prevState: GlobalSliceState, action: { payload: any }) => {
+export const updateSelectedPersonaUseCase = (prevState: GlobalSliceState, action: PayloadAction<any>) => {
   const { useCases } = prevState.userPersona;
   const { payload } = action;
 
@@ -93,7 +95,7 @@ export const updateSelectedPersonaUseCase = (prevState: GlobalSliceState, action
   }
 };
 
-export const updateOtherPersonaUseCase = (prevState: GlobalSliceState, action: { payload: any }) => {
+export const updateOtherPersonaUseCase = (prevState: GlobalSliceState, action: PayloadAction<any>) => {
   const { useCases } = prevState.userPersona;
   const { payload } = action;
 
@@ -112,17 +114,17 @@ export const updateOtherPersonaUseCase = (prevState: GlobalSliceState, action: {
   }
 };
 
-export const updateIsPersonaSurveyCompleted = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updateIsPersonaSurveyCompleted = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.userPersona.isSurveyCompleted = action.payload;
 };
 
-export const updatePersonaSurveyPage = (prevState: GlobalSliceState, action: { payload: SurveyPage }) => {
+export const updatePersonaSurveyPage = (prevState: GlobalSliceState, action: PayloadAction<SurveyPage>) => {
   prevState.userPersona.page = action.payload;
 };
 
 export const updateUserAttributes = (
   prevState: GlobalSliceState,
-  action: { payload: GlobalSliceState["userAttributes"] }
+  action: PayloadAction<GlobalSliceState["userAttributes"]>
 ) => {
   prevState.userAttributes = {
     ...prevState.userAttributes,
@@ -132,12 +134,10 @@ export const updateUserAttributes = (
 
 export const updateProductTourCompleted = (
   prevState: GlobalSliceState,
-  action: {
-    payload: {
-      subTour?: SUB_TOUR_TYPES;
-      tour: TOUR_TYPES;
-    };
-  }
+  action: PayloadAction<{
+    subTour?: SUB_TOUR_TYPES;
+    tour: TOUR_TYPES;
+  }>
 ) => {
   if (action.payload.tour === TOUR_TYPES.MISCELLANEOUS) {
     prevState.misc.persist.isMiscTourCompleted = {
@@ -149,7 +149,7 @@ export const updateProductTourCompleted = (
   }
 };
 
-export const updateNetworkSessionSaveInProgress = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updateNetworkSessionSaveInProgress = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.misc.nonPersist.networkSessionSaveInProgress = action.payload;
 };
 
@@ -162,7 +162,7 @@ export const updateIsWorkspaceOnboardingCompleted = (prevState: GlobalSliceState
   prevState.workspaceOnboarding.workspace = {};
 };
 
-export const updateWorkspaceOnboardingStep = (prevState: GlobalSliceState, action: { payload: ONBOARDING_STEPS }) => {
+export const updateWorkspaceOnboardingStep = (prevState: GlobalSliceState, action: PayloadAction<ONBOARDING_STEPS>) => {
   prevState.workspaceOnboarding.step = action.payload;
 };
 
@@ -170,33 +170,33 @@ export const updateAppOnboardingCompleted = (prevState: GlobalSliceState) => {
   prevState.appOnboarding.isOnboardingCompleted = true;
 };
 
-export const updateAppOnboardingStep = (prevState: GlobalSliceState, action: { payload: ONBOARDING_STEPS }) => {
+export const updateAppOnboardingStep = (prevState: GlobalSliceState, action: PayloadAction<ONBOARDING_STEPS>) => {
   prevState.appOnboarding.step = action.payload;
   prevState.appOnboarding.disableSkip = false;
 };
 
-export const updateIsAppOnboardingStepDisabled = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updateIsAppOnboardingStepDisabled = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.appOnboarding.disableSkip = action.payload;
 };
 
 export const updateAppOnboardingPersona = (
   prevState: GlobalSliceState,
-  action: { payload: GlobalSliceState["appOnboarding"]["persona"] }
+  action: PayloadAction<GlobalSliceState["appOnboarding"]["persona"]>
 ) => {
   prevState.appOnboarding.persona = action.payload;
 };
 
-export const updateAppOnboardingIndustry = (prevState: GlobalSliceState, action: { payload: string }) => {
+export const updateAppOnboardingIndustry = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
   prevState.appOnboarding.industry = action.payload;
 };
 
-export const updateAppOnboardingFullName = (prevState: GlobalSliceState, action: { payload: string }) => {
+export const updateAppOnboardingFullName = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
   prevState.appOnboarding.fullName = action.payload;
 };
 
 export const updateAppOnboardingTeamDetails = (
   prevState: GlobalSliceState,
-  action: { payload: GlobalSliceState["appOnboarding"]["createdWorkspace"] }
+  action: PayloadAction<GlobalSliceState["appOnboarding"]["createdWorkspace"]>
 ) => {
   prevState.appOnboarding.createdWorkspace = {
     ...prevState.appOnboarding.createdWorkspace,
@@ -206,70 +206,73 @@ export const updateAppOnboardingTeamDetails = (
 
 export const updateWorkspaceOnboardingTeamDetails = (
   prevState: GlobalSliceState,
-  action: { payload: GlobalSliceState["workspaceOnboarding"]["workspace"] }
+  action: PayloadAction<GlobalSliceState["workspaceOnboarding"]["workspace"]>
 ) => {
   prevState.workspaceOnboarding.workspace = { ...prevState.workspaceOnboarding.workspace, ...action.payload };
 };
 
-export const updateIsCommandBarOpen = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updateIsCommandBarOpen = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.misc.nonPersist.isCommandBarOpen = action.payload;
 };
 
-export const updateLastSeenInviteTs = (prevState: GlobalSliceState, action: { payload: number }) => {
+export const updateLastSeenInviteTs = (prevState: GlobalSliceState, action: PayloadAction<number>) => {
   prevState.misc.persist.lastSeenInviteTs = action.payload;
 };
 
-export const updateJoinWorkspaceCardVisible = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updateJoinWorkspaceCardVisible = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.misc.persist.isJoinWorkspaceCardVisible = action.payload;
 };
 
-export const updateIsProductHuntLaunchedBannerClosed = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updateIsProductHuntLaunchedBannerClosed = (
+  prevState: GlobalSliceState,
+  action: PayloadAction<boolean>
+) => {
   prevState.misc.persist.isProductHuntLaunchedBannerClosed = action.payload;
 };
 
-export const updateExtensionInstallSource = (prevState: GlobalSliceState, action: { payload: string }) => {
+export const updateExtensionInstallSource = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
   prevState.misc.persist.extensionInstallSource = action.payload;
 };
 
-export const updateTimeToResendEmailLogin = (prevState: GlobalSliceState, action: { payload: number }) => {
+export const updateTimeToResendEmailLogin = (prevState: GlobalSliceState, action: PayloadAction<number>) => {
   prevState.misc.nonPersist.timeToResendEmailLogin = action.payload;
 };
 
-export const updateAppNotificationBannerDismissTs = (prevState: GlobalSliceState, action: { payload: number }) => {
+export const updateAppNotificationBannerDismissTs = (prevState: GlobalSliceState, action: PayloadAction<number>) => {
   prevState.misc.persist.appNotificationBannerDismissTs = action.payload;
 };
 
-export const updateIsOrgBannerDismissed = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updateIsOrgBannerDismissed = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.misc.persist.isOrgBannerDismissed = action.payload;
 };
 
-export const updatePlanExpiredBannerClosed = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updatePlanExpiredBannerClosed = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.misc.persist.isPlanExpiredBannerClosed = action.payload;
 };
 
-export const updateIsManageBillingTeamAlertVisible = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updateIsManageBillingTeamAlertVisible = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.misc.persist.isManageBillingTeamAlertVisible = action.payload;
 };
 
-export const updateIsAppBannerVisible = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updateIsAppBannerVisible = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.misc.nonPersist.isAppBannerVisible = action.payload;
 };
 
-export const updateIsSupportChatOpened = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updateIsSupportChatOpened = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.misc.persist.isSupportChatOpened = action.payload;
 };
 
 export const updateIsCodeEditorFullScreenModeOnboardingCompleted = (
   prevState: GlobalSliceState,
-  action: { payload: boolean }
+  action: PayloadAction<boolean>
 ) => {
   prevState.misc.persist.isCodeEditorFullScreenModeOnboardingCompleted = action.payload;
 };
 
-export const updateBillingTeamNudgeLastSeenTs = (prevState: GlobalSliceState, action: { payload: number }) => {
+export const updateBillingTeamNudgeLastSeenTs = (prevState: GlobalSliceState, action: PayloadAction<number>) => {
   prevState.misc.persist.billingTeamNudgeLastSeenTs = action.payload;
 };
 
-export const updateIsSlackConnectButtonVisible = (prevState: GlobalSliceState, action: { payload: boolean }) => {
+export const updateIsSlackConnectButtonVisible = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.misc.persist.isSlackConnectButtonVisible = action.payload;
 };
