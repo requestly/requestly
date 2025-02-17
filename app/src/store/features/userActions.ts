@@ -1,9 +1,14 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import { SurveyPage } from "components/misc/PersonaSurvey/types";
+import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
+import { ONBOARDING_STEPS } from "features/onboarding/types";
+import { OnboardingSteps } from "features/rules/screens/rulesList/components/RulesList/components/GettingStarted/WorkspaceOnboarding/types";
 import { GlobalSliceState } from "store/slices/global/types";
+import { UserAuth } from "store/slices/global/user/types";
 
 export const updateUserInfo = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{ loggedIn: boolean; details?: any }>
+  action: PayloadAction<{ loggedIn: boolean; details: UserAuth["details"] }>
 ) => {
   prevState.user.loggedIn = action.payload.loggedIn;
   if (action.payload.details) {
@@ -18,12 +23,7 @@ export const updateUserInfo = (
 
 export const updateUserProfile = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{
-    userProfile: {
-      isSyncEnabled?: boolean;
-      isBackupEnabled?: boolean;
-    };
-  }>
+  action: PayloadAction<{ userProfile: UserAuth["details"]["profile"] }>
 ) => {
   prevState.user.details.profile = action.payload.userProfile;
 
@@ -34,10 +34,7 @@ export const updateUserProfile = (
 
 export const updateUserPlanDetails = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{
-    userPlanDetails: any;
-    isUserPremium: boolean;
-  }>
+  action: PayloadAction<{ userPlanDetails: UserAuth["details"]["planDetails"]; isUserPremium: boolean }>
 ) => {
   prevState.user.details.planDetails = action.payload.userPlanDetails;
   prevState.user.details.isPremium = action.payload.isUserPremium;
@@ -45,10 +42,7 @@ export const updateUserPlanDetails = (
 
 export const updateUserPreferences = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{
-    key: string;
-    value: any;
-  }>
+  action: PayloadAction<{ key: keyof GlobalSliceState["userPreferences"]; value: boolean }>
 ) => {
   prevState.userPreferences[action.payload.key] = action.payload.value;
 };
@@ -61,12 +55,7 @@ export const updateSecondarySidebarCollapse = (
   prevState.userPreferences.isSecondarySidebarCollapsed = action.payload ?? !isCollapsed;
 };
 
-export const updateUsername = (
-  prevState: GlobalSliceState,
-  action: PayloadAction<{
-    username: string;
-  }>
-) => {
+export const updateUsername = (prevState: GlobalSliceState, action: PayloadAction<{ username: string }>) => {
   prevState.user.details.username = action.payload.username;
 };
 
@@ -78,7 +67,7 @@ export const updateUserLimitReached = (prevState: GlobalSliceState, action: Payl
   prevState.user.isLimitReached = action.payload;
 };
 
-export const updateOrganizationDetails = (prevState: GlobalSliceState, action: PayloadAction<any>) => {
+export const updateOrganizationDetails = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
   prevState.user.details.organization = action.payload;
 };
 
@@ -90,15 +79,18 @@ export const setUserPersonaData = (
   prevState.userPersona = { ...prevState.userPersona, ...action.payload };
 };
 
-export const updateUserPersona = (prevState: GlobalSliceState, action: PayloadAction<any>) => {
-  prevState.userPersona[action.payload.key] = action.payload.value;
+export const updateUserPersona = (
+  prevState: GlobalSliceState,
+  action: PayloadAction<{ key: string; value: string }>
+) => {
+  (prevState.userPersona as any)[action.payload.key] = action.payload.value;
 };
 
 export const updateSelectedPersonaUseCase = (prevState: GlobalSliceState, action: PayloadAction<any>) => {
   const { useCases } = prevState.userPersona;
   const { payload } = action;
 
-  const index = useCases.findIndex((option: any) => JSON.stringify(option) === JSON.stringify(payload));
+  const index = useCases.findIndex((option: string) => JSON.stringify(option) === JSON.stringify(payload));
 
   if (index === -1) {
     prevState.userPersona.useCases = [...useCases, payload];
@@ -135,11 +127,15 @@ export const updateOtherPersonaUseCase = (
 export const updateIsPersonaSurveyCompleted = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.userPersona.isSurveyCompleted = action.payload;
 };
-export const updatePersonaSurveyPage = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
+
+export const updatePersonaSurveyPage = (prevState: GlobalSliceState, action: PayloadAction<SurveyPage>) => {
   prevState.userPersona.page = action.payload;
 };
 
-export const updateUserAttributes = (prevState: GlobalSliceState, action: PayloadAction<any>) => {
+export const updateUserAttributes = (
+  prevState: GlobalSliceState,
+  action: PayloadAction<GlobalSliceState["userAttributes"]>
+) => {
   prevState.userAttributes = {
     ...prevState.userAttributes,
     ...action.payload,
@@ -149,12 +145,18 @@ export const updateUserAttributes = (prevState: GlobalSliceState, action: Payloa
 export const updateProductTourCompleted = (
   prevState: GlobalSliceState,
   action: PayloadAction<{
-    tour: string;
-    subTour?: string;
+    subTour?: SUB_TOUR_TYPES;
+    tour: TOUR_TYPES;
   }>
 ) => {
-  if (action.payload.subTour) prevState.misc.persist[action.payload.tour][action.payload.subTour] = true;
-  else prevState.misc.persist[action.payload.tour] = true;
+  if (action.payload.tour === TOUR_TYPES.MISCELLANEOUS) {
+    prevState.misc.persist.isMiscTourCompleted = {
+      ...prevState.misc.persist.isMiscTourCompleted,
+      [action.payload.subTour]: true,
+    };
+  } else {
+    prevState.misc.persist[action.payload.tour] = true;
+  }
 };
 
 export const updateNetworkSessionSaveInProgress = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
@@ -170,7 +172,7 @@ export const updateIsWorkspaceOnboardingCompleted = (prevState: GlobalSliceState
   prevState.workspaceOnboarding.workspace = {};
 };
 
-export const updateWorkspaceOnboardingStep = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
+export const updateWorkspaceOnboardingStep = (prevState: GlobalSliceState, action: PayloadAction<OnboardingSteps>) => {
   prevState.workspaceOnboarding.step = action.payload;
 };
 
@@ -178,7 +180,7 @@ export const updateAppOnboardingCompleted = (prevState: GlobalSliceState) => {
   prevState.appOnboarding.isOnboardingCompleted = true;
 };
 
-export const updateAppOnboardingStep = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
+export const updateAppOnboardingStep = (prevState: GlobalSliceState, action: PayloadAction<ONBOARDING_STEPS>) => {
   prevState.appOnboarding.step = action.payload;
   prevState.appOnboarding.disableSkip = false;
 };
@@ -187,7 +189,10 @@ export const updateIsAppOnboardingStepDisabled = (prevState: GlobalSliceState, a
   prevState.appOnboarding.disableSkip = action.payload;
 };
 
-export const updateAppOnboardingPersona = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
+export const updateAppOnboardingPersona = (
+  prevState: GlobalSliceState,
+  action: PayloadAction<GlobalSliceState["appOnboarding"]["persona"]>
+) => {
   prevState.appOnboarding.persona = action.payload;
 };
 

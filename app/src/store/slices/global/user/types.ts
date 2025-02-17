@@ -12,9 +12,8 @@ export interface UserAuth {
       isSyncEnabled?: boolean;
       isBackupEnabled?: boolean;
     };
-    isLoggedIn: boolean;
-    username: string;
-
+    isLoggedIn?: boolean;
+    username?: string;
     isBackupEnabled?: boolean;
     isSyncEnabled?: boolean;
     isPremium?: boolean;

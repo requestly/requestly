@@ -5,6 +5,7 @@ import ExtensionDeactivationMessage from "../../ExtensionDeactivationMessage";
 import InstallExtensionCTA from "../index";
 import { InstallExtensionContent } from "../type";
 import { getAppFlavour } from "utils/AppUtils";
+//@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import InstallSessionBearExtensionCTA from "../../../../src-SessionBear/components/InstallSessionBearCTA";
 import "./installExtensionModal.css";
