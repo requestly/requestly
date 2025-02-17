@@ -1,10 +1,8 @@
-import SachinJain from "assets/img/users/sachin-jain.jpeg";
-
 const GoodbyeAbout = () => {
   return (
     <div className="goodbye-about-wrapper">
       <div className="goodbye-img-wrapper">
-        <img alt="" className="goodbye-image" src={SachinJain} />
+        <img alt="" className="goodbye-image" src={"/assets/media/components/sachin-jain.jpeg"} />
       </div>
       <div className="goodbye-about-text">
         <p>Hi,</p>

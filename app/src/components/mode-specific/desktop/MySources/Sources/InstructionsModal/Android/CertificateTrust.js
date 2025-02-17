@@ -1,12 +1,10 @@
 import { Col, Image, List, Row } from "antd";
-
-import oneplus_certs_install_gif from "assets/img/screenshots/android/oneplus/certs_install.gif";
 import { ANDROID_DEVICES } from "./constants";
 
 const CertificateTrustInstructions = ({ device_id }) => {
   const renderGif = () => {
     if (device_id === ANDROID_DEVICES.ONEPLUS) {
-      return <Image src={oneplus_certs_install_gif} />;
+      return <Image src={"/assets/media/components/certs_install.gif"} />;
     }
   };
 

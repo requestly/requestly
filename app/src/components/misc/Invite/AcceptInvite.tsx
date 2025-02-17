@@ -28,21 +28,21 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
   const handleAcceptInvitation = () => {
     setInProgress(true);
     acceptTeamInvite(inviteId)
-      .then((res: any) => {
-        if (res?.data?.success) {
+      .then((res) => {
+        if (res?.success) {
           toast.success("Successfully accepted invite");
           trackWorkspaceInviteAccepted(
-            res?.data?.data?.invite?.metadata?.teamId,
-            res?.data?.data?.invite?.metadata?.teamName,
+            res?.data?.invite?.metadata?.teamId,
+            res?.data?.invite?.metadata?.teamName,
             inviteId,
             "invite_screen",
-            res?.data?.data?.invite?.usage,
-            res?.data?.data?.invite?.metadata?.teamAccessCount
+            res?.data?.invite?.usage,
+            res?.data?.invite?.metadata?.teamAccessCount
           );
 
-          if (res?.data?.data?.invite.type === "teams") {
-            switchWorkspace(res?.data?.data?.invite?.metadata?.teamId, "invite_screen");
-            redirectToTeam(navigate, res?.data?.data?.invite?.metadata?.teamId, {
+          if (res?.data?.invite.type === "teams") {
+            switchWorkspace(res?.data?.invite?.metadata?.teamId as string, "invite_screen");
+            redirectToTeam(navigate, res?.data?.invite?.metadata?.teamId, {
               state: {
                 isNewTeam: false,
               },

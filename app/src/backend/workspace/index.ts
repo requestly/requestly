@@ -17,26 +17,27 @@ export const getPendingInvites = async ({ email, domain }: { email: boolean; dom
     getFunctions(),
     "teams-getPendingTeamInvites"
   );
-  return getInvites({ email, domain })
-    .then((res) => {
-      return res?.data;
-    })
-    .catch((e) => {
-      console.log("error", e);
-      return [];
-    });
+
+  try {
+    const res = await getInvites({ email, domain });
+    return res?.data;
+  } catch (e) {
+    return { pendingInvites: [], success: false };
+  }
 };
 
 export const acceptTeamInvite = async (inviteId: string) => {
-  const acceptInvite = httpsCallable(getFunctions(), "invites-acceptInvite");
+  const acceptInvite = httpsCallable<
+    { inviteId: string },
+    { data?: { invite: Invite }; success: boolean; message: string }
+  >(getFunctions(), "invites-acceptInvite");
 
-  return acceptInvite({ inviteId })
-    .then((res: any) => {
-      return res;
-    })
-    .catch((e) => {
-      return null;
-    });
+  try {
+    const res = await acceptInvite({ inviteId });
+    return res?.data;
+  } catch (error) {
+    return { success: false, message: "Error while accepting invite" };
+  }
 };
 
 export const setWorkspaceSyncState = async (workspaceId: string, state: boolean) => {
