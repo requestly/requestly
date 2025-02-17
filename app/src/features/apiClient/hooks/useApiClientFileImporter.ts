@@ -100,7 +100,6 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
         .then((results) => {
           const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
           if (hasProcessingAllFilesFailed) {
-            trackImportParseFailed("requestly");
             throw new Error("Could not process the selected files!, Please check if the files are valid export files.");
           }
 
