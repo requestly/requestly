@@ -20,9 +20,11 @@ import { trackErrorInSavingDNR } from "modules/analytics/events/common/rules";
 import { useSelector } from "react-redux";
 import { StorageService } from "init";
 import { getAppMode } from "store/selectors";
+import { getIsWorkspaceLocal } from "store/features/teams/selectors";
 
 const RulesFeatureContainer = () => {
   const appMode = useSelector(getAppMode);
+  const isWorkspaceLocal = useSelector(getIsWorkspaceLocal);
 
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener("ruleSaveError", (message: any) => {
@@ -74,6 +76,11 @@ const RulesFeatureContainer = () => {
         });
     });
   }, [appMode]);
+
+  if (isWorkspaceLocal) {
+    // TODO: USE NUDGE COMPONENT
+    return <div>NO ACCESS - LOCAL WORKSPACE</div>;
+  }
 
   return (
     <SecondarySidebarLayout secondarySidebar={<RulesSidebar />}>
