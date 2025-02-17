@@ -28,6 +28,7 @@ import { useNavigate } from "react-router-dom";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { useIncentiveActions } from "features/incentivization/hooks";
 import "./createWorkspaceModal.scss";
+import { createWorkspaceFolderCommand, useFsManager } from "hooks/useFsManager";
 
 interface Props {
   isOpen: boolean;
@@ -161,6 +162,10 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
         : ({ type: WorkspaceType.SHARED } as SharedOrPrivateWorkspaceConfig);
 
     try {
+      if (config.type === WorkspaceType.LOCAL) {
+        await createWorkspaceFolderCommand(config.rootPath);
+      }
+
       const response: any = await createTeam({
         teamName: workspaceName,
         config,
@@ -195,6 +200,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
       callback?.();
       toggleModal();
     } catch (err) {
+      console.error("Team creation failed", err);
       toast.error("Unable to Create Team");
       trackNewTeamCreateFailure(workspaceName);
     } finally {

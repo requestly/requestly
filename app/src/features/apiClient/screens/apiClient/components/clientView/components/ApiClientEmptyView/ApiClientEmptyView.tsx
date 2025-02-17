@@ -10,7 +10,7 @@ import APP_CONSTANTS from "config/constants";
 import { useState } from "react";
 import { toast } from "utils/Toast";
 import "./apiClientEmptyView.scss";
-import { TestMyMagic } from "../../../sidebar/components/emptyState/TestMyMagic";
+// import { TestMyMagic } from "../../../sidebar/components/emptyState/TestMyMagic";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
@@ -57,7 +57,7 @@ export const ApiClientEmptyView = () => {
     <div className="api-client-empty-view-container">
       {/* TODO: FIX */}
       {/* <img src={isEmpty ? emptyViewIcon : defaultViewIcon} alt="empty-view" /> */}
-      <TestMyMagic />
+      {/* <TestMyMagic /> */}
       <div>
         <div className="api-client-empty-view-header">
           {isEmpty ? "No API requests created yet." : "Pick up where you left off or start fresh."}
