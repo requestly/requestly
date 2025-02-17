@@ -8,6 +8,7 @@ import { toast } from "utils/Toast";
 import firebaseApp from "../../firebase";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { WorkspaceType } from "types";
 
 const db = getFirestore(firebaseApp);
 
@@ -34,7 +35,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
               submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
             }
 
-            return {
+            const formattedTeamData = {
               id: team.id,
               name: teamData.name,
               owner: teamData.owner,
@@ -44,7 +45,14 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
               adminCount: teamData.adminCount,
               members: teamData.members,
               appsumo: teamData?.appsumo || null,
+              workspaceType: teamData?.workspaceType || WorkspaceType.SHARED,
             };
+
+            if (formattedTeamData.workspaceType === WorkspaceType.LOCAL) {
+              formattedTeamData.rootPath = teamData.rootPath;
+            }
+
+            return formattedTeamData;
           })
           .filter(Boolean);
 
@@ -69,6 +77,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
               id: found.id,
               name: found.name,
               membersCount: found.accessCount,
+              workspaceType: found.workspaceType,
             })
           );
 
