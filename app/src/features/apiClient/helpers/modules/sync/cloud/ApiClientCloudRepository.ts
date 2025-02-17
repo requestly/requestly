@@ -1,7 +1,7 @@
-import { ApiClientCloudMeta } from "../interfaces";
+import { ApiClientCloudMeta, ApiClientRepositoryInterface } from "../interfaces";
 import { ApiClientCloudSync } from "./CloudSync";
 
-export class ApiClientCloudRepository {
+export class ApiClientCloudRepository implements ApiClientRepositoryInterface {
   environmentVariablesRepository: ApiClientCloudSync.FirebaseEnvSync;
   apiClientRecordsRepository: ApiClientCloudSync.FirebaseApiClientRecordsSync;
 
