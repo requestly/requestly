@@ -1,30 +1,16 @@
-/* Expects the service to be present in Desktop background process */
-export default class BackgroundServiceAdapter<MethodNames = string> {
-  private RPC_CHANNEL_PREFIX: string;
-  private LIVE_EVENTS_CHANNEL: string;
+const IPC_TIMEOUT = 15000;
 
-  private IPC_TIMEOUT = 15000;
-
-  constructor(serviceName: string) {
-    if (window?.RQ?.MODE !== "DESKTOP") {
-      // TODO: HANDLE THIS, CURRENTLY BREAKS WEB APP
-      console.log("DBG");
-    }
-    this.RPC_CHANNEL_PREFIX = `${serviceName}-`;
-    this.LIVE_EVENTS_CHANNEL = `SERVICE-${serviceName}-LIVE-EVENTS`;
-  }
-
-  protected invokeProcedureInBG(method: MethodNames, ...args: any): Promise<any> {
-    return new Promise((resolve, reject) => {
+export function rpcCall(namespace: string, method: string, ...args: any) {
+	return new Promise((resolve, reject) => {
       setTimeout(() => {
         reject(
           new Error(
             `IPC Timeout: no response for [${method}] RPC call. Please make sure method is implemented correctly in Background process`
           )
         );
-      }, this.IPC_TIMEOUT);
+      }, IPC_TIMEOUT);
 
-      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(`${this.RPC_CHANNEL_PREFIX}${method}`, args)
+      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(`${namespace}-${method}`, args)
         .then((res: any) => {
           if (res.success) {
             resolve(res.data);
@@ -34,10 +20,27 @@ export default class BackgroundServiceAdapter<MethodNames = string> {
         })
         .catch(reject);
     });
+}
+
+/* Expects the service to be present in Desktop background process */
+export default class BackgroundServiceAdapter {
+  private RPC_CHANNEL_PREFIX: string;
+  private LIVE_EVENTS_CHANNEL: string;
+
+  constructor(serviceName: string) {
+    if (window?.RQ?.MODE !== "DESKTOP") {
+      throw new Error('BackgroundServiceAdapter is only supported in desktop app!')
+    }
+    this.RPC_CHANNEL_PREFIX = `${serviceName}`;
+    this.LIVE_EVENTS_CHANNEL = `SERVICE-${serviceName}-LIVE-EVENTS`;
   }
 
-  /* 
-    !!! Imposing only one listener at a time. 
+  protected invokeProcedureInBG(method: string, ...args: any): Promise<any> {
+		return rpcCall(this.RPC_CHANNEL_PREFIX, method, args);
+  }
+
+  /*
+    !!! Imposing only one listener at a time.
     Multiple listeners are possible but not implemented yet for simplicity.
   */
   setEventListener(listener: Function): void {
@@ -47,10 +50,4 @@ export default class BackgroundServiceAdapter<MethodNames = string> {
   removeEventListeners(): void {
     window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent(this.LIVE_EVENTS_CHANNEL);
   }
-}
-
-export abstract class Singleton<MethodNames = string> extends BackgroundServiceAdapter<MethodNames> {
-  static instance: BackgroundServiceAdapter;
-
-  static getInstance() {}
 }
