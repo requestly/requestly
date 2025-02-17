@@ -8,7 +8,6 @@ import { growthbook } from "utils/feature-flag/growthbook";
 import LocalUserAttributesHelperComponent from "hooks/LocalUserAttributesHelperComponent";
 import usePreLoadRemover from "hooks/usePreLoadRemover";
 import AppModeInitializer from "hooks/AppModeInitializer";
-import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
 import ExtensionContextInvalidationNotice from "components/misc/notices/ExtensionContextInvalidationNotice";
 import AutomationNotAllowedNotice from "components/misc/notices/AutomationNotAllowedNotice";
@@ -39,8 +38,6 @@ const App: React.FC = () => {
       <AuthHandler />
       <AppModeInitializer />
       <DBListeners />
-      {/* @ts-ignore */}
-      <ActiveWorkspace />
       {/* @ts-ignore */}
       <ThirdPartyIntegrationsHandler />
       <ThemeProvider>

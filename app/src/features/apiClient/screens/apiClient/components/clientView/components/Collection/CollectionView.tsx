@@ -10,10 +10,11 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import "./collectionView.scss";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { upsertApiRecord } from "backend/apiClient";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -26,7 +27,7 @@ export const CollectionView = () => {
   const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords } = useApiClientContext();
   const { replaceTab } = useTabsLayoutContext();
   const user = useSelector(getUserAuthDetails);
-  const teamId = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const location = useLocation();
 
   const collection = useMemo(() => {
@@ -42,14 +43,14 @@ export const CollectionView = () => {
           auth: newAuthOptions,
         },
       };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId)
+      return upsertApiRecord(user.details?.profile?.uid, record, activeWorkspaceId)
         .then((result) => {
           // fix-me: to verify new change are broadcasted to child entries that are open in tabs
           onSaveRecord(result.data);
         })
         .catch(console.error);
     },
-    [collection, onSaveRecord, teamId, user.details?.profile?.uid]
+    [collection, onSaveRecord, activeWorkspaceId, user.details?.profile?.uid]
   );
 
   const tabItems = useMemo(() => {
@@ -81,7 +82,7 @@ export const CollectionView = () => {
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
       const record = { ...collection, name };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
+      return upsertApiRecord(user.details?.profile?.uid, record, activeWorkspaceId).then((result) => {
         onSaveRecord(result.data);
         replaceTab(result.data.id, {
           id: result.data.id,
@@ -90,7 +91,7 @@ export const CollectionView = () => {
         });
       });
     },
-    [collection, teamId, user.details?.profile?.uid, onSaveRecord, replaceTab]
+    [collection, activeWorkspaceId, user.details?.profile?.uid, onSaveRecord, replaceTab]
   );
 
   if (isLoadingApiClientRecords) {

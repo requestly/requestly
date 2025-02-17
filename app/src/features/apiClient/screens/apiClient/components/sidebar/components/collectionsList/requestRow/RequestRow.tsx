@@ -11,7 +11,6 @@ import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { upsertApiRecord } from "backend/apiClient";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import {
@@ -21,6 +20,8 @@ import {
   trackMoveRequestToCollectionClicked,
 } from "modules/analytics/events/features/apiClient";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -39,7 +40,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
   const [recordToMove, setRecordToMove] = useState(null);
   const { updateRecordsToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
@@ -48,7 +49,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
         name: `(Copy) ${record.name || record.data.request.url}`,
       };
       delete newRecord.id;
-      return upsertApiRecord(user?.details?.profile?.uid, newRecord, team?.id)
+      return upsertApiRecord(user?.details?.profile?.uid, newRecord, activeWorkspaceId)
         .then((result) => {
           if (!result.success) {
             throw new Error("Failed to duplicate request");
@@ -63,7 +64,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
           trackDuplicateRequestFailed();
         });
     },
-    [team?.id, user?.details?.profile?.uid, onSaveRecord]
+    [activeWorkspaceId, user?.details?.profile?.uid, onSaveRecord]
   );
 
   const getRequestOptions = useCallback((): MenuProps["items"] => {

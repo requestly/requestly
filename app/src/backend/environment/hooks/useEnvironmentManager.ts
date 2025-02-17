@@ -7,7 +7,6 @@ import {
   getCurrentEnvironmentId,
 } from "store/features/variables/selectors";
 import { variablesActions } from "store/features/variables/slice";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
 import {
   attachEnvironmentVariableListener,
@@ -26,6 +25,9 @@ import { isEmpty } from "lodash";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
+import { getOwnerId } from "backend/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { upsertApiRecord } from "backend/apiClient/upsertApiRecord";
 
@@ -48,15 +50,12 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
   const collectionVariables = useSelector(getCollectionVariables);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
-  const ownerId = useMemo(
-    () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
-    [currentlyActiveWorkspace.id, user?.details?.profile?.uid]
-  );
+  const ownerId = getOwnerId(user?.details?.profile?.uid, activeWorkspaceId);
 
   const activeOwnerEnvironments = useMemo(() => {
     return allEnvironmentData?.[ownerId] ?? {};
@@ -433,12 +432,12 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
         ...collection,
         data: { ...collection?.data, variables: updatedVariables },
       };
-      return upsertApiRecord(user.details?.profile?.uid, record, currentlyActiveWorkspace?.id).then((result) => {
+      return upsertApiRecord(user.details?.profile?.uid, record, activeWorkspaceId).then((result) => {
         onSaveRecord(result.data);
         dispatch(variablesActions.setCollectionVariables({ collectionId, variables }));
       });
     },
-    [currentlyActiveWorkspace?.id, user.details?.profile?.uid, onSaveRecord, dispatch, apiClientRecords]
+    [activeWorkspaceId, user.details?.profile?.uid, onSaveRecord, dispatch, apiClientRecords]
   );
 
   const removeCollectionVariable = useCallback(
@@ -452,12 +451,12 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       const updatedVariables = { ...collection?.data?.variables };
       delete updatedVariables[key];
       const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
-      return upsertApiRecord(user.details?.profile?.uid, record, currentlyActiveWorkspace?.id).then((result) => {
+      return upsertApiRecord(user.details?.profile?.uid, record, activeWorkspaceId).then((result) => {
         onSaveRecord(result.data);
         dispatch(variablesActions.setCollectionVariables({ collectionId, variables: updatedVariables }));
       });
     },
-    [currentlyActiveWorkspace?.id, user.details?.profile?.uid, onSaveRecord, dispatch, apiClientRecords]
+    [activeWorkspaceId, user.details?.profile?.uid, onSaveRecord, dispatch, apiClientRecords]
   );
 
   return {

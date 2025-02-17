@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Col, Row, Spin } from "antd";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { RQButton } from "lib/design-system/components";
 import { getMocks } from "backend/mocks/getMocks";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -17,11 +16,13 @@ import Logger from "lib/logger";
 import PATHS from "config/constants/sub/paths";
 import { trackHomeMockActionClicked } from "components/Home/analytics";
 import "./mocksCard.scss";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 export const MocksCard: React.FC = () => {
   const MAX_MOCKS_TO_SHOW = 3;
   const navigate = useNavigate();
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const user = useSelector(getUserAuthDetails);
   const [isLoading, setIsLoading] = useState(true);
   const [mocks, setMocks] = useState(null);
@@ -33,7 +34,7 @@ export const MocksCard: React.FC = () => {
       return;
     }
     setIsLoading(true);
-    getMocks(user?.details?.profile?.uid, MockType.API, workspace?.id)
+    getMocks(user?.details?.profile?.uid, MockType.API, activeWorkspaceId)
       .then((data) => {
         const mocks: RQMockMetadataSchema[] = [];
         const collections: { [id: string]: RQMockCollection } = {};
@@ -60,7 +61,7 @@ export const MocksCard: React.FC = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [user?.details?.profile?.uid, workspace?.id, user.loggedIn]);
+  }, [user?.details?.profile?.uid, activeWorkspaceId, user.loggedIn]);
 
   if (isLoading)
     return (
