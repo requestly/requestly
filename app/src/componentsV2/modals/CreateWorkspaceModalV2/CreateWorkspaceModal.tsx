@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig, WorkspaceType } from "types";
-import { displayFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
+import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -315,7 +315,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
                               disabled={appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP}
                               block
                               type="primary"
-                              onClick={() => displayFileSelector(folderSelectCallback)}
+                              onClick={() => displayFolderSelector(folderSelectCallback)}
                             >
                               Select a folder
                             </RQButton>

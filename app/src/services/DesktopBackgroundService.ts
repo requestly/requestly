@@ -7,7 +7,8 @@ export default class BackgroundServiceAdapter<MethodNames = string> {
 
   constructor(serviceName: string) {
     if (window?.RQ?.MODE !== "DESKTOP") {
-      throw new Error("This service is only available on the desktop app");
+      // TODO: HANDLE THIS, CURRENTLY BREAKS WEB APP
+      console.log("DBG");
     }
     this.RPC_CHANNEL_PREFIX = `${serviceName}-`;
     this.LIVE_EVENTS_CHANNEL = `SERVICE-${serviceName}-LIVE-EVENTS`;
