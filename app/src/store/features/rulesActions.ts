@@ -6,7 +6,7 @@ import { GlobalSliceState } from "store/slices/global/types";
 import { Group, QueryParamRule, Rule, ScriptRule } from "@requestly/shared/types/entities/rules";
 import { PayloadAction } from "@reduxjs/toolkit";
 
-export const updateLastBackupTimeStamp = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
+export const updateLastBackupTimeStamp = (prevState: GlobalSliceState, action: PayloadAction<number>) => {
   prevState.rules.lastBackupTimeStamp = action.payload;
 };
 
