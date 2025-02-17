@@ -114,15 +114,18 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const { openTab, deleteTabs, updateTab, replaceTab, updateAddTabBtnCallback } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
 
-  const openDraftRequest = useCallback(() => {
-    const requestId = generateDocumentId("apis");
-    trackNewTabOpened();
+  const openDraftRequest = useCallback(
+    (callAnalyticEvent: boolean = true) => {
+      const requestId = generateDocumentId("apis");
+      callAnalyticEvent && trackNewTabOpened();
 
-    openTab(requestId, {
-      title: "Untitled request",
-      url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?create=true`,
-    });
-  }, [openTab]);
+      openTab(requestId, {
+        title: "Untitled request",
+        url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?create=true`,
+      });
+    },
+    [openTab]
+  );
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -296,7 +299,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           trackNewRequestClicked(analyticEventSource);
 
           if (analyticEventSource === "api_client_sidebar_header") {
-            openDraftRequest();
+            openDraftRequest(false);
             return;
           }
 

@@ -9,7 +9,11 @@ import { omit } from "lodash";
 import { EnvironmentData } from "backend/environment/types";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { isApiCollection } from "../../../utils";
-import { trackExportApiCollectionsFailed } from "modules/analytics/events/features/apiClient";
+import {
+  trackEnvironmentExported,
+  trackExportApiCollectionsFailed,
+  trackExportCollectionsClicked,
+} from "modules/analytics/events/features/apiClient";
 
 interface BaseModalProps {
   isOpen: boolean;
@@ -55,6 +59,7 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
 
       const fileName = `RQ-${fileInfo.label}-export-${getFormattedDate("DD_MM_YYYY")}.json`;
       fileDownload(fileContent, fileName, "application/json");
+      exportType === "collection" ? trackExportCollectionsClicked() : trackEnvironmentExported();
       onClose();
     } catch (error) {
       console.error(error);

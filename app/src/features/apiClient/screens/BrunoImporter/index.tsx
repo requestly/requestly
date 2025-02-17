@@ -57,6 +57,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
   const handleFileDrop = useCallback((files: File[]) => {
     setProcessingStatus("processing");
+    trackImportStarted("bruno");
     setImportError(null);
 
     const processFiles = files.map((file) => {
@@ -80,6 +81,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
             const processedData = processBrunoCollectionData(fileContent);
             resolve({ data: processedData });
           } catch (error) {
+            trackImportParseFailed("bruno", error.message);
             console.error("Error processing Bruno file:", error);
             reject(error);
           }
@@ -92,6 +94,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
       .then((results) => {
         const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
         if (hasProcessingAllFilesFailed) {
+          trackImportParseFailed("bruno");
           throw new Error(
             "Could not process the selected files! Please check if the files are valid Bruno export files."
           );
@@ -116,6 +119,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
             trackImportParsed("bruno", processedRecords.collections.length, processedRecords.apis.length);
           }
         });
+
         setProcessedFileData(processedRecords);
         setProcessingStatus("processed");
       })
@@ -200,7 +204,6 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
   const handleImportBrunoData = useCallback(() => {
     setIsImporting(true);
-    trackImportStarted("bruno");
     Promise.all([handleImportEnvironments(), handleImportCollectionsAndApis()])
       .then(([importedEnvs, importedCollections]) => {
         if (importedCollections === 0 && importedEnvs === 0) {

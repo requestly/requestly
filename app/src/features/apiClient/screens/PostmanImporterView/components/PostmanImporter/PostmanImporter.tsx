@@ -60,6 +60,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   const handleFileDrop = useCallback(
     (files: File[]) => {
       setProcessingStatus("processing");
+      trackImportStarted("postman");
       setImportError(null);
 
       const processFiles = files.map((file) => {
@@ -94,6 +95,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 });
               }
             } catch (error) {
+              trackImportParseFailed("postman", error.message);
               Logger.error("Error processing postman file:", error);
               reject(error);
             }
@@ -106,6 +108,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         .then((results) => {
           const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
           if (hasProcessingAllFilesFailed) {
+            trackImportParseFailed("postman");
             throw new Error(
               "Could not process the selected files!, Please check if the files are valid Postman export files."
             );
@@ -129,7 +132,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 trackImportParsed("postman", collections.length, apis.length);
               }
             } else {
-              trackImportParseFailed("postman");
+              trackImportParseFailed("postman", result.reason);
               console.error("Error processing postman file:", result.reason);
             }
           });
@@ -138,6 +141,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           setProcessingStatus("processed");
         })
         .catch((error) => {
+          trackImportParseFailed("postman", error.message);
           setImportError(error.message);
         })
         .finally(() => {
@@ -234,7 +238,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   }, [processedFileData.apiRecords, user?.details?.profile?.uid, workspace?.id, onSaveRecord]);
 
   const handleImportPostmanData = useCallback(() => {
-    trackImportStarted("postman");
     setIsImporting(true);
     Promise.allSettled([handleImportEnvironments(), handleImportCollectionsAndApis()])
       .then((results) => {

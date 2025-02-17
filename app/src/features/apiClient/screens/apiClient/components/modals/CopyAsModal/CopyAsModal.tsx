@@ -43,7 +43,6 @@ const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
         snippetTypeId.split("-")[1] as ClientId,
         {}
       );
-      trackRequestCurlCopied();
     } catch (err) {
       snippet = "Some error occured while generating snippet.";
     }
@@ -73,7 +72,7 @@ const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
               });
             })}
           </Select>
-          <CopyButton copyText={getSnippet()} />
+          <CopyButton copyText={getSnippet()} trackCopiedEvent={() => trackRequestCurlCopied(snippetTypeId)} />
         </div>
         <div className="snippet-content">{getSnippet()}</div>
       </div>
