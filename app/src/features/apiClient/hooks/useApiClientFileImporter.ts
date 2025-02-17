@@ -201,13 +201,11 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
     ]);
 
     if (failedCollectionsCount > 0 || failedApisCount > 0) {
-      const failureMessage =
-        failedCollectionsCount > 0
-          ? `${failedCollectionsCount} ${failedCollectionsCount > 1 ? "collections" : "collection"} failed`
-          : "";
-      if (failureMessage.length) {
-        toast.warn(`Some imports failed: ${failureMessage}, Please contact support if the issue persists.`);
-      }
+      toast.warn(
+        `Failed to import ${
+          failedCollectionsCount + failedApisCount
+        } items. Please contact support if the issue persists.`
+      );
     }
 
     return { importedCollectionsCount, importedApisCount };
@@ -223,18 +221,17 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
           handleImportCollectionsAndApis(),
         ]);
         const importedEnvironments = envResult.status === "fulfilled" ? envResult.value : 0;
-        const importedCollectionsAndApis =
-          collResult.status === "fulfilled"
-            ? collResult.value.importedCollectionsCount + collResult.value.importedApisCount
-            : 0;
+        const importedCollections = collResult.status === "fulfilled" ? collResult.value.importedCollectionsCount : 0;
+        const importedApis = collResult.status === "fulfilled" ? collResult.value.importedApisCount : 0;
+        const importedCollectionsAndApis = importedCollections + importedApis;
 
-        trackImportSuccess("requestly", importedCollectionsAndApis);
+        trackImportSuccess("requestly", importedCollections, importedApis);
 
         const failedEnvironments = environments.length - importedEnvironments;
         const failedCollectionsAndApis =
           (collections.length ? collections.length : apis.length) - importedCollectionsAndApis;
 
-        if (!importedEnvironments && !importedCollectionsAndApis) {
+        if (!importedEnvironments && !importedCollections && !importedApis) {
           toast.error("Failed to import data");
           return;
         }

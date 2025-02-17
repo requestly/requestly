@@ -125,11 +125,11 @@ export const trackImportParseFailed = (type, reason) => {
   });
 };
 
-export const trackImportSuccess = (type, recordsCount) => {
+export const trackImportSuccess = (type, collectionsCount, requestsCount) => {
   trackEvent(API_CLIENT.IMPORT_SUCCESS, {
     import_type: type,
-    collection_count: recordsCount,
-    request_count: recordsCount.length,
+    collection_count: collectionsCount,
+    request_count: requestsCount,
   });
 };
 
@@ -137,7 +137,6 @@ export const trackImportFailed = (type, reason) => {
   trackEvent(API_CLIENT.IMPORT_FAILED, { import_type: type, reason });
 };
 
-// -------------------------------------------------//
 export const trackBeautifyRequestJSONClicked = () => {
   trackEvent(API_CLIENT.BEAUTIFY_REQUEST_JSON_CLICKED);
 };
