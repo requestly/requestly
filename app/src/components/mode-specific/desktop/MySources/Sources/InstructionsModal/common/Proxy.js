@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, Tabs, Badge, Tag, List, Image } from "antd";
 import { CheckCircleTwoTone } from "@ant-design/icons";
 import { getDesktopSpecificDetails } from "../../../../../../../store/selectors";
-import proxyStepsGif from "assets/img/screenshots/proxy_steps.gif";
 // import winProxyStepsGif from "assets/img/screenshots/win_proxy_steps.gif";
 import UAParser from "ua-parser-js";
 import Logger from "lib/logger";
@@ -170,7 +169,7 @@ const ProxyInstructions = () => {
             description={
               <>
                 <br />
-                <Image width={"100%"} src={proxyStepsGif} />
+                <Image width={"100%"} src={"/assets/media/components/proxy_steps.gif"} />
               </>
             }
           />

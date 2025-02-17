@@ -276,7 +276,6 @@ const MockEditor: React.FC<Props> = ({
           value={latency}
           name="latency"
           onChange={handleMockLatencyChange}
-          // @ts-ignore: TS2322
           addonAfter="ms"
         />
       </Col>
@@ -318,12 +317,9 @@ const MockEditor: React.FC<Props> = ({
         <AutoComplete
           id="content-type"
           size="large"
-          // @ts-ignore
-          type="text"
           placeholder="content"
           value={contentType}
           options={APP_CONSTANTS.CONTENT_TYPE}
-          name="type"
           onChange={(e) => setContentType(e)}
         />
       </Col>

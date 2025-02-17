@@ -121,7 +121,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
 
       if (isDuplicationInSameWorkspace) {
         toast.success("Duplicated the rule successfully.");
-        redirectToRuleEditor(navigate, newRule.id, "");
+        redirectToRuleEditor(navigate, newRule.id, analyticEventSource);
       } else {
         toast.success("Duplicated the rule in the selected workspace successfully.");
       }
@@ -214,6 +214,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
     isRulesListRefreshPending,
     selectedWorkspaceId,
     isDuplicationInSameWorkspace,
+    analyticEventSource,
   ]);
 
   useEffect(() => {

@@ -2,7 +2,6 @@ import { useSelector } from "react-redux";
 import { Row, Col, Image, List } from "antd";
 import { getDesktopSpecificDetails } from "../../../../../../../store/selectors";
 import { ANDROID_DEVICES } from "./constants";
-import oneplus_wifi_settings_gif from "assets/img/screenshots/android/oneplus/wifi_settings.gif";
 
 const WifiInstructions = ({ device_id }) => {
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
@@ -10,7 +9,7 @@ const WifiInstructions = ({ device_id }) => {
 
   const renderGif = () => {
     if (device_id === ANDROID_DEVICES.ONEPLUS) {
-      return <Image src={oneplus_wifi_settings_gif} />;
+      return <Image src={"/assets/media/components/wifi_settings.gif"} />;
     }
   };
 

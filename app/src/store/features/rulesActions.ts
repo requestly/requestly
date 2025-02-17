@@ -3,7 +3,7 @@ import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { get, set } from "lodash";
 import { GlobalSliceState } from "store/slices/global/types";
-import { Group, QueryParamRule, RecordType, Rule, ScriptRule } from "@requestly/shared/types/entities/rules";
+import { Group, QueryParamRule, Rule, ScriptRule } from "@requestly/shared/types/entities/rules";
 import { PayloadAction } from "@reduxjs/toolkit";
 
 export const updateLastBackupTimeStamp = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
@@ -20,18 +20,6 @@ export const updateRulesAndGroups = (
 ) => {
   prevState.rules.allRules.rules = action.payload.rules;
   prevState.rules.allRules.groups = action.payload.groups;
-};
-
-export const addRulesAndGroups = (
-  prevState: GlobalSliceState,
-  action: PayloadAction<{ rules: Rule[]; groups: Group[] }>
-) => {
-  prevState.rules.allRules.rules.push(...action.payload.rules);
-  prevState.rules.allRules.groups.push(...action.payload.groups);
-};
-
-export const updateRulesToPopulate = (prevState: GlobalSliceState, action: PayloadAction<Rule[]>) => {
-  prevState.rules.rulesToPopulate = action.payload;
 };
 
 export const updateGroupwiseRulesToPopulate = (
@@ -133,22 +121,33 @@ export const closeCurrentlySelectedRuleDetailsPanel = (prevState: GlobalSliceSta
   };
 };
 
-export const updateRecord = (prevState: GlobalSliceState, action: PayloadAction<Rule>) => {
-  const ObjectTypeMap = {
-    [GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP as RecordType.GROUP]: "groups",
-    [GLOBAL_CONSTANTS.OBJECT_TYPES.RULE as RecordType.RULE]: "rules",
-  };
-  const recordType = ObjectTypeMap[action.payload.objectType] as "rules" | "groups";
+// export const updateRecord = (
+//   prevState: GlobalSliceState,
+//   action: PayloadAction<{
+//     objectType: string;
+//     id: string;
+//     [key: string]: any;
+//   }>
+// ) => {
+//   const ObjectTypeMap = {
+//     [GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP]: "groups",
+//     [GLOBAL_CONSTANTS.OBJECT_TYPES.RULE]: "rules",
+//   };
+//   const recordType = ObjectTypeMap[action.payload.objectType];
 
-  const ruleIndex = prevState.rules.allRules[recordType].findIndex((record) => record.id === action.payload.id);
+//   const ruleIndex = prevState.rules.allRules[recordType].findIndex((record) => record.id === action.payload.id);
 
-  prevState.rules.allRules[recordType][ruleIndex] = action.payload;
-};
+//   prevState.rules.allRules[recordType][ruleIndex] = action.payload;
+// };
 
 // rule editor actions
 export const updateRulePairAtGivenPath = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{ pairIndex: number; updates: any; triggerUnsavedChangesIndication?: boolean }>
+  action: PayloadAction<{
+    pairIndex: number;
+    updates?: Record<string, any>;
+    triggerUnsavedChangesIndication?: boolean;
+  }>
 ) => {
   const { pairIndex, updates = {}, triggerUnsavedChangesIndication = true } = action.payload;
 

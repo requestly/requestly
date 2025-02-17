@@ -1,9 +1,16 @@
-// @ts-ignore Expected to through an error since we haven't compiled this module with ts yet!
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
-/* TYPES */
-type ScriptLanguage = typeof GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS | typeof GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS;
-type ScriptType = typeof GLOBAL_CONSTANTS.SCRIPT_TYPES.URL | typeof GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE;
+/* TYPES todo: make enum */
+enum ScriptLanguage {
+  JS = "js",
+  CSS = "css",
+}
+
+enum ScriptType {
+  URL = "url",
+  CODE = "code",
+}
+
 type ScriptAttributes = {
   name: string;
   value: string;

@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { Button, Col, Image, List, Row, Steps } from "antd";
 import InstructionsHeader from "./InstructionsHeader";
-import existingBrowserConnection from "assets/img/screenshots/existing_browser_connection.png";
 
 const ExistingBrowserInstructionModal: React.FC<{
   setShowInstructions: () => void;
@@ -51,7 +50,7 @@ const ExistingBrowserInstructionModal: React.FC<{
               </List.Item>
             </List>
             <Row>
-              <Image src={existingBrowserConnection} />
+              <Image src={"/assets/media/components/existing_browser_connection.png"} />
             </Row>
           </>
         ),
@@ -77,7 +76,7 @@ const ExistingBrowserInstructionModal: React.FC<{
   return (
     <>
       <InstructionsHeader
-        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/chrome.png"}
+        icon={window.location.origin + "/assets/media/components/chrome.png"}
         heading="Connect Existing Browser Profile"
         description={
           <Col>

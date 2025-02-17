@@ -4,7 +4,6 @@ import { getAppMode } from "store/selectors";
 import { AutoRecordingMode, SessionRecordingConfig } from "features/sessionBook";
 import { defaultSessionRecordingConfig } from "..";
 import { StorageService } from "init";
-// @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled, isExtensionVersionCompatible } from "actions/ExtensionActions";
 
