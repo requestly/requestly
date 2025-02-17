@@ -5,10 +5,11 @@ import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
-import { forEach, isEmpty, omit, split, unionBy } from "lodash";
+import { differenceWith, forEach, isEmpty, isEqual, omit, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
 import { generateDocumentId } from "backend/utils";
+import { EnvironmentVariables } from "backend/environment/types";
 
 export const makeRequest = async (
   appMode: string,
@@ -574,4 +575,24 @@ export const processRecordsForDuplication = (recordsToProcess: RQAPI.Record[]) =
   }
 
   return recordsToDuplicate;
+};
+
+export const getUpdatedVariableCount = (originalData: EnvironmentVariables, updatedData: EnvironmentVariables) => {
+  const formattedData = Object.entries(originalData).map(([key, value]) => ({
+    key,
+    type: value.type,
+    localValue: value.localValue,
+    syncValue: value.syncValue,
+    id: value.id,
+  }));
+
+  const formattedChangedData = Object.entries(updatedData).map(([key, value]) => ({
+    key,
+    type: value.type,
+    localValue: value.localValue,
+    syncValue: value.syncValue,
+    id: value.id,
+  }));
+
+  return differenceWith(formattedChangedData, formattedData, isEqual).length;
 };

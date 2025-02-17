@@ -133,6 +133,8 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
     let failedCollectionsCount = 0;
+    let importedApisCount = 0;
+    let failedApisCount = 0;
 
     const { collections, apis } = processedFileData;
 
@@ -164,8 +166,9 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
       try {
         const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
         onSaveRecord(newApi.data, "none");
+        importedApisCount++;
       } catch (error) {
-        failedCollectionsCount++;
+        failedApisCount++;
         Logger.error("Error importing API:", error);
       }
     };
@@ -175,11 +178,15 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
       batchWrite(BATCH_SIZE, apis, handleApiWrites),
     ]);
 
-    if (failedCollectionsCount > 0) {
-      toast.warn(`Failed to import ${failedCollectionsCount} items. Please contact support if the issue persists.`);
+    if (failedCollectionsCount > 0 || failedApisCount > 0) {
+      toast.warn(
+        `Failed to import ${
+          failedCollectionsCount + failedApisCount
+        } items. Please contact support if the issue persists.`
+      );
     }
 
-    return importedCollectionsCount;
+    return { importedCollectionsCount, importedApisCount };
   }, [processedFileData, user?.details?.profile?.uid, workspace?.id, onSaveRecord]);
 
   const handleImportEnvironments = useCallback(async () => {
@@ -205,14 +212,20 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
   const handleImportBrunoData = useCallback(() => {
     setIsImporting(true);
     Promise.all([handleImportEnvironments(), handleImportCollectionsAndApis()])
-      .then(([importedEnvs, importedCollections]) => {
-        if (importedCollections === 0 && importedEnvs === 0) {
+      .then(([importedEnvs, recordsResult]) => {
+        if (
+          recordsResult.importedApisCount === 0 &&
+          importedEnvs === 0 &&
+          recordsResult.importedCollectionsCount === 0
+        ) {
           toast.error("Failed to import Bruno data");
           return;
         }
 
         const successMessage = [
-          importedCollections > 0 ? `${importedCollections} collection(s)` : null,
+          recordsResult.importedApisCount + recordsResult.importedCollectionsCount > 0
+            ? `${recordsResult} collection(s)`
+            : null,
           importedEnvs > 0 ? `${importedEnvs} environment(s)` : null,
         ]
           .filter(Boolean)
@@ -220,7 +233,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
         toast.success(`Successfully imported ${successMessage}`);
 
-        trackImportSuccess("bruno", importedCollections);
+        trackImportSuccess("bruno", recordsResult.importedCollectionsCount, recordsResult.importedApisCount);
         onSuccess?.();
       })
       .catch((error) => {
