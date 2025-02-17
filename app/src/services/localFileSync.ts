@@ -1,6 +1,6 @@
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
+// import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import BackgroundServiceAdapter, { Singleton } from "./DesktopBackgroundService";
-import FEATURES from "config/constants/sub/features";
+// import FEATURES from "config/constants/sub/features";
 
 // type FILE_SERVICE_METHODS = 'test' | 'anyOtherMethod'; // not required, but can be specified
 const SERVICE_NAMESPACE = "fs";
@@ -8,9 +8,9 @@ const SERVICE_NAMESPACE = "fs";
 export class LocalFileSync extends BackgroundServiceAdapter {
   constructor() {
     super(SERVICE_NAMESPACE);
-    if (!isFeatureCompatible(FEATURES.LOCAL_FILE_SYNC)) {
-      throw new Error("LocalFileSync is not supported in the current version of the app");
-    }
+    // if (!isFeatureCompatible(FEATURES.LOCAL_FILE_SYNC)) {
+    //   throw new Error("LocalFileSync is not supported in the current version of the app");
+    // }
   }
 
   // type imposed for args (expected to mirror background method defination)
