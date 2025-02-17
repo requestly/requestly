@@ -24,7 +24,10 @@
   </a>
 </p>
 
-<h1 align="center">Open-Source API Platform - Build, Test, Intercept & Mock APIs </h1>
+<h1 align="center">
+  Open-Source API Platform
+  <p>Build, Test, Intercept & Mock APIs</p>
+</h1>
 
 **Requestly is a powerful combination of a local HTTP Proxy and an API client with collaboration features. Requestly can be used directly in the browser as a Chrome Extension or installed as a desktop application.**
 
