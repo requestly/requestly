@@ -231,13 +231,13 @@ CONSTANTS.REQUEST_STATE = {
   COMPLETE: "COMPLETE",
 };
 
+CONSTANTS.CLIENT_SOURCE = {
+  REQUESTLY: "requestly:client",
+  SESSIONBEAR: "sessionbear:client",
+};
+
 export default CONSTANTS;
 if (!isReactApp) {
   /** For legacy apps- browser extension */
   Object.assign(window.RQ, CONSTANTS);
 }
-
-CONSTANTS.CLIENT_SOURCE = {
-  REQUESTLY: "requestly:client",
-  SESSIONBEAR: "sessionbear:client",
-};

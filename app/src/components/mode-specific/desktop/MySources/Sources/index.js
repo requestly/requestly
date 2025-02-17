@@ -85,7 +85,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               type: "mobile",
               name: device.id,
               description: device?.product,
-              icon: "android.png",
+              icon: "/assets/media/components/android.png",
               isActive: false,
               isScanned: true,
               comingSoon: false,
@@ -99,6 +99,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
       }
       setFetchingDevices(false);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]); // Don't add appsList as dependency
 
   const toggleCloseConfirmModal = () => {
@@ -373,6 +374,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         );
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [processingApps, handleActivateAppOnClick, handleDisconnectAppOnClick]
   );
 
@@ -437,7 +439,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                         type="link"
                         onClick={() => {
                           window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
-                            link: "https://developers.requestly.com/android-emulators/",
+                            link: "https://docs.requestly.com/general/http-interceptor/android-simulator-interception",
                           });
                         }}
                         icon={<InfoCircleFilled />}

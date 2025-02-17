@@ -40,7 +40,7 @@ const APIClientSidebar: React.FC<Props> = () => {
     onNewClick,
     onImportClick,
     onSelectionFromHistory,
-    recordToBeDeleted,
+    recordsToBeDeleted,
     isDeleteModalOpen,
     onDeleteModalClose,
     selectedHistoryIndex,
@@ -175,7 +175,7 @@ const APIClientSidebar: React.FC<Props> = () => {
 
   return (
     <>
-      <div className="api-client-sidebar">
+      <div className={`api-client-sidebar ${user.loggedIn ? "" : "api-client-sidebar-disabled"}`}>
         <ApiClientSidebarHeader
           activeTab={activeKey}
           history={history}
@@ -195,7 +195,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         />
       </div>
 
-      <DeleteApiRecordModal open={isDeleteModalOpen} record={recordToBeDeleted} onClose={onDeleteModalClose} />
+      <DeleteApiRecordModal open={isDeleteModalOpen} records={recordsToBeDeleted} onClose={onDeleteModalClose} />
 
       <ImportRequestModal
         isRequestLoading={isLoading}

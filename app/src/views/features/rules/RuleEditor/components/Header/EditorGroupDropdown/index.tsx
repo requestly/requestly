@@ -9,7 +9,6 @@ import { globalActions } from "store/slices/global/slice";
 import { StorageService } from "init";
 import GroupMenuItem from "./GroupMenuItem";
 import APP_CONSTANTS from "config/constants";
-//@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackGroupChangedEvent, trackGroupCreatedEvent } from "features/rules/analytics";
 import Logger from "lib/logger";
@@ -212,7 +211,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
               width={10}
               height={6}
               alt="down arrow"
-              src="/assets/icons/downArrow.svg" // TODO: Use react-icons
+              src="/assets/media/common/down-arrow.svg" // TODO: Use react-icons
             />
           </span>
         </RQButton>
