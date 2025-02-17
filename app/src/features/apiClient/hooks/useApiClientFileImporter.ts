@@ -62,6 +62,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
   const processFiles = useCallback(
     (files: File[]) => {
       setProcessingStatus("processing");
+      trackImportStarted("requestly");
       setError(null);
 
       const processFiles = files.map((file) => {
@@ -86,7 +87,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
               const processedData = processor(content, uid);
               resolve(processedData);
             } catch (error) {
-              trackImportParseFailed("requestly");
+              trackImportParseFailed("requestly", error.message);
               Logger.error("Error processing file:", error);
               reject(error);
             }
@@ -99,6 +100,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
         .then((results) => {
           const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
           if (hasProcessingAllFilesFailed) {
+            trackImportParseFailed("requestly");
             throw new Error("Could not process the selected files!, Please check if the files are valid export files.");
           }
 
@@ -113,6 +115,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
                 return prev;
               });
             } else {
+              trackImportParseFailed("requestly", result.reason);
               console.error("Error processing file:", result.reason);
             }
           });
@@ -120,6 +123,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
           setProcessingStatus("processed");
         })
         .catch((error) => {
+          trackImportParseFailed("requestly", error.message);
           setError(error.message);
           setProcessingStatus("idle");
         });
@@ -212,7 +216,6 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
   const handleImportData = useCallback(
     async (onSuccess: () => void) => {
       setIsImporting(true);
-      trackImportStarted("requestly");
 
       try {
         const [envResult, collResult] = await Promise.allSettled([

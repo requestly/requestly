@@ -40,8 +40,8 @@ export const trackRequestMoved = (collectionType) => {
   trackEvent(API_CLIENT.REQUEST_MOVED, { collectionType });
 };
 
-export const trackRequestCurlCopied = () => {
-  trackEvent(API_CLIENT.REQUEST_CODE_COPIED);
+export const trackRequestCurlCopied = (language) => {
+  trackEvent(API_CLIENT.REQUEST_CODE_COPIED, { language });
 };
 
 export const trackAPIRequestCancelled = () => {
@@ -118,11 +118,10 @@ export const trackImportParsed = (type, collectionsCount, requestsCount) => {
   });
 };
 
-export const trackImportParseFailed = (type, requestCount, collectionCount) => {
+export const trackImportParseFailed = (type, reason) => {
   trackEvent(API_CLIENT.IMPORT_DATA_FAILED, {
     import_type: type,
-    request_count: requestCount,
-    collection_count: collectionCount,
+    reason,
   });
 };
 
