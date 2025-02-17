@@ -1,6 +1,6 @@
 import { ReducerKeys } from "store/constants";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { TeamRole } from "types";
+import { TeamRole, WorkspaceType } from "types";
 
 export const getTeamsState = (state) => {
   return state[ReducerKeys.TEAMS];
@@ -15,6 +15,20 @@ export const getCurrentlyActiveWorkspace = (state) => {
 };
 export const getIsWorkspaceMode = (state) => {
   return !!getTeamsState(state).currentlyActiveWorkspace.id;
+};
+
+export const getIsWorkspaceLocal = (state) => {
+  const teamsState = getTeamsState(state);
+  const teamId = teamsState.currentlyActiveWorkspace.id;
+  const team = teamsState.availableTeams.find((team) => team.id === teamId);
+  return team?.workspaceType === WorkspaceType.LOCAL;
+};
+
+export const getWorkspaceRootPath = (state) => {
+  const teamsState = getTeamsState(state);
+  const teamId = teamsState.currentlyActiveWorkspace.id;
+  const team = teamsState.availableTeams.find((team) => team.id === teamId);
+  return team?.rootPath;
 };
 
 export const getCurrentlyActiveWorkspaceMembers = (state) => {
