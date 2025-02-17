@@ -46,7 +46,10 @@ export const updateUserPreferences = (
   prevState.userPreferences[action.payload.key] = action.payload.value;
 };
 
-export const updateSecondarySidebarCollapse = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
+export const updateSecondarySidebarCollapse = (
+  prevState: GlobalSliceState,
+  action: PayloadAction<boolean | undefined>
+) => {
   const isCollapsed = prevState.userPreferences.isSecondarySidebarCollapsed;
   prevState.userPreferences.isSecondarySidebarCollapsed = action.payload ?? !isCollapsed;
 };
@@ -70,7 +73,7 @@ export const updateOrganizationDetails = (prevState: GlobalSliceState, action: P
 //Persona Survey actions
 export const setUserPersonaData = (
   prevState: GlobalSliceState,
-  action: PayloadAction<GlobalSliceState["userPersona"]>
+  action: PayloadAction<Partial<GlobalSliceState["userPersona"]>>
 ) => {
   prevState.userPersona = { ...prevState.userPersona, ...action.payload };
 };
@@ -95,11 +98,17 @@ export const updateSelectedPersonaUseCase = (prevState: GlobalSliceState, action
   }
 };
 
-export const updateOtherPersonaUseCase = (prevState: GlobalSliceState, action: PayloadAction<any>) => {
+export const updateOtherPersonaUseCase = (
+  prevState: GlobalSliceState,
+  action: PayloadAction<{
+    optionType: string;
+    value: string;
+  }>
+) => {
   const { useCases } = prevState.userPersona;
   const { payload } = action;
 
-  const index = useCases.findIndex((option: { optionType: string }) => option.optionType === "other");
+  const index = useCases.findIndex((option: any) => option.optionType === "other");
 
   if (index === -1) {
     if (payload.value.length) {
@@ -196,7 +205,7 @@ export const updateAppOnboardingFullName = (prevState: GlobalSliceState, action:
 
 export const updateAppOnboardingTeamDetails = (
   prevState: GlobalSliceState,
-  action: PayloadAction<GlobalSliceState["appOnboarding"]["createdWorkspace"]>
+  action: PayloadAction<Partial<GlobalSliceState["appOnboarding"]["createdWorkspace"]>>
 ) => {
   prevState.appOnboarding.createdWorkspace = {
     ...prevState.appOnboarding.createdWorkspace,
@@ -206,7 +215,7 @@ export const updateAppOnboardingTeamDetails = (
 
 export const updateWorkspaceOnboardingTeamDetails = (
   prevState: GlobalSliceState,
-  action: PayloadAction<GlobalSliceState["workspaceOnboarding"]["workspace"]>
+  action: PayloadAction<Partial<GlobalSliceState["workspaceOnboarding"]["workspace"]>>
 ) => {
   prevState.workspaceOnboarding.workspace = { ...prevState.workspaceOnboarding.workspace, ...action.payload };
 };

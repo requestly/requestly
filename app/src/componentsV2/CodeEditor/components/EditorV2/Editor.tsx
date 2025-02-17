@@ -131,7 +131,7 @@ const Editor: React.FC<EditorProps> = ({
     }
   };
 
-  const updateContent = useCallback((code: string): null => {
+  const updateContent = useCallback((code: string): void => {
     const view = editorRef.current?.view;
     if (!view) {
       return null;

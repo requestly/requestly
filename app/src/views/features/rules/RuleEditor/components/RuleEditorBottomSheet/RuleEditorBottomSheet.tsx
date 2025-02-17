@@ -81,7 +81,6 @@ export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mo
             startWalkthrough={startWalkthrough}
             onTourComplete={() => {
               dispatch(
-                // @ts-ignore
                 globalActions.updateProductTourCompleted({
                   tour: TOUR_TYPES.MISCELLANEOUS,
                   subTour: SUB_TOUR_TYPES.TEST_THIS_RULE,
