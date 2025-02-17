@@ -108,7 +108,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         .then((results) => {
           const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
           if (hasProcessingAllFilesFailed) {
-            trackImportParseFailed("postman");
             throw new Error(
               "Could not process the selected files!, Please check if the files are valid Postman export files."
             );

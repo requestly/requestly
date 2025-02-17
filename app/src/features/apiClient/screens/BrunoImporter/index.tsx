@@ -94,7 +94,6 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
       .then((results) => {
         const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
         if (hasProcessingAllFilesFailed) {
-          trackImportParseFailed("bruno");
           throw new Error(
             "Could not process the selected files! Please check if the files are valid Bruno export files."
           );
