@@ -28,7 +28,7 @@ import { useNavigate } from "react-router-dom";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { useIncentiveActions } from "features/incentivization/hooks";
 import "./createWorkspaceModal.scss";
-import { createWorkspaceFolderCommand, useFsManager } from "hooks/useFsManager";
+import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
 
 interface Props {
   isOpen: boolean;
@@ -163,7 +163,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
 
     try {
       if (config.type === WorkspaceType.LOCAL) {
-        await createWorkspaceFolderCommand(config.rootPath);
+        await createWorkspaceFolder(config.rootPath);
       }
 
       const response: any = await createTeam({
