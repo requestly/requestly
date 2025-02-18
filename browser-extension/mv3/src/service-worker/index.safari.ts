@@ -1,7 +1,7 @@
 import config from "common/config";
 import { initContextMenu } from "./services/contextMenu";
 import { handleInstallUninstall } from "./services/installUninstall";
-import { initMessageHandler } from "./services/messageHandler";
+import { initMessageHandler } from "./services/messageHandler.safari";
 
 handleInstallUninstall();
 initMessageHandler();
