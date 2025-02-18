@@ -87,8 +87,6 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
           sanitizeRecords(record, recordsToExport);
         }
       });
-
-      return recordsToExport;
     },
     []
   );
@@ -109,22 +107,15 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     if (!isOpen || isApiRecordsProcessed) return;
 
     if (exportType === "collection") {
-      let processedRecords: ExportRecord[] = [];
-
       recordsToBeExported.forEach((record) => {
         if (isApiCollection(record)) {
-          const { collections: processedCollection, apis } = sanitizeRecords(record, recordsToExport);
-
-          processedRecords = processedRecords.concat(processedCollection);
-
-          apis.forEach((api) => {
-            processedRecords.push(api);
-          });
+          sanitizeRecords(record, recordsToExport);
         } else {
-          processedRecords.push({ ...sanitizeRecord(record), collectionId: "" });
+          recordsToExport.apis.push({ ...sanitizeRecord(record), collectionId: "" });
         }
       });
-      setExportData({ records: processedRecords });
+
+      setExportData({ records: [...recordsToExport.apis, ...recordsToExport.collections] });
     } else {
       const processedEnvironments = processEnvironments(environments);
       setExportData({ environments: processedEnvironments });
