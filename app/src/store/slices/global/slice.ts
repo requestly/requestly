@@ -40,7 +40,6 @@ const { actions, reducer } = globalSlice;
 
 const globalReducersWithLocal = getReducerWithLocalStorageSync("root", reducer, [
   "user",
-  "appMode",
   "appTheme",
   "isExtensionEnabled",
   "hasConnectedApp",

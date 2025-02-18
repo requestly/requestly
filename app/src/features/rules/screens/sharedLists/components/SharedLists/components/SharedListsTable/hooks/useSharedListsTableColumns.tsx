@@ -14,8 +14,9 @@ import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { redirectToSharedListViewer } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { UserAvatar } from "componentsV2/UserAvatar";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 interface Props {
   handleDeleteSharedListClick: (sharedListId: string) => void;
@@ -23,7 +24,9 @@ interface Props {
 
 export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Props) => {
   const navigate = useNavigate();
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+
   const [copiedSharedListId, setCopiedSharedListId] = useState("");
 
   const handleOnURLCopy = useCallback((id: string) => {
@@ -108,7 +111,7 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
     },
   ];
 
-  if (isWorkspaceMode) {
+  if (isSharedWorkspaceMode) {
     columns.splice(3, 0, {
       key: "createdBy",
       title: <div className="text-center">Created by</div>,

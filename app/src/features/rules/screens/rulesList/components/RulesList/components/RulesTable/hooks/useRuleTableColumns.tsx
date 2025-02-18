@@ -7,7 +7,6 @@ import { getAllRecordsMap } from "store/features/rules/selectors";
 import { Group, RecordStatus, Rule } from "@requestly/shared/types/entities/rules";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { UserAvatar } from "componentsV2/UserAvatar";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { MdOutlineShare } from "@react-icons/all-files/md/MdOutlineShare";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
@@ -26,10 +25,13 @@ import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { WarningOutlined } from "@ant-design/icons";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import RuleNameColumn from "../components/RulesColumn/RulesColumn";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
+  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
   const allRecordsMap = useSelector(getAllRecordsMap);
   const {
     recordsChangeGroupAction,
@@ -82,7 +84,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     {
       title: "Rules",
       key: "name",
-      width: isWorkspaceMode ? 322 : 376,
+      width: isSharedWorkspaceMode ? 322 : 376,
       ellipsis: true,
       render: (record: RuleTableRecord) => {
         return <RuleNameColumn record={record} />;
@@ -230,19 +232,20 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     },
     {
       title: "Updated on",
-      key: "modificationDate",
+      key: "updatedAt",
       width: 152,
       responsive: ["lg"],
       render: (record: RuleTableRecord) => {
         if (isGroup(record)) {
           return null;
         }
-        const dateToDisplay = record.modificationDate ? record.modificationDate : record.creationDate;
-        const beautifiedDate = moment(dateToDisplay).format("MMM DD, YYYY");
-        if (currentlyActiveWorkspace?.id && !options?.hideLastModifiedBy) {
+        // TODO-syncing: FIX Types
+        const dateToDisplay = record.updatedAt ? record.updatedAt : record.createdAt;
+        const beautifiedDate = `${moment(dateToDisplay).format("MMM DD, YYYY HH:mm:ss")}`;
+        if (activeWorkspaceId && !options?.hideLastModifiedBy) {
           return (
             <span className="rule-updated-on-cell">
-              {beautifiedDate} <UserAvatar uid={record.lastModifiedBy} />
+              {beautifiedDate} <UserAvatar uid={record.updatedBy} />
             </span>
           );
         } else return <span className="rule-updated-on-cell">{beautifiedDate}</span>;
@@ -252,15 +255,15 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       showSorterTooltip: false,
       sorter: {
         compare: (a, b) => {
-          const recordAModificationDate = a.modificationDate ? a.modificationDate : a.creationDate;
-          const recordBModificationDate = b.modificationDate ? b.modificationDate : b.creationDate;
+          const recordAUpdatedAt = a.updatedAt ? a.updatedAt : a.createdAt;
+          const recordBUpdatedAt = b.updatedAt ? b.updatedAt : b.createdAt;
 
           if (isGroup(a) && !isGroup(b)) {
             return -1;
           } else if (!isGroup(a) && isGroup(b)) {
             return 1;
           } else {
-            return recordAModificationDate < recordBModificationDate ? -1 : 1;
+            return recordAUpdatedAt < recordBUpdatedAt ? -1 : 1;
           }
         },
       },
@@ -418,7 +421,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
   ];
 
   // FIXME: Extend the column type to also support custom fields eg hidden property to hide the column
-  if (isWorkspaceMode && !options.hideCreatedBy) {
+  if (isSharedWorkspaceMode && !options.hideCreatedBy) {
     columns.splice(6, 0, {
       title: "Author",
       width: 92,
@@ -429,7 +432,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           return null;
         }
         const uid = record.createdBy ?? null;
-        return currentlyActiveWorkspace?.id ? <UserAvatar uid={uid} /> : null;
+        return activeWorkspaceId ? <UserAvatar uid={uid} /> : null;
       },
     });
   }

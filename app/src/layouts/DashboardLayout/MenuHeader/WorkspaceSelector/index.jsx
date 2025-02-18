@@ -1,30 +1,22 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   DownOutlined,
   LoadingOutlined,
-  LockOutlined,
   PlusOutlined,
   PlusSquareOutlined,
   SettingOutlined,
   UserOutlined,
-  ExclamationCircleFilled,
   RightOutlined,
 } from "@ant-design/icons";
-import {
-  clearCurrentlyActiveWorkspace,
-  showSwitchWorkspaceSuccessToast,
-  switchWorkspace,
-} from "actions/TeamWorkspaceActions";
-import { Avatar, Badge, Divider, Dropdown, Menu, Modal, Spin, Tag, Tooltip } from "antd";
+import { Badge, Divider, Dropdown, Menu, Spin, Tag, Tooltip } from "antd";
 import {
   trackInviteTeammatesClicked,
   trackWorkspaceDropdownClicked,
   trackCreateNewTeamClicked,
 } from "modules/analytics/events/common/teams";
-import { getCurrentlyActiveWorkspace, getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
-import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getLastSeenInviteTs } from "store/selectors";
+import { getLastSeenInviteTs } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToTeam, redirectToWorkspaceSettings } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
@@ -32,13 +24,21 @@ import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getUniqueColorForWorkspace } from "utils/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import { trackWorkspaceInviteAnimationViewed } from "modules/analytics/events/common/teams";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { getActiveWorkspaceIds, getAllWorkspaces, getWorkspaceById } from "store/slices/workspaces/selectors";
+import {
+  getActiveWorkspaceId,
+  isOnlineWorkspace,
+  isPersonalWorkspace,
+  isSharedWorkspace,
+} from "features/workspaces/utils";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { toast } from "utils/Toast";
 
 const { PATHS } = APP_CONSTANTS;
@@ -49,27 +49,17 @@ export const isWorkspacesFeatureEnabled = (email) => {
 };
 
 const prettifyWorkspaceName = (workspaceName) => {
-  // if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
-  //   return "Private";
-  return workspaceName || "Unknown";
-};
-
-const getWorkspaceIcon = (workspaceName) => {
-  if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
-  return workspaceName ? workspaceName[0].toUpperCase() : "?";
+  return workspaceName || "Workspaces";
 };
 
 const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
   // Global State
-  const user = useSelector(getUserAuthDetails);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
+  // For right now only as we only support to connect one workspace at a time
+  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
+  const activeWorkspace = useSelector(getWorkspaceById(activeWorkspaceId));
 
-  const activeWorkspaceName = user.loggedIn
-    ? isWorkspaceMode
-      ? currentlyActiveWorkspace.name
-      : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-    : "Workspaces";
+  const activeWorkspaceName = activeWorkspace?.name || "";
 
   const handleWorkspaceDropdownClick = (open) => {
     if (open) {
@@ -85,33 +75,43 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
       onOpenChange={handleWorkspaceDropdownClick}
     >
       <div className="cursor-pointer items-center">
-        <Avatar
-          size={26}
-          shape="square"
-          icon={getWorkspaceIcon(activeWorkspaceName)}
-          className="workspace-avatar"
-          style={{
-            backgroundColor: user.loggedIn
-              ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                ? "#1E69FF"
-                : getUniqueColorForWorkspace(currentlyActiveWorkspace?.id, activeWorkspaceName)
-              : "#ffffff4d",
-          }}
-        />
-        <Tooltip
-          overlayClassName="workspace-selector-tooltip"
-          style={{ top: "35px" }}
-          title={prettifyWorkspaceName(activeWorkspaceName)}
-          placement={"bottomRight"}
-          showArrow={false}
-          mouseEnterDelay={2}
-        >
-          <span className="items-center active-workspace-name">
-            <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
-            {hasNewInvites ? <Badge dot={true} /> : null}
-            <DownOutlined className="active-workspace-name-down-icon" />
-          </span>
-        </Tooltip>
+        {activeWorkspace ? (
+          <>
+            {<WorkspaceAvatar workspaceId={activeWorkspace?.id} workspaceName={activeWorkspace?.name} />}
+            <Tooltip
+              overlayClassName="workspace-selector-tooltip"
+              style={{ top: "35px" }}
+              title={prettifyWorkspaceName(activeWorkspaceName)}
+              placement={"bottomRight"}
+              showArrow={false}
+              mouseEnterDelay={2}
+            >
+              <span className="items-center active-workspace-name">
+                <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
+                {hasNewInvites ? <Badge dot={true} /> : null}
+                <DownOutlined className="active-workspace-name-down-icon" />
+              </span>
+            </Tooltip>
+          </>
+        ) : (
+          <>
+            {<WorkspaceAvatar workspaceId={activeWorkspace?.id} workspaceName={activeWorkspace?.name} />}
+            <Tooltip
+              overlayClassName="workspace-selector-tooltip"
+              style={{ top: "35px" }}
+              title={"No Workspace Selected"}
+              placement={"bottomRight"}
+              showArrow={false}
+              mouseEnterDelay={2}
+            >
+              <span className="items-center active-workspace-name">
+                <span className="active-workspace-name">{"No Workspace Selected"}</span>
+                {hasNewInvites ? <Badge dot={true} /> : null}
+                <DownOutlined className="active-workspace-name-down-icon" />
+              </span>
+            </Tooltip>
+          </>
+        )}
       </div>
     </Dropdown>
   );
@@ -120,22 +120,21 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
 const WorkspaceSelector = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { pathname } = useLocation();
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const isLimitToPrivateWorkspaceActive = useFeatureIsOn("limit_to_private_workspace");
 
   // GLOBAL STATE
   const user = useSelector(getUserAuthDetails);
-  const availableTeams = useSelector(getAvailableTeams);
-  const _availableTeams = availableTeams || [];
-  const sortedAvailableTeams = [
-    ..._availableTeams.filter((team) => !team?.archived),
-    ..._availableTeams.filter((team) => team?.archived),
+  const availableWorkspaces = useSelector(getAllWorkspaces) || [];
+  const sortedAvailableWorkspaces = [
+    ...availableWorkspaces.filter((team) => !team?.archived),
+    ...availableWorkspaces.filter((team) => team?.archived),
   ];
-  const appMode = useSelector(getAppMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
+  // For right now only as we only support to connect one workspace at a time
+  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
+
   const lastSeenInviteTs = useSelector(getLastSeenInviteTs);
 
   // Local State
@@ -164,10 +163,10 @@ const WorkspaceSelector = () => {
   }, [user.loggedIn]);
 
   useEffect(() => {
-    if (availableTeams?.length > 0) {
-      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_WORKSPACES, availableTeams.length);
+    if (availableWorkspaces?.length > 0) {
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_WORKSPACES, availableWorkspaces.length);
     }
-  }, [availableTeams?.length]);
+  }, [availableWorkspaces?.length]);
 
   const renderLoader = () => {
     return (
@@ -255,8 +254,8 @@ const WorkspaceSelector = () => {
         })
       );
       trackInviteTeammatesClicked("workspaces_dropdown");
-      if (isWorkspaceMode) {
-        redirectToTeam(navigate, currentlyActiveWorkspace.id);
+      if (isSharedWorkspace(activeWorkspaceId)) {
+        redirectToTeam(navigate, activeWorkspaceId);
       } else {
         redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");
       }
@@ -268,90 +267,13 @@ const WorkspaceSelector = () => {
     }
   };
 
-  const redirects = useMemo(
-    () => ({
-      rules: PATHS.RULES.MY_RULES.ABSOLUTE,
-      mock: PATHS.MOCK_SERVER_V2.ABSOLUTE,
-      files: PATHS.FILE_SERVER_V2.ABSOLUTE,
-      sessions: PATHS.SESSIONS.ABSOLUTE,
-      teams: PATHS.ACCOUNT.TEAMS.ABSOLUTE,
-    }),
-    []
-  );
-
-  const path = useMemo(
-    () =>
-      Object.keys(redirects).find(
-        (path) =>
-          pathname.includes(path) &&
-          (pathname.includes("editor") ||
-            pathname.includes("viewer") ||
-            pathname.includes("saved") ||
-            pathname.includes("/teams/"))
-      ),
-    [redirects, pathname]
-  );
-
-  const confirmWorkspaceSwitch = useCallback(
-    (callback = () => {}) => {
-      const handleCallback = () => {
-        dispatch(globalActions.updateIsWorkspaceSwitchConfirmationActive(false));
-        callback();
-
-        if (path) {
-          navigate(redirects[path]);
-        }
-      };
-
-      if (!isCurrentlySelectedRuleHasUnsavedChanges || pathname.includes(PATHS.ACCOUNT.TEAMS.ABSOLUTE)) {
-        handleCallback();
-        return;
-      }
-
-      dispatch(globalActions.updateIsWorkspaceSwitchConfirmationActive(true));
-      Modal.confirm({
-        title: "Discard changes?",
-        icon: <ExclamationCircleFilled />,
-        content: "Changes you made on a rule may not be saved.",
-        okText: "Switch",
-        onOk: handleCallback,
-        afterClose: () => dispatch(globalActions.updateIsWorkspaceSwitchConfirmationActive(false)),
-      });
-    },
-    [isCurrentlySelectedRuleHasUnsavedChanges, navigate, path, pathname, redirects, dispatch]
-  );
-
-  const handleSwitchToPrivateWorkspace = useCallback(async () => {
-    setIsModalOpen(true);
-    return clearCurrentlyActiveWorkspace(dispatch, appMode).then(() => {
-      setIsModalOpen(false);
-      showSwitchWorkspaceSuccessToast();
-    });
-  }, [appMode, dispatch]);
-
   const handleWorkspaceSwitch = async (team) => {
     setIsModalOpen(true);
-    switchWorkspace(
-      {
-        teamId: team.id,
-        teamName: team.name,
-        teamMembersCount: team.accessCount,
-      },
-      dispatch,
-      {
-        isSyncEnabled: user?.details?.isSyncEnabled,
-        isWorkspaceMode,
-      },
-      appMode,
-      undefined,
-      "workspaces_dropdown"
-    )
+    switchWorkspace(team.id)
       .then(() => {
-        if (!isModalOpen) showSwitchWorkspaceSuccessToast(team.name);
         setIsModalOpen(false);
       })
-      .catch((error) => {
-        console.error(error);
+      .catch((err) => {
         setIsModalOpen(false);
         toast.error(
           "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
@@ -398,7 +320,7 @@ const WorkspaceSelector = () => {
     </Menu>
   );
 
-  const isTeamCurrentlyActive = (teamId) => currentlyActiveWorkspace.id === teamId;
+  const isTeamCurrentlyActive = (teamId) => activeWorkspaceId === teamId;
   const TeamsInviteCountBadge = (
     <Badge color="#0361FF" count={teamInvites?.length} className="join-workspace-invite-count-badge" />
   );
@@ -431,90 +353,47 @@ const WorkspaceSelector = () => {
     joinWorkspaceDropdownItems[key]?.onClick?.();
   };
 
-  useEffect(() => {
-    if (isLimitToPrivateWorkspaceActive) {
-      if (currentlyActiveWorkspace?.id) {
-        confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace);
-      }
-    }
-  }, [
-    isLimitToPrivateWorkspaceActive,
-    currentlyActiveWorkspace?.id,
-    confirmWorkspaceSwitch,
-    handleSwitchToPrivateWorkspace,
-  ]);
-
   const menu = (
     <Menu className="workspaces-menu" disabled={isLimitToPrivateWorkspaceActive}>
       <Menu.ItemGroup key="Workspaces" title="Your workspaces">
-        <Menu.Item
-          key="1"
-          icon={
-            <Avatar
-              size={28}
-              shape="square"
-              icon={getWorkspaceIcon(APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)}
-              className="workspace-avatar"
-              style={{ backgroundColor: "#1E69FF" }}
-            />
-          }
-          className={`workspace-menu-item ${!currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""}`}
-          onClick={() => {
-            confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace);
-            trackWorkspaceDropdownClicked("switch_workspace");
-          }}
-        >
-          <div className="workspace-name-container">
-            {APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE} (Default)
-          </div>
-        </Menu.Item>
-        {availableTeams === null ? renderLoader() : null}
-
-        {sortedAvailableTeams &&
-          sortedAvailableTeams.map((team) => {
+        {availableWorkspaces === null ? renderLoader() : null}
+        {sortedAvailableWorkspaces &&
+          sortedAvailableWorkspaces.map((workspace) => {
             return (
               <Menu.Item
-                key={team.id}
-                disabled={!!team.archived || isTeamCurrentlyActive(team.id)}
-                icon={
-                  <Avatar
-                    size={28}
-                    shape="square"
-                    icon={team.name?.[0]?.toUpperCase() ?? "P"}
-                    className="workspace-avatar"
-                    style={{
-                      backgroundColor: `${getUniqueColorForWorkspace(team.id, team.name)}`,
-                    }}
-                  />
-                }
+                key={workspace.id}
+                disabled={!!workspace.archived || isTeamCurrentlyActive(workspace.id)}
+                icon={<WorkspaceAvatar workspaceId={workspace.id} workspaceName={workspace.name} />}
                 className={`workspace-menu-item ${
-                  team.id === currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""
+                  workspace.id === activeWorkspaceId ? "active-workspace-dropdownItem" : ""
                 }`}
                 onClick={() => {
-                  confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team));
+                  handleWorkspaceSwitch(workspace);
                   trackWorkspaceDropdownClicked("switch_workspace");
                 }}
               >
                 <Tooltip
                   placement="right"
                   overlayInnerStyle={{ width: "178px" }}
-                  title={team.archived ? "This workspace has been archived." : ""}
+                  title={workspace.archived ? "This workspace has been archived." : ""}
                 >
                   <div className="workspace-item-wrapper">
                     <div
                       className={`workspace-name-container ${
-                        team.archived || isTeamCurrentlyActive(team.id) ? "archived-workspace-item" : ""
+                        workspace.archived || isTeamCurrentlyActive(workspace.id) ? "archived-workspace-item" : ""
                       }`}
                     >
-                      <div className="workspace-name">{team.name}</div>
-                      <div className="text-gray workspace-details">
-                        {team.subscriptionStatus ? `${team.subscriptionStatus} • ` : null}
-                        {team.accessCount} {team.accessCount > 1 ? "members" : "member"}
-                      </div>
+                      <div className="workspace-name">{workspace.name}</div>
+                      {isPersonalWorkspace(workspace.id) ? null : (
+                        <div className="text-gray workspace-details">
+                          {workspace.subscriptionStatus ? `${workspace.subscriptionStatus} • ` : null}
+                          {workspace.accessCount} {workspace.accessCount > 1 ? "members" : "member"}
+                        </div>
+                      )}
                     </div>
-                    {team.archived ? (
+                    {workspace.archived ? (
                       <Tag color="gold">archived</Tag>
-                    ) : isTeamCurrentlyActive(team.id) ? (
+                    ) : isTeamCurrentlyActive(workspace.id) ? (
                       <Tag color="green">current</Tag>
                     ) : null}
                   </div>
@@ -546,7 +425,7 @@ const WorkspaceSelector = () => {
         </Dropdown>
       </Menu.Item>
 
-      {isWorkspaceMode ? (
+      {isSharedWorkspace(activeWorkspaceId) ? (
         <>
           <Divider className="ant-divider-margin workspace-divider" />
           <Menu.Item
@@ -560,23 +439,25 @@ const WorkspaceSelector = () => {
           >
             Invite teammates
           </Menu.Item>
-
-          <Menu.Item
-            key="5"
-            icon={<SettingOutlined className="icon-wrapper" />}
-            className="workspace-menu-item"
-            onClick={() => {
-              if (isWorkspaceMode) {
-                redirectToTeam(navigate, currentlyActiveWorkspace.id);
-              } else {
-                redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");
-              }
-              trackWorkspaceDropdownClicked("manage_workspace");
-            }}
-          >
-            Manage Workspace
-          </Menu.Item>
         </>
+      ) : null}
+      {/* FIXME-syncing-cleanup: Improve this settings UI-UX */}
+      {isOnlineWorkspace(activeWorkspaceId) ? (
+        <Menu.Item
+          key="5"
+          icon={<SettingOutlined className="icon-wrapper" />}
+          className="workspace-menu-item"
+          onClick={() => {
+            if (isOnlineWorkspace(activeWorkspaceId)) {
+              redirectToTeam(navigate, activeWorkspaceId);
+            } else {
+              redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");
+            }
+            trackWorkspaceDropdownClicked("manage_workspace");
+          }}
+        >
+          Manage Workspace
+        </Menu.Item>
       ) : null}
     </Menu>
   );

@@ -6,7 +6,6 @@ import React, { useCallback, useMemo, useState } from "react";
 import { upsertApiRecord } from "backend/apiClient";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
 import {
@@ -14,6 +13,8 @@ import {
   trackMoveRequestToCollectionSuccessful,
 } from "modules/analytics/events/features/apiClient";
 import "./moveToCollectionModal.scss";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { isApiCollection } from "../../../utils";
 import { firebaseBatchWrite } from "backend/utils";
 import { head, isEmpty, omit } from "lodash";
@@ -29,7 +30,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const collectionOptions = useMemo(() => {
     const exclusions = new Set();
@@ -65,14 +66,14 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         variables: {},
       },
     };
-    const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToBeCreated, team?.id);
+    const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToBeCreated, activeWorkspaceId);
     if (newCollection.success) {
       onSaveRecord(newCollection.data);
       return newCollection.data.id;
     } else {
       throw new Error("Failed to create a new collection");
     }
-  }, [user?.details?.profile?.uid, team?.id, onSaveRecord, selectedCollection?.label]);
+  }, [user?.details?.profile?.uid, activeWorkspaceId, onSaveRecord, selectedCollection?.label]);
 
   const moveRecordsToCollection = useCallback(
     async (collectionId: string, isNewCollection: boolean) => {
@@ -93,7 +94,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         throw new Error("Failed to move some requests to collection");
       }
     },
-    [user?.details?.profile?.uid, team?.id, onSaveRecord, recordsToMove]
+    [recordsToMove, onSaveRecord, onSaveBulkRecords]
   );
 
   const handleRecordMove = useCallback(async () => {

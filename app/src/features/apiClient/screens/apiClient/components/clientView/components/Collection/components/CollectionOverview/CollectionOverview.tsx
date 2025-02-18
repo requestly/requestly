@@ -5,7 +5,6 @@ import { Input, Tabs } from "antd";
 import { upsertApiRecord } from "backend/apiClient";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { useDebounce } from "hooks/useDebounce";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
@@ -15,6 +14,8 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import { useOutsideClick } from "hooks";
 import "./collectionOverview.scss";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 interface CollectionOverviewProps {
   collection: RQAPI.CollectionRecord;
@@ -24,7 +25,7 @@ const COLLECTION_DETAILS_PLACEHOLDER = "Collection description";
 
 export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collection }) => {
   const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const { onSaveRecord } = useApiClientContext();
   const { replaceTab } = useTabsLayoutContext();
 
@@ -41,11 +42,11 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
         ...collection,
         description: newDescription,
       };
-      return upsertApiRecord(user.details?.profile?.uid, updatedCollection, team?.id).then((result) => {
+      return upsertApiRecord(user.details?.profile?.uid, updatedCollection, activeWorkspaceId).then((result) => {
         onSaveRecord(result.data);
       });
     },
-    [collection, onSaveRecord, user.details?.profile?.uid, team?.id]
+    [collection, onSaveRecord, user.details?.profile?.uid, activeWorkspaceId]
   );
 
   const debouncedDescriptionChange = useDebounce(handleDescriptionChange, 1500);
@@ -60,7 +61,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
       setCollectionName("Untitled Collection");
     }
 
-    return upsertApiRecord(user.details?.profile?.uid, updatedCollection, team?.id).then((result) => {
+    return upsertApiRecord(user.details?.profile?.uid, updatedCollection, activeWorkspaceId).then((result) => {
       onSaveRecord(result.data);
       replaceTab(result.data.id, {
         id: result.data.id,
