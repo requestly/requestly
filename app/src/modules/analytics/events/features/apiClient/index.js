@@ -165,23 +165,11 @@ export const trackRawResponseViewed = () => {
   trackEvent(API_CLIENT.RAW_RESPONSE_VIEWED);
 };
 
-export const trackImportFromPostmanClicked = () => {
-  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_CLICKED);
-};
-
-export const trackImportFromBrunoClicked = () => {
-  trackEvent(API_CLIENT.IMPORT_FROM_BRUNO_CLICKED);
-};
-
 export const trackInstallExtensionDialogShown = (params) =>
   trackEvent(API_CLIENT.INSTALL_EXTENSION_DIALOG_SHOWN, params);
 
 export const trackExportApiCollectionsFailed = (num_records, num_variables) => {
   trackEvent(API_CLIENT.EXPORT_COLLECTIONS_FAILED, { num_records, num_variables });
-};
-
-export const trackImportApiCollectionsClicked = () => {
-  trackEvent(API_CLIENT.IMPORT_COLLECTIONS_CLICKED);
 };
 
 export const trackDuplicateRequestClicked = () => {

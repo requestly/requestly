@@ -18,7 +18,6 @@ import {
   trackImportFailed,
   trackImportParsed,
   trackImportParseFailed,
-  trackImportStarted,
   trackImportSuccess,
 } from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
@@ -60,7 +59,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   const handleFileDrop = useCallback(
     (files: File[]) => {
       setProcessingStatus("processing");
-      trackImportStarted("postman");
       setImportError(null);
 
       const processFiles = files.map((file) => {
@@ -95,7 +93,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 });
               }
             } catch (error) {
-              trackImportParseFailed("postman", error.message);
               Logger.error("Error processing postman file:", error);
               reject(error);
             }

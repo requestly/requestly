@@ -113,8 +113,8 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
             );
           }
 
-          // Tracking user properties for analytics
-          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ENVIRONMENTS, Object.keys(environmentMap).length);
+          // Tracking user properties for analytics (excluding global variables)
+          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ENVIRONMENTS, Object.keys(environmentMap).length - 1);
 
           const updatedEnvironmentMap: EnvironmentMap = {};
 

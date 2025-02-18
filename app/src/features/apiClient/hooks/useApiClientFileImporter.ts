@@ -13,7 +13,6 @@ import {
   trackImportFailed,
   trackImportParsed,
   trackImportParseFailed,
-  trackImportStarted,
   trackImportSuccess,
 } from "modules/analytics/events/features/apiClient";
 import { processRqImportData } from "features/apiClient/screens/apiClient/components/modals/importModal/utils";
@@ -62,7 +61,6 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
   const processFiles = useCallback(
     (files: File[]) => {
       setProcessingStatus("processing");
-      trackImportStarted("requestly");
       setError(null);
 
       const processFiles = files.map((file) => {
@@ -87,7 +85,6 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
               const processedData = processor(content, uid);
               resolve(processedData);
             } catch (error) {
-              trackImportParseFailed("requestly", error.message);
               Logger.error("Error processing file:", error);
               reject(error);
             }
