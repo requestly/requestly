@@ -252,7 +252,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         const importedApis = collectionsResult.status === "fulfilled" ? collectionsResult.value.importedApisCount : 0;
 
         const failedEnvironments = processedFileData.environments.length - importedEnvironments;
-        const failedCollections = collectionsCount.current - (importedCollections + importedApis);
+        const failedCollections = collectionsCount.current - importedCollections;
 
         if (!importedEnvironments && !importedCollections && !importedApis) {
           toast.error("Failed to import Postman data");
