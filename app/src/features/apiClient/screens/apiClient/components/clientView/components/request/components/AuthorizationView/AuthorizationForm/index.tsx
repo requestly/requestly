@@ -1,86 +1,28 @@
 import { Select } from "antd";
 import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
-// import { AuthFormField, SingleLineEditorField, SelectField, AuthForm.FIELD_TYPE, AuthFormData } from "./formStructure/types";
-import React, { useCallback } from "react";
+import React from "react";
 import { EnvironmentVariables } from "backend/environment/types";
 import { AuthForm } from "./formStructure/types";
-import {
-  ApiKeyAuthorizationConfig,
-  AuthConfig,
-  Authorization,
-  BasicAuthAuthorizationConfig,
-  BearerTokenAuthorizationConfig,
-} from "../types/AuthConfig";
+import { AuthConfig, Authorization } from "../types/AuthConfig";
+import { useAuthFormState } from "./hooks/useAuthFormState";
+import { RQAPI } from "features/apiClient/types";
 
 interface AuthorizationFormProps {
+  defaultAuthValues: RQAPI.Auth;
   formData: AuthForm.FormField[];
   formType: Authorization.Type;
   onChangeHandler: (newFormConfig: AuthConfig | null) => void;
   variables: EnvironmentVariables;
 }
 
-const AuthorizationForm: React.FC<AuthorizationFormProps> = ({ formData, formType, onChangeHandler, variables }) => {
-  const [formState, setFormState] = React.useState<Record<string, any>>({});
-  // const [formConfig, setFormConfig] = React.useState<Authorization | null>(null);
-  // const formConfig = useMemo(() => {
-  //   let config;
-  //   switch (formType) {
-  //     case Authorization.Type.BASIC_AUTH:
-  //       const { username, password } = formState;
-  //       config = new BasicAuthAuthorizationConfig(username, password);
-  //       break;
-  //     case Authorization.Type.BEARER_TOKEN:
-  //       config = new BearerTokenAuthorizationConfig(formState.bearer);
-  //       break;
-  //     case Authorization.Type.API_KEY:
-  //       const { key, value, addTo } = formState;
-  //       config = new ApiKeyAuthorizationConfig(key, value, addTo);
-  //       break;
-  //     default:
-  //       config = null;
-  //   }
-  //   if(config) {
-  //     if(!config.validate()) return null;
-  //     onChangeHandler(config);
-  //   }
-  //   return config
-  // }, [formType, formState])
-  const onFormChange = useCallback(
-    (value: string, id: string): void => {
-      if (formState[id] === value) return;
-      const newFormState = { ...formState, [id]: value };
-      // setFormState((prev) => ({ ...prev, [id]: value }));
-      let config;
-      switch (formType) {
-        case Authorization.Type.BASIC_AUTH: {
-          const { username, password } = formState;
-          config = new BasicAuthAuthorizationConfig(username, password);
-          break;
-        }
-        case Authorization.Type.BEARER_TOKEN: {
-          config = new BearerTokenAuthorizationConfig(formState.bearer);
-          break;
-        }
-        case Authorization.Type.API_KEY: {
-          const { key, value, addTo } = formState;
-          config = new ApiKeyAuthorizationConfig(key, value, addTo);
-          break;
-        }
-        default: {
-          config = null;
-        }
-      }
-      if (config) {
-        if (!config.validate()) {
-          onChangeHandler(null);
-        } else {
-          onChangeHandler(config);
-        }
-      }
-      setFormState(newFormState);
-    },
-    [formState, formType, onChangeHandler]
-  );
+const AuthorizationForm: React.FC<AuthorizationFormProps> = ({
+  defaultAuthValues,
+  formData,
+  formType,
+  onChangeHandler,
+  variables,
+}) => {
+  const { formState, handleFormChange } = useAuthFormState(defaultAuthValues, formType, onChangeHandler);
 
   return (
     <div className="form">
@@ -88,7 +30,7 @@ const AuthorizationForm: React.FC<AuthorizationFormProps> = ({ formData, formTyp
         <div className="field-group" key={formField.id || index}>
           <label>{formField.label}</label>
           <div className="field">
-            {generateFields(formField, index, variables, formType, onFormChange, formState[formField.id])}
+            {generateFields(formField, index, variables, formType, handleFormChange, formState[formField.id])}
           </div>
         </div>
       ))}
@@ -96,15 +38,13 @@ const AuthorizationForm: React.FC<AuthorizationFormProps> = ({ formData, formTyp
   );
 };
 
-export default AuthorizationForm;
-
 function generateFields(
   field: AuthForm.FormField,
   index: number,
   currentEnvironmentVariables: EnvironmentVariables,
-  formType: string,
+  formType: Authorization.Type,
   onChangeHandler: (value: string, id: string) => void,
-  value: any
+  value: string
 ) {
   switch (field.type) {
     case AuthForm.FIELD_TYPE.INPUT:
@@ -133,3 +73,5 @@ function generateFields(
       return null;
   }
 }
+
+export default React.memo(AuthorizationForm);

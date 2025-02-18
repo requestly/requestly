@@ -30,6 +30,7 @@ export namespace AuthForm {
 
   export type FormData = Record<Authorization.Type, FormField[] | null>;
 
+  /* DESCRIPTION */
   export namespace Description {
     interface Step {
       value: string;
@@ -61,5 +62,3 @@ export namespace AuthForm {
     };
   };
 }
-
-/* DESCRIPTION */
