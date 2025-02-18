@@ -1,6 +1,7 @@
 import PSMH from "../config/PageScriptMessageHandler";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import * as semver from "semver";
+import UAParser from "ua-parser-js";
 
 export function getExtensionVersion() {
   return document.documentElement.getAttribute("rq-ext-version");
@@ -19,7 +20,11 @@ export function isExtensionInstalled() {
 }
 
 export const isSafariExtension = () => {
-  return !!document.documentElement.getAttribute("rq-is-safari");
+  const parser = new UAParser(window.navigator.userAgent);
+  const result = parser.getResult();
+  const browser = result.browser.name;
+
+  return browser === "Safari" && isExtensionInstalled();
 };
 
 export function isSessionBearExtensionInstalled() {

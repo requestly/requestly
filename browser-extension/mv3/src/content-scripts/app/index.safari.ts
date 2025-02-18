@@ -9,8 +9,5 @@ document.documentElement.setAttribute("rq-ext-mv", "3");
 // extension id
 document.documentElement.setAttribute("rq-ext-id", chrome.runtime.id);
 
-//is safari extension
-document.documentElement.setAttribute("rq-is-safari", "true");
-
 initMessageHandler();
 initExtensionMessageListener();
