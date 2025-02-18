@@ -71,7 +71,7 @@ const processScripts = (item: any) => {
   };
 
   const migratePostmanScripts = (postmanScript: string) => {
-    return postmanScript.replace(/pm\./g, "rq."); // Replace all occurrences of 'pm.' with 'rq.'
+    return postmanScript?.replace(/pm\./g, "rq."); // Replace all occurrences of 'pm.' with 'rq.'
   };
 
   if (!item.event?.length) {
@@ -80,9 +80,9 @@ const processScripts = (item: any) => {
 
   item.event.forEach((event: any) => {
     if (event.listen === "prerequest") {
-      scripts.preRequest = migratePostmanScripts(event.script.exec.join("\n"));
+      scripts.preRequest = migratePostmanScripts(event.script?.exec?.join("\n"));
     } else if (event.listen === "test") {
-      scripts.postResponse = migratePostmanScripts(event.script.exec.join("\n"));
+      scripts.postResponse = migratePostmanScripts(event.script?.exec?.join("\n"));
     }
   });
 
@@ -99,7 +99,8 @@ const processAuthorizationOptions = (
 
   const auth: RQAPI.AuthOptions = { currentAuthType, [currentAuthType]: {} };
 
-  const authOptions = item[item?.type] || [];
+  const authOptions = Array.isArray(item[item?.type]) ? item[item?.type] : [];
+
   authOptions.forEach((option: Record<string, any>) => {
     auth[currentAuthType][POSTMAN_FIELD_MAPPING.get(option.key)] = POSTMAN_FIELD_MAPPING.get(option.value);
   });
@@ -140,16 +141,16 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
     requestBody =
       formdata?.map((formData: { key: string; value: string }) => ({
         id: Date.now(),
-        key: formData.key,
-        value: formData.value,
+        key: formData?.key || "",
+        value: formData?.value || "",
         isEnabled: true,
       })) || [];
   } else if (mode === "urlencoded") {
     contentType = RequestContentType.FORM;
     requestBody = urlencoded.map((data: { key: string; value: string }) => ({
       id: Date.now() + Math.random(),
-      key: data.key,
-      value: data.value,
+      key: data?.key || "",
+      value: data?.value || "",
       isEnabled: true,
     }));
   }

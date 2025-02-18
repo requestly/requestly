@@ -178,7 +178,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     let importedCollectionsCount = 0;
     let failedCollectionsCount = 0;
     let importedApisCount = 0;
-    let failedApisCount = 0;
 
     const collections = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.COLLECTION);
     const apis = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.API);
@@ -213,7 +212,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         onSaveRecord(newApi.data, "none");
         importedApisCount++;
       } catch (error) {
-        failedApisCount++;
+        failedCollectionsCount++;
         Logger.error("Error importing API:", error);
       }
     };
@@ -223,12 +222,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       batchWrite(BATCH_SIZE, apis, handleApiWrites),
     ]);
 
-    if (failedCollectionsCount > 0 || failedApisCount > 0) {
+    if (failedCollectionsCount > 0) {
       const failureMessage =
-        failedCollectionsCount + failedApisCount > 0
-          ? `${failedCollectionsCount + failedApisCount} ${
-              failedCollectionsCount + failedApisCount > 1 ? "collections" : "collection"
-            } failed`
+        failedCollectionsCount > 0
+          ? `${failedCollectionsCount} ${failedCollectionsCount > 1 ? "collections" : "collection"} failed`
           : "";
       if (failureMessage.length) {
         toast.warn(`Some imports failed: ${failureMessage}, Please contact support if the issue persists.`);
@@ -251,13 +248,13 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         const failedEnvironments = processedFileData.environments.length - importedEnvironments;
         const failedCollections = collectionsCount.current - importedCollections;
 
-        if (!importedEnvironments && !importedCollections && !importedApis) {
+        if (!importedEnvironments && !importedCollections) {
           toast.error("Failed to import Postman data");
           return;
         }
 
         const hasFailures = failedEnvironments > 0 || failedCollections > 0;
-        const hasSuccesses = importedEnvironments > 0 || importedCollections + importedApis > 0;
+        const hasSuccesses = importedEnvironments > 0 || importedCollections > 0;
 
         if (hasFailures && hasSuccesses) {
           const failureMessage = [
@@ -273,9 +270,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
         toast.success(
           `Successfully imported ${[
-            importedCollections + importedApis > 0
-              ? `${importedCollections + importedApis} collection${importedCollections + importedApis !== 1 ? "s" : ""}`
-              : "",
+            importedCollections > 0 ? `${importedCollections} collection${importedCollections !== 1 ? "s" : ""}` : "",
             importedEnvironments > 0
               ? `${importedEnvironments} environment${importedEnvironments !== 1 ? "s" : ""}`
               : "",
