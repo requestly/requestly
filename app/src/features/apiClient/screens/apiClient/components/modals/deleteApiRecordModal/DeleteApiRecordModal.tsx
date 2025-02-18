@@ -17,7 +17,7 @@ interface DeleteApiRecordModalProps {
 }
 
 export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open, records, onClose, onSuccess }) => {
-  const { onDeleteRecords, apiClientSyncRepository } = useApiClientContext();
+  const { onDeleteRecords, apiClientRecordsRepository } = useApiClientContext();
 
   const [isDeleting, setIsDeleting] = useState(false);
   if (isEmpty(records)) {
@@ -46,7 +46,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
     setIsDeleting(true);
 
     const recordIds = getAllIdsToDelete();
-    const result = await apiClientSyncRepository.deleteRecords(recordIds);
+    const result = await apiClientRecordsRepository.deleteRecords(recordIds);
 
     onDeleteRecords(recordIds);
 

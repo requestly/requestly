@@ -19,7 +19,7 @@ const TAB_KEYS = {
 
 export const CollectionView = () => {
   const { collectionId } = useParams();
-  const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords, apiClientSyncRepository } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords, apiClientRecordsRepository } = useApiClientContext();
   const { replaceTab } = useTabsLayoutContext();
   const location = useLocation();
 
@@ -36,7 +36,7 @@ export const CollectionView = () => {
           auth: newAuthOptions,
         },
       };
-      return apiClientSyncRepository
+      return apiClientRecordsRepository
         .updateRecord(record)
         .then((result) => {
           // fix-me: to verify new change are broadcasted to child entries that are open in tabs
@@ -44,7 +44,7 @@ export const CollectionView = () => {
         })
         .catch(console.error);
     },
-    [collection, onSaveRecord, apiClientSyncRepository]
+    [collection, onSaveRecord, apiClientRecordsRepository]
   );
 
   const tabItems = useMemo(() => {
@@ -76,7 +76,7 @@ export const CollectionView = () => {
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
       const record = { ...collection, name };
-      return apiClientSyncRepository.updateRecord(record).then((result) => {
+      return apiClientRecordsRepository.updateRecord(record).then((result) => {
         onSaveRecord(result.data);
         replaceTab(result.data.id, {
           id: result.data.id,
@@ -85,7 +85,7 @@ export const CollectionView = () => {
         });
       });
     },
-    [collection, onSaveRecord, replaceTab, apiClientSyncRepository]
+    [collection, onSaveRecord, replaceTab, apiClientRecordsRepository]
   );
 
   if (isLoadingApiClientRecords) {

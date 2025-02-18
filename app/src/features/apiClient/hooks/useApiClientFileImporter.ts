@@ -49,7 +49,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
 
   const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ initFetchers: false });
-  const { onSaveRecord, apiClientSyncRepository } = useApiClientContext();
+  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 
@@ -153,7 +153,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
     // Utility function to handle batch writes for collections
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
-        const newCollection = await apiClientSyncRepository.createRecordWithId(collection, collection.id);
+        const newCollection = await apiClientRecordsRepository.createRecordWithId(collection, collection.id);
         onSaveRecord(newCollection.data, "none");
         importedCollectionsCount++;
         return newCollection.data.id;
@@ -169,7 +169,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
       const newCollectionId = collections.find((collection) => collection.id === api.collectionId)?.id;
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
-        const newApi = await apiClientSyncRepository.createRecordWithId(updatedApi, updatedApi.id);
+        const newApi = await apiClientRecordsRepository.createRecordWithId(updatedApi, updatedApi.id);
         onSaveRecord(newApi.data, "none");
         !newCollectionId && importedCollectionsCount++;
       } catch (error) {
@@ -194,7 +194,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
     }
 
     return importedCollectionsCount;
-  }, [onSaveRecord, collections, apis, apiClientSyncRepository]);
+  }, [onSaveRecord, collections, apis, apiClientRecordsRepository]);
 
   const handleImportData = useCallback(
     async (onSuccess: () => void) => {

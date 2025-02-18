@@ -45,7 +45,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   });
 
   const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ initFetchers: false });
-  const { onSaveRecord, apiClientSyncRepository } = useApiClientContext();
+  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
 
   const collectionsCount = useRef(0);
 
@@ -175,7 +175,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
-        const newCollection = await apiClientSyncRepository.createRecordWithId(collection, collection.id);
+        const newCollection = await apiClientRecordsRepository.createRecordWithId(collection, collection.id);
         onSaveRecord(newCollection.data, "none");
         importedCollectionsCount++;
         return newCollection.data.id;
@@ -194,7 +194,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
-        const newApi = await apiClientSyncRepository.createRecordWithId(updatedApi, updatedApi.id);
+        const newApi = await apiClientRecordsRepository.createRecordWithId(updatedApi, updatedApi.id);
         onSaveRecord(newApi.data, "none");
       } catch (error) {
         failedCollectionsCount++;
@@ -218,7 +218,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     }
 
     return importedCollectionsCount;
-  }, [processedFileData.apiRecords, onSaveRecord, apiClientSyncRepository]);
+  }, [processedFileData.apiRecords, onSaveRecord, apiClientRecordsRepository]);
 
   const handleImportPostmanData = useCallback(() => {
     trackImportFromPostmanStarted(collectionsCount.current, processedFileData.environments.length);

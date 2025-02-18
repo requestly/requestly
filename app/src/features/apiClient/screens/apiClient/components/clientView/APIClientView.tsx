@@ -71,7 +71,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const { requestId } = useParams();
 
   const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
-  const { apiClientRecords, onSaveRecord, apiClientWorkloadManager, apiClientSyncRepository } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const {
     getVariablesWithPrecedence,
@@ -368,14 +368,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.name = requestName;
     }
 
-    const args: Parameters<typeof apiClientSyncRepository.updateRecord> = [record];
+    const args: Parameters<typeof apiClientRecordsRepository.updateRecord> = [record];
 
     if (isCreateMode) {
       args.push(requestId);
       record.name = requestName;
     }
 
-    const result = await apiClientSyncRepository.updateRecord(...args);
+    const result = await apiClientRecordsRepository.updateRecord(...args);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
@@ -403,13 +403,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.id = apiEntryDetails?.id;
     }
 
-    const args: Parameters<typeof apiClientSyncRepository.updateRecord> = [record];
+    const args: Parameters<typeof apiClientRecordsRepository.updateRecord> = [record];
 
     if (isCreateMode) {
       args.push(requestId);
     }
 
-    const result = await apiClientSyncRepository.updateRecord(...args);
+    const result = await apiClientRecordsRepository.updateRecord(...args);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
@@ -425,7 +425,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
 
     setIsRequestSaving(false);
-  }, [entry, apiEntryDetails, onSaveRecord, setEntry, resetChanges, isCreateMode, requestId, apiClientSyncRepository]);
+  }, [entry, apiEntryDetails, onSaveRecord, setEntry, resetChanges, isCreateMode, requestId, apiClientRecordsRepository]);
 
   const cancelRequest = useCallback(() => {
     apiClientExecutor.abort();

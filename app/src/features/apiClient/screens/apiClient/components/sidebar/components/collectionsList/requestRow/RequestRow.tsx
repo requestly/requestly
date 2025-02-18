@@ -37,7 +37,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
     updateRecordsToBeDeleted,
     setIsDeleteModalOpen,
     onSaveRecord,
-    apiClientSyncRepository,
+    apiClientRecordsRepository,
   } = useApiClientContext();
 
   const handleDuplicateRequest = useCallback(
@@ -47,7 +47,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
         name: `(Copy) ${record.name || record.data.request.url}`,
       };
       delete newRecord.id;
-      return apiClientSyncRepository
+      return apiClientRecordsRepository
         .createRecord(newRecord)
         .then((result) => {
           if (!result.success) {
@@ -63,7 +63,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
           trackDuplicateRequestFailed();
         });
     },
-    [onSaveRecord, apiClientSyncRepository]
+    [onSaveRecord, apiClientRecordsRepository]
   );
 
   const getRequestOptions = useCallback((): MenuProps["items"] => {
