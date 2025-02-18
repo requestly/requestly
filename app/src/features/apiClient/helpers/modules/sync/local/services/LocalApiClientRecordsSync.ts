@@ -7,8 +7,8 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   constructor(readonly metadata: ApiClientLocalMeta) {
     this.meta = metadata;
   }
-    getAllRecords(): RQAPI.RecordsPromise {
-        throw new Error("Method not implemented.");
+    async getAllRecords(): RQAPI.RecordsPromise {
+			return [] as any;
     }
     getRecord(recordId: string): RQAPI.RecordPromise {
         throw new Error("Method not implemented.");
