@@ -24,7 +24,6 @@ import {
   trackImportFailed,
   trackImportParsed,
   trackImportParseFailed,
-  trackImportStarted,
   trackImportSuccess,
 } from "modules/analytics/events/features/apiClient";
 
@@ -57,7 +56,6 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
   const handleFileDrop = useCallback((files: File[]) => {
     setProcessingStatus("processing");
-    trackImportStarted("bruno");
     setImportError(null);
 
     const processFiles = files.map((file) => {
@@ -81,7 +79,6 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
             const processedData = processBrunoCollectionData(fileContent);
             resolve({ data: processedData });
           } catch (error) {
-            trackImportParseFailed("bruno", error.message);
             console.error("Error processing Bruno file:", error);
             reject(error);
           }

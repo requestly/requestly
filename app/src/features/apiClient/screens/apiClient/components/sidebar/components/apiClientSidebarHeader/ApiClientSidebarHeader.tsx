@@ -8,11 +8,7 @@ import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { ApiClientSidebarTabKey } from "../../APIClientSidebar";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
-import {
-  trackImportApiCollectionsClicked,
-  trackImportFromBrunoClicked,
-  trackImportFromPostmanClicked,
-} from "modules/analytics/events/features/apiClient";
+import { trackImportStarted } from "modules/analytics/events/features/apiClient";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
@@ -91,6 +87,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </div>
         ),
         onClick: () => {
+          trackImportStarted("requestly");
           if (!user.loggedIn) {
             dispatch(
               globalActions.toggleActiveModal({
@@ -104,7 +101,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
               })
             );
           } else {
-            trackImportApiCollectionsClicked();
             setIsImportModalOpen(true);
           }
         },
@@ -117,7 +113,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </div>
         ),
         onClick: () => {
-          trackImportFromPostmanClicked();
+          trackImportStarted("postman");
           if (!user.loggedIn) {
             dispatch(
               globalActions.toggleActiveModal({
@@ -143,7 +139,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </div>
         ),
         onClick: () => {
-          trackImportFromBrunoClicked();
+          trackImportStarted("bruno");
           if (!user.loggedIn) {
             dispatch(
               globalActions.toggleActiveModal({
