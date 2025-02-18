@@ -1,3 +1,6 @@
+
+
+
 ![Requestly Logo](https://github.com/user-attachments/assets/5bccaf91-2d9b-4969-91ee-aaa957f976e5)
 
 <br/>
@@ -8,7 +11,7 @@ Requestly is a powerful combination of a local HTTP Proxy and an API client with
 
 
 #### ⚡ A Local-first, Beautiful & Powerful alternative to Postman, Insomina & Charles Proxy ⚡
-
+![requestly-overview](https://github.com/user-attachments/assets/04c32f25-96c4-46d9-a31d-b6887ce7bfdc)
 <br/>
 
 ![GitHub closed issues](https://img.shields.io/github/issues-closed/requestly/requestly)     [![Chrome Web Store Rating](https://img.shields.io/chrome-web-store/rating/mdnleldcmiljblolnjhpnblkcekpdkpa) ![Chrome Web Store Reviews](https://img.shields.io/chrome-web-store/rating-count/mdnleldcmiljblolnjhpnblkcekpdkpa?label=reviews) ![Chrome Web Store Downloads](https://img.shields.io/chrome-web-store/users/mdnleldcmiljblolnjhpnblkcekpdkpa?label=downloads)](https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/) [![Status badge](https://uptime.betterstack.com/status-badges/v2/monitor/13j20.svg)](https://status.requestly.io)
