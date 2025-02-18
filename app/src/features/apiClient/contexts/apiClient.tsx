@@ -17,7 +17,11 @@ import {
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { clearExpandedRecordIdsFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
+import {
+  clearExpandedRecordIdsFromSession,
+  createBlankApiRecord,
+  trackUserProperties,
+} from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { useSearchParams } from "react-router-dom";
@@ -154,6 +158,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       .then((result) => {
         if (result.success) {
           setApiClientRecords(result.data);
+
+          // Tracking user properties for analytics
+          trackUserProperties(result.data);
         }
       })
       .catch((error) => {
@@ -167,20 +174,34 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
     setApiClientRecords((prev) => {
-      return [...prev, { ...apiClientRecord }];
+      const updatedRecords = [...prev, { ...apiClientRecord }];
+
+      // Tracking user properties for analytics
+      trackUserProperties(updatedRecords);
+      return updatedRecords;
     });
   }, []);
 
   const onRemoveRecord = useCallback((apiClientRecord: RQAPI.Record) => {
     setApiClientRecords((prev) => {
-      return prev.filter((record) => record.id !== apiClientRecord.id);
+      const updatedRecords = prev.filter((record) => record.id !== apiClientRecord.id);
+
+      // Tracking user properties for analytics
+      trackUserProperties(updatedRecords);
+      return updatedRecords;
     });
   }, []);
 
   const onUpdateRecord = useCallback(
     (apiClientRecord: RQAPI.Record) => {
       setApiClientRecords((prev) => {
-        return prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record));
+        const updatedRecords = prev.map((record) =>
+          record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record
+        );
+
+        // Tracking user properties for analytics
+        trackUserProperties(updatedRecords);
+        return updatedRecords;
       });
 
       updateTab(apiClientRecord.id, {
@@ -198,9 +219,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       clearExpandedRecordIdsFromSession(recordIdsToBeDeleted);
 
       setApiClientRecords((prev) => {
-        return prev.filter((record) => {
+        const updatedRecords = prev.filter((record) => {
           return !recordIdsToBeDeleted.includes(record.id);
         });
+
+        // Tracking user properties for analytics
+        trackUserProperties(updatedRecords);
+        return updatedRecords;
       });
     },
     [deleteTabs]
@@ -220,7 +245,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           }
           currentRecordsMap.set(record.id, record);
         });
-        return Array.from(currentRecordsMap.values());
+
+        const updatedRecords = Array.from(currentRecordsMap.values());
+        // Tracking user properties for analytics
+        trackUserProperties(updatedRecords);
+        return updatedRecords;
       });
     },
     [updateTab, setApiClientRecords]

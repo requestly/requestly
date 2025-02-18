@@ -137,10 +137,6 @@ export const trackImportFailed = (type, reason) => {
   trackEvent(API_CLIENT.IMPORT_FAILED, { import_type: type, reason });
 };
 
-export const trackBeautifyRequestJSONClicked = () => {
-  trackEvent(API_CLIENT.BEAUTIFY_REQUEST_JSON_CLICKED);
-};
-
 export const trackImportCurlClicked = () => {
   trackEvent(API_CLIENT.IMPORT_CURL_CLICKED);
 };
@@ -169,91 +165,27 @@ export const trackRawResponseViewed = () => {
   trackEvent(API_CLIENT.RAW_RESPONSE_VIEWED);
 };
 
-export const trackResponseHeadersViewed = () => {
-  trackEvent(API_CLIENT.RESPONSE_HEADERS_VIEWED);
-};
-
-export const trackInstallExtensionDialogShown = (params) =>
-  trackEvent(API_CLIENT.INSTALL_EXTENSION_DIALOG_SHOWN, params);
-
-export const trackExportApiCollectionsStarted = (num_records, num_variables) => {
-  trackEvent(API_CLIENT.EXPORT_COLLECTIONS_STARTED, { num_records, num_variables });
-};
-
-export const trackExportApiCollectionsFailed = (num_records, num_variables) => {
-  trackEvent(API_CLIENT.EXPORT_COLLECTIONS_FAILED, { num_records, num_variables });
-};
-
-export const trackExportApiCollectionsSuccessful = (num_records, num_variables) => {
-  trackEvent(API_CLIENT.EXPORT_COLLECTIONS_SUCCESSFUL, { num_records, num_variables });
-};
-
-export const trackImportApiCollectionsClicked = () => {
-  trackEvent(API_CLIENT.IMPORT_COLLECTIONS_CLICKED);
-};
-
-export const trackImportApiCollectionsStarted = (num_records, num_variables) => {
-  trackEvent(API_CLIENT.IMPORT_COLLECTIONS_STARTED, { num_records, num_variables });
-};
-
-export const trackImportApiCollectionsFailed = (num_records, num_variables) => {
-  trackEvent(API_CLIENT.IMPORT_COLLECTIONS_FAILED, { num_records, num_variables });
-};
-
-export const trackImportApiCollectionsSuccessful = (num_records, num_variables) => {
-  trackEvent(API_CLIENT.IMPORT_COLLECTIONS_SUCCESSFUL, { num_records, num_variables });
-};
-
-export const trackEnableKeyValueToggled = (is_active, type) => {
-  trackEvent(API_CLIENT.ENABLE_KEY_VALUE_TOGGLED, { is_active, type });
-};
-
 export const trackImportFromPostmanClicked = () => {
   trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_CLICKED);
-};
-
-export const trackImportFromPostmanCompleted = (num_collections, num_environments) => {
-  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_COMPLETED, { num_collections, num_environments });
-};
-
-export const trackImportFromPostmanFailed = (num_collections, num_environments) => {
-  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_FAILED, { num_collections, num_environments });
-};
-
-export const trackImportFromPostmanDataProcessed = (num_collections, num_environments) => {
-  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_DATA_PROCESSED, { num_collections, num_environments });
-};
-
-export const trackImportFromPostmanStarted = (num_collections, num_environments) => {
-  trackEvent(API_CLIENT.IMPORT_FROM_POSTMAN_STARTED, { num_collections, num_environments });
 };
 
 export const trackImportFromBrunoClicked = () => {
   trackEvent(API_CLIENT.IMPORT_FROM_BRUNO_CLICKED);
 };
 
-export const trackImportFromBrunoCompleted = (num_collections, num_environments) => {
-  trackEvent(API_CLIENT.IMPORT_FROM_BRUNO_COMPLETED, { num_collections, num_environments });
+export const trackInstallExtensionDialogShown = (params) =>
+  trackEvent(API_CLIENT.INSTALL_EXTENSION_DIALOG_SHOWN, params);
+
+export const trackExportApiCollectionsFailed = (num_records, num_variables) => {
+  trackEvent(API_CLIENT.EXPORT_COLLECTIONS_FAILED, { num_records, num_variables });
 };
 
-export const trackImportFromBrunoFailed = (num_collections, num_environments) => {
-  trackEvent(API_CLIENT.IMPORT_FROM_BRUNO_FAILED, { num_collections, num_environments });
-};
-
-export const trackImportFromBrunoDataProcessed = (num_collections, num_environments) => {
-  trackEvent(API_CLIENT.IMPORT_FROM_BRUNO_DATA_PROCESSED, { num_collections, num_environments });
-};
-
-export const trackImportFromBrunoStarted = (num_collections, num_environments) => {
-  trackEvent(API_CLIENT.IMPORT_FROM_BRUNO_STARTED, { num_collections, num_environments });
+export const trackImportApiCollectionsClicked = () => {
+  trackEvent(API_CLIENT.IMPORT_COLLECTIONS_CLICKED);
 };
 
 export const trackDuplicateRequestClicked = () => {
   trackEvent(API_CLIENT.DUPLICATE_REQUEST_CLICKED);
-};
-
-export const trackDuplicateRequestSuccessful = () => {
-  trackEvent(API_CLIENT.DUPLICATE_REQUEST_SUCCESSFUL);
 };
 
 export const trackDuplicateRequestFailed = () => {
@@ -262,10 +194,6 @@ export const trackDuplicateRequestFailed = () => {
 
 export const trackMoveRequestToCollectionClicked = () => {
   trackEvent(API_CLIENT.MOVE_REQUEST_TO_COLLECTION_CLICKED);
-};
-
-export const trackMoveRequestToCollectionSuccessful = (destination) => {
-  trackEvent(API_CLIENT.MOVE_REQUEST_TO_COLLECTION_SUCCESSFUL, { destination });
 };
 
 export const trackMoveRequestToCollectionFailed = (destination) => {
