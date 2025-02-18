@@ -26,7 +26,6 @@ type APIEntity = Collection | API;
 
 export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientLocalMeta> {
   meta: ApiClientLocalMeta;
-	fsManagerService: FsManagerServiceAdapter;
 
 	constructor(readonly metadata: ApiClientLocalMeta) {
     this.meta = metadata;
