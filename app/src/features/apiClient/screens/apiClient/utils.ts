@@ -10,6 +10,8 @@ import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
 import { generateDocumentId } from "backend/utils";
 import { EnvironmentVariables } from "backend/environment/types";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import APP_CONSTANTS from "config/constants";
 
 export const makeRequest = async (
   appMode: string,
@@ -595,4 +597,11 @@ export const getUpdatedVariableCount = (originalData: EnvironmentVariables, upda
   }));
 
   return differenceWith(formattedChangedData, formattedData, isEqual).length;
+};
+
+export const trackUserProperties = (records: RQAPI.Record[]) => {
+  const totalCollections = records.filter((record) => isApiCollection(record)).length;
+  const totalRequests = records.length - totalCollections;
+  submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_COLLECTIONS, totalCollections);
+  submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_REQUESTS, totalRequests);
 };
