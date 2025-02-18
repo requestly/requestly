@@ -1,6 +1,7 @@
 import { addRxPlugin, createRxDatabase, deepEqual, RxCollection, RxDatabase } from "rxdb";
 import { getRxStorageDexie } from "rxdb/plugins/storage-dexie";
 import { RxDBMigrationSchemaPlugin } from "rxdb/plugins/migration-schema";
+import { RxDBCleanupPlugin } from "rxdb/plugins/cleanup";
 import { replicateRxCollection, RxReplicationState } from "rxdb/plugins/replication";
 import { Observable, Subject, Subscription } from "rxjs";
 import { omit } from "lodash";
@@ -11,6 +12,7 @@ import { SyncEntityType, syncTypeToEntityMap } from "@requestly/shared/types/syn
 import { ReplicationConfig } from "./types";
 
 addRxPlugin(RxDBMigrationSchemaPlugin);
+addRxPlugin(RxDBCleanupPlugin);
 class SyncWorkspace {
   userId: string | undefined;
   authToken: string = "";
@@ -97,7 +99,10 @@ class SyncWorkspace {
     this.database = await createRxDatabase({
       name: `sync-db${this.userId ? "-" + this.userId : ""}-${this.workspaceId}`,
       storage: getRxStorageDexie(),
-      // ignoreDuplicate: true,
+      cleanupPolicy: {
+        minimumDeletedTime: 7 * 24 * 60 * 60 * 1000, // 7 days
+        runEach: 1000 * 60 * 5, // 5 minutes
+      },
     });
 
     this.collections = await this.database.addCollections({
