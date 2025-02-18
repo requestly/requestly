@@ -298,9 +298,6 @@ export const extractQueryParams = (inputString: string) => {
 };
 
 export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString: string) => {
-  if (isEmpty(queryParams)) {
-    return inputString;
-  }
   const baseUrl = split(inputString, "?")[0];
   const enabledParams = queryParams.filter((param) => param.isEnabled ?? true);
 
