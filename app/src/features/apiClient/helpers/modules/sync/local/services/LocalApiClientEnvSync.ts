@@ -1,10 +1,26 @@
 import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 import { ApiClientLocalMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
+import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
 
 export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
 	constructor(readonly meta: ApiClientLocalMeta) {
 
 	}
+
+	private async getAdapter() {
+    return fsManagerServiceAdapterProvider.get(this.meta.rootPath);
+  }
+
+  // async getAllRecords(): RQAPI.RecordsPromise {
+		// const service = await this.getAdapter();
+		// const entities: APIEntity[] = await service.getAllRecords();
+		// const parsedRecords = this.parseAPIEntities(entities);
+		// return {
+		// 	success: true,
+		// 	data: parsedRecords,
+		// };
+  // }
+
 	createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData> {
 		throw new Error("Method not implemented.");
 	}
