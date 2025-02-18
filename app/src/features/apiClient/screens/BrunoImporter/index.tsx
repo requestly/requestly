@@ -223,7 +223,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
         const successMessage = [
           recordsResult.importedApisCount + recordsResult.importedCollectionsCount > 0
-            ? `${recordsResult} collection(s)`
+            ? `${recordsResult.importedApisCount + recordsResult.importedCollectionsCount} collection(s) and api(s)`
             : null,
           importedEnvs > 0 ? `${importedEnvs} environment(s)` : null,
         ]
