@@ -13,6 +13,10 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   async build(rootPath: string) {
     return this.invokeProcedureInBG("build", rootPath) as Promise<void>;
   }
+
+	async getAllRecords() {
+		return this.invokeProcedureInBG("getAllRecords") as Promise<any>;
+	}
 }
 
 class FsManagerServiceAdapterProvider {
