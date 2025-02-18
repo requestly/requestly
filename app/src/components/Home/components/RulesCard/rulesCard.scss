@@ -16,6 +16,13 @@
 
 .content-container {
   &.rules-card {
+    .new-rule-button {
+      background: #1e69ff;
+      border: 0;
+      &:hover {
+        background: var(--requestly-color-primary);
+      }
+    }
     .middle-section {
       .list {
         .list-item {

@@ -9,10 +9,12 @@ import { TabsLayout } from "layouts/TabsLayout";
 import { RQDropdown } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
+import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 
 interface CardProps {
   contentLoading?: boolean;
   wrapperClass?: string;
+  defaultImportClickHandler: () => void;
   emptyCardOptions: {
     title: string;
     description: string;
@@ -53,6 +55,7 @@ export const Card: React.FC<CardProps> = ({
   viewAllCtaLink,
   viewAllCtaOnClick,
   importOptions,
+  defaultImportClickHandler,
 }) => {
   const MAX_LIST_ITEMS_TO_SHOW = 5;
 
@@ -76,12 +79,10 @@ export const Card: React.FC<CardProps> = ({
                 <h1>{title}</h1>
               </div>
               <div className="action-buttons">
-                <RQDropdown menu={{ items: importOptions.menu }} trigger={["click"]}>
-                  <RQButton type="transparent" className="import-dropdown-trigger">
-                    <MdOutlineFileUpload />
-                    Import
-                  </RQButton>
-                </RQDropdown>
+                <RQButton type="transparent" className="import-dropdown-trigger" onClick={defaultImportClickHandler}>
+                  <MdOutlineFileUpload />
+                  Import
+                </RQButton>
                 {actionButtons}
               </div>
             </div>
@@ -99,11 +100,18 @@ export const Card: React.FC<CardProps> = ({
               </div>
             </div>
             <div className="footer-section">
-              {contentList.length > MAX_LIST_ITEMS_TO_SHOW && (
-                <Link className="view-all-cta" to={viewAllCtaLink} onClick={viewAllCtaOnClick}>
-                  {viewAllCta}
-                </Link>
-              )}
+              <Link className="view-all-cta" to={viewAllCtaLink} onClick={viewAllCtaOnClick}>
+                {viewAllCta}
+              </Link>
+              <div className="import-dropdown">
+                <img src={importOptions.icon} alt={importOptions.label} />
+                <RQDropdown menu={{ items: importOptions.menu }} trigger={["click"]}>
+                  <RQButton className="import-dropdown-button" type="transparent">
+                    <span>Import from other apps</span>
+                    <MdOutlineKeyboardArrowDown />
+                  </RQButton>
+                </RQDropdown>
+              </div>
             </div>
           </div>
         </m.div>

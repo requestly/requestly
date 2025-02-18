@@ -44,7 +44,7 @@ const APIClientSidebar: React.FC<Props> = () => {
     onNewClick,
     onImportClick,
     onSelectionFromHistory,
-    recordToBeDeleted,
+    recordsToBeDeleted,
     isDeleteModalOpen,
     onDeleteModalClose,
     selectedHistoryIndex,
@@ -204,7 +204,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         />
       </div>
 
-      <DeleteApiRecordModal open={isDeleteModalOpen} record={recordToBeDeleted} onClose={onDeleteModalClose} />
+      <DeleteApiRecordModal open={isDeleteModalOpen} records={recordsToBeDeleted} onClose={onDeleteModalClose} />
 
       <ImportRequestModal
         isRequestLoading={isLoading}

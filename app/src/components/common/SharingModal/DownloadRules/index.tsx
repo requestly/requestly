@@ -8,10 +8,10 @@ import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRulesExportedEvent } from "modules/analytics/events/common/rules";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
-import { unselectAllRecords } from "components/features/rules/actions";
 import { getAllRecords } from "store/features/rules/selectors";
 import "./DownloadRules.css";
 import { StorageRecord } from "@requestly/shared/types/entities/rules";
+import { globalActions } from "store/slices/global/slice";
 
 interface DownloadRulesProps {
   selectedRules: StorageRecord["id"][];
@@ -49,7 +49,7 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({
 
       trackRQLastActivity("rules_exported");
       trackRulesExportedEvent(rulesCount);
-      unselectAllRecords(dispatch);
+      dispatch(globalActions.clearSelectedRecords());
       fileDownload(fileContent, fileName, "application/json");
       setTimeout(() => toast.success(`${rulesCount === 1 ? "Rule" : "Rules"} downloaded successfully`), 0);
       onRulesDownloaded();
