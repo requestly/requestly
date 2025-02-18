@@ -51,6 +51,8 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
   );
   const [fileInfo, setFileInfo] = useState<{ label: string; type: string }>({ label: "", type: "" });
 
+  const recordsToExport: ExportRecord[] = [];
+
   const handleExport = useCallback(() => {
     const dataToExport = { schema_version: COLLECTIONS_SCHEMA_VERSION, ...exportData };
 
@@ -67,31 +69,21 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     }
   }, [exportData, recordsToBeExported, environments, onClose, fileInfo.label]);
 
-  const recordsToExport: { collections: ExportRecord[]; apis: ExportRecord[] } = {
-    collections: [],
-    apis: [],
-  };
-
   const sanitizeRecord = (record: RQAPI.Record): ExportRecord =>
     omit(record, ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"]);
 
-  const sanitizeRecords = useCallback(
-    (collection: RQAPI.CollectionRecord, recordsToExport: { collections: ExportRecord[]; apis: ExportRecord[] }) => {
-      recordsToExport.collections.push(
-        sanitizeRecord({ ...collection, data: omit(collection.data, "children") }) as RQAPI.CollectionRecord
-      );
-      collection.data.children.forEach((record: RQAPI.Record) => {
-        if (record.type === RQAPI.RecordType.API) {
-          recordsToExport.apis.push(sanitizeRecord(record) as ExportRecord);
-        } else {
-          sanitizeRecords(record, recordsToExport);
-        }
-      });
-
-      return recordsToExport;
-    },
-    []
-  );
+  const sanitizeRecords = useCallback((collection: RQAPI.CollectionRecord, recordsToExport: ExportRecord[]) => {
+    recordsToExport.push(
+      sanitizeRecord({ ...collection, data: omit(collection.data, "children") }) as RQAPI.CollectionRecord
+    );
+    collection.data.children.forEach((record: RQAPI.Record) => {
+      if (record.type === RQAPI.RecordType.API) {
+        recordsToExport.push(sanitizeRecord(record) as ExportRecord);
+      } else {
+        sanitizeRecords(record, recordsToExport);
+      }
+    });
+  }, []);
 
   const processEnvironments = useCallback((environments: EnvironmentData[]): EnvironmentData[] => {
     return environments.map((env) => {
@@ -109,22 +101,15 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     if (!isOpen || isApiRecordsProcessed) return;
 
     if (exportType === "collection") {
-      let processedRecords: ExportRecord[] = [];
-
       recordsToBeExported.forEach((record) => {
         if (isApiCollection(record)) {
-          const { collections: processedCollection, apis } = sanitizeRecords(record, recordsToExport);
-
-          processedRecords = processedRecords.concat(processedCollection);
-
-          apis.forEach((api) => {
-            processedRecords.push(api);
-          });
+          sanitizeRecords(record, recordsToExport);
         } else {
-          processedRecords.push({ ...sanitizeRecord(record), collectionId: "" });
+          recordsToExport.push({ ...sanitizeRecord(record), collectionId: "" });
         }
       });
-      setExportData({ records: processedRecords });
+
+      setExportData({ records: recordsToExport });
     } else {
       const processedEnvironments = processEnvironments(environments);
       setExportData({ environments: processedEnvironments });
