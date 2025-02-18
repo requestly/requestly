@@ -77,7 +77,7 @@ export interface GlobalSliceState {
       timeToResendEmailLogin: number;
       isCommandBarOpen: boolean;
       isAppBannerVisible: boolean;
-      requestBot: { isActive: boolean; modelType: "app" };
+      requestBot: { isActive: boolean; modelType: string };
     };
   };
   userAttributes: any;
