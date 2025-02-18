@@ -2,27 +2,7 @@ import { EnvironmentVariables, EnvironmentVariableType } from "backend/environme
 import { ApiClientLocalMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { RQAPI } from "features/apiClient/types";
 import { FsManagerServiceAdapter, fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
-
-type Collection = {
-  type: "collection";
-  collectionId?: string;
-  id: string;
-  name: string;
-  variables?: Record<string, any>;
-};
-
-type API = {
-  type: "api";
-  collectionId?: string;
-  id: string;
-  request: {
-    name: string;
-    url: string;
-    method: string;
-  };
-};
-
-type APIEntity = Collection | API;
+import { APIEntity, FileSystemResult } from "./types";
 
 export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientLocalMeta> {
   meta: ApiClientLocalMeta;
@@ -87,8 +67,16 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
   async getAllRecords(): RQAPI.RecordsPromise {
 		const service = await this.getAdapter();
-		const entities: APIEntity[] = await service.getAllRecords();
-		const parsedRecords = this.parseAPIEntities(entities);
+		const result: FileSystemResult<APIEntity[]> = await service.getAllRecords();
+		console.log('aaaaa', result);
+		if (result.type === 'error') {
+			return {
+				success: false,
+				data: [],
+				message: result.error.message,
+			};
+		}
+		const parsedRecords = this.parseAPIEntities(result.content);
 		return {
 			success: true,
 			data: parsedRecords,
