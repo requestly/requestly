@@ -1,6 +1,6 @@
 import { Select } from "antd";
 import { isEmpty } from "lodash";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import AuthorizationForm from "./AuthorizationForm";
 import Description from "./Description";
 import { FORM_TEMPLATE_STATIC_DATA, AUTH_SELECTOR_LABELS } from "./AuthorizationForm/formStructure";
@@ -16,62 +16,54 @@ import { AuthConfig, Authorization } from "./types/AuthConfig";
 
 interface Props {
   wrapperClass?: string;
-  defaultValues: RQAPI.Auth;
-  onAuthUpdate: (authOptions: RQAPI.Auth) => any;
-  rootLevelRecord: Boolean;
+  defaults?: RQAPI.Auth;
+  onAuthUpdate: (newAuth: RQAPI.Auth) => void;
+  isRootLevelRecord: Boolean;
   variables: EnvironmentVariables;
   authorizationViewActions?: React.ReactElement;
 }
 
 const AuthorizationView: React.FC<Props> = ({
-  defaultValues,
+  defaults,
   onAuthUpdate,
-  rootLevelRecord,
+  isRootLevelRecord,
   wrapperClass = "",
   variables,
   authorizationViewActions,
 }) => {
+  const defaultsRef = useRef(defaults);
   const [selectedAuthType, setSelectedAuthType] = useState<Authorization.Type>(
-    defaultValues?.currentAuthType || (rootLevelRecord ? Authorization.Type.NO_AUTH : Authorization.Type.INHERIT)
+    defaultsRef.current?.currentAuthType ||
+      (isRootLevelRecord ? Authorization.Type.NO_AUTH : Authorization.Type.INHERIT)
   );
-  const [finalAuthOptions, setFinalAuthOptions] = useState<RQAPI.Auth>({
-    currentAuthType: selectedAuthType,
-    authConfigStore: {},
-  });
 
-  // const getAuthOptions = (
-  //   previousFormValues: Record<string, any>,
-  //   currentAuthType: Authorization.Type,
-  //   updatedValue?: string,
-  //   updatedId?: string
-  // ) => {
-  //   const authOptions = {
-  //     currentAuthType,
-  //     [currentAuthType]: {
-  //       ...previousFormValues[currentAuthType],
-  //       ...(updatedId || updatedValue ? { [updatedId]: updatedValue } : {}),
-  //     },
-  //   };
-  //   return authOptions;
-  // };
+  const [resolvedAuthConfigStore, setResolvedAuthConfigStore] = useState<RQAPI.Auth["authConfigStore"]>(
+    defaultsRef.current?.authConfigStore
+  );
 
-  // todo: add authType here
-  const onChangeHandler = useCallback(
-    (authConfig: AuthConfig | null) => {
-      const newAuthOptions = finalAuthOptions;
-      if (selectedAuthType === Authorization.Type.NO_AUTH || selectedAuthType === Authorization.Type.INHERIT) {
-        // no op so far
-      } else {
-        newAuthOptions.authConfigStore[selectedAuthType] = authConfig?.config;
+  const onFormConfigChange = useCallback((authConfig: AuthConfig | null) => {
+    setResolvedAuthConfigStore((prevOptions) => {
+      const newConfigStore = { ...prevOptions };
+      if (authConfig.type !== Authorization.Type.NO_AUTH && authConfig.type !== Authorization.Type.INHERIT) {
+        newConfigStore[authConfig.type] = authConfig.config;
       }
-      newAuthOptions.currentAuthType = selectedAuthType;
-      setFinalAuthOptions(newAuthOptions);
-      onAuthUpdate(newAuthOptions);
-    },
-    [finalAuthOptions, onAuthUpdate, selectedAuthType]
-  );
+      return newConfigStore;
+    });
+  }, []);
 
-  // const debouncedOnChange = debounce(onChangeHandler, 500);
+  const handleAuthTypeChange = useCallback((value: Authorization.Type) => {
+    setSelectedAuthType(value);
+  }, []);
+
+  useEffect(() => {
+    // for some reason there is a re render outside this component that sends an empty defaults object
+    if (defaultsRef.current) {
+      onAuthUpdate({
+        currentAuthType: selectedAuthType,
+        authConfigStore: resolvedAuthConfigStore,
+      } as RQAPI.Auth);
+    }
+  }, [selectedAuthType, resolvedAuthConfigStore, onAuthUpdate]);
 
   return (
     <div className={`authorization-view ${wrapperClass}`}>
@@ -81,20 +73,13 @@ const AuthorizationView: React.FC<Props> = ({
           <Select
             className="form-selector-dropdown"
             value={selectedAuthType}
-            onChange={useCallback(
-              (value) => {
-                setSelectedAuthType(value);
-                onAuthUpdate(finalAuthOptions);
-              },
-              [finalAuthOptions, onAuthUpdate]
-            )}
+            onChange={handleAuthTypeChange}
             options={AUTH_SELECTOR_LABELS}
           />
           {![Authorization.Type.NO_AUTH, Authorization.Type.INHERIT].includes(selectedAuthType) && (
             <div
               className="clear-icon"
               onClick={() => {
-                onAuthUpdate(finalAuthOptions);
                 setSelectedAuthType(Authorization.Type.NO_AUTH);
               }}
             >
@@ -113,9 +98,10 @@ const AuthorizationView: React.FC<Props> = ({
               <span>{LABEL_TEXT.INFO_TEXT}</span>
             </p>
             <AuthorizationForm
+              defaultAuthValues={defaultsRef.current}
               formData={FORM_TEMPLATE_STATIC_DATA[selectedAuthType].formData}
               formType={selectedAuthType}
-              onChangeHandler={onChangeHandler}
+              onChangeHandler={onFormConfigChange}
               variables={variables}
             />
           </div>

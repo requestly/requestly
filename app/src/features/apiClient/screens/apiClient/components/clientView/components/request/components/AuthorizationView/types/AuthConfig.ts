@@ -1,16 +1,41 @@
+export namespace Authorization {
+  export enum Type {
+    INHERIT = "INHERIT",
+    NO_AUTH = "NO_AUTH",
+    API_KEY = "API_KEY",
+    BEARER_TOKEN = "BEARER_TOKEN",
+    BASIC_AUTH = "BASIC_AUTH",
+  }
+
+  type AddToOptions = "HEADER" | "QUERY";
+  export type API_KEY_CONFIG = {
+    key: string;
+    value: string;
+    addTo: AddToOptions;
+  };
+
+  export type BEARER_TOKEN_CONFIG = {
+    bearer: string;
+  };
+
+  export type BASIC_AUTH_CONFIG = {
+    username: string;
+    password: string;
+  };
+}
+
 export abstract class AuthConfig {
-  type: Authorization.Type;
   abstract validate(): boolean;
   abstract get config(): any;
+  abstract get type(): Authorization.Type;
 }
 
 export class ApiKeyAuthorizationConfig implements AuthConfig {
-  type: Authorization.Type.API_KEY;
   key: string;
   value: string;
-  addTo: "HEADER" | "QUERY";
+  addTo: Authorization.API_KEY_CONFIG["addTo"];
 
-  constructor(key: string, value: string, addTo: "HEADER" | "QUERY" = "HEADER") {
+  constructor(key: string, value: string, addTo: Authorization.API_KEY_CONFIG["addTo"] = "HEADER") {
     this.key = key;
     this.value = value;
     this.addTo = addTo;
@@ -20,7 +45,11 @@ export class ApiKeyAuthorizationConfig implements AuthConfig {
     return this.key !== "" && this.value !== "";
   }
 
-  get config() {
+  get type() {
+    return Authorization.Type.API_KEY;
+  }
+
+  get config(): Authorization.API_KEY_CONFIG | null {
     if (!this.validate()) {
       // throw new Error("Invalid API Key Authorization Config");
       return null;
@@ -34,7 +63,6 @@ export class ApiKeyAuthorizationConfig implements AuthConfig {
 }
 
 export class BearerTokenAuthorizationConfig implements AuthConfig {
-  type: Authorization.Type.BEARER_TOKEN;
   bearer: string;
   constructor(bearer: string) {
     this.bearer = bearer;
@@ -43,7 +71,7 @@ export class BearerTokenAuthorizationConfig implements AuthConfig {
   validate(): boolean {
     return this.bearer !== "";
   }
-  get config() {
+  get config(): Authorization.BEARER_TOKEN_CONFIG | null {
     if (!this.validate()) {
       // throw new Error("Invalid Bearer Token Authorization Config");
       return null;
@@ -52,10 +80,13 @@ export class BearerTokenAuthorizationConfig implements AuthConfig {
       bearer: this.bearer,
     };
   }
+
+  get type() {
+    return Authorization.Type.BEARER_TOKEN;
+  }
 }
 
 export class BasicAuthAuthorizationConfig implements AuthConfig {
-  type: Authorization.Type.BASIC_AUTH;
   username: string;
   password: string;
   constructor(username: string, password: string) {
@@ -67,7 +98,7 @@ export class BasicAuthAuthorizationConfig implements AuthConfig {
     return this.username !== "" && this.password !== "";
   }
 
-  get config() {
+  get config(): Authorization.BASIC_AUTH_CONFIG | null {
     if (!this.validate()) {
       // throw new Error("Invalid Basic Auth Authorization Config");
       return null;
@@ -77,29 +108,8 @@ export class BasicAuthAuthorizationConfig implements AuthConfig {
       password: this.password,
     };
   }
-}
 
-export namespace Authorization {
-  export enum Type {
-    INHERIT = "INHERIT",
-    NO_AUTH = "NO_AUTH",
-    API_KEY = "API_KEY",
-    BEARER_TOKEN = "BEARER_TOKEN",
-    BASIC_AUTH = "BASIC_AUTH",
-  }
-
-  export interface API_KEY_CONFIG {
-    key: string;
-    value: string;
-    addTo: "HEADER" | "QUERY";
-  }
-
-  export interface BEARER_TOKEN_CONFIG {
-    bearer: string;
-  }
-
-  export interface BASIC_AUTH_CONFIG {
-    username: string;
-    password: string;
+  get type() {
+    return Authorization.Type.BASIC_AUTH;
   }
 }

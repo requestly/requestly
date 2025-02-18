@@ -437,10 +437,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     trackAPIRequestCancelled();
   }, [apiClientExecutor]);
 
-  const handleAuthChange = useCallback((authOptions: RQAPI.Auth) => {
+  const handleAuthChange = useCallback((newAuth: RQAPI.Auth) => {
     setEntry((prevEntry) => {
       const updatedEntry = { ...prevEntry };
-      updatedEntry.auth = authOptions;
+      updatedEntry.auth = newAuth;
       return updatedEntry;
     });
   }, []);

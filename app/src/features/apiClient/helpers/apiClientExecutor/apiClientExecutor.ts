@@ -41,7 +41,7 @@ export class ApiClientExecutor {
 
     const { headers, queryParams } = processAuthForEntry(
       this.entryDetails,
-      { id: this.recordId, collectionId: this.collectionId },
+      { id: this.recordId, parentId: this.collectionId },
       this.apiRecords
     );
     this.entryDetails.request.headers = updateRequestWithAuthOptions(this.entryDetails.request.headers, headers);
