@@ -15,6 +15,7 @@ The following domains are eligible for the student programme:
     ".edu.br",
     ".alfa-college.nl",
     ".mail.adelphi.edu",
-    ".edu.in"
+    ".edu.in",
+    ".eur.nl"
   ]
 }
