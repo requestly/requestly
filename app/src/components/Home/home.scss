@@ -249,6 +249,7 @@
         transition: 0.2s all ease-in-out;
         cursor: pointer;
         display: flex;
+        align-items: center;
         gap: 8px;
         width: 100%;
 
@@ -261,6 +262,7 @@
         }
 
         &-icon {
+          height: 20px;
           svg {
             width: 20px;
             height: 20px;
@@ -295,14 +297,16 @@
     padding: 4px 4px 4px 24px;
     justify-content: space-between;
     align-items: center;
-    border-radius: 0px 0px 8px 8px;
-    background: var(--alias-tokens-color-white-t-10, rgba(255, 255, 255, 0.06));
+    border-radius: 0px 0px 16px 16px;
+    background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
     .import-dropdown {
       display: flex;
       margin-top: 0;
 
       .import-dropdown-button {
+        box-shadow: none;
+        font-weight: 400;
         &:hover {
           background: none;
         }

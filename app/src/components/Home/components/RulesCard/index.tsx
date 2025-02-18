@@ -119,7 +119,7 @@ export const RulesCard = () => {
       cardType={CardType.RULES}
       defaultImportClickHandler={() => importTriggerHandler(ImporterTypes.REQUESTLY)}
       importOptions={{
-        menu: IMPORT_OPTIONS.slice(0, 3),
+        menu: IMPORT_OPTIONS,
         label: "Charles, ModHeader, & more",
         icon: "/assets/media/rules/import-icon.svg",
       }}
