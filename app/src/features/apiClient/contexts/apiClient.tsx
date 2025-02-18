@@ -22,6 +22,7 @@ import { useSearchParams } from "react-router-dom";
 import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
 import { ApiClientCloudRepository } from "../helpers/modules/sync/cloud";
 import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
+import { useGetApiClientSyncRepo } from "../helpers/modules/sync/useApiClientSyncRepo";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -55,7 +56,7 @@ interface ApiClientContextInterface {
 
   setIsImportModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   apiClientWorkloadManager: APIClientWorkloadManager;
-  apiClientSyncRepository: ApiClientRecordsInterface<Record<any, any>>;
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<any, any>>;
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
@@ -90,7 +91,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   setIsImportModalOpen: () => {},
 
   apiClientWorkloadManager: new APIClientWorkloadManager(),
-  apiClientSyncRepository: null,
+  apiClientRecordsRepository: null,
 });
 
 interface ApiClientProviderProps {
@@ -116,10 +117,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const { openTab, deleteTabs, updateTab, replaceTab, updateAddTabBtnCallback } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
 
-  const apiClientSyncRepository = useMemo(
-    () => new ApiClientCloudRepository({ uid, teamId }).apiClientRecordsRepository,
-    [uid, teamId]
-  );
+	const { apiClientRecordsRepository  } = useGetApiClientSyncRepo();
 
   const openDraftRequest = useCallback(() => {
     const requestId = generateDocumentId("apis");
@@ -153,7 +151,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     }
 
     setIsLoadingApiClientRecords(true);
-    apiClientSyncRepository
+    apiClientRecordsRepository
       .getAllRecords()
       .then((result) => {
         if (result.success) {
@@ -167,7 +165,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       .finally(() => {
         setIsLoadingApiClientRecords(false);
       });
-  }, [apiClientSyncRepository, uid]);
+  }, [apiClientRecordsRepository, uid]);
 
   const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
     setApiClientRecords((prev) => {
@@ -386,7 +384,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     onImportRequestModalClose,
     onNewClick,
     apiClientWorkloadManager: workloadManager,
-    apiClientSyncRepository,
+    apiClientRecordsRepository,
   };
 
   return <ApiClientContext.Provider value={value}>{children}</ApiClientContext.Provider>;

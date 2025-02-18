@@ -21,7 +21,7 @@ interface Props {
 }
 
 export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
-  const { apiClientRecords, onSaveRecord, onSaveBulkRecords, apiClientSyncRepository } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, onSaveBulkRecords, apiClientRecordsRepository } = useApiClientContext();
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -59,7 +59,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         variables: {},
       },
     };
-    const newCollection = await apiClientSyncRepository.createRecordWithId(
+    const newCollection = await apiClientRecordsRepository.createRecordWithId(
       collectionToBeCreated,
       collectionToBeCreated.id
     );
@@ -69,7 +69,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
     } else {
       throw new Error("Failed to create a new collection");
     }
-  }, [onSaveRecord, selectedCollection?.label, apiClientSyncRepository]);
+  }, [onSaveRecord, selectedCollection?.label, apiClientRecordsRepository]);
 
   const moveRecordsToCollection = useCallback(
     async (collectionId: string, isNewCollection: boolean) => {

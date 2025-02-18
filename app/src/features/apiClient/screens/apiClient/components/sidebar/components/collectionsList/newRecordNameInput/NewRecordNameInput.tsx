@@ -34,7 +34,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const { onSaveRecord, apiClientSyncRepository } = useApiClientContext();
+  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
   const { replaceTab, updateTab } = useTabsLayoutContext();
 
   const defaultRecordName = recordType === RQAPI.RecordType.API ? "Untitled request" : "New collection";
@@ -70,7 +70,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       record.collectionId = newRecordCollectionId;
     }
 
-    const result = await apiClientSyncRepository.createRecord(record);
+    const result = await apiClientRecordsRepository.createRecord(record);
 
     if (result.success) {
       onSaveRecord(result.data);
@@ -111,7 +111,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     newRecordCollectionId,
     onSuccess,
     replaceTab,
-    apiClientSyncRepository,
+    apiClientRecordsRepository,
   ]);
 
   const updateRecord = useCallback(async () => {

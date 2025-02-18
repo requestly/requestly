@@ -18,7 +18,7 @@ export const APIClient: React.FC<Props> = React.memo(() => {
     history,
     selectedHistoryIndex,
     addToHistory,
-    apiClientSyncRepository,
+    apiClientRecordsRepository,
   } = useApiClientContext();
 
   const [persistedRequestId, setPersistedRequestId] = useState<string>(() => requestId);
@@ -83,7 +83,7 @@ export const APIClient: React.FC<Props> = React.memo(() => {
       return;
     }
 
-    apiClientSyncRepository
+    apiClientRecordsRepository
       .getRecord(persistedRequestId)
       .then((result) => {
         console.log("OLA", { result });
@@ -101,7 +101,7 @@ export const APIClient: React.FC<Props> = React.memo(() => {
         Logger.error("Error loading api record", error);
       })
       .finally(() => {});
-  }, [persistedRequestId, isCreateMode, apiClientSyncRepository]);
+  }, [persistedRequestId, isCreateMode, apiClientRecordsRepository]);
 
   const entryDetails = useMemo(() => (isHistoryPath ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord, [
     isHistoryPath,

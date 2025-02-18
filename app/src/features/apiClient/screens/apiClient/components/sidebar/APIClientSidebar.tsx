@@ -44,7 +44,7 @@ const APIClientSidebar: React.FC<Props> = () => {
     isDeleteModalOpen,
     onDeleteModalClose,
     selectedHistoryIndex,
-    apiClientSyncRepository,
+    apiClientRecordsRepository,
   } = useApiClientContext();
 
   const handleNewRecordClick = useCallback(
@@ -153,7 +153,7 @@ const APIClientSidebar: React.FC<Props> = () => {
           data: apiEntry,
         };
 
-        const result = await apiClientSyncRepository.createRecord(record);
+        const result = await apiClientRecordsRepository.createRecord(record);
 
         if (result.success) {
           onSaveRecord(result.data);
@@ -170,7 +170,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         setIsLoading(false);
       }
     },
-    [user?.loggedIn, onSaveRecord, setIsImportModalOpen, apiClientSyncRepository]
+    [user?.loggedIn, onSaveRecord, setIsImportModalOpen, apiClientRecordsRepository]
   );
 
   return (

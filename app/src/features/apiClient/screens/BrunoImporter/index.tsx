@@ -43,7 +43,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
     }>;
   }>({ collections: [], apis: [], environments: [] });
 
-  const { onSaveRecord, apiClientSyncRepository } = useApiClientContext();
+  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
   const { addNewEnvironment, setVariables } = useEnvironmentManager();
 
   const collectionsCount = useRef(0);
@@ -126,7 +126,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
-        const newCollection = await apiClientSyncRepository.createRecordWithId(collection, collection.id);
+        const newCollection = await apiClientRecordsRepository.createRecordWithId(collection, collection.id);
         onSaveRecord(newCollection.data, "none");
         importedCollectionsCount++;
         return newCollection.data.id;
@@ -145,7 +145,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
-        const newApi = await apiClientSyncRepository.updateRecord(updatedApi);
+        const newApi = await apiClientRecordsRepository.updateRecord(updatedApi);
         onSaveRecord(newApi.data, "none");
       } catch (error) {
         failedCollectionsCount++;
@@ -163,7 +163,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
     }
 
     return importedCollectionsCount;
-  }, [processedFileData, onSaveRecord, apiClientSyncRepository]);
+  }, [processedFileData, onSaveRecord, apiClientRecordsRepository]);
 
   const handleImportEnvironments = useCallback(async () => {
     let importedEnvCount = 0;
