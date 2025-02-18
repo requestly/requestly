@@ -51,6 +51,8 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
   );
   const [fileInfo, setFileInfo] = useState<{ label: string; type: string }>({ label: "", type: "" });
 
+  const recordsToExport: ExportRecord[] = [];
+
   const handleExport = useCallback(() => {
     const dataToExport = { schema_version: COLLECTIONS_SCHEMA_VERSION, ...exportData };
 
@@ -66,8 +68,6 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
       trackExportApiCollectionsFailed(dataToExport.records?.length, dataToExport.environments?.length);
     }
   }, [exportData, recordsToBeExported, environments, onClose, fileInfo.label]);
-
-  const recordsToExport: ExportRecord[] = [];
 
   const sanitizeRecord = (record: RQAPI.Record): ExportRecord =>
     omit(record, ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"]);
