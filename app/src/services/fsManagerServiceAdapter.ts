@@ -17,6 +17,10 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 	async getAllRecords() {
 		return this.invokeProcedureInBG("getAllRecords") as Promise<any>;
 	}
+
+	async getRecord(id: string) {
+		return this.invokeProcedureInBG("getRecord", id) as Promise<any>;
+	}
 }
 
 class FsManagerServiceAdapterProvider {

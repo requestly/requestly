@@ -2,7 +2,7 @@ import { EnvironmentVariables, EnvironmentVariableType } from "backend/environme
 import { ApiClientLocalMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { RQAPI } from "features/apiClient/types";
 import { FsManagerServiceAdapter, fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
-import { APIEntity, FileSystemResult } from "./types";
+import { API, APIEntity, FileSystemResult } from "./types";
 
 export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientLocalMeta> {
   meta: ApiClientLocalMeta;
@@ -68,7 +68,6 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   async getAllRecords(): RQAPI.RecordsPromise {
 		const service = await this.getAdapter();
 		const result: FileSystemResult<APIEntity[]> = await service.getAllRecords();
-		console.log('aaaaa', result);
 		if (result.type === 'error') {
 			return {
 				success: false,
@@ -82,8 +81,22 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 			data: parsedRecords,
 		};
   }
-  getRecord(_recordId: string): RQAPI.RecordPromise {
-      throw new Error("Method not implemented.");
+  async getRecord(id: string): RQAPI.RecordPromise {
+  	const service = await this.getAdapter();
+		const result: FileSystemResult<API> = await service.getRecord(id);
+		console.log('nanana', result);
+		if (result.type === 'error') {
+			return {
+				success: false,
+				data: null,
+				message: result.error.message,
+			};
+		}
+		const parsedRecords = this.parseAPIEntities([result.content]);
+		return {
+			success: true,
+			data: parsedRecords[0],
+		};
   }
   createRecord(_record: Partial<RQAPI.Record>): RQAPI.RecordPromise {
       throw new Error("Method not implemented.");
