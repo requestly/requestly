@@ -15,8 +15,7 @@ import { isNull } from "lodash";
 import { trackAppOnboardingTeamsViewed, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import "./index.scss";
-import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
+import { Invite } from "types";
 
 interface WorkspaceOnboardingViewProps {
   isOpen: boolean;
@@ -24,7 +23,6 @@ interface WorkspaceOnboardingViewProps {
 
 export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = ({ isOpen }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
@@ -51,19 +49,12 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
   );
 
   const handlePendingInvites = useCallback(
-    (res: any) => {
+    (res: { pendingInvites: Invite[]; success: boolean }) => {
       setPendingInvites(res?.pendingInvites ?? []);
       if (res?.pendingInvites?.length > 0) setIsLoading(false);
       else {
         setIsLoading(false);
-        redirectToWebAppHomePage(navigate);
-        dispatch(globalActions.updateAppOnboardingCompleted());
-        dispatch(
-          globalActions.toggleActiveModal({
-            modalName: "appOnboardingModal",
-            newValue: false,
-          })
-        );
+        dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
       }
     },
     [dispatch]
@@ -77,14 +68,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
 
     if (!isCompanyEmail(user?.details?.profile?.email) || !user?.details?.profile?.isEmailVerified) {
       setIsLoading(false);
-      redirectToWebAppHomePage(navigate);
-      dispatch(globalActions.updateAppOnboardingCompleted());
-      dispatch(
-        globalActions.toggleActiveModal({
-          modalName: "appOnboardingModal",
-          newValue: false,
-        })
-      );
+      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
       return;
     }
 

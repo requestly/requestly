@@ -61,7 +61,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
     setIsJoining(true);
     acceptTeamInvite(inviteId)
       .then((res) => {
-        if (res?.data?.success) {
+        if (res?.success) {
           toast.success("Team joined successfully");
           setHasJoined(true);
           trackWorkspaceInviteAccepted(
@@ -69,8 +69,8 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
             teamName,
             inviteId,
             SOURCE.HOME_SCREEN,
-            res?.data?.data?.invite?.usage,
-            res?.data?.data?.invite?.metadata?.teamAccessCount
+            res?.data?.invite?.usage,
+            res?.data?.invite?.metadata?.teamAccessCount
           );
         } else {
           toast.error("Something went wrong, please try again");

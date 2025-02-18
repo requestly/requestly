@@ -1,12 +1,11 @@
 import { Col, Image, List, Row } from "antd";
 
-import installAndTrustCustomProfileGIF from "assets/img/screenshots/ios/install-and-trust-ios-profile.gif";
 import { IOS_DEVICES } from "./constants";
 
 const CertificateTrustInstructions = ({ device_id }) => {
   const renderGif = () => {
     if (device_id === IOS_DEVICES.IPHONE13_PRO) {
-      return <Image src={installAndTrustCustomProfileGIF} />;
+      return <Image src={"/assets/media/components/install-and-trust-ios-profile.gif"} />;
     }
   };
 

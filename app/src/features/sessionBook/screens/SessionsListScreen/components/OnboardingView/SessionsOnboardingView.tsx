@@ -20,7 +20,6 @@ import { toast } from "utils/Toast";
 import { prefixUrlWithHttps } from "utils/URLUtils";
 import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
 import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
-import StartSessionRecordingGif from "../../assets/sessions-banner.gif";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -171,7 +170,11 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
           {!isModalView && (
             <Col span={12} className="banner-demo-video">
               <Row justify="end">
-                <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
+                <img
+                  src={"/assets/media/common/sessions-banner.gif"}
+                  alt="How to start session recording"
+                  className="demo-video"
+                />
               </Row>
               <Row onClick={trackOnboardingSampleSessionViewed}>
                 <a

@@ -99,6 +99,7 @@ const ApiClientCard = () => {
     <Card
       wrapperClass={`${cardOptions?.type === FormatType.HISTORY ? "history-card" : ""} api-client-card`}
       cardType={CardType.API_CLIENT}
+      defaultImportClickHandler={() => importTriggerHandler(ImporterTypes.REQUESTLY)}
       title={"API Client"}
       cardIcon={"/assets/media/apiClient/api-client-icon.svg"}
       importOptions={{

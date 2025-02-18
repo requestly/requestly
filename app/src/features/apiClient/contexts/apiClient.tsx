@@ -29,9 +29,10 @@ interface ApiClientContextInterface {
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => void;
   onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => void;
+  onSaveBulkRecords: (apiClientRecords: RQAPI.Record[]) => void;
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => void;
-  recordToBeDeleted: RQAPI.Record;
-  updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => void;
+  recordsToBeDeleted: RQAPI.Record[];
+  updateRecordsToBeDeleted: (apiClientRecord: RQAPI.Record[]) => void;
   isDeleteModalOpen: boolean;
   setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onDeleteModalClose: () => void;
@@ -62,9 +63,10 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => {},
   onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => {},
+  onSaveBulkRecords: (apiClientRecords: RQAPI.Record[]) => {},
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => {},
-  recordToBeDeleted: null,
-  updateRecordToBeDeleted: (apiClientRecord: RQAPI.Record) => {},
+  recordsToBeDeleted: null,
+  updateRecordsToBeDeleted: (apiClientRecord: RQAPI.Record[]) => {},
   isDeleteModalOpen: false,
   setIsDeleteModalOpen: () => {},
   onDeleteModalClose: () => {},
@@ -103,7 +105,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [locationState, setLocationState] = useState(location?.state);
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(!!locationState?.action);
   const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
-  const [recordToBeDeleted, setRecordToBeDeleted] = useState<RQAPI.Record>();
+  const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.Record[]>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
 
@@ -201,6 +203,26 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     [deleteTabs]
   );
 
+  const onSaveBulkRecords = useCallback(
+    (records: RQAPI.Record[]) => {
+      setApiClientRecords((previousRecords: RQAPI.Record[]) => {
+        const currentRecordsMap = new Map(previousRecords.map((record) => [record.id, record]));
+        records.forEach((record) => {
+          if (currentRecordsMap.has(record.id)) {
+            updateTab(record.id, {
+              title: record.name,
+              hasUnsavedChanges: false,
+              isPreview: false,
+            });
+          }
+          currentRecordsMap.set(record.id, record);
+        });
+        return Array.from(currentRecordsMap.values());
+      });
+    },
+    [updateTab, setApiClientRecords]
+  );
+
   const onSaveRecord = useCallback(
     (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open") => {
       const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
@@ -236,13 +258,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     [apiClientRecords, onUpdateRecord, onNewRecord, openTab, replaceTab, searchParams]
   );
 
-  const updateRecordToBeDeleted = useCallback((record: RQAPI.Record) => {
-    setRecordToBeDeleted(record);
+  const updateRecordsToBeDeleted = useCallback((record: RQAPI.Record[]) => {
+    setRecordsToBeDeleted(record);
   }, []);
 
   const onDeleteModalClose = useCallback(() => {
     setIsDeleteModalOpen(false);
-    setRecordToBeDeleted(null);
+    setRecordsToBeDeleted(null);
   }, []);
 
   const addToHistory = useCallback((apiEntry: RQAPI.Entry) => {
@@ -340,9 +362,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     onRemoveRecord,
     onUpdateRecord,
     onSaveRecord,
+    onSaveBulkRecords,
     onDeleteRecords,
-    recordToBeDeleted,
-    updateRecordToBeDeleted,
+    recordsToBeDeleted,
+    updateRecordsToBeDeleted,
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     onDeleteModalClose,

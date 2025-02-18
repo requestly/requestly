@@ -117,8 +117,9 @@ export const RulesCard = () => {
       cardIcon={"/assets/media/rules/rules-icon.svg"}
       contentLoading={isLoading || isRulesLoading}
       cardType={CardType.RULES}
+      defaultImportClickHandler={() => importTriggerHandler(ImporterTypes.REQUESTLY)}
       importOptions={{
-        menu: IMPORT_OPTIONS,
+        menu: IMPORT_OPTIONS.slice(0, 3),
         label: "Charles, ModHeader, & more",
         icon: "/assets/media/rules/import-icon.svg",
       }}
@@ -139,6 +140,7 @@ export const RulesCard = () => {
         >
           <RQButton
             type="primary"
+            className="new-rule-button"
             onClick={() => {
               trackHomeRulesActionClicked("new_rule_button");
               trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
