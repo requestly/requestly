@@ -38,12 +38,14 @@ interface EditorProps {
   toolbarOptions?: EditorCustomToolbar;
   hideCharacterCount?: boolean;
   handleChange?: (value: string) => void;
-  analyticEventProperties?: AnalyticEventProperties;
   prettifyOnInit?: boolean;
   envVariables?: EnvironmentVariables;
+  analyticEventProperties?: AnalyticEventProperties;
   showOptions?: {
     enablePrettify?: boolean;
   };
+  isFullScreen?: boolean;
+  onFullScreenChange?: () => void;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -54,20 +56,21 @@ const Editor: React.FC<EditorProps> = ({
   hideCharacterCount = false,
   handleChange = () => {},
   toolbarOptions,
-  scriptId = "",
   analyticEventProperties = {},
+  scriptId = "",
   prettifyOnInit = false,
   envVariables,
   showOptions = { enablePrettify: true },
+  isFullScreen = false,
+  onFullScreenChange = () => {},
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const editorRef = useRef<ReactCodeMirrorRef | null>(null);
   const [editorHeight, setEditorHeight] = useState(height);
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [hoveredVariable, setHoveredVariable] = useState(null);
-  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const isFullScreenModeOnboardingCompleted = useSelector(getIsCodeEditorFullScreenModeOnboardingCompleted);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isEditorInitialized, setIsEditorInitialized] = useState(false);
   const allEditorToast = useSelector(getAllEditorToast);
   const toastOverlay = useMemo(() => allEditorToast[scriptId], [allEditorToast, scriptId]); // todo: rename
@@ -79,7 +82,7 @@ const Editor: React.FC<EditorProps> = ({
   };
 
   const handleFullScreenToggle = useCallback(() => {
-    setIsFullScreen((prev) => !prev);
+    onFullScreenChange();
     if (!isFullScreen) {
       trackCodeEditorExpandedClick(analyticEventProperties);
 
@@ -96,7 +99,14 @@ const Editor: React.FC<EditorProps> = ({
     } else {
       trackCodeEditorCollapsedClick(analyticEventProperties);
     }
-  }, [analyticEventProperties, dispatch, isFullScreen, isFullScreenModeOnboardingCompleted, location?.pathname]);
+  }, [
+    analyticEventProperties,
+    dispatch,
+    isFullScreen,
+    isFullScreenModeOnboardingCompleted,
+    location?.pathname,
+    onFullScreenChange,
+  ]);
 
   const editorLanguage = useMemo(() => {
     switch (language) {
@@ -121,7 +131,7 @@ const Editor: React.FC<EditorProps> = ({
     }
   };
 
-  const updateContent = useCallback((code: string) => {
+  const updateContent = useCallback((code: string): void => {
     const view = editorRef.current?.view;
     if (!view) {
       return null;
@@ -301,7 +311,7 @@ const Editor: React.FC<EditorProps> = ({
         open={isFullScreen}
         destroyOnClose
         onCancel={() => {
-          setIsFullScreen(false);
+          handleFullScreenToggle();
         }}
         closable={false}
         closeIcon={null}

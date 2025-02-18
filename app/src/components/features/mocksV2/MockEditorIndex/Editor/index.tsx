@@ -28,7 +28,6 @@ import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import MockLogs from "./BottomSheet/MockLogs";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
-// @ts-expect-error growthbook-react does not provide types
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { ExportMocksModalWrapper } from "features/mocks/modals";
 import { globalActions } from "store/slices/global/slice";
@@ -216,7 +215,6 @@ const MockEditor: React.FC<Props> = ({
       onSave(finalMockData);
     } else {
       if (errors.headers) {
-        // @ts-expect-error since the actions file is not typed
         dispatch(
           globalActions.triggerToastForEditor({
             id: `headers-${id}`,
@@ -278,7 +276,6 @@ const MockEditor: React.FC<Props> = ({
           value={latency}
           name="latency"
           onChange={handleMockLatencyChange}
-          // @ts-ignore: TS2322
           addonAfter="ms"
         />
       </Col>
@@ -320,12 +317,9 @@ const MockEditor: React.FC<Props> = ({
         <AutoComplete
           id="content-type"
           size="large"
-          // @ts-ignore
-          type="text"
           placeholder="content"
           value={contentType}
           options={APP_CONSTANTS.CONTENT_TYPE}
-          name="type"
           onChange={(e) => setContentType(e)}
         />
       </Col>

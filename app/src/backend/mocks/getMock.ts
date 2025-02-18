@@ -10,7 +10,7 @@ export const getMock = async (uid: string, mockId: string, teamId?: string): Pro
     return null;
   }
 
-  const mock = await getMockFromFirebase(mockId).catch(() => null);
+  const mock = await getMockFromFirebase(mockId).catch((): null => null);
 
   // TODO: We can lazy load this in another call and show a loader
   if (BODY_IN_BUCKET_ENABLED && mock && mock?.recordType !== MockRecordType.COLLECTION) {

@@ -8,7 +8,6 @@ import { redirectToRules } from "utils/RedirectionUtils";
 import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { FeatureBanner } from "components/common/featureBanner";
-import FileIcon from "../../assets/file.svg";
 import ImportSharedListFromURLModal from "../../modals/ImportSharedListFromURLModal";
 
 //CONSTANTS
@@ -55,7 +54,7 @@ const CreateSharedListCTA = () => {
     <>
       <FeatureBanner
         title="Share Rules with other users"
-        bannerImg={FileIcon}
+        bannerImg={"/assets/media/common/file.svg"}
         bannerTitle="Shared lists"
         description={renderEmptyListDescription()}
       />

@@ -2,9 +2,6 @@ import { Button, Tabs, List, Tag, Image } from "antd";
 import { LockOutlined, DownloadOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { saveRootCert } from "actions/DesktopActions";
-import importCertGif from "assets/img/screenshots/import_cert.gif";
-import trustCertGif from "assets/img/screenshots/trust_cert.gif";
-import installWinCert from "assets/img/screenshots/install_win_cert.gif";
 import UAParser from "ua-parser-js";
 import Logger from "lib/logger";
 
@@ -155,7 +152,7 @@ const CertsInstructions = () => {
                   </li>
                   <li>Import the certificate you downloaded in the previous step (RQProxyCA.pem)</li>
                 </ul>
-                <Image width={"100%"} src={installWinCert} />
+                <Image width={"100%"} src={"/assets/media/components/install_win_cert.gif"} />
               </>
             }
           />
@@ -189,7 +186,7 @@ const CertsInstructions = () => {
                   <li>Click on "Import Items"</li>
                   <li>Import the cert you downloaded in the previous step (RQProxyCA.pem)</li>
                 </ul>
-                <Image width={"100%"} src={importCertGif} />
+                <Image width={"100%"} src={"/assets/media/components/import_cert.gif"} />
               </>
             }
           />
@@ -204,7 +201,7 @@ const CertsInstructions = () => {
                   <li>In Trust Section, Select "Always Trust" for "When using this certificate" </li>
                   <li>Close the window (Admin permissions required)</li>
                 </ul>
-                <Image width={"100%"} src={trustCertGif} />
+                <Image width={"100%"} src={"/assets/media/components/trust_cert.gif"} />
               </>
             }
           />

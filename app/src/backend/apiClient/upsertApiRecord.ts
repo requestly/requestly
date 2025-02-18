@@ -15,6 +15,7 @@ export const upsertApiRecord = async (
   const sanitizedRecord = { ...record };
   if (sanitizedRecord.type === RQAPI.RecordType.API) {
     delete sanitizedRecord.data.response;
+    delete sanitizedRecord.data.testResults;
   }
 
   if (sanitizedRecord.type === RQAPI.RecordType.COLLECTION) {
@@ -60,29 +61,28 @@ const createApiRecord = async (
   if (docId) {
     // Creating a new record with a given id
     const docRef = doc(db, "apis", docId);
-    return setDoc(docRef, { ...newRecord, id: docId })
-      .then((docRef) => {
-        Logger.log(`Api document created with ID ${docId}`);
-        return { success: true, data: { ...newRecord, id: docId } };
-      })
-      .catch((err) => {
-        Logger.error(`Error creating Api document with ID ${docId}`);
-        return { success: false, data: null };
-      });
+    try {
+      await setDoc(docRef, { ...newRecord, id: docId });
+      Logger.log(`Api document created with ID ${docId}`);
+      return { success: true, data: { ...newRecord, id: docId } };
+    } catch {
+      Logger.error(`Error creating Api document with ID ${docId}`);
+      return { success: false, data: null };
+    }
   } else {
-    return addDoc(rootApiRecordsCollectionRef, { ...newRecord })
-      .then((docRef) => {
-        Logger.log(`Api document created ${docRef.id}`);
-        updateDoc(docRef, {
-          id: docRef.id,
-        });
-
-        return { success: true, data: { ...newRecord, id: docRef.id } };
-      })
-      .catch((err) => {
-        Logger.error("Error while creating api record", err);
-        return { success: false, data: null };
+    try {
+      const resultDocRef = await addDoc(rootApiRecordsCollectionRef, { ...newRecord });
+      Logger.log(`Api document created ${resultDocRef.id}`);
+      // TODO: Figure out why do we need this? Why update the id with its own id?
+      updateDoc(resultDocRef, {
+        id: resultDocRef.id,
       });
+
+      return { success: true, data: { ...newRecord, id: resultDocRef.id } };
+    } catch (err) {
+      Logger.error("Error while creating api record", err);
+      return { success: false, data: null };
+    }
   }
 };
 
@@ -100,15 +100,12 @@ const updateApiRecord = async (
     updatedTs: Timestamp.now().toMillis(),
   } as RQAPI.Record;
 
-  const result = await updateDoc(apiRecordDocRef, { ...updatedRecord })
-    .then(() => {
-      Logger.log(`Api document updated`);
-      return { success: true, data: updatedRecord };
-    })
-    .catch((err) => {
-      Logger.error("Error while updating api record", err);
-      return { success: false, data: null };
-    });
-
-  return result;
+  try {
+    await updateDoc(apiRecordDocRef, { ...updatedRecord });
+    Logger.log(`Api document updated`);
+    return { success: true, data: updatedRecord };
+  } catch (err) {
+    Logger.error("Error while updating api record", err);
+    return { success: false, data: null };
+  }
 };
