@@ -11,6 +11,17 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 const db = getFirestore(firebaseApp);
 
+const splitMembersBasedOnRoles = (members) => {
+  const result = {};
+  Object.values(members).forEach((member) => {
+    if (!result[member.role]) {
+      result[member.role] = [];
+    }
+    result[member.role].push(member);
+  });
+  return result;
+};
+
 const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode) => {
   if (!uid) {
     // Rare edge case
@@ -27,21 +38,22 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
         const records = querySnapshot.docs
           .map((team) => {
             const teamData = team.data();
+            console.log("Fetched teamData", teamData);
 
             if (teamData.deleted) return null;
 
             if (!teamData.archived && teamData.appsumo) {
               submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
             }
-
+            const membersPerRole = splitMembersBasedOnRoles(teamData.members);
             return {
               id: team.id,
               name: teamData.name,
               owner: teamData.owner,
               archived: teamData.archived,
               subscriptionStatus: teamData.subscriptionStatus,
-              accessCount: teamData.accessCount,
-              adminCount: teamData.adminCount,
+              accessCount: Object.keys(teamData.members).length || 0,
+              adminCount: membersPerRole.admin?.length || 0,
               members: teamData.members,
               appsumo: teamData?.appsumo || null,
             };
