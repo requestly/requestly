@@ -23,6 +23,7 @@ import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { RuleType } from "@requestly/shared/types/entities/rules";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import "./ResponseBodyRow.css";
+import LazyEditor from "componentsV2/CodeEditor/components/Editor";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const theme = useTheme();
@@ -321,7 +322,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             }}
           >
             <Col xl="12" span={24}>
-              <CodeEditor
+              <LazyEditor
                 // key={pair.response.type}
                 language={
                   pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
