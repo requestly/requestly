@@ -76,6 +76,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       };
     }
     const parsedRecords = this.parseAPIEntities(result.content);
+		console.log('local fs parsing', parsedRecords);
     return {
       success: true,
       data: parsedRecords,
@@ -98,9 +99,48 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: parsedRecords[0],
     };
   }
-  createRecord(_record: Partial<RQAPI.Record>): RQAPI.RecordPromise {
-    throw new Error("Method not implemented.");
+	async createRecord(record: Partial<Omit<RQAPI.ApiRecord, 'id'>>): RQAPI.RecordPromise {
+    const service = await this.getAdapter();
+		const result = await service.createRecord({
+			name: record.name || "Untitled Request",
+			url: record.data.request.url,
+			method: record.data.request.method,
+		}, record.collectionId);
+
+		if (result.type === "error") {
+      return {
+        success: false,
+        data: null,
+        message: result.error.message,
+      };
+    }
+
+		const [parsedApiRecord] = this.parseAPIEntities([result.content]);
+		return {
+      success: true,
+      data: parsedApiRecord,
+    };
   }
+
+  async createCollection(record: Partial<Omit<RQAPI.CollectionRecord, 'id'>>): RQAPI.RecordPromise {
+    const service = await this.getAdapter();
+		const result = await service.createCollection(record.name, record.collectionId);
+
+		if (result.type === "error") {
+       return {
+         success: false,
+         data: null,
+         message: result.error.message,
+       };
+     }
+
+		const [parsedApiRecord] = this.parseAPIEntities([result.content]);
+		return {
+      success: true,
+      data: parsedApiRecord,
+    };
+   }
+
   createRecordWithId(_record: Partial<RQAPI.Record>, _id: string): RQAPI.RecordPromise {
     throw new Error("Method not implemented.");
   }

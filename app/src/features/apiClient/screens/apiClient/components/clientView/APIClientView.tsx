@@ -367,15 +367,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.id = apiEntryDetails?.id;
       record.name = requestName;
     }
-
-    const args: Parameters<typeof apiClientRecordsRepository.updateRecord> = [record];
-
     if (isCreateMode) {
-      args.push(requestId);
       record.name = requestName;
     }
 
-    const result = await apiClientRecordsRepository.updateRecord(...args);
+    const result = isCreateMode ? await apiClientRecordsRepository.createRecord(record) : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
@@ -403,13 +399,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.id = apiEntryDetails?.id;
     }
 
-    const args: Parameters<typeof apiClientRecordsRepository.updateRecord> = [record];
+    // const args: Parameters<typeof apiClientRecordsRepository.updateRecord> = [record];
 
-    if (isCreateMode) {
-      args.push(requestId);
-    }
+    // if (isCreateMode) {
+    //   args.push(requestId);
+    // }
 
-    const result = await apiClientRecordsRepository.updateRecord(...args);
+    const result = isCreateMode ? await apiClientRecordsRepository.createRecord(record) : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
