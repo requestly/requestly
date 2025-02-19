@@ -29,7 +29,7 @@ interface ApiClientContextInterface {
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => void;
-  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => void;
+  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none", alternateId?: string) => void;
   onSaveBulkRecords: (apiClientRecords: RQAPI.Record[]) => void;
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => void;
   recordsToBeDeleted: RQAPI.Record[];
@@ -228,32 +228,36 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   );
 
   const onSaveRecord = useCallback(
-    (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open") => {
-      const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
+    (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open", alternateId?: string) => {
+			const recordId = alternateId || apiClientRecord.id;
+    	const isRecordExist = apiClientRecords.find((record) => record.id === recordId);
+			console.log('on save id', recordId, isRecordExist);
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
       const requestTab = searchParams.get("tab") || RequestTab.QUERY_PARAMS;
 
       if (isRecordExist) {
         onUpdateRecord(apiClientRecord);
-        replaceTab(apiClientRecord.id, {
+        replaceTab(recordId, {
           title: apiClientRecord.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?tab=${requestTab}`,
+          url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${recordId}?tab=${requestTab}`,
         });
+				console.log('called replace tab 1', recordId);
       } else {
         onNewRecord(apiClientRecord);
 
         if (onSaveTabAction === "replace") {
-          replaceTab(apiClientRecord.id, {
+          replaceTab(recordId, {
             title: apiClientRecord.name,
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?tab=${requestTab}`,
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${recordId}?tab=${requestTab}`,
           });
+          console.log('called replace tab 2', recordId);
           return;
         }
 
         if (onSaveTabAction === "open") {
-          openTab(apiClientRecord.id, {
+          openTab(recordId, {
             title: apiClientRecord.name,
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?new`,
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${recordId}?new`,
           });
           return;
         }

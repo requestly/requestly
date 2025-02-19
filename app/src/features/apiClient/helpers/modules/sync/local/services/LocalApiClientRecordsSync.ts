@@ -144,8 +144,31 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   createRecordWithId(_record: Partial<RQAPI.Record>, _id: string): RQAPI.RecordPromise {
     throw new Error("Method not implemented.");
   }
-  updateRecord(_record: Partial<RQAPI.Record>, _id?: string): RQAPI.RecordPromise {
-    throw new Error("Method not implemented.");
+  async updateRecord(patch: Partial<Omit<RQAPI.ApiRecord, 'id'>>, nativeId: string): RQAPI.RecordPromise {
+  const id = parseNativeId(nativeId);
+  const service = await this.getAdapter();
+	const result = await service.updateRecord(
+		{
+			name: patch.name,
+			url: patch.data.request.url,
+			method: patch.data.request.method,
+		},
+		id
+	);
+
+		if (result.type === "error") {
+    return {
+      success: false,
+      data: null,
+      message: result.error.message,
+    };
+  }
+
+		const [parsedApiRecord] = this.parseAPIEntities([result.content]);
+		return {
+    success: true,
+    data: parsedApiRecord,
+  };
   }
   deleteRecords(_recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {
     throw new Error("Method not implemented.");

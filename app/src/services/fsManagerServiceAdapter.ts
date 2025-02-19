@@ -27,6 +27,10 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 		return this.invokeProcedureInBG("createRecord", record, collectionId, ) as Promise<FileSystemResult<API>>;
 	}
 
+	async updateRecord(patch: Partial<API['request']>, id: string, ) {
+		return this.invokeProcedureInBG("updateRecord", patch, id) as Promise<FileSystemResult<API>>;
+	}
+
 	async createCollection(name: string, collectionId?: string, ) {
 		return this.invokeProcedureInBG("createCollection", name, collectionId) as Promise<FileSystemResult<Collection>>;
 	}

@@ -47,6 +47,7 @@ import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/
 import { isEmpty } from "lodash";
 import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
+import { parseNativeId } from "features/apiClient/helpers/modules/sync/utils";
 
 interface Props {
   openInModal?: boolean;
@@ -156,7 +157,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       setRequestName("");
     }
 
-    animationTimerRef.current = setTimeout(() => setIsAnimating(false), 800);
+    animationTimerRef.current = setTimeout(() => setIsAnimating(false), 0);
 
     return () => {
       clearTimeout(animationTimerRef.current);
@@ -380,10 +381,15 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       ? await apiClientRecordsRepository.createRecord(record)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
+    const idFromStorage = parseNativeId(result.data.id);
+		const idFromUrl = requestId;
+		const alternateId: string | undefined = idFromUrl === idFromStorage ? undefined : idFromUrl;
+
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
         { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
-        isCreateMode ? "replace" : "open"
+        isCreateMode ? "replace" : "open",
+        alternateId
       );
       trackRequestRenamed("breadcrumb");
       setRequestName("");
@@ -412,14 +418,23 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     //   args.push(requestId);
     // }
 
+		console.log('operating on ', record, apiEntryDetails);
+
     const result = isCreateMode
       ? await apiClientRecordsRepository.createRecord(record)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
+		const idFromStorage = parseNativeId(result.data.id);
+		const idFromUrl = requestId;
+		const alternateId: string | undefined = idFromUrl === idFromStorage ? undefined : idFromUrl;
+
+		console.log('nnn', idFromStorage, idFromUrl, alternateId);
+
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
         { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
-        isCreateMode ? "replace" : "open"
+        isCreateMode ? "replace" : "open",
+        alternateId,
       );
       setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
       resetChanges();
@@ -430,7 +445,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
 
     setIsRequestSaving(false);
-  }, [entry, apiEntryDetails, onSaveRecord, setEntry, resetChanges, isCreateMode, apiClientRecordsRepository]);
+  }, [entry, apiEntryDetails, onSaveRecord, setEntry, resetChanges, isCreateMode, apiClientRecordsRepository, requestId]);
 
   const cancelRequest = useCallback(() => {
     apiClientExecutor.abort();
