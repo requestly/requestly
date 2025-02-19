@@ -20,7 +20,6 @@ import { generateDocumentId } from "backend/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { useSearchParams } from "react-router-dom";
 import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
-import { ApiClientCloudRepository } from "../helpers/modules/sync/cloud";
 import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
 import { useGetApiClientSyncRepo } from "../helpers/modules/sync/useApiClientSyncRepo";
 
@@ -117,7 +116,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const { openTab, deleteTabs, updateTab, replaceTab, updateAddTabBtnCallback } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
 
-	const { apiClientRecordsRepository  } = useGetApiClientSyncRepo();
+  const { apiClientRecordsRepository } = useGetApiClientSyncRepo();
 
   const openDraftRequest = useCallback(() => {
     const requestId = generateDocumentId("apis");

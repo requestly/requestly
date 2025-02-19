@@ -1,13 +1,14 @@
 import { EnvironmentVariables, EnvironmentVariableType } from "backend/environment/types";
+import { VariableEntity } from "./local/services/types";
 
-export const parseEntityVariables = (variables: Record<string, any>) => {
+export const parseEntityVariables = (variables: VariableEntity) => {
   const result: EnvironmentVariables = {};
 
-  Object.keys(variables).forEach((key, index) => {
+  Object.keys(variables).forEach((key) => {
     result[key] = {
-      id: index,
-      type: EnvironmentVariableType.String,
-      localValue: variables[key],
+      id: variables[key].id,
+      type: variables[key].isSecret ? EnvironmentVariableType.Secret : variables[key].type,
+      localValue: variables[key].value,
     };
   });
 

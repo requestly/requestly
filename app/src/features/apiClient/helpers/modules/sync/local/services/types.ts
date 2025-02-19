@@ -1,3 +1,5 @@
+import { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
+
 export type FileSystemError = { message: string };
 export type ContentfulSuccess<T> = T extends void ? { type: "success" } : { type: "success"; content: T };
 export type FileSystemResult<T> =
@@ -26,11 +28,21 @@ export type API = {
   };
 };
 
+export type VariableEntity = Record<
+  string,
+  {
+    id: number;
+    value: VariableValueType;
+    type: EnvironmentVariableType;
+    isSecret: boolean;
+  }
+>;
+
 export type EnvironmentEntity = {
   type: "environment";
   id: string;
   name: string;
-  variables?: Record<string, any>;
+  variables?: VariableEntity;
 };
 
 export type APIEntity = Collection | API;
