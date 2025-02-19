@@ -31,7 +31,10 @@ export const makeRequest = async (
 
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
       getAPIResponseViaExtension(request).then((result: ResponseOrError) => {
-        if ("error" in result) {
+        if (!result) {
+          //Backward compatibility check
+          reject(new Error("Failed to make request. Please check if the URL is valid."));
+        } else if ("error" in result) {
           reject(new Error(result.error));
         } else {
           resolve(result);
@@ -39,7 +42,10 @@ export const makeRequest = async (
       });
     } else if (appMode === CONSTANTS.APP_MODES.DESKTOP) {
       getAPIResponseViaProxy(request).then((result: ResponseOrError) => {
-        if ("error" in result) {
+        if (!result) {
+          //Backward compatibility check
+          reject(new Error("Failed to make request. Please check if the URL is valid."));
+        } else if ("error" in result) {
           reject(new Error(result.error));
         } else {
           resolve(result);
