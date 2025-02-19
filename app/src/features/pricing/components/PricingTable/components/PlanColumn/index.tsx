@@ -282,7 +282,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           <a
             target="_blank"
             rel="noreferrer"
-            href="https://rqst.ly/accelerator-program"
+            href={`https://rqst.ly/accelerator-program?page_source=${
+              product === PRICING.PRODUCTS.API_CLIENT ? "api_client_pricing_page" : "rules_pricing_page"
+            }`}
             onClick={() => {
               trackGetFreeTrialClicked(source);
             }}
