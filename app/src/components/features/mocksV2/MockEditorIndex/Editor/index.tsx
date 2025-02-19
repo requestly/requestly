@@ -31,6 +31,7 @@ import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { ExportMocksModalWrapper } from "features/mocks/modals";
 import { globalActions } from "store/slices/global/slice";
+import LazyEditor from "componentsV2/CodeEditor/components/Editor";
 
 interface Props {
   isNew?: boolean;
@@ -366,7 +367,7 @@ const MockEditor: React.FC<Props> = ({
     return (
       <Row className="editor-row">
         <Col span={24}>
-          <CodeEditor
+          <LazyEditor
             id={`headers-${id}`} // used to show error toasts created because header invalidation
             isResizable
             height={220}
@@ -385,7 +386,7 @@ const MockEditor: React.FC<Props> = ({
     return (
       <Row className="editor-row">
         <Col span={24}>
-          <CodeEditor
+          <LazyEditor
             isResizable
             height={220}
             value={body}
