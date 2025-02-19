@@ -3,6 +3,7 @@ import { RQAPI } from "features/apiClient/types";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
 import { API, APIEntity, FileSystemResult } from "./types";
 import { parseFsId, parseNativeId } from "../../utils";
+import { v4 as uuidv4 } from 'uuid';
 
 export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientLocalMeta> {
   meta: ApiClientLocalMeta;
@@ -13,6 +14,20 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
   private async getAdapter() {
     return fsManagerServiceAdapterProvider.get(this.meta.rootPath);
+  }
+
+  private generateFileName() {
+    return `${uuidv4()}.json`;
+  }
+
+  private getNormalizedPath(path: string) {
+    const normalizedPath = path.endsWith("/") ? path : `${path}/`;
+    return normalizedPath;
+  }
+
+  private appendPath(basePath: string, resourcePath: string) {
+    const separator = basePath.endsWith("/") ? "" : "/";
+    return `${basePath}${separator}${resourcePath}`;
   }
 
   private parseAPIEntities(entities: APIEntity[]): RQAPI.Record[] {
@@ -65,6 +80,16 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     });
   }
 
+  generateApiRecordId(parentId?: string) {
+		const name = this.generateFileName();
+		return parseFsId(this.appendPath(parentId || this.meta.rootPath, name));
+	}
+
+	generateCollectionId(name: string, parentId?: string) {
+		const path = this.appendPath(parentId || this.meta.rootPath, name);
+		return parseFsId(this.getNormalizedPath(path));
+	}
+
   async getAllRecords(): RQAPI.RecordsPromise {
     const service = await this.getAdapter();
     const result: FileSystemResult<APIEntity[]> = await service.getAllRecords();
@@ -99,7 +124,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: parsedRecords[0],
     };
   }
-	async createRecord(record: Partial<Omit<RQAPI.ApiRecord, 'id'>>): RQAPI.RecordPromise {
+	async createRecord(record: Partial<RQAPI.ApiRecord>): RQAPI.RecordPromise {
+		if (record.id) {
+			return this.createRecordWithId(record, record.id);
+		}
     const service = await this.getAdapter();
 		const result = await service.createRecord({
 			name: record.name || "Untitled Request",
@@ -141,8 +169,31 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
    }
 
-  createRecordWithId(_record: Partial<RQAPI.Record>, _id: string): RQAPI.RecordPromise {
-    throw new Error("Method not implemented.");
+  async createRecordWithId(record: Partial<RQAPI.ApiRecord>, nativeId: string): RQAPI.RecordPromise {
+  	const id = parseNativeId(nativeId);
+   	const service = await this.getAdapter();
+		const result = await service.createRecordWithId(
+			{
+				name: record.name || "Untitled Request",
+				url: record.data.request.url,
+				method: record.data.request.method,
+			},
+			id
+		);
+
+		if (result.type === "error") {
+	    return {
+	      success: false,
+	      data: null,
+	      message: result.error.message,
+	    };
+	  }
+
+		const [parsedApiRecord] = this.parseAPIEntities([result.content]);
+			return {
+	    success: true,
+	    data: parsedApiRecord,
+	  };
   }
   async updateRecord(patch: Partial<Omit<RQAPI.ApiRecord, 'id'>>, nativeId: string): RQAPI.RecordPromise {
   const id = parseNativeId(nativeId);

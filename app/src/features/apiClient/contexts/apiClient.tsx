@@ -29,7 +29,7 @@ interface ApiClientContextInterface {
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => void;
-  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none", alternateId?: string) => void;
+  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => void;
   onSaveBulkRecords: (apiClientRecords: RQAPI.Record[]) => void;
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => void;
   recordsToBeDeleted: RQAPI.Record[];
@@ -119,13 +119,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const { apiClientRecordsRepository } = useGetApiClientSyncRepo();
 
   const openDraftRequest = useCallback(() => {
-    const requestId = generateDocumentId("apis");
+    const requestId = apiClientRecordsRepository.generateApiRecordId();
 
     openTab(requestId, {
       title: "Untitled request",
       url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?create=true`,
     });
-  }, [openTab]);
+  }, [openTab, apiClientRecordsRepository]);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -228,8 +228,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   );
 
   const onSaveRecord = useCallback(
-    (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open", alternateId?: string) => {
-			const recordId = alternateId || apiClientRecord.id;
+    (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open") => {
+			const recordId = apiClientRecord.id;
     	const isRecordExist = apiClientRecords.find((record) => record.id === recordId);
 			console.log('on save id', recordId, isRecordExist);
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
@@ -250,7 +250,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             title: apiClientRecord.name,
             url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${recordId}?tab=${requestTab}`,
           });
-          console.log('called replace tab 2', recordId);
+          console.log('called replace tab 1', recordId);
           return;
         }
 

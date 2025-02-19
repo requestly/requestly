@@ -20,14 +20,14 @@ export const getIsWorkspaceMode = (state) => {
 export const getIsWorkspaceLocal = (state) => {
   const teamsState = getTeamsState(state);
   const teamId = teamsState.currentlyActiveWorkspace.id;
-  const team = teamsState.availableTeams.find((team) => team.id === teamId);
+  const team = teamsState.availableTeams?.find((team) => team.id === teamId);
   return team?.workspaceType === WorkspaceType.LOCAL;
 };
 
 export const getWorkspaceRootPath = (state) => {
   const teamsState = getTeamsState(state);
   const teamId = teamsState.currentlyActiveWorkspace.id;
-  const team = teamsState.availableTeams.find((team) => team.id === teamId);
+  const team = teamsState.availableTeams?.find((team) => team.id === teamId);
   return team?.rootPath;
 };
 

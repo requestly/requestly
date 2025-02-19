@@ -1,6 +1,6 @@
 import { deleteApiRecords, getApiRecord, getApiRecords, upsertApiRecord } from "backend/apiClient";
 import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces";
-import { getOwnerId } from "backend/utils";
+import { generateDocumentId, getOwnerId } from "backend/utils";
 import { RQAPI } from "features/apiClient/types";
 import { sanitizeRecord, updateApiRecord } from "backend/apiClient/upsertApiRecord";
 
@@ -14,6 +14,14 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   private getPrimaryId() {
     return getOwnerId(this.meta.uid, this.meta.teamId);
   }
+
+  generateApiRecordId(parentId?: string) {
+		return generateDocumentId("apis");
+	}
+
+	generateCollectionId(name: string, parentId?: string) {
+		return generateDocumentId("apis");
+	}
 
   async getAllRecords() {
     return getApiRecords(this.getPrimaryId());
