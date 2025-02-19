@@ -10,6 +10,7 @@ import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
 import { generateDocumentId } from "backend/utils";
 
+type ResponseOrError = RQAPI.Response | { error: string };
 export const makeRequest = async (
   appMode: string,
   request: RQAPI.Request,
@@ -29,9 +30,27 @@ export const makeRequest = async (
     }
 
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
-      getAPIResponseViaExtension(request).then(resolve);
+      getAPIResponseViaExtension(request).then((result: ResponseOrError) => {
+        if (!result) {
+          //Backward compatibility check
+          reject(new Error("Failed to make request. Please check if the URL is valid."));
+        } else if ("error" in result) {
+          reject(new Error(result.error));
+        } else {
+          resolve(result);
+        }
+      });
     } else if (appMode === CONSTANTS.APP_MODES.DESKTOP) {
-      getAPIResponseViaProxy(request).then(resolve);
+      getAPIResponseViaProxy(request).then((result: ResponseOrError) => {
+        if (!result) {
+          //Backward compatibility check
+          reject(new Error("Failed to make request. Please check if the URL is valid."));
+        } else if ("error" in result) {
+          reject(new Error(result.error));
+        } else {
+          resolve(result);
+        }
+      });
     } else {
       resolve(null);
     }
