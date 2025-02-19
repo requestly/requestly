@@ -15,7 +15,7 @@ import "./apiClientEmptyView.scss";
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
 
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+	const { apiClientRecords, onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
   const team = useSelector(getCurrentlyActiveWorkspace);
@@ -40,7 +40,7 @@ export const ApiClientEmptyView = () => {
       return;
     }
     setIsRecordCreating(recordType);
-    createBlankApiRecord(user?.details?.profile?.uid, team?.id, recordType, "")
+    createBlankApiRecord(user?.details?.profile?.uid, team?.id, recordType, "", apiClientRecordsRepository)
       .then((result) => {
         onSaveRecord(result.data);
       })

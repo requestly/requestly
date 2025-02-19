@@ -20,9 +20,10 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   meta: Meta;
   getAllRecords(): RQAPI.RecordsPromise;
   getRecord(recordId: string): RQAPI.RecordPromise;
-  createRecord(record: Partial<RQAPI.Record>): RQAPI.RecordPromise;
+  createRecord(record: Partial<Omit<RQAPI.ApiRecord, 'id'>>): RQAPI.RecordPromise;
+  createCollection(record: Partial<Omit<RQAPI.CollectionRecord, 'id'>>): RQAPI.RecordPromise;
   createRecordWithId(record: Partial<RQAPI.Record>, id: string): RQAPI.RecordPromise;
-  updateRecord(record: Partial<RQAPI.Record>, id?: string): RQAPI.RecordPromise;
+  updateRecord(record: Partial<Omit<RQAPI.Record, 'id'>>, id: string): RQAPI.RecordPromise;
   deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }>;
 }
 

@@ -1,4 +1,5 @@
 // import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { API, Collection, FileSystemResult } from "features/apiClient/helpers/modules/sync/local/services/types";
 import BackgroundServiceAdapter, { rpc } from "./DesktopBackgroundService";
 // import FEATURES from "config/constants/sub/features";
 export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
@@ -21,6 +22,14 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   async getRecord(id: string) {
     return this.invokeProcedureInBG("getRecord", id) as Promise<any>;
   }
+
+	async createRecord(record: API['request'], collectionId?: string, ) {
+		return this.invokeProcedureInBG("createRecord", record, collectionId, ) as Promise<FileSystemResult<API>>;
+	}
+
+	async createCollection(name: string, collectionId?: string, ) {
+		return this.invokeProcedureInBG("createCollection", name, collectionId) as Promise<FileSystemResult<Collection>>;
+	}
 
   async getAllEnvironments() {
     return this.invokeProcedureInBG("getAllEnvironments") as Promise<any>;
