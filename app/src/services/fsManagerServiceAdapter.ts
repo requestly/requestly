@@ -14,13 +14,17 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
     return this.invokeProcedureInBG("build", rootPath) as Promise<void>;
   }
 
-	async getAllRecords() {
-		return this.invokeProcedureInBG("getAllRecords") as Promise<any>;
-	}
+  async getAllRecords() {
+    return this.invokeProcedureInBG("getAllRecords") as Promise<any>;
+  }
 
-	async getRecord(id: string) {
-		return this.invokeProcedureInBG("getRecord", id) as Promise<any>;
-	}
+  async getRecord(id: string) {
+    return this.invokeProcedureInBG("getRecord", id) as Promise<any>;
+  }
+
+  async getAllEnvironments() {
+    return this.invokeProcedureInBG("getAllEnvironments") as Promise<any>;
+  }
 }
 
 class FsManagerServiceAdapterProvider {
@@ -41,5 +45,5 @@ class FsManagerServiceAdapterProvider {
 
 export const fsManagerServiceAdapterProvider = new FsManagerServiceAdapterProvider();
 export function createWorkspaceFolder(path: string) {
-	return rpc(FsManagerServiceAdapter.NAMESPACE, "createWorkspaceFolder", path);
+  return rpc(FsManagerServiceAdapter.NAMESPACE, "createWorkspaceFolder", path);
 }

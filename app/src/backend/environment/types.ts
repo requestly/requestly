@@ -10,6 +10,7 @@ export interface EnvironmentVariableValue {
 export type EnvironmentVariables = Record<string, EnvironmentVariableValue>;
 
 export interface EnvironmentData {
+  externalId?: string;
   id: string;
   name: string;
   variables: EnvironmentVariables;
