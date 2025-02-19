@@ -1,4 +1,3 @@
-//@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 export enum AuthTypes {

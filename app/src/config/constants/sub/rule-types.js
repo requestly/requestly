@@ -4,7 +4,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
 import { isDesktopMode } from "utils/AppUtils";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "../sub/features";
+import FEATURES from "./features";
 
 const getSourceFormat = () => ({
   filters: [],

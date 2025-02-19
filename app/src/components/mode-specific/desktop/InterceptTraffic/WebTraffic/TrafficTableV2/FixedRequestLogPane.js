@@ -163,8 +163,8 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
         <div className="navigation-panel-wrapper">
           <Editor
             id={`${title}-${log_id}`}
-            value={body}
-            defaultValue={body}
+            value={body || "{}"}
+            defaultValue={body || "{}"}
             language={EditorLanguage.JSON}
             isReadOnly
             isResizable={false}
