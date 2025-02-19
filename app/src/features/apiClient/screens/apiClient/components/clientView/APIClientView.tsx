@@ -381,15 +381,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       ? await apiClientRecordsRepository.createRecord(record)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
-    const idFromStorage = parseNativeId(result.data.id);
-		const idFromUrl = requestId;
-		const alternateId: string | undefined = idFromUrl === idFromStorage ? undefined : idFromUrl;
-
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
         { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
         isCreateMode ? "replace" : "open",
-        alternateId
       );
       trackRequestRenamed("breadcrumb");
       setRequestName("");
@@ -412,29 +407,16 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.id = apiEntryDetails?.id;
     }
 
-    // const args: Parameters<typeof apiClientRecordsRepository.updateRecord> = [record];
-
-    // if (isCreateMode) {
-    //   args.push(requestId);
-    // }
-
-		console.log('operating on ', record, apiEntryDetails);
 
     const result = isCreateMode
       ? await apiClientRecordsRepository.createRecord(record)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
-		const idFromStorage = parseNativeId(result.data.id);
-		const idFromUrl = requestId;
-		const alternateId: string | undefined = idFromUrl === idFromStorage ? undefined : idFromUrl;
-
-		console.log('nnn', idFromStorage, idFromUrl, alternateId);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
         { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
         isCreateMode ? "replace" : "open",
-        alternateId,
       );
       setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
       resetChanges();
@@ -445,7 +427,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
 
     setIsRequestSaving(false);
-  }, [entry, apiEntryDetails, onSaveRecord, setEntry, resetChanges, isCreateMode, apiClientRecordsRepository, requestId]);
+  }, [entry, apiEntryDetails, onSaveRecord, setEntry, resetChanges, isCreateMode, apiClientRecordsRepository]);
 
   const cancelRequest = useCallback(() => {
     apiClientExecutor.abort();
