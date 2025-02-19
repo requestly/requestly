@@ -15,6 +15,7 @@ import { isGlobalEnvironment } from "features/apiClient/screens/environment/util
 
 interface EnvironmentsListItemProps {
   environment: {
+    externalId?: string;
     id: string;
     name: string;
     isGlobal?: boolean;
@@ -122,7 +123,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
       { key: EnvironmentMenuKey.EXPORT, label: "Export", onClick: () => onExportClick?.(environment) },
       { key: EnvironmentMenuKey.DELETE, label: "Delete", danger: true, onClick: () => handleEnvironmentDelete() },
     ];
-  }, [handleEnvironmentDuplicate, handleEnvironmentDelete]);
+  }, [handleEnvironmentDuplicate, onExportClick, environment, handleEnvironmentDelete]);
 
   if (isRenameInputVisible) {
     return (
@@ -143,10 +144,10 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
       key={environment.id}
       className={`environments-list-item ${environment.id === envId && activeTab?.id === envId ? "active" : ""}`}
       onClick={() => {
-        redirectToEnvironment(navigate, environment.id);
-        openTab(environment.id, {
+        redirectToEnvironment(navigate, environment.externalId || environment.id);
+        openTab(environment.externalId || environment.id, {
           title: environment.name,
-          url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environment.id}`,
+          url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environment.externalId || environment.id}`,
         });
       }}
     >

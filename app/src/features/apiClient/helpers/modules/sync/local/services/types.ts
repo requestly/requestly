@@ -26,4 +26,11 @@ export type API = {
   };
 };
 
+export type EnvironmentEntity = {
+  type: "environment";
+  id: string;
+  name: string;
+  variables?: Record<string, any>;
+};
+
 export type APIEntity = Collection | API;

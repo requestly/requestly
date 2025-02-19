@@ -3,6 +3,7 @@ import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
   meta: Meta;
+  getAllEnvironments(): Promise<EnvironmentMap>;
   createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData>;
   createGlobalEnvironment(): Promise<EnvironmentData>;
   deleteEnvironment(envId: string): Promise<void>;

@@ -6,6 +6,7 @@ import {
   createNonGlobalEnvironmentInDB,
   deleteEnvironmentFromDB,
   duplicateEnvironmentInDB,
+  fetchAllEnvironmentDetails,
   removeEnvironmentVariableFromDB,
   updateEnvironmentInDB,
 } from "backend/environment";
@@ -20,6 +21,10 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
 
   private getPrimaryId() {
     return getOwnerId(this.meta.uid, this.meta.teamId);
+  }
+
+  async getAllEnvironments(): Promise<EnvironmentMap> {
+    return fetchAllEnvironmentDetails(this.getPrimaryId());
   }
 
   async deleteEnvironment(envId: string): Promise<void> {
