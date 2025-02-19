@@ -240,11 +240,14 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
       const parentNode = recordsMap[record.collectionId] as RQAPI.CollectionRecord;
       if (parentNode) {
         parentNode.data.children.push(recordState);
+      } else {
+        updatedRecords.push(recordState);
       }
     } else {
       updatedRecords.push(recordState);
     }
   });
+  console.log(updatedRecords, recordsMap, "DBG-1");
 
   sortNestedRecords(updatedRecords);
   return { recordsMap, updatedRecords };
