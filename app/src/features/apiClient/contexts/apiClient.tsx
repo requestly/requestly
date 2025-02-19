@@ -305,16 +305,18 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(uid, teamId, recordType, collectionId).then((result) => {
-            setIsRecordBeingCreated(null);
-            onSaveRecord(result.data);
-          });
+          return createBlankApiRecord(uid, teamId, recordType, collectionId, apiClientRecordsRepository).then(
+            (result) => {
+              setIsRecordBeingCreated(null);
+              onSaveRecord(result.data);
+            }
+          );
         }
 
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(uid, teamId, recordType, collectionId)
+          return createBlankApiRecord(uid, teamId, recordType, collectionId, apiClientRecordsRepository)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
@@ -347,7 +349,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [openTab, openDraftRequest, addNewEnvironment, teamId, uid, onSaveRecord]
+    [openTab, openDraftRequest, addNewEnvironment, teamId, uid, onSaveRecord, apiClientRecordsRepository]
   );
 
   const workloadManager = useMemo(() => new APIClientWorkloadManager(), []);
