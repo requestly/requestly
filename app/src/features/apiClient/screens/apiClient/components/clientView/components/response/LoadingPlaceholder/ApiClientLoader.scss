@@ -1,8 +1,8 @@
-.api-client-empty-response-view {
+.api-client-loading-view {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 48px;
+  gap: 24px;
   padding: 32px;
   height: 100%;
 
@@ -11,11 +11,12 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: var(--space-4, 16px);
   }
 
   img {
-    width: 80px;
-    height: 80px;
+    width: 116px;
+    height: 116px;
   }
 
   &__title {
@@ -24,20 +25,5 @@
     font-weight: var(--requestly-font-weight-medium);
     font-size: var(--requestly-font-size-sm);
     color: var(--requestly-color-text-default);
-    margin-top: 24px;
-  }
-
-  &__description {
-    font-size: var(--requestly-font-size-xs);
-    color: var(--requestly-color-text-subtle);
-  }
-
-  .documentation-link {
-    display: flex;
-    padding-top: 16px;
-    align-items: center;
-    gap: 4px;
-    color: var(--requestly-color-primary-text, #639ff9);
-    font-size: var(--requestly-font-size-xs);
   }
 }
