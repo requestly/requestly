@@ -327,11 +327,16 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   );
 
   const renderVariables = useCallback(
-    (template: string | Record<string, any>, requestCollectionId: string = "") => {
+    (
+      template: RQAPI.Request,
+      requestCollectionId: string = ""
+    ): {
+      renderedVariables?: Record<string, unknown>;
+      renderedRequest: RQAPI.Request;
+    } => {
       const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
-      const renderedTemplate = renderTemplate(template, variablesWithPrecedence);
-
-      return renderedTemplate;
+      const { renderedTemplate, renderedVariables } = renderTemplate(template, variablesWithPrecedence);
+      return { renderedVariables, renderedRequest: renderedTemplate as RQAPI.Request };
     },
     [getVariablesWithPrecedence]
   );
