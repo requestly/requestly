@@ -23,7 +23,7 @@ export const TeamsCard: React.FC = () => {
       return;
     }
     getPendingInvites({ email: true, domain: true })
-      .then((res: any) => {
+      .then((res) => {
         if (res?.pendingInvites) {
           const invites = res?.pendingInvites;
           const sortedInvites = invites.sort(
