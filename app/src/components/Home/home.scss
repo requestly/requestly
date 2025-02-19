@@ -311,11 +311,12 @@
           background: none;
         }
         img {
-          width: 24px;
-          height: 24px;
+          width: auto;
+          height: auto;
         }
       }
     }
+
     .view-all-cta {
       display: block;
       line-height: 18px;

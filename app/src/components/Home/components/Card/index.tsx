@@ -104,9 +104,9 @@ export const Card: React.FC<CardProps> = ({
                 {viewAllCta}
               </Link>
               <div className="import-dropdown">
-                <img src={importOptions.icon} alt={importOptions.label} />
                 <RQDropdown menu={{ items: importOptions.menu.slice(0, 3) }} trigger={["click"]}>
                   <RQButton className="import-dropdown-button" type="transparent">
+                    <img src={importOptions.icon} alt={importOptions.label} />
                     Import from other apps
                     <MdOutlineKeyboardArrowDown />
                   </RQButton>
