@@ -8,8 +8,6 @@ import { RQButton } from "lib/design-system/components";
 import { getDesktopSpecificDetails } from "store/selectors";
 import InstructionsHeader from "../MySources/Sources/InstructionsModal/InstructionsHeader";
 import { saveRootCert } from "actions/DesktopActions";
-import trustCertGif from "assets/img/screenshots/trust_cert.gif";
-import installWinCert from "assets/img/screenshots/install_win_cert.gif";
 
 const { Text } = Typography;
 
@@ -90,7 +88,7 @@ const ManualProxySetup = ({ setShowInstructions }) => {
         {macInstructions.map((step) => {
           return <List.Item.Meta title={step.title} description={step.description} />;
         })}
-        <Image src={trustCertGif} />
+        <Image src={"/assets/media/components/trust_cert.gif"} />
       </>
     );
   };
@@ -101,7 +99,7 @@ const ManualProxySetup = ({ setShowInstructions }) => {
         {windowsInstructions.map((step) => {
           return <List.Item.Meta title={step.title} />;
         })}
-        <Image src={installWinCert} />
+        <Image src={"/assets/media/components/install_win_cert.gif"} />
       </>
     );
   };
@@ -109,7 +107,7 @@ const ManualProxySetup = ({ setShowInstructions }) => {
   return (
     <>
       <InstructionsHeader
-        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/package.png"}
+        icon={window.location.origin + "/assets/media/components/package.png"}
         heading="Setting up system proxy"
         description="Requestly requires your applications to send their network traffic through its local proxy server before
             going to the destination."
