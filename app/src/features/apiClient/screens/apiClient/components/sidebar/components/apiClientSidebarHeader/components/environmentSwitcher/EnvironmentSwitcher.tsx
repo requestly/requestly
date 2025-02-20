@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Dropdown, Typography } from "antd";
+//import { Dropdown, Typography } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
@@ -13,6 +13,8 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./environmentSwitcher.scss";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { trackEnvironmentSwitched } from "modules/analytics/events/features/apiClient";
+import Dropdown from "antd/es/dropdown";
+import Typography from "antd/es/typography";
 
 export const EnvironmentSwitcher = () => {
   const navigate = useNavigate();
