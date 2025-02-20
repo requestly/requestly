@@ -135,7 +135,6 @@ const AuthHandler: React.FC<{}> = () => {
           })
         );
         dispatch(
-          // @ts-ignore
           globalActions.updateInitializations({
             initType: "auth",
             initValue: true,
@@ -252,7 +251,6 @@ const AuthHandler: React.FC<{}> = () => {
           globalActions.updateUserInfo({ loggedIn: false, details: null })
         );
         dispatch(
-          // @ts-ignore
           globalActions.updateInitializations({
             initType: "auth",
             initValue: true,

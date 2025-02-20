@@ -15,7 +15,6 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { IoIosArrowDropright } from "@react-icons/all-files/io/IoIosArrowDropright";
 import { IoIosArrowDropleft } from "@react-icons/all-files/io/IoIosArrowDropleft";
 import "./index.scss";
-import { RuleType } from "@requestly/shared/types/entities/rules";
 
 export const Templates: React.FC = () => {
   const scrollContainerRef = useRef(null);
@@ -89,7 +88,7 @@ export const Templates: React.FC = () => {
               <div className="homepage-primary-card home-templates-row-card" key={index}>
                 <Typography.Text className="home-templates-row-card-title">{template.name}</Typography.Text>
                 <Row gutter={8} align="middle" className="home-templates-row-card-tag">
-                  <Col className="home-templates-row-card-icon">{ruleIcons[ruleType as RuleType]}</Col>
+                  <Col className="home-templates-row-card-icon">{ruleIcons[ruleType as keyof typeof ruleIcons]}</Col>
                   <Col className="home-templates-row-card-ruletype">
                     {APP_CONSTANTS.RULE_TYPES_CONFIG[ruleType]?.NAME}
                   </Col>

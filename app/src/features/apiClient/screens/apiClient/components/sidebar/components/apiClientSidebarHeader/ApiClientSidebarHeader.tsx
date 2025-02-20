@@ -173,7 +173,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       onClick: () => {
         if (!user.loggedIn) {
           dispatch(
-            // @ts-ignore
             globalActions.toggleActiveModal({
               modalName: "authModal",
               newValue: true,
@@ -203,7 +202,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       onClick: () => {
         if (!user.loggedIn) {
           dispatch(
-            // @ts-ignore
             globalActions.toggleActiveModal({
               modalName: "authModal",
               newValue: true,

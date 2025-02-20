@@ -127,10 +127,16 @@ export namespace RQAPI {
     message: Error["message"];
   };
 
+  export type ExecutionWarning = {
+    message: string;
+    description: string;
+  };
+
   export type ExecutionResult =
     | {
         status: ExecutionStatus.SUCCESS;
         executedEntry: RQAPI.Entry;
+        warning?: ExecutionWarning;
       }
     | {
         status: ExecutionStatus.ERROR;

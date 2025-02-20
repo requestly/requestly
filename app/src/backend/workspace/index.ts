@@ -26,14 +26,15 @@ export const getPendingInvites = async ({ email, domain }: { email: boolean; dom
 };
 
 export const acceptTeamInvite = async (inviteId: string) => {
-  const acceptInvite = httpsCallable<{ inviteId: string }, { invite: Invite; success: boolean }>(
-    getFunctions(),
-    "invites-acceptInvite"
-  );
+  const acceptInvite = httpsCallable<
+    { inviteId: string },
+    { data?: { invite: Invite }; success: boolean; message: string }
+  >(getFunctions(), "invites-acceptInvite");
 
   try {
-    return await acceptInvite({ inviteId });
+    const res = await acceptInvite({ inviteId });
+    return res?.data;
   } catch (error) {
-    return { success: false };
+    return { success: false, message: "Error while accepting invite" };
   }
 };
