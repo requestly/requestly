@@ -7,7 +7,7 @@ import { getApiRecords } from "backend/apiClient";
 import Logger from "lib/logger";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
-  trackEnvironmentClicked,
+  trackNewEnvironmentClicked,
   trackHistoryCleared,
   trackImportCurlClicked,
   trackNewCollectionClicked,
@@ -17,15 +17,13 @@ import {
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import {
-  clearExpandedRecordIdsFromSession,
-  createBlankApiRecord,
-  trackUserProperties,
-} from "../screens/apiClient/utils";
+import { clearExpandedRecordIdsFromSession, createBlankApiRecord, isApiCollection } from "../screens/apiClient/utils";
 import { generateDocumentId } from "backend/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { useSearchParams } from "react-router-dom";
 import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
+import APP_CONSTANTS from "config/constants";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -118,18 +116,14 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const { openTab, deleteTabs, updateTab, replaceTab, updateAddTabBtnCallback } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
 
-  const openDraftRequest = useCallback(
-    (callAnalyticEvent: boolean = true) => {
-      const requestId = generateDocumentId("apis");
-      callAnalyticEvent && trackNewTabOpened();
+  const openDraftRequest = useCallback(() => {
+    const requestId = generateDocumentId("apis");
 
-      openTab(requestId, {
-        title: "Untitled request",
-        url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?create=true`,
-      });
-    },
-    [openTab]
-  );
+    openTab(requestId, {
+      title: "Untitled request",
+      url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?create=true`,
+    });
+  }, [openTab]);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -142,7 +136,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       return;
     }
 
-    updateAddTabBtnCallback(openDraftRequest);
+    updateAddTabBtnCallback(() => {
+      trackNewTabOpened();
+      openDraftRequest();
+    });
   }, [user.loggedIn, updateAddTabBtnCallback, openDraftRequest]);
 
   // TODO: Create modal context
@@ -158,9 +155,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       .then((result) => {
         if (result.success) {
           setApiClientRecords(result.data);
-
-          // Tracking user properties for analytics
-          trackUserProperties(result.data);
         }
       })
       .catch((error) => {
@@ -172,37 +166,23 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       });
   }, [uid, teamId]);
 
-  const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-    setApiClientRecords((prev) => {
-      const updatedRecords = [...prev, { ...apiClientRecord }];
+  useEffect(() => {
+    trackUserProperties(apiClientRecords);
+  }, [apiClientRecords]);
 
-      // Tracking user properties for analytics
-      trackUserProperties(updatedRecords);
-      return updatedRecords;
-    });
+  const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
+    setApiClientRecords((prev) => [...prev, { ...apiClientRecord }]);
   }, []);
 
   const onRemoveRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-    setApiClientRecords((prev) => {
-      const updatedRecords = prev.filter((record) => record.id !== apiClientRecord.id);
-
-      // Tracking user properties for analytics
-      trackUserProperties(updatedRecords);
-      return updatedRecords;
-    });
+    setApiClientRecords((prev) => prev.filter((record) => record.id !== apiClientRecord.id));
   }, []);
 
   const onUpdateRecord = useCallback(
     (apiClientRecord: RQAPI.Record) => {
-      setApiClientRecords((prev) => {
-        const updatedRecords = prev.map((record) =>
-          record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record
-        );
-
-        // Tracking user properties for analytics
-        trackUserProperties(updatedRecords);
-        return updatedRecords;
-      });
+      setApiClientRecords((prev) =>
+        prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record))
+      );
 
       updateTab(apiClientRecord.id, {
         title: apiClientRecord.name,
@@ -218,15 +198,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       deleteTabs(recordIdsToBeDeleted);
       clearExpandedRecordIdsFromSession(recordIdsToBeDeleted);
 
-      setApiClientRecords((prev) => {
-        const updatedRecords = prev.filter((record) => {
+      setApiClientRecords((prev) =>
+        prev.filter((record) => {
           return !recordIdsToBeDeleted.includes(record.id);
-        });
-
-        // Tracking user properties for analytics
-        trackUserProperties(updatedRecords);
-        return updatedRecords;
-      });
+        })
+      );
     },
     [deleteTabs]
   );
@@ -246,10 +222,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           currentRecordsMap.set(record.id, record);
         });
 
-        const updatedRecords = Array.from(currentRecordsMap.values());
-        // Tracking user properties for analytics
-        trackUserProperties(updatedRecords);
-        return updatedRecords;
+        return Array.from(currentRecordsMap.values());
       });
     },
     [updateTab, setApiClientRecords]
@@ -319,6 +292,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     trackImportCurlClicked();
   }, []);
 
+  const trackUserProperties = useCallback((records: RQAPI.Record[]) => {
+    const totalCollections = records.filter((record) => isApiCollection(record)).length;
+    const totalRequests = records.length - totalCollections;
+    submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_COLLECTIONS, totalCollections);
+    submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_REQUESTS, totalRequests);
+  }, []);
+
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);
 
   const onNewClick = useCallback(
@@ -328,7 +308,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           trackNewRequestClicked(analyticEventSource);
 
           if (analyticEventSource === "api_client_sidebar_header") {
-            openDraftRequest(false);
+            openDraftRequest();
             return;
           }
 
@@ -356,7 +336,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
         case RQAPI.RecordType.ENVIRONMENT: {
           setIsRecordBeingCreated(recordType);
-          trackEnvironmentClicked();
+          trackNewEnvironmentClicked();
           return addNewEnvironment("New Environment")
             .then((newEnvironment: { id: string; name: string; isGlobal: boolean }) => {
               setIsRecordBeingCreated(null);

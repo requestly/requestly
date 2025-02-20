@@ -258,10 +258,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   const onSendButtonClick = useCallback(async () => {
     updateTab(apiEntryDetails?.id, { isPreview: false });
-    trackAPIRequestSent({
-      has_scripts: Boolean(entry.scripts?.preRequest?.length),
-      auth_type: entry?.auth?.currentAuthType,
-    });
 
     if (!entry.request.url) {
       return;
@@ -301,6 +297,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     try {
       const apiClientExecutionResult = await apiClientExecutor.execute();
+      trackAPIRequestSent({
+        has_scripts: Boolean(entry.scripts?.preRequest),
+        auth_type: entry?.auth?.currentAuthType,
+      });
       const { executedEntry } = apiClientExecutionResult;
       const entryWithResponse: RQAPI.Entry = {
         ...entry,
@@ -430,7 +430,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       resetChanges();
       trackRequestSaved({
         src: "api_client_view",
-        has_scripts: Boolean(entry.scripts?.preRequest?.length),
+        has_scripts: Boolean(entry.scripts?.preRequest),
         auth_type: entry?.auth?.currentAuthType,
       });
       toast.success("Request saved!");

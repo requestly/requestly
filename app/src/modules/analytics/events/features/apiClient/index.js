@@ -77,7 +77,7 @@ export const trackExportCollectionsClicked = () => {
 };
 
 // Environment & Variables
-export const trackEnvironmentClicked = () => {
+export const trackNewEnvironmentClicked = () => {
   trackEvent(API_CLIENT.ENVIRONMENT_CLICKED);
 };
 
