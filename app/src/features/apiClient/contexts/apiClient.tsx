@@ -16,7 +16,6 @@ import { trackCreateEnvironmentClicked } from "../screens/environment/analytics"
 import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { clearExpandedRecordIdsFromSession, createBlankApiRecord } from "../screens/apiClient/utils";
-import { generateDocumentId } from "backend/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { useSearchParams } from "react-router-dom";
 import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
@@ -229,10 +228,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onSaveRecord = useCallback(
     (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open") => {
-			console.log('on save', apiClientRecord, onSaveTabAction);
-    	const recordId = apiClientRecord.id;
-    	const isRecordExist = apiClientRecords.find((record) => record.id === recordId);
-			console.log('on save id', recordId, isRecordExist, apiClientRecords);
+      console.log("on save", apiClientRecord, onSaveTabAction);
+      const recordId = apiClientRecord.id;
+      const isRecordExist = apiClientRecords.find((record) => record.id === recordId);
+      console.log("on save id", recordId, isRecordExist, apiClientRecords);
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
       const requestTab = searchParams.get("tab") || RequestTab.QUERY_PARAMS;
 
@@ -242,7 +241,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           title: apiClientRecord.name,
           url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${encodeURIComponent(recordId)}?tab=${requestTab}`,
         });
-				console.log('called replace tab 1', recordId);
+        console.log("called replace tab 1", recordId);
       } else {
         onNewRecord(apiClientRecord);
 
@@ -251,7 +250,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             title: apiClientRecord.name,
             url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${encodeURIComponent(recordId)}?tab=${requestTab}`,
           });
-          console.log('called replace tab 1', recordId);
+          console.log("called replace tab 1", recordId);
           return;
         }
 
@@ -337,7 +336,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setIsRecordBeingCreated(recordType);
           trackCreateEnvironmentClicked(analyticEventSource);
           return addNewEnvironment("New Environment")
-            .then((newEnvironment: { id: string; name: string; isGlobal: boolean }) => {
+            .then((newEnvironment: { id: string; name: string }) => {
               setIsRecordBeingCreated(null);
               openTab(newEnvironment.id, {
                 title: newEnvironment.name,

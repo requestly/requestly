@@ -16,10 +16,12 @@ const addNewEnvironment = (
     id: string;
     name: string;
     ownerId: string;
+    externalId?: string;
   }>
 ) => {
   state.environments[action.payload.ownerId][action.payload.id] = {
     id: action.payload.id,
+    externalId: action.payload?.externalId,
     variables: {},
     name: action.payload.name,
   };
