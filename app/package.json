@@ -64,7 +64,7 @@
     "@sentry/tracing": "^7.54.0",
     "@stripe/react-stripe-js": "^2.3.0",
     "@stripe/stripe-js": "^1.24.0",
-    "@tanstack/react-virtual": "^3.0.0-beta.54",
+    "@tanstack/react-virtual": "^3.11.3",
     "@types/har-format": "^1.2.15",
     "@uiw/codemirror-theme-vscode": "^4.22.1",
     "@uiw/react-codemirror": "^4.22.1",
