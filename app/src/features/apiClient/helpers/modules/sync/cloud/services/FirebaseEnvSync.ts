@@ -7,7 +7,6 @@ import {
   deleteEnvironmentFromDB,
   duplicateEnvironmentInDB,
   fetchAllEnvironmentDetails,
-  removeEnvironmentVariableFromDB,
   updateEnvironmentInDB,
 } from "backend/environment";
 import { getOwnerId } from "backend/utils";
@@ -39,10 +38,6 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
 
   async duplicateEnvironment(environmentId: string, allEnvironments: EnvironmentMap): Promise<EnvironmentData> {
     return duplicateEnvironmentInDB(this.getPrimaryId(), environmentId, allEnvironments);
-  }
-
-  async removeVariableFromEnvironment(environmentId: string, key: string): Promise<void> {
-    await removeEnvironmentVariableFromDB(this.getPrimaryId(), { environmentId, key });
   }
 
   async updateEnvironment(
