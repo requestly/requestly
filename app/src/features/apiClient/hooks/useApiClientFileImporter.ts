@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { toast } from "utils/Toast";
 import Logger from "lib/logger";
 import { batchWrite } from "backend/utils";
@@ -34,10 +34,13 @@ export enum ImporterTypes {
 }
 
 const useApiClientFileImporter = (importer: ImporterTypes) => {
-  const processors: Record<string, (content: any, uid: string) => any> = {
-    RQ: processRqImportData,
-    // Add other importers as needed
-  };
+  const processors = useMemo(
+    () => ({
+      RQ: processRqImportData,
+      // Add other importers as needed
+    }),
+    []
+  );
 
   const [processedFileData, setProcessedFileData] = useState<ProcessedData>({
     apis: [],
@@ -77,6 +80,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
             try {
               const content = JSON.parse(reader.result as string);
               const processor = processors[importer];
+              console.log(processor, "processionr");
 
               if (!processor) {
                 throw new Error(`Unsupported importer: ${importer}`);
