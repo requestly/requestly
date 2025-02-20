@@ -80,7 +80,6 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
             try {
               const content = JSON.parse(reader.result as string);
               const processor = processors[importer];
-              console.log(processor, "processionr");
 
               if (!processor) {
                 throw new Error(`Unsupported importer: ${importer}`);
