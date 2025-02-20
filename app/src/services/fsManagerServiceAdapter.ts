@@ -68,6 +68,10 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   async updateEnvironment(id: string, patch: Partial<Pick<EnvironmentData, "name" | "variables">>) {
     return this.invokeProcedureInBG("updateEnvironment", id, patch) as Promise<FileSystemResult<EnvironmentEntity>>;
   }
+
+  async duplicateEnvironment(id: string) {
+    return this.invokeProcedureInBG("duplicateEnvironment", id) as Promise<FileSystemResult<EnvironmentEntity>>;
+  }
 }
 
 class FsManagerServiceAdapterProvider {
