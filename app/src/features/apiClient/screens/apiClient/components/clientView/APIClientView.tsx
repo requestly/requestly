@@ -298,6 +298,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     try {
       const apiClientExecutionResult = await apiClientExecutor.execute();
+
       const { executedEntry } = apiClientExecutionResult;
       const entryWithResponse: RQAPI.Entry = {
         ...entry,
@@ -333,7 +334,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
           });
         }
-        trackRequestFailed();
+        trackRequestFailed(error.message);
         trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
         trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
       }
@@ -428,7 +429,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       );
       setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
       resetChanges();
-      trackRequestSaved("api_client_view");
+      trackRequestSaved({
+        src: "api_client_view",
+        has_scripts: Boolean(entry.scripts?.preRequest),
+        auth_type: entry?.auth?.currentAuthType,
+      });
       toast.success("Request saved!");
     } else {
       toast.error("Something went wrong!");

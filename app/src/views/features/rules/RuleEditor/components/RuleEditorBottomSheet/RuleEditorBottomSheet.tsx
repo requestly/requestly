@@ -7,11 +7,12 @@ import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import FEATURES from "config/constants/sub/features";
 import APP_CONSTANTS from "config/constants";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
+import { MISC_TOURS } from "components/misc/ProductWalkthrough/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { getAppMode, getCurrentlySelectedRuleData, getIsMiscTourCompleted } from "store/selectors";
 import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
+import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 
 interface RuleEditorBottomSheetProps {
   mode: string;
@@ -82,7 +83,7 @@ export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mo
               dispatch(
                 globalActions.updateProductTourCompleted({
                   tour: TOUR_TYPES.MISCELLANEOUS,
-                  subTour: "testThisRule",
+                  subTour: SUB_TOUR_TYPES.TEST_THIS_RULE,
                 })
               );
             }}
