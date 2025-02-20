@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Popconfirm, Tooltip } from "antd";
+import { Tooltip } from "antd";
 import { getAppMode, getIsSecondarySidebarCollapsed, getNetworkSessionSaveInProgress } from "store/selectors";
 import { ApiOutlined, HomeOutlined } from "@ant-design/icons";
 import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
@@ -27,7 +27,7 @@ import { SidebarToggleButton } from "componentsV2/SecondarySidebar/components/Si
 import APP_CONSTANTS from "config/constants";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import "./PrimarySidebar.css";
-import { isSafariExtension } from "actions/ExtensionActions";
+import { isSafariBrowser, isSafariExtension } from "actions/ExtensionActions";
 import { SafariComingSoonTooltip } from "componentsV2/SafariExtension/SafariComingSoonTooltip";
 
 export const PrimarySidebar: React.FC = () => {
@@ -57,7 +57,7 @@ export const PrimarySidebar: React.FC = () => {
         title: "Home",
         path: PATHS.HOME.RELATIVE,
         icon: <HomeOutlined />,
-        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariExtension(),
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
       {
         id: 1,
@@ -71,7 +71,7 @@ export const PrimarySidebar: React.FC = () => {
         title: "Network inspector",
         path: PATHS.NETWORK_INSPECTOR.RELATIVE,
         icon: <NetworkTrafficInspectorIcon />,
-        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariExtension(),
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
       {
         id: 3,

@@ -19,12 +19,16 @@ export function isExtensionInstalled() {
   return !!getExtensionVersion();
 }
 
-export const isSafariExtension = () => {
+export const isSafariBrowser = () => {
   const parser = new UAParser(window.navigator.userAgent);
   const result = parser.getResult();
   const browser = result.browser.name;
 
-  return browser === "Safari" && isExtensionInstalled();
+  return browser === "Safari";
+};
+
+export const isSafariExtension = () => {
+  return isSafariBrowser() && isExtensionInstalled();
 };
 
 export function isSessionBearExtensionInstalled() {
