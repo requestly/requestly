@@ -74,7 +74,7 @@ const processScripts = (item: any) => {
     if (!postmanScript) {
       return "";
     }
-    return postmanScript?.replace(/pm\./g, "rq."); // Replace all occurrences of 'pm.' with 'rq.'
+    return postmanScript.replace(/pm\./g, "rq."); // Replace all occurrences of 'pm.' with 'rq.'
   };
 
   if (!item.event?.length) {
@@ -102,7 +102,7 @@ const processAuthorizationOptions = (
 
   const auth: RQAPI.AuthOptions = { currentAuthType, [currentAuthType]: {} };
 
-  const authOptions = Array.isArray(item[item?.type]) ? item[item?.type] : [];
+  const authOptions = item[item?.type] || [];
 
   authOptions.forEach((option: Record<string, any>) => {
     auth[currentAuthType][POSTMAN_FIELD_MAPPING.get(option.key)] = POSTMAN_FIELD_MAPPING.get(option.value);
