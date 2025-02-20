@@ -11,6 +11,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     this.meta = metadata;
   }
 
+
   private getPrimaryId() {
     return getOwnerId(this.meta.uid, this.meta.teamId);
   }
@@ -27,6 +28,10 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return getApiRecords(this.getPrimaryId());
   }
 
+  getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void> {
+		return;
+	}
+
   async getRecord(recordId: string) {
     return getApiRecord(recordId);
   }
@@ -34,6 +39,10 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   async getCollection(recordId: string) {
     return getApiRecord(recordId);
   }
+
+  async renameCollection(id: string, newName: string): RQAPI.RecordPromise {
+		return this.updateRecord({ id, name: newName }, id);
+	}
 
   async createRecord(record: Partial<RQAPI.Record>) {
     return upsertApiRecord(this.meta.uid, record, this.meta.teamId);
@@ -47,8 +56,9 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
   }
 
-  async updateRecord(record: Partial<Omit<RQAPI.Record, 'id'>>, id: string) {
+  async updateRecord(record: Partial<RQAPI.Record>, id: string) {
 		const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
+		sanitizedRecord.id = id;
     return updateApiRecord(this.meta.uid, sanitizedRecord, this.meta.teamId);
   }
 

@@ -107,6 +107,9 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: parsedRecords,
     };
   }
+  getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void> {
+		return this.getAllRecords();
+	}
   async getRecord(nativeId: string): RQAPI.RecordPromise {
     const id = parseNativeId(nativeId);
     const service = await this.getAdapter();
@@ -243,6 +246,23 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   async getCollection(recordId: string): RQAPI.RecordPromise {
 	  const service = await this.getAdapter();
 	  const result = await service.getCollection(recordId);
+	  if (result.type === "error") {
+	    return {
+	      success: false,
+	      data: null,
+	      message: result.error.message,
+	    };
+	  }
+	  const parsedRecords = this.parseAPIEntities([result.content]);
+	  return {
+	    success: true,
+	    data: parsedRecords[0],
+	  };
+	}
+
+	async renameCollection(id: string, newName: string): RQAPI.RecordPromise {
+		const service = await this.getAdapter();
+	  const result = await service.renameCollection(id, newName);
 	  if (result.type === "error") {
 	    return {
 	      success: false,
