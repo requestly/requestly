@@ -8,7 +8,7 @@ import { UserAuth } from "store/slices/global/user/types";
 
 export const updateUserInfo = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{ loggedIn: boolean; details: UserAuth["details"] }>
+  action: PayloadAction<{ loggedIn: boolean; details: UserAuth }>
 ) => {
   prevState.user.loggedIn = action.payload.loggedIn;
   if (action.payload.details) {
