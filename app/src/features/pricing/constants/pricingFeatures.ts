@@ -118,7 +118,6 @@ export const PricingFeatures: PlanFeatures = {
         {
           title: "Complete access to the API client",
           enabled: true,
-          tooltip: "Get complimentary access to API Client Professional Plan.",
         },
         {
           title: "API access",
