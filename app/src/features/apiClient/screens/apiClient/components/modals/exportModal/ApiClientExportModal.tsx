@@ -62,7 +62,6 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
       exportType === "collection" ? trackExportCollectionsClicked() : trackEnvironmentExported();
       onClose();
     } catch (error) {
-      console.error(error);
       trackExportApiCollectionsFailed(dataToExport.records?.length, dataToExport.environments?.length);
     }
   }, [exportData, recordsToBeExported, environments, onClose, fileInfo.label]);

@@ -4,7 +4,7 @@ import { FilePicker } from "components/common/FilePicker";
 import { processBrunoCollectionData } from "./utils";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
-import { RQAPI } from "features/apiClient/types";
+import { ApiClientImporters, RQAPI } from "features/apiClient/types";
 import { upsertApiRecord } from "backend/apiClient";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -112,7 +112,11 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
             processedRecords.apis.push(...apis);
             processedRecords.environments.push(...environments);
             collectionsCount.current += collections.length;
-            trackImportParsed("bruno", processedRecords.collections.length, processedRecords.apis.length);
+            trackImportParsed(
+              ApiClientImporters.BRUNO,
+              processedRecords.collections.length,
+              processedRecords.apis.length
+            );
           }
         });
 
@@ -120,7 +124,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
         setProcessingStatus("processed");
       })
       .catch((error) => {
-        trackImportParseFailed("bruno", error.message);
+        trackImportParseFailed(ApiClientImporters.BRUNO, error.message);
         setImportError(error.message);
         setProcessingStatus("idle");
       });
@@ -229,13 +233,17 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
         toast.success(`Successfully imported ${successMessage}`);
 
-        trackImportSuccess("bruno", recordsResult.importedCollectionsCount, recordsResult.importedApisCount);
+        trackImportSuccess(
+          ApiClientImporters.BRUNO,
+          recordsResult.importedCollectionsCount,
+          recordsResult.importedApisCount
+        );
         onSuccess?.();
       })
       .catch((error) => {
         Logger.error("Bruno data import failed:", error);
         setImportError("Something went wrong! Couldn't import Bruno data");
-        trackImportFailed("bruno", JSON.stringify(error));
+        trackImportFailed(ApiClientImporters.BRUNO, JSON.stringify(error));
       })
       .finally(() => {
         setIsImporting(false);

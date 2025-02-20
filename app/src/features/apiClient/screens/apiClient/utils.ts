@@ -5,13 +5,10 @@ import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { upsertApiRecord } from "backend/apiClient";
-import { differenceWith, forEach, isEmpty, isEqual, omit, split, unionBy } from "lodash";
+import { forEach, isEmpty, omit, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
 import { generateDocumentId } from "backend/utils";
-import { EnvironmentVariables } from "backend/environment/types";
-import { submitAttrUtil } from "utils/AnalyticsUtils";
-import APP_CONSTANTS from "config/constants";
 
 export const makeRequest = async (
   appMode: string,
@@ -575,31 +572,4 @@ export const processRecordsForDuplication = (recordsToProcess: RQAPI.Record[]) =
   }
 
   return recordsToDuplicate;
-};
-
-export const getUpdatedVariableCount = (originalData: EnvironmentVariables, updatedData: EnvironmentVariables) => {
-  const formattedData = Object.entries(originalData).map(([key, value]) => ({
-    key,
-    type: value.type,
-    localValue: value.localValue,
-    syncValue: value.syncValue,
-    id: value.id,
-  }));
-
-  const formattedChangedData = Object.entries(updatedData).map(([key, value]) => ({
-    key,
-    type: value.type,
-    localValue: value.localValue,
-    syncValue: value.syncValue,
-    id: value.id,
-  }));
-
-  return differenceWith(formattedChangedData, formattedData, isEqual).length;
-};
-
-export const trackUserProperties = (records: RQAPI.Record[]) => {
-  const totalCollections = records.filter((record) => isApiCollection(record)).length;
-  const totalRequests = records.length - totalCollections;
-  submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_COLLECTIONS, totalCollections);
-  submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_REQUESTS, totalRequests);
 };

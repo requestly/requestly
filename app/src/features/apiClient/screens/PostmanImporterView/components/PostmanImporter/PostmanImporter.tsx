@@ -7,7 +7,7 @@ import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
-import { RQAPI } from "features/apiClient/types";
+import { ApiClientImporters, RQAPI } from "features/apiClient/types";
 import { upsertApiRecord } from "backend/apiClient";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -125,10 +125,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 processedRecords.variables = { ...processedRecords.variables, ...result.value.data.variables };
                 processedRecords.apiRecords.push(...collections, ...apis);
                 collectionsCount.current += collections.length;
-                trackImportParsed("postman", collections.length, apis.length);
+                trackImportParsed(ApiClientImporters.POSTMAN, collections.length, apis.length);
               }
             } else {
-              trackImportParseFailed("postman", result.reason);
+              trackImportParseFailed(ApiClientImporters.POSTMAN, result.reason);
               console.error("Error processing postman file:", result.reason);
             }
           });
@@ -137,7 +137,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           setProcessingStatus("processed");
         })
         .catch((error) => {
-          trackImportParseFailed("postman", error.message);
+          trackImportParseFailed(ApiClientImporters.POSTMAN, error.message);
           setImportError(error.message);
         })
         .finally(() => {
@@ -241,20 +241,21 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       .then((results) => {
         const [environmentsResult, collectionsResult] = results;
         const importedEnvironments = environmentsResult.status === "fulfilled" ? environmentsResult.value : 0;
-        const importedCollections =
+        const importedCollectionsCount =
           collectionsResult.status === "fulfilled" ? collectionsResult.value.importedCollectionsCount : 0;
-        const importedApis = collectionsResult.status === "fulfilled" ? collectionsResult.value.importedApisCount : 0;
+        const importedApisCount =
+          collectionsResult.status === "fulfilled" ? collectionsResult.value.importedApisCount : 0;
 
         const failedEnvironments = processedFileData.environments.length - importedEnvironments;
-        const failedCollections = collectionsCount.current - importedCollections;
+        const failedCollections = collectionsCount.current - importedCollectionsCount;
 
-        if (!importedEnvironments && !importedCollections) {
+        if (!importedEnvironments && !importedCollectionsCount) {
           toast.error("Failed to import Postman data");
           return;
         }
 
         const hasFailures = failedEnvironments > 0 || failedCollections > 0;
-        const hasSuccesses = importedEnvironments > 0 || importedCollections > 0;
+        const hasSuccesses = importedEnvironments > 0 || importedCollectionsCount > 0;
 
         if (hasFailures && hasSuccesses) {
           const failureMessage = [
@@ -270,7 +271,9 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
         toast.success(
           `Successfully imported ${[
-            importedCollections > 0 ? `${importedCollections} collection${importedCollections !== 1 ? "s" : ""}` : "",
+            importedCollectionsCount > 0
+              ? `${importedCollectionsCount} collection${importedCollectionsCount !== 1 ? "s" : ""}`
+              : "",
             importedEnvironments > 0
               ? `${importedEnvironments} environment${importedEnvironments !== 1 ? "s" : ""}`
               : "",
@@ -280,12 +283,12 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         );
 
         onSuccess?.();
-        trackImportSuccess("postman", importedCollections, importedApis);
+        trackImportSuccess(ApiClientImporters.POSTMAN, importedCollectionsCount, importedApisCount);
       })
       .catch((error) => {
         Logger.error("Postman data import failed:", error);
         setImportError("Something went wrong!, Couldn't import Postman data");
-        trackImportFailed("postman", JSON.stringify(error));
+        trackImportFailed(ApiClientImporters.POSTMAN, JSON.stringify(error));
       })
       .finally(() => {
         setIsImporting(false);

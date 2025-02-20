@@ -6,7 +6,7 @@ import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { ApiClientSidebarTabKey } from "../../APIClientSidebar";
-import { RQAPI } from "features/apiClient/types";
+import { ApiClientImporters, RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import { trackImportStarted } from "modules/analytics/events/features/apiClient";
 import { useDispatch, useSelector } from "react-redux";
@@ -87,7 +87,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </div>
         ),
         onClick: () => {
-          trackImportStarted("requestly");
+          trackImportStarted(ApiClientImporters.REQUESTLY);
           if (!user.loggedIn) {
             dispatch(
               globalActions.toggleActiveModal({
@@ -113,7 +113,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </div>
         ),
         onClick: () => {
-          trackImportStarted("postman");
+          trackImportStarted(ApiClientImporters.POSTMAN);
           if (!user.loggedIn) {
             dispatch(
               globalActions.toggleActiveModal({
@@ -139,7 +139,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </div>
         ),
         onClick: () => {
-          trackImportStarted("bruno");
+          trackImportStarted(ApiClientImporters.BRUNO);
           if (!user.loggedIn) {
             dispatch(
               globalActions.toggleActiveModal({
