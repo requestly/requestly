@@ -48,7 +48,7 @@ export const EnvironmentSwitcher = () => {
           if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
             openTab(environment.id, {
               title: environment.name,
-              url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environment.id}`,
+              url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(environment.id)}`,
             });
             trackEnvironmentSwitched(environments.length);
             redirectToEnvironment(navigate, environment.id);

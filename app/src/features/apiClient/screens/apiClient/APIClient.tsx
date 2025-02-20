@@ -51,22 +51,27 @@ export const APIClient: React.FC<Props> = React.memo(() => {
   }, [isHistoryPath, history, selectedHistoryIndex]);
 
   useEffect(() => {
+		console.log('e1 start');
     //For updating breadcrumb name
     if (!persistedRequestId) {
       return;
     }
 
+    console.log('e2 start');
     const record = apiClientRecords.find((rec) => rec.id === persistedRequestId);
-
+    console.log('e2', record);
     if (!record) {
       return;
     }
 
+    console.log('e3 start');
     setSelectedEntryDetails((prev) => {
+    	console.log('e3', prev, record);
       return prev?.id === record?.id && persistedRequestId === prev?.id
         ? ({ ...(prev ?? {}), name: record?.name, collectionId: record?.collectionId } as RQAPI.ApiRecord)
         : prev;
     });
+    console.log('e3 end');
   }, [persistedRequestId, apiClientRecords]);
 
   const isRequestFetched = useRef(false);
@@ -96,6 +101,7 @@ export const APIClient: React.FC<Props> = React.memo(() => {
         }
       })
       .catch((error) => {
+      	console.error('aaa', error)
         setSelectedEntryDetails(null);
         // TODO: redirect to new empty entry
         Logger.error("Error loading api record", error);

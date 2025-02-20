@@ -81,7 +81,7 @@ export const CollectionView = () => {
         replaceTab(result.data.id, {
           id: result.data.id,
           title: result.data.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${result.data.id}`,
+          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(result.data.id)}`,
         });
       });
     },

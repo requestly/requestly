@@ -24,10 +24,12 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
 
 	async createRecord(record: API['request'], collectionId?: string, ) {
+		console.log('ppp creating', record);
 		return this.invokeProcedureInBG("createRecord", record, collectionId, ) as Promise<FileSystemResult<API>>;
 	}
 
 	async createRecordWithId(record: API['request'], id: string, ) {
+		console.log('ppp1 creating with id', record);
 		return this.invokeProcedureInBG("createRecordWithId", record, id ) as Promise<FileSystemResult<API>>;
 	}
 

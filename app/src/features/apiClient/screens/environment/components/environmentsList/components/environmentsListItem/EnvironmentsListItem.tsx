@@ -147,7 +147,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
         redirectToEnvironment(navigate, environment.externalId || environment.id);
         openTab(environment.externalId || environment.id, {
           title: environment.name,
-          url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environment.externalId || environment.id}`,
+          url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(environment.id)}`,
         });
       }}
     >

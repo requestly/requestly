@@ -16,9 +16,11 @@ export const parseEntityVariables = (variables: VariableEntity) => {
 };
 
 export function parseFsId(id: string) {
-  return encodeURIComponent(id);
+	return id;
+  // return encodeURIComponent(id);
 }
 
 export function parseNativeId(id: string) {
-  return decodeURIComponent(id);
+	return id;
+  // return decodeURIComponent(id);
 }

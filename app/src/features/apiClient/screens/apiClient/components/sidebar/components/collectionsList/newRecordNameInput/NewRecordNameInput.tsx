@@ -81,7 +81,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
         replaceTab("request/new", {
           id: result.data.id,
           title: result.data.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`,
+          url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(result.data.id)}`,
         });
       } else {
         trackCollectionSaved(analyticEventSource);
@@ -89,7 +89,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
         replaceTab("collection/new", {
           id: result.data.id,
           title: result.data.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${result.data.id}`,
+          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(result.data.id)}`,
         });
       }
 

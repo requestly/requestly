@@ -1,6 +1,7 @@
 const IPC_TIMEOUT = 15000;
 
 export function rpc(namespace: string, method: string, ...args: any[]) {
+	console.log('hhhh rpc happening', namespace, method, args);
 	return new Promise((resolve, reject) => {
       setTimeout(() => {
         reject(
