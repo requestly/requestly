@@ -140,7 +140,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
               openTab(record.id, {
                 isPreview: true,
                 title: record.name || record.data.request?.url,
-                url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`,
+                url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(record.id)}`,
               });
             }}
           >

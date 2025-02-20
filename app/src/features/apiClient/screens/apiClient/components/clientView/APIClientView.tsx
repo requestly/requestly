@@ -128,6 +128,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, [toggleSheetPlacement]);
 
   useEffect(() => {
+		console.log('update tab flow', isCreateMode, requestId, apiEntryDetails)
     const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
 
     updateTab(tabId, { hasUnsavedChanges: hasUnsavedChanges });
@@ -373,12 +374,15 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.id = apiEntryDetails?.id;
       record.name = requestName;
     }
+
     if (isCreateMode) {
       record.name = requestName;
     }
 
-    const result = isCreateMode
-      ? await apiClientRecordsRepository.createRecord(record)
+		console.log('kkkk', apiEntryDetails, record);
+
+		const result = isCreateMode
+			? await apiClientRecordsRepository.createRecordWithId(record, requestId)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
@@ -409,7 +413,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
 
     const result = isCreateMode
-      ? await apiClientRecordsRepository.createRecord(record)
+      ? await apiClientRecordsRepository.createRecordWithId(record, requestId)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
 
@@ -427,7 +431,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
 
     setIsRequestSaving(false);
-  }, [entry, apiEntryDetails, onSaveRecord, setEntry, resetChanges, isCreateMode, apiClientRecordsRepository]);
+  }, [entry, apiEntryDetails, onSaveRecord, setEntry, resetChanges, isCreateMode, apiClientRecordsRepository, requestId]);
 
   const cancelRequest = useCallback(() => {
     apiClientExecutor.abort();
