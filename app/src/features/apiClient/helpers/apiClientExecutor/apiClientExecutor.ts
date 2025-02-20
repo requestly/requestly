@@ -14,6 +14,7 @@ import {
   trackScriptExecutionFailed,
   trackScriptExecutionStarted,
 } from "../modules/scriptsV2/analytics";
+import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient";
 import { isMethodSupported, isOnline, isUrlProtocolValid, isUrlValid } from "./apiClientExecutorHelpers";
 import { isEmpty } from "lodash";
 
@@ -213,6 +214,10 @@ export class ApiClientExecutor {
     try {
       const response = await makeRequest(this.appMode, this.entryDetails.request, this.abortController.signal);
       this.entryDetails.response = response;
+      trackAPIRequestSent({
+        has_scripts: Boolean(this.entryDetails.scripts?.preRequest),
+        auth_type: this.entryDetails?.auth?.currentAuthType,
+      });
     } catch (e) {
       return {
         status: RQAPI.ExecutionStatus.ERROR,

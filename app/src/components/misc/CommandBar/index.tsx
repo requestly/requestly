@@ -69,7 +69,7 @@ export const CommandBar = () => {
   }, [isCommandBarOpen]);
 
   const renderItems = (items: CommandBarItem[]) => {
-    return items.map((item, index) => {
+    return items.map((item) => {
       return renderItem(item);
     });
   };
