@@ -191,11 +191,6 @@ export class ApiClientExecutor {
       this.internalFunctions.postScriptExecutionCallback
     );
 
-    trackAPIRequestSent({
-      has_scripts: Boolean(this.entryDetails.scripts?.preRequest),
-      auth_type: this.entryDetails?.auth?.currentAuthType,
-    });
-
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
       trackScriptExecutionFailed(
         RQAPI.ScriptType.PRE_REQUEST,
@@ -219,6 +214,10 @@ export class ApiClientExecutor {
     try {
       const response = await makeRequest(this.appMode, this.entryDetails.request, this.abortController.signal);
       this.entryDetails.response = response;
+      trackAPIRequestSent({
+        has_scripts: Boolean(this.entryDetails.scripts?.preRequest),
+        auth_type: this.entryDetails?.auth?.currentAuthType,
+      });
     } catch (e) {
       return {
         status: RQAPI.ExecutionStatus.ERROR,
