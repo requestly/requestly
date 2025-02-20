@@ -81,7 +81,7 @@ export const trackNewEnvironmentClicked = () => {
   trackEvent(API_CLIENT.ENVIRONMENT_CLICKED);
 };
 
-export const trackVariablesUpdated = (params) => {
+export const trackVariablesSaved = (params) => {
   trackEvent(API_CLIENT.VARIABLES_UPDATED, params);
 };
 
