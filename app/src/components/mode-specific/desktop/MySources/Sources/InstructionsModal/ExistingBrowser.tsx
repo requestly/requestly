@@ -7,7 +7,11 @@ const ExistingBrowserInstructionModal: React.FC<{
   handleActivateAppOnClick: (appId: string) => void;
   appId: string;
 }> = ({ setShowInstructions, handleActivateAppOnClick, appId }) => {
-  const instructionSteps = useMemo(() => {
+  const instructionSteps: {
+    title: string;
+    status: "process" | "finish" | "wait" | "error";
+    description: React.ReactNode;
+  }[] = useMemo(() => {
     return [
       {
         title: "Install Requestly Extension in your browser profile",
