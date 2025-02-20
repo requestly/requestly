@@ -54,6 +54,12 @@ export const EnvironmentView = () => {
   }, [updateTab, envId, hasUnsavedChanges]);
 
   useEffect(() => {
+    if (!isSaving) {
+      setPendingVariables(variables);
+    }
+  }, [variables, isSaving]);
+
+  useEffect(() => {
     if (!isEnvironmentsLoading) {
       if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE)) {
         return;
@@ -119,7 +125,11 @@ export const EnvironmentView = () => {
                 onExportClick: () => setIsExportModalOpen(true),
               }}
             />
-            <VariablesList searchValue={searchValue} variables={variables} onVariablesChange={setPendingVariables} />
+            <VariablesList
+              searchValue={searchValue}
+              variables={pendingVariables}
+              onVariablesChange={setPendingVariables}
+            />
             {isExportModalOpen && (
               <ApiClientExportModal
                 exportType="environment"
