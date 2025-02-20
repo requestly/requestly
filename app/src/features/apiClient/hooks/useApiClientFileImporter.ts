@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { ApiClientImporters, RQAPI } from "features/apiClient/types";
+import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import {
   trackImportFailed,
   trackImportParsed,
@@ -107,11 +107,11 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
                 prev.apis.push(...result.value.apis);
                 prev.environments.push(...result.value.environments);
                 prev.recordsCount = prev.recordsCount + result.value.count;
-                trackImportParsed(ApiClientImporters.REQUESTLY, prev.collections.length, prev.apis.length);
+                trackImportParsed(ApiClientImporterType.REQUESTLY, prev.collections.length, prev.apis.length);
                 return prev;
               });
             } else {
-              trackImportParseFailed(ApiClientImporters.REQUESTLY, result.reason);
+              trackImportParseFailed(ApiClientImporterType.REQUESTLY, result.reason);
               console.error("Error processing file:", result.reason);
             }
           });
@@ -119,7 +119,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
           setProcessingStatus("processed");
         })
         .catch((error) => {
-          trackImportParseFailed(ApiClientImporters.REQUESTLY, error.message);
+          trackImportParseFailed(ApiClientImporterType.REQUESTLY, error.message);
           setError(error.message);
           setProcessingStatus("idle");
         });
@@ -222,7 +222,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
         const importedApisCount = collResult.status === "fulfilled" ? collResult.value.importedApisCount : 0;
         const importedCollectionsAndApisCount = importedCollectionsCount + importedApisCount;
 
-        trackImportSuccess(ApiClientImporters.REQUESTLY, importedCollectionsCount, importedApisCount);
+        trackImportSuccess(ApiClientImporterType.REQUESTLY, importedCollectionsCount, importedApisCount);
 
         const failedEnvironments = environments.length - importedEnvironments;
         const failedCollectionsAndApis =
@@ -267,7 +267,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
       } catch (error) {
         Logger.error("Data import failed:", error);
         setError("Something went wrong! Couldn't import data");
-        trackImportFailed(ApiClientImporters.REQUESTLY, JSON.stringify(error));
+        trackImportFailed(ApiClientImporterType.REQUESTLY, JSON.stringify(error));
       } finally {
         setIsImporting(false);
       }
