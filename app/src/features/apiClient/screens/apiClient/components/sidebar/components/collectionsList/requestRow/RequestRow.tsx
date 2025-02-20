@@ -134,7 +134,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
           )}
           <NavLink
             title={record.name || record.data.request?.url}
-            to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`}
+            to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(record.id)}`}
             className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
             onClick={() => {
               openTab(record.id, {

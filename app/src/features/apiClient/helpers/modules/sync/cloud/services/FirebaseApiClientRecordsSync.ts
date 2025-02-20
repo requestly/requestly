@@ -31,6 +31,10 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return getApiRecord(recordId);
   }
 
+  async getCollection(recordId: string) {
+    return getApiRecord(recordId);
+  }
+
   async createRecord(record: Partial<RQAPI.Record>) {
     return upsertApiRecord(this.meta.uid, record, this.meta.teamId);
   }

@@ -239,4 +239,21 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 			data: undefined,
 		};
   }
+
+  async getCollection(recordId: string): RQAPI.RecordPromise {
+	  const service = await this.getAdapter();
+	  const result = await service.getCollection(recordId);
+	  if (result.type === "error") {
+	    return {
+	      success: false,
+	      data: null,
+	      message: result.error.message,
+	    };
+	  }
+	  const parsedRecords = this.parseAPIEntities([result.content]);
+	  return {
+	    success: true,
+	    data: parsedRecords[0],
+	  };
+	}
 }

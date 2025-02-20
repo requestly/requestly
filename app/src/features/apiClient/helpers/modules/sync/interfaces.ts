@@ -25,6 +25,8 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   updateRecord(record: Partial<Omit<RQAPI.Record, "id">>, id: string): RQAPI.RecordPromise;
   deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }>;
 
+  getCollection(recordId: string): RQAPI.RecordPromise;
+
   generateApiRecordId(parentId?: string): string;
   generateCollectionId(name: string, parentId?: string): string;
 }
