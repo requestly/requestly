@@ -2,7 +2,7 @@ import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 import { ApiClientLocalMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
 import { EnvironmentEntity, FileSystemResult } from "./types";
-import { parseEntityVariables, parseFsId } from "../../utils";
+import { parseEntityVariables } from "../../utils";
 
 export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   constructor(readonly meta: ApiClientLocalMeta) {}
@@ -13,10 +13,8 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
 
   private parseEnvironmentEntitiesToMap(entities: EnvironmentEntity[]): EnvironmentMap {
     const environmentsMap = entities.reduce((acc, cur) => {
-      const parsedId = parseFsId(cur.id);
       acc[cur.id] = {
         id: cur.id,
-        externalId: parsedId,
         name: cur.name,
         variables: parseEntityVariables(cur?.variables || {}),
       };
@@ -27,10 +25,8 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   }
 
   private parseEnvironmentEntity(entity: EnvironmentEntity): EnvironmentData {
-    const parsedId = parseFsId(entity.id);
     const environment: EnvironmentData = {
       id: entity.id,
-      externalId: parsedId,
       name: entity.name,
       variables: entity.variables,
     };

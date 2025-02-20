@@ -127,7 +127,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, [toggleSheetPlacement]);
 
   useEffect(() => {
-    console.log("update tab flow", isCreateMode, requestId, apiEntryDetails);
     const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
 
     updateTab(tabId, { hasUnsavedChanges: hasUnsavedChanges });

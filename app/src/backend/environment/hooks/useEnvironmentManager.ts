@@ -79,11 +79,10 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     async (newEnvironmentName: string) => {
       return syncRepository.environmentVariablesRepository
         .createNonGlobalEnvironment(newEnvironmentName)
-        .then(({ id, name, externalId }) => {
-          const envId = externalId || id;
-          dispatch(variablesActions.addNewEnvironment({ id, name, ownerId, externalId }));
+        .then(({ id, name }) => {
+          dispatch(variablesActions.addNewEnvironment({ id, name, ownerId }));
           return {
-            id: envId,
+            id,
             name,
           };
         })
@@ -378,7 +377,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     const environments = activeOwnerEnvironments;
     return Object.keys(environments).map((key) => {
       return {
-        externalId: environments[key].externalId,
         id: key,
         name: environments[key].name,
       };
