@@ -87,7 +87,7 @@ const generateCurlFromHarObject = (requestHarObject: HarRequest) => {
   try {
     const harObject = cloneDeep(requestHarObject);
 
-    requestCurl = new HTTPSnippet({
+    const snippetResult = new HTTPSnippet({
       ...harObject,
       postData: {
         ...harObject.postData,
@@ -95,7 +95,9 @@ const generateCurlFromHarObject = (requestHarObject: HarRequest) => {
       },
     }).convert("shell", "curl", {
       indent: " ",
-    }) as string;
+    });
+
+    requestCurl = Array.isArray(snippetResult) ? snippetResult[0]?.toString() ?? "" : "";
   } catch (err) {
     Logger.log(`LoggerMiddleware.generate_curl_from_har Error: ${err}`);
   }

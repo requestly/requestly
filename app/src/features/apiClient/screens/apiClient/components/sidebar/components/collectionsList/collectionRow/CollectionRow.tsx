@@ -9,7 +9,6 @@ import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState"
 import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
-import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
@@ -184,7 +183,6 @@ export const CollectionRow: React.FC<Props> = ({
                         onNewClick("collection_row", RQAPI.RecordType.API, record.id).then(() => {
                           setCreateNewField(null);
                         });
-                        trackNewRequestClicked("collection_row");
                       }}
                     />
                   </Tooltip>
@@ -200,7 +198,6 @@ export const CollectionRow: React.FC<Props> = ({
                         onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id).then(() => {
                           setCreateNewField(null);
                         });
-                        trackNewCollectionClicked("collection_row");
                       }}
                     />
                   </Tooltip>
@@ -225,7 +222,7 @@ export const CollectionRow: React.FC<Props> = ({
                 analyticEventSource="collection_row"
                 message="No requests created yet"
                 newRecordBtnText="New request"
-                onNewRecordClick={() => onNewClick("collection_row", RQAPI.RecordType.API, record.id)}
+                onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.API, record.id)}
               />
             ) : (
               record.data.children?.map((apiRecord) => {

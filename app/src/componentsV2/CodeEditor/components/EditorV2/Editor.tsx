@@ -169,7 +169,6 @@ const Editor: React.FC<EditorProps> = ({
 
   const handleEditorClose = useCallback(
     (scriptId: string) => {
-      // @ts-expect-error
       dispatch(globalActions.removeToastForEditor({ scriptId }));
     },
     [dispatch]
