@@ -8,6 +8,7 @@ import {
 import BackgroundServiceAdapter, { rpc } from "./DesktopBackgroundService";
 import { EnvironmentData } from "backend/environment/types";
 // import FEATURES from "config/constants/sub/features";
+
 export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   static NAMESPACE = "local_sync";
   constructor() {
@@ -18,7 +19,7 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
 
   async build(rootPath: string) {
-    return this.invokeProcedureInBG("build", rootPath) as Promise<void>;
+		return this.invokeProcedureInBGWithRetries("build", { retryCount: 10, timeout: 1000 }, rootPath) as Promise<void>;
   }
 
   async getAllRecords() {
@@ -59,6 +60,10 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
     return this.invokeProcedureInBG("createCollection", name, collectionId) as Promise<FileSystemResult<Collection>>;
   }
 
+  async renameCollection(id: string, newName: string) {
+    return this.invokeProcedureInBG("renameCollection", id, newName) as Promise<FileSystemResult<Collection>>;
+  }
+
   async getAllEnvironments() {
     return this.invokeProcedureInBG("getAllEnvironments") as Promise<any>;
   }
@@ -79,22 +84,39 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 }
 
 class FsManagerServiceAdapterProvider {
+	constructor() {
+		console.log('provider created');
+	}
   private service: FsManagerServiceAdapter;
 
   async get(rootPath: string) {
     if (this.service) {
+    	console.log('got provider from cache');
       return this.service;
     }
 
-    const service = new FsManagerServiceAdapter();
-    await service.build(rootPath);
-    this.service = service;
-
-    return service;
+		// const release = await buildLock.acquire();
+		if (this.service) {
+			return this.service;
+		}
+		try {
+			const service = new FsManagerServiceAdapter();
+			console.log('calling build', Date.now());
+			await service.build(rootPath);
+			console.log('received build', Date.now())
+			this.service = service;
+			return service;
+		} catch (e) {
+			console.error('build error', e);
+			// release();
+		}
   }
 }
 
 export const fsManagerServiceAdapterProvider = new FsManagerServiceAdapterProvider();
 export function createWorkspaceFolder(path: string) {
-  return rpc(FsManagerServiceAdapter.NAMESPACE, "createWorkspaceFolder", path);
+	return rpc({
+		namespace: FsManagerServiceAdapter.NAMESPACE,
+		method: "createWorkspaceFolder",
+	}, path);
 }

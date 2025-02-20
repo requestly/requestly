@@ -26,6 +26,9 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }>;
 
   getCollection(recordId: string): RQAPI.RecordPromise;
+	renameCollection(id: string, newName: string): RQAPI.RecordPromise;
+
+	getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void>;
 
   generateApiRecordId(parentId?: string): string;
   generateCollectionId(name: string, parentId?: string): string;

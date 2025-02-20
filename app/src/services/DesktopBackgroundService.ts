@@ -1,15 +1,21 @@
 const IPC_TIMEOUT = 15000;
 
-export function rpc(namespace: string, method: string, ...args: any[]) {
-	console.log('hhhh rpc happening', namespace, method, args);
+class TimoutError extends Error {
+	constructor(method: string) {
+		super(`IPC Timeout: no response for [${method}] RPC call. Please make sure method is implemented correctly in Background process`)
+	}
+}
+
+export function rpc(params: {
+	namespace: string, method: string, timeout?: number,
+}, ...args: any[]) {
+	const { namespace, method, timeout } = params;
 	return new Promise((resolve, reject) => {
       setTimeout(() => {
         reject(
-          new Error(
-            `IPC Timeout: no response for [${method}] RPC call. Please make sure method is implemented correctly in Background process`
-          )
+          new TimoutError(method)
         );
-      }, IPC_TIMEOUT);
+      }, timeout || IPC_TIMEOUT);
 
       window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(`${namespace}-${method}`, args)
         .then((res: any) => {
@@ -37,7 +43,32 @@ export default class BackgroundServiceAdapter {
   }
 
   protected invokeProcedureInBG(method: string, ...args: any): Promise<any> {
-		return rpc(this.RPC_CHANNEL_PREFIX, method, ...args);
+		return rpc({
+			namespace: this.RPC_CHANNEL_PREFIX,
+			method
+		}, ...args);
+  }
+
+	protected async invokeProcedureInBGWithRetries(method: string, config: { retryCount: number, timeout: number }, ...args: any): Promise<any> {
+		let retries = config.retryCount
+		while(retries >= 0) {
+			console.log('attempt', retries);
+			try {
+				return await rpc({
+					namespace: this.RPC_CHANNEL_PREFIX,
+					method,
+					timeout: config.timeout,
+				}, ...args)
+			} catch (err) {
+				console.log('attempt error', retries, err);
+				if(err instanceof TimoutError) {
+					retries--;
+					continue;
+				}
+				console.log('weird error', retries, err);
+				throw err;
+			}
+		}
   }
 
   /*
