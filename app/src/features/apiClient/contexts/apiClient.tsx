@@ -24,6 +24,7 @@ import { useSearchParams } from "react-router-dom";
 import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { debounce } from "lodash";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -97,6 +98,14 @@ interface ApiClientProviderProps {
   children: React.ReactElement;
 }
 
+const trackUserProperties = (records: RQAPI.Record[]) => {
+  console.log("Tracking user properties");
+  const totalCollections = records.filter((record) => isApiCollection(record)).length;
+  const totalRequests = records.length - totalCollections;
+  submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_COLLECTIONS, totalCollections);
+  submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_REQUESTS, totalRequests);
+};
+
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
@@ -112,6 +121,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
+
+  const debouncedTrackUserProperties = debounce(() => trackUserProperties(apiClientRecords), 1000);
 
   const { openTab, deleteTabs, updateTab, replaceTab, updateAddTabBtnCallback } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
@@ -167,7 +178,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   }, [uid, teamId]);
 
   useEffect(() => {
-    trackUserProperties(apiClientRecords);
+    debouncedTrackUserProperties();
   }, [apiClientRecords]);
 
   const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
@@ -290,13 +301,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const onImportClick = useCallback(() => {
     setIsImportModalOpen(true);
     trackImportCurlClicked();
-  }, []);
-
-  const trackUserProperties = useCallback((records: RQAPI.Record[]) => {
-    const totalCollections = records.filter((record) => isApiCollection(record)).length;
-    const totalRequests = records.length - totalCollections;
-    submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_COLLECTIONS, totalCollections);
-    submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_REQUESTS, totalRequests);
   }, []);
 
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);

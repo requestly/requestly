@@ -15,6 +15,7 @@ import {
   trackScriptExecutionFailed,
   trackScriptExecutionStarted,
 } from "../modules/scriptsV2/analytics";
+import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient";
 
 type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
@@ -132,6 +133,11 @@ export class ApiClientExecutor {
     const preRequestScriptResult = await this.executePreRequestScript(
       this.internalFunctions.postScriptExecutionCallback
     );
+
+    trackAPIRequestSent({
+      has_scripts: Boolean(this.entryDetails.scripts?.preRequest),
+      auth_type: this.entryDetails?.auth?.currentAuthType,
+    });
 
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
       trackScriptExecutionFailed(

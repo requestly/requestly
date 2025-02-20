@@ -20,7 +20,6 @@ import {
   trackInstallExtensionDialogShown,
   trackRequestSaved,
   trackRequestRenamed,
-  trackAPIRequestSent,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
@@ -297,10 +296,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     try {
       const apiClientExecutionResult = await apiClientExecutor.execute();
-      trackAPIRequestSent({
-        has_scripts: Boolean(entry.scripts?.preRequest),
-        auth_type: entry?.auth?.currentAuthType,
-      });
+
       const { executedEntry } = apiClientExecutionResult;
       const entryWithResponse: RQAPI.Entry = {
         ...entry,
