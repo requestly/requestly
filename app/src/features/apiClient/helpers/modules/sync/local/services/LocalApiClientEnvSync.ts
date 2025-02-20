@@ -11,7 +11,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     return fsManagerServiceAdapterProvider.get(this.meta.rootPath);
   }
 
-  private parseEnvironmentEntities(entities: EnvironmentEntity[]): EnvironmentMap {
+  private parseEnvironmentEntitiesToMap(entities: EnvironmentEntity[]): EnvironmentMap {
     const environmentsMap = entities.reduce((acc, cur) => {
       const parsedId = parseFsId(cur.id);
       acc[cur.id] = {
@@ -26,22 +26,54 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     return environmentsMap;
   }
 
+  private parseEnvironmentEntity(entity: EnvironmentEntity): EnvironmentData {
+    const parsedId = parseFsId(entity.id);
+    const environment: EnvironmentData = {
+      id: entity.id,
+      externalId: parsedId,
+      name: entity.name,
+      variables: entity.variables,
+    };
+
+    return environment;
+  }
+
   async getAllEnvironments() {
     const service = await this.getAdapter();
     const result: FileSystemResult<EnvironmentEntity[]> = await service.getAllEnvironments();
     if (result.type === "success") {
-      const parsedEnvs = this.parseEnvironmentEntities(result.content);
+      const parsedEnvs = this.parseEnvironmentEntitiesToMap(result.content);
+      const globalEnvPath = `${this.meta.rootPath}/environments/global.json`;
+      if (!parsedEnvs[globalEnvPath]) {
+        const globalEnv = await this.createGlobalEnvironment();
+        parsedEnvs[globalEnvPath] = globalEnv;
+      }
       return parsedEnvs;
     } else {
       return {};
     }
   }
 
-  createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData> {
-    throw new Error("Method not implemented.");
+  async createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData> {
+    const service = await this.getAdapter();
+    const result: FileSystemResult<EnvironmentEntity> = await service.createEnvironment(environmentName, false);
+    if (result.type === "success") {
+      const parsedEnv = this.parseEnvironmentEntity(result.content);
+      return parsedEnv;
+    }
+
+    throw new Error("Something went wrong while create a new environment.");
   }
-  createGlobalEnvironment(): Promise<EnvironmentData> {
-    throw new Error("Method not implemented.");
+
+  async createGlobalEnvironment(): Promise<EnvironmentData> {
+    const service = await this.getAdapter();
+    const result: FileSystemResult<EnvironmentEntity> = await service.createEnvironment("Global Variables", true);
+    if (result.type === "success") {
+      const parsedEnv = this.parseEnvironmentEntity(result.content);
+      return parsedEnv;
+    }
+
+    return null;
   }
   deleteEnvironment(envId: string): Promise<void> {
     throw new Error("Method not implemented.");

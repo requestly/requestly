@@ -47,7 +47,6 @@ import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/
 import { isEmpty } from "lodash";
 import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { parseNativeId } from "features/apiClient/helpers/modules/sync/utils";
 
 interface Props {
   openInModal?: boolean;
@@ -128,7 +127,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, [toggleSheetPlacement]);
 
   useEffect(() => {
-		console.log('update tab flow', isCreateMode, requestId, apiEntryDetails)
+    console.log("update tab flow", isCreateMode, requestId, apiEntryDetails);
     const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
 
     updateTab(tabId, { hasUnsavedChanges: hasUnsavedChanges });
@@ -379,16 +378,16 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.name = requestName;
     }
 
-		console.log('kkkk', apiEntryDetails, record);
+    console.log("kkkk", apiEntryDetails, record);
 
-		const result = isCreateMode
-			? await apiClientRecordsRepository.createRecordWithId(record, requestId)
+    const result = isCreateMode
+      ? await apiClientRecordsRepository.createRecordWithId(record, requestId)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
         { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
-        isCreateMode ? "replace" : "open",
+        isCreateMode ? "replace" : "open"
       );
       trackRequestRenamed("breadcrumb");
       setRequestName("");
@@ -411,16 +410,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.id = apiEntryDetails?.id;
     }
 
-
     const result = isCreateMode
       ? await apiClientRecordsRepository.createRecordWithId(record, requestId)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
-
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
         { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
-        isCreateMode ? "replace" : "open",
+        isCreateMode ? "replace" : "open"
       );
       setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
       resetChanges();
@@ -431,7 +428,16 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     }
 
     setIsRequestSaving(false);
-  }, [entry, apiEntryDetails, onSaveRecord, setEntry, resetChanges, isCreateMode, apiClientRecordsRepository, requestId]);
+  }, [
+    entry,
+    apiEntryDetails,
+    onSaveRecord,
+    setEntry,
+    resetChanges,
+    isCreateMode,
+    apiClientRecordsRepository,
+    requestId,
+  ]);
 
   const cancelRequest = useCallback(() => {
     apiClientExecutor.abort();

@@ -1,5 +1,10 @@
 // import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import { API, Collection, FileSystemResult } from "features/apiClient/helpers/modules/sync/local/services/types";
+import {
+  API,
+  Collection,
+  EnvironmentEntity,
+  FileSystemResult,
+} from "features/apiClient/helpers/modules/sync/local/services/types";
 import BackgroundServiceAdapter, { rpc } from "./DesktopBackgroundService";
 // import FEATURES from "config/constants/sub/features";
 export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
@@ -23,26 +28,32 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
     return this.invokeProcedureInBG("getRecord", id) as Promise<any>;
   }
 
-	async createRecord(record: API['request'], collectionId?: string, ) {
-		console.log('ppp creating', record);
-		return this.invokeProcedureInBG("createRecord", record, collectionId, ) as Promise<FileSystemResult<API>>;
-	}
+  async createRecord(record: API["request"], collectionId?: string) {
+    console.log("ppp creating", record);
+    return this.invokeProcedureInBG("createRecord", record, collectionId) as Promise<FileSystemResult<API>>;
+  }
 
-	async createRecordWithId(record: API['request'], id: string, ) {
-		console.log('ppp1 creating with id', record);
-		return this.invokeProcedureInBG("createRecordWithId", record, id ) as Promise<FileSystemResult<API>>;
-	}
+  async createRecordWithId(record: API["request"], id: string) {
+    console.log("ppp1 creating with id", record);
+    return this.invokeProcedureInBG("createRecordWithId", record, id) as Promise<FileSystemResult<API>>;
+  }
 
-	async updateRecord(patch: Partial<API['request']>, id: string, ) {
-		return this.invokeProcedureInBG("updateRecord", patch, id) as Promise<FileSystemResult<API>>;
-	}
+  async updateRecord(patch: Partial<API["request"]>, id: string) {
+    return this.invokeProcedureInBG("updateRecord", patch, id) as Promise<FileSystemResult<API>>;
+  }
 
-	async createCollection(name: string, collectionId?: string, ) {
-		return this.invokeProcedureInBG("createCollection", name, collectionId) as Promise<FileSystemResult<Collection>>;
-	}
+  async createCollection(name: string, collectionId?: string) {
+    return this.invokeProcedureInBG("createCollection", name, collectionId) as Promise<FileSystemResult<Collection>>;
+  }
 
   async getAllEnvironments() {
     return this.invokeProcedureInBG("getAllEnvironments") as Promise<any>;
+  }
+
+  async createEnvironment(environmentName: string, isGlobal?: boolean) {
+    return this.invokeProcedureInBG("createEnvironment", environmentName, isGlobal) as Promise<
+      FileSystemResult<EnvironmentEntity>
+    >;
   }
 }
 
