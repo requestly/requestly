@@ -28,6 +28,8 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { upsertApiRecord } from "backend/apiClient/upsertApiRecord";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import APP_CONSTANTS from "config/constants";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -110,6 +112,9 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
               Object.keys(environmentMap).filter((key) => !isGlobalEnvironment(environmentMap[key].id))[0]
             );
           }
+
+          // Tracking user properties for analytics (excluding global variables)
+          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ENVIRONMENTS, Object.keys(environmentMap).length - 1);
 
           const updatedEnvironmentMap: EnvironmentMap = {};
 

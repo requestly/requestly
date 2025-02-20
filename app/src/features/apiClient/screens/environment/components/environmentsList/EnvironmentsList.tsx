@@ -116,6 +116,7 @@ export const EnvironmentsList = () => {
     (environment: { id: string; name: string }) => {
       const variables = getEnvironmentVariables(environment.id);
       setEnvironmentsToExport([{ ...environment, variables }]);
+
       setIsExportModalOpen(true);
     },
     [getEnvironmentVariables]

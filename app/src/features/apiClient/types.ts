@@ -45,6 +45,12 @@ export enum BulkActions {
   EXPORT = "EXPORT",
 }
 
+export enum ApiClientImporterType {
+  "REQUESTLY" = "REQUESTLY",
+  "POSTMAN" = "POSTMAN",
+  "BRUNO" = "BRUNO",
+}
+
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
 
 export namespace RQAPI {
