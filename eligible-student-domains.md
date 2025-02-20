@@ -17,6 +17,7 @@ The following domains are eligible for the student programme:
     ".mail.adelphi.edu",
     ".edu.in",
     ".eur.nl",
+    ".edu.uy",
     "bupt.cn"
   ]
 }
