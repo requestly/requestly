@@ -68,17 +68,23 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
       const parsedEnv = this.parseEnvironmentEntity(result.content);
       return parsedEnv;
     }
-
+    // TODO: FIX THIS
     return null;
   }
+
   deleteEnvironment(envId: string): Promise<void> {
     throw new Error("Method not implemented.");
   }
-  updateEnvironment(
+
+  async updateEnvironment(
     environmentId: string,
     updates: Partial<Pick<EnvironmentData, "name" | "variables">>
   ): Promise<void> {
-    throw new Error("Method not implemented.");
+    const service = await this.getAdapter();
+    const result: FileSystemResult<EnvironmentEntity> = await service.updateEnvironment(environmentId, updates);
+    if (result.type === "error") {
+      throw new Error("Something went wrong while updating environment");
+    }
   }
   removeVariableFromEnvironment(environmentId: string, key: string): Promise<void> {
     throw new Error("Method not implemented.");

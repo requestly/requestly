@@ -6,6 +6,7 @@ import {
   FileSystemResult,
 } from "features/apiClient/helpers/modules/sync/local/services/types";
 import BackgroundServiceAdapter, { rpc } from "./DesktopBackgroundService";
+import { EnvironmentData } from "backend/environment/types";
 // import FEATURES from "config/constants/sub/features";
 export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   static NAMESPACE = "local_sync";
@@ -54,6 +55,10 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
     return this.invokeProcedureInBG("createEnvironment", environmentName, isGlobal) as Promise<
       FileSystemResult<EnvironmentEntity>
     >;
+  }
+
+  async updateEnvironment(id: string, patch: Partial<Pick<EnvironmentData, "name" | "variables">>) {
+    return this.invokeProcedureInBG("updateEnvironment", id, patch) as Promise<FileSystemResult<EnvironmentEntity>>;
   }
 }
 
