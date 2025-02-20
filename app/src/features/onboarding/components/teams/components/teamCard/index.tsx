@@ -36,14 +36,14 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJo
     setIsJoining(true);
     acceptTeamInvite(invite.id)
       .then((res) => {
-        if (res?.data?.success) {
+        if (res?.success) {
           toast.success("Team joined successfully");
           setHasJoined(true);
           switchWorkspace(
             {
               teamId: invite?.metadata?.teamId,
               teamName: invite?.metadata?.teamName,
-              teamMembersCount: res?.data?.data?.invite?.metadata?.teamAccessCount,
+              teamMembersCount: res?.data?.invite?.metadata?.teamAccessCount,
             },
             dispatch,
             {
@@ -59,8 +59,8 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJo
             invite?.metadata?.teamName,
             invite?.id,
             "app_onboarding",
-            res?.data?.data?.invite?.usage,
-            res?.data?.data?.invite?.metadata?.teamAccessCount
+            res?.data?.invite?.usage,
+            res?.data?.invite?.metadata?.teamAccessCount
           );
         }
         dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
