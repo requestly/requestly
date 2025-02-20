@@ -276,19 +276,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     [ownerId, dispatch, syncRepository]
   );
 
-  const removeVariable = useCallback(
-    async (environmentId: string, key: string) => {
-      try {
-        await syncRepository.environmentVariablesRepository.removeVariableFromEnvironment(environmentId, key);
-        dispatch(variablesActions.removeVariableFromEnvironment({ key, environmentId, ownerId }));
-      } catch (err) {
-        toast.error("Error while removing environment variables.");
-        Logger.error("Error while removing environment variables from db", err);
-      }
-    },
-    [ownerId, dispatch, syncRepository]
-  );
-
   const getVariablesWithPrecedence = useCallback(
     (currentCollectionId: string): Record<string, EnvironmentVariableValue> => {
       const allVariables: Record<string, EnvironmentVariableValue> = {};
@@ -488,7 +475,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     addNewEnvironment,
     getCurrentEnvironment,
     setVariables,
-    removeVariable,
     renderVariables,
     getEnvironmentVariables,
     getCurrentEnvironmentVariables,

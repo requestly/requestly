@@ -72,8 +72,13 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     return null;
   }
 
-  deleteEnvironment(envId: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  async deleteEnvironment(envId: string): Promise<void> {
+    const service = await this.getAdapter();
+    const result = await service.deleteRecord(envId);
+
+    if (result.type === "error") {
+      throw new Error("Something went wrong while deleting environment");
+    }
   }
 
   async updateEnvironment(
@@ -86,9 +91,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
       throw new Error("Something went wrong while updating environment");
     }
   }
-  removeVariableFromEnvironment(environmentId: string, key: string): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
+
   duplicateEnvironment(environmentId: string, allEnvironments: EnvironmentMap): Promise<EnvironmentData> {
     throw new Error("Method not implemented.");
   }
