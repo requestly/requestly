@@ -53,12 +53,11 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   async createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData> {
     const service = await this.getAdapter();
     const result: FileSystemResult<EnvironmentEntity> = await service.createEnvironment(environmentName, false);
-    if (result.type === "success") {
-      const parsedEnv = this.parseEnvironmentEntity(result.content);
-      return parsedEnv;
+    if (result.type === "error") {
+      throw new Error("Something went wrong while create a new environment.");
     }
-
-    throw new Error("Something went wrong while create a new environment.");
+    const parsedEnv = this.parseEnvironmentEntity(result.content);
+    return parsedEnv;
   }
 
   async createGlobalEnvironment(): Promise<EnvironmentData> {
@@ -92,8 +91,14 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     }
   }
 
-  duplicateEnvironment(environmentId: string, allEnvironments: EnvironmentMap): Promise<EnvironmentData> {
-    throw new Error("Method not implemented.");
+  async duplicateEnvironment(environmentId: string, allEnvironments: EnvironmentMap): Promise<EnvironmentData> {
+    const service = await this.getAdapter();
+    const result: FileSystemResult<EnvironmentEntity> = await service.duplicateEnvironment(environmentId);
+    if (result.type === "error") {
+      throw new Error("Something went wrong while updating environment");
+    }
+    const parsedEnv = this.parseEnvironmentEntity(result.content);
+    return parsedEnv;
   }
   attachListener(params: EnvironmentListenerParams): () => any {
     return () => {};
