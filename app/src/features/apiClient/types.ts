@@ -45,7 +45,7 @@ export enum BulkActions {
   EXPORT = "EXPORT",
 }
 
-export enum ApiClientImporters {
+export enum ApiClientImporterType {
   "REQUESTLY" = "REQUESTLY",
   "POSTMAN" = "POSTMAN",
   "BRUNO" = "BRUNO",

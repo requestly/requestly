@@ -4,7 +4,7 @@ import { FilePicker } from "components/common/FilePicker";
 import { processBrunoCollectionData } from "./utils";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
-import { ApiClientImporters, RQAPI } from "features/apiClient/types";
+import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { upsertApiRecord } from "backend/apiClient";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -113,7 +113,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
             processedRecords.environments.push(...environments);
             collectionsCount.current += collections.length;
             trackImportParsed(
-              ApiClientImporters.BRUNO,
+              ApiClientImporterType.BRUNO,
               processedRecords.collections.length,
               processedRecords.apis.length
             );
@@ -124,7 +124,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
         setProcessingStatus("processed");
       })
       .catch((error) => {
-        trackImportParseFailed(ApiClientImporters.BRUNO, error.message);
+        trackImportParseFailed(ApiClientImporterType.BRUNO, error.message);
         setImportError(error.message);
         setProcessingStatus("idle");
       });
@@ -234,7 +234,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
         toast.success(`Successfully imported ${successMessage}`);
 
         trackImportSuccess(
-          ApiClientImporters.BRUNO,
+          ApiClientImporterType.BRUNO,
           recordsResult.importedCollectionsCount,
           recordsResult.importedApisCount
         );
@@ -243,7 +243,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
       .catch((error) => {
         Logger.error("Bruno data import failed:", error);
         setImportError("Something went wrong! Couldn't import Bruno data");
-        trackImportFailed(ApiClientImporters.BRUNO, JSON.stringify(error));
+        trackImportFailed(ApiClientImporterType.BRUNO, JSON.stringify(error));
       })
       .finally(() => {
         setIsImporting(false);

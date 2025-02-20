@@ -7,7 +7,7 @@ import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
-import { ApiClientImporters, RQAPI } from "features/apiClient/types";
+import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { upsertApiRecord } from "backend/apiClient";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -125,10 +125,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 processedRecords.variables = { ...processedRecords.variables, ...result.value.data.variables };
                 processedRecords.apiRecords.push(...collections, ...apis);
                 collectionsCount.current += collections.length;
-                trackImportParsed(ApiClientImporters.POSTMAN, collections.length, apis.length);
+                trackImportParsed(ApiClientImporterType.POSTMAN, collections.length, apis.length);
               }
             } else {
-              trackImportParseFailed(ApiClientImporters.POSTMAN, result.reason);
+              trackImportParseFailed(ApiClientImporterType.POSTMAN, result.reason);
               console.error("Error processing postman file:", result.reason);
             }
           });
@@ -137,7 +137,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           setProcessingStatus("processed");
         })
         .catch((error) => {
-          trackImportParseFailed(ApiClientImporters.POSTMAN, error.message);
+          trackImportParseFailed(ApiClientImporterType.POSTMAN, error.message);
           setImportError(error.message);
         })
         .finally(() => {
@@ -283,12 +283,12 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         );
 
         onSuccess?.();
-        trackImportSuccess(ApiClientImporters.POSTMAN, importedCollectionsCount, importedApisCount);
+        trackImportSuccess(ApiClientImporterType.POSTMAN, importedCollectionsCount, importedApisCount);
       })
       .catch((error) => {
         Logger.error("Postman data import failed:", error);
         setImportError("Something went wrong!, Couldn't import Postman data");
-        trackImportFailed(ApiClientImporters.POSTMAN, JSON.stringify(error));
+        trackImportFailed(ApiClientImporterType.POSTMAN, JSON.stringify(error));
       })
       .finally(() => {
         setIsImporting(false);
