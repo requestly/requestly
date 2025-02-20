@@ -196,32 +196,47 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 	  };
   }
   async updateRecord(patch: Partial<Omit<RQAPI.ApiRecord, 'id'>>, nativeId: string): RQAPI.RecordPromise {
-  const id = parseNativeId(nativeId);
-  const service = await this.getAdapter();
-	const result = await service.updateRecord(
-		{
-			name: patch.name,
-			url: patch.data.request.url,
-			method: patch.data.request.method,
-		},
-		id
-	);
+	  const id = parseNativeId(nativeId);
+	  const service = await this.getAdapter();
+		const result = await service.updateRecord(
+			{
+				name: patch.name,
+				url: patch.data.request.url,
+				method: patch.data.request.method,
+			},
+			id
+		);
+
+			if (result.type === "error") {
+	    return {
+	      success: false,
+	      data: null,
+	      message: result.error.message,
+	    };
+	  }
+
+			const [parsedApiRecord] = this.parseAPIEntities([result.content]);
+			return {
+	    success: true,
+	    data: parsedApiRecord,
+	  };
+  }
+
+  async deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {
+    const service = await this.getAdapter();
+		const result = await service.deleteRecords(recordIds);
 
 		if (result.type === "error") {
-    return {
-      success: false,
-      data: null,
-      message: result.error.message,
-    };
-  }
+			return {
+				success: false,
+				data: undefined,
+				message: result.error.message,
+			};
+		}
 
-		const [parsedApiRecord] = this.parseAPIEntities([result.content]);
 		return {
-    success: true,
-    data: parsedApiRecord,
-  };
-  }
-  deleteRecords(_recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {
-    throw new Error("Method not implemented.");
+			success: true,
+			data: undefined,
+		};
   }
 }
