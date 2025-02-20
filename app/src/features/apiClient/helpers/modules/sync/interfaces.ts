@@ -23,11 +23,11 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   createRecord(record: Partial<RQAPI.ApiRecord>): RQAPI.RecordPromise;
   createCollection(record: Partial<RQAPI.CollectionRecord>): RQAPI.RecordPromise;
   createRecordWithId(record: Partial<RQAPI.Record>, id: string): RQAPI.RecordPromise;
-  updateRecord(record: Partial<Omit<RQAPI.Record, 'id'>>, id: string): RQAPI.RecordPromise;
+  updateRecord(record: Partial<Omit<RQAPI.Record, "id">>, id: string): RQAPI.RecordPromise;
   deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }>;
 
-	generateApiRecordId(parentId?: string): string;
-	generateCollectionId(name: string, parentId?: string): string;
+  generateApiRecordId(parentId?: string): string;
+  generateCollectionId(name: string, parentId?: string): string;
 }
 
 export interface ApiClientRepositoryInterface {
