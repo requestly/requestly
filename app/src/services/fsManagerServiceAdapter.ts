@@ -114,9 +114,15 @@ class FsManagerServiceAdapterProvider {
 }
 
 export const fsManagerServiceAdapterProvider = new FsManagerServiceAdapterProvider();
-export function createWorkspaceFolder(path: string) {
+export function createWorkspaceFolder(name: string, path: string) {
 	return rpc({
 		namespace: FsManagerServiceAdapter.NAMESPACE,
 		method: "createWorkspaceFolder",
-	}, path);
+	}, name, path) as Promise<FileSystemResult<{id: string, name: string, path: string}>>;
+}
+export function getAllWorkspaces() {
+	return rpc({
+		namespace: FsManagerServiceAdapter.NAMESPACE,
+		method: "getAllWorkspaces",
+	}) as Promise<FileSystemResult<{id: string, name: string, path: string}[]>>;
 }
