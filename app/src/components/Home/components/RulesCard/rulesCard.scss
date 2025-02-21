@@ -1,47 +1,39 @@
-.rules-card-create-btn.ant-btn {
+.add-cta {
+  height: 100%;
+  width: 100%;
+  line-height: 20px;
+  font-size: 14px;
+  font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-.homepage-rules-card-header-action {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.homepage-rules-list {
-  height: 144px;
-  overflow-y: auto;
-  margin-top: 8px;
-}
-
-.homepage-rules-list-item {
-  font-size: var(--requestly-font-size-sm);
-  padding: 8px;
-  border-radius: 4px;
-  transition: 0.25s background ease-in-out;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  color: var(--white);
-  text-decoration-color: #ffffff00;
-  transition: 0.2s all ease-in-out;
-  cursor: pointer;
-  height: 46px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  &-icon {
-    margin-top: 5px;
-    transform: scale(0.85);
+  justify-content: center;
+  svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
   }
+}
 
-  &:hover {
-    background: var(--surface-1);
-    text-decoration: underline;
-    text-decoration-color: var(--white);
-    text-decoration-thickness: 1px;
-    text-underline-offset: 4px;
+.content-container {
+  &.rules-card {
+    .new-rule-button {
+      background: #1e69ff;
+      border: 0;
+      &:hover {
+        background: var(--requestly-color-primary);
+      }
+    }
+    .middle-section {
+      .list {
+        .list-item {
+          &-icon {
+            svg {
+              height: 16px;
+              width: auto;
+            }
+          }
+        }
+      }
+    }
   }
 }

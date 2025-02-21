@@ -6,7 +6,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
 import {} from "modules/analytics/events/features/apiClient";
 import "./apiClientImportModal.scss";
-import useApiClientFileImporter, { ImporterTypes } from "features/apiClient/hooks/useApiClientFileImporter";
+import useApiClientFileImporter, { ImporterType } from "features/apiClient/hooks/useApiClientFileImporter";
 
 interface Props {
   isOpen: boolean;
@@ -21,7 +21,7 @@ export const ApiClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
     handleImportData,
     resetImportData,
     processingStatus = "processed",
-  } = useApiClientFileImporter(ImporterTypes.RQ);
+  } = useApiClientFileImporter(ImporterType.RQ);
 
   const handleFileDrop = (files: File[]) => {
     processFiles(files);

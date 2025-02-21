@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Dropdown, DropdownProps } from "antd";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -21,6 +21,7 @@ import { SiBruno } from "@react-icons/all-files/si/SiBruno";
 import { PostmanImporterModal } from "../../../modals/postmanImporterModal/PostmanImporterModal";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
+import { useLocation } from "react-router-dom";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -45,6 +46,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   onClearHistory,
 }) => {
   const dispatch = useDispatch();
+  const { state } = useLocation();
   const user = useSelector(getUserAuthDetails);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
@@ -250,6 +252,24 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       },
     },
   ];
+
+  useEffect(() => {
+    if (state?.modal) {
+      switch (state?.modal) {
+        case ApiClientImporterType.BRUNO:
+          setIsBrunoImporterModalOpen(true);
+          break;
+        case ApiClientImporterType.POSTMAN:
+          setIsPostmanImporterModalOpen(true);
+          break;
+        case ApiClientImporterType.REQUESTLY:
+          setIsImportModalOpen(true);
+          break;
+        default:
+          break;
+      }
+    }
+  }, [state?.modal]);
 
   return (
     <>
