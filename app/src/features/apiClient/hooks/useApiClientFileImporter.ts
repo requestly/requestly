@@ -29,11 +29,11 @@ type ProcessedData = {
 
 type ProcessingStatus = "idle" | "processing" | "processed";
 
-export enum ImporterTypes {
+export enum ImporterType {
   RQ = "RQ",
 }
 
-const useApiClientFileImporter = (importer: ImporterTypes) => {
+const useApiClientFileImporter = (importer: ImporterType) => {
   const processors = useMemo(
     () => ({
       RQ: processRqImportData,

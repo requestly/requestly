@@ -32,7 +32,7 @@ import ResourceOverride from "../../../../assets/img/brand/resource-override-ico
 import Charles from "../../../../assets/img/brand/charles-icon.svg?react";
 import "./rulesCard.scss";
 import { RQButton } from "lib/design-system-v2/components";
-import { ImporterTypes } from "components/Home/types";
+import { ImporterType } from "components/Home/types";
 
 export const RulesCard = () => {
   const MAX_RULES_TO_SHOW = 5;
@@ -52,8 +52,8 @@ export const RulesCard = () => {
   };
 
   const importTriggerHandler = useCallback(
-    (modal: ImporterTypes) => {
-      if (modal === ImporterTypes.REQUESTLY && !user?.details?.isLoggedIn) {
+    (modal: ImporterType) => {
+      if (modal === ImporterType.REQUESTLY && !user?.details?.isLoggedIn) {
         dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
       } else {
         navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal } });
@@ -68,25 +68,25 @@ export const RulesCard = () => {
       key: "1",
       label: "Charles Proxy",
       icon: <Charles />,
-      onClick: () => importTriggerHandler(ImporterTypes.CHARLES),
+      onClick: () => importTriggerHandler(ImporterType.CHARLES),
     },
     {
       key: "2",
       label: "Resource Override",
       icon: <ResourceOverride />,
-      onClick: () => importTriggerHandler(ImporterTypes.RESOURCE_OVERRIDE),
+      onClick: () => importTriggerHandler(ImporterType.RESOURCE_OVERRIDE),
     },
     {
       key: "3",
       label: "ModHeader",
       icon: <ModHeader />,
-      onClick: () => importTriggerHandler(ImporterTypes.MOD_HEADER),
+      onClick: () => importTriggerHandler(ImporterType.MOD_HEADER),
     },
     {
       key: "4",
       label: "Requestly",
       icon: <img src={"/assets/img/brandLogos/requestly-icon.svg"} alt="Requestly" />,
-      onClick: () => importTriggerHandler(ImporterTypes.REQUESTLY),
+      onClick: () => importTriggerHandler(ImporterType.REQUESTLY),
     },
   ];
 
@@ -117,7 +117,7 @@ export const RulesCard = () => {
       cardIcon={"/assets/media/rules/rules-icon.svg"}
       contentLoading={isLoading || isRulesLoading}
       cardType={CardType.RULES}
-      defaultImportClickHandler={() => importTriggerHandler(ImporterTypes.REQUESTLY)}
+      defaultImportClickHandler={() => importTriggerHandler(ImporterType.REQUESTLY)}
       importOptions={{
         menu: IMPORT_OPTIONS,
         label: "Charles, ModHeader, & more",
