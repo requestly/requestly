@@ -15,14 +15,19 @@ export const useGetApiClientSyncRepo = () => {
   const isWorkspaceLocal: boolean = useSelector(getIsWorkspaceLocal);
   const workspaceRootPath: string = useSelector(getWorkspaceRootPath);
 
-  const getRepository:  () => ApiClientRepositoryInterface = useCallback(() => {
-		if (!user.loggedIn) {
-			throw new Error('Data can not be synced unless you log in!');
-		};
+  const getRepository: () => ApiClientRepositoryInterface = useCallback(() => {
+    if (!user.loggedIn) {
+      // TODO: FIX THIS
+      return {
+        apiClientRecordsRepository: {},
+        environmentVariablesRepository: {},
+      };
+      // throw new Error('Data can not be synced unless you log in!');
+    }
     if (isWorkspaceLocal && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-			return new ApiClientLocalRepository({
-				rootPath: workspaceRootPath,
-			});
+      return new ApiClientLocalRepository({
+        rootPath: workspaceRootPath,
+      });
     } else {
       return new ApiClientCloudRepository({ uid: user.details.profile.uid, teamId: workspace?.id });
     }
