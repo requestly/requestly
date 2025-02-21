@@ -97,6 +97,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [entry, setEntry] = useState<RQAPI.Entry>({ ...(apiEntry ?? getEmptyAPIEntry()) });
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.ExecutionError>(null);
+  const [warning, setWarning] = useState<RQAPI.ExecutionWarning>(null);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
@@ -278,6 +279,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     setIsFailed(false);
     setError(null);
+    setWarning(null);
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
     //Need to change the response and error to null
@@ -296,6 +298,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     try {
       const apiClientExecutionResult = await apiClientExecutor.execute();
+
       const { executedEntry } = apiClientExecutionResult;
       const entryWithResponse: RQAPI.Entry = {
         ...entry,
@@ -305,6 +308,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       setEntry(entryWithResponse);
 
       if (apiClientExecutionResult.status === "success") {
+        if (apiClientExecutionResult.warning) {
+          setWarning(apiClientExecutionResult.warning);
+        }
         trackResponseLoaded({
           type: getContentTypeFromResponseHeaders(executedEntry.response.headers),
           time: Math.round(executedEntry.response.time / 1000),
@@ -328,7 +334,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
           });
         }
-        trackRequestFailed();
+        trackRequestFailed(error.message);
         trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
         trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
       }
@@ -423,7 +429,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       );
       setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
       resetChanges();
-      trackRequestSaved("api_client_view");
+      trackRequestSaved({
+        src: "api_client_view",
+        has_scripts: Boolean(entry.scripts?.preRequest),
+        auth_type: entry?.auth?.currentAuthType,
+      });
       toast.success("Request saved!");
     } else {
       toast.error("Something went wrong!");
@@ -435,6 +445,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const cancelRequest = useCallback(() => {
     apiClientExecutor.abort();
     trackAPIRequestCancelled();
+    setIsRequestCancelled(true);
   }, [apiClientExecutor]);
 
   const handleAuthChange = useCallback((authOptions: RQAPI.AuthOptions) => {
@@ -616,6 +627,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             onCancelRequest={cancelRequest}
             handleTestResultRefresh={handleTestResultRefresh}
             error={error}
+            warning={warning}
+            executeRequest={onSendButtonClick}
           />
         }
         minSize={35}

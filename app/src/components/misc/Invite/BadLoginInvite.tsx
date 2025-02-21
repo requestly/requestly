@@ -1,5 +1,4 @@
 import { Avatar, Col, Row } from "antd";
-
 import { RQButton } from "lib/design-system/components";
 import { useDispatch, useSelector } from "react-redux";
 import { getUniqueColorForWorkspace } from "utils/teams";
@@ -36,6 +35,7 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
           },
         })
       );
+
       dispatch(
         globalActions.updateHardRefreshPendingStatus({
           type: "rules",

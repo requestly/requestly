@@ -11,7 +11,7 @@ import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
+import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import { useDebounce } from "hooks/useDebounce";
 import { trackRulesListFilterApplied, trackRulesListSearched } from "features/rules/analytics";
 import { useRulesActionContext } from "features/rules/context/actions";
@@ -54,6 +54,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
       icon: <DownloadOutlined />,
       onClickHandler: importRecordsAction,
       trackClickEvent: () => {
+        trackRulesImportStarted();
         trackUploadRulesButtonClicked(SOURCE.RULES_LIST);
       },
     },
