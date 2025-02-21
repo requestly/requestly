@@ -1,4 +1,5 @@
 import { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
+import { KeyValuePair, RequestContentType, RQAPI } from "features/apiClient/types";
 
 export type FileSystemError = { message: string };
 export type ContentfulSuccess<T> = T extends void ? { type: "success" } : { type: "success"; content: T };
@@ -25,6 +26,15 @@ export type API = {
     name: string;
     url: string;
     method: string;
+    queryParams: KeyValuePair[];
+    headers: KeyValuePair[];
+    body?: RQAPI.RequestBody;
+    bodyContainer: RQAPI.RequestBodyContainer;
+    contentType: RequestContentType;
+    scripts: {
+      preRequest: string;
+      postResponse: string;
+    };
   };
 };
 

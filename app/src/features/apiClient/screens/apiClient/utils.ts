@@ -58,6 +58,10 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
       contentType: RequestContentType.RAW,
       ...(request || {}),
     },
+    scripts: {
+      preRequest: "",
+      postResponse: "",
+    },
     response: null,
   };
 };
@@ -274,7 +278,10 @@ export const createBlankApiRecord = (
     newRecord.collectionId = collectionId;
   }
 
-	const result = recordType === RQAPI.RecordType.COLLECTION ? apiClientRecordsRepository.createCollection(newRecord as RQAPI.CollectionRecord): apiClientRecordsRepository.createRecord(newRecord as RQAPI.ApiRecord);
+  const result =
+    recordType === RQAPI.RecordType.COLLECTION
+      ? apiClientRecordsRepository.createCollection(newRecord as RQAPI.CollectionRecord)
+      : apiClientRecordsRepository.createRecord(newRecord as RQAPI.ApiRecord);
 
   return result;
 };
