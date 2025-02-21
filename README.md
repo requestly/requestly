@@ -19,7 +19,7 @@ Requestly is a powerful combination of a local HTTP Proxy and an API client with
 Access Requestly on macOS, Windows, and Linux, or as a browser extension for Chrome, Firefox, Edge, and Safari. Seamlessly integrate it with your favorite apps like Spotify, Slack, Postman, VSCode, and more.
 
 <a href="https://requestly.com/downloads/desktop/" target="_blank"><img src="https://github.com/user-attachments/assets/c3251798-44be-45dc-8301-2ac57c8351cd" width="336" /></a> &nbsp; &nbsp; &nbsp;
-<a href="https://requestly.com/downloads/" target="_blank"><img src="https://github.com/user-attachments/assets/18968e11-61ec-4346-b766-d7cd63bd7414" width="336" /></a>
+<a href="https://requestly.com/downloads/#browser-extension" target="_blank"><img src="https://github.com/user-attachments/assets/18968e11-61ec-4346-b766-d7cd63bd7414" width="336" /></a>
 
 <br/>
 
