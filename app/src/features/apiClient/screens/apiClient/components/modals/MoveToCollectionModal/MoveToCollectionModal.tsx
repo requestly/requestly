@@ -9,10 +9,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
-import {
-  trackMoveRequestToCollectionFailed,
-  trackMoveRequestToCollectionSuccessful,
-} from "modules/analytics/events/features/apiClient";
+import { trackMoveRequestToCollectionFailed, trackRequestMoved } from "modules/analytics/events/features/apiClient";
 import "./moveToCollectionModal.scss";
 import { isApiCollection } from "../../../utils";
 import { firebaseBatchWrite } from "backend/utils";
@@ -85,7 +82,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       try {
         const result = await firebaseBatchWrite("apis", updatedRequests);
 
-        trackMoveRequestToCollectionSuccessful(isNewCollection ? "new_collection" : "existing_collection");
+        trackRequestMoved(isNewCollection ? "new_collection" : "existing_collection");
         toast.success("Requests moved to collection successfully");
         result.length === 1 ? onSaveRecord(head(result)) : onSaveBulkRecords(result);
       } catch (error) {

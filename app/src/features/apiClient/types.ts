@@ -58,6 +58,12 @@ export enum BulkActions {
   EXPORT = "EXPORT",
 }
 
+export enum ApiClientImporterType {
+  "REQUESTLY" = "REQUESTLY",
+  "POSTMAN" = "POSTMAN",
+  "BRUNO" = "BRUNO",
+}
+
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
 
 export namespace RQAPI {
@@ -135,10 +141,16 @@ export namespace RQAPI {
     message: Error["message"];
   };
 
+  export type ExecutionWarning = {
+    message: string;
+    description: string;
+  };
+
   export type ExecutionResult =
     | {
         status: ExecutionStatus.SUCCESS;
         executedEntry: RQAPI.Entry;
+        warning?: ExecutionWarning;
       }
     | {
         status: ExecutionStatus.ERROR;
