@@ -30,7 +30,6 @@ import { useIncentiveActions } from "features/incentivization/hooks";
 import "./createWorkspaceModal.scss";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
 import { teamsActions } from "store/features/teams/slice";
-import { partial } from "lodash";
 
 interface Props {
   isOpen: boolean;
@@ -164,40 +163,38 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
         : ({ type: WorkspaceType.SHARED } as SharedOrPrivateWorkspaceConfig);
 
     try {
-			const teamId = await (async () => {
-				if (config.type === WorkspaceType.LOCAL) {
-					const workspaceCreationResult = await createWorkspaceFolder(workspaceName, config.rootPath);
-					if (workspaceCreationResult.type === "error") {
-						throw new Error(workspaceCreationResult.error.message);
-					}
-					const partialWorkspace = workspaceCreationResult.content;
-					const localWorkspace = {
-			        "id": partialWorkspace.id,
-			        "name": partialWorkspace.name,
-			        "owner": user.details.profile.uid,
-			        "accessCount": 1,
-			        "adminCount": 1,
-			        "members": {
-			            [user.details.profile.uid]: {
-			                "role": "admin"
-			            }
-			        },
-			        "appsumo": null,
-			        "workspaceType": WorkspaceType.LOCAL,
-			        "rootPath": partialWorkspace.path,
-			    }
-					dispatch(teamsActions.addToAvailableTeams(localWorkspace));
-					return partialWorkspace.id;
-				} else {
-					const response: any = await createTeam({
-		        teamName: workspaceName,
-		        config,
-		      });
-		      return response.data.teamId;
-				}
-			})();
-
-
+      const teamId = await (async () => {
+        if (config.type === WorkspaceType.LOCAL) {
+          const workspaceCreationResult = await createWorkspaceFolder(workspaceName, config.rootPath);
+          if (workspaceCreationResult.type === "error") {
+            throw new Error(workspaceCreationResult.error.message);
+          }
+          const partialWorkspace = workspaceCreationResult.content;
+          const localWorkspace = {
+            id: partialWorkspace.id,
+            name: partialWorkspace.name,
+            owner: user?.details?.profile?.uid,
+            accessCount: 1,
+            adminCount: 1,
+            members: {
+              [user?.details?.profile?.uid]: {
+                role: "admin",
+              },
+            },
+            appsumo: null,
+            workspaceType: WorkspaceType.LOCAL,
+            rootPath: partialWorkspace.path,
+          };
+          dispatch(teamsActions.addToAvailableTeams(localWorkspace));
+          return partialWorkspace.id;
+        } else {
+          const response: any = await createTeam({
+            teamName: workspaceName,
+            config,
+          });
+          return response.data.teamId;
+        }
+      })();
 
       await handleIncentiveRewards(availableTeams?.length, dispatch);
 
@@ -247,6 +244,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
     handleDomainInvitesCreation,
     workspaceType,
     folderPath,
+    user?.details?.profile?.uid,
   ]);
 
   return (
@@ -266,7 +264,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, cal
           <RQButton onClick={toggleModal}>Cancel</RQButton>
           <RQButton
             type="primary"
-            disabled={!workspaceName.length}
+            disabled={!workspaceName.length || (workspaceType === WorkspaceType.LOCAL && !folderPath.length)}
             loading={isLoading}
             onClick={handleTeamWorkspaceCreation}
           >
