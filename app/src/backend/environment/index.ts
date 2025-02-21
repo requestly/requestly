@@ -18,8 +18,8 @@ import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 import {
   trackEnvironmentCreatedInDB,
   trackEnvironmentDeletedFromDB,
-  trackEnvironmentsFetchedFromDB,
   trackEnvironmentUpdatedInDB,
+  trackEnvironmentsFetchedFromDB,
 } from "features/apiClient/screens/environment/analytics";
 import { fetchLock } from "./fetch-lock";
 import { patchMissingIdInVariables } from "backend/apiClient/utils";
