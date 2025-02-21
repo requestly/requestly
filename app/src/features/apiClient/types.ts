@@ -39,13 +39,6 @@ export enum QueryParamSyncType {
   TABLE = "table",
 }
 
-export enum ImporterTypes {
-  BRUNO = "BRUNO",
-  POSTMAN = "POSTMAN",
-  REQUESTLY = "REQUESTLY",
-  CURL = "CURL",
-}
-
 export enum CreateType {
   API = "api",
   COLLECTION = "collection",
@@ -59,9 +52,10 @@ export enum BulkActions {
 }
 
 export enum ApiClientImporterType {
-  "REQUESTLY" = "REQUESTLY",
-  "POSTMAN" = "POSTMAN",
-  "BRUNO" = "BRUNO",
+  REQUESTLY = "REQUESTLY",
+  POSTMAN = "POSTMAN",
+  BRUNO = "BRUNO",
+  CURL = "CURL",
 }
 
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;

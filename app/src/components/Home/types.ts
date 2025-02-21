@@ -13,7 +13,7 @@ export type Changelog = {
   link: string;
 };
 
-export enum ImporterTypes {
+export enum ImporterType {
   CHARLES = "CHARLES",
   RESOURCE_OVERRIDE = "RESOURCE_OVERRIDE",
   MOD_HEADER = "MOD_HEADER",

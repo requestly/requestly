@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ImporterTypes, RQAPI } from "../../../../types";
+import { ApiClientImporterType, RQAPI } from "../../../../types";
 import { useLocation, useParams } from "react-router-dom";
 import { Tabs, TabsProps, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
@@ -177,7 +177,7 @@ const APIClientSidebar: React.FC<Props> = () => {
   );
 
   useEffect(() => {
-    if (state?.modal === ImporterTypes.CURL) {
+    if (state?.modal === ApiClientImporterType.CURL) {
       setIsImportModalOpen(true);
     }
   }, [state?.modal]);
