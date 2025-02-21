@@ -7,8 +7,10 @@ import { teamsActions } from "store/features/teams/slice";
 import { toast } from "utils/Toast";
 import firebaseApp from "../../firebase";
 import APP_CONSTANTS from "config/constants";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { WorkspaceType } from "types";
+import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
 
 const db = getFirestore(firebaseApp);
 
@@ -24,7 +26,31 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
     const q = query(collection(db, "teams"), where("access", "array-contains", uid));
     return onSnapshot(
       q,
-      (querySnapshot) => {
+      async (querySnapshot) => {
+				let localRecords = [];
+				if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+					const allLocalWorkspacesResult = await getAllWorkspaces();
+					const allLocalWorkspaces = allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
+					for (const partialWorkspace of allLocalWorkspaces) {
+						const localWorkspace = {
+				        "id": partialWorkspace.id,
+				        "name": partialWorkspace.name,
+				        "owner": uid,
+				        "accessCount": 1,
+				        "adminCount": 1,
+				        "members": {
+				            [uid]: {
+				                "role": "admin"
+				            }
+				        },
+				        "appsumo": null,
+				        "workspaceType": WorkspaceType.LOCAL,
+				        "rootPath": partialWorkspace.path,
+				    }
+
+						localRecords.push(localWorkspace);
+					}
+				}
         const records = querySnapshot.docs
           .map((team) => {
             const teamData = team.data();
@@ -55,7 +81,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
             return formattedTeamData;
           })
           .filter(Boolean);
-
+				records.push(...localRecords);
         dispatch(teamsActions.setAvailableTeams(records));
 
         if (!currentlyActiveWorkspace?.id) return;
