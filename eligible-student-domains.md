@@ -18,6 +18,7 @@ The following domains are eligible for the student programme:
     ".edu.in",
     ".eur.nl",
     ".edu.uy",
-    "bupt.cn"
+    "bupt.cn",
+    ".edu.ar"
   ]
 }
