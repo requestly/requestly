@@ -5,6 +5,8 @@ import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSh
 import { RQAPI } from "features/apiClient/types";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import Logger from "lib/logger";
+import { Skeleton } from "antd";
+import { getEmptyAPIEntry } from "./utils";
 import "./apiClient.scss";
 
 interface Props {}
@@ -20,7 +22,6 @@ export const APIClient: React.FC<Props> = React.memo(() => {
     addToHistory,
     apiClientRecordsRepository,
   } = useApiClientContext();
-
   const [persistedRequestId, setPersistedRequestId] = useState<string>(() => requestId);
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
   const isHistoryPath = location.pathname.includes("history");
@@ -51,27 +52,27 @@ export const APIClient: React.FC<Props> = React.memo(() => {
   }, [isHistoryPath, history, selectedHistoryIndex]);
 
   useEffect(() => {
-		console.log('e1 start');
+    console.log("e1 start");
     //For updating breadcrumb name
     if (!persistedRequestId) {
       return;
     }
 
-    console.log('e2 start');
+    console.log("e2 start");
     const record = apiClientRecords.find((rec) => rec.id === persistedRequestId);
-    console.log('e2', record);
+    console.log("e2", record);
     if (!record) {
       return;
     }
 
-    console.log('e3 start');
+    console.log("e3 start");
     setSelectedEntryDetails((prev) => {
-    	console.log('e3', prev, record);
+      console.log("e3", prev, record);
       return prev?.id === record?.id && persistedRequestId === prev?.id
         ? ({ ...(prev ?? {}), name: record?.name, collectionId: record?.collectionId } as RQAPI.ApiRecord)
         : prev;
     });
-    console.log('e3 end');
+    console.log("e3 end");
   }, [persistedRequestId, apiClientRecords]);
 
   const isRequestFetched = useRef(false);
@@ -101,7 +102,7 @@ export const APIClient: React.FC<Props> = React.memo(() => {
         }
       })
       .catch((error) => {
-      	console.error('aaa', error)
+        console.error("aaa", error);
         setSelectedEntryDetails(null);
         // TODO: redirect to new empty entry
         Logger.error("Error loading api record", error);
@@ -114,6 +115,12 @@ export const APIClient: React.FC<Props> = React.memo(() => {
     requestHistoryEntry,
     selectedEntryDetails,
   ]);
+
+  const entryDetailsToView = useMemo(() => {
+    if (isCreateMode) return getEmptyAPIEntry();
+    else return entryDetails?.data;
+  }, [isCreateMode, entryDetails?.data]);
+
   const handleAppRequestFinished = useCallback(
     (entry: RQAPI.Entry) => {
       if (!isHistoryPath) addToHistory(entry);
@@ -121,13 +128,22 @@ export const APIClient: React.FC<Props> = React.memo(() => {
     [addToHistory, isHistoryPath]
   );
 
+  if (!entryDetailsToView) {
+    return (
+      <>
+        <Skeleton className="api-client-header-skeleton" paragraph={{ rows: 1, width: "100%" }} />
+        <Skeleton className="api-client-body-skeleton" />
+      </>
+    );
+  }
+
   return (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT} isSheetOpenByDefault={true}>
       <div className="api-client-container-content">
         <APIClientView
           // TODO: Fix - "apiEntry" is used for history, remove this prop and derive everything from "apiEntryDetails"
           // key={persistedRequestId}
-          apiEntry={entryDetails?.data}
+          apiEntry={entryDetailsToView}
           apiEntryDetails={entryDetails}
           notifyApiRequestFinished={handleAppRequestFinished}
         />
