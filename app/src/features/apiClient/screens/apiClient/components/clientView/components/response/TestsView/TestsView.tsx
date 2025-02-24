@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { EmptyTestsView } from "./components/EmptyTestsView/EmptyTestsView";
 import { TestResultItem } from "./components/TestResult/TestResult";
-import { Badge, Radio, Spin } from "antd";
+import { Badge, Radio } from "antd";
 import { MdRefresh } from "@react-icons/all-files/md/MdRefresh";
 import { RQButton } from "lib/design-system-v2/components";
 import { useTheme } from "styled-components";
@@ -9,20 +9,13 @@ import "./testsView.scss";
 import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 
 interface TestsViewProps {
-  isLoading: boolean;
-  onCancelRequest: () => void;
   handleTestResultRefresh: () => Promise<void>;
   testResults: TestResult[];
 }
 
 type TestsFilter = TestResult["status"] | "all";
 
-export const TestsView: React.FC<TestsViewProps> = ({
-  isLoading,
-  onCancelRequest,
-  testResults,
-  handleTestResultRefresh,
-}) => {
+export const TestsView: React.FC<TestsViewProps> = ({ testResults, handleTestResultRefresh }) => {
   const theme = useTheme();
   const [testsFilter, setTestsFilter] = useState<TestsFilter>("all");
 
@@ -45,17 +38,6 @@ export const TestsView: React.FC<TestsViewProps> = ({
     }
     return testResults?.filter((testResult) => testResult.status === testsFilter);
   }, [testResults, testsFilter]);
-
-  if (isLoading) {
-    return (
-      <div className="api-client-response__loading-overlay">
-        <Spin size="large" tip="Request in progress..." />
-        <RQButton onClick={onCancelRequest} className="mt-16">
-          Cancel request
-        </RQButton>
-      </div>
-    );
-  }
 
   if (!testResults?.length) {
     return <EmptyTestsView />;

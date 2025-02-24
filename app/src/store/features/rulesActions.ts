@@ -1,23 +1,22 @@
-import { PayloadAction } from "@reduxjs/toolkit";
 import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { get, set } from "lodash";
 import { GlobalSliceState } from "store/slices/global/types";
-import { Group } from "@requestly/shared/types/entities/rules";
+import { Group, QueryParamRule, Rule, ScriptRule } from "@requestly/shared/types/entities/rules";
+import { PayloadAction } from "@reduxjs/toolkit";
 
 export const updateLastBackupTimeStamp = (prevState: GlobalSliceState, action: PayloadAction<number>) => {
   prevState.rules.lastBackupTimeStamp = action.payload;
 };
 
-export const updateGroups = (prevState: GlobalSliceState, action: PayloadAction<any[]>) => {
+export const updateGroups = (prevState: GlobalSliceState, action: PayloadAction<Group[]>) => {
   prevState.rules.allRules.groups = action.payload;
 };
 
 export const updateRulesAndGroups = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{
-    rules: any[];
-    groups: any[];
-  }>
+  action: PayloadAction<{ rules: Rule[]; groups: Group[] }>
 ) => {
   prevState.rules.allRules.rules = action.payload.rules;
   prevState.rules.allRules.groups = action.payload.groups;
@@ -25,7 +24,7 @@ export const updateRulesAndGroups = (
 
 export const updateGroupwiseRulesToPopulate = (
   prevState: GlobalSliceState,
-  action: PayloadAction<Record<Group["id"], { group_rules: any[] }>>
+  action: PayloadAction<Record<string, Rule[]>>
 ) => {
   prevState.rules.groupwiseRulesToPopulate = action.payload;
 };
@@ -40,10 +39,7 @@ export const updateIsSampleRulesImported = (prevState: GlobalSliceState, action:
 
 export const updateRefreshPendingStatus = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{
-    type: string;
-    newValue?: boolean;
-  }>
+  action: PayloadAction<{ newValue?: boolean; type: "rules" | "sharedLists" | "sessionRecordingConfig" }>
 ) => {
   prevState.pendingRefresh[action.payload.type] = action.payload.newValue
     ? action.payload.newValue
@@ -52,14 +48,19 @@ export const updateRefreshPendingStatus = (
 
 export const updateHardRefreshPendingStatus = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{
-    type: string;
-    newValue?: boolean; // not passed from anywhere in code, but leaving it here for legacy reasons
-  }>
+  action: PayloadAction<{ type: "rules"; newValue?: boolean }>
 ) => {
   prevState.pendingHardRefresh[action.payload.type] = action.payload.newValue
     ? action.payload.newValue
     : !prevState["pendingHardRefresh"][action.payload.type];
+};
+
+export const updateSelectedRules = (prevState: GlobalSliceState, action: PayloadAction<Record<string, Rule>>) => {
+  prevState.rules.selectedRules = action.payload;
+};
+
+export const updateSelectedGroups = (prevState: GlobalSliceState, action: PayloadAction<Record<string, Group>>) => {
+  prevState.rules.selectedGroups = action.payload;
 };
 
 export const clearSelectedRecords = (prevState: GlobalSliceState) => {
@@ -67,7 +68,15 @@ export const clearSelectedRecords = (prevState: GlobalSliceState) => {
   prevState.rules.selectedGroups = {};
 };
 
-export const updateCurrentlySelectedRuleData = (prevState: GlobalSliceState, action: PayloadAction<any>) => {
+export const clearSelectedRules = (prevState: GlobalSliceState) => {
+  prevState.rules.selectedRules = {};
+};
+
+export const clearSelectedGroups = (prevState: GlobalSliceState) => {
+  prevState.rules.selectedGroups = {};
+};
+
+export const updateCurrentlySelectedRuleData = (prevState: GlobalSliceState, action: PayloadAction<Rule>) => {
   prevState.rules.currentlySelectedRule.data = action.payload;
 };
 
@@ -91,7 +100,7 @@ export const updateIsWorkspaceSwitchConfirmationActive = (
 
 export const updateCurrentlySelectedRuleErrors = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{ name: string }>
+  action: PayloadAction<Record<string, any>>
 ) => {
   prevState.rules.currentlySelectedRule.errors = action.payload;
 };
@@ -143,7 +152,11 @@ export const updateRulePairAtGivenPath = (
   const { pairIndex, updates = {}, triggerUnsavedChangesIndication = true } = action.payload;
 
   for (const [modificationPath, value] of Object.entries(updates)) {
-    set(prevState.rules.currentlySelectedRule.data?.pairs?.[pairIndex], getFilterObjectPath(modificationPath), value);
+    set(
+      (prevState.rules.currentlySelectedRule.data as Rule)?.pairs?.[pairIndex],
+      getFilterObjectPath(modificationPath),
+      value
+    );
   }
 
   if (triggerUnsavedChangesIndication) {
@@ -153,48 +166,39 @@ export const updateRulePairAtGivenPath = (
 
 export const removeValueInRulePairByIndex = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{
-    pairIndex: number;
-    arrayPath: string;
-    index: number;
-  }>
+  action: PayloadAction<{ pairIndex: number; arrayPath: string; index: number }>
 ) => {
   const { pairIndex, arrayPath, index } = action.payload;
-  get(prevState.rules.currentlySelectedRule.data?.pairs[pairIndex], arrayPath).splice(index, 1);
+  get((prevState.rules.currentlySelectedRule.data as Rule)?.pairs[pairIndex], arrayPath).splice(index, 1);
   prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
 };
 
-export const removeRulePairByIndex = (
-  prevState: GlobalSliceState,
-  action: PayloadAction<{
-    pairIndex: number;
-  }>
-) => {
+export const removeRulePairByIndex = (prevState: GlobalSliceState, action: PayloadAction<{ pairIndex: number }>) => {
   const { pairIndex } = action.payload;
-  prevState.rules.currentlySelectedRule.data.pairs?.splice(pairIndex, 1);
+  (prevState.rules.currentlySelectedRule.data as Rule)?.pairs?.splice(pairIndex, 1);
   prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
 };
 
 export const addValueInRulePairArray = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{
-    pairIndex: number;
-    arrayPath: string;
-    value: any;
-  }>
+  action: PayloadAction<{ pairIndex: number; arrayPath: string; value: Rule }>
 ) => {
   const { pairIndex, arrayPath, value } = action.payload;
 
-  const targetArray = get(prevState.rules.currentlySelectedRule.data.pairs[pairIndex], arrayPath);
-  set(prevState.rules.currentlySelectedRule.data.pairs[pairIndex], arrayPath, [...(targetArray || []), value]);
+  const targetArray = get((prevState.rules.currentlySelectedRule.data as Rule).pairs[pairIndex], arrayPath);
+  set((prevState.rules.currentlySelectedRule.data as Rule)?.pairs[pairIndex], arrayPath, [
+    ...(targetArray || []),
+    value,
+  ]);
 
   prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
 
   // Don't block navigation when its initial state
   if (
-    (prevState.rules.currentlySelectedRule?.data?.pairs?.length === 1 &&
-      prevState.rules.currentlySelectedRule?.data?.pairs?.[0]?.modifications?.length === 1) ||
-    prevState.rules.currentlySelectedRule?.data?.pairs?.[0]?.scripts?.length === 1
+    ((prevState.rules.currentlySelectedRule?.data as Rule)?.pairs?.length === 1 &&
+      (prevState.rules.currentlySelectedRule?.data as QueryParamRule.Record)?.pairs?.[0]?.modifications?.length ===
+        1) ||
+    (prevState.rules.currentlySelectedRule?.data as ScriptRule.Record)?.pairs?.[0]?.scripts?.length === 1
   ) {
     prevState.rules.currentlySelectedRule.hasUnsavedChanges = false;
   }
