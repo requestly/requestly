@@ -240,7 +240,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
               : (typeof value.syncValue as EnvironmentVariableType);
           return [
             key.trim(),
-            { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB, id: value.id },
+            { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB, id: index },
           ];
         })
       );
