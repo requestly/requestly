@@ -227,7 +227,11 @@
         .ant-collapse-content-box {
           margin-left: 6px;
           padding: 2px 0px 0px 6px;
-          border-left: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+          border-left: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
+
+          &:hover {
+            border-left: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+          }
         }
       }
     }
