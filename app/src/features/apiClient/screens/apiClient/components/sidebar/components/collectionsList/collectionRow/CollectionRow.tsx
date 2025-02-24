@@ -53,6 +53,11 @@ export const CollectionRow: React.FC<Props> = ({
   const [hoveredId, setHoveredId] = useState("");
   const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
   const { collectionId } = useParams();
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+  const handleDropdownVisibleChange = (isOpen: boolean) => {
+    setIsDropdownVisible(isOpen);
+  };
 
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {
@@ -131,6 +136,7 @@ export const CollectionRow: React.FC<Props> = ({
     sessionStorage.removeItem("collapsed_collection_keys");
   }, []);
 
+  console.log("debug:", hoveredId);
   return (
     <>
       {isEditMode ? (
@@ -189,7 +195,7 @@ export const CollectionRow: React.FC<Props> = ({
                   {record.name}
                 </div>
 
-                <div className={`collection-options ${hoveredId === record.id ? "visible" : " "}`}>
+                <div className={`collection-options ${hoveredId === record.id || isDropdownVisible ? "active" : " "}`}>
                   <Tooltip title={"Add Request"}>
                     <RQButton
                       size="small"
@@ -226,6 +232,8 @@ export const CollectionRow: React.FC<Props> = ({
                     menu={{ items: getCollectionOptions(record) }}
                     placement="bottomRight"
                     overlayClassName="collection-dropdown-menu"
+                    open={isDropdownVisible}
+                    onOpenChange={handleDropdownVisibleChange}
                   >
                     <RQButton
                       onClick={(e) => {

@@ -45,6 +45,11 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
   const { updateRecordsToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const team = useSelector(getCurrentlyActiveWorkspace);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+  const handleDropdownVisibleChange = (isOpen: boolean) => {
+    setIsDropdownVisible(isOpen);
+  };
 
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
@@ -182,8 +187,14 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
                 : record.data.request?.method}
             </Typography.Text>
             <div className="request-url">{record.name || record.data.request?.url}</div>
-            <div className="request-options">
-              <Dropdown trigger={["click"]} menu={{ items: getRequestOptions() }} placement="bottomRight">
+            <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
+              <Dropdown
+                trigger={["click"]}
+                menu={{ items: getRequestOptions() }}
+                placement="bottomRight"
+                open={isDropdownVisible}
+                onOpenChange={handleDropdownVisibleChange}
+              >
                 <RQButton
                   onClick={(e) => {
                     e.stopPropagation();
@@ -201,3 +212,9 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
     </>
   );
 };
+
+/* Remove this notes before prod
+1. request options(children) stay till hover is on its parent class
+2. as cursor moves hover state is lost & visibilty set to hidden
+3. need to make something, that can continue the hover state till the dropdown is closed
+*/
