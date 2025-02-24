@@ -301,4 +301,20 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: parsedRecords[0],
     };
   }
+
+  async deleteCollections(ids: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {
+    const service = await this.getAdapter();
+    const result = await service.deleteCollections(ids);
+    if (result.type === "error") {
+      return {
+        success: false,
+        data: undefined,
+        message: result.error.message,
+      };
+    }
+    return {
+      success: true,
+      data: undefined,
+    };
+  }
 }

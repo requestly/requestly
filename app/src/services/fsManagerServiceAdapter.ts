@@ -12,7 +12,7 @@ const LOCAL_SYNC_BUILDER_NAMESPACE = "local_sync_builder";
 
 export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   constructor(rootPath: string) {
-  	super(`local_sync: ${rootPath}`);
+    super(`local_sync: ${rootPath}`);
     // if (!isFeatureCompatible(FEATURES.LOCAL_FILE_SYNC)) {
     //   throw new Error("LocalFileSync is not supported in the current version of the app");
     // }
@@ -77,51 +77,62 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   async duplicateEnvironment(id: string) {
     return this.invokeProcedureInBG("duplicateEnvironment", id) as Promise<FileSystemResult<EnvironmentEntity>>;
   }
+
+  async deleteCollections(ids: string[]) {
+    return this.invokeProcedureInBG("deleteCollections", ids) as Promise<FileSystemResult<EnvironmentEntity>>;
+  }
 }
 
 class FsManagerServiceAdapterProvider {
-	private cache = new Map<string, FsManagerServiceAdapter>();
-	constructor() {
-		console.log('provider created');
-	}
+  private cache = new Map<string, FsManagerServiceAdapter>();
+  constructor() {
+    console.log("provider created");
+  }
 
   async get(rootPath: string) {
     if (this.cache.has(rootPath)) {
-    	console.log('got provider from cache');
+      console.log("got provider from cache");
       return this.cache.get(rootPath);
     }
-		try {
-			console.log('calling build', Date.now());
-			await buildFsManager(rootPath);
-			console.log('received build', Date.now())
-			const service = new FsManagerServiceAdapter(rootPath);
-			this.cache.set(rootPath, service);
-			return service;
-		} catch (e) {
-			console.error('build error', e);
-			// release();
-		}
+    try {
+      console.log("calling build", Date.now());
+      await buildFsManager(rootPath);
+      console.log("received build", Date.now());
+      const service = new FsManagerServiceAdapter(rootPath);
+      this.cache.set(rootPath, service);
+      return service;
+    } catch (e) {
+      console.error("build error", e);
+      // release();
+    }
   }
 }
 
 export const fsManagerServiceAdapterProvider = new FsManagerServiceAdapterProvider();
 export function buildFsManager(rootPath: string) {
-	return rpcWithRetry({
-		namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
-		method: "build",
-		retryCount: 10,
-		timeout: 1000,
-	}, rootPath) as Promise<void>;
+  return rpcWithRetry(
+    {
+      namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
+      method: "build",
+      retryCount: 10,
+      timeout: 1000,
+    },
+    rootPath
+  ) as Promise<void>;
 }
 export function createWorkspaceFolder(name: string, path: string) {
-	return rpc({
-		namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
-		method: "createWorkspaceFolder",
-	}, name, path) as Promise<FileSystemResult<{id: string, name: string, path: string}>>;
+  return rpc(
+    {
+      namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
+      method: "createWorkspaceFolder",
+    },
+    name,
+    path
+  ) as Promise<FileSystemResult<{ id: string; name: string; path: string }>>;
 }
 export function getAllWorkspaces() {
-	return rpc({
-		namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
-		method: "getAllWorkspaces",
-	}) as Promise<FileSystemResult<{id: string, name: string, path: string}[]>>;
+  return rpc({
+    namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
+    method: "getAllWorkspaces",
+  }) as Promise<FileSystemResult<{ id: string; name: string; path: string }[]>>;
 }

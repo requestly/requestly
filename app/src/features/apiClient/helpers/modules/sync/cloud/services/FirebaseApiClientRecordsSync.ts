@@ -11,26 +11,25 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     this.meta = metadata;
   }
 
-
   private getPrimaryId() {
     return getOwnerId(this.meta.uid, this.meta.teamId);
   }
 
   generateApiRecordId(parentId?: string) {
-		return generateDocumentId("apis");
-	}
+    return generateDocumentId("apis");
+  }
 
-	generateCollectionId(name: string, parentId?: string) {
-		return generateDocumentId("apis");
-	}
+  generateCollectionId(name: string, parentId?: string) {
+    return generateDocumentId("apis");
+  }
 
   async getAllRecords() {
     return getApiRecords(this.getPrimaryId());
   }
 
   getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void> {
-		return;
-	}
+    return;
+  }
 
   async getRecord(recordId: string) {
     return getApiRecord(recordId);
@@ -41,15 +40,15 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async renameCollection(id: string, newName: string): RQAPI.RecordPromise {
-		return this.updateRecord({ id, name: newName }, id);
-	}
+    return this.updateRecord({ id, name: newName }, id);
+  }
 
   async createRecord(record: Partial<RQAPI.Record>) {
     return upsertApiRecord(this.meta.uid, record, this.meta.teamId);
   }
 
   async createCollection(record: Partial<RQAPI.Record>) {
-		return this.createRecord(record);
+    return this.createRecord(record);
   }
 
   async createRecordWithId(record: Partial<RQAPI.Record>, id: string) {
@@ -57,12 +56,16 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async updateRecord(record: Partial<RQAPI.Record>, id: string) {
-		const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
-		sanitizedRecord.id = id;
+    const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
+    sanitizedRecord.id = id;
     return updateApiRecord(this.meta.uid, sanitizedRecord, this.meta.teamId);
   }
 
   async deleteRecords(recordIds: string[]) {
     return deleteApiRecords(this.meta.uid, recordIds, this.meta.teamId);
+  }
+
+  async deleteCollections(ids: string[]) {
+    return deleteApiRecords(this.meta.uid, ids, this.meta.teamId);
   }
 }
