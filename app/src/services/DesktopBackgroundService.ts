@@ -29,6 +29,30 @@ export function rpc(params: {
     });
 }
 
+export async function rpcWithRetry(params: {
+	namespace: string, method: string, retryCount: number, timeout: number,
+}, ...args: any[]) {
+	let retries = params.retryCount
+	while(retries >= 0) {
+		console.log('attempt', retries);
+		try {
+			return await rpc({
+				namespace: params.namespace,
+				method: params.method,
+				timeout: params.timeout,
+			}, ...args)
+		} catch (err) {
+			console.log('attempt error', retries, err);
+			if(err instanceof TimoutError) {
+				retries--;
+				continue;
+			}
+			console.log('weird error', retries, err);
+			throw err;
+		}
+	}
+}
+
 /* Expects the service to be present in Desktop background process */
 export default class BackgroundServiceAdapter {
   private RPC_CHANNEL_PREFIX: string;
@@ -50,25 +74,12 @@ export default class BackgroundServiceAdapter {
   }
 
 	protected async invokeProcedureInBGWithRetries(method: string, config: { retryCount: number, timeout: number }, ...args: any): Promise<any> {
-		let retries = config.retryCount
-		while(retries >= 0) {
-			console.log('attempt', retries);
-			try {
-				return await rpc({
-					namespace: this.RPC_CHANNEL_PREFIX,
-					method,
-					timeout: config.timeout,
-				}, ...args)
-			} catch (err) {
-				console.log('attempt error', retries, err);
-				if(err instanceof TimoutError) {
-					retries--;
-					continue;
-				}
-				console.log('weird error', retries, err);
-				throw err;
-			}
-		}
+		return await rpcWithRetry({
+			namespace: this.RPC_CHANNEL_PREFIX,
+			method,
+			timeout: config.timeout,
+			retryCount: config.retryCount,
+		}, ...args)
   }
 
   /*
