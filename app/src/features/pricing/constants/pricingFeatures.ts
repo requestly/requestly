@@ -147,7 +147,7 @@ export const PricingFeatures: PlanFeatures = {
   [PRICING.PRODUCTS.API_CLIENT]: {
     free: {
       planTitle: "Free",
-      heading: "Everything you need for <br/> individuals and small teams",
+      heading: "All you need for individual & small teams",
       features: [
         {
           title: "Unlimited collections and environments",
@@ -177,7 +177,7 @@ export const PricingFeatures: PlanFeatures = {
     },
     [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: {
       planTitle: "Enterprise",
-      heading: "For Org-wide secure and <br/> controlled API development.",
+      heading: "Org-wide secure & controlled API dev",
       features: [
         {
           title: "Role-based access control",
