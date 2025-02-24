@@ -17,6 +17,10 @@ import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlac
 import { isEmpty } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
+import "./CollectionRow.scss";
+import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
+import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
+import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -55,7 +59,12 @@ export const CollectionRow: React.FC<Props> = ({
       const items: MenuProps["items"] = [
         {
           key: "0",
-          label: <div>Rename</div>,
+          label: (
+            <div>
+              <MdOutlineBorderColor style={{ marginRight: 8 }} />
+              Rename
+            </div>
+          ),
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
             setIsEditMode(true);
@@ -63,7 +72,12 @@ export const CollectionRow: React.FC<Props> = ({
         },
         {
           key: "1",
-          label: <div>Export</div>,
+          label: (
+            <div>
+              <MdOutlineIosShare style={{ marginRight: 8 }} />
+              Export
+            </div>
+          ),
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
             onExportClick(record);
@@ -71,7 +85,12 @@ export const CollectionRow: React.FC<Props> = ({
         },
         {
           key: "2",
-          label: <div>Delete</div>,
+          label: (
+            <div>
+              <MdOutlineDelete style={{ marginRight: 8 }} />
+              Delete
+            </div>
+          ),
           danger: true,
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
@@ -202,7 +221,12 @@ export const CollectionRow: React.FC<Props> = ({
                     />
                   </Tooltip>
 
-                  <Dropdown trigger={["click"]} menu={{ items: getCollectionOptions(record) }} placement="bottomRight">
+                  <Dropdown
+                    trigger={["click"]}
+                    menu={{ items: getCollectionOptions(record) }}
+                    placement="bottomRight"
+                    overlayClassName="collection-dropdown-menu"
+                  >
                     <RQButton
                       onClick={(e) => {
                         e.stopPropagation();

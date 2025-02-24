@@ -21,6 +21,11 @@ import {
   trackRequestDuplicated,
 } from "modules/analytics/events/features/apiClient";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
+import "./RequestRow.scss";
+import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
+import { MdContentCopy } from "@react-icons/all-files/md/MdContentCopy";
+import { MdDriveFileMoveOutline } from "@react-icons/all-files/md/MdDriveFileMoveOutline";
+import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -70,7 +75,12 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
     return [
       {
         key: "0",
-        label: <div>Rename</div>,
+        label: (
+          <div>
+            <MdOutlineBorderColor style={{ marginRight: 8 }} />
+            Rename
+          </div>
+        ),
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setIsEditMode(true);
@@ -78,7 +88,12 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
       },
       {
         key: "1",
-        label: <div>Duplicate</div>,
+        label: (
+          <div>
+            <MdContentCopy style={{ marginRight: 8 }} />
+            Duplicate
+          </div>
+        ),
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           handleDuplicateRequest(record);
@@ -87,7 +102,12 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
       },
       {
         key: "2",
-        label: <div>Move to Collection</div>,
+        label: (
+          <div>
+            <MdDriveFileMoveOutline style={{ marginRight: 8 }} />
+            Move to Collection
+          </div>
+        ),
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setRecordToMove(record);
@@ -96,7 +116,12 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
       },
       {
         key: "3",
-        label: <div>Delete</div>,
+        label: (
+          <div>
+            <MdOutlineDelete style={{ marginRight: 8 }} />
+            Delete
+          </div>
+        ),
         danger: true,
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();

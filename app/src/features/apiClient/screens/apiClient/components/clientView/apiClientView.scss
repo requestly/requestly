@@ -83,15 +83,19 @@
       flex: auto;
       height: 32px;
       width: calc(100% - 205px);
+      gap: 8px;
 
       .api-request-method-selector {
         width: 120px;
       }
 
+      .api-request-method-selector .ant-select-selector {
+        border-top-right-radius: 4px !important;
+        border-bottom-right-radius: 4px !important;
+      }
+
       .api-request-url {
         padding: 4px 8px;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
         background: transparent;
       }
 
