@@ -57,7 +57,9 @@ export const RulesCard = () => {
         dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
       } else {
         navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal } });
-        trackHomeRulesActionClicked(`${modal.toLowerCase()}_importer_clicked`);
+        trackHomeRulesActionClicked(
+          `${modal.toLowerCase()}${modal.toLowerCase() === ImporterType.REQUESTLY ? "_rules" : ""}_importer_clicked`
+        );
       }
     },
     [user?.details?.isLoggedIn]
