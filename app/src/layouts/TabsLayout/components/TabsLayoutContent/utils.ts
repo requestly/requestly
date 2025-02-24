@@ -8,6 +8,8 @@ const getIconTypeFromTabUrl = (url: string) => {
     return TabsLayout.IconType.COLLECTION;
   } else if (url.includes("environments")) {
     return TabsLayout.IconType.ENVIORNMENT_VARIABLE;
+  } else if (url.includes("history")) {
+    return TabsLayout.IconType.HISTORY;
   }
 };
 
