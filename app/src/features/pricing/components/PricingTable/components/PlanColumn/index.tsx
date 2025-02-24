@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { Col, InputNumber, Row, Space, Tooltip, Typography } from "antd";
 import { PricingTableButtons } from "../../PricingTableButtons";
 import { CloseOutlined } from "@ant-design/icons";
-import { capitalize } from "lodash";
+import { capitalize, kebabCase } from "lodash";
 import { PRICING } from "features/pricing/constants/pricing";
 import { PricingPlans } from "features/pricing/constants/pricingPlans";
 import { trackGetFreeTrialClicked, trackPricingPlansQuantityChanged } from "features/pricing/analytics";
@@ -66,14 +66,10 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
 
   const renderFeaturesListHeader = (planName: string, heading: string) => {
     return (
-      <Row className="pro-basic-feature-title text-left">
+      <Row className={`pro-basic-feature-title text-left ${kebabCase(product)}`}>
         {product === PRICING.PRODUCTS.API_CLIENT ? (
           <Col>
-            <span>
-              {heading.split("<br/>")[0]}
-              <img src={"/assets/media/common/yellow-highlight.svg"} alt="highlight" />
-              {heading.split("<br/>")[1]}
-            </span>
+            <span>{heading}</span>
           </Col>
         ) : (
           <>
