@@ -21,6 +21,7 @@ import { useSelector } from "react-redux";
 import { StorageService } from "init";
 import { getAppMode } from "store/selectors";
 import { getIsWorkspaceLocal } from "store/features/teams/selectors";
+import { LocalFirstComingSoon } from "componentsV2/Nudge/views/LocalFirstComingSoon/LocalFirstComingSoon";
 
 const RulesFeatureContainer = () => {
   const appMode = useSelector(getAppMode);
@@ -79,7 +80,7 @@ const RulesFeatureContainer = () => {
 
   if (isWorkspaceLocal) {
     // TODO: USE NUDGE COMPONENT
-    return <div>NO ACCESS - LOCAL WORKSPACE</div>;
+    return <LocalFirstComingSoon featureName="HTTP Rules" />;
   }
 
   return (
