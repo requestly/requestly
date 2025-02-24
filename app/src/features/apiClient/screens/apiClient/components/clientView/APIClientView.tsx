@@ -1,12 +1,11 @@
-import { Dropdown, Row, Select, Skeleton, Space } from "antd";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Dropdown, Row, Select, Space } from "antd";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
 import { QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
 import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
 import {
   getContentTypeFromResponseHeaders,
-  getEmptyAPIEntry,
   getEmptyPair,
   sanitizeEntry,
   supportsRequestBody,
@@ -94,7 +93,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   ]);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
-  const [entry, setEntry] = useState<RQAPI.Entry>({ ...(apiEntry ?? getEmptyAPIEntry()) });
+  const [entry, setEntry] = useState<RQAPI.Entry>(apiEntry);
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.ExecutionError>(null);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
@@ -103,12 +102,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
 
   // const abortControllerRef = useRef<AbortController>(null);
-  const [isAnimating, setIsAnimating] = useState(true);
-  const animationTimerRef = useRef<NodeJS.Timeout>(null);
-  const { response, ...entryWithoutResponse } = entry;
+  const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB
-  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse), isAnimating);
+  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse));
   const { updateTab, activeTab } = useTabsLayoutContext();
 
   const [copyAsModalOpen, setCopyAsModalOpen] = useState(false);
@@ -155,12 +152,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       });
       setRequestName("");
     }
-
-    animationTimerRef.current = setTimeout(() => setIsAnimating(false), 0);
-
-    return () => {
-      clearTimeout(animationTimerRef.current);
-    };
   }, [apiEntry]);
 
   const setUrl = useCallback((url: string) => {
@@ -504,67 +495,59 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
   return isExtensionEnabled ? (
     <div className="api-client-view">
-      <Skeleton
-        className="header-skeleton"
-        loading={isAnimating}
-        active
-        title={true}
-        paragraph={{ rows: 1, width: "100%" }}
-      >
-        <div className="api-client-header-container">
-          <div className="api-client-breadcrumb-container">
-            {user.loggedIn && !openInModal ? (
-              <RQBreadcrumb
-                loading={isAnimating}
-                placeholder="New Request"
-                recordName={apiEntryDetails?.name}
-                onRecordNameUpdate={setRequestName}
-                onBlur={handleRecordNameUpdate}
-                // Auto focus breadcrumb input when a new record is created
-                autoFocus={location.search.includes("new")}
-              />
-            ) : null}
-            <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: 0,
-                    onClick: () => {
-                      apiClientExecutor.updateApiRecords(apiClientRecords);
-                      apiClientExecutor.updateEntryDetails({
-                        entry: sanitizeEntry(entry),
-                        recordId: apiEntryDetails?.id,
-                        collectionId: apiEntryDetails?.collectionId,
-                      });
-                      setCopyAsModalOpen(true);
-                    },
-                    label: <Row>Copy As</Row>,
+      <div className="api-client-header-container">
+        <div className="api-client-breadcrumb-container">
+          {user.loggedIn && !openInModal ? (
+            <RQBreadcrumb
+              placeholder="New Request"
+              recordName={apiEntryDetails?.name}
+              onRecordNameUpdate={setRequestName}
+              onBlur={handleRecordNameUpdate}
+              // Auto focus breadcrumb input when a new record is created
+              autoFocus={location.search.includes("new")}
+            />
+          ) : null}
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: 0,
+                  onClick: () => {
+                    apiClientExecutor.updateApiRecords(apiClientRecords);
+                    apiClientExecutor.updateEntryDetails({
+                      entry: sanitizeEntry(entry),
+                      recordId: apiEntryDetails?.id,
+                      collectionId: apiEntryDetails?.collectionId,
+                    });
+                    setCopyAsModalOpen(true);
                   },
-                ],
+                  label: <Row>Copy As</Row>,
+                },
+              ],
+            }}
+            trigger={["click"]}
+            overlayClassName="rule-more-actions-dropdown"
+          >
+            <RQButton
+              type="transparent"
+              className="more-api-request-actions-button"
+              icon={<MdOutlineMoreHoriz />}
+              onClick={(e) => {
+                e.stopPropagation();
               }}
-              trigger={["click"]}
-              overlayClassName="rule-more-actions-dropdown"
-            >
-              <RQButton
-                type="transparent"
-                className="more-api-request-actions-button"
-                icon={<MdOutlineMoreHoriz />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              />
-            </Dropdown>
-          </div>
-          <div className="api-client-header">
-            <Space.Compact className="api-client-url-container">
-              <Select
-                popupClassName="api-request-method-selector"
-                className="api-request-method-selector"
-                options={requestMethodOptions}
-                value={entry.request.method}
-                onChange={setMethod}
-              />
-              {/* <Input
+            />
+          </Dropdown>
+        </div>
+        <div className="api-client-header">
+          <Space.Compact className="api-client-url-container">
+            <Select
+              popupClassName="api-request-method-selector"
+              className="api-request-method-selector"
+              options={requestMethodOptions}
+              value={entry.request.method}
+              onChange={setMethod}
+            />
+            {/* <Input
               className="api-request-url"
               placeholder="https://example.com"
               value={entry.request.url}
@@ -573,49 +556,48 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               onBlur={onUrlInputBlur}
               prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
             /> */}
-              <RQSingleLineEditor
-                className="api-request-url"
-                placeholder="https://example.com"
-                //value={entry.request.url}
-                defaultValue={entry.request.url}
-                onChange={(text) => {
-                  setUrl(text);
-                }}
-                onPressEnter={onUrlInputEnterPressed}
-                variables={currentEnvironmentVariables}
-                // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
-              />
-            </Space.Compact>
+            <RQSingleLineEditor
+              className="api-request-url"
+              placeholder="https://example.com"
+              //value={entry.request.url}
+              defaultValue={entry.request.url}
+              onChange={(text) => {
+                setUrl(text);
+              }}
+              onPressEnter={onUrlInputEnterPressed}
+              variables={currentEnvironmentVariables}
+              // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
+            />
+          </Space.Compact>
+          <RQButton
+            showHotKeyText
+            onClick={onSendButtonClick}
+            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
+            type="primary"
+            className="text-bold"
+            disabled={!entry.request.url}
+          >
+            Send
+          </RQButton>
+          {user.loggedIn && !openInModal ? (
             <RQButton
               showHotKeyText
-              onClick={onSendButtonClick}
-              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
-              type="primary"
-              className="text-bold"
-              disabled={!entry.request.url}
+              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
+              onClick={onSaveButtonClick}
+              loading={isRequestSaving}
             >
-              Send
+              Save
             </RQButton>
-            {user.loggedIn && !openInModal ? (
-              <RQButton
-                showHotKeyText
-                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
-                onClick={onSaveButtonClick}
-                loading={isRequestSaving}
-              >
-                Save
-              </RQButton>
-            ) : null}
-          </div>
+          ) : null}
         </div>
-      </Skeleton>
+      </div>
       <BottomSheetLayout
         layout={SheetLayout.SPLIT}
         bottomSheet={
           <ApiClientBottomSheet
             key={requestId}
             response={entry.response}
-            testResults={entry.testResults}
+            testResults={testResults}
             isLoading={isLoadingResponse}
             isFailed={isFailed}
             isRequestCancelled={isRequestCancelled}
@@ -628,17 +610,15 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         initialSizes={[60, 40]}
       >
         <div className="api-client-body">
-          <Skeleton loading={isAnimating} active className="body-skeleton">
-            <RequestTabs
-              key={requestId}
-              requestId={apiEntryDetails?.id}
-              collectionId={apiEntryDetails?.collectionId}
-              requestEntry={entry}
-              setRequestEntry={setRequestEntry}
-              setContentType={setContentType}
-              handleAuthChange={handleAuthChange}
-            />
-          </Skeleton>
+          <RequestTabs
+            key={requestId}
+            requestId={apiEntryDetails?.id}
+            collectionId={apiEntryDetails?.collectionId}
+            requestEntry={entry}
+            setRequestEntry={setRequestEntry}
+            setContentType={setContentType}
+            handleAuthChange={handleAuthChange}
+          />
         </div>
       </BottomSheetLayout>
       {copyAsModalOpen ? (
