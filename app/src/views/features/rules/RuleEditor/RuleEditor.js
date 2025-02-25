@@ -21,6 +21,7 @@ import { RuleEditorBottomSheet } from "./components/RuleEditorBottomSheet/RuleEd
 import { trackSampleRuleTested } from "features/rules/analytics";
 import { RecordStatus } from "@requestly/shared/types/entities/rules";
 import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
+import { useCurrentWorkspaceUserRole } from "hooks";
 import "./RuleEditor.css";
 
 const RuleEditor = (props) => {
@@ -35,6 +36,7 @@ const RuleEditor = (props) => {
   const [showEnableRuleTooltip, setShowEnableRuleTooltip] = useState(false);
   const tryThisRuleTooltipTimerRef = useRef(null);
   const [isSampleRule, setIsSampleRule] = useState(false);
+  const { role } = useCurrentWorkspaceUserRole();
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
@@ -61,6 +63,8 @@ const RuleEditor = (props) => {
     }
 
     window.open(sampleRuleDetails[currentlySelectedRuleData.sampleId].demoLink, "_blank");
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentlySelectedRuleData?.name, currentlySelectedRuleData?.status]);
 
   useEffect(() => {
@@ -120,6 +124,7 @@ const RuleEditor = (props) => {
       <Col key={MODE + RULE_TYPE_TO_CREATE} className="overflow-hidden h-full">
         {MODE !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
           <EditorHeader
+            role={role}
             mode={MODE}
             showEnableRuleTooltip={showEnableRuleTooltip}
             handleSeeLiveRuleDemoClick={handleSeeLiveRuleDemoClick}
@@ -128,7 +133,7 @@ const RuleEditor = (props) => {
 
         {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
           <ProCard className="rule-editor-procard rule-editor-body-scroll">
-            <RuleBuilder />
+            <RuleBuilder role={role} />
           </ProCard>
         ) : (
           <BottomSheetLayout
@@ -142,13 +147,13 @@ const RuleEditor = (props) => {
                   : "rules-create-mode"
               }`}
             >
-              <RuleBuilder handleSeeLiveRuleDemoClick={handleSeeLiveRuleDemoClick} />
+              <RuleBuilder role={role} handleSeeLiveRuleDemoClick={handleSeeLiveRuleDemoClick} />
             </ProCard>
           </BottomSheetLayout>
         )}
       </Col>
     );
-  }, [MODE, RULE_TYPE_TO_CREATE, appMode, showEnableRuleTooltip, handleSeeLiveRuleDemoClick, isSampleRule]);
+  }, [role, MODE, RULE_TYPE_TO_CREATE, appMode, showEnableRuleTooltip, handleSeeLiveRuleDemoClick, isSampleRule]);
 
   switch (appMode) {
     case GLOBAL_CONSTANTS.APP_MODES.EXTENSION:

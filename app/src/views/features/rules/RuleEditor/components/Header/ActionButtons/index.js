@@ -1,14 +1,17 @@
 import CreateRuleButton from "./CreateRuleButton";
 import ShareRuleButton from "./ShareRuleButton";
 import APP_CONSTANTS from "config/constants";
+import { TeamRole } from "types";
 import "./RuleEditorActionButtons.css";
 
-const ActionButtons = ({ mode }) => {
+const ActionButtons = ({ role, mode }) => {
+  const isReadRole = role === TeamRole.read;
+
   return (
     <div className="rule-editor-header-action-btns">
-      {mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? <ShareRuleButton /> : null}
+      {mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT || isReadRole ? <ShareRuleButton /> : null}
 
-      <CreateRuleButton />
+      {isReadRole ? null : <CreateRuleButton />}
     </div>
   );
 };

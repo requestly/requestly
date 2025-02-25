@@ -30,14 +30,16 @@ import { trackSampleRuleCreateRuleClicked } from "features/rules/analytics";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import { getEventObject } from "components/common/RuleEditorModal/utils";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
+import { TeamRole } from "types";
 
-const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleTooltip = false }) => {
+const Header = ({ role, mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleTooltip = false }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const allRecordsMap = useSelector(getAllRecordsMap);
+  const isReadRole = role === TeamRole.read;
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
 
@@ -84,10 +86,8 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
         <div className="rule-editor-title-info">
           <CloseButton mode={mode} ruleType={currentlySelectedRuleData?.ruleType} />
           <div className="text-gray rule-editor-header-title">
-            {/* {getRuleTitle(currentlySelectedRuleConfig.NAME, mode)} */}
-
             <RQBreadcrumb
-              disabled={isSampleRule}
+              disabled={isSampleRule || isReadRole}
               placeholder="Enter rule name"
               recordName={currentlySelectedRuleData?.name}
               onRecordNameUpdate={handleRuleNameChange}
@@ -134,39 +134,50 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
           </div>
         ) : (
           <div className="ml-auto rule-editor-header-actions-container">
-            <HelpButton />
+            {isReadRole ? (
+              <>
+                <HelpButton />
+                <Divider type="vertical" />
+                <ActionButtons role={role} mode={mode} />
+                <TestRuleButton role={role} />
+              </>
+            ) : (
+              <>
+                <HelpButton />
 
-            <Status mode={mode} />
+                <Status mode={mode} />
 
-            {isRuleGroupDisabled && (
-              <div className="rule-editor-header-disabled-group-warning">
-                <Tooltip title="This rule won't execute because its parent group is disabled. Enable the group to run this rule.">
-                  <WarningOutlined className="icon__wrapper" />
-                  Group is disabled.{" "}
-                  <RQButton
-                    type="transparent"
-                    size="small"
-                    onClick={() =>
-                      recordStatusToggleAction(normalizeRecord(allRecordsMap[currentlySelectedRuleData.groupId]))
-                    }
-                  >
-                    Enable now
-                  </RQButton>
-                </Tooltip>
-              </div>
+                {isRuleGroupDisabled && (
+                  <div className="rule-editor-header-disabled-group-warning">
+                    <Tooltip title="This rule won't execute because its parent group is disabled. Enable the group to run this rule.">
+                      <WarningOutlined className="icon__wrapper" />
+                      Group is disabled.{" "}
+                      <RQButton
+                        type="transparent"
+                        size="small"
+                        onClick={() =>
+                          recordStatusToggleAction(normalizeRecord(allRecordsMap[currentlySelectedRuleData.groupId]))
+                        }
+                      >
+                        Enable now
+                      </RQButton>
+                    </Tooltip>
+                  </div>
+                )}
+
+                <PinButton rule={currentlySelectedRuleData} />
+
+                <Divider type="vertical" />
+
+                <RuleOptions mode={mode} rule={currentlySelectedRuleData} />
+
+                <EditorGroupDropdown mode={mode} />
+
+                <TestRuleButton />
+
+                <ActionButtons mode={mode} />
+              </>
             )}
-
-            <PinButton rule={currentlySelectedRuleData} />
-
-            <Divider type="vertical" />
-
-            <RuleOptions mode={mode} rule={currentlySelectedRuleData} />
-
-            <EditorGroupDropdown mode={mode} />
-
-            <TestRuleButton />
-
-            <ActionButtons mode={mode} />
           </div>
         )}
       </div>

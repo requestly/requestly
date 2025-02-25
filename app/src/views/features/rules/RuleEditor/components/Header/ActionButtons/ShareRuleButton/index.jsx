@@ -10,12 +10,15 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { RQButton } from "lib/design-system-v2/components";
+import { useCurrentWorkspaceUserRole } from "hooks";
+import { TeamRole } from "types";
 
 const ShareRuleButton = ({ isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
   const user = useSelector(getUserAuthDetails);
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const { role } = useCurrentWorkspaceUserRole();
 
   const shareRuleClickHandler = () => {
     trackShareButtonClicked("rule_editor");
@@ -66,6 +69,30 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
           >
             Share rule
           </Row>
+        </RQButton>
+      ) : role === TeamRole.read ? (
+        <RQButton
+          type="transparent"
+          icon={
+            <img
+              width="13.4px"
+              height="10px"
+              alt="down arrow"
+              src="/assets/media/views/share.svg"
+              className="rule-header-share-btn-icon"
+            />
+          }
+          onClick={() => {
+            shareRuleClickHandler();
+            trackRuleEditorHeaderClicked(
+              "share_button",
+              currentlySelectedRuleData.ruleType,
+              MODE,
+              "rule_editor_screen_header"
+            );
+          }}
+        >
+          Share
         </RQButton>
       ) : (
         <Tooltip title="Share rule" placement="bottom">
