@@ -156,12 +156,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     apiClientRecordsRepository
       .getAllRecords()
       .then((result) => {
-        if (result.success) {
-          setApiClientRecords(result.data);
-        }
+        setApiClientRecords(result.data);
+        // show notification here if success is false
       })
       .catch((error) => {
         setApiClientRecords([]);
+        // show notification here
         Logger.error("Error loading api records!", error);
       })
       .finally(() => {
