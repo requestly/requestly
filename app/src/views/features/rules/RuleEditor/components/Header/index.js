@@ -45,12 +45,6 @@ const Header = ({ role, mode, handleSeeLiveRuleDemoClick = () => {}, showEnableR
 
   const { recordStatusToggleAction } = useRulesActionContext();
 
-  // const getRuleTitle = (name, mode) => {
-  //   return `${replace(capitalize(name), "api", "API")} / ${capitalize(mode)} ${
-  //     mode === "create" ? "new rule" : "rule"
-  //   }`;
-  // };
-
   const isRuleGroupDisabled = useMemo(() => checkIsRuleGroupDisabled(allRecordsMap, currentlySelectedRuleData), [
     allRecordsMap,
     currentlySelectedRuleData,
