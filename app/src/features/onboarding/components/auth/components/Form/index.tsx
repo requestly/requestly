@@ -6,7 +6,7 @@ import { AuthFormInput } from "./components/AuthFormInput";
 // import { PersonaInput } from "../../../persona/components/PersonaInput";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import AUTH from "config/constants/sub/auth";
-import { handleEmailSignIn, handleEmailSignUp, handleGoogleSignIn } from "./actions";
+import { handleAppleSignIn, handleEmailSignIn, handleEmailSignUp, handleGoogleSignIn } from "./actions";
 import { globalActions } from "store/slices/global/slice";
 import { getGreeting, isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
@@ -30,6 +30,7 @@ import { useFeatureValue } from "@growthbook/growthbook-react";
 import { getAppFlavour } from "utils/AppUtils";
 import LINKS from "config/constants/sub/links";
 import "./index.scss";
+import { isSafariBrowser } from "actions/ExtensionActions";
 
 interface AuthFormProps {
   authMode: string;
@@ -62,6 +63,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   const appMode = useSelector(getAppMode);
   const [password, setPassword] = useState("");
   const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
+  const [isAppleSignInLoading, setIsAppleSignInLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isNewUser, setIsNewUser] = useState(null);
   const [isAuthWarningBannerVisible, setIsAuthWarningBannerVisible] = useState(!!warningMessage?.length);
@@ -113,6 +115,44 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         setIsGoogleSignInLoading(false);
       });
   }, [authMode, source, appMode, isOnboarding, callback, postAuthGreeting]);
+
+  const handleAppleSignInButtonClick = useCallback(() => {
+    setIsAppleSignInLoading(true);
+    handleAppleSignIn(source)
+      .then((result) => {
+        if (result.uid) {
+          setIsNewUser(result?.isNewUser || false);
+        }
+        const greatingName = result.displayName?.split(" ")?.[0];
+        !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : postAuthGreeting);
+
+        callback?.();
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setIsAppleSignInLoading(false);
+      });
+  }, [callback, isOnboarding, postAuthGreeting, source]);
+
+  const renderSignInWithApple = useCallback(() => {
+    if (isSafariBrowser()) {
+      return (
+        <RQButton
+          type="default"
+          className="onboarding-google-auth-button"
+          onClick={handleAppleSignInButtonClick}
+          loading={isAppleSignInLoading}
+          disabled={isLoading}
+        >
+          <img src={"/assets/media/common/apple-white.svg"} alt="apple" height={24} width={24} />
+          {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Apple" : "Sign in with Apple"}
+        </RQButton>
+      );
+    }
+    return null;
+  }, [authMode, handleAppleSignInButtonClick, isAppleSignInLoading, isLoading]);
 
   const handleMagicLinkAuthClick = useCallback(() => {
     if (authMode === AUTH.ACTION_LABELS.LOG_IN || authMode === AUTH.ACTION_LABELS.SIGN_UP) {
@@ -238,6 +278,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           <img src={"/assets/media/common/google.svg"} alt="google" />
           {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
         </RQButton>
+        {renderSignInWithApple()}
         <Divider plain className="onboarding-auth-form-divider">
           Or
         </Divider>
@@ -343,8 +384,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         </span>
       </Row>
       <div className="auth-form-footer">
-        By clicking {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}, Continue
-        with Single Sign-on (SSO) or Continue you agree to our{" "}
+        By clicking {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"},
+        {isSafariBrowser()
+          ? authMode === AUTH.ACTION_LABELS.SIGN_UP
+            ? " Sign up with Apple"
+            : " Sign in with Apple"
+          : ""}
+        , Continue with Single Sign-on (SSO) or Continue you agree to our{" "}
         <a href={LINKS.REQUESTLY_TERMS_AND_CONDITIONS} target="_blank" rel="noreferrer">
           Terms and Conditions
         </a>{" "}
@@ -380,6 +426,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         <img src={"/assets/media/common/google.svg"} alt="google" />
         {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
       </RQButton>
+      {renderSignInWithApple()}
       <Divider plain className="onboarding-auth-form-divider">
         Or
       </Divider>
