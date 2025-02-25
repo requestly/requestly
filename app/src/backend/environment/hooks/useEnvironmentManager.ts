@@ -443,15 +443,28 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
         ...collection,
         data: { ...collection?.data, variables: updatedVariables },
       };
-      return syncRepository.apiClientRecordsRepository.setCollectionVariables(record.id, updatedVariables).then((result) => {
-				if (result.success) {
-        	onSaveRecord(result.data);
-         	dispatch(variablesActions.setCollectionVariables({ collectionId, variables }));
-					return;
-				}
+      return syncRepository.apiClientRecordsRepository.createRecord(record).then((result) => {
+        onSaveRecord(result.data);
+        dispatch(variablesActions.setCollectionVariables({ collectionId, variables }));
+      });
+    },
+    [onSaveRecord, dispatch, syncRepository.apiClientRecordsRepository, apiClientRecords]
+  );
 
-				toast.error(result.message || "Could not create set collection variables!", 5);
+  const removeCollectionVariable = useCallback(
+    async (key: string, collectionId: string) => {
+      const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
 
+      if (!collection) {
+        throw new Error("Collection not found");
+      }
+
+      const updatedVariables = { ...collection?.data?.variables };
+      delete updatedVariables[key];
+      const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
+      return syncRepository.apiClientRecordsRepository.createRecord(record).then((result) => {
+        onSaveRecord(result.data);
+        dispatch(variablesActions.setCollectionVariables({ collectionId, variables: updatedVariables }));
       });
     },
     [onSaveRecord, dispatch, syncRepository.apiClientRecordsRepository, apiClientRecords]
@@ -474,6 +487,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     isEnvironmentsLoading: isLoading,
     getGlobalVariables,
     setCollectionVariables,
+    removeCollectionVariable,
     getCollectionVariables: getCurrentCollectionVariables,
   };
 };

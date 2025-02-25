@@ -86,7 +86,7 @@ export const CollectionView = () => {
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
       const record = { ...collection, name };
-      return apiClientRecordsRepository.renameCollection(record.id, name).then((result) => {
+      return apiClientRecordsRepository.updateRecord(record).then((result) => {
         onSaveRecord(result.data);
         replaceTab(result.data.id, {
           id: result.data.id,
