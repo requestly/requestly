@@ -42,6 +42,12 @@ export enum QueryParamSyncType {
   URL = "url",
   TABLE = "table",
 }
+export enum BulkActions {
+  DUPLICATE = "DUPLICATE",
+  DELETE = "DELETE",
+  MOVE = "MOVE",
+  EXPORT = "EXPORT",
+}
 
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
 

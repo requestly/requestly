@@ -155,7 +155,6 @@ const Editor: React.FC<EditorProps> = ({
 
   const handleEditorClose = useCallback(
     (id: string) => {
-      // @ts-expect-error
       dispatch(globalActions.removeToastForEditor({ id }));
     },
     [dispatch]

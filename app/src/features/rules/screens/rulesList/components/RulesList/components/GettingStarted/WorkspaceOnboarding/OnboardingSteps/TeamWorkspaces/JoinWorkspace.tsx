@@ -33,19 +33,19 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
     trackWorkspaceJoinClicked(team?.teamId, "workspace_onboarding");
     setIsJoining(true);
     acceptTeamInvite(team.inviteId)
-      .then((res: any) => {
-        if (res?.data?.success) {
+      .then((res) => {
+        if (res?.success) {
           toast.success("Successfully accepted invite");
           trackWorkspaceInviteAccepted(
             team.teamId,
             team.teamName,
             team.inviteId,
             "onboarding",
-            res?.data?.data?.invite?.usage,
-            res?.data?.data?.invite?.metadata?.teamAccessCount
+            res?.data?.invite?.usage,
+            res?.data?.invite?.metadata?.teamAccessCount
           );
 
-          if (res?.data?.data?.invite.type === "teams") {
+          if (res?.data?.invite.type === "teams") {
             switchWorkspace(
               {
                 teamId: team.teamId,
