@@ -21,7 +21,7 @@ export const PricingFeatures: PlanFeatures = {
         {
           title: "Unlimited Header Rules",
           enabled: true,
-          tooltip: "There is no limit on header modification rules; they only count as one towards your total rule",
+          tooltip: "There is no limit on header modification rules, they only count as one towards your total rule",
         },
         {
           title: "5 API Mocks",
