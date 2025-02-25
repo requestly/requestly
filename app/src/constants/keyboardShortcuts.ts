@@ -5,10 +5,12 @@ enum Feature {
 
 export const KEY_ICONS: Record<string, string> = {
   meta: "⌘",
+  enter: "⏎",
 };
 
 export type KEYBOARD_SHORTCUT = {
   hotKey: string;
+  displayHotkey?: string;
   description: string;
 };
 

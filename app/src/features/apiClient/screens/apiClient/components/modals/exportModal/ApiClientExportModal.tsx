@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Modal } from "antd";
 import { RQAPI } from "features/apiClient/types";
-import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
+// import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import "./apiClientExportModal.scss";
 import fileDownload from "js-file-download";
@@ -14,6 +14,7 @@ import {
   trackExportApiCollectionsFailed,
   trackExportCollectionsClicked,
 } from "modules/analytics/events/features/apiClient";
+import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 
 interface BaseModalProps {
   isOpen: boolean;
@@ -128,7 +129,7 @@ export const ApiClientExportModal: React.FC<ExportModalProps> = ({ isOpen, onClo
     <Modal
       title={
         <div className="export-collections-modal-title">
-          <MdOutlineFileDownload />
+          <MdOutlineIosShare />
           Export {fileInfo.label}
         </div>
       }
