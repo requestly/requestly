@@ -133,7 +133,8 @@ const RuleEditor = (props) => {
 
         {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
           <ProCard className="rule-editor-procard rule-editor-body-scroll">
-            <RuleBuilder role={role} />
+            {/* TODO: rename "isSharedListViewRule" prop to view only mode */}
+            <RuleBuilder />
           </ProCard>
         ) : (
           <BottomSheetLayout
@@ -147,7 +148,7 @@ const RuleEditor = (props) => {
                   : "rules-create-mode"
               }`}
             >
-              <RuleBuilder role={role} handleSeeLiveRuleDemoClick={handleSeeLiveRuleDemoClick} />
+              <RuleBuilder handleSeeLiveRuleDemoClick={handleSeeLiveRuleDemoClick} />
             </ProCard>
           </BottomSheetLayout>
         )}
