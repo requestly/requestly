@@ -75,6 +75,9 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
       onSuccess?.();
 
       // TODO: add analytics
+    } else {
+      const erroredResult = !recordDeletionResult.success ? recordDeletionResult : collectionsDeletionResult;
+      toast.error(erroredResult.message || `Error deleting ${records.length === 1 ? "record" : "records"}`);
     }
 
     setIsDeleting(false);

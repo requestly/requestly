@@ -99,7 +99,9 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       const toastSuccessMessage = recordType === RQAPI.RecordType.API ? "Request created!" : "Collection Created!";
       toast.success(toastSuccessMessage);
     } else {
-      toast.error("Something went wrong!");
+      toast.error(
+        result?.message || `Could not save ${record.type === RQAPI.RecordType.COLLECTION ? "Collection" : "Request"}.`
+      );
     }
 
     setIsLoading(false);

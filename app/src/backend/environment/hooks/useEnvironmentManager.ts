@@ -443,7 +443,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
         ...collection,
         data: { ...collection?.data, variables: updatedVariables },
       };
-      return syncRepository.apiClientRecordsRepository.createRecord(record).then((result) => {
+      return syncRepository.apiClientRecordsRepository.updateRecord(record, record.id).then((result) => {
         onSaveRecord(result.data);
         dispatch(variablesActions.setCollectionVariables({ collectionId, variables }));
       });
@@ -462,7 +462,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       const updatedVariables = { ...collection?.data?.variables };
       delete updatedVariables[key];
       const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
-      return syncRepository.apiClientRecordsRepository.createRecord(record).then((result) => {
+      return syncRepository.apiClientRecordsRepository.updateRecord(record, record.id).then((result) => {
         onSaveRecord(result.data);
         dispatch(variablesActions.setCollectionVariables({ collectionId, variables: updatedVariables }));
       });

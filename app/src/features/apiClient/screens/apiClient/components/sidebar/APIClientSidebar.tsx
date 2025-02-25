@@ -159,12 +159,13 @@ const APIClientSidebar: React.FC<Props> = () => {
           onSaveRecord(result.data);
 
           setIsImportModalOpen(false);
+        } else {
+          throw new Error(result.message);
         }
-
         return result.data;
       } catch (error) {
         console.error("Error importing request", error);
-        toast.error("Error importing request");
+        toast.error(error.message || "Error importing request");
         throw error;
       } finally {
         setIsLoading(false);

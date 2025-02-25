@@ -101,7 +101,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       return {
         success: false,
         data: [],
-        message: result.error.message,
+        message: `Error: ${result.error.message} in ${result.error.path}`,
       };
     }
     const parsedRecords = this.parseAPIEntities(result.content);
