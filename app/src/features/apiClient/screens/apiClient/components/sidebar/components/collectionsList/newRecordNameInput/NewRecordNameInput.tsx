@@ -156,7 +156,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       // False is passed to not open the tab when renaming the record from sidebar
       onSaveRecord(result.data);
 
-      const wasForceRefreshed = await forceRefreshApiClientRecords(record.id);
+      const wasForceRefreshed = await forceRefreshApiClientRecords();
       if (wasForceRefreshed) {
         closeTab(record.id);
       }

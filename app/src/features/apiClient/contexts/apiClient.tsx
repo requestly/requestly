@@ -22,6 +22,7 @@ import { RequestTab } from "../screens/apiClient/components/clientView/component
 import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
 import { useGetApiClientSyncRepo } from "../helpers/modules/sync/useApiClientSyncRepo";
 import { notification } from "antd";
+import { toast } from "utils/Toast";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -57,7 +58,7 @@ interface ApiClientContextInterface {
   apiClientWorkloadManager: APIClientWorkloadManager;
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<any, any>>;
 
-  forceRefreshApiClientRecords: (id: string) => Promise<boolean>;
+  forceRefreshApiClientRecords: () => Promise<boolean>;
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
@@ -344,9 +345,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
               setIsRecordBeingCreated(null);
               if (result.success) {
                 onSaveRecord(result.data);
+              } else {
+                toast.error(result.message || "Could not create collection.", 5);
               }
             })
             .catch((error) => {
+              toast.error(error.message || "Could not create collection.", 5);
               console.error("Error adding new collection", error);
             });
         }

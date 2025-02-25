@@ -171,10 +171,14 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     const result = await service.createCollection(record.name, record.collectionId);
 
     if (result.type === "error") {
+      const message = result.error.message;
+      const doesFolderAlreadyExists = message === "Folder already exists!";
       return {
         success: false,
         data: null,
-        message: result.error.message,
+        message: doesFolderAlreadyExists
+          ? `${result.error.message} Please rename the collection with name "${record.name}"`
+          : message,
       };
     }
 
