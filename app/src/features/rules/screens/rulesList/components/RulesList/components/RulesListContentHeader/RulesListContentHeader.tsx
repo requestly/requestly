@@ -20,15 +20,17 @@ import { RuleSelectionList } from "../RuleSelectionList/RuleSelectionList";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
 import { RQButton } from "lib/design-system-v2/components";
 import { useLocation } from "react-router-dom";
+import { TeamRole } from "types";
 
 interface Props {
+  userRole: TeamRole;
   searchValue: string;
   setSearchValue: (value: string) => void;
   filter: FilterType;
   records: StorageRecord[];
 }
 
-const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, filter, records }) => {
+const RulesListContentHeader: React.FC<Props> = ({ userRole, searchValue, setSearchValue, filter, records }) => {
   const user = useSelector(getUserAuthDetails);
   const { state } = useLocation();
   const debouncedTrackRulesListSearched = useDebounce(trackRulesListSearched, 500);
@@ -187,7 +189,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
     <ContentListHeader
       title="My Rules"
       subtitle="Create and manage your rules from here"
-      actions={contentHeaderActions}
+      actions={userRole !== TeamRole.read ? contentHeaderActions : null}
       searchValue={searchValue}
       setSearchValue={handleSearchValueUpdate}
       filters={contentHeaderFilters}

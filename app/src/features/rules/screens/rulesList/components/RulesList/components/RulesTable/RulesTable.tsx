@@ -31,18 +31,19 @@ import { enhanceRecords, importSampleRules, normalizeRecords } from "./utils/rul
 import { useRulesActionContext } from "features/rules/context/actions";
 import { globalActions } from "store/slices/global/slice";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import "./rulesTable.css";
-
 import { RecordType, RecordStatus, StorageRecord } from "@requestly/shared/types/entities/rules";
+import { TeamRole } from "types";
+import "./rulesTable.css";
 
 interface Props {
   records: StorageRecord[];
   allRecordsMap: { [id: string]: StorageRecord };
   loading: boolean;
   searchValue: string;
+  userRole: TeamRole;
 }
 
-const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecordsMap }) => {
+const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecordsMap, userRole }) => {
   const { selectedRows, clearSelectedRows } = useContentListTableContext();
 
   const dispatch = useDispatch();
@@ -240,9 +241,9 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   return (
     <>
       {/* Add Modals Required in Rules List here */}
-
       <ContentListTable
-        dragAndDrop
+        dragAndDrop={userRole !== TeamRole.read}
+        isRowSelection={userRole !== TeamRole.read}
         onRowDropped={onRowDropped}
         id="rules-list-table"
         className="rules-list-table"

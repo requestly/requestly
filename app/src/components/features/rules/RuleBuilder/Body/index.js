@@ -9,6 +9,7 @@ import { getAppMode, getCurrentlySelectedRuleErrors } from "store/selectors";
 import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
 import RuleInfoBanner from "./RuleInfoBanner";
+import { useCurrentWorkspaceUserRole } from "hooks";
 import "./RuleBuilderBody.css";
 
 const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRuleConfig }) => {
@@ -18,6 +19,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
   const ruleErrors = useSelector(getCurrentlySelectedRuleErrors);
   const isSharedListView = mode === "shared-list-rule-view";
   const isSampleRule = currentlySelectedRuleData?.isSample;
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const getEventObject = (name, value) => ({ target: { name, value } });
 
@@ -52,7 +54,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
         {!isSharedListView && (
           <RQEditorTitle
             isSampleRule={isSampleRule}
-            disabled={isSampleRule}
+            disabled={isSampleRule || isReadRole}
             mode={mode}
             errors={ruleErrors}
             showDocs={showDocs}
@@ -86,7 +88,10 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
               <Row justify="end">
                 <Col span={24}>
                   {mode !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
-                    <AddPairButton disabled={isSampleRule} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
+                    <AddPairButton
+                      disabled={isSampleRule || isReadRole}
+                      currentlySelectedRuleConfig={currentlySelectedRuleConfig}
+                    />
                   ) : null}
                 </Col>
               </Row>
