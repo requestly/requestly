@@ -70,7 +70,10 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       record.collectionId = newRecordCollectionId;
     }
 
-    const result = record.type === RQAPI.RecordType.API ? await apiClientRecordsRepository.createRecord(record) : await apiClientRecordsRepository.createCollection(record);
+    const result =
+      record.type === RQAPI.RecordType.API
+        ? await apiClientRecordsRepository.createRecord(record)
+        : await apiClientRecordsRepository.createCollection(record);
 
     if (result.success) {
       onSaveRecord(result.data);
@@ -132,7 +135,10 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       name: recordName,
     };
 
-    const result =  record.type === RQAPI.RecordType.API ? await apiClientRecordsRepository.updateRecord(record, record.id) : await apiClientRecordsRepository.renameCollection(record.id, record.name);
+    const result =
+      record.type === RQAPI.RecordType.API
+        ? await apiClientRecordsRepository.updateRecord(record, record.id)
+        : await apiClientRecordsRepository.renameCollection(record.id, record.name);
 
     // const updatedRecords = await repository.reactToRename(records);
     // if(updatedRecords) {
@@ -144,15 +150,14 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     // setApiClientRecords()
     // }
 
-
     if (result.success) {
       // False is passed to not open the tab when renaming the record from sidebar
       onSaveRecord(result.data);
 
       const wasForceRefreshed = await forceRefreshApiClientRecords(record.id);
-			if (wasForceRefreshed) {
-				closeTab(record.id);
-			}
+      if (wasForceRefreshed) {
+        closeTab(record.id);
+      }
 
       if (recordType === RQAPI.RecordType.API) {
         trackRequestRenamed("api_client_sidebar");
@@ -165,13 +170,23 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       const toastSuccessMessage = recordType === RQAPI.RecordType.API ? "Request updated!" : "Collection updated!";
       toast.success(toastSuccessMessage);
     } else {
-			console.log('rename', result);
-      toast.error("Something went wrong!");
+      toast.error(result?.message || "Something went wrong!");
     }
 
     setIsLoading(false);
     onSuccess?.();
-  }, [recordType, recordToBeEdited, recordName, uid, onSaveRecord, onSuccess, updateTab, apiClientRecordsRepository, forceRefreshApiClientRecords]);
+  }, [
+    recordType,
+    recordToBeEdited,
+    recordName,
+    uid,
+    onSaveRecord,
+    onSuccess,
+    updateTab,
+    apiClientRecordsRepository,
+    forceRefreshApiClientRecords,
+    closeTab,
+  ]);
 
   const onBlur = isEditMode ? updateRecord : saveNewRecord;
 
