@@ -19,13 +19,15 @@ import { getFilteredRecords } from "./utils";
 import RulesListContentHeader from "./components/RulesListContentHeader/RulesListContentHeader";
 import { useSearchParams } from "react-router-dom";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
-import "./rulesList.scss";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
+import { useCurrentWorkspaceUserRole } from "hooks";
+import "./rulesList.scss";
 
 interface Props {}
 
 const RulesList: React.FC<Props> = () => {
   const user = useSelector(getUserAuthDetails);
+  const { role: userRole } = useCurrentWorkspaceUserRole();
   const isRuleListLoading = useSelector(getIsRulesListLoading);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
@@ -78,6 +80,7 @@ const RulesList: React.FC<Props> = () => {
               <RQBreadcrumb />
 
               <RulesListContentHeader
+                userRole={userRole}
                 searchValue={searchValue}
                 setSearchValue={setSearchValue}
                 filter={activeFilter}
@@ -85,6 +88,7 @@ const RulesList: React.FC<Props> = () => {
               />
               <div className="rq-rules-table">
                 <RulesTable
+                  userRole={userRole}
                   allRecordsMap={allRecordsMap}
                   records={filteredRecords}
                   loading={isLoading || isRuleListLoading}
