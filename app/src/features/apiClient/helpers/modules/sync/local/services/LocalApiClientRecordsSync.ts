@@ -4,7 +4,6 @@ import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapte
 import { API, APIEntity, FileSystemResult } from "./types";
 import { parseFsId, parseNativeId } from "../../utils";
 import { v4 as uuidv4 } from "uuid";
-import { EnvironmentVariables } from "backend/environment/types";
 
 export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientLocalMeta> {
   meta: ApiClientLocalMeta;
@@ -48,7 +47,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
           type: RQAPI.RecordType.COLLECTION,
           data: {
-            variables: e.variables,
+            variables: {},
           },
         };
         return collection;
@@ -320,23 +319,6 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return {
       success: true,
       data: undefined,
-    };
-  }
-
-  async setCollectionVariables(id: string, variables: EnvironmentVariables): Promise<{ success: boolean; data: RQAPI.CollectionRecord; message?: string; }> {
-  	const service = await this.getAdapter();
-		const result = await service.setCollectionVariables(id, variables);
-		if (result.type === "error") {
-      return {
-        success: false,
-        data: undefined,
-        message: result.error.message,
-      };
-    }
-		const [parsedRecord] = this.parseAPIEntities([result.content]);
-    return {
-      success: true,
-      data: parsedRecord as RQAPI.CollectionRecord,
     };
   }
 }

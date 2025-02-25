@@ -3,7 +3,6 @@ import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces"
 import { generateDocumentId, getOwnerId } from "backend/utils";
 import { RQAPI } from "features/apiClient/types";
 import { sanitizeRecord, updateApiRecord } from "backend/apiClient/upsertApiRecord";
-import { EnvironmentVariables } from "backend/environment/types";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -68,9 +67,5 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
 
   async deleteCollections(ids: string[]) {
     return deleteApiRecords(this.meta.uid, ids, this.meta.teamId);
-  }
-
-  async setCollectionVariables(id: string, variables: EnvironmentVariables): Promise<{ success: boolean; data: RQAPI.CollectionRecord | null; message?: string; }> {
-		return this.updateRecord({ data: { variables } }, id) as Promise<{ success: boolean; data: RQAPI.CollectionRecord | null; message?: string; }>;
   }
 }

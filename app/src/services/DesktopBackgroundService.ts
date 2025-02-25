@@ -9,7 +9,6 @@ class TimoutError extends Error {
 export function rpc(params: {
 	namespace: string, method: string, timeout?: number,
 }, ...args: any[]) {
-	console.log('rpc happening', params);
 	const { namespace, method, timeout } = params;
 	return new Promise((resolve, reject) => {
       setTimeout(() => {
