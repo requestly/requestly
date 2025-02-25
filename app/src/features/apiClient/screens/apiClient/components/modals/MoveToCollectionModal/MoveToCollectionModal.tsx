@@ -101,7 +101,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       }
     } catch (error) {
       console.error("Error moving request to collection:", error);
-      toast.error(error.message);
+      toast.error(error.message || "Error moving records to collection");
       trackMoveRequestToCollectionFailed(selectedCollection?.__isNew__ ? "new_collection" : "existing_collection");
     } finally {
       setIsLoading(false);
