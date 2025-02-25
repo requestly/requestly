@@ -47,6 +47,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { toast } from "utils/Toast";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { WorkspaceType } from "types";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -129,6 +130,7 @@ const WorkspaceSelector = () => {
   const dispatch = useDispatch();
   const isWorkspaceTypeLocal = useSelector(getIsWorkspaceLocal);
   const { pathname } = useLocation();
+  const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
 
   const isLimitToPrivateWorkspaceActive = useFeatureIsOn("limit_to_private_workspace");
 
@@ -482,62 +484,65 @@ const WorkspaceSelector = () => {
       {availableTeams === null ? renderLoader() : null}
 
       {/* Shared Workspaces */}
-      <Menu.ItemGroup key="sharedWorkspaces" title="Shared workspaces">
-        {sortedAvailableTeams
-          .filter((team) => team.workspaceType !== WorkspaceType.LOCAL)
-          .map((team) => (
-            <Menu.Item
-              key={team.id}
-              disabled={!!team.archived || isTeamCurrentlyActive(team.id)}
-              icon={
-                <Avatar
-                  size={28}
-                  shape="square"
-                  icon={team.name?.[0]?.toUpperCase() ?? "P"}
-                  className="workspace-avatar"
-                  style={{
-                    backgroundColor: `${getUniqueColorForWorkspace(team.id, team.name)}`,
-                  }}
-                />
-              }
-              className={`workspace-menu-item ${
-                team.id === currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""
-              }`}
-              onClick={() => {
-                confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team));
-                trackWorkspaceDropdownClicked("switch_workspace");
-              }}
-            >
-              <Tooltip
-                placement="right"
-                overlayInnerStyle={{ width: "178px" }}
-                title={team.archived ? "This workspace has been archived." : ""}
+      {sortedAvailableTeams.filter((team) => team.workspaceType !== WorkspaceType.LOCAL).length ? (
+        <Menu.ItemGroup key="sharedWorkspaces" title="Shared workspaces">
+          {sortedAvailableTeams
+            .filter((team) => team.workspaceType !== WorkspaceType.LOCAL)
+            .map((team) => (
+              <Menu.Item
+                key={team.id}
+                disabled={!!team.archived || isTeamCurrentlyActive(team.id)}
+                icon={
+                  <Avatar
+                    size={28}
+                    shape="square"
+                    icon={team.name?.[0]?.toUpperCase() ?? "P"}
+                    className="workspace-avatar"
+                    style={{
+                      backgroundColor: `${getUniqueColorForWorkspace(team.id, team.name)}`,
+                    }}
+                  />
+                }
+                className={`workspace-menu-item ${
+                  team.id === currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""
+                }`}
+                onClick={() => {
+                  confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team));
+                  trackWorkspaceDropdownClicked("switch_workspace");
+                }}
               >
-                <div className="workspace-item-wrapper">
-                  <div
-                    className={`workspace-name-container ${
-                      team.archived || isTeamCurrentlyActive(team.id) ? "archived-workspace-item" : ""
-                    }`}
-                  >
-                    <div className="workspace-name">{team.name}</div>
-                    <div className="text-gray workspace-details">
-                      {team.subscriptionStatus ? `${team.subscriptionStatus} • ` : null}
-                      {team.accessCount} {team.accessCount > 1 ? "members" : "member"}
+                <Tooltip
+                  placement="right"
+                  overlayInnerStyle={{ width: "178px" }}
+                  title={team.archived ? "This workspace has been archived." : ""}
+                >
+                  <div className="workspace-item-wrapper">
+                    <div
+                      className={`workspace-name-container ${
+                        team.archived || isTeamCurrentlyActive(team.id) ? "archived-workspace-item" : ""
+                      }`}
+                    >
+                      <div className="workspace-name">{team.name}</div>
+                      <div className="text-gray workspace-details">
+                        {team.subscriptionStatus ? `${team.subscriptionStatus} • ` : null}
+                        {team.accessCount} {team.accessCount > 1 ? "members" : "member"}
+                      </div>
                     </div>
+                    {team.archived ? (
+                      <Tag color="gold">archived</Tag>
+                    ) : isTeamCurrentlyActive(team.id) ? (
+                      <Tag color="green">current</Tag>
+                    ) : null}
                   </div>
-                  {team.archived ? (
-                    <Tag color="gold">archived</Tag>
-                  ) : isTeamCurrentlyActive(team.id) ? (
-                    <Tag color="green">current</Tag>
-                  ) : null}
-                </div>
-              </Tooltip>
-            </Menu.Item>
-          ))}
-      </Menu.ItemGroup>
+                </Tooltip>
+              </Menu.Item>
+            ))}
+        </Menu.ItemGroup>
+      ) : null}
 
       {/* Local Workspaces */}
-      {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+      {isLocalSyncEnabled &&
+      sortedAvailableTeams.filter((team) => team.workspaceType === WorkspaceType.LOCAL).length ? (
         <Menu.ItemGroup key="localWorkspace" title="Local workspaces">
           {sortedAvailableTeams
             .filter((team) => team.workspaceType === WorkspaceType.LOCAL)
