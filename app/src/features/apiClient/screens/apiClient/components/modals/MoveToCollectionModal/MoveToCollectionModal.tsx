@@ -59,10 +59,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         variables: {},
       },
     };
-    const newCollection = await apiClientRecordsRepository.createRecordWithId(
-      collectionToBeCreated,
-      collectionToBeCreated.id
-    );
+    const newCollection = await apiClientRecordsRepository.createCollection(collectionToBeCreated);
     if (newCollection.success) {
       onSaveRecord(newCollection.data);
       return newCollection.data.id;

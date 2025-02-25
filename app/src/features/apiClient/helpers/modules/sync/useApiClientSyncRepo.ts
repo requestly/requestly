@@ -17,12 +17,7 @@ export const useGetApiClientSyncRepo = () => {
 
   const getRepository: () => ApiClientRepositoryInterface = useCallback(() => {
     if (!user.loggedIn) {
-      // TODO: FIX THIS
-      return {
-        apiClientRecordsRepository: {},
-        environmentVariablesRepository: {},
-      };
-      // throw new Error('Data can not be synced unless you log in!');
+      throw new Error("Data can not be synced unless you log in!");
     }
     if (isWorkspaceLocal && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       return new ApiClientLocalRepository({
