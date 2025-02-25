@@ -46,13 +46,11 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
     setIsDeleting(true);
 
     let result;
-    let recordIds: string[] = [];
+    const recordIds = getAllIdsToDelete();
 
     if (records.length === 1 && isApiCollection(records[0])) {
       result = await apiClientRecordsRepository.deleteCollections([records[0].id]);
-      recordIds = [records[0].id];
     } else {
-      recordIds = getAllIdsToDelete();
       result = await apiClientRecordsRepository.deleteRecords(recordIds);
     }
 
