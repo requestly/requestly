@@ -3,25 +3,25 @@ import { RQSingleLineEditor } from "features/apiClient/screens/environment/compo
 import React from "react";
 import { EnvironmentVariables } from "backend/environment/types";
 import { AuthForm } from "./formStructure/types";
-import { AuthConfig, Authorization } from "../types/AuthConfig";
+import { AuthConfig, AuthConfigMeta, Authorization } from "../types/AuthConfig";
 import { useAuthFormState } from "./hooks/useAuthFormState";
 import { RQAPI } from "features/apiClient/types";
 
-interface AuthorizationFormProps {
+interface AuthorizationFormProps<T extends AuthConfigMeta.AuthWithConfig> {
   defaultAuthValues: RQAPI.Auth;
   formData: AuthForm.FormField[];
-  formType: Authorization.Type;
-  onChangeHandler: (newFormConfig: AuthConfig | null) => void;
+  formType: T;
+  onChangeHandler: (config: AuthConfig<T> | null) => void;
   variables: EnvironmentVariables;
 }
 
-const AuthorizationForm: React.FC<AuthorizationFormProps> = ({
+const AuthorizationForm = <T extends AuthConfigMeta.AuthWithConfig>({
   defaultAuthValues,
   formData,
   formType,
   onChangeHandler,
   variables,
-}) => {
+}: AuthorizationFormProps<T>) => {
   const { formState, handleFormChange } = useAuthFormState(defaultAuthValues, formType, onChangeHandler);
 
   return (

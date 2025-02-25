@@ -5,10 +5,14 @@ import {
   BasicAuthAuthorizationConfig,
   BearerTokenAuthorizationConfig,
   ApiKeyAuthorizationConfig,
+  AuthConfigMeta,
 } from "../../types/AuthConfig";
 import { RQAPI } from "features/apiClient/types";
 
-const createAuthConfig = (formState: Record<string, string>, formType: Authorization.Type): AuthConfig | null => {
+const createAuthConfig = (
+  formState: Record<string, string>,
+  formType: AuthConfigMeta.AuthWithConfig
+): AuthConfig<typeof formType> | null => {
   switch (formType) {
     case Authorization.Type.BASIC_AUTH: {
       const { username, password } = formState;
@@ -22,11 +26,14 @@ const createAuthConfig = (formState: Record<string, string>, formType: Authoriza
       return new ApiKeyAuthorizationConfig(key, value, addTo as Authorization.API_KEY_CONFIG["addTo"]);
     }
     default:
-      return null;
+      throw new Error("Invalid Auth Type");
   }
 };
 
 export const getDefaultFormState = (defaultConfig: RQAPI.Auth): Record<string, string> => {
+  if (Authorization.hasNoConfig(defaultConfig.currentAuthType)) {
+    return {};
+  }
   switch (defaultConfig.currentAuthType) {
     case Authorization.Type.BASIC_AUTH: {
       const { username, password } = defaultConfig.authConfigStore[Authorization.Type.BASIC_AUTH];
@@ -41,14 +48,14 @@ export const getDefaultFormState = (defaultConfig: RQAPI.Auth): Record<string, s
       return { key, value, addTo };
     }
     default:
-      return {};
+      throw new Error("Invalid Auth Type");
   }
 };
 
 export const useAuthFormState = (
   defaultAuth: RQAPI.Auth,
-  formType: Authorization.Type,
-  onChangeHandler: (config: AuthConfig | null) => void
+  formType: AuthConfigMeta.AuthWithConfig,
+  onChangeHandler: (config: AuthConfig<typeof formType> | null) => void
 ) => {
   const defaults = getDefaultFormState(defaultAuth);
   const [formState, setFormState] = useState<Record<string, string>>(defaults ?? {});

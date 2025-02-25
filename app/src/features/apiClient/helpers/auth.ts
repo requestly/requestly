@@ -2,6 +2,7 @@ import { isEmpty, unionBy } from "lodash";
 import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/AuthorizationForm/formStructure/types";
 import { KeyValuePair, RQAPI } from "../types";
 import { Authorization } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { getDefaultAuth } from "backend/apiClient/migrations/auth";
 
 export const processAuthForEntry = (
   entry: RQAPI.Entry,
@@ -16,17 +17,7 @@ export const processAuthForEntry = (
   const currentAuth = entryCopy.auth;
   let finalAuth: RQAPI.Auth | null = currentAuth;
   if (isEmpty(currentAuth)) {
-    if (entryDetails.parentId) {
-      finalAuth = {
-        currentAuthType: Authorization.Type.INHERIT,
-        authConfigStore: {},
-      };
-    } else {
-      finalAuth = {
-        currentAuthType: Authorization.Type.NO_AUTH,
-        authConfigStore: {},
-      };
-    }
+    finalAuth = getDefaultAuth(entryDetails.parentId === null);
   }
 
   if (finalAuth.currentAuthType === Authorization.Type.INHERIT) {

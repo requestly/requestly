@@ -1,11 +1,6 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { TestResult } from "./helpers/modules/scriptsV2/worker/script-internals/types";
-import {
-  ApiKeyAuthorizationConfig,
-  Authorization,
-  BasicAuthAuthorizationConfig,
-  BearerTokenAuthorizationConfig,
-} from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { Authorization } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 
 export enum RequestMethod {
   GET = "GET",
@@ -75,11 +70,7 @@ export namespace RQAPI {
 
   export type Auth = {
     currentAuthType: Authorization.Type;
-    authConfigStore: {
-      [Authorization.Type.API_KEY]?: ApiKeyAuthorizationConfig["config"];
-      [Authorization.Type.BEARER_TOKEN]?: BearerTokenAuthorizationConfig["config"];
-      [Authorization.Type.BASIC_AUTH]?: BasicAuthAuthorizationConfig["config"];
-    };
+    authConfigStore: Authorization.Store;
   };
   export interface Request {
     url: string;
@@ -108,7 +99,7 @@ export namespace RQAPI {
       preRequest: string;
       postResponse: string;
     };
-    auth?: Auth;
+    auth: Auth;
   }
 
   export enum ExecutionStatus {
@@ -152,7 +143,7 @@ export namespace RQAPI {
       postResponse: string;
     };
     variables: Omit<EnvironmentVariables, "localValue">;
-    auth?: Auth;
+    auth: Auth;
   }
 
   interface RecordMetadata {

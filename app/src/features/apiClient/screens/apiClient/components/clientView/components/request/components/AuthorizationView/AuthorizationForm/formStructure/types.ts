@@ -1,4 +1,4 @@
-import { Authorization } from "../../types/AuthConfig";
+import { AuthConfigMeta, Authorization } from "../../types/AuthConfig";
 
 export const AUTH_ENTRY_IDENTIFIER = "auth";
 
@@ -47,18 +47,24 @@ export namespace AuthForm {
     }
   }
 
+  // export type FormStructure = Record<
+  //   Exclude<Authorization.Type, [Authorization.Type.NO_AUTH, Authorization.Type.INHERIT]>,
+  //   {
+  //     formData: FormField[];
+  //     description: Description.Data;
+  //   }
+  // > & {
+  //   [Authorization.Type.INHERIT]: {
+  //     description: Description.Data;
+  //   };
+  //   [Authorization.Type.NO_AUTH]: {
+  //     description: Description.Data;
+  //   };
+  // };
+
   export type FormStructure = Record<
-    Exclude<Authorization.Type, [Authorization.Type.NO_AUTH, Authorization.Type.INHERIT]>,
-    {
-      formData: FormField[];
-      description: Description.Data;
-    }
-  > & {
-    [Authorization.Type.INHERIT]: {
-      description: Description.Data;
-    };
-    [Authorization.Type.NO_AUTH]: {
-      description: Description.Data;
-    };
-  };
+    AuthConfigMeta.AuthWithConfig,
+    { formData: FormField[]; description: Description.Data }
+  > &
+    Record<AuthConfigMeta.NoConfigAuth, { description: Description.Data }>;
 }
