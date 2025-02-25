@@ -424,67 +424,6 @@ export async function googleSignIn(callback, MODE, source) {
     });
 }
 
-export async function appleSignIn(source, callback) {
-  const provider = new OAuthProvider("apple.com");
-  provider.addScope("email");
-  provider.addScope("name");
-  const auth = getAuth(firebaseApp);
-  return signInWithPopup(auth, provider)
-    .then((result) => {
-      console.log("!!!debug", "result appleSignin", {
-        result,
-        add: getAdditionalUserInfo(result),
-      });
-      let is_new_user = getAdditionalUserInfo(result).isNewUser || false;
-      let uid = result?.user?.uid || null;
-      let email = result?.user?.email || null;
-      if (is_new_user) {
-        trackSignUpAttemptedEvent({
-          auth_provider: AUTH_PROVIDERS.GMAIL,
-          source,
-        });
-        trackSignupSuccessEvent({
-          auth_provider: AUTH_PROVIDERS.GMAIL,
-          email,
-          uid,
-          email_type: getEmailType(email),
-          domain: email.split("@")[1],
-          source,
-        });
-        setSignupDate(uid);
-        setEmailVerified(uid, true);
-      } else {
-        trackLoginAttemptedEvent({
-          auth_provider: AUTH_PROVIDERS.GMAIL,
-          source,
-        });
-        trackLoginSuccessEvent({
-          auth_provider: AUTH_PROVIDERS.GMAIL,
-          uid,
-          email,
-          email_type: getEmailType(email),
-          domain: email.split("@")[1],
-          source,
-        });
-      }
-
-      const authData = getAuthData(result.user);
-      const database = getDatabase();
-      update(ref(database, getUserProfilePath(authData.uid)), authData);
-
-      callback && callback.call(null, true);
-
-      return { ...authData, isNewUser: is_new_user };
-    })
-    .catch((err) => {
-      trackLoginFailedEvent({
-        auth_provider: AUTH_PROVIDERS.GMAIL,
-        error_message: err.message,
-        source,
-      });
-    });
-}
-
 export const googleSignInDesktopApp = (callback, MODE, source) => {
   return new Promise((resolve, reject) => {
     const id = uuidv4();
@@ -508,6 +447,63 @@ export const googleSignInDesktopApp = (callback, MODE, source) => {
     window.open(getDesktopSignInAuthPath(id, source), "_blank");
   });
 };
+
+export async function appleSignIn(source, callback) {
+  const provider = new OAuthProvider("apple.com");
+  provider.addScope("email");
+  provider.addScope("name");
+  const auth = getAuth(firebaseApp);
+  return signInWithPopup(auth, provider)
+    .then((result) => {
+      let is_new_user = getAdditionalUserInfo(result).isNewUser || false;
+      let uid = result?.user?.uid || null;
+      let email = result?.user?.email || null;
+      if (is_new_user) {
+        trackSignUpAttemptedEvent({
+          auth_provider: AUTH_PROVIDERS.APPLE,
+          source,
+        });
+        trackSignupSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.APPLE,
+          email,
+          uid,
+          email_type: getEmailType(email),
+          domain: email.split("@")[1],
+          source,
+        });
+        setSignupDate(uid);
+        setEmailVerified(uid, true);
+      } else {
+        trackLoginAttemptedEvent({
+          auth_provider: AUTH_PROVIDERS.APPLE,
+          source,
+        });
+        trackLoginSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.APPLE,
+          uid,
+          email,
+          email_type: getEmailType(email),
+          domain: email.split("@")[1],
+          source,
+        });
+      }
+
+      const authData = getAuthData(result.user);
+      const database = getDatabase();
+      update(ref(database, getUserProfilePath(authData.uid)), authData);
+
+      callback && callback.call(null, true);
+
+      return { ...authData, isNewUser: is_new_user };
+    })
+    .catch((err) => {
+      trackLoginFailedEvent({
+        auth_provider: AUTH_PROVIDERS.APPLE,
+        error_message: err.message,
+        source,
+      });
+    });
+}
 
 export const signInWithEmailLink = async (email, callback) => {
   try {
