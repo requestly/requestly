@@ -10,7 +10,7 @@ export const PRODUCT_FEATURES = [
   },
   {
     key: PRICING.PRODUCTS.API_CLIENT,
-    title: "API client only",
+    title: "API client",
     description: "Open-source, feature-rich tool for API testing and contract creation.",
     icon: "/assets/media/pricing/api-client.svg",
     activeIcon: "/assets/media/pricing/active-product-tick.svg",
