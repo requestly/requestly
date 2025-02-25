@@ -11,7 +11,7 @@ import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constan
 interface Props {
   authOptions?: RQAPI.Auth;
   updateAuthData: (authOptions: RQAPI.Auth) => any;
-  rootLevelRecord: Boolean;
+  rootLevelRecord: boolean;
 }
 
 /**

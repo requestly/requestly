@@ -92,16 +92,20 @@ function extractAuthHeadersAndParams(auth: RQAPI.Auth) {
     case Authorization.Type.NO_AUTH:
       break;
     case Authorization.Type.BASIC_AUTH: {
+      if (!auth.authConfigStore) break; // invalid auth config gets stored as null for now
       const { username, password } = auth.authConfigStore[Authorization.Type.BASIC_AUTH];
       addEntryToResults(resultingHeaders, "Authorization", `Basic ${btoa(`${username || ""}:${password || ""}`)}`);
       break;
     }
     case Authorization.Type.BEARER_TOKEN: {
+      console.log("DBG-1: extractAuthHeadersAndParams: auth.authConfigStore: ", auth.authConfigStore);
+      if (!auth.authConfigStore) break; // invalid auth config gets stored as null for now
       const { bearer } = auth.authConfigStore[Authorization.Type.BEARER_TOKEN];
       addEntryToResults(resultingHeaders, "Authorization", `Bearer ${bearer}`);
       break;
     }
     case Authorization.Type.API_KEY: {
+      if (!auth.authConfigStore) break; // invalid auth config gets stored as null for now
       const { key, value, addTo } = auth.authConfigStore[Authorization.Type.API_KEY];
       addEntryToResults(addTo === "QUERY" ? resultingQueryParams : resultingHeaders, key || "", value || "");
       break;

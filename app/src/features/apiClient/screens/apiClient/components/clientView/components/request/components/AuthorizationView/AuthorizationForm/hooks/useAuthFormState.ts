@@ -30,21 +30,30 @@ const createAuthConfig = (
   }
 };
 
-export const getDefaultFormState = (defaultConfig: RQAPI.Auth): Record<string, string> => {
-  if (Authorization.hasNoConfig(defaultConfig.currentAuthType)) {
+export const getDefaultFormState = (defaultAuth?: RQAPI.Auth): Record<string, string> => {
+  if (!defaultAuth.currentAuthType) {
+    // no default config passed
     return {};
   }
-  switch (defaultConfig.currentAuthType) {
+  if (Authorization.hasNoConfig(defaultAuth.currentAuthType)) {
+    return {};
+  }
+
+  if (!defaultAuth.authConfigStore || !defaultAuth.authConfigStore[defaultAuth.currentAuthType]) {
+    // happens when auth type has changed but there is no existing config values to prefill the form with
+    return {};
+  }
+  switch (defaultAuth.currentAuthType) {
     case Authorization.Type.BASIC_AUTH: {
-      const { username, password } = defaultConfig.authConfigStore[Authorization.Type.BASIC_AUTH];
+      const { username, password } = defaultAuth.authConfigStore[Authorization.Type.BASIC_AUTH];
       return { username, password };
     }
     case Authorization.Type.BEARER_TOKEN: {
-      const { bearer } = defaultConfig.authConfigStore[Authorization.Type.BEARER_TOKEN];
+      const { bearer } = defaultAuth.authConfigStore[Authorization.Type.BEARER_TOKEN];
       return { bearer };
     }
     case Authorization.Type.API_KEY: {
-      const { key, value, addTo } = defaultConfig.authConfigStore[Authorization.Type.API_KEY];
+      const { key, value, addTo } = defaultAuth.authConfigStore[Authorization.Type.API_KEY];
       return { key, value, addTo };
     }
     default:
@@ -53,9 +62,9 @@ export const getDefaultFormState = (defaultConfig: RQAPI.Auth): Record<string, s
 };
 
 export const useAuthFormState = (
-  defaultAuth: RQAPI.Auth,
   formType: AuthConfigMeta.AuthWithConfig,
-  onChangeHandler: (config: AuthConfig<typeof formType> | null) => void
+  onChangeHandler: (config: AuthConfig<typeof formType> | null) => void,
+  defaultAuth?: RQAPI.Auth
 ) => {
   const defaults = getDefaultFormState(defaultAuth);
   const [formState, setFormState] = useState<Record<string, string>>(defaults ?? {});

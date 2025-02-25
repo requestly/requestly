@@ -43,6 +43,9 @@ const AuthorizationView: React.FC<Props> = ({
 
   const onFormConfigChange = useCallback(
     <T extends AuthConfigMeta.AuthWithConfig>(authConfig: AuthConfig<T> | null) => {
+      if (!authConfig) {
+        return;
+      }
       setResolvedAuthConfigStore((prevOptions) => {
         const newConfigStore = { ...prevOptions };
         newConfigStore[authConfig.type] = authConfig.config;
