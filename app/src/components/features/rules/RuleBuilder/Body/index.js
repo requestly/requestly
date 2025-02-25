@@ -10,7 +10,6 @@ import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
 import RuleInfoBanner from "./RuleInfoBanner";
 import { useCurrentWorkspaceUserRole } from "hooks";
-import { TeamRole } from "types";
 import "./RuleBuilderBody.css";
 
 const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRuleConfig }) => {
@@ -20,8 +19,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
   const ruleErrors = useSelector(getCurrentlySelectedRuleErrors);
   const isSharedListView = mode === "shared-list-rule-view";
   const isSampleRule = currentlySelectedRuleData?.isSample;
-  const { role } = useCurrentWorkspaceUserRole();
-  const isReadRole = role === TeamRole.read;
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const getEventObject = (name, value) => ({ target: { name, value } });
 
