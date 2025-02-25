@@ -26,6 +26,7 @@ import useFetchSlackInviteVisibility from "components/misc/SupportPanel/useSlack
 import { SidebarToggleButton } from "componentsV2/SecondarySidebar/components/SidebarToggleButton/SidebarToggleButton";
 import APP_CONSTANTS from "config/constants";
 import { RQBadge } from "lib/design-system/components/RQBadge";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import "./PrimarySidebar.css";
 
 export const PrimarySidebar: React.FC = () => {
@@ -37,6 +38,7 @@ export const PrimarySidebar: React.FC = () => {
   const isIncentivizationEnabled = useIsIncentivizationEnabled();
   const isSlackConnectFeatureEnabled = useFeatureIsOn("slack_connect");
   const isSlackInviteVisible = useFetchSlackInviteVisibility();
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
@@ -156,7 +158,7 @@ export const PrimarySidebar: React.FC = () => {
       <div className="primary-sidebar-bottom-btns">
         {isIncentivizationEnabled ? <CreditsButton /> : null}
         {isSlackConnectFeatureEnabled && isSlackInviteVisible && <JoinSlackButton />}
-        <InviteButton />
+        {!isLocalSyncEnabled && <InviteButton />}
       </div>
     </div>
   );

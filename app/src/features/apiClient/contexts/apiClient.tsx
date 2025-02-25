@@ -162,7 +162,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           notification.error({
             message: "Could not fetch records!",
             description: result.message,
-            placement: "topRight",
+            placement: "bottomRight",
           });
           setApiClientRecords([]);
           return;
@@ -174,7 +174,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         notification.error({
           message: "Could not fetch records!",
           description: error.message,
-          placement: "topRight",
+          placement: "bottomRight",
         });
         setApiClientRecords([]);
         Logger.error("Error loading api records!", error);

@@ -20,12 +20,12 @@ import { trackErrorInSavingDNR } from "modules/analytics/events/common/rules";
 import { useSelector } from "react-redux";
 import { StorageService } from "init";
 import { getAppMode } from "store/selectors";
-import { getIsWorkspaceLocal } from "store/features/teams/selectors";
 import { LocalFirstComingSoon } from "componentsV2/Nudge/views/LocalFirstComingSoon/LocalFirstComingSoon";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 const RulesFeatureContainer = () => {
   const appMode = useSelector(getAppMode);
-  const isWorkspaceLocal = useSelector(getIsWorkspaceLocal);
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener("ruleSaveError", (message: any) => {
@@ -78,8 +78,7 @@ const RulesFeatureContainer = () => {
     });
   }, [appMode]);
 
-  if (isWorkspaceLocal) {
-    // TODO: USE NUDGE COMPONENT
+  if (isLocalSyncEnabled) {
     return <LocalFirstComingSoon featureName="HTTP Rules" />;
   }
 
