@@ -10,6 +10,8 @@ import PATHS from "config/constants/sub/paths";
 import "./collectionView.scss";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
+import { LocalWorkspaceTooltip } from "../LocalWorkspaceTooltip/LocalWorkspaceTooltip";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -19,9 +21,15 @@ const TAB_KEYS = {
 
 export const CollectionView = () => {
   const { collectionId } = useParams();
-  const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords, apiClientRecordsRepository } = useApiClientContext();
+  const {
+    apiClientRecords,
+    onSaveRecord,
+    isLoadingApiClientRecords,
+    apiClientRecordsRepository,
+  } = useApiClientContext();
   const { replaceTab } = useTabsLayoutContext();
   const location = useLocation();
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const collection = useMemo(() => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
@@ -55,13 +63,15 @@ export const CollectionView = () => {
         children: <CollectionOverview collection={collection} />,
       },
       {
-        label: "Variables",
+        label: <LocalWorkspaceTooltip featureName="Collection variables">Variables</LocalWorkspaceTooltip>,
         key: TAB_KEYS.VARIABLES,
+        disabled: isLocalSyncEnabled,
         children: <CollectionsVariablesView collection={collection} />,
       },
       {
-        label: "Authorization",
+        label: <LocalWorkspaceTooltip featureName="Authorization headers">Authorization</LocalWorkspaceTooltip>,
         key: TAB_KEYS.AUTHORIZATION,
+        disabled: isLocalSyncEnabled,
         children: (
           <CollectionAuthorizationView
             authOptions={collection?.data?.auth}
@@ -71,7 +81,7 @@ export const CollectionView = () => {
         ),
       },
     ];
-  }, [collection, updateCollectionAuthData]);
+  }, [collection, updateCollectionAuthData, isLocalSyncEnabled]);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {

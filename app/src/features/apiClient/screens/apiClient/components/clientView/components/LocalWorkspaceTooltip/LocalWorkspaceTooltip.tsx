@@ -12,15 +12,12 @@ interface Props {
 export const LocalWorkspaceTooltip: React.FC<Props> = ({ featureName, children, placement = "right" }) => {
   const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
+  if (!isLocalSyncEnabled) return children;
   return (
     <Tooltip
       color="#000"
       placement={placement}
-      title={
-        isLocalSyncEnabled
-          ? `Local workspaces currently do not support ${featureName}. Use your Private or a Team Workspace instead.`
-          : ""
-      }
+      title={`Local workspaces currently do not support ${featureName}. Use your Private or a Team Workspace instead.`}
     >
       {children}
     </Tooltip>
