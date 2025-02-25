@@ -22,7 +22,8 @@ import { trackSampleRuleTested } from "features/rules/analytics";
 import { RecordStatus } from "@requestly/shared/types/entities/rules";
 import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
 import { useCurrentWorkspaceUserRole } from "hooks";
-import "./RuleEditor.css";
+import { ReadOnlyModeAlert } from "./components/ReadOnlyModeAlert/ReadOnlyModeAlert";
+import "./RuleEditor.scss";
 
 const RuleEditor = (props) => {
   const location = useLocation();
@@ -36,7 +37,7 @@ const RuleEditor = (props) => {
   const [showEnableRuleTooltip, setShowEnableRuleTooltip] = useState(false);
   const tryThisRuleTooltipTimerRef = useRef(null);
   const [isSampleRule, setIsSampleRule] = useState(false);
-  const { role } = useCurrentWorkspaceUserRole();
+  const { role, isReadRole } = useCurrentWorkspaceUserRole();
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
@@ -121,7 +122,9 @@ const RuleEditor = (props) => {
 
   const ruleEditor = useMemo(() => {
     return (
-      <Col key={MODE + RULE_TYPE_TO_CREATE} className="overflow-hidden h-full">
+      <Col key={MODE + RULE_TYPE_TO_CREATE} className="overflow-hidden h-full rule-editor-container">
+        {isReadRole ? <ReadOnlyModeAlert /> : null}
+
         {MODE !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
           <EditorHeader
             role={role}
@@ -154,7 +157,16 @@ const RuleEditor = (props) => {
         )}
       </Col>
     );
-  }, [role, MODE, RULE_TYPE_TO_CREATE, appMode, showEnableRuleTooltip, handleSeeLiveRuleDemoClick, isSampleRule]);
+  }, [
+    role,
+    isReadRole,
+    MODE,
+    RULE_TYPE_TO_CREATE,
+    appMode,
+    showEnableRuleTooltip,
+    handleSeeLiveRuleDemoClick,
+    isSampleRule,
+  ]);
 
   switch (appMode) {
     case GLOBAL_CONSTANTS.APP_MODES.EXTENSION:
