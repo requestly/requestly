@@ -3,11 +3,11 @@ import { toast } from "utils/Toast";
 import { RQModal } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import { RQAPI } from "features/apiClient/types";
-import { isApiCollection } from "../../../utils";
+import { isApiCollection, isApiRequest } from "../../../utils";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { trackCollectionDeleted } from "modules/analytics/events/features/apiClient";
 import "./deleteApiRecordModal.scss";
-import { isEmpty } from "lodash";
+import { isEmpty, partition } from "lodash";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
@@ -33,7 +33,6 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
     while (stack.length) {
       const record = stack.pop()!;
       idsToBeDeleted.push(record.id);
-
       if (isApiCollection(record) && record.data.children) {
         stack.push(...record.data.children);
       }
@@ -43,19 +42,27 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
   };
 
   const handleDeleteApiRecord = async () => {
-    setIsDeleting(true);
-
-    let result;
     const recordIds = getAllIdsToDelete();
-
-    if (records.length === 1 && isApiCollection(records[0])) {
-      result = await apiClientRecordsRepository.deleteCollections([records[0].id]);
-    } else {
-      result = await apiClientRecordsRepository.deleteRecords(recordIds);
+    if (!recordIds.length) {
+      toast.error("Please select atleast one entity you want to delete.");
+      return;
     }
 
-    if (result.success) {
-      onDeleteRecords(recordIds);
+    setIsDeleting(true);
+
+    const [apiRecords, collectionRecords] = partition(records, isApiRequest);
+    const apiRecordIds = apiRecords.map((record) => record.id);
+    const collectionRecordIds = collectionRecords.map((record) => record.id);
+
+    // First delete records
+    const recordDeletionResult = await apiClientRecordsRepository.deleteRecords(apiRecordIds);
+
+    // Then delete collections
+    const collectionsDeletionResult = await apiClientRecordsRepository.deleteCollections(collectionRecordIds); // Combine results
+
+    // Check if both deletions were successful
+    if (recordDeletionResult.success && collectionsDeletionResult.success) {
+      onDeleteRecords([...apiRecordIds, ...collectionRecordIds]);
       trackCollectionDeleted();
       toast.success(
         records.length === 1

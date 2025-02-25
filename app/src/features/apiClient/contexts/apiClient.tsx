@@ -56,7 +56,7 @@ interface ApiClientContextInterface {
   apiClientWorkloadManager: APIClientWorkloadManager;
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<any, any>>;
 
-	forceRefreshApiClientRecords: (id: string) => Promise<boolean>;
+  forceRefreshApiClientRecords: (id: string) => Promise<boolean>;
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
@@ -93,7 +93,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   apiClientWorkloadManager: new APIClientWorkloadManager(),
   apiClientRecordsRepository: null,
 
-	forceRefreshApiClientRecords: async () => false
+  forceRefreshApiClientRecords: async () => false,
 });
 
 interface ApiClientProviderProps {
@@ -116,7 +116,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
 
-  const { openTab, deleteTabs, updateTab, replaceTab, updateAddTabBtnCallback, closeTab } = useTabsLayoutContext();
+  const { openTab, deleteTabs, updateTab, replaceTab, updateAddTabBtnCallback } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
 
   const { apiClientRecordsRepository } = useGetApiClientSyncRepo();
@@ -247,7 +247,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         });
         console.log("called replace tab 1", recordId);
       } else {
-				console.log('calling on new');
+        console.log("calling on new");
         onNewRecord(apiClientRecord);
 
         if (onSaveTabAction === "replace") {
@@ -361,14 +361,14 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     [openTab, openDraftRequest, addNewEnvironment, teamId, uid, onSaveRecord, apiClientRecordsRepository]
   );
 
-	const forceRefreshApiClientRecords = useCallback(async () => {
-		const recordsToRefresh = await apiClientRecordsRepository.getRecordsForForceRefresh();
-		if (!recordsToRefresh || !recordsToRefresh.success) {
-			return false;
-		}
-		setApiClientRecords(()=> [...recordsToRefresh.data]);
-		return true;
-	}, [apiClientRecordsRepository]);
+  const forceRefreshApiClientRecords = useCallback(async () => {
+    const recordsToRefresh = await apiClientRecordsRepository.getRecordsForForceRefresh();
+    if (!recordsToRefresh || !recordsToRefresh.success) {
+      return false;
+    }
+    setApiClientRecords(() => [...recordsToRefresh.data]);
+    return true;
+  }, [apiClientRecordsRepository]);
 
   const workloadManager = useMemo(() => new APIClientWorkloadManager(), []);
 
@@ -404,7 +404,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     onNewClick,
     apiClientWorkloadManager: workloadManager,
     apiClientRecordsRepository,
-    forceRefreshApiClientRecords
+    forceRefreshApiClientRecords,
   };
 
   return <ApiClientContext.Provider value={value}>{children}</ApiClientContext.Provider>;
