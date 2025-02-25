@@ -12,6 +12,7 @@ import { CollectionsVariablesView } from "./components/CollectionsVariablesView/
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 import { LocalWorkspaceTooltip } from "../LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { toast } from "utils/Toast";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -26,8 +27,9 @@ export const CollectionView = () => {
     onSaveRecord,
     isLoadingApiClientRecords,
     apiClientRecordsRepository,
+    forceRefreshApiClientRecords,
   } = useApiClientContext();
-  const { replaceTab } = useTabsLayoutContext();
+  const { replaceTab, closeTab } = useTabsLayoutContext();
   const location = useLocation();
   const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
@@ -86,16 +88,28 @@ export const CollectionView = () => {
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
       const record = { ...collection, name };
-      return apiClientRecordsRepository.renameCollection(record.id, name).then((result) => {
-        onSaveRecord(result.data);
-        replaceTab(result.data.id, {
+      return apiClientRecordsRepository.renameCollection(record.id, name).then(async (result) => {
+				if (!result.success) {
+					toast.error(result.message || "Could not rename collection!");
+					return;
+				}
+
+				onSaveRecord(result.data);
+
+				const wasForceRefreshed = await forceRefreshApiClientRecords();
+	      if (wasForceRefreshed) {
+	        closeTab(record.id);
+					return;
+	      }
+
+				replaceTab(result.data.id, {
           id: result.data.id,
           title: result.data.name,
           url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(result.data.id)}`,
         });
       });
     },
-    [collection, onSaveRecord, replaceTab, apiClientRecordsRepository]
+    [collection, apiClientRecordsRepository, onSaveRecord, forceRefreshApiClientRecords, replaceTab, closeTab]
   );
 
   if (isLoadingApiClientRecords) {
