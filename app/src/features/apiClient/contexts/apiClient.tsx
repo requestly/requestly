@@ -21,6 +21,8 @@ import { useSearchParams } from "react-router-dom";
 import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
 import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
 import { useGetApiClientSyncRepo } from "../helpers/modules/sync/useApiClientSyncRepo";
+import { notification } from "antd";
+import { toast } from "utils/Toast";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -56,7 +58,7 @@ interface ApiClientContextInterface {
   apiClientWorkloadManager: APIClientWorkloadManager;
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<any, any>>;
 
-  forceRefreshApiClientRecords: (id: string) => Promise<boolean>;
+  forceRefreshApiClientRecords: () => Promise<boolean>;
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
@@ -156,12 +158,25 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     apiClientRecordsRepository
       .getAllRecords()
       .then((result) => {
-        setApiClientRecords(result.data);
-        // show notification here if success is false
+        if (!result.success) {
+          notification.error({
+            message: "Could not fetch records!",
+            description: result.message,
+            placement: "topRight",
+          });
+          setApiClientRecords([]);
+          return;
+        } else {
+          setApiClientRecords(result.data);
+        }
       })
       .catch((error) => {
+        notification.error({
+          message: "Could not fetch records!",
+          description: error.message,
+          placement: "topRight",
+        });
         setApiClientRecords([]);
-        // show notification here
         Logger.error("Error loading api records!", error);
       })
       .finally(() => {
@@ -330,9 +345,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
               setIsRecordBeingCreated(null);
               if (result.success) {
                 onSaveRecord(result.data);
+              } else {
+                toast.error(result.message || "Could not create collection.", 5);
               }
             })
             .catch((error) => {
+              toast.error(error.message || "Could not create collection.", 5);
               console.error("Error adding new collection", error);
             });
         }

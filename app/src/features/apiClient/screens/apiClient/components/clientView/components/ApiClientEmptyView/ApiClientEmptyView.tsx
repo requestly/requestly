@@ -15,7 +15,7 @@ import "./apiClientEmptyView.scss";
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
 
-	const { apiClientRecords, onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
   const team = useSelector(getCurrentlyActiveWorkspace);
@@ -42,11 +42,15 @@ export const ApiClientEmptyView = () => {
     setIsRecordCreating(recordType);
     createBlankApiRecord(user?.details?.profile?.uid, team?.id, recordType, "", apiClientRecordsRepository)
       .then((result) => {
-        onSaveRecord(result.data);
+        if (result.success) {
+          onSaveRecord(result.data);
+        } else {
+          toast.error(result.message || "Could not create a collection.");
+        }
       })
       .catch((error) => {
         console.error("Error creating record", error);
-        toast.error("Something went wrong, please try again or contact support!");
+        toast.error(error.message || "Could not create a collection.");
       })
       .finally(() => {
         setIsRecordCreating(null);
