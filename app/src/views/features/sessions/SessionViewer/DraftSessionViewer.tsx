@@ -295,7 +295,6 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
               loading={isSessionSaving}
               onClick={() => {
                 handleSaveDraftSession();
-                // @ts-ignore
                 globalActions.updateProductTourCompleted({
                   tour: TOUR_TYPES.MISCELLANEOUS,
                   subTour: "firstDraftSession",
@@ -312,7 +311,6 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
               onClick={() => {
                 setIsSavePopupVisible((prev) => !prev);
                 dispatch(
-                  // @ts-ignore
                   globalActions.updateProductTourCompleted({
                     tour: TOUR_TYPES.MISCELLANEOUS,
                     subTour: "firstDraftSession",
