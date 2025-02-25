@@ -1,6 +1,11 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { TestResult } from "./helpers/modules/scriptsV2/worker/script-internals/types";
-import { Authorization } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import {
+  ApiKeyAuthorizationConfig,
+  Authorization,
+  BasicAuthAuthorizationConfig,
+  BearerTokenAuthorizationConfig,
+} from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 
 export enum RequestMethod {
   GET = "GET",
@@ -70,7 +75,11 @@ export namespace RQAPI {
 
   export type Auth = {
     currentAuthType: Authorization.Type;
-    authConfigStore: Authorization.Store;
+    authConfigStore: {
+      [Authorization.Type.API_KEY]?: ApiKeyAuthorizationConfig["config"];
+      [Authorization.Type.BEARER_TOKEN]?: BearerTokenAuthorizationConfig["config"];
+      [Authorization.Type.BASIC_AUTH]?: BasicAuthAuthorizationConfig["config"];
+    };
   };
   export interface Request {
     url: string;

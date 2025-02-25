@@ -30,10 +30,6 @@ export namespace Authorization {
   export const hasNoConfig = (type: Type): type is AuthConfigMeta.NoConfigAuth => {
     return [Type.NO_AUTH, Type.INHERIT].includes(type);
   };
-
-  export type Store = {
-    [K in AuthConfigMeta.AuthWithConfig]?: AuthConfigMeta.TypeToConfig[K];
-  };
 }
 
 export namespace AuthConfigMeta {
@@ -58,7 +54,7 @@ export namespace AuthConfigMeta {
 
 export abstract class AuthConfig<T extends AuthConfigMeta.AuthWithConfig> {
   abstract validate(): boolean;
-  type: T;
+  abstract get type(): T;
   abstract get config(): AuthConfigMeta.TypeToConfig[T] | null;
 }
 
@@ -66,8 +62,6 @@ export class ApiKeyAuthorizationConfig implements AuthConfig<Authorization.Type.
   key: string;
   value: string;
   addTo: Authorization.API_KEY_CONFIG["addTo"];
-
-  type: Authorization.Type.API_KEY = Authorization.Type.API_KEY;
 
   constructor(key: string, value: string, addTo: Authorization.API_KEY_CONFIG["addTo"] = "HEADER") {
     this.key = key;
@@ -77,6 +71,10 @@ export class ApiKeyAuthorizationConfig implements AuthConfig<Authorization.Type.
 
   validate(): boolean {
     return this.key !== "" && this.value !== "";
+  }
+
+  get type(): Authorization.Type.API_KEY {
+    return Authorization.Type.API_KEY;
   }
 
   get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.API_KEY] | null {
@@ -95,13 +93,16 @@ export class ApiKeyAuthorizationConfig implements AuthConfig<Authorization.Type.
 export class BearerTokenAuthorizationConfig implements AuthConfig<Authorization.Type.BEARER_TOKEN> {
   bearer: string;
 
-  type: Authorization.Type.BEARER_TOKEN;
   constructor(bearer: string) {
     this.bearer = bearer;
   }
 
   validate(): boolean {
     return this.bearer !== "";
+  }
+
+  get type(): Authorization.Type.BEARER_TOKEN {
+    return Authorization.Type.BEARER_TOKEN;
   }
 
   get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.BEARER_TOKEN] | null {
@@ -119,7 +120,6 @@ export class BasicAuthAuthorizationConfig implements AuthConfig<Authorization.Ty
   username: string;
   password: string;
 
-  type: Authorization.Type.BASIC_AUTH;
   constructor(username: string, password: string) {
     this.username = username;
     this.password = password;
@@ -127,6 +127,10 @@ export class BasicAuthAuthorizationConfig implements AuthConfig<Authorization.Ty
 
   validate(): boolean {
     return this.username !== "" && this.password !== "";
+  }
+
+  get type(): Authorization.Type.BASIC_AUTH {
+    return Authorization.Type.BASIC_AUTH;
   }
 
   get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.BASIC_AUTH] | null {

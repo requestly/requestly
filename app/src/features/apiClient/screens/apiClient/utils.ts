@@ -8,6 +8,7 @@ import { upsertApiRecord } from "backend/apiClient";
 import { forEach, isEmpty, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
+import { getDefaultAuth } from "backend/apiClient/migrations/auth";
 
 export const makeRequest = async (
   appMode: string,
@@ -57,6 +58,7 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
       contentType: RequestContentType.RAW,
       ...(request || {}),
     },
+    auth: getDefaultAuth(false),
     response: null,
   };
 };
