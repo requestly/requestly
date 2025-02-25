@@ -1,4 +1,4 @@
-import { EnvironmentData, EnvironmentMap, VariableScope } from "backend/environment/types";
+import { EnvironmentData, EnvironmentMap, EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
@@ -25,6 +25,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   updateRecord(record: Partial<Omit<RQAPI.Record, "id">>, id: string): RQAPI.RecordPromise;
   deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }>;
   deleteCollections(ids: string[]): Promise<{ success: boolean; data: unknown; message?: string }>;
+  setCollectionVariables(id: string, variables: EnvironmentVariables): Promise<{ success: boolean; data: RQAPI.CollectionRecord | null; message?: string }>;
 
   getCollection(recordId: string): RQAPI.RecordPromise;
   renameCollection(id: string, newName: string): RQAPI.RecordPromise;
