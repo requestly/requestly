@@ -21,6 +21,7 @@ import { useSearchParams } from "react-router-dom";
 import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
 import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
 import { useGetApiClientSyncRepo } from "../helpers/modules/sync/useApiClientSyncRepo";
+import { notification } from "antd";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -156,12 +157,25 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     apiClientRecordsRepository
       .getAllRecords()
       .then((result) => {
-        setApiClientRecords(result.data);
-        // show notification here if success is false
+        if (!result.success) {
+          notification.error({
+            message: "Could not fetch records!",
+            description: result.message,
+            placement: "topRight",
+          });
+          setApiClientRecords([]);
+          return;
+        } else {
+          setApiClientRecords(result.data);
+        }
       })
       .catch((error) => {
+        notification.error({
+          message: "Could not fetch records!",
+          description: error.message,
+          placement: "topRight",
+        });
         setApiClientRecords([]);
-        // show notification here
         Logger.error("Error loading api records!", error);
       })
       .finally(() => {

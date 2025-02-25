@@ -384,7 +384,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
       toast.success("Request name updated!");
     } else {
-      toast.error("Something went wrong!");
+      toast.error(result?.message || `Could not rename Request.`);
     }
   };
 
@@ -414,7 +414,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       trackRequestSaved("api_client_view");
       toast.success("Request saved!");
     } else {
-      toast.error("Something went wrong!");
+      toast.error(result?.message || `Could not save Request.`);
     }
 
     setIsRequestSaving(false);

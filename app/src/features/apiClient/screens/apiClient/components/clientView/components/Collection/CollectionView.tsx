@@ -10,6 +10,7 @@ import PATHS from "config/constants/sub/paths";
 import "./collectionView.scss";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
+import { toast } from "utils/Toast";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -19,7 +20,12 @@ const TAB_KEYS = {
 
 export const CollectionView = () => {
   const { collectionId } = useParams();
-  const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords, apiClientRecordsRepository } = useApiClientContext();
+  const {
+    apiClientRecords,
+    onSaveRecord,
+    isLoadingApiClientRecords,
+    apiClientRecordsRepository,
+  } = useApiClientContext();
   const { replaceTab } = useTabsLayoutContext();
   const location = useLocation();
 
@@ -37,7 +43,7 @@ export const CollectionView = () => {
         },
       };
       return apiClientRecordsRepository
-        .updateRecord(record)
+        .updateRecord(record, record.id)
         .then((result) => {
           // fix-me: to verify new change are broadcasted to child entries that are open in tabs
           onSaveRecord(result.data);
@@ -75,17 +81,21 @@ export const CollectionView = () => {
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
-      const record = { ...collection, name };
-      return apiClientRecordsRepository.updateRecord(record).then((result) => {
-        onSaveRecord(result.data);
-        replaceTab(result.data.id, {
-          id: result.data.id,
-          title: result.data.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(result.data.id)}`,
+      return apiClientRecordsRepository
+        .renameCollection(collectionId, name)
+        .then((result) => {
+          onSaveRecord(result.data);
+          replaceTab(result.data.id, {
+            id: result.data.id,
+            title: result.data.name,
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(result.data.id)}`,
+          });
+        })
+        .catch((error) => {
+          toast.error(error.message || "Could not update collection name.");
         });
-      });
     },
-    [collection, onSaveRecord, replaceTab, apiClientRecordsRepository]
+    [onSaveRecord, replaceTab, apiClientRecordsRepository, collectionId]
   );
 
   if (isLoadingApiClientRecords) {
