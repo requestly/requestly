@@ -29,7 +29,7 @@ export const LocalFirstComingSoon: React.FC<Props> = ({ featureName }) => {
       >
         <div className="coming-soon-title">{featureName} for Local workspace is coming soon.</div>
         <div className="coming-soon-description">
-          Local workspaces (currently in Beta) do not support HTTP rules. 🚀 Support is coming soon! Track updates on{" "}
+          Local workspaces (currently in Beta) do not support {featureName}. 🚀 Support is coming soon! Track updates on{" "}
           <a href={LINKS.REQUESTLY_GITHUB} target="_blank" rel="noreferrer">
             GitHub.
           </a>

@@ -5,6 +5,7 @@ import { SearchOutlined, MoreOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system-v2/components";
 import { BiSelectMultiple } from "@react-icons/all-files/bi/BiSelectMultiple";
 import "./sidebarListHeader.scss";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 interface ListHeaderProps {
   onSearch: (value: string) => void;
@@ -16,10 +17,12 @@ interface ListHeaderProps {
 }
 
 export const SidebarListHeader: React.FC<ListHeaderProps> = ({ onSearch, menuItems, multiSelectOptions }) => {
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
   const { showMultiSelect = false, toggleMultiSelect } = multiSelectOptions || {};
+
   return (
     <div className="sidebar-list-header">
-      {showMultiSelect && (
+      {showMultiSelect && !isLocalSyncEnabled && (
         <div className="multi-select-option">
           <Tooltip title={"Select items"}>
             <BiSelectMultiple size={"18px"} onClick={toggleMultiSelect} />

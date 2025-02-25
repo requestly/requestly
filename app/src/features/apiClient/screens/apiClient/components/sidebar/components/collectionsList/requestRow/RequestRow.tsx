@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Typography, Dropdown, MenuProps, Checkbox } from "antd";
 import PATHS from "config/constants/sub/paths";
 import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
@@ -17,6 +17,8 @@ import {
   trackMoveRequestToCollectionClicked,
 } from "modules/analytics/events/features/apiClient";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { LocalWorkspaceTooltip } from "../../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -39,6 +41,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
     onSaveRecord,
     apiClientRecordsRepository,
   } = useApiClientContext();
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
@@ -66,7 +69,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
     [onSaveRecord, apiClientRecordsRepository]
   );
 
-  const getRequestOptions = useCallback((): MenuProps["items"] => {
+  const requestOptions = useMemo((): MenuProps["items"] => {
     return [
       {
         key: "0",
@@ -78,7 +81,11 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
       },
       {
         key: "1",
-        label: <div>Duplicate</div>,
+        label: (
+          <LocalWorkspaceTooltip featureName="Request duplication" placement="bottomRight">
+            <div>Duplicate</div>
+          </LocalWorkspaceTooltip>
+        ),
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           handleDuplicateRequest(record);
@@ -87,7 +94,12 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
       },
       {
         key: "2",
-        label: <div>Move to Collection</div>,
+        disabled: isLocalSyncEnabled,
+        label: (
+          <LocalWorkspaceTooltip featureName="Move to Collection">
+            <div>Move to Collection</div>
+          </LocalWorkspaceTooltip>
+        ),
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setRecordToMove(record);
@@ -105,7 +117,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
         },
       },
     ];
-  }, [record, updateRecordsToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest]);
+  }, [record, updateRecordsToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest, isLocalSyncEnabled]);
 
   return (
     <>
@@ -158,7 +170,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
             </Typography.Text>
             <div className="request-url">{record.name || record.data.request?.url}</div>
             <div className="request-options">
-              <Dropdown trigger={["click"]} menu={{ items: getRequestOptions() }} placement="bottomRight">
+              <Dropdown trigger={["click"]} menu={{ items: requestOptions }} placement="bottomRight">
                 <RQButton
                   onClick={(e) => {
                     e.stopPropagation();

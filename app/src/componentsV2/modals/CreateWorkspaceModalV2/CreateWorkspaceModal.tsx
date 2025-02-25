@@ -37,7 +37,7 @@ interface Props {
   callback?: () => void;
 }
 
-export const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, callback }) => {
+export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, callback }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
