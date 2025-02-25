@@ -19,6 +19,11 @@ export const PricingFeatures: PlanFeatures = {
             "Redirect requests, Replace Strings, Modify headers, Cancel requests, Modify Query Params, Delay Network Requests",
         },
         {
+          title: "Unlimited Header Rules",
+          enabled: true,
+          tooltip: "There is no limit on header modification rules; they only count as one towards your total rule",
+        },
+        {
           title: "5 API Mocks",
           enabled: true,
         },
@@ -41,11 +46,6 @@ export const PricingFeatures: PlanFeatures = {
           title: "All HTTP Modifications",
           enabled: true,
           tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts + Standard HTTP Modifications",
-        },
-        {
-          title: "Unlimited Header Rules",
-          enabled: true,
-          tooltip: "There is no limit on header modification rules; they only count as one towards your total rule",
         },
         {
           title: "5 API Mocks",
