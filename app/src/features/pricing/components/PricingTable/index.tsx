@@ -7,6 +7,7 @@ import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
 import { PlanColumn } from "./components/PlanColumn";
 import "./index.scss";
 import { kebabCase } from "lodash";
+import { isSafariBrowser } from "actions/ExtensionActions";
 
 interface PricingTableProps {
   product?: string;
@@ -38,8 +39,17 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             !isOpenedFromModal &&
             product !== PRICING.PRODUCTS.API_CLIENT &&
             planName === PRICING.PLAN_NAMES.ENTERPRISE
-          )
+          ) {
             return null;
+          }
+
+          if (
+            isSafariBrowser() &&
+            planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE &&
+            product === PRICING.PRODUCTS.API_CLIENT
+          ) {
+            return null;
+          }
 
           return (
             <PlanColumn
