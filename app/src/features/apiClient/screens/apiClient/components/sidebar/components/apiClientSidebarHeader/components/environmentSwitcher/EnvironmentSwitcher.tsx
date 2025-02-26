@@ -9,10 +9,10 @@ import { MdOutlineCheckCircleOutline } from "@react-icons/all-files/md/MdOutline
 import { toast } from "utils/Toast";
 import { redirectToEnvironment } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
-import { trackEnvironmentSwitched } from "features/apiClient/screens/environment/analytics";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./environmentSwitcher.scss";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
+import { trackEnvironmentSwitched } from "modules/analytics/events/features/apiClient";
 
 export const EnvironmentSwitcher = () => {
   const navigate = useNavigate();
@@ -45,12 +45,13 @@ export const EnvironmentSwitcher = () => {
         ),
         onClick: () => {
           setCurrentEnvironment(environment.id);
+          trackEnvironmentSwitched();
           if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
             openTab(environment.id, {
               title: environment.name,
               url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(environment.id)}`,
             });
-            trackEnvironmentSwitched(environments.length);
+
             redirectToEnvironment(navigate, environment.id);
           }
           toast.success(`Switched to ${environment.name} environment`);

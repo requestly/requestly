@@ -33,10 +33,13 @@ import { ImportFromCharles } from "features/rules/screens/rulesList/components/R
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { ImportFromModheader } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ModheaderImporter/ModheaderImporter";
 import { ImportFromResourceOverride } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ResourceOverrideImporter";
+import { useLocation } from "react-router-dom";
+import { ImporterType } from "components/Home/types";
 
 export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   //Global State
   const dispatch = useDispatch();
+  const { state } = useLocation();
   const appMode = useSelector(getAppMode);
   const allRules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
@@ -295,6 +298,24 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
       });
     }
   }, [allRules, dataToImport]);
+
+  useEffect(() => {
+    if (state?.modal) {
+      switch (state?.modal) {
+        case ImporterType.CHARLES:
+          setIsImportFromCharlesModalOpen(true);
+          break;
+        case ImporterType.MOD_HEADER:
+          setIsImportFromModheaderModalOpen(true);
+          break;
+        case ImporterType.RESOURCE_OVERRIDE:
+          setIsImportFromResourceOverrideModalOpen(true);
+          break;
+        default:
+          break;
+      }
+    }
+  }, [state?.modal]);
 
   return (
     <>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Dropdown, DropdownProps } from "antd";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -6,15 +6,9 @@ import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { ApiClientSidebarTabKey } from "../../APIClientSidebar";
-import { RQAPI } from "features/apiClient/types";
+import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
-import {
-  trackImportApiCollectionsClicked,
-  trackImportFromBrunoClicked,
-  trackImportFromPostmanClicked,
-  trackNewCollectionClicked,
-  trackNewRequestClicked,
-} from "modules/analytics/events/features/apiClient";
+import { trackImportStarted } from "modules/analytics/events/features/apiClient";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
@@ -29,6 +23,7 @@ import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LocalWorkspaceTooltip } from "../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
+import { useLocation } from "react-router-dom";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -53,6 +48,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   onClearHistory,
 }) => {
   const dispatch = useDispatch();
+  const { state } = useLocation();
   const user = useSelector(getUserAuthDetails);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
@@ -99,6 +95,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </LocalWorkspaceTooltip>
         ),
         onClick: () => {
+          trackImportStarted(ApiClientImporterType.REQUESTLY);
           if (!user.loggedIn) {
             dispatch(
               globalActions.toggleActiveModal({
@@ -112,7 +109,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
               })
             );
           } else {
-            trackImportApiCollectionsClicked();
             setIsImportModalOpen(true);
           }
         },
@@ -128,7 +124,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </LocalWorkspaceTooltip>
         ),
         onClick: () => {
-          trackImportFromPostmanClicked();
+          trackImportStarted(ApiClientImporterType.POSTMAN);
           if (!user.loggedIn) {
             dispatch(
               globalActions.toggleActiveModal({
@@ -157,7 +153,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </LocalWorkspaceTooltip>
         ),
         onClick: () => {
-          trackImportFromBrunoClicked();
+          trackImportStarted(ApiClientImporterType.BRUNO);
           if (!user.loggedIn) {
             dispatch(
               globalActions.toggleActiveModal({
@@ -206,7 +202,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           return;
         }
 
-        trackNewRequestClicked("api_client_sidebar_header");
         onNewClick(RQAPI.RecordType.API);
       },
     },
@@ -236,7 +231,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           return;
         }
 
-        trackNewCollectionClicked("api_client_sidebar_header");
         onNewClick(RQAPI.RecordType.COLLECTION);
       },
     },
@@ -270,6 +264,24 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       },
     },
   ];
+
+  useEffect(() => {
+    if (state?.modal) {
+      switch (state?.modal) {
+        case ApiClientImporterType.BRUNO:
+          setIsBrunoImporterModalOpen(true);
+          break;
+        case ApiClientImporterType.POSTMAN:
+          setIsPostmanImporterModalOpen(true);
+          break;
+        case ApiClientImporterType.REQUESTLY:
+          setIsImportModalOpen(true);
+          break;
+        default:
+          break;
+      }
+    }
+  }, [state?.modal]);
 
   return (
     <>
