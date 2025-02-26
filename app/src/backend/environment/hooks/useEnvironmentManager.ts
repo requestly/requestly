@@ -23,6 +23,8 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { useGetApiClientSyncRepo } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import APP_CONSTANTS from "config/constants";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -158,6 +160,9 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
             setCurrentEnvironment(newCurrentEnvironmentId);
           }
 
+          // Tracking user properties for analytics (excluding global variables)
+          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ENVIRONMENTS, Object.keys(environmentMap).length - 1);
+
           const updatedEnvironmentMap: EnvironmentMap = {};
 
           if (!isEmpty(activeOwnerEnvironmentsRef.current)) {
@@ -252,7 +257,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
               : (typeof value.syncValue as EnvironmentVariableType);
           return [
             key.trim(),
-            { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB, id: value.id },
+            { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB, id: index },
           ];
         })
       );
@@ -329,11 +334,16 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   );
 
   const renderVariables = useCallback(
-    (template: string | Record<string, any>, requestCollectionId: string = "") => {
+    (
+      template: RQAPI.Request,
+      requestCollectionId: string = ""
+    ): {
+      renderedVariables?: Record<string, unknown>;
+      renderedRequest: RQAPI.Request;
+    } => {
       const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
-      const renderedTemplate = renderTemplate(template, variablesWithPrecedence);
-
-      return renderedTemplate;
+      const { renderedTemplate, renderedVariables } = renderTemplate(template, variablesWithPrecedence);
+      return { renderedVariables, renderedRequest: renderedTemplate as RQAPI.Request };
     },
     [getVariablesWithPrecedence]
   );

@@ -1,4 +1,4 @@
-import { EnvironmentVariableValue } from "backend/environment/types";
+import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { generateDocumentId } from "backend/utils";
 import { AUTHORIZATION_TYPES } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
@@ -120,7 +120,7 @@ const createCollectionRecord = (
       const varValue: EnvironmentVariableValue = {
         id: index,
         syncValue: v.value,
-        type: v.type || "string",
+        type: v.type || EnvironmentVariableType.String,
       };
 
       if (v.local) {
@@ -162,7 +162,7 @@ export const processBrunoCollectionData = (
         acc[variable.name] = {
           id: index,
           syncValue: variable.value,
-          type: variable.type || "string",
+          type: variable.type || EnvironmentVariableType.String,
         };
       }
       return acc;

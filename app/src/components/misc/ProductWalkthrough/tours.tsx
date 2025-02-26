@@ -23,6 +23,7 @@ const tourTooltipPresets = {
   pointerPlacement: PointerPlacement.TOP_50,
 };
 
+//@ts-expect-error -> Placement type is defined inside react-joyride there is no export
 export const productTours: Record<string, CustomSteps[]> = {
   // TOURS FOR RULE EDITORS STARTS HERE
   [GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]: generateRuleEditorTour([

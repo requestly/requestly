@@ -9,7 +9,7 @@ import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 export const setUserPersona = (dispatch: any, value: string | OtherOption, clear: boolean, key: string) => {
-  dispatch(globalActions.updateUserPersona({ value: clear ? "" : value, key }));
+  dispatch(globalActions.updateUserPersona({ value: clear ? "" : String(value), key }));
 };
 
 export const handleSurveyNavigation = (

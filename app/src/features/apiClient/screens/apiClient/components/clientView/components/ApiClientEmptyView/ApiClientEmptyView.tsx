@@ -10,7 +10,7 @@ import APP_CONSTANTS from "config/constants";
 import { useState } from "react";
 import { toast } from "utils/Toast";
 import "./apiClientEmptyView.scss";
-// import { TestMyMagic } from "../../../sidebar/components/emptyState/TestMyMagic";
+import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
@@ -25,6 +25,10 @@ export const ApiClientEmptyView = () => {
   const isEmpty = apiClientRecords.length === 0;
 
   const handleNewRecordClick = (recordType: RQAPI.RecordType) => {
+    recordType === RQAPI.RecordType.API
+      ? trackNewRequestClicked("api_client_home")
+      : trackNewCollectionClicked("api_client_home");
+
     if (!user.loggedIn) {
       dispatch(
         globalActions.toggleActiveModal({

@@ -34,6 +34,7 @@ export namespace TabsLayout {
     REQUEST = "request",
     COLLECTION = "collection",
     ENVIORNMENT_VARIABLE = "environment_variable",
+    HISTORY = "history",
   }
 }
 

@@ -12,6 +12,11 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { redirectToEnvironment } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
+import {
+  trackEnvironmentDeleted,
+  trackEnvironmentDuplicated,
+  trackEnvironmentRenamed,
+} from "modules/analytics/events/features/apiClient";
 
 interface EnvironmentsListItemProps {
   environment: {
@@ -58,6 +63,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
     setIsRenaming(true);
     renameEnvironment(environment.id, newEnvironmentName)
       .then(() => {
+        trackEnvironmentRenamed();
         updateTab(environment.id, { title: newEnvironmentName });
         toast.success("Environment renamed successfully");
       })
@@ -74,6 +80,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
     toast.loading("Duplicating environment...");
     duplicateEnvironment(environment.id)
       .then(() => {
+        trackEnvironmentDuplicated();
         toast.success("Environment duplicated successfully");
       })
       .catch(() => {
@@ -86,6 +93,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
     deleteEnvironment(environment.id)
       .then(() => {
         closeTab(environment.id);
+        trackEnvironmentDeleted();
         toast.success("Environment deleted successfully");
         const availableEnvironments = allEnvironments.filter((env) => env.id !== environment.id);
         const isActiveEnvironmentBeingDeleted = environment.id === currentEnvironmentId;
