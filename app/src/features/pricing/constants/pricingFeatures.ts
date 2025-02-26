@@ -19,6 +19,11 @@ export const PricingFeatures: PlanFeatures = {
             "Redirect requests, Replace Strings, Modify headers, Cancel requests, Modify Query Params, Delay Network Requests",
         },
         {
+          title: "Unlimited Header Rules",
+          enabled: true,
+          tooltip: "There is no limit on header modification rules, they only count as one towards your total rule",
+        },
+        {
           title: "5 API Mocks",
           enabled: true,
         },
@@ -41,11 +46,6 @@ export const PricingFeatures: PlanFeatures = {
           title: "All HTTP Modifications",
           enabled: true,
           tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts + Standard HTTP Modifications",
-        },
-        {
-          title: "Unlimited Header Rules",
-          enabled: true,
-          tooltip: "There is no limit on header modification rules; they only count as one towards your total rule",
         },
         {
           title: "5 API Mocks",
@@ -147,7 +147,7 @@ export const PricingFeatures: PlanFeatures = {
   [PRICING.PRODUCTS.API_CLIENT]: {
     free: {
       planTitle: "Free",
-      heading: "Everything you need for <br/> individuals and small teams",
+      heading: "All you need for individual & small teams",
       features: [
         {
           title: "Unlimited collections and environments",
@@ -177,7 +177,7 @@ export const PricingFeatures: PlanFeatures = {
     },
     [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: {
       planTitle: "Enterprise",
-      heading: "For Org-wide secure and <br/> controlled API development.",
+      heading: "Org-wide secure & controlled API dev",
       features: [
         {
           title: "Role-based access control",
