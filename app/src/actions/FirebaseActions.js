@@ -19,6 +19,7 @@ import {
   sendEmailVerification,
   sendSignInLinkToEmail,
   SAMLAuthProvider,
+  OAuthProvider,
 } from "firebase/auth";
 import { getDatabase, ref, update, onValue, remove, get, set, child } from "firebase/database";
 import md5 from "md5";
@@ -446,6 +447,63 @@ export const googleSignInDesktopApp = (callback, MODE, source) => {
     window.open(getDesktopSignInAuthPath(id, source), "_blank");
   });
 };
+
+export async function appleSignIn(source, callback) {
+  const provider = new OAuthProvider("apple.com");
+  provider.addScope("email");
+  provider.addScope("name");
+  const auth = getAuth(firebaseApp);
+  return signInWithPopup(auth, provider)
+    .then((result) => {
+      const isNewUser = getAdditionalUserInfo(result).isNewUser || false;
+      const uid = result?.user?.uid || null;
+      const email = result?.user?.email || null;
+      if (isNewUser) {
+        trackSignUpAttemptedEvent({
+          auth_provider: AUTH_PROVIDERS.APPLE,
+          source,
+        });
+        trackSignupSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.APPLE,
+          email,
+          uid,
+          email_type: getEmailType(email),
+          domain: email.split("@")[1],
+          source,
+        });
+        setSignupDate(uid);
+        setEmailVerified(uid, true);
+      } else {
+        trackLoginAttemptedEvent({
+          auth_provider: AUTH_PROVIDERS.APPLE,
+          source,
+        });
+        trackLoginSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.APPLE,
+          uid,
+          email,
+          email_type: getEmailType(email),
+          domain: email.split("@")[1],
+          source,
+        });
+      }
+
+      const authData = getAuthData(result.user);
+      const database = getDatabase();
+      update(ref(database, getUserProfilePath(authData.uid)), authData);
+
+      callback && callback.call(null, true);
+
+      return { ...authData, isNewUser: isNewUser };
+    })
+    .catch((err) => {
+      trackLoginFailedEvent({
+        auth_provider: AUTH_PROVIDERS.APPLE,
+        error_message: err.message,
+        source,
+      });
+    });
+}
 
 export const signInWithEmailLink = async (email, callback) => {
   try {
