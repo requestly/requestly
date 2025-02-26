@@ -26,31 +26,30 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
 
   let apiRequestCount = records.length === 1 ? (isApiCollection(records[0]) ? records[0].data.children.length : 1) : "";
 
-  const getAllIdsToDelete = () => {
-    const idsToBeDeleted: string[] = [];
+  const getAllRecordsToDelete = () => {
+    const recordsToBeDeleted: RQAPI.Record[] = [];
     const stack: RQAPI.Record[] = [...records];
 
     while (stack.length) {
       const record = stack.pop()!;
-      idsToBeDeleted.push(record.id);
+      recordsToBeDeleted.push(record);
       if (isApiCollection(record) && record.data.children) {
         stack.push(...record.data.children);
       }
     }
 
-    return idsToBeDeleted;
+    return recordsToBeDeleted;
   };
 
   const handleDeleteApiRecord = async () => {
-    const recordIds = getAllIdsToDelete();
-    if (!recordIds.length) {
+    const recordsToBeDeleted = getAllRecordsToDelete();
+    if (!recordsToBeDeleted.length) {
       toast.error("Please select atleast one entity you want to delete.");
       return;
     }
 
     setIsDeleting(true);
-
-    const [apiRecords, collectionRecords] = partition(records, isApiRequest);
+    const [apiRecords, collectionRecords] = partition(recordsToBeDeleted, isApiRequest);
     const apiRecordIds = apiRecords.map((record) => record.id);
     const collectionRecordIds = collectionRecords.map((record) => record.id);
 
@@ -62,7 +61,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
 
     // Check if both deletions were successful
     if (recordDeletionResult.success && collectionsDeletionResult.success) {
-      onDeleteRecords(recordIds);
+      onDeleteRecords([...apiRecordIds, ...collectionRecordIds]);
       trackCollectionDeleted();
       toast.success(
         records.length === 1
