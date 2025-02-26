@@ -61,6 +61,10 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
               submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
             }
 
+            if (teamData?.workspaceType === WorkspaceType.LOCAL) {
+              return null;
+            }
+
             const formattedTeamData = {
               id: team.id,
               name: teamData.name,
@@ -73,10 +77,6 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
               appsumo: teamData?.appsumo || null,
               workspaceType: teamData?.workspaceType || WorkspaceType.SHARED,
             };
-
-            if (formattedTeamData.workspaceType === WorkspaceType.LOCAL) {
-              formattedTeamData.rootPath = teamData.rootPath;
-            }
 
             return formattedTeamData;
           })
