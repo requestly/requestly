@@ -13,8 +13,8 @@ import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/
 import {
   trackDuplicateRequestClicked,
   trackDuplicateRequestFailed,
-  trackDuplicateRequestSuccessful,
   trackMoveRequestToCollectionClicked,
+  trackRequestDuplicated,
 } from "modules/analytics/events/features/apiClient";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
@@ -58,7 +58,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
           }
           onSaveRecord(result.data);
           toast.success("Request duplicated successfully");
-          trackDuplicateRequestSuccessful();
+          trackRequestDuplicated();
         })
         .catch((error) => {
           console.error("Error duplicating request:", error);

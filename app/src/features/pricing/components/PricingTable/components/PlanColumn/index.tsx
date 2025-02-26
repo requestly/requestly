@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { Col, InputNumber, Row, Space, Tooltip, Typography } from "antd";
 import { PricingTableButtons } from "../../PricingTableButtons";
 import { CloseOutlined } from "@ant-design/icons";
-import { capitalize } from "lodash";
+import { capitalize, kebabCase } from "lodash";
 import { PRICING } from "features/pricing/constants/pricing";
 import { PricingPlans } from "features/pricing/constants/pricingPlans";
 import { trackGetFreeTrialClicked, trackPricingPlansQuantityChanged } from "features/pricing/analytics";
@@ -56,10 +56,6 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       return capitalize(PRICING.PLAN_NAMES.FREE);
     }
 
-    if (planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL) {
-      return capitalize(PRICING.PLAN_NAMES.FREE);
-    }
-
     if (planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE) {
       return capitalize(PRICING.PLAN_NAMES.PROFESSIONAL);
     }
@@ -68,25 +64,33 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     return capitalize(pricingPlansOrder[index - 1]);
   };
 
-  const renderFeaturesListHeader = (planName: string) => {
+  const renderFeaturesListHeader = (planName: string, heading: string) => {
     return (
-      <Row className="pro-basic-feature-title text-left">
-        {planName === PRICING.PLAN_NAMES.FREE && (
+      <Row className={`pro-basic-feature-title text-left ${kebabCase(product)}`}>
+        {product === PRICING.PRODUCTS.API_CLIENT ? (
           <Col>
-            <span>
-              All you need
-              <img src={"/assets/media/common/yellow-highlight.svg"} alt="highlight" />
-            </span>{" "}
-            to get started
+            <span>{heading}</span>
           </Col>
-        )}
-        {planName !== PRICING.PLAN_NAMES.FREE && (
-          <Col>
-            <span>
-              Everything <img src={"/assets/media/common/yellow-highlight.svg"} alt="highlight" />
-            </span>{" "}
-            in {getHeaderPlanName()} plan +
-          </Col>
+        ) : (
+          <>
+            {planName === PRICING.PLAN_NAMES.FREE && (
+              <Col>
+                <span>
+                  All you need
+                  <img src={"/assets/media/common/yellow-highlight.svg"} alt="highlight" />
+                </span>{" "}
+                to get started
+              </Col>
+            )}
+            {planName !== PRICING.PLAN_NAMES.FREE && (
+              <Col>
+                <span>
+                  Everything <img src={"/assets/media/common/yellow-highlight.svg"} alt="highlight" />
+                </span>{" "}
+                in {getHeaderPlanName()} plan +
+              </Col>
+            )}
+          </>
         )}
       </Row>
     );
@@ -100,8 +104,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       planName === PRICING.PLAN_NAMES.BASIC ||
       planName === PRICING.PLAN_NAMES.PROFESSIONAL ||
       planName === PRICING.PLAN_NAMES.LITE ||
-      planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE ||
-      planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL
+      planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE
     )
       return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price * quantity} annually`;
     return null;
@@ -190,9 +193,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                 planName !== PRICING.PLAN_NAMES.FREE &&
                 planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
                 planName !== PRICING.PLAN_NAMES.LITE) ||
-                (product === PRICING.PRODUCTS.API_CLIENT &&
-                  (planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL ||
-                    planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE))) && (
+                (product === PRICING.PRODUCTS.API_CLIENT && planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE)) && (
                 <Space>
                   <InputNumber
                     style={{ width: "65px", height: "30px", display: "flex", alignItems: "center" }}
@@ -255,7 +256,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       </div>
 
       <div className="plan-card-details">
-        <>{renderFeaturesListHeader(planName)}</>
+        <>{renderFeaturesListHeader(planName, planDetails.heading)}</>
         <Space direction="vertical" className="plan-features-list">
           {planDetails.features.map((feature: any, index: number) => {
             if (isOpenedFromModal && feature.visibleInPricingPageOnly) return null;
@@ -277,7 +278,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           <a
             target="_blank"
             rel="noreferrer"
-            href="https://rqst.ly/accelerator-program"
+            href={`https://rqst.ly/accelerator-program?page_source=${
+              product === PRICING.PRODUCTS.API_CLIENT ? "api_client_pricing_page" : "rules_pricing_page"
+            }`}
             onClick={() => {
               trackGetFreeTrialClicked(source);
             }}
