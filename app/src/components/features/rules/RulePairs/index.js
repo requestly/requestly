@@ -7,15 +7,17 @@ import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "../..
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 import ResponseRuleResourceTypes from "./ResponseRuleResourceTypes";
 import { rulePairComponents } from "./Pairs";
+import { useCurrentWorkspaceUserRole } from "hooks";
 import "./RulePairs.css";
 
 const RulePairs = (props) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
-  const isInputDisabled = props.mode === "shared-list-rule-view" || !!isSampleRule;
+  const isInputDisabled = props.mode === "shared-list-rule-view" || !!isSampleRule || isReadRole;
 
   const getPairMarkup = (pair, pairIndex) => {
     const commonProps = {
@@ -72,7 +74,7 @@ const RulePairs = (props) => {
   return (
     <>
       {props.currentlySelectedRuleConfig.TYPE === "Response" ? (
-        <ResponseRuleResourceTypes ruleDetails={props.currentlySelectedRuleConfig} />
+        <ResponseRuleResourceTypes disabled={isInputDisabled} ruleDetails={props.currentlySelectedRuleConfig} />
       ) : null}
 
       {props.currentlySelectedRuleConfig.TYPE !== "Response" || responseRuleResourceType !== "" ? (
