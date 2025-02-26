@@ -22,6 +22,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { getAllRecordsMap } from "store/features/rules/selectors";
 import { useIsNewUserForIncentivization } from "features/incentivization/hooks";
 import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivization/constants";
+import { useCurrentWorkspaceUserRole } from "hooks";
 import "./index.scss";
 
 export const TestRuleHeader = () => {
@@ -30,6 +31,7 @@ export const TestRuleHeader = () => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const allRecordsMap = useSelector(getAllRecordsMap);
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
@@ -121,10 +123,10 @@ export const TestRuleHeader = () => {
   ]);
 
   useEffect(() => {
-    if (!user.loggedIn) {
+    if (!user.loggedIn || isReadRole) {
       setDoCaptureSession(false);
     }
-  }, [user.loggedIn]);
+  }, [user.loggedIn, isReadRole]);
 
   return (
     <>
@@ -159,6 +161,7 @@ export const TestRuleHeader = () => {
         source={SOURCE.TEST_THIS_RULE}
       >
         <Checkbox
+          disabled={isReadRole}
           checked={doCaptureSession}
           onClick={() => {
             if (user.loggedIn) setDoCaptureSession(!doCaptureSession);
