@@ -157,7 +157,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       onSaveRecord(result.data);
 
       const wasForceRefreshed = await forceRefreshApiClientRecords();
-      if (wasForceRefreshed) {
+      if (wasForceRefreshed && recordType === RQAPI.RecordType.COLLECTION) {
         closeTab(record.id);
       }
 

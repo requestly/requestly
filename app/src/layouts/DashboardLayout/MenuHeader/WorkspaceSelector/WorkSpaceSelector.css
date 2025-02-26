@@ -173,3 +173,7 @@
   align-items: center;
   justify-content: space-between;
 }
+
+.local-workspace-avatar {
+  background: var(--requestly-color-white-t-20);
+}
