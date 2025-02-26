@@ -48,6 +48,7 @@ import { toast } from "utils/Toast";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { WorkspaceType } from "types";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { LuFolderSync } from "@react-icons/all-files/lu/LuFolderSync";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -72,6 +73,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isLocalWorkspace = useSelector(getIsWorkspaceLocal);
 
   const activeWorkspaceName = user.loggedIn
     ? isWorkspaceMode
@@ -96,12 +98,14 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
         <Avatar
           size={26}
           shape="square"
-          icon={getWorkspaceIcon(activeWorkspaceName)}
+          icon={isLocalWorkspace ? <LuFolderSync /> : getWorkspaceIcon(activeWorkspaceName)}
           className="workspace-avatar"
           style={{
             backgroundColor: user.loggedIn
               ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
                 ? "#1E69FF"
+                : isLocalWorkspace
+                ? "#FFFFFF33"
                 : getUniqueColorForWorkspace(currentlyActiveWorkspace?.id, activeWorkspaceName)
               : "#ffffff4d",
           }}
@@ -554,11 +558,8 @@ const WorkspaceSelector = () => {
                   <Avatar
                     size={28}
                     shape="square"
-                    icon={team.name?.[0]?.toUpperCase() ?? "P"}
-                    className="workspace-avatar"
-                    style={{
-                      backgroundColor: `${getUniqueColorForWorkspace(team.id, team.name)}`,
-                    }}
+                    icon={<LuFolderSync />}
+                    className="workspace-avatar local-workspace-avatar"
                   />
                 }
                 className={`workspace-menu-item ${
@@ -581,10 +582,7 @@ const WorkspaceSelector = () => {
                       }`}
                     >
                       <div className="workspace-name">{team.name}</div>
-                      <div className="text-gray workspace-details">
-                        {team.subscriptionStatus ? `${team.subscriptionStatus} • ` : null}
-                        {team.accessCount} {team.accessCount > 1 ? "members" : "member"}
-                      </div>
+                      <div className="text-gray workspace-details">{team.rootPath || ""}</div>
                     </div>
                     {team.archived ? (
                       <Tag color="gold">archived</Tag>
