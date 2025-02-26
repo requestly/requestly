@@ -47,7 +47,7 @@ export const CollectionView = () => {
         },
       };
       return apiClientRecordsRepository
-        .updateRecord(record)
+        .updateRecord(record, record.id)
         .then((result) => {
           // fix-me: to verify new change are broadcasted to child entries that are open in tabs
           onSaveRecord(result.data);
