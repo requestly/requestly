@@ -246,7 +246,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
         isRowSelection={userRole !== TeamRole.read}
         onRowDropped={onRowDropped}
         id="rules-list-table"
-        className="rules-list-table"
+        className={`rules-list-table ${userRole === TeamRole.read ? "read-only" : ""}`}
         defaultExpandedRowKeys={groupIdsToExpand}
         size="middle"
         scroll={{ y: getTableScrollHeight() }}
