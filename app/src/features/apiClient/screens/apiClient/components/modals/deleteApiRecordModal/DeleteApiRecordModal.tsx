@@ -58,11 +58,11 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
     const recordDeletionResult = await apiClientRecordsRepository.deleteRecords(apiRecordIds);
 
     // Then delete collections
-    const collectionsDeletionResult = await apiClientRecordsRepository.deleteCollections(collectionRecordIds); // Combine results
+    const collectionsDeletionResult = await apiClientRecordsRepository.deleteCollections(collectionRecordIds);
 
     // Check if both deletions were successful
     if (recordDeletionResult.success && collectionsDeletionResult.success) {
-      onDeleteRecords([...apiRecordIds, ...collectionRecordIds]);
+      onDeleteRecords(recordIds);
       trackCollectionDeleted();
       toast.success(
         records.length === 1
