@@ -455,10 +455,10 @@ export async function appleSignIn(source, callback) {
   const auth = getAuth(firebaseApp);
   return signInWithPopup(auth, provider)
     .then((result) => {
-      let is_new_user = getAdditionalUserInfo(result).isNewUser || false;
-      let uid = result?.user?.uid || null;
-      let email = result?.user?.email || null;
-      if (is_new_user) {
+      const isNewUser = getAdditionalUserInfo(result).isNewUser || false;
+      const uid = result?.user?.uid || null;
+      const email = result?.user?.email || null;
+      if (isNewUser) {
         trackSignUpAttemptedEvent({
           auth_provider: AUTH_PROVIDERS.APPLE,
           source,
@@ -494,7 +494,7 @@ export async function appleSignIn(source, callback) {
 
       callback && callback.call(null, true);
 
-      return { ...authData, isNewUser: is_new_user };
+      return { ...authData, isNewUser: isNewUser };
     })
     .catch((err) => {
       trackLoginFailedEvent({
