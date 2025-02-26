@@ -8,7 +8,7 @@ export const parseEntityVariables = (variables: VariableEntity) => {
     result[key] = {
       id: variables[key].id,
       type: variables[key].isSecret ? EnvironmentVariableType.Secret : variables[key].type,
-      localValue: variables[key].value,
+      syncValue: variables[key].value,
     };
   });
 
@@ -16,11 +16,11 @@ export const parseEntityVariables = (variables: VariableEntity) => {
 };
 
 export function parseFsId(id: string) {
-	return id;
+  return id;
   // return encodeURIComponent(id);
 }
 
 export function parseNativeId(id: string) {
-	return id;
+  return id;
   // return decodeURIComponent(id);
 }
