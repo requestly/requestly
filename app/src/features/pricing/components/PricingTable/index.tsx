@@ -45,8 +45,8 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 
           if (
             isSafariBrowser() &&
-            planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE &&
-            product === PRICING.PRODUCTS.API_CLIENT
+            product === PRICING.PRODUCTS.API_CLIENT &&
+            planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE
           ) {
             return null;
           }
