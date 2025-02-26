@@ -77,9 +77,12 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
     if (result.success) {
       onSaveRecord(result.data);
-
       if (recordType === RQAPI.RecordType.API) {
-        trackRequestSaved(analyticEventSource);
+        trackRequestSaved({
+          src: analyticEventSource,
+          has_scripts: Boolean(record?.data?.scripts?.preRequest?.length),
+          auth_type: record?.data?.auth?.currentAuthType,
+        });
 
         replaceTab("request/new", {
           id: result.data.id,

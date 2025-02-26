@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { RQAPI } from "../../../../types";
-import { useParams } from "react-router-dom";
+import { ApiClientImporterType, RQAPI } from "../../../../types";
+import { useLocation, useParams } from "react-router-dom";
 import { Tabs, TabsProps, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
@@ -27,6 +27,7 @@ export enum ApiClientSidebarTabKey {
 
 const APIClientSidebar: React.FC<Props> = () => {
   const user = useSelector(getUserAuthDetails);
+  const { state } = useLocation();
   const { requestId, collectionId } = useParams();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
@@ -173,6 +174,12 @@ const APIClientSidebar: React.FC<Props> = () => {
     },
     [user?.loggedIn, onSaveRecord, setIsImportModalOpen, apiClientRecordsRepository]
   );
+
+  useEffect(() => {
+    if (state?.modal === ApiClientImporterType.CURL) {
+      setIsImportModalOpen(true);
+    }
+  }, [state?.modal, setIsImportModalOpen]);
 
   return (
     <>

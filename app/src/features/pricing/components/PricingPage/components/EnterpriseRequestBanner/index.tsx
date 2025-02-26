@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, JSX } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getAvailableBillingTeams, getBillingTeamMemberById } from "store/features/billing/selectors";
@@ -14,7 +14,7 @@ import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { redirectToBillingTeam } from "utils/RedirectionUtils";
 import "./index.css";
 
-export default function EnterpriseRequestBanner(): React.ReactNode {
+export default function EnterpriseRequestBanner(): JSX.Element | null {
   const user = useSelector(getUserAuthDetails);
   const navigate = useNavigate();
   const billingTeams = useSelector(getAvailableBillingTeams);

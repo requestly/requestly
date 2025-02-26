@@ -31,7 +31,8 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => {
           const planPrice = PricingPlans[planName]?.plans[duration]?.usd?.price;
 
-          if (isOpenedFromModal && planName === PRICING.PLAN_NAMES.FREE) return null;
+          if (isOpenedFromModal && planName === PRICING.PLAN_NAMES.FREE && product !== PRICING.PRODUCTS.API_CLIENT)
+            return null;
 
           if (
             !isOpenedFromModal &&

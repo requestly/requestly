@@ -27,3 +27,17 @@ export interface CustomTooltipProps extends Omit<TooltipRenderProps, "step"> {
   step: CustomSteps;
   context: unknown;
 }
+
+export enum TOUR_TYPES {
+  REDIRECT_RULE = "isRedirectRuleTourCompleted",
+  TRAFFIC_TABLE = "isTrafficTableTourCompleted",
+  CONNECTED_APPS = "isConnectedAppsTourCompleted",
+  RULE_EDITOR = "isRuleEditorTourCompleted",
+  MISCELLANEOUS = "isMiscTourCompleted",
+}
+
+export enum SUB_TOUR_TYPES {
+  FIRST_DRAFT_SESSION = "firstDraftSession",
+  TEST_THIS_RULE = "testThisRule",
+  UPGRADE_WORKSPACE_MENU = "upgradeWorkspaceMenu",
+}

@@ -12,7 +12,6 @@ import {
 } from "modules/analytics/events/desktopApp";
 import { trackWalkthroughCompleted } from "modules/analytics/events/misc/productWalkthrough";
 import FEATURES from "config/constants/sub/features";
-import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { getLogResponseById } from "store/features/desktop-traffic-table/selectors";
 import "./index.css";
@@ -21,6 +20,7 @@ import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
 import { RuleType } from "@requestly/shared/types/entities/rules";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LocalWorkspaceTooltip } from "features/apiClient/screens/apiClient/components/clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
+import { TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 
 interface ContextMenuProps {
   log: any;
