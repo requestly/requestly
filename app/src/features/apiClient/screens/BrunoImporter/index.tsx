@@ -145,7 +145,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
-        const newApi = await apiClientRecordsRepository.updateRecord(updatedApi);
+        const newApi = await apiClientRecordsRepository.updateRecord(updatedApi, updatedApi.id);
         onSaveRecord(newApi.data, "none");
       } catch (error) {
         failedCollectionsCount++;
