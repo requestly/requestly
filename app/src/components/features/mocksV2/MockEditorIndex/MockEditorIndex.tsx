@@ -26,6 +26,7 @@ import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
+import { useCurrentWorkspaceUserRole } from "hooks";
 
 interface Props {
   isNew?: boolean;
@@ -54,6 +55,7 @@ const MockEditorIndex: React.FC<Props> = ({
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const [mockEditorData, setMockEditorData] = useState<MockEditorDataSchema>(null);
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
@@ -203,6 +205,7 @@ const MockEditorIndex: React.FC<Props> = ({
         mockData={mockData}
         savingInProgress={savingInProgress}
         isEditorOpenInModal={isEditorOpenInModal}
+        isEditorReadOnly={isReadRole}
       />
     );
   } else {
@@ -223,6 +226,7 @@ const MockEditorIndex: React.FC<Props> = ({
         savingInProgress={savingInProgress}
         isEditorOpenInModal={isEditorOpenInModal}
         isMockCollectionLoading={isMockCollectionLoading}
+        isEditorReadOnly={isReadRole}
       />
     );
   }
