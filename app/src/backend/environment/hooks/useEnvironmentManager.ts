@@ -13,7 +13,7 @@ import {
   getCurrentEnvironmentId,
 } from "store/features/variables/selectors";
 import { variablesActions } from "store/features/variables/slice";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspace, getIsWorkspaceLocal } from "store/features/teams/selectors";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
@@ -44,10 +44,12 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
+  const isWorkspaceLocal = useSelector(getIsWorkspaceLocal);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
   const collectionVariables = useSelector(getCollectionVariables);
+
   const ownerId = useMemo(
     () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
     [currentlyActiveWorkspace.id, user?.details?.profile?.uid]
@@ -58,12 +60,20 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const activeOwnerEnvironments = useMemo(() => {
     return allEnvironmentData?.[ownerId] ?? {};
   }, [allEnvironmentData, ownerId]);
+
   const activeOwnerEnvironmentsRef = useRef(activeOwnerEnvironments);
   useEffect(() => {
     activeOwnerEnvironmentsRef.current = activeOwnerEnvironments;
   }, [activeOwnerEnvironments]);
 
-  const globalEnvironmentData = useMemo(() => activeOwnerEnvironments?.["global"] || null, [activeOwnerEnvironments]);
+  const globalEnvironmentData = useMemo(() => {
+    // Look for the global.json file if the workspace is local, otherwise return the global environment directly
+    const globalEnv = isWorkspaceLocal
+      ? Object.values(activeOwnerEnvironments).find((env) => env.id.endsWith("global.json"))
+      : activeOwnerEnvironments["global"];
+
+    return globalEnv || null;
+  }, [activeOwnerEnvironments, isWorkspaceLocal]);
 
   const collectionVariablesRef = useRef(collectionVariables);
   useEffect(() => {
@@ -275,7 +285,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       } catch (err) {
         toast.error("Error while setting environment variables.");
         Logger.error("Error while setting environment variables in db", err);
-        console.error("Error while setting environment variables in db", err);
       }
     },
     [ownerId, dispatch, syncRepository]
@@ -362,6 +371,10 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const getGlobalVariables = useCallback((): EnvironmentVariables => {
     return activeOwnerEnvironments[globalEnvironmentData?.id]?.variables ?? {};
   }, [activeOwnerEnvironments, globalEnvironmentData?.id]);
+
+  const getGlobalEnvironmentId = useCallback(() => {
+    return globalEnvironmentData.id;
+  }, [globalEnvironmentData.id]);
 
   const getCurrentCollectionVariables = useCallback(
     (collectionId: string): EnvironmentVariables => {
@@ -496,6 +509,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     getVariablesWithPrecedence,
     isEnvironmentsLoading: isLoading,
     getGlobalVariables,
+    getGlobalEnvironmentId,
     setCollectionVariables,
     removeCollectionVariable,
     getCollectionVariables: getCurrentCollectionVariables,
