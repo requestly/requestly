@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
-import { getApiRecords } from "backend/apiClient";
 import Logger from "lib/logger";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
@@ -18,10 +17,13 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { clearExpandedRecordIdsFromSession, createBlankApiRecord, isApiCollection } from "../screens/apiClient/utils";
-import { generateDocumentId } from "backend/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
+import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
+import { useGetApiClientSyncRepo } from "../helpers/modules/sync/useApiClientSyncRepo";
+import { notification } from "antd";
+import { toast } from "utils/Toast";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
@@ -58,6 +60,9 @@ interface ApiClientContextInterface {
 
   setIsImportModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   apiClientWorkloadManager: APIClientWorkloadManager;
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<any, any>>;
+
+  forceRefreshApiClientRecords: () => Promise<boolean>;
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
@@ -92,6 +97,9 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   setIsImportModalOpen: () => {},
 
   apiClientWorkloadManager: new APIClientWorkloadManager(),
+  apiClientRecordsRepository: null,
+
+  forceRefreshApiClientRecords: async () => false,
 });
 
 interface ApiClientProviderProps {
@@ -129,14 +137,16 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const { openTab, deleteTabs, updateTab, replaceTab, updateAddTabBtnCallback } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
 
+  const { apiClientRecordsRepository } = useGetApiClientSyncRepo();
+
   const openDraftRequest = useCallback(() => {
-    const requestId = generateDocumentId("apis");
+    const requestId = apiClientRecordsRepository.generateApiRecordId();
 
     openTab(requestId, {
       title: "Untitled request",
-      url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?create=true`,
+      url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(requestId)}?create=true`,
     });
-  }, [openTab]);
+  }, [openTab, apiClientRecordsRepository]);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -164,24 +174,38 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     }
 
     setIsLoadingApiClientRecords(true);
-    getApiRecords(uid, teamId)
+    apiClientRecordsRepository
+      .getAllRecords()
       .then((result) => {
-        if (result.success) {
+        if (!result.success) {
+          notification.error({
+            message: "Could not fetch records!",
+            description: result.message,
+            placement: "bottomRight",
+          });
+          setApiClientRecords([]);
+          return;
+        } else {
           setApiClientRecords(result.data);
         }
       })
       .catch((error) => {
+        notification.error({
+          message: "Could not fetch records!",
+          description: error.message,
+          placement: "bottomRight",
+        });
         setApiClientRecords([]);
         Logger.error("Error loading api records!", error);
       })
       .finally(() => {
         setIsLoadingApiClientRecords(false);
       });
-  }, [uid, teamId]);
+  }, [apiClientRecordsRepository, uid]);
 
   useEffect(() => {
     debouncedTrackUserProperties();
-  }, [apiClientRecords]);
+  }, [apiClientRecords, debouncedTrackUserProperties]);
 
   const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
     setApiClientRecords((prev) => [...prev, { ...apiClientRecord }]);
@@ -243,31 +267,37 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onSaveRecord = useCallback(
     (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open") => {
-      const isRecordExist = apiClientRecords.find((record) => record.id === apiClientRecord.id);
+      console.log("on save", apiClientRecord, onSaveTabAction);
+      const recordId = apiClientRecord.id;
+      const isRecordExist = apiClientRecords.find((record) => record.id === recordId);
+      console.log("on save id", recordId, isRecordExist, apiClientRecords);
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
       const requestTab = searchParams.get("tab") || RequestTab.QUERY_PARAMS;
 
       if (isRecordExist) {
         onUpdateRecord(apiClientRecord);
-        replaceTab(apiClientRecord.id, {
+        replaceTab(recordId, {
           title: apiClientRecord.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?tab=${requestTab}`,
+          url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${encodeURIComponent(recordId)}?tab=${requestTab}`,
         });
+        console.log("called replace tab 1", recordId);
       } else {
+        console.log("calling on new");
         onNewRecord(apiClientRecord);
 
         if (onSaveTabAction === "replace") {
-          replaceTab(apiClientRecord.id, {
+          replaceTab(recordId, {
             title: apiClientRecord.name,
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?tab=${requestTab}`,
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${encodeURIComponent(recordId)}?tab=${requestTab}`,
           });
+          console.log("called replace tab 1", recordId);
           return;
         }
 
         if (onSaveTabAction === "open") {
-          openTab(apiClientRecord.id, {
+          openTab(recordId, {
             title: apiClientRecord.name,
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${apiClientRecord.id}?new`,
+            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${encodeURIComponent(recordId)}?new`,
           });
           return;
         }
@@ -319,23 +349,28 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(uid, teamId, recordType, collectionId).then((result) => {
-            setIsRecordBeingCreated(null);
-            onSaveRecord(result.data);
-          });
+          return createBlankApiRecord(uid, teamId, recordType, collectionId, apiClientRecordsRepository).then(
+            (result) => {
+              setIsRecordBeingCreated(null);
+              onSaveRecord(result.data);
+            }
+          );
         }
 
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(uid, teamId, recordType, collectionId)
+          return createBlankApiRecord(uid, teamId, recordType, collectionId, apiClientRecordsRepository)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
                 onSaveRecord(result.data);
+              } else {
+                toast.error(result.message || "Could not create collection.", 5);
               }
             })
             .catch((error) => {
+              toast.error(error.message || "Could not create collection.", 5);
               console.error("Error adding new collection", error);
             });
         }
@@ -344,11 +379,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setIsRecordBeingCreated(recordType);
           trackNewEnvironmentClicked();
           return addNewEnvironment("New Environment")
-            .then((newEnvironment: { id: string; name: string; isGlobal: boolean }) => {
+            .then((newEnvironment: { id: string; name: string }) => {
               setIsRecordBeingCreated(null);
               openTab(newEnvironment.id, {
                 title: newEnvironment.name,
-                url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${newEnvironment.id}?new`,
+                url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${encodeURIComponent(newEnvironment.id)}?new`,
               });
             })
             .catch((error) => {
@@ -361,15 +396,24 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [openTab, openDraftRequest, addNewEnvironment, teamId, uid, onSaveRecord]
+    [openTab, openDraftRequest, addNewEnvironment, teamId, uid, onSaveRecord, apiClientRecordsRepository]
   );
+
+  const forceRefreshApiClientRecords = useCallback(async () => {
+    const recordsToRefresh = await apiClientRecordsRepository.getRecordsForForceRefresh();
+    if (!recordsToRefresh || !recordsToRefresh.success) {
+      return false;
+    }
+    setApiClientRecords(() => [...recordsToRefresh.data]);
+    return true;
+  }, [apiClientRecordsRepository]);
 
   useEffect(() => {
     if (!isLoadingApiClientRecords) {
       locationState?.action === "create" && onNewClick("home_screen", locationState?.type);
       setLocationState({});
     }
-  }, [isLoadingApiClientRecords]);
+  }, [isLoadingApiClientRecords, locationState?.action, locationState?.type, onNewClick]);
 
   const workloadManager = useMemo(() => new APIClientWorkloadManager(), []);
 
@@ -404,6 +448,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     onImportRequestModalClose,
     onNewClick,
     apiClientWorkloadManager: workloadManager,
+    apiClientRecordsRepository,
+    forceRefreshApiClientRecords,
   };
 
   return <ApiClientContext.Provider value={value}>{children}</ApiClientContext.Provider>;

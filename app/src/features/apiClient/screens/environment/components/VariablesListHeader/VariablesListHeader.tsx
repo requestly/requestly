@@ -41,7 +41,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
       replaceTab(environmentId, {
         id: environmentId,
         title: newName,
-        url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environmentId}`,
+        url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(environmentId)}`,
       });
     });
   };

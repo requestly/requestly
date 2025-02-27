@@ -12,7 +12,8 @@
 
   &-buttons {
     display: flex;
-    gap: var(--space-4, 8px);
+    align-items: center;
+    gap: var(--space-8, 14px);
     margin-top: var(--space-8, 24px);
   }
 }
