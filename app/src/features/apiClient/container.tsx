@@ -26,6 +26,40 @@ const ApiClientFeatureContainer: React.FC = () => {
     redirectToUrl(LINKS.API_CLIENT_LOCAL_FIRST_ANNOUNCEMENT, true);
   }, []);
 
+  const loggedOutView = (
+    <div className="api-client-logged-out-view">
+      <NudgePrompt
+        icon={"/assets/media/apiClient/mandatory-login.svg"}
+        buttons={[
+          <RQButton type="secondary" onClick={handleReadAnnouncementClick}>
+            Read announcement
+          </RQButton>,
+          <RQButton type="primary" onClick={handleSignUp}>
+            Sign up to get started
+          </RQButton>,
+        ]}
+      >
+        <div className="api-client-logged-out-view_content">
+          <Typography.Title level={5}>Please login first to use API client</Typography.Title>
+          <Typography.Text className="api-client-logged-out-view_description">
+            Requestly API client requires an account for <span className="success">secure</span> workspace
+            collaboration. A <span className="success">local-first</span> version is coming soon, and creating an
+            account will no longer be required!
+          </Typography.Text>
+        </div>
+      </NudgePrompt>
+    </div>
+  );
+
+  if (!user.loggedIn) {
+    return (
+      <div className="api-client-container">
+        <APIClientSidebar />
+        {loggedOutView}
+      </div>
+    );
+  }
+
   return (
     <TabsLayoutContainer id="apiClient">
       <ApiClientProvider>
@@ -34,28 +68,7 @@ const ApiClientFeatureContainer: React.FC = () => {
           {user.loggedIn ? (
             <TabsLayoutContainer.TabsLayoutContent Outlet={(props: any) => <Outlet {...props} />} />
           ) : (
-            <div className="api-client-logged-out-view">
-              <NudgePrompt
-                icon={"/assets/media/apiClient/mandatory-login.svg"}
-                buttons={[
-                  <RQButton type="secondary" onClick={handleReadAnnouncementClick}>
-                    Read announcement
-                  </RQButton>,
-                  <RQButton type="primary" onClick={handleSignUp}>
-                    Sign up to get started
-                  </RQButton>,
-                ]}
-              >
-                <div className="api-client-logged-out-view_content">
-                  <Typography.Title level={5}>Please login first to use API client</Typography.Title>
-                  <Typography.Text className="api-client-logged-out-view_description">
-                    Requestly API client requires an account for <span className="success">secure</span> workspace
-                    collaboration. A <span className="success">local-first</span> version is coming soon, and creating
-                    an account will no longer be required!
-                  </Typography.Text>
-                </div>
-              </NudgePrompt>
-            </div>
+            <>{loggedOutView}</>
           )}
         </div>
       </ApiClientProvider>
