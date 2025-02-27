@@ -13,6 +13,7 @@ import CollectionAuthorizationView from "./components/CollectionAuthorizationVie
 import { LocalWorkspaceTooltip } from "../LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { toast } from "utils/Toast";
+import { useCurrentWorkspaceUserRole } from "hooks";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -32,6 +33,7 @@ export const CollectionView = () => {
   const { replaceTab, closeTab } = useTabsLayoutContext();
   const location = useLocation();
   const isLocalSyncEnabled = useCheckLocalSyncSupport();
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const collection = useMemo(() => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
@@ -62,13 +64,13 @@ export const CollectionView = () => {
       {
         label: "Overview",
         key: TAB_KEYS.OVERVIEW,
-        children: <CollectionOverview collection={collection} />,
+        children: <CollectionOverview isReadRole={isReadRole} collection={collection} />,
       },
       {
         label: <LocalWorkspaceTooltip featureName="Collection variables">Variables</LocalWorkspaceTooltip>,
         key: TAB_KEYS.VARIABLES,
         disabled: isLocalSyncEnabled,
-        children: <CollectionsVariablesView collection={collection} />,
+        children: <CollectionsVariablesView isReadRole={isReadRole} collection={collection} />,
       },
       {
         label: <LocalWorkspaceTooltip featureName="Authorization headers">Authorization</LocalWorkspaceTooltip>,
@@ -76,6 +78,7 @@ export const CollectionView = () => {
         disabled: isLocalSyncEnabled,
         children: (
           <CollectionAuthorizationView
+            isReadRole={isReadRole}
             authOptions={collection?.data?.auth}
             updateAuthData={updateCollectionAuthData}
             rootLevelRecord={!collection?.collectionId}
@@ -83,26 +86,26 @@ export const CollectionView = () => {
         ),
       },
     ];
-  }, [collection, updateCollectionAuthData, isLocalSyncEnabled]);
+  }, [isReadRole, collection, updateCollectionAuthData, isLocalSyncEnabled]);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
       const record = { ...collection, name };
       return apiClientRecordsRepository.renameCollection(record.id, name).then(async (result) => {
-				if (!result.success) {
-					toast.error(result.message || "Could not rename collection!");
-					return;
-				}
+        if (!result.success) {
+          toast.error(result.message || "Could not rename collection!");
+          return;
+        }
 
-				onSaveRecord(result.data);
+        onSaveRecord(result.data);
 
-				const wasForceRefreshed = await forceRefreshApiClientRecords();
-	      if (wasForceRefreshed) {
-	        closeTab(record.id);
-					return;
-	      }
+        const wasForceRefreshed = await forceRefreshApiClientRecords();
+        if (wasForceRefreshed) {
+          closeTab(record.id);
+          return;
+        }
 
-				replaceTab(result.data.id, {
+        replaceTab(result.data.id, {
           id: result.data.id,
           title: result.data.name,
           url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(result.data.id)}`,
