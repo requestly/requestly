@@ -8,8 +8,9 @@ import { VariablesListHeader } from "features/apiClient/screens/environment/comp
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
-import "./collectionsVariablesView.scss";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
+import { ReadOnlyModeAlert } from "../../../ReadOnlyModeAlert/ReadOnlyModeAlert";
+import "./collectionsVariablesView.scss";
 
 interface CollectionsVariablesViewProps {
   isReadRole: boolean;
@@ -53,6 +54,10 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
 
   return (
     <div className="collection-variables-view">
+      {isReadRole ? (
+        <ReadOnlyModeAlert description="As a viewer, you can update variables with current values and test the APIs, but saving your updates is not permitted." />
+      ) : null}
+
       <VariablesListHeader
         isReadRole={isReadRole}
         hideBreadcrumb
