@@ -15,6 +15,7 @@ import PATHS from "config/constants/sub/paths";
 import { RQButton } from "lib/design-system/components";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { useSessionsActionContext } from "features/sessionBook/context/actions";
+import { useCurrentWorkspaceUserRole } from "hooks";
 
 interface SessionsTableColumnsProps {
   handleUpdateSharingRecordId: (id: string) => void;
@@ -31,6 +32,7 @@ export const useSessionsTableColumns = ({
 }: SessionsTableColumnsProps) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const { handleDeleteSessionAction } = useSessionsActionContext();
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
@@ -112,6 +114,10 @@ export const useSessionsTableColumns = ({
       width: 120,
       align: "right",
       render: (id, record) => {
+        if (isReadRole) {
+          return null;
+        }
+
         return (
           <div className="sessions-table-actions">
             <Tooltip title="Share with your Teammates">
