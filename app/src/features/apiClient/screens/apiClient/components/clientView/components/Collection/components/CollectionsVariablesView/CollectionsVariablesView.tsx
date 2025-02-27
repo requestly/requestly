@@ -12,10 +12,11 @@ import "./collectionsVariablesView.scss";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 
 interface CollectionsVariablesViewProps {
+  isReadRole: boolean;
   collection: RQAPI.CollectionRecord;
 }
 
-export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> = ({ collection }) => {
+export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> = ({ isReadRole, collection }) => {
   const { updateTab } = useTabsLayoutContext();
   const { setCollectionVariables } = useEnvironmentManager();
   const collectionVariables = useSelector(getCollectionVariables);
@@ -53,6 +54,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   return (
     <div className="collection-variables-view">
       <VariablesListHeader
+        isReadRole={isReadRole}
         hideBreadcrumb
         searchValue={searchValue}
         onSearchValueChange={setSearchValue}
