@@ -2,7 +2,7 @@ import { isEmpty, unionBy } from "lodash";
 import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/AuthorizationForm/formStructure/types";
 import { KeyValuePair, RQAPI } from "../types";
 import { Authorization } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
-import { getDefaultAuth } from "backend/apiClient/migrations/auth";
+import { getDefaultAuth } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
 
 export const processAuthForEntry = (
   entry: RQAPI.Entry,

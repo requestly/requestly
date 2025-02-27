@@ -8,8 +8,8 @@ import { upsertApiRecord } from "backend/apiClient";
 import { forEach, isEmpty, omit, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
-import { getDefaultAuth } from "backend/apiClient/migrations/auth";
 import { generateDocumentId } from "backend/utils";
+import { getDefaultAuth } from "./components/clientView/components/request/components/AuthorizationView/defaults";
 
 export const makeRequest = async (
   appMode: string,
@@ -270,7 +270,10 @@ export const createBlankApiRecord = (
   if (recordType === RQAPI.RecordType.COLLECTION) {
     newRecord.name = "New collection";
     newRecord.type = RQAPI.RecordType.COLLECTION;
-    newRecord.data = { variables: {} };
+    newRecord.data = {
+      variables: {},
+      auth: getDefaultAuth(false),
+    };
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
   }
