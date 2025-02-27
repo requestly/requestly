@@ -42,7 +42,7 @@ const AuthorizationView: React.FC<Props> = ({
   );
 
   const onFormConfigChange = useCallback(
-    <T extends AuthConfigMeta.AuthWithConfig>(authConfig: AuthConfig<T> | null) => {
+    <SelectedAuthType extends AuthConfigMeta.AuthWithConfig>(authConfig: AuthConfig<SelectedAuthType> | null) => {
       if (!authConfig) {
         return;
       }
