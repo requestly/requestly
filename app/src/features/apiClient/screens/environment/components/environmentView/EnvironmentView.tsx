@@ -113,7 +113,7 @@ export const EnvironmentView = () => {
         ) : (
           <>
             {isReadRole ? (
-              <ReadOnlyModeAlert description="Your changes will not be saved. As a viewer, you can modify and test the APIs, but saving your updates is not permitted." />
+              <ReadOnlyModeAlert description="As a viewer, you can update variables with current values and test the APIs, but saving your updates is not permitted." />
             ) : null}
 
             <VariablesListHeader
