@@ -15,7 +15,9 @@ export const SafariLimitedSupportView: React.FC = () => {
             <Typography.Title level={5}>Limited Support on Safari Browser</Typography.Title>
             <Row className="safari-limited-support-subheading">
               Currently, only the API Client feature works on Safari. Other features
-              <br /> like HTTP Rules, Mock Server, and Sessions aren’t available yet.
+              <br /> like HTTP Rules and Sessions aren’t available yet.
+              <br />
+              It is completely free to use the API Client on Safari.
               <br />
               <br />
               🚀 Good news: Full Safari support is coming soon! Stay tuned.
