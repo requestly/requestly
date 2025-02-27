@@ -70,6 +70,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
         ) : (
           <RQSingleLineEditor
             enableWrapping={true}
+            showTooltip={true}
             className={`key-value-table-input ${record.isEnabled === false ? "key-value-table-input-disabled" : ""}`}
             placeholder={dataIndex === "key" ? "Key" : "Value"}
             defaultValue={record?.[dataIndex] as string}

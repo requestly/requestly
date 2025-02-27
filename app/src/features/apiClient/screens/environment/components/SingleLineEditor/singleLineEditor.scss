@@ -32,5 +32,24 @@
         max-height: unset;
       }
     }
+
+    .cm-tooltip {
+      display: none !important;
+    }
+  }
+}
+
+.cm-tooltip {
+  background-color: var(--requestly-color-black, #000) !important;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  max-width: 100%;
+  word-break: break-word;
+  border: 0 !important;
+  display: block !important;
+  max-width: 250px;
+
+  .cm-tooltip-section {
+    padding: 12px 16px !important;
   }
 }
