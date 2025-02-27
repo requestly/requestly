@@ -1,14 +1,10 @@
 import React, { useCallback, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 import { FilePicker } from "components/common/FilePicker";
 import { processBrunoCollectionData } from "./utils";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
-import { upsertApiRecord } from "backend/apiClient";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { Row } from "antd";
@@ -47,9 +43,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
     }>;
   }>({ collections: [], apis: [], environments: [] });
 
-  const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const { onSaveRecord } = useApiClientContext();
+  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
   const { addNewEnvironment, setVariables } = useEnvironmentManager();
 
   const collectionsCount = useRef(0);
@@ -140,12 +134,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
-        const newCollection = await upsertApiRecord(
-          user?.details?.profile?.uid,
-          collection,
-          workspace?.id,
-          collection.id
-        );
+        const newCollection = await apiClientRecordsRepository.createRecordWithId(collection, collection.id);
         onSaveRecord(newCollection.data, "none");
         importedCollectionsCount++;
         return newCollection.data.id;
@@ -164,7 +153,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
-        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
+        const newApi = await apiClientRecordsRepository.updateRecord(updatedApi, updatedApi.id);
         onSaveRecord(newApi.data, "none");
         importedApisCount++;
       } catch (error) {
@@ -187,7 +176,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
     }
 
     return { importedCollectionsCount, importedApisCount };
-  }, [processedFileData, user?.details?.profile?.uid, workspace?.id, onSaveRecord]);
+  }, [processedFileData, onSaveRecord, apiClientRecordsRepository]);
 
   const handleImportEnvironments = useCallback(async () => {
     let importedEnvCount = 0;
@@ -248,7 +237,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
       .finally(() => {
         setIsImporting(false);
       });
-  }, [processedFileData.environments.length, handleImportEnvironments, handleImportCollectionsAndApis, onSuccess]);
+  }, [handleImportEnvironments, handleImportCollectionsAndApis, onSuccess]);
 
   const handleResetImport = () => {
     setProcessingStatus("idle");

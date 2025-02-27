@@ -148,6 +148,8 @@ const LINKS = {
   STUDENT_PROGRAM_DOC: "https://requestly.notion.site/Requestly-Student-Program-12dd193f3c998018ad45d31c784f3131",
 
   API_CLIENT_LOCAL_FIRST_ANNOUNCEMENT: "https://github.com/requestly/requestly/issues/2629",
+
+  REQUESTLY_GITHUB: "https://github.com/requestly/requestly",
 };
 
 export default LINKS;
