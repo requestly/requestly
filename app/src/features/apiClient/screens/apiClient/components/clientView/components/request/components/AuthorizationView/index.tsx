@@ -13,7 +13,7 @@ import { EnvironmentVariables } from "backend/environment/types";
 
 import "./authorizationView.scss";
 import { AuthConfig, AuthConfigMeta, Authorization } from "./types/AuthConfig";
-import { getDefaultAuthType } from "backend/apiClient/migrations/auth";
+import { getDefaultAuthType } from "./defaults";
 
 interface Props {
   wrapperClass?: string;

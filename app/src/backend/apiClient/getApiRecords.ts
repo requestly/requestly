@@ -4,7 +4,7 @@ import { getOwnerId } from "backend/utils";
 import { RQAPI } from "features/apiClient/types";
 import Logger from "lib/logger";
 import { patchMissingIdInVariables } from "./utils";
-import { enforceLatestRecordSchema } from "./migrations";
+import { enforceLatestRecordSchema } from "./parser";
 
 function patchCollectionVariablesMissingId(params: { success: boolean; data: RQAPI.Record[] }) {
   if (!params.success) {

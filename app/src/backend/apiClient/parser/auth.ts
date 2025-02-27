@@ -1,10 +1,11 @@
+import { getDefaultAuth } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
 import {
   Authorization,
   AuthConfigMeta,
 } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 import { RQAPI } from "features/apiClient/types";
 
-export function runAuthMigration(record: Partial<RQAPI.Record>): RQAPI.Record["data"]["auth"] {
+export function patchAuthSchema(record: Partial<RQAPI.Record>): RQAPI.Record["data"]["auth"] {
   const newRecord = { ...record };
   const oldAuth = newRecord.data.auth as any;
   if (!oldAuth) {
@@ -14,17 +15,6 @@ export function runAuthMigration(record: Partial<RQAPI.Record>): RQAPI.Record["d
     newRecord.data.auth = extractedAuth;
   }
   return newRecord.data.auth;
-}
-
-export function getDefaultAuthType(isRootRecord: boolean): Authorization.Type {
-  return isRootRecord ? Authorization.Type.NO_AUTH : Authorization.Type.INHERIT;
-}
-
-export function getDefaultAuth(isRootRecord: boolean): RQAPI.Auth {
-  return {
-    currentAuthType: getDefaultAuthType(isRootRecord),
-    authConfigStore: {},
-  };
 }
 
 /* 

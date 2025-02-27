@@ -1,7 +1,7 @@
 import firebaseApp from "../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { RQAPI } from "features/apiClient/types";
-import { enforceLatestRecordSchema } from "./migrations";
+import { enforceLatestRecordSchema } from "./parser";
 
 export const getApiRecord = async (
   recordId: string

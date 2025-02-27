@@ -3,8 +3,11 @@ import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features
 import { generateDocumentId } from "backend/utils";
 import { POSTMAN_AUTH_TYPES_MAPPING, PostmanAuth } from "features/apiClient/constants";
 import { Authorization } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
-import { getDefaultAuth, getDefaultAuthType } from "backend/apiClient/migrations/auth";
 import { isEmpty } from "lodash";
+import {
+  getDefaultAuth,
+  getDefaultAuthType,
+} from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
 
 interface PostmanCollectionExport {
   info: {
