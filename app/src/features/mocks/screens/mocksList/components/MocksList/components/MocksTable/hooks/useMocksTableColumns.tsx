@@ -25,6 +25,7 @@ import { isMock, isCollection } from "../utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
 import PATHS from "config/constants/sub/paths";
+import { useCurrentWorkspaceUserRole } from "hooks";
 
 export const useMocksTableColumns = ({
   source,
@@ -47,6 +48,7 @@ export const useMocksTableColumns = ({
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
   const { pathname } = useLocation();
+  const { isReadRole } = useCurrentWorkspaceUserRole();
   const isOpenedInRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const {
@@ -134,7 +136,7 @@ export const useMocksTableColumns = ({
               </Tooltip>
             ) : null}
 
-            {isOpenedInRuleEditor ? null : (
+            {isOpenedInRuleEditor || isReadRole ? null : (
               <>
                 <Button
                   className="add-mock-btn"
@@ -242,6 +244,10 @@ export const useMocksTableColumns = ({
       align: "right",
       width: isWorkspaceMode ? (isOpenedInRuleEditor ? 50 : 90) : 90,
       render: (_: any, record: RQMockSchema) => {
+        if (isReadRole) {
+          return null;
+        }
+
         const collectionPath =
           isMock(record) && record.collectionId
             ? ((allRecordsMap[record.collectionId] as unknown) as RQMockCollection).path

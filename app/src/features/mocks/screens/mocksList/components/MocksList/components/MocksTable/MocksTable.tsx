@@ -31,6 +31,7 @@ import PATHS from "config/constants/sub/paths";
 import { trackMocksListBulkActionPerformed } from "modules/analytics/events/features/mocksV2";
 import "./mocksTable.scss";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
+import { useCurrentWorkspaceUserRole } from "hooks";
 
 export interface MocksTableProps {
   source: MockListSource;
@@ -60,6 +61,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   forceRender = () => {},
 }) => {
   const { clearSelectedRows } = useContentListTableContext();
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const { pathname } = useLocation();
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
@@ -170,14 +172,15 @@ export const MocksTable: React.FC<MocksTableProps> = ({
 
   return (
     <ContentListTable
-      dragAndDrop
+      isRowSelection={!isReadRole}
+      dragAndDrop={!isReadRole}
       onRowDropped={onRowDropped}
       loading={isLoading}
       id="mock-list-table"
       pagination={false}
       size="middle"
       rowKey="id"
-      className="rq-mocks-list-table"
+      className={`rq-mocks-list-table ${isReadRole ? "read-only" : ""}`}
       customRowClassName={(record) => {
         return `rq-mocks-list-table-row ${record.isFavourite ? "starred" : "unstarred"} ${
           record.recordType === MockRecordType.COLLECTION ? "collection-row" : "mock-row"
