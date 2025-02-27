@@ -86,6 +86,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     getCollectionVariables,
     getCurrentEnvironmentVariables,
     renderVariables,
+    getGlobalEnvironmentId,
   } = environmentManager;
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
     apiEntryDetails?.collectionId,
@@ -237,14 +238,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           }
         }
         if (key === "global") {
-          await setVariables("global", state[key]);
+          await setVariables(getGlobalEnvironmentId(), state[key]);
         }
         if (key === "collectionVariables") {
           await setCollectionVariables(state[key], apiEntryDetails?.collectionId);
         }
       }
     },
-    [getCurrentEnvironment, setVariables, setCollectionVariables, apiEntryDetails?.collectionId]
+    [getCurrentEnvironment, setVariables, setCollectionVariables, apiEntryDetails?.collectionId, getGlobalEnvironmentId]
   );
 
   const onSendButtonClick = useCallback(async () => {
