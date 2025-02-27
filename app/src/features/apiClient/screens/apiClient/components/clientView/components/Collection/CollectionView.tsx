@@ -4,16 +4,15 @@ import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { useCallback, useMemo } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
-import { useSelector } from "react-redux";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import "./collectionView.scss";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { upsertApiRecord } from "backend/apiClient";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
+import { LocalWorkspaceTooltip } from "../LocalWorkspaceTooltip/LocalWorkspaceTooltip";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { toast } from "utils/Toast";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -23,11 +22,16 @@ const TAB_KEYS = {
 
 export const CollectionView = () => {
   const { collectionId } = useParams();
-  const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords } = useApiClientContext();
-  const { replaceTab } = useTabsLayoutContext();
-  const user = useSelector(getUserAuthDetails);
-  const teamId = useSelector(getCurrentlyActiveWorkspace);
+  const {
+    apiClientRecords,
+    onSaveRecord,
+    isLoadingApiClientRecords,
+    apiClientRecordsRepository,
+    forceRefreshApiClientRecords,
+  } = useApiClientContext();
+  const { replaceTab, closeTab } = useTabsLayoutContext();
   const location = useLocation();
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const collection = useMemo(() => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
@@ -42,14 +46,15 @@ export const CollectionView = () => {
           auth: newAuthOptions,
         },
       };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId)
+      return apiClientRecordsRepository
+        .updateRecord(record, record.id)
         .then((result) => {
           // fix-me: to verify new change are broadcasted to child entries that are open in tabs
           onSaveRecord(result.data);
         })
         .catch(console.error);
     },
-    [collection, onSaveRecord, teamId, user.details?.profile?.uid]
+    [collection, onSaveRecord, apiClientRecordsRepository]
   );
 
   const tabItems = useMemo(() => {
@@ -60,13 +65,15 @@ export const CollectionView = () => {
         children: <CollectionOverview collection={collection} />,
       },
       {
-        label: "Variables",
+        label: <LocalWorkspaceTooltip featureName="Collection variables">Variables</LocalWorkspaceTooltip>,
         key: TAB_KEYS.VARIABLES,
+        disabled: isLocalSyncEnabled,
         children: <CollectionsVariablesView collection={collection} />,
       },
       {
-        label: "Authorization",
+        label: <LocalWorkspaceTooltip featureName="Authorization headers">Authorization</LocalWorkspaceTooltip>,
         key: TAB_KEYS.AUTHORIZATION,
+        disabled: isLocalSyncEnabled,
         children: (
           <CollectionAuthorizationView
             authOptions={collection?.data?.auth}
@@ -76,21 +83,33 @@ export const CollectionView = () => {
         ),
       },
     ];
-  }, [collection, updateCollectionAuthData]);
+  }, [collection, updateCollectionAuthData, isLocalSyncEnabled]);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
       const record = { ...collection, name };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
-        onSaveRecord(result.data);
-        replaceTab(result.data.id, {
+      return apiClientRecordsRepository.renameCollection(record.id, name).then(async (result) => {
+				if (!result.success) {
+					toast.error(result.message || "Could not rename collection!");
+					return;
+				}
+
+				onSaveRecord(result.data);
+
+				const wasForceRefreshed = await forceRefreshApiClientRecords();
+	      if (wasForceRefreshed) {
+	        closeTab(record.id);
+					return;
+	      }
+
+				replaceTab(result.data.id, {
           id: result.data.id,
           title: result.data.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${result.data.id}`,
+          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(result.data.id)}`,
         });
       });
     },
-    [collection, teamId, user.details?.profile?.uid, onSaveRecord, replaceTab]
+    [collection, apiClientRecordsRepository, onSaveRecord, forceRefreshApiClientRecords, replaceTab, closeTab]
   );
 
   if (isLoadingApiClientRecords) {

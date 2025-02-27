@@ -20,6 +20,7 @@ The following domains are eligible for the student programme:
     ".edu.uy",
     "bupt.cn",
     ".edu.ar",
+    ".edu.kh",
     "bennington.edu",
     "yonsei.ac.kr"
   ]
