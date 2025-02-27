@@ -19,6 +19,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 
 interface EnvironmentsListItemProps {
+  isReadRole: boolean;
   environment: {
     id: string;
     name: string;
@@ -35,7 +36,12 @@ export enum EnvironmentMenuKey {
   EXPORT = "export",
 }
 
-export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ environment, openTab, onExportClick }) => {
+export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
+  isReadRole,
+  environment,
+  openTab,
+  onExportClick,
+}) => {
   const navigate = useNavigate();
   const { envId } = useParams();
   const {
@@ -205,19 +211,22 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
         </Tooltip>
       </div>
       {/* wrapping dropdown in a div to prevent it from triggering click events on parent div element*/}
-      <div onClick={(e) => e.stopPropagation()}>
-        {!isGlobalEnvironment(environment.id) ? (
-          <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
-            <RQButton
-              size="small"
-              type="transparent"
-              icon={<MdOutlineMoreHoriz />}
-              className="environment-list-item-dropdown-button"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </Dropdown>
-        ) : null}
-      </div>
+
+      {isReadRole ? null : (
+        <div onClick={(e) => e.stopPropagation()}>
+          {!isGlobalEnvironment(environment.id) ? (
+            <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
+              <RQButton
+                size="small"
+                type="transparent"
+                icon={<MdOutlineMoreHoriz />}
+                className="environment-list-item-dropdown-button"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </Dropdown>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 };
