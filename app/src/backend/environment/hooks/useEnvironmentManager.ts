@@ -13,7 +13,7 @@ import {
   getCurrentEnvironmentId,
 } from "store/features/variables/selectors";
 import { variablesActions } from "store/features/variables/slice";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceLocal } from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
@@ -44,7 +44,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
-  const isWorkspaceLocal = useSelector(getIsWorkspaceLocal);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
@@ -67,13 +66,10 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   }, [activeOwnerEnvironments]);
 
   const globalEnvironmentData = useMemo(() => {
-    // Look for the global.json file if the workspace is local, otherwise return the global environment directly
-    const globalEnv = isWorkspaceLocal
-      ? Object.values(activeOwnerEnvironments).find((env) => env.id.endsWith("global.json"))
-      : activeOwnerEnvironments["global"];
+    const globalEnv = activeOwnerEnvironments[syncRepository.environmentVariablesRepository.getGlobalEnvironmentId()];
 
     return globalEnv || null;
-  }, [activeOwnerEnvironments, isWorkspaceLocal]);
+  }, [activeOwnerEnvironments, syncRepository.environmentVariablesRepository]);
 
   const collectionVariablesRef = useRef(collectionVariables);
   useEffect(() => {
@@ -327,8 +323,8 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
       // Get collection hierarchy variables
       getParentVariables(currentCollectionId);
-
-      const globalEnvironmentVariables = activeOwnerEnvironments["global"]?.variables || {};
+      const globalEnvId = syncRepository.environmentVariablesRepository.getGlobalEnvironmentId();
+      const globalEnvironmentVariables = activeOwnerEnvironments[globalEnvId]?.variables || {};
 
       Object.entries(globalEnvironmentVariables).forEach(([key, value]) => {
         // global variables (lowest precedence)
@@ -339,7 +335,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
       return allVariables;
     },
-    [activeOwnerEnvironments, currentEnvironmentId, apiClientRecords, collectionVariables]
+    [activeOwnerEnvironments, currentEnvironmentId, apiClientRecords, collectionVariables, syncRepository]
   );
 
   const renderVariables = useCallback(
@@ -371,10 +367,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const getGlobalVariables = useCallback((): EnvironmentVariables => {
     return activeOwnerEnvironments[globalEnvironmentData?.id]?.variables ?? {};
   }, [activeOwnerEnvironments, globalEnvironmentData?.id]);
-
-  const getGlobalEnvironmentId = useCallback(() => {
-    return globalEnvironmentData.id;
-  }, [globalEnvironmentData.id]);
 
   const getCurrentCollectionVariables = useCallback(
     (collectionId: string): EnvironmentVariables => {
@@ -509,10 +501,10 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     getVariablesWithPrecedence,
     isEnvironmentsLoading: isLoading,
     getGlobalVariables,
-    getGlobalEnvironmentId,
     setCollectionVariables,
     removeCollectionVariable,
     getCollectionVariables: getCurrentCollectionVariables,
+    environmentSyncRepository: syncRepository.environmentVariablesRepository,
   };
 };
 

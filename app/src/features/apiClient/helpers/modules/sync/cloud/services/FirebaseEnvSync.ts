@@ -47,6 +47,10 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
     await updateEnvironmentInDB(this.getPrimaryId(), environmentId, updates);
   }
 
+  getGlobalEnvironmentId() {
+    return "global";
+  }
+
   attachListener(params: EnvironmentListenerParams) {
     if (params.scope === VariableScope.COLLECTION) {
       return attachCollectionVariableListener(this.getPrimaryId(), params.callback);
