@@ -8,8 +8,7 @@ import PATHS from "config/constants/sub/paths";
 import { TabsLayoutContextInterface, useTabsLayoutContext } from "layouts/TabsLayout";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useCallback, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { redirectToEnvironment } from "utils/RedirectionUtils";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "utils/Toast";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import {
@@ -42,7 +41,6 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   openTab,
   onExportClick,
 }) => {
-  const navigate = useNavigate();
   const { envId } = useParams();
   const {
     getCurrentEnvironment,
@@ -157,7 +155,6 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       key={environment.id}
       className={`environments-list-item ${environment.id === envId && activeTab?.id === envId ? "active" : ""}`}
       onClick={() => {
-        redirectToEnvironment(navigate, environment.id);
         openTab(environment.id, {
           title: environment.name,
           url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(environment.id)}`,
