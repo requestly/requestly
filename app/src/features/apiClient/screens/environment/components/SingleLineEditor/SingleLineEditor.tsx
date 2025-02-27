@@ -46,13 +46,12 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   const [hoveredVariable, setHoveredVariable] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
-  // Function to add tooltip on hover without modifying existing CodeMirror logic
+  // Function to add tooltip on hover
   const tooltip = hoverTooltip((view, pos, side) => {
     const { from, to, text } = view.state.doc.lineAt(pos);
     let start = pos,
       end = pos;
 
-    // Expand the selection to the word boundaries
     while (start > from && /\w/.test(text[start - from - 1])) start--;
     while (end < to && /\w/.test(text[end - from])) end++;
 
