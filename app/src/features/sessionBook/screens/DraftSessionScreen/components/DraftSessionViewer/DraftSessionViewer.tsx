@@ -13,8 +13,10 @@ import { trackDraftSessionDiscarded, trackDraftSessionViewed } from "features/se
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
+import { useCurrentWorkspaceUserRole } from "hooks";
 import "./draftSessionViewer.scss";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
+import { RQTooltip } from "lib/design-system-v2/components";
 
 interface DraftSessionViewerProps {
   isDesktopMode: boolean;
@@ -30,6 +32,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const metadata = useSelector(getSessionRecordingMetaData);
   const isOpenedInIframe = location.pathname.includes("iframe");
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   if (!isDesktopMode) {
     unstable_usePrompt({
@@ -99,7 +102,9 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
               </RQButton>
             )}
 
-            <SaveSessionButton onSaveClick={handleSaveSessionClicked} />
+            <RQTooltip title={isReadRole ? "As a viewer, you cannot save the session!" : null} placement="bottomLeft">
+              <SaveSessionButton disabled={isReadRole} onSaveClick={handleSaveSessionClicked} />
+            </RQTooltip>
           </div>
         </div>
         <div className="draft-session-viewer-body-wrapper">
@@ -108,7 +113,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
               <SessionPlayer onPlayerTimeOffsetChange={setSessionPlayerOffset} />
             </Col>
             <Col span={9}>
-              <DraftSessionDetailsPanel playerTimeOffset={sessionPlayerOffset} />
+              <DraftSessionDetailsPanel isReadOnly={isReadRole} playerTimeOffset={sessionPlayerOffset} />
             </Col>
           </Row>
         </div>
