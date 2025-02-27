@@ -17,12 +17,13 @@ import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/syn
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 
 interface CollectionOverviewProps {
+  isReadRole: boolean;
   collection: RQAPI.CollectionRecord;
 }
 
 const COLLECTION_DETAILS_PLACEHOLDER = "Collection description";
 
-export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collection }) => {
+export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ isReadRole, collection }) => {
   const user = useSelector(getUserAuthDetails);
   const team = useSelector(getCurrentlyActiveWorkspace);
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
@@ -98,6 +99,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
     <div className="collection-overview-wrapper">
       <div className="collection-overview-container">
         <InlineInput
+          disabled={isReadRole}
           value={collectionName}
           onChange={(value) => {
             setCollectionName(value);
@@ -139,7 +141,16 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
                 />
               </>
             ) : (
-              <div className="collection-overview-description-markdown" onClick={() => setShowEditor(true)}>
+              <div
+                className="collection-overview-description-markdown"
+                onClick={() => {
+                  if (isReadRole) {
+                    return;
+                  }
+
+                  setShowEditor(true);
+                }}
+              >
                 {markdown}
               </div>
             )}
