@@ -7,3 +7,30 @@
   box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
   z-index: 10;
 }
+
+.editor-popup-container {
+  .cm-lineWrapping {
+    .cm-line {
+      max-height: 20px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+      overflow: hidden;
+    }
+  }
+
+  .cm-focused {
+    z-index: 1;
+    .cm-lineWrapping {
+      .cm-line {
+        display: block;
+        position: relative;
+        border-radius: 4px;
+        background: var(--requestly-color-surface-0, #212121);
+        border: 1px solid var(--requestly-color-primary, #004eeb);
+        max-height: unset;
+      }
+    }
+  }
+}

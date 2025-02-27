@@ -14,6 +14,7 @@ interface RQSingleLineEditorProps {
   placeholder?: string;
   onPressEnter?: (event: KeyboardEvent, text: string) => void;
   onBlur?: (text: string) => void;
+  enableWrapping?: boolean;
   variables?: Record<string, any>;
 }
 
@@ -24,6 +25,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   placeholder,
   onPressEnter,
   onBlur,
+  enableWrapping,
   variables = {},
 }) => {
   const editorRef = useRef(null);
@@ -124,6 +126,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
           ),
           generateCompletionsForVariables(variables),
           cmPlaceHolder(placeholder ?? "Input here"),
+          ...(enableWrapping ? [EditorView.lineWrapping] : []),
         ],
       }),
     });

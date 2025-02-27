@@ -1,4 +1,8 @@
 .api-key-value-table {
+  .ant-table-content {
+    overflow: visible !important;
+  }
+
   tr {
     td.ant-table-cell:nth-last-child(2) {
       border-right: none !important;
@@ -19,6 +23,7 @@
 
   td.ant-table-cell {
     padding: 4px 12px !important;
+    overflow: visible;
 
     .key-value-delete-btn.ant-btn.ant-btn-icon-only {
       width: 30px;
