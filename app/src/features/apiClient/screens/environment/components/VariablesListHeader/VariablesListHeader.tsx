@@ -10,6 +10,7 @@ import "./variablesListHeader.scss";
 import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 interface VariablesListHeaderProps {
+  isReadRole: boolean;
   searchValue: string;
   currentEnvironmentName: string;
   environmentId: string;
@@ -31,6 +32,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   hideBreadcrumb = false,
   onSave,
   exportActions,
+  isReadRole,
 }) => {
   const { renameEnvironment } = useEnvironmentManager();
   const { replaceTab } = useTabsLayoutContext();
@@ -67,23 +69,27 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           value={searchValue}
           onChange={(e) => onSearchValueChange(e.target.value)}
         />
-        <div className="variables-list-btn-actions-container">
-          <RQButton
-            showHotKeyText
-            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
-            type="primary"
-            onClick={onSave}
-            disabled={!hasUnsavedChanges}
-            loading={isSaving}
-          >
-            Save
-          </RQButton>
-          {exportActions?.showExport && (
-            <RQButton type="primary" onClick={exportActions?.onExportClick} disabled={!exportActions?.enableExport}>
-              Export
+
+        {isReadRole ? null : (
+          <div className="variables-list-btn-actions-container">
+            <RQButton
+              showHotKeyText
+              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+              type="primary"
+              onClick={onSave}
+              disabled={!hasUnsavedChanges}
+              loading={isSaving}
+            >
+              Save
             </RQButton>
-          )}
-        </div>
+
+            {exportActions?.showExport && (
+              <RQButton type="primary" onClick={exportActions?.onExportClick} disabled={!exportActions?.enableExport}>
+                Export
+              </RQButton>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
