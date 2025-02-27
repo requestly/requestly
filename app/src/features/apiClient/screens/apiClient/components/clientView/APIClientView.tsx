@@ -595,7 +595,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           >
             Send
           </RQButton>
-          {user.loggedIn && !openInModal ? (
+
+          {user.loggedIn && !openInModal && !isReadRole ? (
             <RQButton
               showHotKeyText
               hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
