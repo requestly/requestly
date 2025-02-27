@@ -449,6 +449,7 @@ const MockEditor: React.FC<Props> = ({
               handleTest={handleTest}
               setPassword={setPassword}
               password={password}
+              isEditorReadOnly={isEditorReadOnly}
             />
             <BottomSheetLayout
               layout={SheetLayout.SPLIT}
@@ -500,6 +501,7 @@ const MockEditor: React.FC<Props> = ({
             handleTest={handleTest}
             setPassword={setPassword}
             password={password}
+            isEditorReadOnly={isEditorReadOnly}
           />
           <Col className="mock-editor-title-container">
             <RQEditorTitle
