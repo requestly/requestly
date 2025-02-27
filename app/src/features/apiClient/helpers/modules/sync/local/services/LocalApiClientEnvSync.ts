@@ -2,7 +2,7 @@ import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 import { ApiClientLocalMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
 import { EnvironmentEntity, FileSystemResult } from "./types";
-import { parseEntityVariables } from "../../utils";
+import { appendPath, parseEntityVariables } from "../../utils";
 
 export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   constructor(readonly meta: ApiClientLocalMeta) {}
@@ -100,6 +100,11 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     const parsedEnv = this.parseEnvironmentEntity(result.content);
     return parsedEnv;
   }
+
+  getGlobalEnvironmentId(): string {
+    return appendPath(this.meta.rootPath, appendPath("environments", "global.json"));
+  }
+
   attachListener(params: EnvironmentListenerParams): () => any {
     return () => {};
   }

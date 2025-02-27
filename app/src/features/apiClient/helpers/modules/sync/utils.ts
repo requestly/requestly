@@ -24,3 +24,13 @@ export function parseNativeId(id: string) {
   return id;
   // return decodeURIComponent(id);
 }
+
+export function getNormalizedPath(path: string) {
+  const normalizedPath = path.endsWith("/") ? path : `${path}/`;
+  return normalizedPath;
+}
+
+export function appendPath(basePath: string, resourcePath: string) {
+  const separator = basePath.endsWith("/") ? "" : "/";
+  return `${basePath}${separator}${resourcePath}`;
+}

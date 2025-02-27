@@ -12,6 +12,7 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
     updates: Partial<Pick<EnvironmentData, "name" | "variables">>
   ): Promise<void>;
   duplicateEnvironment(environmentId: string, allEnvironments: EnvironmentMap): Promise<EnvironmentData>;
+  getGlobalEnvironmentId(): string;
   attachListener(params: EnvironmentListenerParams): () => any;
 }
 
