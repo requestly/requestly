@@ -21,8 +21,8 @@ import { RuleEditorBottomSheet } from "./components/RuleEditorBottomSheet/RuleEd
 import { trackSampleRuleTested } from "features/rules/analytics";
 import { RecordStatus } from "@requestly/shared/types/entities/rules";
 import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
-import { ReadOnlyModeAlert } from "./components/ReadOnlyModeAlert/ReadOnlyModeAlert";
 import { useRBAC } from "features/rbac";
+import { ReadOnlyModeAlert } from "components/common/ReadOnlyModeAlert/ReadOnlyModeAlert";
 import "./RuleEditor.scss";
 
 const RuleEditor = (props) => {
@@ -42,10 +42,10 @@ const RuleEditor = (props) => {
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
-  const { MODE, RULE_TYPE_TO_CREATE } = useMemo(() => getModeData(location, props.isSharedListViewRule), [
-    location,
-    props.isSharedListViewRule,
-  ]);
+  const { MODE, RULE_TYPE_TO_CREATE } = useMemo(
+    () => getModeData(location, props.isSharedListViewRule),
+    [location, props.isSharedListViewRule]
+  );
 
   const handleSeeLiveRuleDemoClick = useCallback(() => {
     trackSampleRuleTested(currentlySelectedRuleData?.name, currentlySelectedRuleData.status);
@@ -124,7 +124,10 @@ const RuleEditor = (props) => {
   const ruleEditor = useMemo(() => {
     return (
       <Col key={MODE + RULE_TYPE_TO_CREATE} className="overflow-hidden h-full rule-editor-container">
-        <ReadOnlyModeAlert hide={isValidPermission} />
+        <ReadOnlyModeAlert
+          hide={isValidPermission}
+          description="As a viewer, you can test rules but cannot modify them."
+        />
 
         {MODE !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
           <EditorHeader
