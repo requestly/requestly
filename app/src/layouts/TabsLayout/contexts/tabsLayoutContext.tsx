@@ -5,6 +5,8 @@ import { useDispatch } from "react-redux";
 import { tabsLayoutActions } from "store/slices/tabs-layout";
 import { TabsProps } from "antd";
 import { usePatchedTabs } from "./usePatchedTabs";
+import { useCurrentWorkspaceUserRole } from "hooks";
+import { toast } from "utils/Toast";
 
 const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
   tabs: [],
@@ -29,6 +31,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [addTabBtnCallback, setAddTabBtnCallback] = useState(() => () => {});
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
@@ -179,10 +182,19 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
   const onTabsEdit: TabsProps["onEdit"] = useCallback(
     (event, action) => {
       if (action === "add") {
+        if (isReadRole && ["apiClient"].includes(id)) {
+          toast.warn(
+            `As a viewer, you cannot create new request. Contact your workspace admin to update your role.`,
+            5
+          );
+
+          return;
+        }
+
         addTabBtnCallback?.();
       }
     },
-    [addTabBtnCallback]
+    [addTabBtnCallback, isReadRole, id]
   );
 
   const updateAddTabBtnCallback = useCallback((cb: () => void) => {
