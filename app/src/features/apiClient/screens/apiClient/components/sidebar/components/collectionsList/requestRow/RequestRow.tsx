@@ -25,6 +25,7 @@ import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 interface Props {
   record: RQAPI.ApiRecord;
   openTab: TabsLayoutContextInterface["openTab"];
+  isReadRole: boolean;
   bulkActionOptions: {
     showSelection: boolean;
     selectedRecords: Set<RQAPI.Record["id"]>;
@@ -33,7 +34,7 @@ interface Props {
   };
 }
 
-export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions }) => {
+export const RequestRow: React.FC<Props> = ({ record, openTab, isReadRole, bulkActionOptions }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
@@ -157,19 +158,22 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
                 : record.data.request?.method}
             </Typography.Text>
             <div className="request-url">{record.name || record.data.request?.url}</div>
-            <div className="request-options">
-              <Dropdown trigger={["click"]} menu={{ items: getRequestOptions() }} placement="bottomRight">
-                <RQButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowSelection(false);
-                  }}
-                  size="small"
-                  type="transparent"
-                  icon={<MdOutlineMoreHoriz />}
-                />
-              </Dropdown>
-            </div>
+
+            {isReadRole ? null : (
+              <div className="request-options">
+                <Dropdown trigger={["click"]} menu={{ items: getRequestOptions() }} placement="bottomRight">
+                  <RQButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowSelection(false);
+                    }}
+                    size="small"
+                    type="transparent"
+                    icon={<MdOutlineMoreHoriz />}
+                  />
+                </Dropdown>
+              </div>
+            )}
           </NavLink>
         </div>
       )}

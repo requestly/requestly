@@ -25,6 +25,8 @@ import { RequestTab } from "../screens/apiClient/components/clientView/component
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
+import { toast } from "utils/Toast";
+import { useCurrentWorkspaceUserRole } from "hooks";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -111,6 +113,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -309,6 +312,14 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onNewClick = useCallback(
     async (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId = "") => {
+      if (isReadRole) {
+        toast.warn(
+          `As a viewer, you cannot create new ${recordType}. Contact your workspace admin to request an update to your role.`,
+          5
+        );
+        return;
+      }
+
       switch (recordType) {
         case RQAPI.RecordType.API: {
           trackNewRequestClicked(analyticEventSource);
@@ -361,7 +372,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [openTab, openDraftRequest, addNewEnvironment, teamId, uid, onSaveRecord]
+    [openTab, openDraftRequest, addNewEnvironment, teamId, uid, onSaveRecord, isReadRole]
   );
 
   useEffect(() => {
