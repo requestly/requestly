@@ -25,6 +25,7 @@ import { toast } from "utils/Toast";
 import { isMock, isCollection } from "../screens/mocksList/components/MocksList/components/MocksTable/utils";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH } from "../constants";
+import { useCurrentWorkspaceUserRole } from "hooks";
 
 type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
@@ -53,6 +54,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const {
     openCollectionModalAction,
@@ -64,6 +66,15 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     openShareMocksModalAction,
     openMocksImportModalAction,
   } = useMocksModalsContext();
+
+  const showReadOnlyWarning = useCallback(() => {
+    toast.warn(
+      `As a viewer, you cannot take action. Contact your workspace admin to request an update to your role.`,
+      5
+    );
+
+    return;
+  }, []);
 
   const createNewCollectionAction = useCallback(
     (mockType: MockType) => {
@@ -121,16 +132,21 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
         onSuccess?.();
       });
     },
-    [teamId]
+    [uid, teamId]
   );
 
   const uploadMockAction = useCallback(
     (mockType: MockType) => {
       Logger.log("[DEBUG]", "uploadMockAction", { mockType });
+      if (isReadRole) {
+        showReadOnlyWarning();
+        return;
+      }
+
       trackMockUploadWorkflowStarted(mockType);
       openMockUploaderModalAction(mockType);
     },
-    [openMockUploaderModalAction]
+    [isReadRole, showReadOnlyWarning, openMockUploaderModalAction]
   );
 
   const createNewFileAction = useCallback(() => {
@@ -142,6 +158,11 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     (type: MockType, source: MockListSource, collectionId: string = "") => {
       Logger.log("[DEBUG]", "createNewMockAction", { source, type });
 
+      if (isReadRole) {
+        showReadOnlyWarning();
+        return;
+      }
+
       if (source === MockListSource.PICKER_MODAL) {
         trackNewMockButtonClicked(type, "picker_modal");
         return redirectToMockEditorCreateMock(navigate, true, collectionId);
@@ -152,7 +173,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
       trackNewMockButtonClicked(type, "mock_list");
       return redirectToMockEditorCreateMock(navigate, false, collectionId);
     },
-    [openNewFileModalAction, navigate]
+    [isReadRole, showReadOnlyWarning, openNewFileModalAction, navigate]
   );
 
   const removeMocksFromCollectionAction = useCallback(
@@ -167,6 +188,8 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     },
     [uid, teamId]
   );
+
+  // uploadMockAction, createNewMockAction, importMocksAction
 
   const exportMocksAction = useCallback(
     async (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
@@ -198,10 +221,16 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const importMocksAction = useCallback(
     (mockType: MockType, source: string, onSuccess?: () => void) => {
       Logger.log("[DEBUG]", "importMocksAction", { mockType });
+
+      if (isReadRole) {
+        showReadOnlyWarning();
+        return;
+      }
+
       trackMockImportClicked(mockType, source);
       openMocksImportModalAction(mockType, source, onSuccess);
     },
-    [openMocksImportModalAction]
+    [isReadRole, showReadOnlyWarning, openMocksImportModalAction]
   );
 
   const value = {
