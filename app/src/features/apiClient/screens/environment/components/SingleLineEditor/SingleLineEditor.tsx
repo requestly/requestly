@@ -43,7 +43,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   const onChangeRef = useRef(onChange);
   const previousDefaultValueRef = useRef(defaultValue);
 
-  const [hoveredVariable, setHoveredVariable] = useState(null);
+  const [hoveredVariable, setHoveredVariable] = useState(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
   // Function to add tooltip on hover
