@@ -34,10 +34,6 @@
   box-sizing: border-box;
   background-color: var(--requestly-color-background);
 
-  .header-skeleton {
-    padding: 8px 16px;
-  }
-
   .api-client-header-container {
     border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
@@ -56,10 +52,6 @@
   .api-client-body {
     padding-top: 8px;
     overflow: hidden;
-
-    .body-skeleton {
-      padding: 0 16px;
-    }
 
     .ant-tabs {
       .ant-tabs-nav-wrap {

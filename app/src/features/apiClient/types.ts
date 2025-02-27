@@ -38,6 +38,12 @@ export enum QueryParamSyncType {
   URL = "url",
   TABLE = "table",
 }
+
+export enum CreateType {
+  API = "api",
+  COLLECTION = "collection",
+  ENVIRONMENT = "environment",
+}
 export enum BulkActions {
   DUPLICATE = "DUPLICATE",
   DELETE = "DELETE",
@@ -46,15 +52,17 @@ export enum BulkActions {
 }
 
 export enum ApiClientImporterType {
-  "REQUESTLY" = "REQUESTLY",
-  "POSTMAN" = "POSTMAN",
-  "BRUNO" = "BRUNO",
+  REQUESTLY = "REQUESTLY",
+  POSTMAN = "POSTMAN",
+  BRUNO = "BRUNO",
+  CURL = "CURL",
 }
 
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
 
 export namespace RQAPI {
   export type AnalyticsEventSource =
+    | "home_screen"
     | "collection_row"
     | "collection_list_empty_state"
     | "api_client_sidebar_header"
@@ -190,4 +198,8 @@ export namespace RQAPI {
   }
 
   export type Record = ApiRecord | CollectionRecord;
+
+  export type RecordPromise = Promise<{ success: boolean; data: Record; message?: string }>;
+
+  export type RecordsPromise = Promise<{ success: boolean; data: Record[]; message?: string }>;
 }

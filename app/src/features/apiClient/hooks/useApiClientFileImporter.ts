@@ -2,10 +2,8 @@ import { useState, useCallback, useMemo } from "react";
 import { toast } from "utils/Toast";
 import Logger from "lib/logger";
 import { batchWrite } from "backend/utils";
-import { upsertApiRecord } from "backend/apiClient";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
@@ -29,11 +27,11 @@ type ProcessedData = {
 
 type ProcessingStatus = "idle" | "processing" | "processed";
 
-export enum ImporterTypes {
+export enum ImporterType {
   RQ = "RQ",
 }
 
-const useApiClientFileImporter = (importer: ImporterTypes) => {
+const useApiClientFileImporter = (importer: ImporterType) => {
   const processors = useMemo(
     () => ({
       RQ: processRqImportData,
@@ -54,12 +52,11 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
 
   const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ initFetchers: false });
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const { onSaveRecord } = useApiClientContext();
+  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 
-  const { environments = [], collections = [], apis = [], recordsCount = 0 } = processedFileData;
+  const { environments = [], collections = [], apis = [] } = processedFileData;
 
   const processFiles = useCallback(
     (files: File[]) => {
@@ -164,12 +161,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
     // Utility function to handle batch writes for collections
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
-        const newCollection = await upsertApiRecord(
-          user?.details?.profile?.uid,
-          collection,
-          workspace?.id,
-          collection.id
-        );
+        const newCollection = await apiClientRecordsRepository.createRecordWithId(collection, collection.id);
         onSaveRecord(newCollection.data, "none");
         importedCollectionsCount++;
         return newCollection.data.id;
@@ -185,7 +177,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
       const newCollectionId = collections.find((collection) => collection.id === api.collectionId)?.id;
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
-        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
+        const newApi = await apiClientRecordsRepository.createRecordWithId(updatedApi, updatedApi.id);
         onSaveRecord(newApi.data, "none");
         importedApisCount++;
       } catch (error) {
@@ -208,7 +200,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
     }
 
     return { importedCollectionsCount, importedApisCount };
-  }, [user, workspace, onSaveRecord, collections, apis]);
+  }, [onSaveRecord, collections, apis, apiClientRecordsRepository]);
 
   const handleImportData = useCallback(
     async (onSuccess: () => void) => {
@@ -275,7 +267,7 @@ const useApiClientFileImporter = (importer: ImporterTypes) => {
         setIsImporting(false);
       }
     },
-    [collections, apis, environments, recordsCount, handleImportCollectionsAndApis, handleImportEnvironments]
+    [collections, apis, environments, handleImportCollectionsAndApis, handleImportEnvironments]
   );
 
   const resetImportData = () => {

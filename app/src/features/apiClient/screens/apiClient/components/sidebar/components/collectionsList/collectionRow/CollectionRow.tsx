@@ -131,7 +131,7 @@ export const CollectionRow: React.FC<Props> = ({
   }, [expandedRecordIds, record.id]);
 
   useEffect(() => {
-    /* Temporary Change-> To remove previous key from session storage 
+    /* Temporary Change-> To remove previous key from session storage
        which was added due to the previous logic can be removed after some time */
     sessionStorage.removeItem("collapsed_collection_keys");
   }, []);
@@ -187,7 +187,7 @@ export const CollectionRow: React.FC<Props> = ({
                 onClick={() => {
                   openTab(record.id, {
                     title: record.name || "New Collection",
-                    url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${record.id}`,
+                    url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(record.id)}`,
                   });
                 }}
               >

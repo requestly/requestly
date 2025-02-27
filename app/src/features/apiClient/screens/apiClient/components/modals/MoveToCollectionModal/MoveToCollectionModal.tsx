@@ -3,10 +3,6 @@ import CreatableReactSelect from "react-select/creatable";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 import React, { useCallback, useMemo, useState } from "react";
-import { upsertApiRecord } from "backend/apiClient";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
 import { trackMoveRequestToCollectionFailed, trackRequestMoved } from "modules/analytics/events/features/apiClient";
@@ -22,11 +18,9 @@ interface Props {
 }
 
 export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
-  const { apiClientRecords, onSaveRecord, onSaveBulkRecords } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, onSaveBulkRecords, apiClientRecordsRepository } = useApiClientContext();
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
 
   const collectionOptions = useMemo(() => {
     const exclusions = new Set();
@@ -62,14 +56,14 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         variables: {},
       },
     };
-    const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToBeCreated, team?.id);
+    const newCollection = await apiClientRecordsRepository.createCollection(collectionToBeCreated);
     if (newCollection.success) {
       onSaveRecord(newCollection.data);
       return newCollection.data.id;
     } else {
       throw new Error("Failed to create a new collection");
     }
-  }, [user?.details?.profile?.uid, team?.id, onSaveRecord, selectedCollection?.label]);
+  }, [onSaveRecord, selectedCollection?.label, apiClientRecordsRepository]);
 
   const moveRecordsToCollection = useCallback(
     async (collectionId: string, isNewCollection: boolean) => {
@@ -79,6 +73,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
           : { ...record, collectionId }
       );
 
+      // TODO: use apiClient interface
       try {
         const result = await firebaseBatchWrite("apis", updatedRequests);
 
@@ -90,7 +85,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         throw new Error("Failed to move some requests to collection");
       }
     },
-    [user?.details?.profile?.uid, team?.id, onSaveRecord, recordsToMove]
+    [onSaveRecord, recordsToMove, onSaveBulkRecords]
   );
 
   const handleRecordMove = useCallback(async () => {
@@ -103,7 +98,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       }
     } catch (error) {
       console.error("Error moving request to collection:", error);
-      toast.error(error.message);
+      toast.error(error.message || "Error moving records to collection");
       trackMoveRequestToCollectionFailed(selectedCollection?.__isNew__ ? "new_collection" : "existing_collection");
     } finally {
       setIsLoading(false);

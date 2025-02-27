@@ -1,17 +1,13 @@
 import React, { useState } from "react";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { RQModal } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import { RQAPI } from "features/apiClient/types";
-import { isApiCollection } from "../../../utils";
-import { deleteApiRecords } from "backend/apiClient";
+import { isApiCollection, isApiRequest } from "../../../utils";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { trackCollectionDeleted } from "modules/analytics/events/features/apiClient";
 import "./deleteApiRecordModal.scss";
-import { isEmpty } from "lodash";
+import { isEmpty, partition } from "lodash";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
@@ -21,11 +17,7 @@ interface DeleteApiRecordModalProps {
 }
 
 export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open, records, onClose, onSuccess }) => {
-  const user = useSelector(getUserAuthDetails);
-  const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
-  const { onDeleteRecords } = useApiClientContext();
+  const { onDeleteRecords, apiClientRecordsRepository } = useApiClientContext();
 
   const [isDeleting, setIsDeleting] = useState(false);
   if (isEmpty(records)) {
@@ -34,31 +26,42 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
 
   let apiRequestCount = records.length === 1 ? (isApiCollection(records[0]) ? records[0].data.children.length : 1) : "";
 
-  const getAllIdsToDelete = () => {
-    const idsToBeDeleted: string[] = [];
+  const getAllRecordsToDelete = () => {
+    const recordsToBeDeleted: RQAPI.Record[] = [];
     const stack: RQAPI.Record[] = [...records];
 
     while (stack.length) {
       const record = stack.pop()!;
-      idsToBeDeleted.push(record.id);
-
+      recordsToBeDeleted.push(record);
       if (isApiCollection(record) && record.data.children) {
         stack.push(...record.data.children);
       }
     }
 
-    return idsToBeDeleted;
+    return recordsToBeDeleted;
   };
 
   const handleDeleteApiRecord = async () => {
+    const recordsToBeDeleted = getAllRecordsToDelete();
+    if (!recordsToBeDeleted.length) {
+      toast.error("Please select atleast one entity you want to delete.");
+      return;
+    }
+
     setIsDeleting(true);
+    const [apiRecords, collectionRecords] = partition(recordsToBeDeleted, isApiRequest);
+    const apiRecordIds = apiRecords.map((record) => record.id);
+    const collectionRecordIds = collectionRecords.map((record) => record.id);
 
-    const recordIds = getAllIdsToDelete();
+    // First delete records
+    const recordDeletionResult = await apiClientRecordsRepository.deleteRecords(apiRecordIds);
 
-    const result = await deleteApiRecords(uid, recordIds, teamId);
-    onDeleteRecords(recordIds);
+    // Then delete collections
+    const collectionsDeletionResult = await apiClientRecordsRepository.deleteCollections(collectionRecordIds);
 
-    if (result.success) {
+    // Check if both deletions were successful
+    if (recordDeletionResult.success && collectionsDeletionResult.success) {
+      onDeleteRecords([...apiRecordIds, ...collectionRecordIds]);
       trackCollectionDeleted();
       toast.success(
         records.length === 1
@@ -71,6 +74,9 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
       onSuccess?.();
 
       // TODO: add analytics
+    } else {
+      const erroredResult = !recordDeletionResult.success ? recordDeletionResult : collectionsDeletionResult;
+      toast.error(erroredResult.message || `Error deleting ${records.length === 1 ? "record" : "records"}`);
     }
 
     setIsDeleting(false);
