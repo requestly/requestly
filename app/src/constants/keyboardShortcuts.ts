@@ -10,7 +10,6 @@ export const KEY_ICONS: Record<string, string> = {
 
 export type KEYBOARD_SHORTCUT = {
   hotKey: string;
-  displayHotkey?: string;
   description: string;
 };
 

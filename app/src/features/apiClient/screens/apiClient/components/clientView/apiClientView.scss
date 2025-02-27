@@ -97,7 +97,14 @@
       .api-request-url {
         padding: 4px 8px;
         background: transparent;
-        border: 0.5px solid #1e69ff;
+
+        &.highlight-url {
+          border: 0.5px solid #1e69ff;
+        }
+
+        &:focus-within {
+          border: 0.5px solid #3e4044;
+        }
       }
 
       .ant-select-selector {

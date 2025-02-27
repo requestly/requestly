@@ -579,7 +579,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
             /> */}
               <RQSingleLineEditor
-                className="api-request-url"
+                className={`api-request-url ${isCreateMode || location.search.includes("new") ? "highlight-url" : ""}`}
                 placeholder="https://example.com"
                 //value={entry.request.url}
                 defaultValue={entry.request.url}
