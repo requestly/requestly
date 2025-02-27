@@ -77,8 +77,6 @@ export const useAuthFormState = (
 
   useEffect(() => {
     const newConfig = createAuthConfig(formState, formType);
-    console.log("DBG: useAuthFormState: useEffect: newConfig: ", newConfig);
-    console.log("DBG: useAuthFormState: useEffect: formState: ", newConfig.type);
     onChangeHandlerRef.current(newConfig?.validate() ? newConfig : null);
   }, [formState, formType]);
 

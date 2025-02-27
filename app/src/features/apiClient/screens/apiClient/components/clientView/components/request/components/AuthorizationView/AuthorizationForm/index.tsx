@@ -7,21 +7,21 @@ import { AuthConfig, AuthConfigMeta, Authorization } from "../types/AuthConfig";
 import { useAuthFormState } from "./hooks/useAuthFormState";
 import { RQAPI } from "features/apiClient/types";
 
-interface AuthorizationFormProps<T extends AuthConfigMeta.AuthWithConfig> {
+interface AuthorizationFormProps<AuthType extends AuthConfigMeta.AuthWithConfig> {
   defaultAuthValues?: RQAPI.Auth;
   formData: AuthForm.FormField[];
-  formType: T;
-  onChangeHandler: (config: AuthConfig<T> | null) => void;
+  formType: AuthType;
+  onChangeHandler: (config: AuthConfig<AuthType> | null) => void;
   variables: EnvironmentVariables;
 }
 
-const AuthorizationForm = <T extends AuthConfigMeta.AuthWithConfig>({
+const AuthorizationForm = <AuthType extends AuthConfigMeta.AuthWithConfig>({
   defaultAuthValues,
   formData,
   formType,
   onChangeHandler,
   variables,
-}: AuthorizationFormProps<T>) => {
+}: AuthorizationFormProps<AuthType>) => {
   const { formState, handleFormChange } = useAuthFormState(formType, onChangeHandler, defaultAuthValues);
 
   return (
