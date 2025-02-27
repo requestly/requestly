@@ -24,6 +24,7 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { tabsLayoutActions } from "store/slices/tabs-layout";
+import { isSafariBrowser } from "actions/ExtensionActions";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -135,7 +136,8 @@ export default function HeaderUser() {
           >
             <Avatar size={28} src={userPhoto} shape="square" className="cursor-pointer" />
           </Dropdown>
-          {(!planDetails?.planId || !["active", "past_due"].includes(planDetails?.status)) &&
+          {!isSafariBrowser() &&
+          (!planDetails?.planId || !["active", "past_due"].includes(planDetails?.status)) &&
           appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY ? (
             <RQButton
               type="primary"
