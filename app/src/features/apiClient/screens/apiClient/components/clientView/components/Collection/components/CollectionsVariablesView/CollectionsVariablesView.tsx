@@ -65,6 +65,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
         isSaving={isSaving}
       />
       <VariablesList
+        isReadRole={isReadRole}
         variables={collectionVariables[collection.id]?.variables || {}}
         onVariablesChange={setPendingVariables}
         searchValue={searchValue}

@@ -16,6 +16,7 @@ import { isEmpty } from "lodash";
 import { isGlobalEnvironment } from "../../utils";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
+import { ReadOnlyModeAlert } from "features/apiClient/screens/apiClient/components/clientView/components/ReadOnlyModeAlert/ReadOnlyModeAlert";
 
 export const EnvironmentView = () => {
   const navigate = useNavigate();
@@ -111,6 +112,10 @@ export const EnvironmentView = () => {
           <Skeleton active />
         ) : (
           <>
+            {isReadRole ? (
+              <ReadOnlyModeAlert description="Your changes will not be saved. As a viewer, you can modify and test the APIs, but saving your updates is not permitted." />
+            ) : null}
+
             <VariablesListHeader
               isReadRole={isReadRole}
               searchValue={searchValue}
@@ -126,7 +131,12 @@ export const EnvironmentView = () => {
                 onExportClick: () => setIsExportModalOpen(true),
               }}
             />
-            <VariablesList searchValue={searchValue} variables={variables} onVariablesChange={setPendingVariables} />
+            <VariablesList
+              isReadRole={isReadRole}
+              searchValue={searchValue}
+              variables={variables}
+              onVariablesChange={setPendingVariables}
+            />
             {isExportModalOpen && (
               <ApiClientExportModal
                 exportType="environment"
