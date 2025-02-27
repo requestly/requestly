@@ -3,13 +3,13 @@
   flex-direction: column;
   align-items: center;
 
-  & > .api-client-read-only-mode-alert {
-    width: calc(100% - 32px);
-  }
-
   .variables-list-header {
     width: 100%;
     max-width: 1920px;
     padding: 0 1rem;
+
+    .api-client-read-only-mode-alert {
+      margin: 7px 0 8px 0 !important;
+    }
   }
 }

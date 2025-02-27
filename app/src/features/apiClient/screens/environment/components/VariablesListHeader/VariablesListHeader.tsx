@@ -9,6 +9,7 @@ import { useLocation } from "react-router-dom";
 import "./variablesListHeader.scss";
 import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { ReadOnlyModeAlert } from "features/apiClient/screens/apiClient/components/clientView/components/ReadOnlyModeAlert/ReadOnlyModeAlert";
 interface VariablesListHeaderProps {
   isReadRole: boolean;
   searchValue: string;
@@ -61,6 +62,11 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
       ) : (
         <div />
       )}
+
+      {isReadRole ? (
+        <ReadOnlyModeAlert description="As a viewer, you can update variables with current values and test the APIs, but saving your updates is not permitted." />
+      ) : null}
+
       <div className="variables-list-action-container">
         <Input
           placeholder="Search"
