@@ -40,7 +40,7 @@ import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/type
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
-import { useHasUnsavedChanges } from "hooks";
+import { useCurrentWorkspaceUserRole, useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
 import { isEmpty } from "lodash";
@@ -69,13 +69,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const isCreateMode = searchParams.has("create");
   const { requestId } = useParams();
 
+  const { isReadRole } = useCurrentWorkspaceUserRole();
   const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
-  const {
-    apiClientRecords,
-    onSaveRecord,
-    apiClientWorkloadManager,
-    apiClientRecordsRepository,
-  } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } =
+    useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const {
     getVariablesWithPrecedence,
@@ -88,10 +85,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     renderVariables,
     environmentSyncRepository,
   } = environmentManager;
-  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
-    apiEntryDetails?.collectionId,
-    getVariablesWithPrecedence,
-  ]);
+  const currentEnvironmentVariables = useMemo(
+    () => getVariablesWithPrecedence(apiEntryDetails?.collectionId),
+    [apiEntryDetails?.collectionId, getVariablesWithPrecedence]
+  );
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>(apiEntry);
@@ -639,6 +636,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
             handleAuthChange={handleAuthChange}
+            isReadRole={isReadRole}
           />
         </div>
       </BottomSheetLayout>

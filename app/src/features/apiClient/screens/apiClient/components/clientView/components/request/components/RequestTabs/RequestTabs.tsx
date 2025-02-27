@@ -40,6 +40,7 @@ interface Props {
   setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
   handleAuthChange: (authOptions: RQAPI.AuthOptions) => void;
+  isReadRole: boolean;
 }
 
 const RequestTabs: React.FC<Props> = ({
@@ -49,6 +50,7 @@ const RequestTabs: React.FC<Props> = ({
   setRequestEntry,
   setContentType,
   handleAuthChange,
+  isReadRole,
 }) => {
   const { activeTab, updateTab } = useTabsLayoutContext();
   const [selectedTab, setSelectedTab] = useDeepLinkState({ tab: RequestTab.QUERY_PARAMS });
@@ -128,6 +130,7 @@ const RequestTabs: React.FC<Props> = ({
         disabled: isLocalSyncEnabled,
         children: (
           <AuthorizationView
+            isReadRole={isReadRole}
             defaultValues={requestEntry.auth}
             onAuthUpdate={handleAuthChange}
             rootLevelRecord={!collectionId}
@@ -154,6 +157,7 @@ const RequestTabs: React.FC<Props> = ({
     return items;
   }, [
     requestEntry,
+    isReadRole,
     setRequestEntry,
     setContentType,
     isApiClientScripts,

@@ -9,6 +9,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constants/keyboardShortcuts";
 
 interface Props {
+  isReadRole: boolean;
   authOptions: RQAPI.AuthOptions;
   updateAuthData: (authOptions: RQAPI.AuthOptions) => any;
   rootLevelRecord: Boolean;
@@ -22,7 +23,7 @@ interface Props {
  * and remain separated from the main Collection View
  *
  */
-const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthData, rootLevelRecord }) => {
+const CollectionAuthorizationView: React.FC<Props> = ({ isReadRole, authOptions, updateAuthData, rootLevelRecord }) => {
   const { collectionId } = useParams();
   const [authOptionsState, setAuthOptionsState] = useState(authOptions);
   const [isSaving, setIsSaving] = useState(false);
@@ -50,24 +51,26 @@ const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthD
       });
   }, [authOptionsState]);
 
-  const AuthorizationViewActions = () => (
-    <div className="authorization-save-btn">
-      <RQButton
-        showHotKeyText
-        hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
-        type="primary"
-        onClick={onSaveAuthData}
-        disabled={!hasUnsavedChanges}
-        loading={isSaving}
-      >
-        Save
-      </RQButton>
-    </div>
-  );
+  const AuthorizationViewActions = () =>
+    isReadRole ? null : (
+      <div className="authorization-save-btn">
+        <RQButton
+          showHotKeyText
+          hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+          type="primary"
+          onClick={onSaveAuthData}
+          disabled={!hasUnsavedChanges}
+          loading={isSaving}
+        >
+          Save
+        </RQButton>
+      </div>
+    );
 
   return (
     <AuthorizationView
       wrapperClass="collection-auth"
+      isReadRole={isReadRole}
       defaultValues={authOptionsState}
       onAuthUpdate={setAuthOptionsState}
       rootLevelRecord={rootLevelRecord}
