@@ -102,10 +102,9 @@ class SyncEngine {
         entityType: (syncModel.constructor as typeof SyncModel).entityType,
         syncWorkspaceMap: this.syncWorkspacesMap,
       });
-      const syncWorkspace = this.syncWorkspacesMap[syncModel.workspaceId];
-      const updatedDataDoc = await syncWorkspace.collections[
-        (syncModel.constructor as typeof SyncModel).entityType
-      ]?.upsert(syncModel.entity);
+      const syncWorkspace = this.syncWorkspacesMap[syncModel.entity.workspaceId];
+      // FIXME: Type any needs to be fixed
+      const updatedDataDoc = await syncWorkspace.collections[syncModel.entity.type]?.upsert(syncModel.entity as any);
       const updatedData = updatedDataDoc?.toJSON() as SyncEntity;
       console.log("[SyncEngine.upsert] Done", { updatedData });
       return updatedData;
@@ -120,7 +119,7 @@ class SyncEngine {
       entityType: (syncModel.constructor as typeof SyncModel).entityType,
     });
 
-    const syncWorkspace = this.syncWorkspacesMap[syncModel.workspaceId];
+    const syncWorkspace = this.syncWorkspacesMap[syncModel.entity.workspaceId];
 
     await syncWorkspace.collections[(syncModel.constructor as typeof SyncModel).entityType]
       ?.findOne({

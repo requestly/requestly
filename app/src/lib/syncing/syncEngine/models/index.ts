@@ -5,11 +5,9 @@ export class SyncModel<U extends SyncEntity> {
   static entityType: SyncEntityType;
 
   entity: U;
-  workspaceId: string;
 
-  constructor(data: U, workspaceId: string) {
+  constructor(data: U) {
     this.entity = data;
-    this.workspaceId = workspaceId;
   }
 
   updateEntity(data: U) {
@@ -33,8 +31,8 @@ export class SyncModel<U extends SyncEntity> {
   // TODO: Improve types
   static async subscribe(callback: (models: SyncModel<any>[]) => void): Promise<(() => void) | void> {
     console.log("[SyncModel.subscribe]", { entityType: this.entityType });
-    const unsubscribe = syncEngine.subscribe(this.entityType, (entities: SyncEntity[], workspaceId: string) => {
-      const models = entities.map((entity) => new this(entity, workspaceId));
+    const unsubscribe = syncEngine.subscribe(this.entityType, (entities: SyncEntity[]) => {
+      const models = entities.map((entity) => new this(entity));
       callback(models);
     });
     return unsubscribe;
@@ -47,7 +45,7 @@ export class SyncModel<U extends SyncEntity> {
 
     if (syncEntity) {
       console.log("[SyncModel.get] Entity found", { id, entityType: this.entityType, workspaceId, syncEntity });
-      return new this(syncEntity, workspaceId);
+      return new this(syncEntity);
     }
 
     console.error("[SyncModel.get] Entity not found", { id, entityType: this.entityType, workspaceId });
@@ -58,6 +56,6 @@ export class SyncModel<U extends SyncEntity> {
     console.log("[SyncModel.getAll]", { entityType: this.entityType });
     const entities = await syncEngine.getAll(this.entityType, workspaceId);
 
-    return entities.map((entity) => new this(entity, workspaceId));
+    return entities.map((entity) => new this(entity));
   }
 }

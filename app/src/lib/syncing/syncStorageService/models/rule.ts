@@ -3,6 +3,7 @@ import { StorageModel } from ".";
 import { RuleDataSyncModel } from "../../syncEngine/models/ruleData";
 import { RuleMetadataSyncModel } from "../../syncEngine/models/ruleMetadata";
 import { StorageRecord } from "@requestly/shared/types/entities/rules";
+import { SyncEntityType } from "@requestly/shared/types/syncEntities";
 
 export class RuleStorageModel extends StorageModel<StorageRecord> {
   ruleDataSyncModel!: RuleDataSyncModel;
@@ -21,25 +22,38 @@ export class RuleStorageModel extends StorageModel<StorageRecord> {
     // TODO: Improve this logic and use spread and delete operator
     const ruleMetadataEntity: RuleMetadataSyncEntity = {
       id: data.id,
-      status: data.status,
-      isFavourite: data.isFavourite,
+      workspaceId: workspaceId,
+      forkId: "",
+      type: SyncEntityType.RULE_METADATA,
+
+      data: {
+        status: data.status,
+        isFavourite: data.isFavourite,
+      },
+
       createdAt: data.createdAt || 0,
       updatedAt: data.updatedAt || 0,
       createdBy: data.createdBy || "",
       updatedBy: data.updatedBy || "",
     };
-    this.ruleMetadataSyncModel = new RuleMetadataSyncModel(ruleMetadataEntity, workspaceId);
+    this.ruleMetadataSyncModel = new RuleMetadataSyncModel(ruleMetadataEntity);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { status, isFavourite, ..._ruleDataEntity } = data;
+    const { status, isFavourite, id, createdAt, updatedAt, createdBy, updatedBy, ..._ruleDataEntity } = data;
     const ruleDataEntity: RuleDataSyncEntity = {
-      ..._ruleDataEntity,
+      id: data.id,
+      workspaceId: workspaceId,
+      forkId: "",
+      type: SyncEntityType.RULE_DATA,
+
+      data: { ..._ruleDataEntity },
+
       createdAt: data.createdAt || 0,
       updatedAt: data.updatedAt || 0,
       createdBy: data.createdBy || "",
       updatedBy: data.updatedBy || "",
     };
-    this.ruleDataSyncModel = new RuleDataSyncModel(ruleDataEntity, workspaceId);
+    this.ruleDataSyncModel = new RuleDataSyncModel(ruleDataEntity);
   }
 
   delete(): void {
@@ -66,14 +80,14 @@ export class RuleStorageModel extends StorageModel<StorageRecord> {
     if (ruleMetadataSyncModel && !ruleDataSyncModel) {
       ruleDataSyncModel = await RuleDataSyncModel.get(
         ruleMetadataSyncModel.entity.id,
-        ruleMetadataSyncModel.workspaceId
+        ruleMetadataSyncModel.entity.workspaceId
       );
     }
 
     if (ruleDataSyncModel && !ruleMetadataSyncModel) {
       ruleMetadataSyncModel = await RuleMetadataSyncModel.get(
         ruleDataSyncModel.entity.id,
-        ruleDataSyncModel.workspaceId
+        ruleDataSyncModel.entity.workspaceId
       );
     }
 
@@ -84,7 +98,7 @@ export class RuleStorageModel extends StorageModel<StorageRecord> {
     console.log("[RuleStorageModel.createFromSyncModels]", { ruleDataSyncModel, ruleMetadataSyncModel });
     const storageEntity = RuleStorageModel.createStorageEntityFromSyncModels(ruleDataSyncModel, ruleMetadataSyncModel);
 
-    return new RuleStorageModel(storageEntity, ruleDataSyncModel?.workspaceId);
+    return new RuleStorageModel(storageEntity, ruleDataSyncModel.entity.workspaceId);
   }
 
   static createStorageEntityFromSyncModels(
@@ -92,8 +106,11 @@ export class RuleStorageModel extends StorageModel<StorageRecord> {
     ruleMetadataSyncModel: RuleMetadataSyncModel
   ) {
     const storageEntity: StorageRecord = {
-      ...ruleMetadataSyncModel.entity,
-      ...ruleDataSyncModel.entity,
+      id: ruleDataSyncModel.entity.id,
+
+      ...ruleMetadataSyncModel.entity.data,
+      ...ruleDataSyncModel.entity.data,
+
       createdAt: ruleDataSyncModel.entity.createdAt,
       updatedAt: ruleDataSyncModel.entity.updatedAt,
       createdBy: ruleDataSyncModel.entity.createdBy,
@@ -106,7 +123,8 @@ export class RuleStorageModel extends StorageModel<StorageRecord> {
   static async subscribe(callback: (rules: RuleStorageModel[]) => void) {
     const unsub1 = await RuleDataSyncModel.subscribe(async (ruleDataSyncModels: RuleDataSyncModel[]) => {
       // Reduces no of queries on rxdb
-      const allRuleMetadata = await RuleMetadataSyncModel.getAll(ruleDataSyncModels?.[0]?.workspaceId);
+      // FIXME-multi-workspace: This logic won't work for multi-workspace
+      const allRuleMetadata = await RuleMetadataSyncModel.getAll(ruleDataSyncModels?.[0]?.entity.workspaceId);
       const allRuleMetadataMap: Record<string, RuleMetadataSyncModel> = {};
       allRuleMetadata.forEach((ruleMetadata) => {
         allRuleMetadataMap[ruleMetadata.entity.id] = ruleMetadata;
@@ -139,7 +157,7 @@ export class RuleStorageModel extends StorageModel<StorageRecord> {
     const unsub2 = await RuleMetadataSyncModel.subscribe(async (ruleMetadataSyncModels: RuleMetadataSyncModel[]) => {
       // Reduces no of queries on rxdb
       // FIXME: Can be improved
-      const allRuleData = await RuleDataSyncModel.getAll(ruleMetadataSyncModels?.[0]?.workspaceId);
+      const allRuleData = await RuleDataSyncModel.getAll(ruleMetadataSyncModels?.[0]?.entity.workspaceId);
       const allRuleDataMap: Record<string, RuleDataSyncModel> = {};
       allRuleData.forEach((ruleData) => {
         allRuleDataMap[ruleData.entity.id] = ruleData;
@@ -170,7 +188,9 @@ export class RuleStorageModel extends StorageModel<StorageRecord> {
     });
 
     return () => {
+      // @ts-ignore
       unsub1?.();
+      // @ts-ignore
       unsub2?.();
     };
   }

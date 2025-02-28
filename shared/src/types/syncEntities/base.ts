@@ -1,8 +1,17 @@
-export interface SyncEntity {
+import { SyncEntityType } from ".";
+
+export interface BaseSyncEntity<T> {
   id: string;
+  forkId: string;
+  workspaceId: string;
+
+  type: SyncEntityType;
+  _deleted?: boolean;
+
+  data: T;
+
   createdAt: number;
   updatedAt: number;
-  _deleted?: boolean;
   createdBy: string;
   updatedBy: string;
 }
