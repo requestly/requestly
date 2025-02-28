@@ -5,7 +5,7 @@ export function getDefaultAuthType(isRootRecord: boolean): Authorization.Type {
   return isRootRecord ? Authorization.Type.NO_AUTH : Authorization.Type.INHERIT;
 }
 
-export function getDefaultAuth(isRootRecord: boolean): RQAPI.Auth {
+export function getDefaultAuth(isRootRecord: boolean = false): RQAPI.Auth {
   return {
     currentAuthType: getDefaultAuthType(isRootRecord),
     authConfigStore: {},
