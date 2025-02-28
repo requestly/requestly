@@ -1,4 +1,10 @@
 import { StorageRecord } from "~/types/entities/rules";
-import { SyncEntity } from "../base";
+import { BaseSyncEntity } from "../base";
+import { SyncEntityType } from "..";
 
-export type RuleDataSyncEntity = Omit<StorageRecord, "status" | "isFavourite"> & SyncEntity;
+export interface RuleDataSyncEntity
+  extends BaseSyncEntity<
+    Omit<StorageRecord, "status" | "isFavourite" | "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
+  > {
+  type: SyncEntityType.RULE_DATA;
+}

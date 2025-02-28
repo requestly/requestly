@@ -86,7 +86,7 @@ class WorkspaceManager {
           id: workspaceId,
           replication: {
             enabled: this._workspaceMap[workspaceId]?.isSyncEnabled || true,
-            baseUrl: `http://localhost:8081/sync/workspaces`,
+            baseUrl: process.env.SYNC_BACKEND_BASE_URL,
           },
         },
       ],

@@ -6,8 +6,8 @@ import { replicateRxCollection, RxReplicationState } from "rxdb/plugins/replicat
 import { Observable, Subject, Subscription } from "rxjs";
 import { omit } from "lodash";
 
-import { ruleDataSchema } from "./entities/ruleData";
-import { ruleMetadataSchema } from "./entities/ruleMetadata";
+import { ruleDataSchema } from "./schemas/ruleData";
+import { ruleMetadataSchema } from "./schemas/ruleMetadata";
 import { SyncEntityType, syncTypeToEntityMap } from "@requestly/shared/types/syncEntities";
 import { ReplicationConfig } from "./types";
 
@@ -144,6 +144,7 @@ class SyncWorkspace {
       this.collections[entityType]?.preSave((plainData, rxDocument) => {
         console.log(`[SyncWorkspace.collections.${entityType}.preSave]`, { plainData, rxDocument });
         const _plainData = omit(plainData, [
+          "forkId",
           "createdAt",
           "updatedAt",
           "createdBy",
@@ -153,6 +154,7 @@ class SyncWorkspace {
           "_attachments",
         ]);
         const _rxDocument = omit(rxDocument, [
+          "forkId",
           "createdAt",
           "updatedAt",
           "createdBy",
@@ -243,13 +245,17 @@ class SyncWorkspace {
       if (event === "RESYNC") {
         collectionStream$.next(event);
       } else {
-        if (event && event?.data?.[collectionType] && event?.data[collectionType].documents.length > 0) {
-          const filteredDocuments = event.data[collectionType].documents;
-          const checkpoint = event.data[collectionType].checkpoint;
-          console.log(
-            `[SyncWorkspace._setupReplication] collectionType:${collectionType} pullStream filteredDocuments`,
-            { event, filteredDocuments }
-          );
+        console.log("[SyncWorkspace._setupReplication] pullStream", event);
+        const allDocuments = event?.entities || [];
+        const filteredDocuments = allDocuments.filter((doc: any) => doc.type === collectionType);
+        const checkpoint = event.checkpoint;
+
+        console.log(`[SyncWorkspace._setupReplication] collectionType:${collectionType} pullStream filteredDocuments`, {
+          event,
+          filteredDocuments,
+        });
+
+        if (filteredDocuments.length > 0) {
           collectionStream$.next({
             documents: filteredDocuments,
             checkpoint: checkpoint,
@@ -334,22 +340,20 @@ class SyncWorkspace {
             checkpointOrNull,
             batchSize,
           });
-          const updatedAt = checkpointOrNull && checkpointOrNull.updatedAt ? checkpointOrNull.updatedAt : 0;
-          // const id = checkpointOrNull ? checkpointOrNull.id : "";
-          // Only full collectionType so that we don't fetch redundant data
+          const checkpoint = checkpointOrNull ? checkpointOrNull : {};
+          checkpoint.lastUpdatedTs = checkpoint.lastUpdatedTs || 0;
           const response = await fetch(
-            `${pullUrl}?checkpointUpdatedAt=${updatedAt}&limit=${batchSize}&entityType=${entityType}`,
+            `${pullUrl}?checkpoint_lastUpdatedTs=${checkpoint.lastUpdatedTs}&batchSize=${batchSize}&entityType=${entityType}`,
             {
               headers: {
                 Authorization: self.authToken ?? "",
               },
             }
           );
-          const data = await response.json();
-          const collectionData = data[entityType];
-          console.log("[SyncWorkspace] Pull end", { data, collectionData });
+          const collectionData = await response.json();
+          console.log("[SyncWorkspace] Pull end", { collectionData });
           return {
-            documents: collectionData.documents,
+            documents: collectionData.entities,
             checkpoint: collectionData.checkpoint,
           };
         },
