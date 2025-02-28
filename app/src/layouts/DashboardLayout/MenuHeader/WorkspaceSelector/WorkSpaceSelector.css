@@ -59,7 +59,7 @@
 }
 
 .workspaces-menu.ant-dropdown-menu {
-  width: 16.25rem;
+  width: 280px;
   background-color: var(--component-dark-background);
 }
 
@@ -172,4 +172,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.local-workspace-avatar {
+  background: var(--requestly-color-white-t-20);
 }

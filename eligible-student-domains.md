@@ -19,6 +19,9 @@ The following domains are eligible for the student programme:
     ".eur.nl",
     ".edu.uy",
     "bupt.cn",
-    ".edu.ar"
+    ".edu.ar",
+    ".edu.kh",
+    "bennington.edu",
+    "yonsei.ac.kr"
   ]
 }

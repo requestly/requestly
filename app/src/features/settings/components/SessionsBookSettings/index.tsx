@@ -10,7 +10,7 @@ import { PageSourceRow } from "./components/PageSourceRow";
 import { SessionRecordingPageSource } from "types";
 import { AutoRecordingMode, SessionRecordingConfig } from "features/sessionBook";
 import { generateObjectId } from "utils/FormattingHelper";
-import { isExtensionInstalled, isSafariExtension } from "actions/ExtensionActions";
+import { isExtensionInstalled, isSafariBrowser } from "actions/ExtensionActions";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -225,12 +225,12 @@ export const SessionsSettings: React.FC = () => {
     [config, handleSaveConfig]
   );
 
-  if (!isExtensionInstalled()) {
-    return <InstallExtensionCTA eventPage="session_settings" />;
+  if (isSafariBrowser()) {
+    return <SafariLimitedSupportView />;
   }
 
-  if (isSafariExtension()) {
-    return <SafariLimitedSupportView />;
+  if (!isExtensionInstalled()) {
+    return <InstallExtensionCTA eventPage="session_settings" />;
   }
 
   const isPageSourcesDisabled =

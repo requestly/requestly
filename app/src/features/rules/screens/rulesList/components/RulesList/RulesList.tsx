@@ -11,7 +11,7 @@ import { GettingStarted } from "./components";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { isExtensionInstalled, isSafariExtension } from "actions/ExtensionActions";
+import { isExtensionInstalled, isSafariBrowser } from "actions/ExtensionActions";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import MonitorMountedTime from "components/common/SentryMonitoring/MonitorMountedTime";
@@ -51,7 +51,9 @@ const RulesList: React.FC<Props> = () => {
 
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP || appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
-      if (!isExtensionInstalled()) {
+      if (isSafariBrowser()) {
+        return <SafariLimitedSupportView />;
+      } else if (!isExtensionInstalled()) {
         return (
           <InstallExtensionCTA
             heading="Install Browser extension to start modifying network requests"
@@ -59,8 +61,6 @@ const RulesList: React.FC<Props> = () => {
             eventPage="rules_page"
           />
         );
-      } else if (isSafariExtension()) {
-        return <SafariLimitedSupportView />;
       } else if (!isExtensionEnabled) {
         return <ExtensionDeactivationMessage />;
       }

@@ -15,7 +15,7 @@ import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analy
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
 
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
   const team = useSelector(getCurrentlyActiveWorkspace);
@@ -44,13 +44,17 @@ export const ApiClientEmptyView = () => {
       return;
     }
     setIsRecordCreating(recordType);
-    createBlankApiRecord(user?.details?.profile?.uid, team?.id, recordType, "")
+    createBlankApiRecord(user?.details?.profile?.uid, team?.id, recordType, "", apiClientRecordsRepository)
       .then((result) => {
-        onSaveRecord(result.data);
+        if (result.success) {
+          onSaveRecord(result.data);
+        } else {
+          toast.error(result.message || "Could not create a collection.");
+        }
       })
       .catch((error) => {
         console.error("Error creating record", error);
-        toast.error("Something went wrong, please try again or contact support!");
+        toast.error(error.message || "Could not create a collection.");
       })
       .finally(() => {
         setIsRecordCreating(null);
@@ -59,10 +63,9 @@ export const ApiClientEmptyView = () => {
 
   return (
     <div className="api-client-empty-view-container">
-      <img
-        src={isEmpty ? "/assets/media/apiClient/emptyView.svg" : "/assets/media/apiClient/defaultView.svg"}
-        alt="empty-view"
-      />
+      {/* TODO: FIX */}
+      {/* <img src={isEmpty ? emptyViewIcon : defaultViewIcon} alt="empty-view" /> */}
+      {/* <TestMyMagic /> */}
       <div>
         <div className="api-client-empty-view-header">
           {isEmpty ? "No API requests created yet." : "Pick up where you left off or start fresh."}
