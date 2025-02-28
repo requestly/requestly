@@ -17,6 +17,7 @@ import { sessionRecordingActions } from "store/features/session-recording/slice"
 import { updateSessionDescription, updateSessionName } from "../../../../screens/SavedSessionScreen/components/utils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { useCurrentWorkspaceUserRole } from "hooks";
 import "./sessionInfo.scss";
 
 export const SessionInfo: React.FC = () => {
@@ -26,6 +27,7 @@ export const SessionInfo: React.FC = () => {
   const sessionMetadata = useSelector(getSessionRecordingMetaData);
   const sessionAttributes = useSelector(getSessionRecordingAttributes);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const [sessionName, setSessionName] = useState(sessionMetadata?.name);
   const [sessionDescription, setSessionDescription] = useState(sessionMetadata?.description);
@@ -63,7 +65,7 @@ export const SessionInfo: React.FC = () => {
               dispatch(sessionRecordingActions.setName(value));
             }}
             onBlur={handleSessionNameUpdate}
-            disabled={!isRequestedByOwner || isInsideIframe}
+            disabled={!isRequestedByOwner || isInsideIframe || isReadRole}
           />
         ),
       },
@@ -79,7 +81,7 @@ export const SessionInfo: React.FC = () => {
               dispatch(sessionRecordingActions.setDescription(value));
             }}
             onBlur={handleSessionDescriptionUpdate}
-            disabled={!isRequestedByOwner || isInsideIframe}
+            disabled={!isRequestedByOwner || isInsideIframe || isReadRole}
           />
         ),
       },
@@ -97,6 +99,7 @@ export const SessionInfo: React.FC = () => {
     sessionMetadata?.name,
     isRequestedByOwner,
     isInsideIframe,
+    isReadRole,
   ]);
 
   return (

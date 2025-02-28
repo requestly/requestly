@@ -26,6 +26,7 @@ import { hideElement, showElement } from "utils/domUtils";
 import StaticSessionViewerBottomSheet from "features/sessionBook/components/SessionViewerBottomSheet/StaticSessionViewerBottomSheet";
 import "./savedSessionViewer.scss";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
+import { useCurrentWorkspaceUserRole } from "hooks";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -36,6 +37,7 @@ export const SavedSessionViewer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const { handleDeleteSessionAction } = useSessionsActionContext();
   const sessionMetadata = useSelector(getSessionRecordingMetaData);
@@ -104,7 +106,7 @@ export const SavedSessionViewer = () => {
       <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
         <div className="saved-session-header">
           <SessionTitle />
-          {isRequestedByOwner && !isInsideIframe ? (
+          {!isReadRole && isRequestedByOwner && !isInsideIframe ? (
             <div className="saved-session-actions">
               <Tooltip title="Delete session">
                 <RQButton
