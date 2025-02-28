@@ -21,6 +21,8 @@ import { SiBruno } from "@react-icons/all-files/si/SiBruno";
 import { PostmanImporterModal } from "../../../modals/postmanImporterModal/PostmanImporterModal";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { LocalWorkspaceTooltip } from "../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import { useLocation } from "react-router-dom";
 
 interface Props {
@@ -51,6 +53,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
   const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const importItems: DropdownProps["menu"]["items"] = useMemo(
     () => [
@@ -82,11 +85,14 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       },
       {
         key: "2",
+        disabled: isLocalSyncEnabled,
         label: (
-          <div className="new-btn-option">
-            <BsCollection />
-            Requestly Collection and Environments
-          </div>
+          <LocalWorkspaceTooltip featureName="Requestly collection and environment imports">
+            <div className="new-btn-option">
+              <BsCollection />
+              Requestly Collection and Environments
+            </div>
+          </LocalWorkspaceTooltip>
         ),
         onClick: () => {
           trackImportStarted(ApiClientImporterType.REQUESTLY);
@@ -109,10 +115,13 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       },
       {
         key: "3",
+        disabled: isLocalSyncEnabled,
         label: (
-          <div className="new-btn-option">
-            <SiPostman /> Postman Collections and Environments
-          </div>
+          <LocalWorkspaceTooltip featureName="Postman collections and environments">
+            <div className="new-btn-option">
+              <SiPostman /> Postman Collections and Environments
+            </div>
+          </LocalWorkspaceTooltip>
         ),
         onClick: () => {
           trackImportStarted(ApiClientImporterType.POSTMAN);
@@ -135,10 +144,13 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       },
       {
         key: "4",
+        disabled: isLocalSyncEnabled,
         label: (
-          <div className="new-btn-option">
-            <SiBruno /> Bruno Collections and Variables
-          </div>
+          <LocalWorkspaceTooltip featureName="Postman collections and environments">
+            <div className="new-btn-option">
+              <SiBruno /> Bruno Collections and Variables
+            </div>
+          </LocalWorkspaceTooltip>
         ),
         onClick: () => {
           trackImportStarted(ApiClientImporterType.BRUNO);
@@ -160,7 +172,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         },
       },
     ],
-    [user.loggedIn, dispatch, onImportClick]
+    [user.loggedIn, dispatch, onImportClick, isLocalSyncEnabled]
   );
 
   const items: DropdownProps["menu"]["items"] = [

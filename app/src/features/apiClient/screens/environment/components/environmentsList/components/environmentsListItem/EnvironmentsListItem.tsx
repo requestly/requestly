@@ -130,7 +130,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
       { key: EnvironmentMenuKey.EXPORT, label: "Export", onClick: () => onExportClick?.(environment) },
       { key: EnvironmentMenuKey.DELETE, label: "Delete", danger: true, onClick: () => handleEnvironmentDelete() },
     ];
-  }, [handleEnvironmentDuplicate, handleEnvironmentDelete]);
+  }, [handleEnvironmentDuplicate, onExportClick, environment, handleEnvironmentDelete]);
 
   if (isRenameInputVisible) {
     return (
@@ -154,7 +154,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
         redirectToEnvironment(navigate, environment.id);
         openTab(environment.id, {
           title: environment.name,
-          url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environment.id}`,
+          url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(environment.id)}`,
         });
       }}
     >
