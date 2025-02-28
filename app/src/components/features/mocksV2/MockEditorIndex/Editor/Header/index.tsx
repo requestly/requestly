@@ -19,6 +19,7 @@ interface HeaderProps {
   handleTest: () => void;
   setPassword: (password: string) => void;
   password: string;
+  isEditorReadOnly: boolean;
 }
 
 export const MockEditorHeader: React.FC<HeaderProps> = ({
@@ -30,6 +31,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
   handleTest,
   setPassword,
   password,
+  isEditorReadOnly,
 }) => {
   const location = useLocation();
 
@@ -89,32 +91,39 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
           {!location.pathname.includes("rules") && <RQBreadcrumb />}
         </Col>
         <Col className="header-right-section">
-          <div className="mock-edtior-options-container">
-            <Dropdown
-              destroyPopupOnHide
-              trigger={["click"]}
-              open={showDropdown}
-              placement="bottomRight"
-              overlay={dropdownOverlay}
-              onOpenChange={handleDropdownVisibleChange}
-              className={`mock-editor-options-dropdown-trigger ${
-                showDropdown ? "mock-editor-options-dropdown-active" : ""
-              }`}
-            >
-              <span className="text-gray">
-                More
-                <img
-                  width={10}
-                  height={6}
-                  alt="down arrow"
-                  src="/assets/media/common/down-arrow.svg"
-                  className="mock-editor-options-trigger-icon"
-                />
-              </span>
-            </Dropdown>
-          </div>
+          {isEditorReadOnly ? null : (
+            <div className="mock-edtior-options-container">
+              <Dropdown
+                destroyPopupOnHide
+                trigger={["click"]}
+                open={showDropdown}
+                placement="bottomRight"
+                overlay={dropdownOverlay}
+                onOpenChange={handleDropdownVisibleChange}
+                className={`mock-editor-options-dropdown-trigger ${
+                  showDropdown ? "mock-editor-options-dropdown-active" : ""
+                }`}
+              >
+                <span className="text-gray">
+                  More
+                  <img
+                    width={10}
+                    height={6}
+                    alt="down arrow"
+                    src="/assets/media/common/down-arrow.svg"
+                    className="mock-editor-options-trigger-icon"
+                  />
+                </span>
+              </Dropdown>
+            </div>
+          )}
+
           {!isNewMock && isFeatureCompatible(FEATURES.API_CLIENT) && (
-            <RQButton type="default" icon={<ExperimentOutlined />} onClick={handleTest}>
+            <RQButton
+              icon={<ExperimentOutlined />}
+              onClick={handleTest}
+              type={isEditorReadOnly ? "primary" : "default"}
+            >
               Test
             </RQButton>
           )}
@@ -127,9 +136,12 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
           >
             Cancel
           </RQButton>
-          <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={handleSave}>
-            {isNewMock ? (savingInProgress ? "Creating" : "Create") : savingInProgress ? "Saving" : "Save"}
-          </RQButton>
+
+          {isEditorReadOnly ? null : (
+            <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={handleSave}>
+              {isNewMock ? (savingInProgress ? "Creating" : "Create") : savingInProgress ? "Saving" : "Save"}
+            </RQButton>
+          )}
         </Col>
       </Row>
     </Layout.Header>
