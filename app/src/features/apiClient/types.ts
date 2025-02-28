@@ -114,7 +114,7 @@ export namespace RQAPI {
       preRequest: string;
       postResponse: string;
     };
-    auth?: Auth;
+    auth: Auth;
   }
 
   export enum ExecutionStatus {
@@ -158,7 +158,7 @@ export namespace RQAPI {
       postResponse: string;
     };
     variables: Omit<EnvironmentVariables, "localValue">;
-    auth?: Auth;
+    auth: Auth;
   }
 
   interface RecordMetadata {

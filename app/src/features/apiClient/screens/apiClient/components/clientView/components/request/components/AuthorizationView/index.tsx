@@ -1,5 +1,5 @@
 import { Select } from "antd";
-import { isEmpty } from "lodash";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import AuthorizationForm from "./AuthorizationForm";
 import Description from "./Description";
@@ -10,15 +10,16 @@ import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineE
 import { MdClear } from "@react-icons/all-files/md/MdClear";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentVariables } from "backend/environment/types";
-import { HelpPanel } from "./HelpPanel";
+
 import "./authorizationView.scss";
-import { AuthConfig, Authorization } from "./types/AuthConfig";
+import { AuthConfig, AuthConfigMeta, Authorization } from "./types/AuthConfig";
+import { getDefaultAuthType } from "./defaults";
 
 interface Props {
   wrapperClass?: string;
   defaults?: RQAPI.Auth;
   onAuthUpdate: (newAuth: RQAPI.Auth) => void;
-  isRootLevelRecord: Boolean;
+  isRootLevelRecord: boolean;
   variables: EnvironmentVariables;
   authorizationViewActions?: React.ReactElement;
 }
@@ -33,23 +34,26 @@ const AuthorizationView: React.FC<Props> = ({
 }) => {
   const defaultsRef = useRef(defaults);
   const [selectedAuthType, setSelectedAuthType] = useState<Authorization.Type>(
-    defaultsRef.current?.currentAuthType ||
-      (isRootLevelRecord ? Authorization.Type.NO_AUTH : Authorization.Type.INHERIT)
+    defaultsRef.current?.currentAuthType || getDefaultAuthType(isRootLevelRecord)
   );
 
   const [resolvedAuthConfigStore, setResolvedAuthConfigStore] = useState<RQAPI.Auth["authConfigStore"]>(
     defaultsRef.current?.authConfigStore
   );
 
-  const onFormConfigChange = useCallback((authConfig: AuthConfig | null) => {
-    setResolvedAuthConfigStore((prevOptions) => {
-      const newConfigStore = { ...prevOptions };
-      if (authConfig.type !== Authorization.Type.NO_AUTH && authConfig.type !== Authorization.Type.INHERIT) {
-        newConfigStore[authConfig.type] = authConfig.config;
+  const onFormConfigChange = useCallback(
+    <SelectedAuthType extends AuthConfigMeta.AuthWithConfig>(authConfig: AuthConfig<SelectedAuthType> | null) => {
+      if (!authConfig) {
+        return;
       }
-      return newConfigStore;
-    });
-  }, []);
+      setResolvedAuthConfigStore((prevOptions) => {
+        const newConfigStore = { ...prevOptions };
+        newConfigStore[authConfig.type] = authConfig.config;
+        return newConfigStore;
+      });
+    },
+    []
+  );
 
   const handleAuthTypeChange = useCallback((value: Authorization.Type) => {
     setSelectedAuthType(value);
@@ -61,7 +65,7 @@ const AuthorizationView: React.FC<Props> = ({
       onAuthUpdate({
         currentAuthType: selectedAuthType,
         authConfigStore: resolvedAuthConfigStore,
-      } as RQAPI.Auth);
+      });
     }
   }, [selectedAuthType, resolvedAuthConfigStore, onAuthUpdate]);
 
@@ -76,7 +80,7 @@ const AuthorizationView: React.FC<Props> = ({
             onChange={handleAuthTypeChange}
             options={AUTH_SELECTOR_LABELS}
           />
-          {![Authorization.Type.NO_AUTH, Authorization.Type.INHERIT].includes(selectedAuthType) && (
+          {Authorization.requiresConfig(selectedAuthType) && (
             <div
               className="clear-icon"
               onClick={() => {
@@ -91,7 +95,7 @@ const AuthorizationView: React.FC<Props> = ({
         </div>
       </div>
       <div className="form-and-description">
-        {!isEmpty(FORM_TEMPLATE_STATIC_DATA[selectedAuthType].formData) && (
+        {Authorization.requiresConfig(selectedAuthType) && (
           <div className="form-view">
             <p className="info-text">
               <AiOutlineExclamationCircle size={"12px"} color="#8f8f8f" />
@@ -106,14 +110,7 @@ const AuthorizationView: React.FC<Props> = ({
             />
           </div>
         )}
-
-        {!isEmpty(FORM_TEMPLATE_STATIC_DATA[selectedAuthType]?.description) ? (
-          [Authorization.Type.NO_AUTH, Authorization.Type.INHERIT].includes(selectedAuthType) ? (
-            <Description data={FORM_TEMPLATE_STATIC_DATA[selectedAuthType]?.description} />
-          ) : (
-            <HelpPanel data={FORM_TEMPLATE_STATIC_DATA[selectedAuthType]?.description} />
-          )
-        ) : null}
+        <Description data={FORM_TEMPLATE_STATIC_DATA[selectedAuthType].description} />
       </div>
     </div>
   );

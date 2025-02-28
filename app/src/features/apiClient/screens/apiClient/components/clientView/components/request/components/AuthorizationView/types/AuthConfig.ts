@@ -22,18 +22,48 @@ export namespace Authorization {
     username: string;
     password: string;
   };
+
+  export const requiresConfig = (type: Type): type is AuthConfigMeta.AuthWithConfig => {
+    return ![Type.NO_AUTH, Type.INHERIT].includes(type);
+  };
+
+  export const hasNoConfig = (type: Type): type is AuthConfigMeta.NoConfigAuth => {
+    return [Type.NO_AUTH, Type.INHERIT].includes(type);
+  };
 }
 
-export abstract class AuthConfig {
+export namespace AuthConfigMeta {
+  export type TypeToConfig = {
+    [Authorization.Type.API_KEY]: Authorization.API_KEY_CONFIG;
+    [Authorization.Type.BEARER_TOKEN]: Authorization.BEARER_TOKEN_CONFIG;
+    [Authorization.Type.BASIC_AUTH]: Authorization.BASIC_AUTH_CONFIG;
+    [Authorization.Type.NO_AUTH]: never;
+    [Authorization.Type.INHERIT]: never;
+  };
+
+  type HasConfig<T extends Authorization.Type> = TypeToConfig[T] extends never ? false : true;
+
+  export type AuthWithConfig = {
+    [K in Authorization.Type]: HasConfig<K> extends true ? K : never;
+  }[Authorization.Type];
+
+  export type NoConfigAuth = {
+    [K in Authorization.Type]: HasConfig<K> extends false ? K : never;
+  }[Authorization.Type];
+}
+
+export abstract class AuthConfig<T extends AuthConfigMeta.AuthWithConfig> {
   abstract validate(): boolean;
-  abstract get config(): any;
-  abstract get type(): Authorization.Type;
+  abstract readonly type: T;
+  abstract get config(): AuthConfigMeta.TypeToConfig[T] | null;
 }
 
-export class ApiKeyAuthorizationConfig implements AuthConfig {
+export class ApiKeyAuthorizationConfig implements AuthConfig<Authorization.Type.API_KEY> {
   key: string;
   value: string;
   addTo: Authorization.API_KEY_CONFIG["addTo"];
+
+  type: Authorization.Type.API_KEY = Authorization.Type.API_KEY;
 
   constructor(key: string, value: string, addTo: Authorization.API_KEY_CONFIG["addTo"] = "HEADER") {
     this.key = key;
@@ -45,11 +75,7 @@ export class ApiKeyAuthorizationConfig implements AuthConfig {
     return this.key !== "" && this.value !== "";
   }
 
-  get type() {
-    return Authorization.Type.API_KEY;
-  }
-
-  get config(): Authorization.API_KEY_CONFIG | null {
+  get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.API_KEY] | null {
     if (!this.validate()) {
       // throw new Error("Invalid API Key Authorization Config");
       return null;
@@ -62,8 +88,11 @@ export class ApiKeyAuthorizationConfig implements AuthConfig {
   }
 }
 
-export class BearerTokenAuthorizationConfig implements AuthConfig {
+export class BearerTokenAuthorizationConfig implements AuthConfig<Authorization.Type.BEARER_TOKEN> {
   bearer: string;
+
+  type: Authorization.Type.BEARER_TOKEN = Authorization.Type.BEARER_TOKEN;
+
   constructor(bearer: string) {
     this.bearer = bearer;
   }
@@ -71,7 +100,8 @@ export class BearerTokenAuthorizationConfig implements AuthConfig {
   validate(): boolean {
     return this.bearer !== "";
   }
-  get config(): Authorization.BEARER_TOKEN_CONFIG | null {
+
+  get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.BEARER_TOKEN] | null {
     if (!this.validate()) {
       // throw new Error("Invalid Bearer Token Authorization Config");
       return null;
@@ -80,15 +110,14 @@ export class BearerTokenAuthorizationConfig implements AuthConfig {
       bearer: this.bearer,
     };
   }
-
-  get type() {
-    return Authorization.Type.BEARER_TOKEN;
-  }
 }
 
-export class BasicAuthAuthorizationConfig implements AuthConfig {
+export class BasicAuthAuthorizationConfig implements AuthConfig<Authorization.Type.BASIC_AUTH> {
   username: string;
   password: string;
+
+  type: Authorization.Type.BASIC_AUTH = Authorization.Type.BASIC_AUTH;
+
   constructor(username: string, password: string) {
     this.username = username;
     this.password = password;
@@ -98,7 +127,7 @@ export class BasicAuthAuthorizationConfig implements AuthConfig {
     return this.username !== "" && this.password !== "";
   }
 
-  get config(): Authorization.BASIC_AUTH_CONFIG | null {
+  get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.BASIC_AUTH] | null {
     if (!this.validate()) {
       // throw new Error("Invalid Basic Auth Authorization Config");
       return null;
@@ -107,9 +136,5 @@ export class BasicAuthAuthorizationConfig implements AuthConfig {
       username: this.username,
       password: this.password,
     };
-  }
-
-  get type() {
-    return Authorization.Type.BASIC_AUTH;
   }
 }
