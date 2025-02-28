@@ -75,16 +75,28 @@
       flex: auto;
       height: 32px;
       width: calc(100% - 205px);
+      gap: 8px;
 
       .api-request-method-selector {
-        width: 120px;
+        width: 100px;
+      }
+
+      .api-request-method-selector .ant-select-selector {
+        border-top-right-radius: 4px !important;
+        border-bottom-right-radius: 4px !important;
       }
 
       .api-request-url {
         padding: 4px 8px;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
         background: transparent;
+
+        &.highlight-url {
+          border: 0.5px solid #1e69ff;
+        }
+
+        &:focus-within {
+          border: 0.5px solid #3e4044;
+        }
       }
 
       .ant-select-selector {
