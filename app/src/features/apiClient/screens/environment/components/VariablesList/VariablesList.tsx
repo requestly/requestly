@@ -14,6 +14,7 @@ import APP_CONSTANTS from "config/constants";
 import "./variablesList.scss";
 
 interface VariablesListProps {
+  isReadRole: boolean;
   variables: EnvironmentVariables;
   searchValue?: string;
   onVariablesChange: (variables: EnvironmentVariables) => void;
@@ -21,7 +22,12 @@ interface VariablesListProps {
 
 export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string };
 
-export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", variables, onVariablesChange }) => {
+export const VariablesList: React.FC<VariablesListProps> = ({
+  isReadRole,
+  searchValue = "",
+  variables,
+  onVariablesChange,
+}) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [dataSource, setDataSource] = useState([]);
@@ -207,13 +213,17 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
         },
       }}
       scroll={{ y: "calc(100vh - 280px)" }}
-      footer={() => (
-        <div className="variables-list-footer">
-          <RQButton icon={<MdAdd />} size="small" onClick={handleAddVariable}>
-            Add More
-          </RQButton>
-        </div>
-      )}
+      footer={
+        isReadRole
+          ? null
+          : () => (
+              <div className="variables-list-footer">
+                <RQButton icon={<MdAdd />} size="small" onClick={handleAddVariable}>
+                  Add More
+                </RQButton>
+              </div>
+            )
+      }
     />
   );
 };

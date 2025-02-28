@@ -11,11 +11,13 @@ import { useState } from "react";
 import { toast } from "utils/Toast";
 import "./apiClientEmptyView.scss";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
+import { useCurrentWorkspaceUserRole } from "hooks";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
 
   const { apiClientRecords, onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const user = useSelector(getUserAuthDetails);
   const team = useSelector(getCurrentlyActiveWorkspace);
@@ -28,6 +30,14 @@ export const ApiClientEmptyView = () => {
     recordType === RQAPI.RecordType.API
       ? trackNewRequestClicked("api_client_home")
       : trackNewCollectionClicked("api_client_home");
+
+    if (isReadRole) {
+      toast.warn(
+        `As a viewer, you cannot create new ${recordType}. Contact your workspace admin to request an update to your role.`,
+        5
+      );
+      return;
+    }
 
     if (!user.loggedIn) {
       dispatch(
