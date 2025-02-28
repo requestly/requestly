@@ -1,4 +1,4 @@
-import { Authorization } from "../../types/AuthConfig";
+import { AuthConfigMeta, Authorization } from "../../types/AuthConfig";
 import { AuthForm } from "./types";
 
 export const AUTH_SELECTOR_LABELS = [
@@ -9,7 +9,7 @@ export const AUTH_SELECTOR_LABELS = [
   { label: "Basic Auth", value: Authorization.Type.BASIC_AUTH },
 ];
 
-const FORM_FIELDS_LAYOUT: Record<Authorization.Type, AuthForm.FormField[]> = {
+const FORM_FIELDS_LAYOUT: Record<AuthConfigMeta.AuthWithConfig, AuthForm.FormField[]> = {
   [Authorization.Type.API_KEY]: [
     { id: "key", type: AuthForm.FIELD_TYPE.INPUT, label: "Key", placeholder: "Key" },
     { id: "value", type: AuthForm.FIELD_TYPE.INPUT, label: "Value", placeholder: "Value" },
@@ -31,13 +31,10 @@ const FORM_FIELDS_LAYOUT: Record<Authorization.Type, AuthForm.FormField[]> = {
     { id: "username", type: AuthForm.FIELD_TYPE.INPUT, label: "Username", placeholder: "Username" },
     { id: "password", type: AuthForm.FIELD_TYPE.INPUT, label: "Password", placeholder: "Password" },
   ],
-  [Authorization.Type.NO_AUTH]: null,
-  [Authorization.Type.INHERIT]: null,
 };
 
 export const FORM_TEMPLATE_STATIC_DATA: AuthForm.FormStructure = {
   [Authorization.Type.INHERIT]: {
-    formData: FORM_FIELDS_LAYOUT[Authorization.Type.INHERIT],
     description: {
       img: "/assets/media/apiClient/inherit-auth.svg",
       heading: "Inherits authorization from the parent collection.",
@@ -45,7 +42,6 @@ export const FORM_TEMPLATE_STATIC_DATA: AuthForm.FormStructure = {
     },
   },
   [Authorization.Type.NO_AUTH]: {
-    formData: FORM_FIELDS_LAYOUT[Authorization.Type.NO_AUTH],
     description: {
       img: "/assets/media/apiClient/no-auth.svg",
       heading: "No authorization type selected for this request.",

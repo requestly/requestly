@@ -1,8 +1,13 @@
 import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { generateDocumentId } from "backend/utils";
-import { POSTMAN_AUTH_TYPES_MAPPING, POSTMAN_FIELD_MAPPING } from "features/apiClient/constants";
+import { POSTMAN_AUTH_TYPES_MAPPING, PostmanAuth } from "features/apiClient/constants";
 import { Authorization } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { isEmpty } from "lodash";
+import {
+  getDefaultAuth,
+  getDefaultAuthType,
+} from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
 
 interface PostmanCollectionExport {
   info: {
@@ -89,21 +94,57 @@ const processScripts = (item: any) => {
   return scripts;
 };
 
-const processAuthorizationOptions = (item: Record<string, any> = {}, parentCollectionId?: string): RQAPI.Auth => {
-  const currentAuthType =
-    POSTMAN_AUTH_TYPES_MAPPING[item?.type] ??
-    (parentCollectionId ? Authorization.Type.INHERIT : Authorization.Type.NO_AUTH);
+const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentCollectionId?: string): RQAPI.Auth => {
+  if (isEmpty(item)) return getDefaultAuth(parentCollectionId === null);
 
-  const auth: RQAPI.Auth = { currentAuthType, authConfigStore: { [currentAuthType]: {} } };
+  const currentAuthType = POSTMAN_AUTH_TYPES_MAPPING[item.type] ?? getDefaultAuthType(parentCollectionId === null);
 
-  const authOptions = item[item?.type] || [];
-  authOptions.forEach((option: Record<string, any>) => {
-    // todo
-    auth.authConfigStore[currentAuthType][POSTMAN_FIELD_MAPPING.get(option.key)] = POSTMAN_FIELD_MAPPING.get(
-      option.value
-    );
-  });
+  const auth: RQAPI.Auth = { currentAuthType, authConfigStore: {} };
 
+  if (item.type === PostmanAuth.AuthType.BEARER_TOKEN) {
+    const authOptions = item[item.type];
+    const token = authOptions[0];
+    auth.authConfigStore[Authorization.Type.BEARER_TOKEN] = {
+      bearer: token.value,
+    };
+  } else if (item.type === PostmanAuth.AuthType.BASIC_AUTH) {
+    const basicAuthOptions = item[item.type];
+    let username: PostmanAuth.KV<"username">, password: PostmanAuth.KV<"password">;
+
+    basicAuthOptions.forEach((option) => {
+      if (option.key === "username") {
+        username = option;
+      } else if (option.key === "password") {
+        password = option;
+      }
+    });
+
+    auth.authConfigStore[Authorization.Type.BASIC_AUTH] = {
+      username: username.value,
+      password: password.value,
+    };
+  } else if (item.type === PostmanAuth.AuthType.API_KEY) {
+    const apiKeyOptions = item[item.type];
+    let keyLabel: PostmanAuth.KV<"key">;
+    let apiKey: PostmanAuth.KV<"value">;
+    let addTo: Authorization.API_KEY_CONFIG["addTo"];
+
+    apiKeyOptions.forEach((option) => {
+      if (option.key === "key") {
+        keyLabel = option;
+      } else if (option.key === "value") {
+        apiKey = option;
+      } else if (option.key === "in") {
+        addTo = option.value === "header" ? "HEADER" : "QUERY";
+      }
+    });
+
+    auth.authConfigStore[Authorization.Type.API_KEY] = {
+      key: keyLabel.value,
+      value: apiKey.value,
+      addTo,
+    };
+  }
   return auth;
 };
 
