@@ -54,7 +54,7 @@ export namespace AuthConfigMeta {
 
 export abstract class AuthConfig<T extends AuthConfigMeta.AuthWithConfig> {
   abstract validate(): boolean;
-  abstract get type(): T;
+  abstract readonly type: T;
   abstract get config(): AuthConfigMeta.TypeToConfig[T] | null;
 }
 
@@ -63,7 +63,7 @@ export class ApiKeyAuthorizationConfig implements AuthConfig<Authorization.Type.
   value: string;
   addTo: Authorization.API_KEY_CONFIG["addTo"];
 
-  type: Authorization.Type.API_KEY;
+  type: Authorization.Type.API_KEY = Authorization.Type.API_KEY;
 
   constructor(key: string, value: string, addTo: Authorization.API_KEY_CONFIG["addTo"] = "HEADER") {
     this.key = key;
@@ -91,7 +91,7 @@ export class ApiKeyAuthorizationConfig implements AuthConfig<Authorization.Type.
 export class BearerTokenAuthorizationConfig implements AuthConfig<Authorization.Type.BEARER_TOKEN> {
   bearer: string;
 
-  type: Authorization.Type.BEARER_TOKEN;
+  type: Authorization.Type.BEARER_TOKEN = Authorization.Type.BEARER_TOKEN;
 
   constructor(bearer: string) {
     this.bearer = bearer;
@@ -116,7 +116,7 @@ export class BasicAuthAuthorizationConfig implements AuthConfig<Authorization.Ty
   username: string;
   password: string;
 
-  type: Authorization.Type.BASIC_AUTH;
+  type: Authorization.Type.BASIC_AUTH = Authorization.Type.BASIC_AUTH;
 
   constructor(username: string, password: string) {
     this.username = username;

@@ -23,6 +23,7 @@ export const processAuthForEntry = (
   if (finalAuth.currentAuthType === Authorization.Type.INHERIT) {
     finalAuth = inheritAuthFromParent(entryDetails, allRecords);
   }
+  finalAuth = pruneConfig(finalAuth);
 
   if (!finalAuth) {
     return {
@@ -92,22 +93,21 @@ function extractAuthHeadersAndParams(auth: RQAPI.Auth) {
     case Authorization.Type.NO_AUTH:
       break;
     case Authorization.Type.BASIC_AUTH: {
-      if (!auth.authConfigStore) break; // invalid auth config gets stored as null for now
+      if (!auth.authConfigStore?.[Authorization.Type.BASIC_AUTH]) break; // invalid auth config gets stored as null for now
       const { username, password } = auth.authConfigStore[Authorization.Type.BASIC_AUTH];
-      addEntryToResults(resultingHeaders, "Authorization", `Basic ${btoa(`${username || ""}:${password || ""}`)}`);
+      addEntryToResults(resultingHeaders, "Authorization", `Basic ${btoa(`${username}:${password}`)}`);
       break;
     }
     case Authorization.Type.BEARER_TOKEN: {
-      console.log("DBG-1: extractAuthHeadersAndParams: auth.authConfigStore: ", auth.authConfigStore);
-      if (!auth.authConfigStore) break; // invalid auth config gets stored as null for now
+      if (!auth.authConfigStore?.[Authorization.Type.BEARER_TOKEN]) break; // invalid auth config gets stored as null for now
       const { bearer } = auth.authConfigStore[Authorization.Type.BEARER_TOKEN];
       addEntryToResults(resultingHeaders, "Authorization", `Bearer ${bearer}`);
       break;
     }
     case Authorization.Type.API_KEY: {
-      if (!auth.authConfigStore) break; // invalid auth config gets stored as null for now
+      if (!auth.authConfigStore?.[Authorization.Type.API_KEY]) break; // invalid auth config gets stored as null for now
       const { key, value, addTo } = auth.authConfigStore[Authorization.Type.API_KEY];
-      addEntryToResults(addTo === "QUERY" ? resultingQueryParams : resultingHeaders, key || "", value || "");
+      addEntryToResults(addTo === "QUERY" ? resultingQueryParams : resultingHeaders, key, value);
       break;
     }
     default:
@@ -118,6 +118,55 @@ function extractAuthHeadersAndParams(auth: RQAPI.Auth) {
     headers: resultingHeaders,
     queryParams: resultingQueryParams,
   };
+}
+
+/* Last line of checks against older records that were created before validations were added to the form */
+function pruneConfig(auth?: RQAPI.Auth): RQAPI.Auth | null {
+  if (!auth) {
+    return null;
+  }
+
+  const { currentAuthType, authConfigStore } = auth;
+  switch (currentAuthType) {
+    case Authorization.Type.NO_AUTH:
+    case Authorization.Type.INHERIT:
+      return {
+        currentAuthType,
+        authConfigStore: {},
+      };
+    case Authorization.Type.BASIC_AUTH:
+      if (
+        isEmpty(authConfigStore[Authorization.Type.BASIC_AUTH]) ||
+        !authConfigStore[Authorization.Type.BASIC_AUTH].username ||
+        !authConfigStore[Authorization.Type.BASIC_AUTH].password
+      ) {
+        return null;
+      }
+      break;
+    case Authorization.Type.BEARER_TOKEN:
+      console.log("DBG: authConfigStore", authConfigStore);
+      if (
+        isEmpty(authConfigStore[Authorization.Type.BEARER_TOKEN]) ||
+        !authConfigStore[Authorization.Type.BEARER_TOKEN].bearer
+      ) {
+        return null;
+      }
+      break;
+    case Authorization.Type.API_KEY:
+      if (
+        isEmpty(authConfigStore[Authorization.Type.API_KEY]) ||
+        !authConfigStore[Authorization.Type.API_KEY].key ||
+        !authConfigStore[Authorization.Type.API_KEY].value ||
+        !["HEADER", "QUERY"].includes(authConfigStore[Authorization.Type.API_KEY].addTo)
+      ) {
+        return null;
+      }
+      break;
+    default:
+      throw new Error("Invalid Auth Type");
+  }
+
+  return auth;
 }
 
 export const updateRequestWithAuthOptions = (data: KeyValuePair[], dataToAdd: KeyValuePair[]) => {
