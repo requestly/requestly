@@ -13,10 +13,12 @@ import { trackNewRuleButtonClicked } from "modules/analytics/events/common/rules
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { trackSampleRuleEditorViewed } from "features/rules/analytics";
+import { TeamRole } from "types";
 
 const RuleNameColumn: React.FC<{
+  role: TeamRole;
   record: RuleTableRecord;
-}> = ({ record }) => {
+}> = ({ role, record }) => {
   // TODO: remove this when tooltip component is added in the design system
   const baseEllipsisTooltipConfig: TooltipProps = {
     overlayClassName: "rules-table-ellipsis-tooltip",
@@ -122,23 +124,25 @@ const RuleNameColumn: React.FC<{
           </Tooltip>
         ) : null}
 
-        <RuleSelectionListDrawer
-          groupId={group.id}
-          open={isRulesListDrawerOpen}
-          onClose={onRulesListDrawerClose}
-          source={SOURCE.RULE_GROUP}
-        >
-          <Button
-            className="add-rule-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsRulesListDrawerOpen(true);
-              trackNewRuleButtonClicked(SOURCE.RULE_GROUP);
-            }}
+        {role === TeamRole.read ? null : (
+          <RuleSelectionListDrawer
+            groupId={group.id}
+            open={isRulesListDrawerOpen}
+            onClose={onRulesListDrawerClose}
+            source={SOURCE.RULE_GROUP}
           >
-            <span>+</span> <span>Add rule</span>
-          </Button>
-        </RuleSelectionListDrawer>
+            <Button
+              className="add-rule-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsRulesListDrawerOpen(true);
+                trackNewRuleButtonClicked(SOURCE.RULE_GROUP);
+              }}
+            >
+              <span>+</span> <span>Add rule</span>
+            </Button>
+          </RuleSelectionListDrawer>
+        )}
       </div>
     );
   }
