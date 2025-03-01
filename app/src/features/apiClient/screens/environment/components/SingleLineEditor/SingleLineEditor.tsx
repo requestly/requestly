@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
+import { EditorView, placeholder as cmPlaceHolder, keymap, hoverTooltip } from "@codemirror/view";
 import { EditorState, Prec } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
@@ -7,6 +7,7 @@ import { EditorPopover } from "componentsV2/CodeEditor/components/Editor/compone
 import "componentsV2/CodeEditor/components/Editor/components/PopOver/popover.scss";
 import generateCompletionsForVariables from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
 import "./singleLineEditor.scss";
+
 interface RQSingleLineEditorProps {
   defaultValue?: string;
   className?: string;
@@ -14,6 +15,8 @@ interface RQSingleLineEditorProps {
   placeholder?: string;
   onPressEnter?: (event: KeyboardEvent, text: string) => void;
   onBlur?: (text: string) => void;
+  enableWrapping?: boolean;
+  showTooltip?: boolean;
   variables?: Record<string, any>;
 }
 
@@ -24,6 +27,8 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   placeholder,
   onPressEnter,
   onBlur,
+  enableWrapping,
+  showTooltip,
   variables = {},
 }) => {
   const editorRef = useRef(null);
@@ -38,13 +43,39 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
   const onChangeRef = useRef(onChange);
   const previousDefaultValueRef = useRef(defaultValue);
 
+  const [hoveredVariable, setHoveredVariable] = useState(null); // Track hovered variable
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+
+  // Function to add tooltip on hover
+  const tooltip = hoverTooltip((view, pos, side) => {
+    const { from, to, text } = view.state.doc.lineAt(pos);
+    let start = pos,
+      end = pos;
+
+    while (start > from && /\w/.test(text[start - from - 1])) start--;
+    while (end < to && /\w/.test(text[end - from])) end++;
+
+    if ((start === pos && side < 0) || (end === pos && side > 0)) return null;
+
+    const word = text.slice(start - from, end - from);
+
+    return {
+      pos: start,
+      end,
+      above: true,
+      create: () => {
+        const dom = document.createElement("div");
+        dom.className = "cm-tooltip";
+        dom.textContent = `${word}`;
+        return { dom };
+      },
+    };
+  });
+
   useEffect(() => {
     onBlurRef.current = onBlur;
     onChangeRef.current = onChange;
   }, [onBlur, onChange]);
-
-  const [hoveredVariable, setHoveredVariable] = useState(null); // Track hovered variable
-  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     if (editorViewRef.current) {
@@ -62,6 +93,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
       state: EditorState.create({
         doc: defaultValue ?? "",
         extensions: [
+          showTooltip ? tooltip : [],
           history(),
           keymap.of(historyKeymap),
           Prec.highest(
@@ -124,6 +156,7 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
           ),
           generateCompletionsForVariables(variables),
           cmPlaceHolder(placeholder ?? "Input here"),
+          ...(enableWrapping ? [EditorView.lineWrapping] : []),
         ],
       }),
     });
