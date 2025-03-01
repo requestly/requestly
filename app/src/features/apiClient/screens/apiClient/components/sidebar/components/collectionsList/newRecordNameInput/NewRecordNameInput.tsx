@@ -1,10 +1,8 @@
 import React, { useCallback, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { Input } from "antd";
-import { upsertApiRecord } from "backend/apiClient";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { toast } from "utils/Toast";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -36,10 +34,8 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
-  const { onSaveRecord } = useApiClientContext();
-  const { replaceTab, updateTab } = useTabsLayoutContext();
+  const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
+  const { replaceTab, updateTab, closeTab } = useTabsLayoutContext();
 
   const defaultRecordName = recordType === RQAPI.RecordType.API ? "Untitled request" : "New collection";
   const [recordName, setRecordName] = useState(recordToBeEdited?.name || defaultRecordName);
@@ -74,7 +70,10 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       record.collectionId = newRecordCollectionId;
     }
 
-    const result = await upsertApiRecord(uid, record, teamId);
+    const result =
+      record.type === RQAPI.RecordType.API
+        ? await apiClientRecordsRepository.createRecord(record)
+        : await apiClientRecordsRepository.createCollection(record);
 
     if (result.success) {
       onSaveRecord(result.data);
@@ -88,7 +87,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
         replaceTab("request/new", {
           id: result.data.id,
           title: result.data.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${result.data.id}`,
+          url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(result.data.id)}`,
         });
       } else {
         trackCollectionSaved(analyticEventSource);
@@ -96,14 +95,16 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
         replaceTab("collection/new", {
           id: result.data.id,
           title: result.data.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${result.data.id}`,
+          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(result.data.id)}`,
         });
       }
 
       const toastSuccessMessage = recordType === RQAPI.RecordType.API ? "Request created!" : "Collection Created!";
       toast.success(toastSuccessMessage);
     } else {
-      toast.error("Something went wrong!");
+      toast.error(
+        result?.message || `Could not save ${record.type === RQAPI.RecordType.COLLECTION ? "Collection" : "Request"}.`
+      );
     }
 
     setIsLoading(false);
@@ -112,13 +113,13 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     recordType,
     recordName,
     uid,
-    teamId,
     onSaveRecord,
     defaultRecordName,
     analyticEventSource,
     newRecordCollectionId,
     onSuccess,
     replaceTab,
+    apiClientRecordsRepository,
   ]);
 
   const updateRecord = useCallback(async () => {
@@ -139,11 +140,29 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       name: recordName,
     };
 
-    const result = await upsertApiRecord(uid, record, teamId);
+    const result =
+      record.type === RQAPI.RecordType.API
+        ? await apiClientRecordsRepository.updateRecord(record, record.id)
+        : await apiClientRecordsRepository.renameCollection(record.id, record.name);
+
+    // const updatedRecords = await repository.reactToRename(records);
+    // if(updatedRecords) {
+    // 	setState(updatedRecords);
+    // }
+    //
+    // await forceRefreshApilClientRecords(){
+    // repo.getAllRecords()
+    // setApiClientRecords()
+    // }
 
     if (result.success) {
       // False is passed to not open the tab when renaming the record from sidebar
       onSaveRecord(result.data);
+
+      const wasForceRefreshed = await forceRefreshApiClientRecords();
+      if (wasForceRefreshed && recordType === RQAPI.RecordType.COLLECTION) {
+        closeTab(record.id);
+      }
 
       if (recordType === RQAPI.RecordType.API) {
         trackRequestRenamed("api_client_sidebar");
@@ -156,12 +175,23 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       const toastSuccessMessage = recordType === RQAPI.RecordType.API ? "Request updated!" : "Collection updated!";
       toast.success(toastSuccessMessage);
     } else {
-      toast.error("Something went wrong!");
+      toast.error(result?.message || "Something went wrong!");
     }
 
     setIsLoading(false);
     onSuccess?.();
-  }, [recordType, recordToBeEdited, recordName, uid, teamId, onSaveRecord, onSuccess, updateTab]);
+  }, [
+    recordType,
+    recordToBeEdited,
+    recordName,
+    uid,
+    onSaveRecord,
+    onSuccess,
+    updateTab,
+    apiClientRecordsRepository,
+    forceRefreshApiClientRecords,
+    closeTab,
+  ]);
 
   const onBlur = isEditMode ? updateRecord : saveNewRecord;
 
