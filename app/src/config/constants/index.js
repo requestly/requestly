@@ -14,7 +14,6 @@ import FILES_TABLE_CONSTANTS from "./sub/files-table-constants";
 import THEME_COLORS from "./sub/theme-colors";
 import AUTH from "./sub/auth";
 import LIMIT_REACHED_MODAL from "./sub/limit-reached-modal";
-import EMAIL_DOMAINS from "./sub/email-domains";
 import STYLES from "./sub/styles";
 import COOKIES from "./sub/cookies";
 import THEMES from "./sub/themes";
@@ -92,9 +91,6 @@ APP_CONSTANTS.TRASH_DURATION_OF_DELETED_RULES_TO_SHOW = 30;
 APP_CONSTANTS.BETA = "beta";
 APP_CONSTANTS.LOCAL = "local";
 APP_CONSTANTS.PROD = "prod";
-
-// LIST OF PERSONAL EMAIL DOMAINS
-APP_CONSTANTS.EMAIL_DOMAINS = EMAIL_DOMAINS;
 
 //List of known headers used for suggestion
 APP_CONSTANTS.HEADER_SUGGESTIONS = HEADER_SUGGESTIONS;
