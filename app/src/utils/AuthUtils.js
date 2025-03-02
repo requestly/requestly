@@ -11,8 +11,7 @@ import {
   trackEmailVerificationSendSuccess,
 } from "modules/analytics/events/common/auth/emailVerification";
 import Logger from "lib/logger";
-import disposableEmailDomains from "disposable-email-domains/index.json";
-import disposableEmailDomainsWildcard from "disposable-email-domains/wildcard.json";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -35,9 +34,10 @@ export const isEmailVerified = (userId) => {
     .catch((err) => Logger.log(err));
 };
 
-export const isDisposableEmail = (email) => {
-  const domain = email.split("@")[1];
-  return disposableEmailDomains.includes(domain) || disposableEmailDomainsWildcard.includes(domain);
+export const isDisposableEmail = async (email) => {
+  const checkDisposable = httpsCallable(getFunctions(), "fetchEmailType");
+  const result = await checkDisposable({ userEmail: email });
+  return result.data.type === "destroyable";
 };
 
 export const setEmailVerified = async (userId, value) => {

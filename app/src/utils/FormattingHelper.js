@@ -1,9 +1,8 @@
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import APP_CONSTANTS from "config/constants";
 import { PRICING } from "features/pricing";
 import { capitalize } from "lodash";
-import { isDisposableEmail } from "./AuthUtils";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 export const generateObjectId = () => {
   return Math.random().toString(36).substr(2, 5);
@@ -73,34 +72,32 @@ export const getCompanyNameFromEmail = (email) => {
   return capitalize(getDomainFromEmail(email).split(".")[0]);
 };
 
-export const isCompanyEmail = (email) => {
+export const isCompanyEmail = async (email) => {
   const domain = getDomainFromEmail(email);
   if (!domain) {
     return false;
   }
-
-  if (isDisposableEmail(email)) {
-    return false;
-  }
-
-  return !(
-    APP_CONSTANTS.EMAIL_DOMAINS.PERSONAL.includes(domain) || APP_CONSTANTS.EMAIL_DOMAINS.DESTROYABLE.includes(domain)
-  );
+  const checkEmailType = httpsCallable(getFunctions(), "fetchEmailType");
+  const result = await checkEmailType({ userEmail: email });
+  return result.data.type === "business";
 };
 
 export const getByteSize = (inputString) => {
   return new Blob([inputString]).size;
 };
 
-export const getEmailType = (email) => {
+export const getEmailType = async (email) => {
   const domain = getDomainFromEmail(email);
   if (!domain) {
     return "UNDEFINED";
-  } else if (APP_CONSTANTS.EMAIL_DOMAINS.PERSONAL.includes(domain)) {
+  }
+  const checkEmailType = httpsCallable(getFunctions(), "fetchEmailType");
+  const result = await checkEmailType({ userEmail: email });
+  if (result.data.type === "personal") {
     return "PERSONAL";
-  } else if (isDisposableEmail(email)) {
+  } else if (result.data.type === "destroyable") {
     return "DESTROYABLE";
-  } else if (isCompanyEmail(email)) {
+  } else if (result.data.type === "business") {
     return "BUSINESS";
   } else return "UNDEFINED";
 };
