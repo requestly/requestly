@@ -1,26 +1,21 @@
-export const AUTHORIZATION_TYPES = {
-  INHERIT: "INHERIT",
-  NO_AUTH: "NO_AUTH",
-  API_KEY: "API_KEY",
-  BEARER_TOKEN: "BEARER_TOKEN",
-  BASIC_AUTH: "BASIC_AUTH",
-};
+import { AuthConfigMeta, Authorization } from "../../types/AuthConfig";
+import { AuthForm } from "./types";
 
-export const AUTHORIZATION_TYPES_META = [
-  { label: "Inherit from Parent", value: AUTHORIZATION_TYPES.INHERIT },
-  { label: "No Auth", value: AUTHORIZATION_TYPES.NO_AUTH },
-  { label: "API Key", value: AUTHORIZATION_TYPES.API_KEY },
-  { label: "Bearer Token", value: AUTHORIZATION_TYPES.BEARER_TOKEN },
-  { label: "Basic Auth", value: AUTHORIZATION_TYPES.BASIC_AUTH },
+export const AUTH_SELECTOR_LABELS = [
+  { label: "Inherit from Parent", value: Authorization.Type.INHERIT },
+  { label: "No Auth", value: Authorization.Type.NO_AUTH },
+  { label: "API Key", value: Authorization.Type.API_KEY },
+  { label: "Bearer Token", value: Authorization.Type.BEARER_TOKEN },
+  { label: "Basic Auth", value: Authorization.Type.BASIC_AUTH },
 ];
 
-export const AUTHORIZATION_FORM_DATA = {
-  [AUTHORIZATION_TYPES.API_KEY]: [
-    { id: "key", type: "RQ_SINGLE_LINE_EDITOR", label: "Key", placeholder: "Key" },
-    { id: "value", type: "RQ_SINGLE_LINE_EDITOR", label: "Value", placeholder: "Value" },
+const FORM_FIELDS_LAYOUT: Record<AuthConfigMeta.AuthWithConfig, AuthForm.FormField[]> = {
+  [Authorization.Type.API_KEY]: [
+    { id: "key", type: AuthForm.FIELD_TYPE.INPUT, label: "Key", placeholder: "Key" },
+    { id: "value", type: AuthForm.FIELD_TYPE.INPUT, label: "Value", placeholder: "Value" },
     {
       id: "addTo",
-      type: "SELECT",
+      type: AuthForm.FIELD_TYPE.SELECT,
       label: "Add to",
       options: [
         { label: "Header", value: "HEADER" },
@@ -29,32 +24,32 @@ export const AUTHORIZATION_FORM_DATA = {
       defaultValue: "HEADER",
     },
   ],
-  [AUTHORIZATION_TYPES.BEARER_TOKEN]: [
-    { id: "bearer", type: "RQ_SINGLE_LINE_EDITOR", label: "Token", placeholder: "Token" },
+  [Authorization.Type.BEARER_TOKEN]: [
+    { id: "bearer", type: AuthForm.FIELD_TYPE.INPUT, label: "Token", placeholder: "Token" },
   ],
-  [AUTHORIZATION_TYPES.BASIC_AUTH]: [
-    { id: "username", type: "RQ_SINGLE_LINE_EDITOR", label: "Username", placeholder: "Username" },
-    { id: "password", type: "RQ_SINGLE_LINE_EDITOR", label: "Password", placeholder: "Password" },
+  [Authorization.Type.BASIC_AUTH]: [
+    { id: "username", type: AuthForm.FIELD_TYPE.INPUT, label: "Username", placeholder: "Username" },
+    { id: "password", type: AuthForm.FIELD_TYPE.INPUT, label: "Password", placeholder: "Password" },
   ],
 };
 
-export const AUTHORIZATION_STATIC_DATA = {
-  [AUTHORIZATION_TYPES.INHERIT]: {
+export const FORM_TEMPLATE_STATIC_DATA: AuthForm.FormStructure = {
+  [Authorization.Type.INHERIT]: {
     description: {
       img: "/assets/media/apiClient/inherit-auth.svg",
       heading: "Inherits authorization from the parent collection.",
       subHeading: "This request will use its parent collection’s auth token when you send the request.",
     },
   },
-  [AUTHORIZATION_TYPES.NO_AUTH]: {
+  [Authorization.Type.NO_AUTH]: {
     description: {
       img: "/assets/media/apiClient/no-auth.svg",
       heading: "No authorization type selected for this request.",
       subHeading: "Please select a authorization type above.",
     },
   },
-  [AUTHORIZATION_TYPES.API_KEY]: {
-    formData: AUTHORIZATION_FORM_DATA[AUTHORIZATION_TYPES.API_KEY],
+  [Authorization.Type.API_KEY]: {
+    formData: FORM_FIELDS_LAYOUT[Authorization.Type.API_KEY],
     description: {
       heading: "API Key",
       subHeading:
@@ -62,8 +57,8 @@ export const AUTHORIZATION_STATIC_DATA = {
       externalLink: "https://docs.requestly.com/general/api-client/authorization/authorization-types#api-key",
     },
   },
-  [AUTHORIZATION_TYPES.BEARER_TOKEN]: {
-    formData: AUTHORIZATION_FORM_DATA[AUTHORIZATION_TYPES.BEARER_TOKEN],
+  [Authorization.Type.BEARER_TOKEN]: {
+    formData: FORM_FIELDS_LAYOUT[Authorization.Type.BEARER_TOKEN],
     description: {
       heading: "Bearer Token",
       subHeading:
@@ -71,8 +66,8 @@ export const AUTHORIZATION_STATIC_DATA = {
       externalLink: "https://docs.requestly.com/general/api-client/authorization/authorization-types#bearer-tokens",
     },
   },
-  [AUTHORIZATION_TYPES.BASIC_AUTH]: {
-    formData: AUTHORIZATION_FORM_DATA[AUTHORIZATION_TYPES.BASIC_AUTH],
+  [Authorization.Type.BASIC_AUTH]: {
+    formData: FORM_FIELDS_LAYOUT[Authorization.Type.BASIC_AUTH],
     description: {
       heading: "Basic Auth",
       subHeading:
