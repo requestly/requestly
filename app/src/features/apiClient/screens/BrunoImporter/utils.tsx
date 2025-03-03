@@ -126,7 +126,7 @@ const createCollectionRecord = (
       const varValue: EnvironmentVariableValue = {
         id: index,
         syncValue: v.value,
-        type: (v.type as EnvironmentVariableType) || EnvironmentVariableType.String,
+        type: v.type || EnvironmentVariableType.String,
       };
 
       if (v.local) {
@@ -168,7 +168,7 @@ export const processBrunoCollectionData = (
         acc[variable.name] = {
           id: index,
           syncValue: variable.value,
-          type: (variable.type as EnvironmentVariableType) || EnvironmentVariableType.String,
+          type: variable.type || EnvironmentVariableType.String,
         };
       }
       return acc;

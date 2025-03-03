@@ -15,7 +15,6 @@ import {
   processRecordsForDuplication,
 } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
-import { trackExportCollectionsClicked } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
@@ -29,6 +28,7 @@ import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";
 import { firebaseBatchWrite } from "backend/utils";
+import { apiClientRoutes } from "features/apiClient/routes";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -101,7 +101,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
   const handleExportCollection = useCallback((collection: RQAPI.CollectionRecord) => {
     setCollectionsToExport((prev) => [...prev, collection]);
-    trackExportCollectionsClicked();
     setIsExportModalOpen(true);
   }, []);
 

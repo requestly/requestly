@@ -16,6 +16,13 @@ The following domains are eligible for the student programme:
     ".alfa-college.nl",
     ".mail.adelphi.edu",
     ".edu.in",
-    ".eur.nl"
+    ".eur.nl",
+    ".edu.uy",
+    "bupt.cn",
+    ".edu.ar",
+    ".edu.kh",
+    ".ac.id",
+    "bennington.edu",
+    "yonsei.ac.kr"
   ]
 }

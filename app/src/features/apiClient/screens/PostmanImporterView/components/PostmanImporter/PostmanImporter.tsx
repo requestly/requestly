@@ -1,5 +1,4 @@
 import React, { useCallback, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 import { FilePicker } from "components/common/FilePicker";
 import { getUploadedPostmanFileType, processPostmanCollectionData, processPostmanEnvironmentData } from "./utils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
@@ -7,18 +6,15 @@ import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
-import { RQAPI } from "features/apiClient/types";
-import { upsertApiRecord } from "backend/apiClient";
+import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { Row } from "antd";
 import {
-  trackImportFromPostmanCompleted,
-  trackImportFromPostmanDataProcessed,
-  trackImportFromPostmanFailed,
-  trackImportFromPostmanStarted,
+  trackImportFailed,
+  trackImportParsed,
+  trackImportParseFailed,
+  trackImportSuccess,
 } from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
 import "./postmanImporter.scss";
@@ -48,11 +44,8 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     variables: {},
   });
 
-  const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-
   const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ initFetchers: false });
-  const { onSaveRecord } = useApiClientContext();
+  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
 
   const collectionsCount = useRef(0);
 
@@ -125,18 +118,19 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 processedRecords.variables = { ...processedRecords.variables, ...result.value.data.variables };
                 processedRecords.apiRecords.push(...collections, ...apis);
                 collectionsCount.current += collections.length;
+                trackImportParsed(ApiClientImporterType.POSTMAN, collections.length, apis.length);
               }
             } else {
+              trackImportParseFailed(ApiClientImporterType.POSTMAN, result.reason);
               console.error("Error processing postman file:", result.reason);
             }
           });
-
-          trackImportFromPostmanDataProcessed(collectionsCount.current, processedRecords.environments.length);
 
           setProcessedFileData(processedRecords);
           setProcessingStatus("processed");
         })
         .catch((error) => {
+          trackImportParseFailed(ApiClientImporterType.POSTMAN, error.message);
           setImportError(error.message);
         })
         .finally(() => {
@@ -176,18 +170,14 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
     let failedCollectionsCount = 0;
+    let importedApisCount = 0;
 
     const collections = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.COLLECTION);
     const apis = processedFileData.apiRecords.filter((record) => record.type === RQAPI.RecordType.API);
 
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
-        const newCollection = await upsertApiRecord(
-          user?.details?.profile?.uid,
-          collection,
-          workspace?.id,
-          collection.id
-        );
+        const newCollection = await apiClientRecordsRepository.createRecordWithId(collection, collection.id);
         onSaveRecord(newCollection.data, "none");
         importedCollectionsCount++;
         return newCollection.data.id;
@@ -206,8 +196,9 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
-        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
+        const newApi = await apiClientRecordsRepository.createRecordWithId(updatedApi, updatedApi.id);
         onSaveRecord(newApi.data, "none");
+        importedApisCount++;
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing API:", error);
@@ -229,28 +220,30 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       }
     }
 
-    return importedCollectionsCount;
-  }, [processedFileData.apiRecords, user?.details?.profile?.uid, workspace?.id, onSaveRecord]);
+    return { importedCollectionsCount, importedApisCount };
+  }, [processedFileData.apiRecords, onSaveRecord, apiClientRecordsRepository]);
 
   const handleImportPostmanData = useCallback(() => {
-    trackImportFromPostmanStarted(collectionsCount.current, processedFileData.environments.length);
     setIsImporting(true);
     Promise.allSettled([handleImportEnvironments(), handleImportCollectionsAndApis()])
       .then((results) => {
         const [environmentsResult, collectionsResult] = results;
         const importedEnvironments = environmentsResult.status === "fulfilled" ? environmentsResult.value : 0;
-        const importedCollections = collectionsResult.status === "fulfilled" ? collectionsResult.value : 0;
+        const importedCollectionsCount =
+          collectionsResult.status === "fulfilled" ? collectionsResult.value.importedCollectionsCount : 0;
+        const importedApisCount =
+          collectionsResult.status === "fulfilled" ? collectionsResult.value.importedApisCount : 0;
 
         const failedEnvironments = processedFileData.environments.length - importedEnvironments;
-        const failedCollections = collectionsCount.current - importedCollections;
+        const failedCollections = collectionsCount.current - importedCollectionsCount;
 
-        if (!importedEnvironments && !importedCollections) {
+        if (!importedEnvironments && !importedCollectionsCount) {
           toast.error("Failed to import Postman data");
           return;
         }
 
         const hasFailures = failedEnvironments > 0 || failedCollections > 0;
-        const hasSuccesses = importedEnvironments > 0 || importedCollections > 0;
+        const hasSuccesses = importedEnvironments > 0 || importedCollectionsCount > 0;
 
         if (hasFailures && hasSuccesses) {
           const failureMessage = [
@@ -266,7 +259,9 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
         toast.success(
           `Successfully imported ${[
-            importedCollections > 0 ? `${importedCollections} collection${importedCollections !== 1 ? "s" : ""}` : "",
+            importedCollectionsCount > 0
+              ? `${importedCollectionsCount} collection${importedCollectionsCount !== 1 ? "s" : ""}`
+              : "",
             importedEnvironments > 0
               ? `${importedEnvironments} environment${importedEnvironments !== 1 ? "s" : ""}`
               : "",
@@ -276,12 +271,12 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         );
 
         onSuccess?.();
-        trackImportFromPostmanCompleted(importedCollections, importedEnvironments);
+        trackImportSuccess(ApiClientImporterType.POSTMAN, importedCollectionsCount, importedApisCount);
       })
       .catch((error) => {
         Logger.error("Postman data import failed:", error);
         setImportError("Something went wrong!, Couldn't import Postman data");
-        trackImportFromPostmanFailed(collectionsCount.current, processedFileData.environments.length);
+        trackImportFailed(ApiClientImporterType.POSTMAN, JSON.stringify(error));
       })
       .finally(() => {
         setIsImporting(false);

@@ -21,7 +21,7 @@ import { saveDraftSession, generateDraftSessionTitle } from "features/sessionBoo
 import { globalActions } from "store/slices/global/slice";
 import PATHS from "config/constants/sub/paths";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
+import { MISC_TOURS } from "components/misc/ProductWalkthrough/constants";
 import { DRAFT_SESSION_VIEWED_SOURCE } from "./constants";
 import {
   trackDraftSessionDiscarded,
@@ -41,6 +41,7 @@ import { toast } from "utils/Toast";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import Logger from "../../../../../../common/logger";
 import { useIncentiveActions } from "features/incentivization/hooks";
+import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 export interface DraftSessionViewerProps {
   testRuleDraftSession?: {
     draftSessionTabId: string;
@@ -297,7 +298,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
                 handleSaveDraftSession();
                 globalActions.updateProductTourCompleted({
                   tour: TOUR_TYPES.MISCELLANEOUS,
-                  subTour: "firstDraftSession",
+                  subTour: SUB_TOUR_TYPES.FIRST_DRAFT_SESSION,
                 });
               }}
             >
@@ -313,7 +314,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
                 dispatch(
                   globalActions.updateProductTourCompleted({
                     tour: TOUR_TYPES.MISCELLANEOUS,
-                    subTour: "firstDraftSession",
+                    subTour: SUB_TOUR_TYPES.FIRST_DRAFT_SESSION,
                   })
                 );
               }}
@@ -360,7 +361,10 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
         tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_DRAFT_SESSION}
         onTourComplete={() =>
           dispatch(
-            globalActions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" })
+            globalActions.updateProductTourCompleted({
+              tour: TOUR_TYPES.MISCELLANEOUS,
+              subTour: SUB_TOUR_TYPES.FIRST_DRAFT_SESSION,
+            })
           )
         }
       />

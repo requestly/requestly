@@ -76,6 +76,9 @@ const processScripts = (item: any) => {
   };
 
   const migratePostmanScripts = (postmanScript: string) => {
+    if (!postmanScript) {
+      return "";
+    }
     return postmanScript.replace(/pm\./g, "rq."); // Replace all occurrences of 'pm.' with 'rq.'
   };
 
@@ -85,9 +88,9 @@ const processScripts = (item: any) => {
 
   item.event.forEach((event: any) => {
     if (event.listen === "prerequest") {
-      scripts.preRequest = migratePostmanScripts(event.script.exec.join("\n"));
+      scripts.preRequest = event.script ? migratePostmanScripts(event.script.exec.join("\n")) : "";
     } else if (event.listen === "test") {
-      scripts.postResponse = migratePostmanScripts(event.script.exec.join("\n"));
+      scripts.postResponse = event.script ? migratePostmanScripts(event.script.exec.join("\n")) : "";
     }
   });
 
@@ -189,8 +192,8 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
     contentType = RequestContentType.FORM;
     requestBody = urlencoded.map((data: { key: string; value: string }) => ({
       id: Date.now() + Math.random(),
-      key: data.key,
-      value: data.value,
+      key: data?.key || "",
+      value: data?.value || "",
       isEnabled: true,
     }));
   }

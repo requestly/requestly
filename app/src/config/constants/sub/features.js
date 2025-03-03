@@ -88,5 +88,6 @@ FEATURES.OVERRIDEN_SYNC_STATUS_VALUE = "overriden_sync_status_value";
 
 FEATURES.CONNECT_EXTENSION = "connect_extension";
 FEATURES.EDIT_LOCAL_FILE_PATH = "edit_local_file_path";
+FEATURES.LOCAL_FILE_SYNC = "local_file_sync";
 
 export default FEATURES;

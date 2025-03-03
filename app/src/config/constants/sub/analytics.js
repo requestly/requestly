@@ -169,6 +169,10 @@ export const GA_EVENTS = {
     COMPANY_USER_SERIAL: "company_user_serial",
     APP_FLAVOUR: "app_flavour",
     SESSIONBEAR_INSTALLED: "sessionbear_installed",
+
+    NUM_REQUESTS: "num_requests",
+    NUM_COLLECTIONS: "num_collections",
+    NUM_ENVIRONMENTS: "num_environments",
   },
   VALUES: {
     PAYPAL: "paypal",

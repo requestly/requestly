@@ -17,6 +17,7 @@ import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUt
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
 import { tabsLayoutActions } from "store/slices/tabs-layout";
+import { WorkspaceType } from "types";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -32,7 +33,8 @@ export const switchWorkspace = async (
   setLoader,
   source
 ) => {
-  const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
+  const { teamId, teamName, teamMembersCount, workspaceType } = newWorkspaceDetails;
+
   let needToMergeRecords = false;
   await StorageService(appMode).waitForAllTransactions();
   if (teamId !== null) {
@@ -102,6 +104,7 @@ export const switchWorkspace = async (
       id: teamId,
       name: teamName,
       membersCount: teamMembersCount,
+      workspaceType: workspaceType,
     })
   );
 
@@ -114,5 +117,10 @@ export const switchWorkspace = async (
 };
 
 export const clearCurrentlyActiveWorkspace = async (dispatch, appMode) => {
-  await switchWorkspace({ teamId: null, teamName: null, teamMembersCount: null }, dispatch, null, appMode);
+  await switchWorkspace(
+    { teamId: null, teamName: null, teamMembersCount: null, workspaceType: WorkspaceType.PERSONAL },
+    dispatch,
+    null,
+    appMode
+  );
 };
