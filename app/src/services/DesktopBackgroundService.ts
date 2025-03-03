@@ -1,56 +1,70 @@
 const IPC_TIMEOUT = 15000;
 
 class TimoutError extends Error {
-	constructor(method: string) {
-		super(`IPC Timeout: no response for [${method}] RPC call. Please make sure method is implemented correctly in Background process`)
-	}
+  constructor(method: string) {
+    super(
+      `IPC Timeout: no response for [${method}] RPC call. Please make sure method is implemented correctly in Background process`
+    );
+  }
 }
 
-export function rpc(params: {
-	namespace: string, method: string, timeout?: number,
-}, ...args: any[]) {
-	const { namespace, method, timeout } = params;
-	return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        reject(
-          new TimoutError(method)
-        );
-      }, timeout || IPC_TIMEOUT);
+export function rpc(
+  params: {
+    namespace: string;
+    method: string;
+    timeout?: number;
+  },
+  ...args: any[]
+) {
+  const { namespace, method, timeout } = params;
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new TimoutError(method));
+    }, timeout || IPC_TIMEOUT);
 
-      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(`${namespace}-${method}`, args)
-        .then((res: any) => {
-          if (res.success) {
-            resolve(res.data);
-          } else {
-            reject(res.data);
-          }
-        })
-        .catch(reject);
-    });
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(`${namespace}-${method}`, args)
+      .then((res: any) => {
+        if (res.success) {
+          resolve(res.data);
+        } else {
+          reject(res.data);
+        }
+      })
+      .catch(reject);
+  });
 }
 
-export async function rpcWithRetry(params: {
-	namespace: string, method: string, retryCount: number, timeout: number,
-}, ...args: any[]) {
-	let retries = params.retryCount
-	while(retries >= 0) {
-		console.log('attempt', retries);
-		try {
-			return await rpc({
-				namespace: params.namespace,
-				method: params.method,
-				timeout: params.timeout,
-			}, ...args)
-		} catch (err) {
-			console.log('attempt error', retries, err);
-			if(err instanceof TimoutError) {
-				retries--;
-				continue;
-			}
-			console.log('weird error', retries, err);
-			throw err;
-		}
-	}
+export async function rpcWithRetry(
+  params: {
+    namespace: string;
+    method: string;
+    retryCount: number;
+    timeout: number;
+  },
+  ...args: any[]
+) {
+  let retries = params.retryCount;
+  while (retries >= 0) {
+    console.log("attempt", retries);
+    try {
+      return await rpc(
+        {
+          namespace: params.namespace,
+          method: params.method,
+          timeout: params.timeout,
+        },
+        ...args
+      );
+    } catch (err) {
+      console.log("attempt error", retries, err);
+      if (err instanceof TimoutError) {
+        retries--;
+        continue;
+      }
+      console.log("weird error", retries, err);
+      throw err;
+    }
+  }
 }
 
 /* Expects the service to be present in Desktop background process */
@@ -60,26 +74,36 @@ export default class BackgroundServiceAdapter {
 
   constructor(serviceName: string) {
     if (window?.RQ?.MODE !== "DESKTOP") {
-      throw new Error('BackgroundServiceAdapter is only supported in desktop app!')
+      throw new Error("BackgroundServiceAdapter is only supported in desktop app!");
     }
     this.RPC_CHANNEL_PREFIX = `${serviceName}`;
     this.LIVE_EVENTS_CHANNEL = `SERVICE-${serviceName}-LIVE-EVENTS`;
   }
 
   protected invokeProcedureInBG(method: string, ...args: any): Promise<any> {
-		return rpc({
-			namespace: this.RPC_CHANNEL_PREFIX,
-			method
-		}, ...args);
+    return rpc(
+      {
+        namespace: this.RPC_CHANNEL_PREFIX,
+        method,
+      },
+      ...args
+    );
   }
 
-	protected async invokeProcedureInBGWithRetries(method: string, config: { retryCount: number, timeout: number }, ...args: any): Promise<any> {
-		return await rpcWithRetry({
-			namespace: this.RPC_CHANNEL_PREFIX,
-			method,
-			timeout: config.timeout,
-			retryCount: config.retryCount,
-		}, ...args)
+  protected async invokeProcedureInBGWithRetries(
+    method: string,
+    config: { retryCount: number; timeout: number },
+    ...args: any
+  ): Promise<any> {
+    return await rpcWithRetry(
+      {
+        namespace: this.RPC_CHANNEL_PREFIX,
+        method,
+        timeout: config.timeout,
+        retryCount: config.retryCount,
+      },
+      ...args
+    );
   }
 
   /*
