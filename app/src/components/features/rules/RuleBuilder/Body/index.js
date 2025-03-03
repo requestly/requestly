@@ -9,7 +9,7 @@ import { getAppMode, getCurrentlySelectedRuleErrors } from "store/selectors";
 import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
 import RuleInfoBanner from "./RuleInfoBanner";
-import { useCurrentWorkspaceUserRole } from "hooks";
+import { RBAC, useRBAC } from "features/rbac";
 import "./RuleBuilderBody.css";
 
 const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRuleConfig }) => {
@@ -19,7 +19,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
   const ruleErrors = useSelector(getCurrentlySelectedRuleErrors);
   const isSharedListView = mode === "shared-list-rule-view";
   const isSampleRule = currentlySelectedRuleData?.isSample;
-  const { isReadRole } = useCurrentWorkspaceUserRole();
+  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
 
   const getEventObject = (name, value) => ({ target: { name, value } });
 
@@ -48,13 +48,15 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
     currentlySelectedRuleData.ruleType,
   ]);
 
+  const { isValid: isValidRole } = validatePermission(RBAC.Permission.update);
+
   return (
     <>
       <div className="rule-editor-title-container">
         {!isSharedListView && (
           <RQEditorTitle
             isSampleRule={isSampleRule}
-            disabled={isSampleRule || isReadRole}
+            disabled={isSampleRule || !isValidRole}
             mode={mode}
             errors={ruleErrors}
             showDocs={showDocs}
@@ -89,7 +91,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
                 <Col span={24}>
                   {mode !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
                     <AddPairButton
-                      disabled={isSampleRule || isReadRole}
+                      disabled={isSampleRule || !isValidRole}
                       currentlySelectedRuleConfig={currentlySelectedRuleConfig}
                     />
                   ) : null}
