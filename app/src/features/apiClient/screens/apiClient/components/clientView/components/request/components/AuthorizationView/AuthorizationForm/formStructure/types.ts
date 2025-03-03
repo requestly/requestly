@@ -32,7 +32,7 @@ export namespace AuthForm {
 
   /* DESCRIPTION */
   export namespace Description {
-    interface Step {
+    export interface Step {
       value: string;
       steps?: Step[];
     }
