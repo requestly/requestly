@@ -12,8 +12,6 @@ import { ShareInWorkspaces } from "./Workspaces";
 import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
 import { trackShareModalViewed, trackSharingTabSwitched } from "modules/analytics/events/misc/sharing";
-import { useCurrentWorkspaceUserRole } from "hooks";
-import { TeamRole } from "types";
 import "./index.css";
 
 interface ModalProps {
@@ -33,58 +31,50 @@ export const SharingModal: React.FC<ModalProps> = ({
 }) => {
   const availableTeams = useSelector(getAvailableTeams);
   const [activeTab, setActiveTab] = useState(SharingOptions.SHARE_LINK);
-  const { role } = useCurrentWorkspaceUserRole();
 
   const sharingOptions: TabsProps["items"] = useMemo(
-    () =>
-      [
-        {
-          key: SharingOptions.SHARE_LINK,
-          label: "Shared list",
-          children: (
-            <>
-              {selectedRules?.length ? (
-                <ShareLinkView selectedRules={selectedRules} source={source} onSharedLinkCreated={callback} />
-              ) : (
-                <EmptySelectionView />
-              )}
-            </>
-          ),
-        },
-        {
-          key: SharingOptions.WORKSPACE,
-          label: "Share in workspace",
-          children: (
-            <>
-              {selectedRules?.length ? (
-                <ShareInWorkspaces selectedRules={selectedRules} toggleModal={toggleModal} onRulesShared={callback} />
-              ) : (
-                <EmptySelectionView />
-              )}
-            </>
-          ),
-        },
-        {
-          key: SharingOptions.DOWNLOAD,
-          label: "Download",
-          children: (
-            <>
-              {selectedRules?.length ? (
-                <DownloadRules selectedRules={selectedRules} toggleModal={toggleModal} onRulesDownloaded={callback} />
-              ) : (
-                <EmptySelectionView />
-              )}
-            </>
-          ),
-        },
-      ].filter(({ key }) => {
-        if (role === TeamRole.read) {
-          return ![SharingOptions.DOWNLOAD].includes(key);
-        } else {
-          return true;
-        }
-      }),
-    [callback, selectedRules, toggleModal, source, role]
+    () => [
+      {
+        key: SharingOptions.SHARE_LINK,
+        label: "Shared list",
+        children: (
+          <>
+            {selectedRules?.length ? (
+              <ShareLinkView selectedRules={selectedRules} source={source} onSharedLinkCreated={callback} />
+            ) : (
+              <EmptySelectionView />
+            )}
+          </>
+        ),
+      },
+      {
+        key: SharingOptions.WORKSPACE,
+        label: "Share in workspace",
+        children: (
+          <>
+            {selectedRules?.length ? (
+              <ShareInWorkspaces selectedRules={selectedRules} toggleModal={toggleModal} onRulesShared={callback} />
+            ) : (
+              <EmptySelectionView />
+            )}
+          </>
+        ),
+      },
+      {
+        key: SharingOptions.DOWNLOAD,
+        label: "Download",
+        children: (
+          <>
+            {selectedRules?.length ? (
+              <DownloadRules selectedRules={selectedRules} toggleModal={toggleModal} onRulesDownloaded={callback} />
+            ) : (
+              <EmptySelectionView />
+            )}
+          </>
+        ),
+      },
+    ],
+    [callback, selectedRules, toggleModal, source]
   );
 
   const handleSharingOptionsChange = (key: SharingOptions) => {
