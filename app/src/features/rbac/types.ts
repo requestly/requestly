@@ -3,7 +3,6 @@ import { TeamRole } from "types";
 export namespace RBAC {
   export enum Resource {
     http_rule = "http_rule",
-    http_rules_group = "http_rules_group",
     api_client_request = "api_client_request",
     api_client_collection = "api_client_collection",
     api_client_environment = "api_client_environment",
