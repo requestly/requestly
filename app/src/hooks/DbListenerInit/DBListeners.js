@@ -15,6 +15,7 @@ import { globalActions } from "store/slices/global/slice";
 import { isArray } from "lodash";
 import { useHasChanged } from "hooks/useHasChanged";
 import { userSubscriptionDocListener } from "./userSubscriptionDocListener";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 window.isFirstSyncComplete = false;
 
@@ -25,6 +26,7 @@ const DBListeners = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const currentTeamMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
   const hasAuthInitialized = useSelector(getAuthInitialization);
+  const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
 
   let unsubscribeUserNodeRef = useRef(null);
   window.unsubscribeSyncingNodeRef = useRef(null);
@@ -97,7 +99,8 @@ const DBListeners = () => {
         dispatch,
         user?.details?.profile?.uid,
         currentlyActiveWorkspace,
-        appMode
+        appMode,
+        isLocalSyncEnabled
       );
     } else {
       dispatch(teamsActions.setAvailableTeams(null));
@@ -106,7 +109,7 @@ const DBListeners = () => {
         clearCurrentlyActiveWorkspace(dispatch, appMode);
       }
     }
-  }, [appMode, currentlyActiveWorkspace, dispatch, user?.details?.profile?.uid, user?.loggedIn]);
+  }, [appMode, currentlyActiveWorkspace, dispatch, user?.details?.profile?.uid, user?.loggedIn, isLocalSyncEnabled]);
 
   /* Force refresh custom claims in auth token */
   useEffect(() => {

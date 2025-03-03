@@ -9,7 +9,6 @@ import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState"
 import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
-import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
@@ -108,7 +107,7 @@ export const CollectionRow: React.FC<Props> = ({
   }, [expandedRecordIds, record.id]);
 
   useEffect(() => {
-    /* Temporary Change-> To remove previous key from session storage 
+    /* Temporary Change-> To remove previous key from session storage
        which was added due to the previous logic can be removed after some time */
     sessionStorage.removeItem("collapsed_collection_keys");
   }, []);
@@ -163,7 +162,7 @@ export const CollectionRow: React.FC<Props> = ({
                 onClick={() => {
                   openTab(record.id, {
                     title: record.name || "New Collection",
-                    url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${record.id}`,
+                    url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(record.id)}`,
                   });
                 }}
               >
@@ -184,7 +183,6 @@ export const CollectionRow: React.FC<Props> = ({
                         onNewClick("collection_row", RQAPI.RecordType.API, record.id).then(() => {
                           setCreateNewField(null);
                         });
-                        trackNewRequestClicked("collection_row");
                       }}
                     />
                   </Tooltip>
@@ -200,7 +198,6 @@ export const CollectionRow: React.FC<Props> = ({
                         onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id).then(() => {
                           setCreateNewField(null);
                         });
-                        trackNewCollectionClicked("collection_row");
                       }}
                     />
                   </Tooltip>
@@ -225,7 +222,7 @@ export const CollectionRow: React.FC<Props> = ({
                 analyticEventSource="collection_row"
                 message="No requests created yet"
                 newRecordBtnText="New request"
-                onNewRecordClick={() => onNewClick("collection_row", RQAPI.RecordType.API, record.id)}
+                onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.API, record.id)}
               />
             ) : (
               record.data.children?.map((apiRecord) => {

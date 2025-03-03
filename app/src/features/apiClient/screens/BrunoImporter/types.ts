@@ -1,3 +1,4 @@
+import { EnvironmentVariableType } from "backend/environment/types";
 import { RequestMethod } from "features/apiClient/types";
 
 interface RootData {
@@ -74,7 +75,7 @@ export namespace Bruno {
   export interface Variable extends FieldValue {
     local: boolean;
     secret?: boolean;
-    type?: string;
+    type?: EnvironmentVariableType;
   }
 
   export type Header = FieldValue;

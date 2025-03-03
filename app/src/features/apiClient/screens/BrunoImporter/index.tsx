@@ -1,14 +1,10 @@
 import React, { useCallback, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 import { FilePicker } from "components/common/FilePicker";
 import { processBrunoCollectionData } from "./utils";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
-import { RQAPI } from "features/apiClient/types";
-import { upsertApiRecord } from "backend/apiClient";
+import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { Row } from "antd";
@@ -21,10 +17,10 @@ import { useNavigate } from "react-router-dom";
 import { redirectToApiClient } from "utils/RedirectionUtils";
 import { RQModal } from "lib/design-system/components";
 import {
-  trackImportFromBrunoCompleted,
-  trackImportFromBrunoDataProcessed,
-  trackImportFromBrunoFailed,
-  trackImportFromBrunoStarted,
+  trackImportFailed,
+  trackImportParsed,
+  trackImportParseFailed,
+  trackImportSuccess,
 } from "modules/analytics/events/features/apiClient";
 
 interface BrunoImporterProps {
@@ -47,9 +43,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
     }>;
   }>({ collections: [], apis: [], environments: [] });
 
-  const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const { onSaveRecord } = useApiClientContext();
+  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
   const { addNewEnvironment, setVariables } = useEnvironmentManager();
 
   const collectionsCount = useRef(0);
@@ -112,13 +106,19 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
             processedRecords.apis.push(...apis);
             processedRecords.environments.push(...environments);
             collectionsCount.current += collections.length;
+            trackImportParsed(
+              ApiClientImporterType.BRUNO,
+              processedRecords.collections.length,
+              processedRecords.apis.length
+            );
           }
         });
+
         setProcessedFileData(processedRecords);
         setProcessingStatus("processed");
-        trackImportFromBrunoDataProcessed(collectionsCount.current, processedRecords.environments.length);
       })
       .catch((error) => {
+        trackImportParseFailed(ApiClientImporterType.BRUNO, error.message);
         setImportError(error.message);
         setProcessingStatus("idle");
       });
@@ -127,17 +127,14 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
     let failedCollectionsCount = 0;
+    let importedApisCount = 0;
+    let failedApisCount = 0;
 
     const { collections, apis } = processedFileData;
 
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
-        const newCollection = await upsertApiRecord(
-          user?.details?.profile?.uid,
-          collection,
-          workspace?.id,
-          collection.id
-        );
+        const newCollection = await apiClientRecordsRepository.createRecordWithId(collection, collection.id);
         onSaveRecord(newCollection.data, "none");
         importedCollectionsCount++;
         return newCollection.data.id;
@@ -156,10 +153,11 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
-        const newApi = await upsertApiRecord(user.details?.profile?.uid, updatedApi, workspace?.id, updatedApi.id);
+        const newApi = await apiClientRecordsRepository.updateRecord(updatedApi, updatedApi.id);
         onSaveRecord(newApi.data, "none");
+        importedApisCount++;
       } catch (error) {
-        failedCollectionsCount++;
+        failedApisCount++;
         Logger.error("Error importing API:", error);
       }
     };
@@ -169,12 +167,16 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
       batchWrite(BATCH_SIZE, apis, handleApiWrites),
     ]);
 
-    if (failedCollectionsCount > 0) {
-      toast.warn(`Failed to import ${failedCollectionsCount} items. Please contact support if the issue persists.`);
+    if (failedCollectionsCount > 0 || failedApisCount > 0) {
+      toast.warn(
+        `Failed to import ${
+          failedCollectionsCount + failedApisCount
+        } items. Please contact support if the issue persists.`
+      );
     }
 
-    return importedCollectionsCount;
-  }, [processedFileData, user?.details?.profile?.uid, workspace?.id, onSaveRecord]);
+    return { importedCollectionsCount, importedApisCount };
+  }, [processedFileData, onSaveRecord, apiClientRecordsRepository]);
 
   const handleImportEnvironments = useCallback(async () => {
     let importedEnvCount = 0;
@@ -198,34 +200,44 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
   const handleImportBrunoData = useCallback(() => {
     setIsImporting(true);
-    trackImportFromBrunoStarted(collectionsCount.current, processedFileData.environments.length);
     Promise.all([handleImportEnvironments(), handleImportCollectionsAndApis()])
-      .then(([importedEnvs, importedCollections]) => {
-        if (importedCollections === 0 && importedEnvs === 0) {
+      .then(([importedEnvs, recordsResult]) => {
+        if (
+          recordsResult.importedApisCount === 0 &&
+          importedEnvs === 0 &&
+          recordsResult.importedCollectionsCount === 0
+        ) {
           toast.error("Failed to import Bruno data");
           return;
         }
 
         const successMessage = [
-          importedCollections > 0 ? `${importedCollections} collection(s)` : null,
+          recordsResult.importedApisCount + recordsResult.importedCollectionsCount > 0
+            ? `${recordsResult.importedApisCount + recordsResult.importedCollectionsCount} collection(s) and api(s)`
+            : null,
           importedEnvs > 0 ? `${importedEnvs} environment(s)` : null,
         ]
           .filter(Boolean)
           .join(" and ");
 
         toast.success(`Successfully imported ${successMessage}`);
-        trackImportFromBrunoCompleted(importedCollections, importedEnvs);
+
+        trackImportSuccess(
+          ApiClientImporterType.BRUNO,
+          recordsResult.importedCollectionsCount,
+          recordsResult.importedApisCount
+        );
         onSuccess?.();
       })
       .catch((error) => {
         Logger.error("Bruno data import failed:", error);
         setImportError("Something went wrong! Couldn't import Bruno data");
-        trackImportFromBrunoFailed(collectionsCount.current, processedFileData.environments.length);
+        trackImportFailed(ApiClientImporterType.BRUNO, JSON.stringify(error));
       })
       .finally(() => {
         setIsImporting(false);
       });
-  }, [processedFileData.environments.length, handleImportEnvironments, handleImportCollectionsAndApis, onSuccess]);
+  }, [handleImportEnvironments, handleImportCollectionsAndApis, onSuccess]);
 
   const handleResetImport = () => {
     setProcessingStatus("idle");

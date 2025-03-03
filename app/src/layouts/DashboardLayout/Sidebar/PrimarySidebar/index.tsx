@@ -26,7 +26,10 @@ import useFetchSlackInviteVisibility from "components/misc/SupportPanel/useSlack
 import { SidebarToggleButton } from "componentsV2/SecondarySidebar/components/SidebarToggleButton/SidebarToggleButton";
 import APP_CONSTANTS from "config/constants";
 import { RQBadge } from "lib/design-system/components/RQBadge";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import "./PrimarySidebar.css";
+import { isSafariBrowser, isSafariExtension } from "actions/ExtensionActions";
+import { SafariComingSoonTooltip } from "componentsV2/SafariExtension/SafariComingSoonTooltip";
 
 export const PrimarySidebar: React.FC = () => {
   const { pathname } = useLocation();
@@ -37,6 +40,7 @@ export const PrimarySidebar: React.FC = () => {
   const isIncentivizationEnabled = useIsIncentivizationEnabled();
   const isSlackConnectFeatureEnabled = useFeatureIsOn("slack_connect");
   const isSlackInviteVisible = useFetchSlackInviteVisibility();
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
@@ -55,7 +59,7 @@ export const PrimarySidebar: React.FC = () => {
         title: "Home",
         path: PATHS.HOME.RELATIVE,
         icon: <HomeOutlined />,
-        display: appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
       {
         id: 1,
@@ -69,13 +73,17 @@ export const PrimarySidebar: React.FC = () => {
         title: "Network inspector",
         path: PATHS.NETWORK_INSPECTOR.RELATIVE,
         icon: <NetworkTrafficInspectorIcon />,
-        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
       {
         id: 3,
         title: "HTTP Rules",
         path: PATHS.RULES.INDEX,
-        icon: <HttpRulesIcon />,
+        icon: (
+          <SafariComingSoonTooltip isVisible={isSafariExtension()}>
+            <HttpRulesIcon />
+          </SafariComingSoonTooltip>
+        ),
         display: true,
         activeColor: "var(--http-rules)",
       },
@@ -156,7 +164,7 @@ export const PrimarySidebar: React.FC = () => {
       <div className="primary-sidebar-bottom-btns">
         {isIncentivizationEnabled ? <CreditsButton /> : null}
         {isSlackConnectFeatureEnabled && isSlackInviteVisible && <JoinSlackButton />}
-        <InviteButton />
+        {!isLocalSyncEnabled && <InviteButton />}
       </div>
     </div>
   );

@@ -1,8 +1,11 @@
 import APP_CONSTANTS from "config/constants";
+//@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { GlobalSliceState } from "./types";
-
 import appListJson from "../../initial-state/sub/appsList.json";
+import { ONBOARDING_STEPS } from "features/onboarding/types";
+import { SurveyPage } from "components/misc/PersonaSurvey/types";
+import { OnboardingSteps } from "features/rules/screens/rulesList/components/RulesList/components/GettingStarted/WorkspaceOnboarding/types";
 
 const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   /* User */
@@ -14,9 +17,10 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   syncingV2: false,
 
   userPersona: {
-    page: "getting_started",
+    page: SurveyPage.GETTING_STARTED,
     persona: "",
     isSurveyCompleted: false,
+    useCases: {},
   },
 
   isExtensionEnabled: true,
@@ -45,7 +49,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
     groupwiseRulesToPopulate: {},
     selectedRules: {},
     selectedGroups: {},
-    lastBackupTimeStamp: "",
+    lastBackupTimeStamp: 0,
     isRulesListLoading: false,
     isSampleRulesImported: false,
   },
@@ -174,13 +178,13 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   },
 
   workspaceOnboarding: {
-    step: "auth",
+    step: OnboardingSteps.AUTH,
     isOnboardingCompleted: false,
     workspace: {},
   },
 
   appOnboarding: {
-    step: "auth",
+    step: ONBOARDING_STEPS.AUTH,
     persona: null,
     fullName: null,
     industry: null,
@@ -193,6 +197,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
 
   misc: {
     persist: {
+      isOrgBannerDismissed: false,
       isPlanExpiredBannerClosed: false,
       appNotificationBannerDismissTs: 0,
       isProductHuntLaunchedBannerClosed: false,

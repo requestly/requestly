@@ -4,13 +4,14 @@ import { KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMet
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
-import { upsertApiRecord } from "backend/apiClient";
 import { forEach, isEmpty, omit, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
 import { generateDocumentId } from "backend/utils";
 import { getDefaultAuth } from "./components/clientView/components/request/components/AuthorizationView/defaults";
+import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
+type ResponseOrError = RQAPI.Response | { error: string };
 export const makeRequest = async (
   appMode: string,
   request: RQAPI.Request,
@@ -30,9 +31,27 @@ export const makeRequest = async (
     }
 
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
-      getAPIResponseViaExtension(request).then(resolve);
+      getAPIResponseViaExtension(request).then((result: ResponseOrError) => {
+        if (!result) {
+          //Backward compatibility check
+          reject(new Error("Failed to make request. Please check if the URL is valid."));
+        } else if ("error" in result) {
+          reject(new Error(result.error));
+        } else {
+          resolve(result);
+        }
+      });
     } else if (appMode === CONSTANTS.APP_MODES.DESKTOP) {
-      getAPIResponseViaProxy(request).then(resolve);
+      getAPIResponseViaProxy(request).then((result: ResponseOrError) => {
+        if (!result) {
+          //Backward compatibility check
+          reject(new Error("Failed to make request. Please check if the URL is valid."));
+        } else if ("error" in result) {
+          reject(new Error(result.error));
+        } else {
+          resolve(result);
+        }
+      });
     } else {
       resolve(null);
     }
@@ -60,6 +79,10 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
       ...(request || {}),
     },
     auth: getDefaultAuth(false),
+    scripts: {
+      preRequest: "",
+      postResponse: "",
+    },
     response: null,
   };
 };
@@ -235,13 +258,11 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 
   recordsCopy.forEach((record) => {
     const recordState = recordsMap[record.id];
-    if (record.collectionId) {
-      const parentNode = recordsMap[record.collectionId] as RQAPI.CollectionRecord;
-      if (parentNode) {
-        parentNode.data.children.push(recordState);
-      }
+    const parentNode = recordsMap[record.collectionId] as RQAPI.CollectionRecord;
+    if (parentNode) {
+      parentNode.data.children.push(recordState);
     } else {
-      updatedRecords.push(recordState);
+      updatedRecords.push({ ...recordState, collectionId: "" });
     }
   });
 
@@ -255,7 +276,8 @@ export const createBlankApiRecord = (
   uid: string,
   teamId: string,
   recordType: RQAPI.RecordType,
-  collectionId: string
+  collectionId: string,
+  apiClientRecordsRepository: ApiClientRecordsInterface<any>
 ) => {
   const newRecord: Partial<RQAPI.Record> = {};
 
@@ -278,7 +300,12 @@ export const createBlankApiRecord = (
     newRecord.collectionId = collectionId;
   }
 
-  return upsertApiRecord(uid, newRecord, teamId);
+  const result =
+    recordType === RQAPI.RecordType.COLLECTION
+      ? apiClientRecordsRepository.createCollection(newRecord as RQAPI.CollectionRecord)
+      : apiClientRecordsRepository.createRecord(newRecord as RQAPI.ApiRecord);
+
+  return result;
 };
 
 export const extractQueryParams = (inputString: string) => {
