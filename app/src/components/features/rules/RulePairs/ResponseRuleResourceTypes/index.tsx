@@ -121,7 +121,7 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
                 </span>
               }
             >
-              <Radio disabled={!isDesktop} value={ResponseRule.ResourceType.STATIC}>
+              <Radio disabled={!isDesktop || disabled} value={ResponseRule.ResourceType.STATIC}>
                 HTML / JS / CSS
                 <QuestionCircleOutlined className="resource-disable-option-info-icon" />
               </Radio>
