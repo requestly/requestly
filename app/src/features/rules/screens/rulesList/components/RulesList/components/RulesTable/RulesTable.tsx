@@ -45,7 +45,7 @@ interface Props {
 const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecordsMap }) => {
   const { selectedRows, clearSelectedRows } = useContentListTableContext();
   const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValid: isValidRole } = validatePermission(RBAC.Permission.create);
+  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.create);
 
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -243,11 +243,11 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     <>
       {/* Add Modals Required in Rules List here */}
       <ContentListTable
-        dragAndDrop={isValidRole}
-        isRowSelectable={isValidRole}
+        dragAndDrop={isValidPermission}
+        isRowSelectable={isValidPermission}
         onRowDropped={onRowDropped}
         id="rules-list-table"
-        className={`rules-list-table ${!isValidRole ? "read-only" : ""}`}
+        className={`rules-list-table ${!isValidPermission ? "read-only" : ""}`}
         defaultExpandedRowKeys={groupIdsToExpand}
         size="middle"
         scroll={{ y: getTableScrollHeight() }}

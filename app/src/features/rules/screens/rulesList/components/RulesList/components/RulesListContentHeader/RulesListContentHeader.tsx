@@ -38,7 +38,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
 
   const { createRuleAction, createGroupAction, importRecordsAction } = useRulesActionContext();
   const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValid: isValidRole } = validatePermission(RBAC.Permission.create);
+  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.create);
 
   const buttonData = [
     {
@@ -190,7 +190,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
     <ContentListHeader
       title="My Rules"
       subtitle="Create and manage your rules from here"
-      actions={isValidRole ? contentHeaderActions : null}
+      actions={isValidPermission ? contentHeaderActions : null}
       searchValue={searchValue}
       setSearchValue={handleSearchValueUpdate}
       filters={contentHeaderFilters}

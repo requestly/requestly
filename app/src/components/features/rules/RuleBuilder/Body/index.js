@@ -48,7 +48,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
     currentlySelectedRuleData.ruleType,
   ]);
 
-  const { isValid: isValidRole } = validatePermission(RBAC.Permission.update);
+  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.update);
 
   return (
     <>
@@ -56,7 +56,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
         {!isSharedListView && (
           <RQEditorTitle
             isSampleRule={isSampleRule}
-            disabled={isSampleRule || !isValidRole}
+            disabled={isSampleRule || !isValidPermission}
             mode={mode}
             errors={ruleErrors}
             showDocs={showDocs}
@@ -91,7 +91,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
                 <Col span={24}>
                   {mode !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
                     <AddPairButton
-                      disabled={isSampleRule || !isValidRole}
+                      disabled={isSampleRule || !isValidPermission}
                       currentlySelectedRuleConfig={currentlySelectedRuleConfig}
                     />
                   ) : null}

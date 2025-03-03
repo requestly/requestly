@@ -26,7 +26,7 @@ const RuleNameColumn: React.FC<{
   };
 
   const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValid: isValidRole } = validatePermission(RBAC.Permission.create);
+  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.create);
 
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -126,7 +126,7 @@ const RuleNameColumn: React.FC<{
           </Tooltip>
         ) : null}
 
-        {isValidRole ? (
+        {isValidPermission ? (
           <RuleSelectionListDrawer
             groupId={group.id}
             open={isRulesListDrawerOpen}

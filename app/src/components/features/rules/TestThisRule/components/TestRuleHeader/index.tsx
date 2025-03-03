@@ -32,7 +32,7 @@ export const TestRuleHeader = () => {
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const allRecordsMap = useSelector(getAllRecordsMap);
   const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValid: isValidRole } = validatePermission(RBAC.Permission.create);
+  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.create);
 
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
@@ -124,10 +124,10 @@ export const TestRuleHeader = () => {
   ]);
 
   useEffect(() => {
-    if (!user.loggedIn || !isValidRole) {
+    if (!user.loggedIn || !isValidPermission) {
       setDoCaptureSession(false);
     }
-  }, [user.loggedIn, isValidRole]);
+  }, [user.loggedIn, isValidPermission]);
 
   return (
     <>
@@ -162,7 +162,7 @@ export const TestRuleHeader = () => {
         source={SOURCE.TEST_THIS_RULE}
       >
         <Checkbox
-          disabled={!isValidRole}
+          disabled={!isValidPermission}
           checked={doCaptureSession}
           onClick={() => {
             if (user.loggedIn) setDoCaptureSession(!doCaptureSession);
