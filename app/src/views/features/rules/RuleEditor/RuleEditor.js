@@ -38,7 +38,7 @@ const RuleEditor = (props) => {
   const tryThisRuleTooltipTimerRef = useRef(null);
   const [isSampleRule, setIsSampleRule] = useState(false);
   const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.update);
+  const { isValidPermission } = validatePermission(RBAC.Permission.update);
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
@@ -124,7 +124,7 @@ const RuleEditor = (props) => {
   const ruleEditor = useMemo(() => {
     return (
       <Col key={MODE + RULE_TYPE_TO_CREATE} className="overflow-hidden h-full rule-editor-container">
-        {isValidPermission ? null : <ReadOnlyModeAlert />}
+        <ReadOnlyModeAlert hide={isValidPermission} />
 
         {MODE !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
           <EditorHeader
