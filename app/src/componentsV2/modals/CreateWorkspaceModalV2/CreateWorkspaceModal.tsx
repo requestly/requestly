@@ -170,7 +170,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
             throw new Error(workspaceCreationResult.error.message);
           }
           const partialWorkspace = workspaceCreationResult.content;
-          const localWorkspace = {
+          const localWorkspace: Record<string, any> = {
             id: partialWorkspace.id,
             name: partialWorkspace.name,
             owner: user?.details?.profile?.uid,
