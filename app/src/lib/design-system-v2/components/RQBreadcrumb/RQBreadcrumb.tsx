@@ -4,6 +4,7 @@ import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevro
 import { Input, Skeleton, Typography } from "antd";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import "./RQBreadcrumb.scss";
+import { useCurrentWorkspaceUserRole } from "hooks";
 
 interface Props {
   loading?: boolean;
@@ -41,6 +42,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
   const [name, setName] = useState(recordName || "");
   const [isEditRecord, setIsEditRecord] = useState(false);
   const matchedRoutes = useMatches() as MatchedRoute[];
+  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   useEffect(() => {
     setName(recordName);
@@ -79,7 +81,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
   };
 
   const handleRecordNameEditClick = () => {
-    if (disabled) {
+    if (disabled || isReadRole) {
       return;
     }
 
@@ -114,12 +116,14 @@ export const RQBreadcrumb: React.FC<Props> = ({
                     <Typography.Text className="record-name" ellipsis={true} onClick={handleRecordNameEditClick}>
                       {name || placeholder}
                     </Typography.Text>
-                    {disabled ? null : <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />}
+                    {disabled || isReadRole ? null : (
+                      <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />
+                    )}
                   </div>
                 )
               ) : (
                 <>
-                  {isPathDisabled ? (
+                  {isPathDisabled || isReadRole ? (
                     <li key={index} className="rq-breadcrumb-item">
                       {label}
                     </li>

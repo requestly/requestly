@@ -6,6 +6,7 @@ import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
 import { RiEyeOffLine } from "@react-icons/all-files/ri/RiEyeOffLine";
 import { useCallback } from "react";
 import { EnvironmentVariableType } from "backend/environment/types";
+import { useCurrentWorkspaceUserRole } from "hooks";
 
 interface Props {
   handleVariableChange: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
@@ -26,6 +27,8 @@ export const useVariablesListColumns = ({
   recordsCount,
   duplicateKeyIndices,
 }: Props) => {
+  const { isReadRole } = useCurrentWorkspaceUserRole();
+
   const checkIsSecretHidden = useCallback(
     (recordId: number) => {
       return !visibleSecretsRowIds.includes(recordId);
@@ -44,6 +47,7 @@ export const useVariablesListColumns = ({
         title: "Key",
         handleVariableChange,
         duplicateKeyIndices,
+        isReadRole,
       }),
     },
     {
@@ -56,6 +60,7 @@ export const useVariablesListColumns = ({
         dataIndex: "type",
         title: "Type",
         handleVariableChange,
+        isReadRole,
         options: ["string", "number", "boolean", "secret"],
       }),
     },
@@ -78,6 +83,7 @@ export const useVariablesListColumns = ({
         dataIndex: "syncValue",
         title: "Sync Value",
         handleVariableChange,
+        isReadRole,
         isSecret: checkIsSecretHidden(record.id),
       }),
     },
@@ -100,6 +106,7 @@ export const useVariablesListColumns = ({
         dataIndex: "localValue",
         title: "Local Value",
         handleVariableChange,
+        isReadRole,
         isSecret: checkIsSecretHidden(record.id),
       }),
     },
@@ -110,7 +117,7 @@ export const useVariablesListColumns = ({
       render: (_: any, record: EnvironmentVariableTableRow) => {
         return (
           <div className="variable-row-actions">
-            {record.type === EnvironmentVariableType.Secret && (
+            {record.type === EnvironmentVariableType.Secret && !isReadRole && (
               <RQButton
                 icon={checkIsSecretHidden(record.id) ? <RiEyeOffLine /> : <RiEyeLine />}
                 type="transparent"
@@ -119,16 +126,18 @@ export const useVariablesListColumns = ({
                 className="secret-variable-toggle-btn"
               />
             )}
-            {(recordsCount > 1 ||
-              (recordsCount === 1 && (record.key !== "" || record.syncValue !== "" || record.localValue !== ""))) && (
-              <RQButton
-                icon={<RiDeleteBin6Line />}
-                type="transparent"
-                size="small"
-                className="delete-variable-btn"
-                onClick={() => handleDeleteVariable(record.id)}
-              />
-            )}
+
+            {!isReadRole &&
+              (recordsCount > 1 ||
+                (recordsCount === 1 && (record.key !== "" || record.syncValue !== "" || record.localValue !== ""))) && (
+                <RQButton
+                  icon={<RiDeleteBin6Line />}
+                  type="transparent"
+                  size="small"
+                  className="delete-variable-btn"
+                  onClick={() => handleDeleteVariable(record.id)}
+                />
+              )}
           </div>
         );
       },
