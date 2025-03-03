@@ -38,7 +38,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
 
   const { createRuleAction, createGroupAction, importRecordsAction } = useRulesActionContext();
   const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.create);
+  const { isValidPermission } = validatePermission(RBAC.Permission.create);
 
   const buttonData = [
     {

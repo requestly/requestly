@@ -40,7 +40,7 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const allRecordsMap = useSelector(getAllRecordsMap);
   const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.create);
+  const { isValidPermission } = validatePermission(RBAC.Permission.create);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
 

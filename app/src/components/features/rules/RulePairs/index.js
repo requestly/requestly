@@ -15,10 +15,10 @@ const RulePairs = (props) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
   const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValid } = validatePermission(RBAC.Permission.create);
+  const { isValidPermission } = validatePermission(RBAC.Permission.create);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
-  const isInputDisabled = props.mode === "shared-list-rule-view" || !!isSampleRule || !isValid;
+  const isInputDisabled = props.mode === "shared-list-rule-view" || !!isSampleRule || !isValidPermission;
 
   const getPairMarkup = (pair, pairIndex) => {
     const commonProps = {

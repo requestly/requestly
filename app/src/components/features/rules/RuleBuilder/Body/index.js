@@ -48,7 +48,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
     currentlySelectedRuleData.ruleType,
   ]);
 
-  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.update);
+  const { isValidPermission } = validatePermission(RBAC.Permission.update);
 
   return (
     <>

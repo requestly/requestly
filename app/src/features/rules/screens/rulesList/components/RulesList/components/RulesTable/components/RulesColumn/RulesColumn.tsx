@@ -26,7 +26,7 @@ const RuleNameColumn: React.FC<{
   };
 
   const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.create);
+  const { isValidPermission } = validatePermission(RBAC.Permission.create);
 
   const dispatch = useDispatch();
   const theme = useTheme();

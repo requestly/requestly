@@ -14,7 +14,7 @@ export const TestRuleButton: React.FC = () => {
   const location = useLocation();
   const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
   const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.create);
+  const { isValidPermission } = validatePermission(RBAC.Permission.create);
 
   const MODE = getModeData(location).MODE;
 

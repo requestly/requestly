@@ -32,7 +32,7 @@ export const TestRuleHeader = () => {
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const allRecordsMap = useSelector(getAllRecordsMap);
   const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.create);
+  const { isValidPermission } = validatePermission(RBAC.Permission.create);
 
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
