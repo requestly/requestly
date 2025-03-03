@@ -26,14 +26,14 @@ import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { WarningOutlined } from "@ant-design/icons";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import RuleNameColumn from "../components/RulesColumn/RulesColumn";
-import { useCurrentWorkspaceUserRole } from "hooks";
-import { TeamRole } from "types";
+import { RBAC, useRBAC } from "features/rbac";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const allRecordsMap = useSelector(getAllRecordsMap);
-  const { role } = useCurrentWorkspaceUserRole();
+  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
+  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.create);
   const {
     recordsChangeGroupAction,
     recordsShareAction,
@@ -88,7 +88,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: isWorkspaceMode ? 322 : 376,
       ellipsis: true,
       render: (record: RuleTableRecord) => {
-        return <RuleNameColumn role={role} record={record} />;
+        return <RuleNameColumn record={record} />;
       },
       onCell: (record: RuleTableRecord) => {
         if (isGroup(record)) {
@@ -330,21 +330,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           },
         ];
 
-        const readRoleGroupActions: MenuProps["items"] = [
-          {
-            key: 0,
-            onClick: (info) => {
-              info.domEvent?.stopPropagation?.();
-              groupShareAction(record as Group);
-            },
-            label: (
-              <Row>
-                <MdOutlineShare /> Share
-              </Row>
-            ),
-          },
-        ];
-
         const ruleActions: MenuProps["items"] = [
           isRule(record) && !record.isSample && record.groupId
             ? {
@@ -401,67 +386,34 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             ),
           },
         ];
-        return (
+        return !isValidPermission ? null : (
           <Row align="middle" wrap={false} className="rules-actions-container">
-            {role === TeamRole.read ? (
-              <>
-                {isRule(record) ? (
-                  <Button
-                    type="text"
-                    icon={<MdOutlineShare />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      recordsShareAction([normalizeRecord(record)]);
-                    }}
-                  />
-                ) : (
-                  <Dropdown
-                    menu={{ items: readRoleGroupActions }}
-                    trigger={["click"]}
-                    overlayClassName="rule-more-actions-dropdown"
-                  >
-                    <Button
-                      type="text"
-                      className="more-rule-actions-btn"
-                      icon={<MdOutlineMoreHoriz />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        trackRulesListActionsClicked(record.objectType);
-                      }}
-                    />
-                  </Dropdown>
-                )}
-              </>
-            ) : (
-              <>
-                {isRule(record) ? (
-                  <Button
-                    type="text"
-                    icon={<MdOutlineShare />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      recordsShareAction([normalizeRecord(record)]);
-                    }}
-                  />
-                ) : null}
+            {isRule(record) ? (
+              <Button
+                type="text"
+                icon={<MdOutlineShare />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  recordsShareAction([normalizeRecord(record)]);
+                }}
+              />
+            ) : null}
 
-                <Dropdown
-                  menu={{ items: isRule(record) ? ruleActions : groupActions }}
-                  trigger={["click"]}
-                  overlayClassName="rule-more-actions-dropdown"
-                >
-                  <Button
-                    type="text"
-                    className="more-rule-actions-btn"
-                    icon={<MdOutlineMoreHoriz />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      trackRulesListActionsClicked(record.objectType);
-                    }}
-                  />
-                </Dropdown>
-              </>
-            )}
+            <Dropdown
+              menu={{ items: isRule(record) ? ruleActions : groupActions }}
+              trigger={["click"]}
+              overlayClassName="rule-more-actions-dropdown"
+            >
+              <Button
+                type="text"
+                className="more-rule-actions-btn"
+                icon={<MdOutlineMoreHoriz />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  trackRulesListActionsClicked(record.objectType);
+                }}
+              />
+            </Dropdown>
           </Row>
         );
       },
