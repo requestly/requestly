@@ -8,17 +8,19 @@ export const useRBAC = (resource: RBAC.Resource) => {
   const userRole = (role as unknown) as RBAC.Role;
 
   const validatePermission = useCallback(
-    (permissionToCheck: RBAC.Permission): { isValid: true } | { isValid: false; error: RBAC.Error } => {
+    (
+      permissionToCheck: RBAC.Permission
+    ): { isValidPermission: true } | { isValidPermission: false; error: RBAC.Error } => {
       const result = validateResourcePermissionByRole(userRole, resource, permissionToCheck);
 
       if (result.isValid === false) {
         return {
-          isValid: false,
+          isValidPermission: false,
           error: result.error,
         };
       } else {
         return {
-          isValid: true,
+          isValidPermission: true,
         };
       }
     },
