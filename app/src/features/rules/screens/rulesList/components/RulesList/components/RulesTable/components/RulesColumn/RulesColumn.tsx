@@ -13,18 +13,20 @@ import { trackNewRuleButtonClicked } from "modules/analytics/events/common/rules
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { trackSampleRuleEditorViewed } from "features/rules/analytics";
-import { TeamRole } from "types";
+import { RBAC, useRBAC } from "features/rbac";
 
 const RuleNameColumn: React.FC<{
-  role: TeamRole;
   record: RuleTableRecord;
-}> = ({ role, record }) => {
+}> = ({ record }) => {
   // TODO: remove this when tooltip component is added in the design system
   const baseEllipsisTooltipConfig: TooltipProps = {
     overlayClassName: "rules-table-ellipsis-tooltip",
     placement: "right",
     showArrow: false,
   };
+
+  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
+  const { isValid: isValidRole } = validatePermission(RBAC.Permission.create);
 
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -124,7 +126,7 @@ const RuleNameColumn: React.FC<{
           </Tooltip>
         ) : null}
 
-        {role === TeamRole.read ? null : (
+        {isValidRole ? (
           <RuleSelectionListDrawer
             groupId={group.id}
             open={isRulesListDrawerOpen}
@@ -142,7 +144,7 @@ const RuleNameColumn: React.FC<{
               <span>+</span> <span>Add rule</span>
             </Button>
           </RuleSelectionListDrawer>
-        )}
+        ) : null}
       </div>
     );
   }
