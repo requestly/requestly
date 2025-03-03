@@ -7,17 +7,18 @@ import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "../..
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 import ResponseRuleResourceTypes from "./ResponseRuleResourceTypes";
 import { rulePairComponents } from "./Pairs";
-import { useCurrentWorkspaceUserRole } from "hooks";
+import { RBAC, useRBAC } from "features/rbac";
 import "./RulePairs.css";
 
 const RulePairs = (props) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
-  const { isReadRole } = useCurrentWorkspaceUserRole();
+  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
-  const isInputDisabled = props.mode === "shared-list-rule-view" || !!isSampleRule || isReadRole;
+  const { isValid } = validatePermission(RBAC.Permission.create);
+  const isInputDisabled = props.mode === "shared-list-rule-view" || !!isSampleRule || !isValid;
 
   const getPairMarkup = (pair, pairIndex) => {
     const commonProps = {
