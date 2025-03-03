@@ -26,11 +26,14 @@ import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { WarningOutlined } from "@ant-design/icons";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import RuleNameColumn from "../components/RulesColumn/RulesColumn";
+import { RBAC, useRBAC } from "features/rbac";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const allRecordsMap = useSelector(getAllRecordsMap);
+  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
+  const { isValidPermission } = validatePermission(RBAC.Permission.create);
   const {
     recordsChangeGroupAction,
     recordsShareAction,
@@ -383,7 +386,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             ),
           },
         ];
-        return (
+        return !isValidPermission ? null : (
           <Row align="middle" wrap={false} className="rules-actions-container">
             {isRule(record) ? (
               <Button

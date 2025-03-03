@@ -13,6 +13,7 @@ import { trackNewRuleButtonClicked } from "modules/analytics/events/common/rules
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { trackSampleRuleEditorViewed } from "features/rules/analytics";
+import { RBAC, useRBAC } from "features/rbac";
 
 const RuleNameColumn: React.FC<{
   record: RuleTableRecord;
@@ -23,6 +24,9 @@ const RuleNameColumn: React.FC<{
     placement: "right",
     showArrow: false,
   };
+
+  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
+  const { isValidPermission } = validatePermission(RBAC.Permission.create);
 
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -122,23 +126,25 @@ const RuleNameColumn: React.FC<{
           </Tooltip>
         ) : null}
 
-        <RuleSelectionListDrawer
-          groupId={group.id}
-          open={isRulesListDrawerOpen}
-          onClose={onRulesListDrawerClose}
-          source={SOURCE.RULE_GROUP}
-        >
-          <Button
-            className="add-rule-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsRulesListDrawerOpen(true);
-              trackNewRuleButtonClicked(SOURCE.RULE_GROUP);
-            }}
+        {isValidPermission ? (
+          <RuleSelectionListDrawer
+            groupId={group.id}
+            open={isRulesListDrawerOpen}
+            onClose={onRulesListDrawerClose}
+            source={SOURCE.RULE_GROUP}
           >
-            <span>+</span> <span>Add rule</span>
-          </Button>
-        </RuleSelectionListDrawer>
+            <Button
+              className="add-rule-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsRulesListDrawerOpen(true);
+                trackNewRuleButtonClicked(SOURCE.RULE_GROUP);
+              }}
+            >
+              <span>+</span> <span>Add rule</span>
+            </Button>
+          </RuleSelectionListDrawer>
+        ) : null}
       </div>
     );
   }
