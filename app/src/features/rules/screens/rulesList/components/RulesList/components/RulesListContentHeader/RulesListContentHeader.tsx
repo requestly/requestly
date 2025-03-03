@@ -20,17 +20,16 @@ import { RuleSelectionList } from "../RuleSelectionList/RuleSelectionList";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
 import { RQButton } from "lib/design-system-v2/components";
 import { useLocation } from "react-router-dom";
-import { TeamRole } from "types";
+import { RBAC, useRBAC } from "features/rbac";
 
 interface Props {
-  userRole: TeamRole;
   searchValue: string;
   setSearchValue: (value: string) => void;
   filter: FilterType;
   records: StorageRecord[];
 }
 
-const RulesListContentHeader: React.FC<Props> = ({ userRole, searchValue, setSearchValue, filter, records }) => {
+const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, filter, records }) => {
   const user = useSelector(getUserAuthDetails);
   const { state } = useLocation();
   const debouncedTrackRulesListSearched = useDebounce(trackRulesListSearched, 500);
@@ -38,6 +37,8 @@ const RulesListContentHeader: React.FC<Props> = ({ userRole, searchValue, setSea
   const [isRuleDropdownOpen, setIsRuleDropdownOpen] = useState(isRedirectFromCreateRulesRoute || false);
 
   const { createRuleAction, createGroupAction, importRecordsAction } = useRulesActionContext();
+  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
+  const { isValid: isValidRole } = validatePermission(RBAC.Permission.create);
 
   const buttonData = [
     {
@@ -189,7 +190,7 @@ const RulesListContentHeader: React.FC<Props> = ({ userRole, searchValue, setSea
     <ContentListHeader
       title="My Rules"
       subtitle="Create and manage your rules from here"
-      actions={userRole !== TeamRole.read ? contentHeaderActions : null}
+      actions={isValidRole ? contentHeaderActions : null}
       searchValue={searchValue}
       setSearchValue={handleSearchValueUpdate}
       filters={contentHeaderFilters}

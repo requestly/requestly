@@ -32,7 +32,7 @@ import { useRulesActionContext } from "features/rules/context/actions";
 import { globalActions } from "store/slices/global/slice";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { RecordType, RecordStatus, StorageRecord } from "@requestly/shared/types/entities/rules";
-import { TeamRole } from "types";
+import { RBAC, useRBAC } from "features/rbac";
 import "./rulesTable.css";
 
 interface Props {
@@ -40,11 +40,12 @@ interface Props {
   allRecordsMap: { [id: string]: StorageRecord };
   loading: boolean;
   searchValue: string;
-  userRole: TeamRole;
 }
 
-const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecordsMap, userRole }) => {
+const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecordsMap }) => {
   const { selectedRows, clearSelectedRows } = useContentListTableContext();
+  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
+  const { isValid: isValidRole } = validatePermission(RBAC.Permission.create);
 
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -242,11 +243,11 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     <>
       {/* Add Modals Required in Rules List here */}
       <ContentListTable
-        dragAndDrop={userRole !== TeamRole.read}
-        isRowSelection={userRole !== TeamRole.read}
+        dragAndDrop={isValidRole}
+        isRowSelectable={isValidRole}
         onRowDropped={onRowDropped}
         id="rules-list-table"
-        className={`rules-list-table ${userRole === TeamRole.read ? "read-only" : ""}`}
+        className={`rules-list-table ${!isValidRole ? "read-only" : ""}`}
         defaultExpandedRowKeys={groupIdsToExpand}
         size="middle"
         scroll={{ y: getTableScrollHeight() }}
