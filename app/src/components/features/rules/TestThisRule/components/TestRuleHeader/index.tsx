@@ -22,7 +22,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { getAllRecordsMap } from "store/features/rules/selectors";
 import { useIsNewUserForIncentivization } from "features/incentivization/hooks";
 import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivization/constants";
-import { useCurrentWorkspaceUserRole } from "hooks";
+import { RBAC, useRBAC } from "features/rbac";
 import "./index.scss";
 
 export const TestRuleHeader = () => {
@@ -31,7 +31,8 @@ export const TestRuleHeader = () => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const allRecordsMap = useSelector(getAllRecordsMap);
-  const { isReadRole } = useCurrentWorkspaceUserRole();
+  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
+  const { isValid: isValidRole } = validatePermission(RBAC.Permission.create);
 
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
@@ -123,10 +124,10 @@ export const TestRuleHeader = () => {
   ]);
 
   useEffect(() => {
-    if (!user.loggedIn || isReadRole) {
+    if (!user.loggedIn || !isValidRole) {
       setDoCaptureSession(false);
     }
-  }, [user.loggedIn, isReadRole]);
+  }, [user.loggedIn, isValidRole]);
 
   return (
     <>
@@ -161,7 +162,7 @@ export const TestRuleHeader = () => {
         source={SOURCE.TEST_THIS_RULE}
       >
         <Checkbox
-          disabled={isReadRole}
+          disabled={!isValidRole}
           checked={doCaptureSession}
           onClick={() => {
             if (user.loggedIn) setDoCaptureSession(!doCaptureSession);
