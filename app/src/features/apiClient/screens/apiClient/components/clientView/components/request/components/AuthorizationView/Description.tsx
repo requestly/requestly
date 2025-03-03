@@ -1,7 +1,7 @@
 import { isEmpty } from "lodash";
 import { BiLinkExternal } from "@react-icons/all-files/bi/BiLinkExternal";
 import { LABEL_TEXT } from "./authConstants";
-import { AuthDescriptionData, AuthDescriptionStep } from "./types";
+import { AuthDescriptionData, AuthDescriptionStep } from "./AuthorizationForm/formStructure/types";
 import React from "react";
 interface DescriptionProps {
   data: AuthDescriptionData;
