@@ -90,7 +90,7 @@ export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   dragAndDrop?: boolean;
   onRowDropped?: (sourceRecordId: string, targetRecordId: string) => void;
   defaultExpandedRowKeys?: string[];
-  isRowSelection?: boolean;
+  isRowSelectable?: boolean;
 }
 
 const ContentListTable = <DataType extends { [key: string]: any }>({
@@ -114,7 +114,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   footer,
   bordered = false,
   showHeader = true,
-  isRowSelection = true,
+  isRowSelectable = true,
 }: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
@@ -176,7 +176,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   );
 
   const commonProps: TableProps<DataType> = {
-    className: `rq-content-list-table ${className} ${isRowSelection ? "rq-content-list-table-selectable" : ""}`,
+    className: `rq-content-list-table ${className} ${isRowSelectable ? "rq-content-list-table-selectable" : ""}`,
     onHeaderRow: () => ({
       className: "rq-content-list-table-header",
     }),
@@ -190,7 +190,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     scroll: scroll,
     locale: locale,
     rowSelection:
-      isRowSelection && bulkActionBarConfig
+      isRowSelectable && bulkActionBarConfig
         ? {
             checkStrictly: false,
             selectedRowKeys: selectedRows.map((record) => (record as any)[rowKey]),
