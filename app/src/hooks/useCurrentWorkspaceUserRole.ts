@@ -4,7 +4,7 @@ import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/t
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Team, TeamRole } from "types";
 
-export const useCurrentWorkspaceUserRole = (): { role: TeamRole | undefined; isReadRole: boolean } => {
+export const useCurrentWorkspaceUserRole = (): { role: TeamRole | undefined } => {
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams) as Team[] | null;
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -15,14 +15,14 @@ export const useCurrentWorkspaceUserRole = (): { role: TeamRole | undefined; isR
   ]);
 
   if (!user.loggedIn) {
-    return { role: undefined, isReadRole: false };
+    return { role: undefined };
   }
 
   // Private workspace
   if (currentlyActiveWorkspace.id === null) {
-    return { role: TeamRole.admin, isReadRole: false };
+    return { role: TeamRole.admin };
   }
 
   const role = teamDetails?.members?.[user?.details?.profile?.uid]?.role;
-  return { role: role, isReadRole: role === TeamRole.read };
+  return { role: role };
 };
