@@ -28,7 +28,7 @@ export class RuleStorageModel extends StorageModel<StorageRecord> {
 
       data: {
         status: data.status,
-        isFavourite: data.isFavourite,
+        isFavourite: data.isFavourite || false,
       },
 
       createdAt: data.createdAt || 0,
