@@ -21,8 +21,8 @@ import { RuleEditorBottomSheet } from "./components/RuleEditorBottomSheet/RuleEd
 import { trackSampleRuleTested } from "features/rules/analytics";
 import { RecordStatus } from "@requestly/shared/types/entities/rules";
 import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
-import { useCurrentWorkspaceUserRole } from "hooks";
 import { ReadOnlyModeAlert } from "./components/ReadOnlyModeAlert/ReadOnlyModeAlert";
+import { RBAC, useRBAC } from "features/rbac";
 import "./RuleEditor.scss";
 
 const RuleEditor = (props) => {
@@ -37,7 +37,8 @@ const RuleEditor = (props) => {
   const [showEnableRuleTooltip, setShowEnableRuleTooltip] = useState(false);
   const tryThisRuleTooltipTimerRef = useRef(null);
   const [isSampleRule, setIsSampleRule] = useState(false);
-  const { role, isReadRole } = useCurrentWorkspaceUserRole();
+  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
+  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.update);
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
@@ -123,11 +124,10 @@ const RuleEditor = (props) => {
   const ruleEditor = useMemo(() => {
     return (
       <Col key={MODE + RULE_TYPE_TO_CREATE} className="overflow-hidden h-full rule-editor-container">
-        {isReadRole ? <ReadOnlyModeAlert /> : null}
+        {isValidPermission ? null : <ReadOnlyModeAlert />}
 
         {MODE !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
           <EditorHeader
-            role={role}
             mode={MODE}
             showEnableRuleTooltip={showEnableRuleTooltip}
             handleSeeLiveRuleDemoClick={handleSeeLiveRuleDemoClick}
@@ -158,8 +158,7 @@ const RuleEditor = (props) => {
       </Col>
     );
   }, [
-    role,
-    isReadRole,
+    isValidPermission,
     MODE,
     RULE_TYPE_TO_CREATE,
     appMode,

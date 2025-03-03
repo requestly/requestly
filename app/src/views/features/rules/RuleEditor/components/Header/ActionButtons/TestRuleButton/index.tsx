@@ -7,13 +7,14 @@ import { useLocation } from "react-router-dom";
 import RULE_EDITOR_CONFIG from "config/constants/sub/rule-editor";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { TeamRole } from "types";
+import { RBAC, useRBAC } from "features/rbac";
 import "./index.scss";
 
-export const TestRuleButton: React.FC<{ role?: TeamRole }> = ({ role }) => {
+export const TestRuleButton: React.FC = () => {
   const location = useLocation();
   const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
-  const isReadRole = role === TeamRole.read;
+  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
+  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.create);
 
   const MODE = getModeData(location).MODE;
 
@@ -22,7 +23,7 @@ export const TestRuleButton: React.FC<{ role?: TeamRole }> = ({ role }) => {
       <RQButton
         disabled={MODE !== RULE_EDITOR_CONFIG.MODES.EDIT}
         className="header-test-rule-btn"
-        type={isReadRole ? "primary" : "transparent"}
+        type={isValidPermission ? "transparent" : "primary"}
         icon={<MdOutlineScience />}
         onClick={() => {
           if (sheetPlacement === BottomSheetPlacement.BOTTOM) {

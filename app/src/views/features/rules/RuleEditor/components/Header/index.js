@@ -30,16 +30,17 @@ import { trackSampleRuleCreateRuleClicked } from "features/rules/analytics";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import { getEventObject } from "components/common/RuleEditorModal/utils";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
-import { TeamRole } from "types";
+import { RBAC, useRBAC } from "features/rbac";
 
-const Header = ({ role, mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleTooltip = false }) => {
+const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleTooltip = false }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const allRecordsMap = useSelector(getAllRecordsMap);
-  const isReadRole = role === TeamRole.read;
+  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
+  const { isValid: isValidPermission } = validatePermission(RBAC.Permission.create);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
 
@@ -81,7 +82,7 @@ const Header = ({ role, mode, handleSeeLiveRuleDemoClick = () => {}, showEnableR
           <CloseButton mode={mode} ruleType={currentlySelectedRuleData?.ruleType} />
           <div className="text-gray rule-editor-header-title">
             <RQBreadcrumb
-              disabled={isSampleRule || isReadRole}
+              disabled={isSampleRule || !isValidPermission}
               placeholder="Enter rule name"
               recordName={currentlySelectedRuleData?.name}
               onRecordNameUpdate={handleRuleNameChange}
@@ -128,14 +129,7 @@ const Header = ({ role, mode, handleSeeLiveRuleDemoClick = () => {}, showEnableR
           </div>
         ) : (
           <div className="ml-auto rule-editor-header-actions-container">
-            {isReadRole ? (
-              <>
-                <HelpButton />
-                <Divider type="vertical" />
-                <ActionButtons role={role} mode={mode} />
-                <TestRuleButton role={role} />
-              </>
-            ) : (
+            {isValidPermission ? (
               <>
                 <HelpButton />
 
@@ -170,6 +164,12 @@ const Header = ({ role, mode, handleSeeLiveRuleDemoClick = () => {}, showEnableR
                 <TestRuleButton />
 
                 <ActionButtons mode={mode} />
+              </>
+            ) : (
+              <>
+                <HelpButton />
+                <Divider type="vertical" />
+                <TestRuleButton />
               </>
             )}
           </div>
