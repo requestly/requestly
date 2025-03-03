@@ -29,6 +29,10 @@ function extractAuthDetails(oldAuth: any): RQAPI.Auth {
     return getDefaultAuth(false);
   }
   const { currentAuthType, ...extraKeys } = oldAuth;
+  if (extraKeys.authConfigStore) {
+    // already the latest version, does not need schema patching
+    return oldAuth as RQAPI.Auth;
+  }
   const existingConfig = extraKeys as OldAuthOptions;
   if (Authorization.hasNoConfig(currentAuthType)) {
     return {
