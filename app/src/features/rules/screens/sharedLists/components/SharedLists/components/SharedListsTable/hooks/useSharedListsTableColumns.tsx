@@ -27,8 +27,8 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [copiedSharedListId, setCopiedSharedListId] = useState("");
 
-  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValidPermission } = validatePermission(RBAC.Permission.delete);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.delete);
 
   const handleOnURLCopy = useCallback((id: string) => {
     trackSharedListUrlCopied("shared_list_list", id);

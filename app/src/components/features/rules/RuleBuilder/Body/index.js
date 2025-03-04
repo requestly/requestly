@@ -19,7 +19,8 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
   const ruleErrors = useSelector(getCurrentlySelectedRuleErrors);
   const isSharedListView = mode === "shared-list-rule-view";
   const isSampleRule = currentlySelectedRuleData?.isSample;
-  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.update);
 
   const getEventObject = (name, value) => ({ target: { name, value } });
 
@@ -47,8 +48,6 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
     generateRuleName,
     currentlySelectedRuleData.ruleType,
   ]);
-
-  const { isValidPermission } = validatePermission(RBAC.Permission.update);
 
   return (
     <>

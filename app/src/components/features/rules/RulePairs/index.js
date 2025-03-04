@@ -14,8 +14,8 @@ const RulePairs = (props) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
-  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValidPermission } = validatePermission(RBAC.Permission.create);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.create);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
   const isInputDisabled = props.mode === "shared-list-rule-view" || !!isSampleRule || !isValidPermission;

@@ -44,8 +44,8 @@ interface Props {
 
 const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecordsMap }) => {
   const { selectedRows, clearSelectedRows } = useContentListTableContext();
-  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValidPermission } = validatePermission(RBAC.Permission.create);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.create);
 
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);

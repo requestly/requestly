@@ -37,8 +37,8 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
   const [isRuleDropdownOpen, setIsRuleDropdownOpen] = useState(isRedirectFromCreateRulesRoute || false);
 
   const { createRuleAction, createGroupAction, importRecordsAction } = useRulesActionContext();
-  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValidPermission } = validatePermission(RBAC.Permission.create);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.create);
 
   const buttonData = [
     {

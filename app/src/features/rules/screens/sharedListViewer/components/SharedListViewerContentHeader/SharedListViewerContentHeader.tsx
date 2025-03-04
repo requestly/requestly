@@ -50,8 +50,8 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { getFeatureLimitValue } = useFeatureLimiter();
-  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValidPermission } = validatePermission(RBAC.Permission.create);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.create);
 
   const [areRulesImporting, setAreRulesImporting] = useState(false);
   const isImportLimitReached = useMemo(

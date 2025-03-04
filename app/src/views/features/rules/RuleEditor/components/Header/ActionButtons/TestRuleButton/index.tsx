@@ -13,8 +13,8 @@ import "./index.scss";
 export const TestRuleButton: React.FC = () => {
   const location = useLocation();
   const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
-  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValidPermission } = validatePermission(RBAC.Permission.create);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.create);
 
   const MODE = getModeData(location).MODE;
 

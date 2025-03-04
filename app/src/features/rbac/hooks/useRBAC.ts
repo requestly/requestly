@@ -3,12 +3,13 @@ import { RBAC } from "../types";
 import { validateResourcePermissionByRole } from "../utils";
 import { useCurrentWorkspaceUserRole } from "hooks";
 
-export const useRBAC = (resource: RBAC.Resource) => {
+export const useRBAC = () => {
   const { role } = useCurrentWorkspaceUserRole();
   const userRole = (role as unknown) as RBAC.Role;
 
   const validatePermission = useCallback(
     (
+      resource: RBAC.Resource,
       permissionToCheck: RBAC.Permission
     ): { isValidPermission: true } | { isValidPermission: false; error: RBAC.Error } => {
       const result = validateResourcePermissionByRole(userRole, resource, permissionToCheck);
@@ -25,7 +26,7 @@ export const useRBAC = (resource: RBAC.Resource) => {
       }
     },
 
-    [userRole, resource]
+    [userRole]
   );
 
   return { validatePermission };

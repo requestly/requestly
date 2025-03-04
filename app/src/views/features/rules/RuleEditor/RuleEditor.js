@@ -37,8 +37,8 @@ const RuleEditor = (props) => {
   const [showEnableRuleTooltip, setShowEnableRuleTooltip] = useState(false);
   const tryThisRuleTooltipTimerRef = useRef(null);
   const [isSampleRule, setIsSampleRule] = useState(false);
-  const { validatePermission } = useRBAC(RBAC.Resource.http_rule);
-  const { isValidPermission } = validatePermission(RBAC.Permission.update);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.update);
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
