@@ -14,6 +14,8 @@ import { trackAppOnboardingTeamsViewed, trackAppOnboardingViewed } from "feature
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import "./index.scss";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
+import { useNavigate } from "react-router-dom";
 import { Invite } from "types";
 
 interface WorkspaceOnboardingViewProps {
@@ -22,6 +24,7 @@ interface WorkspaceOnboardingViewProps {
 
 export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = ({ isOpen }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const user = useSelector(getUserAuthDetails);
   const [pendingInvites, setPendingInvites] = useState(null);
@@ -41,7 +44,14 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
       if (res?.pendingInvites?.length > 0) setIsLoading(false);
       else {
         setIsLoading(false);
-        dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+        redirectToWebAppHomePage(navigate);
+        dispatch(globalActions.updateAppOnboardingCompleted());
+        dispatch(
+          globalActions.toggleActiveModal({
+            modalName: "appOnboardingModal",
+            newValue: false,
+          })
+        );
       }
     },
     [dispatch]
@@ -55,7 +65,14 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
 
     if (!isCompanyEmail(user?.details?.profile?.email) || !user?.details?.profile?.isEmailVerified) {
       setIsLoading(false);
-      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+      redirectToWebAppHomePage(navigate);
+      dispatch(globalActions.updateAppOnboardingCompleted());
+      dispatch(
+        globalActions.toggleActiveModal({
+          modalName: "appOnboardingModal",
+          newValue: false,
+        })
+      );
       return;
     }
 
@@ -73,6 +90,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
     dispatch,
     handleSwitchWorkspace,
     handlePendingInvites,
+    navigate,
   ]);
 
   useEffect(() => {

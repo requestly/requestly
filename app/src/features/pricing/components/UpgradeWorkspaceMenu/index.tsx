@@ -10,12 +10,13 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 import APP_CONSTANTS from "config/constants";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
+import { MISC_TOURS } from "components/misc/ProductWalkthrough/constants";
 import { globalActions } from "store/slices/global/slice";
 import { trackPricingWorkspaceSwitched } from "features/pricing/analytics";
 import "./index.scss";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { getActiveWorkspaceIds, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 
 interface MenuProps {
   workspaceToUpgrade: { name: string; id: string; accessCount: number };
@@ -124,7 +125,7 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
           dispatch(
             globalActions.updateProductTourCompleted({
               tour: TOUR_TYPES.MISCELLANEOUS,
-              subTour: "upgradeWorkspaceMenu",
+              subTour: SUB_TOUR_TYPES.UPGRADE_WORKSPACE_MENU,
             })
           )
         }
@@ -146,7 +147,7 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
                   dispatch(
                     globalActions.updateProductTourCompleted({
                       tour: TOUR_TYPES.MISCELLANEOUS,
-                      subTour: "upgradeWorkspaceMenu",
+                      subTour: SUB_TOUR_TYPES.UPGRADE_WORKSPACE_MENU,
                     })
                   );
                 }

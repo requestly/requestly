@@ -1,14 +1,15 @@
 // import Logger from "lib/logger";
-import { Workspace } from "../types";
+import { Workspace, WorkspaceType } from "../types";
 
-export const LOGGED_OUT_WORKSPACE_ID = "local";
+export const LOGGED_OUT_WORKSPACE_ID = "localstorage";
 export const LoggedOutWorkspace: Workspace = {
   id: LOGGED_OUT_WORKSPACE_ID,
-  name: "Private (Local)",
+  name: "Private (LocalStorage)",
   members: {},
+  workspaceType: WorkspaceType.LOCAL_STORAGE,
 };
 
-export const isLocalWorkspace = (workspaceId: string) => {
+export const isLocalStorageWorkspace = (workspaceId: string) => {
   return workspaceId === LOGGED_OUT_WORKSPACE_ID;
 };
 
@@ -47,8 +48,8 @@ export const hasAccessToWorkspace = (userId?: string, workspace?: Workspace): bo
   }
 };
 
-export const isSharedWorkspace = (workspaceId: string) => {
-  if (workspaceId === LOGGED_OUT_WORKSPACE_ID || isPersonalWorkspace(workspaceId)) {
+export const isSharedWorkspace = (workspace: Workspace) => {
+  if (workspace.id === LOGGED_OUT_WORKSPACE_ID || isPersonalWorkspace(workspace.id) || isLocalFSWorkspace(workspace)) {
     return false;
   }
 
@@ -66,4 +67,12 @@ export const isOnlineWorkspace = (workspaceId: string) => {
 // For now only as we can have only 1 connected workspace right now
 export const getActiveWorkspaceId = (activeWorkspaceIds: string[]) => {
   return activeWorkspaceIds?.[0];
+};
+
+export const isLocalFSWorkspace = (workspace: Workspace) => {
+  return workspace?.workspaceType === WorkspaceType.LOCAL;
+};
+
+export const getLocalFSWorkspaceRootPath = (workspace: Workspace) => {
+  return workspace?.rootPath;
 };

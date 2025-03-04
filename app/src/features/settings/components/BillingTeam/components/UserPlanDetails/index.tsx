@@ -25,6 +25,8 @@ import { PlanStatus, PlanType } from "../../types";
 import { CancelPlanModal } from "../BillingDetails/modals/common/CancelPlanModal";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { isSafariBrowser } from "actions/ExtensionActions";
+import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
 
 export const UserPlanDetails = () => {
   const navigate = useNavigate();
@@ -161,7 +163,9 @@ export const UserPlanDetails = () => {
           marginTop: !user?.details?.isPremium ? "80px" : "0px",
         }}
       >
-        {user?.details?.isPremium && !(user?.details?.planDetails?.status === "trialing" && hasAppSumoSubscription) ? (
+        {!isSafariBrowser() &&
+        user?.details?.isPremium &&
+        !(user?.details?.planDetails?.status === "trialing" && hasAppSumoSubscription) ? (
           <>
             {" "}
             <Row gutter={8} align="middle" className="user-plan-card-header">
@@ -235,7 +239,9 @@ export const UserPlanDetails = () => {
           </>
         ) : null}
 
-        {hasAppSumoSubscription ? (
+        {isSafariBrowser() ? (
+          <SafariLimitedSupportView />
+        ) : hasAppSumoSubscription ? (
           <div
             style={{
               padding: "1rem 8px",

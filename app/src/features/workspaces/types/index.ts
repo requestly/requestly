@@ -18,9 +18,13 @@ export interface Workspace {
 
   isSyncEnabled?: boolean;
   workspaceType?: WorkspaceType;
+
+  rootPath?: string;
 }
 
 export enum WorkspaceType {
   PERSONAL = "PERSONAL",
   SHARED = "SHARED",
+  LOCAL = "LOCAL",
+  LOCAL_STORAGE = "LOCAL_STORAGE",
 }

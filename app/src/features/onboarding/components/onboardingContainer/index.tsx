@@ -6,7 +6,6 @@ import { getAppMode, getAppOnboardingDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { AuthScreen } from "../auth";
 import { ONBOARDING_STEPS } from "../../types";
-import { RecommendationsView } from "../recommendations";
 import { PersonaScreen } from "../persona/components/personaScreen";
 import { MdOutlineArrowForward } from "@react-icons/all-files/md/MdOutlineArrowForward";
 import { globalActions } from "store/slices/global/slice";
@@ -17,6 +16,7 @@ import { WorkspaceOnboardingView } from "../teams";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.scss";
 
 interface OnboardingProps {
@@ -33,8 +33,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
     trackAppOnboardingSkipped(step);
     if (step === ONBOARDING_STEPS.AUTH) {
       dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
-    } else if (step === ONBOARDING_STEPS.TEAMS) {
-      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
     } else {
       redirectToWebAppHomePage(navigate);
       dispatch(globalActions.updateAppOnboardingCompleted());
@@ -83,7 +81,12 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
     >
       <div className="onboarding-modal-body-wrapper">
         <div className="onboarding-modal-body">
-          <Row justify="space-between" className="w-full onboarding-modal-header">
+          <Row
+            justify="space-between"
+            className={`w-full onboarding-modal-header ${
+              appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? "desktop-onboarding-header-margin" : ""
+            }`}
+          >
             <Col>
               <img src={"/assets/media/common/rq_logo_full.svg"} alt="requestly logo" style={{ width: "90px" }} />
             </Col>
@@ -106,10 +109,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
             />
           ) : step === ONBOARDING_STEPS.PERSONA ? (
             <PersonaScreen isOpen={isOpen} />
-          ) : step === ONBOARDING_STEPS.TEAMS ? (
-            <WorkspaceOnboardingView isOpen={isOpen} />
           ) : (
-            <RecommendationsView isOpen={isOpen} />
+            <WorkspaceOnboardingView isOpen={isOpen} />
           )}
         </div>
       </div>

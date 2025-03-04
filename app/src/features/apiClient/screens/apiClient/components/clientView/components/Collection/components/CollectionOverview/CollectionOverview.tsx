@@ -7,8 +7,6 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { useDebounce } from "hooks/useDebounce";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
-import PATHS from "config/constants/sub/paths";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
@@ -16,6 +14,8 @@ import { useOutsideClick } from "hooks";
 import "./collectionOverview.scss";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { useTabsLayoutContext } from "layouts/TabsLayout";
 
 interface CollectionOverviewProps {
   collection: RQAPI.CollectionRecord;
@@ -26,12 +26,13 @@ const COLLECTION_DETAILS_PLACEHOLDER = "Collection description";
 export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collection }) => {
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const { onSaveRecord } = useApiClientContext();
-  const { replaceTab } = useTabsLayoutContext();
+  const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
+  const { closeTab } = useTabsLayoutContext();
 
   const [collectionName, setCollectionName] = useState(collection?.name || "");
   const [collectionDescription, setCollectionDescription] = useState(collection?.description || "");
   const [showEditor, setShowEditor] = useState(false);
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const { ref: collectionDescriptionRef } = useOutsideClick<HTMLDivElement>(() => setShowEditor(false));
 
@@ -61,14 +62,14 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
       setCollectionName("Untitled Collection");
     }
 
-    return upsertApiRecord(user.details?.profile?.uid, updatedCollection, activeWorkspaceId).then((result) => {
+    const result = await apiClientRecordsRepository.renameCollection(updatedCollection.id, collectionName);
+    if (result.success) {
       onSaveRecord(result.data);
-      replaceTab(result.data.id, {
-        id: result.data.id,
-        title: result.data.name,
-        url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${result.data.id}`,
-      });
-    });
+    }
+    const wasForceRefreshed = await forceRefreshApiClientRecords();
+    if (wasForceRefreshed) {
+      closeTab(collection.id);
+    }
   };
 
   const markdown = useMemo(() => {
@@ -105,45 +106,46 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
           onBlur={handleCollectionNameChange}
           placeholder="Collection name"
         />
-
-        <div ref={collectionDescriptionRef} className="collection-overview-description">
-          {showEditor ? (
-            <>
-              <Tabs
-                size="small"
-                defaultActiveKey="markdown"
-                items={[
-                  {
-                    key: "markdown",
-                    label: "Markdown",
-                    children: (
-                      <Input.TextArea
-                        autoFocus
-                        value={collectionDescription}
-                        placeholder={COLLECTION_DETAILS_PLACEHOLDER}
-                        className="collection-overview-description-textarea"
-                        autoSize={{ minRows: 15 }}
-                        onChange={(e) => {
-                          setCollectionDescription(e.target.value);
-                          debouncedDescriptionChange(e.target.value);
-                        }}
-                      />
-                    ),
-                  },
-                  {
-                    key: "preview",
-                    label: "Preview",
-                    children: <div className="collection-overview-description-markdown-preview">{markdown}</div>,
-                  },
-                ]}
-              />
-            </>
-          ) : (
-            <div className="collection-overview-description-markdown" onClick={() => setShowEditor(true)}>
-              {markdown}
-            </div>
-          )}
-        </div>
+        {!isLocalSyncEnabled && (
+          <div ref={collectionDescriptionRef} className="collection-overview-description">
+            {showEditor ? (
+              <>
+                <Tabs
+                  size="small"
+                  defaultActiveKey="markdown"
+                  items={[
+                    {
+                      key: "markdown",
+                      label: "Markdown",
+                      children: (
+                        <Input.TextArea
+                          autoFocus
+                          value={collectionDescription}
+                          placeholder={COLLECTION_DETAILS_PLACEHOLDER}
+                          className="collection-overview-description-textarea"
+                          autoSize={{ minRows: 15 }}
+                          onChange={(e) => {
+                            setCollectionDescription(e.target.value);
+                            debouncedDescriptionChange(e.target.value);
+                          }}
+                        />
+                      ),
+                    },
+                    {
+                      key: "preview",
+                      label: "Preview",
+                      children: <div className="collection-overview-description-markdown-preview">{markdown}</div>,
+                    },
+                  ]}
+                />
+              </>
+            ) : (
+              <div className="collection-overview-description-markdown" onClick={() => setShowEditor(true)}>
+                {markdown}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

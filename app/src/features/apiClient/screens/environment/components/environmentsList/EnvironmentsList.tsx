@@ -62,7 +62,7 @@ export const EnvironmentsList = () => {
               setCurrentEnvironment(newEnvironment.id);
             }
 
-            const targetPath = `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${newEnvironment.id}`;
+            const targetPath = `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(newEnvironment.id)}`;
             const tabConfig = {
               id: newEnvironment.id,
               title: newEnvironment.name,
@@ -116,6 +116,7 @@ export const EnvironmentsList = () => {
     (environment: { id: string; name: string }) => {
       const variables = getEnvironmentVariables(environment.id);
       setEnvironmentsToExport([{ ...environment, variables }]);
+
       setIsExportModalOpen(true);
     },
     [getEnvironmentVariables]

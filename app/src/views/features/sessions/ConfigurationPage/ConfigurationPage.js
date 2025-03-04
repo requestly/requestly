@@ -12,7 +12,7 @@ import APP_CONSTANTS from "config/constants";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { RQButton } from "lib/design-system/components";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
-import { isExtensionInstalled } from "actions/ExtensionActions";
+import { isExtensionInstalled, isSafariBrowser } from "actions/ExtensionActions";
 import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./configurationPage.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
@@ -21,6 +21,7 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
+import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
 
 const emptyPageSourceData = {
   key: GLOBAL_CONSTANTS.URL_COMPONENTS.URL,
@@ -147,6 +148,10 @@ const ConfigurationPage = () => {
   const addEmptyPageSource = () => {
     setCustomPageSources((prevPageSources) => [{ ...emptyPageSourceData }, ...prevPageSources]);
   };
+
+  if (isSafariBrowser()) {
+    return <SafariLimitedSupportView />;
+  }
 
   if (!isExtensionInstalled()) {
     return <InstallExtensionCTA eventPage="session_settings" />;
