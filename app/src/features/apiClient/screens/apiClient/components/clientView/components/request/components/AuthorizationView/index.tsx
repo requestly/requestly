@@ -14,10 +14,10 @@ import { RQAPI } from "features/apiClient/types";
 import { EnvironmentVariables } from "backend/environment/types";
 import { HelpPanel } from "./HelpPanel";
 import { ReadOnlyModeAlert } from "../../../ReadOnlyModeAlert/ReadOnlyModeAlert";
+import { useRBAC } from "features/rbac";
 import "./authorizationView.scss";
 
 interface Props {
-  isReadRole: boolean;
   wrapperClass?: string;
   defaultValues: {
     currentAuthType?: AUTHORIZATION_TYPES;
@@ -30,7 +30,6 @@ interface Props {
 }
 
 const AuthorizationView: React.FC<Props> = ({
-  isReadRole,
   defaultValues,
   onAuthUpdate,
   rootLevelRecord,
@@ -43,6 +42,8 @@ const AuthorizationView: React.FC<Props> = ({
   );
   const [formValues, setFormValues] = useState<Record<string, any>>(defaultValues || {});
   const [showReadOnlyAlert, setShowReadOnlyAlert] = useState(false);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_request", "create");
 
   const getAuthOptions = (
     previousFormValues: Record<string, any>,
@@ -81,7 +82,7 @@ const AuthorizationView: React.FC<Props> = ({
         <ReadOnlyModeAlert description="Your changes will not be saved. As a viewer, you can modify and test the APIs, but saving your updates is not permitted." />
       )}
 
-      <div className={`authorization-view ${wrapperClass} ${isReadRole ? "read-only" : ""}`}>
+      <div className={`authorization-view ${wrapperClass} ${!isValidPermission ? "read-only" : ""}`}>
         <div className="type-of-authorization">
           <div className="form-selector">
             <label>{LABEL_TEXT.AUTHORIZATION_TYPE_LABEL}</label>
@@ -89,7 +90,7 @@ const AuthorizationView: React.FC<Props> = ({
               className="form-selector-dropdown"
               value={selectedForm}
               onChange={(value) => {
-                if (isReadRole) {
+                if (!isValidPermission) {
                   setShowReadOnlyAlert(true);
                 }
 
@@ -102,7 +103,7 @@ const AuthorizationView: React.FC<Props> = ({
               <div
                 className="clear-icon"
                 onClick={() => {
-                  if (isReadRole) {
+                  if (!isValidPermission) {
                     setShowReadOnlyAlert(true);
                   }
 
@@ -128,7 +129,7 @@ const AuthorizationView: React.FC<Props> = ({
                 formData={AUTHORIZATION_FORM_DATA[selectedForm] || []}
                 formType={selectedForm}
                 onChangeHandler={(value: string, id: string) => {
-                  if (isReadRole) {
+                  if (!isValidPermission) {
                     setShowReadOnlyAlert(true);
                   }
 
