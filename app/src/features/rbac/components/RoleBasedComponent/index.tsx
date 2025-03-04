@@ -9,9 +9,9 @@ interface Props {
   fallback?: React.ReactNode;
 }
 
-export const RoleBasedComponent: React.FC<Props> = ({ resource, permission, children, fallback }) => {
+export const RoleBasedComponent: React.FC<Props> = ({ resource, permission, children, fallback = null }) => {
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission(resource, permission);
 
-  return isValidPermission ? children : fallback || null;
+  return isValidPermission ? children : fallback;
 };
