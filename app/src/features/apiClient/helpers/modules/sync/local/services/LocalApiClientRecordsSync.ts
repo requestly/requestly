@@ -4,6 +4,7 @@ import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapte
 import { API, APIEntity, FileSystemResult } from "./types";
 import { parseFsId, parseNativeId } from "../../utils";
 import { v4 as uuidv4 } from "uuid";
+import { Authorization } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 
 export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientLocalMeta> {
   meta: ApiClientLocalMeta;
@@ -48,6 +49,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           type: RQAPI.RecordType.COLLECTION,
           data: {
             variables: {},
+            auth: {
+              currentAuthType: Authorization.Type.NO_AUTH,
+              authConfigStore: {},
+            },
           },
         };
         return collection;
@@ -76,6 +81,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
               contentType: e.request?.contentType,
             },
             scripts: e.request.scripts,
+            auth: {
+              currentAuthType: Authorization.Type.NO_AUTH,
+              authConfigStore: {},
+            },
           },
         };
 

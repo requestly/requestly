@@ -1,8 +1,8 @@
 import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { generateDocumentId } from "backend/utils";
-import { AUTHORIZATION_TYPES } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 import { Bruno } from "./types";
+import { Authorization } from "../apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 
 export const processBrunoScripts = (request: Bruno.Request) => {
   const scripts = {
@@ -12,34 +12,40 @@ export const processBrunoScripts = (request: Bruno.Request) => {
   return scripts;
 };
 
-const processAuthorizationOptions = (auth?: Bruno.Auth, parentCollectionId?: string): RQAPI.AuthOptions => {
+const processAuthorizationOptions = (auth?: Bruno.Auth, parentCollectionId?: string): RQAPI.Auth => {
   if (!auth) {
     return {
-      currentAuthType: parentCollectionId ? AUTHORIZATION_TYPES.INHERIT : AUTHORIZATION_TYPES.NO_AUTH,
+      currentAuthType: parentCollectionId ? Authorization.Type.INHERIT : Authorization.Type.NO_AUTH,
+      authConfigStore: {},
     };
   }
 
   switch (auth.mode) {
     case "bearer":
       return {
-        currentAuthType: AUTHORIZATION_TYPES.BEARER_TOKEN,
-        [AUTHORIZATION_TYPES.BEARER_TOKEN]: {
-          bearer: auth.bearer?.token || "",
+        currentAuthType: Authorization.Type.BEARER_TOKEN,
+        authConfigStore: {
+          [Authorization.Type.BEARER_TOKEN]: {
+            bearer: auth.bearer?.token || "",
+          },
         },
       };
     case "basic":
       return {
-        currentAuthType: AUTHORIZATION_TYPES.BASIC_AUTH,
-        [AUTHORIZATION_TYPES.BASIC_AUTH]: {
-          username: auth.basic?.username || "",
-          password: auth.basic?.password || "",
+        currentAuthType: Authorization.Type.BASIC_AUTH,
+        authConfigStore: {
+          [Authorization.Type.BASIC_AUTH]: {
+            username: auth.basic?.username || "",
+            password: auth.basic?.password || "",
+          },
         },
       };
     case "none":
-      return { currentAuthType: AUTHORIZATION_TYPES.NO_AUTH };
+      return { currentAuthType: Authorization.Type.NO_AUTH, authConfigStore: {} };
     default:
       return {
-        currentAuthType: parentCollectionId ? AUTHORIZATION_TYPES.INHERIT : AUTHORIZATION_TYPES.NO_AUTH,
+        currentAuthType: parentCollectionId ? Authorization.Type.INHERIT : Authorization.Type.NO_AUTH,
+        authConfigStore: {},
       };
   }
 };
