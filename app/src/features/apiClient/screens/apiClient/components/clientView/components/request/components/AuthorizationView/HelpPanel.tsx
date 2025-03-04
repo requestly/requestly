@@ -1,11 +1,12 @@
 import React from "react";
 import { LABEL_TEXT } from "./authConstants";
-import { AuthDescriptionData } from "./types";
+import { AuthForm } from "./AuthorizationForm/formStructure/types";
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 interface HelpPanelProps {
-  data: AuthDescriptionData;
+  data: AuthForm.Description.Data;
 }
 
+/* Seems like this was never even used */
 export const HelpPanel: React.FC<HelpPanelProps> = ({ data }) => {
   const { subHeading, externalLink } = data;
 

@@ -10,6 +10,7 @@ import "./moveToCollectionModal.scss";
 import { isApiCollection } from "../../../utils";
 import { firebaseBatchWrite } from "backend/utils";
 import { head, isEmpty, omit } from "lodash";
+import { Authorization } from "../../clientView/components/request/components/AuthorizationView/types/AuthConfig";
 
 interface Props {
   recordsToMove: RQAPI.Record[];
@@ -54,6 +55,10 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       deleted: false,
       data: {
         variables: {},
+        auth: {
+          currentAuthType: Authorization.Type.NO_AUTH,
+          authConfigStore: {},
+        },
       },
     };
     const newCollection = await apiClientRecordsRepository.createCollection(collectionToBeCreated);

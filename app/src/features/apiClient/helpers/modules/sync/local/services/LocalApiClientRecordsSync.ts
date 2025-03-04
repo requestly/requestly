@@ -5,6 +5,7 @@ import { API, APIEntity, FileSystemResult } from "./types";
 import { parseEntityVariables, parseFsId, parseNativeId } from "../../utils";
 import { v4 as uuidv4 } from "uuid";
 import { EnvironmentVariables } from "backend/environment/types";
+import { Authorization } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 
 export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientLocalMeta> {
   meta: ApiClientLocalMeta;
@@ -49,6 +50,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           type: RQAPI.RecordType.COLLECTION,
           data: {
             variables: parseEntityVariables(e.variables || {}),
+            auth: {
+              currentAuthType: Authorization.Type.NO_AUTH,
+              authConfigStore: {},
+            },
           },
         };
         return collection;
@@ -77,6 +82,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
               contentType: e.request?.contentType,
             },
             scripts: e.request.scripts,
+            auth: {
+              currentAuthType: Authorization.Type.NO_AUTH,
+              authConfigStore: {},
+            },
           },
         };
 

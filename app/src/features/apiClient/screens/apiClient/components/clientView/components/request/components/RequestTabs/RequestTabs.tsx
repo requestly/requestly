@@ -39,7 +39,7 @@ interface Props {
   collectionId: string;
   setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
-  handleAuthChange: (authOptions: RQAPI.AuthOptions) => void;
+  handleAuthChange: (newAuth: RQAPI.Auth) => void;
 }
 
 const RequestTabs: React.FC<Props> = ({
@@ -128,9 +128,9 @@ const RequestTabs: React.FC<Props> = ({
         disabled: isLocalSyncEnabled,
         children: (
           <AuthorizationView
-            defaultValues={requestEntry.auth}
+            defaults={requestEntry.auth}
             onAuthUpdate={handleAuthChange}
-            rootLevelRecord={!collectionId}
+            isRootLevelRecord={!collectionId}
             variables={variables}
           />
         ),
