@@ -9,7 +9,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import { EnvironmentVariables } from "backend/environment/types";
 import { toast } from "utils/Toast";
-import { useCurrentWorkspaceUserRole, useHasUnsavedChanges } from "hooks";
+import { useHasUnsavedChanges } from "hooks";
 import "./environmentView.scss";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { isEmpty } from "lodash";
@@ -30,7 +30,6 @@ export const EnvironmentView = () => {
   } = useEnvironmentManager();
   const { updateTab, tabs } = useTabsLayoutContext();
   const { envId } = useParams();
-  const { isReadRole } = useCurrentWorkspaceUserRole();
   const [persistedEnvId, setPersistedEnvId] = useState<string>(envId);
 
   const user = useSelector(getUserAuthDetails);
@@ -112,7 +111,6 @@ export const EnvironmentView = () => {
         ) : (
           <>
             <VariablesListHeader
-              isReadRole={isReadRole}
               searchValue={searchValue}
               onSearchValueChange={setSearchValue}
               currentEnvironmentName={environmentName}
@@ -126,12 +124,7 @@ export const EnvironmentView = () => {
                 onExportClick: () => setIsExportModalOpen(true),
               }}
             />
-            <VariablesList
-              isReadRole={isReadRole}
-              searchValue={searchValue}
-              variables={variables}
-              onVariablesChange={setPendingVariables}
-            />
+            <VariablesList searchValue={searchValue} variables={variables} onVariablesChange={setPendingVariables} />
             {isExportModalOpen && (
               <ApiClientExportModal
                 exportType="environment"
