@@ -20,7 +20,7 @@ export const createSharedList = async (
 
   const updatedGroups: NewGroup[] = groups.map((group) => ({
     ...group,
-    children: [],
+    children: [] as NewGroup[],
   }));
 
   const sharedListData: SharedListData = {
@@ -54,7 +54,7 @@ export const prepareContentToExport = (appMode: string, selectedRuleIds: string[
     getRulesAndGroupsFromRuleIds(appMode, selectedRuleIds).then(({ rules, groups }) => {
       const updatedGroups: NewGroup[] = groups.map((group) => ({
         ...group,
-        children: [],
+        children: [] as NewGroup[],
       }));
       resolve({
         fileContent: JSON.stringify((rules as StorageRecord[]).concat(updatedGroups), null, 2),

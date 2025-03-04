@@ -1,0 +1,51 @@
+.api-client-error-panel-container {
+  display: flex;
+  padding: var(--space-4, 8px);
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--space-2, 4px);
+  align-self: stretch;
+  background: var(--requestly-color-surface-2);
+
+  .api-client-error-panel-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3, 6px);
+    font-size: 12px;
+
+    .warning-icon {
+      color: var(--requestly-color-error);
+    }
+  }
+
+  .api-client-error-panel-content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4, 8px);
+    align-self: stretch;
+
+    .api-client-error-panel-message {
+      display: flex;
+      padding: var(--space-2, 4px) var(--space-4, 8px);
+      justify-content: flex-start;
+      align-items: center;
+      gap: var(--space-4, 4px);
+      flex: 1 0 0;
+      border-radius: 6px;
+      background: var(--requestly-color-background);
+      font-size: var(--requestly-font-size-xs);
+      text-overflow: ellipsis;
+      line-height: 18px;
+
+      .error-name {
+        color: var(--requestly-color-error-text);
+        align-self: flex-start;
+      }
+
+      .error-message {
+        color: var(--requestly-color-text-subtle);
+      }
+    }
+  }
+}

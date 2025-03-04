@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getBillingTeamMemberById } from "store/features/billing/selectors";
 import { Col, Popover, Row } from "antd";
@@ -18,7 +17,6 @@ import { TeamPlanActionButtons } from "./components/TeamPlanActionButtons";
 
 export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
   const user = useSelector(getUserAuthDetails);
-  const isDomainWithCustomInfo = useFeatureValue("domain_with_custom_admin_info", false);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeamDetails.id, billingTeamDetails.owner));
   const [isPlanDetailsPopoverVisible, setIsPlanDetailsPopoverVisible] = useState(false);
 
@@ -112,13 +110,13 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
             <div className="team-plan-details-section__team-details">
               <Col>
                 <div className="team-plan-details-section-label">
-                  {billingTeamDetails?.isAcceleratorTeam || isDomainWithCustomInfo ? "Admin" : "Billing manager"}
+                  {billingTeamDetails?.isAcceleratorTeam ? "Admin" : "Billing manager"}
                 </div>
                 <div className="text-white">{teamOwnerDetails?.displayName ?? "User"}</div>
               </Col>
               <Col>
                 <div className="team-plan-details-section-label">
-                  {billingTeamDetails?.isAcceleratorTeam || isDomainWithCustomInfo ? "Admin" : "Billing"} email
+                  {billingTeamDetails?.isAcceleratorTeam ? "Admin" : "Billing"} email
                 </div>
                 <div className="text-white">{teamOwnerDetails?.email}</div>
               </Col>

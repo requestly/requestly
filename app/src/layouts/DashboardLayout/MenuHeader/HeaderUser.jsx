@@ -25,6 +25,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 import { tabsLayoutActions } from "store/slices/tabs-layout";
+import { isSafariBrowser } from "actions/ExtensionActions";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -137,7 +138,8 @@ export default function HeaderUser() {
           >
             <Avatar size={28} src={userPhoto} shape="square" className="cursor-pointer" />
           </Dropdown>
-          {(!planDetails?.planId || !["active", "past_due"].includes(planDetails?.status)) &&
+          {!isSafariBrowser() &&
+          (!planDetails?.planId || !["active", "past_due"].includes(planDetails?.status)) &&
           appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY ? (
             <RQButton
               type="primary"

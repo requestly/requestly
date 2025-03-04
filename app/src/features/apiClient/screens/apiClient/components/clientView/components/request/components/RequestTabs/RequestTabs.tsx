@@ -13,6 +13,8 @@ import { HeadersTable } from "./components/HeadersTable/HeadersTable";
 import { useDeepLinkState } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { LocalWorkspaceTooltip } from "../../../LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -37,7 +39,7 @@ interface Props {
   collectionId: string;
   setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
-  handleAuthChange: (authOptions: RQAPI.AuthOptions) => void;
+  handleAuthChange: (newAuth: RQAPI.Auth) => void;
 }
 
 const RequestTabs: React.FC<Props> = ({
@@ -52,6 +54,7 @@ const RequestTabs: React.FC<Props> = ({
   const [selectedTab, setSelectedTab] = useDeepLinkState({ tab: RequestTab.QUERY_PARAMS });
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
   useEffect(() => {
@@ -117,12 +120,17 @@ const RequestTabs: React.FC<Props> = ({
       },
       {
         key: RequestTab.AUTHORIZATION,
-        label: <LabelWithCount label="Authorization" />,
+        label: (
+          <LocalWorkspaceTooltip featureName="Authorization headers">
+            <LabelWithCount label="Authorization" />
+          </LocalWorkspaceTooltip>
+        ),
+        disabled: isLocalSyncEnabled,
         children: (
           <AuthorizationView
-            defaultValues={requestEntry.auth}
+            defaults={requestEntry.auth}
             onAuthUpdate={handleAuthChange}
-            rootLevelRecord={!collectionId}
+            isRootLevelRecord={!collectionId}
             variables={variables}
           />
         ),
@@ -144,7 +152,16 @@ const RequestTabs: React.FC<Props> = ({
     }
 
     return items;
-  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts, variables, handleAuthChange, collectionId]);
+  }, [
+    requestEntry,
+    setRequestEntry,
+    setContentType,
+    isApiClientScripts,
+    variables,
+    handleAuthChange,
+    collectionId,
+    isLocalSyncEnabled,
+  ]);
 
   return (
     <Tabs

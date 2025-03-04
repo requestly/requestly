@@ -9,11 +9,12 @@ import Logger from "lib/logger";
 import { LoadingOutlined } from "@ant-design/icons";
 import { BiCheckCircle } from "@react-icons/all-files/bi/BiCheckCircle";
 import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
-import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { globalActions } from "store/slices/global/slice";
 import { isNull } from "lodash";
 import "./index.scss";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
+import { useNavigate } from "react-router-dom";
 
 interface TeamCardProps {
   invite: Invite & { metadata?: any };
@@ -23,6 +24,7 @@ interface TeamCardProps {
 
 export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJoiningTeamId }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const [hasJoined, setHasJoined] = useState<boolean>(false);
 
@@ -47,7 +49,14 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJo
             res?.data?.invite?.metadata?.teamAccessCount
           );
         }
-        dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+        redirectToWebAppHomePage(navigate);
+        dispatch(globalActions.updateAppOnboardingCompleted());
+        dispatch(
+          globalActions.toggleActiveModal({
+            modalName: "appOnboardingModal",
+            newValue: false,
+          })
+        );
       })
       .catch((e) => {
         Logger.error(e);
@@ -58,7 +67,15 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJo
         setIsJoining(false);
         setJoiningTeamId(null);
       });
-  }, [invite?.metadata?.teamId, invite?.metadata?.teamName, invite.id, setJoiningTeamId, dispatch, switchWorkspace]);
+  }, [
+    invite?.metadata?.teamId,
+    invite?.metadata?.teamName,
+    invite.id,
+    setJoiningTeamId,
+    navigate,
+    dispatch,
+    switchWorkspace,
+  ]);
 
   return (
     <div className="team-card-wrapper">

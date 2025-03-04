@@ -10,7 +10,7 @@ import { PageSourceRow } from "./components/PageSourceRow";
 import { SessionRecordingPageSource } from "types";
 import { AutoRecordingMode, SessionRecordingConfig } from "features/sessionBook";
 import { generateObjectId } from "utils/FormattingHelper";
-import { isExtensionInstalled } from "actions/ExtensionActions";
+import { isExtensionInstalled, isSafariBrowser } from "actions/ExtensionActions";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import APP_CONSTANTS from "config/constants";
 import Logger from "lib/logger";
@@ -21,6 +21,7 @@ import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/u
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
 import { RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
+import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
 
 const emptyPageSourceData: SessionRecordingPageSource = {
   value: "",
@@ -221,6 +222,10 @@ export const SessionsSettings: React.FC = () => {
     },
     [config, handleSaveConfig]
   );
+
+  if (isSafariBrowser()) {
+    return <SafariLimitedSupportView />;
+  }
 
   if (!isExtensionInstalled()) {
     return <InstallExtensionCTA eventPage="session_settings" />;

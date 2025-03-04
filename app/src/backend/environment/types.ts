@@ -27,3 +27,9 @@ export enum EnvironmentVariableType {
 export type VariableExport = EnvironmentVariableValue & {
   key: string;
 };
+
+export enum VariableScope {
+  GLOBAL = "global",
+  ENVIRONMENT = "environment",
+  COLLECTION = "collection",
+}

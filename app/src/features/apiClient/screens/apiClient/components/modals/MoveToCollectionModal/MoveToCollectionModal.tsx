@@ -3,21 +3,14 @@ import CreatableReactSelect from "react-select/creatable";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 import React, { useCallback, useMemo, useState } from "react";
-import { upsertApiRecord } from "backend/apiClient";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
-import {
-  trackMoveRequestToCollectionFailed,
-  trackMoveRequestToCollectionSuccessful,
-} from "modules/analytics/events/features/apiClient";
+import { trackMoveRequestToCollectionFailed, trackRequestMoved } from "modules/analytics/events/features/apiClient";
 import "./moveToCollectionModal.scss";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { isApiCollection } from "../../../utils";
 import { firebaseBatchWrite } from "backend/utils";
 import { head, isEmpty, omit } from "lodash";
+import { Authorization } from "../../clientView/components/request/components/AuthorizationView/types/AuthConfig";
 
 interface Props {
   recordsToMove: RQAPI.Record[];
@@ -26,11 +19,9 @@ interface Props {
 }
 
 export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
-  const { apiClientRecords, onSaveRecord, onSaveBulkRecords } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, onSaveBulkRecords, apiClientRecordsRepository } = useApiClientContext();
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const collectionOptions = useMemo(() => {
     const exclusions = new Set();
@@ -64,16 +55,20 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       deleted: false,
       data: {
         variables: {},
+        auth: {
+          currentAuthType: Authorization.Type.NO_AUTH,
+          authConfigStore: {},
+        },
       },
     };
-    const newCollection = await upsertApiRecord(user?.details?.profile?.uid, collectionToBeCreated, activeWorkspaceId);
+    const newCollection = await apiClientRecordsRepository.createCollection(collectionToBeCreated);
     if (newCollection.success) {
       onSaveRecord(newCollection.data);
       return newCollection.data.id;
     } else {
       throw new Error("Failed to create a new collection");
     }
-  }, [user?.details?.profile?.uid, activeWorkspaceId, onSaveRecord, selectedCollection?.label]);
+  }, [onSaveRecord, selectedCollection?.label, apiClientRecordsRepository]);
 
   const moveRecordsToCollection = useCallback(
     async (collectionId: string, isNewCollection: boolean) => {
@@ -83,10 +78,11 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
           : { ...record, collectionId }
       );
 
+      // TODO: use apiClient interface
       try {
         const result = await firebaseBatchWrite("apis", updatedRequests);
 
-        trackMoveRequestToCollectionSuccessful(isNewCollection ? "new_collection" : "existing_collection");
+        trackRequestMoved(isNewCollection ? "new_collection" : "existing_collection");
         toast.success("Requests moved to collection successfully");
         result.length === 1 ? onSaveRecord(head(result)) : onSaveBulkRecords(result);
       } catch (error) {
@@ -94,7 +90,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         throw new Error("Failed to move some requests to collection");
       }
     },
-    [recordsToMove, onSaveRecord, onSaveBulkRecords]
+    [onSaveRecord, recordsToMove, onSaveBulkRecords]
   );
 
   const handleRecordMove = useCallback(async () => {
@@ -107,7 +103,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       }
     } catch (error) {
       console.error("Error moving request to collection:", error);
-      toast.error(error.message);
+      toast.error(error.message || "Error moving records to collection");
       trackMoveRequestToCollectionFailed(selectedCollection?.__isNew__ ? "new_collection" : "existing_collection");
     } finally {
       setIsLoading(false);

@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useHasChanged } from "hooks";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableBillingTeams, getBillingTeamById, getBillingTeamMembers } from "store/features/billing/selectors";
 import { TeamPlanStatus } from "../../TeamPlanStatus";
@@ -20,7 +19,6 @@ import "./index.scss";
 export const OtherBillingTeamDetails: React.FC = () => {
   const { billingId } = useParams();
   const user = useSelector(getUserAuthDetails);
-  const isDomainWithCustomInfo = useFeatureValue("domain_with_custom_admin_info", false);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const billingTeamDetails = useSelector(getBillingTeamById(billingId));
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId)) as Record<string, BillingTeamMember>;
@@ -50,8 +48,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
                   <span className="text-bold text-white">{`${record.displayName ?? "User"}`}</span>
                 </Col>
                 <Col>
-                  {((isDomainWithCustomInfo || billingTeamDetails?.isAcceleratorTeam) &&
-                    record.role === BillingTeamRoles.Manager) ||
+                  {(billingTeamDetails?.isAcceleratorTeam && record.role === BillingTeamRoles.Manager) ||
                   record.role === BillingTeamRoles.Admin ? (
                     <Row className="icon__wrapper warning" align="middle">
                       <MdOutlineAdminPanelSettings style={{ marginRight: "2px" }} />
@@ -82,7 +79,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
         ),
       },
     ],
-    [membersTableSource.length, isDomainWithCustomInfo, billingTeamDetails?.isAcceleratorTeam]
+    [membersTableSource.length, billingTeamDetails?.isAcceleratorTeam]
   );
 
   useEffect(() => {

@@ -1,7 +1,11 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { AUTH_OPTIONS } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/form";
-import { AUTHORIZATION_TYPES } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
 import { TestResult } from "./helpers/modules/scriptsV2/worker/script-internals/types";
+import {
+  ApiKeyAuthorizationConfig,
+  Authorization,
+  BasicAuthAuthorizationConfig,
+  BearerTokenAuthorizationConfig,
+} from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 
 export enum RequestMethod {
   GET = "GET",
@@ -38,6 +42,12 @@ export enum QueryParamSyncType {
   URL = "url",
   TABLE = "table",
 }
+
+export enum CreateType {
+  API = "api",
+  COLLECTION = "collection",
+  ENVIRONMENT = "environment",
+}
 export enum BulkActions {
   DUPLICATE = "DUPLICATE",
   DELETE = "DELETE",
@@ -45,10 +55,18 @@ export enum BulkActions {
   EXPORT = "EXPORT",
 }
 
+export enum ApiClientImporterType {
+  REQUESTLY = "REQUESTLY",
+  POSTMAN = "POSTMAN",
+  BRUNO = "BRUNO",
+  CURL = "CURL",
+}
+
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;
 
 export namespace RQAPI {
   export type AnalyticsEventSource =
+    | "home_screen"
     | "collection_row"
     | "collection_list_empty_state"
     | "api_client_sidebar_header"
@@ -75,10 +93,13 @@ export namespace RQAPI {
     form?: KeyValuePair[];
   };
 
-  export type AuthOptions<T extends AUTHORIZATION_TYPES = AUTHORIZATION_TYPES> = {
-    currentAuthType: T;
-  } & {
-    [K in AUTHORIZATION_TYPES]?: K extends T ? AUTH_OPTIONS : never;
+  export type Auth = {
+    currentAuthType: Authorization.Type;
+    authConfigStore: {
+      [Authorization.Type.API_KEY]?: ApiKeyAuthorizationConfig["config"];
+      [Authorization.Type.BEARER_TOKEN]?: BearerTokenAuthorizationConfig["config"];
+      [Authorization.Type.BASIC_AUTH]?: BasicAuthAuthorizationConfig["config"];
+    };
   };
   export interface Request {
     url: string;
@@ -107,7 +128,7 @@ export namespace RQAPI {
       preRequest: string;
       postResponse: string;
     };
-    auth?: AuthOptions;
+    auth: Auth;
   }
 
   export enum ExecutionStatus {
@@ -121,10 +142,16 @@ export namespace RQAPI {
     message: Error["message"];
   };
 
+  export type ExecutionWarning = {
+    message: string;
+    description: string;
+  };
+
   export type ExecutionResult =
     | {
         status: ExecutionStatus.SUCCESS;
         executedEntry: RQAPI.Entry;
+        warning?: ExecutionWarning;
       }
     | {
         status: ExecutionStatus.ERROR;
@@ -151,7 +178,7 @@ export namespace RQAPI {
       postResponse: string;
     };
     variables: Omit<EnvironmentVariables, "localValue">;
-    auth?: AuthOptions;
+    auth: Auth;
   }
 
   interface RecordMetadata {
@@ -178,4 +205,8 @@ export namespace RQAPI {
   }
 
   export type Record = ApiRecord | CollectionRecord;
+
+  export type RecordPromise = Promise<{ success: boolean; data: Record; message?: string }>;
+
+  export type RecordsPromise = Promise<{ success: boolean; data: Record[]; message?: string }>;
 }

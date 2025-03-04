@@ -16,7 +16,7 @@ import {
   trackWorkspaceDropdownClicked,
   trackCreateNewTeamClicked,
 } from "modules/analytics/events/common/teams";
-import { getLastSeenInviteTs } from "store/selectors";
+import { getAppMode, getLastSeenInviteTs } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToTeam, redirectToWorkspaceSettings } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
@@ -40,8 +40,9 @@ import {
 } from "features/workspaces/utils";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { toast } from "utils/Toast";
-
-const { PATHS } = APP_CONSTANTS;
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { WorkspaceType } from "types";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 export const isWorkspacesFeatureEnabled = (email) => {
   if (!email) return false;
@@ -121,6 +122,7 @@ const WorkspaceSelector = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { switchWorkspace } = useWorkspaceHelpers();
+  const appMode = useSelector(getAppMode);
 
   const isLimitToPrivateWorkspaceActive = useFeatureIsOn("limit_to_private_workspace");
 
@@ -134,8 +136,11 @@ const WorkspaceSelector = () => {
   const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
   // For right now only as we only support to connect one workspace at a time
   const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
+  const activeWorkspace = useSelector(getWorkspaceById(activeWorkspaceId));
 
   const lastSeenInviteTs = useSelector(getLastSeenInviteTs);
+
+  const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
 
   // Local State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -223,7 +228,7 @@ const WorkspaceSelector = () => {
   };
 
   const handleCreateNewWorkspaceRedirect = () => {
-    if (user.loggedIn) {
+    if (user.loggedIn || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "createWorkspaceModal",
@@ -358,8 +363,60 @@ const WorkspaceSelector = () => {
       <Menu.ItemGroup key="Workspaces" title="Your workspaces">
         {availableWorkspaces === null ? renderLoader() : null}
         {sortedAvailableWorkspaces &&
-          sortedAvailableWorkspaces.map((workspace) => {
-            return (
+          sortedAvailableWorkspaces
+            .filter((team) => team.workspaceType !== WorkspaceType.LOCAL)
+            .length.map((workspace) => {
+              return (
+                <Menu.Item
+                  key={workspace.id}
+                  disabled={!!workspace.archived || isTeamCurrentlyActive(workspace.id)}
+                  icon={<WorkspaceAvatar workspaceId={workspace.id} workspaceName={workspace.name} />}
+                  className={`workspace-menu-item ${
+                    workspace.id === activeWorkspaceId ? "active-workspace-dropdownItem" : ""
+                  }`}
+                  onClick={() => {
+                    handleWorkspaceSwitch(workspace);
+                    trackWorkspaceDropdownClicked("switch_workspace");
+                  }}
+                >
+                  <Tooltip
+                    placement="right"
+                    overlayInnerStyle={{ width: "178px" }}
+                    title={workspace.archived ? "This workspace has been archived." : ""}
+                  >
+                    <div className="workspace-item-wrapper">
+                      <div
+                        className={`workspace-name-container ${
+                          workspace.archived || isTeamCurrentlyActive(workspace.id) ? "archived-workspace-item" : ""
+                        }`}
+                      >
+                        <div className="workspace-name">{workspace.name}</div>
+                        {isPersonalWorkspace(workspace.id) ? null : (
+                          <div className="text-gray workspace-details">
+                            {workspace.subscriptionStatus ? `${workspace.subscriptionStatus} • ` : null}
+                            {workspace.accessCount} {workspace.accessCount > 1 ? "members" : "member"}
+                          </div>
+                        )}
+                      </div>
+                      {workspace.archived ? (
+                        <Tag color="gold">archived</Tag>
+                      ) : isTeamCurrentlyActive(workspace.id) ? (
+                        <Tag color="green">current</Tag>
+                      ) : null}
+                    </div>
+                  </Tooltip>
+                </Menu.Item>
+              );
+            })}
+      </Menu.ItemGroup>
+
+      {/* Local Workspaces */}
+      {isLocalSyncEnabled &&
+      sortedAvailableWorkspaces.filter((workspace) => workspace.workspaceType === WorkspaceType.LOCAL).length ? (
+        <Menu.ItemGroup key="localWorkspace" title="Local workspaces">
+          {sortedAvailableWorkspaces
+            .filter((workspace) => workspace.workspaceType === WorkspaceType.LOCAL)
+            .map((workspace) => (
               <Menu.Item
                 key={workspace.id}
                 disabled={!!workspace.archived || isTeamCurrentlyActive(workspace.id)}
@@ -384,12 +441,7 @@ const WorkspaceSelector = () => {
                       }`}
                     >
                       <div className="workspace-name">{workspace.name}</div>
-                      {isPersonalWorkspace(workspace.id) ? null : (
-                        <div className="text-gray workspace-details">
-                          {workspace.subscriptionStatus ? `${workspace.subscriptionStatus} • ` : null}
-                          {workspace.accessCount} {workspace.accessCount > 1 ? "members" : "member"}
-                        </div>
-                      )}
+                      <div className="text-gray workspace-details">{workspace.rootPath || ""}</div>
                     </div>
                     {workspace.archived ? (
                       <Tag color="gold">archived</Tag>
@@ -399,9 +451,9 @@ const WorkspaceSelector = () => {
                   </div>
                 </Tooltip>
               </Menu.Item>
-            );
-          })}
-      </Menu.ItemGroup>
+            ))}
+        </Menu.ItemGroup>
+      ) : null}
 
       <Divider className="ant-divider-margin workspace-divider" />
       <Menu.Item key="3" className="workspace-menu-item">
@@ -425,7 +477,7 @@ const WorkspaceSelector = () => {
         </Dropdown>
       </Menu.Item>
 
-      {isSharedWorkspace(activeWorkspaceId) ? (
+      {isSharedWorkspace(activeWorkspace) ? (
         <>
           <Divider className="ant-divider-margin workspace-divider" />
           <Menu.Item

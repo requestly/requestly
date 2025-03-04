@@ -11,11 +11,12 @@ import { toast } from "utils/Toast";
 import "./apiClientEmptyView.scss";
 import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
 
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
@@ -25,6 +26,10 @@ export const ApiClientEmptyView = () => {
   const isEmpty = apiClientRecords.length === 0;
 
   const handleNewRecordClick = (recordType: RQAPI.RecordType) => {
+    recordType === RQAPI.RecordType.API
+      ? trackNewRequestClicked("api_client_home")
+      : trackNewCollectionClicked("api_client_home");
+
     if (!user.loggedIn) {
       dispatch(
         globalActions.toggleActiveModal({
@@ -40,13 +45,17 @@ export const ApiClientEmptyView = () => {
       return;
     }
     setIsRecordCreating(recordType);
-    createBlankApiRecord(user?.details?.profile?.uid, activeWorkspaceId, recordType, "")
+    createBlankApiRecord(user?.details?.profile?.uid, activeWorkspaceId, recordType, "", apiClientRecordsRepository)
       .then((result) => {
-        onSaveRecord(result.data);
+        if (result.success) {
+          onSaveRecord(result.data);
+        } else {
+          toast.error(result.message || "Could not create a collection.");
+        }
       })
       .catch((error) => {
         console.error("Error creating record", error);
-        toast.error("Something went wrong, please try again or contact support!");
+        toast.error(error.message || "Could not create a collection.");
       })
       .finally(() => {
         setIsRecordCreating(null);
@@ -55,10 +64,9 @@ export const ApiClientEmptyView = () => {
 
   return (
     <div className="api-client-empty-view-container">
-      <img
-        src={isEmpty ? "/assets/media/apiClient/emptyView.svg" : "/assets/media/apiClient/defaultView.svg"}
-        alt="empty-view"
-      />
+      {/* TODO: FIX */}
+      {/* <img src={isEmpty ? emptyViewIcon : defaultViewIcon} alt="empty-view" /> */}
+      {/* <TestMyMagic /> */}
       <div>
         <div className="api-client-empty-view-header">
           {isEmpty ? "No API requests created yet." : "Pick up where you left off or start fresh."}

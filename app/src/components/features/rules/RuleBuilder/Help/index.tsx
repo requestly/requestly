@@ -6,7 +6,6 @@ import LeftArrow from "assets/icons/left-arrow.svg?react";
 import RightArrow from "assets/icons/right-arrow.svg?react";
 import { ExternalLink } from "./types";
 import APP_CONSTANTS from "config/constants";
-
 import {
   trackDocsSidebarContactUsClicked,
   trackDocsSidebarSecondaryCategoryClicked,
