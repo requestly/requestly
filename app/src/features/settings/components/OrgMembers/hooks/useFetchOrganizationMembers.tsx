@@ -13,14 +13,14 @@ export const useFetchOrgMembers = () => {
   const [organizationMembers, setOrganizationMembers] = useState<{ total: number; users: OrgMember[] }>(null);
 
   useEffect(() => {
-    if (user.loggedIn && !isCompanyEmail(user?.details?.profile?.email)) {
+    if (user.loggedIn && user.details.emailType !== "BUSINESS") {
       trackBillingTeamNoMemberFound("personal_email", "");
       setOrganizationMembers({ total: 0, users: [] });
       setIsLoading(false);
       return;
     }
 
-    if (user?.details?.profile?.isEmailVerified && isCompanyEmail(user?.details?.profile?.email)) {
+    if (user?.details?.profile?.isEmailVerified && user.details.emailType === "BUSINESS") {
       const getOrganizationUsers = httpsCallable(getFunctions(), "users-getOrganizationUsers");
       getOrganizationUsers({
         domain: getDomainFromEmail(user?.details?.profile?.email),
@@ -38,7 +38,7 @@ export const useFetchOrgMembers = () => {
           setIsLoading(false);
         });
     }
-  }, [user.loggedIn, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified]);
+  }, [user.loggedIn, user.details?.profile?.email, user.details?.profile?.isEmailVerified, user.details.emailType]);
 
   return { isLoading, organizationMembers: organizationMembers?.users };
 };

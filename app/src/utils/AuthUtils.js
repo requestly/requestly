@@ -15,6 +15,12 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
+const emailType = {
+  PERSONAL: "PERSONAL",
+  DESTROYABLE: "DESTROYABLE",
+  BUSINESS: "BUSINESS",
+};
+
 /**
  * Email verified bool is taken from firebase database instead of data provided by firebase auth api
  * This is done to consider accounts before implementing email verification as email verified
@@ -37,7 +43,7 @@ export const isEmailVerified = (userId) => {
 export const isDisposableEmail = async (email) => {
   const checkDisposable = httpsCallable(getFunctions(), "fetchEmailType");
   const result = await checkDisposable({ userEmail: email });
-  return result.data.type === "destroyable";
+  return result.data.type === emailType.DESTROYABLE;
 };
 
 export const setEmailVerified = async (userId, value) => {

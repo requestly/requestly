@@ -25,7 +25,7 @@ export const MyBillingTeamDetails: React.FC = () => {
     if (billingId && billingTeamDetails) {
       const emailStatus = !user.loggedIn
         ? "no_loggedIn"
-        : isCompanyEmail(user.details.profile.email)
+        : user.details.emailType === "BUSINESS"
         ? "company_email"
         : "personal_email";
       trackBillingTeamViewed(
@@ -39,8 +39,9 @@ export const MyBillingTeamDetails: React.FC = () => {
     billingTeamDetails,
     billingTeams?.length,
     user.loggedIn,
-    user.details.profile.email,
-    user.details.profile.uid,
+    user.details?.profile.email,
+    user.details?.profile?.uid,
+    user.details.emailType,
   ]);
 
   if (!billingTeamDetails) return null;

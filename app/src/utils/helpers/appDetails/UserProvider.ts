@@ -41,9 +41,10 @@ export const resetUserDetails = (): void => {
   };
 };
 
-export const updateUserEmail = (email: string) => {
+export const updateUserEmail = async (email: string) => {
   userDetails.email = email;
-  if (email && isCompanyEmail(email)) {
+  const iscompanyEmail = await isCompanyEmail(email);
+  if (email && iscompanyEmail) {
     userDetails.isBusinessAccount = true;
     userDetails.company = getDomainFromEmail(email);
   }

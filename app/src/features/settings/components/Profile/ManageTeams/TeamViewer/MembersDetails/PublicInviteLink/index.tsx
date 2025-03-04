@@ -37,7 +37,7 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
     user?.details?.profile?.email,
   ]);
 
-  const isBusinessEmail = useMemo(() => isCompanyEmail(user?.details?.profile?.email), [user?.details?.profile?.email]);
+  const isBusinessEmail = user.details.emailType === "BUSINESS";
 
   const handlePublicInviteCreateClicked = useCallback(() => {
     trackWorkspaceInviteLinkGenerated(teamId);

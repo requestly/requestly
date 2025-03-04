@@ -86,7 +86,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
 
     const verifiedUser = await isEmailVerified(user?.details?.profile?.uid);
     if (verifiedUser && pendingInvites != null) {
-      if (!isCompanyEmail(user?.details?.profile?.email)) {
+      if (user.details.emailType === "BUSINESS") {
         dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
         return;
       }

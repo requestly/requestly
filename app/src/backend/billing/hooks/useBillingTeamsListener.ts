@@ -50,7 +50,8 @@ export const useBillingTeamsListener = () => {
         };
       });
 
-      if (isCompanyEmail(user?.details?.profile?.email)) {
+      //const iscompanyEmail = await isCompanyEmail(user?.details?.profile?.email)
+      if (user.details.emailType === "BUSINESS") {
         const domainBillingTeamsQuery = query(
           collection(db, "billing"),
           where("ownerDomains", "array-contains", domain)

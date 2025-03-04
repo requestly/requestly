@@ -33,7 +33,7 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
   const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
 
   useEffect(() => {
-    if (!isCompanyEmail(userEmail)) return;
+    if (user.details.emailType !== "BUSINESS") return;
 
     getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((res: any) => {
       const users = res.data.users;
@@ -46,7 +46,7 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
       });
       setSuggestionOptions(suggestionOptionsFromEmails);
     });
-  }, [getOrganizationUsers, userEmail]);
+  }, [getOrganizationUsers, user.details.emailType, userEmail]);
 
   useEffect(() => {
     // Set default value if it is a valid email

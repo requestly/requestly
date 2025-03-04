@@ -32,5 +32,6 @@ export interface UserAuth {
       };
     };
     organization?: any;
+    emailType?: string;
   };
 }

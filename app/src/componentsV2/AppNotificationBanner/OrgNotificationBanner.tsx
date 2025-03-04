@@ -103,7 +103,7 @@ export const OrgNotificationBanner = () => {
       return;
     }
 
-    if (isCompanyEmail(userEmail)) {
+    if (user.details.emailType === "BUSINESS") {
       const getOrganizationUsers = httpsCallable(getFunctions(), "users-getOrganizationUsers");
       getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((result: any) => {
         setUserDetails(result.data.users);

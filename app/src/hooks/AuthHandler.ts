@@ -48,11 +48,14 @@ const AuthHandler: React.FC<{}> = () => {
       Logger.timeLog("AuthHandler-nonBlockingOperations", "START");
 
       submitAttrUtil(TRACKING.ATTR.EMAIL_DOMAIN, user.email.split("@")[1].replace(".", "_dot_") ?? "Missing_Value");
-      submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, getEmailType(user.email) ?? "Missing_Value");
+
+      const emailType = await getEmailType(user.email);
+      submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, emailType ?? "Missing_Value");
 
       /* To ensure that this attribute is assigned to only the users signing up for the first time */
       if (user?.metadata?.creationTime === user?.metadata?.lastSignInTime) {
-        if (isCompanyEmail(user.email) && user.emailVerified && !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]) {
+        const iscompanyEmail = await isCompanyEmail(user.email);
+        if (iscompanyEmail && user.emailVerified && !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]) {
           getOrganizationUsers({ domain: getDomainFromEmail(user.email) }).then((res) => {
             const users = res.data.users;
             submitAttrUtil(TRACKING.ATTR.COMPANY_USER_SERIAL, users.length);
@@ -131,6 +134,7 @@ const AuthHandler: React.FC<{}> = () => {
               isBackupEnabled,
               isSyncEnabled,
               isPremium: isUserPremium,
+              emailType: await getEmailType(user.email),
             },
           })
         );

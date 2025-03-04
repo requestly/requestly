@@ -74,7 +74,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
             id: "members",
             name: "Members",
             path: PATHS.SETTINGS.MEMBERS.RELATIVE,
-            ishidden: !(user?.details?.profile?.isEmailVerified && isCompanyEmail(user?.details?.profile?.email)),
+            ishidden: !(user?.details?.profile?.isEmailVerified && user.details.emailType === "BUSINESS"),
           },
           {
             id: "workspaces",
@@ -90,7 +90,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
         ],
       },
     ],
-    [appMode, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified, user.loggedIn]
+    [appMode, user.details.emailType, user.details?.profile?.isEmailVerified, user.loggedIn]
   );
 
   return (

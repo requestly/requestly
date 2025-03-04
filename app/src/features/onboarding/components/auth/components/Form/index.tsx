@@ -154,7 +154,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     return null;
   }, [authMode, handleAppleSignInButtonClick, isAppleSignInLoading, isLoading]);
 
-  const handleMagicLinkAuthClick = useCallback(() => {
+  const handleMagicLinkAuthClick = useCallback(async () => {
     if (authMode === AUTH.ACTION_LABELS.LOG_IN || authMode === AUTH.ACTION_LABELS.SIGN_UP) {
       if (!email) {
         toast.error("Please enter your email address");
@@ -166,7 +166,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         return;
       }
 
-      if (isDisposableEmail(email)) {
+      const isDisposable = await isDisposableEmail(email);
+      if (isDisposable) {
         setIsInputEmailDisposable(true);
         return;
       }

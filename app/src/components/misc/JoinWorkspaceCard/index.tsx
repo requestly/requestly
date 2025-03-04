@@ -84,7 +84,7 @@ export const JoinWorkspaceCard = () => {
 
   useEffect(() => {
     isEmailVerified(user?.details?.profile?.uid).then((result) => {
-      if (result && isCompanyEmail(user?.details?.profile?.email)) {
+      if (result && user.details.emailType === "BUSINESS") {
         getOrganizationUsers({
           domain: getDomainFromEmail(user?.details?.profile?.email),
           size: MIN_MEMBERS_IN_WORKSPACE,
@@ -93,7 +93,7 @@ export const JoinWorkspaceCard = () => {
         });
       }
     });
-  }, [getOrganizationUsers, user?.details?.profile?.email, user?.details?.profile?.uid]);
+  }, [getOrganizationUsers, user.details.emailType, user.details?.profile?.email, user.details?.profile?.uid]);
 
   useEffect(() => {
     if (!organizationMembers || organizationMembers.total < MIN_MEMBERS_IN_WORKSPACE) {

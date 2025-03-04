@@ -170,7 +170,7 @@ export const AppNotificationBanner = () => {
           return `Dear ${companyName} user, ${text}`;
         }
         case BANNER_ID.ACCELERATOR_PROGRAM: {
-          if (isCompanyEmail(user?.details?.profile?.email)) {
+          if (user.details.emailType === "BUSINESS") {
             return `Requestly is offering an exclusive 6-month free access to the entire ${getCompanyNameFromEmail(
               user?.details?.profile?.email
             )} team as a part of its Accelerator Program.`;

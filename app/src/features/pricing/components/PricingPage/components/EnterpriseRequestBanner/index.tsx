@@ -54,27 +54,26 @@ export default function EnterpriseRequestBanner(): JSX.Element | null {
   useEffect(() => {
     if (
       billingTeams.length &&
-      isCompanyEmail(user?.details?.profile?.email) &&
+      user.details.emailType === "BUSINESS" &&
       user?.details?.profile?.isEmailVerified &&
       user?.details?.isLoggedIn &&
       !user?.details?.isPremium
     )
       trackTeamPlanCardShown(billingTeams[0].ownerDomains);
   }, [
-    user?.details?.isLoggedIn,
-    user?.details?.isPremium,
-    user?.details?.profile?.email,
-    user?.details?.profile?.isEmailVerified,
+    user.details?.isLoggedIn,
+    user.details?.isPremium,
+    user.details?.profile.email,
+    user.details?.profile?.isEmailVerified,
     billingTeams,
+    user.details.emailType,
   ]);
 
   if (user?.details?.isPremium || !user?.details?.isLoggedIn) return null;
 
   return (
     <React.Fragment>
-      {billingTeams?.length &&
-      isCompanyEmail(user?.details?.profile?.email) &&
-      user?.details?.profile?.isEmailVerified ? (
+      {billingTeams?.length && user.details.emailType === "BUSINESS" && user?.details?.profile?.isEmailVerified ? (
         enterpriseRequestedState === 1 ? (
           <>
             <br />

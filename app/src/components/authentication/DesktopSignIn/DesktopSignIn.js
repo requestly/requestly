@@ -50,6 +50,8 @@ const DesktopSignIn = () => {
       let uid = firebaseUser?.uid || null;
       let email = firebaseUser?.email || null;
 
+      const emailType = await getEmailType(email);
+
       createAuthToken({
         oneTimeCode: code,
         idToken: token,
@@ -66,7 +68,7 @@ const DesktopSignIn = () => {
               auth_provider: AUTH_PROVIDERS.GMAIL,
               email,
               uid,
-              email_type: getEmailType(email),
+              email_type: emailType,
               domain: email.split("@")[1],
               source,
             });

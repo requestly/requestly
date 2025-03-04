@@ -57,7 +57,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
       return;
     }
 
-    if (user?.loggedIn && isCompanyEmail(user?.details?.profile?.email) && user?.details?.profile?.isEmailVerified) {
+    if (user?.loggedIn && user.details.emailType === "BUSINESS" && user?.details?.profile?.isEmailVerified) {
       dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.TEAMS));
     } else {
       redirectToWebAppHomePage(navigate);
@@ -69,7 +69,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
         })
       );
     }
-  }, [dispatch, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified, user?.loggedIn]);
+  }, [dispatch, navigate, user.details.emailType, user.details?.profile?.isEmailVerified, user?.loggedIn]);
 
   const handleSetPersona = useCallback(() => {
     if (persona) {

@@ -90,7 +90,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
     <>
       {billingTeams.length &&
       user?.details?.profile?.isEmailVerified &&
-      isCompanyEmail(user?.details?.profile?.email) &&
+      user.details.emailType === "BUSINESS" &&
       !disabled &&
       features ? (
         <>

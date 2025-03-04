@@ -176,11 +176,10 @@ export const getConnectedAppsCount = (appsListArray) => {
 export const isVerifiedBusinessDomainUser = async (email, uid) => {
   if (!email || !uid) return false;
 
-  return isEmailVerified(uid).then((result) => {
-    if (result && isCompanyEmail(email)) {
-      return true;
-    } else return false;
-  });
+  const result = await isEmailVerified(uid);
+  const iscompanyEmail = await isCompanyEmail(email);
+
+  return result && iscompanyEmail;
 };
 
 export const openEmailClientWithDefaultEmailBody = (email, subject, body) => {

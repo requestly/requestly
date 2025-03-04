@@ -84,7 +84,7 @@ export const TeamsCard: React.FC = () => {
       </AnimatePresence>
     );
   // TODO: Add default workspace view after onboarding is 100% rolled out
-  if (isCompanyEmail(user?.details?.profile?.email))
+  if (user.details.emailType === "BUSINESS")
     return (
       <AnimatePresence>
         <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>

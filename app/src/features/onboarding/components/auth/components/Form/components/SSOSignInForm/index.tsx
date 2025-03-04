@@ -27,7 +27,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
   const [isNoConnectionFoundCardVisible, setIsNoConnectionFoundCardVisible] = useState(false);
 
   const domain = useMemo(() => getDomainFromEmail(email), [email]);
-  const emailType = useMemo(() => getEmailType(email), [email]);
+  const emailType = useMemo(async () => await getEmailType(email), [email]);
 
   const handleLoginWithSSO = useCallback(async () => {
     if (!email) {
@@ -39,8 +39,8 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
       toast.error("Please enter a valid email");
       return;
     }
-
-    if (isDisposableEmail(email)) {
+    const isDisposable = await isDisposableEmail(email);
+    if (isDisposable) {
       toast.error("Please enter a valid email address. Temporary or disposable email addresses are not allowed.");
       return;
     }

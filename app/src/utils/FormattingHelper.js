@@ -1,7 +1,7 @@
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { PRICING } from "features/pricing";
-import { capitalize } from "lodash";
+import { capitalize, result } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
 export const generateObjectId = () => {
@@ -79,7 +79,7 @@ export const isCompanyEmail = async (email) => {
   }
   const checkEmailType = httpsCallable(getFunctions(), "fetchEmailType");
   const result = await checkEmailType({ userEmail: email });
-  return result.data.type === "business";
+  return result.data.type === "BUSINESS";
 };
 
 export const getByteSize = (inputString) => {
@@ -88,16 +88,18 @@ export const getByteSize = (inputString) => {
 
 export const getEmailType = async (email) => {
   const domain = getDomainFromEmail(email);
+
   if (!domain) {
     return "UNDEFINED";
   }
   const checkEmailType = httpsCallable(getFunctions(), "fetchEmailType");
   const result = await checkEmailType({ userEmail: email });
-  if (result.data.type === "personal") {
+
+  if (result.data.type === "PERSONAL") {
     return "PERSONAL";
-  } else if (result.data.type === "destroyable") {
+  } else if (result.data.type === "DESTROYABLE") {
     return "DESTROYABLE";
-  } else if (result.data.type === "business") {
+  } else if (result.data.type === "BUSINESS") {
     return "BUSINESS";
   } else return "UNDEFINED";
 };
