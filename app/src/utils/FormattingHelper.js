@@ -2,8 +2,6 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { PRICING } from "features/pricing";
 import { capitalize } from "lodash";
-import { emailType } from "../../../shared/src/types/entities/emailType/type";
-import { fetchEmailType } from "./emailService";
 
 export const generateObjectId = () => {
   return Math.random().toString(36).substr(2, 5);
@@ -71,15 +69,6 @@ export const getDomainFromEmail = (email) => {
 export const getCompanyNameFromEmail = (email) => {
   if (!email) return;
   return capitalize(getDomainFromEmail(email).split(".")[0]);
-};
-
-export const isCompanyEmail = async (email) => {
-  const domain = getDomainFromEmail(email);
-  if (!domain) {
-    return false;
-  }
-  const mailType = await fetchEmailType(email);
-  return mailType === emailType.BUSINESS;
 };
 
 export const getByteSize = (inputString) => {

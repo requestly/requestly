@@ -6,8 +6,7 @@ import firebaseApp from "firebase.js";
 import { User, getAuth, onAuthStateChanged, signInWithCustomToken } from "firebase/auth";
 import { globalActions } from "store/slices/global/slice";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
-import { getEmailType } from "utils/MailcheckUtils";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import { getAppMode, getUserAttributes, getAppOnboardingDetails } from "store/selectors";
 import { getPlanName, isPremiumUser } from "utils/PremiumUtils";
 import moment from "moment";
@@ -21,6 +20,8 @@ import { getUser } from "backend/user/getUser";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { StorageService } from "init";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { getEmailType } from "utils/MailcheckUtils";
+import { emailType as email_type } from "@requestly/shared/types/common";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -55,8 +56,13 @@ const AuthHandler: React.FC<{}> = () => {
 
       /* To ensure that this attribute is assigned to only the users signing up for the first time */
       if (user?.metadata?.creationTime === user?.metadata?.lastSignInTime) {
-        const iscompanyEmail = await isCompanyEmail(user.email);
-        if (iscompanyEmail && user.emailVerified && !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]) {
+        const CompanyEmail = await getEmailType(user.email);
+
+        if (
+          CompanyEmail === email_type.BUSINESS &&
+          user.emailVerified &&
+          !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]
+        ) {
           getOrganizationUsers({ domain: getDomainFromEmail(user.email) }).then((res) => {
             const users = res.data.users;
             submitAttrUtil(TRACKING.ATTR.COMPANY_USER_SERIAL, users.length);
@@ -121,6 +127,8 @@ const AuthHandler: React.FC<{}> = () => {
         window.isSyncEnabled = isSyncEnabled;
         window.keySetDoneisSyncEnabled = true;
 
+        const mailType = await getEmailType(user.email);
+
         dispatch(
           // @ts-ignore
           globalActions.updateUserInfo({
@@ -135,7 +143,7 @@ const AuthHandler: React.FC<{}> = () => {
               isBackupEnabled,
               isSyncEnabled,
               isPremium: isUserPremium,
-              emailType: await getEmailType(user.email),
+              emailType: mailType,
             },
           })
         );

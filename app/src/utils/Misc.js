@@ -7,8 +7,9 @@ import { dateObjToDateString, getOldestDate } from "./DateTimeUtils";
 import { trackDesktopAppInstalled } from "modules/analytics/events/misc/installation";
 import { getValueAsPromise } from "actions/FirebaseActions";
 import { isEmailVerified } from "./AuthUtils";
-import { isCompanyEmail } from "./FormattingHelper";
 import moment from "moment";
+import { emailType } from "@requestly/shared/types/common";
+import { getEmailType } from "utils/MailcheckUtils";
 
 const { APP_MODES } = GLOBAL_CONSTANTS;
 
@@ -177,9 +178,10 @@ export const isVerifiedBusinessDomainUser = async (email, uid) => {
   if (!email || !uid) return false;
 
   const result = await isEmailVerified(uid);
-  const iscompanyEmail = await isCompanyEmail(email);
+  const email_type = await getEmailType(email);
+  const isCompanyEmail = email_type === emailType.BUSINESS;
 
-  return result && iscompanyEmail;
+  return result && isCompanyEmail;
 };
 
 export const openEmailClientWithDefaultEmailBody = (email, subject, body) => {
