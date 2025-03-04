@@ -22,7 +22,7 @@ interface EditableCellProps {
   isSecret?: boolean;
   options?: string[];
   duplicateKeyIndices?: Set<number>;
-  isReadRole: boolean;
+  isReadOnly: boolean;
 }
 
 export const EditableRow = ({ index, ...props }: { index: number }) => {
@@ -46,7 +46,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   options,
   isSecret,
   duplicateKeyIndices,
-  isReadRole,
+  isReadOnly,
   ...restProps
 }) => {
   const form = useContext(EditableContext)!;
@@ -113,7 +113,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   }, []);
 
   const renderValueInputByType = useCallback(() => {
-    const disabled = isReadRole && ["key", "type", "syncValue"].includes(dataIndex);
+    const disabled = isReadOnly && ["key", "type", "syncValue"].includes(dataIndex);
 
     switch (record.type) {
       case EnvironmentVariableType.String:
@@ -161,7 +161,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           </Select>
         );
     }
-  }, [isReadRole, record, handleChange, dataIndex, getPlaceholderText, isSecret]);
+  }, [isReadOnly, record, handleChange, dataIndex, getPlaceholderText, isSecret]);
 
   useEffect(() => {
     // Update form fields when record changes non-user actions like syncing variables from listener
@@ -179,7 +179,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={record?.[dataIndex]}>
         {dataIndex === "type" ? (
           <Select
-            disabled={isReadRole}
+            disabled={isReadOnly}
             className="w-full"
             onChange={(value) => handleChange(value as EnvironmentVariableType)}
             value={record.type}
@@ -192,7 +192,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           </Select>
         ) : dataIndex === "key" ? (
           <Input
-            disabled={isReadRole}
+            disabled={isReadOnly}
             ref={inputRef}
             onChange={(e) => handleChange(e.target.value)}
             placeholder={getPlaceholderText(dataIndex)}
