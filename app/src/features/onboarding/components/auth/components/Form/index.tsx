@@ -25,7 +25,7 @@ import { SSOSignInForm } from "./components/SSOSignInForm";
 import { RequestPasswordResetForm } from "./components/RequestPasswordResetForm";
 import { trackLoginWithSSOClicked, trackSignUpSignInSwitched } from "../../analytics";
 import { AuthWarningBanner } from "./components/AuthWarningBanner";
-import { isDisposableEmail } from "utils/AuthUtils";
+import { isDisposableEmail } from "utils/MailcheckUtils";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { getAppFlavour } from "utils/AppUtils";
 import LINKS from "config/constants/sub/links";

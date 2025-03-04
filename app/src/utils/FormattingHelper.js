@@ -1,8 +1,9 @@
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { PRICING } from "features/pricing";
-import { capitalize, result } from "lodash";
-import { getFunctions, httpsCallable } from "firebase/functions";
+import { capitalize } from "lodash";
+import { emailType } from "../../../shared/src/types/entities/emailType/type";
+import { fetchEmailType } from "./emailService";
 
 export const generateObjectId = () => {
   return Math.random().toString(36).substr(2, 5);
@@ -77,31 +78,12 @@ export const isCompanyEmail = async (email) => {
   if (!domain) {
     return false;
   }
-  const checkEmailType = httpsCallable(getFunctions(), "fetchEmailType");
-  const result = await checkEmailType({ userEmail: email });
-  return result.data.type === "BUSINESS";
+  const mailType = await fetchEmailType(email);
+  return mailType === emailType.BUSINESS;
 };
 
 export const getByteSize = (inputString) => {
   return new Blob([inputString]).size;
-};
-
-export const getEmailType = async (email) => {
-  const domain = getDomainFromEmail(email);
-
-  if (!domain) {
-    return "UNDEFINED";
-  }
-  const checkEmailType = httpsCallable(getFunctions(), "fetchEmailType");
-  const result = await checkEmailType({ userEmail: email });
-
-  if (result.data.type === "PERSONAL") {
-    return "PERSONAL";
-  } else if (result.data.type === "DESTROYABLE") {
-    return "DESTROYABLE";
-  } else if (result.data.type === "BUSINESS") {
-    return "BUSINESS";
-  } else return "UNDEFINED";
 };
 
 export const getGreeting = () => {

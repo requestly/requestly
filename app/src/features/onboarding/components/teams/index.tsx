@@ -4,7 +4,6 @@ import { getAppMode, getAppOnboardingDetails } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { DefaultTeamView } from "./components/defaultTeamView";
 import { JoinTeamView } from "./components/joinTeamsView";
-import { isCompanyEmail } from "utils/FormattingHelper";
 import { getPendingInvites } from "backend/workspace";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -18,6 +17,7 @@ import "./index.scss";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { Invite } from "types";
+import { isCompanyEmail } from "utils/MailcheckUtils";
 
 interface WorkspaceOnboardingViewProps {
   isOpen: boolean;
@@ -76,7 +76,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
       return;
     }
 
-    if (user.details.emailType !== "BUSINESS" || !user?.details?.profile?.isEmailVerified) {
+    if (isCompanyEmail(user.details?.emailType) || !user?.details?.profile?.isEmailVerified) {
       setIsLoading(false);
       redirectToWebAppHomePage(navigate);
       dispatch(globalActions.updateAppOnboardingCompleted());
@@ -109,7 +109,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
 
   useEffect(() => {
     if (!isNull(pendingInvites)) {
-      if (user.details.emailType !== "BUSINESS") {
+      if (!isCompanyEmail(user.details?.emailType)) {
         trackAppOnboardingTeamsViewed("no_workspaces");
         return;
       }

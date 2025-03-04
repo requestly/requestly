@@ -11,15 +11,8 @@ import {
   trackEmailVerificationSendSuccess,
 } from "modules/analytics/events/common/auth/emailVerification";
 import Logger from "lib/logger";
-import { getFunctions, httpsCallable } from "firebase/functions";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
-
-const emailType = {
-  PERSONAL: "PERSONAL",
-  DESTROYABLE: "DESTROYABLE",
-  BUSINESS: "BUSINESS",
-};
 
 /**
  * Email verified bool is taken from firebase database instead of data provided by firebase auth api
@@ -38,12 +31,6 @@ export const isEmailVerified = (userId) => {
       } else return data.emailVerified;
     })
     .catch((err) => Logger.log(err));
-};
-
-export const isDisposableEmail = async (email) => {
-  const checkDisposable = httpsCallable(getFunctions(), "fetchEmailType");
-  const result = await checkDisposable({ userEmail: email });
-  return result.data.type === emailType.DESTROYABLE;
 };
 
 export const setEmailVerified = async (userId, value) => {

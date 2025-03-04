@@ -9,12 +9,12 @@ import { RiBuildingLine } from "@react-icons/all-files/ri/RiBuildingLine";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import { MdOutlineAccountBox } from "@react-icons/all-files/md/MdOutlineAccountBox";
 import { redirectToTraffic } from "utils/RedirectionUtils";
-import { isCompanyEmail } from "utils/FormattingHelper";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackAppSettingsSidebarClicked } from "features/settings/analytics";
 import "./index.scss";
+import { isCompanyEmail } from "utils/MailcheckUtils";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -74,7 +74,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
             id: "members",
             name: "Members",
             path: PATHS.SETTINGS.MEMBERS.RELATIVE,
-            ishidden: !(user?.details?.profile?.isEmailVerified && user.details.emailType === "BUSINESS"),
+            ishidden: !(user?.details?.profile?.isEmailVerified && isCompanyEmail(user.details?.emailType)),
           },
           {
             id: "workspaces",
@@ -90,7 +90,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
         ],
       },
     ],
-    [appMode, user.details.emailType, user.details?.profile?.isEmailVerified, user.loggedIn]
+    [appMode, user.details?.emailType, user.details?.profile?.isEmailVerified, user.loggedIn]
   );
 
   return (

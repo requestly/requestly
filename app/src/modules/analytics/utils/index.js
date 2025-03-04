@@ -7,7 +7,7 @@ export async function buildBasicUserProperties(user) {
     let isBusinessAccount = false;
     let company = null;
 
-    if (email && user.details.emailType === "BUSINESS") {
+    if (email && isCompanyEmail(user.email)) {
       isBusinessAccount = true;
       company = getDomainFromEmail(email);
     }

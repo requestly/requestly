@@ -10,9 +10,10 @@ import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/busin
 import { LoadingOutlined } from "@ant-design/icons";
 import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";
 import { trackTeamPlanCardClicked, trackTeamPlanCardShown } from "modules/analytics/events/common/teams";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import { redirectToBillingTeam } from "utils/RedirectionUtils";
 import "./index.css";
+import { isCompanyEmail } from "utils/MailcheckUtils";
 
 export default function EnterpriseRequestBanner(): JSX.Element | null {
   const user = useSelector(getUserAuthDetails);
@@ -54,7 +55,7 @@ export default function EnterpriseRequestBanner(): JSX.Element | null {
   useEffect(() => {
     if (
       billingTeams.length &&
-      user.details.emailType === "BUSINESS" &&
+      isCompanyEmail(user.details?.emailType) &&
       user?.details?.profile?.isEmailVerified &&
       user?.details?.isLoggedIn &&
       !user?.details?.isPremium
@@ -66,14 +67,14 @@ export default function EnterpriseRequestBanner(): JSX.Element | null {
     user.details?.profile.email,
     user.details?.profile?.isEmailVerified,
     billingTeams,
-    user.details.emailType,
+    user.details?.emailType,
   ]);
 
   if (user?.details?.isPremium || !user?.details?.isLoggedIn) return null;
 
   return (
     <React.Fragment>
-      {billingTeams?.length && user.details.emailType === "BUSINESS" && user?.details?.profile?.isEmailVerified ? (
+      {billingTeams?.length && isCompanyEmail(user.details?.emailType) && user?.details?.profile?.isEmailVerified ? (
         enterpriseRequestedState === 1 ? (
           <>
             <br />

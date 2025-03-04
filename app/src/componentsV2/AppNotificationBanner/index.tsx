@@ -13,7 +13,7 @@ import rehypeRaw from "rehype-raw";
 import { ButtonType } from "antd/lib/button";
 import { capitalize } from "lodash";
 import { redirectToUrl } from "utils/RedirectionUtils";
-import { getCompanyNameFromEmail, getPrettyPlanName, isCompanyEmail } from "utils/FormattingHelper";
+import { getCompanyNameFromEmail, getPrettyPlanName } from "utils/FormattingHelper";
 import LINKS from "config/constants/sub/links";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { trackAppBannerDismissed, trackAppNotificationBannerViewed, trackAppBannerCtaClicked } from "./analytics";
@@ -24,6 +24,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { PlanStatus, PlanType } from "features/settings/components/BillingTeam/types";
 import { PRICING } from "features/pricing/constants/pricing";
+import { isCompanyEmail } from "utils/MailcheckUtils";
 
 enum BANNER_TYPE {
   WARNING = "warning",
@@ -170,7 +171,7 @@ export const AppNotificationBanner = () => {
           return `Dear ${companyName} user, ${text}`;
         }
         case BANNER_ID.ACCELERATOR_PROGRAM: {
-          if (user.details.emailType === "BUSINESS") {
+          if (isCompanyEmail(user.details?.emailType)) {
             return `Requestly is offering an exclusive 6-month free access to the entire ${getCompanyNameFromEmail(
               user?.details?.profile?.email
             )} team as a part of its Accelerator Program.`;
@@ -190,7 +191,7 @@ export const AppNotificationBanner = () => {
           return text;
       }
     },
-    [user?.details?.planDetails?.planName, user?.details?.profile?.email]
+    [user.details?.emailType, user.details?.planDetails?.planName, user.details?.profile?.email]
   );
 
   const checkBannerVisibility = useCallback(

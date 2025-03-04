@@ -19,7 +19,7 @@ import {
 } from "firebase/auth";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 //UTILS
-import { getEmailType } from "utils/FormattingHelper";
+import { getEmailType } from "utils/MailcheckUtils";
 //EVENTS
 import {
   trackSignupSuccessEvent,
