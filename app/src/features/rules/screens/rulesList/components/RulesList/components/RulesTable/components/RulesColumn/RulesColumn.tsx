@@ -13,7 +13,7 @@ import { trackNewRuleButtonClicked } from "modules/analytics/events/common/rules
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { trackSampleRuleEditorViewed } from "features/rules/analytics";
-import { RBAC, useRBAC } from "features/rbac";
+import { RoleBasedComponent } from "features/rbac";
 
 const RuleNameColumn: React.FC<{
   record: RuleTableRecord;
@@ -24,9 +24,6 @@ const RuleNameColumn: React.FC<{
     placement: "right",
     showArrow: false,
   };
-
-  const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.create);
 
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -126,7 +123,7 @@ const RuleNameColumn: React.FC<{
           </Tooltip>
         ) : null}
 
-        {isValidPermission ? (
+        <RoleBasedComponent resource="http_rule" permission="create">
           <RuleSelectionListDrawer
             groupId={group.id}
             open={isRulesListDrawerOpen}
@@ -144,7 +141,7 @@ const RuleNameColumn: React.FC<{
               <span>+</span> <span>Add rule</span>
             </Button>
           </RuleSelectionListDrawer>
-        ) : null}
+        </RoleBasedComponent>
       </div>
     );
   }

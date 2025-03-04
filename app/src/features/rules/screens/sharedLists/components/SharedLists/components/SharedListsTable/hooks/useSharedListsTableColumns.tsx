@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { UserAvatar } from "componentsV2/UserAvatar";
-import { RBAC, useRBAC } from "features/rbac";
+import { RoleBasedComponent } from "features/rbac";
 
 interface Props {
   handleDeleteSharedListClick: (sharedListId: string) => void;
@@ -26,9 +26,6 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
   const navigate = useNavigate();
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [copiedSharedListId, setCopiedSharedListId] = useState("");
-
-  const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.delete);
 
   const handleOnURLCopy = useCallback((id: string) => {
     trackSharedListUrlCopied("shared_list_list", id);
@@ -100,7 +97,7 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
               </Tooltip>
             </CopyToClipboard>
 
-            {isValidPermission ? (
+            <RoleBasedComponent resource="http_rule" permission="delete">
               <Tooltip title="Delete">
                 <RQButton
                   icon={<RiDeleteBinLine />}
@@ -108,7 +105,7 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
                   onClick={() => handleDeleteSharedListClick(record.shareId)}
                 />
               </Tooltip>
-            ) : null}
+            </RoleBasedComponent>
           </div>
         );
       },
