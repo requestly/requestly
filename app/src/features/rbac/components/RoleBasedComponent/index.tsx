@@ -6,11 +6,12 @@ interface Props {
   resource: keyof typeof RBAC.Resource;
   permission: keyof typeof RBAC.Permission;
   children: React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
-export const RoleBasedComponent: React.FC<Props> = ({ resource, permission, children }) => {
+export const RoleBasedComponent: React.FC<Props> = ({ resource, permission, children, fallback }) => {
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission(resource, permission);
 
-  return isValidPermission ? children : null;
+  return isValidPermission ? children : fallback || null;
 };

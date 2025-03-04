@@ -30,7 +30,7 @@ import { trackSampleRuleCreateRuleClicked } from "features/rules/analytics";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import { getEventObject } from "components/common/RuleEditorModal/utils";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
-import { useRBAC } from "features/rbac";
+import { RoleBasedComponent, useRBAC } from "features/rbac";
 
 const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleTooltip = false }) => {
   const navigate = useNavigate();
@@ -129,49 +129,53 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
           </div>
         ) : (
           <div className="ml-auto rule-editor-header-actions-container">
-            {isValidPermission ? (
-              <>
-                <HelpButton />
+							<RoleBasedComponent
+								resource="http_rule"
+								permission="create"
+								fallback={
+									<>
+		                <HelpButton />
+		                <Divider type="vertical" />
+		                <TestRuleButton />
+		              </>
+								}
+							>
+	         		<>
+		             <HelpButton />
 
-                <Status mode={mode} />
+		             <Status mode={mode} />
 
-                {isRuleGroupDisabled && (
-                  <div className="rule-editor-header-disabled-group-warning">
-                    <Tooltip title="This rule won't execute because its parent group is disabled. Enable the group to run this rule.">
-                      <WarningOutlined className="icon__wrapper" />
-                      Group is disabled.{" "}
-                      <RQButton
-                        type="transparent"
-                        size="small"
-                        onClick={() =>
-                          recordStatusToggleAction(normalizeRecord(allRecordsMap[currentlySelectedRuleData.groupId]))
-                        }
-                      >
-                        Enable now
-                      </RQButton>
-                    </Tooltip>
-                  </div>
-                )}
+		             {isRuleGroupDisabled && (
+		               <div className="rule-editor-header-disabled-group-warning">
+		                 <Tooltip title="This rule won't execute because its parent group is disabled. Enable the group to run this rule.">
+		                   <WarningOutlined className="icon__wrapper" />
+		                   Group is disabled.{" "}
+		                   <RQButton
+		                     type="transparent"
+		                     size="small"
+		                     onClick={() =>
+		                       recordStatusToggleAction(normalizeRecord(allRecordsMap[currentlySelectedRuleData.groupId]))
+		                     }
+		                   >
+		                     Enable now
+		                   </RQButton>
+		                 </Tooltip>
+		               </div>
+		             )}
 
-                <PinButton rule={currentlySelectedRuleData} />
+		             <PinButton rule={currentlySelectedRuleData} />
 
-                <Divider type="vertical" />
+		             <Divider type="vertical" />
 
-                <RuleOptions mode={mode} rule={currentlySelectedRuleData} />
+		             <RuleOptions mode={mode} rule={currentlySelectedRuleData} />
 
-                <EditorGroupDropdown mode={mode} />
+		             <EditorGroupDropdown mode={mode} />
 
-                <TestRuleButton />
+		             <TestRuleButton />
 
-                <ActionButtons mode={mode} />
-              </>
-            ) : (
-              <>
-                <HelpButton />
-                <Divider type="vertical" />
-                <TestRuleButton />
-              </>
-            )}
+		             <ActionButtons mode={mode} />
+		          </>
+           	</RoleBasedComponent>
           </div>
         )}
       </div>
