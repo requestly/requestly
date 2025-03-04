@@ -3,8 +3,8 @@ import { Link, Params, useMatches } from "react-router-dom";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import { Input, Skeleton, Typography } from "antd";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
+import { useRBAC } from "features/rbac";
 import "./RQBreadcrumb.scss";
-import { useCurrentWorkspaceUserRole } from "hooks";
 
 interface Props {
   loading?: boolean;
@@ -42,7 +42,8 @@ export const RQBreadcrumb: React.FC<Props> = ({
   const [name, setName] = useState(recordName || "");
   const [isEditRecord, setIsEditRecord] = useState(false);
   const matchedRoutes = useMatches() as MatchedRoute[];
-  const { isReadRole } = useCurrentWorkspaceUserRole();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("breadcrumbs", "update");
 
   useEffect(() => {
     setName(recordName);
@@ -81,7 +82,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
   };
 
   const handleRecordNameEditClick = () => {
-    if (disabled || isReadRole) {
+    if (disabled || !isValidPermission) {
       return;
     }
 
@@ -116,14 +117,14 @@ export const RQBreadcrumb: React.FC<Props> = ({
                     <Typography.Text className="record-name" ellipsis={true} onClick={handleRecordNameEditClick}>
                       {name || placeholder}
                     </Typography.Text>
-                    {disabled || isReadRole ? null : (
+                    {disabled || !isValidPermission ? null : (
                       <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />
                     )}
                   </div>
                 )
               ) : (
                 <>
-                  {isPathDisabled || isReadRole ? (
+                  {isPathDisabled || !isValidPermission ? (
                     <li key={index} className="rq-breadcrumb-item">
                       {label}
                     </li>
