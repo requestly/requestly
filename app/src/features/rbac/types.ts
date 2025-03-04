@@ -12,6 +12,7 @@ export namespace RBAC {
     workspace = "workspace",
     workspace_settings_synced_status = "workspace_settings_synced_status",
     breadcrumbs = "breadcrumbs",
+    tabs_layout = "tabs_layout",
   }
 
   // Keep this updated with TeamRole

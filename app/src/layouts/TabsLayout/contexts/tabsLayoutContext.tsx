@@ -5,8 +5,8 @@ import { useDispatch } from "react-redux";
 import { tabsLayoutActions } from "store/slices/tabs-layout";
 import { TabsProps } from "antd";
 import { usePatchedTabs } from "./usePatchedTabs";
-import { useCurrentWorkspaceUserRole } from "hooks";
 import { toast } from "utils/Toast";
+import { RBAC, useRBAC } from "features/rbac";
 
 const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
   tabs: [],
@@ -31,7 +31,8 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [addTabBtnCallback, setAddTabBtnCallback] = useState(() => () => {});
-  const { isReadRole } = useCurrentWorkspaceUserRole();
+  const { validatePermission, getErrorMessage } = useRBAC();
+  const validationResult = validatePermission("tabs_layout", "create");
 
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
@@ -182,19 +183,16 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
   const onTabsEdit: TabsProps["onEdit"] = useCallback(
     (event, action) => {
       if (action === "add") {
-        if (isReadRole && ["apiClient"].includes(id)) {
-          toast.warn(
-            `As a viewer, you cannot create new request. Contact your workspace admin to update your role.`,
-            5
-          );
-
+        if (validationResult.isValidPermission === false && ["apiClient"].includes(id)) {
+          const errorMessage = getErrorMessage(validationResult.error, RBAC.Permission.create)("request");
+          toast.warn(errorMessage, 5);
           return;
         }
 
         addTabBtnCallback?.();
       }
     },
-    [addTabBtnCallback, isReadRole, id]
+    [addTabBtnCallback, validationResult, id, getErrorMessage]
   );
 
   const updateAddTabBtnCallback = useCallback((cb: () => void) => {
