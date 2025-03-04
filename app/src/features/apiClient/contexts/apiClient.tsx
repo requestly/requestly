@@ -107,7 +107,6 @@ interface ApiClientProviderProps {
 }
 
 const trackUserProperties = (records: RQAPI.Record[]) => {
-  console.log("Tracking user properties");
   const totalCollections = records.filter((record) => isApiCollection(record)).length;
   const totalRequests = records.length - totalCollections;
   submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_COLLECTIONS, totalCollections);
