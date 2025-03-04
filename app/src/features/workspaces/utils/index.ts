@@ -49,6 +49,8 @@ export const hasAccessToWorkspace = (userId?: string, workspace?: Workspace): bo
 };
 
 export const isSharedWorkspace = (workspace: Workspace) => {
+  if (!workspace) return false;
+
   if (workspace.id === LOGGED_OUT_WORKSPACE_ID || isPersonalWorkspace(workspace.id) || isLocalFSWorkspace(workspace)) {
     return false;
   }

@@ -259,7 +259,7 @@ const WorkspaceSelector = () => {
         })
       );
       trackInviteTeammatesClicked("workspaces_dropdown");
-      if (isSharedWorkspace(activeWorkspaceId)) {
+      if (isSharedWorkspace(activeWorkspace)) {
         redirectToTeam(navigate, activeWorkspaceId);
       } else {
         redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");
@@ -365,7 +365,7 @@ const WorkspaceSelector = () => {
         {sortedAvailableWorkspaces &&
           sortedAvailableWorkspaces
             .filter((team) => team.workspaceType !== WorkspaceType.LOCAL)
-            .length.map((workspace) => {
+            .map((workspace) => {
               return (
                 <Menu.Item
                   key={workspace.id}
