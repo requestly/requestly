@@ -26,7 +26,7 @@ import "./sharedListViewerContentHeader.scss";
 import APP_CONSTANTS from "config/constants";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { Group, Rule } from "@requestly/shared/types/entities/rules";
-import { RBAC, useRBAC } from "features/rbac";
+import { useRBAC } from "features/rbac";
 
 interface ContentHeaderProps {
   searchValue: string;
@@ -51,7 +51,7 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
   const location = useLocation();
   const { getFeatureLimitValue } = useFeatureLimiter();
   const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.create);
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const [areRulesImporting, setAreRulesImporting] = useState(false);
   const isImportLimitReached = useMemo(

@@ -22,7 +22,7 @@ import { trackSampleRuleTested } from "features/rules/analytics";
 import { RecordStatus } from "@requestly/shared/types/entities/rules";
 import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
 import { ReadOnlyModeAlert } from "./components/ReadOnlyModeAlert/ReadOnlyModeAlert";
-import { RBAC, useRBAC } from "features/rbac";
+import { useRBAC } from "features/rbac";
 import "./RuleEditor.scss";
 
 const RuleEditor = (props) => {
@@ -38,7 +38,7 @@ const RuleEditor = (props) => {
   const tryThisRuleTooltipTimerRef = useRef(null);
   const [isSampleRule, setIsSampleRule] = useState(false);
   const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.update);
+  const { isValidPermission } = validatePermission("http_rule", "update");
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 

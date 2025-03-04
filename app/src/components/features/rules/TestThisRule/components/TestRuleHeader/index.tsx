@@ -22,7 +22,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { getAllRecordsMap } from "store/features/rules/selectors";
 import { useIsNewUserForIncentivization } from "features/incentivization/hooks";
 import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivization/constants";
-import { RBAC, useRBAC } from "features/rbac";
+import { useRBAC } from "features/rbac";
 import "./index.scss";
 
 export const TestRuleHeader = () => {
@@ -32,7 +32,7 @@ export const TestRuleHeader = () => {
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const allRecordsMap = useSelector(getAllRecordsMap);
   const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.create);
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);

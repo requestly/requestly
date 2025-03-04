@@ -7,7 +7,7 @@ import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "../..
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 import ResponseRuleResourceTypes from "./ResponseRuleResourceTypes";
 import { rulePairComponents } from "./Pairs";
-import { RBAC, useRBAC } from "features/rbac";
+import { useRBAC } from "features/rbac";
 import "./RulePairs.css";
 
 const RulePairs = (props) => {
@@ -15,7 +15,7 @@ const RulePairs = (props) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
   const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.create);
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
   const isInputDisabled = props.mode === "shared-list-rule-view" || !!isSampleRule || !isValidPermission;

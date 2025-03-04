@@ -20,7 +20,7 @@ import { RuleSelectionList } from "../RuleSelectionList/RuleSelectionList";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
 import { RQButton } from "lib/design-system-v2/components";
 import { useLocation } from "react-router-dom";
-import { RBAC, useRBAC } from "features/rbac";
+import { useRBAC } from "features/rbac";
 
 interface Props {
   searchValue: string;
@@ -38,7 +38,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
 
   const { createRuleAction, createGroupAction, importRecordsAction } = useRulesActionContext();
   const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.create);
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const buttonData = [
     {

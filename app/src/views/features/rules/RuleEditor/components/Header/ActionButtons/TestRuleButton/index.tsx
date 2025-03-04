@@ -7,14 +7,14 @@ import { useLocation } from "react-router-dom";
 import RULE_EDITOR_CONFIG from "config/constants/sub/rule-editor";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { RBAC, useRBAC } from "features/rbac";
+import { useRBAC } from "features/rbac";
 import "./index.scss";
 
 export const TestRuleButton: React.FC = () => {
   const location = useLocation();
   const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
   const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.create);
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const MODE = getModeData(location).MODE;
 

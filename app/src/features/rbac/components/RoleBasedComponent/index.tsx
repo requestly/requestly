@@ -10,7 +10,7 @@ interface Props {
 
 export const RoleBasedComponent: React.FC<Props> = ({ resource, permission, children }) => {
   const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission(RBAC.Resource[resource], RBAC.Permission[permission]);
+  const { isValidPermission } = validatePermission(resource, permission);
 
   return isValidPermission ? children : null;
 };

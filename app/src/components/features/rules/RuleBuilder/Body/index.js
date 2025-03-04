@@ -9,7 +9,7 @@ import { getAppMode, getCurrentlySelectedRuleErrors } from "store/selectors";
 import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
 import RuleInfoBanner from "./RuleInfoBanner";
-import { RBAC, useRBAC } from "features/rbac";
+import { useRBAC } from "features/rbac";
 import "./RuleBuilderBody.css";
 
 const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRuleConfig }) => {
@@ -20,7 +20,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
   const isSharedListView = mode === "shared-list-rule-view";
   const isSampleRule = currentlySelectedRuleData?.isSample;
   const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission(RBAC.Resource.http_rule, RBAC.Permission.update);
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const getEventObject = (name, value) => ({ target: { name, value } });
 
