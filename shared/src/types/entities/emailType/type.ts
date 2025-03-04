@@ -1,0 +1,5 @@
+export enum emailType {
+  PERSONAL = "PERSONAL",
+  DESTROYABLE = "DESTROYABLE",
+  BUSINESS = "BUSINESS",
+}
