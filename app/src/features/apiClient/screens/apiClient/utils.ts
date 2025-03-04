@@ -8,6 +8,7 @@ import { forEach, isEmpty, omit, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
 import { generateDocumentId } from "backend/utils";
+import { getDefaultAuth } from "./components/clientView/components/request/components/AuthorizationView/defaults";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
 type ResponseOrError = RQAPI.Response | { error: string };
@@ -77,6 +78,7 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
       contentType: RequestContentType.RAW,
       ...(request || {}),
     },
+    auth: getDefaultAuth(false),
     scripts: {
       preRequest: "",
       postResponse: "",
@@ -290,7 +292,10 @@ export const createBlankApiRecord = (
   if (recordType === RQAPI.RecordType.COLLECTION) {
     newRecord.name = "New collection";
     newRecord.type = RQAPI.RecordType.COLLECTION;
-    newRecord.data = { variables: {} };
+    newRecord.data = {
+      variables: {},
+      auth: getDefaultAuth(false),
+    };
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
   }

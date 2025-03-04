@@ -22,9 +22,9 @@ const slice = createSlice({
     setAvailableTeams: (state, action) => {
       state.availableTeams = action.payload;
     },
-		addToAvailableTeams: (state, action) => {
-			state.availableTeams = [...state.availableTeams, action.payload]
-		},
+    addToAvailableTeams: (state, action) => {
+      state.availableTeams = [...state.availableTeams, action.payload];
+    },
     setCurrentlyActiveWorkspace: (state, action) => {
       const payload = action.payload;
       if (payload.id !== undefined) state.currentlyActiveWorkspace.id = payload.id;

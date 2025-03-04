@@ -9,9 +9,9 @@ import { RQButton } from "lib/design-system-v2/components";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constants/keyboardShortcuts";
 
 interface Props {
-  authOptions: RQAPI.AuthOptions;
-  updateAuthData: (authOptions: RQAPI.AuthOptions) => any;
-  rootLevelRecord: Boolean;
+  authOptions?: RQAPI.Auth;
+  updateAuthData: (authOptions: RQAPI.Auth) => any;
+  rootLevelRecord: boolean;
 }
 
 /**
@@ -24,7 +24,7 @@ interface Props {
  */
 const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthData, rootLevelRecord }) => {
   const { collectionId } = useParams();
-  const [authOptionsState, setAuthOptionsState] = useState(authOptions);
+  const [authOptionsState, setAuthOptionsState] = useState<RQAPI.Auth>(authOptions);
   const [isSaving, setIsSaving] = useState(false);
 
   const { getVariablesWithPrecedence } = useEnvironmentManager();
@@ -48,7 +48,7 @@ const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthD
       .finally(() => {
         setIsSaving(false);
       });
-  }, [authOptionsState]);
+  }, [authOptionsState, resetChanges, updateAuthData]);
 
   const AuthorizationViewActions = () => (
     <div className="authorization-save-btn">
@@ -68,9 +68,9 @@ const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthD
   return (
     <AuthorizationView
       wrapperClass="collection-auth"
-      defaultValues={authOptionsState}
+      defaults={authOptionsState}
       onAuthUpdate={setAuthOptionsState}
-      rootLevelRecord={rootLevelRecord}
+      isRootLevelRecord={rootLevelRecord}
       variables={variables}
       authorizationViewActions={<AuthorizationViewActions />}
     />

@@ -3,6 +3,7 @@ import { collection, getDocs, getFirestore, query, where } from "firebase/firest
 import { RQAPI } from "features/apiClient/types";
 import Logger from "lib/logger";
 import { patchMissingIdInVariables } from "./utils";
+import { enforceLatestRecordSchema } from "./parser";
 
 function patchCollectionVariablesMissingId(params: { success: boolean; data: RQAPI.Record[] }) {
   if (!params.success) {
@@ -40,7 +41,7 @@ const getApiRecordsFromFirebase = async (ownerId: string): Promise<{ success: bo
   try {
     const q = query(rootApiRecordsRef, where("ownerId", "==", ownerId), where("deleted", "in", [false]));
 
-    const result: any = [];
+    const result: RQAPI.Record[] = [];
     const snapshot = await getDocs(q);
 
     if (snapshot.empty) {
@@ -48,7 +49,10 @@ const getApiRecordsFromFirebase = async (ownerId: string): Promise<{ success: bo
     }
 
     snapshot.forEach((doc) => {
-      result.push({ ...doc.data(), id: doc.id });
+      const data = doc.data();
+      const id = doc.id;
+      const processedData = enforceLatestRecordSchema(id, data);
+      result.push(processedData);
     });
 
     return { success: true, data: result };
