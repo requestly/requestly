@@ -26,6 +26,7 @@ The following domains are eligible for the student programme:
     ".ac.id",
     "bennington.edu",
     "yonsei.ac.kr",
+    "estg.ipp.pt",
     "duke.edu"
   ]
 }
