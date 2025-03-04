@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
@@ -27,6 +27,8 @@ import { toast } from "utils/Toast";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
+import { variablesActions } from "store/features/variables/slice";
+import { EnvironmentVariables } from "backend/environment/types";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -115,6 +117,7 @@ const trackUserProperties = (records: RQAPI.Record[]) => {
 };
 
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -173,6 +176,20 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       return;
     }
 
+    const updateCollectionVariablesOnInit = (records: RQAPI.Record[]) => {
+      const collections = records.filter((record) => record.type === RQAPI.RecordType.COLLECTION);
+      const collectionVariables: Record<string, { variables: EnvironmentVariables }> = collections.reduce(
+        (acc: Record<string, { variables: EnvironmentVariables }>, current: RQAPI.CollectionRecord) => {
+          acc[current.id] = {
+            variables: current.data.variables || {},
+          };
+          return acc;
+        },
+        {}
+      );
+      dispatch(variablesActions.setCollectionVariables(collectionVariables));
+    };
+
     setIsLoadingApiClientRecords(true);
     apiClientRecordsRepository
       .getAllRecords()
@@ -187,6 +204,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           return;
         } else {
           setApiClientRecords(result.data);
+          updateCollectionVariablesOnInit(result.data);
         }
       })
       .catch((error) => {
@@ -201,7 +219,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       .finally(() => {
         setIsLoadingApiClientRecords(false);
       });
-  }, [apiClientRecordsRepository, uid]);
+  }, [apiClientRecordsRepository, uid, dispatch]);
 
   useEffect(() => {
     debouncedTrackUserProperties();

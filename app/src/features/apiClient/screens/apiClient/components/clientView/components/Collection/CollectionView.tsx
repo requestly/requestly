@@ -67,7 +67,6 @@ export const CollectionView = () => {
       {
         label: <LocalWorkspaceTooltip featureName="Collection variables">Variables</LocalWorkspaceTooltip>,
         key: TAB_KEYS.VARIABLES,
-        disabled: isLocalSyncEnabled,
         children: <CollectionsVariablesView collection={collection} />,
       },
       {
@@ -89,20 +88,20 @@ export const CollectionView = () => {
     async (name: string) => {
       const record = { ...collection, name };
       return apiClientRecordsRepository.renameCollection(record.id, name).then(async (result) => {
-				if (!result.success) {
-					toast.error(result.message || "Could not rename collection!");
-					return;
-				}
+        if (!result.success) {
+          toast.error(result.message || "Could not rename collection!");
+          return;
+        }
 
-				onSaveRecord(result.data);
+        onSaveRecord(result.data);
 
-				const wasForceRefreshed = await forceRefreshApiClientRecords();
-	      if (wasForceRefreshed) {
-	        closeTab(record.id);
-					return;
-	      }
+        const wasForceRefreshed = await forceRefreshApiClientRecords();
+        if (wasForceRefreshed) {
+          closeTab(record.id);
+          return;
+        }
 
-				replaceTab(result.data.id, {
+        replaceTab(result.data.id, {
           id: result.data.id,
           title: result.data.name,
           url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(result.data.id)}`,
