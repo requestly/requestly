@@ -24,7 +24,7 @@ import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LocalWorkspaceTooltip } from "../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import { useLocation } from "react-router-dom";
-import { useCurrentWorkspaceUserRole } from "hooks";
+import { RoleBasedComponent } from "features/rbac";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -55,7 +55,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
   const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
   const isLocalSyncEnabled = useCheckLocalSyncSupport();
-  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const importItems: DropdownProps["menu"]["items"] = useMemo(
     () => [
@@ -289,7 +288,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
     <>
       <div className="api-client-sidebar-header">
         {activeTab === ApiClientSidebarTabKey.COLLECTIONS || activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
-          isReadRole ? null : (
+          <RoleBasedComponent resource="api_client_request" permission="create">
             <div>
               <Dropdown
                 menu={{ items }}
@@ -312,7 +311,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
                 </RQButton>
               </Dropdown>
             </div>
-          )
+          </RoleBasedComponent>
         ) : activeTab === ApiClientSidebarTabKey.HISTORY ? (
           <RQButton
             disabled={!history?.length}
