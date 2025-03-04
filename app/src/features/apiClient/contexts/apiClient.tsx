@@ -27,7 +27,7 @@ import { toast } from "utils/Toast";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
-import { useCurrentWorkspaceUserRole } from "hooks";
+import { RBAC, useRBAC } from "features/rbac";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -120,7 +120,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
-  const { isReadRole } = useCurrentWorkspaceUserRole();
+  const { validatePermission } = useRBAC();
+  const permissionValidationResult = validatePermission("api_client_request", "create");
 
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -339,9 +340,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);
 
+  const isInvalidPermission =
+    permissionValidationResult.isValidPermission === false &&
+    permissionValidationResult.error === RBAC.Error.not_allowed;
+
   const onNewClick = useCallback(
     async (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId = "") => {
-      if (isReadRole) {
+      if (isInvalidPermission) {
         toast.warn(
           `As a viewer, you cannot create new ${recordType}. Contact your workspace admin to request an update to your role.`,
           5
@@ -406,7 +411,16 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [openTab, openDraftRequest, addNewEnvironment, teamId, uid, onSaveRecord, isReadRole, apiClientRecordsRepository]
+    [
+      openTab,
+      openDraftRequest,
+      addNewEnvironment,
+      teamId,
+      uid,
+      onSaveRecord,
+      isInvalidPermission,
+      apiClientRecordsRepository,
+    ]
   );
 
   const forceRefreshApiClientRecords = useCallback(async () => {
