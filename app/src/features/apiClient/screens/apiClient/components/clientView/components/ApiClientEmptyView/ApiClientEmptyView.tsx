@@ -11,18 +11,19 @@ import { useState } from "react";
 import { toast } from "utils/Toast";
 import "./apiClientEmptyView.scss";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
-import { useCurrentWorkspaceUserRole } from "hooks";
+import { useRBAC } from "features/rbac";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
 
   const { apiClientRecords, onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
-  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const user = useSelector(getUserAuthDetails);
   const team = useSelector(getCurrentlyActiveWorkspace);
 
   const [isRecordCreating, setIsRecordCreating] = useState(null);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_request", "create");
 
   const isEmpty = apiClientRecords.length === 0;
 
@@ -31,7 +32,7 @@ export const ApiClientEmptyView = () => {
       ? trackNewRequestClicked("api_client_home")
       : trackNewCollectionClicked("api_client_home");
 
-    if (isReadRole) {
+    if (!isValidPermission) {
       toast.warn(
         `As a viewer, you cannot create new ${recordType}. Contact your workspace admin to request an update to your role.`,
         5
@@ -73,9 +74,6 @@ export const ApiClientEmptyView = () => {
 
   return (
     <div className="api-client-empty-view-container">
-      {/* TODO: FIX */}
-      {/* <img src={isEmpty ? emptyViewIcon : defaultViewIcon} alt="empty-view" /> */}
-      {/* <TestMyMagic /> */}
       <div>
         <div className="api-client-empty-view-header">
           {isEmpty ? "No API requests created yet." : "Pick up where you left off or start fresh."}
