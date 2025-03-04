@@ -18,7 +18,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 
 interface EnvironmentsListItemProps {
-  isReadRole: boolean;
+  isReadOnly: boolean;
   environment: {
     id: string;
     name: string;
@@ -36,7 +36,7 @@ export enum EnvironmentMenuKey {
 }
 
 export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
-  isReadRole,
+  isReadOnly,
   environment,
   openTab,
   onExportClick,
@@ -209,7 +209,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       </div>
       {/* wrapping dropdown in a div to prevent it from triggering click events on parent div element*/}
 
-      {isReadRole ? null : (
+      {isReadOnly ? null : (
         <div onClick={(e) => e.stopPropagation()}>
           {!isGlobalEnvironment(environment.id) ? (
             <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
