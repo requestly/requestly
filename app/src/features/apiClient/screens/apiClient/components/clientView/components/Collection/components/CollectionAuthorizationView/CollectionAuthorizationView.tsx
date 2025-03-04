@@ -7,9 +7,9 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constants/keyboardShortcuts";
+import { RoleBasedComponent } from "features/rbac";
 
 interface Props {
-  isReadRole: boolean;
   authOptions: RQAPI.AuthOptions;
   updateAuthData: (authOptions: RQAPI.AuthOptions) => any;
   rootLevelRecord: Boolean;
@@ -23,7 +23,7 @@ interface Props {
  * and remain separated from the main Collection View
  *
  */
-const CollectionAuthorizationView: React.FC<Props> = ({ isReadRole, authOptions, updateAuthData, rootLevelRecord }) => {
+const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthData, rootLevelRecord }) => {
   const { collectionId } = useParams();
   const [authOptionsState, setAuthOptionsState] = useState(authOptions);
   const [isSaving, setIsSaving] = useState(false);
@@ -51,8 +51,8 @@ const CollectionAuthorizationView: React.FC<Props> = ({ isReadRole, authOptions,
       });
   }, [authOptionsState]);
 
-  const AuthorizationViewActions = () =>
-    isReadRole ? null : (
+  const AuthorizationViewActions = () => (
+    <RoleBasedComponent resource="api_client_collection" permission="update">
       <div className="authorization-save-btn">
         <RQButton
           showHotKeyText
@@ -65,12 +65,12 @@ const CollectionAuthorizationView: React.FC<Props> = ({ isReadRole, authOptions,
           Save
         </RQButton>
       </div>
-    );
+    </RoleBasedComponent>
+  );
 
   return (
     <AuthorizationView
       wrapperClass="collection-auth"
-      isReadRole={isReadRole}
       defaultValues={authOptionsState}
       onAuthUpdate={setAuthOptionsState}
       rootLevelRecord={rootLevelRecord}

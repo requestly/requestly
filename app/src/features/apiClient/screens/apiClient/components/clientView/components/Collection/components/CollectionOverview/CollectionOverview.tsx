@@ -15,19 +15,21 @@ import { useOutsideClick } from "hooks";
 import "./collectionOverview.scss";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { useRBAC } from "features/rbac";
 
 interface CollectionOverviewProps {
-  isReadRole: boolean;
   collection: RQAPI.CollectionRecord;
 }
 
 const COLLECTION_DETAILS_PLACEHOLDER = "Collection description";
 
-export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ isReadRole, collection }) => {
+export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collection }) => {
   const user = useSelector(getUserAuthDetails);
   const team = useSelector(getCurrentlyActiveWorkspace);
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
   const { closeTab } = useTabsLayoutContext();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_collection", "create");
 
   const [collectionName, setCollectionName] = useState(collection?.name || "");
   const [collectionDescription, setCollectionDescription] = useState(collection?.description || "");
@@ -99,7 +101,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ isReadRo
     <div className="collection-overview-wrapper">
       <div className="collection-overview-container">
         <InlineInput
-          disabled={isReadRole}
+          disabled={!isValidPermission}
           value={collectionName}
           onChange={(value) => {
             setCollectionName(value);
@@ -144,7 +146,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ isReadRo
               <div
                 className="collection-overview-description-markdown"
                 onClick={() => {
-                  if (isReadRole) {
+                  if (!isValidPermission) {
                     return;
                   }
 

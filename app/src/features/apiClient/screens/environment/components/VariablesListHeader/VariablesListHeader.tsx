@@ -10,8 +10,8 @@ import "./variablesListHeader.scss";
 import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { ReadOnlyModeAlert } from "features/apiClient/screens/apiClient/components/clientView/components/ReadOnlyModeAlert/ReadOnlyModeAlert";
+import { RoleBasedComponent } from "features/rbac";
 interface VariablesListHeaderProps {
-  isReadRole: boolean;
   searchValue: string;
   currentEnvironmentName: string;
   environmentId: string;
@@ -33,7 +33,6 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   hideBreadcrumb = false,
   onSave,
   exportActions,
-  isReadRole,
 }) => {
   const { renameEnvironment } = useEnvironmentManager();
   const { replaceTab } = useTabsLayoutContext();
@@ -63,9 +62,9 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
         <div />
       )}
 
-      {isReadRole ? (
+      <RoleBasedComponent resource="api_client_environment" permission="read">
         <ReadOnlyModeAlert description="As a viewer, you can update variables with current values and test the APIs, but saving your updates is not permitted." />
-      ) : null}
+      </RoleBasedComponent>
 
       <div className="variables-list-action-container">
         <Input
@@ -76,7 +75,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           onChange={(e) => onSearchValueChange(e.target.value)}
         />
 
-        {isReadRole ? null : (
+        <RoleBasedComponent resource="api_client_environment" permission="update">
           <div className="variables-list-btn-actions-container">
             <RQButton
               showHotKeyText
@@ -95,7 +94,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
               </RQButton>
             )}
           </div>
-        )}
+        </RoleBasedComponent>
       </div>
     </div>
   );
