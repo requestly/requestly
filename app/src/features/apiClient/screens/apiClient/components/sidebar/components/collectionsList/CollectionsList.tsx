@@ -28,7 +28,7 @@ import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";
 import { firebaseBatchWrite } from "backend/utils";
-import { useCurrentWorkspaceUserRole } from "hooks";
+import { useRBAC } from "features/rbac";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -38,7 +38,8 @@ interface Props {
 export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated }) => {
   const navigate = useNavigate();
   const { collectionId, requestId } = useParams();
-  const { isReadRole } = useCurrentWorkspaceUserRole();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_request", "create");
 
   const location = useLocation();
   const { openTab, tabs } = useTabsLayoutContext();
@@ -111,7 +112,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   }, [setSelectedRecords, setShowSelection]);
 
   const multiSelectOptions = {
-    showMultiSelect: !isReadRole,
+    showMultiSelect: isValidPermission,
     toggleMultiSelect: toggleSelection,
   };
 
@@ -275,7 +276,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               {updatedRecords.collections.map((record) => {
                 return (
                   <CollectionRow
-                    isReadRole={isReadRole}
+                    isReadOnly={!isValidPermission}
                     openTab={openTab}
                     key={record.id}
                     record={record}
@@ -301,7 +302,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     key={record.id}
                     record={record}
                     openTab={openTab}
-                    isReadRole={isReadRole}
+                    isReadOnly={!isValidPermission}
                     bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />
                 );

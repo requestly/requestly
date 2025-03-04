@@ -25,7 +25,7 @@ interface Props {
   openTab: TabsLayoutContextInterface["openTab"];
   setExpandedRecordIds: (keys: RQAPI.Record["id"][]) => void;
   expandedRecordIds: string[];
-  isReadRole: boolean;
+  isReadOnly: boolean;
   bulkActionOptions: {
     showSelection: boolean;
     selectedRecords: Set<RQAPI.Record["id"]>;
@@ -42,7 +42,7 @@ export const CollectionRow: React.FC<Props> = ({
   expandedRecordIds,
   setExpandedRecordIds,
   bulkActionOptions,
-  isReadRole,
+  isReadOnly,
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
@@ -172,7 +172,7 @@ export const CollectionRow: React.FC<Props> = ({
                   {record.name}
                 </div>
 
-                {isReadRole ? null : (
+                {isReadOnly ? null : (
                   <div className={`collection-options ${hoveredId === record.id ? "visible" : " "}`}>
                     <Tooltip title={"Add Request"}>
                       <RQButton
@@ -240,7 +240,7 @@ export const CollectionRow: React.FC<Props> = ({
                       key={apiRecord.id}
                       record={apiRecord}
                       openTab={openTab}
-                      isReadRole={isReadRole}
+                      isReadOnly={isReadOnly}
                       bulkActionOptions={bulkActionOptions}
                     />
                   );
@@ -250,7 +250,7 @@ export const CollectionRow: React.FC<Props> = ({
                       key={apiRecord.id}
                       openTab={openTab}
                       record={apiRecord}
-                      isReadRole={isReadRole}
+                      isReadOnly={isReadOnly}
                       onNewClick={onNewClick}
                       onExportClick={onExportClick}
                       expandedRecordIds={expandedRecordIds}
