@@ -228,7 +228,9 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
               collectionVariablesRef.current[collectionId]?.variables ?? {},
               collectionDetails[collectionId].variables ?? {}
             );
-            dispatch(variablesActions.setCollectionVariables({ collectionId, variables: mergedCollectionVariables }));
+            dispatch(
+              variablesActions.updateCollectionVariables({ collectionId, variables: mergedCollectionVariables })
+            );
           });
         },
       });
@@ -458,29 +460,15 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
         ...collection,
         data: { ...collection?.data, variables: updatedVariables },
       };
-      return syncRepository.apiClientRecordsRepository.createRecord(record).then((result) => {
-        onSaveRecord(result.data);
-        dispatch(variablesActions.setCollectionVariables({ collectionId, variables }));
-      });
-    },
-    [onSaveRecord, dispatch, syncRepository.apiClientRecordsRepository, apiClientRecords]
-  );
-
-  const removeCollectionVariable = useCallback(
-    async (key: string, collectionId: string) => {
-      const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
-
-      if (!collection) {
-        throw new Error("Collection not found");
-      }
-
-      const updatedVariables = { ...collection?.data?.variables };
-      delete updatedVariables[key];
-      const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
-      return syncRepository.apiClientRecordsRepository.createRecord(record).then((result) => {
-        onSaveRecord(result.data);
-        dispatch(variablesActions.setCollectionVariables({ collectionId, variables: updatedVariables }));
-      });
+      return syncRepository.apiClientRecordsRepository
+        .setCollectionVariables(record.id, record.data.variables)
+        .then((result) => {
+          onSaveRecord(result.data as RQAPI.Record);
+          dispatch(variablesActions.updateCollectionVariables({ collectionId, variables }));
+        })
+        .catch(() => {
+          toast.error("error while updating collection variables");
+        });
     },
     [onSaveRecord, dispatch, syncRepository.apiClientRecordsRepository, apiClientRecords]
   );
@@ -502,7 +490,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     isEnvironmentsLoading: isLoading,
     getGlobalVariables,
     setCollectionVariables,
-    removeCollectionVariable,
     getCollectionVariables: getCurrentCollectionVariables,
     environmentSyncRepository: syncRepository.environmentVariablesRepository,
   };

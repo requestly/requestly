@@ -6,7 +6,7 @@ import {
   FileSystemResult,
 } from "features/apiClient/helpers/modules/sync/local/services/types";
 import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackgroundService";
-import { EnvironmentData } from "backend/environment/types";
+import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
 
 const LOCAL_SYNC_BUILDER_NAMESPACE = "local_sync_builder";
 
@@ -80,6 +80,10 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 
   async deleteCollections(ids: string[]) {
     return this.invokeProcedureInBG("deleteCollections", ids) as Promise<FileSystemResult<EnvironmentEntity>>;
+  }
+
+  async setCollectionVariables(id: string, variables: EnvironmentVariables) {
+    return this.invokeProcedureInBG("setCollectionVariables", id, variables) as Promise<FileSystemResult<Collection>>;
   }
 }
 
