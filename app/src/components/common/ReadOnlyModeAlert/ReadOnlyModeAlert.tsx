@@ -3,17 +3,15 @@ import { FiAlertOctagon } from "@react-icons/all-files/fi/FiAlertOctagon";
 import "./readOnlyModeAlert.scss";
 
 interface Props {
-  hide?: boolean;
   description: string;
 }
 
 export const ReadOnlyModeAlert: React.FC<Props> = ({
-  hide = false,
   description = "As a viewer, you cannot update or modify anything.",
 }) => {
   // TODO: get admin email
 
-  return hide ? null : (
+  return (
     <div className="read-only-mode-alert">
       <div className="icon">
         <FiAlertOctagon />

@@ -21,7 +21,7 @@ import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { trackMocksListFilterChanged } from "modules/analytics/events/features/mocksV2";
-import { useCurrentWorkspaceUserRole } from "hooks";
+import { useRBAC } from "features/rbac";
 
 interface Props {
   source?: MockListSource;
@@ -48,7 +48,8 @@ export const MocksListContentHeader: React.FC<Props> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const { pathname } = useLocation();
-  const { isReadRole } = useCurrentWorkspaceUserRole();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("mock_api", "create");
   const { createNewCollectionAction, uploadMockAction, createNewMockAction, importMocksAction } =
     useMocksActionContext() ?? {};
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
@@ -208,5 +209,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
       }
     : {};
 
-  return <ContentListHeader {...contentListHeaderSearchProps} actions={isReadRole ? null : contentHeaderActions} />;
+  return (
+    <ContentListHeader {...contentListHeaderSearchProps} actions={isValidPermission ? contentHeaderActions : null} />
+  );
 };
