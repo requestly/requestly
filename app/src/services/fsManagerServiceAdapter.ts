@@ -7,6 +7,7 @@ import {
 } from "features/apiClient/helpers/modules/sync/local/services/types";
 import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackgroundService";
 import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
+import { RQAPI } from "features/apiClient/types";
 
 const LOCAL_SYNC_BUILDER_NAMESPACE = "local_sync_builder";
 
@@ -90,6 +91,9 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
     return this.invokeProcedureInBG("updateCollectionDescription", id, newDescription) as Promise<
       FileSystemResult<string>
     >;
+  }
+  async updateCollectionAuthData(id: string, newAuth: RQAPI.Auth) {
+    return this.invokeProcedureInBG("updateCollectionAuthData", id, newAuth) as Promise<FileSystemResult<RQAPI.Auth>>;
   }
 }
 

@@ -50,7 +50,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           type: RQAPI.RecordType.COLLECTION,
           data: {
             variables: parseEntityVariables(e.variables || {}),
-            auth: {
+            auth: e.auth || {
               currentAuthType: Authorization.Type.NO_AUTH,
               authConfigStore: {},
             },
@@ -367,6 +367,32 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     const updatedCollection: RQAPI.CollectionRecord = {
       ...collection,
       description: result.content,
+    };
+    return {
+      success: true,
+      data: updatedCollection,
+    };
+  }
+
+  async updateCollectionAuthData(
+    collection: RQAPI.CollectionRecord
+  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+    const service = await this.getAdapter();
+    const result = await service.updateCollectionAuthData(collection.id, collection.data.auth);
+
+    if (result.type === "error") {
+      return {
+        success: false,
+        data: undefined,
+        message: result.error.message,
+      };
+    }
+    const updatedCollection: RQAPI.CollectionRecord = {
+      ...collection,
+      data: {
+        ...collection.data,
+        auth: result.content,
+      },
     };
     return {
       success: true,
