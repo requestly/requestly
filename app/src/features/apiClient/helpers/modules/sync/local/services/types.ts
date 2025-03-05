@@ -17,6 +17,7 @@ export type Collection = {
   name: string;
   variables?: Record<string, any>;
   description?: string;
+  auth?: RQAPI.Auth;
 };
 
 export type API = {

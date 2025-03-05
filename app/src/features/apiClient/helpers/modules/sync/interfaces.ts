@@ -36,6 +36,9 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   updateCollectionDescription(
     collection: RQAPI.CollectionRecord
   ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }>;
+  updateCollectionAuthData(
+    collection: RQAPI.CollectionRecord
+  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }>;
 
   getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void>;
 

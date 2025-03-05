@@ -91,4 +91,10 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
     return this.updateRecord(collection, collection.id);
   }
+
+  async updateCollectionAuthData(
+    collection: RQAPI.CollectionRecord
+  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+    return this.updateRecord(collection, collection.id);
+  }
 }
