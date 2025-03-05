@@ -20,7 +20,7 @@ import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/featu
 import PATHS from "config/constants/sub/paths";
 import "./index.css";
 import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/teams";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 const MIN_MEMBERS_IN_WORKSPACE = 3;
 

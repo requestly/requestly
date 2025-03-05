@@ -17,7 +17,7 @@ import "./index.scss";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { Invite } from "types";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface WorkspaceOnboardingViewProps {
   isOpen: boolean;

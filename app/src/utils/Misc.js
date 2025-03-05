@@ -8,8 +8,8 @@ import { trackDesktopAppInstalled } from "modules/analytics/events/misc/installa
 import { getValueAsPromise } from "actions/FirebaseActions";
 import { isEmailVerified } from "./AuthUtils";
 import moment from "moment";
-import { emailType } from "@requestly/shared/types/common";
-import { getEmailType } from "utils/MailcheckUtils";
+import { EmailType } from "@requestly/shared/types/common";
+import { getEmailType } from "./mailCheckerUtils";
 
 const { APP_MODES } = GLOBAL_CONSTANTS;
 
@@ -179,7 +179,7 @@ export const isVerifiedBusinessDomainUser = async (email, uid) => {
 
   const result = await isEmailVerified(uid);
   const email_type = await getEmailType(email);
-  const isCompanyEmail = email_type === emailType.BUSINESS;
+  const isCompanyEmail = email_type === EmailType.BUSINESS;
 
   return result && isCompanyEmail;
 };

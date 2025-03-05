@@ -24,7 +24,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { PlanStatus, PlanType } from "features/settings/components/BillingTeam/types";
 import { PRICING } from "features/pricing/constants/pricing";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 enum BANNER_TYPE {
   WARNING = "warning",

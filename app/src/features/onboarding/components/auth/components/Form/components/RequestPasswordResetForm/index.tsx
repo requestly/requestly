@@ -7,7 +7,7 @@ import { isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import { handleForgotPasswordButtonOnClick } from "../../actions";
 import "./index.scss";
-import { isDisposableEmail } from "utils/MailcheckUtils";
+import { isDisposableEmail } from "utils/mailCheckerUtils";
 
 interface Props {
   email: string;

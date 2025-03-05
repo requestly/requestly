@@ -1,3 +1,4 @@
+import { EmailType } from "@requestly/shared/types/common";
 export interface UserAuth {
   loggedIn: boolean;
   isLimitReached?: boolean;
@@ -32,6 +33,6 @@ export interface UserAuth {
       };
     };
     organization?: any;
-    emailType?: string;
+    emailType?: EmailType;
   };
 }

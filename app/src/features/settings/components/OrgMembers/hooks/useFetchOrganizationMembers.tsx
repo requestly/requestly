@@ -6,7 +6,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { OrgMember } from "../types";
 import Logger from "../../../../../../../common/logger";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 export const useFetchOrgMembers = () => {
   const user = useSelector(getUserAuthDetails);

@@ -14,7 +14,7 @@ import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackAppSettingsSidebarClicked } from "features/settings/analytics";
 import "./index.scss";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 const { PATHS } = APP_CONSTANTS;
 

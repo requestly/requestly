@@ -35,7 +35,7 @@ import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/misc/onbo
 import { trackNewTeamCreateSuccess, trackWorkspaceOnboardingViewed } from "modules/analytics/events/features/teams";
 import { capitalize } from "lodash";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface OnboardingProps {
   isOpen: boolean;

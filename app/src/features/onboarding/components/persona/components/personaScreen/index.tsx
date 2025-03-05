@@ -30,7 +30,7 @@ import { IndustryInput } from "../IndustryInput";
 import "./index.scss";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface Props {
   isOpen: boolean;

@@ -9,7 +9,7 @@ import { billingActions } from "store/features/billing/slice";
 import { getBillingTeamMembersProfile } from "..";
 import Logger from "lib/logger";
 import { getDomainFromEmail } from "utils/FormattingHelper";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 let unsubscribeBillingTeamsListener: () => void = null;
 

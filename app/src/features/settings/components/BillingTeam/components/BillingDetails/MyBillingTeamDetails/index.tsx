@@ -11,7 +11,7 @@ import { BillingTeamRoles } from "../../../types";
 import { trackBillingTeamViewed } from "features/settings/analytics";
 import { BillingInformation } from "./components/BillingInformation";
 import { AppMembersDrawer } from "./components/AddMembersDrawer/AddMembersDrawer";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 export const MyBillingTeamDetails: React.FC = () => {
   const { billingId } = useParams();

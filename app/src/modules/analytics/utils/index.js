@@ -1,6 +1,6 @@
 import { getDomainFromEmail } from "utils/FormattingHelper";
-import { emailType } from "@requestly/shared/types/common";
-import { getEmailType } from "utils/MailcheckUtils";
+import { EmailType } from "@requestly/shared/types/common";
+import { getEmailType } from "utils/mailCheckerUtils";
 
 export async function buildBasicUserProperties(user) {
   if (user && user.uid && user.providerData && user.providerData.length > 0) {
@@ -10,7 +10,7 @@ export async function buildBasicUserProperties(user) {
     let company = null;
     const email_type = await getEmailType(user.email);
 
-    if (email && email_type === emailType.BUSINESS) {
+    if (email && email_type === EmailType.BUSINESS) {
       isBusinessAccount = true;
       company = getDomainFromEmail(email);
     }

@@ -29,8 +29,7 @@ import { v4 as uuidv4 } from "uuid";
 import { setEmailVerified, setSignupDate } from "../utils/AuthUtils";
 import { getDesktopSignInAuthPath } from "../utils/PathUtils";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
-//import { getEmailType } from "utils/FormattingHelper";
-import { getEmailType } from "utils/MailcheckUtils";
+import { getEmailType } from "utils/mailCheckerUtils";
 import {
   trackSignUpAttemptedEvent,
   trackSignUpFailedEvent,

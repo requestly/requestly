@@ -20,8 +20,8 @@ import { getUser } from "backend/user/getUser";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { StorageService } from "init";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-import { getEmailType } from "utils/MailcheckUtils";
-import { emailType as email_type } from "@requestly/shared/types/common";
+import { getEmailType } from "utils/mailCheckerUtils";
+import { EmailType } from "@requestly/shared/types/common";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -56,10 +56,8 @@ const AuthHandler: React.FC<{}> = () => {
 
       /* To ensure that this attribute is assigned to only the users signing up for the first time */
       if (user?.metadata?.creationTime === user?.metadata?.lastSignInTime) {
-        const CompanyEmail = await getEmailType(user.email);
-
         if (
-          CompanyEmail === email_type.BUSINESS &&
+          emailType === EmailType.BUSINESS &&
           user.emailVerified &&
           !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]
         ) {
@@ -114,10 +112,11 @@ const AuthHandler: React.FC<{}> = () => {
 
       try {
         // FIXME: getOrUpdateUserSyncState, checkUserBackupState taking too long for large workspace, can this be improved or moved to non-blocking operations?
-        const [firestorePlanDetails, isSyncEnabled, isBackupEnabled] = await Promise.all([
+        const [firestorePlanDetails, isSyncEnabled, isBackupEnabled, mailType] = await Promise.all([
           getUserSubscription(user.uid),
           getOrUpdateUserSyncState(user.uid, appMode),
           checkUserBackupState(user.uid),
+          getEmailType(user.email),
         ]);
 
         // phase-1 migration: Adaptor to convert firestore schema into old schema
@@ -126,8 +125,6 @@ const AuthHandler: React.FC<{}> = () => {
 
         window.isSyncEnabled = isSyncEnabled;
         window.keySetDoneisSyncEnabled = true;
-
-        const mailType = await getEmailType(user.email);
 
         dispatch(
           // @ts-ignore

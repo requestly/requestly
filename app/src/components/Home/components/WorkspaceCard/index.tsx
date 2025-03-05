@@ -9,7 +9,7 @@ import { getPendingInvites } from "backend/workspace";
 import Logger from "lib/logger";
 import { Invite } from "types";
 import { m, AnimatePresence } from "framer-motion";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 export const TeamsCard: React.FC = () => {
   const user = useSelector(getUserAuthDetails);

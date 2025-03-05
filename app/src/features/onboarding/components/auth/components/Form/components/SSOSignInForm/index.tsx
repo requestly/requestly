@@ -7,14 +7,14 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { getDomainFromEmail, isEmailValid } from "utils/FormattingHelper";
-import { getEmailType } from "utils/MailcheckUtils";
+import { getEmailType } from "utils/mailCheckerUtils";
 import { toast } from "utils/Toast";
 import { trackLoginAttemptedEvent, trackLoginFailedEvent } from "modules/analytics/events/common/auth/login";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
 import "./index.scss";
 import { getSSOProviderId } from "backend/auth/sso";
 import { loginWithSSO } from "actions/FirebaseActions";
-import { isDisposableEmail } from "utils/MailcheckUtils";
+import { isDisposableEmail } from "utils/mailCheckerUtils";
 
 interface Props {
   email: string;

@@ -14,7 +14,7 @@ import {
 } from "modules/analytics/events/features/teams";
 import { trackWorkspaceInviteLinkCopied } from "modules/analytics/events/common/teams";
 import { getDomainFromEmail } from "utils/FormattingHelper";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface Props {
   teamId: string;

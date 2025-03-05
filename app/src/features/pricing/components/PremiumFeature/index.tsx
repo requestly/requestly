@@ -17,7 +17,7 @@ import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import LINKS from "config/constants/sub/links";
 import "./index.scss";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface PremiumFeatureProps {
   onContinue?: () => void;

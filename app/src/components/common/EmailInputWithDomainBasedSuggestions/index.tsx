@@ -6,7 +6,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getDomainFromEmail, isEmailValid } from "utils/FormattingHelper";
 import CreatableSelect from "react-select/creatable";
 import { MultiValue } from "react-select";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface Props {
   autoFocus?: boolean;

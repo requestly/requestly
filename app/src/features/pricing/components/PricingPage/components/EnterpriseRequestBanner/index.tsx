@@ -13,7 +13,7 @@ import { trackTeamPlanCardClicked, trackTeamPlanCardShown } from "modules/analyt
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { redirectToBillingTeam } from "utils/RedirectionUtils";
 import "./index.css";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 export default function EnterpriseRequestBanner(): JSX.Element | null {
   const user = useSelector(getUserAuthDetails);

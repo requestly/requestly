@@ -16,7 +16,7 @@ import { globalActions } from "store/slices/global/slice";
 import Logger from "lib/logger";
 import { capitalize } from "lodash";
 import "./appNotificationBanner.scss";
-import { isCompanyEmail } from "utils/MailcheckUtils";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 const UsersModal: React.FC<{
   users: any[];
