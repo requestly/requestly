@@ -63,6 +63,7 @@ const CreateWorkspace = () => {
         trackNewTeamCreateSuccess(teamId, newTeamName);
       })
       .catch((err) => {
+        console.log("DBG-1: Workspace creation action error", err);
         toast.error("Unable to Create Team");
         trackNewTeamCreateFailure(newTeamName);
         setIsSubmitProcess(false);
