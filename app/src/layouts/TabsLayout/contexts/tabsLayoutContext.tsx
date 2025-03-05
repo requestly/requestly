@@ -32,7 +32,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
   const dispatch = useDispatch();
   const [addTabBtnCallback, setAddTabBtnCallback] = useState(() => () => {});
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
-  const validationResult = validatePermission("tabs_layout", "create");
+  const { isValidPermission } = validatePermission("tabs_layout", "create");
 
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
@@ -183,16 +183,15 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
   const onTabsEdit: TabsProps["onEdit"] = useCallback(
     (event, action) => {
       if (action === "add") {
-        if (!validationResult.isValidPermission && ["apiClient"].includes(id)) {
-          const errorMessage = getRBACValidationFailureErrorMessage(RBAC.Permission.create)("request");
-          toast.warn(errorMessage, 5);
+        if (!isValidPermission && ["apiClient"].includes(id)) {
+          toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, "request"), 5);
           return;
         }
 
         addTabBtnCallback?.();
       }
     },
-    [addTabBtnCallback, validationResult, id, getRBACValidationFailureErrorMessage]
+    [addTabBtnCallback, isValidPermission, id, getRBACValidationFailureErrorMessage]
   );
 
   const updateAddTabBtnCallback = useCallback((cb: () => void) => {

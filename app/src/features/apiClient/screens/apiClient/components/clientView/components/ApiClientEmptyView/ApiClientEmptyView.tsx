@@ -11,7 +11,7 @@ import { useState } from "react";
 import { toast } from "utils/Toast";
 import "./apiClientEmptyView.scss";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
-import { useRBAC } from "features/rbac";
+import { RBAC, useRBAC } from "features/rbac";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
@@ -22,7 +22,7 @@ export const ApiClientEmptyView = () => {
   const team = useSelector(getCurrentlyActiveWorkspace);
 
   const [isRecordCreating, setIsRecordCreating] = useState(null);
-  const { validatePermission } = useRBAC();
+  const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
 
   const isEmpty = apiClientRecords.length === 0;
@@ -33,10 +33,7 @@ export const ApiClientEmptyView = () => {
       : trackNewCollectionClicked("api_client_home");
 
     if (!isValidPermission) {
-      toast.warn(
-        `As a viewer, you cannot create new ${recordType}. Contact your workspace admin to request an update to your role.`,
-        5
-      );
+      toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, recordType), 5);
       return;
     }
 

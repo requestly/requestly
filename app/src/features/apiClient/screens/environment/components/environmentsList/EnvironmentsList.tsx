@@ -21,7 +21,7 @@ import { isGlobalEnvironment } from "../../utils";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { EnvironmentData } from "backend/environment/types";
 import { toast } from "utils/Toast";
-import { useRBAC } from "features/rbac";
+import { RBAC, useRBAC } from "features/rbac";
 
 export const EnvironmentsList = () => {
   const dispatch = useDispatch();
@@ -37,7 +37,7 @@ export const EnvironmentsList = () => {
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const { setIsRecordBeingCreated, isRecordBeingCreated } = useApiClientContext();
-  const { validatePermission } = useRBAC();
+  const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_environment", "update");
 
   const { openTab, replaceTab } = useTabsLayoutContext();
@@ -99,10 +99,7 @@ export const EnvironmentsList = () => {
 
   const handleAddEnvironmentClick = useCallback(() => {
     if (!isValidPermission) {
-      toast.warn(
-        `As a viewer, you cannot create new environment. Contact your workspace admin to request an update to your role.`,
-        5
-      );
+      toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, "environment"), 5);
       return;
     }
 
@@ -122,7 +119,7 @@ export const EnvironmentsList = () => {
     }
     trackCreateEnvironmentClicked(EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
     return createNewEnvironment();
-  }, [user.loggedIn, dispatch, createNewEnvironment, isValidPermission]);
+  }, [user.loggedIn, dispatch, createNewEnvironment, isValidPermission, getRBACValidationFailureErrorMessage]);
 
   const handleExportEnvironments = useCallback(
     (environment: { id: string; name: string }) => {
