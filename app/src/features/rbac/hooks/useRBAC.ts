@@ -18,31 +18,22 @@ export const useRBAC = () => {
         RBAC.Permission[permissionToCheck]
       );
 
-      if (result.isValidPermission === false) {
-        return {
-          isValidPermission: false,
-        };
-      } else {
-        return {
-          isValidPermission: true,
-        };
-      }
+      return {
+        isValidPermission: result.isValidPermission,
+      };
     },
-
     [userRole]
   );
 
   const getRBACValidationFailureErrorMessage = useCallback(
-    (permission: RBAC.Permission): ((entityName?: string) => string) => {
+    (permission: RBAC.Permission, entityName: string): string => {
       const roleToDisplayTextMapping = {
         [RBAC.Role.admin]: "admin",
         [RBAC.Role.write]: "write",
         [RBAC.Role.read]: "viewer",
       };
 
-      return (entityName: string) => {
-        return `As a ${roleToDisplayTextMapping[userRole]}, you cannot ${permission} ${entityName}. Contact your workspace admin to update your role.`;
-      };
+      return `As a ${roleToDisplayTextMapping[userRole]}, you cannot ${permission} ${entityName}. Contact your workspace admin to update your role.`;
     },
     [userRole]
   );
