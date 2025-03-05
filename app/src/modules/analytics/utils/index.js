@@ -1,3 +1,4 @@
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 
 export function buildBasicUserProperties(user) {
@@ -17,7 +18,9 @@ export function buildBasicUserProperties(user) {
       uid: user.uid,
       isBusinessAccount,
       company,
-      workspaceId: window.currentlyActiveWorkspaceTeamId ? window.currentlyActiveWorkspaceTeamId : null,
+      workspaceId: getActiveWorkspaceId(window.activeWorkspaceIds)
+        ? getActiveWorkspaceId(window.activeWorkspaceIds)
+        : null,
     };
   }
 }

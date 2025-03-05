@@ -1,6 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
 import Logger from "lib/logger";
@@ -15,6 +14,8 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { clearExpandedRecordIdsFromSession, createBlankApiRecord, isApiCollection } from "../screens/apiClient/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
@@ -116,8 +117,7 @@ const trackUserProperties = (records: RQAPI.Record[]) => {
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -348,18 +348,22 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(uid, teamId, recordType, collectionId, apiClientRecordsRepository).then(
-            (result) => {
-              setIsRecordBeingCreated(null);
-              onSaveRecord(result.data);
-            }
-          );
+          return createBlankApiRecord(
+            uid,
+            activeWorkspaceId,
+            recordType,
+            collectionId,
+            apiClientRecordsRepository
+          ).then((result) => {
+            setIsRecordBeingCreated(null);
+            onSaveRecord(result.data);
+          });
         }
 
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(uid, teamId, recordType, collectionId, apiClientRecordsRepository)
+          return createBlankApiRecord(uid, activeWorkspaceId, recordType, collectionId, apiClientRecordsRepository)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
@@ -395,7 +399,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [openTab, openDraftRequest, addNewEnvironment, teamId, uid, onSaveRecord, apiClientRecordsRepository]
+    [openTab, openDraftRequest, addNewEnvironment, activeWorkspaceId, uid, onSaveRecord, apiClientRecordsRepository]
   );
 
   const forceRefreshApiClientRecords = useCallback(async () => {

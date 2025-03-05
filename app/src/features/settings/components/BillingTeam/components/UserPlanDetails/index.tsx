@@ -16,7 +16,6 @@ import Logger from "lib/logger";
 import APP_CONSTANTS from "config/constants";
 import firebaseApp from "../../../../../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import SubscriptionInfo from "features/settings/components/Profile/ActiveLicenseInfo/SubscriptionInfo";
 import { redirectToPersonalSubscription } from "utils/RedirectionUtils";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
@@ -24,6 +23,8 @@ import "./index.scss";
 import { trackPersonalSubscriptionDownloadInvoicesClicked } from "features/settings/analytics";
 import { PlanStatus, PlanType } from "../../types";
 import { CancelPlanModal } from "../BillingDetails/modals/common/CancelPlanModal";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { isSafariBrowser } from "actions/ExtensionActions";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
 
@@ -32,7 +33,7 @@ export const UserPlanDetails = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const teamId = useSelector(getCurrentlyActiveWorkspace)?.id;
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const [daysLeft, setDaysLeft] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [hasAppSumoSubscription, setHasAppSumoSubscription] = useState(false);
@@ -52,9 +53,9 @@ export const UserPlanDetails = () => {
   }, []);
 
   useEffect(() => {
-    if (teamId) {
+    if (activeWorkspaceId) {
       const db = getFirestore(firebaseApp);
-      const teamsRef = doc(db, "teams", teamId);
+      const teamsRef = doc(db, "teams", activeWorkspaceId);
       getDoc(teamsRef)
         .then((docSnap) => {
           if (docSnap.exists()) {
@@ -76,7 +77,7 @@ export const UserPlanDetails = () => {
         })
         .finally(() => setIsLoading(false));
     }
-  }, [getSubscriptionEndDateForAppsumo, teamId]);
+  }, [getSubscriptionEndDateForAppsumo, activeWorkspaceId]);
 
   let trialDuration = 0;
   try {

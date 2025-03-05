@@ -5,7 +5,6 @@ import { Input, Tabs } from "antd";
 import { upsertApiRecord } from "backend/apiClient";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { useDebounce } from "hooks/useDebounce";
 import ReactMarkdown from "react-markdown";
@@ -13,6 +12,8 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import { useOutsideClick } from "hooks";
 import "./collectionOverview.scss";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 
@@ -24,7 +25,7 @@ const COLLECTION_DETAILS_PLACEHOLDER = "Collection description";
 
 export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collection }) => {
   const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
   const { closeTab } = useTabsLayoutContext();
 
@@ -42,11 +43,11 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
         ...collection,
         description: newDescription,
       };
-      return upsertApiRecord(user.details?.profile?.uid, updatedCollection, team?.id).then((result) => {
+      return upsertApiRecord(user.details?.profile?.uid, updatedCollection, activeWorkspaceId).then((result) => {
         onSaveRecord(result.data);
       });
     },
-    [collection, onSaveRecord, user.details?.profile?.uid, team?.id]
+    [collection, onSaveRecord, user.details?.profile?.uid, activeWorkspaceId]
   );
 
   const debouncedDescriptionChange = useDebounce(handleDescriptionChange, 1500);
