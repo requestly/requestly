@@ -23,7 +23,7 @@ export const getDomainFromEmail = (email: string) => {
   return email.split("@")[1];
 };
 
-export const isCompanyEmail = async (emailType: EmailType) => {
+export const isCompanyEmail = (emailType: EmailType) => {
   return emailType === EmailType.BUSINESS;
 };
 
