@@ -1,2 +1,2 @@
 export * as network from "./network";
-export * from "./emailType";
+export * from "./email";

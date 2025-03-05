@@ -1,5 +1,6 @@
 import { EmailType } from "@requestly/shared/types/common";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import Logger from "lib/logger";
 
 interface EmailTypeResponse {
   userEmail: string;
@@ -12,7 +13,8 @@ export const fetchEmailType = async (email: string): Promise<EmailType> => {
     const result = await checkEmailType({ userEmail: email });
     return result.data.type;
   } catch (error) {
-    console.error("Error while fetching the emailType", error);
+    Logger.error("Error while fetching the emailType", error);
+    return null;
   }
 };
 
@@ -29,7 +31,7 @@ export const getEmailType = async (email: string) => {
   try {
     const domain = getDomainFromEmail(email);
     if (!domain) {
-      return "UNDEFINED";
+      return null;
     }
     const mailType = await fetchEmailType(email);
     if (mailType === EmailType.PERSONAL) {
@@ -38,17 +40,9 @@ export const getEmailType = async (email: string) => {
       return EmailType.DESTROYABLE;
     } else if (mailType === EmailType.BUSINESS) {
       return EmailType.BUSINESS;
-    } else return "UNDEFINED";
+    } else return null;
   } catch (error) {
-    console.error("Error in getEmailType", error);
-  }
-};
-
-export const isDisposableEmail = async (email: string) => {
-  try {
-    const mailType = await fetchEmailType(email);
-    return mailType === EmailType.DESTROYABLE;
-  } catch (error) {
-    console.error("Error checking disposable email", error);
+    Logger.error("Error in getEmailType", error);
+    return null;
   }
 };

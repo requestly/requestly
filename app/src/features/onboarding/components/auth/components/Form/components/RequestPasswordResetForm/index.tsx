@@ -7,7 +7,8 @@ import { isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import { handleForgotPasswordButtonOnClick } from "../../actions";
 import "./index.scss";
-import { isDisposableEmail } from "utils/mailCheckerUtils";
+import { getEmailType } from "utils/mailCheckerUtils";
+import { EmailType } from "@requestly/shared/types/common";
 
 interface Props {
   email: string;
@@ -30,8 +31,8 @@ export const RequestPasswordResetForm: React.FC<Props> = ({ setAuthMode, email, 
         return;
       }
 
-      const isDisposable = await isDisposableEmail(email);
-      if (isDisposable) {
+      const isDisposable = await getEmailType(email);
+      if (isDisposable === EmailType.DESTROYABLE) {
         toast.error("Please enter a valid email address. Temporary or disposable email addresses are not allowed.");
         return;
       }
