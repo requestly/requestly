@@ -84,7 +84,7 @@ const updateEnvironmentName = (
   state.environments[action.payload.ownerId][action.payload.environmentId].name = action.payload.newName;
 };
 
-const setCollectionVariables = (
+const updateCollectionVariables = (
   state: InitialState,
   action: PayloadAction<{ collectionId: string; variables: EnvironmentVariables }>
 ) => {
@@ -92,6 +92,13 @@ const setCollectionVariables = (
     ...state.api_collections,
     [action.payload.collectionId]: { variables: action.payload.variables },
   };
+};
+
+const setCollectionVariables = (
+  state: InitialState,
+  action: PayloadAction<Record<string, { variables: EnvironmentVariables }>>
+) => {
+  state.api_collections = action.payload;
 };
 
 const environmentVariablesReducerFunctions = {
@@ -103,6 +110,7 @@ const environmentVariablesReducerFunctions = {
   updateEnvironmentData,
   removeEnvironment,
   updateEnvironmentName,
+  updateCollectionVariables,
   setCollectionVariables,
 };
 

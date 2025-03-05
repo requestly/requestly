@@ -67,7 +67,6 @@ export const CollectionView = () => {
       {
         label: <LocalWorkspaceTooltip featureName="Collection variables">Variables</LocalWorkspaceTooltip>,
         key: TAB_KEYS.VARIABLES,
-        disabled: isLocalSyncEnabled,
         children: <CollectionsVariablesView collection={collection} />,
       },
       {

@@ -2,8 +2,9 @@ import { ApiClientLocalMeta, ApiClientRecordsInterface } from "../../interfaces"
 import { RQAPI } from "features/apiClient/types";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
 import { API, APIEntity, FileSystemResult } from "./types";
-import { parseFsId, parseNativeId } from "../../utils";
+import { parseEntityVariables, parseFsId, parseNativeId } from "../../utils";
 import { v4 as uuidv4 } from "uuid";
+import { EnvironmentVariables } from "backend/environment/types";
 import { Authorization } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 
 export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientLocalMeta> {
@@ -48,11 +49,11 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
           type: RQAPI.RecordType.COLLECTION,
           data: {
-            variables: {},
-						auth: {
-							currentAuthType: Authorization.Type.NO_AUTH,
-							authConfigStore: {},
-						},
+            variables: parseEntityVariables(e.variables || {}),
+            auth: {
+              currentAuthType: Authorization.Type.NO_AUTH,
+              authConfigStore: {},
+            },
           },
         };
         return collection;
@@ -82,9 +83,9 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
             },
             scripts: e.request.scripts,
             auth: {
-							currentAuthType: Authorization.Type.NO_AUTH,
-							authConfigStore: {},
-						},
+              currentAuthType: Authorization.Type.NO_AUTH,
+              authConfigStore: {},
+            },
           },
         };
 
@@ -328,6 +329,25 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return {
       success: true,
       data: undefined,
+    };
+  }
+
+  async setCollectionVariables(
+    id: string,
+    variables: EnvironmentVariables
+  ): Promise<{ success: boolean; data: unknown; message?: string }> {
+    const service = await this.getAdapter();
+    const result = await service.setCollectionVariables(id, variables);
+    if (result.type === "error") {
+      return {
+        success: false,
+        data: undefined,
+        message: result.error.message,
+      };
+    }
+    return {
+      success: true,
+      data: result.content,
     };
   }
 }
