@@ -32,6 +32,7 @@ import { useFeatureValue } from "@growthbook/growthbook-react";
 import { ExportMocksModalWrapper } from "features/mocks/modals";
 import { globalActions } from "store/slices/global/slice";
 import { ReadOnlyModeAlert } from "components/common/ReadOnlyModeAlert/ReadOnlyModeAlert";
+import { Conditional } from "components/common/Conditional";
 
 interface Props {
   isNew?: boolean;
@@ -499,9 +500,9 @@ const MockEditor: React.FC<Props> = ({
         </div>
       ) : (
         <div className="overflow-hidden mock-editor-layout-container">
-          {isEditorReadOnly ? (
+          <Conditional condition={isEditorReadOnly}>
             <ReadOnlyModeAlert description="As a viewer, you can test mocks but cannot modify them." />
-          ) : null}
+          </Conditional>
 
           <MockEditorHeader
             isNewMock={isNew}

@@ -9,6 +9,7 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { useLocation } from "react-router-dom";
 import PasswordPopup from "./PasswordPopup/PasswordPopup";
+import { Conditional } from "components/common/Conditional";
 
 interface HeaderProps {
   isNewMock: boolean;
@@ -91,7 +92,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
           {!location.pathname.includes("rules") && <RQBreadcrumb />}
         </Col>
         <Col className="header-right-section">
-          {isEditorReadOnly ? null : (
+          <Conditional condition={!isEditorReadOnly}>
             <div className="mock-edtior-options-container">
               <Dropdown
                 destroyPopupOnHide
@@ -116,7 +117,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
                 </span>
               </Dropdown>
             </div>
-          )}
+          </Conditional>
 
           {!isNewMock && isFeatureCompatible(FEATURES.API_CLIENT) && (
             <RQButton
@@ -137,11 +138,11 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
             Cancel
           </RQButton>
 
-          {isEditorReadOnly ? null : (
+          <Conditional condition={!isEditorReadOnly}>
             <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={handleSave}>
               {isNewMock ? (savingInProgress ? "Creating" : "Create") : savingInProgress ? "Saving" : "Save"}
             </RQButton>
-          )}
+          </Conditional>
         </Col>
       </Row>
     </Layout.Header>
