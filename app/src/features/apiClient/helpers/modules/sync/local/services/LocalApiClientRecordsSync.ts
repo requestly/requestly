@@ -39,7 +39,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           id: parseFsId(e.id),
           collectionId: e.collectionId,
           name: e.name,
-
+          description: e.description || "",
           ownerId: this.meta.rootPath,
           deleted: false,
           createdBy: "local",
@@ -348,6 +348,29 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return {
       success: true,
       data: result.content,
+    };
+  }
+
+  async updateCollectionDescription(
+    collection: RQAPI.CollectionRecord
+  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+    const service = await this.getAdapter();
+    const result = await service.updateCollectionDescription(collection.id, collection.description);
+
+    if (result.type === "error") {
+      return {
+        success: false,
+        data: undefined,
+        message: result.error.message,
+      };
+    }
+    const updatedCollection: RQAPI.CollectionRecord = {
+      ...collection,
+      description: result.content,
+    };
+    return {
+      success: true,
+      data: updatedCollection,
     };
   }
 }

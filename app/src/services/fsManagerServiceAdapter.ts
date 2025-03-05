@@ -85,6 +85,12 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   async setCollectionVariables(id: string, variables: EnvironmentVariables) {
     return this.invokeProcedureInBG("setCollectionVariables", id, variables) as Promise<FileSystemResult<Collection>>;
   }
+
+  async updateCollectionDescription(id: string, newDescription: string) {
+    return this.invokeProcedureInBG("updateCollectionDescription", id, newDescription) as Promise<
+      FileSystemResult<string>
+    >;
+  }
 }
 
 class FsManagerServiceAdapterProvider {
