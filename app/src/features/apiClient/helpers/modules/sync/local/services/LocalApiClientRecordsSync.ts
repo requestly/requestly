@@ -82,7 +82,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
               contentType: e.request?.contentType,
             },
             scripts: e.request.scripts,
-            auth: {
+            auth: e.request.auth || {
               currentAuthType: Authorization.Type.NO_AUTH,
               authConfigStore: {},
             },
@@ -213,6 +213,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         bodyContainer: record.data.request?.bodyContainer,
         contentType: record.data.request?.contentType,
         scripts: record.data.scripts,
+        auth: record.data.auth,
       },
       id
     );
@@ -245,6 +246,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         bodyContainer: patch.data.request?.bodyContainer,
         contentType: patch.data.request?.contentType,
         scripts: patch.data.scripts,
+        auth: patch.data.auth,
       },
       id
     );
