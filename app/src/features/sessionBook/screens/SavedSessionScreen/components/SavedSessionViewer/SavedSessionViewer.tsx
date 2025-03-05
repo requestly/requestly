@@ -26,7 +26,8 @@ import { hideElement, showElement } from "utils/domUtils";
 import StaticSessionViewerBottomSheet from "features/sessionBook/components/SessionViewerBottomSheet/StaticSessionViewerBottomSheet";
 import "./savedSessionViewer.scss";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
-import { useCurrentWorkspaceUserRole } from "hooks";
+import { useRBAC } from "features/rbac";
+import { Conditional } from "components/common/Conditional";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -37,7 +38,8 @@ export const SavedSessionViewer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isReadRole } = useCurrentWorkspaceUserRole();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("session_recording", "update");
 
   const { handleDeleteSessionAction } = useSessionsActionContext();
   const sessionMetadata = useSelector(getSessionRecordingMetaData);
@@ -106,7 +108,8 @@ export const SavedSessionViewer = () => {
       <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
         <div className="saved-session-header">
           <SessionTitle />
-          {!isReadRole && isRequestedByOwner && !isInsideIframe ? (
+
+          <Conditional condition={isValidPermission && isRequestedByOwner && !isInsideIframe}>
             <div className="saved-session-actions">
               <Tooltip title="Delete session">
                 <RQButton
@@ -124,7 +127,7 @@ export const SavedSessionViewer = () => {
               </RQButton>
               <SaveSessionButton />
             </div>
-          ) : null}
+          </Conditional>
         </div>
         <BottomSheetLayout
           hideBottomSheet={bottomSheetLayoutBreakpoint}

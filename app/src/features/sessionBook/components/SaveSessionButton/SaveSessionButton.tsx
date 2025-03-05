@@ -23,6 +23,7 @@ import APP_CONSTANTS from "config/constants";
 import { useSaveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/hooks/useSaveDraftSession";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { globalActions } from "store/slices/global/slice";
+import { Conditional } from "components/common/Conditional";
 import "./saveSessionButton.scss";
 
 interface SaveSessionButtonProps {
@@ -132,9 +133,10 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ disabled, 
       >
         <DownArrow />
       </RQButton>
-      {isPopupVisible && !disabled && (
+
+      <Conditional condition={isPopupVisible && !disabled}>
         <SessionConfigPopup onClose={() => setIsPopupVisible(false)} onSaveClick={onSaveClick} />
-      )}
+      </Conditional>
     </div>
   );
 };

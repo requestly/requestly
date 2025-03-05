@@ -28,7 +28,8 @@ import { RQButton } from "lib/design-system/components";
 import { ImportSessionModal } from "features/sessionBook/modals/ImportSessionModal/ImportSessionModal";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { useCurrentWorkspaceUserRole } from "hooks";
+import { useRBAC } from "features/rbac";
+import { Conditional } from "components/common/Conditional";
 import "./sessionsOnboardingView.scss";
 
 const { Text, Title } = Typography;
@@ -43,7 +44,8 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
   const navigate = useNavigate();
   const [isImportSessionModalOpen, setIsImportSessionModalOpen] = useState(false);
   const appFlavour = getAppFlavour();
-  const { isReadRole } = useCurrentWorkspaceUserRole();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("session_recording", "create");
 
   useEffect(() => {
     trackOnboardingPageViewed();
@@ -101,7 +103,7 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
         {!isModalView && (
           <Row justify="end" align="middle" className="settings-row">
             <Space size={20}>
-              {isReadRole ? null : openDownloadedSessionModalBtn}
+              <Conditional condition={isValidPermission}>{openDownloadedSessionModalBtn}</Conditional>
               {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY && (
                 <span onClick={handleSettingsNavigation} className="settings-btn">
                   <MdOutlineSettings /> &nbsp; <Text underline>Settings</Text>

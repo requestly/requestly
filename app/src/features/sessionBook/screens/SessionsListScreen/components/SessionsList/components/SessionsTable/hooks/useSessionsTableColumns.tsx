@@ -15,7 +15,7 @@ import PATHS from "config/constants/sub/paths";
 import { RQButton } from "lib/design-system/components";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { useSessionsActionContext } from "features/sessionBook/context/actions";
-import { useCurrentWorkspaceUserRole } from "hooks";
+import { RoleBasedComponent } from "features/rbac";
 
 interface SessionsTableColumnsProps {
   handleUpdateSharingRecordId: (id: string) => void;
@@ -32,7 +32,6 @@ export const useSessionsTableColumns = ({
 }: SessionsTableColumnsProps) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const { handleDeleteSessionAction } = useSessionsActionContext();
-  const { isReadRole } = useCurrentWorkspaceUserRole();
 
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
@@ -114,32 +113,30 @@ export const useSessionsTableColumns = ({
       width: 120,
       align: "right",
       render: (id, record) => {
-        if (isReadRole) {
-          return null;
-        }
-
         return (
-          <div className="sessions-table-actions">
-            <Tooltip title="Share with your Teammates">
-              <RQButton
-                icon={<ShareAltOutlined />}
-                iconOnly
-                onClick={() => {
-                  handleUpdateSharingRecordId(id);
-                  handleUpdateSelectedRowVisibility(record.visibility);
-                  handleShareModalVisibiliity(true);
-                }}
-              />
-            </Tooltip>
+          <RoleBasedComponent resource="session_recording" permission="delete">
+            <div className="sessions-table-actions">
+              <Tooltip title="Share with your Teammates">
+                <RQButton
+                  icon={<ShareAltOutlined />}
+                  iconOnly
+                  onClick={() => {
+                    handleUpdateSharingRecordId(id);
+                    handleUpdateSelectedRowVisibility(record.visibility);
+                    handleShareModalVisibiliity(true);
+                  }}
+                />
+              </Tooltip>
 
-            <Tooltip title="Delete">
-              <RQButton
-                icon={<RiDeleteBinLine />}
-                iconOnly
-                onClick={() => handleDeleteSessionAction(id, record.eventsFilePath, handleForceRender)}
-              />
-            </Tooltip>
-          </div>
+              <Tooltip title="Delete">
+                <RQButton
+                  icon={<RiDeleteBinLine />}
+                  iconOnly
+                  onClick={() => handleDeleteSessionAction(id, record.eventsFilePath, handleForceRender)}
+                />
+              </Tooltip>
+            </div>
+          </RoleBasedComponent>
         );
       },
     },
