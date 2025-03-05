@@ -81,7 +81,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         },
       });
     },
-    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.loggedIn, user?.details?.isSyncEnabled]
+    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.details?.isSyncEnabled]
   );
 
   const handleFinishClick = useCallback(
@@ -94,6 +94,8 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         const response = await createTeam({
           teamName: newTeamName,
         });
+
+        console.log("DBG-1: fineshed response", JSON.stringify({ response }, null, 2));
 
         claimIncentiveRewards({
           type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
@@ -115,7 +117,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
             );
           }
         });
-
+        console.log("DBG-1: 1 response", response);
         trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "create_workspace_modal");
         toast.info("Workspace Created");
 
@@ -158,6 +160,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         callback?.();
         toggleModal();
       } catch (err) {
+        console.log("DBG-1: Create workspace modal err", err);
         toast.error("Unable to Create Team");
         trackNewTeamCreateFailure(newTeamName);
       } finally {
@@ -165,6 +168,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       }
     },
     [
+      dispatch,
       isNotifyAllSelected,
       createOrgTeamInvite,
       callback,

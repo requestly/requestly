@@ -31,7 +31,9 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
     return null;
   }
   try {
+    // const q = query(collection(db, "teams"), where(`members.${uid}.role`, "in", ["admin", "writer", "viewer"]));
     const q = query(collection(db, "teams"), where("access", "array-contains", uid));
+    console.log("DBG: availableTeamsListener -> q", q);
     return onSnapshot(
       q,
       (querySnapshot) => {
@@ -107,10 +109,12 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
         }
       },
       (error) => {
+        console.log("DBG: availableTeams Query -> error", error);
         Logger.error(error);
       }
     );
   } catch (e) {
+    console.log("DBG: availableTeamsListener final catch -> e", e);
     return null;
   }
 };
