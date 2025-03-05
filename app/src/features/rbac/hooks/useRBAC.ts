@@ -11,17 +11,16 @@ export const useRBAC = () => {
     (
       resource: keyof typeof RBAC.Resource,
       permissionToCheck: keyof typeof RBAC.Permission
-    ): { isValidPermission: true } | { isValidPermission: false; error: RBAC.Error } => {
+    ): { isValidPermission: boolean } => {
       const result = validateResourcePermissionByRole(
         userRole,
         RBAC.Resource[resource],
         RBAC.Permission[permissionToCheck]
       );
 
-      if (result.isValid === false) {
+      if (result.isValidPermission === false) {
         return {
           isValidPermission: false,
-          error: result.error,
         };
       } else {
         return {
@@ -33,32 +32,20 @@ export const useRBAC = () => {
     [userRole]
   );
 
-  const getErrorMessage = useCallback(
-    (error: RBAC.Error, permission: RBAC.Permission): ((entityName?: string) => string) => {
+  const getRBACValidationFailureErrorMessage = useCallback(
+    (permission: RBAC.Permission): ((entityName?: string) => string) => {
       const roleToDisplayTextMapping = {
         [RBAC.Role.admin]: "admin",
         [RBAC.Role.write]: "write",
         [RBAC.Role.read]: "viewer",
       };
 
-      switch (error) {
-        case RBAC.Error.not_allowed: {
-          return (entityName: string) => {
-            return `As a ${roleToDisplayTextMapping[userRole]}, you cannot ${permission} ${entityName}. Contact your workspace admin to update your role.`;
-          };
-        }
-        case RBAC.Error.invalid_role:
-          return () => `INTERNAL: '${userRole}' is not a recognized role.`;
-        case RBAC.Error.invalid_resource:
-          return () => `INTERNAL: Not a valid resource.`;
-        case RBAC.Error.invalid_permission:
-          return () => `INTERNAL: '${permission}' is not a valid permission.`;
-        default:
-          return () => `INTERNAL: Something went wrong! role=${userRole} error=${error} permission=${permission}`;
-      }
+      return (entityName: string) => {
+        return `As a ${roleToDisplayTextMapping[userRole]}, you cannot ${permission} ${entityName}. Contact your workspace admin to update your role.`;
+      };
     },
     [userRole]
   );
 
-  return { validatePermission, getErrorMessage };
+  return { validatePermission, getRBACValidationFailureErrorMessage };
 };

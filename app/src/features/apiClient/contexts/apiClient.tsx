@@ -27,7 +27,7 @@ import { toast } from "utils/Toast";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
-import { RBAC, useRBAC } from "features/rbac";
+import { useRBAC } from "features/rbac";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -340,13 +340,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);
 
-  const isInvalidPermission =
-    permissionValidationResult.isValidPermission === false &&
-    permissionValidationResult.error === RBAC.Error.not_allowed;
+	const { isValidPermission } =
+    permissionValidationResult;
 
   const onNewClick = useCallback(
     async (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId = "") => {
-      if (isInvalidPermission) {
+      if (!isValidPermission) {
         toast.warn(
           `As a viewer, you cannot create new ${recordType}. Contact your workspace admin to request an update to your role.`,
           5
@@ -418,7 +417,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       teamId,
       uid,
       onSaveRecord,
-      isInvalidPermission,
+      isValidPermission,
       apiClientRecordsRepository,
     ]
   );

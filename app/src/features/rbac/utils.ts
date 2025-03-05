@@ -5,19 +5,14 @@ export const validateResourcePermissionByRole = (
   role: RBAC.Role,
   resource: RBAC.Resource,
   permissionToValidate: RBAC.Permission
-):
-  | {
-      isValid: true;
-    }
-  | { isValid: false; error: RBAC.Error } => {
+): {isValidPermission: boolean} => {
   const resourcePermissions = ROLE_TO_RESOURCE_PERMISSIONS_MAP[role][resource];
   const isAllowed = resourcePermissions[permissionToValidate];
   if (!isAllowed) {
     return {
-      isValid: false,
-      error: RBAC.Error.not_allowed,
+      isValidPermission: false,
     };
   }
 
-  return { isValid: true };
+  return { isValidPermission: true };
 };
