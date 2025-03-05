@@ -33,6 +33,7 @@ export type API = {
     body?: RQAPI.RequestBody;
     bodyContainer: RQAPI.RequestBodyContainer;
     contentType: RequestContentType;
+    auth?: RQAPI.Auth;
     scripts: {
       preRequest: string;
       postResponse: string;
