@@ -7,7 +7,7 @@ interface EmailTypeResponse {
   type: EmailType;
 }
 //backend for frontend implementation
-export const fetchEmailType = async (email: string): Promise<EmailType> => {
+export const fetchEmailType = async (email: string): Promise<EmailType | null> => {
   try {
     const checkEmailType = httpsCallable<{ userEmail: string }, EmailTypeResponse>(getFunctions(), "fetchEmailType");
     const result = await checkEmailType({ userEmail: email });
@@ -34,13 +34,16 @@ export const getEmailType = async (email: string) => {
       return null;
     }
     const mailType = await fetchEmailType(email);
-    if (mailType === EmailType.PERSONAL) {
-      return EmailType.PERSONAL;
-    } else if (mailType === EmailType.DESTROYABLE) {
-      return EmailType.DESTROYABLE;
-    } else if (mailType === EmailType.BUSINESS) {
-      return EmailType.BUSINESS;
-    } else return null;
+    switch (mailType) {
+      case EmailType.PERSONAL:
+        return EmailType.PERSONAL;
+      case EmailType.DESTROYABLE:
+        return EmailType.DESTROYABLE;
+      case EmailType.BUSINESS:
+        return EmailType.BUSINESS;
+      default:
+        return null;
+    }
   } catch (error) {
     Logger.error("Error in getEmailType", error);
     return null;

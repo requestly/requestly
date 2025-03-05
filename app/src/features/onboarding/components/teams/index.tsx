@@ -97,13 +97,13 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
         setPendingInvites([]);
       });
   }, [
-    user.details?.profile.email,
+    user.details?.profile?.email,
     user.details?.profile?.isEmailVerified,
     user.loggedIn,
     dispatch,
     handleSwitchWorkspace,
     handlePendingInvites,
-    user.details.emailType,
+    user.details?.emailType,
     navigate,
   ]);
 
@@ -122,7 +122,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
         return;
       }
     }
-  }, [pendingInvites, user.details.profile.email, appOnboardingDetails.createdWorkspace, user.details.emailType]);
+  }, [pendingInvites, user.details?.profile?.email, appOnboardingDetails.createdWorkspace, user.details?.emailType]);
 
   useEffect(() => {
     if (isOpen) {
