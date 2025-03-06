@@ -21,7 +21,10 @@ import { RuleEditorBottomSheet } from "./components/RuleEditorBottomSheet/RuleEd
 import { trackSampleRuleTested } from "features/rules/analytics";
 import { RecordStatus } from "@requestly/shared/types/entities/rules";
 import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
-import "./RuleEditor.css";
+import { useRBAC } from "features/rbac";
+import { ReadOnlyModeAlert } from "components/common/ReadOnlyModeAlert/ReadOnlyModeAlert";
+import { Conditional } from "components/common/Conditional";
+import "./RuleEditor.scss";
 
 const RuleEditor = (props) => {
   const location = useLocation();
@@ -35,6 +38,8 @@ const RuleEditor = (props) => {
   const [showEnableRuleTooltip, setShowEnableRuleTooltip] = useState(false);
   const tryThisRuleTooltipTimerRef = useRef(null);
   const [isSampleRule, setIsSampleRule] = useState(false);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("http_rule", "update");
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
@@ -61,6 +66,8 @@ const RuleEditor = (props) => {
     }
 
     window.open(sampleRuleDetails[currentlySelectedRuleData.sampleId].demoLink, "_blank");
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentlySelectedRuleData?.name, currentlySelectedRuleData?.status]);
 
   useEffect(() => {
@@ -117,7 +124,11 @@ const RuleEditor = (props) => {
 
   const ruleEditor = useMemo(() => {
     return (
-      <Col key={MODE + RULE_TYPE_TO_CREATE} className="overflow-hidden h-full">
+      <Col key={MODE + RULE_TYPE_TO_CREATE} className="overflow-hidden h-full rule-editor-container">
+        <Conditional condition={!isValidPermission}>
+          <ReadOnlyModeAlert description="As a viewer, you can test rules but cannot modify them." />
+        </Conditional>
+
         {MODE !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
           <EditorHeader
             mode={MODE}
@@ -128,6 +139,7 @@ const RuleEditor = (props) => {
 
         {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
           <ProCard className="rule-editor-procard rule-editor-body-scroll">
+            {/* TODO: rename "isSharedListViewRule" prop to view only mode */}
             <RuleBuilder />
           </ProCard>
         ) : (
@@ -148,7 +160,15 @@ const RuleEditor = (props) => {
         )}
       </Col>
     );
-  }, [MODE, RULE_TYPE_TO_CREATE, appMode, showEnableRuleTooltip, handleSeeLiveRuleDemoClick, isSampleRule]);
+  }, [
+    isValidPermission,
+    MODE,
+    RULE_TYPE_TO_CREATE,
+    appMode,
+    showEnableRuleTooltip,
+    handleSeeLiveRuleDemoClick,
+    isSampleRule,
+  ]);
 
   switch (appMode) {
     case GLOBAL_CONSTANTS.APP_MODES.EXTENSION:

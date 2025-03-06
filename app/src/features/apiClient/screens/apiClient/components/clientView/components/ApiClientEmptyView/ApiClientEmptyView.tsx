@@ -11,6 +11,7 @@ import { useState } from "react";
 import { toast } from "utils/Toast";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { variablesActions } from "store/features/variables/slice";
+import { RBAC, useRBAC } from "features/rbac";
 import "./apiClientEmptyView.scss";
 
 export const ApiClientEmptyView = () => {
@@ -22,6 +23,8 @@ export const ApiClientEmptyView = () => {
   const team = useSelector(getCurrentlyActiveWorkspace);
 
   const [isRecordCreating, setIsRecordCreating] = useState(null);
+  const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_request", "create");
 
   const isEmpty = apiClientRecords.length === 0;
 
@@ -29,6 +32,11 @@ export const ApiClientEmptyView = () => {
     recordType === RQAPI.RecordType.API
       ? trackNewRequestClicked("api_client_home")
       : trackNewCollectionClicked("api_client_home");
+
+    if (!isValidPermission) {
+      toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, recordType), 5);
+      return;
+    }
 
     if (!user.loggedIn) {
       dispatch(
@@ -67,9 +75,6 @@ export const ApiClientEmptyView = () => {
 
   return (
     <div className="api-client-empty-view-container">
-      {/* TODO: FIX */}
-      {/* <img src={isEmpty ? emptyViewIcon : defaultViewIcon} alt="empty-view" /> */}
-      {/* <TestMyMagic /> */}
       <div>
         <div className="api-client-empty-view-header">
           {isEmpty ? "No API requests created yet." : "Pick up where you left off or start fresh."}
