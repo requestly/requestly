@@ -33,7 +33,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
     return null;
   }
   try {
-    const q = query(collection(db, "teams"), where("access", "array-contains", uid));
+    const q = query(collection(db, "teams"), where(`members.${uid}.role`, "in", ["admin", "write", "read"]));
     return onSnapshot(
       q,
       async (querySnapshot) => {
@@ -65,7 +65,6 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
         const records = querySnapshot.docs
           .map((team) => {
             const teamData = team.data();
-            console.log("Fetched teamData", teamData);
 
             if (teamData.deleted) return null;
 
@@ -101,7 +100,6 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
         if (!currentlyActiveWorkspace?.id) return;
 
         const found = records.find((team) => team.id === currentlyActiveWorkspace.id);
-
         if (!found) {
           if (!window.hasUserRemovedHimselfRecently)
             alert("You no longer have access to this workspace. Please contact your team admin.");
@@ -144,10 +142,12 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
         }
       },
       (error) => {
+        console.log("DBG: availableTeams Query -> error", error);
         Logger.error(error);
       }
     );
   } catch (e) {
+    console.log("DBG: availableTeamsListener final catch -> e", e);
     return null;
   }
 };
