@@ -11,6 +11,9 @@ import Logger from "lib/logger";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
+import APP_CONSTANTS from "config/constants";
+
+const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
 let unsubscribeBillingTeamsListener: () => void = null;
 
@@ -56,7 +59,7 @@ export const useBillingTeamsListener = () => {
       // TODO: Can be removed after a month as this seeding is already present in backend
       const isAcceleratorBillingTeam = billingTeamDetails.some((team) => team.isAcceleratorTeam === true);
       if (isAcceleratorBillingTeam) {
-        submitAttrUtil("rq_subscription_type", "accelerator");
+        submitAttrUtil(TRACKING.ATTR.RQ_SUBSCRIPTION_TYPE, "accelerator");
       }
 
       if (isCompanyEmail(user.details?.emailType)) {
@@ -68,10 +71,14 @@ export const useBillingTeamsListener = () => {
           .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
               if (!userBillingTeamIds.has(doc.id)) {
-                billingTeamDetails.push({
+                const billingTeam = {
                   ...(doc.data() as BillingTeamDetails),
                   id: doc.id,
-                });
+                };
+                if (billingTeam.isAcceleratorTeam === true) {
+                  submitAttrUtil(TRACKING.ATTR.IS_ACCELERATOR_AVAILABLE, true);
+                }
+                billingTeamDetails.push(billingTeam);
               }
             });
           })
