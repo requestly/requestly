@@ -1,0 +1,1 @@
+export { RoleBasedComponent } from "./RoleBasedComponent";

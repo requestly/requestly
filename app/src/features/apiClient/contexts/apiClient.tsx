@@ -29,6 +29,7 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
 import { variablesActions } from "store/features/variables/slice";
 import { EnvironmentVariables } from "backend/environment/types";
+import { RBAC, useRBAC } from "features/rbac";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -121,6 +122,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
+  const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_request", "create");
 
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -356,6 +359,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onNewClick = useCallback(
     async (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId = "") => {
+      if (!isValidPermission) {
+        toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, recordType), 5);
+        return;
+      }
+
       switch (recordType) {
         case RQAPI.RecordType.API: {
           trackNewRequestClicked(analyticEventSource);
@@ -414,7 +422,18 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [uid, teamId, apiClientRecordsRepository, openDraftRequest, onSaveRecord, dispatch, addNewEnvironment, openTab]
+    [
+      uid,
+      teamId,
+      apiClientRecordsRepository,
+      openDraftRequest,
+      onSaveRecord,
+      dispatch,
+      addNewEnvironment,
+      openTab,
+      getRBACValidationFailureErrorMessage,
+      isValidPermission,
+    ]
   );
 
   const forceRefreshApiClientRecords = useCallback(async () => {

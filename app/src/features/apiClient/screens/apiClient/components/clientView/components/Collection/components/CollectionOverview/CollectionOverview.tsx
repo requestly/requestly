@@ -15,6 +15,7 @@ import { useOutsideClick } from "hooks";
 import "./collectionOverview.scss";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { useRBAC } from "features/rbac";
 
 interface CollectionOverviewProps {
   collection: RQAPI.CollectionRecord;
@@ -27,6 +28,8 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
   const team = useSelector(getCurrentlyActiveWorkspace);
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
   const { closeTab } = useTabsLayoutContext();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_collection", "create");
 
   const [collectionName, setCollectionName] = useState(collection?.name || "");
   const [collectionDescription, setCollectionDescription] = useState(collection?.description || "");
@@ -98,6 +101,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
     <div className="collection-overview-wrapper">
       <div className="collection-overview-container">
         <InlineInput
+          disabled={!isValidPermission}
           value={collectionName}
           onChange={(value) => {
             setCollectionName(value);
@@ -139,7 +143,16 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
                 />
               </>
             ) : (
-              <div className="collection-overview-description-markdown" onClick={() => setShowEditor(true)}>
+              <div
+                className="collection-overview-description-markdown"
+                onClick={() => {
+                  if (!isValidPermission) {
+                    return;
+                  }
+
+                  setShowEditor(true);
+                }}
+              >
                 {markdown}
               </div>
             )}
