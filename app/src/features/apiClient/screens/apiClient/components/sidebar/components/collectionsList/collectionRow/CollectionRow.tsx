@@ -17,6 +17,7 @@ import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlac
 import { isEmpty } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
+import { Conditional } from "components/common/Conditional";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -25,6 +26,7 @@ interface Props {
   openTab: TabsLayoutContextInterface["openTab"];
   setExpandedRecordIds: (keys: RQAPI.Record["id"][]) => void;
   expandedRecordIds: string[];
+  isReadOnly: boolean;
   bulkActionOptions: {
     showSelection: boolean;
     selectedRecords: Set<RQAPI.Record["id"]>;
@@ -41,6 +43,7 @@ export const CollectionRow: React.FC<Props> = ({
   expandedRecordIds,
   setExpandedRecordIds,
   bulkActionOptions,
+  isReadOnly,
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
@@ -169,51 +172,56 @@ export const CollectionRow: React.FC<Props> = ({
                 <div className="collection-name" title={record.name}>
                   {record.name}
                 </div>
+                <Conditional condition={!isReadOnly}>
+                  <div className={`collection-options ${hoveredId === record.id ? "visible" : " "}`}>
+                    <Tooltip title={"Add Request"}>
+                      <RQButton
+                        size="small"
+                        type="transparent"
+                        icon={<FileAddOutlined />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveKey(record.id);
+                          setCreateNewField(RQAPI.RecordType.API);
+                          onNewClick("collection_row", RQAPI.RecordType.API, record.id).then(() => {
+                            setCreateNewField(null);
+                          });
+                        }}
+                      />
+                    </Tooltip>
+                    <Tooltip title={"Add Folder"}>
+                      <RQButton
+                        size="small"
+                        type="transparent"
+                        icon={<FolderAddOutlined />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveKey(record.id);
+                          setCreateNewField(RQAPI.RecordType.COLLECTION);
+                          onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id).then(() => {
+                            setCreateNewField(null);
+                          });
+                        }}
+                      />
+                    </Tooltip>
 
-                <div className={`collection-options ${hoveredId === record.id ? "visible" : " "}`}>
-                  <Tooltip title={"Add Request"}>
-                    <RQButton
-                      size="small"
-                      type="transparent"
-                      icon={<FileAddOutlined />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveKey(record.id);
-                        setCreateNewField(RQAPI.RecordType.API);
-                        onNewClick("collection_row", RQAPI.RecordType.API, record.id).then(() => {
-                          setCreateNewField(null);
-                        });
-                      }}
-                    />
-                  </Tooltip>
-                  <Tooltip title={"Add Folder"}>
-                    <RQButton
-                      size="small"
-                      type="transparent"
-                      icon={<FolderAddOutlined />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveKey(record.id);
-                        setCreateNewField(RQAPI.RecordType.COLLECTION);
-                        onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id).then(() => {
-                          setCreateNewField(null);
-                        });
-                      }}
-                    />
-                  </Tooltip>
-
-                  <Dropdown trigger={["click"]} menu={{ items: getCollectionOptions(record) }} placement="bottomRight">
-                    <RQButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowSelection(false);
-                      }}
-                      size="small"
-                      type="transparent"
-                      icon={<MdOutlineMoreHoriz />}
-                    />
-                  </Dropdown>
-                </div>
+                    <Dropdown
+                      trigger={["click"]}
+                      menu={{ items: getCollectionOptions(record) }}
+                      placement="bottomRight"
+                    >
+                      <RQButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowSelection(false);
+                        }}
+                        size="small"
+                        type="transparent"
+                        icon={<MdOutlineMoreHoriz />}
+                      />
+                    </Dropdown>
+                  </div>
+                </Conditional>
               </div>
             }
           >
@@ -232,6 +240,7 @@ export const CollectionRow: React.FC<Props> = ({
                       key={apiRecord.id}
                       record={apiRecord}
                       openTab={openTab}
+                      isReadOnly={isReadOnly}
                       bulkActionOptions={bulkActionOptions}
                     />
                   );
@@ -241,6 +250,7 @@ export const CollectionRow: React.FC<Props> = ({
                       key={apiRecord.id}
                       openTab={openTab}
                       record={apiRecord}
+                      isReadOnly={isReadOnly}
                       onNewClick={onNewClick}
                       onExportClick={onExportClick}
                       expandedRecordIds={expandedRecordIds}

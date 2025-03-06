@@ -7,6 +7,7 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constants/keyboardShortcuts";
+import { RoleBasedComponent } from "features/rbac";
 
 interface Props {
   authOptions: RQAPI.AuthOptions;
@@ -51,18 +52,20 @@ const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthD
   }, [authOptionsState]);
 
   const AuthorizationViewActions = () => (
-    <div className="authorization-save-btn">
-      <RQButton
-        showHotKeyText
-        hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
-        type="primary"
-        onClick={onSaveAuthData}
-        disabled={!hasUnsavedChanges}
-        loading={isSaving}
-      >
-        Save
-      </RQButton>
-    </div>
+    <RoleBasedComponent resource="api_client_collection" permission="update">
+      <div className="authorization-save-btn">
+        <RQButton
+          showHotKeyText
+          hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+          type="primary"
+          onClick={onSaveAuthData}
+          disabled={!hasUnsavedChanges}
+          loading={isSaving}
+        >
+          Save
+        </RQButton>
+      </div>
+    </RoleBasedComponent>
   );
 
   return (

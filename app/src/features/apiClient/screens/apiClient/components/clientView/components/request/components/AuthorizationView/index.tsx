@@ -13,6 +13,8 @@ import { AUTH_OPTIONS } from "./types/form";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentVariables } from "backend/environment/types";
 import { HelpPanel } from "./HelpPanel";
+import { ReadOnlyModeAlert } from "../../../ReadOnlyModeAlert/ReadOnlyModeAlert";
+import { useRBAC } from "features/rbac";
 import "./authorizationView.scss";
 
 interface Props {
@@ -24,7 +26,7 @@ interface Props {
   onAuthUpdate: (authOptions: RQAPI.AuthOptions) => any;
   rootLevelRecord: Boolean;
   variables: EnvironmentVariables;
-  authorizationViewActions?: React.ReactElement;
+  authorizationViewActions?: React.ReactNode;
 }
 
 const AuthorizationView: React.FC<Props> = ({
@@ -39,6 +41,9 @@ const AuthorizationView: React.FC<Props> = ({
     defaultValues?.currentAuthType || (rootLevelRecord ? AUTHORIZATION_TYPES.NO_AUTH : AUTHORIZATION_TYPES.INHERIT)
   );
   const [formValues, setFormValues] = useState<Record<string, any>>(defaultValues || {});
+  const [showReadOnlyAlert, setShowReadOnlyAlert] = useState(false);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_request", "create");
 
   const getAuthOptions = (
     previousFormValues: Record<string, any>,
@@ -72,60 +77,80 @@ const AuthorizationView: React.FC<Props> = ({
   const debouncedOnChange = debounce(onChangeHandler, 500);
 
   return (
-    <div className={`authorization-view ${wrapperClass}`}>
-      <div className="type-of-authorization">
-        <div className="form-selector">
-          <label>{LABEL_TEXT.AUTHORIZATION_TYPE_LABEL}</label>
-          <Select
-            className="form-selector-dropdown"
-            value={selectedForm}
-            onChange={(value) => {
-              setSelectedForm(value);
-              onAuthUpdate(getAuthOptions(formValues, value));
-            }}
-            options={AUTHORIZATION_TYPES_META}
-          />
-          {![AUTHORIZATION_TYPES.NO_AUTH, AUTHORIZATION_TYPES.INHERIT].includes(selectedForm) && (
-            <div
-              className="clear-icon"
-              onClick={() => {
-                onAuthUpdate(getAuthOptions(formValues, AUTHORIZATION_TYPES.NO_AUTH));
-                setSelectedForm(AUTHORIZATION_TYPES.NO_AUTH);
+    <>
+      {showReadOnlyAlert && (
+        <ReadOnlyModeAlert description="Your changes will not be saved. As a viewer, you can modify and test the APIs, but saving your updates is not permitted." />
+      )}
+
+      <div className={`authorization-view ${wrapperClass} ${!isValidPermission ? "read-only" : ""}`}>
+        <div className="type-of-authorization">
+          <div className="form-selector">
+            <label>{LABEL_TEXT.AUTHORIZATION_TYPE_LABEL}</label>
+            <Select
+              className="form-selector-dropdown"
+              value={selectedForm}
+              onChange={(value) => {
+                if (!isValidPermission) {
+                  setShowReadOnlyAlert(true);
+                }
+
+                setSelectedForm(value);
+                onAuthUpdate(getAuthOptions(formValues, value));
               }}
-            >
-              <MdClear color="#bbbbbb" size="12px" />
-              <span>{LABEL_TEXT.CLEAR}</span>
+              options={AUTHORIZATION_TYPES_META}
+            />
+            {![AUTHORIZATION_TYPES.NO_AUTH, AUTHORIZATION_TYPES.INHERIT].includes(selectedForm) && (
+              <div
+                className="clear-icon"
+                onClick={() => {
+                  if (!isValidPermission) {
+                    setShowReadOnlyAlert(true);
+                  }
+
+                  onAuthUpdate(getAuthOptions(formValues, AUTHORIZATION_TYPES.NO_AUTH));
+                  setSelectedForm(AUTHORIZATION_TYPES.NO_AUTH);
+                }}
+              >
+                <MdClear color="#bbbbbb" size="12px" />
+                <span>{LABEL_TEXT.CLEAR}</span>
+              </div>
+            )}
+            {authorizationViewActions}
+          </div>
+        </div>
+        <div className="form-and-description">
+          {!isEmpty(AUTHORIZATION_FORM_DATA[selectedForm]) && (
+            <div className="form-view">
+              <p className="info-text">
+                <AiOutlineExclamationCircle size={"12px"} color="#8f8f8f" />
+                <span>{LABEL_TEXT.INFO_TEXT}</span>
+              </p>
+              <AuthorizationForm
+                formData={AUTHORIZATION_FORM_DATA[selectedForm] || []}
+                formType={selectedForm}
+                onChangeHandler={(value: string, id: string) => {
+                  if (!isValidPermission) {
+                    setShowReadOnlyAlert(true);
+                  }
+
+                  debouncedOnChange(value, id);
+                }}
+                formvalues={formValues[selectedForm] || {}}
+                variables={variables}
+              />
             </div>
           )}
-          {authorizationViewActions}
+
+          {!isEmpty(AUTHORIZATION_STATIC_DATA[selectedForm]?.description) ? (
+            [AUTHORIZATION_TYPES.NO_AUTH, AUTHORIZATION_TYPES.INHERIT].includes(selectedForm) ? (
+              <Description data={AUTHORIZATION_STATIC_DATA[selectedForm]?.description} />
+            ) : (
+              <HelpPanel data={AUTHORIZATION_STATIC_DATA[selectedForm]?.description} />
+            )
+          ) : null}
         </div>
       </div>
-      <div className="form-and-description">
-        {!isEmpty(AUTHORIZATION_FORM_DATA[selectedForm]) && (
-          <div className="form-view">
-            <p className="info-text">
-              <AiOutlineExclamationCircle size={"12px"} color="#8f8f8f" />
-              <span>{LABEL_TEXT.INFO_TEXT}</span>
-            </p>
-            <AuthorizationForm
-              formData={AUTHORIZATION_FORM_DATA[selectedForm] || []}
-              formType={selectedForm}
-              onChangeHandler={debouncedOnChange}
-              formvalues={formValues[selectedForm] || {}}
-              variables={variables}
-            />
-          </div>
-        )}
-
-        {!isEmpty(AUTHORIZATION_STATIC_DATA[selectedForm]?.description) ? (
-          [AUTHORIZATION_TYPES.NO_AUTH, AUTHORIZATION_TYPES.INHERIT].includes(selectedForm) ? (
-            <Description data={AUTHORIZATION_STATIC_DATA[selectedForm]?.description} />
-          ) : (
-            <HelpPanel data={AUTHORIZATION_STATIC_DATA[selectedForm]?.description} />
-          )
-        ) : null}
-      </div>
-    </div>
+    </>
   );
 };
 
