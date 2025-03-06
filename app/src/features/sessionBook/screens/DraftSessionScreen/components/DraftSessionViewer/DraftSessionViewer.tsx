@@ -13,8 +13,10 @@ import { trackDraftSessionDiscarded, trackDraftSessionViewed } from "features/se
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
-import "./draftSessionViewer.scss";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
+import { RQTooltip } from "lib/design-system-v2/components";
+import { useRBAC } from "features/rbac";
+import "./draftSessionViewer.scss";
 
 interface DraftSessionViewerProps {
   isDesktopMode: boolean;
@@ -30,6 +32,8 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const metadata = useSelector(getSessionRecordingMetaData);
   const isOpenedInIframe = location.pathname.includes("iframe");
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("session_recording", "create");
 
   if (!isDesktopMode) {
     unstable_usePrompt({
@@ -99,7 +103,12 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
               </RQButton>
             )}
 
-            <SaveSessionButton onSaveClick={handleSaveSessionClicked} />
+            <RQTooltip
+              placement="bottomLeft"
+              title={isValidPermission ? null : "As a viewer, you cannot save the session!"}
+            >
+              <SaveSessionButton disabled={!isValidPermission} onSaveClick={handleSaveSessionClicked} />
+            </RQTooltip>
           </div>
         </div>
         <div className="draft-session-viewer-body-wrapper">
@@ -108,7 +117,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
               <SessionPlayer onPlayerTimeOffsetChange={setSessionPlayerOffset} />
             </Col>
             <Col span={9}>
-              <DraftSessionDetailsPanel playerTimeOffset={sessionPlayerOffset} />
+              <DraftSessionDetailsPanel isReadOnly={!isValidPermission} playerTimeOffset={sessionPlayerOffset} />
             </Col>
           </Row>
         </div>

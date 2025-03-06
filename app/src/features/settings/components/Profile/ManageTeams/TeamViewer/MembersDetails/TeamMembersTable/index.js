@@ -16,6 +16,8 @@ import "./TeamMembersTable.css";
 import MemberActionsDropdown from "../../common/MemberActionsDropdown";
 import { ClockCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { SendInviteButton } from "./SendInviteButton/SendInviteButton";
+import { RoleBasedComponent } from "features/rbac";
+import { Conditional } from "components/common/Conditional";
 
 const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails }) => {
   const navigate = useNavigate();
@@ -123,17 +125,20 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
                       </div>
                     }
                   />
-                  {member?.isInviteExpired && (
-                    <SendInviteButton
-                      role={member?.isAdmin ? "admin" : "write"}
-                      teamId={teamId}
-                      teamName={teamDetails?.name}
-                      numberOfMembers={teamDetails?.accessCount}
-                      email={member.email}
-                      onInvite={fetchTeamMembers}
-                      source="team_members_table"
-                    />
-                  )}
+
+                  <RoleBasedComponent resource="workspace" permission="update">
+                    <Conditional condition={member?.isInviteExpired}>
+                      <SendInviteButton
+                        role={member?.isAdmin ? "admin" : "write"}
+                        teamId={teamId}
+                        teamName={teamDetails?.name}
+                        numberOfMembers={teamDetails?.accessCount}
+                        email={member.email}
+                        onInvite={fetchTeamMembers}
+                        source="team_members_table"
+                      />
+                    </Conditional>
+                  </RoleBasedComponent>
                 </>
               ) : null}
             </Row>

@@ -9,6 +9,8 @@ import { useLocation } from "react-router-dom";
 import "./variablesListHeader.scss";
 import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { ReadOnlyModeAlert } from "features/apiClient/screens/apiClient/components/clientView/components/ReadOnlyModeAlert/ReadOnlyModeAlert";
+import { RoleBasedComponent } from "features/rbac";
 interface VariablesListHeaderProps {
   searchValue: string;
   currentEnvironmentName: string;
@@ -59,6 +61,11 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
       ) : (
         <div />
       )}
+
+      <RoleBasedComponent resource="api_client_environment" permission="read">
+        <ReadOnlyModeAlert description="As a viewer, you can update variables with current values and test the APIs, but saving your updates is not permitted." />
+      </RoleBasedComponent>
+
       <div className="variables-list-action-container">
         <Input
           placeholder="Search"
@@ -67,23 +74,27 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           value={searchValue}
           onChange={(e) => onSearchValueChange(e.target.value)}
         />
-        <div className="variables-list-btn-actions-container">
-          <RQButton
-            showHotKeyText
-            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
-            type="primary"
-            onClick={onSave}
-            disabled={!hasUnsavedChanges}
-            loading={isSaving}
-          >
-            Save
-          </RQButton>
-          {exportActions?.showExport && (
-            <RQButton type="primary" onClick={exportActions?.onExportClick} disabled={!exportActions?.enableExport}>
-              Export
+
+        <RoleBasedComponent resource="api_client_environment" permission="update">
+          <div className="variables-list-btn-actions-container">
+            <RQButton
+              showHotKeyText
+              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+              type="primary"
+              onClick={onSave}
+              disabled={!hasUnsavedChanges}
+              loading={isSaving}
+            >
+              Save
             </RQButton>
-          )}
-        </div>
+
+            {exportActions?.showExport && (
+              <RQButton type="primary" onClick={exportActions?.onExportClick} disabled={!exportActions?.enableExport}>
+                Export
+              </RQButton>
+            )}
+          </div>
+        </RoleBasedComponent>
       </div>
     </div>
   );

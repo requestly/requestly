@@ -47,6 +47,16 @@
     .rq-content-list-table-container {
       padding-top: 0;
     }
+
+    .ant-tabs-tabpane {
+      .api-client-read-only-mode-alert {
+        margin: 7px 16px 8px 16px;
+      }
+
+      .authorization-view {
+        margin: 0 16px;
+      }
+    }
   }
 }
 
