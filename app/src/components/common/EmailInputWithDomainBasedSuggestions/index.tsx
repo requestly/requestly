@@ -3,9 +3,10 @@ import { without } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getDomainFromEmail, isCompanyEmail, isEmailValid } from "utils/FormattingHelper";
+import { getDomainFromEmail, isEmailValid } from "utils/FormattingHelper";
 import CreatableSelect from "react-select/creatable";
 import { MultiValue } from "react-select";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface Props {
   autoFocus?: boolean;
@@ -33,7 +34,7 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
   const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
 
   useEffect(() => {
-    if (!isCompanyEmail(userEmail)) return;
+    if (!isCompanyEmail(user.details?.emailType)) return;
 
     getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((res: any) => {
       const users = res.data.users;
@@ -46,7 +47,7 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
       });
       setSuggestionOptions(suggestionOptionsFromEmails);
     });
-  }, [getOrganizationUsers, userEmail]);
+  }, [getOrganizationUsers, user.details?.emailType, userEmail]);
 
   useEffect(() => {
     // Set default value if it is a valid email
