@@ -10,7 +10,6 @@ import { globalActions } from "store/slices/global/slice";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytics";
 import { capitalize } from "lodash";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
-import { isCompanyEmail } from "utils/FormattingHelper";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
@@ -18,6 +17,7 @@ import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import LINKS from "config/constants/sub/links";
 import "./index.scss";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface PremiumFeatureProps {
   onContinue?: () => void;
@@ -90,7 +90,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
     <>
       {billingTeams.length &&
       user?.details?.profile?.isEmailVerified &&
-      isCompanyEmail(user?.details?.profile?.email) &&
+      isCompanyEmail(user.details?.emailType) &&
       !disabled &&
       features ? (
         <>
