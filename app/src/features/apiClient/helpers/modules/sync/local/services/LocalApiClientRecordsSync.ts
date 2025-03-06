@@ -49,10 +49,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           type: RQAPI.RecordType.COLLECTION,
           data: {
             variables: {},
-						auth: {
-							currentAuthType: Authorization.Type.NO_AUTH,
-							authConfigStore: {},
-						},
+            auth: {
+              currentAuthType: Authorization.Type.NO_AUTH,
+              authConfigStore: {},
+            },
           },
         };
         return collection;
@@ -82,9 +82,9 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
             },
             scripts: e.request.scripts,
             auth: {
-							currentAuthType: Authorization.Type.NO_AUTH,
-							authConfigStore: {},
-						},
+              currentAuthType: Authorization.Type.NO_AUTH,
+              authConfigStore: {},
+            },
           },
         };
 
