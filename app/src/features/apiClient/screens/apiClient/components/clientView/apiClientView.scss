@@ -35,17 +35,27 @@
   background-color: var(--requestly-color-background);
 
   .api-client-header-container {
-    padding: 8px 16px 8px 6px;
     border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+
+    .api-client-breadcrumb-container {
+      display: flex;
+      align-items: center;
+      padding: 0 16px 0 0;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+      .more-api-request-actions-button {
+        height: auto;
+      }
+    }
   }
 
   .api-client-body {
-    padding: 0 16px;
     padding-top: 8px;
     overflow: hidden;
 
     .ant-tabs {
       .ant-tabs-nav-wrap {
+        padding: 0 16px;
         .ant-tabs-tab {
           padding: 6px 4px;
         }
@@ -53,15 +63,12 @@
     }
   }
 
-  .rq-breadcrumb {
-    margin: 0 10px;
-  }
-
   .api-client-header {
     flex: 0;
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 8px 16px 12px;
 
     .api-client-url-container {
       display: flex;
@@ -103,7 +110,7 @@
 
     .ant-tabs-content-holder {
       height: inherit;
-      padding-bottom: 44px;
+      padding: 0 16px 44px;
 
       .ant-tabs-content-top {
         height: 100%;

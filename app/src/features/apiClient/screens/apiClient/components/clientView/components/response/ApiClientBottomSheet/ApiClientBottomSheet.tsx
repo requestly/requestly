@@ -8,6 +8,13 @@ import StatusLine from "../StatusLine";
 import { Tag } from "antd";
 import { TestsView } from "../TestsView/TestsView";
 import { TestResult } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
+import { ApiClientErrorPanel } from "../../errors/ApiClientErrorPanel/ApiClientErrorPanel";
+import { ApiClientLoader } from "../LoadingPlaceholder/ApiClientLoader";
+import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
+import { AbortError } from "../../errors/AbortError";
+import { RequestError } from "../../errors/RequestError";
+import "./apiclientBottomSheet.scss";
+import { ApiClientWarningPanel } from "../../errors/ApiClientWarningPanel/ApiClientWarningPanel";
 
 interface Props {
   response: RQAPI.Response;
@@ -17,7 +24,9 @@ interface Props {
   isRequestCancelled: boolean;
   onCancelRequest: () => void;
   handleTestResultRefresh: () => Promise<void>;
+  executeRequest: () => Promise<void>;
   error?: RQAPI.ExecutionError;
+  warning?: RQAPI.ExecutionWarning;
 }
 
 const BOTTOM_SHEET_TAB_KEYS = {
@@ -31,70 +40,105 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   testResults,
   isLoading,
   isFailed,
-  handleTestResultRefresh,
   isRequestCancelled,
+  handleTestResultRefresh,
   onCancelRequest,
   error,
+  warning,
+  executeRequest,
 }) => {
   const contentTypeHeader = useMemo(() => {
     return response?.headers ? getContentTypeFromResponseHeaders(response.headers) : "";
   }, [response?.headers]);
 
   const bottomSheetTabItems = useMemo(() => {
-    return [
+    const baseTabItems = [
       {
         key: BOTTOM_SHEET_TAB_KEYS.RESPONSE,
         label: "Response body",
-        children: (
-          <ResponseBody
-            responseText={response?.body}
-            contentTypeHeader={contentTypeHeader}
-            isLoading={isLoading}
-            isFailed={isFailed}
-            onCancelRequest={onCancelRequest}
-            error={error}
-          />
-        ),
+        children: <ResponseBody responseText={response?.body} contentTypeHeader={contentTypeHeader} />,
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.HEADERS,
         label: (
           <>Headers {response?.headers?.length ? <Tag className="count">{response?.headers?.length}</Tag> : null}</>
         ),
-        children: (
-          <ResponseHeaders
-            headers={response?.headers}
-            isLoading={isLoading}
-            isFailed={isFailed}
-            onCancelRequest={onCancelRequest}
-            error={error}
-          />
-        ),
+        children: <ResponseHeaders headers={response?.headers} />,
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
         label: <>Tests {testResults?.length ? <Tag className="count">{testResults?.length}</Tag> : null}</>,
-        children: (
-          <TestsView
-            testResults={testResults}
-            isLoading={isLoading}
-            onCancelRequest={onCancelRequest}
-            handleTestResultRefresh={handleTestResultRefresh}
-          />
-        ),
+        children: <TestsView testResults={testResults} handleTestResultRefresh={handleTestResultRefresh} />,
       },
     ];
+
+    if (isLoading) {
+      return baseTabItems.map((tabItem) => {
+        return {
+          ...tabItem,
+          children: <ApiClientLoader onCancelRequest={onCancelRequest} />,
+        };
+      });
+    }
+
+    if (!response) {
+      if (isRequestCancelled) {
+        return baseTabItems.map((tabItem) => {
+          return {
+            ...tabItem,
+            children: <AbortError error={error} onRetry={executeRequest} />,
+          };
+        });
+      }
+
+      if (isFailed) {
+        return baseTabItems.map((tabItem) => {
+          return {
+            ...tabItem,
+            children: <RequestError error={error} onRetry={executeRequest} />,
+          };
+        });
+      }
+
+      return baseTabItems.map((tabItem) => {
+        return {
+          ...tabItem,
+          children: (
+            <EmptyResponsePlaceholder
+              isFailed={isFailed}
+              emptyDescription="Please run a request to see the response"
+              error={error}
+            />
+          ),
+        };
+      });
+    }
+
+    return baseTabItems;
   }, [
-    response?.body,
-    response?.headers,
     contentTypeHeader,
-    isLoading,
-    isFailed,
-    onCancelRequest,
     error,
-    testResults,
+    executeRequest,
     handleTestResultRefresh,
+    isFailed,
+    isLoading,
+    isRequestCancelled,
+    onCancelRequest,
+    response,
+    testResults,
   ]);
 
-  return <BottomSheet items={bottomSheetTabItems} disableDocking utilities={<StatusLine response={response} />} />;
+  return (
+    <div className="api-client-sheet-panel-container">
+      {response && error && !isRequestCancelled && <ApiClientErrorPanel error={error} />}
+      {!error && warning && !isRequestCancelled && <ApiClientWarningPanel warning={warning} />}
+      <div className="api-client-sheet-panel">
+        <BottomSheet
+          items={bottomSheetTabItems}
+          disableDocking
+          tabBarExtraContent={<StatusLine response={response} />}
+        />
+      </div>
+    </div>
+  );
 };

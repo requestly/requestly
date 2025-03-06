@@ -8,6 +8,8 @@ import { toast } from "utils/Toast";
 import firebaseApp from "../../firebase";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { WorkspaceType } from "types";
+import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
 
 const db = getFirestore(firebaseApp);
 
@@ -22,7 +24,7 @@ const splitMembersBasedOnRoles = (members) => {
   return result;
 };
 
-const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode) => {
+const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode, isLocalSyncEnabled) => {
   if (!uid) {
     // Rare edge case
     if (currentlyActiveWorkspace.id) {
@@ -34,7 +36,32 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
     const q = query(collection(db, "teams"), where("access", "array-contains", uid));
     return onSnapshot(
       q,
-      (querySnapshot) => {
+      async (querySnapshot) => {
+        let localRecords = [];
+        if (isLocalSyncEnabled) {
+          const allLocalWorkspacesResult = await getAllWorkspaces();
+          const allLocalWorkspaces =
+            allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
+          for (const partialWorkspace of allLocalWorkspaces) {
+            const localWorkspace = {
+              id: partialWorkspace.id,
+              name: partialWorkspace.name,
+              owner: uid,
+              accessCount: 1,
+              adminCount: 1,
+              members: {
+                [uid]: {
+                  role: "admin",
+                },
+              },
+              appsumo: null,
+              workspaceType: WorkspaceType.LOCAL,
+              rootPath: partialWorkspace.path,
+            };
+
+            localRecords.push(localWorkspace);
+          }
+        }
         const records = querySnapshot.docs
           .map((team) => {
             const teamData = team.data();
@@ -45,8 +72,14 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
             if (!teamData.archived && teamData.appsumo) {
               submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
             }
+
+            if (teamData?.workspaceType === WorkspaceType.LOCAL) {
+              return null;
+            }
+
             const membersPerRole = splitMembersBasedOnRoles(teamData.members);
-            return {
+
+            const formattedTeamData = {
               id: team.id,
               name: teamData.name,
               owner: teamData.owner,
@@ -56,10 +89,13 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
               adminCount: membersPerRole.admin?.length || 0,
               members: teamData.members,
               appsumo: teamData?.appsumo || null,
+              workspaceType: teamData?.workspaceType || WorkspaceType.SHARED,
             };
+
+            return formattedTeamData;
           })
           .filter(Boolean);
-
+        records.push(...localRecords);
         dispatch(teamsActions.setAvailableTeams(records));
 
         if (!currentlyActiveWorkspace?.id) return;
@@ -81,6 +117,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
               id: found.id,
               name: found.name,
               membersCount: found.accessCount,
+              workspaceType: found.workspaceType,
             })
           );
 

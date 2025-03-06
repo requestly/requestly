@@ -1,3 +1,4 @@
+import { EmailType } from "@requestly/shared/types/common";
 export interface UserAuth {
   loggedIn: boolean;
   isLimitReached?: boolean;
@@ -12,9 +13,8 @@ export interface UserAuth {
       isSyncEnabled?: boolean;
       isBackupEnabled?: boolean;
     };
-    isLoggedIn: boolean;
-    username: string;
-
+    isLoggedIn?: boolean;
+    username?: string;
     isBackupEnabled?: boolean;
     isSyncEnabled?: boolean;
     isPremium?: boolean;
@@ -33,5 +33,6 @@ export interface UserAuth {
       };
     };
     organization?: any;
+    emailType?: EmailType;
   };
 }

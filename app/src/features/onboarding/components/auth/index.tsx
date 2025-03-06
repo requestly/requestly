@@ -82,15 +82,9 @@ export const AuthScreen: React.FC<Props> = ({
               authMode === AUTH.ACTION_LABELS.SIGN_UP && onboardingVariation !== "variant3" ? "w-full" : ""
             }`}
           >
-            {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
-              <img
-                src={"/assets/media/common/sessionBearLogoFull.svg"}
-                alt="SessionBear logo"
-                style={{ width: "165px" }}
-              />
-            ) : (
+            {!isOnboarding ? (
               <img src={"/assets/media/common/rq_logo_full.svg"} alt="Requestly logo" style={{ width: "133px" }} />
-            )}
+            ) : null}
             <m.div transition={{ type: "linear" }} layout className="onboarding-auth-form-wrapper">
               <AuthForm
                 authMode={authMode}

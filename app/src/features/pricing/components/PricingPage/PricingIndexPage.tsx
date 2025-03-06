@@ -19,11 +19,14 @@ import ProductSwitcher from "../ProductSwitcher";
 import "./pricingIndexPage.scss";
 import { kebabCase } from "lodash";
 import { StudentProgram } from "./components/StudentProgram";
+import { isSafariBrowser } from "actions/ExtensionActions";
 
 export const PricingIndexPage = () => {
   const navigate = useNavigate();
 
-  const [activeProduct, setActiveProduct] = useState(PRICING.PRODUCTS.HTTP_RULES);
+  const [activeProduct, setActiveProduct] = useState(
+    isSafariBrowser() ? PRICING.PRODUCTS.API_CLIENT : PRICING.PRODUCTS.HTTP_RULES
+  );
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
 
   return (
@@ -48,7 +51,9 @@ export const PricingIndexPage = () => {
             <div className="pricing-page-description">
               More than half of Fortune 500 companies already use Requestly
             </div>
-            <ProductSwitcher activeProduct={activeProduct} setActiveProduct={setActiveProduct} />
+            {!isSafariBrowser() && (
+              <ProductSwitcher activeProduct={activeProduct} setActiveProduct={setActiveProduct} />
+            )}
             <Row justify="center" className="display-row-center w-full mt-24" gutter={24}>
               <Col className="display-row-center plan-duration-switch-container">
                 <Switch

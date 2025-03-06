@@ -6,7 +6,7 @@ import firebaseApp from "firebase.js";
 import { User, getAuth, onAuthStateChanged, signInWithCustomToken } from "firebase/auth";
 import { globalActions } from "store/slices/global/slice";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getDomainFromEmail, getEmailType, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import { getAppMode, getUserAttributes, getAppOnboardingDetails } from "store/selectors";
 import { getPlanName, isPremiumUser } from "utils/PremiumUtils";
 import moment from "moment";
@@ -20,6 +20,8 @@ import { getUser } from "backend/user/getUser";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { StorageService } from "init";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { getEmailType } from "utils/mailCheckerUtils";
+import { EmailType } from "@requestly/shared/types/common";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -33,7 +35,14 @@ const AuthHandler: React.FC<{}> = () => {
   const onboardingDetails = useSelector(getAppOnboardingDetails);
 
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
-  const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
+  const getOrganizationUsers = useMemo(
+    () =>
+      httpsCallable<{ domain: string }, { total: number; users: unknown[] }>(
+        getFunctions(),
+        "users-getOrganizationUsers"
+      ),
+    []
+  );
 
   const nonBlockingOperations = useCallback(
     async (user: User) => {
@@ -41,11 +50,17 @@ const AuthHandler: React.FC<{}> = () => {
       Logger.timeLog("AuthHandler-nonBlockingOperations", "START");
 
       submitAttrUtil(TRACKING.ATTR.EMAIL_DOMAIN, user.email.split("@")[1].replace(".", "_dot_") ?? "Missing_Value");
-      submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, getEmailType(user.email) ?? "Missing_Value");
+
+      const emailType = await getEmailType(user.email);
+      submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, emailType ?? "Missing_Value");
 
       /* To ensure that this attribute is assigned to only the users signing up for the first time */
       if (user?.metadata?.creationTime === user?.metadata?.lastSignInTime) {
-        if (isCompanyEmail(user.email) && user.emailVerified && !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]) {
+        if (
+          emailType === EmailType.BUSINESS &&
+          user.emailVerified &&
+          !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]
+        ) {
           getOrganizationUsers({ domain: getDomainFromEmail(user.email) }).then((res) => {
             const users = res.data.users;
             submitAttrUtil(TRACKING.ATTR.COMPANY_USER_SERIAL, users.length);
@@ -63,14 +78,10 @@ const AuthHandler: React.FC<{}> = () => {
       }
 
       if (userData?.username) {
-        dispatch(
-          // @ts-ignore
-          globalActions.updateUsername({ username: userData.username })
-        );
+        dispatch(globalActions.updateUsername({ username: userData.username }));
       }
 
       dispatch(
-        // @ts-ignore
         globalActions.updateUserInfo({
           loggedIn: true,
           details: {
@@ -101,10 +112,11 @@ const AuthHandler: React.FC<{}> = () => {
 
       try {
         // FIXME: getOrUpdateUserSyncState, checkUserBackupState taking too long for large workspace, can this be improved or moved to non-blocking operations?
-        const [firestorePlanDetails, isSyncEnabled, isBackupEnabled] = await Promise.all([
+        const [firestorePlanDetails, isSyncEnabled, isBackupEnabled, mailType] = await Promise.all([
           getUserSubscription(user.uid),
           getOrUpdateUserSyncState(user.uid, appMode),
           checkUserBackupState(user.uid),
+          getEmailType(user.email),
         ]);
 
         // phase-1 migration: Adaptor to convert firestore schema into old schema
@@ -128,11 +140,11 @@ const AuthHandler: React.FC<{}> = () => {
               isBackupEnabled,
               isSyncEnabled,
               isPremium: isUserPremium,
+              emailType: mailType,
             },
           })
         );
         dispatch(
-          // @ts-ignore
           globalActions.updateInitializations({
             initType: "auth",
             initValue: true,
@@ -249,7 +261,6 @@ const AuthHandler: React.FC<{}> = () => {
           globalActions.updateUserInfo({ loggedIn: false, details: null })
         );
         dispatch(
-          // @ts-ignore
           globalActions.updateInitializations({
             initType: "auth",
             initValue: true,

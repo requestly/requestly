@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { RQAPI } from "../../../../types";
-import { useParams } from "react-router-dom";
+import { ApiClientImporterType, RQAPI } from "../../../../types";
+import { useLocation, useParams } from "react-router-dom";
 import { Tabs, TabsProps, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
@@ -12,11 +12,9 @@ import { EnvironmentsList } from "../../../environment/components/environmentsLi
 import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal, ImportRequestModal } from "../modals";
 import { getEmptyAPIEntry } from "../../utils";
-import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import "./apiClientSidebar.scss";
 
 interface Props {}
@@ -29,7 +27,7 @@ export enum ApiClientSidebarTabKey {
 
 const APIClientSidebar: React.FC<Props> = () => {
   const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
+  const { state } = useLocation();
   const { requestId, collectionId } = useParams();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
@@ -43,10 +41,11 @@ const APIClientSidebar: React.FC<Props> = () => {
     onNewClick,
     onImportClick,
     onSelectionFromHistory,
-    recordToBeDeleted,
+    recordsToBeDeleted,
     isDeleteModalOpen,
     onDeleteModalClose,
     selectedHistoryIndex,
+    apiClientRecordsRepository,
   } = useApiClientContext();
 
   const handleNewRecordClick = useCallback(
@@ -155,25 +154,32 @@ const APIClientSidebar: React.FC<Props> = () => {
           data: apiEntry,
         };
 
-        const result = await upsertApiRecord(user.details?.profile?.uid, record, team?.id);
+        const result = await apiClientRecordsRepository.createRecord(record);
 
         if (result.success) {
           onSaveRecord(result.data);
 
           setIsImportModalOpen(false);
+        } else {
+          throw new Error(result.message);
         }
-
         return result.data;
       } catch (error) {
         console.error("Error importing request", error);
-        toast.error("Error importing request");
+        toast.error(error.message || "Error importing request");
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [user.details?.profile?.uid, user?.loggedIn, team?.id, onSaveRecord, setIsImportModalOpen]
+    [user?.loggedIn, onSaveRecord, setIsImportModalOpen, apiClientRecordsRepository]
   );
+
+  useEffect(() => {
+    if (state?.modal === ApiClientImporterType.CURL) {
+      setIsImportModalOpen(true);
+    }
+  }, [state?.modal, setIsImportModalOpen]);
 
   return (
     <>
@@ -197,7 +203,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         />
       </div>
 
-      <DeleteApiRecordModal open={isDeleteModalOpen} record={recordToBeDeleted} onClose={onDeleteModalClose} />
+      <DeleteApiRecordModal open={isDeleteModalOpen} records={recordsToBeDeleted} onClose={onDeleteModalClose} />
 
       <ImportRequestModal
         isRequestLoading={isLoading}

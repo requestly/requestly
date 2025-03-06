@@ -131,7 +131,7 @@ const Editor: React.FC<EditorProps> = ({
     }
   };
 
-  const updateContent = useCallback((code: string) => {
+  const updateContent = useCallback((code: string): void => {
     const view = editorRef.current?.view;
     if (!view) {
       return null;
@@ -169,7 +169,6 @@ const Editor: React.FC<EditorProps> = ({
 
   const handleEditorClose = useCallback(
     (scriptId: string) => {
-      // @ts-expect-error
       dispatch(globalActions.removeToastForEditor({ scriptId }));
     },
     [dispatch]

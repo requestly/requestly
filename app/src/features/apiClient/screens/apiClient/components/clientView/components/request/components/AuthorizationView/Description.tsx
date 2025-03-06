@@ -1,16 +1,16 @@
 import { isEmpty } from "lodash";
 import { BiLinkExternal } from "@react-icons/all-files/bi/BiLinkExternal";
 import { LABEL_TEXT } from "./authConstants";
-import { AuthDescriptionData, AuthDescriptionStep } from "./types";
 import React from "react";
+import { AuthForm } from "./AuthorizationForm/formStructure/types";
 interface DescriptionProps {
-  data: AuthDescriptionData;
+  data: AuthForm.Description.Data;
 }
 
 const Description: React.FC<DescriptionProps> = ({ data }) => {
   const { img, heading, subHeading, note, externalLink, steps = [] } = data;
 
-  const renderSteps = (descriptionSteps: AuthDescriptionStep[]) => {
+  const renderSteps = (descriptionSteps: AuthForm.Description.Step[]) => {
     if (isEmpty(descriptionSteps)) {
       return;
     }
