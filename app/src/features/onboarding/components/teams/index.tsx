@@ -4,7 +4,6 @@ import { getAppMode, getAppOnboardingDetails } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { DefaultTeamView } from "./components/defaultTeamView";
 import { JoinTeamView } from "./components/joinTeamsView";
-import { isCompanyEmail } from "utils/FormattingHelper";
 import { getPendingInvites } from "backend/workspace";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -15,7 +14,10 @@ import { isNull } from "lodash";
 import { trackAppOnboardingTeamsViewed, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import "./index.scss";
+import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
+import { useNavigate } from "react-router-dom";
 import { Invite } from "types";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface WorkspaceOnboardingViewProps {
   isOpen: boolean;
@@ -23,6 +25,7 @@ interface WorkspaceOnboardingViewProps {
 
 export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = ({ isOpen }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
@@ -54,7 +57,14 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
       if (res?.pendingInvites?.length > 0) setIsLoading(false);
       else {
         setIsLoading(false);
-        dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+        redirectToWebAppHomePage(navigate);
+        dispatch(globalActions.updateAppOnboardingCompleted());
+        dispatch(
+          globalActions.toggleActiveModal({
+            modalName: "appOnboardingModal",
+            newValue: false,
+          })
+        );
       }
     },
     [dispatch]
@@ -66,9 +76,16 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
       return;
     }
 
-    if (!isCompanyEmail(user?.details?.profile?.email) || !user?.details?.profile?.isEmailVerified) {
+    if (isCompanyEmail(user.details?.emailType) || !user?.details?.profile?.isEmailVerified) {
       setIsLoading(false);
-      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+      redirectToWebAppHomePage(navigate);
+      dispatch(globalActions.updateAppOnboardingCompleted());
+      dispatch(
+        globalActions.toggleActiveModal({
+          modalName: "appOnboardingModal",
+          newValue: false,
+        })
+      );
       return;
     }
 
@@ -80,17 +97,19 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
         setPendingInvites([]);
       });
   }, [
-    user?.details?.profile?.email,
-    user?.details?.profile?.isEmailVerified,
+    user.details?.profile?.email,
+    user.details?.profile?.isEmailVerified,
     user.loggedIn,
     dispatch,
     handleSwitchWorkspace,
     handlePendingInvites,
+    user.details?.emailType,
+    navigate,
   ]);
 
   useEffect(() => {
     if (!isNull(pendingInvites)) {
-      if (!isCompanyEmail(user?.details?.profile?.email)) {
+      if (!isCompanyEmail(user.details?.emailType)) {
         trackAppOnboardingTeamsViewed("no_workspaces");
         return;
       }
@@ -103,7 +122,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
         return;
       }
     }
-  }, [pendingInvites, user?.details?.profile?.email, appOnboardingDetails.createdWorkspace]);
+  }, [pendingInvites, user.details?.profile?.email, appOnboardingDetails.createdWorkspace, user.details?.emailType]);
 
   useEffect(() => {
     if (isOpen) {

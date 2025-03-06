@@ -81,7 +81,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         },
       });
     },
-    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.loggedIn, user?.details?.isSyncEnabled]
+    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.details?.isSyncEnabled]
   );
 
   const handleFinishClick = useCallback(
@@ -115,7 +115,6 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
             );
           }
         });
-
         trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "create_workspace_modal");
         toast.info("Workspace Created");
 
@@ -165,6 +164,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       }
     },
     [
+      dispatch,
       isNotifyAllSelected,
       createOrgTeamInvite,
       callback,

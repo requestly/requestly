@@ -1,0 +1,18 @@
+.safari-limited-support-container {
+  display: flex;
+  flex-direction: horizontal;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--space-12, 56px);
+  gap: var(--space-8, 24px);
+
+  .safari-limited-support-subheading {
+    font-size: var(--requestly-font-size-sm);
+    color: var(--text-subtle);
+  }
+
+  .safari-limited-support-icon {
+    align-self: flex-start;
+  }
+}

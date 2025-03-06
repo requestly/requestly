@@ -1,22 +1,16 @@
 import React, { ReactElement, memo, useCallback, useMemo, useState } from "react";
-import { Radio, RadioChangeEvent, Spin, Tooltip } from "antd";
+import { Radio, RadioChangeEvent, Tooltip } from "antd";
 import { trackRawResponseViewed } from "modules/analytics/events/features/apiClient";
 // import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
 import { getEditorLanguageFromContentType } from "componentsV2/CodeEditor";
 import "./responseBody.scss";
-import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
 import { RQButton } from "lib/design-system-v2/components";
 import { IoMdCopy } from "@react-icons/all-files/io/IoMdCopy";
-import { RQAPI } from "features/apiClient/types";
 import LazyEditorV2 from "componentsV2/CodeEditor/components/EditorV2";
 
 interface Props {
   responseText: string;
   contentTypeHeader: string;
-  isLoading: boolean;
-  isFailed: boolean;
-  onCancelRequest: () => void;
-  error?: RQAPI.ExecutionError;
 }
 
 enum ResponseMode {
@@ -32,14 +26,7 @@ const ImageResponsePreview: React.FC<{ responseText: string; mimeType: string }>
   return <img src={responseText} className="image-response-preview" alt="Response" />;
 };
 
-const ResponseBody: React.FC<Props> = ({
-  responseText,
-  contentTypeHeader,
-  isLoading,
-  isFailed,
-  onCancelRequest,
-  error,
-}) => {
+const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
   const [responseMode, setResponseMode] = useState(ResponseMode.PREVIEW);
   const [isResponseCopied, setIsResponseCopied] = useState(false);
 
@@ -114,44 +101,28 @@ const ResponseBody: React.FC<Props> = ({
 
   return (
     <div className="api-client-response-body">
-      {isLoading ? (
-        <div className="api-client-response__loading-overlay">
-          <Spin size="large" tip="Request in progress..." />
-          <RQButton onClick={onCancelRequest} className="mt-16">
-            Cancel request
-          </RQButton>
-        </div>
-      ) : null}
-      {responseText && !isLoading ? (
-        <div className="api-response-body-content">
-          {preview && responseMode === ResponseMode.PREVIEW ? (
-            preview
-          ) : (
-            <div className="api-response-body-raw-content">
-              <div className="api-response-body-raw-content__header">
-                {bodyPreviewModeOptions}
-                <Tooltip title={isResponseCopied ? "Copied!" : "Copy"} placement="left" color="#000">
-                  <RQButton
-                    type="transparent"
-                    icon={<IoMdCopy className="copy-raw-response-icon" />}
-                    size="small"
-                    onClick={onCopyButtonClick}
-                  />
-                </Tooltip>
-              </div>
-              <div className="api-response-body-raw-content__body">
-                <pre>{responseText}</pre>
-              </div>
+      <div className="api-response-body-content">
+        {preview && responseMode === ResponseMode.PREVIEW ? (
+          preview
+        ) : (
+          <div className="api-response-body-raw-content">
+            <div className="api-response-body-raw-content__header">
+              {bodyPreviewModeOptions}
+              <Tooltip title={isResponseCopied ? "Copied!" : "Copy"} placement="left" color="#000">
+                <RQButton
+                  type="transparent"
+                  icon={<IoMdCopy className="copy-raw-response-icon" />}
+                  size="small"
+                  onClick={onCopyButtonClick}
+                />
+              </Tooltip>
             </div>
-          )}
-        </div>
-      ) : (
-        <EmptyResponsePlaceholder
-          isFailed={isFailed}
-          emptyDescription="Please run a request to see the response"
-          error={error}
-        />
-      )}
+            <div className="api-response-body-raw-content__body">
+              <pre>{responseText}</pre>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

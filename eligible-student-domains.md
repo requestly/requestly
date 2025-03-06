@@ -15,8 +15,19 @@ The following domains are eligible for the student programme:
     ".edu.br",
     ".alfa-college.nl",
     ".mail.adelphi.edu",
+    ".edu.np",
     ".edu.in",
     ".eur.nl",
-    "bupt.cn"
+    ".edu.uy",
+    "bupt.cn",
+    ".edu.ar",
+    ".edu.kh",
+    ".edu.tw",
+    ".ac.id",
+    "bennington.edu",
+    "yonsei.ac.kr",
+    "lakeheadu.ca",
+    "estg.ipp.pt",
+    "duke.edu"
   ]
 }

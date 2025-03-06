@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Typography, Dropdown, MenuProps, Checkbox } from "antd";
 import PATHS from "config/constants/sub/paths";
 import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
@@ -8,19 +8,17 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
-import { upsertApiRecord } from "backend/apiClient";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import {
   trackDuplicateRequestClicked,
   trackDuplicateRequestFailed,
-  trackDuplicateRequestSuccessful,
   trackMoveRequestToCollectionClicked,
+  trackRequestDuplicated,
 } from "modules/analytics/events/features/apiClient";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { LocalWorkspaceTooltip } from "../../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -37,9 +35,13 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
-  const { updateRecordsToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
-  const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
+  const {
+    updateRecordsToBeDeleted,
+    setIsDeleteModalOpen,
+    onSaveRecord,
+    apiClientRecordsRepository,
+  } = useApiClientContext();
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
@@ -48,14 +50,15 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
         name: `(Copy) ${record.name || record.data.request.url}`,
       };
       delete newRecord.id;
-      return upsertApiRecord(user?.details?.profile?.uid, newRecord, team?.id)
+      return apiClientRecordsRepository
+        .createRecord(newRecord)
         .then((result) => {
           if (!result.success) {
             throw new Error("Failed to duplicate request");
           }
           onSaveRecord(result.data);
           toast.success("Request duplicated successfully");
-          trackDuplicateRequestSuccessful();
+          trackRequestDuplicated();
         })
         .catch((error) => {
           console.error("Error duplicating request:", error);
@@ -63,10 +66,10 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
           trackDuplicateRequestFailed();
         });
     },
-    [team?.id, user?.details?.profile?.uid, onSaveRecord]
+    [onSaveRecord, apiClientRecordsRepository]
   );
 
-  const getRequestOptions = useCallback((): MenuProps["items"] => {
+  const requestOptions = useMemo((): MenuProps["items"] => {
     return [
       {
         key: "0",
@@ -78,7 +81,11 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
       },
       {
         key: "1",
-        label: <div>Duplicate</div>,
+        label: (
+          <LocalWorkspaceTooltip featureName="Request duplication" placement="bottomRight">
+            <div>Duplicate</div>
+          </LocalWorkspaceTooltip>
+        ),
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           handleDuplicateRequest(record);
@@ -87,7 +94,12 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
       },
       {
         key: "2",
-        label: <div>Move to Collection</div>,
+        disabled: isLocalSyncEnabled,
+        label: (
+          <LocalWorkspaceTooltip featureName="Move to Collection">
+            <div>Move to Collection</div>
+          </LocalWorkspaceTooltip>
+        ),
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setRecordToMove(record);
@@ -105,7 +117,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
         },
       },
     ];
-  }, [record, updateRecordsToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest]);
+  }, [record, updateRecordsToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest, isLocalSyncEnabled]);
 
   return (
     <>
@@ -134,13 +146,13 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
           )}
           <NavLink
             title={record.name || record.data.request?.url}
-            to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`}
+            to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(record.id)}`}
             className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
             onClick={() => {
               openTab(record.id, {
                 isPreview: true,
                 title: record.name || record.data.request?.url,
-                url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`,
+                url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(record.id)}`,
               });
             }}
           >
@@ -158,7 +170,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
             </Typography.Text>
             <div className="request-url">{record.name || record.data.request?.url}</div>
             <div className="request-options">
-              <Dropdown trigger={["click"]} menu={{ items: getRequestOptions() }} placement="bottomRight">
+              <Dropdown trigger={["click"]} menu={{ items: requestOptions }} placement="bottomRight">
                 <RQButton
                   onClick={(e) => {
                     e.stopPropagation();
