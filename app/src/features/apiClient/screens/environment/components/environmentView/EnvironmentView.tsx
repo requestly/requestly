@@ -15,6 +15,7 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { isEmpty } from "lodash";
 import { isGlobalEnvironment } from "../../utils";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
+import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 
 export const EnvironmentView = () => {
   const navigate = useNavigate();
@@ -87,6 +88,10 @@ export const EnvironmentView = () => {
     return setVariables(persistedEnvId, pendingVariables)
       .then(() => {
         toast.success("Variables updated successfully");
+        trackVariablesSaved({
+          type: isGlobalEnvironment(envId) ? "global_variables" : "environment_variable",
+          num_variables: pendingVariables.length,
+        });
         resetChanges();
       })
       .catch((error) => {

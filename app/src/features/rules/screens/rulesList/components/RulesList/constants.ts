@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { RuleType } from "@requestly/shared/types/entities/rules";
 import LINKS from "config/constants/sub/links";
+import { RuleTemplate } from "features/rules/types/rules";
 import { RuleDetails } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
 
 export const sampleRuleDetails: Record<string, { id: string; demoLink: string; details: RuleDetails }> = {
@@ -80,7 +81,7 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
   },
 };
 
-export const localSampleRules = [
+export const localSampleRules: RuleTemplate[] = [
   {
     data: {
       ruleData: {

@@ -32,8 +32,8 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
         >
           {Object.entries(RuleSourceKey).map(([key, value]) =>
             value === RuleSourceKey.PATH ? null : (
-              <Select.Option key={value} value={value}>
-                {capitalize(value)}
+              <Select.Option key={String(value)} value={value}>
+                {capitalize(String(value))}
               </Select.Option>
             )
           )}
@@ -53,7 +53,7 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
                 ? "Wildcard"
                 : value === RuleSourceOperator.MATCHES
                 ? "RegEx"
-                : value}
+                : String(value)}
             </Select.Option>
           ))}
         </Select>

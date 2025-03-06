@@ -21,11 +21,10 @@ export const updateMock = async (
   if (BODY_IN_BUCKET_ENABLED && mockData?.recordType !== MockRecordType.COLLECTION) {
     responsesWithBody = [];
     // Update body to null and filePath
-    mockData.responses.map((response) => {
+    mockData.responses.forEach((response) => {
       response.filePath = createResponseBodyFilepath(uid, mockId, response.id, teamId);
       responsesWithBody.push({ ...response });
       response.body = null;
-      return null;
     });
   }
 

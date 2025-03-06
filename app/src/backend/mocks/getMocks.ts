@@ -10,8 +10,12 @@ export const getMocks = async (uid: string, type: MockType, teamId?: string): Pr
   }
 
   const ownerId = getOwnerId(uid, teamId);
-  const mocks = await getMocksFromFirebase(ownerId, type).catch(() => []);
-  return mocks;
+
+  try {
+    return await getMocksFromFirebase(ownerId, type);
+  } catch {
+    return [];
+  }
 };
 
 const getMocksFromFirebase = async (ownerId: string, type?: MockType): Promise<RQMockMetadataSchema[]> => {

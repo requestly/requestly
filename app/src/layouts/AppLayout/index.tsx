@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import isEmpty from "is-empty";
+import { isEmpty } from "lodash";
 import { submitAppDetailAttributes } from "utils/AnalyticsUtils.js";
 import { ConfigProvider } from "antd";
 import enUS from "antd/lib/locale/en_US";
@@ -30,7 +30,6 @@ import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
-import useRedirectToLastFeature from "hooks/useRedirectToLastFeature";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -40,7 +39,6 @@ const App: React.FC = () => {
     growthbook.loadFeatures({ autoRefresh: true });
   }, []);
 
-  useRedirectToLastFeature();
   usePreLoadRemover();
   useGeoLocation();
   useIsExtensionEnabled();
@@ -76,15 +74,15 @@ const App: React.FC = () => {
       <AutomationNotAllowedNotice />
       <AuthHandler />
       <AppModeInitializer />
-      <DBListeners />
-      {/* <RuleExecutionsSyncer /> */}
-      {/* @ts-ignore */}
-      <ActiveWorkspace />
-      {/* @ts-ignore */}
-      <ThirdPartyIntegrationsHandler />
-      <ThemeProvider>
-        <ConfigProvider locale={enUS}>
-          <GrowthBookProvider growthbook={growthbook}>
+      <GrowthBookProvider growthbook={growthbook}>
+        <DBListeners />
+        {/* <RuleExecutionsSyncer /> */}
+        {/* @ts-ignore */}
+        <ActiveWorkspace />
+        {/* @ts-ignore */}
+        <ThirdPartyIntegrationsHandler />
+        <ThemeProvider>
+          <ConfigProvider locale={enUS}>
             {/* @ts-ignore */}
             <InitImplicitWidgetConfigHandler />
             <LocalUserAttributesHelperComponent />
@@ -98,9 +96,9 @@ const App: React.FC = () => {
                 <Outlet />
               </div>
             </LazyMotion>
-          </GrowthBookProvider>
-        </ConfigProvider>
-      </ThemeProvider>
+          </ConfigProvider>
+        </ThemeProvider>
+      </GrowthBookProvider>
     </>
   );
 };

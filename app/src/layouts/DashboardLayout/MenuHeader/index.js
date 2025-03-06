@@ -25,6 +25,7 @@ import { PlanExpiredBadge } from "./PlanExpiredBadge";
 import { trackAskAIClicked } from "features/requestBot";
 import BotIcon from "assets/icons/bot.svg?react";
 import "./MenuHeader.css";
+import { isSafariBrowser } from "actions/ExtensionActions";
 
 const { Header } = Layout;
 const { PATHS } = APP_CONSTANTS;
@@ -133,13 +134,14 @@ const MenuHeader = () => {
 
                 <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen no-drag" />
 
-                {(appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
-                  (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
-                    user?.details?.planDetails?.status !== "canceled")) && (
-                  <Col className="no-drag">
-                    <PremiumPlanBadge />
-                  </Col>
-                )}
+                {!isSafariBrowser() &&
+                  (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
+                    (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+                      user?.details?.planDetails?.status !== "canceled")) && (
+                    <Col className="no-drag">
+                      <PremiumPlanBadge />
+                    </Col>
+                  )}
 
                 {/* settings */}
                 <Col>

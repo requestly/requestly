@@ -1,11 +1,10 @@
 import { Col, Image, List, Row } from "antd";
-import downloadProfileGIF from "assets/img/screenshots/ios/download-ios-profile.gif";
 import { IOS_DEVICES } from "./constants";
 
 const CertificateDownloadInstructions = ({ device_id }) => {
   const renderGif = () => {
     if (device_id === IOS_DEVICES.IPHONE13_PRO) {
-      return <Image src={downloadProfileGIF} />;
+      return <Image src={"/assets/media/components/download-ios-profile.gif"} />;
     }
   };
   return (

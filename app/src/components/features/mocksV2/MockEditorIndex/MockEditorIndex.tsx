@@ -117,11 +117,9 @@ const MockEditorIndex: React.FC<Props> = ({
             type: IncentivizeEvent.MOCK_CREATED,
             metadata: { num_mocks: userAttributes?.num_mocks || 1 },
           })?.then((response) => {
-            // @ts-ignore
             if (response.data?.success) {
               dispatch(
                 incentivizationActions.setUserMilestoneAndRewardDetails({
-                  // @ts-ignore
                   userMilestoneAndRewardDetails: response.data?.data,
                 })
               );

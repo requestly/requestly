@@ -97,11 +97,9 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
 
       trackSampleRulesImported();
 
-      // @ts-ignore
       dispatch(globalActions.updateIsSampleRulesImported(true));
 
       dispatch(
-        // @ts-ignore
         globalActions.updateRefreshPendingStatus({
           type: "rules",
           newValue: !isRulesListRefreshPending,

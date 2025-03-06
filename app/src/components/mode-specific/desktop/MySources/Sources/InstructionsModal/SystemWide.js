@@ -8,7 +8,7 @@ const SystemWideInstructions = ({ setShowInstructions }) => {
   return (
     <>
       <InstructionsHeader
-        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/package.png"}
+        icon={window.location.origin + "/assets/media/components/package.png"}
         heading="Setting up system proxy"
         description="Requestly requires your applications to send their network traffic through its local proxy server before
             going to the destination."

@@ -4,11 +4,14 @@ import { KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMet
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
-import { upsertApiRecord } from "backend/apiClient";
-import { forEach, isEmpty, split, unionBy } from "lodash";
+import { forEach, isEmpty, omit, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
+import { generateDocumentId } from "backend/utils";
+import { getDefaultAuth } from "./components/clientView/components/request/components/AuthorizationView/defaults";
+import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
+type ResponseOrError = RQAPI.Response | { error: string };
 export const makeRequest = async (
   appMode: string,
   request: RQAPI.Request,
@@ -28,9 +31,27 @@ export const makeRequest = async (
     }
 
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
-      getAPIResponseViaExtension(request).then(resolve);
+      getAPIResponseViaExtension(request).then((result: ResponseOrError) => {
+        if (!result) {
+          //Backward compatibility check
+          reject(new Error("Failed to make request. Please check if the URL is valid."));
+        } else if ("error" in result) {
+          reject(new Error(result.error));
+        } else {
+          resolve(result);
+        }
+      });
     } else if (appMode === CONSTANTS.APP_MODES.DESKTOP) {
-      getAPIResponseViaProxy(request).then(resolve);
+      getAPIResponseViaProxy(request).then((result: ResponseOrError) => {
+        if (!result) {
+          //Backward compatibility check
+          reject(new Error("Failed to make request. Please check if the URL is valid."));
+        } else if ("error" in result) {
+          reject(new Error(result.error));
+        } else {
+          resolve(result);
+        }
+      });
     } else {
       resolve(null);
     }
@@ -56,6 +77,11 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
       body: null,
       contentType: RequestContentType.RAW,
       ...(request || {}),
+    },
+    auth: getDefaultAuth(false),
+    scripts: {
+      preRequest: "",
+      postResponse: "",
     },
     response: null,
   };
@@ -232,18 +258,16 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 
   recordsCopy.forEach((record) => {
     const recordState = recordsMap[record.id];
-    if (record.collectionId) {
-      const parentNode = recordsMap[record.collectionId] as RQAPI.CollectionRecord;
-      if (parentNode) {
-        parentNode.data.children.push(recordState);
-      }
+    const parentNode = recordsMap[record.collectionId] as RQAPI.CollectionRecord;
+    if (parentNode) {
+      parentNode.data.children.push(recordState);
     } else {
-      updatedRecords.push(recordState);
+      updatedRecords.push({ ...recordState, collectionId: "" });
     }
   });
 
   sortNestedRecords(updatedRecords);
-  return updatedRecords;
+  return { recordsMap, updatedRecords };
 };
 
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
@@ -252,7 +276,8 @@ export const createBlankApiRecord = (
   uid: string,
   teamId: string,
   recordType: RQAPI.RecordType,
-  collectionId: string
+  collectionId: string,
+  apiClientRecordsRepository: ApiClientRecordsInterface<any>
 ) => {
   const newRecord: Partial<RQAPI.Record> = {};
 
@@ -267,12 +292,20 @@ export const createBlankApiRecord = (
   if (recordType === RQAPI.RecordType.COLLECTION) {
     newRecord.name = "New collection";
     newRecord.type = RQAPI.RecordType.COLLECTION;
-    newRecord.data = { variables: {} };
+    newRecord.data = {
+      variables: {},
+      auth: getDefaultAuth(false),
+    };
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
   }
 
-  return upsertApiRecord(uid, newRecord, teamId);
+  const result =
+    recordType === RQAPI.RecordType.COLLECTION
+      ? apiClientRecordsRepository.createCollection(newRecord as RQAPI.CollectionRecord)
+      : apiClientRecordsRepository.createRecord(newRecord as RQAPI.ApiRecord);
+
+  return result;
 };
 
 export const extractQueryParams = (inputString: string) => {
@@ -297,9 +330,6 @@ export const extractQueryParams = (inputString: string) => {
 };
 
 export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString: string) => {
-  if (isEmpty(queryParams)) {
-    return inputString;
-  }
   const baseUrl = split(inputString, "?")[0];
   const enabledParams = queryParams.filter((param) => param.isEnabled ?? true);
 
@@ -527,4 +557,50 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.Request): HarReq
   }
 
   return harRequest;
+};
+
+export const filterOutChildrenRecords = (
+  selectedRecords: Set<RQAPI.Record["id"]>,
+  childParentMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>,
+  recordsMap: Record<RQAPI.Record["id"], RQAPI.Record>
+) =>
+  [...selectedRecords]
+    .filter((id) => !childParentMap[id] || !selectedRecords.has(childParentMap[id]))
+    .map((id) => recordsMap[id]);
+
+export const processRecordsForDuplication = (recordsToProcess: RQAPI.Record[]) => {
+  const recordsToDuplicate: RQAPI.Record[] = [];
+  const queue: RQAPI.Record[] = [...recordsToProcess];
+
+  while (queue.length > 0) {
+    const record = queue.shift()!;
+
+    if (record.type === RQAPI.RecordType.COLLECTION) {
+      const newId = generateDocumentId("apis");
+
+      const collectionToDuplicate: RQAPI.CollectionRecord = Object.assign({}, record, {
+        id: newId,
+        name: `(Copy) ${record.name}`,
+        data: omit(record.data, "children"),
+      });
+
+      recordsToDuplicate.push(collectionToDuplicate);
+
+      if (record.data.children?.length) {
+        const childrenToDuplicate = record.data.children.map((child) =>
+          Object.assign({}, child, { collectionId: newId })
+        );
+        queue.push(...childrenToDuplicate);
+      }
+    } else {
+      const requestToDuplicate: RQAPI.Record = Object.assign({}, record, {
+        id: generateDocumentId("apis"),
+        name: `(Copy) ${record.name}`,
+      });
+
+      recordsToDuplicate.push(requestToDuplicate);
+    }
+  }
+
+  return recordsToDuplicate;
 };

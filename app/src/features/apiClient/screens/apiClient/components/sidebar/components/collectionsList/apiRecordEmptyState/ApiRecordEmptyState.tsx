@@ -11,7 +11,7 @@ export const ApiRecordEmptyState: React.FC<Props> = ({
 }) => {
   return (
     <div className="api-record-empty-state-container">
-      <div className="mt-8">
+      <div className="mt-8 empty-state-wrapper">
         <EmptyState
           message={message}
           newRecordBtnText={newRecordBtnText}

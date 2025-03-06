@@ -1,4 +1,6 @@
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
+import { EmailType } from "@requestly/shared/types/common";
+import { getEmailType } from "utils/mailCheckerUtils";
 /* was created for integrations but no longer used */
 export type User = {
   id: string;
@@ -41,9 +43,10 @@ export const resetUserDetails = (): void => {
   };
 };
 
-export const updateUserEmail = (email: string) => {
+export const updateUserEmail = async (email: string) => {
   userDetails.email = email;
-  if (email && isCompanyEmail(email)) {
+  const emailType = await getEmailType(email);
+  if (email && emailType === EmailType.BUSINESS) {
     userDetails.isBusinessAccount = true;
     userDetails.company = getDomainFromEmail(email);
   }

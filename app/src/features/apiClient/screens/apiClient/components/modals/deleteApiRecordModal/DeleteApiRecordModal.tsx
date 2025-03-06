@@ -1,74 +1,100 @@
 import React, { useState } from "react";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { RQModal } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import { RQAPI } from "features/apiClient/types";
-import { isApiCollection } from "../../../utils";
-import { deleteApiRecords } from "backend/apiClient";
+import { isApiCollection, isApiRequest } from "../../../utils";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { trackCollectionDeleted } from "modules/analytics/events/features/apiClient";
 import "./deleteApiRecordModal.scss";
+import { isEmpty, partition } from "lodash";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
-  record: RQAPI.Record;
+  records: RQAPI.Record[];
   onClose: () => void;
   onSuccess?: () => void;
 }
 
-export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open, record, onClose, onSuccess }) => {
-  const user = useSelector(getUserAuthDetails);
-  const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
-  const { onDeleteRecords } = useApiClientContext();
+export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open, records, onClose, onSuccess }) => {
+  const { onDeleteRecords, apiClientRecordsRepository } = useApiClientContext();
 
   const [isDeleting, setIsDeleting] = useState(false);
-
-  if (!record) {
+  if (isEmpty(records)) {
     return null;
   }
 
-  let apiRequestCount = isApiCollection(record) ? record.data.children.length : 1;
+  let apiRequestCount = records.length === 1 ? (isApiCollection(records[0]) ? records[0].data.children.length : 1) : "";
 
-  const collectAllRecordIds = (record: RQAPI.Record): string[] => {
-    const recordIds: string[] = [record.id];
+  const getAllRecordsToDelete = () => {
+    const recordsToBeDeleted: RQAPI.Record[] = [];
+    const stack: RQAPI.Record[] = [...records];
 
-    if (isApiCollection(record) && record.data.children) {
-      record.data.children.forEach((child) => {
-        recordIds.push(...collectAllRecordIds(child));
-      });
+    while (stack.length) {
+      const record = stack.pop()!;
+      recordsToBeDeleted.push(record);
+      if (isApiCollection(record) && record.data.children) {
+        stack.push(...record.data.children);
+      }
     }
-    return recordIds;
+
+    return recordsToBeDeleted;
   };
 
   const handleDeleteApiRecord = async () => {
+    const recordsToBeDeleted = getAllRecordsToDelete();
+    if (!recordsToBeDeleted.length) {
+      toast.error("Please select atleast one entity you want to delete.");
+      return;
+    }
+
     setIsDeleting(true);
+    const [apiRecords, collectionRecords] = partition(recordsToBeDeleted, isApiRequest);
+    const apiRecordIds = apiRecords.map((record) => record.id);
+    const collectionRecordIds = collectionRecords.map((record) => record.id);
 
-    const recordIds = collectAllRecordIds(record);
-    const result = await deleteApiRecords(uid, recordIds, teamId);
-    onDeleteRecords(recordIds);
+    // First delete records
+    const recordDeletionResult = await apiClientRecordsRepository.deleteRecords(apiRecordIds);
 
-    if (result.success) {
+    // Then delete collections
+    const collectionsDeletionResult = await apiClientRecordsRepository.deleteCollections(collectionRecordIds);
+
+    // Check if both deletions were successful
+    if (recordDeletionResult.success && collectionsDeletionResult.success) {
+      onDeleteRecords([...apiRecordIds, ...collectionRecordIds]);
       trackCollectionDeleted();
-      toast.success(record.type === RQAPI.RecordType.API ? "API request deleted" : "Collection deleted");
+      toast.success(
+        records.length === 1
+          ? records[0].type === RQAPI.RecordType.API
+            ? "API request deleted"
+            : "Collection deleted"
+          : "Records Deleted"
+      );
       onClose();
       onSuccess?.();
 
       // TODO: add analytics
+    } else {
+      const erroredResult = !recordDeletionResult.success ? recordDeletionResult : collectionsDeletionResult;
+      toast.error(erroredResult.message || `Error deleting ${records.length === 1 ? "record" : "records"}`);
     }
 
     setIsDeleting(false);
   };
 
-  const header = record.type === RQAPI.RecordType.API ? "Delete API Request" : "Delete Collection";
+  const header =
+    records.length === 1
+      ? records[0].type === RQAPI.RecordType.API
+        ? "Delete API Request"
+        : "Delete Collection"
+      : "Delete Records";
+
   const description =
-    record.type === RQAPI.RecordType.API
-      ? `This action will permanently delete this API request. Are you sure you want to continue?`
-      : `This action will permanently delete the entire collection and its ${apiRequestCount} requests. Are you sure you want to continue?`;
+    records.length === 1
+      ? records[0].type === RQAPI.RecordType.API
+        ? `This action will permanently delete this API request. Are you sure you want to continue?`
+        : `This action will permanently delete the entire collection and its ${apiRequestCount} requests. Are you sure you want to continue?`
+      : "This action will permanently delete the selected Collections, APIs, and their associated requests. Are you sure you want to proceed?";
 
   return (
     <RQModal
@@ -88,7 +114,11 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
           Cancel
         </RQButton>
         <RQButton block type="danger" loading={isDeleting} onClick={handleDeleteApiRecord}>
-          {record.type === RQAPI.RecordType.API ? "Delete API" : "Delete collection"}
+          {records.length === 1
+            ? records[0].type === RQAPI.RecordType.API
+              ? "Delete API"
+              : "Delete collection"
+            : "Delete Records"}
         </RQButton>
       </div>
     </RQModal>

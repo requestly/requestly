@@ -20,7 +20,7 @@ import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExtern
 import { copyToClipBoard } from "utils/Misc";
 import "../importer-components.css";
 import { parseRulesFromResourceOverride } from "modules/rule-adapters/resource-override-rule-adapters/parseRulesFromResourceOverride";
-import { Rule } from "types";
+import { Rule } from "@requestly/shared/types/entities/rules";
 import { generateObjectId } from "utils/FormattingHelper";
 import {
   trackResourceOverrideSettingsImportComplete,
@@ -298,16 +298,16 @@ export const ImportFromResourceOverride: React.FC<ImportFromResourceOverrideProp
                   Follow below steps to export settings from Resource Override:
                 </Row>
                 <ol>
-                  {validExportSteps.map(({ step, additionalSteps = [] }, index) => (
+                  {validExportSteps.map(({ step }, index) => (
                     <>
                       <li key={index}>{step}</li>
-                      {additionalSteps.length > 0 && (
+                      {/* {additionalSteps.length > 0 && (
                         <ol className="additional-import-steps-list">
                           {additionalSteps.map(({ step }, index) => (
                             <li key={index}>{step}</li>
                           ))}
                         </ol>
-                      )}
+                      )} */}
                     </>
                   ))}
                 </ol>

@@ -4,14 +4,13 @@ import { PostmanImporter } from "features/apiClient/screens/PostmanImporterView/
 
 interface PostmanImporterModalProps {
   isOpen: boolean;
-  patchLostRecords?: boolean;
   onClose: () => void;
 }
 
-export const PostmanImporterModal: React.FC<PostmanImporterModalProps> = ({ isOpen, onClose, patchLostRecords }) => {
+export const PostmanImporterModal: React.FC<PostmanImporterModalProps> = ({ isOpen, onClose }) => {
   return (
     <Modal open={isOpen} onCancel={onClose} footer={null} width={600}>
-      <PostmanImporter onSuccess={onClose} patchLostRecords={patchLostRecords} />
+      <PostmanImporter onSuccess={onClose} />
     </Modal>
   );
 };

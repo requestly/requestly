@@ -9,7 +9,6 @@ import { globalActions } from "store/slices/global/slice";
 import { StorageService } from "init";
 import GroupMenuItem from "./GroupMenuItem";
 import APP_CONSTANTS from "config/constants";
-//@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackGroupChangedEvent, trackGroupCreatedEvent } from "features/rules/analytics";
 import Logger from "lib/logger";
