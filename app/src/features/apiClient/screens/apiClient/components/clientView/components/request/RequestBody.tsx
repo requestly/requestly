@@ -30,7 +30,7 @@ function parseSingleModeBody(params: {
 const RequestBody: React.FC<RequestBodyProps> = (props) => {
   const { contentType, variables, setRequestEntry, setContentType } = props;
 
-  const [requestBodyStateManager] = useState(
+  const requestBodyStateManager = useMemo(
     () =>
       new RequestBodyStateManager(
         props.mode === "multiple"
@@ -39,7 +39,8 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
               contentType,
               body: props.body,
             })
-      )
+      ),
+    [contentType, props]
   );
 
   const requestBodyOptions = useMemo(() => {
