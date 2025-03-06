@@ -158,6 +158,7 @@ const AuthHandler: React.FC<{}> = () => {
           submitAttrUtil(TRACKING.ATTR.PAYMENT_MODE, planDetails.type ?? "Missing Value");
           submitAttrUtil(TRACKING.ATTR.PLAN_ID, planDetails.planId ?? "Missing Value");
           submitAttrUtil(TRACKING.ATTR.IS_TRIAL, planDetails.status === "trialing");
+          submitAttrUtil("subscription_status", planDetails.status);
 
           if (planDetails.subscription) {
             submitAttrUtil(TRACKING.ATTR.PLAN_START_DATE, planDetails.subscription.startDate ?? "Missing Value");

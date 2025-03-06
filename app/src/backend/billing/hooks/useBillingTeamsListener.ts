@@ -10,6 +10,7 @@ import { getBillingTeamMembersProfile } from "..";
 import Logger from "lib/logger";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 let unsubscribeBillingTeamsListener: () => void = null;
 
@@ -50,6 +51,13 @@ export const useBillingTeamsListener = () => {
           id: billingTeam.id,
         };
       });
+
+      // Seed the attribute lazily
+      // TODO: Can be removed after a month as this seeding is already present in backend
+      const isAcceleratorBillingTeam = billingTeamDetails.some((team) => team.isAcceleratorTeam === true);
+      if (isAcceleratorBillingTeam) {
+        submitAttrUtil("rq_subscription_type", "accelerator");
+      }
 
       if (isCompanyEmail(user.details?.emailType)) {
         const domainBillingTeamsQuery = query(
