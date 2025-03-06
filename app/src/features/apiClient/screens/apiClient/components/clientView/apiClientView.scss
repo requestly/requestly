@@ -52,7 +52,6 @@
   .api-client-body {
     padding-top: 8px;
     overflow: hidden;
-    border: 1px solid var(--requestly-color-white-t-10);
 
     .ant-tabs {
       .ant-tabs-nav-wrap {
@@ -93,12 +92,8 @@
         padding: 4px 8px;
         background: transparent;
 
-        &.highlight-url {
-          border: 0.5px solid var(--requestly-color-primary);
-        }
-
         &:focus-within {
-          border: 0.5px solid #3e4044;
+          border: 1px solid var(--requestly-color-primary);
         }
       }
 
