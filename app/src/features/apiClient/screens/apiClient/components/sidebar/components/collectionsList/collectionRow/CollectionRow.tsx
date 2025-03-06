@@ -172,55 +172,55 @@ export const CollectionRow: React.FC<Props> = ({
                 <div className="collection-name" title={record.name}>
                   {record.name}
                 </div>
-                <Conditional condition={isReadOnly}>
-	               	<div className={`collection-options ${hoveredId === record.id ? "visible" : " "}`}>
-	                  <Tooltip title={"Add Request"}>
-	                    <RQButton
-	                      size="small"
-	                      type="transparent"
-	                      icon={<FileAddOutlined />}
-	                      onClick={(e) => {
-	                        e.stopPropagation();
-	                        setActiveKey(record.id);
-	                        setCreateNewField(RQAPI.RecordType.API);
-	                        onNewClick("collection_row", RQAPI.RecordType.API, record.id).then(() => {
-	                          setCreateNewField(null);
-	                        });
-	                      }}
-	                    />
-	                  </Tooltip>
-	                  <Tooltip title={"Add Folder"}>
-	                    <RQButton
-	                      size="small"
-	                      type="transparent"
-	                      icon={<FolderAddOutlined />}
-	                      onClick={(e) => {
-	                        e.stopPropagation();
-	                        setActiveKey(record.id);
-	                        setCreateNewField(RQAPI.RecordType.COLLECTION);
-	                        onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id).then(() => {
-	                          setCreateNewField(null);
-	                        });
-	                      }}
-	                    />
-	                  </Tooltip>
+                <Conditional condition={!isReadOnly}>
+                  <div className={`collection-options ${hoveredId === record.id ? "visible" : " "}`}>
+                    <Tooltip title={"Add Request"}>
+                      <RQButton
+                        size="small"
+                        type="transparent"
+                        icon={<FileAddOutlined />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveKey(record.id);
+                          setCreateNewField(RQAPI.RecordType.API);
+                          onNewClick("collection_row", RQAPI.RecordType.API, record.id).then(() => {
+                            setCreateNewField(null);
+                          });
+                        }}
+                      />
+                    </Tooltip>
+                    <Tooltip title={"Add Folder"}>
+                      <RQButton
+                        size="small"
+                        type="transparent"
+                        icon={<FolderAddOutlined />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveKey(record.id);
+                          setCreateNewField(RQAPI.RecordType.COLLECTION);
+                          onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id).then(() => {
+                            setCreateNewField(null);
+                          });
+                        }}
+                      />
+                    </Tooltip>
 
-	                  <Dropdown
-	                    trigger={["click"]}
-	                    menu={{ items: getCollectionOptions(record) }}
-	                    placement="bottomRight"
-	                  >
-	                    <RQButton
-	                      onClick={(e) => {
-	                        e.stopPropagation();
-	                        setShowSelection(false);
-	                      }}
-	                      size="small"
-	                      type="transparent"
-	                      icon={<MdOutlineMoreHoriz />}
-	                    />
-	                  </Dropdown>
-	                </div>
+                    <Dropdown
+                      trigger={["click"]}
+                      menu={{ items: getCollectionOptions(record) }}
+                      placement="bottomRight"
+                    >
+                      <RQButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowSelection(false);
+                        }}
+                        size="small"
+                        type="transparent"
+                        icon={<MdOutlineMoreHoriz />}
+                      />
+                    </Dropdown>
+                  </div>
                 </Conditional>
               </div>
             }
