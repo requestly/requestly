@@ -13,7 +13,8 @@ import {
   trackWorkspaceInviteLinkRevoked,
 } from "modules/analytics/events/features/teams";
 import { trackWorkspaceInviteLinkCopied } from "modules/analytics/events/common/teams";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface Props {
   teamId: string;
@@ -36,8 +37,7 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);
-
-  const isBusinessEmail = useMemo(() => isCompanyEmail(user?.details?.profile?.email), [user?.details?.profile?.email]);
+  const isBusinessEmail = useMemo(() => isCompanyEmail(user.details?.emailType), [user.details?.emailType]);
 
   const handlePublicInviteCreateClicked = useCallback(() => {
     trackWorkspaceInviteLinkGenerated(teamId);

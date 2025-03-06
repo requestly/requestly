@@ -8,7 +8,8 @@ import { getAuth } from "firebase/auth";
 import { billingActions } from "store/features/billing/slice";
 import { getBillingTeamMembersProfile } from "..";
 import Logger from "lib/logger";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 let unsubscribeBillingTeamsListener: () => void = null;
 
@@ -50,7 +51,7 @@ export const useBillingTeamsListener = () => {
         };
       });
 
-      if (isCompanyEmail(user?.details?.profile?.email)) {
+      if (isCompanyEmail(user.details?.emailType)) {
         const domainBillingTeamsQuery = query(
           collection(db, "billing"),
           where("ownerDomains", "array-contains", domain)
@@ -81,11 +82,12 @@ export const useBillingTeamsListener = () => {
       });
     });
   }, [
+    user.loggedIn,
+    user.details?.profile?.email,
+    user.details?.profile?.uid,
+    user.details?.emailType,
     dispatch,
     fetchAndDispatchBillingTeamMembersProfile,
-    user.loggedIn,
-    user?.details?.profile?.email,
-    user?.details?.profile?.uid,
   ]);
 
   const refreshUserToken = async () => {
