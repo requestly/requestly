@@ -46,7 +46,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
   const getTeamBillingExclude = useMemo(() => httpsCallable(getFunctions(), "teams-getTeamBillingExclude"), []);
 
   const changeTeamUserRole = ({ teamId, userId, updatedRole, isAdmin, setIsLoading }) => {
-    if ((isAdmin && updatedRole === "admin") || (!isAdmin && updatedRole === "user")) {
+    if (isAdmin && updatedRole === "admin") {
       return;
     }
 

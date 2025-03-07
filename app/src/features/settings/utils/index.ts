@@ -12,3 +12,7 @@ export const getDisplayTextForRole = (currentRole: TeamRole = TeamRole.admin) =>
       return "Admin";
   }
 };
+
+export const isAdmin = (role: TeamRole) => {
+  return role === TeamRole.admin;
+};
