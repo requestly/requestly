@@ -38,7 +38,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
       return apiClientRecordsRepository
         .updateCollectionDescription(updatedCollection)
         .then((result) => {
-          onSaveRecord(result.data as RQAPI.CollectionRecord);
+          onSaveRecord(result.data);
         })
         .catch((error) => {
           toast.error("Error updating collection description");
