@@ -16,10 +16,11 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { SidebarPlaceholderItem } from "features/apiClient/screens/apiClient/components/sidebar/components/SidebarPlaceholderItem/SidebarPlaceholderItem";
-import "./environmentsList.scss";
 import { isGlobalEnvironment } from "../../utils";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { EnvironmentData } from "backend/environment/types";
+import { ErrorFilesList } from "features/apiClient/screens/apiClient/components/sidebar/components/ErrorFilesList/ErrorFileslist";
+import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
   const dispatch = useDispatch();
@@ -30,6 +31,7 @@ export const EnvironmentsList = () => {
     addNewEnvironment,
     setCurrentEnvironment,
     getEnvironmentVariables,
+    errorEnvFiles,
   } = useEnvironmentManager();
   const [searchValue, setSearchValue] = useState("");
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
@@ -136,29 +138,32 @@ export const EnvironmentsList = () => {
       ) : (
         <>
           <SidebarListHeader onSearch={(value) => setSearchValue(value)} />
-          <div className="environments-list">
-            {searchValue.length > 0 && filteredEnvironments.length === 0 ? (
-              <ListEmptySearchView message="No environments found. Try searching with a different name" />
-            ) : (
-              <>
-                {filteredEnvironments.map((environment) =>
-                  isGlobalEnvironment(environment.id) ? (
-                    <EnvironmentsListItem openTab={openTab} environment={environment} />
-                  ) : (
-                    <EnvironmentsListItem
-                      openTab={openTab}
-                      environment={environment}
-                      onExportClick={handleExportEnvironments}
-                    />
-                  )
-                )}
-                <div className="mt-8">
-                  {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && (
-                    <SidebarPlaceholderItem name="New Environment" />
+          <div className="environments-list-container">
+            <div className="environments-list">
+              {searchValue.length > 0 && filteredEnvironments.length === 0 ? (
+                <ListEmptySearchView message="No environments found. Try searching with a different name" />
+              ) : (
+                <>
+                  {filteredEnvironments.map((environment) =>
+                    isGlobalEnvironment(environment.id) ? (
+                      <EnvironmentsListItem openTab={openTab} environment={environment} />
+                    ) : (
+                      <EnvironmentsListItem
+                        openTab={openTab}
+                        environment={environment}
+                        onExportClick={handleExportEnvironments}
+                      />
+                    )
                   )}
-                </div>
-              </>
-            )}
+                  <div className="mt-8">
+                    {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && (
+                      <SidebarPlaceholderItem name="New Environment" />
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+            {errorEnvFiles.length > 0 && <ErrorFilesList errorFiles={errorEnvFiles} />}
           </div>
           {isExportModalOpen && (
             <ApiClientExportModal

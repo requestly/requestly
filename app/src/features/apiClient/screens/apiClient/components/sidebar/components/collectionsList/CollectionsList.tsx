@@ -28,6 +28,7 @@ import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";
 import { firebaseBatchWrite } from "backend/utils";
+import { ErrorFilesList } from "../ErrorFilesList/ErrorFileslist";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -44,6 +45,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     isLoadingApiClientRecords,
     apiClientRecords,
     isRecordBeingCreated,
+    errorFiles,
     setIsDeleteModalOpen,
     updateRecordsToBeDeleted,
     onSaveRecord,
@@ -161,7 +163,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           break;
       }
     },
-    [selectedRecords, onSaveRecord, updatedRecords, onSaveBulkRecords]
+    [selectedRecords, onSaveRecord, updatedRecords, onSaveBulkRecords, updateRecordsToBeDeleted, setIsDeleteModalOpen]
   );
 
   // Main toggle handler
@@ -318,7 +320,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             />
           )}
         </div>
+        {errorFiles.length > 0 && <ErrorFilesList errorFiles={errorFiles} />}
       </div>
+
       {isExportModalOpen && (
         <ApiClientExportModal
           exportType="collection"
