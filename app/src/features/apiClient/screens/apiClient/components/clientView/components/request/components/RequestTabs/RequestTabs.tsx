@@ -13,8 +13,6 @@ import { HeadersTable } from "./components/HeadersTable/HeadersTable";
 import { useDeepLinkState } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
-import { LocalWorkspaceTooltip } from "../../../LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -54,7 +52,6 @@ const RequestTabs: React.FC<Props> = ({
   const [selectedTab, setSelectedTab] = useDeepLinkState({ tab: RequestTab.QUERY_PARAMS });
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
-  const isLocalSyncEnabled = useCheckLocalSyncSupport();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
   useEffect(() => {
@@ -120,12 +117,7 @@ const RequestTabs: React.FC<Props> = ({
       },
       {
         key: RequestTab.AUTHORIZATION,
-        label: (
-          <LocalWorkspaceTooltip featureName="Authorization headers">
-            <LabelWithCount label="Authorization" />
-          </LocalWorkspaceTooltip>
-        ),
-        disabled: isLocalSyncEnabled,
+        label: <LabelWithCount label="Authorization" />,
         children: (
           <AuthorizationView
             defaults={requestEntry.auth}
@@ -152,16 +144,7 @@ const RequestTabs: React.FC<Props> = ({
     }
 
     return items;
-  }, [
-    requestEntry,
-    setRequestEntry,
-    setContentType,
-    isApiClientScripts,
-    variables,
-    handleAuthChange,
-    collectionId,
-    isLocalSyncEnabled,
-  ]);
+  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts, variables, handleAuthChange, collectionId]);
 
   return (
     <Tabs
