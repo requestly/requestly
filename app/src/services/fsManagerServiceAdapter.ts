@@ -4,6 +4,7 @@ import {
   Collection,
   EnvironmentEntity,
   FileSystemResult,
+  FileType,
 } from "features/apiClient/helpers/modules/sync/local/services/types";
 import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackgroundService";
 import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
@@ -94,6 +95,14 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
   async updateCollectionAuthData(id: string, newAuth: RQAPI.Auth) {
     return this.invokeProcedureInBG("updateCollectionAuthData", id, newAuth) as Promise<FileSystemResult<RQAPI.Auth>>;
+  }
+
+  async writeToRawFile(id: string, record: any, fileType: FileType) {
+    return this.invokeProcedureInBG("writeToRawFile", id, record, fileType) as Promise<FileSystemResult<API>>;
+  }
+
+  async getRawFileData(id: string) {
+    return this.invokeProcedureInBG("getRawFileData", id) as Promise<FileSystemResult<unknown>>;
   }
 }
 
