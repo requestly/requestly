@@ -18,6 +18,7 @@ import { ClockCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { SendInviteButton } from "./SendInviteButton/SendInviteButton";
 import { RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
+import { getDisplayTextForRole } from "features/settings/utils";
 
 const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails }) => {
   const navigate = useNavigate();
@@ -62,7 +63,9 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
         toast.info("Successfully changed the role");
         modifyMembersCallback();
       })
-      .catch((err) => toast.error(err.message))
+      .catch((err) => {
+        toast.error(err.message);
+      })
       .finally(() => setIsLoading(false));
   };
 
@@ -155,15 +158,17 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
         if (member.isOwner) return <div>Admin</div>;
 
         if (member.id === loggedInUserId) {
-          return <div>{member.isAdmin ? "Admin" : "Member"}</div>;
+          return <div>{getDisplayTextForRole(member.role)}</div>;
         }
 
         return (
           <MemberRoleDropdown
+            key={member.id}
             showLoader
             isHoverEffect={isLoggedInUserAdmin && member?.id !== loggedInUserId}
             placement="bottomLeft"
-            isAdmin={member.isAdmin}
+            role={member.role}
+            isAdmin={member.isAdmin} // TODO: To be cleanup
             memberId={member.id}
             isPending={member.isPending}
             loggedInUserId={loggedInUserId}
