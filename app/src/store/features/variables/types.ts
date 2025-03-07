@@ -1,4 +1,5 @@
 import { EnvironmentMap, EnvironmentVariables } from "backend/environment/types";
+import { ErrorFile } from "features/apiClient/helpers/modules/sync/local/services/types";
 
 export interface InitialState {
   currentEnvironment: string;
@@ -10,4 +11,5 @@ export interface InitialState {
       variables: EnvironmentVariables;
     };
   };
+  errorEnvFiles: ErrorFile[];
 }

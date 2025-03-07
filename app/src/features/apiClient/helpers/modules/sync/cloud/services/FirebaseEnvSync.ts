@@ -10,6 +10,7 @@ import {
   updateEnvironmentInDB,
 } from "backend/environment";
 import { getOwnerId } from "backend/utils";
+import { ErrorFile } from "../../local/services/types";
 
 export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -22,8 +23,18 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
     return getOwnerId(this.meta.uid, this.meta.teamId);
   }
 
-  async getAllEnvironments(): Promise<EnvironmentMap> {
-    return fetchAllEnvironmentDetails(this.getPrimaryId());
+  async getAllEnvironments(): Promise<{
+    success: boolean;
+    data: { environments: EnvironmentMap; errorFiles: ErrorFile[] };
+  }> {
+    const result = await fetchAllEnvironmentDetails(this.getPrimaryId());
+    return {
+      success: true,
+      data: {
+        environments: result,
+        errorFiles: [] as ErrorFile[],
+      },
+    };
   }
 
   async deleteEnvironment(envId: string): Promise<void> {

@@ -1,7 +1,7 @@
 import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 import { ApiClientLocalMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
-import { EnvironmentEntity, FileSystemResult } from "./types";
+import { EnvironmentEntity, ErrorFile, FileSystemResult } from "./types";
 import { appendPath, parseEntityVariables } from "../../utils";
 
 export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
@@ -12,6 +12,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   }
 
   private parseEnvironmentEntitiesToMap(entities: EnvironmentEntity[]): EnvironmentMap {
+    console.log("env entities", entities);
     const environmentsMap = entities.reduce((acc, cur) => {
       acc[cur.id] = {
         id: cur.id,
@@ -36,17 +37,32 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
 
   async getAllEnvironments() {
     const service = await this.getAdapter();
-    const result: FileSystemResult<EnvironmentEntity[]> = await service.getAllEnvironments();
+    const result: FileSystemResult<{
+      environments: EnvironmentEntity[];
+      errorFiles: ErrorFile[];
+    }> = await service.getAllEnvironments();
     if (result.type === "success") {
-      const parsedEnvs = this.parseEnvironmentEntitiesToMap(result.content);
+      const parsedEnvs = this.parseEnvironmentEntitiesToMap(result.content.environments);
       const globalEnvPath = `${this.meta.rootPath}/environments/global.json`;
       if (!parsedEnvs[globalEnvPath]) {
         const globalEnv = await this.createGlobalEnvironment();
         parsedEnvs[globalEnvPath] = globalEnv;
       }
-      return parsedEnvs;
+      return {
+        success: true,
+        data: {
+          environments: parsedEnvs,
+          errorFiles: result.content.errorFiles,
+        },
+      };
     } else {
-      return {};
+      return {
+        success: true,
+        data: {
+          environments: {},
+          errorFiles: [],
+        },
+      };
     }
   }
 

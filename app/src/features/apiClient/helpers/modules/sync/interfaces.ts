@@ -1,9 +1,10 @@
 import { EnvironmentData, EnvironmentMap, EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
+import { ErrorFile, FileType } from "./local/services/types";
 
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
   meta: Meta;
-  getAllEnvironments(): Promise<EnvironmentMap>;
+  getAllEnvironments(): Promise<{ success: boolean; data: { environments: EnvironmentMap; errorFiles: ErrorFile[] } }>;
   createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData>;
   createGlobalEnvironment(): Promise<EnvironmentData>;
   deleteEnvironment(envId: string): Promise<void>;
@@ -44,6 +45,12 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
 
   generateApiRecordId(parentId?: string): string;
   generateCollectionId(name: string, parentId?: string): string;
+  writeToRawFile(
+    id: string,
+    record: any,
+    fileType: FileType
+  ): Promise<{ success: boolean; data: unknown; message?: string }>;
+  getRawFileData(id: string): Promise<{ success: boolean; data: unknown; message?: string }>;
 }
 
 export interface ApiClientRepositoryInterface {
