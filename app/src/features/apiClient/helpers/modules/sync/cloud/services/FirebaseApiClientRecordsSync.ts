@@ -87,9 +87,15 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async updateCollectionDescription(
-    collection: RQAPI.CollectionRecord
-  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
-    return this.updateRecord(collection, collection.id);
+    id: string,
+    description: string
+  ): Promise<{ success: boolean; data: string; message?: string }> {
+    const result = await this.updateRecord({ id, description }, id);
+    return {
+      success: result.success,
+      data: result.data.description,
+      message: "Something went wrong while updating collection description",
+    };
   }
 
   async updateCollectionAuthData(
