@@ -9,8 +9,9 @@ import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { useState } from "react";
 import { toast } from "utils/Toast";
-import "./apiClientEmptyView.scss";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
+import { variablesActions } from "store/features/variables/slice";
+import "./apiClientEmptyView.scss";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
@@ -48,6 +49,9 @@ export const ApiClientEmptyView = () => {
       .then((result) => {
         if (result.success) {
           onSaveRecord(result.data);
+          if (recordType === RQAPI.RecordType.COLLECTION) {
+            dispatch(variablesActions.updateCollectionVariables({ collectionId: result.data.id, variables: {} }));
+          }
         } else {
           toast.error(result.message || "Could not create a collection.");
         }
