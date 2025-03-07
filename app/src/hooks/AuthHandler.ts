@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { checkUserBackupState, getAuthData, getOrUpdateUserSyncState } from "actions/FirebaseActions";
@@ -43,21 +43,17 @@ const AuthHandler: React.FC<{}> = () => {
       ),
     []
   );
+  const emailTypeRef = useRef<string | null>(null);
 
   const nonBlockingOperations = useCallback(
     async (user: User) => {
       Logger.time("AuthHandler-nonBlockingOperations");
       Logger.timeLog("AuthHandler-nonBlockingOperations", "START");
 
-      submitAttrUtil(TRACKING.ATTR.EMAIL_DOMAIN, user.email.split("@")[1].replace(".", "_dot_") ?? "Missing_Value");
-
-      const emailType = await getEmailType(user.email);
-      submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, emailType ?? "Missing_Value");
-
       /* To ensure that this attribute is assigned to only the users signing up for the first time */
       if (user?.metadata?.creationTime === user?.metadata?.lastSignInTime) {
         if (
-          emailType === EmailType.BUSINESS &&
+          emailTypeRef.current === EmailType.BUSINESS &&
           user.emailVerified &&
           !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]
         ) {
@@ -119,6 +115,8 @@ const AuthHandler: React.FC<{}> = () => {
           getEmailType(user.email),
         ]);
 
+        emailTypeRef.current = mailType;
+
         // phase-1 migration: Adaptor to convert firestore schema into old schema
         const planDetails = newSchemaToOldSchemaAdapter(firestorePlanDetails);
         const isUserPremium = isPremiumUser(planDetails);
@@ -127,7 +125,6 @@ const AuthHandler: React.FC<{}> = () => {
         window.keySetDoneisSyncEnabled = true;
 
         dispatch(
-          // @ts-ignore
           globalActions.updateUserInfo({
             loggedIn: true,
             details: {
@@ -150,6 +147,10 @@ const AuthHandler: React.FC<{}> = () => {
             initValue: true,
           })
         );
+
+        submitAttrUtil(TRACKING.ATTR.EMAIL_DOMAIN, user.email.split("@")[1].replace(".", "_dot_") ?? "Missing_Value");
+        submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, mailType ?? "Missing_Value");
+
         submitAttrUtil(TRACKING.ATTR.IS_PREMIUM, isUserPremium);
         const userName = user.displayName !== "User" ? user.displayName : onboardingDetails.fullName;
         submitAttrUtil(TRACKING.ATTR.DISPLAY_NAME, userName);
@@ -173,14 +174,12 @@ const AuthHandler: React.FC<{}> = () => {
         window.uid = null;
 
         dispatch(
-          // @ts-ignore
           globalActions.updateUserInfo({
             loggedIn: false,
             details: null,
           })
         );
         dispatch(
-          // @ts-ignore
           globalActions.updateInitializations({
             initType: "auth",
             initValue: true,
