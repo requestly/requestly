@@ -1,9 +1,12 @@
 import React, { useMemo, useState } from "react";
 import { Dropdown, DropDownProps, Menu, Spin, Typography } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
+import { TeamRole } from "types";
+import { getDisplayTextForRole } from "features/settings/utils";
 import "./MemberRoleDropdown.css";
 
 interface MemberRoleDropdownProps extends DropDownProps {
+  role?: TeamRole;
   isAdmin: boolean;
   isHoverEffect?: boolean;
   showLoader?: boolean;
@@ -12,12 +15,13 @@ interface MemberRoleDropdownProps extends DropDownProps {
   loggedInUserId?: string;
   handleMemberRoleChange: (
     makeUserAdmin: boolean,
-    updatedRole: "admin" | "user",
+    updatedRole: "admin" | "user" | "read",
     setIsLoading: (status: boolean) => void
   ) => void;
 }
 
 const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
+  role,
   isAdmin,
   showLoader,
   memberId,
@@ -28,6 +32,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
   ...props
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [currentRole, setCurrentRole] = useState<TeamRole>(role ?? TeamRole.admin);
 
   const items = useMemo(
     () => (
@@ -36,7 +41,10 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
           key="admin"
           disabled={!!memberId && !isLoggedInUserAdmin}
           className="dropdown-access-type-menu-item"
-          onClick={() => handleMemberRoleChange(true, "admin", setIsLoading)}
+          onClick={() => {
+            setCurrentRole(TeamRole.admin);
+            handleMemberRoleChange(true, "admin", setIsLoading);
+          }}
         >
           <div>
             <div className="subtitle">Admin</div>
@@ -44,29 +52,51 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
           </div>
           <img
             alt="downoutlined"
-            className={`dropdown-selected-icon ${isAdmin ? "" : "visibility-hidden"}`}
+            className={`dropdown-selected-icon ${currentRole === TeamRole.admin ? "" : "visibility-hidden"}`}
             src="/assets/media/common/tick.svg"
           />
         </Menu.Item>
         <Menu.Item
-          key="member"
+          key="editor"
           disabled={!!memberId && !isLoggedInUserAdmin}
           className="dropdown-access-type-menu-item"
-          onClick={() => handleMemberRoleChange(false, "user", setIsLoading)}
+          onClick={() => {
+            setCurrentRole(TeamRole.write);
+            handleMemberRoleChange(false, "user", setIsLoading);
+          }}
         >
           <div>
-            <div className="subtitle">Member</div>
+            <div className="subtitle">Editor</div>
             <div className="caption text-gray">Cannot change workspace settings</div>
           </div>
           <img
             alt="downoutlined"
-            className={`dropdown-selected-icon ${!isAdmin ? "" : "visibility-hidden"}`}
+            className={`dropdown-selected-icon ${currentRole === TeamRole.write ? "" : "visibility-hidden"}`}
+            src="/assets/media/common/tick.svg"
+          />
+        </Menu.Item>
+        <Menu.Item
+          key="viewer"
+          disabled={!!memberId && !isLoggedInUserAdmin}
+          className="dropdown-access-type-menu-item"
+          onClick={() => {
+            setCurrentRole(TeamRole.read);
+            handleMemberRoleChange(false, "read", setIsLoading);
+          }}
+        >
+          <div>
+            <div className="subtitle">Viewer</div>
+            <div className="caption text-gray">Can only view</div>
+          </div>
+          <img
+            alt="downoutlined"
+            className={`dropdown-selected-icon ${currentRole === TeamRole.read ? "" : "visibility-hidden"}`}
             src="/assets/media/common/tick.svg"
           />
         </Menu.Item>
       </Menu>
     ),
-    [isAdmin, memberId, loggedInUserId, isLoggedInUserAdmin, handleMemberRoleChange]
+    [memberId, currentRole, isLoggedInUserAdmin, handleMemberRoleChange]
   );
 
   return (
@@ -78,7 +108,8 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
     >
       <div className={`dropdown-trigger ${isHoverEffect ? "member-role-dropdown-trigger" : ""}`}>
         <Typography.Text className={!props.disabled && "cursor-pointer"}>
-          {isAdmin ? "Admin" : "Member"}
+          {getDisplayTextForRole(currentRole)}
+
           {isLoggedInUserAdmin && memberId !== loggedInUserId && (
             <img
               width="10px"
