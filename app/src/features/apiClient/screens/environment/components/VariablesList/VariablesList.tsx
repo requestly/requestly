@@ -11,6 +11,7 @@ import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../t
 import { trackAddVariableClicked } from "../../analytics";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
+import { useRBAC } from "features/rbac";
 import "./variablesList.scss";
 
 interface VariablesListProps {
@@ -26,6 +27,8 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
   const user = useSelector(getUserAuthDetails);
   const [dataSource, setDataSource] = useState([]);
   const [visibleSecretsRowIds, setVisibleSecrets] = useState([]);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_environment", "create");
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
@@ -207,13 +210,17 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
         },
       }}
       scroll={{ y: "calc(100vh - 280px)" }}
-      footer={() => (
-        <div className="variables-list-footer">
-          <RQButton icon={<MdAdd />} size="small" onClick={handleAddVariable}>
-            Add More
-          </RQButton>
-        </div>
-      )}
+      footer={
+        !isValidPermission
+          ? null
+          : () => (
+              <div className="variables-list-footer">
+                <RQButton icon={<MdAdd />} size="small" onClick={handleAddVariable}>
+                  Add More
+                </RQButton>
+              </div>
+            )
+      }
     />
   );
 };

@@ -8,6 +8,14 @@
   margin: 0 auto;
 }
 
+.mock-editor-layout-container .read-only-mode-alert {
+  display: none;
+}
+
+.mock-editor-layout-container:hover .read-only-mode-alert {
+  display: flex;
+}
+
 .mock-editor-wrapper {
   display: flex;
   justify-content: center;

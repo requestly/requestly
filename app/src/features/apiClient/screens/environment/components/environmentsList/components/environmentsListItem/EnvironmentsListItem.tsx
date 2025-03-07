@@ -8,8 +8,7 @@ import PATHS from "config/constants/sub/paths";
 import { TabsLayoutContextInterface, useTabsLayoutContext } from "layouts/TabsLayout";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useCallback, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { redirectToEnvironment } from "utils/RedirectionUtils";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "utils/Toast";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import {
@@ -19,6 +18,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 
 interface EnvironmentsListItemProps {
+  isReadOnly: boolean;
   environment: {
     id: string;
     name: string;
@@ -35,8 +35,12 @@ export enum EnvironmentMenuKey {
   EXPORT = "export",
 }
 
-export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ environment, openTab, onExportClick }) => {
-  const navigate = useNavigate();
+export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
+  isReadOnly,
+  environment,
+  openTab,
+  onExportClick,
+}) => {
   const { envId } = useParams();
   const {
     getCurrentEnvironment,
@@ -151,7 +155,6 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
       key={environment.id}
       className={`environments-list-item ${environment.id === envId && activeTab?.id === envId ? "active" : ""}`}
       onClick={() => {
-        redirectToEnvironment(navigate, environment.id);
         openTab(environment.id, {
           title: environment.name,
           url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(environment.id)}`,
@@ -205,19 +208,22 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({ envi
         </Tooltip>
       </div>
       {/* wrapping dropdown in a div to prevent it from triggering click events on parent div element*/}
-      <div onClick={(e) => e.stopPropagation()}>
-        {!isGlobalEnvironment(environment.id) ? (
-          <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
-            <RQButton
-              size="small"
-              type="transparent"
-              icon={<MdOutlineMoreHoriz />}
-              className="environment-list-item-dropdown-button"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </Dropdown>
-        ) : null}
-      </div>
+
+      {isReadOnly ? null : (
+        <div onClick={(e) => e.stopPropagation()}>
+          {!isGlobalEnvironment(environment.id) ? (
+            <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
+              <RQButton
+                size="small"
+                type="transparent"
+                icon={<MdOutlineMoreHoriz />}
+                className="environment-list-item-dropdown-button"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </Dropdown>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 };
