@@ -2,18 +2,20 @@ import { Modal } from "antd";
 import React, { useMemo } from "react";
 import { APIClientRequest } from "./types";
 import BetaBadge from "components/misc/BetaBadge";
-import { RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
+import { QueryParamSyncType, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import {
   filterHeadersToImport,
   generateKeyValuePairsFromJson,
   getContentTypeFromRequestHeaders,
   getEmptyAPIEntry,
   parseCurlRequest,
+  syncQueryParams,
 } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import APIClientView from "../../../screens/apiClient/components/clientView/APIClientView";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import "./apiClient.scss";
+import { isEmpty } from "lodash";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -68,6 +70,15 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
         entry.request.body = generateKeyValuePairsFromJson(formDataObj);
       }
     }
+
+    entry.request = {
+      ...entry.request,
+      ...syncQueryParams(
+        entry.request.queryParams,
+        entry.request.url,
+        isEmpty(entry.request.queryParams) ? QueryParamSyncType.TABLE : QueryParamSyncType.SYNC
+      ),
+    };
 
     return entry;
   }, [request]);
