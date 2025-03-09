@@ -91,7 +91,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
                     />
                     <div>{team.name}</div>
                   </Col>
-                  <Col>{`${team.accessCount} members`}</Col>
+                  <Col>{`${Object.keys(team.members).length} members`}</Col>
 
                   <Button type="primary" onClick={() => handleSwitchWorkspaceClick(team)}>
                     Switch

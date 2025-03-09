@@ -1,21 +1,19 @@
 import { useMemo } from "react";
 import { Dropdown, Typography } from "antd";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { MdOutlineCheckCircleOutline } from "@react-icons/all-files/md/MdOutlineCheckCircleOutline";
 import { toast } from "utils/Toast";
-import { redirectToEnvironment } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
-import { trackEnvironmentSwitched } from "features/apiClient/screens/environment/analytics";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./environmentSwitcher.scss";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
+import { trackEnvironmentSwitched } from "modules/analytics/events/features/apiClient";
 
 export const EnvironmentSwitcher = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const { getAllEnvironments, getCurrentEnvironment, setCurrentEnvironment } = useEnvironmentManager();
   const { currentEnvironmentId, currentEnvironmentName } = getCurrentEnvironment();
@@ -45,18 +43,19 @@ export const EnvironmentSwitcher = () => {
         ),
         onClick: () => {
           setCurrentEnvironment(environment.id);
+          trackEnvironmentSwitched();
           if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
             openTab(environment.id, {
               title: environment.name,
-              url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environment.id}`,
+              url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(environment.id)}`,
             });
-            trackEnvironmentSwitched(environments.length);
-            redirectToEnvironment(navigate, environment.id);
+            // Removed the below redirect as openTab handles redirection internally
+            // redirectToEnvironment(navigate, environment.id);
           }
           toast.success(`Switched to ${environment.name} environment`);
         },
       }));
-  }, [environments, setCurrentEnvironment, currentEnvironmentId, navigate, location.pathname, openTab]);
+  }, [environments, setCurrentEnvironment, currentEnvironmentId, location.pathname, openTab]);
 
   if (environments.length === 0 || (environments.length === 1 && isGlobalEnvironment(environments[0].id))) {
     return (

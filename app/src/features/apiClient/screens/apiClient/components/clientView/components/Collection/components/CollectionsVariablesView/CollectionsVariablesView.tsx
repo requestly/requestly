@@ -9,6 +9,7 @@ import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import "./collectionsVariablesView.scss";
+import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 
 interface CollectionsVariablesViewProps {
   collection: RQAPI.CollectionRecord;
@@ -39,6 +40,11 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
     return setCollectionVariables(pendingVariables, collection.id)
       .then(() => {
         toast.success("Variables updated successfully");
+        trackVariablesSaved({
+          type: "collection_variable",
+          num_variables: pendingVariables.length,
+        });
+
         resetChanges();
       })
       .catch((error) => {

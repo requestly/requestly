@@ -8,10 +8,23 @@ import { toast } from "utils/Toast";
 import firebaseApp from "../../firebase";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { WorkspaceType } from "types";
+import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
 
 const db = getFirestore(firebaseApp);
 
-const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode) => {
+const splitMembersBasedOnRoles = (members) => {
+  const result = {};
+  Object.values(members).forEach((member) => {
+    if (!result[member.role]) {
+      result[member.role] = [];
+    }
+    result[member.role].push(member);
+  });
+  return result;
+};
+
+const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode, isLocalSyncEnabled) => {
   if (!uid) {
     // Rare edge case
     if (currentlyActiveWorkspace.id) {
@@ -20,10 +33,35 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
     return null;
   }
   try {
-    const q = query(collection(db, "teams"), where("access", "array-contains", uid));
+    const q = query(collection(db, "teams"), where(`members.${uid}.role`, "in", ["admin", "write", "read"]));
     return onSnapshot(
       q,
-      (querySnapshot) => {
+      async (querySnapshot) => {
+        let localRecords = [];
+        if (isLocalSyncEnabled) {
+          const allLocalWorkspacesResult = await getAllWorkspaces();
+          const allLocalWorkspaces =
+            allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
+          for (const partialWorkspace of allLocalWorkspaces) {
+            const localWorkspace = {
+              id: partialWorkspace.id,
+              name: partialWorkspace.name,
+              owner: uid,
+              accessCount: 1,
+              adminCount: 1,
+              members: {
+                [uid]: {
+                  role: "admin",
+                },
+              },
+              appsumo: null,
+              workspaceType: WorkspaceType.LOCAL,
+              rootPath: partialWorkspace.path,
+            };
+
+            localRecords.push(localWorkspace);
+          }
+        }
         const records = querySnapshot.docs
           .map((team) => {
             const teamData = team.data();
@@ -34,26 +72,34 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
               submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
             }
 
-            return {
+            if (teamData?.workspaceType === WorkspaceType.LOCAL) {
+              return null;
+            }
+
+            const membersPerRole = splitMembersBasedOnRoles(teamData.members);
+
+            const formattedTeamData = {
               id: team.id,
               name: teamData.name,
               owner: teamData.owner,
               archived: teamData.archived,
               subscriptionStatus: teamData.subscriptionStatus,
-              accessCount: teamData.accessCount,
-              adminCount: teamData.adminCount,
+              accessCount: Object.keys(teamData.members).length || 0,
+              adminCount: membersPerRole.admin?.length || 0,
               members: teamData.members,
               appsumo: teamData?.appsumo || null,
+              workspaceType: teamData?.workspaceType || WorkspaceType.SHARED,
             };
+
+            return formattedTeamData;
           })
           .filter(Boolean);
-
+        records.push(...localRecords);
         dispatch(teamsActions.setAvailableTeams(records));
 
         if (!currentlyActiveWorkspace?.id) return;
 
         const found = records.find((team) => team.id === currentlyActiveWorkspace.id);
-
         if (!found) {
           if (!window.hasUserRemovedHimselfRecently)
             alert("You no longer have access to this workspace. Please contact your team admin.");
@@ -69,6 +115,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
               id: found.id,
               name: found.name,
               membersCount: found.accessCount,
+              workspaceType: found.workspaceType,
             })
           );
 
@@ -95,10 +142,12 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
         }
       },
       (error) => {
+        console.log("DBG: availableTeams Query -> error", error);
         Logger.error(error);
       }
     );
   } catch (e) {
+    console.log("DBG: availableTeamsListener final catch -> e", e);
     return null;
   }
 };

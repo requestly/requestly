@@ -9,7 +9,6 @@ import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState"
 import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
-import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
@@ -18,6 +17,10 @@ import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlac
 import { isEmpty } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
+import "./CollectionRow.scss";
+import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
+import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
+import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -50,13 +53,23 @@ export const CollectionRow: React.FC<Props> = ({
   const [hoveredId, setHoveredId] = useState("");
   const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
   const { collectionId } = useParams();
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+  const handleDropdownVisibleChange = (isOpen: boolean) => {
+    setIsDropdownVisible(isOpen);
+  };
 
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {
       const items: MenuProps["items"] = [
         {
           key: "0",
-          label: <div>Rename</div>,
+          label: (
+            <div>
+              <MdOutlineBorderColor style={{ marginRight: 8 }} />
+              Rename
+            </div>
+          ),
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
             setIsEditMode(true);
@@ -64,7 +77,12 @@ export const CollectionRow: React.FC<Props> = ({
         },
         {
           key: "1",
-          label: <div>Export</div>,
+          label: (
+            <div>
+              <MdOutlineIosShare style={{ marginRight: 8 }} />
+              Export
+            </div>
+          ),
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
             onExportClick(record);
@@ -72,7 +90,12 @@ export const CollectionRow: React.FC<Props> = ({
         },
         {
           key: "2",
-          label: <div>Delete</div>,
+          label: (
+            <div>
+              <MdOutlineDelete style={{ marginRight: 8 }} />
+              Delete
+            </div>
+          ),
           danger: true,
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
@@ -108,11 +131,12 @@ export const CollectionRow: React.FC<Props> = ({
   }, [expandedRecordIds, record.id]);
 
   useEffect(() => {
-    /* Temporary Change-> To remove previous key from session storage 
+    /* Temporary Change-> To remove previous key from session storage
        which was added due to the previous logic can be removed after some time */
     sessionStorage.removeItem("collapsed_collection_keys");
   }, []);
 
+  console.log("debug:", hoveredId);
   return (
     <>
       {isEditMode ? (
@@ -163,7 +187,7 @@ export const CollectionRow: React.FC<Props> = ({
                 onClick={() => {
                   openTab(record.id, {
                     title: record.name || "New Collection",
-                    url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${record.id}`,
+                    url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(record.id)}`,
                   });
                 }}
               >
@@ -171,7 +195,7 @@ export const CollectionRow: React.FC<Props> = ({
                   {record.name}
                 </div>
 
-                <div className={`collection-options ${hoveredId === record.id ? "visible" : " "}`}>
+                <div className={`collection-options ${hoveredId === record.id || isDropdownVisible ? "active" : " "}`}>
                   <Tooltip title={"Add Request"}>
                     <RQButton
                       size="small"
@@ -184,7 +208,6 @@ export const CollectionRow: React.FC<Props> = ({
                         onNewClick("collection_row", RQAPI.RecordType.API, record.id).then(() => {
                           setCreateNewField(null);
                         });
-                        trackNewRequestClicked("collection_row");
                       }}
                     />
                   </Tooltip>
@@ -200,12 +223,18 @@ export const CollectionRow: React.FC<Props> = ({
                         onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id).then(() => {
                           setCreateNewField(null);
                         });
-                        trackNewCollectionClicked("collection_row");
                       }}
                     />
                   </Tooltip>
 
-                  <Dropdown trigger={["click"]} menu={{ items: getCollectionOptions(record) }} placement="bottomRight">
+                  <Dropdown
+                    trigger={["click"]}
+                    menu={{ items: getCollectionOptions(record) }}
+                    placement="bottomRight"
+                    overlayClassName="collection-dropdown-menu"
+                    open={isDropdownVisible}
+                    onOpenChange={handleDropdownVisibleChange}
+                  >
                     <RQButton
                       onClick={(e) => {
                         e.stopPropagation();
@@ -225,7 +254,7 @@ export const CollectionRow: React.FC<Props> = ({
                 analyticEventSource="collection_row"
                 message="No requests created yet"
                 newRecordBtnText="New request"
-                onNewRecordClick={() => onNewClick("collection_row", RQAPI.RecordType.API, record.id)}
+                onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.API, record.id)}
               />
             ) : (
               record.data.children?.map((apiRecord) => {

@@ -19,6 +19,7 @@ import {
   sendEmailVerification,
   sendSignInLinkToEmail,
   SAMLAuthProvider,
+  OAuthProvider,
 } from "firebase/auth";
 import { getDatabase, ref, update, onValue, remove, get, set, child } from "firebase/database";
 import md5 from "md5";
@@ -28,7 +29,7 @@ import { v4 as uuidv4 } from "uuid";
 import { setEmailVerified, setSignupDate } from "../utils/AuthUtils";
 import { getDesktopSignInAuthPath } from "../utils/PathUtils";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
-import { getEmailType } from "utils/FormattingHelper";
+import { getEmailType } from "utils/mailCheckerUtils";
 import {
   trackSignUpAttemptedEvent,
   trackSignUpFailedEvent,
@@ -75,7 +76,7 @@ const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000
  * @returns Promise Object which can be chained with then and catch to handle success and error respectively
  */
 export async function signUp(email, password, refCode, source) {
-  const email_type = getEmailType(email);
+  const email_type = await getEmailType(email);
   const domain = email.split("@")[1];
   trackSignUpAttemptedEvent({
     ref_code: refCode,
@@ -218,6 +219,7 @@ export async function emailSignIn(email, password, isSignUp, source) {
     source,
   });
   const auth = getAuth(firebaseApp);
+  const emailType = await getEmailType(email);
   return signInWithEmailAndPassword(auth, email, password)
     .then((result) => {
       Logger.log("Profile Logged In Successfully");
@@ -229,7 +231,7 @@ export async function emailSignIn(email, password, isSignUp, source) {
         auth_provider: AUTH_PROVIDERS.EMAIL,
         uid,
         email,
-        email_type: getEmailType(email),
+        email_type: emailType,
         domain: email.split("@")[1],
         source,
       });
@@ -327,6 +329,8 @@ export const handleOnetapSignIn = async ({ credential }) => {
     const additionalUserInfo = getAdditionalUserInfo(result); // get this info
     const is_new_user = additionalUserInfo?.isNewUser || false;
 
+    const emailType = await getEmailType(email);
+
     if (is_new_user) {
       trackSignUpAttemptedEvent({
         auth_provider: AUTH_PROVIDERS.GMAIL,
@@ -336,7 +340,7 @@ export const handleOnetapSignIn = async ({ credential }) => {
         auth_provider: AUTH_PROVIDERS.GMAIL,
         email,
         uid,
-        email_type: getEmailType(email),
+        email_type: emailType,
         domain: email.split("@")[1],
         source: SOURCE.ONE_TAP_PROMPT,
       });
@@ -349,7 +353,7 @@ export const handleOnetapSignIn = async ({ credential }) => {
         auth_provider: AUTH_PROVIDERS.GMAIL,
         uid,
         email,
-        email_type: getEmailType(email),
+        email_type: emailType,
         domain: email.split("@")[1],
         source: SOURCE.ONE_TAP_PROMPT,
       });
@@ -372,10 +376,12 @@ export async function googleSignIn(callback, MODE, source) {
   provider.addScope("email");
   const auth = getAuth(firebaseApp);
   return signInWithPopup(auth, provider)
-    .then((result) => {
+    .then(async (result) => {
       let is_new_user = getAdditionalUserInfo(result).isNewUser || false;
       let uid = result?.user?.uid || null;
       let email = result?.user?.email || null;
+      const emailType = await getEmailType(email);
+
       if (is_new_user) {
         trackSignUpAttemptedEvent({
           auth_provider: AUTH_PROVIDERS.GMAIL,
@@ -385,7 +391,7 @@ export async function googleSignIn(callback, MODE, source) {
           auth_provider: AUTH_PROVIDERS.GMAIL,
           email,
           uid,
-          email_type: getEmailType(email),
+          email_type: emailType,
           domain: email.split("@")[1],
           source,
         });
@@ -400,7 +406,7 @@ export async function googleSignIn(callback, MODE, source) {
           auth_provider: AUTH_PROVIDERS.GMAIL,
           uid,
           email,
-          email_type: getEmailType(email),
+          email_type: emailType,
           domain: email.split("@")[1],
           source,
         });
@@ -447,6 +453,65 @@ export const googleSignInDesktopApp = (callback, MODE, source) => {
   });
 };
 
+export async function appleSignIn(source, callback) {
+  const provider = new OAuthProvider("apple.com");
+  provider.addScope("email");
+  provider.addScope("name");
+  const auth = getAuth(firebaseApp);
+  return signInWithPopup(auth, provider)
+    .then(async (result) => {
+      const isNewUser = getAdditionalUserInfo(result).isNewUser || false;
+      const uid = result?.user?.uid || null;
+      const email = result?.user?.email || null;
+      const emailType = await getEmailType(email);
+
+      if (isNewUser) {
+        trackSignUpAttemptedEvent({
+          auth_provider: AUTH_PROVIDERS.APPLE,
+          source,
+        });
+        trackSignupSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.APPLE,
+          email,
+          uid,
+          email_type: emailType,
+          domain: email.split("@")[1],
+          source,
+        });
+        setSignupDate(uid);
+        setEmailVerified(uid, true);
+      } else {
+        trackLoginAttemptedEvent({
+          auth_provider: AUTH_PROVIDERS.APPLE,
+          source,
+        });
+        trackLoginSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.APPLE,
+          uid,
+          email,
+          email_type: emailType,
+          domain: email.split("@")[1],
+          source,
+        });
+      }
+
+      const authData = getAuthData(result.user);
+      const database = getDatabase();
+      update(ref(database, getUserProfilePath(authData.uid)), authData);
+
+      callback && callback.call(null, true);
+
+      return { ...authData, isNewUser: isNewUser };
+    })
+    .catch((err) => {
+      trackLoginFailedEvent({
+        auth_provider: AUTH_PROVIDERS.APPLE,
+        error_message: err.message,
+        source,
+      });
+    });
+}
+
 export const signInWithEmailLink = async (email, callback) => {
   try {
     const auth = getAuth(firebaseApp);
@@ -461,6 +526,7 @@ export const signInWithEmailLink = async (email, callback) => {
     const database = getDatabase();
 
     if (isNewUser) await update(ref(database, getUserProfilePath(authData.uid)), authData);
+    const emailType = await getEmailType(email);
 
     //  Analytics - Track event
     if (isNewUser) {
@@ -469,7 +535,7 @@ export const signInWithEmailLink = async (email, callback) => {
         auth_provider: AUTH_PROVIDERS.EMAIL,
         email,
         uid: authData.uid,
-        email_type: getEmailType(email),
+        email_type: emailType,
         domain: email.split("@")[1],
         source: SOURCE.MAGIC_LINK,
       });
@@ -478,7 +544,7 @@ export const signInWithEmailLink = async (email, callback) => {
         auth_provider: AUTH_PROVIDERS.EMAIL_LINK,
         uid: authData.uid,
         email,
-        email_type: getEmailType(email),
+        email_type: emailType,
         domain: email.split("@")[1],
         source: SOURCE.MAGIC_LINK,
       });
@@ -492,6 +558,7 @@ export const signInWithEmailLink = async (email, callback) => {
     if (error?.code === "auth/email-already-in-use") {
       /* user already exists with another auth provider */
       const userEmail = error?.email;
+      const emailType = await getEmailType(userEmail);
       try {
         const auth = getAuth(firebaseApp);
         const authData = getAuthData(auth.currentUser) || {};
@@ -500,7 +567,7 @@ export const signInWithEmailLink = async (email, callback) => {
           auth_provider: AUTH_PROVIDERS.EMAIL_LINK,
           uid: authData.uid,
           email,
-          email_type: getEmailType(email),
+          email_type: emailType,
           domain: email.split("@")[1],
           source: SOURCE.MAGIC_LINK,
         });
