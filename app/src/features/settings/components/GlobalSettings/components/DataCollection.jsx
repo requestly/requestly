@@ -1,8 +1,11 @@
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 import { useState } from "react";
 import SettingsItem from "./SettingsItem";
+import { useRBAC } from "features/rbac";
 
 const DataCollection = () => {
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("global_settings", "update");
   const [dataCollectionStatus, setDataCollectionStatus] = useState(
     localStorage.getItem("dataCollectionStatus")
       ? localStorage.getItem("dataCollectionStatus") === "enabled"
@@ -23,6 +26,7 @@ const DataCollection = () => {
   return (
     <>
       <SettingsItem
+        disabled={!isValidPermission}
         isActive={dataCollectionStatus === "enabled"}
         onChange={handleChange}
         title="Help improve Requestly"

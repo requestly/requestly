@@ -11,9 +11,11 @@ import { MdClear } from "@react-icons/all-files/md/MdClear";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentVariables } from "backend/environment/types";
 
-import "./authorizationView.scss";
 import { AuthConfig, AuthConfigMeta, Authorization } from "./types/AuthConfig";
 import { getDefaultAuthType } from "./defaults";
+import { useRBAC } from "features/rbac";
+import "./authorizationView.scss";
+import { ReadOnlyModeAlert } from "../../../ReadOnlyModeAlert/ReadOnlyModeAlert";
 
 interface Props {
   wrapperClass?: string;
@@ -36,6 +38,9 @@ const AuthorizationView: React.FC<Props> = ({
   const [selectedAuthType, setSelectedAuthType] = useState<Authorization.Type>(
     defaultsRef.current?.currentAuthType || getDefaultAuthType(isRootLevelRecord)
   );
+  const [showReadOnlyAlert, setShowReadOnlyAlert] = useState(false);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_request", "create");
 
   const [resolvedAuthConfigStore, setResolvedAuthConfigStore] = useState<RQAPI.Auth["authConfigStore"]>(
     defaultsRef.current?.authConfigStore
@@ -43,6 +48,10 @@ const AuthorizationView: React.FC<Props> = ({
 
   const onFormConfigChange = useCallback(
     <SelectedAuthType extends AuthConfigMeta.AuthWithConfig>(authConfig: AuthConfig<SelectedAuthType> | null) => {
+      if (!isValidPermission) {
+        setShowReadOnlyAlert(true);
+      }
+
       if (!authConfig) {
         return;
       }
@@ -52,12 +61,19 @@ const AuthorizationView: React.FC<Props> = ({
         return newConfigStore;
       });
     },
-    []
+    [isValidPermission]
   );
 
-  const handleAuthTypeChange = useCallback((value: Authorization.Type) => {
-    setSelectedAuthType(value);
-  }, []);
+  const handleAuthTypeChange = useCallback(
+    (value: Authorization.Type) => {
+      if (!isValidPermission) {
+        setShowReadOnlyAlert(true);
+      }
+
+      setSelectedAuthType(value);
+    },
+    [isValidPermission]
+  );
 
   useEffect(() => {
     // for some reason there is a re render outside this component that sends an empty defaults object
@@ -70,49 +86,59 @@ const AuthorizationView: React.FC<Props> = ({
   }, [selectedAuthType, resolvedAuthConfigStore, onAuthUpdate]);
 
   return (
-    <div className={`authorization-view ${wrapperClass}`}>
-      <div className="type-of-authorization">
-        <div className="form-selector">
-          <label>{LABEL_TEXT.AUTHORIZATION_TYPE_LABEL}</label>
-          <Select
-            className="form-selector-dropdown"
-            value={selectedAuthType}
-            onChange={handleAuthTypeChange}
-            options={AUTH_SELECTOR_LABELS}
-          />
+    <>
+      {showReadOnlyAlert && (
+        <ReadOnlyModeAlert description="Your changes will not be saved. As a viewer, you can modify and test the APIs, but saving your updates is not permitted." />
+      )}
+
+      <div className={`authorization-view ${wrapperClass}`}>
+        <div className="type-of-authorization">
+          <div className="form-selector">
+            <label>{LABEL_TEXT.AUTHORIZATION_TYPE_LABEL}</label>
+            <Select
+              className="form-selector-dropdown"
+              value={selectedAuthType}
+              onChange={handleAuthTypeChange}
+              options={AUTH_SELECTOR_LABELS}
+            />
+            {Authorization.requiresConfig(selectedAuthType) && (
+              <div
+                className="clear-icon"
+                onClick={() => {
+                  if (!isValidPermission) {
+                    setShowReadOnlyAlert(true);
+                  }
+
+                  setSelectedAuthType(Authorization.Type.NO_AUTH);
+                }}
+              >
+                <MdClear color="#bbbbbb" size="12px" />
+                <span>{LABEL_TEXT.CLEAR}</span>
+              </div>
+            )}
+            {authorizationViewActions}
+          </div>
+        </div>
+        <div className="form-and-description">
           {Authorization.requiresConfig(selectedAuthType) && (
-            <div
-              className="clear-icon"
-              onClick={() => {
-                setSelectedAuthType(Authorization.Type.NO_AUTH);
-              }}
-            >
-              <MdClear color="#bbbbbb" size="12px" />
-              <span>{LABEL_TEXT.CLEAR}</span>
+            <div className="form-view">
+              <p className="info-text">
+                <AiOutlineExclamationCircle size={"12px"} color="#8f8f8f" />
+                <span>{LABEL_TEXT.INFO_TEXT}</span>
+              </p>
+              <AuthorizationForm
+                defaultAuthValues={defaultsRef.current}
+                formData={FORM_TEMPLATE_STATIC_DATA[selectedAuthType].formData}
+                formType={selectedAuthType}
+                onChangeHandler={onFormConfigChange}
+                variables={variables}
+              />
             </div>
           )}
-          {authorizationViewActions}
+          <Description data={FORM_TEMPLATE_STATIC_DATA[selectedAuthType].description} />
         </div>
       </div>
-      <div className="form-and-description">
-        {Authorization.requiresConfig(selectedAuthType) && (
-          <div className="form-view">
-            <p className="info-text">
-              <AiOutlineExclamationCircle size={"12px"} color="#8f8f8f" />
-              <span>{LABEL_TEXT.INFO_TEXT}</span>
-            </p>
-            <AuthorizationForm
-              defaultAuthValues={defaultsRef.current}
-              formData={FORM_TEMPLATE_STATIC_DATA[selectedAuthType].formData}
-              formType={selectedAuthType}
-              onChangeHandler={onFormConfigChange}
-              variables={variables}
-            />
-          </div>
-        )}
-        <Description data={FORM_TEMPLATE_STATIC_DATA[selectedAuthType].description} />
-      </div>
-    </div>
+    </>
   );
 };
 
