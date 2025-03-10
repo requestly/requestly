@@ -153,15 +153,16 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
       <ContentListHeader
         searchValue={searchValue}
         setSearchValue={handleSearchValueUpdate}
-        actions={
-          isValidPermission
-            ? [
-                <RQButton type="primary" loading={areRulesImporting} onClick={handleImportListOnClick}>
-                  Import to my rules
-                </RQButton>,
-              ]
-            : null
-        }
+        actions={[
+          <RQButton
+            type="primary"
+            disabled={!isValidPermission}
+            loading={areRulesImporting}
+            onClick={handleImportListOnClick}
+          >
+            Import to my rules
+          </RQButton>,
+        ]}
       />
     </div>
   );
