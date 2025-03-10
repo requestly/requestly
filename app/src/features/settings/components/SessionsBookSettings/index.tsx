@@ -23,6 +23,7 @@ import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analy
 import "./sessionsSettings.css";
 import { RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
+import { useRBAC } from "features/rbac";
 
 const emptyPageSourceData: SessionRecordingPageSource = {
   value: "",
@@ -52,6 +53,8 @@ export const SessionsSettings: React.FC = () => {
   const [config, setConfig] = useState<SessionRecordingConfig>({});
   const [showNewPageSource, setShowNewPageSource] = useState<boolean>(false);
   const { autoRecording } = config;
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("session_recording", "update");
 
   const getPageSourceLabel = useCallback((source: SessionRecordingPageSource): string => {
     const upperCasedSourceKey = source.key.toUpperCase();
@@ -234,7 +237,7 @@ export const SessionsSettings: React.FC = () => {
   }
 
   const isPageSourcesDisabled =
-    (!autoRecording?.isActive || autoRecording?.mode === AutoRecordingMode.ALL_PAGES) ?? false;
+    (!isValidPermission || !autoRecording?.isActive || autoRecording?.mode === AutoRecordingMode.ALL_PAGES) ?? false;
 
   return (
     <div className="session-settings-container">
@@ -250,12 +253,16 @@ export const SessionsSettings: React.FC = () => {
 
             <div className="automatic-recording-switch">
               <span>{autoRecording?.isActive ? "Enabled" : "Disabled"}</span>
-              <Switch checked={!!autoRecording?.isActive} onChange={handleAutoRecordingToggle} />
+              <Switch
+                disabled={!isValidPermission}
+                checked={!!autoRecording?.isActive}
+                onChange={handleAutoRecordingToggle}
+              />
             </div>
 
             <Radio.Group
               value={autoRecording?.mode ?? AutoRecordingMode.ALL_PAGES}
-              disabled={!autoRecording?.isActive}
+              disabled={!autoRecording?.isActive || !isValidPermission}
               onChange={handleConfigModeChange}
               className="automatic-recording-radio-group"
             >
@@ -303,7 +310,7 @@ export const SessionsSettings: React.FC = () => {
                   ) : (
                     <Button
                       block
-                      disabled={!autoRecording?.isActive}
+                      disabled={!autoRecording?.isActive || !isValidPermission}
                       type="dashed"
                       icon={<PlusOutlined />}
                       className="add-new-source-btn"
