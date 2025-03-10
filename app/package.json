@@ -80,7 +80,6 @@
     "codemirror": "^5.65.2",
     "comlink": "^4.4.2",
     "curlconverter": "^4.10.1",
-    "disposable-email-domains": "^1.0.62",
     "fflate": "^0.7.3",
     "file-saver": "^2.0.5",
     "firebase": "^10.8.1",

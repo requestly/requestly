@@ -1,4 +1,7 @@
 .api-key-value-table {
+  &.rq-content-list-table {
+    border: none !important;
+  }
   tr {
     td.ant-table-cell:nth-last-child(2) {
       border-right: none !important;

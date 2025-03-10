@@ -22,6 +22,7 @@ export const getPendingInvites = async ({ email, domain }: { email: boolean; dom
     const res = await getInvites({ email, domain });
     return res?.data;
   } catch (e) {
+    console.log("getPendingInvites:error", e);
     return { pendingInvites: [], success: false };
   }
 };
@@ -36,6 +37,7 @@ export const acceptTeamInvite = async (inviteId: string) => {
     const res = await acceptInvite({ inviteId });
     return res?.data;
   } catch (error) {
+    console.log("acceptTeamInvite: error", error);
     return { success: false, message: "Error while accepting invite" };
   }
 };

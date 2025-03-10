@@ -6,7 +6,7 @@ import { RQButton } from "lib/design-system/components";
 import { CloseOutlined } from "@ant-design/icons";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { getPendingInvites } from "backend/workspace";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import { isEmailVerified } from "utils/AuthUtils";
 import { globalActions } from "store/slices/global/slice";
 import { capitalize } from "lodash";
@@ -21,6 +21,7 @@ import PATHS from "config/constants/sub/paths";
 import "./index.css";
 import { getUniqueTeamsFromInvites } from "utils/teams";
 import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 const MIN_MEMBERS_IN_WORKSPACE = 3;
 
@@ -85,7 +86,7 @@ export const JoinWorkspaceCard = () => {
 
   useEffect(() => {
     isEmailVerified(user?.details?.profile?.uid).then((result) => {
-      if (result && isCompanyEmail(user?.details?.profile?.email)) {
+      if (result && isCompanyEmail(user.details?.emailType)) {
         getOrganizationUsers({
           domain: getDomainFromEmail(user?.details?.profile?.email),
           size: MIN_MEMBERS_IN_WORKSPACE,
@@ -94,7 +95,7 @@ export const JoinWorkspaceCard = () => {
         });
       }
     });
-  }, [getOrganizationUsers, user?.details?.profile?.email, user?.details?.profile?.uid]);
+  }, [getOrganizationUsers, user.details?.emailType, user.details?.profile?.email, user.details?.profile?.uid]);
 
   useEffect(() => {
     if (!organizationMembers || organizationMembers.total < MIN_MEMBERS_IN_WORKSPACE) {
