@@ -28,6 +28,7 @@ The following domains are eligible for the student programme:
     "yonsei.ac.kr",
     "lakeheadu.ca",
     "estg.ipp.pt",
-    "duke.edu"
+    "duke.edu",
+    ".edu.np"
   ]
 }
