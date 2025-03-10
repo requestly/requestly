@@ -363,10 +363,11 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   }
 
   async updateCollectionDescription(
-    collection: RQAPI.CollectionRecord
-  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+    id: string,
+    description: string
+  ): Promise<{ success: boolean; data: string; message?: string }> {
     const service = await this.getAdapter();
-    const result = await service.updateCollectionDescription(collection.id, collection.description);
+    const result = await service.updateCollectionDescription(id, description);
 
     if (result.type === "error") {
       return {
@@ -375,13 +376,9 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         message: result.error.message,
       };
     }
-    const updatedCollection: RQAPI.CollectionRecord = {
-      ...collection,
-      description: result.content,
-    };
     return {
       success: true,
-      data: updatedCollection,
+      data: result.content,
     };
   }
 

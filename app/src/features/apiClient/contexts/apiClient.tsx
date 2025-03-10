@@ -389,6 +389,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
               setIsRecordBeingCreated(null);
               if (result.success) {
                 onSaveRecord(result.data);
+                dispatch(variablesActions.updateCollectionVariables({ collectionId: result.data.id, variables: {} }));
               } else {
                 toast.error(result.message || "Could not create collection.", 5);
               }
@@ -420,7 +421,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [openTab, openDraftRequest, addNewEnvironment, teamId, uid, onSaveRecord, apiClientRecordsRepository]
+    [uid, teamId, apiClientRecordsRepository, openDraftRequest, onSaveRecord, dispatch, addNewEnvironment, openTab]
   );
 
   const forceRefreshApiClientRecords = useCallback(async () => {
