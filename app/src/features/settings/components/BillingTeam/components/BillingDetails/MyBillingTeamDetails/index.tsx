@@ -8,10 +8,10 @@ import { useParams } from "react-router-dom";
 import { getAvailableBillingTeams, getBillingTeamById } from "store/features/billing/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { BillingTeamRoles } from "../../../types";
-import { isCompanyEmail } from "utils/FormattingHelper";
 import { trackBillingTeamViewed } from "features/settings/analytics";
 import { BillingInformation } from "./components/BillingInformation";
 import { AppMembersDrawer } from "./components/AddMembersDrawer/AddMembersDrawer";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 export const MyBillingTeamDetails: React.FC = () => {
   const { billingId } = useParams();
@@ -25,7 +25,7 @@ export const MyBillingTeamDetails: React.FC = () => {
     if (billingId && billingTeamDetails) {
       const emailStatus = !user.loggedIn
         ? "no_loggedIn"
-        : isCompanyEmail(user.details.profile.email)
+        : isCompanyEmail(user.details?.emailType)
         ? "company_email"
         : "personal_email";
       trackBillingTeamViewed(
@@ -39,8 +39,9 @@ export const MyBillingTeamDetails: React.FC = () => {
     billingTeamDetails,
     billingTeams?.length,
     user.loggedIn,
-    user.details.profile.email,
-    user.details.profile.uid,
+    user.details?.profile.email,
+    user.details?.profile?.uid,
+    user.details?.emailType,
   ]);
 
   if (!billingTeamDetails) return null;

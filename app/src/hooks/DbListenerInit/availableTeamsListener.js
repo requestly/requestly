@@ -13,6 +13,17 @@ import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
 
 const db = getFirestore(firebaseApp);
 
+const splitMembersBasedOnRoles = (members) => {
+  const result = {};
+  Object.values(members).forEach((member) => {
+    if (!result[member.role]) {
+      result[member.role] = [];
+    }
+    result[member.role].push(member);
+  });
+  return result;
+};
+
 const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode, isLocalSyncEnabled) => {
   if (!uid) {
     // Rare edge case
@@ -22,7 +33,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
     return null;
   }
   try {
-    const q = query(collection(db, "teams"), where("access", "array-contains", uid));
+    const q = query(collection(db, "teams"), where(`members.${uid}.role`, "in", ["admin", "write", "read"]));
     return onSnapshot(
       q,
       async (querySnapshot) => {
@@ -65,14 +76,16 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
               return null;
             }
 
+            const membersPerRole = splitMembersBasedOnRoles(teamData.members);
+
             const formattedTeamData = {
               id: team.id,
               name: teamData.name,
               owner: teamData.owner,
               archived: teamData.archived,
               subscriptionStatus: teamData.subscriptionStatus,
-              accessCount: teamData.accessCount,
-              adminCount: teamData.adminCount,
+              accessCount: Object.keys(teamData.members).length || 0,
+              adminCount: membersPerRole.admin?.length || 0,
               members: teamData.members,
               appsumo: teamData?.appsumo || null,
               workspaceType: teamData?.workspaceType || WorkspaceType.SHARED,
@@ -87,7 +100,6 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
         if (!currentlyActiveWorkspace?.id) return;
 
         const found = records.find((team) => team.id === currentlyActiveWorkspace.id);
-
         if (!found) {
           if (!window.hasUserRemovedHimselfRecently)
             alert("You no longer have access to this workspace. Please contact your team admin.");
@@ -130,10 +142,12 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
         }
       },
       (error) => {
+        console.log("DBG: availableTeams Query -> error", error);
         Logger.error(error);
       }
     );
   } catch (e) {
+    console.log("DBG: availableTeamsListener final catch -> e", e);
     return null;
   }
 };

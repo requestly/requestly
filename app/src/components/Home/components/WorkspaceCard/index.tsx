@@ -5,11 +5,11 @@ import { Spin } from "antd";
 import { CreateWorkspaceView } from "./components/CreateWorkspaceView";
 import { TeamsListView } from "./components/TeamsListView";
 import { getPendingInvites } from "backend/workspace";
-import { isCompanyEmail } from "utils/FormattingHelper";
 import Logger from "lib/logger";
 import { Invite } from "types";
 import { m, AnimatePresence } from "framer-motion";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 export const TeamsCard: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
@@ -84,7 +84,7 @@ export const TeamsCard: React.FC = () => {
       </AnimatePresence>
     );
   // TODO: Add default workspace view after onboarding is 100% rolled out
-  if (isCompanyEmail(user?.details?.profile?.email))
+  if (isCompanyEmail(user.details?.emailType))
     return (
       <AnimatePresence>
         <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>

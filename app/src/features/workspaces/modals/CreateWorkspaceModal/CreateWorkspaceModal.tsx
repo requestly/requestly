@@ -108,7 +108,6 @@ const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, callback, 
             );
           }
         });
-
         trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "create_workspace_modal");
         toast.info("Workspace Created");
 

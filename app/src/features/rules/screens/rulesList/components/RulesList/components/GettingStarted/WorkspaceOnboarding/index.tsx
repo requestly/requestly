@@ -22,7 +22,7 @@ import { isEmailVerified } from "utils/AuthUtils";
 import { shouldShowOnboarding } from "components/misc/PersonaSurvey/utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { OnboardingSteps } from "./types";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import { getPendingInvites } from "backend/workspace";
 import { globalActions } from "store/slices/global/slice";
 import { Invite, InviteUsage } from "types";
@@ -35,6 +35,7 @@ import { trackNewTeamCreateSuccess, trackWorkspaceOnboardingViewed } from "modul
 import { capitalize } from "lodash";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface OnboardingProps {
   isOpen: boolean;
@@ -87,7 +88,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
 
     const verifiedUser = await isEmailVerified(user?.details?.profile?.uid);
     if (verifiedUser && pendingInvites != null) {
-      if (!isCompanyEmail(user?.details?.profile?.email)) {
+      if (isCompanyEmail(user.details?.emailType)) {
         dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
         return;
       }
@@ -119,8 +120,8 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     }
   }, [
     isPendingEmailInvite,
-    user?.details?.profile?.uid,
-    user?.details?.profile?.email,
+    user.details?.profile?.uid,
+    user.details?.emailType,
     pendingInvites,
     dispatch,
     userEmailDomain,
