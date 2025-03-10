@@ -92,6 +92,7 @@ export const PageSourceRow: React.FC<Props> = React.memo(
     ) : (
       <>
         <SourceConditionInput
+          disabled={disabled}
           autoFocus={true}
           source={pageSourceDetails}
           onSourceChange={(updatedSource) => handlePageSourceDetailsChange(updatedSource as SessionRecordingPageSource)}
