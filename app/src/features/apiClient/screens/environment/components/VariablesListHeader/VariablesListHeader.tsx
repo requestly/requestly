@@ -11,6 +11,7 @@ import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { ReadOnlyModeAlert } from "features/apiClient/screens/apiClient/components/clientView/components/ReadOnlyModeAlert/ReadOnlyModeAlert";
 import { RoleBasedComponent } from "features/rbac";
+
 interface VariablesListHeaderProps {
   searchValue: string;
   currentEnvironmentName: string;
@@ -62,9 +63,14 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
         <div />
       )}
 
-      <RoleBasedComponent resource="api_client_environment" permission="read">
-        <ReadOnlyModeAlert description="As a viewer, you can update variables with current values and test the APIs, but saving your updates is not permitted." />
-      </RoleBasedComponent>
+      <RoleBasedComponent
+        resource="api_client_environment"
+        permission="create"
+        children={null}
+        fallback={
+          <ReadOnlyModeAlert description="As a viewer, you can update variables with current values and test the APIs, but saving your updates is not permitted." />
+        }
+      />
 
       <div className="variables-list-action-container">
         <Input
