@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getAppMode, getAppOnboardingDetails } from "store/selectors";
+import { getAppOnboardingDetails } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { DefaultTeamView } from "./components/defaultTeamView";
 import { JoinTeamView } from "./components/joinTeamsView";
 import { getPendingInvites } from "backend/workspace";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
 import { OnboardingLoader } from "../loader";
@@ -14,6 +12,7 @@ import { isNull } from "lodash";
 import { trackAppOnboardingTeamsViewed, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import "./index.scss";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { Invite } from "types";
@@ -26,29 +25,17 @@ interface WorkspaceOnboardingViewProps {
 export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = ({ isOpen }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const user = useSelector(getUserAuthDetails);
   const [pendingInvites, setPendingInvites] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const handleSwitchWorkspace = useCallback(
     (teamId: string, newTeamName: string) => {
-      switchWorkspace(
-        {
-          teamId: teamId,
-          teamName: newTeamName,
-          teamMembersCount: 1,
-        },
-        dispatch,
-        { isWorkspaceMode, isSyncEnabled: true },
-        appMode,
-        null,
-        "app_onboarding"
-      );
+      switchWorkspace(teamId, "app_onboarding");
     },
-    [dispatch, isWorkspaceMode, appMode]
+    [switchWorkspace]
   );
 
   const handlePendingInvites = useCallback(

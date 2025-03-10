@@ -1,10 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { Typography, Switch, Divider, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
@@ -29,6 +26,7 @@ import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWi
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
@@ -36,6 +34,8 @@ interface Props {
 export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   const dispatch = useDispatch();
   const functions = getFunctions();
+
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const upsertTeamCommonInvite = useMemo(
     () =>
@@ -47,8 +47,6 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   );
 
   const user = useSelector(getUserAuthDetails);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const appMode = useSelector(getAppMode);
 
   const [inviteEmails, setInviteEmails] = useState<string[]>([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
@@ -99,27 +97,14 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
             dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
           }
           setIsProcessing(false);
-          switchWorkspace(
-            {
-              teamId: defaultTeamData?.teamId ?? newTeamId,
-              teamMembersCount: 1,
-            },
-            dispatch,
-            {
-              isWorkspaceMode,
-              isSyncEnabled: true,
-            },
-            appMode,
-            null,
-            "onboarding"
-          );
+          switchWorkspace(defaultTeamData?.teamId ?? newTeamId, "onboarding");
         })
         .catch((err) => {
           toast.error("Error while sending invitations");
           trackAddTeamMemberFailure(defaultTeamData?.teamId ?? newTeamId, inviteEmails, null, "onboarding");
         });
     },
-    [appMode, dispatch, isWorkspaceMode, inviteEmails, defaultTeamData?.teamId, makeUserAdmin]
+    [inviteEmails, defaultTeamData?.teamId, makeUserAdmin, switchWorkspace, billingTeams, dispatch]
   );
 
   const handleCreateNewTeam = useCallback(() => {
@@ -136,20 +121,9 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
         dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
       }
       trackNewTeamCreateSuccess(response?.data?.teamId, newWorkspaceName, "onboarding");
-      switchWorkspace(
-        {
-          teamId: response?.data?.teamId,
-          teamName: newWorkspaceName,
-          teamMembersCount: response?.data?.accessCount,
-        },
-        dispatch,
-        { isWorkspaceMode, isSyncEnabled: true },
-        appMode,
-        null,
-        "onboarding"
-      );
+      switchWorkspace(response?.data?.teamId, "onboarding");
     });
-  }, [appMode, dispatch, isWorkspaceMode, newWorkspaceName, inviteEmails?.length, handleAddMembers]);
+  }, [newWorkspaceName, inviteEmails?.length, switchWorkspace, handleAddMembers, dispatch]);
 
   const handleDomainToggle = useCallback(
     (enabled: boolean) => {

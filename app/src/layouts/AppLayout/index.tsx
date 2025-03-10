@@ -16,7 +16,6 @@ import AppModeInitializer from "hooks/AppModeInitializer";
 import DBListeners from "hooks/DbListenerInit/DBListeners";
 // import RuleExecutionsSyncer from "hooks/RuleExecutionsSyncer";
 import FeatureUsageEvent from "hooks/FeatureUsageEvent";
-import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
 import ExtensionContextInvalidationNotice from "components/misc/notices/ExtensionContextInvalidationNotice";
 import AutomationNotAllowedNotice from "components/misc/notices/AutomationNotAllowedNotice";
@@ -29,6 +28,8 @@ import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
 import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
+import { useWorkspaceManager } from "features/workspaces/hooks/useWorkspaceManager";
+import useClientStorageService from "services/clientStorageService/hooks/useClientStorageService";
 import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
 
 const { PATHS } = APP_CONSTANTS;
@@ -41,6 +42,9 @@ const App: React.FC = () => {
 
   usePreLoadRemover();
   useGeoLocation();
+
+  useClientStorageService();
+
   useIsExtensionEnabled();
   useBillingTeamsListener();
   useAppLanguageObserver();
@@ -48,6 +52,9 @@ const App: React.FC = () => {
 
   submitAppDetailAttributes();
   useAppUpdateChecker();
+
+  // FIXME-syncing: Move to AppModeProvider after refractoring. Everything triggered by appMode should be there
+  useWorkspaceManager();
 
   if (!isEmpty(window.location.hash)) {
     //Support legacy URL formats
@@ -74,15 +81,14 @@ const App: React.FC = () => {
       <AutomationNotAllowedNotice />
       <AuthHandler />
       <AppModeInitializer />
-      <GrowthBookProvider growthbook={growthbook}>
-        <DBListeners />
-        {/* <RuleExecutionsSyncer /> */}
-        {/* @ts-ignore */}
-        <ActiveWorkspace />
-        {/* @ts-ignore */}
-        <ThirdPartyIntegrationsHandler />
-        <ThemeProvider>
-          <ConfigProvider locale={enUS}>
+      <DBListeners />
+      {/* <RuleExecutionsSyncer /> */}
+      {/* @ts-ignore */}
+      {/* @ts-ignore */}
+      <ThirdPartyIntegrationsHandler />
+      <ThemeProvider>
+        <ConfigProvider locale={enUS}>
+          <GrowthBookProvider growthbook={growthbook}>
             {/* @ts-ignore */}
             <InitImplicitWidgetConfigHandler />
             <LocalUserAttributesHelperComponent />
@@ -96,9 +102,9 @@ const App: React.FC = () => {
                 <Outlet />
               </div>
             </LazyMotion>
-          </ConfigProvider>
-        </ThemeProvider>
-      </GrowthBookProvider>
+          </GrowthBookProvider>
+        </ConfigProvider>
+      </ThemeProvider>
     </>
   );
 };

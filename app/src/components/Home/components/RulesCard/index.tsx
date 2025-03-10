@@ -3,11 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsRulesListLoading } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useHasChanged } from "hooks";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
-import { StorageService } from "init";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
@@ -22,6 +20,9 @@ import {
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/components/RulesList/components";
+import "./rulesCard.scss";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 import { Rule, RuleType } from "@requestly/shared/types/entities/rules";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { Card } from "../Card";
@@ -39,7 +40,7 @@ export const RulesCard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
   const user = useSelector(getUserAuthDetails);
   const isRulesLoading = useSelector(getIsRulesListLoading);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
@@ -94,8 +95,8 @@ export const RulesCard = () => {
 
   useEffect(() => {
     if (isExtensionInstalled() && !isRulesLoading) {
-      StorageService(appMode)
-        .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
+      clientRuleStorageService
+        .getRecordsByObjectType(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
         .then((res) => {
           setRules(
             res
@@ -112,7 +113,7 @@ export const RulesCard = () => {
     } else {
       setIsLoading(false);
     }
-  }, [appMode, workspace.id, hasUserChanged, isRulesLoading]);
+  }, [appMode, activeWorkspaceIds, hasUserChanged, isRulesLoading]);
 
   return (
     <Card

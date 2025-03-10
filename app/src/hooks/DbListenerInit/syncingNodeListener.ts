@@ -19,7 +19,6 @@ import {
   getTeamUserRuleAllConfigsPath,
 } from "utils/syncing/syncDataUtils";
 import { trackSyncCompleted } from "modules/analytics/events/features/syncing";
-import { StorageService } from "init";
 import { doSyncRecords } from "utils/syncing/SyncUtils";
 import { SYNC_CONSTANTS } from "utils/syncing/syncConstants";
 import APP_CONSTANTS from "config/constants";
@@ -62,10 +61,10 @@ const setLastSyncTarget = async (
 ): Promise<void> => {
   const desiredValue: string = syncTarget === "teamSync" ? team_id : uid;
 
-  const storageService = StorageService(appMode);
-  await storageService.saveRecord({
-    [APP_CONSTANTS.LAST_SYNC_TARGET]: desiredValue,
-  });
+  // const storageService = StorageService(appMode);
+  // await storageService.saveRecord({
+  //   [APP_CONSTANTS.LAST_SYNC_TARGET]: desiredValue,
+  // });
 };
 
 /**
@@ -155,61 +154,61 @@ export const doSync = async (
   team_id: string
 ): Promise<void> => {
   console.log("DEBUG", "doSync");
-  if (!isLocalStoragePresent(appMode)) {
-    return;
-  }
-  // Consistency check. Merge records if inconsistent
-  const storageService = StorageService(appMode);
-  const lastSyncTarget: string = await storageService.getRecord(APP_CONSTANTS.LAST_SYNC_TARGET);
+  // if (!isLocalStoragePresent(appMode)) {
+  //   return;
+  // }
+  // // Consistency check. Merge records if inconsistent
+  // const storageService = StorageService(appMode);
+  // // const lastSyncTarget: string = await storageService.getRecord(APP_CONSTANTS.LAST_SYNC_TARGET);
 
-  let consistencyCheckPassed: boolean =
-    (syncTarget === "teamSync" && lastSyncTarget === team_id) || (syncTarget === "sync" && lastSyncTarget === uid);
+  // let consistencyCheckPassed: boolean =
+  //   (syncTarget === "teamSync" && lastSyncTarget === team_id) || (syncTarget === "sync" && lastSyncTarget === uid);
 
-  let allSyncedRecords: Record<string, any>[] = await parseRemoteRecords(appMode, updatedFirebaseRecords);
+  // let allSyncedRecords: Record<string, any>[] = await parseRemoteRecords(appMode, updatedFirebaseRecords);
 
-  if (!consistencyCheckPassed) {
-    // Merge records
-    allSyncedRecords = await mergeRecordsAndSaveToFirebase(appMode, allSyncedRecords);
-    await setLastSyncTarget(appMode, syncTarget, uid, team_id);
-  } else {
-    // At this stage we are sure that we want to sync with this target only, target is consistent
-    // Now let's check if there are any local update that we should prioritize
-    const tsResult: boolean = await checkIfNoUpdateHasBeenPerformedSinceLastSync(appMode);
-    if (!tsResult) {
-      // This means some updates have been performed locally and they have not been synced with firebase yet
-      // Handle conflicts
-      allSyncedRecords = await resolveLocalConflictsAndSaveToFirebase(appMode, allSyncedRecords);
-      await setLastSyncTarget(appMode, syncTarget, uid, team_id);
-    }
-  }
+  // if (!consistencyCheckPassed) {
+  //   // Merge records
+  //   allSyncedRecords = await mergeRecordsAndSaveToFirebase(appMode, allSyncedRecords);
+  //   await setLastSyncTarget(appMode, syncTarget, uid, team_id);
+  // } else {
+  //   // At this stage we are sure that we want to sync with this target only, target is consistent
+  //   // Now let's check if there are any local update that we should prioritize
+  //   const tsResult: boolean = await checkIfNoUpdateHasBeenPerformedSinceLastSync(appMode);
+  //   if (!tsResult) {
+  //     // This means some updates have been performed locally and they have not been synced with firebase yet
+  //     // Handle conflicts
+  //     allSyncedRecords = await resolveLocalConflictsAndSaveToFirebase(appMode, allSyncedRecords);
+  //     await setLastSyncTarget(appMode, syncTarget, uid, team_id);
+  //   }
+  // }
 
-  // Write to local
-  await syncToLocalFromFirebase(allSyncedRecords, appMode, uid);
-  trackSyncCompleted(uid);
-  window.isFirstSyncComplete = true;
+  // // Write to local
+  // await syncToLocalFromFirebase(allSyncedRecords, appMode, uid);
+  // trackSyncCompleted(uid);
+  // window.isFirstSyncComplete = true;
 
-  // Refresh Rules
-  dispatch(globalActions.updateRefreshPendingStatus({ type: "rules" }));
-  dispatch(globalActions.updateIsRulesListLoading(false));
+  // // Refresh Rules
+  // dispatch(globalActions.updateRefreshPendingStatus({ type: "rules" }));
+  // dispatch(globalActions.updateIsRulesListLoading(false));
 
-  // Fetch Session Recording
-  if (appMode === "EXTENSION") {
-    const sessionRecordingConfigOnFirebase: Record<string, any> | null = await getSyncedSessionRecordingPageConfig(uid);
-    const localSessionRecordingConfig = await StorageService(appMode).getRecord(
-      GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG
-    );
-    saveSessionRecordingPageConfigLocallyWithoutSync(
-      sessionRecordingConfigOnFirebase ? sessionRecordingConfigOnFirebase : localSessionRecordingConfig,
-      appMode
-    );
+  // // Fetch Session Recording
+  // // if (appMode === "EXTENSION") {
+  // //   const sessionRecordingConfigOnFirebase: Record<string, any> | null = await getSyncedSessionRecordingPageConfig(uid);
+  // //   const localSessionRecordingConfig = await StorageService(appMode).getRecord(
+  //     GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG
+  //   );
+  //   saveSessionRecordingPageConfigLocallyWithoutSync(
+  //     sessionRecordingConfigOnFirebase ? sessionRecordingConfigOnFirebase : localSessionRecordingConfig,
+  //     appMode
+  //   );
 
-    // Refresh Session Recording Config
-    dispatch(
-      globalActions.updateRefreshPendingStatus({
-        type: "sessionRecordingConfig",
-      })
-    );
-  }
+  //   // Refresh Session Recording Config
+  //   dispatch(
+  //     globalActions.updateRefreshPendingStatus({
+  //       type: "sessionRecordingConfig",
+  //     })
+  //   );
+  // }
 };
 
 /** Trottled version of the doSync function */

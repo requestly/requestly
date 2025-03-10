@@ -13,7 +13,6 @@ import {
   getCurrentEnvironmentId,
 } from "store/features/variables/selectors";
 import { variablesActions } from "store/features/variables/slice";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
@@ -21,6 +20,9 @@ import { isEmpty } from "lodash";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
+import { getOwnerId } from "backend/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { useGetApiClientSyncRepo } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
@@ -44,15 +46,12 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
   const collectionVariables = useSelector(getCollectionVariables);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
 
-  const ownerId = useMemo(
-    () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
-    [currentlyActiveWorkspace.id, user?.details?.profile?.uid]
-  );
+  const ownerId = getOwnerId(user?.details?.profile?.uid, activeWorkspaceId);
 
   const syncRepository = useGetApiClientSyncRepo();
 

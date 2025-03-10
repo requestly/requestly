@@ -1,7 +1,6 @@
 import { ShareAltOutlined } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Table, Tooltip } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { UserAvatar } from "componentsV2/UserAvatar";
@@ -15,6 +14,8 @@ import PATHS from "config/constants/sub/paths";
 import { RQButton } from "lib/design-system/components";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { useSessionsActionContext } from "features/sessionBook/context/actions";
+import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 interface SessionsTableColumnsProps {
   handleUpdateSharingRecordId: (id: string) => void;
@@ -29,7 +30,8 @@ export const useSessionsTableColumns = ({
   handleShareModalVisibiliity,
   handleForceRender,
 }: SessionsTableColumnsProps) => {
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
   const { handleDeleteSessionAction } = useSessionsActionContext();
 
   const isDesktopSessionsCompatible =
@@ -102,7 +104,9 @@ export const useSessionsTableColumns = ({
       width: 120,
       align: "center",
       render: (visibility) => (
-        <Tooltip title={getPrettyVisibilityName(visibility, isWorkspaceMode)}>{renderHeroIcon(visibility)}</Tooltip>
+        <Tooltip title={getPrettyVisibilityName(visibility, isSharedWorkspaceMode)}>
+          {renderHeroIcon(visibility)}
+        </Tooltip>
       ),
     },
 
@@ -139,7 +143,7 @@ export const useSessionsTableColumns = ({
     },
   ];
 
-  if (!isWorkspaceMode) {
+  if (!isSharedWorkspaceMode) {
     // remove createdBy column
     columns.splice(5, 1);
   }
