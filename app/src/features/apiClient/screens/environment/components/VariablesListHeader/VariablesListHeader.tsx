@@ -81,26 +81,26 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           onChange={(e) => onSearchValueChange(e.target.value)}
         />
 
-        <RoleBasedComponent resource="api_client_environment" permission="update">
-          <div className="variables-list-btn-actions-container">
-            <RQButton
-              showHotKeyText
-              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
-              type="primary"
-              onClick={onSave}
-              disabled={!hasUnsavedChanges}
-              loading={isSaving}
-            >
-              Save
-            </RQButton>
+        <div className="variables-list-btn-actions-container">
+          <RQButton
+            showHotKeyText
+            hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+            type="primary"
+            onClick={onSave}
+            disabled={!hasUnsavedChanges}
+            loading={isSaving}
+          >
+            Save
+          </RQButton>
 
+          <RoleBasedComponent resource="api_client_environment" permission="update">
             {exportActions?.showExport && (
               <RQButton type="primary" onClick={exportActions?.onExportClick} disabled={!exportActions?.enableExport}>
                 Export
               </RQButton>
             )}
-          </div>
-        </RoleBasedComponent>
+          </RoleBasedComponent>
+        </div>
       </div>
     </div>
   );
