@@ -107,7 +107,7 @@ export const useVariablesListColumns = ({
         dataIndex: "localValue",
         title: "Local Value",
         handleVariableChange,
-        isReadOnly: !isValidPermission,
+        isReadOnly: !isValidPermission && recordsCount === 1 && !record.key,
         isSecret: checkIsSecretHidden(record.id),
       }),
     },
