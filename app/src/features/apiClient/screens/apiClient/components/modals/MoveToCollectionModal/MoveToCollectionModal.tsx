@@ -56,9 +56,9 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       data: {
         variables: {},
         auth: {
-					currentAuthType: Authorization.Type.NO_AUTH,
-					authConfigStore: {},
-				},
+          currentAuthType: Authorization.Type.NO_AUTH,
+          authConfigStore: {},
+        },
       },
     };
     const newCollection = await apiClientRecordsRepository.createCollection(collectionToBeCreated);

@@ -31,7 +31,7 @@ const createAuthConfig = (
 };
 
 export const getDefaultFormState = (defaultAuth?: RQAPI.Auth): Record<string, string> => {
-  if (!defaultAuth.currentAuthType) {
+  if (!defaultAuth || !defaultAuth.currentAuthType) {
     // no default config passed
     return {};
   }
