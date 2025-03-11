@@ -113,7 +113,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   }, []);
 
   const renderValueInputByType = useCallback(() => {
-    const disabled = isReadOnly && ["key", "type", "syncValue"].includes(dataIndex);
+    const disabled = isReadOnly;
 
     switch (record.type) {
       case EnvironmentVariableType.String:
