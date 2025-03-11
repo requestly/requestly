@@ -6,6 +6,7 @@ import { useFeatureValue } from "@growthbook/growthbook-react";
 import { getUserAttributes } from "store/selectors";
 import { initGrowthbook, updateGrowthbookAttributes } from "utils/feature-flag/growthbook";
 import firebaseApp from "firebase.js";
+import { getEmailType } from "utils/mailCheckerUtils";
 
 const useGrowthBookIntegration = () => {
   // Keeping it object as boolean wasn't working when updating attributes
@@ -44,7 +45,8 @@ const useGrowthBookIntegration = () => {
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, async (user) => {
       setGrowthbookStatus({ initDone: false });
-      initGrowthbook(user);
+      const emailType = await getEmailType(user.email);
+      initGrowthbook({ ...user, emailType });
       setGrowthbookStatus({ initDone: true });
     });
   }, []);
