@@ -1,6 +1,6 @@
 import { deleteApiRecords, getApiRecord, getApiRecords, upsertApiRecord } from "backend/apiClient";
 import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces";
-import { generateDocumentId, getOwnerId } from "backend/utils";
+import { batchWrite, generateDocumentId, getOwnerId } from "backend/utils";
 import { RQAPI } from "features/apiClient/types";
 import { sanitizeRecord, updateApiRecord } from "backend/apiClient/upsertApiRecord";
 import { EnvironmentVariables } from "backend/environment/types";
@@ -124,5 +124,30 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
       success: true,
       data: undefined,
     };
+  }
+
+  async createCollectionFromImport(
+    collection: RQAPI.CollectionRecord,
+    id: string
+  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+    return this.createRecordWithId(collection, id);
+  }
+
+  async batchWriteApiEntities(
+    batchSize: number,
+    entities: RQAPI.Record[],
+    writeFunction: (entity: RQAPI.Record) => Promise<any>
+  ) {
+    try {
+      const result = await batchWrite(batchSize, entities, writeFunction);
+      return {
+        success: result.every((r) => r.status === "fulfilled"),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
   }
 }
