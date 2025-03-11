@@ -145,11 +145,14 @@ const Editor: React.FC<EditorProps> = ({
 
   useEffect(() => {
     if (!isDefaultPrettificationDone.current) {
-      if (prettifyOnInit && (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT)) {
-        const prettifiedCode = prettifyCode(value, language);
-        setEditorContent(prettifiedCode.code);
-        isDefaultPrettificationDone.current = true;
-      }
+      const prettifyAsync = async () => {
+        if (prettifyOnInit && (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT)) {
+          const prettifiedCode = await prettifyCode(value, language);
+          setEditorContent(prettifiedCode.code);
+          isDefaultPrettificationDone.current = true;
+        }
+      };
+      prettifyAsync();
     }
   }, [prettifyOnInit, language, value]);
 

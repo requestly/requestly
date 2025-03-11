@@ -192,14 +192,14 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     return null;
   };
 
-  const responseBodyChangeHandler = (value) => {
+  const responseBodyChangeHandler = async (value) => {
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           "response.type": pair.response.type,
           "response.value":
-            pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? formatJSONString(value) : value,
+            pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? await formatJSONString(value) : value,
         },
         triggerUnsavedChangesIndication: !codeFormattedFlag.current,
       })

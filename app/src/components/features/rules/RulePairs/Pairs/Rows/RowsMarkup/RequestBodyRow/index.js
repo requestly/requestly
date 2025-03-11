@@ -53,7 +53,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     return null;
   }, [pair.request.type]);
 
-  const requestBodyChangeHandler = (value) => {
+  const requestBodyChangeHandler = async (value) => {
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
@@ -61,7 +61,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
         updates: {
           "request.type": pair.request.type,
           "request.value":
-            pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? formatJSONString(value) : value,
+            pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? await formatJSONString(value) : value,
         },
       })
     );
