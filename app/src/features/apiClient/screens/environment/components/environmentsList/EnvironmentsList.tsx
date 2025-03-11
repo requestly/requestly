@@ -140,6 +140,7 @@ export const EnvironmentsList = () => {
             message="No environment created yet"
             newRecordBtnText="Create new environment"
             analyticEventSource={EnvironmentAnalyticsSource.ENVIRONMENTS_LIST}
+            disabled={!isValidPermission}
           />
         </div>
       ) : (

@@ -9,6 +9,7 @@ import { EnvironmentAnalyticsSource } from "features/apiClient/screens/environme
 import "./emptyState.scss";
 
 export interface EmptyStateProps {
+  disabled?: boolean;
   analyticEventSource: RQAPI.AnalyticsEventSource | EnvironmentAnalyticsSource;
   message: string;
   newRecordBtnText: string;
@@ -17,6 +18,7 @@ export interface EmptyStateProps {
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
   message,
+  disabled = false,
   newRecordBtnText,
   onNewRecordClick,
   analyticEventSource = "collections_empty_state",
@@ -65,7 +67,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       />
       <div className="empty-message">{message}</div>
 
-      <RQButton loading={isLoading} size="small" className="new-record-btn" onClick={handleOnClick}>
+      <RQButton disabled={disabled} loading={isLoading} size="small" className="new-record-btn" onClick={handleOnClick}>
         {newRecordBtnText}
       </RQButton>
     </div>
