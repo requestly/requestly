@@ -145,6 +145,7 @@ class SyncWorkspace {
         console.log(`[SyncWorkspace.collections.${entityType}.preSave]`, { plainData, rxDocument });
         const _plainData = omit(plainData, [
           "forkId",
+          "isGlobal",
           "createdAt",
           "updatedAt",
           "createdBy",
@@ -155,6 +156,7 @@ class SyncWorkspace {
         ]);
         const _rxDocument = omit(rxDocument, [
           "forkId",
+          "isGlobal",
           "createdAt",
           "updatedAt",
           "createdBy",
