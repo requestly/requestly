@@ -443,4 +443,44 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: result.content,
     };
   }
+
+  async createCollectionFromImport(
+    collection: RQAPI.CollectionRecord,
+    id: string
+  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+    const service = await this.getAdapter();
+    const result = await service.createCollectionFromCompleteRecord(collection, id);
+    if (result.type === "error") {
+      return {
+        success: false,
+        data: null,
+        message: result.error.message,
+      };
+    }
+    const parsedRecords = this.parseAPIEntities([result.content as APIEntity]);
+    return {
+      success: true,
+      data: parsedRecords[0],
+    };
+  }
+
+  async batchWriteApiEntities(
+    batchSize: number,
+    entities: RQAPI.Record[],
+    writeFunction: (entity: RQAPI.Record) => Promise<any>
+  ) {
+    try {
+      for (const entity of entities) {
+        await writeFunction(entity);
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+    return {
+      success: true,
+    };
+  }
 }
