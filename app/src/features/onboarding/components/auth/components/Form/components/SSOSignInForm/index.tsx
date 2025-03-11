@@ -28,7 +28,6 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
   const [isNoConnectionFoundCardVisible, setIsNoConnectionFoundCardVisible] = useState(false);
 
   const domain = useMemo(() => getDomainFromEmail(email), [email]);
-  const emailType = useMemo(async () => await getEmailType(email), [email]);
 
   const handleLoginWithSSO = useCallback(async () => {
     if (!email) {
@@ -40,8 +39,9 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
       toast.error("Please enter a valid email");
       return;
     }
-    const isDisposable = await getEmailType(email);
-    if (isDisposable === EmailType.DESTROYABLE) {
+
+    const emailType = await getEmailType(email);
+    if (emailType === EmailType.DESTROYABLE) {
       toast.error("Please enter a valid email address. Temporary or disposable email addresses are not allowed.");
       return;
     }
@@ -73,7 +73,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
       });
       const captureSSOInterest = httpsCallable(getFunctions(), "auth-captureSSOInterest");
 
-      captureSSOInterest({ email, isCompanyEmail: emailType === "BUSINESS" })
+      captureSSOInterest({ email, isCompanyEmail: emailType === EmailType.BUSINESS })
         .then(() => {
           Logger.log("SSO interest captured successfully");
         })
@@ -82,7 +82,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
         });
     }
     setIsLoading(false);
-  }, [domain, email, emailType, source]);
+  }, [domain, email, source]);
 
   return (
     <>
