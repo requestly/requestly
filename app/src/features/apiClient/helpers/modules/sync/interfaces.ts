@@ -52,7 +52,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     fileType: FileType
   ): Promise<{ success: boolean; data: unknown; message?: string }>;
   getRawFileData(id: string): Promise<{ success: boolean; data: unknown; message?: string }>;
-  createCollectionFromImport(
+  createCollectionFromCompleteRecord(
     collection: RQAPI.CollectionRecord,
     id: string
   ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }>;
@@ -63,6 +63,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     entities: Partial<RQAPI.Record>[],
     writeFunction: (entity: RQAPI.Record) => Promise<unknown>
   ): Promise<{ success: boolean; message?: string }>;
+  duplicateApiEntities(entities: Partial<RQAPI.Record>[]): Promise<RQAPI.Record[]>;
 }
 
 export interface ApiClientRepositoryInterface {
