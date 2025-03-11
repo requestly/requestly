@@ -1,6 +1,5 @@
 import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
-import { generateDocumentId } from "backend/utils";
 import { POSTMAN_AUTH_TYPES_MAPPING, PostmanAuth } from "features/apiClient/constants";
 import { Authorization } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 import { isEmpty } from "lodash";
@@ -8,6 +7,7 @@ import {
   getDefaultAuth,
   getDefaultAuthType,
 } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
+import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
 interface PostmanCollectionExport {
   info: {
@@ -151,7 +151,11 @@ const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentC
   return auth;
 };
 
-const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.ApiRecord> => {
+const createApiRecord = (
+  item: any,
+  parentCollectionId: string,
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
+): Partial<RQAPI.ApiRecord> => {
   const { request } = item;
   if (!request) throw new Error(`Invalid API item: ${item.name}`);
 
@@ -199,7 +203,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
   }
 
   return {
-    id: generateDocumentId("apis"),
+    id: apiClientRecordsRepository.generateApiRecordId(parentCollectionId),
     collectionId: parentCollectionId,
     name: item.name,
     type: RQAPI.RecordType.API,
@@ -222,7 +226,7 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
 const createCollectionRecord = (
   name: string,
   description: string,
-  id = generateDocumentId("apis"),
+  id: string,
   variables?: any[],
   auth?: any,
   parentCollectionId?: string
@@ -255,7 +259,8 @@ const createCollectionRecord = (
 };
 
 export const processPostmanCollectionData = (
-  fileContent: any
+  fileContent: any,
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
 ): { collections: Partial<RQAPI.CollectionRecord>[]; apis: Partial<RQAPI.ApiRecord>[] } => {
   if (!fileContent.info?.name) {
     throw new Error("Invalid collection file: missing name");
@@ -273,7 +278,7 @@ export const processPostmanCollectionData = (
         const subCollection = createCollectionRecord(
           item.name,
           item.description || "",
-          generateDocumentId("apis"),
+          apiClientRecordsRepository.generateCollectionId(item.name, parentCollectionId),
           [],
           item.auth,
           parentCollectionId
@@ -286,14 +291,14 @@ export const processPostmanCollectionData = (
         result.apis.push(...subItems.apis);
       } else if (item.request) {
         // This is an API endpoint
-        result.apis.push(createApiRecord(item, parentCollectionId));
+        result.apis.push(createApiRecord(item, parentCollectionId, apiClientRecordsRepository));
       }
     });
 
     return result;
   };
 
-  const rootCollectionId = generateDocumentId("apis");
+  const rootCollectionId = apiClientRecordsRepository.generateCollectionId(fileContent.info.name, "");
   const rootCollection = createCollectionRecord(
     fileContent.info.name,
     fileContent.info?.description || "",
