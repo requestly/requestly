@@ -257,6 +257,7 @@ export const CollectionRow: React.FC<Props> = ({
           >
             {record.data.children?.length === 0 ? (
               <ApiRecordEmptyState
+                disabled={isReadOnly}
                 analyticEventSource="collection_row"
                 message="No requests created yet"
                 newRecordBtnText="New request"
