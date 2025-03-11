@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
-import { getIsWorkspaceLocal } from "store/features/teams/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { getActiveWorkspaceId, isLocalFSWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspaceIds, getWorkspaceById } from "store/slices/workspaces/selectors";
 
 interface Props {
   skipWorkspaceCheck: boolean;
@@ -13,7 +14,9 @@ interface Props {
 
 export const useCheckLocalSyncSupport = (options: Props = { skipWorkspaceCheck: false }) => {
   const isLocalSyncFlagSupported = useFeatureValue("local_sync", false);
-  const rawIsWorkspaceLocal = useSelector(getIsWorkspaceLocal);
+
+  const activeWorkspace = useSelector(getWorkspaceById(getActiveWorkspaceId(useSelector(getActiveWorkspaceIds))));
+  const rawIsWorkspaceLocal: boolean = isLocalFSWorkspace(activeWorkspace);
   const isWorkspaceLocal = options.skipWorkspaceCheck ? true : rawIsWorkspaceLocal;
   const appMode = useSelector(getAppMode);
 

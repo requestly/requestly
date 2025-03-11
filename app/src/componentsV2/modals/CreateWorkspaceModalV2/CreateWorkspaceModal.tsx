@@ -19,17 +19,16 @@ import {
 import { toast } from "utils/Toast";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
-import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { useIncentiveActions } from "features/incentivization/hooks";
 import "./createWorkspaceModal.scss";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
-import { teamsActions } from "store/features/teams/slice";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface Props {
   isOpen: boolean;
@@ -42,8 +41,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [workspaceName, setWorkspaceName] = useState("");
   const [workspaceType, setWorkspaceType] = useState(user.loggedIn ? WorkspaceType.SHARED : WorkspaceType.LOCAL);
@@ -52,6 +50,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
 
   const { claimIncentiveRewards } = useIncentiveActions();
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const folderSelectCallback = (path: string) => {
     setFolderPath(path);
@@ -59,22 +58,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
 
   const handlePostTeamCreationStep = useCallback(
     (teamId: string, newTeamName: string, hasMembersInSameDomain: boolean) => {
-      switchWorkspace(
-        {
-          teamId: teamId,
-          teamName: newTeamName,
-          teamMembersCount: 1,
-          workspaceType,
-        },
-        dispatch,
-        {
-          isSyncEnabled: user?.details?.isSyncEnabled,
-          isWorkspaceMode,
-        },
-        appMode,
-        null,
-        "create_workspace_modal"
-      );
+      switchWorkspace(teamId, "create_workspace_modal");
       if (workspaceType === WorkspaceType.SHARED) {
         redirectToTeam(navigate, teamId, {
           state: {
@@ -83,7 +67,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
         });
       }
     },
-    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.details?.isSyncEnabled, workspaceType]
+    [switchWorkspace, workspaceType, navigate, isNotifyAllSelected]
   );
 
   const handleIncentiveRewards = useCallback(
@@ -163,30 +147,31 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
         : ({ type: WorkspaceType.SHARED } as SharedOrPrivateWorkspaceConfig);
 
     try {
+      // TODO-syncing-local-fs-bug??
       const teamId = await (async () => {
         if (config.type === WorkspaceType.LOCAL) {
           const workspaceCreationResult = await createWorkspaceFolder(workspaceName, config.rootPath);
           if (workspaceCreationResult.type === "error") {
             throw new Error(workspaceCreationResult.error.message);
           }
-          const partialWorkspace = workspaceCreationResult.content;
-          const localWorkspace: Record<string, any> = {
-            id: partialWorkspace.id,
-            name: partialWorkspace.name,
-            owner: user?.details?.profile?.uid,
-            accessCount: 1,
-            adminCount: 1,
-            members: {
-              [user?.details?.profile?.uid]: {
-                role: "admin",
-              },
-            },
-            appsumo: null,
-            workspaceType: WorkspaceType.LOCAL,
-            rootPath: partialWorkspace.path,
-          };
-          dispatch(teamsActions.addToAvailableTeams(localWorkspace));
-          return partialWorkspace.id;
+          // const partialWorkspace = workspaceCreationResult.content;
+          // const localWorkspace: Record<string, any> = {
+          //   id: partialWorkspace.id,
+          //   name: partialWorkspace.name,
+          //   owner: user?.details?.profile?.uid,
+          //   accessCount: 1,
+          //   adminCount: 1,
+          //   members: {
+          //     [user?.details?.profile?.uid]: {
+          //       role: "admin",
+          //     },
+          //   },
+          //   appsumo: null,
+          //   workspaceType: WorkspaceType.LOCAL,
+          //   rootPath: partialWorkspace.path,
+          // };
+          // dispatch(teamsActions.addToAvailableTeams(localWorkspace));
+          // return partialWorkspace.id;
         } else {
           const response: any = await createTeam({
             teamName: workspaceName,
@@ -196,7 +181,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
         }
       })();
 
-      await handleIncentiveRewards(availableTeams?.length, dispatch);
+      await handleIncentiveRewards(availableWorkspaces?.length, dispatch);
 
       trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal");
       toast.info("Workspace Created");
@@ -231,7 +216,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
       setIsLoading(false);
     }
   }, [
-    availableTeams?.length,
+    availableWorkspaces?.length,
     billingTeams,
     callback,
     dispatch,
