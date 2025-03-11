@@ -88,7 +88,6 @@
     "html-validate": "^8.9.1",
     "http-status": "^2.1.0",
     "is-empty": "^1.2.0",
-    "javascript-1flow-sdk": "^1.0.2",
     "js-file-download": "^0.4.12",
     "jsoneditor": "^9.7.3",
     "jsoneditor-react": "^3.1.2",
