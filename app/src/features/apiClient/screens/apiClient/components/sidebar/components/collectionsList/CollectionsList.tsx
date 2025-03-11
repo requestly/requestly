@@ -27,7 +27,6 @@ import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExpor
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";
-import { firebaseBatchWrite } from "backend/utils";
 import { ErrorFilesList } from "../ErrorFilesList/ErrorFileslist";
 
 interface Props {
@@ -50,6 +49,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     updateRecordsToBeDeleted,
     onSaveRecord,
     onSaveBulkRecords,
+    apiClientRecordsRepository,
   } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.Record[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -129,10 +129,10 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       );
       switch (action) {
         case BulkActions.DUPLICATE: {
-          const recordsToDuplicate = processRecordsForDuplication(processedRecords);
+          const recordsToDuplicate = processRecordsForDuplication(processedRecords, apiClientRecordsRepository);
 
           try {
-            const result = await firebaseBatchWrite("apis", recordsToDuplicate);
+            const result = await apiClientRecordsRepository.duplicateApiEntities(recordsToDuplicate);
 
             toast.success("Records Duplicated successfully");
             result.length === 1 ? onSaveRecord(head(result)) : onSaveBulkRecords(result);
@@ -163,7 +163,15 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           break;
       }
     },
-    [selectedRecords, onSaveRecord, updatedRecords, onSaveBulkRecords, updateRecordsToBeDeleted, setIsDeleteModalOpen]
+    [
+      selectedRecords,
+      onSaveRecord,
+      updatedRecords,
+      onSaveBulkRecords,
+      updateRecordsToBeDeleted,
+      setIsDeleteModalOpen,
+      apiClientRecordsRepository,
+    ]
   );
 
   // Main toggle handler
