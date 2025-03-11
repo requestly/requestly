@@ -139,10 +139,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   }, [updateTab, activeTab?.id, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
 
   useEffect(() => {
-    if (entry) {
+    if (apiEntry) {
       setRequestName("");
     }
-  }, [entry]);
+  }, [apiEntry]);
 
   const setUrl = useCallback((url: string) => {
     setEntry((entry) => ({
