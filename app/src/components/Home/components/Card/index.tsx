@@ -10,9 +10,12 @@ import { RQDropdown } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
+import { Conditional } from "components/common/Conditional";
 
 interface CardProps {
   contentLoading?: boolean;
+  showFooter?: boolean;
+  showActionButtons?: boolean;
   wrapperClass?: string;
   defaultImportClickHandler: () => void;
   emptyCardOptions: {
@@ -37,7 +40,7 @@ interface CardProps {
     label: string;
     icon: string;
     menu: DropDownProps["menu"]["items"];
-  };
+  } | null;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -55,9 +58,11 @@ export const Card: React.FC<CardProps> = ({
   viewAllCtaLink,
   viewAllCtaOnClick,
   importOptions,
+  showFooter = false,
+  showActionButtons = false,
   defaultImportClickHandler,
 }) => {
-  const MAX_LIST_ITEMS_TO_SHOW = 5;
+  const MAX_LIST_ITEMS_TO_SHOW = showFooter ? 5 : 8;
 
   if (contentLoading)
     return (
@@ -78,13 +83,16 @@ export const Card: React.FC<CardProps> = ({
                 <img src={cardIcon} alt={title} />
                 <h1>{title}</h1>
               </div>
-              <div className="action-buttons">
-                <RQButton type="transparent" className="import-dropdown-trigger" onClick={defaultImportClickHandler}>
-                  <MdOutlineFileUpload />
-                  Import
-                </RQButton>
-                {actionButtons}
-              </div>
+
+              <Conditional condition={showActionButtons}>
+                <div className="action-buttons">
+                  <RQButton type="transparent" className="import-dropdown-trigger" onClick={defaultImportClickHandler}>
+                    <MdOutlineFileUpload />
+                    Import
+                  </RQButton>
+                  {actionButtons}
+                </div>
+              </Conditional>
             </div>
             <div className="middle-section">
               <h2>{bodyTitle}</h2>
@@ -99,20 +107,26 @@ export const Card: React.FC<CardProps> = ({
                   ))}
               </div>
             </div>
-            <div className="footer-section">
-              <Link className="view-all-cta" to={viewAllCtaLink} onClick={viewAllCtaOnClick}>
-                {viewAllCta}
-              </Link>
-              <div className="import-dropdown">
-                <RQDropdown menu={{ items: importOptions.menu.slice(0, 3) }} trigger={["click"]}>
-                  <RQButton className="import-dropdown-button" type="transparent">
-                    <img src={importOptions.icon} alt={importOptions.label} />
-                    Import from other apps
-                    <MdOutlineKeyboardArrowDown />
-                  </RQButton>
-                </RQDropdown>
+
+            <Conditional condition={showFooter}>
+              <div className="footer-section">
+                <Link className="view-all-cta" to={viewAllCtaLink} onClick={viewAllCtaOnClick}>
+                  {viewAllCta}
+                </Link>
+
+                {importOptions ? (
+                  <div className="import-dropdown">
+                    <RQDropdown menu={{ items: importOptions.menu.slice(0, 3) }} trigger={["click"]}>
+                      <RQButton className="import-dropdown-button" type="transparent">
+                        <img src={importOptions.icon} alt={importOptions.label} />
+                        Import from other apps
+                        <MdOutlineKeyboardArrowDown />
+                      </RQButton>
+                    </RQDropdown>
+                  </div>
+                ) : null}
               </div>
-            </div>
+            </Conditional>
           </div>
         </m.div>
       ) : (

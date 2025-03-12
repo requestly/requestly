@@ -22,6 +22,7 @@ import { ApiClientImporterType } from "features/apiClient/types";
 import Postman from "../../../../assets/img/brand/postman-icon.svg?react";
 import { CreateType } from "features/apiClient/types";
 import { trackHomeApisActionClicked } from "components/Home/analytics";
+import { RoleBasedComponent, useRBAC } from "features/rbac";
 
 interface CardOptions {
   contentList: TabsLayout.Tab[];
@@ -36,6 +37,8 @@ const ApiClientCard = () => {
   const isLoggedIn = user?.details?.isLoggedIn;
   const tabs = useSelector(getTabs("apiClient"));
   const [cardOptions] = useState<CardOptions>(!isEmpty(tabs) ? getOptions(tabs, FormatType.TABS) : null);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_request", "create");
 
   const createNewHandler = useCallback(
     (type: CreateType) => {
@@ -97,16 +100,22 @@ const ApiClientCard = () => {
 
   return (
     <Card
+      showFooter={isValidPermission}
+      showActionButtons={isValidPermission}
       wrapperClass={`${cardOptions?.type === FormatType.HISTORY ? "history-card" : ""} api-client-card`}
       cardType={CardType.API_CLIENT}
       defaultImportClickHandler={() => importTriggerHandler(ApiClientImporterType.REQUESTLY)}
       title={"API Client"}
       cardIcon={"/assets/media/apiClient/api-client-icon.svg"}
-      importOptions={{
-        menu: IMPORT_OPTIONS,
-        label: "Postman, Bruno & more",
-        icon: "/assets/media/apiClient/import-icon.svg",
-      }}
+      importOptions={
+        isValidPermission
+          ? {
+              menu: IMPORT_OPTIONS,
+              label: "Postman, Bruno & more",
+              icon: "/assets/media/apiClient/import-icon.svg",
+            }
+          : null
+      }
       bodyTitle={cardOptions?.bodyTitle}
       contentList={isLoggedIn ? cardOptions?.contentList : []}
       actionButtons={
@@ -134,15 +143,30 @@ const ApiClientCard = () => {
       emptyCardOptions={{
         ...PRODUCT_FEATURES.API_CLIENT,
         primaryAction: (
-          <div
-            className="new-request-cta"
-            onClick={() => {
-              navigate(PATHS.API_CLIENT.ABSOLUTE);
-              trackHomeApisActionClicked("create/send_first_api");
-            }}
+          <RoleBasedComponent
+            resource="api_client_request"
+            permission="create"
+            fallback={
+              <div
+                className="new-request-cta"
+                onClick={() => {
+                  navigate(PATHS.API_CLIENT.ABSOLUTE);
+                }}
+              >
+                View and test APIs
+              </div>
+            }
           >
-            <MdOutlineSyncAlt /> Create or test an API
-          </div>
+            <div
+              className="new-request-cta"
+              onClick={() => {
+                navigate(PATHS.API_CLIENT.ABSOLUTE);
+                trackHomeApisActionClicked("create/send_first_api");
+              }}
+            >
+              <MdOutlineSyncAlt /> Create or test an API
+            </div>
+          </RoleBasedComponent>
         ),
       }}
     />
