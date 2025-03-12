@@ -68,7 +68,11 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
 
       if (targetTab.hasUnsavedChanges) {
         // TODO: Trigger a warning modal
-        const result = window.confirm("Discard changes? Changes you made will not be saved.");
+        const result = window.confirm(
+          isValidPermission
+            ? "Discard changes? Changes you made will not be saved."
+            : "You've made changes, but as a viewer, they can't be saved and will be lost if you close this tab."
+        );
 
         if (!result) {
           return;
@@ -85,7 +89,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
 
       delete tabOutletElementsMap.current[tabId];
     },
-    [tabs, activeTab?.id, updateActivetab, dispatch, id]
+    [tabs, activeTab?.id, updateActivetab, dispatch, id, isValidPermission]
   );
 
   const updateTab = useCallback(
