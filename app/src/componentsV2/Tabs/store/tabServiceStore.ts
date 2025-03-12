@@ -1,4 +1,5 @@
 import { create, StoreApi, useStore } from "zustand";
+import { useShallow } from "zustand/shallow";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 
@@ -8,7 +9,7 @@ type SourceMap = Map<SourceId, TabId>;
 type TabServiceState = {
   tabIdSequence: TabId;
   activeTabId: TabId;
-  tabsIndex: Map<string, SourceMap>; // Type: Source -> sourceId->tabId eg: Request -> [requestId,tabId]
+  tabsIndex: Map<string, SourceMap>; // Type: Source -> sourceId -> tabId eg: Request -> [requestId,tabId]
   tabs: Map<TabId, StoreApi<TabState>>;
 
   _version: number;
@@ -22,7 +23,7 @@ type TabServiceState = {
   _incrementVersion: () => void;
 };
 
-export const createTabServiceStore = () => {
+const createTabServiceStore = () => {
   return create<TabServiceState>((set, get) => ({
     tabIdSequence: 0,
     activeTabId: 0,
@@ -133,6 +134,7 @@ export const createTabServiceStore = () => {
   }));
 };
 
-export const useTabService = <T>(selector: (state: TabServiceState) => T) => {
-  return useStore(createTabServiceStore(), selector);
+const tabServiceStore = createTabServiceStore();
+export const useTabService = <T = TabServiceState>(selector?: (state: TabServiceState) => T) => {
+  return useStore(tabServiceStore, useShallow(selector ?? ((state) => state as T)));
 };
