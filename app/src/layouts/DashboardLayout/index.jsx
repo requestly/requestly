@@ -23,6 +23,10 @@ import { getUserOS } from "utils/Misc";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import useRootPathRedirector from "hooks/useRootPathRedirector";
+import { ViewOnlyModeBanner } from "components/common/ViewOnlyModeBanner/ViewOnlyModeBanner";
+import { useCurrentWorkspaceUserRole } from "hooks";
+import { TeamRole } from "types";
+import { Conditional } from "components/common/Conditional";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -31,6 +35,8 @@ const DashboardLayout = () => {
   const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
   const user = useSelector(getUserAuthDetails);
   const { isDesktopAppConnected } = useDesktopAppConnection();
+  const { role } = useCurrentWorkspaceUserRole();
+  const isReadRole = role === TeamRole.read;
 
   useRootPathRedirector();
   initializeOneTap();
@@ -72,7 +78,8 @@ const DashboardLayout = () => {
     <>
       <AppNotificationBanner />
       <PlanExpiredBanner />
-      <div className="app-layout app-dashboard-layout">
+
+      <div className={`app-layout app-dashboard-layout  ${isReadRole ? "read-role" : ""}`}>
         <div
           className={`app-header ${
             isDesktopMode() && isFeatureCompatible(FEATURES.FRAMELESS_DESKTOP_APP)
@@ -80,15 +87,16 @@ const DashboardLayout = () => {
               : ""
           }`}
         >
-          {" "}
           <MenuHeader />
+          <Conditional condition={isReadRole}>
+            <ViewOnlyModeBanner />
+          </Conditional>
         </div>
 
         {isDesktopAppConnected ? (
           <ConnectedToDesktopView />
         ) : (
           <>
-            {" "}
             <div className="app-sidebar">{isSidebarVisible && <Sidebar />}</div>
             <div className="app-main-content">
               <DashboardContent />
