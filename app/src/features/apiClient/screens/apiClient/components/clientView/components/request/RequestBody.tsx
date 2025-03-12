@@ -1,5 +1,5 @@
 import { Radio, Select } from "antd";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { RQAPI, RequestContentType } from "../../../../../../types";
 import { FormBody } from "./renderers/form-body-renderer";
 import { RawBody } from "./renderers/raw-body-renderer";
@@ -30,7 +30,7 @@ function parseSingleModeBody(params: {
 const RequestBody: React.FC<RequestBodyProps> = (props) => {
   const { contentType, variables, setRequestEntry, setContentType } = props;
 
-  const [requestBodyStateManager] = useState(
+  const requestBodyStateManager = useMemo(
     () =>
       new RequestBodyStateManager(
         props.mode === "multiple"
@@ -39,7 +39,8 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
               contentType,
               body: props.body,
             })
-      )
+      ),
+    [contentType, props]
   );
 
   const requestBodyOptions = useMemo(() => {
