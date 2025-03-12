@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Button, Checkbox, Col, Form, Input, Row } from "antd";
@@ -29,6 +29,7 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
 import "./CreateWorkspaceModal.css";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
@@ -97,7 +98,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
 
         claimIncentiveRewards({
           type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
-          metadata: { num_workspaces: availableTeams?.length || 1 },
+          metadata: { num_workspaces: availableWorkspaces?.length || 1 },
         })?.then((response) => {
           if (response.data?.success) {
             dispatch(
@@ -173,7 +174,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       user?.details?.profile?.email,
       handlePostTeamCreation,
       billingTeams,
-      availableTeams?.length,
+      availableWorkspaces?.length,
       claimIncentiveRewards,
     ]
   );

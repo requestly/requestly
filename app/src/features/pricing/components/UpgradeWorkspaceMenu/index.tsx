@@ -7,7 +7,7 @@ import { RQButton } from "lib/design-system/components";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { getIsMiscTourCompleted } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import APP_CONSTANTS from "config/constants";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
@@ -16,6 +16,7 @@ import { globalActions } from "store/slices/global/slice";
 import { trackPricingWorkspaceSwitched } from "features/pricing/analytics";
 import "./index.scss";
 import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface MenuProps {
   workspaceToUpgrade: { name: string; id: string; accessCount: number };
@@ -39,17 +40,17 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
 
   const filteredAvailableTeams = useMemo(() => {
     return (
-      availableTeams?.filter(
+      availableWorkspaces?.filter(
         (team: any) => !team?.archived && team.members?.[user?.details?.profile?.uid]?.role === "admin"
       ) ?? []
     );
-  }, [availableTeams, user?.details?.profile?.uid]);
+  }, [availableWorkspaces, user?.details?.profile?.uid]);
 
   const populateWorkspaceDetails = useCallback(
     (workspaceId: string) => {

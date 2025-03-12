@@ -23,12 +23,7 @@ import {
   trackWorkspaceDropdownClicked,
   trackCreateNewTeamClicked,
 } from "modules/analytics/events/common/teams";
-import {
-  getCurrentlyActiveWorkspace,
-  getAvailableTeams,
-  getIsWorkspaceMode,
-  getIsWorkspaceLocal,
-} from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspace, getIsWorkspaceMode, getIsWorkspaceLocal } from "store/features/teams/selectors";
 import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getLastSeenInviteTs } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToTeam, redirectToWorkspaceSettings } from "utils/RedirectionUtils";
@@ -49,6 +44,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { WorkspaceType } from "types";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LuFolderSync } from "@react-icons/all-files/lu/LuFolderSync";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -140,11 +136,11 @@ const WorkspaceSelector = () => {
 
   // GLOBAL STATE
   const user = useSelector(getUserAuthDetails);
-  const availableTeams = useSelector(getAvailableTeams);
-  const _availableTeams = availableTeams || [];
-  const sortedAvailableTeams = [
-    ..._availableTeams.filter((team) => !team?.archived),
-    ..._availableTeams.filter((team) => team?.archived),
+  const availableWorkspaces = useSelector(getAllWorkspaces);
+  const _availableWorkspaces = availableWorkspaces || [];
+  const sortedAvailableWorkspaces = [
+    ..._availableWorkspaces.filter((team) => !team?.archived),
+    ..._availableWorkspaces.filter((team) => team?.archived),
   ];
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -178,10 +174,10 @@ const WorkspaceSelector = () => {
   }, [user.loggedIn]);
 
   useEffect(() => {
-    if (availableTeams?.length > 0) {
-      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_WORKSPACES, availableTeams.length);
+    if (availableWorkspaces?.length > 0) {
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_WORKSPACES, availableWorkspaces.length);
     }
-  }, [availableTeams?.length]);
+  }, [availableWorkspaces?.length]);
 
   const renderLoader = () => {
     return (
@@ -485,12 +481,12 @@ const WorkspaceSelector = () => {
         </Menu.Item>
       </Menu.ItemGroup>
 
-      {availableTeams === null ? renderLoader() : null}
+      {availableWorkspaces === null ? renderLoader() : null}
 
       {/* Shared Workspaces */}
-      {sortedAvailableTeams.filter((team) => team.workspaceType !== WorkspaceType.LOCAL).length ? (
+      {sortedAvailableWorkspaces.filter((team) => team.workspaceType !== WorkspaceType.LOCAL).length ? (
         <Menu.ItemGroup key="sharedWorkspaces" title="Shared workspaces">
-          {sortedAvailableTeams
+          {sortedAvailableWorkspaces
             .filter((team) => team.workspaceType !== WorkspaceType.LOCAL)
             .map((team) => (
               <Menu.Item
@@ -546,9 +542,9 @@ const WorkspaceSelector = () => {
 
       {/* Local Workspaces */}
       {isLocalSyncEnabled &&
-      sortedAvailableTeams.filter((team) => team.workspaceType === WorkspaceType.LOCAL).length ? (
+      sortedAvailableWorkspaces.filter((team) => team.workspaceType === WorkspaceType.LOCAL).length ? (
         <Menu.ItemGroup key="localWorkspace" title="Local workspaces">
-          {sortedAvailableTeams
+          {sortedAvailableWorkspaces
             .filter((team) => team.workspaceType === WorkspaceType.LOCAL)
             .map((team) => (
               <Menu.Item

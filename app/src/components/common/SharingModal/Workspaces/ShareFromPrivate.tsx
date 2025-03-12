@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { Avatar, Row, Divider } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
@@ -20,6 +20,7 @@ import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import "./index.scss";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface Props {
   selectedRules: string[];
@@ -34,10 +35,10 @@ export const ShareFromPrivate: React.FC<Props> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const _availableTeams = useRef(availableTeams);
+  const _availableWorkspaces = useRef(availableWorkspaces);
 
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -144,7 +145,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
           <div className="text-gray">Not shared with anyone</div>
         </span>
       </Row>
-      {_availableTeams.current.length ? (
+      {_availableWorkspaces.current.length ? (
         <>
           <div className="mt-1">Copy rules into a workspace to start collaborating</div>
           <WorkspaceShareMenu isLoading={isLoading} defaultActiveWorkspaces={2} onTransferClick={handleRulesTransfer} />

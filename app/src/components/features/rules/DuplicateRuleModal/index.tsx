@@ -12,8 +12,7 @@ import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRuleDuplicatedEvent, trackGroupDuplicatedEvent } from "modules/analytics/events/common/rules";
 import { toast } from "utils/Toast";
 import type { InputRef } from "antd";
-import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { TeamWorkspace } from "types/teamWorkspace";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import APP_CONSTANTS from "config/constants";
 import { RQButton } from "lib/design-system/components";
@@ -25,6 +24,7 @@ import { globalActions } from "store/slices/global/slice";
 import "./duplicateRuleModal.scss";
 import { Group, RecordStatus, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
 import { isGroup, isRule } from "features/rules";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface Props {
   isOpen: boolean;
@@ -40,7 +40,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
-  const availableWorkspaces: TeamWorkspace[] = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);

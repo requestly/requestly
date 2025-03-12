@@ -8,7 +8,7 @@ import {
   getUserPersonaSurveyDetails,
 } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { FullPageHeader } from "components/common/FullPageHeader";
 import { AuthFormHero } from "components/authentication/AuthForm/AuthFormHero";
@@ -36,6 +36,7 @@ import { trackNewTeamCreateSuccess, trackWorkspaceOnboardingViewed } from "modul
 import { capitalize } from "lodash";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface OnboardingProps {
   isOpen: boolean;
@@ -48,7 +49,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const currentTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const step = useSelector(getWorkspaceOnboardingStep);
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -172,12 +173,12 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
 
   useEffect(() => {
     if (user?.loggedIn && step === OnboardingSteps.AUTH) {
-      if (currentTeams?.length) dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
+      if (availableWorkspaces?.length) dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
       else if (isNewUserFromEmailLinkSignIn)
         dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
       else dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
     }
-  }, [dispatch, user?.loggedIn, currentTeams?.length, step, isNewUserFromEmailLinkSignIn]);
+  }, [dispatch, user?.loggedIn, availableWorkspaces?.length, step, isNewUserFromEmailLinkSignIn]);
 
   useEffect(() => {
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {

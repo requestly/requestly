@@ -4,10 +4,11 @@ import { Avatar, Dropdown, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import "./index.scss";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 const getWorkspaceIcon = (workspaceName: string) => {
   if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
@@ -22,16 +23,16 @@ const WorkspaceDropdown: React.FC<{
   disabled?: boolean;
 }> = ({ isAppSumo = false, workspaceToUpgrade, setWorkspaceToUpgrade, className, disabled = false }) => {
   const user = useSelector(getUserAuthDetails);
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
   const filteredAvailableTeams = useMemo(() => {
     return (
-      availableTeams?.filter(
+      availableWorkspaces?.filter(
         (team: any) => !team?.archived && team.members?.[user?.details?.profile?.uid]?.role === "admin"
       ) ?? []
     );
-  }, [availableTeams, user?.details?.profile?.uid]);
+  }, [availableWorkspaces, user?.details?.profile?.uid]);
 
   const populateWorkspaceDetails = useCallback(
     (workspaceId: string) => {

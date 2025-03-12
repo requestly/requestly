@@ -1,11 +1,11 @@
 export interface Workspace {
   id: string;
   name: string;
+  accessCount?: number;
+  adminCount?: any;
   owner?: string;
   archived?: boolean;
   subscriptionStatus?: any;
-  accessCount?: number;
-  adminCount?: any;
   members?: {
     [uid: string]: {
       role: "write" | "admin";
@@ -13,6 +13,7 @@ export interface Workspace {
   };
   membersCount?: number; // Old Field
   appsumo?: boolean;
+  inviteId?: string;
   deleted?: boolean;
   createdAt?: number;
 
