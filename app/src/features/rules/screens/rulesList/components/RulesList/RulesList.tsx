@@ -20,6 +20,7 @@ import RulesListContentHeader from "./components/RulesListContentHeader/RulesLis
 import { useSearchParams } from "react-router-dom";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
+import { EmptyState, RoleBasedComponent } from "features/rbac";
 import "./rulesList.scss";
 
 interface Props {}
@@ -94,7 +95,18 @@ const RulesList: React.FC<Props> = () => {
             </div>
           </>
         ) : (
-          <GettingStarted />
+          <RoleBasedComponent
+            resource="http_rule"
+            permission="create"
+            fallback={
+              <EmptyState
+                title="No rules created yet."
+                description="As a viewer, you will be able to view and test rules once someone from your team creates them. You can contact your workspace admin to update your role."
+              />
+            }
+          >
+            <GettingStarted />
+          </RoleBasedComponent>
         )}
       </>
     );

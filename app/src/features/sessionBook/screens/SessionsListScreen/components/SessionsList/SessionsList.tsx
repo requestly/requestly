@@ -10,6 +10,7 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import ShareRecordingModal from "views/features/sessions/ShareRecordingModal";
+import { EmptyState, RoleBasedComponent } from "features/rbac";
 
 export const SessionsList = () => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -76,5 +77,19 @@ export const SessionsList = () => {
         ) : null}
       </>
     );
-  } else return <SessionsOnboardingView />;
+  } else
+    return (
+      <RoleBasedComponent
+        resource="session_recording"
+        permission="create"
+        fallback={
+          <EmptyState
+            title="No sessions created yet."
+            description="As a viewer, you will be able to view and sessions once someone from your team creates them. You can contact your workspace admin to update your role."
+          />
+        }
+      >
+        <SessionsOnboardingView />
+      </RoleBasedComponent>
+    );
 };
