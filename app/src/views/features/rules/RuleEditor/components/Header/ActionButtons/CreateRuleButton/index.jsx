@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Tooltip } from "antd";
-import { RQButton } from "lib/design-system-v2/components";
+
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 import {
@@ -47,6 +46,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../constants/keyboardShortcuts";
+import { RBACButton } from "features/rbac";
 import "../RuleEditorActionButtons.css";
 
 const getEventParams = (rule) => {
@@ -135,12 +135,6 @@ const CreateRuleButton = ({
         return null;
     }
   }, [currentlySelectedRuleData.ruleType]);
-
-  const tooltipText = isDisabled
-    ? "Only available in desktop app."
-    : navigator.platform.match("Mac")
-    ? "⌘+S"
-    : "Ctrl+S";
 
   const currentActionText = MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "Save" : "Create";
 
@@ -342,20 +336,22 @@ const CreateRuleButton = ({
       source={SOURCE.CREATE_NEW_RULE}
       placement="bottomLeft"
     >
-      <Tooltip title={tooltipText} placement="bottom">
-        <RQButton
-          showHotKeyText
-          hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
-          data-tour-id="rule-editor-create-btn"
-          id="rule-editor-save-btn"
-          type="primary"
-          className="text-bold"
-          disabled={isDisabled}
-        >
-          {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
-          {`Save rule`}
-        </RQButton>
-      </Tooltip>
+      <RBACButton
+        permission="update"
+        resource="http_rule"
+        showHotKeyText
+        hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
+        data-tour-id="rule-editor-create-btn"
+        id="rule-editor-save-btn"
+        type="primary"
+        className="text-bold"
+        disabled={isDisabled}
+        tooltipPlacement="bottom"
+        tooltipTitle="Saving is not allowed in view-only mode. You can test rules but cannot save them."
+      >
+        {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
+        {`Save rule`}
+      </RBACButton>
     </AuthConfirmationPopover>
   ) : (
     <>
@@ -367,20 +363,20 @@ const CreateRuleButton = ({
         disabled={checkIsUpgradePopoverDisabled()}
         source={currentlySelectedRuleData.ruleType}
       >
-        <Tooltip title={tooltipText} placement="bottom">
-          <RQButton
-            showHotKeyText
-            hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
-            data-tour-id="rule-editor-create-btn"
-            id="rule-editor-save-btn"
-            type="primary"
-            className="text-bold"
-            disabled={isDisabled}
-          >
-            {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
-            {`Save rule`}
-          </RQButton>
-        </Tooltip>
+        <RBACButton
+          showHotKeyText
+          hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
+          data-tour-id="rule-editor-create-btn"
+          id="rule-editor-save-btn"
+          type="primary"
+          className="text-bold"
+          disabled={isDisabled}
+          tooltipPlacement="bottom"
+          tooltipTitle="Saving is not allowed in view-only mode. You can test rules but cannot save them."
+        >
+          {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
+          {`Save rule`}
+        </RBACButton>
       </PremiumFeature>
     </>
   );

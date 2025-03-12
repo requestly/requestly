@@ -30,7 +30,8 @@ import { trackSampleRuleCreateRuleClicked } from "features/rules/analytics";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import { getEventObject } from "components/common/RuleEditorModal/utils";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
-import { RoleBasedComponent, useRBAC } from "features/rbac";
+import { RBACButton, RoleBasedComponent, useRBAC } from "features/rbac";
+import CreateRuleButton from "./ActionButtons/CreateRuleButton";
 
 const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleTooltip = false }) => {
   const navigate = useNavigate();
@@ -114,14 +115,18 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
 
             <Divider type="vertical" />
 
-            <RQButton
+            <RBACButton
+              permission="create"
+              resource="http_rule"
+              tooltipPlacement="bottom"
+              tooltipTitle="Saving is not allowed in view-only mode. You can test rules but cannot save them."
               onClick={() => {
                 trackSampleRuleCreateRuleClicked(currentlySelectedRuleData?.name, currentlySelectedRuleData?.ruleType);
                 navigate(`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${currentlySelectedRuleData?.ruleType}`);
               }}
             >
               Create {currentlySelectedRuleConfig.NAME?.toLowerCase()} rule
-            </RQButton>
+            </RBACButton>
 
             <RQButton type="primary" onClick={handleSeeLiveRuleDemoClick}>
               See live rule demo
@@ -138,6 +143,7 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
                   <Status mode={mode} />
                   <Divider type="vertical" />
                   <TestRuleButton />
+                  <CreateRuleButton />
                 </>
               }
             >
