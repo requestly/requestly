@@ -16,6 +16,7 @@ export type Collection = {
   id: string;
   name: string;
   variables?: Record<string, any>;
+  description?: string;
 };
 
 export type API = {
