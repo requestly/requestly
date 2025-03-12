@@ -10,6 +10,7 @@ import FEATURES from "config/constants/sub/features";
 import { useLocation } from "react-router-dom";
 import PasswordPopup from "./PasswordPopup/PasswordPopup";
 import { Conditional } from "components/common/Conditional";
+import { RBACButton } from "features/rbac";
 
 interface HeaderProps {
   isNewMock: boolean;
@@ -138,11 +139,17 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
             Cancel
           </RQButton>
 
-          <Conditional condition={!isEditorReadOnly}>
-            <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={handleSave}>
-              {isNewMock ? (savingInProgress ? "Creating" : "Create") : savingInProgress ? "Saving" : "Save"}
-            </RQButton>
-          </Conditional>
+          <RBACButton
+            permission="create"
+            resource="mock_api"
+            type="primary"
+            loading={savingInProgress}
+            disabled={savingInProgress}
+            onClick={handleSave}
+            tooltipTitle="Saving is not allowed in view-only mode. You can test mocks but cannot save them."
+          >
+            {isNewMock ? (savingInProgress ? "Creating" : "Create") : savingInProgress ? "Saving" : "Save"}
+          </RBACButton>
         </Col>
       </Row>
     </Layout.Header>
