@@ -8,7 +8,7 @@ export interface Workspace {
   subscriptionStatus?: any;
   members?: {
     [uid: string]: {
-      role: "write" | "admin";
+      role: WorkspaceMemberRole;
     };
   };
   membersCount?: number; // Old Field
@@ -28,4 +28,9 @@ export enum WorkspaceType {
   SHARED = "SHARED",
   LOCAL = "LOCAL",
   LOCAL_STORAGE = "LOCAL_STORAGE",
+}
+
+export enum WorkspaceMemberRole {
+  admin = "admin",
+  write = "write",
 }

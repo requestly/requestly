@@ -1,12 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace, getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getAppMode, getAuthInitialization } from "../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import availableTeamsListener from "./availableTeamsListener";
 import syncingNodeListener from "./syncingNodeListener";
 import userNodeListener from "./userNodeListener";
-import { teamsActions } from "store/features/teams/slice";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { getAuth } from "firebase/auth";
 import firebaseApp from "../../firebase";
@@ -16,6 +15,8 @@ import { isArray } from "lodash";
 import { useHasChanged } from "hooks/useHasChanged";
 import { userSubscriptionDocListener } from "./userSubscriptionDocListener";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { workspaceActions } from "store/slices/workspaces/slice";
+import { getActiveWorkspacesMembers } from "store/slices/workspaces/selectors";
 
 window.isFirstSyncComplete = false;
 
@@ -24,7 +25,8 @@ const DBListeners = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const currentTeamMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
+
+  const currentTeamMembers = useSelector(getActiveWorkspacesMembers);
   const hasAuthInitialized = useSelector(getAuthInitialization);
   const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
 
@@ -103,7 +105,8 @@ const DBListeners = () => {
         isLocalSyncEnabled
       );
     } else {
-      dispatch(teamsActions.setAvailableTeams(null));
+      dispatch(workspaceActions.setAllWorkspaces([]));
+      // dispatch(teamsActions.setAvailableTeams(null));
       // Very edge case
       if (currentlyActiveWorkspace.id) {
         clearCurrentlyActiveWorkspace(dispatch, appMode);
