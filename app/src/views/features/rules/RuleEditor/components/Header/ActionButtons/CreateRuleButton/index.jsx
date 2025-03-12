@@ -363,6 +363,8 @@ const CreateRuleButton = ({
         source={currentlySelectedRuleData.ruleType}
       >
         <RBACButton
+          permission="update"
+          resource="http_rule"
           showHotKeyText
           hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
           data-tour-id="rule-editor-create-btn"
