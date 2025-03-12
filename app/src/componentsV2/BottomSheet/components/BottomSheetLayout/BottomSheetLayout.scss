@@ -28,6 +28,10 @@
       border-top: 1px solid var(--requestly-color-surface-1);
       cursor: ns-resize;
     }
+    & .ant-tabs-content-holder {
+      padding: 8px 8px 28px 8px;
+      overflow: scroll;
+    }
   }
 
   .content {

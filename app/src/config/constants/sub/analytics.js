@@ -173,6 +173,9 @@ export const GA_EVENTS = {
     NUM_REQUESTS: "num_requests",
     NUM_COLLECTIONS: "num_collections",
     NUM_ENVIRONMENTS: "num_environments",
+    RQ_SUBSCRIPTION_TYPE: "rq_subscription_type",
+    SUBSCRIPTION_STATUS: "subscription_status",
+    IS_ACCELERATOR_AVAILABLE: "is_accelerator_available",
   },
   VALUES: {
     PAYPAL: "paypal",

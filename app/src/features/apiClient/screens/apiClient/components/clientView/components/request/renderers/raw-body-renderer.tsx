@@ -46,7 +46,7 @@ export function RawBody(props: {
         language={editorLanguage}
         value={text}
         handleChange={handleTextChange}
-        prettifyOnInit={contentType === "application/json"}
+        prettifyOnInit={false}
         isResizable={false}
         hideCharacterCount
         envVariables={environmentVariables}
