@@ -5,6 +5,7 @@ import { NetworkSessionRecord } from "./types";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { NewtorkSessionsOnboardingView } from "./NetworkSessionViewer/NetworkSessionsOnboardingView";
+import { EmptyState, RoleBasedComponent } from "features/rbac";
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
 const NetworkSessionsIndexPage: React.FC<{}> = () => {
@@ -34,7 +35,18 @@ const NetworkSessionsIndexPage: React.FC<{}> = () => {
   return networkSessions.length ? (
     <NetworkSessionsList networkSessionsMetadata={networkSessions} />
   ) : (
-    <NewtorkSessionsOnboardingView />
+    <RoleBasedComponent
+      resource="network_sessions"
+      permission="create"
+      fallback={
+        <EmptyState
+          title="No sessions created yet."
+          description="As a viewer, you will be able to view and sessions once someone from your team creates them. You can contact your workspace admin to update your role."
+        />
+      }
+    >
+      <NewtorkSessionsOnboardingView />
+    </RoleBasedComponent>
   );
 };
 

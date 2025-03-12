@@ -9,6 +9,7 @@ export namespace RBAC {
     mock_api = "mock_api",
     mock_collection = "mock_collection",
     session_recording = "session_recording",
+    network_sessions = "network_sessions",
     workspace = "workspace",
     workspace_settings_synced_status = "workspace_settings_synced_status",
     breadcrumbs = "breadcrumbs",
