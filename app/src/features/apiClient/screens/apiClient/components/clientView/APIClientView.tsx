@@ -45,7 +45,8 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
 import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { RoleBasedComponent } from "features/rbac";
+import { RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
+import { Conditional } from "components/common/Conditional";
 
 interface Props {
   openInModal?: boolean;
@@ -501,9 +502,27 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     apiClientExecutor,
   ]);
 
+  const handleRevertChanges = () => {
+    setEntry({ ...apiEntry });
+    setTimeout(() => resetChanges(), 800); // HACK
+  };
+
   return isExtensionEnabled ? (
     <div className="api-client-view">
       <div className="api-client-header-container">
+        <RoleBasedComponent
+          permission="create"
+          resource="api_client_request"
+          fallback={
+            <Conditional condition={user.loggedIn && !openInModal && hasUnsavedChanges}>
+              <RevertViewModeChangesAlert
+                title="As a viewer, You can modify and test APIs, but cannot save updates."
+                callback={handleRevertChanges}
+              />
+            </Conditional>
+          }
+        />
+
         <div className="api-client-breadcrumb-container">
           {user.loggedIn && !openInModal ? (
             <RQBreadcrumb
