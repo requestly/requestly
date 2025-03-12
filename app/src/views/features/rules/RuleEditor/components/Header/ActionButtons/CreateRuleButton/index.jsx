@@ -346,7 +346,6 @@ const CreateRuleButton = ({
         type="primary"
         className="text-bold"
         disabled={isDisabled}
-        tooltipPlacement="bottom"
         tooltipTitle="Saving is not allowed in view-only mode. You can test rules but cannot save them."
       >
         {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
@@ -371,7 +370,6 @@ const CreateRuleButton = ({
           type="primary"
           className="text-bold"
           disabled={isDisabled}
-          tooltipPlacement="bottom"
           tooltipTitle="Saving is not allowed in view-only mode. You can test rules but cannot save them."
         >
           {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}

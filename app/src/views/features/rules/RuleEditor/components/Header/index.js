@@ -118,7 +118,6 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
             <RBACButton
               permission="create"
               resource="http_rule"
-              tooltipPlacement="bottom"
               tooltipTitle="Saving is not allowed in view-only mode. You can test rules but cannot save them."
               onClick={() => {
                 trackSampleRuleCreateRuleClicked(currentlySelectedRuleData?.name, currentlySelectedRuleData?.ruleType);
