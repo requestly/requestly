@@ -501,4 +501,25 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     }
     return result;
   }
+
+  async moveAPIEntities(entities: RQAPI.Record[], newParentId: string) {
+    const service = await this.getAdapter();
+    const result: RQAPI.Record[] = [];
+    for (const entity of entities) {
+      if (entity.type === RQAPI.RecordType.API) {
+        const newRecordResult = await service.moveRecord(entity.id, newParentId);
+        if (newRecordResult.type === "success") {
+          const parsedRecord = this.parseAPIEntities([newRecordResult.content as APIEntity]);
+          result.push(parsedRecord[0]);
+        }
+      } else {
+        const newCollectionResult = await service.moveCollection(entity.id, newParentId);
+        if (newCollectionResult.type === "success") {
+          const parsedCollection = this.parseAPIEntities([newCollectionResult.content as APIEntity]);
+          result.push(parsedCollection[0]);
+        }
+      }
+      return result;
+    }
+  }
 }

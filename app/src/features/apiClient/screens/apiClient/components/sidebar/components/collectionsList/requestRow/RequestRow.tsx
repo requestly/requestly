@@ -17,7 +17,6 @@ import {
   trackRequestDuplicated,
 } from "modules/analytics/events/features/apiClient";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LocalWorkspaceTooltip } from "../../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 
 interface Props {
@@ -41,7 +40,6 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
     onSaveRecord,
     apiClientRecordsRepository,
   } = useApiClientContext();
-  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
@@ -94,12 +92,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
       },
       {
         key: "2",
-        disabled: isLocalSyncEnabled,
-        label: (
-          <LocalWorkspaceTooltip featureName="Move to Collection">
-            <div>Move to Collection</div>
-          </LocalWorkspaceTooltip>
-        ),
+        label: <div>Move to Collection</div>,
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setRecordToMove(record);
@@ -117,7 +110,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
         },
       },
     ];
-  }, [record, updateRecordsToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest, isLocalSyncEnabled]);
+  }, [record, updateRecordsToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest]);
 
   return (
     <>

@@ -8,7 +8,6 @@ import { RQButton } from "lib/design-system/components";
 import { trackMoveRequestToCollectionFailed, trackRequestMoved } from "modules/analytics/events/features/apiClient";
 import "./moveToCollectionModal.scss";
 import { isApiCollection } from "../../../utils";
-import { firebaseBatchWrite } from "backend/utils";
 import { head, isEmpty, omit } from "lodash";
 import { Authorization } from "../../clientView/components/request/components/AuthorizationView/types/AuthConfig";
 
@@ -19,7 +18,13 @@ interface Props {
 }
 
 export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
-  const { apiClientRecords, onSaveRecord, onSaveBulkRecords, apiClientRecordsRepository } = useApiClientContext();
+  const {
+    apiClientRecords,
+    onSaveRecord,
+    onSaveBulkRecords,
+    apiClientRecordsRepository,
+    forceRefreshApiClientRecords,
+  } = useApiClientContext();
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -80,17 +85,18 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
 
       // TODO: use apiClient interface
       try {
-        const result = await firebaseBatchWrite("apis", updatedRequests);
+        const result = await apiClientRecordsRepository.moveAPIEntities(updatedRequests, collectionId);
 
         trackRequestMoved(isNewCollection ? "new_collection" : "existing_collection");
         toast.success("Requests moved to collection successfully");
         result.length === 1 ? onSaveRecord(head(result)) : onSaveBulkRecords(result);
+        forceRefreshApiClientRecords();
       } catch (error) {
         console.error("Error moving records: ", error);
         throw new Error("Failed to move some requests to collection");
       }
     },
-    [onSaveRecord, recordsToMove, onSaveBulkRecords]
+    [onSaveRecord, recordsToMove, onSaveBulkRecords, apiClientRecordsRepository, forceRefreshApiClientRecords]
   );
 
   const handleRecordMove = useCallback(async () => {
