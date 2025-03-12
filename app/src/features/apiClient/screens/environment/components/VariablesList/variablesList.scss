@@ -1,6 +1,10 @@
 .variables-list-table {
   margin-top: 8px;
 
+  &.rq-content-list-table {
+    border: none !important;
+  }
+
   .ant-table {
     background: transparent;
   }

@@ -1,4 +1,5 @@
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
+import { EmailType } from "@requestly/shared/types/common";
 
 export function buildBasicUserProperties(user) {
   if (user && user.uid && user.providerData && user.providerData.length > 0) {
@@ -6,7 +7,9 @@ export function buildBasicUserProperties(user) {
     const email = profile["email"];
     let isBusinessAccount = false;
     let company = null;
-    if (email && isCompanyEmail(email)) {
+    const emailType = user.emailType;
+
+    if (email && emailType === EmailType.BUSINESS) {
       isBusinessAccount = true;
       company = getDomainFromEmail(email);
     }
