@@ -34,6 +34,10 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   getCollection(recordId: string): RQAPI.RecordPromise;
   renameCollection(id: string, newName: string): RQAPI.RecordPromise;
   updateCollectionDescription(
+    id: string,
+    description: string
+  ): Promise<{ success: boolean; data: string; message?: string }>;
+  updateCollectionAuthData(
     collection: RQAPI.CollectionRecord
   ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }>;
 
