@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getIsOrgBannerDismissed } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import { Avatar, Divider, Row, Space, Typography } from "antd";
 import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
 import { parseGravatarImage } from "utils/Misc";
@@ -16,6 +16,7 @@ import { globalActions } from "store/slices/global/slice";
 import Logger from "lib/logger";
 import { capitalize } from "lodash";
 import "./appNotificationBanner.scss";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 const UsersModal: React.FC<{
   users: any[];
@@ -103,7 +104,7 @@ export const OrgNotificationBanner = () => {
       return;
     }
 
-    if (isCompanyEmail(userEmail)) {
+    if (isCompanyEmail(user.details?.emailType)) {
       const getOrganizationUsers = httpsCallable(getFunctions(), "users-getOrganizationUsers");
       getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((result: any) => {
         setUserDetails(result.data.users);
@@ -115,9 +116,10 @@ export const OrgNotificationBanner = () => {
   }, [
     isOrgBannerDismissed,
     orgBannerConfig,
-    user?.details?.isPremium,
-    user?.details?.profile?.email,
-    user?.details?.planDetails?.status,
+    user.details?.isPremium,
+    user.details?.profile?.email,
+    user.details?.planDetails?.status,
+    user.details?.emailType,
   ]);
 
   if (isOrgBannerDismissed || !orgBannerConfig || userDetails.length === 0) return null;

@@ -10,13 +10,14 @@
   }
 
   svg {
-    color: var(--requestly-color-success);
+    color: var(--requestly-color-text-default);
   }
 }
 
 .environment-switcher-dropdown {
   .ant-dropdown-menu {
-    width: 200px;
+    width: 160px;
+    height: 112px;
     background: var(--requestly-color-surface-1);
     border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.16);
