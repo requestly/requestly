@@ -44,6 +44,12 @@ export const getUserTeamRole = (state) => {
   const memberData = getCurrentlyActiveWorkspaceMembers(state)[userId];
 
   if (!memberData) return null;
+
+  if (memberData.role) {
+    return memberData.role;
+  }
+
+  // TODO: Legacy - needs cleanup
   if (memberData.isOwner || memberData.isAdmin) return TeamRole.admin;
   return TeamRole.write;
 };
