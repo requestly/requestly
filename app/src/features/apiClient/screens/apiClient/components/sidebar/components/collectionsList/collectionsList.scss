@@ -111,16 +111,18 @@
           visibility: hidden;
           opacity: 0;
           transition: opacity 0.3s;
+
+          &:hover,
+          &.active {
+            background: var(--requestly-color-surface-1);
+            visibility: visible;
+            opacity: 1;
+          }
         }
 
         &:hover .request-options {
           visibility: visible;
           opacity: 1;
-        }
-
-        &:hover,
-        &.active {
-          background: var(--requestly-color-surface-1);
         }
       }
 
@@ -213,13 +215,23 @@
             svg {
               color: var(--requestly-color-text-subtle);
             }
+
+            &:hover,
+            &.active {
+              visibility: visible;
+              opacity: 1;
+            }
           }
         }
 
         .ant-collapse-content-box {
           margin-left: 6px;
           padding: 2px 0px 0px 6px;
-          border-left: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+          border-left: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
+
+          &:hover {
+            border-left: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+          }
         }
       }
     }
