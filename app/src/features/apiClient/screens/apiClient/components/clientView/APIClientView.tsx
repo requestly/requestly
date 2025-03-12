@@ -45,7 +45,7 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
 import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
+import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 
 interface Props {
@@ -607,18 +607,19 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             Send
           </RQButton>
 
-          {user.loggedIn && !openInModal ? (
-            <RoleBasedComponent resource="api_client_request" permission="create">
-              <RQButton
-                showHotKeyText
-                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
-                onClick={onSaveButtonClick}
-                loading={isRequestSaving}
-              >
-                Save
-              </RQButton>
-            </RoleBasedComponent>
-          ) : null}
+          <Conditional condition={user.loggedIn && !openInModal}>
+            <RBACButton
+              permission="create"
+              resource="api_client_request"
+              showHotKeyText
+              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
+              onClick={onSaveButtonClick}
+              loading={isRequestSaving}
+              tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
+            >
+              Save
+            </RBACButton>
+          </Conditional>
         </div>
       </div>
       <BottomSheetLayout
