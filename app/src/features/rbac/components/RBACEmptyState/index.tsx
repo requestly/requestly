@@ -4,14 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { redirectToTeam, redirectToWorkspaceSettings } from "utils/RedirectionUtils";
-import "./emptyState.scss";
+import "./rbacEmptyState.scss";
 
 interface Props {
   title: string;
   description: string;
 }
 
-export const EmptyState: React.FC<Props> = ({ title, description }) => {
+export const RBACEmptyState: React.FC<Props> = ({ title, description }) => {
   const navigate = useNavigate();
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
