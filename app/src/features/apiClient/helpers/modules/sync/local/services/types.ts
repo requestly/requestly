@@ -17,6 +17,7 @@ export type Collection = {
   name: string;
   variables?: Record<string, any>;
   description?: string;
+  auth?: RQAPI.Auth;
 };
 
 export type API = {
@@ -32,6 +33,7 @@ export type API = {
     body?: RQAPI.RequestBody;
     bodyContainer: RQAPI.RequestBodyContainer;
     contentType: RequestContentType;
+    auth?: RQAPI.Auth;
     scripts: {
       preRequest: string;
       postResponse: string;

@@ -50,7 +50,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           type: RQAPI.RecordType.COLLECTION,
           data: {
             variables: parseEntityVariables(e.variables || {}),
-            auth: {
+            auth: e.auth || {
               currentAuthType: Authorization.Type.NO_AUTH,
               authConfigStore: {},
             },
@@ -82,7 +82,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
               contentType: e.request?.contentType,
             },
             scripts: e.request.scripts,
-            auth: {
+            auth: e.request.auth || {
               currentAuthType: Authorization.Type.NO_AUTH,
               authConfigStore: {},
             },
@@ -213,6 +213,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         bodyContainer: record.data.request?.bodyContainer,
         contentType: record.data.request?.contentType,
         scripts: record.data.scripts,
+        auth: record.data.auth,
       },
       id
     );
@@ -245,6 +246,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         bodyContainer: patch.data.request?.bodyContainer,
         contentType: patch.data.request?.contentType,
         scripts: patch.data.scripts,
+        auth: patch.data.auth,
       },
       id
     );
@@ -352,10 +354,30 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   }
 
   async updateCollectionDescription(
+    id: string,
+    description: string
+  ): Promise<{ success: boolean; data: string; message?: string }> {
+    const service = await this.getAdapter();
+    const result = await service.updateCollectionDescription(id, description);
+
+    if (result.type === "error") {
+      return {
+        success: false,
+        data: undefined,
+        message: result.error.message,
+      };
+    }
+    return {
+      success: true,
+      data: result.content,
+    };
+  }
+
+  async updateCollectionAuthData(
     collection: RQAPI.CollectionRecord
   ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
     const service = await this.getAdapter();
-    const result = await service.updateCollectionDescription(collection.id, collection.description);
+    const result = await service.updateCollectionAuthData(collection.id, collection.data.auth);
 
     if (result.type === "error") {
       return {
@@ -366,7 +388,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     }
     const updatedCollection: RQAPI.CollectionRecord = {
       ...collection,
-      description: result.content,
+      data: {
+        ...collection.data,
+        auth: result.content,
+      },
     };
     return {
       success: true,

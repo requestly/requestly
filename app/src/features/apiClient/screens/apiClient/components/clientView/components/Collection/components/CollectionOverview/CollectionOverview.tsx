@@ -31,14 +31,15 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
   const handleDescriptionChange = useCallback(
     async (value: string) => {
       const newDescription = value;
-      const updatedCollection = {
-        ...collection,
-        description: newDescription,
-      };
+
       return apiClientRecordsRepository
-        .updateCollectionDescription(updatedCollection)
+        .updateCollectionDescription(collection.id, newDescription)
         .then((result) => {
-          onSaveRecord(result.data);
+          const updatedCollection = {
+            ...collection,
+            description: result.data,
+          };
+          onSaveRecord(updatedCollection);
         })
         .catch((error) => {
           toast.error("Error updating collection description");
