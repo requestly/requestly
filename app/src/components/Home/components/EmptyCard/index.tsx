@@ -10,7 +10,7 @@ interface Props {
   description?: string;
   primaryAction?: ReactNode;
   playIcon: { src: string; label: string; url: string; onClick: () => void };
-  importDropdownOptions: {
+  importDropdownOptions: null | {
     label: string;
     icon: string;
     menu: DropDownProps["menu"]["items"];
@@ -24,7 +24,7 @@ export const HomepageEmptyCard: React.FC<Props> = ({
   features,
   primaryAction,
   playIcon,
-  importDropdownOptions,
+  importDropdownOptions = null,
 }) => {
   return (
     <>
@@ -51,16 +51,19 @@ export const HomepageEmptyCard: React.FC<Props> = ({
         </a>
       </div>
       <div className="action-section">{primaryAction}</div>
-      <div className="import-dropdown">
-        <span className="import-dropdown-label">Import from</span>
-        <RQDropdown menu={{ items: importDropdownOptions.menu }} trigger={["click"]}>
-          <RQButton>
-            <img src={importDropdownOptions.icon} alt={importDropdownOptions.label} />
-            {importDropdownOptions.label}
-            <MdOutlineKeyboardArrowDown />
-          </RQButton>
-        </RQDropdown>
-      </div>
+
+      {importDropdownOptions ? (
+        <div className="import-dropdown">
+          <span className="import-dropdown-label">Import from</span>
+          <RQDropdown menu={{ items: importDropdownOptions.menu }} trigger={["click"]}>
+            <RQButton>
+              <img src={importDropdownOptions.icon} alt={importDropdownOptions.label} />
+              {importDropdownOptions.label}
+              <MdOutlineKeyboardArrowDown />
+            </RQButton>
+          </RQDropdown>
+        </div>
+      ) : null}
     </>
   );
 };
