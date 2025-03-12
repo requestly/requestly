@@ -24,6 +24,7 @@ import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "back
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { TeamRole } from "types";
 import { isAdmin } from "features/settings/utils";
+import { Conditional } from "components/common/Conditional";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
@@ -45,8 +46,8 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   // Global state
   const user = useSelector(getUserAuthDetails);
   const loggedInUserId = user?.details?.profile?.uid;
-  const userTeamRole = useSelector(getUserTeamRole);
-  const isLoggedInUserAdmin = userTeamRole === TeamRole.admin;
+  const loggedInUserTeamRole = useSelector(getUserTeamRole);
+  const isLoggedInUserAdmin = loggedInUserTeamRole === TeamRole.admin;
   const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
 
   const availableTeams = useSelector(getAvailableTeams);
@@ -268,9 +269,10 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                   <div className="email-invites-wrapper">
                     <div className="emails-input-wrapper">
                       <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} transparentBackground={true} />
-                      {isTeamAdmin && (
+                      <Conditional condition={loggedInUserTeamRole && loggedInUserTeamRole !== TeamRole.read}>
                         <div className="access-dropdown-container">
                           <MemberRoleDropdown
+                            loggedInUserTeamRole={loggedInUserTeamRole}
                             placement="bottomRight"
                             isAdmin={isAdmin(userInviteRole)}
                             isLoggedInUserAdmin={isLoggedInUserAdmin}
@@ -286,7 +288,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                             }}
                           />
                         </div>
-                      )}
+                      </Conditional>
                     </div>
 
                     <RQButton

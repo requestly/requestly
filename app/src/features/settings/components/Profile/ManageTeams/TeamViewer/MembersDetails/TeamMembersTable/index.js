@@ -19,6 +19,7 @@ import { SendInviteButton } from "./SendInviteButton/SendInviteButton";
 import { RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { getDisplayTextForRole } from "features/settings/utils";
+import { useCurrentWorkspaceUserRole } from "hooks";
 
 const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails }) => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
   const user = useSelector(getUserAuthDetails);
   const loggedInUserId = user?.details?.profile?.uid;
   const [isLoggedInUserAdmin, setIsLoggedInUserAdmin] = useState(false);
-
+  const { role } = useCurrentWorkspaceUserRole();
   // Component State
   const [members, setMembers] = useState([]);
   const [pendingMembers, setPendingMembers] = useState([]);
@@ -167,7 +168,8 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
             showLoader
             isHoverEffect={isLoggedInUserAdmin && member?.id !== loggedInUserId}
             placement="bottomLeft"
-            role={member.role}
+            memberRole={member.role}
+            loggedInUserTeamRole={role}
             isAdmin={member.isAdmin} // TODO: To be cleanup
             memberId={member.id}
             isPending={member.isPending}

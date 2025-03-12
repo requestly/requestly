@@ -3,10 +3,13 @@ import { Dropdown, DropDownProps, Menu, Spin, Typography } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { TeamRole } from "types";
 import { getDisplayTextForRole } from "features/settings/utils";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { useSelector } from "react-redux";
 import "./MemberRoleDropdown.css";
 
 interface MemberRoleDropdownProps extends DropDownProps {
-  role?: TeamRole;
+  memberRole?: TeamRole;
+  loggedInUserTeamRole?: TeamRole;
   isAdmin: boolean;
   isHoverEffect?: boolean;
   showLoader?: boolean;
@@ -20,64 +23,73 @@ interface MemberRoleDropdownProps extends DropDownProps {
   ) => void;
 }
 
+// TODO: refactor
 const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
-  role,
   isAdmin,
   showLoader,
   memberId,
   loggedInUserId,
   isHoverEffect = false,
+  loggedInUserTeamRole,
+  memberRole,
   isLoggedInUserAdmin = false,
   handleMemberRoleChange,
   ...props
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [currentRole, setCurrentRole] = useState<TeamRole>(role ?? TeamRole.admin);
+  const [currentRole, setCurrentRole] = useState<TeamRole>(memberRole ?? TeamRole.write);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const hasWriteAccess = [TeamRole.admin, TeamRole.write].includes(loggedInUserTeamRole);
 
   const items = useMemo(
     () => (
       <Menu className="dropdown-menu">
-        <Menu.Item
-          key="admin"
-          disabled={!!memberId && !isLoggedInUserAdmin}
-          className="dropdown-access-type-menu-item"
-          onClick={() => {
-            setCurrentRole(TeamRole.admin);
-            handleMemberRoleChange(true, "admin", setIsLoading);
-          }}
-        >
-          <div>
-            <div className="subtitle">Admin</div>
-            <div className="caption text-gray">Can change workspace settings</div>
-          </div>
-          <img
-            alt="downoutlined"
-            className={`dropdown-selected-icon ${currentRole === TeamRole.admin ? "" : "visibility-hidden"}`}
-            src="/assets/media/common/tick.svg"
-          />
-        </Menu.Item>
-        <Menu.Item
-          key="editor"
-          disabled={!!memberId && !isLoggedInUserAdmin}
-          className="dropdown-access-type-menu-item"
-          onClick={() => {
-            setCurrentRole(TeamRole.write);
-            handleMemberRoleChange(false, "user", setIsLoading);
-          }}
-        >
-          <div>
-            <div className="subtitle">Editor</div>
-            <div className="caption text-gray">Cannot change workspace settings</div>
-          </div>
-          <img
-            alt="downoutlined"
-            className={`dropdown-selected-icon ${currentRole === TeamRole.write ? "" : "visibility-hidden"}`}
-            src="/assets/media/common/tick.svg"
-          />
-        </Menu.Item>
+        {loggedInUserTeamRole === TeamRole.admin ? (
+          <Menu.Item
+            key="admin"
+            disabled={!!memberId && loggedInUserTeamRole !== TeamRole.admin}
+            className="dropdown-access-type-menu-item"
+            onClick={() => {
+              setCurrentRole(TeamRole.admin);
+              handleMemberRoleChange(true, "admin", setIsLoading);
+            }}
+          >
+            <div>
+              <div className="subtitle">Admin</div>
+              <div className="caption text-gray">Can change workspace settings</div>
+            </div>
+            <img
+              alt="downoutlined"
+              className={`dropdown-selected-icon ${currentRole === TeamRole.admin ? "" : "visibility-hidden"}`}
+              src="/assets/media/common/tick.svg"
+            />
+          </Menu.Item>
+        ) : null}
+
+        {hasWriteAccess ? (
+          <Menu.Item
+            key="editor"
+            disabled={!!memberId && loggedInUserTeamRole !== TeamRole.admin && loggedInUserTeamRole !== TeamRole.write}
+            className="dropdown-access-type-menu-item"
+            onClick={() => {
+              setCurrentRole(TeamRole.write);
+              handleMemberRoleChange(false, "user", setIsLoading);
+            }}
+          >
+            <div>
+              <div className="subtitle">Editor</div>
+              <div className="caption text-gray">Cannot change workspace settings</div>
+            </div>
+            <img
+              alt="downoutlined"
+              className={`dropdown-selected-icon ${currentRole === TeamRole.write ? "" : "visibility-hidden"}`}
+              src="/assets/media/common/tick.svg"
+            />
+          </Menu.Item>
+        ) : null}
+
         <Menu.Item
           key="viewer"
-          disabled={!!memberId && !isLoggedInUserAdmin}
           className="dropdown-access-type-menu-item"
           onClick={() => {
             setCurrentRole(TeamRole.read);
@@ -96,7 +108,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
         </Menu.Item>
       </Menu>
     ),
-    [memberId, currentRole, isLoggedInUserAdmin, handleMemberRoleChange]
+    [memberId, currentRole, hasWriteAccess, loggedInUserTeamRole, handleMemberRoleChange]
   );
 
   return (
@@ -104,13 +116,18 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
       overlay={items}
       trigger={["click"]}
       {...props}
-      disabled={isLoading || (memberId !== loggedInUserId && !isLoggedInUserAdmin) || memberId === loggedInUserId}
+      disabled={
+        isLoading ||
+        !currentlyActiveWorkspace?.id ||
+        (memberId !== loggedInUserId && !hasWriteAccess) ||
+        memberId === loggedInUserId
+      }
     >
       <div className={`dropdown-trigger ${isHoverEffect ? "member-role-dropdown-trigger" : ""}`}>
         <Typography.Text className={!props.disabled && "cursor-pointer"}>
           {getDisplayTextForRole(currentRole)}
 
-          {isLoggedInUserAdmin && memberId !== loggedInUserId && (
+          {hasWriteAccess && memberId !== loggedInUserId && currentlyActiveWorkspace?.id && (
             <img
               width="10px"
               height="6px"
