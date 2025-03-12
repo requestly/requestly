@@ -1,4 +1,3 @@
-import { RQButton } from "lib/design-system-v2/components";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { createBlankApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,7 +10,7 @@ import { useState } from "react";
 import { toast } from "utils/Toast";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { variablesActions } from "store/features/variables/slice";
-import { RBAC, useRBAC } from "features/rbac";
+import { RBACButton } from "features/rbac";
 import "./apiClientEmptyView.scss";
 
 export const ApiClientEmptyView = () => {
@@ -23,8 +22,6 @@ export const ApiClientEmptyView = () => {
   const team = useSelector(getCurrentlyActiveWorkspace);
 
   const [isRecordCreating, setIsRecordCreating] = useState(null);
-  const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
-  const { isValidPermission } = validatePermission("api_client_request", "create");
 
   const isEmpty = apiClientRecords.length === 0;
 
@@ -32,11 +29,6 @@ export const ApiClientEmptyView = () => {
     recordType === RQAPI.RecordType.API
       ? trackNewRequestClicked("api_client_home")
       : trackNewCollectionClicked("api_client_home");
-
-    if (!isValidPermission) {
-      toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, recordType), 5);
-      return;
-    }
 
     if (!user.loggedIn) {
       dispatch(
@@ -85,19 +77,25 @@ export const ApiClientEmptyView = () => {
             : "View saved collections and requests, continue from where you left off, or start something new."}
         </div>
         <div className="api-client-empty-view-actions">
-          <RQButton
+          <RBACButton
+            permission="create"
+            resource="api_client_request"
+            tooltipTitle="Creating a new request is not allowed in view-only mode."
             loading={isRecordCreating === RQAPI.RecordType.API}
             onClick={() => handleNewRecordClick(RQAPI.RecordType.API)}
           >
             Create a new API request
-          </RQButton>
-          <RQButton
+          </RBACButton>
+          <RBACButton
+            permission="create"
+            resource="api_client_collection"
+            tooltipTitle="Creating a new collection is not allowed in view-only mode."
             loading={isRecordCreating === RQAPI.RecordType.COLLECTION}
             onClick={() => handleNewRecordClick(RQAPI.RecordType.COLLECTION)}
             type="primary"
           >
             Create a new collection
-          </RQButton>
+          </RBACButton>
         </div>
       </div>
     </div>
