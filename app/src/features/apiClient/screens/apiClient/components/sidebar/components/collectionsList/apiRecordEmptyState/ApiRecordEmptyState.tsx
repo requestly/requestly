@@ -4,6 +4,7 @@ import { EmptyState, EmptyStateProps } from "../../emptyState/EmptyState";
 interface Props extends EmptyStateProps {}
 
 export const ApiRecordEmptyState: React.FC<Props> = ({
+  disabled,
   message,
   newRecordBtnText,
   onNewRecordClick,
@@ -13,6 +14,7 @@ export const ApiRecordEmptyState: React.FC<Props> = ({
     <div className="api-record-empty-state-container">
       <div className="mt-8 empty-state-wrapper">
         <EmptyState
+          disabled={disabled}
           message={message}
           newRecordBtnText={newRecordBtnText}
           onNewRecordClick={onNewRecordClick}
