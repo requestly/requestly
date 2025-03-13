@@ -1,8 +1,9 @@
 import { create } from "zustand";
+import { AbstractTabSource } from "../helpers/tabSource";
 
 export type TabState = {
   id: number;
-  source: any;
+  source: AbstractTabSource;
   saved: boolean;
   title: string;
 
