@@ -20,17 +20,19 @@ export const getActiveWorkspaceIds = (state: RootState) => {
   return sliceRootState(state).activeWorkspaceIds;
 };
 
+const dummyPersonalWorkspace = {
+  id: null,
+  name: null,
+  membersCount: null,
+  workspaceType: "PERSONAL",
+} as Workspace;
+
 export const getActiveWorkspace = (state: RootState) => {
   const activeWorkspaceId = getActiveWorkspaceId(state);
 
   if (!activeWorkspaceId) {
     // Backward compatibility for Private Workspacese
-    return {
-      id: null,
-      name: null,
-      membersCount: null,
-      workspaceType: "PERSONAL",
-    } as Workspace;
+    return dummyPersonalWorkspace;
   }
 
   return getWorkspaceById(activeWorkspaceId)(state);
