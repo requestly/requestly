@@ -23,6 +23,7 @@ import Postman from "../../../../assets/img/brand/postman-icon.svg?react";
 import { CreateType } from "features/apiClient/types";
 import { trackHomeApisActionClicked } from "components/Home/analytics";
 import { RoleBasedComponent, useRBAC } from "features/rbac";
+import { RQTooltip } from "lib/design-system-v2/components";
 
 interface CardOptions {
   contentList: TabsLayout.Tab[];
@@ -101,7 +102,6 @@ const ApiClientCard = () => {
   return (
     <Card
       showFooter={isValidPermission}
-      showActionButtons={isValidPermission}
       wrapperClass={`${cardOptions?.type === FormatType.HISTORY ? "history-card" : ""} api-client-card`}
       cardType={CardType.API_CLIENT}
       defaultImportClickHandler={() => importTriggerHandler(ApiClientImporterType.REQUESTLY)}
@@ -119,18 +119,24 @@ const ApiClientCard = () => {
       bodyTitle={cardOptions?.bodyTitle}
       contentList={isLoggedIn ? cardOptions?.contentList : []}
       actionButtons={
-        <DropdownButton
-          icon={<MdOutlineKeyboardArrowDown />}
-          type="primary"
-          overlayClassName="more-options"
-          onClick={() => {
-            createNewHandler(CreateType.API);
-          }}
-          menu={{ items }}
-          trigger={["click"]}
+        <RQTooltip
+          showArrow={false}
+          title={isValidPermission ? null : "Creating a new request is not allowed in view-only mode."}
         >
-          {"New Request"}
-        </DropdownButton>
+          <DropdownButton
+            disabled={!isValidPermission}
+            icon={<MdOutlineKeyboardArrowDown />}
+            type="primary"
+            overlayClassName="more-options"
+            onClick={() => {
+              createNewHandler(CreateType.API);
+            }}
+            menu={{ items }}
+            trigger={["click"]}
+          >
+            {"New Request"}
+          </DropdownButton>
+        </RQTooltip>
       }
       listItemClickHandler={(item: TabsLayout.Tab) => {
         navigate(item.url);
