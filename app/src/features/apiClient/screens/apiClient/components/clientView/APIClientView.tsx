@@ -503,8 +503,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   ]);
 
   const handleRevertChanges = () => {
-    setEntry({ ...apiEntry });
-    setTimeout(() => resetChanges(), 800); // HACK
+    setEntry(apiEntry);
   };
 
   return isExtensionEnabled ? (
