@@ -4,68 +4,12 @@ export function getAppVersion() {
   return window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.VERSION;
 }
 
-const isDesktopStorageServiceAvailable = () => {
+export const isDesktopStorageServiceAvailable = () => {
   return window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE;
 };
 
 export function isAppInstalled() {
   return !!getAppVersion();
-}
-
-export function getStorageSuperObject() {
-  return new Promise((resolve, reject) => {
-    if (isDesktopStorageServiceAvailable()) {
-      resolve(window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE.getStorageSuperObject());
-    } else reject("Couldnt hit desktop API");
-  });
-}
-
-export function getStorageObject(key) {
-  return new Promise((resolve, reject) => {
-    if (isDesktopStorageServiceAvailable()) {
-      resolve(window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE.getStorageObject(key));
-    } else reject("Couldnt hit desktop API");
-  });
-}
-
-export function saveStorageObject(object) {
-  return new Promise((resolve, reject) => {
-    if (isDesktopStorageServiceAvailable()) {
-      resolve(window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE.setStorageObject(object));
-    } else reject("Couldnt hit desktop API");
-  });
-}
-
-export function removeStorageObject(key) {
-  return new Promise((resolve, reject) => {
-    if (isDesktopStorageServiceAvailable()) {
-      resolve(window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE.deleteItem(key));
-    } else reject("Couldnt hit desktop API");
-  });
-}
-
-/**
- * Syntatic sugar to remove list of objects from Storage.
- * Internally calls removeStorageObject for individual object to be deleted
- */
-export function removeStorageObjects(objectsToRemove) {
-  if (!objectsToRemove) {
-    return new Error("Empty objects to remove list");
-  }
-
-  const removeStorageObjectPromises = [];
-  objectsToRemove.forEach((key) => {
-    removeStorageObjectPromises.push(removeStorageObject(key));
-  });
-  return Promise.all(removeStorageObjectPromises).catch((err) => err);
-}
-
-export function clearStorage() {
-  return new Promise((resolve, reject) => {
-    if (isDesktopStorageServiceAvailable()) {
-      resolve(window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE.clearStorage());
-    } else reject("Couldnt hit desktop API");
-  });
 }
 
 export const startBackgroundProcess = async () => {
