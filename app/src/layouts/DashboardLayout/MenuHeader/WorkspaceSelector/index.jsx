@@ -23,7 +23,7 @@ import {
   trackWorkspaceDropdownClicked,
   trackCreateNewTeamClicked,
 } from "modules/analytics/events/common/teams";
-import { getIsWorkspaceMode, getIsWorkspaceLocal } from "store/features/teams/selectors";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getLastSeenInviteTs } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToTeam, redirectToWorkspaceSettings } from "utils/RedirectionUtils";
@@ -41,10 +41,10 @@ import "./WorkSpaceSelector.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { toast } from "utils/Toast";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { WorkspaceType } from "types";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LuFolderSync } from "@react-icons/all-files/lu/LuFolderSync";
 import { getActiveWorkspace, getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "features/workspaces/types";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -70,7 +70,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const isLocalWorkspace = useSelector(getIsWorkspaceLocal);
+  const isLocalWorkspace = activeWorkspace?.workspaceType === WorkspaceType.LOCAL;
 
   const activeWorkspaceName = user.loggedIn
     ? isWorkspaceMode
@@ -129,7 +129,6 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
 const WorkspaceSelector = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isWorkspaceTypeLocal = useSelector(getIsWorkspaceLocal);
   const { pathname } = useLocation();
   const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
 
@@ -145,6 +144,8 @@ const WorkspaceSelector = () => {
   ];
   const appMode = useSelector(getAppMode);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const isWorkspaceTypeLocal = activeWorkspace?.workspaceType === WorkspaceType.LOCAL;
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const lastSeenInviteTs = useSelector(getLastSeenInviteTs);

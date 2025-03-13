@@ -31,6 +31,8 @@ import "./createWorkspaceModal.scss";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
 import { teamsActions } from "store/features/teams/slice";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { workspaceActions } from "store/slices/workspaces/slice";
+import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
 
 interface Props {
   isOpen: boolean;
@@ -171,7 +173,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
             throw new Error(workspaceCreationResult.error.message);
           }
           const partialWorkspace = workspaceCreationResult.content;
-          const localWorkspace: Record<string, any> = {
+          const localWorkspace: Workspace = {
             id: partialWorkspace.id,
             name: partialWorkspace.name,
             owner: user?.details?.profile?.uid,
@@ -179,15 +181,15 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
             adminCount: 1,
             members: {
               [user?.details?.profile?.uid]: {
-                role: "admin",
+                role: WorkspaceMemberRole.admin,
               },
             },
             appsumo: null,
             workspaceType: WorkspaceType.LOCAL,
             rootPath: partialWorkspace.path,
           };
-          // TODO: Discuss With Parth
           dispatch(teamsActions.addToAvailableTeams(localWorkspace));
+          dispatch(workspaceActions.upsertWorkspace(localWorkspace));
           return partialWorkspace.id;
         } else {
           const response: any = await createTeam({
