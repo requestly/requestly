@@ -53,7 +53,7 @@ const useTemplatesTableColumns: (props: Props) => ContentListTableProps<Template
         return (
           <div className="templates-actions-container">
             <Button type="default" onClick={() => handlePreviewTemplate(record)}>
-              Use this
+              View
             </Button>
           </div>
         );

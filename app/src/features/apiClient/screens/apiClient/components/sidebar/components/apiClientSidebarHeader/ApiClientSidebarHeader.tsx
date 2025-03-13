@@ -24,6 +24,7 @@ import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LocalWorkspaceTooltip } from "../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import { useLocation } from "react-router-dom";
+import { RoleBasedComponent } from "features/rbac";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -287,28 +288,30 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
     <>
       <div className="api-client-sidebar-header">
         {activeTab === ApiClientSidebarTabKey.COLLECTIONS || activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
-          <div>
-            <Dropdown
-              menu={{ items }}
-              trigger={["click"]}
-              className="api-client-new-btn-dropdown"
-              overlayClassName="api-client-new-btn-dropdown-overlay"
-            >
-              <RQButton type="transparent" size="small" icon={<MdAdd />}>
-                New
-              </RQButton>
-            </Dropdown>
-            <Dropdown
-              menu={{ items: importItems }}
-              trigger={["click"]}
-              className="api-client-new-btn-dropdown"
-              overlayClassName="api-client-new-btn-dropdown-overlay"
-            >
-              <RQButton type="transparent" size="small" icon={<CodeOutlined />}>
-                Import
-              </RQButton>
-            </Dropdown>
-          </div>
+          <RoleBasedComponent resource="api_client_request" permission="create">
+            <div>
+              <Dropdown
+                menu={{ items }}
+                trigger={["click"]}
+                className="api-client-new-btn-dropdown"
+                overlayClassName="api-client-new-btn-dropdown-overlay"
+              >
+                <RQButton type="transparent" size="small" icon={<MdAdd />}>
+                  New
+                </RQButton>
+              </Dropdown>
+              <Dropdown
+                menu={{ items: importItems }}
+                trigger={["click"]}
+                className="api-client-new-btn-dropdown"
+                overlayClassName="api-client-new-btn-dropdown-overlay"
+              >
+                <RQButton type="transparent" size="small" icon={<CodeOutlined />}>
+                  Import
+                </RQButton>
+              </Dropdown>
+            </div>
+          </RoleBasedComponent>
         ) : activeTab === ApiClientSidebarTabKey.HISTORY ? (
           <RQButton
             disabled={!history?.length}

@@ -9,6 +9,7 @@ import {
   getTeamUserRuleConfigPath,
   getRecordsSyncPath,
 } from "utils/syncing/syncDataUtils";
+import { useCurrentWorkspaceUserRole } from "./useCurrentWorkspaceUserRole";
 
 // Broadcast channel setup
 window.activeWorkspaceBroadcastChannel = new BroadcastChannel("active-workspace");
@@ -20,6 +21,7 @@ window.activeWorkspaceBroadcastChannel.addEventListener("message", (_event) => {
 const ActiveWorkspace = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const user = useSelector(getUserAuthDetails);
+  const { role } = useCurrentWorkspaceUserRole();
 
   const performCleanup = async () => {
     if (window.workspaceCleanupDone) return;
@@ -66,11 +68,12 @@ const ActiveWorkspace = () => {
   }
 
   useEffect(() => {
+    window.currentlyActiveWorkspaceTeamRole = role;
     window.currentlyActiveWorkspaceTeamId = currentlyActiveWorkspace.id;
     window.workspaceMembersCount = currentlyActiveWorkspace?.membersCount ?? null;
     window.keySetDonecurrentlyActiveWorkspaceTeamId = true; // NOT USED ANYWHERE
     window.workspaceCleanupDone = false;
-  }, [currentlyActiveWorkspace.id, currentlyActiveWorkspace?.membersCount]);
+  }, [role, currentlyActiveWorkspace.id, currentlyActiveWorkspace?.membersCount]);
 };
 
 export default ActiveWorkspace;
