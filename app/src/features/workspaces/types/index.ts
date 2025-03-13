@@ -33,4 +33,5 @@ export enum WorkspaceType {
 export enum WorkspaceMemberRole {
   admin = "admin",
   write = "write",
+  read = "read",
 }

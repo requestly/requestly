@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { UserAvatar } from "componentsV2/UserAvatar";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { RoleBasedComponent } from "features/rbac";
 
 interface Props {
   handleDeleteSharedListClick: (sharedListId: string) => void;
@@ -95,13 +96,16 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
                 <RQButton icon={<MdOutlineFileCopy />} iconOnly />
               </Tooltip>
             </CopyToClipboard>
-            <Tooltip title="Delete">
-              <RQButton
-                icon={<RiDeleteBinLine />}
-                iconOnly
-                onClick={() => handleDeleteSharedListClick(record.shareId)}
-              />
-            </Tooltip>
+
+            <RoleBasedComponent resource="http_rule" permission="delete">
+              <Tooltip title="Delete">
+                <RQButton
+                  icon={<RiDeleteBinLine />}
+                  iconOnly
+                  onClick={() => handleDeleteSharedListClick(record.shareId)}
+                />
+              </Tooltip>
+            </RoleBasedComponent>
           </div>
         );
       },

@@ -8,8 +8,8 @@ import { VariablesListHeader } from "features/apiClient/screens/environment/comp
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
-import "./collectionsVariablesView.scss";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
+import "./collectionsVariablesView.scss";
 
 interface CollectionsVariablesViewProps {
   collection: RQAPI.CollectionRecord;

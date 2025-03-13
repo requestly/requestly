@@ -9,10 +9,13 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import SettingsItem from "./SettingsItem";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { useRBAC } from "features/rbac";
 
 const RulesSyncing = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("global_settings", "update");
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const [isSyncStatusChangeProcessing, setIsSyncStatusChangeProcessing] = useState(false);
@@ -51,7 +54,7 @@ const RulesSyncing = () => {
     <SettingsItem
       isActive={isUserLoggedIn && (isWorkspaceMode || (user?.details?.isSyncEnabled ?? false))}
       onChange={handleRulesSyncToggle}
-      disabled={isWorkspaceMode}
+      disabled={isWorkspaceMode || !isValidPermission}
       loading={isSyncStatusChangeProcessing}
       title="Enable syncing"
       toolTipTitle={isWorkspaceMode ? "Syncing is on" : ""}

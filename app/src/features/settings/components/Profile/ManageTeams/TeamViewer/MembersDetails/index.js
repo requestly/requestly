@@ -11,6 +11,7 @@ import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { RoleBasedComponent } from "features/rbac";
 
 const MembersDetails = ({ teamId, isTeamAdmin }) => {
   const dispatch = useDispatch();
@@ -96,11 +97,14 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
             {accessCount > 1 ? `${accessCount} Members` : "Workspace Members"}
           </div>
         </Col>
-        <Col>
-          <Button type="primary" onClick={handleAddMemberClick}>
-            <PlusOutlined /> <span className="text-bold caption">Invite People</span>
-          </Button>
-        </Col>
+
+        <RoleBasedComponent resource="workspace" permission="update">
+          <Col>
+            <Button type="primary" onClick={handleAddMemberClick}>
+              <PlusOutlined /> <span className="text-bold caption">Invite People</span>
+            </Button>
+          </Col>
+        </RoleBasedComponent>
       </Row>
 
       <div className="members-table-container">

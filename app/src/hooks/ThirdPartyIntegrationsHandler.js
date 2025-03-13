@@ -12,8 +12,12 @@ const ThirdPartyIntegrationsHandler = () => {
   useEffect(() => {
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, async (user) => {
-      const emailType = await getEmailType(user.email);
-      initIntegrations({ ...user, emailType }, stableDispatch);
+      if (user) {
+        const emailType = await getEmailType(user.email);
+        initIntegrations({ ...user, emailType }, stableDispatch);
+      } else {
+        initIntegrations(user, stableDispatch);
+      }
     });
   }, [stableDispatch]);
 };

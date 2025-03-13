@@ -256,6 +256,7 @@ const MockEditor: React.FC<Props> = ({
           Method
         </label>
         <Select
+          disabled={isEditorReadOnly}
           id="method"
           size="large"
           options={requestMethodDropdownOptions}
@@ -274,6 +275,7 @@ const MockEditor: React.FC<Props> = ({
           Latency
         </label>
         <InputNumber
+          disabled={isEditorReadOnly}
           id="latency"
           size="large"
           type="text"
@@ -296,6 +298,7 @@ const MockEditor: React.FC<Props> = ({
           Status code
         </label>
         <AutoComplete
+          disabled={isEditorReadOnly}
           ref={statusCodeRef}
           id="status-code"
           size="large"
@@ -322,6 +325,7 @@ const MockEditor: React.FC<Props> = ({
           Content type
         </label>
         <AutoComplete
+          disabled={isEditorReadOnly}
           id="content-type"
           size="large"
           placeholder="content"
@@ -337,6 +341,7 @@ const MockEditor: React.FC<Props> = ({
     return (
       <MockEditorEndpoint
         isNew={isNew}
+        disabled={isEditorReadOnly}
         errors={errors}
         collectionPath={collectionPath}
         endpoint={endpoint}
@@ -382,11 +387,12 @@ const MockEditor: React.FC<Props> = ({
             handleChange={setHeadersString}
             language={EditorLanguage.JSON}
             analyticEventProperties={{ source: "mocks", mock_type: type }}
+            isReadOnly={isEditorReadOnly}
           />
         </Col>
       </Row>
     );
-  }, [headersString, type, id]);
+  }, [headersString, type, id, isEditorReadOnly]);
 
   const renderBodyRow = useCallback((): ReactNode => {
     return (
@@ -456,6 +462,7 @@ const MockEditor: React.FC<Props> = ({
               handleTest={handleTest}
               setPassword={setPassword}
               password={password}
+              isEditorReadOnly={isEditorReadOnly}
             />
             <BottomSheetLayout
               layout={SheetLayout.SPLIT}
@@ -507,9 +514,11 @@ const MockEditor: React.FC<Props> = ({
             handleTest={handleTest}
             setPassword={setPassword}
             password={password}
+            isEditorReadOnly={isEditorReadOnly}
           />
           <Col className="mock-editor-title-container">
             <RQEditorTitle
+              disabled={isEditorReadOnly}
               name={name}
               mode={isNew ? "create" : "edit"}
               description={desc}

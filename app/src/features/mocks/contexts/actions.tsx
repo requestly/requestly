@@ -25,6 +25,7 @@ import { isMock, isCollection } from "../screens/mocksList/components/MocksList/
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH } from "../constants";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { RBAC, useRBAC } from "features/rbac";
 
 type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
@@ -52,6 +53,8 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
+  const { isValidPermission } = validatePermission("mock_api", "create");
 
   const {
     openCollectionModalAction,
@@ -63,6 +66,10 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     openShareMocksModalAction,
     openMocksImportModalAction,
   } = useMocksModalsContext();
+
+  const showReadOnlyWarning = useCallback(() => {
+    toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.update, "mock"), 5);
+  }, [getRBACValidationFailureErrorMessage]);
 
   const createNewCollectionAction = useCallback(
     (mockType: MockType) => {
@@ -126,10 +133,15 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const uploadMockAction = useCallback(
     (mockType: MockType) => {
       Logger.log("[DEBUG]", "uploadMockAction", { mockType });
+      if (!isValidPermission) {
+        showReadOnlyWarning();
+        return;
+      }
+
       trackMockUploadWorkflowStarted(mockType);
       openMockUploaderModalAction(mockType);
     },
-    [openMockUploaderModalAction]
+    [isValidPermission, showReadOnlyWarning, openMockUploaderModalAction]
   );
 
   const createNewFileAction = useCallback(() => {
@@ -141,6 +153,11 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     (type: MockType, source: MockListSource, collectionId: string = "") => {
       Logger.log("[DEBUG]", "createNewMockAction", { source, type });
 
+      if (!isValidPermission) {
+        showReadOnlyWarning();
+        return;
+      }
+
       if (source === MockListSource.PICKER_MODAL) {
         trackNewMockButtonClicked(type, "picker_modal");
         return redirectToMockEditorCreateMock(navigate, true, collectionId);
@@ -151,7 +168,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
       trackNewMockButtonClicked(type, "mock_list");
       return redirectToMockEditorCreateMock(navigate, false, collectionId);
     },
-    [openNewFileModalAction, navigate]
+    [isValidPermission, showReadOnlyWarning, openNewFileModalAction, navigate]
   );
 
   const removeMocksFromCollectionAction = useCallback(
@@ -199,10 +216,16 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const importMocksAction = useCallback(
     (mockType: MockType, source: string, onSuccess?: () => void) => {
       Logger.log("[DEBUG]", "importMocksAction", { mockType });
+
+      if (!isValidPermission) {
+        showReadOnlyWarning();
+        return;
+      }
+
       trackMockImportClicked(mockType, source);
       openMocksImportModalAction(mockType, source, onSuccess);
     },
-    [openMocksImportModalAction]
+    [isValidPermission, showReadOnlyWarning, openMocksImportModalAction]
   );
 
   const value = {

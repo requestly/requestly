@@ -26,6 +26,7 @@ import { WarningOutlined } from "@ant-design/icons";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import RuleNameColumn from "../components/RulesColumn/RulesColumn";
 import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { RoleBasedComponent } from "features/rbac";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
@@ -384,34 +385,36 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           },
         ];
         return (
-          <Row align="middle" wrap={false} className="rules-actions-container">
-            {isRule(record) ? (
-              <Button
-                type="text"
-                icon={<MdOutlineShare />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  recordsShareAction([normalizeRecord(record)]);
-                }}
-              />
-            ) : null}
+          <RoleBasedComponent resource="http_rule" permission="create">
+            <Row align="middle" wrap={false} className="rules-actions-container">
+              {isRule(record) ? (
+                <Button
+                  type="text"
+                  icon={<MdOutlineShare />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    recordsShareAction([normalizeRecord(record)]);
+                  }}
+                />
+              ) : null}
 
-            <Dropdown
-              menu={{ items: isRule(record) ? ruleActions : groupActions }}
-              trigger={["click"]}
-              overlayClassName="rule-more-actions-dropdown"
-            >
-              <Button
-                type="text"
-                className="more-rule-actions-btn"
-                icon={<MdOutlineMoreHoriz />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  trackRulesListActionsClicked(record.objectType);
-                }}
-              />
-            </Dropdown>
-          </Row>
+              <Dropdown
+                menu={{ items: isRule(record) ? ruleActions : groupActions }}
+                trigger={["click"]}
+                overlayClassName="rule-more-actions-dropdown"
+              >
+                <Button
+                  type="text"
+                  className="more-rule-actions-btn"
+                  icon={<MdOutlineMoreHoriz />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    trackRulesListActionsClicked(record.objectType);
+                  }}
+                />
+              </Dropdown>
+            </Row>
+          </RoleBasedComponent>
         );
       },
     },

@@ -31,6 +31,7 @@ import { trackMocksListBulkActionPerformed } from "modules/analytics/events/feat
 import "./mocksTable.scss";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { useRBAC } from "features/rbac";
 
 export interface MocksTableProps {
   source: MockListSource;
@@ -60,6 +61,8 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   forceRender = () => {},
 }) => {
   const { clearSelectedRows } = useContentListTableContext();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("mock_api", "create");
 
   const { pathname } = useLocation();
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
@@ -169,14 +172,15 @@ export const MocksTable: React.FC<MocksTableProps> = ({
 
   return (
     <ContentListTable
-      dragAndDrop
+      isRowSelectable={isValidPermission}
+      dragAndDrop={isValidPermission}
       onRowDropped={onRowDropped}
       loading={isLoading}
       id="mock-list-table"
       pagination={false}
       size="middle"
       rowKey="id"
-      className="rq-mocks-list-table"
+      className={`rq-mocks-list-table ${!isValidPermission ? "read-only" : ""}`}
       customRowClassName={(record) => {
         return `rq-mocks-list-table-row ${record.isFavourite ? "starred" : "unstarred"} ${
           record.recordType === MockRecordType.COLLECTION ? "collection-row" : "mock-row"

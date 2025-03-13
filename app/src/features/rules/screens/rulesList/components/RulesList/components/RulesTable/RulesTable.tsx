@@ -34,6 +34,7 @@ import "./rulesTable.css";
 
 import { RecordType, RecordStatus, StorageRecord } from "@requestly/shared/types/entities/rules";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { useRBAC } from "features/rbac";
 
 interface Props {
   records: StorageRecord[];
@@ -44,6 +45,8 @@ interface Props {
 
 const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecordsMap }) => {
   const { selectedRows, clearSelectedRows } = useContentListTableContext();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -240,12 +243,12 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   return (
     <>
       {/* Add Modals Required in Rules List here */}
-
       <ContentListTable
-        dragAndDrop
+        dragAndDrop={isValidPermission}
+        isRowSelectable={isValidPermission}
         onRowDropped={onRowDropped}
         id="rules-list-table"
-        className="rules-list-table"
+        className={`rules-list-table ${!isValidPermission ? "read-only" : ""}`}
         defaultExpandedRowKeys={groupIdsToExpand}
         size="middle"
         scroll={{ y: getTableScrollHeight() }}

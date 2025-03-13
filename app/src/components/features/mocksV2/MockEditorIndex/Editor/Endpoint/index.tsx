@@ -11,6 +11,7 @@ import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface EndpointProps {
   isNew: boolean;
+  disabled?: boolean;
   errors: ValidationErrors;
   mockType: MockType;
   endpoint: string;
@@ -24,6 +25,7 @@ const MockEditorEndpoint = forwardRef(
   (
     {
       isNew,
+      disabled,
       errors,
       mockType,
       endpoint,
@@ -61,6 +63,7 @@ const MockEditorEndpoint = forwardRef(
           <Col flex="1 0 auto">
             <Input
               ref={ref}
+              disabled={disabled}
               addonBefore={isMockCollectionLoading ? <LoadingOutlined /> : "/" + collectionPath}
               required
               id="endpoint"
