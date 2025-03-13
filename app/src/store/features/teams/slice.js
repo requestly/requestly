@@ -14,6 +14,7 @@ const initialState = {
   currentlyActiveWorkspaceMembers: {},
 };
 
+//** Keeping setters for reverting in case something goes wrong */
 const slice = createSlice({
   name: ReducerKeys.TEAMS,
   initialState,

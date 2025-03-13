@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { createBackupIfRequired, setIsBackupEnabled } from "utils/BackupUtils";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import SettingsItem from "./SettingsItem";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackBackupToggled } from "modules/analytics/events/features/syncing/backup";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const RulesBackup = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [backupStatus, setBackupStatus] = useState(user?.details?.isBackupEnabled ?? false);
   const [isBackupStatusChangeProcessing, setIsBackupStatusChangeProcessing] = useState(false);
@@ -49,7 +48,7 @@ const RulesBackup = () => {
     trackBackupToggled(status);
   };
 
-  if (currentlyActiveWorkspace?.id) return;
+  if (activeWorkspaceId) return;
 
   // TODO: add existing backup link
   return (

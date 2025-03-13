@@ -4,25 +4,25 @@ import { Button } from "antd";
 import { isWorkspacesFeatureEnabled } from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const SwitchWorkspaceButton = ({ teamName, selectedTeamId, teamMembersCount, isTeamArchived = false }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   // Global State
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
 
   let isButtonDisabled = true;
-  if (!isWorkspaceMode) {
+  if (!isSharedWorkspaceMode) {
     // This means there is not currently selected workspace (ie it's personal workspace)
     // Do offer user to switch the workspace
     isButtonDisabled = false;
   }
-  if (currentlyActiveWorkspace?.id && currentlyActiveWorkspace.id !== selectedTeamId) {
+  if (activeWorkspaceId && activeWorkspaceId !== selectedTeamId) {
     // This means user has current selected a workspace that it different from what we're showing him rn on screen
     isButtonDisabled = false;
   }
@@ -41,7 +41,7 @@ const SwitchWorkspaceButton = ({ teamName, selectedTeamId, teamMembersCount, isT
       dispatch,
       {
         isSyncEnabled: user?.details?.isSyncEnabled,
-        isWorkspaceMode,
+        isWorkspaceMode: isSharedWorkspaceMode,
       },
       appMode
     );

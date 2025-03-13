@@ -2,8 +2,8 @@ import { getValueAsPromise, removeValueAsPromise } from "actions/FirebaseActions
 import { isEmpty } from "lodash";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import {
   getTeamUserRuleAllConfigsPath,
   getTeamUserRuleConfigPath,
@@ -19,7 +19,7 @@ window.activeWorkspaceBroadcastChannel.addEventListener("message", (_event) => {
 });
 
 const ActiveWorkspace = () => {
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspace = useSelector(getActiveWorkspace);
   const user = useSelector(getUserAuthDetails);
   const { role } = useCurrentWorkspaceUserRole();
 
@@ -28,10 +28,10 @@ const ActiveWorkspace = () => {
 
     window.workspaceCleanupDone = true;
 
-    if (currentlyActiveWorkspace.id) {
+    if (activeWorkspace?.id) {
       // Fetch fresh rule configs from Firebase
       const teamUserRuleAllConfigsPath = getTeamUserRuleAllConfigsPath(
-        currentlyActiveWorkspace.id,
+        activeWorkspace?.id,
         user?.details?.profile?.uid
       );
       if (!teamUserRuleAllConfigsPath) return;
@@ -69,11 +69,11 @@ const ActiveWorkspace = () => {
 
   useEffect(() => {
     window.currentlyActiveWorkspaceTeamRole = role;
-    window.currentlyActiveWorkspaceTeamId = currentlyActiveWorkspace.id;
-    window.workspaceMembersCount = currentlyActiveWorkspace?.membersCount ?? null;
+    window.currentlyActiveWorkspaceTeamId = activeWorkspace?.id;
+    window.workspaceMembersCount = activeWorkspace?.membersCount ?? null;
     window.keySetDonecurrentlyActiveWorkspaceTeamId = true; // NOT USED ANYWHERE
     window.workspaceCleanupDone = false;
-  }, [role, currentlyActiveWorkspace.id, currentlyActiveWorkspace?.membersCount]);
+  }, [activeWorkspace?.id, activeWorkspace?.membersCount, role]);
 };
 
 export default ActiveWorkspace;

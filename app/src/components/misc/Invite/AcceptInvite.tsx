@@ -10,10 +10,10 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { acceptTeamInvite } from "backend/workspace";
 import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
 import InviteAcceptAnimation from "../LottieAnimation/InviteAcceptAnimation";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 interface Props {
   inviteId: string;
@@ -28,7 +28,7 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
 
   const [inProgress, setInProgress] = useState(false);
 
@@ -57,7 +57,7 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
               dispatch,
               {
                 isSyncEnabled: user?.details?.isSyncEnabled,
-                isWorkspaceMode,
+                isWorkspaceMode: isSharedWorkspaceMode,
               },
               appMode,
               null,

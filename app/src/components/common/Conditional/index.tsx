@@ -1,7 +1,7 @@
 import React from "react";
 
 interface Props {
-	condition: boolean,
+  condition: boolean;
   children: React.ReactNode;
 }
 

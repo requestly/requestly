@@ -19,9 +19,9 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import { globalActions } from "store/slices/global/slice";
 import "./index.scss";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface AppSumoCode {
   error: string;
@@ -39,7 +39,7 @@ const AppSumoModal: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
   const [emailValidationError, setEmailValidationError] = useState(null);
@@ -232,11 +232,11 @@ const AppSumoModal: React.FC = () => {
   };
 
   useEffect(() => {
-    const appsumoWorkspace = availableTeams?.find((team: any) => team?.appsumo);
+    const appsumoWorkspace = availableWorkspaces?.find((team: any) => team?.appsumo);
     if (appsumoWorkspace) {
-      setWorkspaceToUpgrade(appsumoWorkspace);
+      setWorkspaceToUpgrade(appsumoWorkspace as any);
     }
-  }, [availableTeams]);
+  }, [availableWorkspaces]);
 
   useEffect(() => {
     dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
