@@ -6,6 +6,7 @@ import { AuthForm } from "./formStructure/types";
 import { AuthConfig, AuthConfigMeta, Authorization } from "../types/AuthConfig";
 import { useAuthFormState } from "./hooks/useAuthFormState";
 import { RQAPI } from "features/apiClient/types";
+import LazySingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 
 interface AuthorizationFormProps<AuthType extends AuthConfigMeta.AuthWithConfig> {
   defaultAuthValues?: RQAPI.Auth;
@@ -49,7 +50,7 @@ function generateFields(
   switch (field.type) {
     case AuthForm.FIELD_TYPE.INPUT:
       return (
-        <RQSingleLineEditor
+        <LazySingleLineEditor
           key={`${formType}-${index}`}
           className={field.className ?? ""}
           placeholder={field.placeholder}

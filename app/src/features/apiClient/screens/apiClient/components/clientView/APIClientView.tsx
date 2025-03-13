@@ -45,6 +45,7 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
 import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
+import LazySingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 
 interface Props {
   openInModal?: boolean;
@@ -563,12 +564,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               onBlur={onUrlInputBlur}
               prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
             /> */}
-            <RQSingleLineEditor
+            <LazySingleLineEditor
               className="api-request-url"
               placeholder="https://example.com"
               //value={entry.request.url}
               defaultValue={entry.request.url}
-              onChange={(text) => {
+              onChange={(text: string) => {
                 setUrl(text);
               }}
               onPressEnter={onUrlInputEnterPressed}
