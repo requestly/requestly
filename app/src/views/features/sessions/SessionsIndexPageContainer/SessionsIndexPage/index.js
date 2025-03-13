@@ -24,7 +24,6 @@ import RecordingsList from "./RecordingsList";
 import OnboardingView, { SessionOnboardingView } from "./OnboardingView";
 import { globalActions } from "store/slices/global/slice";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getOwnerId } from "backend/utils";
 import PageLoader from "components/misc/PageLoader";
 import { useHasChanged } from "hooks";
@@ -44,7 +43,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { redirectToSessionSettings } from "utils/RedirectionUtils";
-import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -55,7 +54,7 @@ const SessionsIndexPage = () => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
 
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
@@ -173,10 +172,10 @@ const SessionsIndexPage = () => {
   const filteredRecordings = filterUniqueObjects(sessionRecordings);
 
   useEffect(() => {
-    if (filteredRecordings?.length >= 0 && !isWorkspaceMode) {
+    if (filteredRecordings?.length >= 0 && !isSharedWorkspaceMode) {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS, filteredRecordings?.length);
     }
-  }, [filteredRecordings?.length, isWorkspaceMode]);
+  }, [filteredRecordings?.length, isSharedWorkspaceMode]);
 
   const toggleImportSessionModal = useCallback(() => {
     if (!user?.loggedIn) {

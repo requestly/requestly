@@ -19,7 +19,6 @@ import {
 import { toast } from "utils/Toast";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
@@ -30,7 +29,7 @@ import { useIncentiveActions } from "features/incentivization/hooks";
 import "./createWorkspaceModal.scss";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
 import { teamsActions } from "store/features/teams/slice";
-import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
 
@@ -45,7 +44,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [workspaceName, setWorkspaceName] = useState("");
@@ -72,7 +71,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
         dispatch,
         {
           isSyncEnabled: user?.details?.isSyncEnabled,
-          isWorkspaceMode,
+          isWorkspaceMode: isSharedWorkspaceMode,
         },
         appMode,
         null,
@@ -86,7 +85,15 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
         });
       }
     },
-    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.details?.isSyncEnabled, workspaceType]
+    [
+      dispatch,
+      appMode,
+      isNotifyAllSelected,
+      isSharedWorkspaceMode,
+      navigate,
+      user?.details?.isSyncEnabled,
+      workspaceType,
+    ]
   );
 
   const handleIncentiveRewards = useCallback(

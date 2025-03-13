@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getAppMode } from "store/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { Avatar } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -19,12 +18,13 @@ import {
 import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import { OnboardingSteps } from "../../types";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const appMode = useSelector(getAppMode);
 
   const [isJoining, setIsJoining] = useState<boolean>(false);
@@ -54,7 +54,7 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
               },
               dispatch,
               {
-                isWorkspaceMode,
+                isWorkspaceMode: isSharedWorkspaceMode,
                 isSyncEnabled: true,
               },
               appMode,

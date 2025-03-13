@@ -7,7 +7,6 @@ import { getAllRecordsMap } from "store/features/rules/selectors";
 import { Group, RecordStatus, Rule } from "@requestly/shared/types/entities/rules";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { UserAvatar } from "componentsV2/UserAvatar";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { MdOutlineShare } from "@react-icons/all-files/md/MdOutlineShare";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
@@ -26,10 +25,10 @@ import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { WarningOutlined } from "@ant-design/icons";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import RuleNameColumn from "../components/RulesColumn/RulesColumn";
-import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const allRecordsMap = useSelector(getAllRecordsMap);
   const {
@@ -83,7 +82,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     {
       title: "Rules",
       key: "name",
-      width: isWorkspaceMode ? 322 : 376,
+      width: isSharedWorkspaceMode ? 322 : 376,
       ellipsis: true,
       render: (record: RuleTableRecord) => {
         return <RuleNameColumn record={record} />;
@@ -419,7 +418,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
   ];
 
   // FIXME: Extend the column type to also support custom fields eg hidden property to hide the column
-  if (isWorkspaceMode && !options.hideCreatedBy) {
+  if (isSharedWorkspaceMode && !options.hideCreatedBy) {
     columns.splice(6, 0, {
       title: "Author",
       width: 92,

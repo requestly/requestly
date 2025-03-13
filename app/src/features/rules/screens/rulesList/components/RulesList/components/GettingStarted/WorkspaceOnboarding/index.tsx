@@ -8,7 +8,6 @@ import {
   getUserPersonaSurveyDetails,
 } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { FullPageHeader } from "components/common/FullPageHeader";
 import { AuthFormHero } from "components/authentication/AuthForm/AuthFormHero";
@@ -36,7 +35,7 @@ import { trackNewTeamCreateSuccess, trackWorkspaceOnboardingViewed } from "modul
 import { capitalize } from "lodash";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
-import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 interface OnboardingProps {
   isOpen: boolean;
@@ -48,7 +47,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const step = useSelector(getWorkspaceOnboardingStep);
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
@@ -114,7 +113,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
               teamMembersCount: response?.data?.accessCount,
             },
             dispatch,
-            { isWorkspaceMode, isSyncEnabled: true },
+            { isWorkspaceMode: isSharedWorkspaceMode, isSyncEnabled: true },
             appMode,
             null,
             "onboarding"
@@ -138,7 +137,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     userEmailDomain,
     createTeam,
     upsertTeamCommonInvite,
-    isWorkspaceMode,
+    isSharedWorkspaceMode,
     appMode,
   ]);
 

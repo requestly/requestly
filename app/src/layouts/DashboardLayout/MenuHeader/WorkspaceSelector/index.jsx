@@ -23,7 +23,6 @@ import {
   trackWorkspaceDropdownClicked,
   trackCreateNewTeamClicked,
 } from "modules/analytics/events/common/teams";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getLastSeenInviteTs } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToTeam, redirectToWorkspaceSettings } from "utils/RedirectionUtils";
@@ -43,7 +42,12 @@ import { toast } from "utils/Toast";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LuFolderSync } from "@react-icons/all-files/lu/LuFolderSync";
-import { getActiveWorkspace, getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import {
+  getActiveWorkspace,
+  getActiveWorkspaceId,
+  getAllWorkspaces,
+  isActiveWorkspaceShared,
+} from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
 
 const { PATHS } = APP_CONSTANTS;
@@ -69,11 +73,11 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const activeWorkspace = useSelector(getActiveWorkspace);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const isLocalWorkspace = activeWorkspace?.workspaceType === WorkspaceType.LOCAL;
 
   const activeWorkspaceName = user.loggedIn
-    ? isWorkspaceMode
+    ? isSharedWorkspaceMode
       ? activeWorkspace.name
       : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
     : "Workspaces";
@@ -146,7 +150,7 @@ const WorkspaceSelector = () => {
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const isWorkspaceTypeLocal = activeWorkspace?.workspaceType === WorkspaceType.LOCAL;
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const lastSeenInviteTs = useSelector(getLastSeenInviteTs);
 
@@ -267,7 +271,7 @@ const WorkspaceSelector = () => {
         })
       );
       trackInviteTeammatesClicked("workspaces_dropdown");
-      if (isWorkspaceMode) {
+      if (isSharedWorkspaceMode) {
         redirectToTeam(navigate, activeWorkspaceId);
       } else {
         redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");
@@ -353,7 +357,7 @@ const WorkspaceSelector = () => {
       dispatch,
       {
         isSyncEnabled: user?.details?.isSyncEnabled,
-        isWorkspaceMode,
+        isWorkspaceMode: isSharedWorkspaceMode,
       },
       appMode,
       undefined,
@@ -611,7 +615,7 @@ const WorkspaceSelector = () => {
         </Dropdown>
       </Menu.Item>
 
-      {isWorkspaceMode ? (
+      {isSharedWorkspaceMode ? (
         <>
           <Divider className="ant-divider-margin workspace-divider" />
           {!isWorkspaceTypeLocal ? (
@@ -633,7 +637,7 @@ const WorkspaceSelector = () => {
             icon={<SettingOutlined className="icon-wrapper" />}
             className="workspace-menu-item"
             onClick={() => {
-              if (isWorkspaceMode) {
+              if (isSharedWorkspaceMode) {
                 redirectToTeam(navigate, activeWorkspaceId);
               } else {
                 redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");

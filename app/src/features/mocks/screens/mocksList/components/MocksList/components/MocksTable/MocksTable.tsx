@@ -5,7 +5,6 @@ import { Empty } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import {
   MockListSource,
   MockRecordType,
@@ -31,7 +30,7 @@ import PATHS from "config/constants/sub/paths";
 import { trackMocksListBulkActionPerformed } from "modules/analytics/events/features/mocksV2";
 import "./mocksTable.scss";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
-import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 export interface MocksTableProps {
   source: MockListSource;
@@ -65,19 +64,19 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   const { pathname } = useLocation();
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
   const user = useSelector(getUserAuthDetails);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const uid = user?.details?.profile?.uid;
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   useEffect(() => {
-    if (!isWorkspaceMode) {
+    if (!isSharedWorkspaceMode) {
       if (mockType === MockType.FILE) {
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_FILES, filteredRecords?.length);
       } else {
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_MOCKS, filteredRecords?.length);
       }
     }
-  }, [mockType, filteredRecords?.length, isWorkspaceMode]);
+  }, [mockType, filteredRecords?.length, isSharedWorkspaceMode]);
 
   const allRecordsMap = useMemo(() => {
     const recordsMap: { [id: string]: RQMockMetadataSchema } = {};

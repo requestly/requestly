@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Button, Checkbox, Col, Form, Input, Row } from "antd";
@@ -29,7 +28,7 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
 import "./CreateWorkspaceModal.css";
-import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const navigate = useNavigate();
@@ -38,7 +37,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
 
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const availableWorkspaces = useSelector(getAllWorkspaces);
 
@@ -70,7 +69,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         dispatch,
         {
           isSyncEnabled: user?.details?.isSyncEnabled,
-          isWorkspaceMode,
+          isWorkspaceMode: isSharedWorkspaceMode,
         },
         appMode,
         null,
@@ -82,7 +81,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         },
       });
     },
-    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.details?.isSyncEnabled]
+    [dispatch, appMode, isNotifyAllSelected, isSharedWorkspaceMode, navigate, user?.details?.isSyncEnabled]
   );
 
   const handleFinishClick = useCallback(
