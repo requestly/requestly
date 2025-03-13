@@ -12,7 +12,6 @@ import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRuleDuplicatedEvent, trackGroupDuplicatedEvent } from "modules/analytics/events/common/rules";
 import { toast } from "utils/Toast";
 import type { InputRef } from "antd";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import APP_CONSTANTS from "config/constants";
 import { RQButton } from "lib/design-system/components";
@@ -24,7 +23,7 @@ import { globalActions } from "store/slices/global/slice";
 import "./duplicateRuleModal.scss";
 import { Group, RecordStatus, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
 import { isGroup, isRule } from "features/rules";
-import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface Props {
   isOpen: boolean;
@@ -41,16 +40,16 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
   const dispatch = useDispatch();
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const availableWorkspaces = useSelector(getAllWorkspaces);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const userAttributes = useSelector(getUserAttributes);
   const [newRecordName, setNewRecordName] = useState<string>();
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(null);
   const isRecordRule = useMemo(() => isRule(record), [record]);
-  const isDuplicationInSameWorkspace = useMemo(() => selectedWorkspaceId === currentlyActiveWorkspace.id, [
+  const isDuplicationInSameWorkspace = useMemo(() => selectedWorkspaceId === activeWorkspaceId, [
     selectedWorkspaceId,
-    currentlyActiveWorkspace.id,
+    activeWorkspaceId,
   ]);
   const recordNameInputRef = useRef<InputRef>(null);
 
@@ -229,9 +228,9 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
 
   useEffect(() => {
     if (isUsingWorkspaces) {
-      setSelectedWorkspaceId(currentlyActiveWorkspace.id);
+      setSelectedWorkspaceId(activeWorkspaceId);
     }
-  }, [availableWorkspaces, currentlyActiveWorkspace, isUsingWorkspaces, isRecordRule]);
+  }, [availableWorkspaces, activeWorkspaceId, isUsingWorkspaces, isRecordRule]);
 
   return (
     <Modal

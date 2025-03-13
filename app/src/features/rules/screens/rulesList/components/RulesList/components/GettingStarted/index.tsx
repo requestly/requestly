@@ -38,13 +38,14 @@ import { trackAskAIClicked } from "features/requestBot";
 import { RQButton } from "lib/design-system/components";
 import BotIcon from "assets/icons/bot.svg?react";
 import { globalActions } from "store/slices/global/slice";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
 import "./gettingStarted.scss";
 import { RuleType } from "@requestly/shared/types/entities/rules";
 import { ImportFromResourceOverrideModal } from "../ImporterComponents/ResourceOverrideImporter";
 import { ImporterType } from "components/Home/types";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -56,7 +57,7 @@ export const GettingStarted: React.FC = () => {
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
@@ -174,7 +175,7 @@ export const GettingStarted: React.FC = () => {
                   className="cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
-                    redirectToTeam(navigate, currentlyActiveWorkspace.id);
+                    redirectToTeam(navigate, activeWorkspaceId);
                   }}
                 >
                   click here

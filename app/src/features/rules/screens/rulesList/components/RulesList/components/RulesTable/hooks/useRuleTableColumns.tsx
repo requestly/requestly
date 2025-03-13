@@ -7,7 +7,7 @@ import { getAllRecordsMap } from "store/features/rules/selectors";
 import { Group, RecordStatus, Rule } from "@requestly/shared/types/entities/rules";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { UserAvatar } from "componentsV2/UserAvatar";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { MdOutlineShare } from "@react-icons/all-files/md/MdOutlineShare";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
@@ -26,10 +26,11 @@ import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { WarningOutlined } from "@ant-design/icons";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import RuleNameColumn from "../components/RulesColumn/RulesColumn";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const allRecordsMap = useSelector(getAllRecordsMap);
   const {
     recordsChangeGroupAction,
@@ -239,7 +240,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         }
         const dateToDisplay = record.modificationDate ? record.modificationDate : record.creationDate;
         const beautifiedDate = moment(dateToDisplay).format("MMM DD, YYYY");
-        if (currentlyActiveWorkspace?.id && !options?.hideLastModifiedBy) {
+        if (activeWorkspaceId && !options?.hideLastModifiedBy) {
           return (
             <span className="rule-updated-on-cell">
               {beautifiedDate} <UserAvatar uid={record.lastModifiedBy} />
@@ -429,7 +430,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           return null;
         }
         const uid = record.createdBy ?? null;
-        return currentlyActiveWorkspace?.id ? <UserAvatar uid={uid} /> : null;
+        return activeWorkspaceId ? <UserAvatar uid={uid} /> : null;
       },
     });
   }

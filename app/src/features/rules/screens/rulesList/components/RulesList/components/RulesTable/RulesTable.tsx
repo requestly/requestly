@@ -30,10 +30,10 @@ import {
 import { enhanceRecords, importSampleRules, normalizeRecords } from "./utils/rules";
 import { useRulesActionContext } from "features/rules/context/actions";
 import { globalActions } from "store/slices/global/slice";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import "./rulesTable.css";
 
 import { RecordType, RecordStatus, StorageRecord } from "@requestly/shared/types/entities/rules";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface Props {
   records: StorageRecord[];
@@ -52,7 +52,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   const isAppBannerVisible = useSelector(getIsAppBannerVisible);
   const isSampleRulesImported = useSelector(getIsSampleRulesImported);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [groupIdsToExpand, setGroupIdsToExpand] = useState<string[]>([]);
   const [contentTableData, setContentTableData] = useState<RuleTableRecord[]>([]);
@@ -86,7 +86,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       return;
     }
 
-    if (!currentlyActiveWorkspace || currentlyActiveWorkspace?.id) {
+    if (activeWorkspaceId) {
       return;
     }
 
@@ -106,7 +106,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
         })
       );
     });
-  }, [user, appMode, isRuleExist, isSampleRulesImported, currentlyActiveWorkspace?.id, isRulesListRefreshPending]);
+  }, [user, appMode, isRuleExist, isSampleRulesImported, activeWorkspaceId, isRulesListRefreshPending, dispatch]);
 
   useEffect(() => {
     const enhancedRecords = enhanceRecords(records, allRecordsMap);

@@ -4,11 +4,10 @@ import { Avatar, Dropdown, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import "./index.scss";
-import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 const getWorkspaceIcon = (workspaceName: string) => {
   if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
@@ -24,7 +23,7 @@ const WorkspaceDropdown: React.FC<{
 }> = ({ isAppSumo = false, workspaceToUpgrade, setWorkspaceToUpgrade, className, disabled = false }) => {
   const user = useSelector(getUserAuthDetails);
   const availableWorkspaces = useSelector(getAllWorkspaces);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const filteredAvailableTeams = useMemo(() => {
     return (
@@ -42,10 +41,10 @@ const WorkspaceDropdown: React.FC<{
   );
 
   useEffect(() => {
-    if (currentlyActiveWorkspace?.id) {
-      setWorkspaceToUpgrade(populateWorkspaceDetails(currentlyActiveWorkspace?.id));
+    if (activeWorkspaceId) {
+      setWorkspaceToUpgrade(populateWorkspaceDetails(activeWorkspaceId));
     }
-  }, [currentlyActiveWorkspace?.id, populateWorkspaceDetails, setWorkspaceToUpgrade]);
+  }, [activeWorkspaceId, populateWorkspaceDetails, setWorkspaceToUpgrade]);
 
   const workspaceMenuItems = {
     items: [

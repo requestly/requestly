@@ -7,19 +7,19 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { get } from "firebase/database";
 import { getNodeRef } from "actions/FirebaseActions";
 import { getRecordsSyncPath, getSyncRuleStatus } from "utils/syncing/syncDataUtils";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import SettingsItem from "features/settings/components/GlobalSettings/components/SettingsItem";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 import { decompressRecords } from "utils/Compression";
 import FEATURES from "config/constants/sub/features";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const WorkspaceStatusSyncing = () => {
   const dispatch = useDispatch();
   // Global State
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   // Component State
   const [syncRuleStatus, setSyncRuleStatus] = useState(getSyncRuleStatus());
   const isWorkspaceSyncOverriden = useFeatureValue(FEATURES.OVERRIDE_TEAM_SYNC_STATUS, false);
@@ -32,9 +32,7 @@ const WorkspaceStatusSyncing = () => {
       return;
     }
     const triggerSync = async () => {
-      const syncNodeRef = getNodeRef(
-        getRecordsSyncPath("teamSync", user.details.profile.uid, currentlyActiveWorkspace.id)
-      );
+      const syncNodeRef = getNodeRef(getRecordsSyncPath("teamSync", user.details.profile.uid, activeWorkspaceId));
 
       const syncNodeRefNode = await get(syncNodeRef);
 

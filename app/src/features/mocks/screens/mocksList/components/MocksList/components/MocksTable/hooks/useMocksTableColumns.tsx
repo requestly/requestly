@@ -5,7 +5,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table, TooltipProps } from "antd";
 import { MockType, RQMockCollection, RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { EditOutlined } from "@ant-design/icons";
 import { UserAvatar } from "componentsV2/UserAvatar";
 import { fileTypeColorMap, generateFinalUrl } from "components/features/mocksV2/utils";
@@ -25,6 +25,7 @@ import { isMock, isCollection } from "../utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
 import PATHS from "config/constants/sub/paths";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 export const useMocksTableColumns = ({
   source,
@@ -44,8 +45,7 @@ export const useMocksTableColumns = ({
 
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const { pathname } = useLocation();
   const isOpenedInRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
@@ -302,7 +302,7 @@ export const useMocksTableColumns = ({
                     endpoint: record.endpoint,
                     uid: user?.details?.profile?.uid,
                     username: user?.details?.username,
-                    teamId,
+                    teamId: activeWorkspaceId,
                     password: record?.password,
                     collectionPath,
                   });
@@ -402,7 +402,7 @@ export const useMocksTableColumns = ({
                     endpoint: record.endpoint,
                     uid: user?.details?.profile?.uid,
                     username: null,
-                    teamId,
+                    teamId: activeWorkspaceId,
                     password: record?.password,
                     collectionPath,
                   });

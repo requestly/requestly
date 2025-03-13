@@ -23,7 +23,7 @@ import {
   trackWorkspaceDropdownClicked,
   trackCreateNewTeamClicked,
 } from "modules/analytics/events/common/teams";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode, getIsWorkspaceLocal } from "store/features/teams/selectors";
+import { getIsWorkspaceMode, getIsWorkspaceLocal } from "store/features/teams/selectors";
 import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getLastSeenInviteTs } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToTeam, redirectToWorkspaceSettings } from "utils/RedirectionUtils";
@@ -44,7 +44,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { WorkspaceType } from "types";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LuFolderSync } from "@react-icons/all-files/lu/LuFolderSync";
-import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { getActiveWorkspace, getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -67,13 +67,14 @@ const getWorkspaceIcon = (workspaceName) => {
 const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const activeWorkspace = useSelector(getActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const isLocalWorkspace = useSelector(getIsWorkspaceLocal);
 
   const activeWorkspaceName = user.loggedIn
     ? isWorkspaceMode
-      ? currentlyActiveWorkspace.name
+      ? activeWorkspace.name
       : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
     : "Workspaces";
 
@@ -102,7 +103,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
                 ? "#1E69FF"
                 : isLocalWorkspace
                 ? "#FFFFFF33"
-                : getUniqueColorForWorkspace(currentlyActiveWorkspace?.id, activeWorkspaceName)
+                : getUniqueColorForWorkspace(activeWorkspaceId, activeWorkspaceName)
               : "#ffffff4d",
           }}
         />
@@ -143,7 +144,7 @@ const WorkspaceSelector = () => {
     ..._availableWorkspaces.filter((team) => team?.archived),
   ];
   const appMode = useSelector(getAppMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const lastSeenInviteTs = useSelector(getLastSeenInviteTs);
@@ -266,7 +267,7 @@ const WorkspaceSelector = () => {
       );
       trackInviteTeammatesClicked("workspaces_dropdown");
       if (isWorkspaceMode) {
-        redirectToTeam(navigate, currentlyActiveWorkspace.id);
+        redirectToTeam(navigate, activeWorkspaceId);
       } else {
         redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");
       }
@@ -409,7 +410,7 @@ const WorkspaceSelector = () => {
     </Menu>
   );
 
-  const isTeamCurrentlyActive = (teamId) => currentlyActiveWorkspace.id === teamId;
+  const isTeamCurrentlyActive = (teamId) => activeWorkspaceId === teamId;
   const TeamsInviteCountBadge = (
     <Badge color="#0361FF" count={teamInvites?.length} className="join-workspace-invite-count-badge" />
   );
@@ -444,16 +445,11 @@ const WorkspaceSelector = () => {
 
   useEffect(() => {
     if (isLimitToPrivateWorkspaceActive) {
-      if (currentlyActiveWorkspace?.id) {
+      if (activeWorkspaceId) {
         confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace);
       }
     }
-  }, [
-    isLimitToPrivateWorkspaceActive,
-    currentlyActiveWorkspace?.id,
-    confirmWorkspaceSwitch,
-    handleSwitchToPrivateWorkspace,
-  ]);
+  }, [isLimitToPrivateWorkspaceActive, activeWorkspaceId, confirmWorkspaceSwitch, handleSwitchToPrivateWorkspace]);
 
   const menu = (
     <Menu className="workspaces-menu" disabled={isLimitToPrivateWorkspaceActive}>
@@ -469,7 +465,7 @@ const WorkspaceSelector = () => {
               style={{ backgroundColor: "#1E69FF" }}
             />
           }
-          className={`workspace-menu-item ${!currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""}`}
+          className={`workspace-menu-item ${!activeWorkspaceId ? "active-workspace-dropdownItem" : ""}`}
           onClick={() => {
             confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace);
             trackWorkspaceDropdownClicked("switch_workspace");
@@ -504,7 +500,7 @@ const WorkspaceSelector = () => {
                   />
                 }
                 className={`workspace-menu-item ${
-                  team.id === currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""
+                  team.id === activeWorkspaceId ? "active-workspace-dropdownItem" : ""
                 }`}
                 onClick={() => {
                   confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team));
@@ -559,7 +555,7 @@ const WorkspaceSelector = () => {
                   />
                 }
                 className={`workspace-menu-item ${
-                  team.id === currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""
+                  team.id === activeWorkspaceId ? "active-workspace-dropdownItem" : ""
                 }`}
                 onClick={() => {
                   confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team));
@@ -637,7 +633,7 @@ const WorkspaceSelector = () => {
             className="workspace-menu-item"
             onClick={() => {
               if (isWorkspaceMode) {
-                redirectToTeam(navigate, currentlyActiveWorkspace.id);
+                redirectToTeam(navigate, activeWorkspaceId);
               } else {
                 redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");
               }

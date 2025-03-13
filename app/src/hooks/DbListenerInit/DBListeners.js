@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getAppMode, getAuthInitialization } from "../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import availableTeamsListener from "./availableTeamsListener";
@@ -16,7 +15,8 @@ import { useHasChanged } from "hooks/useHasChanged";
 import { userSubscriptionDocListener } from "./userSubscriptionDocListener";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { workspaceActions } from "store/slices/workspaces/slice";
-import { getActiveWorkspacesMembers } from "store/slices/workspaces/selectors";
+import { teamsActions } from "store/features/teams/slice";
+import { getActiveWorkspaceId, getActiveWorkspacesMembers } from "store/slices/workspaces/selectors";
 
 window.isFirstSyncComplete = false;
 
@@ -24,7 +24,7 @@ const DBListeners = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const currentTeamMembers = useSelector(getActiveWorkspacesMembers);
   const hasAuthInitialized = useSelector(getAuthInitialization);
@@ -61,13 +61,13 @@ const DBListeners = () => {
     }
 
     if (user?.loggedIn && user?.details?.profile?.uid) {
-      if (currentlyActiveWorkspace.id || user?.details?.isSyncEnabled) {
+      if (activeWorkspaceId || user?.details?.isSyncEnabled) {
         // This is a team or individual sync
         // Set the db node listener
         window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
           dispatch,
           user?.details?.profile.uid,
-          currentlyActiveWorkspace?.id,
+          activeWorkspaceId,
           appMode,
           user?.details?.isSyncEnabled
         );
@@ -84,7 +84,7 @@ const DBListeners = () => {
   }, [
     hasAuthInitialized,
     appMode,
-    currentlyActiveWorkspace.id,
+    activeWorkspaceId,
     dispatch,
     user?.loggedIn,
     user?.details?.profile.uid,
@@ -100,19 +100,19 @@ const DBListeners = () => {
       unsubscribeAvailableTeams.current = availableTeamsListener(
         dispatch,
         user?.details?.profile?.uid,
-        currentlyActiveWorkspace,
+        activeWorkspaceId,
         appMode,
         isLocalSyncEnabled
       );
     } else {
       dispatch(workspaceActions.setAllWorkspaces([]));
-      // dispatch(teamsActions.setAvailableTeams(null));
+      dispatch(teamsActions.setAvailableTeams(null));
       // Very edge case
-      if (currentlyActiveWorkspace.id) {
+      if (activeWorkspaceId) {
         clearCurrentlyActiveWorkspace(dispatch, appMode);
       }
     }
-  }, [appMode, currentlyActiveWorkspace, dispatch, user?.details?.profile?.uid, user?.loggedIn, isLocalSyncEnabled]);
+  }, [appMode, activeWorkspaceId, dispatch, user?.details?.profile?.uid, user?.loggedIn, isLocalSyncEnabled]);
 
   /* Force refresh custom claims in auth token */
   useEffect(() => {
@@ -121,7 +121,7 @@ const DBListeners = () => {
       ?.then((status) => {
         Logger.log("force updated auth token");
       });
-  }, [user?.details?.profile?.uid, user?.loggedIn, currentlyActiveWorkspace, currentTeamMembers, dispatch]);
+  }, [user?.details?.profile?.uid, user?.loggedIn, activeWorkspaceId, currentTeamMembers, dispatch]);
 
   return null;
 };

@@ -5,7 +5,7 @@ import { Empty } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import {
   MockListSource,
   MockRecordType,
@@ -31,6 +31,7 @@ import PATHS from "config/constants/sub/paths";
 import { trackMocksListBulkActionPerformed } from "modules/analytics/events/features/mocksV2";
 import "./mocksTable.scss";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 export interface MocksTableProps {
   source: MockListSource;
@@ -65,9 +66,8 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
   const uid = user?.details?.profile?.uid;
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   useEffect(() => {
     if (!isWorkspaceMode) {
@@ -133,11 +133,11 @@ export const MocksTable: React.FC<MocksTableProps> = ({
       const mockIds = [mockId];
       const collectionPath = ((allRecordsMap[collectionId] as unknown) as RQMockCollection)?.path ?? "";
 
-      updateMocksCollection(uid, mockIds, collectionId, collectionPath, teamId).then(() => {
+      updateMocksCollection(uid, mockIds, collectionId, collectionPath, activeWorkspaceId).then(() => {
         forceRender();
       });
     },
-    [uid, teamId, forceRender, allRecordsMap]
+    [uid, activeWorkspaceId, forceRender, allRecordsMap]
   );
 
   const onRowDropped: ContentListTableProps<RQMockMetadataSchema>["onRowDropped"] = useCallback(

@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { toast } from "utils/Toast.js";
 import { Row, Col, Checkbox, Typography } from "antd";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import isEmail from "validator/lib/isEmail";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -22,7 +21,7 @@ import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWi
 import "./AddMemberModal.css";
 import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "backend/billing";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { getActiveWorkspacesMembers, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, getActiveWorkspacesMembers, getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { WorkspaceMemberRole } from "features/workspaces/types";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
@@ -51,8 +50,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
 
   const availableWorkspaces = useSelector(getAllWorkspaces);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const { id: activeWorkspaceId } = currentlyActiveWorkspace;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const teamId = useMemo(() => currentTeamId ?? activeWorkspaceId, [activeWorkspaceId, currentTeamId]);
   const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
 

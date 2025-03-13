@@ -1,13 +1,12 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { Avatar, Row, Dropdown } from "antd";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import type { MenuProps } from "antd";
 import { trackShareModalWorkspaceDropdownClicked } from "modules/analytics/events/misc/sharing";
-import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
 
 interface Props {
@@ -29,11 +28,11 @@ interface WorkspaceItemProps {
 
 export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading, defaultActiveWorkspaces = 0 }) => {
   const availableWorkspaces = useSelector(getAllWorkspaces);
-  const currentlyActiveWorkspaceId = useSelector(getCurrentlyActiveWorkspace)?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const activeTeamData: Workspace = useMemo(
-    () => availableWorkspaces?.find((team: Workspace) => team?.id === currentlyActiveWorkspaceId),
-    [currentlyActiveWorkspaceId, availableWorkspaces]
+    () => availableWorkspaces?.find((team: Workspace) => team?.id === activeWorkspaceId),
+    [activeWorkspaceId, availableWorkspaces]
   );
   const sortedTeams: Workspace[] = useMemo(
     () =>

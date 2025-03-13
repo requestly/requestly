@@ -4,19 +4,19 @@ import { globalActions } from "store/slices/global/slice";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { setSyncState } from "utils/syncing/SyncUtils";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import SettingsItem from "./SettingsItem";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const RulesSyncing = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const [isSyncStatusChangeProcessing, setIsSyncStatusChangeProcessing] = useState(false);
-  const isWorkspaceMode = !!currentlyActiveWorkspace?.id;
+  const isWorkspaceMode = !!activeWorkspaceId;
   const isUserLoggedIn = !!(user?.loggedIn || user?.details || user?.details?.profile);
 
   const handleRulesSyncToggle = (status) => {
