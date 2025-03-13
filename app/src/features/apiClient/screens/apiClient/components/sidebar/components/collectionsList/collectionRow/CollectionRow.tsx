@@ -136,7 +136,6 @@ export const CollectionRow: React.FC<Props> = ({
     sessionStorage.removeItem("collapsed_collection_keys");
   }, []);
 
-  console.log("debug:", hoveredId);
   return (
     <>
       {isEditMode ? (
