@@ -45,8 +45,12 @@ const useGrowthBookIntegration = () => {
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, async (user) => {
       setGrowthbookStatus({ initDone: false });
-      const emailType = await getEmailType(user.email);
-      initGrowthbook({ ...user, emailType });
+      if (user) {
+        const emailType = await getEmailType(user?.email);
+        initGrowthbook({ ...user, emailType });
+      } else {
+        initGrowthbook(user);
+      }
       setGrowthbookStatus({ initDone: true });
     });
   }, []);
