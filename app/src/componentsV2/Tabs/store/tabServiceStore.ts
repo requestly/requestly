@@ -20,7 +20,7 @@ type TabServiceState = {
   closeTabById: (tabId: TabId) => void;
   setActiveTabId: (tabId: TabId) => void;
   _generateNewTabId: () => TabId;
-  _incrementVersion: () => void;
+  incrementVersion: () => void;
 };
 
 const createTabServiceStore = () => {
@@ -122,13 +122,15 @@ const createTabServiceStore = () => {
         set({ activeTabId: id });
       }
     },
+
     _generateNewTabId() {
       const { tabIdSequence } = get();
       const nextId = tabIdSequence + 1;
       set({ tabIdSequence: nextId });
       return nextId;
     },
-    _incrementVersion() {
+
+    incrementVersion() {
       set({ _version: get()._version + 1 });
     },
   }));
