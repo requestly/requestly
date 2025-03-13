@@ -3,6 +3,7 @@ import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces"
 import { generateDocumentId, getOwnerId } from "backend/utils";
 import { RQAPI } from "features/apiClient/types";
 import { sanitizeRecord, updateApiRecord } from "backend/apiClient/upsertApiRecord";
+import { EnvironmentVariables } from "backend/environment/types";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -67,5 +68,39 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
 
   async deleteCollections(ids: string[]) {
     return deleteApiRecords(this.meta.uid, ids, this.meta.teamId);
+  }
+
+  async setCollectionVariables(
+    id: string,
+    variables: EnvironmentVariables
+  ): Promise<{ success: boolean; data: unknown; message?: string }> {
+    const record = await this.getCollection(id);
+    const updatedRecord: RQAPI.CollectionRecord = {
+      ...record.data,
+      type: RQAPI.RecordType.COLLECTION,
+      data: {
+        ...record.data.data,
+        variables,
+      },
+    };
+    return this.updateRecord(updatedRecord, updatedRecord.id);
+  }
+
+  async updateCollectionDescription(
+    id: string,
+    description: string
+  ): Promise<{ success: boolean; data: string; message?: string }> {
+    const result = await this.updateRecord({ id, description }, id);
+    return {
+      success: result.success,
+      data: result.data.description,
+      message: "Something went wrong while updating collection description",
+    };
+  }
+
+  async updateCollectionAuthData(
+    collection: RQAPI.CollectionRecord
+  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+    return this.updateRecord(collection, collection.id);
   }
 }
