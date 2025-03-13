@@ -12,6 +12,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { useRBAC } from "features/rbac";
 import "./sessionsTitle.scss";
 
 export const SessionTitle = () => {
@@ -21,6 +22,8 @@ export const SessionTitle = () => {
   const recordingId = useSelector(getSessionRecordingId);
   const sessionMetadata = useSelector(getSessionRecordingMetaData);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("session_recording", "update");
 
   const [sessionName, setSessionName] = useState(sessionMetadata?.name);
 
@@ -52,7 +55,7 @@ export const SessionTitle = () => {
             dispatch(sessionRecordingActions.setName(value));
           }}
           onBlur={handleSessionNameUpdate}
-          disabled={!isRequestedByOwner || isInsideIframe}
+          disabled={!isRequestedByOwner || isInsideIframe || !isValidPermission}
         />
       </div>
     </div>

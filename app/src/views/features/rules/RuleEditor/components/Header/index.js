@@ -30,6 +30,8 @@ import { trackSampleRuleCreateRuleClicked } from "features/rules/analytics";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import { getEventObject } from "components/common/RuleEditorModal/utils";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
+import { RBACButton, RoleBasedComponent, useRBAC } from "features/rbac";
+import CreateRuleButton from "./ActionButtons/CreateRuleButton";
 
 const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleTooltip = false }) => {
   const navigate = useNavigate();
@@ -38,16 +40,12 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const allRecordsMap = useSelector(getAllRecordsMap);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
 
   const { recordStatusToggleAction } = useRulesActionContext();
-
-  // const getRuleTitle = (name, mode) => {
-  //   return `${replace(capitalize(name), "api", "API")} / ${capitalize(mode)} ${
-  //     mode === "create" ? "new rule" : "rule"
-  //   }`;
-  // };
 
   const isRuleGroupDisabled = useMemo(() => checkIsRuleGroupDisabled(allRecordsMap, currentlySelectedRuleData), [
     allRecordsMap,
@@ -84,10 +82,8 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
         <div className="rule-editor-title-info">
           <CloseButton mode={mode} ruleType={currentlySelectedRuleData?.ruleType} />
           <div className="text-gray rule-editor-header-title">
-            {/* {getRuleTitle(currentlySelectedRuleConfig.NAME, mode)} */}
-
             <RQBreadcrumb
-              disabled={isSampleRule}
+              disabled={isSampleRule || !isValidPermission}
               placeholder="Enter rule name"
               recordName={currentlySelectedRuleData?.name}
               onRecordNameUpdate={handleRuleNameChange}
@@ -119,14 +115,17 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
 
             <Divider type="vertical" />
 
-            <RQButton
+            <RBACButton
+              permission="create"
+              resource="http_rule"
+              tooltipTitle="Saving is not allowed in view-only mode. You can test rules but cannot save them."
               onClick={() => {
                 trackSampleRuleCreateRuleClicked(currentlySelectedRuleData?.name, currentlySelectedRuleData?.ruleType);
                 navigate(`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${currentlySelectedRuleData?.ruleType}`);
               }}
             >
               Create {currentlySelectedRuleConfig.NAME?.toLowerCase()} rule
-            </RQButton>
+            </RBACButton>
 
             <RQButton type="primary" onClick={handleSeeLiveRuleDemoClick}>
               See live rule demo
@@ -134,39 +133,55 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
           </div>
         ) : (
           <div className="ml-auto rule-editor-header-actions-container">
-            <HelpButton />
+            <RoleBasedComponent
+              resource="http_rule"
+              permission="create"
+              fallback={
+                <>
+                  <HelpButton />
+                  <Status mode={mode} />
+                  <Divider type="vertical" />
+                  <TestRuleButton />
+                  <CreateRuleButton />
+                </>
+              }
+            >
+              <>
+                <HelpButton />
 
-            <Status mode={mode} />
+                <Status mode={mode} />
 
-            {isRuleGroupDisabled && (
-              <div className="rule-editor-header-disabled-group-warning">
-                <Tooltip title="This rule won't execute because its parent group is disabled. Enable the group to run this rule.">
-                  <WarningOutlined className="icon__wrapper" />
-                  Group is disabled.{" "}
-                  <RQButton
-                    type="transparent"
-                    size="small"
-                    onClick={() =>
-                      recordStatusToggleAction(normalizeRecord(allRecordsMap[currentlySelectedRuleData.groupId]))
-                    }
-                  >
-                    Enable now
-                  </RQButton>
-                </Tooltip>
-              </div>
-            )}
+                {isRuleGroupDisabled && (
+                  <div className="rule-editor-header-disabled-group-warning">
+                    <Tooltip title="This rule won't execute because its parent group is disabled. Enable the group to run this rule.">
+                      <WarningOutlined className="icon__wrapper" />
+                      Group is disabled.{" "}
+                      <RQButton
+                        type="transparent"
+                        size="small"
+                        onClick={() =>
+                          recordStatusToggleAction(normalizeRecord(allRecordsMap[currentlySelectedRuleData.groupId]))
+                        }
+                      >
+                        Enable now
+                      </RQButton>
+                    </Tooltip>
+                  </div>
+                )}
 
-            <PinButton rule={currentlySelectedRuleData} />
+                <PinButton rule={currentlySelectedRuleData} />
 
-            <Divider type="vertical" />
+                <Divider type="vertical" />
 
-            <RuleOptions mode={mode} rule={currentlySelectedRuleData} />
+                <RuleOptions mode={mode} rule={currentlySelectedRuleData} />
 
-            <EditorGroupDropdown mode={mode} />
+                <EditorGroupDropdown mode={mode} />
 
-            <TestRuleButton />
+                <TestRuleButton />
 
-            <ActionButtons mode={mode} />
+                <ActionButtons mode={mode} />
+              </>
+            </RoleBasedComponent>
           </div>
         )}
       </div>

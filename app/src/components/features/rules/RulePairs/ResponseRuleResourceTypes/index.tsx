@@ -26,7 +26,10 @@ const DownloadDesktopAppLink: React.FC = () => (
   </a>
 );
 
-const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown> }> = ({ ruleDetails }) => {
+const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>; disabled: boolean }> = ({
+  disabled,
+  ruleDetails,
+}) => {
   const dispatch = useDispatch();
   const isDesktop = useMemo(isDesktopMode, []);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -84,7 +87,7 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
         <Radio.Group
-          disabled={isSampleRule}
+          disabled={isSampleRule || disabled}
           value={responseRuleResourceType}
           onChange={(e) => {
             if (e.target.value !== ResponseRule.ResourceType.GRAPHQL_API) handleResourceTypeChange(e.target.value);
@@ -118,7 +121,7 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
                 </span>
               }
             >
-              <Radio disabled={!isDesktop} value={ResponseRule.ResourceType.STATIC}>
+              <Radio disabled={!isDesktop || disabled} value={ResponseRule.ResourceType.STATIC}>
                 HTML / JS / CSS
                 <QuestionCircleOutlined className="resource-disable-option-info-icon" />
               </Radio>
