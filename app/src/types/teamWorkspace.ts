@@ -35,6 +35,7 @@ export interface Team {
 export enum TeamRole {
   admin = "admin",
   write = "write",
+  read = "read",
 }
 
 // teams invite

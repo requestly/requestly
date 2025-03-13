@@ -5,7 +5,7 @@ import { getAppMode, getIsRulesListLoading } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useHasChanged } from "hooks";
-import { redirectToRuleEditor } from "utils/RedirectionUtils";
+import { redirectToRuleEditor, redirectToRules } from "utils/RedirectionUtils";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { StorageService } from "init";
 // @ts-ignore
@@ -31,8 +31,8 @@ import ModHeader from "../../../../assets/img/brand/mod-header-icon.svg?react";
 import ResourceOverride from "../../../../assets/img/brand/resource-override-icon.svg?react";
 import Charles from "../../../../assets/img/brand/charles-icon.svg?react";
 import "./rulesCard.scss";
-import { RQButton } from "lib/design-system-v2/components";
 import { ImporterType } from "components/Home/types";
+import { RBACButton, RoleBasedComponent, useRBAC } from "features/rbac";
 
 export const RulesCard = () => {
   const MAX_RULES_TO_SHOW = 5;
@@ -46,6 +46,8 @@ export const RulesCard = () => {
   const [rules, setRules] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRulesDrawerOpen, setIsRulesDrawerOpen] = useState(false);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const onRulesDrawerClose = () => {
     setIsRulesDrawerOpen(false);
@@ -120,11 +122,16 @@ export const RulesCard = () => {
       contentLoading={isLoading || isRulesLoading}
       cardType={CardType.RULES}
       defaultImportClickHandler={() => importTriggerHandler(ImporterType.REQUESTLY)}
-      importOptions={{
-        menu: IMPORT_OPTIONS,
-        label: "Charles, ModHeader, & more",
-        icon: "/assets/media/rules/import-icon.svg",
-      }}
+      showFooter={isValidPermission}
+      importOptions={
+        isValidPermission
+          ? {
+              menu: IMPORT_OPTIONS,
+              label: "Charles, ModHeader, & more",
+              icon: "/assets/media/rules/import-icon.svg",
+            }
+          : null
+      }
       listItemClickHandler={(item: Rule) => {
         trackHomeRulesActionClicked("rule_clicked");
         trackRuleCreationWorkflowStartedEvent(item.ruleType, SOURCE.HOME_SCREEN);
@@ -140,9 +147,12 @@ export const RulesCard = () => {
           source={SOURCE.HOME_SCREEN}
           onRuleItemClick={onRulesDrawerClose}
         >
-          <RQButton
+          <RBACButton
+            permission="create"
+            resource="http_rule"
             type="primary"
             className="new-rule-button"
+            tooltipTitle="Creating a new rule is not allowed in view-only mode."
             onClick={() => {
               trackHomeRulesActionClicked("new_rule_button");
               trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
@@ -155,7 +165,7 @@ export const RulesCard = () => {
             }}
           >
             New Rule
-          </RQButton>
+          </RBACButton>
         </RuleSelectionListDrawer>
       }
       title={"HTTP Rules"}
@@ -169,31 +179,46 @@ export const RulesCard = () => {
       emptyCardOptions={{
         ...PRODUCT_FEATURES.RULES,
         primaryAction: (
-          <RuleSelectionListDrawer
-            open={isRulesDrawerOpen}
-            onClose={onRulesDrawerClose}
-            source={SOURCE.HOME_SCREEN}
-            onRuleItemClick={() => {
-              onRulesDrawerClose();
-            }}
+          <RoleBasedComponent
+            resource="http_rule"
+            permission="create"
+            fallback={
+              <div
+                className="add-cta"
+                onClick={() => {
+                  redirectToRules(navigate);
+                }}
+              >
+                <span> View and run rules </span>
+              </div>
+            }
           >
-            <div
-              className="add-cta"
-              onClick={() => {
-                trackHomeRulesActionClicked("create_first_rule");
-                trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
-
-                if (isExtensionInstalled()) {
-                  setIsRulesDrawerOpen(true);
-                } else {
-                  dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
-                }
+            <RuleSelectionListDrawer
+              open={isRulesDrawerOpen}
+              onClose={onRulesDrawerClose}
+              source={SOURCE.HOME_SCREEN}
+              onRuleItemClick={() => {
+                onRulesDrawerClose();
               }}
             >
-              <IoMdAdd />
-              <span> Create a new rule </span>
-            </div>
-          </RuleSelectionListDrawer>
+              <div
+                className="add-cta"
+                onClick={() => {
+                  trackHomeRulesActionClicked("create_first_rule");
+                  trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
+
+                  if (isExtensionInstalled()) {
+                    setIsRulesDrawerOpen(true);
+                  } else {
+                    dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
+                  }
+                }}
+              >
+                <IoMdAdd />
+                <span> Create a new rule </span>
+              </div>
+            </RuleSelectionListDrawer>
+          </RoleBasedComponent>
         ),
       }}
     />
