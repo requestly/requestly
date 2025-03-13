@@ -2,15 +2,15 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SYNC_CONSTANTS } from "./syncing/syncConstants";
 //UTILS
-import { getStorageHelper } from "../engines";
 import { processRecordsArrayIntoObject } from "./syncing/syncDataUtils";
 import { doSyncRecords } from "./syncing/SyncUtils";
 import { generateObjectId } from "./FormattingHelper";
+import { clientStorageService } from "services/clientStorageService";
 
 class StorageServiceWrapper {
   constructor(options) {
     this.appMode = options.appMode || GLOBAL_CONSTANTS.APP_MODES.EXTENSION;
-    this.StorageHelper = getStorageHelper(this.appMode);
+    this.StorageHelper = clientStorageService;
     this.primaryKeys = options.primaryKeys || ["objectType", "ruleType"];
 
     this.saveRecordWithID = this.saveRecordWithID.bind(this);
