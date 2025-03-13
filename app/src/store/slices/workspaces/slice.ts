@@ -26,7 +26,7 @@ const getTeamSliceCurrentWorkspaceId = () => {
         ? JSON.parse(teamsSliceObj?.currentlyActiveWorkspace)
         : {};
       console.log("Migrated Successfully", { teamsSliceObj, teamsSliceCurrentlyActiveWorkspace });
-      window.localStorage.removeItem("persist:teams");
+      // window.localStorage.removeItem("persist:teams");
       return teamsSliceCurrentlyActiveWorkspace?.id ? [teamsSliceCurrentlyActiveWorkspace?.id] : [];
     } catch (e) {
       console.log("Error while migration teams slice to workspaces slice");
@@ -53,6 +53,9 @@ const slice = createSlice({
 
     setAllWorkspaces: (state: WorkspaceSliceState, action: PayloadAction<Workspace[]>) => {
       workspacesEntityAdapter.setAll(state.allWorkspaces, action.payload);
+    },
+    upsertWorkspace: (state: WorkspaceSliceState, action: PayloadAction<Workspace>) => {
+      workspacesEntityAdapter.upsertOne(state.allWorkspaces, action.payload);
     },
     setWorkspacesUpdatedAt: (state: WorkspaceSliceState, action: PayloadAction<number>) => {
       state.workspacesUpdatedAt = action.payload;
