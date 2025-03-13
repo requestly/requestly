@@ -31,9 +31,8 @@ import ModHeader from "../../../../assets/img/brand/mod-header-icon.svg?react";
 import ResourceOverride from "../../../../assets/img/brand/resource-override-icon.svg?react";
 import Charles from "../../../../assets/img/brand/charles-icon.svg?react";
 import "./rulesCard.scss";
-import { RQButton } from "lib/design-system-v2/components";
 import { ImporterType } from "components/Home/types";
-import { RoleBasedComponent, useRBAC } from "features/rbac";
+import { RBACButton, RoleBasedComponent, useRBAC } from "features/rbac";
 
 export const RulesCard = () => {
   const MAX_RULES_TO_SHOW = 5;
@@ -124,7 +123,6 @@ export const RulesCard = () => {
       cardType={CardType.RULES}
       defaultImportClickHandler={() => importTriggerHandler(ImporterType.REQUESTLY)}
       showFooter={isValidPermission}
-      showActionButtons={isValidPermission}
       importOptions={
         isValidPermission
           ? {
@@ -149,9 +147,12 @@ export const RulesCard = () => {
           source={SOURCE.HOME_SCREEN}
           onRuleItemClick={onRulesDrawerClose}
         >
-          <RQButton
+          <RBACButton
+            permission="create"
+            resource="http_rule"
             type="primary"
             className="new-rule-button"
+            tooltipTitle="Creating a new rule is not allowed in view-only mode."
             onClick={() => {
               trackHomeRulesActionClicked("new_rule_button");
               trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
@@ -164,7 +165,7 @@ export const RulesCard = () => {
             }}
           >
             New Rule
-          </RQButton>
+          </RBACButton>
         </RuleSelectionListDrawer>
       }
       title={"HTTP Rules"}

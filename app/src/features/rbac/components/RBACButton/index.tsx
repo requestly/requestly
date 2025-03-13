@@ -29,7 +29,7 @@ export const RBACButton: React.FC<RBACButtonProps> = ({
   const onClick = props.hotKey ? (isValidPermission ? props.onClick : showInvalidPermissionToast) : props.onClick;
 
   return (
-    <RQTooltip title={isValidPermission ? null : tooltipTitle} placement={tooltipPlacement}>
+    <RQTooltip showArrow={false} title={isValidPermission ? null : tooltipTitle} placement={tooltipPlacement}>
       {/* HACK: React fragment allows applying tooltip on disabled button */}
       <>
         <RQButton {...props} disabled={props.disabled || !isValidPermission} onClick={onClick} />

@@ -15,7 +15,6 @@ import { Conditional } from "components/common/Conditional";
 interface CardProps {
   contentLoading?: boolean;
   showFooter?: boolean;
-  showActionButtons?: boolean;
   wrapperClass?: string;
   defaultImportClickHandler: () => void;
   emptyCardOptions: {
@@ -59,7 +58,6 @@ export const Card: React.FC<CardProps> = ({
   viewAllCtaOnClick,
   importOptions,
   showFooter = false,
-  showActionButtons = false,
   defaultImportClickHandler,
 }) => {
   const MAX_LIST_ITEMS_TO_SHOW = showFooter ? 5 : 8;
@@ -84,15 +82,15 @@ export const Card: React.FC<CardProps> = ({
                 <h1>{title}</h1>
               </div>
 
-              <Conditional condition={showActionButtons}>
-                <div className="action-buttons">
+              <div className="action-buttons">
+                <Conditional condition={showFooter}>
                   <RQButton type="transparent" className="import-dropdown-trigger" onClick={defaultImportClickHandler}>
                     <MdOutlineFileUpload />
                     Import
                   </RQButton>
-                  {actionButtons}
-                </div>
-              </Conditional>
+                </Conditional>
+                {actionButtons}
+              </div>
             </div>
             <div className="middle-section">
               <h2>{bodyTitle}</h2>
