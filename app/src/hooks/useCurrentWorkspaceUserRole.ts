@@ -15,7 +15,7 @@ export const useCurrentWorkspaceUserRole = (): { role: TeamRole | undefined } =>
   ]);
 
   if (!user.loggedIn) {
-    return { role: undefined };
+    return { role: TeamRole.admin };
   }
 
   // Private workspace
