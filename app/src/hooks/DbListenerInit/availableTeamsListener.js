@@ -10,6 +10,7 @@ import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { WorkspaceType } from "types";
 import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
+import { workspaceActions } from "store/slices/workspaces/slice";
 
 const db = getFirestore(firebaseApp);
 
@@ -24,10 +25,10 @@ const splitMembersBasedOnRoles = (members) => {
   return result;
 };
 
-const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode, isLocalSyncEnabled) => {
+const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLocalSyncEnabled) => {
   if (!uid) {
     // Rare edge case
-    if (currentlyActiveWorkspace.id) {
+    if (activeWorkspaceId) {
       clearCurrentlyActiveWorkspace(dispatch, appMode);
     }
     return null;
@@ -96,10 +97,11 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
           .filter(Boolean);
         records.push(...localRecords);
         dispatch(teamsActions.setAvailableTeams(records));
+        dispatch(workspaceActions.setAllWorkspaces(records));
 
-        if (!currentlyActiveWorkspace?.id) return;
+        if (!activeWorkspaceId) return;
 
-        const found = records.find((team) => team.id === currentlyActiveWorkspace.id);
+        const found = records.find((team) => team.id === activeWorkspaceId);
         if (!found) {
           if (!window.hasUserRemovedHimselfRecently)
             alert("You no longer have access to this workspace. Please contact your team admin.");
@@ -110,6 +112,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
           }, 4000);
         } else {
           // Incase team name, members, or anything has changed
+          // No need
           dispatch(
             teamsActions.setCurrentlyActiveWorkspace({
               id: found.id,
@@ -124,7 +127,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
           const getTeamUsers = httpsCallable(functions, "teams-getTeamUsers");
 
           getTeamUsers({
-            teamId: currentlyActiveWorkspace?.id,
+            teamId: activeWorkspaceId,
           })
             .then((res) => {
               const response = res.data;
@@ -134,6 +137,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
                   users[user.id] = response.users[index];
                 });
                 dispatch(teamsActions.setCurrentlyActiveWorkspaceMembers(users));
+                dispatch(workspaceActions.setActiveWorkspacesMembers(users));
               } else {
                 throw new Error(response.message);
               }

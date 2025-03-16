@@ -1,28 +1,21 @@
-import { useMemo } from "react";
+import { WorkspaceMemberRole } from "features/workspaces/types";
 import { useSelector } from "react-redux";
-import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { Team, TeamRole } from "types";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 
-export const useCurrentWorkspaceUserRole = (): { role: TeamRole | undefined } => {
+export const useCurrentWorkspaceUserRole = (): { role: WorkspaceMemberRole | undefined } => {
   const user = useSelector(getUserAuthDetails);
-  const availableTeams = useSelector(getAvailableTeams) as Team[] | null;
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-
-  const teamDetails = useMemo(() => availableTeams?.find((team) => team.id === currentlyActiveWorkspace.id), [
-    availableTeams,
-    currentlyActiveWorkspace.id,
-  ]);
+  const activeWorkspace = useSelector(getActiveWorkspace);
 
   if (!user.loggedIn) {
-    return { role: TeamRole.admin };
+    return { role: WorkspaceMemberRole.admin };
   }
 
   // Private workspace
-  if (currentlyActiveWorkspace.id === null) {
-    return { role: TeamRole.admin };
+  if (!activeWorkspace?.id) {
+    return { role: WorkspaceMemberRole.admin };
   }
 
-  const role = teamDetails?.members?.[user?.details?.profile?.uid]?.role;
+  const role = activeWorkspace?.members?.[user?.details?.profile?.uid]?.role;
   return { role: role };
 };

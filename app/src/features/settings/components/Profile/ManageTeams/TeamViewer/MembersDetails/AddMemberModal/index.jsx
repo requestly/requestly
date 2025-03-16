@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { toast } from "utils/Toast.js";
 import { Row, Col, Checkbox, Typography } from "antd";
-import { getAvailableTeams, getCurrentlyActiveWorkspace, getUserTeamRole } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import isEmail from "validator/lib/isEmail";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -22,14 +21,15 @@ import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWi
 import "./AddMemberModal.css";
 import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "backend/billing";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { TeamRole } from "types";
+import { getActiveWorkspaceId, getActiveWorkspacesMembers, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { WorkspaceMemberRole } from "features/workspaces/types";
 import { isAdmin } from "features/settings/utils";
 import { Conditional } from "components/common/Conditional";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
   const [userEmail, setUserEmail] = useState([]);
-  const [userInviteRole, setUserInviteRole] = useState(TeamRole.read);
+  const [userInviteRole, setUserInviteRole] = useState(WorkspaceMemberRole.read);
   const [isInviteErrorModalActive, setInviteErrorModalActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [inviteErrors, setInviteErrors] = useState([]);
@@ -46,17 +46,20 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   // Global state
   const user = useSelector(getUserAuthDetails);
   const loggedInUserId = user?.details?.profile?.uid;
-  const loggedInUserTeamRole = useSelector(getUserTeamRole);
-  const isLoggedInUserAdmin = loggedInUserTeamRole === TeamRole.admin;
+  const workspaceMembers = useSelector(getActiveWorkspacesMembers);
+  const loggedInUserTeamRole = workspaceMembers?.[loggedInUserId]?.role;
+  const isLoggedInUserAdmin = loggedInUserTeamRole === WorkspaceMemberRole.admin;
   const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
 
-  const availableTeams = useSelector(getAvailableTeams);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const { id: activeWorkspaceId } = currentlyActiveWorkspace;
+  const availableWorkspaces = useSelector(getAllWorkspaces);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const teamId = useMemo(() => currentTeamId ?? activeWorkspaceId, [activeWorkspaceId, currentTeamId]);
   const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
 
-  const teamDetails = useMemo(() => availableTeams?.find((team) => team.id === teamId), [availableTeams, teamId]);
+  const teamDetails = useMemo(() => availableWorkspaces?.find((team) => team.id === teamId), [
+    availableWorkspaces,
+    teamId,
+  ]);
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);
@@ -269,7 +272,9 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                   <div className="email-invites-wrapper">
                     <div className="emails-input-wrapper">
                       <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} transparentBackground={true} />
-                      <Conditional condition={loggedInUserTeamRole && loggedInUserTeamRole !== TeamRole.read}>
+                      <Conditional
+                        condition={loggedInUserTeamRole && loggedInUserTeamRole !== WorkspaceMemberRole.read}
+                      >
                         <div className="access-dropdown-container">
                           <MemberRoleDropdown
                             loggedInUserTeamRole={loggedInUserTeamRole}
@@ -281,7 +286,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                               let role = updatedRole;
 
                               if (role === "user") {
-                                role = TeamRole.write;
+                                role = WorkspaceMemberRole.write;
                               }
 
                               setUserInviteRole(role);

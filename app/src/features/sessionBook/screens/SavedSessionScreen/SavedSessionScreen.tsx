@@ -7,7 +7,6 @@ import { getRecording } from "backend/sessionRecording/getRecording";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { RQSessionEvents } from "@requestly/web-sdk";
 import { decompressEvents } from "views/features/sessions/SessionViewer/sessionEventsUtils";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import PageLoader from "components/misc/PageLoader";
 import { SavedSessionViewer } from "./components/SavedSessionViewer/SavedSessionViewer";
 import PermissionError from "features/sessionBook/components/PermissionError";
@@ -15,6 +14,7 @@ import BadSessionError from "features/sessionBook/components/BadSessionError";
 import NotFoundError from "features/sessionBook/components/NotFoundError";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./savedSessionScreen.scss";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 enum SessionError {
   PermissionDenied = "PermissionDenied",
@@ -26,7 +26,7 @@ export const SavedSessionScreen: React.FC = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const [isFetching, setIsFetching] = useState(false);
   const [showPermissionError, setShowPermissionError] = useState(false);
   const [showNotFoundError, setShowNotFoundError] = useState(false);
@@ -41,7 +41,7 @@ export const SavedSessionScreen: React.FC = () => {
 
     setIsFetching(true);
 
-    getRecording(id, user?.details?.profile?.uid, workspace?.id, user?.details?.profile?.email)
+    getRecording(id, user?.details?.profile?.uid, activeWorkspaceId, user?.details?.profile?.email)
       .then((res) => {
         setShowPermissionError(false);
         dispatch(sessionRecordingActions.setSessionRecordingMetadata({ id, ...res.payload }));
@@ -69,7 +69,7 @@ export const SavedSessionScreen: React.FC = () => {
             setShowPermissionError(true);
         }
       });
-  }, [dispatch, hasAuthInitialized, id, user?.details?.profile?.uid, user?.details?.profile?.email, workspace?.id]);
+  }, [dispatch, hasAuthInitialized, id, user?.details?.profile?.uid, user?.details?.profile?.email, activeWorkspaceId]);
 
   if (showPermissionError) return <PermissionError isInsideIframe={isInsideIframe} />;
   if (showBadSessionError) return <BadSessionError />;
