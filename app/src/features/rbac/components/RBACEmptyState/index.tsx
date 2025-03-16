@@ -2,9 +2,9 @@ import React from "react";
 import { RQButton } from "lib/design-system-v2/components";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { redirectToTeam, redirectToWorkspaceSettings } from "utils/RedirectionUtils";
 import "./rbacEmptyState.scss";
+import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 interface Props {
   title: string;
@@ -13,8 +13,8 @@ interface Props {
 
 export const RBACEmptyState: React.FC<Props> = ({ title, description }) => {
   const navigate = useNavigate();
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
 
   return (
     <div className="rbac-empty-state-container">
@@ -28,8 +28,8 @@ export const RBACEmptyState: React.FC<Props> = ({ title, description }) => {
         type="secondary"
         onClick={() => {
           // TODO: add analytics
-          if (isWorkspaceMode) {
-            redirectToTeam(navigate, currentlyActiveWorkspace.id);
+          if (isSharedWorkspaceMode) {
+            redirectToTeam(navigate, activeWorkspaceId);
           } else {
             redirectToWorkspaceSettings(navigate, window.location.pathname, "rbac_empty_state");
           }

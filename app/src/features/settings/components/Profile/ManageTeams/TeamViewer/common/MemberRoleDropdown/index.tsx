@@ -3,9 +3,9 @@ import { Dropdown, DropDownProps, Menu, Spin, Typography } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { TeamRole } from "types";
 import { getDisplayTextForRole } from "features/settings/utils";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useSelector } from "react-redux";
 import "./MemberRoleDropdown.css";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface MemberRoleDropdownProps extends DropDownProps {
   memberRole?: TeamRole;
@@ -38,7 +38,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentRole, setCurrentRole] = useState<TeamRole>(memberRole ?? TeamRole.write);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const hasWriteAccess = [TeamRole.admin, TeamRole.write].includes(loggedInUserTeamRole);
 
   const items = useMemo(
@@ -118,7 +118,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
       {...props}
       disabled={
         isLoading ||
-        !currentlyActiveWorkspace?.id ||
+        !activeWorkspaceId ||
         (memberId !== loggedInUserId && !hasWriteAccess) ||
         memberId === loggedInUserId
       }
@@ -127,7 +127,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
         <Typography.Text className={!props.disabled && "cursor-pointer"}>
           {getDisplayTextForRole(currentRole)}
 
-          {hasWriteAccess && memberId !== loggedInUserId && currentlyActiveWorkspace?.id && (
+          {hasWriteAccess && memberId !== loggedInUserId && activeWorkspaceId && (
             <img
               width="10px"
               height="6px"

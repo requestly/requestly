@@ -3,7 +3,6 @@ import { getRecordingOptionsToSave } from "features/sessionBook/utils/sessionFil
 import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getAppMode, getUserAttributes } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -24,6 +23,7 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import PATHS from "config/constants/sub/paths";
 import { getAppFlavour } from "utils/AppUtils";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 export const useSaveDraftSession = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ export const useSaveDraftSession = () => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const { claimIncentiveRewards } = useIncentiveActions();
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionAttributes = useSelector(getSessionRecordingAttributes);
@@ -73,7 +73,7 @@ export const useSaveDraftSession = () => {
         );
       }
 
-      const workspaceId = isOpenedInIframe ? searchParams.get("workspaceId") : currentlyActiveWorkspace?.id;
+      const workspaceId = isOpenedInIframe ? searchParams.get("workspaceId") : activeWorkspaceId;
 
       return saveRecording(
         user?.details?.profile?.uid,
@@ -144,7 +144,7 @@ export const useSaveDraftSession = () => {
     [
       appMode,
       claimIncentiveRewards,
-      currentlyActiveWorkspace,
+      activeWorkspaceId,
       dispatch,
       navigate,
       user,
