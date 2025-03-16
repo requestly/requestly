@@ -26,6 +26,8 @@ const getTeamSliceCurrentWorkspaceId = () => {
         ? JSON.parse(teamsSliceObj?.currentlyActiveWorkspace)
         : {};
       console.log("Migrated Successfully", { teamsSliceObj, teamsSliceCurrentlyActiveWorkspace });
+
+      // For backward compatibility in case of any issues. Uncomment when everything is working fine along with all the reducers usage of teams/slice.ts
       // window.localStorage.removeItem("persist:teams");
       return teamsSliceCurrentlyActiveWorkspace?.id ? [teamsSliceCurrentlyActiveWorkspace?.id] : [];
     } catch (e) {
