@@ -25,7 +25,7 @@ const getTeamSliceCurrentWorkspaceId = () => {
       const teamsSliceCurrentlyActiveWorkspace = teamsSliceObj?.currentlyActiveWorkspace
         ? JSON.parse(teamsSliceObj?.currentlyActiveWorkspace)
         : {};
-      console.log("Migrated Successfully", { teamsSliceObj, teamsSliceCurrentlyActiveWorkspace });
+      // console.log("Migrated Successfully", { teamsSliceObj, teamsSliceCurrentlyActiveWorkspace });
 
       // For backward compatibility in case of any issues. Uncomment when everything is working fine along with all the reducers usage of teams/slice.ts
       // window.localStorage.removeItem("persist:teams");
@@ -35,7 +35,7 @@ const getTeamSliceCurrentWorkspaceId = () => {
       return [];
     }
   } else {
-    console.log("Already Migrated or New User");
+    // console.log("Already Migrated or New User");
     return [];
   }
 };

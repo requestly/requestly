@@ -12,7 +12,7 @@ export const useCurrentWorkspaceUserRole = (): { role: WorkspaceMemberRole | und
   }
 
   // Private workspace
-  if (!activeWorkspace.id) {
+  if (!activeWorkspace?.id) {
     return { role: WorkspaceMemberRole.admin };
   }
 

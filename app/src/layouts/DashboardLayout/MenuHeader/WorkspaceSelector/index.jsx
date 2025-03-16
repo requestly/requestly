@@ -78,7 +78,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
 
   const activeWorkspaceName = user.loggedIn
     ? isSharedWorkspaceMode
-      ? activeWorkspace.name
+      ? activeWorkspace?.name
       : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
     : "Workspaces";
 
