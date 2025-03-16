@@ -8,7 +8,7 @@ export const useCurrentWorkspaceUserRole = (): { role: WorkspaceMemberRole | und
   const activeWorkspace = useSelector(getActiveWorkspace);
 
   if (!user.loggedIn) {
-    return { role: TeamRole.admin };
+    return { role: WorkspaceMemberRole.admin };
   }
 
   // Private workspace
