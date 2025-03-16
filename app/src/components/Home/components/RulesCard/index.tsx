@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsRulesListLoading } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useHasChanged } from "hooks";
 import { redirectToRuleEditor, redirectToRules } from "utils/RedirectionUtils";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
@@ -32,6 +31,7 @@ import ResourceOverride from "../../../../assets/img/brand/resource-override-ico
 import Charles from "../../../../assets/img/brand/charles-icon.svg?react";
 import "./rulesCard.scss";
 import { ImporterType } from "components/Home/types";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { RBACButton, RoleBasedComponent, useRBAC } from "features/rbac";
 
 export const RulesCard = () => {
@@ -39,7 +39,7 @@ export const RulesCard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const user = useSelector(getUserAuthDetails);
   const isRulesLoading = useSelector(getIsRulesListLoading);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
@@ -64,7 +64,7 @@ export const RulesCard = () => {
         );
       }
     },
-    [user?.details?.isLoggedIn]
+    [dispatch, navigate, user?.details?.isLoggedIn]
   );
 
   const IMPORT_OPTIONS = [
@@ -114,7 +114,7 @@ export const RulesCard = () => {
     } else {
       setIsLoading(false);
     }
-  }, [appMode, workspace.id, hasUserChanged, isRulesLoading]);
+  }, [appMode, activeWorkspaceId, hasUserChanged, isRulesLoading]);
 
   return (
     <Card

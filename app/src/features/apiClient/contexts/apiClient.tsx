@@ -1,6 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
 import Logger from "lib/logger";
@@ -29,6 +28,7 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
 import { variablesActions } from "store/features/variables/slice";
 import { EnvironmentVariables } from "backend/environment/types";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { RBAC, useRBAC } from "features/rbac";
 
 interface ApiClientContextInterface {
@@ -120,8 +120,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
 
@@ -374,18 +373,22 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(uid, teamId, recordType, collectionId, apiClientRecordsRepository).then(
-            (result) => {
-              setIsRecordBeingCreated(null);
-              onSaveRecord(result.data);
-            }
-          );
+          return createBlankApiRecord(
+            uid,
+            activeWorkspaceId,
+            recordType,
+            collectionId,
+            apiClientRecordsRepository
+          ).then((result) => {
+            setIsRecordBeingCreated(null);
+            onSaveRecord(result.data);
+          });
         }
 
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(uid, teamId, recordType, collectionId, apiClientRecordsRepository)
+          return createBlankApiRecord(uid, activeWorkspaceId, recordType, collectionId, apiClientRecordsRepository)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
@@ -424,7 +427,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     },
     [
       uid,
-      teamId,
+      activeWorkspaceId,
       apiClientRecordsRepository,
       openDraftRequest,
       onSaveRecord,
