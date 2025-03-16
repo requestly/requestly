@@ -11,8 +11,8 @@ import { deleteMock } from "backend/mocks/deleteMock";
 import Logger from "../../../../../../../common/logger";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import "./deleteRecordsModal.scss";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface Props {
   visible: boolean;
@@ -24,7 +24,7 @@ interface Props {
 export const DeleteRecordsModal: React.FC<Props> = ({ visible, records, toggleModalVisibility, onSuccess }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -52,7 +52,7 @@ export const DeleteRecordsModal: React.FC<Props> = ({ visible, records, toggleMo
         }
       });
     } else {
-      return deleteMock(uid, mock.id, workspace?.id)
+      return deleteMock(uid, mock.id, activeWorkspaceId)
         .then(() => {
           trackDeleteMockEvent(mock.id, mock?.type, mock?.fileType);
           onSuccess?.();
