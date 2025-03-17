@@ -16,6 +16,10 @@ import "./TeamMembersTable.css";
 import MemberActionsDropdown from "../../common/MemberActionsDropdown";
 import { ClockCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { SendInviteButton } from "./SendInviteButton/SendInviteButton";
+import { RoleBasedComponent } from "features/rbac";
+import { Conditional } from "components/common/Conditional";
+import { getDisplayTextForRole } from "features/settings/utils";
+import { useCurrentWorkspaceUserRole } from "hooks";
 
 const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails }) => {
   const navigate = useNavigate();
@@ -25,7 +29,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
   const user = useSelector(getUserAuthDetails);
   const loggedInUserId = user?.details?.profile?.uid;
   const [isLoggedInUserAdmin, setIsLoggedInUserAdmin] = useState(false);
-
+  const { role } = useCurrentWorkspaceUserRole();
   // Component State
   const [members, setMembers] = useState([]);
   const [pendingMembers, setPendingMembers] = useState([]);
@@ -43,7 +47,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
   const getTeamBillingExclude = useMemo(() => httpsCallable(getFunctions(), "teams-getTeamBillingExclude"), []);
 
   const changeTeamUserRole = ({ teamId, userId, updatedRole, isAdmin, setIsLoading }) => {
-    if ((isAdmin && updatedRole === "admin") || (!isAdmin && updatedRole === "user")) {
+    if (isAdmin && updatedRole === "admin") {
       return;
     }
 
@@ -60,7 +64,9 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
         toast.info("Successfully changed the role");
         modifyMembersCallback();
       })
-      .catch((err) => toast.error(err.message))
+      .catch((err) => {
+        toast.error(err.message);
+      })
       .finally(() => setIsLoading(false));
   };
 
@@ -123,17 +129,20 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
                       </div>
                     }
                   />
-                  {member?.isInviteExpired && (
-                    <SendInviteButton
-                      role={member?.isAdmin ? "admin" : "write"}
-                      teamId={teamId}
-                      teamName={teamDetails?.name}
-                      numberOfMembers={teamDetails?.accessCount}
-                      email={member.email}
-                      onInvite={fetchTeamMembers}
-                      source="team_members_table"
-                    />
-                  )}
+
+                  <RoleBasedComponent resource="workspace" permission="update">
+                    <Conditional condition={member?.isInviteExpired}>
+                      <SendInviteButton
+                        role={member?.isAdmin ? "admin" : "write"}
+                        teamId={teamId}
+                        teamName={teamDetails?.name}
+                        numberOfMembers={teamDetails?.accessCount}
+                        email={member.email}
+                        onInvite={fetchTeamMembers}
+                        source="team_members_table"
+                      />
+                    </Conditional>
+                  </RoleBasedComponent>
                 </>
               ) : null}
             </Row>
@@ -150,15 +159,18 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
         if (member.isOwner) return <div>Admin</div>;
 
         if (member.id === loggedInUserId) {
-          return <div>{member.isAdmin ? "Admin" : "Member"}</div>;
+          return <div>{getDisplayTextForRole(member.role)}</div>;
         }
 
         return (
           <MemberRoleDropdown
+            key={member.id}
             showLoader
             isHoverEffect={isLoggedInUserAdmin && member?.id !== loggedInUserId}
             placement="bottomLeft"
-            isAdmin={member.isAdmin}
+            memberRole={member.role}
+            loggedInUserTeamRole={role}
+            isAdmin={member.isAdmin} // TODO: To be cleanup
             memberId={member.id}
             isPending={member.isPending}
             loggedInUserId={loggedInUserId}

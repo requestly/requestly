@@ -21,6 +21,7 @@ import {
   ImportMocksModalWrapper,
 } from "features/mocks/modals";
 import { getFilteredRecords } from "./components/MocksListContentHeader/utils";
+import { RBACEmptyState, RoleBasedComponent } from "features/rbac";
 import "./mocksList.scss";
 
 interface Props {
@@ -141,7 +142,18 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
       <UpdateMocksCollectionModalWrapper mockType={type} forceRender={_forceRender} mocks={mockRecords} />
     </>
   ) : (
-    <GettingStarted mockType={type} source={source} forceRender={_forceRender} />
+    <RoleBasedComponent
+      resource="mock_api"
+      permission="create"
+      fallback={
+        <RBACEmptyState
+          title="No mocks created yet."
+          description="As a viewer, you will be able to view and test mocks once someone from your team creates them. You can contact your workspace admin to update your role."
+        />
+      }
+    >
+      <GettingStarted mockType={type} source={source} forceRender={_forceRender} />
+    </RoleBasedComponent>
   );
 };
 
