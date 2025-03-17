@@ -1,5 +1,5 @@
 import { Avatar, Col, Popover, Row, Table, Tooltip } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useHasChanged } from "hooks";
@@ -15,6 +15,7 @@ import { getLongFormatDateString } from "utils/DateTimeUtils";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { RequestBillingTeamAccessModal } from "../modals/RequestBillingTeamAccessModal/RequestBillingTeamAccessModal";
 import "./index.scss";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 export const OtherBillingTeamDetails: React.FC = () => {
   const { billingId } = useParams();
@@ -30,6 +31,26 @@ export const OtherBillingTeamDetails: React.FC = () => {
     user?.details?.profile?.uid,
   ]);
   const hasBillingIdChanged = useHasChanged(billingId);
+
+  const requestJoinAcceleratorTeam = useMemo(
+    () => httpsCallable<{ userEmails: string[]; billingId: string }>(getFunctions(), "billing-joinAcceleratorTeam"),
+    []
+  );
+
+  const handleJoinAcceleratorTeam = useCallback(() => {
+    const emails = user?.details?.profile?.email ? [user.details.profile.email] : [];
+    requestJoinAcceleratorTeam({
+      userEmails: emails,
+      billingId: billingTeams[0].id,
+    })
+      .then(() => {
+        //should we use the same Modal being used in RequestFeatureModal ? i.e setPostRequestMessage state Modal
+        console.log("team joined");
+      })
+      .catch((err) => {
+        console.log("error joining the team!");
+      });
+  }, [billingTeams, requestJoinAcceleratorTeam, user.details.profile.email]);
 
   const columns = useMemo(
     () => [
@@ -140,16 +161,29 @@ export const OtherBillingTeamDetails: React.FC = () => {
 
               {!hasJoinedAnyTeam && (
                 <Col>
-                  <Tooltip title="On clicking, we'll notify the billing manager and admins to assign a license to you.">
-                    <RQButton
-                      className="request-billing-team-btn"
-                      type="default"
-                      icon={<IoMdAdd />}
-                      onClick={() => setIsRequestModalOpen(true)}
-                    >
-                      Request Premium access
-                    </RQButton>
-                  </Tooltip>
+                  {!billingTeamDetails?.isAcceleratorTeam ? (
+                    <Tooltip title="On clicking, we'll notify the billing manager and admins to assign a license to you.">
+                      <RQButton
+                        className="request-billing-team-btn"
+                        type="default"
+                        icon={<IoMdAdd />}
+                        onClick={() => setIsRequestModalOpen(true)}
+                      >
+                        Request Premium access
+                      </RQButton>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title="On clicking, you will join the team">
+                      <RQButton
+                        className="request-billing-team-btn"
+                        type="default"
+                        icon={<IoMdAdd />}
+                        onClick={handleJoinAcceleratorTeam}
+                      >
+                        Join Team
+                      </RQButton>
+                    </Tooltip>
+                  )}
                 </Col>
               )}
             </Row>

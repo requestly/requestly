@@ -12,13 +12,9 @@ import { CloseOutlined } from "@ant-design/icons";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { capitalize } from "lodash";
 import { globalActions } from "store/slices/global/slice";
-import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "../../analytics";
-import { trackTeamPlanCardClicked } from "modules/analytics/events/common/teams";
 import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
 import APP_CONSTANTS from "config/constants";
-import { getBillingTeamMemberById } from "store/features/billing/selectors";
-import { getDomainFromEmail } from "utils/FormattingHelper";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization";
 import { IncentivizationModal } from "store/features/incentivization/types";
@@ -54,50 +50,36 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const user = useSelector(getUserAuthDetails);
   const [isLoading, setIsLoading] = useState(false);
   const [postRequestMessage, setPostRequestMessage] = useState(null);
-  const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeams[0]?.id, billingTeams[0]?.owner));
   const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
-  const requestEnterprisePlanFromAdmin = useMemo(
-    () =>
-      httpsCallable<{ billingId: string }, null>(getFunctions(), "premiumNotifications-requestEnterprisePlanFromAdmin"),
+  const requestJoinAcceleratorTeam = useMemo(
+    () => httpsCallable<{ userEmails: string[]; billingId: string }>(getFunctions(), "billing-joinAcceleratorTeam"),
     []
   );
 
-  const handleSendRequest = useCallback(() => {
+  const handleJoinAcceleratorTeam = useCallback(() => {
     setIsLoading(true);
-    const domain = getDomainFromEmail(user?.details?.profile?.email);
-    trackTeamPlanCardClicked(domain, source);
-    trackUpgradeOptionClicked("send_request_to_admin");
+    const emails = user?.details?.profile?.email ? [user.details.profile.email] : [];
 
-    requestEnterprisePlanFromAdmin({
+    requestJoinAcceleratorTeam({
+      userEmails: emails,
       billingId: billingTeams[0].id,
     })
       .then(() => {
-        setIsLoading(false);
-        trackEnterpriseRequestEvent(domain);
+        setIsLoading(true);
         setPostRequestMessage({
           status: "success",
-          message: (
-            <>
-              Billing team admins been notified.
-              <br /> Please get in touch with them for approval and details.
-            </>
-          ),
+          message: <>Successfully joined the team</>,
         });
       })
       .catch((err) => {
         setIsLoading(false);
         setPostRequestMessage({
           status: "error",
-          message: (
-            <>
-              Unable to send request, contact directly at{" "}
-              <span className="enterprise-admin-details">{teamOwnerDetails?.email} for futher details.</span>.
-            </>
-          ),
+          message: <>Unable to join the team, contact support!</>,
         });
       });
-  }, [requestEnterprisePlanFromAdmin, source, billingTeams, user?.details?.profile?.email, teamOwnerDetails?.email]);
+  }, [billingTeams, requestJoinAcceleratorTeam, user.details.profile.email]);
 
   const renderModalTitle = () => {
     if (!postRequestMessage) {
@@ -184,20 +166,31 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                 Checkout billing teams
               </RQButton>
             ) : (
+              // if there is only one billing team
               <RQButton
                 loading={isLoading}
                 type="primary"
                 icon={<HiOutlinePaperAirplane className="send-icon" />}
-                onClick={handleSendRequest}
+                onClick={handleJoinAcceleratorTeam}
               >
-                Send request
+                Join Team
               </RQButton>
             )}
           </Space>
         </Col>
       </Row>
     );
-  }, [billingTeams, dispatch, handleSendRequest, isLoading, navigate, user, isIncentivizationEnabled]);
+  }, [
+    isIncentivizationEnabled,
+    isLoading,
+    billingTeams,
+    handleJoinAcceleratorTeam,
+    onUpgradeForFreeClickCallback,
+    dispatch,
+    setOpenPopup,
+    onUpgradeYourselfClickCallback,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (isOpen) {
