@@ -1,7 +1,7 @@
 import { create, StoreApi, UseBoundStore, useStore } from "zustand";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
-import { createContext, useContext } from "react";
+import { createContext, ReactNode, useContext } from "react";
 
 type TabId = number;
 type SourceName = string;
@@ -152,8 +152,20 @@ const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) =
 const tabServiceStore = createTabServiceStore();
 const tabServiceStoreWithAutoSelectors = createSelectors(tabServiceStore);
 
-// Creating and passing the store through context to ensure every component does not have access to the store but only the components wrapped in Provider
-export const TabServiceStoreContext = createContext(tabServiceStoreWithAutoSelectors);
+// Creating and passing the store through context to ensure context's value can be mocked easily
+const TabServiceStoreContext = createContext(tabServiceStoreWithAutoSelectors);
+
+export const createTabServiceProvider = () => {
+  return (props: { children: ReactNode }) => {
+    return {
+      type: TabServiceStoreContext.Provider,
+      props: {
+        value: tabServiceStoreWithAutoSelectors,
+        children: props.children,
+      },
+    };
+  };
+};
 
 /**
  * Usage: const [a, b] = useTabServiceSelector(state => [ state.a, state.b ])
