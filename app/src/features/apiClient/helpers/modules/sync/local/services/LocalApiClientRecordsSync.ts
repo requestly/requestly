@@ -487,16 +487,14 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   async duplicateApiEntities(entities: RQAPI.Record[]) {
     const result: RQAPI.Record[] = [];
     for (const entity of entities) {
-      if (entity.type === RQAPI.RecordType.API) {
-        const newRecordResult = await this.createRecordWithId(entity, entity.id);
-        if (newRecordResult.success) {
-          result.push(newRecordResult.data);
+      const duplicationResult = await (async () => {
+        if (entity.type === RQAPI.RecordType.API) {
+          return this.createRecordWithId(entity, entity.id);
         }
-      } else {
-        const newCollectionResult = await this.createCollectionFromCompleteRecord(entity, entity.id);
-        if (newCollectionResult.success) {
-          result.push(newCollectionResult.data);
-        }
+        return this.createCollectionFromCompleteRecord(entity, entity.id);
+      })();
+      if (duplicationResult.success) {
+        result.push(duplicationResult.data);
       }
     }
     return result;
