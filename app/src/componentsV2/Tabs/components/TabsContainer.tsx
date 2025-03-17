@@ -1,10 +1,17 @@
 import React, { useMemo } from "react";
 import { Tabs, TabsProps } from "antd";
-import { useTabService } from "../store/tabServiceStore";
+import { useTabServiceSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 
 export const TabsContainer: React.FC = () => {
-  const { activeTabId, setActiveTabId, tabs, _version, openTab, closeTabById } = useTabService();
+  const [activeTabId, setActiveTabId, tabs, _version, openTab, closeTabById] = useTabServiceSelector((state) => [
+    state.activeTabId,
+    state.setActiveTabId,
+    state.tabs,
+    state._version,
+    state.openTab,
+    state.closeTabById,
+  ]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     return Array.from(tabs.values()).map((tabStore) => {
