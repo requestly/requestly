@@ -8,9 +8,18 @@ import { workspaceActions } from "store/slices/workspaces/slice";
 import { Workspace, WorkspaceMemberRole, WorkspaceType } from "../types";
 import firebaseApp from "firebase";
 import { LoggedOutWorkspace } from "../utils";
-// @ts-ignore
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
+
+const splitMembersBasedOnRoles = (members: any) => {
+  const result: any = {};
+  Object.values(members).forEach((member: any) => {
+    if (!result[member.role]) {
+      result[member.role] = [];
+    }
+    result[member.role].push(member);
+  });
+  return result;
+};
 
 const db = getFirestore(firebaseApp);
 
@@ -22,7 +31,7 @@ export const useAvailableWorkspacesListener = () => {
   const uid = user.details?.profile?.uid;
   // TODO-syncing: Needs to be uncommented
   // const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
-  const isLocalSyncEnabled = false;
+  const isLocalSyncEnabled = true;
 
   useEffect(() => {
     console.log("[useAvailableTeamsListener] start");
@@ -50,21 +59,23 @@ export const useAvailableWorkspacesListener = () => {
             if (!teamData.archived && teamData.appsumo) {
               submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
             }
+
+            const membersPerRole = splitMembersBasedOnRoles(teamData.members);
+
             return {
               id: teamDoc.id,
               name: teamData.name,
               owner: teamData.owner,
               archived: teamData.archived,
               subscriptionStatus: teamData.subscriptionStatus,
-              accessCount: teamData.accessCount,
-              adminCount: teamData.adminCount,
+              accessCount: Object.keys(teamData.members).length || 0,
+              adminCount: membersPerRole.admin?.length || 0,
               members: teamData.members,
               appsumo: teamData?.appsumo || null,
+              workspaceType: teamData?.workspaceType || WorkspaceType.SHARED,
               // @ts-ignore
               createdAt: teamData?.creationTime?.toMillis(),
-
               isSyncEnabled: teamData.isSyncEnabled,
-              workspaceType: teamData.workspaceType,
             };
           })
           .filter(Boolean);

@@ -87,7 +87,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
         trackSharingModalRulesDuplicated("team", selectedRules.length);
         setPostShareViewData({
           type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
-          targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
+          targetTeamData: teamData,
           sourceTeamData: activeWorkspace,
         });
 

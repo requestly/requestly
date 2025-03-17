@@ -15,12 +15,11 @@ import {
   trackMigrationNotificationClosed,
   trackMigrationNotificationShown,
 } from "features/rules/analytics";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
 import clientRuleStorageService from "services/clientStorageService/features/rule";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 export function NotificationCard() {
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [isVisible, setIsVisible] = useState(false);
   const [doesAnyRuleExist, setDoesAnyRuleExist] = useState(false);

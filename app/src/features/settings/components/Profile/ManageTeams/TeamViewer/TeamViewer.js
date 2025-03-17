@@ -1,19 +1,19 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { Row, Col, Avatar, Tabs, Alert } from "antd";
+import { Row, Col, Tabs, Alert } from "antd";
 import MembersDetails from "./MembersDetails";
 import TeamSettings from "./TeamSettings";
 import BillingDetails from "./BillingDetails";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { trackWorkspaceSettingToggled } from "modules/analytics/events/common/teams";
 import SwitchWorkspaceButton from "./SwitchWorkspaceButton";
 import { useIsTeamAdmin } from "./hooks/useIsTeamAdmin";
 import "./TeamViewer.css";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getWorkspaceById } from "store/slices/workspaces/selectors";
-import { isPersonalWorkspace } from "features/workspaces/utils";
+import { isPersonalWorkspaceId } from "features/workspaces/utils";
 import PersonalWorkspaceSettings from "./PersonalWorkspaceSettings";
 import { WorkspaceType } from "features/workspaces/types";
 
@@ -41,7 +41,7 @@ const TeamViewer = () => {
       {
         key: "Workspace settings",
         label: "Workspace settings",
-        children: isPersonalWorkspace(teamId) ? (
+        children: isPersonalWorkspaceId(teamId) ? (
           <PersonalWorkspaceSettings
             key={teamId}
             teamId={teamId}
@@ -99,14 +99,7 @@ const TeamViewer = () => {
         <Row align="middle" justify="space-between" className="manage-workspace-header-container">
           <Col>
             <Row wrap={false} align="middle" className="manage-workspace-header">
-              <Avatar
-                size={28}
-                shape="square"
-                icon={name ? name?.[0]?.toUpperCase() : "P"}
-                style={{
-                  backgroundColor: `${getUniqueColorForWorkspace(teamId, name)}`,
-                }}
-              />{" "}
+              <WorkspaceAvatar workspace={teamDetails} size={28} />
               <span className="header">Manage {name ?? "private"} workspace</span>
             </Row>
           </Col>
