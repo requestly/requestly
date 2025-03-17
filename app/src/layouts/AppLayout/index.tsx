@@ -74,8 +74,8 @@ const App: React.FC = () => {
     <>
       <ExtensionContextInvalidationNotice />
       <AutomationNotAllowedNotice />
-      <AuthHandler />
       <AppModeInitializer />
+      <AuthHandler />
       <GrowthBookProvider growthbook={growthbook}>
         <DBListeners />
         {/* <RuleExecutionsSyncer /> */}
