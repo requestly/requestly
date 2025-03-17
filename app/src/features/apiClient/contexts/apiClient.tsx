@@ -291,10 +291,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onSaveRecord = useCallback(
     (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open") => {
-      console.log("on save", apiClientRecord, onSaveTabAction);
       const recordId = apiClientRecord.id;
       const isRecordExist = apiClientRecords.find((record) => record.id === recordId);
-      console.log("on save id", recordId, isRecordExist, apiClientRecords);
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
       const requestTab = searchParams.get("tab") || RequestTab.QUERY_PARAMS;
 
@@ -304,9 +302,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           title: apiClientRecord.name,
           url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${encodeURIComponent(recordId)}?tab=${requestTab}`,
         });
-        console.log("called replace tab 1", recordId);
       } else {
-        console.log("calling on new");
         onNewRecord(apiClientRecord);
 
         if (onSaveTabAction === "replace") {
@@ -314,7 +310,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             title: apiClientRecord.name,
             url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${encodeURIComponent(recordId)}?tab=${requestTab}`,
           });
-          console.log("called replace tab 1", recordId);
           return;
         }
 
