@@ -20,8 +20,8 @@ const TAB_KEYS = {
   AUTHORIZATION: "authorization",
 };
 
-export const CollectionView = () => {
-  const { collectionId } = useParams();
+export const CollectionView = ({ collectionId }) => {
+  // const { collectionId } = useParams();
   const {
     apiClientRecords,
     onSaveRecord,

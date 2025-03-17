@@ -13,6 +13,13 @@ export const TabsContainer: React.FC = () => {
     state.closeTabById,
   ]);
 
+  // const activeTabId = useTabServiceStore().use.activeTabId();
+  // const setActiveTabId = useTabServiceStore().use.setActiveTabId();
+  // const tabs = useTabServiceStore().use.tabs();
+  // const _version = useTabServiceStore().use._version();
+  // const openTab = useTabServiceStore().use.openTab();
+  // const closeTabById = useTabServiceStore().use.closeTabById();
+
   const tabItems: TabsProps["items"] = useMemo(() => {
     return Array.from(tabs.values()).map((tabStore) => {
       const tabState = tabStore.getState();
@@ -31,7 +38,7 @@ export const TabsContainer: React.FC = () => {
     <Tabs
       type="editable-card"
       items={tabItems}
-      activeKey={activeTabId.toString()}
+      activeKey={activeTabId?.toString()}
       onChange={(key) => {
         setActiveTabId(parseInt(key));
       }}

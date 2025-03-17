@@ -21,6 +21,8 @@ import "./CollectionRow.scss";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
+import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { CollectionSourceView } from "componentsV2/Tabs/helpers/tabSource";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -54,6 +56,8 @@ export const CollectionRow: React.FC<Props> = ({
   const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
   const { collectionId } = useParams();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+  const openNewTab = useTabServiceStore().use.openTab();
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);
@@ -136,7 +140,6 @@ export const CollectionRow: React.FC<Props> = ({
     sessionStorage.removeItem("collapsed_collection_keys");
   }, []);
 
-  console.log("debug:", hoveredId);
   return (
     <>
       {isEditMode ? (
@@ -185,10 +188,16 @@ export const CollectionRow: React.FC<Props> = ({
                 onMouseEnter={() => setHoveredId(record.id)}
                 onMouseLeave={() => setHoveredId("")}
                 onClick={() => {
-                  openTab(record.id, {
-                    title: record.name || "New Collection",
-                    url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(record.id)}`,
-                  });
+                  // openTab(record.id, {
+                  //   title: record.name || "New Collection",
+                  //   url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(record.id)}`,
+                  // });
+                  openNewTab(
+                    new CollectionSourceView({
+                      id: record.id,
+                      title: record.name,
+                    })
+                  );
                 }}
               >
                 <div className="collection-name" title={record.name}>
