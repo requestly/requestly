@@ -2,10 +2,10 @@ import React from "react";
 import { TabState } from "../store/tabStore";
 import { StoreApi } from "zustand";
 import { GenericStateContext } from "hooks/useGenericState";
-import { useTabService } from "../store/tabServiceStore";
+import { useTabServiceStore } from "../store/tabServiceStore";
 
 export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabState> }>> = React.memo((props) => {
-  const { incrementVersion } = useTabService();
+  const incrementVersion = useTabServiceStore().use.incrementVersion();
 
   return (
     <GenericStateContext.Provider
