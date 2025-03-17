@@ -2,6 +2,7 @@ import { create, StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
+import { createContext, useContext } from "react";
 
 type TabId = number;
 type SourceId = string;
@@ -136,7 +137,10 @@ const createTabServiceStore = () => {
   }));
 };
 
-const tabServiceStore = createTabServiceStore();
-export const useTabService = <T = TabServiceState>(selector?: (state: TabServiceState) => T) => {
-  return useStore(tabServiceStore, useShallow(selector ?? ((state) => state as T)));
+// Creating and passing the store through context to ensure every component does not have access to the store but only the components wrapped in Provider
+export const TabServiceStoreContext = createContext(createTabServiceStore());
+
+export const useTabService = <T = TabServiceState>(selector: (state: TabServiceState) => T) => {
+  const store = useContext(TabServiceStoreContext);
+  return useStore(store, selector);
 };
