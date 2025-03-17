@@ -23,8 +23,7 @@ import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import Logger from "../../../../../common/logger";
 import { getAppFlavour } from "utils/AppUtils";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const SignInViaEmailLink = () => {
   //Component State
@@ -39,9 +38,7 @@ const SignInViaEmailLink = () => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
-
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const wasUserAlreadyLoggedIn = useRef(user.loggedIn);
 
   const logOutUser = useCallback(() => {

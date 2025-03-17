@@ -23,8 +23,7 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import PATHS from "config/constants/sub/paths";
 import { getAppFlavour } from "utils/AppUtils";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 export const useSaveDraftSession = () => {
   const navigate = useNavigate();
@@ -32,7 +31,7 @@ export const useSaveDraftSession = () => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const { claimIncentiveRewards } = useIncentiveActions();
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionAttributes = useSelector(getSessionRecordingAttributes);

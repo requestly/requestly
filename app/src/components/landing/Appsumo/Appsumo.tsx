@@ -222,7 +222,7 @@ const AppSumoModal: React.FC = () => {
   useEffect(() => {
     const appsumoWorkspace = availableWorkspaces?.find((team: Workspace) => team?.appsumo);
     if (appsumoWorkspace) {
-      setWorkspaceToUpgrade(appsumoWorkspace);
+      setWorkspaceToUpgrade(appsumoWorkspace as any);
     }
   }, [availableWorkspaces]);
 

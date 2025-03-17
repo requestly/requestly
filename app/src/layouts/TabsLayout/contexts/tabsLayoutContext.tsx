@@ -5,6 +5,8 @@ import { useDispatch } from "react-redux";
 import { tabsLayoutActions } from "store/slices/tabs-layout";
 import { TabsProps } from "antd";
 import { usePatchedTabs } from "./usePatchedTabs";
+import { toast } from "utils/Toast";
+import { RBAC, useRBAC } from "features/rbac";
 
 const TabsLayoutContext = createContext<TabsLayoutContextInterface>({
   tabs: [],
@@ -29,6 +31,8 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [addTabBtnCallback, setAddTabBtnCallback] = useState(() => () => {});
+  const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
+  const { isValidPermission } = validatePermission("tabs_layout", "create");
 
   // This is used to keep track of elements rendered in each tab which is needed by TabOutletHOC
   const tabOutletElementsMap = React.useRef<{ [tabId: string]: React.ReactElement }>({});
@@ -64,7 +68,11 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
 
       if (targetTab.hasUnsavedChanges) {
         // TODO: Trigger a warning modal
-        const result = window.confirm("Discard changes? Changes you made will not be saved.");
+        const result = window.confirm(
+          isValidPermission
+            ? "Discard changes? Changes you made will not be saved."
+            : "You've made changes, but as a viewer, they can't be saved and will be lost if you close this tab."
+        );
 
         if (!result) {
           return;
@@ -81,7 +89,7 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
 
       delete tabOutletElementsMap.current[tabId];
     },
-    [tabs, activeTab?.id, updateActivetab, dispatch, id]
+    [tabs, activeTab?.id, updateActivetab, dispatch, id, isValidPermission]
   );
 
   const updateTab = useCallback(
@@ -179,10 +187,15 @@ export const TabsLayoutProvider: React.FC<TabsLayoutProviderProps> = ({ children
   const onTabsEdit: TabsProps["onEdit"] = useCallback(
     (event, action) => {
       if (action === "add") {
+        if (!isValidPermission && ["apiClient"].includes(id)) {
+          toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, "request"), 5);
+          return;
+        }
+
         addTabBtnCallback?.();
       }
     },
-    [addTabBtnCallback]
+    [addTabBtnCallback, isValidPermission, id, getRBACValidationFailureErrorMessage]
   );
 
   const updateAddTabBtnCallback = useCallback((cb: () => void) => {

@@ -14,9 +14,8 @@ import { MISC_TOURS } from "components/misc/ProductWalkthrough/constants";
 import { globalActions } from "store/slices/global/slice";
 import { trackPricingWorkspaceSwitched } from "features/pricing/analytics";
 import "./index.scss";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds, getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
+import { getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface MenuProps {
   workspaceToUpgrade: { name: string; id: string; accessCount: number };
@@ -41,9 +40,7 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const availableWorkspaces = useSelector(getAllWorkspaces);
-  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
-  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
-
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
 
   const filteredAvailableTeams = useMemo(() => {
@@ -87,7 +84,7 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
           />
         ),
       },
-      ...filteredAvailableTeams.map((team: any) => ({
+      ...filteredAvailableTeams.map((team) => ({
         label: team.name,
         key: team.id,
         icon: (
@@ -97,7 +94,7 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
             icon={getWorkspaceIcon(team.name)}
             className="workspace-avatar"
             style={{
-              backgroundColor: getUniqueColorForWorkspace(team?.id, team.name),
+              backgroundColor: getUniqueColorForWorkspace(team),
             }}
           />
         ),
@@ -166,7 +163,7 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
                       !workspaceToUpgrade ||
                       workspaceToUpgrade?.name === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
                         ? TEAM_WORKSPACES.PRIVATE_WORKSPACE.color
-                        : getUniqueColorForWorkspace(workspaceToUpgrade?.id, workspaceToUpgrade?.name),
+                        : getUniqueColorForWorkspace(workspaceToUpgrade),
                   }}
                 />
                 <Col className="upgrade-workspace-dropdown-btn-info">

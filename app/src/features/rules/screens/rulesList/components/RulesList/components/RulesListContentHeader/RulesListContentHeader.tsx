@@ -20,6 +20,7 @@ import { RuleSelectionList } from "../RuleSelectionList/RuleSelectionList";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
 import { RQButton } from "lib/design-system-v2/components";
 import { useLocation } from "react-router-dom";
+import { useRBAC } from "features/rbac";
 
 interface Props {
   searchValue: string;
@@ -36,6 +37,8 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
   const [isRuleDropdownOpen, setIsRuleDropdownOpen] = useState(isRedirectFromCreateRulesRoute || false);
 
   const { createRuleAction, createGroupAction, importRecordsAction } = useRulesActionContext();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const buttonData = [
     {
@@ -181,13 +184,13 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
     if (state?.modal) {
       importRecordsAction();
     }
-  }, [state?.modal]);
+  }, [importRecordsAction, state?.modal]);
 
   return (
     <ContentListHeader
       title="My Rules"
       subtitle="Create and manage your rules from here"
-      actions={contentHeaderActions}
+      actions={isValidPermission ? contentHeaderActions : null}
       searchValue={searchValue}
       setSearchValue={handleSearchValueUpdate}
       filters={contentHeaderFilters}

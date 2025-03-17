@@ -25,8 +25,8 @@ import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { useRBAC } from "features/rbac";
 
 interface Props {
   isNew?: boolean;
@@ -53,7 +53,9 @@ const MockEditorIndex: React.FC<Props> = ({
   const userAttributes = useSelector(getUserAttributes);
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("mock_api", "create");
 
   const [mockEditorData, setMockEditorData] = useState<MockEditorDataSchema>(null);
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
@@ -203,6 +205,7 @@ const MockEditorIndex: React.FC<Props> = ({
         mockData={mockData}
         savingInProgress={savingInProgress}
         isEditorOpenInModal={isEditorOpenInModal}
+        isEditorReadOnly={!isValidPermission}
       />
     );
   } else {
@@ -223,6 +226,7 @@ const MockEditorIndex: React.FC<Props> = ({
         savingInProgress={savingInProgress}
         isEditorOpenInModal={isEditorOpenInModal}
         isMockCollectionLoading={isMockCollectionLoading}
+        isEditorReadOnly={!isValidPermission}
       />
     );
   }

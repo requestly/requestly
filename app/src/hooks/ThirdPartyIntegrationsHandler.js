@@ -3,6 +3,7 @@ import firebaseApp from "firebase.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { initIntegrations } from "modules/analytics";
 import { useDispatch } from "react-redux";
+import { getEmailType } from "utils/mailCheckerUtils";
 
 const ThirdPartyIntegrationsHandler = () => {
   const dispatch = useDispatch();
@@ -11,7 +12,12 @@ const ThirdPartyIntegrationsHandler = () => {
   useEffect(() => {
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, async (user) => {
-      initIntegrations(user, stableDispatch);
+      if (user) {
+        const emailType = await getEmailType(user.email);
+        initIntegrations({ ...user, emailType }, stableDispatch);
+      } else {
+        initIntegrations(user, stableDispatch);
+      }
     });
   }, [stableDispatch]);
 };

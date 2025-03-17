@@ -10,8 +10,6 @@ import PATHS from "config/constants/sub/paths";
 import "./collectionView.scss";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
-import { LocalWorkspaceTooltip } from "../LocalWorkspaceTooltip/LocalWorkspaceTooltip";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { toast } from "utils/Toast";
 
 const TAB_KEYS = {
@@ -31,7 +29,6 @@ export const CollectionView = () => {
   } = useApiClientContext();
   const { replaceTab, closeTab } = useTabsLayoutContext();
   const location = useLocation();
-  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const collection = useMemo(() => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
@@ -47,12 +44,17 @@ export const CollectionView = () => {
         },
       };
       return apiClientRecordsRepository
-        .updateRecord(record, record.id)
+        .updateCollectionAuthData(record)
         .then((result) => {
-          // fix-me: to verify new change are broadcasted to child entries that are open in tabs
-          onSaveRecord(result.data);
+          if (result.success) {
+            onSaveRecord(result.data);
+          } else {
+            toast.error(result.message || "Could not update collection authorization changes!");
+          }
         })
-        .catch(console.error);
+        .catch((e) => {
+          toast.error(e.message || "Could not update collection authorization changes!");
+        });
     },
     [collection, onSaveRecord, apiClientRecordsRepository]
   );
@@ -65,15 +67,13 @@ export const CollectionView = () => {
         children: <CollectionOverview collection={collection} />,
       },
       {
-        label: <LocalWorkspaceTooltip featureName="Collection variables">Variables</LocalWorkspaceTooltip>,
+        label: "Variables",
         key: TAB_KEYS.VARIABLES,
-        disabled: isLocalSyncEnabled,
         children: <CollectionsVariablesView collection={collection} />,
       },
       {
-        label: <LocalWorkspaceTooltip featureName="Authorization headers">Authorization</LocalWorkspaceTooltip>,
+        label: "Authorization",
         key: TAB_KEYS.AUTHORIZATION,
-        disabled: isLocalSyncEnabled,
         children: (
           <CollectionAuthorizationView
             authOptions={collection?.data?.auth}
@@ -83,7 +83,7 @@ export const CollectionView = () => {
         ),
       },
     ];
-  }, [collection, updateCollectionAuthData, isLocalSyncEnabled]);
+  }, [collection, updateCollectionAuthData]);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {

@@ -1,5 +1,5 @@
-import { Workspace } from "features/workspaces/types";
 import { Group as NewGroup, Rule as NewRule } from "@requestly/shared/types/entities/rules";
+import { Workspace } from "features/workspaces/types";
 
 export enum SharingOptions {
   WORKSPACE = "workspace",

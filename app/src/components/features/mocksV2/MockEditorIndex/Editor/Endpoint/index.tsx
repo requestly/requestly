@@ -7,11 +7,11 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { generateFinalUrlParts } from "components/features/mocksV2/utils";
 import CopyButton from "components/misc/CopyButton";
 import { LoadingOutlined } from "@ant-design/icons";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface EndpointProps {
   isNew: boolean;
+  disabled?: boolean;
   errors: ValidationErrors;
   mockType: MockType;
   endpoint: string;
@@ -25,6 +25,7 @@ const MockEditorEndpoint = forwardRef(
   (
     {
       isNew,
+      disabled,
       errors,
       mockType,
       endpoint,
@@ -38,7 +39,7 @@ const MockEditorEndpoint = forwardRef(
     const user = useSelector(getUserAuthDetails);
     const username = user?.details?.username;
     const uid = user?.details?.profile?.uid;
-    const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+    const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
     const { url } = generateFinalUrlParts({
       endpoint,
@@ -62,6 +63,7 @@ const MockEditorEndpoint = forwardRef(
           <Col flex="1 0 auto">
             <Input
               ref={ref}
+              disabled={disabled}
               addonBefore={isMockCollectionLoading ? <LoadingOutlined /> : "/" + collectionPath}
               required
               id="endpoint"

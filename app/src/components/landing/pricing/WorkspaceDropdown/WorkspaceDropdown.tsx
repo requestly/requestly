@@ -7,9 +7,8 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import APP_CONSTANTS from "config/constants";
 import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 import "./index.scss";
-import { getActiveWorkspaceIds, getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { Workspace } from "features/workspaces/types";
+import { getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
 
 const getWorkspaceIcon = (workspaceName: string) => {
   if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
@@ -25,13 +24,13 @@ const WorkspaceDropdown: React.FC<{
 }> = ({ isAppSumo = false, workspaceToUpgrade, setWorkspaceToUpgrade, className, disabled = false }) => {
   const user = useSelector(getUserAuthDetails);
   const availableWorkspaces = useSelector(getAllWorkspaces);
-  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
-  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const filteredAvailableTeams = useMemo(() => {
     return (
       availableWorkspaces?.filter(
-        (team: Workspace) => !team?.archived && team.members?.[user?.details?.profile?.uid]?.role === "admin"
+        (team: Workspace) =>
+          !team?.archived && team.members?.[user?.details?.profile?.uid]?.role === WorkspaceMemberRole.admin
       ) ?? []
     );
   }, [availableWorkspaces, user?.details?.profile?.uid]);
@@ -64,7 +63,7 @@ const WorkspaceDropdown: React.FC<{
           />
         ),
       },
-      ...filteredAvailableTeams.map((team: any) => ({
+      ...filteredAvailableTeams.map((team) => ({
         label: team.name,
         key: team.id,
         icon: (
@@ -74,7 +73,7 @@ const WorkspaceDropdown: React.FC<{
             icon={getWorkspaceIcon(team.name)}
             className="workspace-avatar"
             style={{
-              backgroundColor: getUniqueColorForWorkspace(team?.id, team.name),
+              backgroundColor: getUniqueColorForWorkspace(team),
             }}
           />
         ),
@@ -140,7 +139,7 @@ const WorkspaceDropdown: React.FC<{
                       ? "#1E69FF"
                       : workspaceToUpgrade?.id === APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE.id
                       ? APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE.color
-                      : getUniqueColorForWorkspace(workspaceToUpgrade?.id, workspaceToUpgrade?.name),
+                      : getUniqueColorForWorkspace(workspaceToUpgrade),
                 }}
               />
               <span>{workspaceToUpgrade?.name}</span>

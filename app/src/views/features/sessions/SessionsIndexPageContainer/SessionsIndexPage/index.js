@@ -43,8 +43,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { redirectToSessionSettings } from "utils/RedirectionUtils";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -54,9 +53,8 @@ const SessionsIndexPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
-
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
 
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);

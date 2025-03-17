@@ -21,8 +21,7 @@ import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWi
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { getActiveWorkspaceIds, getWorkspaceById } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
 
 interface Props {
@@ -37,8 +36,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
   onRulesShared = () => {},
 }) => {
   const appMode = useSelector(getAppMode);
-  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
-  const activeWorkspace = useSelector(getWorkspaceById(getActiveWorkspaceId(activeWorkspaceIds)));
+  const activeWorkspace = useSelector(getActiveWorkspace);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +49,6 @@ export const ShareFromWorkspace: React.FC<Props> = ({
       emails: memberEmails,
       role: TeamRole.write,
       teamName: activeWorkspace.name,
-      // @ts-ignore
       numberOfMembers: activeWorkspace?.membersCount,
       source: "sharing_modal_from_workspace",
     }).then((res: any) => {

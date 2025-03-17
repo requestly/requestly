@@ -54,7 +54,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
         );
       }
     },
-    [dispatch]
+    [dispatch, navigate]
   );
 
   useEffect(() => {

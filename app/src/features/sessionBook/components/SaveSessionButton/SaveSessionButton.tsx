@@ -23,15 +23,17 @@ import APP_CONSTANTS from "config/constants";
 import { useSaveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/hooks/useSaveDraftSession";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { globalActions } from "store/slices/global/slice";
+import { Conditional } from "components/common/Conditional";
 import "./saveSessionButton.scss";
 
 interface SaveSessionButtonProps {
+  disabled?: boolean;
   onSaveClick?: () => void;
 }
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
-export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClick }) => {
+export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ disabled, onSaveClick }) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const user = useSelector(getUserAuthDetails);
@@ -101,19 +103,12 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
       .finally(() => {
         setIsLoading(false);
       });
-  }, [
-    saveDraftSession,
-    user.loggedIn,
-    dispatch,
-    sessionRecordingMetadata,
-    onSaveClick,
-    isOpenedInIframe,
-    trimmedSessionData,
-  ]);
+  }, [saveDraftSession, user?.loggedIn, dispatch, sessionRecordingMetadata, onSaveClick, isOpenedInIframe]);
 
   return (
     <div className="save-session-btn-container">
       <RQButton
+        disabled={disabled}
         loading={isLoading}
         type="primary"
         className="save-session-btn"
@@ -122,10 +117,18 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
       >
         {isDraftSession ? "Save" : "Download"}
       </RQButton>
-      <RQButton type="primary" className="save-popup-button" onClick={() => setIsPopupVisible(true)}>
+      <RQButton
+        disabled={disabled}
+        type="primary"
+        className="save-popup-button"
+        onClick={() => setIsPopupVisible(true)}
+      >
         <DownArrow />
       </RQButton>
-      {isPopupVisible && <SessionConfigPopup onClose={() => setIsPopupVisible(false)} onSaveClick={onSaveClick} />}
+
+      <Conditional condition={isPopupVisible && !disabled}>
+        <SessionConfigPopup onClose={() => setIsPopupVisible(false)} onSaveClick={onSaveClick} />
+      </Conditional>
     </div>
   );
 };

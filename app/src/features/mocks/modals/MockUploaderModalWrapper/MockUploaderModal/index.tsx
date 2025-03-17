@@ -13,8 +13,7 @@ import { redirectToFileMockEditorEditMock, redirectToMockEditorEditMock } from "
 import { toast } from "utils/Toast";
 import { MockType, RQMockSchema } from "components/features/mocksV2/types";
 import { createMockFromUploadedFile, generateFinalUrl } from "components/features/mocksV2/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const { Dragger } = Upload;
 
@@ -33,7 +32,7 @@ export const MockUploaderModal: React.FC<Props> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const navigate = useNavigate();
 

@@ -10,8 +10,7 @@ import ManageSubscription from "./ManageSubscription/ManageSubscription";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import firebaseApp from "../../../../../firebase";
 import Logger from "lib/logger";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const ActiveLicenseInfo = ({
   hideShadow,
@@ -22,7 +21,7 @@ const ActiveLicenseInfo = ({
 }) => {
   //Global State
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [isSessionReplayLifetimeActive, setIsSessionReplayLifetimeActive] = useState(false);
   const [lifeTimeSubscriptionDetails, setLifeTimeSubscriptionDetails] = useState({});

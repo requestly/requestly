@@ -1,9 +1,8 @@
-import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { RuleStorageModel } from "../syncStorageService/models/rule";
 
 class SyncingHelper {
   async saveRuleOrGroup(ruleOrGroup: any, options = {}) {
-    const workspaceId = getActiveWorkspaceId(window.activeWorkspaceIds);
+    const workspaceId = window.activeWorkspaceIds?.[0];
     console.log("[SyncingV2][debug]saveRuleOrGroup", { ruleOrGroup, workspaceId });
     return await RuleStorageModel.create(ruleOrGroup, workspaceId).save();
   }
@@ -21,7 +20,7 @@ class SyncingHelper {
     try {
       console.log("[StorageServiceWrapper]removeRecord", { key });
       // TODO-syncing: Temporary fix to remove record from RuleStorageModel
-      RuleStorageModel.create({ id: key }, getActiveWorkspaceId(window.activeWorkspaceIds)).delete();
+      RuleStorageModel.create({ id: key }, window.activeWorkspaceIds?.[0]).delete();
       return Promise.resolve(true);
     } catch (error) {
       console.error("Error removing record:", error);

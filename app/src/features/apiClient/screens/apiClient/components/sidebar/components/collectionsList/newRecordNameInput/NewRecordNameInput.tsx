@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { Input } from "antd";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { toast } from "utils/Toast";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -16,6 +16,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
+import { variablesActions } from "store/features/variables/slice";
 
 export interface NewRecordNameInputProps {
   recordToBeEdited?: RQAPI.Record;
@@ -32,6 +33,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
   newRecordCollectionId,
   analyticEventSource = "",
 }) => {
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
@@ -91,7 +93,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
         });
       } else {
         trackCollectionSaved(analyticEventSource);
-
+        dispatch(variablesActions.updateCollectionVariables({ collectionId: result.data.id, variables: {} }));
         replaceTab("collection/new", {
           id: result.data.id,
           title: result.data.name,
@@ -110,16 +112,17 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     setIsLoading(false);
     onSuccess?.();
   }, [
-    recordType,
-    recordName,
     uid,
-    onSaveRecord,
+    recordName,
     defaultRecordName,
-    analyticEventSource,
+    recordType,
     newRecordCollectionId,
-    onSuccess,
-    replaceTab,
     apiClientRecordsRepository,
+    onSuccess,
+    onSaveRecord,
+    analyticEventSource,
+    replaceTab,
+    dispatch,
   ]);
 
   const updateRecord = useCallback(async () => {

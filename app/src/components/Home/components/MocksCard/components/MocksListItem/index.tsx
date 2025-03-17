@@ -9,8 +9,7 @@ import { redirectToMockEditorEditMock } from "utils/RedirectionUtils";
 import { generateFinalUrlParts } from "components/features/mocksV2/utils";
 import { trackHomeMockActionClicked } from "components/Home/analytics";
 import "./mocksListItem.scss";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface Props {
   mock: RQMockMetadataSchema;
@@ -20,7 +19,7 @@ interface Props {
 export const MocksListItem: React.FC<Props> = ({ mock, collectionData }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const { url } = useMemo(
     () =>
       generateFinalUrlParts({
@@ -31,7 +30,14 @@ export const MocksListItem: React.FC<Props> = ({ mock, collectionData }) => {
         password: mock.password,
         collectionPath: collectionData?.path ?? "",
       }),
-    [mock.endpoint, user?.details?.profile?.uid, user?.details?.username, activeWorkspaceId, mock.password]
+    [
+      mock.endpoint,
+      mock.password,
+      user?.details?.profile?.uid,
+      user?.details?.username,
+      activeWorkspaceId,
+      collectionData?.path,
+    ]
   );
 
   return (

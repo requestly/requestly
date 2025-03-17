@@ -30,8 +30,8 @@ import PATHS from "config/constants/sub/paths";
 import { trackMocksListBulkActionPerformed } from "modules/analytics/events/features/mocksV2";
 import "./mocksTable.scss";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { useRBAC } from "features/rbac";
 
 export interface MocksTableProps {
   source: MockListSource;
@@ -61,14 +61,15 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   forceRender = () => {},
 }) => {
   const { clearSelectedRows } = useContentListTableContext();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("mock_api", "create");
 
   const { pathname } = useLocation();
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
-
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const uid = user?.details?.profile?.uid;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   useEffect(() => {
     if (!isSharedWorkspaceMode) {
@@ -109,24 +110,27 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   const { deleteRecordsAction, updateMocksCollectionAction, removeMocksFromCollectionAction, exportMocksAction } =
     useMocksActionContext() ?? {};
 
-  const getBulkActionBarInfoText = useCallback((selectedRows: RQMockMetadataSchema[]) => {
-    let mocks = 0;
-    let collections = 0;
+  const getBulkActionBarInfoText = useCallback(
+    (selectedRows: RQMockMetadataSchema[]) => {
+      let mocks = 0;
+      let collections = 0;
 
-    selectedRows.forEach((record) => {
-      isCollection(record) ? collections++ : mocks++;
-    });
+      selectedRows.forEach((record) => {
+        isCollection(record) ? collections++ : mocks++;
+      });
 
-    const formatCount = (count: number, singular: string, plural: string) => {
-      return count > 0 ? `${count} ${count > 1 ? plural : singular}` : "";
-    };
+      const formatCount = (count: number, singular: string, plural: string) => {
+        return count > 0 ? `${count} ${count > 1 ? plural : singular}` : "";
+      };
 
-    const recordType = mockType === MockType.API ? "Mock" : "File";
-    const mockString = formatCount(mocks, recordType, recordType + "s");
-    const collectionString = formatCount(collections, "Collection", "Collections");
+      const recordType = mockType === MockType.API ? "Mock" : "File";
+      const mockString = formatCount(mocks, recordType, recordType + "s");
+      const collectionString = formatCount(collections, "Collection", "Collections");
 
-    return `${collectionString}${collectionString && mockString ? " and " : ""}${mockString} selected`;
-  }, []);
+      return `${collectionString}${collectionString && mockString ? " and " : ""}${mockString} selected`;
+    },
+    [mockType]
+  );
 
   // TODO: move into actions
   const updateCollectionOnDrop = useCallback(
@@ -171,14 +175,15 @@ export const MocksTable: React.FC<MocksTableProps> = ({
 
   return (
     <ContentListTable
-      dragAndDrop
+      isRowSelectable={isValidPermission}
+      dragAndDrop={isValidPermission}
       onRowDropped={onRowDropped}
       loading={isLoading}
       id="mock-list-table"
       pagination={false}
       size="middle"
       rowKey="id"
-      className="rq-mocks-list-table"
+      className={`rq-mocks-list-table ${!isValidPermission ? "read-only" : ""}`}
       customRowClassName={(record) => {
         return `rq-mocks-list-table-row ${record.isFavourite ? "starred" : "unstarred"} ${
           record.recordType === MockRecordType.COLLECTION ? "collection-row" : "mock-row"

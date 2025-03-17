@@ -11,8 +11,7 @@ import { deleteMocks } from "backend/mocks/deleteMocks";
 import { trackMockCollectionDeleted } from "modules/analytics/events/features/mocksV2";
 import { toast } from "utils/Toast";
 import "./deleteCollectionModal.scss";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface DeleteCollectionModalProps {
   visible: boolean;
@@ -29,7 +28,7 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [isDeletingOnlyCollection, setIsDeletingOnlyCollection] = useState(false);
   const [isDeletingCollectionAndMocks, setIsDeletingCollectionAndMocks] = useState(false);

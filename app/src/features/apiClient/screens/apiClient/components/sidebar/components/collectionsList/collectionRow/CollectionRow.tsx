@@ -21,6 +21,7 @@ import "./CollectionRow.scss";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
+import { Conditional } from "components/common/Conditional";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -29,6 +30,7 @@ interface Props {
   openTab: TabsLayoutContextInterface["openTab"];
   setExpandedRecordIds: (keys: RQAPI.Record["id"][]) => void;
   expandedRecordIds: string[];
+  isReadOnly: boolean;
   bulkActionOptions: {
     showSelection: boolean;
     selectedRecords: Set<RQAPI.Record["id"]>;
@@ -45,6 +47,7 @@ export const CollectionRow: React.FC<Props> = ({
   expandedRecordIds,
   setExpandedRecordIds,
   bulkActionOptions,
+  isReadOnly,
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
@@ -136,7 +139,6 @@ export const CollectionRow: React.FC<Props> = ({
     sessionStorage.removeItem("collapsed_collection_keys");
   }, []);
 
-  console.log("debug:", hoveredId);
   return (
     <>
       {isEditMode ? (
@@ -195,62 +197,67 @@ export const CollectionRow: React.FC<Props> = ({
                   {record.name}
                 </div>
 
-                <div className={`collection-options ${hoveredId === record.id || isDropdownVisible ? "active" : " "}`}>
-                  <Tooltip title={"Add Request"}>
-                    <RQButton
-                      size="small"
-                      type="transparent"
-                      icon={<FileAddOutlined />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveKey(record.id);
-                        setCreateNewField(RQAPI.RecordType.API);
-                        onNewClick("collection_row", RQAPI.RecordType.API, record.id).then(() => {
-                          setCreateNewField(null);
-                        });
-                      }}
-                    />
-                  </Tooltip>
-                  <Tooltip title={"Add Folder"}>
-                    <RQButton
-                      size="small"
-                      type="transparent"
-                      icon={<FolderAddOutlined />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveKey(record.id);
-                        setCreateNewField(RQAPI.RecordType.COLLECTION);
-                        onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id).then(() => {
-                          setCreateNewField(null);
-                        });
-                      }}
-                    />
-                  </Tooltip>
-
-                  <Dropdown
-                    trigger={["click"]}
-                    menu={{ items: getCollectionOptions(record) }}
-                    placement="bottomRight"
-                    overlayClassName="collection-dropdown-menu"
-                    open={isDropdownVisible}
-                    onOpenChange={handleDropdownVisibleChange}
+                <Conditional condition={!isReadOnly}>
+                  <div
+                    className={`collection-options ${hoveredId === record.id || isDropdownVisible ? "active" : " "}`}
                   >
-                    <RQButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowSelection(false);
-                      }}
-                      size="small"
-                      type="transparent"
-                      icon={<MdOutlineMoreHoriz />}
-                    />
-                  </Dropdown>
-                </div>
+                    <Tooltip title={"Add Request"}>
+                      <RQButton
+                        size="small"
+                        type="transparent"
+                        icon={<FileAddOutlined />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveKey(record.id);
+                          setCreateNewField(RQAPI.RecordType.API);
+                          onNewClick("collection_row", RQAPI.RecordType.API, record.id).then(() => {
+                            setCreateNewField(null);
+                          });
+                        }}
+                      />
+                    </Tooltip>
+                    <Tooltip title={"Add Folder"}>
+                      <RQButton
+                        size="small"
+                        type="transparent"
+                        icon={<FolderAddOutlined />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveKey(record.id);
+                          setCreateNewField(RQAPI.RecordType.COLLECTION);
+                          onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id).then(() => {
+                            setCreateNewField(null);
+                          });
+                        }}
+                      />
+                    </Tooltip>
+
+                    <Dropdown
+                      trigger={["click"]}
+                      menu={{ items: getCollectionOptions(record) }}
+                      placement="bottomRight"
+                      overlayClassName="collection-dropdown-menu"
+                      open={isDropdownVisible}
+                      onOpenChange={handleDropdownVisibleChange}
+                    >
+                      <RQButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowSelection(false);
+                        }}
+                        size="small"
+                        type="transparent"
+                        icon={<MdOutlineMoreHoriz />}
+                      />
+                    </Dropdown>
+                  </div>
+                </Conditional>
               </div>
             }
           >
             {record.data.children?.length === 0 ? (
               <ApiRecordEmptyState
+                disabled={isReadOnly}
                 analyticEventSource="collection_row"
                 message="No requests created yet"
                 newRecordBtnText="New request"
@@ -261,6 +268,7 @@ export const CollectionRow: React.FC<Props> = ({
                 if (apiRecord.type === RQAPI.RecordType.API) {
                   return (
                     <RequestRow
+                      isReadOnly={isReadOnly}
                       key={apiRecord.id}
                       record={apiRecord}
                       openTab={openTab}
@@ -270,6 +278,7 @@ export const CollectionRow: React.FC<Props> = ({
                 } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
                   return (
                     <CollectionRow
+                      isReadOnly={isReadOnly}
                       key={apiRecord.id}
                       openTab={openTab}
                       record={apiRecord}

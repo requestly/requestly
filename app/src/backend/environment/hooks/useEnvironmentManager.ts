@@ -21,12 +21,11 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 import { getOwnerId } from "backend/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { useGetApiClientSyncRepo } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -46,11 +45,10 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
   const collectionVariables = useSelector(getCollectionVariables);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-
   const ownerId = getOwnerId(user?.details?.profile?.uid, activeWorkspaceId);
 
   const syncRepository = useGetApiClientSyncRepo();
@@ -227,7 +225,9 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
               collectionVariablesRef.current[collectionId]?.variables ?? {},
               collectionDetails[collectionId].variables ?? {}
             );
-            dispatch(variablesActions.setCollectionVariables({ collectionId, variables: mergedCollectionVariables }));
+            dispatch(
+              variablesActions.updateCollectionVariables({ collectionId, variables: mergedCollectionVariables })
+            );
           });
         },
       });
@@ -457,29 +457,15 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
         ...collection,
         data: { ...collection?.data, variables: updatedVariables },
       };
-      return syncRepository.apiClientRecordsRepository.createCollection(record).then((result) => {
-        onSaveRecord(result.data);
-        dispatch(variablesActions.setCollectionVariables({ collectionId, variables }));
-      });
-    },
-    [onSaveRecord, dispatch, syncRepository.apiClientRecordsRepository, apiClientRecords]
-  );
-
-  const removeCollectionVariable = useCallback(
-    async (key: string, collectionId: string) => {
-      const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
-
-      if (!collection) {
-        throw new Error("Collection not found");
-      }
-
-      const updatedVariables = { ...collection?.data?.variables };
-      delete updatedVariables[key];
-      const record = { ...collection, data: { ...collection?.data, variables: updatedVariables } };
-      return syncRepository.apiClientRecordsRepository.createCollection(record).then((result) => {
-        onSaveRecord(result.data);
-        dispatch(variablesActions.setCollectionVariables({ collectionId, variables: updatedVariables }));
-      });
+      return syncRepository.apiClientRecordsRepository
+        .setCollectionVariables(record.id, record.data.variables)
+        .then((result) => {
+          onSaveRecord(result.data as RQAPI.Record);
+          dispatch(variablesActions.updateCollectionVariables({ collectionId, variables }));
+        })
+        .catch(() => {
+          toast.error("error while updating collection variables");
+        });
     },
     [onSaveRecord, dispatch, syncRepository.apiClientRecordsRepository, apiClientRecords]
   );
@@ -501,7 +487,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     isEnvironmentsLoading: isLoading,
     getGlobalVariables,
     setCollectionVariables,
-    removeCollectionVariable,
     getCollectionVariables: getCurrentCollectionVariables,
     environmentSyncRepository: syncRepository.environmentVariablesRepository,
   };

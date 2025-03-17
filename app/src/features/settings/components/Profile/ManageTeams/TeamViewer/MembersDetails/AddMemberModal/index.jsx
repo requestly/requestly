@@ -21,14 +21,15 @@ import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWi
 import "./AddMemberModal.css";
 import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "backend/billing";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds, getAllWorkspaces, getWorkspaceById } from "store/slices/workspaces/selectors";
-import { TeamRole } from "types";
+import { getActiveWorkspaceId, getActiveWorkspacesMembers, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { WorkspaceMemberRole } from "features/workspaces/types";
+import { isAdmin } from "features/settings/utils";
+import { Conditional } from "components/common/Conditional";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
   const [userEmail, setUserEmail] = useState([]);
-  const [makeUserAdmin, setMakeUserAdmin] = useState(false);
+  const [userInviteRole, setUserInviteRole] = useState(WorkspaceMemberRole.read);
   const [isInviteErrorModalActive, setInviteErrorModalActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [inviteErrors, setInviteErrors] = useState([]);
@@ -45,16 +46,14 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   // Global state
   const user = useSelector(getUserAuthDetails);
   const loggedInUserId = user?.details?.profile?.uid;
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const workspaceMembers = useSelector(getActiveWorkspacesMembers);
+  const loggedInUserTeamRole = workspaceMembers?.[loggedInUserId]?.role;
+  const isLoggedInUserAdmin = loggedInUserTeamRole === WorkspaceMemberRole.admin;
   const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
 
   const availableWorkspaces = useSelector(getAllWorkspaces);
-
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const teamId = useMemo(() => currentTeamId ?? activeWorkspaceId, [activeWorkspaceId, currentTeamId]);
-  const currentWorkspace = useSelector(getWorkspaceById(teamId));
-  const isLoggedInUserAdmin =
-    currentWorkspace?.members?.[loggedInUserId]?.role === TeamRole.admin || currentWorkspace?.owner === loggedInUserId;
-
   const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
 
   const teamDetails = useMemo(() => availableWorkspaces?.find((team) => team.id === teamId), [
@@ -64,6 +63,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);
+
   const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
   const getTeamPublicInvite = useMemo(() => httpsCallable(getFunctions(), "invites-getTeamPublicInvite"), []);
 
@@ -125,7 +125,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
     createTeamInvites({
       teamId: teamId,
       emails: userEmail,
-      role: makeUserAdmin ? "admin" : "write",
+      role: userInviteRole,
       teamName: teamDetails?.name,
       numberOfMembers: teamDetails?.accessCount,
       source: "add_member_modal",
@@ -137,7 +137,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
           trackAddTeamMemberSuccess({
             team_id: teamId,
             emails: userEmail,
-            is_admin: makeUserAdmin,
+            is_admin: isAdmin(userInviteRole),
             source: "add_member_modal",
             num_users_added: userEmail.length,
             workspace_type: isBillingTeamMapped
@@ -162,7 +162,6 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   }, [
     userEmail,
     teamId,
-    makeUserAdmin,
     teamDetails,
     callback,
     toggleModal,
@@ -170,6 +169,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
     isTeamAdmin,
     isBillingTeamMapped,
     isAppSumoDeal,
+    userInviteRole,
   ]);
 
   const handleAllowDomainUsers = useCallback(
@@ -272,17 +272,28 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                   <div className="email-invites-wrapper">
                     <div className="emails-input-wrapper">
                       <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} transparentBackground={true} />
-                      {isTeamAdmin && (
+                      <Conditional
+                        condition={loggedInUserTeamRole && loggedInUserTeamRole !== WorkspaceMemberRole.read}
+                      >
                         <div className="access-dropdown-container">
                           <MemberRoleDropdown
+                            loggedInUserTeamRole={loggedInUserTeamRole}
                             placement="bottomRight"
-                            isAdmin={makeUserAdmin}
+                            isAdmin={isAdmin(userInviteRole)}
                             isLoggedInUserAdmin={isLoggedInUserAdmin}
                             loggedInUserId={loggedInUserId}
-                            handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
+                            handleMemberRoleChange={(_, updatedRole) => {
+                              let role = updatedRole;
+
+                              if (role === "user") {
+                                role = WorkspaceMemberRole.write;
+                              }
+
+                              setUserInviteRole(role);
+                            }}
                           />
                         </div>
-                      )}
+                      </Conditional>
                     </div>
 
                     <RQButton
@@ -365,7 +376,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
         handleModalClose={toggleInviteEmailModal}
         errors={inviteErrors}
         teamId={teamId}
-        isAdmin={makeUserAdmin}
+        isAdmin={isAdmin(userInviteRole)}
       />
     </>
   );

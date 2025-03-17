@@ -183,6 +183,12 @@
     }
   }
 
+  &.read-only {
+    .form-and-description {
+      height: calc(100% - 45px - 48px); // 48px = read only alert height
+    }
+  }
+
   .type-of-authorization {
     padding: 6px 8px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);

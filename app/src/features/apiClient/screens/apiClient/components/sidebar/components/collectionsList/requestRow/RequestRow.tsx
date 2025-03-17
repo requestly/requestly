@@ -24,10 +24,12 @@ import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderC
 import { MdContentCopy } from "@react-icons/all-files/md/MdContentCopy";
 import { MdDriveFileMoveOutline } from "@react-icons/all-files/md/MdDriveFileMoveOutline";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
+import { Conditional } from "components/common/Conditional";
 
 interface Props {
   record: RQAPI.ApiRecord;
   openTab: TabsLayoutContextInterface["openTab"];
+  isReadOnly: boolean;
   bulkActionOptions: {
     showSelection: boolean;
     selectedRecords: Set<RQAPI.Record["id"]>;
@@ -36,7 +38,7 @@ interface Props {
   };
 }
 
-export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions }) => {
+export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkActionOptions }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
@@ -195,25 +197,28 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
                 : record.data.request?.method}
             </Typography.Text>
             <div className="request-url">{record.name || record.data.request?.url}</div>
-            <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
-              <Dropdown
-                trigger={["click"]}
-                menu={{ items: requestOptions }}
-                placement="bottomRight"
-                open={isDropdownVisible}
-                onOpenChange={handleDropdownVisibleChange}
-              >
-                <RQButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowSelection(false);
-                  }}
-                  size="small"
-                  type="transparent"
-                  icon={<MdOutlineMoreHoriz />}
-                />
-              </Dropdown>
-            </div>
+
+            <Conditional condition={!isReadOnly}>
+              <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
+                <Dropdown
+                  trigger={["click"]}
+                  menu={{ items: requestOptions }}
+                  placement="bottomRight"
+                  open={isDropdownVisible}
+                  onOpenChange={handleDropdownVisibleChange}
+                >
+                  <RQButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowSelection(false);
+                    }}
+                    size="small"
+                    type="transparent"
+                    icon={<MdOutlineMoreHoriz />}
+                  />
+                </Dropdown>
+              </div>
+            </Conditional>
           </NavLink>
         </div>
       )}

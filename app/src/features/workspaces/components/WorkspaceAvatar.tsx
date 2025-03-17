@@ -3,49 +3,50 @@ import { Avatar, AvatarProps } from "antd";
 
 import { LockOutlined } from "@ant-design/icons";
 import { IoCloudOfflineOutline } from "@react-icons/all-files/io5/IoCloudOfflineOutline";
+import { LuFolderSync } from "@react-icons/all-files/lu/LuFolderSync";
 
 import { isLocalFSWorkspace, isLocalStorageWorkspace, isPersonalWorkspace } from "../utils";
 import { getColorFromString } from "utils/getColorFromString";
+import { Workspace } from "../types";
 
 interface Props {
-  workspaceId?: string;
-  workspaceName?: string;
+  workspace: Workspace;
   size?: AvatarProps["size"];
 }
 
-const getWorkspaceIcon = (workspaceId?: string, workspaceName?: string) => {
-  if (!workspaceName && !workspaceId) return "?";
+const getWorkspaceIcon = (workspace: Workspace) => {
+  if (!workspace?.name && !workspace?.id) return "?";
 
-  if (isLocalStorageWorkspace(workspaceId)) return <IoCloudOfflineOutline />;
+  if (isLocalStorageWorkspace(workspace?.id)) return <IoCloudOfflineOutline />;
 
-  if (isPersonalWorkspace(workspaceId)) return <LockOutlined />;
+  if (isPersonalWorkspace(workspace)) return <LockOutlined />;
 
-  // if(isLocalFSWorkspace(workspaceId)) return <LuFolderSync /> ; // TODO-syncing
+  if (isLocalFSWorkspace(workspace)) return <LuFolderSync />; // TODO-syncing
 
-  return workspaceName ? workspaceName[0].toUpperCase() : "?";
+  return workspace?.name ? workspace?.name[0].toUpperCase() : "?";
 };
 
-export const getUniqueColorForWorkspace = (workspaceId?: string, workspaceName?: string) => {
-  if (!workspaceName && !workspaceId) return "#ffffff4d";
+export const getUniqueColorForWorkspace = (workspace: Workspace) => {
+  if (!workspace?.name && !workspace?.id) return "#ffffff4d";
 
-  if (isLocalStorageWorkspace(workspaceId)) return "#ffffff4d";
+  if (isLocalStorageWorkspace(workspace?.id)) return "#ffffff4d";
 
-  if (isPersonalWorkspace(workspaceId)) return "#1E69FF";
+  if (isPersonalWorkspace(workspace)) return "#1E69FF";
 
-  // if(isLocalFSWorkspace(workspaceId)) return "#FFFFFF33"; // TODO-syncing
+  if (isLocalFSWorkspace(workspace)) return "#FFFFFF33"; // TODO-syncing
 
-  return getColorFromString(workspaceId + workspaceName);
+  return getColorFromString(workspace?.id + workspace?.name);
 };
 
-const WorkspaceAvatar: React.FC<Props> = ({ workspaceId, workspaceName, size = 26 }) => {
+const WorkspaceAvatar: React.FC<Props> = ({ workspace, size = 26 }) => {
   return (
     <Avatar
       size={size}
       shape="square"
-      icon={getWorkspaceIcon(workspaceId, workspaceName)}
+      icon={getWorkspaceIcon(workspace)}
       className="workspace-avatar"
       style={{
-        backgroundColor: getUniqueColorForWorkspace(workspaceId, workspaceName),
+        backgroundColor: getUniqueColorForWorkspace(workspace),
       }}
     />
   );

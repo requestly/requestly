@@ -27,13 +27,12 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackTestRuleReportDeleted, trackTestRuleReportGenerated, trackTestRuleSessionDraftSaved } from "./analytics";
 import { TestRuleHeader } from "./components/TestRuleHeader";
 import "./TestThisRule.scss";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 export const TestThisRule = () => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const [testReports, setTestReports] = useState<TestReport[]>(null);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 

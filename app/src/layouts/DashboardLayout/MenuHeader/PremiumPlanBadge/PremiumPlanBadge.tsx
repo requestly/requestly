@@ -12,13 +12,12 @@ import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./premiumPlanBadge.scss";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const PremiumPlanBadge = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const userPlanDetails = user?.details?.planDetails;
   const planId = userPlanDetails?.planId;
   const planStatus = userPlanDetails?.status;

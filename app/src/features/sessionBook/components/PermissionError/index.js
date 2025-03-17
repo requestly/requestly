@@ -7,8 +7,7 @@ import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 // DUPLICATED
 // TODO: REMOVE OLD FILE
@@ -16,9 +15,7 @@ const PermissionError = ({ isInsideIframe = false }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const dispatch = useDispatch();
 
   // Component State

@@ -4,8 +4,7 @@ import { Button, Modal } from "antd";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const DeleteConfirmationModal = ({
   isOpen,
@@ -17,8 +16,7 @@ const DeleteConfirmationModal = ({
   isDeletionInProgress,
 }) => {
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
 
   const enableTrash = useFeatureIsOn("enable-trash");
 

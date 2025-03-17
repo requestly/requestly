@@ -7,15 +7,12 @@ import { globalActions } from "store/slices/global/slice";
 import { RQButton } from "lib/design-system/components";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { getActiveWorkspaceIds, getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const InviteButton: React.FC = () => {
   const dispatch = useDispatch();
   const availableWorkspaces = useSelector(getAllWorkspaces);
-  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
-  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const user = useSelector(getUserAuthDetails);
 
   const handleInviteClick = useCallback(() => {

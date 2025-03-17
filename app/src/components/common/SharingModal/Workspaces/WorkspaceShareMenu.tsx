@@ -1,42 +1,35 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Avatar, Row, Dropdown } from "antd";
-import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import type { MenuProps } from "antd";
 import { trackShareModalWorkspaceDropdownClicked } from "modules/analytics/events/misc/sharing";
-import { getActiveWorkspaceIds, getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
+import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
 
 interface Props {
   /**
    * The default number of active workspaces to display before dropdown menu.
    */
   defaultActiveWorkspaces?: number;
-  onTransferClick: (workspace: Workspace) => void;
+  onTransferClick: (teamData: Workspace) => void;
   isLoading: boolean;
 }
 
 interface WorkspaceItemProps {
   workspace: Workspace;
   availableWorkspaces?: Workspace[];
-  onTransferClick?: (workspace: Workspace) => void;
+  onTransferClick?: (teamData: Workspace) => void;
   showArrow?: boolean;
   isLoading?: boolean;
 }
 
 export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading, defaultActiveWorkspaces = 0 }) => {
   const availableWorkspaces = useSelector(getAllWorkspaces);
-  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
-  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
-
-  const activeWorkspace: Workspace = useMemo(
-    () => availableWorkspaces?.find((team: Workspace) => team?.id === activeWorkspaceId),
-    [activeWorkspaceId, availableWorkspaces]
-  );
-  const sortedWorkspaces: Workspace[] = useMemo(
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const sortedTeams: Workspace[] = useMemo(
     () =>
       availableWorkspaces
         ? [...availableWorkspaces].sort((a: Workspace, b: Workspace) => b.accessCount - a.accessCount)
@@ -44,20 +37,18 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
     [availableWorkspaces]
   );
 
-  const filteredWorkspaces = sortedWorkspaces.filter((workspace: Workspace) => !isPersonalWorkspace(workspace?.id));
-
   const menuItems: MenuProps["items"] = useMemo(() => {
-    return filteredWorkspaces
+    return sortedTeams
       .slice(defaultActiveWorkspaces || 0)
-      .map((workspace: Workspace, index: number) => {
-        if (!defaultActiveWorkspaces && workspace?.id === activeWorkspace?.id) return null;
+      .map((team: Workspace, index: number) => {
+        if (!defaultActiveWorkspaces && team?.id === activeWorkspace?.id) return null;
         return {
           key: index,
-          label: <WorkspaceItem isLoading={isLoading} onTransferClick={onTransferClick} workspace={workspace} />,
+          label: <WorkspaceItem isLoading={isLoading} onTransferClick={onTransferClick} workspace={team} />,
         };
       })
       .filter(Boolean);
-  }, [filteredWorkspaces, activeWorkspace?.id, onTransferClick, defaultActiveWorkspaces, isLoading]);
+  }, [sortedTeams, activeWorkspace?.id, onTransferClick, defaultActiveWorkspaces, isLoading]);
 
   const chooseOtherWorkspaceItem = (
     <div className="workspace-share-menu-item-card workspace-share-menu-dropdown">
@@ -84,16 +75,11 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
       {defaultActiveWorkspaces ? (
         <>
           <div className="mt-1">
-            {filteredWorkspaces.slice(0, defaultActiveWorkspaces).map((workspace: Workspace, index: number) => (
-              <WorkspaceItem
-                isLoading={isLoading}
-                workspace={workspace}
-                onTransferClick={onTransferClick}
-                key={index}
-              />
+            {sortedTeams.slice(0, defaultActiveWorkspaces).map((team: Workspace, index: number) => (
+              <WorkspaceItem isLoading={isLoading} workspace={team} onTransferClick={onTransferClick} key={index} />
             ))}
           </div>
-          {filteredWorkspaces.length > defaultActiveWorkspaces && (
+          {sortedTeams.length > defaultActiveWorkspaces && (
             <Dropdown
               menu={{ items: menuItems }}
               placement="bottom"
@@ -146,7 +132,7 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
           shape="square"
           icon={workspace.name ? workspace.name?.[0]?.toUpperCase() : "W"}
           style={{
-            backgroundColor: `${getUniqueColorForWorkspace(workspace.id ?? "", workspace.name)}`,
+            backgroundColor: `${getUniqueColorForWorkspace(workspace)}`,
           }}
         />
         <span className="workspace-card-description">

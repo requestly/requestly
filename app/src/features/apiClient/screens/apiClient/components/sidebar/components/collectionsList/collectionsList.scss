@@ -57,9 +57,11 @@
         }
       }
     }
+
     .request-row {
       display: flex;
       align-items: center;
+
       a {
         width: 100%;
       }
@@ -83,6 +85,7 @@
       border-radius: 4px;
       color: var(--requestly-color-text-subtle);
       font-size: var(--requestly-font-size-sm, 13px);
+      min-height: 28px;
 
       &.api {
         .request-method {
@@ -137,6 +140,10 @@
       .ant-collapse-item {
         width: 100%;
 
+        .ant-collapse-header {
+          min-height: 28px;
+        }
+
         &.ant-collapse-item-active {
           .ant-collapse-header {
             color: var(--requestly-color-text-default);
@@ -168,8 +175,6 @@
               height: 18px;
               padding: 3px;
               color: inherit;
-              position: relative;
-              top: 2px;
               margin: 0;
             }
 

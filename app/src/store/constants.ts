@@ -9,7 +9,7 @@ export enum ReducerKeys {
   RULES = "rules", // ALSO CONTAINS GROUPS
   BILLING = "billing",
   INCENTIVIZATION = "incentivization",
-  WORKSPACE = "workspace",
   VARIABLES = "variables",
   TABS_LAYOUT = "tabsLayout",
+  WORKSPACE = "workspace",
 }

@@ -24,8 +24,9 @@ import { isMock, isCollection } from "../utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
 import PATHS from "config/constants/sub/paths";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { useRBAC } from "features/rbac";
+import { Conditional } from "components/common/Conditional";
 
 export const useMocksTableColumns = ({
   source,
@@ -44,9 +45,11 @@ export const useMocksTableColumns = ({
   };
 
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const { pathname } = useLocation();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("mock_api", "create");
   const isOpenedInRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const {
@@ -134,19 +137,17 @@ export const useMocksTableColumns = ({
               </Tooltip>
             ) : null}
 
-            {isOpenedInRuleEditor ? null : (
-              <>
-                <Button
-                  className="add-mock-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    createNewMockAction(mockType, source, record.id);
-                  }}
-                >
-                  <span>+</span> <span>Add {mockType === MockType.API ? "mock" : "file"}</span>
-                </Button>
-              </>
-            )}
+            <Conditional condition={isValidPermission && !isOpenedInRuleEditor}>
+              <Button
+                className="add-mock-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  createNewMockAction(mockType, source, record.id);
+                }}
+              >
+                <span>+</span> <span>Add {mockType === MockType.API ? "mock" : "file"}</span>
+              </Button>
+            </Conditional>
           </div>
         ) : (
           <div className="mock-name-details-container">
@@ -242,6 +243,10 @@ export const useMocksTableColumns = ({
       align: "right",
       width: isSharedWorkspaceMode ? (isOpenedInRuleEditor ? 50 : 90) : 90,
       render: (_: any, record: RQMockSchema) => {
+        if (!isValidPermission) {
+          return null;
+        }
+
         const collectionPath =
           isMock(record) && record.collectionId
             ? ((allRecordsMap[record.collectionId] as unknown) as RQMockCollection).path

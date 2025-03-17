@@ -1,5 +1,5 @@
 // import Logger from "lib/logger";
-import { Workspace, WorkspaceType } from "../types";
+import { Workspace, WorkspaceMemberRole, WorkspaceType } from "../types";
 
 export const LOGGED_OUT_WORKSPACE_ID = "localstorage";
 export const LoggedOutWorkspace: Workspace = {
@@ -9,15 +9,7 @@ export const LoggedOutWorkspace: Workspace = {
   workspaceType: WorkspaceType.LOCAL_STORAGE,
 };
 
-export const isLocalStorageWorkspace = (workspaceId: string) => {
-  return workspaceId === LOGGED_OUT_WORKSPACE_ID;
-};
-
 const PERSONAL_WORKSPACE_PREFIX = "personal-";
-export const isPersonalWorkspace = (workspaceId: string) => {
-  return !!workspaceId?.startsWith(PERSONAL_WORKSPACE_PREFIX);
-};
-
 export const getPersonalWorkspaceId = (userId?: string) => {
   return `${PERSONAL_WORKSPACE_PREFIX}${userId}`;
 };
@@ -28,7 +20,7 @@ export const getPrivateWorkspace = (userId: string): Workspace => {
     name: "Private Workspace (Default)",
     members: {
       [userId]: {
-        role: "admin",
+        role: WorkspaceMemberRole.admin,
       },
     },
     createdAt: 0,
@@ -48,16 +40,6 @@ export const hasAccessToWorkspace = (userId?: string, workspace?: Workspace): bo
   }
 };
 
-export const isSharedWorkspace = (workspace: Workspace) => {
-  if (!workspace) return false;
-
-  if (workspace.id === LOGGED_OUT_WORKSPACE_ID || isPersonalWorkspace(workspace.id) || isLocalFSWorkspace(workspace)) {
-    return false;
-  }
-
-  return true;
-};
-
 export const isOnlineWorkspace = (workspaceId: string) => {
   if (workspaceId === LOGGED_OUT_WORKSPACE_ID) {
     return false;
@@ -66,15 +48,26 @@ export const isOnlineWorkspace = (workspaceId: string) => {
   return true;
 };
 
-// For now only as we can have only 1 connected workspace right now
-export const getActiveWorkspaceId = (activeWorkspaceIds: string[]) => {
-  return activeWorkspaceIds?.[0];
+export const isLocalStorageWorkspace = (workspaceId: string) => {
+  return workspaceId === LOGGED_OUT_WORKSPACE_ID;
 };
 
 export const isLocalFSWorkspace = (workspace: Workspace) => {
   return workspace?.workspaceType === WorkspaceType.LOCAL;
 };
 
+export const isPersonalWorkspace = (workspace: Workspace) => {
+  return workspace?.workspaceType === WorkspaceType.PERSONAL;
+};
+
+export const isSharedWorkspace = (workspace: Workspace) => {
+  return workspace?.workspaceType === WorkspaceType.SHARED;
+};
+
 export const getLocalFSWorkspaceRootPath = (workspace: Workspace) => {
   return workspace?.rootPath;
+};
+
+export const getActiveWorkspaceId = (workspaceIds: string[]) => {
+  return workspaceIds?.[0];
 };

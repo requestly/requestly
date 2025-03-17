@@ -19,9 +19,8 @@ import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import "./index.scss";
+import { getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
-import { getActiveWorkspaceIds, getAllWorkspaces, getWorkspaceById } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 interface Props {
   selectedRules: string[];
@@ -37,12 +36,9 @@ export const ShareFromPrivate: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const availableWorkspaces = useSelector(getAllWorkspaces);
-  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
-  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
-  const activeWorkspace = useSelector(getWorkspaceById(activeWorkspaceId));
-
+  const activeWorkspace = useSelector(getActiveWorkspace);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const _availableTeams = useRef(availableWorkspaces);
+  const _availableWorkspaces = useRef(availableWorkspaces);
 
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -149,7 +145,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
           <div className="text-gray">Not shared with anyone</div>
         </span>
       </Row>
-      {_availableTeams.current.length ? (
+      {_availableWorkspaces.current.length ? (
         <>
           <div className="mt-1">Copy rules into a workspace to start collaborating</div>
           <WorkspaceShareMenu isLoading={isLoading} defaultActiveWorkspaces={2} onTransferClick={handleRulesTransfer} />

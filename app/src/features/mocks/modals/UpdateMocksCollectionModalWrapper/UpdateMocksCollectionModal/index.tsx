@@ -9,8 +9,7 @@ import { toast } from "utils/Toast";
 import { createCollection } from "backend/mocks/createCollection";
 import { trackMockCollectionCreated } from "modules/analytics/events/features/mocksV2";
 import "./updateMocksCollectionModal.scss";
-import { getActiveWorkspaceIds, getWorkspaceById } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspace, getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface Props {
   visible: boolean;
@@ -32,9 +31,9 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
   mockType,
 }) => {
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const activeWorkspace = useSelector(getWorkspaceById(activeWorkspaceId));
   const uid = user?.details?.profile?.uid;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const activeWorkspace = useSelector(getActiveWorkspace);
 
   const [isLoading, setIsLoading] = useState(false);
   const [collectionId, setCollectionId] = useState("");
