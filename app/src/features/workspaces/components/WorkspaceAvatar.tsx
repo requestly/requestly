@@ -26,7 +26,7 @@ const getWorkspaceIcon = (workspace: Workspace) => {
   return workspace?.name ? workspace?.name[0].toUpperCase() : "?";
 };
 
-export const getUniqueColorForWorkspace = (workspace: Workspace) => {
+const getUniqueColorForWorkspace = (workspace: Workspace) => {
   if (!workspace?.name && !workspace?.id) return "#ffffff4d";
 
   if (isLocalStorageWorkspace(workspace?.id)) return "#ffffff4d";

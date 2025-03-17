@@ -1,21 +1,21 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { LockOutlined } from "@ant-design/icons";
 import { MdExpandMore } from "@react-icons/all-files/md/MdExpandMore";
-import { Avatar, Dropdown, Row, Typography, Col } from "antd";
+import { Dropdown, Row, Typography, Col } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { getIsMiscTourCompleted } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import APP_CONSTANTS from "config/constants";
-import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { MISC_TOURS } from "components/misc/ProductWalkthrough/constants";
 import { globalActions } from "store/slices/global/slice";
 import { trackPricingWorkspaceSwitched } from "features/pricing/analytics";
 import "./index.scss";
 import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 import { getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { isPersonalWorkspaceId } from "features/workspaces/utils";
+import { WorkspaceType } from "types";
 
 interface MenuProps {
   workspaceToUpgrade: { name: string; id: string; accessCount: number };
@@ -24,11 +24,6 @@ interface MenuProps {
   className?: string;
   source: string;
 }
-
-const getWorkspaceIcon = (workspaceName: string) => {
-  if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
-  return workspaceName ? workspaceName[0].toUpperCase() : "?";
-};
 
 export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
   workspaceToUpgrade,
@@ -71,33 +66,10 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
 
   const workspaceMenuItems = {
     items: [
-      {
-        key: "private_workspace",
-        label: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
-        icon: (
-          <Avatar
-            size={18}
-            shape="square"
-            icon={getWorkspaceIcon(APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)}
-            className="workspace-avatar"
-            style={{ backgroundColor: "#1E69FF" }}
-          />
-        ),
-      },
       ...filteredAvailableTeams.map((team) => ({
         label: team.name,
         key: team.id,
-        icon: (
-          <Avatar
-            size={18}
-            shape="square"
-            icon={getWorkspaceIcon(team.name)}
-            className="workspace-avatar"
-            style={{
-              backgroundColor: getUniqueColorForWorkspace(team),
-            }}
-          />
-        ),
+        icon: <WorkspaceAvatar workspace={team} size={18} />,
       })),
     ],
     onClick: ({ key: teamId }: { key: string }) => {
@@ -151,20 +123,14 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
               }}
             >
               <Row className="cursor-pointer items-center">
-                <Avatar
-                  size={28}
-                  shape="square"
-                  icon={getWorkspaceIcon(
-                    workspaceToUpgrade?.name ?? APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                  )}
-                  className="workspace-avatar"
-                  style={{
-                    backgroundColor:
-                      !workspaceToUpgrade ||
-                      workspaceToUpgrade?.name === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                        ? TEAM_WORKSPACES.PRIVATE_WORKSPACE.color
-                        : getUniqueColorForWorkspace(workspaceToUpgrade),
+                <WorkspaceAvatar
+                  workspace={{
+                    ...workspaceToUpgrade,
+                    workspaceType: isPersonalWorkspaceId(workspaceToUpgrade.id)
+                      ? WorkspaceType.PERSONAL
+                      : WorkspaceType.SHARED,
                   }}
+                  size={28}
                 />
                 <Col className="upgrade-workspace-dropdown-btn-info">
                   <Typography.Text className="workspace-name">{workspaceToUpgrade?.name}</Typography.Text>

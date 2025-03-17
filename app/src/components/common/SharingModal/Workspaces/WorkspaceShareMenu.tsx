@@ -7,7 +7,7 @@ import type { MenuProps } from "antd";
 import { trackShareModalWorkspaceDropdownClicked } from "modules/analytics/events/misc/sharing";
 import { getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
-import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
 interface Props {
   /**
@@ -126,15 +126,7 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
       }`}
     >
       <Row align="middle" className="items-center">
-        <Avatar
-          size={35}
-          className="workspace-avatar"
-          shape="square"
-          icon={workspace.name ? workspace.name?.[0]?.toUpperCase() : "W"}
-          style={{
-            backgroundColor: `${getUniqueColorForWorkspace(workspace)}`,
-          }}
-        />
+        <WorkspaceAvatar workspace={workspace} size={35} />
         <span className="workspace-card-description">
           <div className="text-white">{workspace.name}</div>
           <div className="text-gray">

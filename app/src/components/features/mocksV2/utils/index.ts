@@ -11,7 +11,7 @@ import {
 
 import { MockEditorDataSchema } from "../MockEditorIndex/types";
 import { RQMockSchema, FileType } from "../types";
-import { isPersonalWorkspace } from "features/workspaces/utils";
+import { isPersonalWorkspaceId } from "features/workspaces/utils";
 
 export const fileTypeColorMap = {
   [FileType.JS]: "#FFCA5F",
@@ -167,7 +167,7 @@ export const generateFinalUrl = ({
 }) => {
   // For Backward Comptibility
   // FIXME-syncing: Migrate these
-  if (isPersonalWorkspace(teamId)) {
+  if (isPersonalWorkspaceId(teamId)) {
     teamId = null;
   }
 
