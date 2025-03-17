@@ -10,13 +10,14 @@ export const TabsContainer: React.FC = () => {
     return Array.from(tabs.values()).map((tabStore) => {
       const tabState = tabStore.getState();
       return {
-        tabVersion: _version,
         key: tabState.id.toString(),
         label: tabState.title,
         children: <TabItem store={tabStore}>{tabState.source.render()}</TabItem>,
         closable: true,
       };
     });
+    // We need _version in the dependency array
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabs, _version]);
 
   return (
