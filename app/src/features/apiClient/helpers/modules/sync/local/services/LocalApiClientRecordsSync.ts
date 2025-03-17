@@ -506,20 +506,18 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     const service = await this.getAdapter();
     const result: RQAPI.Record[] = [];
     for (const entity of entities) {
-      if (entity.type === RQAPI.RecordType.API) {
-        const newRecordResult = await service.moveRecord(entity.id, newParentId);
-        if (newRecordResult.type === "success") {
-          const parsedRecord = this.parseAPIEntities([newRecordResult.content as APIEntity]);
-          result.push(parsedRecord[0]);
+      const moveResult = await (async () => {
+        if (entity.type === RQAPI.RecordType.API) {
+          return service.moveRecord(entity.id, newParentId);
         }
-      } else {
-        const newCollectionResult = await service.moveCollection(entity.id, newParentId);
-        if (newCollectionResult.type === "success") {
-          const parsedCollection = this.parseAPIEntities([newCollectionResult.content as APIEntity]);
-          result.push(parsedCollection[0]);
-        }
+        return service.moveCollection(entity.id, newParentId);
+      })();
+
+      if (moveResult.type === "success") {
+        const parsedCollection = this.parseAPIEntities([moveResult.content as APIEntity]);
+        result.push(parsedCollection[0]);
       }
-      return result;
     }
+    return result;
   }
 }
