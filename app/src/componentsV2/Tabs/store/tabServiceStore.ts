@@ -1,16 +1,16 @@
 import { create, StoreApi, useStore } from "zustand";
-import { useShallow } from "zustand/shallow";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { createContext, useContext } from "react";
 
 type TabId = number;
+type SourceName = string;
 type SourceId = string;
 type SourceMap = Map<SourceId, TabId>;
 type TabServiceState = {
   tabIdSequence: TabId;
   activeTabId: TabId;
-  tabsIndex: Map<string, SourceMap>; // Type: Source -> sourceId -> tabId eg: Request -> [requestId,tabId]
+  tabsIndex: Map<SourceName, SourceMap>; // Type: SourceName -> sourceId -> tabId eg: Request -> [requestId,tabId]
   tabs: Map<TabId, StoreApi<TabState>>;
 
   _version: number;
@@ -35,8 +35,8 @@ const createTabServiceStore = () => {
 
     openTab(source) {
       const { _generateNewTabId, tabsIndex, tabs, setActiveTabId } = get();
-      const sourceId = source.getId();
-      const sourceName = source.constructor.name;
+      const sourceId = source.getSourceId();
+      const sourceName = source.getSourceName();
 
       const existingTabId = tabsIndex.get(sourceName)?.get(sourceId);
       if (existingTabId) {
@@ -45,7 +45,7 @@ const createTabServiceStore = () => {
       }
 
       const newTabId = _generateNewTabId();
-      const tab = createTabStore(newTabId, source, "Tab Title");
+      const tab = createTabStore(newTabId, source, source.getDefaultTitle());
 
       if (tabsIndex.has(sourceName)) {
         tabsIndex.get(sourceName)?.set(sourceId, newTabId);
@@ -63,8 +63,8 @@ const createTabServiceStore = () => {
 
     closeTab(source) {
       const { tabsIndex, closeTabById } = get();
-      const sourceId = source.getId();
-      const sourceName = source.constructor.name;
+      const sourceId = source.getSourceId();
+      const sourceName = source.getSourceName();
 
       const existingTabId = tabsIndex.get(sourceName)?.get(sourceId);
       if (!existingTabId) {
@@ -89,8 +89,8 @@ const createTabServiceStore = () => {
       }
 
       const tabState = tabStore.getState();
-      const sourceName = tabState.source.constructor.name;
-      const sourceId = tabState.source.getId();
+      const sourceName = tabState.source.getSourceName();
+      const sourceId = tabState.source.getSourceId();
       tabsIndex.get(sourceName)?.delete(sourceId);
 
       if (tabsIndex.get(sourceName)?.size === 0) {
