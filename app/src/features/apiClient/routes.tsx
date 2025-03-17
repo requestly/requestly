@@ -9,8 +9,7 @@ import { TabOutletHOC } from "layouts/TabsLayout/hoc/TabOutletHOC";
 import { CollectionView } from "./screens/apiClient/components/clientView/components/Collection/CollectionView";
 import { ApiClientEmptyView } from "./screens/apiClient/components/clientView/components/ApiClientEmptyView/ApiClientEmptyView";
 import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
-import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceProvider";
-import { TabServiceStoreContext, tabServiceStoreWithAutoSelectors } from "componentsV2/Tabs/store/tabServiceStore";
+import { TabServiceStoreContext } from "componentsV2/Tabs/store/tabServiceStore";
 
 export const apiClientRoutes: RouteObject[] = [
   {
@@ -28,13 +27,10 @@ export const apiClientRoutes: RouteObject[] = [
           // <TabOutletHOC>
           //   <ApiClientEmptyView />
           // </TabOutletHOC>
-          // <TabServiceProvider>
-          //   <TabsContainer />
-          // </TabServiceProvider>
+          // <TabServiceStoreContext.Provider >
+          <TabsContainer />
+          // </TabServiceProvider.Provider>
           //
-          <TabServiceStoreContext.Provider value={tabServiceStoreWithAutoSelectors}>
-            <TabsContainer />
-          </TabServiceStoreContext.Provider>
         ),
       },
       {
