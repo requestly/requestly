@@ -23,6 +23,7 @@ The following domains are eligible for the student programme:
     ".edu.ar",
     ".edu.kh",
     ".edu.tw",
+    ".edu.cn",
     ".ac.id",
     "bennington.edu",
     "yonsei.ac.kr",
