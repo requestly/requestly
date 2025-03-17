@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { Row, Col, Avatar, Tabs, Alert } from "antd";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import MembersDetails from "./MembersDetails";
 import TeamSettings from "./TeamSettings";
 import BillingDetails from "./BillingDetails";
@@ -13,15 +12,19 @@ import SwitchWorkspaceButton from "./SwitchWorkspaceButton";
 import { useIsTeamAdmin } from "./hooks/useIsTeamAdmin";
 import "./TeamViewer.css";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 const TeamViewer = () => {
   const { teamId } = useParams();
   const { isTeamAdmin } = useIsTeamAdmin(teamId);
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const user = useSelector(getUserAuthDetails);
   const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
 
-  const teamDetails = useMemo(() => availableTeams?.find((team) => team.id === teamId), [availableTeams, teamId]);
+  const teamDetails = useMemo(() => availableWorkspaces?.find((team) => team.id === teamId), [
+    availableWorkspaces,
+    teamId,
+  ]);
   const name = teamDetails?.name;
   const teamOwnerId = teamDetails?.owner;
   const isTeamArchived = teamDetails?.archived;

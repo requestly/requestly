@@ -7,7 +7,7 @@ import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 // DUPLICATED
 // TODO: REMOVE OLD FILE
@@ -15,7 +15,7 @@ const PermissionError = ({ isInsideIframe = false }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const dispatch = useDispatch();
 
   // Component State
@@ -34,7 +34,7 @@ const PermissionError = ({ isInsideIframe = false }) => {
           <Button
             type="primary"
             onClick={() => {
-              handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch);
+              handleLogoutButtonOnClick(appMode, isSharedWorkspaceMode, dispatch);
               setAuthAutoPrompt(true);
             }}
           >

@@ -1,0 +1,29 @@
+.revert-view-mode-changes-alert {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3, 6px) var(--space-4, 8px);
+  gap: 24px;
+  background: var(--requestly-color-surface-1, #282828);
+  border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+
+  .content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4, 8px);
+
+    .icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .title {
+      color: var(--requestly-color-text-default, #fff);
+      font-size: var(--font-size-sm, 12px);
+      line-height: 18px; /* 150% */
+    }
+  }
+
+  .revert-btn {
+    margin-left: auto;
+  }
+}

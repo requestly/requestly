@@ -22,6 +22,7 @@ interface EditableCellProps {
   isSecret?: boolean;
   options?: string[];
   duplicateKeyIndices?: Set<number>;
+  isReadOnly: boolean;
 }
 
 export const EditableRow = ({ index, ...props }: { index: number }) => {
@@ -45,6 +46,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   options,
   isSecret,
   duplicateKeyIndices,
+  isReadOnly,
   ...restProps
 }) => {
   const form = useContext(EditableContext)!;
@@ -111,11 +113,14 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   }, []);
 
   const renderValueInputByType = useCallback(() => {
+    const disabled = isReadOnly;
+
     switch (record.type) {
       case EnvironmentVariableType.String:
         return (
           <Input
             ref={inputRef}
+            disabled={disabled}
             onChange={(e) => handleChange(e.target.value)}
             placeholder={getPlaceholderText(dataIndex)}
           />
@@ -126,6 +131,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           <Input
             type={isSecret ? "password" : "text"}
             ref={inputRef}
+            disabled={disabled}
             onChange={(e) => handleChange(e.target.value)}
             placeholder={getPlaceholderText(dataIndex)}
           />
@@ -135,6 +141,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         return (
           <InputNumber
             type="number"
+            disabled={disabled}
             controls={false}
             ref={inputRef}
             onChange={(value) => handleChange(value)}
@@ -143,13 +150,18 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         );
       case EnvironmentVariableType.Boolean:
         return (
-          <Select onChange={(value) => handleChange(value)} value={record[dataIndex]} placeholder="Select value">
+          <Select
+            disabled={disabled}
+            onChange={(value) => handleChange(value)}
+            value={record[dataIndex]}
+            placeholder="Select value"
+          >
             <Select.Option value={true}>True</Select.Option>
             <Select.Option value={false}>False</Select.Option>
           </Select>
         );
     }
-  }, [record, handleChange, dataIndex, getPlaceholderText, isSecret]);
+  }, [isReadOnly, record, handleChange, dataIndex, getPlaceholderText, isSecret]);
 
   useEffect(() => {
     // Update form fields when record changes non-user actions like syncing variables from listener
@@ -167,6 +179,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={record?.[dataIndex]}>
         {dataIndex === "type" ? (
           <Select
+            disabled={isReadOnly}
             className="w-full"
             onChange={(value) => handleChange(value as EnvironmentVariableType)}
             value={record.type}
@@ -179,6 +192,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           </Select>
         ) : dataIndex === "key" ? (
           <Input
+            disabled={isReadOnly}
             ref={inputRef}
             onChange={(e) => handleChange(e.target.value)}
             placeholder={getPlaceholderText(dataIndex)}
