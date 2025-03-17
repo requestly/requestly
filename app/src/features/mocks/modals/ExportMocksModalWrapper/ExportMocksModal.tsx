@@ -13,8 +13,7 @@ import { toast } from "utils/Toast";
 import { trackMocksExported } from "modules/analytics/events/features/mocksV2";
 import Logger from "lib/logger";
 import "./ExportMocksModal.scss";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const EmptySelectionView = () => {
   return (
@@ -40,7 +39,7 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [isMocksLoading, setIsMocksLoading] = useState(false);
   const [mocksExportDetails, setMocksExportDetails] = useState({
@@ -80,7 +79,7 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
     return () => {
       setMocksExportDetails(null);
     };
-  }, [selectedMockIds, uid, activeWorkspaceId]);
+  }, [selectedMockIds, uid, activeWorkspaceId, closeModal]);
 
   const handleMocksExport = () => {
     trackMocksExported(mocksExportDetails.mocksCount, mocksExportDetails.collectionsCount);

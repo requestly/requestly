@@ -8,13 +8,12 @@ import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams
 import { useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const TeamsList = ({ teams = [] }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const columns = [
     {

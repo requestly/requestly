@@ -4,3 +4,4 @@ export { useIsExtensionEnabled } from "./useIsExtensionEnabled";
 export { useHasUnsavedChanges } from "./useHasUnsavedChanges";
 export { useOutsideClick } from "./useOutsideClick";
 export { useDeepLinkState } from "./useDeepLinkState";
+export { useCurrentWorkspaceUserRole } from "./useCurrentWorkspaceUserRole";

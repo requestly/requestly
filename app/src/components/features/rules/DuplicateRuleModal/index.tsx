@@ -20,11 +20,10 @@ import { getAllRulesOfGroup } from "utils/rules/misc";
 import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
 import "./duplicateRuleModal.scss";
-import { getActiveWorkspaceIds, getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { Group, RecordStatus, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
 import { isGroup, isRule } from "features/rules";
 import syncingHelper from "lib/syncing/helpers/syncingHelper";
+import { getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface Props {
   isOpen: boolean;
@@ -40,11 +39,8 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
-
   const availableWorkspaces = useSelector(getAllWorkspaces);
-  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
-  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
-
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const userAttributes = useSelector(getUserAttributes);

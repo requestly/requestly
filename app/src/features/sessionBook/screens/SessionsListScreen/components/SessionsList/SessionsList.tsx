@@ -9,12 +9,11 @@ import { SessionsTable } from "./components/SessionsTable/SessionsTable";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import ShareRecordingModal from "views/features/sessions/ShareRecordingModal";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { RBACEmptyState, RoleBasedComponent } from "features/rbac";
 
 export const SessionsList = () => {
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const user = useSelector(getUserAuthDetails);
   const [searchValue, setSearchValue] = useState("");
   const [forceRender, setForceRender] = useState(false);
@@ -78,5 +77,19 @@ export const SessionsList = () => {
         ) : null}
       </>
     );
-  } else return <SessionsOnboardingView />;
+  } else
+    return (
+      <RoleBasedComponent
+        resource="session_recording"
+        permission="create"
+        fallback={
+          <RBACEmptyState
+            title="No sessions created yet."
+            description="As a viewer, you will be able to view sessions once someone from your team creates them. You can contact your workspace admin to update your role."
+          />
+        }
+      >
+        <SessionsOnboardingView />
+      </RoleBasedComponent>
+    );
 };

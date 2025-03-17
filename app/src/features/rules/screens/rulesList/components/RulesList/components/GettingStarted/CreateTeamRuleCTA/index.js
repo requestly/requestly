@@ -13,14 +13,13 @@ import { RuleSelectionListDrawer } from "../../RuleSelectionListDrawer/RuleSelec
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackNewRuleButtonClicked, trackRulesEmptyStateClicked } from "modules/analytics/events/common/rules";
 import "./CreateTeamRuleCTA.css";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 export const CreateTeamRuleCTA = () => {
   const navigate = useNavigate();
   //Global State
   const dispatch = useDispatch();
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   //Component State
   const [isNewRuleSelectorModalActive, setIsNewRuleSelectorModalActive] = useState(false);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);

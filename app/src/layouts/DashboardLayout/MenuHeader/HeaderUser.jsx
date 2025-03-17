@@ -22,10 +22,9 @@ import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationE
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
 import { tabsLayoutActions } from "store/slices/tabs-layout";
 import { isSafariBrowser } from "actions/ExtensionActions";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -33,8 +32,7 @@ export default function HeaderUser() {
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const appMode = useSelector(getAppMode);
 
   const userName = user.loggedIn ? user?.details?.profile?.displayName ?? "User" : null;

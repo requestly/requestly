@@ -3,8 +3,7 @@ import { useSelector } from "react-redux";
 import { ShareFromPrivate } from "./ShareFromPrivate";
 import { ShareFromWorkspace } from "./ShareFromWorkspace";
 import { PostSharing } from "./PostSharing";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 interface ShareInWorkspaceProps {
   selectedRules: string[];
@@ -17,9 +16,7 @@ export const ShareInWorkspaces: React.FC<ShareInWorkspaceProps> = ({
   toggleModal,
   onRulesShared = () => {},
 }) => {
-  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
-  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const [postShareViewData, setPostShareViewData] = useState(null);
 
   return (

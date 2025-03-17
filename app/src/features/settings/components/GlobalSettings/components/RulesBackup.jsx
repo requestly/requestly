@@ -7,14 +7,13 @@ import { createBackupIfRequired, setIsBackupEnabled } from "utils/BackupUtils";
 import SettingsItem from "./SettingsItem";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackBackupToggled } from "modules/analytics/events/features/syncing/backup";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const RulesBackup = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [backupStatus, setBackupStatus] = useState(user?.details?.isBackupEnabled ?? false);
   const [isBackupStatusChangeProcessing, setIsBackupStatusChangeProcessing] = useState(false);

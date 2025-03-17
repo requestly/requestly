@@ -3,7 +3,7 @@ import { Checkbox, Input, Modal, Radio, Tag } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system-v2/components";
-import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig, WorkspaceType } from "types";
+import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig } from "types";
 import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
@@ -27,8 +27,10 @@ import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { useIncentiveActions } from "features/incentivization/hooks";
 import "./createWorkspaceModal.scss";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
-import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { workspaceActions } from "store/slices/workspaces/slice";
+import { Workspace, WorkspaceMemberRole, WorkspaceType } from "features/workspaces/types";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 interface Props {
   isOpen: boolean;
@@ -147,31 +149,30 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
         : ({ type: WorkspaceType.SHARED } as SharedOrPrivateWorkspaceConfig);
 
     try {
-      // TODO-syncing-local-fs-bug??
       const teamId = await (async () => {
         if (config.type === WorkspaceType.LOCAL) {
           const workspaceCreationResult = await createWorkspaceFolder(workspaceName, config.rootPath);
           if (workspaceCreationResult.type === "error") {
             throw new Error(workspaceCreationResult.error.message);
           }
-          // const partialWorkspace = workspaceCreationResult.content;
-          // const localWorkspace: Record<string, any> = {
-          //   id: partialWorkspace.id,
-          //   name: partialWorkspace.name,
-          //   owner: user?.details?.profile?.uid,
-          //   accessCount: 1,
-          //   adminCount: 1,
-          //   members: {
-          //     [user?.details?.profile?.uid]: {
-          //       role: "admin",
-          //     },
-          //   },
-          //   appsumo: null,
-          //   workspaceType: WorkspaceType.LOCAL,
-          //   rootPath: partialWorkspace.path,
-          // };
-          // dispatch(teamsActions.addToAvailableTeams(localWorkspace));
-          // return partialWorkspace.id;
+          const partialWorkspace = workspaceCreationResult.content;
+          const localWorkspace: Workspace = {
+            id: partialWorkspace.id,
+            name: partialWorkspace.name,
+            owner: user?.details?.profile?.uid,
+            accessCount: 1,
+            adminCount: 1,
+            members: {
+              [user?.details?.profile?.uid]: {
+                role: WorkspaceMemberRole.admin,
+              },
+            },
+            appsumo: null,
+            workspaceType: WorkspaceType.LOCAL,
+            rootPath: partialWorkspace.path,
+          };
+          dispatch(workspaceActions.upsertWorkspace(localWorkspace));
+          return partialWorkspace.id;
         } else {
           const response: any = await createTeam({
             teamName: workspaceName,

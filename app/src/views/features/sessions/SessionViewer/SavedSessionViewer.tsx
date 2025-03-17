@@ -37,8 +37,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -89,7 +88,7 @@ const SavedSessionViewer: React.FC = () => {
   const isMobileScreen = useMediaQuery({ query: "(max-width: 550px)" });
 
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const hasAuthInitialized = useSelector(getAuthInitialization);
   const eventsFilePath = useSelector(getSessionRecordingEventsFilePath);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);

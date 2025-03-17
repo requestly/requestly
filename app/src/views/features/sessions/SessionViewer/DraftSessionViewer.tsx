@@ -40,9 +40,8 @@ import APP_CONSTANTS from "config/constants";
 import { toast } from "utils/Toast";
 import Logger from "../../../../../../common/logger";
 import { useIncentiveActions } from "features/incentivization/hooks";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 export interface DraftSessionViewerProps {
   testRuleDraftSession?: {
     draftSessionTabId: string;
@@ -71,7 +70,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const isImportedSession = tabId === "imported";
 
   const [isLoading, setIsLoading] = useState(true);

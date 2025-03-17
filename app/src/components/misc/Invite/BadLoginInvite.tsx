@@ -1,26 +1,25 @@
-import { Avatar, Col, Row } from "antd";
+import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useDispatch, useSelector } from "react-redux";
-import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { globalActions } from "store/slices/global/slice";
 import "./index.css";
 import APP_CONSTANTS from "config/constants";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
 import { getAppMode } from "store/selectors";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { Workspace } from "features/workspaces/types";
 
 interface Props {
   inviteId: string;
   ownerName: string;
-  workspaceName: string;
+  workspace: Workspace;
   invitedEmail: string;
 }
 
-const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Props) => {
+const BadLoginInvite = ({ inviteId, ownerName, workspace, invitedEmail }: Props) => {
   const dispatch = useDispatch();
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const appMode = useSelector(getAppMode);
 
   const openAuthModal = () => {
@@ -51,17 +50,10 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
       <Col xs={18} sm={16} md={14} lg={12} xl={8}>
         <div className="invite-content">
           <div className="workspace-image invite-accept-avatar-image">
-            <Avatar
-              size={56}
-              shape="square"
-              icon={workspaceName ? workspaceName?.[0]?.toUpperCase() : "P"}
-              style={{
-                backgroundColor: `${getUniqueColorForWorkspace("", workspaceName)}`,
-              }}
-            />
+            <WorkspaceAvatar workspace={workspace} size={56} />
           </div>
           <div className="header invite-header">
-            {ownerName} has invited you to workspace {workspaceName}
+            {ownerName} has invited you to workspace {workspace?.name}
           </div>
           <p className="text-gray invite-subheader">
             {invitedEmail ? (

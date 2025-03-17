@@ -12,9 +12,8 @@ import { RxExternalLink } from "@react-icons/all-files/rx/RxExternalLink";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { RuleMigrationChange, getMV3MigrationData } from "modules/extension/utils";
 import { isEmpty } from "lodash";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { clientStorageService } from "services/clientStorageService";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
   const navigate = useNavigate();
@@ -75,7 +74,7 @@ const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
 };
 
 const MigratedRules = () => {
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const appMode = useSelector(getAppMode);
 
   const [rulesData, setRulesData] = useState({});

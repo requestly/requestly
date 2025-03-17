@@ -20,8 +20,7 @@ import { useSelector } from "react-redux";
 import { StartFromOffsetInput } from "./components/StartFromOffsetInput/StartFromOffsetInput";
 import { getSecondsFromStringifiedMinSec } from "utils/DateTimeUtils";
 import "./shareRecordingModal.scss";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const _ = require("lodash");
 
@@ -67,8 +66,7 @@ const ShareRecordingModal = ({
   currentOffset = "0:00",
 }) => {
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
 
   const publicURL = getSessionRecordingSharedLink(recordingId);
   // Component State

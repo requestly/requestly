@@ -15,8 +15,8 @@ import { redirectToSharedListViewer } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { UserAvatar } from "componentsV2/UserAvatar";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { RoleBasedComponent } from "features/rbac";
 
 interface Props {
   handleDeleteSharedListClick: (sharedListId: string) => void;
@@ -24,9 +24,7 @@ interface Props {
 
 export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Props) => {
   const navigate = useNavigate();
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
-
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const [copiedSharedListId, setCopiedSharedListId] = useState("");
 
   const handleOnURLCopy = useCallback((id: string) => {
@@ -98,13 +96,16 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
                 <RQButton icon={<MdOutlineFileCopy />} iconOnly />
               </Tooltip>
             </CopyToClipboard>
-            <Tooltip title="Delete">
-              <RQButton
-                icon={<RiDeleteBinLine />}
-                iconOnly
-                onClick={() => handleDeleteSharedListClick(record.shareId)}
-              />
-            </Tooltip>
+
+            <RoleBasedComponent resource="http_rule" permission="delete">
+              <Tooltip title="Delete">
+                <RQButton
+                  icon={<RiDeleteBinLine />}
+                  iconOnly
+                  onClick={() => handleDeleteSharedListClick(record.shareId)}
+                />
+              </Tooltip>
+            </RoleBasedComponent>
           </div>
         );
       },

@@ -11,14 +11,15 @@ import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import { getWorkspaceById } from "store/slices/workspaces/selectors";
+import { RoleBasedComponent } from "features/rbac";
 import { WorkspaceType } from "features/workspaces/types";
 
-interface Props {
+interface MembersDetailsProps {
   teamId: string;
   isTeamAdmin: boolean;
 }
 
-const MembersDetails: React.FC<Props> = ({ teamId, isTeamAdmin }) => {
+const MembersDetails = ({ teamId, isTeamAdmin }: MembersDetailsProps) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const isNewTeam = location.state?.isNewTeam;
@@ -30,6 +31,7 @@ const MembersDetails: React.FC<Props> = ({ teamId, isTeamAdmin }) => {
 
   // Global state
   const workspaceDetails = useSelector(getWorkspaceById(teamId));
+
   const accessCount = workspaceDetails?.accessCount;
 
   // To handle refresh in TeamMembersTable
@@ -76,8 +78,8 @@ const MembersDetails: React.FC<Props> = ({ teamId, isTeamAdmin }) => {
       getTeamBillingUsers({
         teamId,
       })
-        .then((res) => {
-          const seatsData: any = res.data;
+        .then((res: any) => {
+          const seatsData = res.data;
           if (seatsData.success) {
             setSeats({
               billQuantity: seatsData.billQuantity, // quantity passed to stripe to bill
@@ -101,15 +103,18 @@ const MembersDetails: React.FC<Props> = ({ teamId, isTeamAdmin }) => {
             {accessCount > 1 ? `${accessCount} Members` : "Workspace Members"}
           </div>
         </Col>
-        <Col>
-          <Button
-            disabled={workspaceDetails?.workspaceType === WorkspaceType.PERSONAL}
-            type="primary"
-            onClick={handleAddMemberClick}
-          >
-            <PlusOutlined /> <span className="text-bold caption">Invite People</span>
-          </Button>
-        </Col>
+
+        <RoleBasedComponent resource="workspace" permission="update">
+          <Col>
+            <Button
+              disabled={workspaceDetails?.workspaceType === WorkspaceType.PERSONAL}
+              type="primary"
+              onClick={handleAddMemberClick}
+            >
+              <PlusOutlined /> <span className="text-bold caption">Invite People</span>
+            </Button>
+          </Col>
+        </RoleBasedComponent>
       </Row>
 
       <div className="members-table-container">

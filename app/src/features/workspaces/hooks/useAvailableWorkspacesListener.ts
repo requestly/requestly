@@ -1,14 +1,16 @@
 import { collection, getFirestore, onSnapshot, where, query } from "firebase/firestore";
-import Logger from "lib/logger";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
-import { Workspace } from "../types";
+import { Workspace, WorkspaceMemberRole, WorkspaceType } from "../types";
 import firebaseApp from "firebase";
 import { LoggedOutWorkspace } from "../utils";
+// @ts-ignore
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
 
 const db = getFirestore(firebaseApp);
 
@@ -18,6 +20,9 @@ export const useAvailableWorkspacesListener = () => {
   const user = useSelector(getUserAuthDetails);
 
   const uid = user.details?.profile?.uid;
+  // TODO-syncing: Needs to be uncommented
+  // const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
+  const isLocalSyncEnabled = false;
 
   useEffect(() => {
     console.log("[useAvailableTeamsListener] start");
@@ -33,10 +38,9 @@ export const useAvailableWorkspacesListener = () => {
     }
 
     try {
-      const collectionRef = collection(db, "teams");
-      const q = query(collectionRef, where("access", "array-contains", uid));
+      const q = query(collection(db, "teams"), where(`members.${uid}.role`, "in", ["admin", "write", "read"]));
 
-      const unsub = onSnapshot(q, (querySnapshot) => {
+      const unsub = onSnapshot(q, async (querySnapshot) => {
         const records = querySnapshot.docs
           .map((teamDoc) => {
             const teamData = teamDoc.data() as Workspace;
@@ -67,8 +71,34 @@ export const useAvailableWorkspacesListener = () => {
 
         console.log("[useAvailableTeamsListener] fetched teams", { records });
 
+        let localRecords = [];
+        if (isLocalSyncEnabled) {
+          const allLocalWorkspacesResult = await getAllWorkspaces();
+          const allLocalWorkspaces =
+            allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
+          for (const partialWorkspace of allLocalWorkspaces) {
+            const localWorkspace: Workspace = {
+              id: partialWorkspace.id,
+              name: partialWorkspace.name,
+              owner: uid,
+              accessCount: 1,
+              adminCount: 1,
+              members: {
+                [uid]: {
+                  role: WorkspaceMemberRole.admin,
+                },
+              },
+              appsumo: null,
+              workspaceType: WorkspaceType.LOCAL,
+              rootPath: partialWorkspace.path,
+            };
+
+            localRecords.push(localWorkspace);
+          }
+        }
+
         // FIXME-syncing: private workspace should not be hardcoded like this here. It should automatically get fetched from db
-        dispatch(workspaceActions.setAllWorkspaces([...records]));
+        dispatch(workspaceActions.setAllWorkspaces([...records, ...localRecords]));
         dispatch(workspaceActions.setWorkspacesUpdatedAt(Date.now()));
       });
 
@@ -81,5 +111,5 @@ export const useAvailableWorkspacesListener = () => {
     } catch (error) {
       console.error(error);
     }
-  }, [dispatch, uid]);
+  }, [dispatch, isLocalSyncEnabled, uid]);
 };

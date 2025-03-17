@@ -4,7 +4,7 @@ import { getAppMode } from "store/selectors";
 import { useDispatch } from "react-redux";
 import { isGroupsSanitizationPassed } from "components/features/rules/RulesIndexPage/actions";
 import { recordsActions } from "store/features/rules/slice";
-import { Group, RecordStatus, RecordType, Rule } from "@requestly/shared/types/entities/rules";
+import { Group, RecordStatus, Rule } from "@requestly/shared/types/entities/rules";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
@@ -14,8 +14,7 @@ import { migrateAllRulesToMV3 } from "modules/extension/utils";
 import { sendIndividualRuleTypesCountAttributes } from "../utils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RuleStorageModel, syncEngine } from "lib/syncing";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -26,10 +25,9 @@ interface Props {
 const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
   const appMode = useSelector(getAppMode);
 
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const userAuthDetails = useSelector(getUserAuthDetails);
   const userId = userAuthDetails.loggedIn && userAuthDetails.details?.profile?.uid;
-  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
-  const activeWorkspaceId = getActiveWorkspaceId(activeWorkspaceIds);
 
   const dispatch = useDispatch();
 

@@ -27,8 +27,8 @@ import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
-import "./createWorkspaceModal.css";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import "./CreateWorkspaceModal.css";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface Props {

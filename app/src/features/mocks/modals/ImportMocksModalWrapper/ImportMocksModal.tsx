@@ -19,8 +19,7 @@ import {
   trackMocksJsonParsed,
 } from "modules/analytics/events/features/mocksV2";
 import "./ImportMocksModal.scss";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface ImportMocksModalProps {
   isOpen: boolean;
@@ -40,7 +39,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [dataToImport, setDataToImport] = useState({
     records: [],

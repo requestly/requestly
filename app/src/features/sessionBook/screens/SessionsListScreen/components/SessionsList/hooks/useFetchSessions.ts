@@ -14,8 +14,7 @@ import {
 import firebaseApp from "../../../../../../../firebase";
 import { getOwnerId } from "backend/utils";
 import { SessionRecording } from "../../../../../types";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 // TODO: ADD PAGINATION
 
@@ -24,7 +23,7 @@ const pageSize = 15;
 
 export const useFetchSessions = (forceRender: boolean) => {
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
   const [isSessionsListLoading, setIsSessionsListLoading] = useState(false);
   const [sessions, setSessions] = useState([]);

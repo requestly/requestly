@@ -18,10 +18,9 @@ import "./configurationPage.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const emptyPageSourceData = {
   key: GLOBAL_CONSTANTS.URL_COMPONENTS.URL,
@@ -46,8 +45,7 @@ const ConfigurationPage = () => {
   const navigate = useNavigate();
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const [customPageSources, setCustomPageSources] = useState([]);
   const [pageSourceType, setPageSourceType] = useState(PAGE_SOURCES_TYPE.ALL_PAGES);
   const inputRef = useRef(null);

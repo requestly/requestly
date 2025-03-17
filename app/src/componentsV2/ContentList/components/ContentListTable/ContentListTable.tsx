@@ -90,6 +90,7 @@ export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   dragAndDrop?: boolean;
   onRowDropped?: (sourceRecordId: string, targetRecordId: string) => void;
   defaultExpandedRowKeys?: string[];
+  isRowSelectable?: boolean;
 }
 
 const ContentListTable = <DataType extends { [key: string]: any }>({
@@ -113,6 +114,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   footer,
   bordered = false,
   showHeader = true,
+  isRowSelectable = true,
 }: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
@@ -122,7 +124,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     if (defaultExpandedRowKeys.length > 0) {
       setExpandedRowsKeys(defaultExpandedRowKeys);
     }
-  }, [defaultExpandedRowKeys.length]);
+  }, [defaultExpandedRowKeys]);
 
   const expandRow = useCallback(
     (expanded: boolean, record: DataType) => {
@@ -174,7 +176,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   );
 
   const commonProps: TableProps<DataType> = {
-    className: `rq-content-list-table ${className}`,
+    className: `rq-content-list-table ${className} ${isRowSelectable ? "rq-content-list-table-selectable" : ""}`,
     onHeaderRow: () => ({
       className: "rq-content-list-table-header",
     }),
@@ -187,16 +189,17 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     pagination: false,
     scroll: scroll,
     locale: locale,
-    rowSelection: bulkActionBarConfig
-      ? {
-          checkStrictly: false,
-          selectedRowKeys: selectedRows.map((record) => (record as any)[rowKey]),
-          onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-            onRecordSelection(selectedRows);
-            setSelectedRows(selectedRows);
-          },
-        }
-      : null,
+    rowSelection:
+      isRowSelectable && bulkActionBarConfig
+        ? {
+            checkStrictly: false,
+            selectedRowKeys: selectedRows.map((record) => (record as any)[rowKey]),
+            onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
+              onRecordSelection(selectedRows);
+              setSelectedRows(selectedRows);
+            },
+          }
+        : null,
     expandable: {
       expandRowByClick: true,
       rowExpandable: () => true,

@@ -23,17 +23,16 @@ import "./index.scss";
 import { trackPersonalSubscriptionDownloadInvoicesClicked } from "features/settings/analytics";
 import { PlanStatus, PlanType } from "../../types";
 import { CancelPlanModal } from "../BillingDetails/modals/common/CancelPlanModal";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { isSafariBrowser } from "actions/ExtensionActions";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 export const UserPlanDetails = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const [daysLeft, setDaysLeft] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [hasAppSumoSubscription, setHasAppSumoSubscription] = useState(false);

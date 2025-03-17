@@ -6,16 +6,14 @@ import { ApiClientCloudRepository } from "./cloud";
 import { ApiClientLocalRepository } from "./local";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { ApiClientRepositoryInterface } from "./interfaces";
-import { getActiveWorkspaceId, getLocalFSWorkspaceRootPath, isLocalFSWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds, getWorkspaceById } from "store/slices/workspaces/selectors";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "features/workspaces/types";
 
 export const useGetApiClientSyncRepo = () => {
   const user: Record<string, any> = useSelector(getUserAuthDetails);
   const appMode: string = useSelector(getAppMode);
-
-  const activeWorkspace = useSelector(getWorkspaceById(getActiveWorkspaceId(useSelector(getActiveWorkspaceIds))));
-  const isWorkspaceLocal: boolean = isLocalFSWorkspace(activeWorkspace);
-  const workspaceRootPath: string = getLocalFSWorkspaceRootPath(activeWorkspace);
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const isWorkspaceLocal: boolean = activeWorkspace?.workspaceType === WorkspaceType.LOCAL;
 
   const getRepository: () => ApiClientRepositoryInterface = useCallback(() => {
     if (!user.loggedIn) {
@@ -23,12 +21,12 @@ export const useGetApiClientSyncRepo = () => {
     }
     if (isWorkspaceLocal && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       return new ApiClientLocalRepository({
-        rootPath: workspaceRootPath,
+        rootPath: activeWorkspace?.rootPath,
       });
     } else {
       return new ApiClientCloudRepository({ uid: user.details.profile.uid, teamId: activeWorkspace.id });
     }
-  }, [isWorkspaceLocal, user?.details?.profile?.uid, user.loggedIn, activeWorkspace.id, workspaceRootPath, appMode]);
+  }, [isWorkspaceLocal, user.details.profile.uid, user.loggedIn, activeWorkspace, appMode]);
 
   const repository = useMemo(() => getRepository(), [getRepository]);
 

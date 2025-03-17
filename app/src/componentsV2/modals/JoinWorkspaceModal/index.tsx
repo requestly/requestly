@@ -17,6 +17,7 @@ import APP_CONSTANTS from "config/constants";
 import "./JoinWorkspaceModal.css";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 
 interface JoinWorkspaceModalProps {
   isOpen: boolean;
@@ -72,7 +73,11 @@ const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
             className="workspace-avatar"
             icon={team.teamName?.[0]?.toUpperCase() ?? "W"}
             style={{
-              backgroundColor: `${getUniqueColorForWorkspace(team.teamId, team.teamName)}`,
+              backgroundColor: `${getUniqueColorForWorkspace({
+                id: team?.teamId,
+                name: team.teamName,
+                workspaceType: WorkspaceType.SHARED,
+              } as Workspace)}`,
             }}
           />
           <div>{team.teamName}</div>

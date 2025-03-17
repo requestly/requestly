@@ -8,8 +8,8 @@ import { getPendingInvites } from "backend/workspace";
 import Logger from "lib/logger";
 import { Invite } from "types";
 import { m, AnimatePresence } from "framer-motion";
-import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 export const TeamsCard: React.FC = () => {
   const user = useSelector(getUserAuthDetails);

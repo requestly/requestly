@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import SpinnerCard from "../SpinnerCard";
 import { trackWorkspaceInviteScreenError } from "modules/analytics/events/features/teams";
 import "./index.css";
+import { WorkspaceType } from "features/workspaces/types";
 
 interface Props {
   inviteId: string;
@@ -27,8 +28,7 @@ const Invite = ({ inviteId }: Props) => {
   const user = useSelector(getUserAuthDetails);
 
   const [ownerName, setOwnerName] = useState(null);
-  const [workspaceId, setWorkspaceId] = useState(null);
-  const [workspaceName, setWorkspaceName] = useState(null);
+  const [workspace, setWorkspace] = useState(null);
   const [invitedEmail, setInvitedEmail] = useState(null);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -45,8 +45,11 @@ const Invite = ({ inviteId }: Props) => {
         const invite = res?.data?.data?.invite;
 
         setOwnerName(invite?.metadata?.ownerDisplayName);
-        setWorkspaceId(invite?.metadata?.teamId);
-        setWorkspaceName(invite?.metadata?.teamName);
+        setWorkspace({
+          id: invite?.metadata?.teamId,
+          name: invite?.metadata?.teamName,
+          workspaceType: WorkspaceType.SHARED,
+        });
         setInvitedEmail(invite?.email);
 
         if (res?.data?.success) {
@@ -67,15 +70,7 @@ const Invite = ({ inviteId }: Props) => {
   }
 
   if (verificationSuccess) {
-    return (
-      <AcceptInvite
-        inviteId={inviteId}
-        ownerName={ownerName}
-        workspaceId={workspaceId}
-        workspaceName={workspaceName}
-        invitedEmail={invitedEmail}
-      />
-    );
+    return <AcceptInvite inviteId={inviteId} ownerName={ownerName} workspace={workspace} invitedEmail={invitedEmail} />;
   }
 
   if (
@@ -83,19 +78,14 @@ const Invite = ({ inviteId }: Props) => {
     verificationError === VerifyInviteErrors.invalid_email
   ) {
     return (
-      <BadLoginInvite
-        inviteId={inviteId}
-        ownerName={ownerName}
-        workspaceName={workspaceName}
-        invitedEmail={invitedEmail}
-      />
+      <BadLoginInvite inviteId={inviteId} ownerName={ownerName} workspace={workspace} invitedEmail={invitedEmail} />
     );
   } else if (verificationError === VerifyInviteErrors.invite_not_found) {
     return (
       <InviteNotFound
         inviteId={inviteId}
         ownerName={ownerName}
-        workspaceName={workspaceName}
+        workspaceName={workspace?.name}
         invitedEmail={invitedEmail}
       />
     );
@@ -104,7 +94,7 @@ const Invite = ({ inviteId }: Props) => {
       <AcceptedInvite
         inviteId={inviteId}
         ownerName={ownerName}
-        workspaceName={workspaceName}
+        workspaceName={workspace?.name}
         invitedEmail={invitedEmail}
       />
     );
@@ -113,7 +103,7 @@ const Invite = ({ inviteId }: Props) => {
       <ExpiredInvite
         inviteId={inviteId}
         ownerName={ownerName}
-        workspaceName={workspaceName}
+        workspaceName={workspace?.name}
         invitedEmail={invitedEmail}
       />
     );
@@ -123,7 +113,7 @@ const Invite = ({ inviteId }: Props) => {
     <InviteNotFound
       inviteId={inviteId}
       ownerName={ownerName}
-      workspaceName={workspaceName}
+      workspaceName={workspace?.name}
       invitedEmail={invitedEmail}
     />
   );

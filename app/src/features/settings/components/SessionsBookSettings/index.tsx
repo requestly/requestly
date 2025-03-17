@@ -17,11 +17,11 @@ import Logger from "lib/logger";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./sessionsSettings.css";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
 import { RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { useRBAC } from "features/rbac";
 
 const emptyPageSourceData: SessionRecordingPageSource = {
   value: "",
@@ -47,12 +47,12 @@ export const defaultSessionRecordingConfig: SessionRecordingConfig = {
 
 export const SessionsSettings: React.FC = () => {
   const appMode = useSelector(getAppMode);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
-
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const [config, setConfig] = useState<SessionRecordingConfig>({});
   const [showNewPageSource, setShowNewPageSource] = useState<boolean>(false);
   const { autoRecording } = config;
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("session_recording", "update");
 
   const getPageSourceLabel = useCallback((source: SessionRecordingPageSource): string => {
     const upperCasedSourceKey = source.key.toUpperCase();
@@ -232,7 +232,7 @@ export const SessionsSettings: React.FC = () => {
   }
 
   const isPageSourcesDisabled =
-    (!autoRecording?.isActive || autoRecording?.mode === AutoRecordingMode.ALL_PAGES) ?? false;
+    (!isValidPermission || !autoRecording?.isActive || autoRecording?.mode === AutoRecordingMode.ALL_PAGES) ?? false;
 
   return (
     <div className="session-settings-container">
@@ -248,12 +248,16 @@ export const SessionsSettings: React.FC = () => {
 
             <div className="automatic-recording-switch">
               <span>{autoRecording?.isActive ? "Enabled" : "Disabled"}</span>
-              <Switch checked={!!autoRecording?.isActive} onChange={handleAutoRecordingToggle} />
+              <Switch
+                disabled={!isValidPermission}
+                checked={!!autoRecording?.isActive}
+                onChange={handleAutoRecordingToggle}
+              />
             </div>
 
             <Radio.Group
               value={autoRecording?.mode ?? AutoRecordingMode.ALL_PAGES}
-              disabled={!autoRecording?.isActive}
+              disabled={!autoRecording?.isActive || !isValidPermission}
               onChange={handleConfigModeChange}
               className="automatic-recording-radio-group"
             >
@@ -301,7 +305,7 @@ export const SessionsSettings: React.FC = () => {
                   ) : (
                     <Button
                       block
-                      disabled={!autoRecording?.isActive}
+                      disabled={!autoRecording?.isActive || !isValidPermission}
                       type="dashed"
                       icon={<PlusOutlined />}
                       className="add-new-source-btn"

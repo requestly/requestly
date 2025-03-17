@@ -12,8 +12,7 @@ import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { cleanupEndpoint, validateEndpoint } from "components/features/mocksV2/MockEditorIndex/utils";
 import { toast } from "utils/Toast";
 import "./createOrUpdateCollectionModal.scss";
-import { getActiveWorkspaceIds, getWorkspaceById } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspace, getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface Props {
   id?: string;
@@ -40,8 +39,8 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const activeWorkspace = useSelector(getWorkspaceById(activeWorkspaceId));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const activeWorkspace = useSelector(getActiveWorkspace);
 
   const [isLoading, setIsLoading] = useState(false);
   const [collectionName, setCollectionName] = useState("");
@@ -108,7 +107,6 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
           "mocksTable",
           activeWorkspace?.id,
           activeWorkspace?.name,
-          // @ts-ignore
           activeWorkspace?.membersCount,
           !!cleanedUpPath
         );
@@ -129,7 +127,6 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
           "mocksTable",
           activeWorkspace?.id,
           activeWorkspace?.name,
-          // @ts-ignore
           activeWorkspace?.membersCount,
           !!cleanedUpPath
         );

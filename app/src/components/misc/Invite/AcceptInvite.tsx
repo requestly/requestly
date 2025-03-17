@@ -1,8 +1,8 @@
-import { Avatar, Col, Row } from "antd";
+import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUniqueColorForWorkspace } from "features/workspaces/components/WorkspaceAvatar";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { toast } from "utils/Toast";
 import "./index.css";
 import { redirectToTeam } from "utils/RedirectionUtils";
@@ -10,16 +10,16 @@ import { acceptTeamInvite } from "backend/workspace";
 import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
 import InviteAcceptAnimation from "../LottieAnimation/InviteAcceptAnimation";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { Workspace } from "features/workspaces/types";
 
 interface Props {
   inviteId: string;
   ownerName: string;
-  workspaceId: string;
-  workspaceName: string;
+  workspace: Workspace;
   invitedEmail?: string;
 }
 
-const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props) => {
+const AcceptInvite = ({ inviteId, ownerName, workspace }: Props) => {
   const navigate = useNavigate();
   const { switchWorkspace } = useWorkspaceHelpers();
 
@@ -65,17 +65,10 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
             No, I'll skip
           </RQButton>
           <div className="workspace-image invite-accept-avatar-image">
-            <Avatar
-              size={56}
-              shape="square"
-              icon={workspaceName ? workspaceName?.[0]?.toUpperCase() : "P"}
-              style={{
-                backgroundColor: `${getUniqueColorForWorkspace(workspaceId ?? "", workspaceName)}`,
-              }}
-            />
+            <WorkspaceAvatar workspace={workspace} size={56} />
           </div>
           <div className="header invite-header">
-            {ownerName} has invited you to join workspace {workspaceName}
+            {ownerName} has invited you to join workspace {workspace?.name}
           </div>
           <p className="text-gray invite-subheader">Accept to start collaborating together</p>
 

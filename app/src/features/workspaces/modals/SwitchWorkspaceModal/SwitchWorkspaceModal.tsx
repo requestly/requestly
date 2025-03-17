@@ -54,7 +54,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
               <li key={workspace?.id}>
                 <div className="w-full teams-list-row">
                   <Col>
-                    <WorkspaceAvatar workspaceId={workspace?.id} workspaceName={workspace?.name} />
+                    <WorkspaceAvatar workspace={workspace} />
                     <div>{workspace.name}</div>
                   </Col>
                   <Col>{`${Object.keys(workspace?.members)?.length} members`}</Col>

@@ -1,15 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import isEmpty from "is-empty";
 import { Col, Row } from "antd";
-import { globalActions } from "store/slices/global/slice";
 import Body from "./Body";
 import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import SpinnerCard from "../../../misc/SpinnerCard";
 import APP_CONSTANTS from "../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import {
   cleanup,
   getModeData,
@@ -19,10 +16,8 @@ import {
 } from "./actions";
 import {
   getAppMode,
-  getAllRules,
   getCurrentlySelectedRuleData,
   getCurrentlySelectedRuleConfig,
-  getIsRuleEditorTourCompleted,
   getIsCurrentlySelectedRuleDetailsPanelShown,
 } from "../../../../store/selectors";
 import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
@@ -34,7 +29,6 @@ import {
   trackDocsSidebarViewed,
 } from "modules/analytics/events/common/rules";
 import { getRuleConfigInEditMode, isDesktopOnlyRule } from "utils/rules/misc";
-import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { useHasChanged } from "hooks";
 import { m } from "framer-motion";
 import { RuleDetailsPanel } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
@@ -61,7 +55,6 @@ const RuleBuilder = (props) => {
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const isDetailsPanelShown = useSelector(getIsCurrentlySelectedRuleDetailsPanelShown);
 
-  const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
@@ -70,14 +63,10 @@ const RuleBuilder = (props) => {
     return !props.isSharedListViewRule;
   }, [props.isSharedListViewRule]);
 
-  const isRuleEditorTourCompleted = useSelector(getIsRuleEditorTourCompleted);
-
   //References
   const isCleaningUpRef = useRef(false);
   //Component State
-  const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
   const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] = useState(false);
-  const [startWalkthrough, setStartWalkthrough] = useState(false);
   const [showDocs] = useState(false);
   const isDocsVisible = useMemo(() => {
     return enableDocs && showDocs;
@@ -166,24 +155,6 @@ const RuleBuilder = (props) => {
     ruleGroupId,
   ]);
 
-  // //If "all rules" are not already there in state, fetch them.
-  // if (!fetchAllRulesComplete && isEmpty(allRules)) {
-  //   Logger.log("Reading to storage in RuleBuilder");
-  //   StorageService(appMode)
-  //     .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
-  //     .then((rules) => {
-  //       //Set Flag to prevent loop
-  //       setFetchAllRulesComplete(true);
-  //       dispatch(globalActions.updateRulesAndGroups({ rules, groups: [] }));
-  //     });
-  // }
-
-  useEffect(() => {
-    if (MODE === RULE_EDITOR_CONFIG.MODES.CREATE && !isRuleEditorTourCompleted && !allRules.length) {
-      setStartWalkthrough(true);
-    }
-  }, [MODE, allRules.length, isRuleEditorTourCompleted]);
-
   useEffect(() => {
     const source = state?.source ?? null;
     const ruleType = currentlySelectedRuleConfig.TYPE;
@@ -245,13 +216,6 @@ const RuleBuilder = (props) => {
 
   return (
     <m.div layout transition={{ type: "linear", duration: 0.2 }} style={{ height: "inherit" }}>
-      {/* <ProductWalkthrough
-        tourFor={RULE_TYPE_TO_CREATE}
-        startWalkthrough={startWalkthrough}
-        context={currentlySelectedRuleData}
-        onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.RULE_EDITOR }))}
-      /> */}
-
       {/* TODO: NEEDS REFACTORING */}
       <Row className="w-full relative rule-builder-container">
         <Col span={24} className="rule-builder-body-wrapper">

@@ -16,14 +16,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { getSessionRecordingVisibility } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId, isPersonalWorkspace } from "features/workspaces/utils";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const ShareButton = ({ recordingId, showShareModal }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
-  const isSharedWorkspaceMode = !isPersonalWorkspace(activeWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const currentVisibility = useSelector(getSessionRecordingVisibility);
   const sharedLink = getSessionRecordingSharedLink(recordingId);
   const [linkCopied, setLinkCopied] = useState();

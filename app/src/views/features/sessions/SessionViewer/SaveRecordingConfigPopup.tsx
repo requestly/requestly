@@ -28,8 +28,7 @@ import { DraftSessionViewerProps } from "./DraftSessionViewer";
 import { useIncentiveActions } from "features/incentivization/hooks";
 import { saveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/utils";
 import Logger from "../../../../../../common/logger";
-import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -53,7 +52,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
   const { pathname } = useLocation();
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
-  const activeWorkspaceId = getActiveWorkspaceId(useSelector(getActiveWorkspaceIds));
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const appMode = useSelector(getAppMode);
