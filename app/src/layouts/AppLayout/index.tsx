@@ -78,16 +78,15 @@ const App: React.FC = () => {
     <>
       <ExtensionContextInvalidationNotice />
       <AutomationNotAllowedNotice />
-      <AuthHandler />
       <AppModeInitializer />
-      <DBListeners />
-      {/* <RuleExecutionsSyncer /> */}
-      {/* @ts-ignore */}
-      {/* @ts-ignore */}
-      <ThirdPartyIntegrationsHandler />
-      <ThemeProvider>
-        <ConfigProvider locale={enUS}>
-          <GrowthBookProvider growthbook={growthbook}>
+      <AuthHandler />
+      <GrowthBookProvider growthbook={growthbook}>
+        <DBListeners />
+        {/* <RuleExecutionsSyncer /> */}
+        {/* @ts-ignore */}
+        <ThirdPartyIntegrationsHandler />
+        <ThemeProvider>
+          <ConfigProvider locale={enUS}>
             {/* @ts-ignore */}
             <InitImplicitWidgetConfigHandler />
             <LocalUserAttributesHelperComponent />
@@ -101,9 +100,9 @@ const App: React.FC = () => {
                 <Outlet />
               </div>
             </LazyMotion>
-          </GrowthBookProvider>
-        </ConfigProvider>
-      </ThemeProvider>
+          </ConfigProvider>
+        </ThemeProvider>
+      </GrowthBookProvider>
     </>
   );
 };
