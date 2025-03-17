@@ -2,6 +2,7 @@ import { create, StoreApi, UseBoundStore, useStore } from "zustand";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { createContext, useContext } from "react";
+import { useShallow } from "zustand/shallow";
 
 type TabId = number;
 type SourceName = string;
@@ -162,7 +163,7 @@ export const TabServiceStoreContext = createContext(tabServiceStoreWithAutoSelec
  */
 export const useTabServiceSelector = <T>(selector: (state: TabServiceState) => T) => {
   const store = useContext(TabServiceStoreContext);
-  return useStore(store, selector);
+  return useStore(store, useShallow(selector));
 };
 
 /**

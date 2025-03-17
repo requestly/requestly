@@ -8,6 +8,9 @@ import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImport
 import { TabOutletHOC } from "layouts/TabsLayout/hoc/TabOutletHOC";
 import { CollectionView } from "./screens/apiClient/components/clientView/components/Collection/CollectionView";
 import { ApiClientEmptyView } from "./screens/apiClient/components/clientView/components/ApiClientEmptyView/ApiClientEmptyView";
+import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
+import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceProvider";
+import { TabServiceStoreContext, tabServiceStoreWithAutoSelectors } from "componentsV2/Tabs/store/tabServiceStore";
 
 export const apiClientRoutes: RouteObject[] = [
   {
@@ -22,9 +25,16 @@ export const apiClientRoutes: RouteObject[] = [
       {
         index: true,
         element: (
-          <TabOutletHOC>
-            <ApiClientEmptyView />
-          </TabOutletHOC>
+          // <TabOutletHOC>
+          //   <ApiClientEmptyView />
+          // </TabOutletHOC>
+          // <TabServiceProvider>
+          //   <TabsContainer />
+          // </TabServiceProvider>
+          //
+          <TabServiceStoreContext.Provider value={tabServiceStoreWithAutoSelectors}>
+            <TabsContainer />
+          </TabServiceStoreContext.Provider>
         ),
       },
       {
