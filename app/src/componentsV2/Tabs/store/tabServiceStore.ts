@@ -1,4 +1,4 @@
-import { create, StoreApi, useStore } from "zustand";
+import { create, StoreApi, UseBoundStore, useStore } from "zustand";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { createContext, useContext } from "react";
@@ -137,10 +137,38 @@ const createTabServiceStore = () => {
   }));
 };
 
-// Creating and passing the store through context to ensure every component does not have access to the store but only the components wrapped in Provider
-export const TabServiceStoreContext = createContext(createTabServiceStore());
+// https://zustand.docs.pmnd.rs/guides/auto-generating-selectors
+type WithSelectors<S> = S extends { getState: () => infer T } ? S & { use: { [K in keyof T]: () => T[K] } } : never;
+const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) => {
+  let store = _store as WithSelectors<typeof _store>;
+  store.use = {};
+  for (let k of Object.keys(store.getState())) {
+    (store.use as any)[k] = () => store((s) => s[k as keyof typeof s]);
+  }
 
-export const useTabService = <T = TabServiceState>(selector: (state: TabServiceState) => T) => {
+  return store;
+};
+
+const tabServiceStore = createTabServiceStore();
+const tabServiceStoreWithAutoSelectors = createSelectors(tabServiceStore);
+
+// Creating and passing the store through context to ensure every component does not have access to the store but only the components wrapped in Provider
+export const TabServiceStoreContext = createContext(tabServiceStoreWithAutoSelectors);
+
+/**
+ * Usage: const [a, b] = useTabServiceSelector(state => [ state.a, state.b ])
+ * @param selector
+ * @returns selector
+ */
+export const useTabServiceSelector = <T>(selector: (state: TabServiceState) => T) => {
   const store = useContext(TabServiceStoreContext);
   return useStore(store, selector);
+};
+
+/**
+ * Usage: const openTab = useTabServiceStore().use.openTab()
+ */
+export const useTabServiceStore = () => {
+  const store = useContext(TabServiceStoreContext);
+  return store;
 };
