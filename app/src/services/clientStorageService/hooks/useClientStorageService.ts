@@ -1,14 +1,22 @@
-import { useEffect } from "react";
+import Logger from "lib/logger";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { initClientStorageService } from "..";
-import Logger from "lib/logger";
+import { useEffect } from "react";
+
+let firstInit = false;
 
 const useClientStorageService = () => {
   const appMode = useSelector(getAppMode);
 
+  if (!firstInit) {
+    Logger.log("[ClientStorageServiceProvider] firstInit", appMode);
+    initClientStorageService(appMode);
+    firstInit = true;
+  }
+
   useEffect(() => {
-    Logger.log("[useClientStorageService]", { appMode });
+    Logger.log("[ClientStorageServiceProvider] appMode changed", appMode);
     initClientStorageService(appMode);
   }, [appMode]);
 };
