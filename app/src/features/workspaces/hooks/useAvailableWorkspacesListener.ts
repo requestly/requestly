@@ -31,7 +31,7 @@ export const useAvailableWorkspacesListener = () => {
   const uid = user.details?.profile?.uid;
   // TODO-syncing: Needs to be uncommented
   // const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
-  const isLocalSyncEnabled = true;
+  const isLocalSyncEnabled = false;
 
   useEffect(() => {
     console.log("[useAvailableTeamsListener] start");
