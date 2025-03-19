@@ -1,16 +1,25 @@
 import React, { useMemo } from "react";
 import { Tabs, TabsProps } from "antd";
-import { useTabServiceSelector } from "../store/tabServiceStore";
+import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 
 export const TabsContainer: React.FC = () => {
-  const [activeTabId, setActiveTabId, tabs, _version, openTab, closeTabById] = useTabServiceSelector((state) => [
+  const [
+    activeTabId,
+    setActiveTabId,
+    tabs,
+    _version,
+    openTab,
+    closeTabById,
+    tabsIndex,
+  ] = useTabServiceWithSelector((state) => [
     state.activeTabId,
     state.setActiveTabId,
     state.tabs,
     state._version,
     state.openTab,
     state.closeTabById,
+    state.tabsIndex,
   ]);
 
   // const activeTabId = useTabServiceStore().use.activeTabId();
@@ -40,7 +49,11 @@ export const TabsContainer: React.FC = () => {
       items={tabItems}
       activeKey={activeTabId?.toString()}
       onChange={(key) => {
-        setActiveTabId(parseInt(key));
+        const tabId = parseInt(key);
+        setActiveTabId(tabId);
+        const sourceId = tabs.get(tabId).getState().sourceId;
+        console.log("!!!debug", "keyy", key, sourceId);
+        window.history.pushState({}, "", `api-client/collection/${sourceId}`);
       }}
       onEdit={(key, action) => {
         if (action === "remove") {
