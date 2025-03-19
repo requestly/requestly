@@ -59,7 +59,7 @@ const InviteButton: React.FC = () => {
         }}
         className="primary-sidebar-link w-full"
       >
-        <span className="icon__wrapper">{<InviteIcon />}</span>
+        <InviteIcon />
         <span className="link-title">{"Invite"}</span>
       </RQButton>
     </>

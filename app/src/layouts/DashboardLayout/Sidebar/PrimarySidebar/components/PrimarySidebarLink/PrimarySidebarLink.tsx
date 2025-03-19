@@ -20,7 +20,7 @@ export const PrimarySidebarLink: React.FC<PrimarySidebarItem> = ({
       };
     }}
   >
-    <span className="icon__wrapper">{icon}</span>
+    {icon}
     <span className="link-title">{title}</span>
   </NavLink>
 );
