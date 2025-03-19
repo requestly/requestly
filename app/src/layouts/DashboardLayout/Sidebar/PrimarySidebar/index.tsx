@@ -109,7 +109,15 @@ export const PrimarySidebar: React.FC = () => {
         id: 6,
         title: "Sessions",
         path: PATHS.SESSIONS.INDEX,
-        icon: <SessionIcon />,
+        icon: (
+          <Tooltip
+            placement="right"
+            open={isSavingNetworkSession}
+            title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
+          >
+            <SessionIcon />
+          </Tooltip>
+        ),
         display: true,
       },
     ];
