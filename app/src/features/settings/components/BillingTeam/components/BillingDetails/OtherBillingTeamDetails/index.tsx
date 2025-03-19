@@ -16,6 +16,8 @@ import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { RequestBillingTeamAccessModal } from "../modals/RequestBillingTeamAccessModal/RequestBillingTeamAccessModal";
 import "./index.scss";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { toast } from "utils/Toast";
+import { BillingTeamDetails } from "..";
 
 export const OtherBillingTeamDetails: React.FC = () => {
   const { billingId } = useParams();
@@ -31,6 +33,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
     user?.details?.profile?.uid,
   ]);
   const hasBillingIdChanged = useHasChanged(billingId);
+  const [isLoading, setIsLoading] = useState(false);
 
   const requestJoinAcceleratorTeam = useMemo(
     () => httpsCallable<{ userEmails: string[]; billingId: string }>(getFunctions(), "billing-joinAcceleratorTeam"),
@@ -44,11 +47,12 @@ export const OtherBillingTeamDetails: React.FC = () => {
       billingId: billingTeams[0].id,
     })
       .then(() => {
-        //should we use the same Modal being used in RequestFeatureModal ? i.e setPostRequestMessage state Modal
-        console.log("team joined");
+        setIsLoading(true);
+        toast.success(`${BillingTeamDetails.name} joined successfully!`);
       })
       .catch((err) => {
-        console.log("error joining the team!");
+        setIsLoading(true);
+        toast.error("Failed to join the team! Please try again, or contact support if the problem persists");
       });
   }, [billingTeams, requestJoinAcceleratorTeam, user.details.profile.email]);
 
@@ -179,6 +183,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
                         type="default"
                         icon={<IoMdAdd />}
                         onClick={handleJoinAcceleratorTeam}
+                        loading={isLoading}
                       >
                         Join Team
                       </RQButton>
