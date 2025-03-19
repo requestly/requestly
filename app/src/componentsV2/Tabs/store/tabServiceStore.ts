@@ -172,7 +172,7 @@ export const createTabServiceProvider = () => {
  * @param selector
  * @returns selector
  */
-export const useTabServiceSelector = <T>(selector: (state: TabServiceState) => T) => {
+export const useTabServiceWithSelector = <T>(selector: (state: TabServiceState) => T) => {
   const store = useContext(TabServiceStoreContext);
   return useStore(store, selector);
 };
