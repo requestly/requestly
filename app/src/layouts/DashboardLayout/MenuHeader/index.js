@@ -18,7 +18,6 @@ import WorkspaceSelector from "./WorkspaceSelector";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
 import { trackHeaderClicked, trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
-import ProductsDropDown from "./ProductsDropDown";
 import PremiumPlanBadge from "./PremiumPlanBadge/PremiumPlanBadge";
 import APP_CONSTANTS from "config/constants";
 import { PlanExpiredBadge } from "./PlanExpiredBadge";
@@ -84,7 +83,6 @@ const MenuHeader = () => {
                 >
                   Tutorials
                 </a>
-                {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && <ProductsDropDown />}
               </div>
             </Col>
           ) : null}
