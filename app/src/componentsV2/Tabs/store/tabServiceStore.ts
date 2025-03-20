@@ -124,10 +124,6 @@ const createTabServiceStore = () => {
       if (tabs.has(id)) {
         set({ activeTabId: id });
       }
-      const sourceId = tabs.get(id).getState().source.getSourceId();
-      const sourceName = tabs.get(id).getState().source.getSourceName();
-      const newPath = [PATHS.API_CLIENT.ABSOLUTE, sourceName, sourceId].join("/");
-      window.history.pushState({}, "", `${newPath}`);
     },
 
     _generateNewTabId() {
