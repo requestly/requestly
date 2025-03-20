@@ -21,6 +21,8 @@ import { ApiClientExportModal } from "features/apiClient/screens/apiClient/compo
 import { EnvironmentData } from "backend/environment/types";
 import { ErrorFilesList } from "features/apiClient/screens/apiClient/components/sidebar/components/ErrorFilesList/ErrorFileslist";
 import "./environmentsList.scss";
+import { toast } from "utils/Toast";
+import { RBAC, useRBAC } from "features/rbac";
 
 export const EnvironmentsList = () => {
   const dispatch = useDispatch();
@@ -37,6 +39,8 @@ export const EnvironmentsList = () => {
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const { setIsRecordBeingCreated, isRecordBeingCreated } = useApiClientContext();
+  const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_environment", "update");
 
   const { openTab, replaceTab } = useTabsLayoutContext();
 
@@ -96,6 +100,11 @@ export const EnvironmentsList = () => {
   );
 
   const handleAddEnvironmentClick = useCallback(() => {
+    if (!isValidPermission) {
+      toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, "environment"), 5);
+      return;
+    }
+
     if (!user.loggedIn) {
       dispatch(
         globalActions.toggleActiveModal({
@@ -112,7 +121,7 @@ export const EnvironmentsList = () => {
     }
     trackCreateEnvironmentClicked(EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
     return createNewEnvironment();
-  }, [user.loggedIn, dispatch, createNewEnvironment]);
+  }, [user.loggedIn, dispatch, createNewEnvironment, isValidPermission, getRBACValidationFailureErrorMessage]);
 
   const handleExportEnvironments = useCallback(
     (environment: { id: string; name: string }) => {
@@ -133,6 +142,7 @@ export const EnvironmentsList = () => {
             message="No environment created yet"
             newRecordBtnText="Create new environment"
             analyticEventSource={EnvironmentAnalyticsSource.ENVIRONMENTS_LIST}
+            disabled={!isValidPermission}
           />
         </div>
       ) : (
@@ -146,11 +156,16 @@ export const EnvironmentsList = () => {
                 <>
                   {filteredEnvironments.map((environment) =>
                     isGlobalEnvironment(environment.id) ? (
-                      <EnvironmentsListItem openTab={openTab} environment={environment} />
+                      <EnvironmentsListItem
+                        openTab={openTab}
+                        environment={environment}
+                        isReadOnly={!isValidPermission}
+                      />
                     ) : (
                       <EnvironmentsListItem
                         openTab={openTab}
                         environment={environment}
+                        isReadOnly={!isValidPermission}
                         onExportClick={handleExportEnvironments}
                       />
                     )

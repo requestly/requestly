@@ -30,6 +30,7 @@ import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
+import useClientStorageService from "services/clientStorageService/hooks/useClientStorageService";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -40,6 +41,7 @@ const App: React.FC = () => {
   }, []);
 
   usePreLoadRemover();
+  useClientStorageService();
   useGeoLocation();
   useIsExtensionEnabled();
   useBillingTeamsListener();
@@ -72,8 +74,8 @@ const App: React.FC = () => {
     <>
       <ExtensionContextInvalidationNotice />
       <AutomationNotAllowedNotice />
-      <AuthHandler />
       <AppModeInitializer />
+      <AuthHandler />
       <GrowthBookProvider growthbook={growthbook}>
         <DBListeners />
         {/* <RuleExecutionsSyncer /> */}

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsJoinWorkspaceCardVisible } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Avatar, Button, Col, Row } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -17,6 +16,7 @@ import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/tea
 import APP_CONSTANTS from "config/constants";
 import "./JoinWorkspaceModal.css";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 interface JoinWorkspaceModalProps {
   isOpen: boolean;
@@ -34,7 +34,7 @@ interface InviteRowProps {
 const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const isJoinWorkspaceCardVisible = useSelector(getIsJoinWorkspaceCardVisible);
   const [isJoining, setIsJoining] = useState<boolean>(false);
 
@@ -55,7 +55,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
               },
               dispatch,
               {
-                isWorkspaceMode,
+                isWorkspaceMode: isSharedWorkspaceMode,
                 isSyncEnabled: true,
               },
               appMode,

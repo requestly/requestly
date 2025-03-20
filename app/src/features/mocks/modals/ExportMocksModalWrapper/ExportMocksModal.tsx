@@ -7,13 +7,13 @@ import { RQMockSchema } from "components/features/mocksV2/types";
 import { getMock } from "backend/mocks/getMock";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { prepareMocksToExport } from "./utils";
 import fileDownload from "js-file-download";
 import { toast } from "utils/Toast";
 import { trackMocksExported } from "modules/analytics/events/features/mocksV2";
 import Logger from "lib/logger";
 import "./ExportMocksModal.scss";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const EmptySelectionView = () => {
   return (
@@ -38,9 +38,8 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
   onSuccess = () => {},
 }) => {
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
   const uid = user?.details?.profile?.uid;
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [isMocksLoading, setIsMocksLoading] = useState(false);
   const [mocksExportDetails, setMocksExportDetails] = useState({
@@ -60,7 +59,7 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
     const mockPromises: Promise<RQMockSchema>[] = [];
 
     selectedMockIds.forEach((mockId) => {
-      mockPromises.push(getMock(uid, mockId, teamId));
+      mockPromises.push(getMock(uid, mockId, activeWorkspaceId));
     });
 
     Promise.all(mockPromises)
@@ -80,7 +79,7 @@ export const ExportMocksModal: React.FC<ShareMocksModalProps> = ({
     return () => {
       setMocksExportDetails(null);
     };
-  }, [selectedMockIds, uid, teamId]);
+  }, [selectedMockIds, uid, activeWorkspaceId, closeModal]);
 
   const handleMocksExport = () => {
     trackMocksExported(mocksExportDetails.mocksCount, mocksExportDetails.collectionsCount);

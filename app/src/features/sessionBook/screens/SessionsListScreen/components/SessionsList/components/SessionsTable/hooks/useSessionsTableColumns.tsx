@@ -1,7 +1,6 @@
 import { ShareAltOutlined } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Table, Tooltip } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { UserAvatar } from "componentsV2/UserAvatar";
@@ -15,6 +14,8 @@ import PATHS from "config/constants/sub/paths";
 import { RQButton } from "lib/design-system/components";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { useSessionsActionContext } from "features/sessionBook/context/actions";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { RoleBasedComponent } from "features/rbac";
 
 interface SessionsTableColumnsProps {
   handleUpdateSharingRecordId: (id: string) => void;
@@ -29,7 +30,7 @@ export const useSessionsTableColumns = ({
   handleShareModalVisibiliity,
   handleForceRender,
 }: SessionsTableColumnsProps) => {
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const { handleDeleteSessionAction } = useSessionsActionContext();
 
   const isDesktopSessionsCompatible =
@@ -102,7 +103,9 @@ export const useSessionsTableColumns = ({
       width: 120,
       align: "center",
       render: (visibility) => (
-        <Tooltip title={getPrettyVisibilityName(visibility, isWorkspaceMode)}>{renderHeroIcon(visibility)}</Tooltip>
+        <Tooltip title={getPrettyVisibilityName(visibility, isSharedWorkspaceMode)}>
+          {renderHeroIcon(visibility)}
+        </Tooltip>
       ),
     },
 
@@ -113,33 +116,35 @@ export const useSessionsTableColumns = ({
       align: "right",
       render: (id, record) => {
         return (
-          <div className="sessions-table-actions">
-            <Tooltip title="Share with your Teammates">
-              <RQButton
-                icon={<ShareAltOutlined />}
-                iconOnly
-                onClick={() => {
-                  handleUpdateSharingRecordId(id);
-                  handleUpdateSelectedRowVisibility(record.visibility);
-                  handleShareModalVisibiliity(true);
-                }}
-              />
-            </Tooltip>
+          <RoleBasedComponent resource="session_recording" permission="delete">
+            <div className="sessions-table-actions">
+              <Tooltip title="Share with your Teammates">
+                <RQButton
+                  icon={<ShareAltOutlined />}
+                  iconOnly
+                  onClick={() => {
+                    handleUpdateSharingRecordId(id);
+                    handleUpdateSelectedRowVisibility(record.visibility);
+                    handleShareModalVisibiliity(true);
+                  }}
+                />
+              </Tooltip>
 
-            <Tooltip title="Delete">
-              <RQButton
-                icon={<RiDeleteBinLine />}
-                iconOnly
-                onClick={() => handleDeleteSessionAction(id, record.eventsFilePath, handleForceRender)}
-              />
-            </Tooltip>
-          </div>
+              <Tooltip title="Delete">
+                <RQButton
+                  icon={<RiDeleteBinLine />}
+                  iconOnly
+                  onClick={() => handleDeleteSessionAction(id, record.eventsFilePath, handleForceRender)}
+                />
+              </Tooltip>
+            </div>
+          </RoleBasedComponent>
         );
       },
     },
   ];
 
-  if (!isWorkspaceMode) {
+  if (!isSharedWorkspaceMode) {
     // remove createdBy column
     columns.splice(5, 1);
   }

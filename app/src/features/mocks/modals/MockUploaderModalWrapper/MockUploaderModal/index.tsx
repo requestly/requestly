@@ -11,9 +11,9 @@ import { useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToFileMockEditorEditMock, redirectToMockEditorEditMock } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { MockType, RQMockSchema } from "components/features/mocksV2/types";
 import { createMockFromUploadedFile, generateFinalUrl } from "components/features/mocksV2/utils";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const { Dragger } = Upload;
 
@@ -32,14 +32,13 @@ export const MockUploaderModal: React.FC<Props> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const navigate = useNavigate();
 
   const handleFileSelection = async (uploadOptions: any) => {
     toast.loading(`Creating Mock from file ${uploadOptions.file.name}`);
-    await createMockFromUploadedFile(uid, uploadOptions.file, teamId)
+    await createMockFromUploadedFile(uid, uploadOptions.file, activeWorkspaceId)
       .then((mock: RQMockSchema) => {
         toast.success("Mock Created Successfully");
         uploadOptions.onSuccess("OK");
@@ -52,7 +51,12 @@ export const MockUploaderModal: React.FC<Props> = ({
         } else {
           selectMockOnUpload &&
             selectMockOnUpload(
-              generateFinalUrl({ endpoint: mock.endpoint, uid: user?.details?.profile?.uid, username: null, teamId })
+              generateFinalUrl({
+                endpoint: mock.endpoint,
+                uid: user?.details?.profile?.uid,
+                username: null,
+                teamId: activeWorkspaceId,
+              })
             );
         }
       })

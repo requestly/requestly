@@ -1,7 +1,6 @@
 import { useHasChanged } from "hooks";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import {
   getFirestore,
@@ -15,6 +14,7 @@ import {
 import firebaseApp from "../../../../../../../firebase";
 import { getOwnerId } from "backend/utils";
 import { SessionRecording } from "../../../../../types";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 // TODO: ADD PAGINATION
 
@@ -23,7 +23,7 @@ const pageSize = 15;
 
 export const useFetchSessions = (forceRender: boolean) => {
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
   const [isSessionsListLoading, setIsSessionsListLoading] = useState(false);
   const [sessions, setSessions] = useState([]);
@@ -34,7 +34,7 @@ export const useFetchSessions = (forceRender: boolean) => {
     const records: SessionRecording[] = [];
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(db, "session-recordings");
-    const ownerId = getOwnerId(user?.details?.profile?.uid, workspace?.id);
+    const ownerId = getOwnerId(user?.details?.profile?.uid, activeWorkspaceId);
 
     let query = null;
 
@@ -91,7 +91,7 @@ export const useFetchSessions = (forceRender: boolean) => {
     stableFetchSessions();
   };
 
-  const stableFetchSessions = useCallback(fetchRecordings, [user?.details?.profile?.uid, workspace]);
+  const stableFetchSessions = useCallback(fetchRecordings, [user?.details?.profile?.uid, activeWorkspaceId]);
 
   useEffect(() => {
     if (user?.details?.profile?.uid) {
@@ -103,7 +103,7 @@ export const useFetchSessions = (forceRender: boolean) => {
       stableFetchSessions();
       // }
     }
-  }, [hasUserChanged, workspace, stableFetchSessions, user?.details?.profile?.uid, forceRender]);
+  }, [hasUserChanged, activeWorkspaceId, stableFetchSessions, user?.details?.profile?.uid, forceRender]);
 
   return {
     sessions,
