@@ -1,7 +1,8 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Tabs, TabsProps } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
+import PATHS from "config/constants/sub/paths";
 
 export const TabsContainer: React.FC = () => {
   const [activeTabId, setActiveTabId, tabs, _version, openTab, closeTabById] = useTabServiceWithSelector((state) => [
@@ -20,6 +21,18 @@ export const TabsContainer: React.FC = () => {
   // const _version = useTabServiceStore().use._version();
   // const openTab = useTabServiceStore().use.openTab();
   // const closeTabById = useTabServiceStore().use.closeTabById();
+
+  useEffect(() => {
+    if (activeTabId) {
+      const sourceId = tabs.get(activeTabId).getState().source.getSourceId();
+      const sourceName = tabs.get(activeTabId).getState().source.getSourceName();
+      const newPath = [PATHS.API_CLIENT.ABSOLUTE, sourceName, sourceId].join("/");
+      window.history.pushState({}, "", `${newPath}`);
+    }
+
+    // should only be dependent on active tabId and not on tabs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTabId]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     return Array.from(tabs.values()).map((tabStore) => {
