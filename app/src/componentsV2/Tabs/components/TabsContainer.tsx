@@ -32,10 +32,7 @@ export const TabsContainer: React.FC = () => {
       const newPath = tabSource.getUrlPath();
       updateUrlPath(newPath);
     }
-
-    // should only be dependent on active tabId and not on tabs
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTabId]);
+  }, [activeTabId, getSourceByTabId]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     return Array.from(tabs.values()).map((tabStore) => {
