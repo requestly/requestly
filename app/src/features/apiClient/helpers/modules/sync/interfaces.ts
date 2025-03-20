@@ -1,13 +1,16 @@
 import { EnvironmentData, EnvironmentMap, EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
-import { ErrorFile, FileType } from "./local/services/types";
+import { ErroredRecords, FileType } from "./local/services/types";
 
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
   meta: Meta;
-  getAllEnvironments(): Promise<{ success: boolean; data: { environments: EnvironmentMap; errorFiles: ErrorFile[] } }>;
+  getAllEnvironments(): Promise<{
+    success: boolean;
+    data: { environments: EnvironmentMap; erroredRecords: ErroredRecords[] };
+  }>;
   createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData>;
   createGlobalEnvironment(): Promise<EnvironmentData>;
-  deleteEnvironment(envId: string): Promise<void>;
+  deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }>;
   updateEnvironment(
     environmentId: string,
     updates: Partial<Pick<EnvironmentData, "name" | "variables">>
@@ -25,7 +28,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   createCollection(record: Partial<RQAPI.CollectionRecord>): RQAPI.RecordPromise;
   createRecordWithId(record: Partial<RQAPI.Record>, id: string): RQAPI.RecordPromise;
   updateRecord(record: Partial<Omit<RQAPI.Record, "id">>, id: string): RQAPI.RecordPromise;
-  deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }>;
+  deleteRecords(recordIds: string[]): Promise<{ success: boolean; message?: string }>;
   deleteCollections(ids: string[]): Promise<{ success: boolean; data: unknown; message?: string }>;
   setCollectionVariables(
     id: string,

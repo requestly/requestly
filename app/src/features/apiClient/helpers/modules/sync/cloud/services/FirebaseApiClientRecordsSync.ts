@@ -4,7 +4,7 @@ import { generateDocumentId, getOwnerId } from "backend/utils";
 import { RQAPI } from "features/apiClient/types";
 import { sanitizeRecord, updateApiRecord } from "backend/apiClient/upsertApiRecord";
 import { EnvironmentVariables } from "backend/environment/types";
-import { ErrorFile } from "../../local/services/types";
+import { ErroredRecords } from "../../local/services/types";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -31,7 +31,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
       success: result.success,
       data: {
         records: result.data,
-        errorFiles: [] as ErrorFile[],
+        erroredRecords: [] as ErroredRecords[],
       },
     };
   }

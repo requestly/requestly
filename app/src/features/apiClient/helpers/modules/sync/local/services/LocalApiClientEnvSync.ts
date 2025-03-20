@@ -1,7 +1,7 @@
 import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 import { ApiClientLocalMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
-import { EnvironmentEntity, ErrorFile, FileSystemResult } from "./types";
+import { EnvironmentEntity, FileSystemResult } from "./types";
 import { appendPath, parseEntityVariables } from "../../utils";
 
 export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
@@ -37,10 +37,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
 
   async getAllEnvironments() {
     const service = await this.getAdapter();
-    const result: FileSystemResult<{
-      environments: EnvironmentEntity[];
-      errorFiles: ErrorFile[];
-    }> = await service.getAllEnvironments();
+    const result = await service.getAllEnvironments();
     if (result.type === "success") {
       const parsedEnvs = this.parseEnvironmentEntitiesToMap(result.content.environments);
       const globalEnvPath = `${this.meta.rootPath}/environments/global.json`;
@@ -52,7 +49,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
         success: true,
         data: {
           environments: parsedEnvs,
-          errorFiles: result.content.errorFiles,
+          erroredRecords: result.content.erroredRecords,
         },
       };
     } else {
@@ -60,7 +57,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
         success: true,
         data: {
           environments: {},
-          errorFiles: [],
+          erroredRecords: [],
         },
       };
     }
@@ -87,12 +84,13 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     return null;
   }
 
-  async deleteEnvironment(envId: string): Promise<void> {
+  async deleteEnvironment(envId: string) {
     const service = await this.getAdapter();
     const result = await service.deleteRecord(envId);
-
-    if (result.type === "error") {
-      throw new Error("Something went wrong while deleting environment");
+    if (result.type === "success") {
+      return { success: true };
+    } else {
+      return { success: false, message: "Something went wrong while deleting environment" };
     }
   }
 
