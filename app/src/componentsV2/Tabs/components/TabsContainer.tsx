@@ -2,27 +2,34 @@ import React, { useEffect, useMemo } from "react";
 import { Tabs, TabsProps } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
-import PATHS from "config/constants/sub/paths";
 
 const updateUrlPath = (path: string) => {
   window.history.pushState({}, "", path);
 };
 
 export const TabsContainer: React.FC = () => {
-  const [activeTabId, setActiveTabId, tabs, _version, openTab, closeTabById] = useTabServiceWithSelector((state) => [
+  const [
+    activeTabId,
+    setActiveTabId,
+    tabs,
+    _version,
+    openTab,
+    closeTabById,
+    getSourceByTabId,
+  ] = useTabServiceWithSelector((state) => [
     state.activeTabId,
     state.setActiveTabId,
     state.tabs,
     state._version,
     state.openTab,
     state.closeTabById,
+    state.getSourceByTabId,
   ]);
 
   useEffect(() => {
     if (activeTabId) {
-      const sourceId = tabs.get(activeTabId).getState().source.getSourceId();
-      const sourceName = tabs.get(activeTabId).getState().source.getSourceName();
-      const newPath = [PATHS.API_CLIENT.ABSOLUTE, sourceName, sourceId].join("/");
+      const tabSource = getSourceByTabId(activeTabId);
+      const newPath = tabSource.getUrlPath();
       updateUrlPath(newPath);
     }
 
