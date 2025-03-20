@@ -1,12 +1,11 @@
 import lazyWithRetry from "utils/lazyWithRetry";
 
-const LazyEditor = lazyWithRetry(
+const Editor = lazyWithRetry(
   () =>
     import(/* webpackChunkName: "EditorComponent" */ "./Editor").then((module) => {
-      console.log("debug");
       return module;
     }),
   null
 );
 
-export default LazyEditor;
+export default Editor;

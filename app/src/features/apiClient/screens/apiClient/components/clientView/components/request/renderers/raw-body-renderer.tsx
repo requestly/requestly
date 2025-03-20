@@ -1,12 +1,10 @@
 import React, { useCallback, useContext, useState } from "react";
-// import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
-// import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { EnvironmentVariables } from "backend/environment/types";
 import { useDebounce } from "hooks/useDebounce";
 import { RequestBodyContext, useTextBody } from "../request-body-state-manager";
 import { RequestBodyProps } from "../request-body-types";
-import LazyEditorV2 from "componentsV2/CodeEditor/components/EditorV2";
+import EditorV2 from "componentsV2/CodeEditor/components/EditorV2";
 
 export function RawBody(props: {
   contentType: "text/plain" | "application/json";
@@ -43,7 +41,7 @@ export function RawBody(props: {
 
   return (
     <div className="api-client-code-editor-container api-request-body-editor-container">
-      <LazyEditorV2
+      <EditorV2
         language={editorLanguage}
         value={text}
         handleChange={handleTextChange}

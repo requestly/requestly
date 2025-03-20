@@ -7,7 +7,7 @@ import { globalActions } from "store/slices/global/slice";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { RuleType } from "@requestly/shared/types/entities/rules";
-import LazyEditor from "componentsV2/CodeEditor/components/Editor";
+import Editor from "componentsV2/CodeEditor/components/Editor";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
@@ -130,7 +130,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
             }}
           >
             <Col xl="12" span={24}>
-              <LazyEditor
+              <Editor
                 // key={pair.request.type}
                 language={
                   pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
