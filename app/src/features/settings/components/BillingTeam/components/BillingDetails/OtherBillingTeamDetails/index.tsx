@@ -17,7 +17,6 @@ import { RequestBillingTeamAccessModal } from "../modals/RequestBillingTeamAcces
 import "./index.scss";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
-import { BillingTeamDetails } from "..";
 
 export const OtherBillingTeamDetails: React.FC = () => {
   const { billingId } = useParams();
@@ -48,13 +47,13 @@ export const OtherBillingTeamDetails: React.FC = () => {
     })
       .then(() => {
         setIsLoading(true);
-        toast.success(`${BillingTeamDetails.name} joined successfully!`);
+        toast.success(`${billingTeamDetails.name} joined successfully!`);
       })
       .catch((err) => {
         setIsLoading(true);
         toast.error("Failed to join the team! Please try again, or contact support if the problem persists");
       });
-  }, [billingTeams, requestJoinAcceleratorTeam, user.details.profile.email]);
+  }, [billingTeamDetails.name, billingTeams, requestJoinAcceleratorTeam, user.details.profile.email]);
 
   const columns = useMemo(
     () => [
