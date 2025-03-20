@@ -3,7 +3,6 @@ import { AbstractTabSource } from "../helpers/tabSource";
 
 export type TabState = {
   id: number;
-  sourceId: string;
   source: AbstractTabSource;
   saved: boolean;
   title: string;
@@ -15,7 +14,6 @@ export type TabState = {
 export const createTabStore = (id: number, source: AbstractTabSource, title: string) => {
   return create<TabState>((set) => ({
     id,
-    sourceId: source.getSourceId(),
     source,
     saved: false,
     title,

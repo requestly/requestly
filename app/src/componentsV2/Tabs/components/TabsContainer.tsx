@@ -4,15 +4,7 @@ import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 
 export const TabsContainer: React.FC = () => {
-  const [
-    activeTabId,
-    setActiveTabId,
-    tabs,
-    _version,
-    openTab,
-    closeTabById,
-    tabsIndex,
-  ] = useTabServiceWithSelector((state) => [
+  const [activeTabId, setActiveTabId, tabs, _version, openTab, closeTabById] = useTabServiceWithSelector((state) => [
     state.activeTabId,
     state.setActiveTabId,
     state.tabs,
@@ -51,9 +43,6 @@ export const TabsContainer: React.FC = () => {
       onChange={(key) => {
         const tabId = parseInt(key);
         setActiveTabId(tabId);
-        const sourceId = tabs.get(tabId).getState().sourceId;
-        console.log("!!!debug", "keyy", key, sourceId);
-        window.history.pushState({}, "", `api-client/collection/${sourceId}`);
       }}
       onEdit={(key, action) => {
         if (action === "remove") {

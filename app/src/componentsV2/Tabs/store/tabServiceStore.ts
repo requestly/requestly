@@ -3,6 +3,7 @@ import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { createContext, useContext } from "react";
 import { useShallow } from "zustand/shallow";
+import PATHS from "config/constants/sub/paths";
 
 type TabId = number;
 type SourceName = string;
@@ -123,6 +124,10 @@ const createTabServiceStore = () => {
       if (tabs.has(id)) {
         set({ activeTabId: id });
       }
+      const sourceId = tabs.get(id).getState().source.getSourceId();
+      const sourceName = tabs.get(id).getState().source.getSourceName();
+      const newPath = [PATHS.API_CLIENT.ABSOLUTE, sourceName, sourceId].join("/");
+      window.history.pushState({}, "", `${newPath}`);
     },
 
     _generateNewTabId() {
