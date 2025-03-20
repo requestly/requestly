@@ -4,6 +4,7 @@ import { generateDocumentId, getOwnerId } from "backend/utils";
 import { RQAPI } from "features/apiClient/types";
 import { sanitizeRecord, updateApiRecord } from "backend/apiClient/upsertApiRecord";
 import { EnvironmentVariables } from "backend/environment/types";
+import { ErroredRecords } from "../../local/services/types";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -25,7 +26,14 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async getAllRecords() {
-    return getApiRecords(this.getPrimaryId());
+    const result = await getApiRecords(this.getPrimaryId());
+    return {
+      success: result.success,
+      data: {
+        records: result.data,
+        erroredRecords: [] as ErroredRecords[],
+      },
+    };
   }
 
   getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void> {
@@ -102,5 +110,19 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     collection: RQAPI.CollectionRecord
   ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
     return this.updateRecord(collection, collection.id);
+  }
+
+  async writeToRawFile(): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+    return {
+      success: true,
+      data: undefined,
+    };
+  }
+
+  async getRawFileData(id: string): Promise<{ success: boolean; data: unknown; message?: string }> {
+    return {
+      success: true,
+      data: undefined,
+    };
   }
 }
