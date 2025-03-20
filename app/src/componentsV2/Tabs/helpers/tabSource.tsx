@@ -20,7 +20,7 @@ export class CollectionSourceView extends AbstractTabSource {
     this.component = <CollectionView collectionId={metadata.id} />;
     this.metadata = {
       id: metadata.id,
-      name: this.constructor.name,
+      name: "collection",
       title: metadata.title,
     };
   }
