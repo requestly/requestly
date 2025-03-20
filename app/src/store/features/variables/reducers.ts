@@ -1,13 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { EnvironmentMap, EnvironmentVariables } from "backend/environment/types";
 import { InitialState } from "./types";
-import { ErrorFile } from "features/apiClient/helpers/modules/sync/local/services/types";
+import { ErroredRecords } from "features/apiClient/helpers/modules/sync/local/services/types";
 
 const initialState = {
   currentEnvironment: "",
   environments: {},
   api_collections: {},
-  errorEnvFiles: [] as ErrorFile[],
+  errorEnvFiles: [] as ErroredRecords[],
 };
 
 const resetState = (): InitialState => initialState;
@@ -103,7 +103,7 @@ const setCollectionVariables = (
   state.api_collections = action.payload;
 };
 
-const setErrorEnvFiles = (state: InitialState, action: PayloadAction<ErrorFile[]>) => {
+const setErrorEnvFiles = (state: InitialState, action: PayloadAction<ErroredRecords[]>) => {
   state.errorEnvFiles = action.payload;
 };
 

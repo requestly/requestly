@@ -28,13 +28,13 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
 import { variablesActions } from "store/features/variables/slice";
 import { EnvironmentVariables } from "backend/environment/types";
-import { ErrorFile } from "../helpers/modules/sync/local/services/types";
+import { ErroredRecords } from "../helpers/modules/sync/local/services/types";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { RBAC, useRBAC } from "features/rbac";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
-  errorFiles: ErrorFile[];
+  errorFiles: ErroredRecords[];
   isLoadingApiClientRecords: boolean;
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
@@ -210,7 +210,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           return;
         } else {
           setApiClientRecords(result.data.records);
-          setErrorFiles(result.data.errorFiles);
+          setErrorFiles(result.data.erroredRecords);
           updateCollectionVariablesOnInit(result.data.records);
         }
       })
@@ -451,7 +451,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       return false;
     }
     setApiClientRecords(() => recordsToRefresh.data.records);
-    setErrorFiles(() => recordsToRefresh.data.errorFiles);
+    setErrorFiles(() => recordsToRefresh.data.erroredRecords);
     return true;
   }, [apiClientRecordsRepository]);
 
