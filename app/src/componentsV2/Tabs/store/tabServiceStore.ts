@@ -2,6 +2,7 @@ import { create, StoreApi, UseBoundStore, useStore } from "zustand";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { createContext, ReactNode, useContext } from "react";
+import PATHS from "config/constants/sub/paths";
 
 type TabId = number;
 type SourceName = string;
@@ -122,6 +123,10 @@ const createTabServiceStore = () => {
       if (tabs.has(id)) {
         set({ activeTabId: id });
       }
+      const sourceId = tabs.get(id).getState().source.getSourceId();
+      const sourceName = tabs.get(id).getState().source.getSourceName();
+      const newPath = [PATHS.API_CLIENT.ABSOLUTE, sourceName, sourceId].join("/");
+      updateUrlPath(newPath);
     },
 
     _generateNewTabId() {
@@ -135,6 +140,10 @@ const createTabServiceStore = () => {
       set({ _version: get()._version + 1 });
     },
   }));
+};
+
+const updateUrlPath = (path: string) => {
+  window.history.pushState({}, "", path);
 };
 
 // https://zustand.docs.pmnd.rs/guides/auto-generating-selectors
