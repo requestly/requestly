@@ -82,17 +82,17 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         setIsLoading(true);
         setPostRequestMessage({
           status: "success",
-          message: <>Successfully joined the team</>,
+          message: <>Successfully {billingTeamDetails.name} joined</>,
         });
       })
       .catch((err) => {
         setIsLoading(false);
         setPostRequestMessage({
           status: "error",
-          message: <>Unable to join the team, contact support!</>,
+          message: <>Unable to join the {billingTeamDetails.name} team, contact support!</>,
         });
       });
-  }, [billingTeams, requestJoinAcceleratorTeam, user.details.profile.email]);
+  }, [billingTeamDetails.name, billingTeams, requestJoinAcceleratorTeam, user.details.profile.email]);
 
   const handleSendRequest = useCallback(() => {
     setIsLoading(true);
