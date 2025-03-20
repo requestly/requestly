@@ -295,7 +295,8 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         </Col>
       ) : (
         <>
-          {!billingTeamDetails.isAcceleratorTeam ? (
+          {console.log(billingTeamDetails)}
+          {billingTeams.length > 1 ? (
             <>
               <Typography.Text>
                 Your organization is currently subscribed to the Requestly Premium Plan. If you need a Requestly
@@ -303,11 +304,19 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               </Typography.Text>
               {ModalActionButtons}
             </>
-          ) : (
+          ) : billingTeamDetails?.isAcceleratorTeam ? (
             <>
               <Typography.Text>
                 Your organization is currently on the Requestly Premium Plan. You can join the team to access premium
                 features.
+              </Typography.Text>
+              {ModalActionButtons}
+            </>
+          ) : (
+            <>
+              <Typography.Text>
+                Your organization is currently subscribed to the Requestly Premium Plan. If you need a Requestly
+                Professional subscription for yourself, send request to admin.
               </Typography.Text>
               {ModalActionButtons}
             </>
