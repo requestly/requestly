@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Avatar, Spin } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { Invite } from "types";
@@ -17,6 +16,7 @@ import { isNull } from "lodash";
 import "./index.scss";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 interface TeamCardProps {
   invite: Invite & { metadata?: any };
@@ -28,7 +28,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJo
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const [hasJoined, setHasJoined] = useState<boolean>(false);
 
@@ -49,7 +49,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJo
             },
             dispatch,
             {
-              isWorkspaceMode,
+              isWorkspaceMode: isSharedWorkspaceMode,
               isSyncEnabled: true,
             },
             appMode,
@@ -84,13 +84,14 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJo
         setJoiningTeamId(null);
       });
   }, [
-    invite.id,
     invite?.metadata?.teamId,
     invite?.metadata?.teamName,
-    dispatch,
-    isWorkspaceMode,
-    appMode,
+    invite.id,
     setJoiningTeamId,
+    navigate,
+    dispatch,
+    isSharedWorkspaceMode,
+    appMode,
   ]);
 
   return (

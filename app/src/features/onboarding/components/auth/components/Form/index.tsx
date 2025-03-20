@@ -25,12 +25,13 @@ import { SSOSignInForm } from "./components/SSOSignInForm";
 import { RequestPasswordResetForm } from "./components/RequestPasswordResetForm";
 import { trackLoginWithSSOClicked, trackSignUpSignInSwitched } from "../../analytics";
 import { AuthWarningBanner } from "./components/AuthWarningBanner";
-import { isDisposableEmail } from "utils/AuthUtils";
+import { getEmailType } from "utils/mailCheckerUtils";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { getAppFlavour } from "utils/AppUtils";
 import LINKS from "config/constants/sub/links";
 import "./index.scss";
 import { isSafariBrowser } from "actions/ExtensionActions";
+import { EmailType } from "@requestly/shared/types/common";
 
 interface AuthFormProps {
   authMode: string;
@@ -154,7 +155,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     return null;
   }, [authMode, handleAppleSignInButtonClick, isAppleSignInLoading, isLoading]);
 
-  const handleMagicLinkAuthClick = useCallback(() => {
+  const handleMagicLinkAuthClick = useCallback(async () => {
     if (authMode === AUTH.ACTION_LABELS.LOG_IN || authMode === AUTH.ACTION_LABELS.SIGN_UP) {
       if (!email) {
         toast.error("Please enter your email address");
@@ -166,7 +167,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         return;
       }
 
-      if (isDisposableEmail(email)) {
+      const isDisposable = await getEmailType(email);
+      if (isDisposable === EmailType.DESTROYABLE) {
         setIsInputEmailDisposable(true);
         return;
       }

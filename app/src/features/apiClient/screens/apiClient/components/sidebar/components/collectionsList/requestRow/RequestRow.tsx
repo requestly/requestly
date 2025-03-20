@@ -19,10 +19,17 @@ import {
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LocalWorkspaceTooltip } from "../../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
+import "./RequestRow.scss";
+import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
+import { MdContentCopy } from "@react-icons/all-files/md/MdContentCopy";
+import { MdDriveFileMoveOutline } from "@react-icons/all-files/md/MdDriveFileMoveOutline";
+import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
+import { Conditional } from "components/common/Conditional";
 
 interface Props {
   record: RQAPI.ApiRecord;
   openTab: TabsLayoutContextInterface["openTab"];
+  isReadOnly: boolean;
   bulkActionOptions: {
     showSelection: boolean;
     selectedRecords: Set<RQAPI.Record["id"]>;
@@ -31,7 +38,7 @@ interface Props {
   };
 }
 
-export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions }) => {
+export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkActionOptions }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
@@ -42,6 +49,11 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
     apiClientRecordsRepository,
   } = useApiClientContext();
   const isLocalSyncEnabled = useCheckLocalSyncSupport();
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+  const handleDropdownVisibleChange = (isOpen: boolean) => {
+    setIsDropdownVisible(isOpen);
+  };
 
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
@@ -73,7 +85,12 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
     return [
       {
         key: "0",
-        label: <div>Rename</div>,
+        label: (
+          <div>
+            <MdOutlineBorderColor style={{ marginRight: 8 }} />
+            Rename
+          </div>
+        ),
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setIsEditMode(true);
@@ -83,7 +100,10 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
         key: "1",
         label: (
           <LocalWorkspaceTooltip featureName="Request duplication" placement="bottomRight">
-            <div>Duplicate</div>
+            <div>
+              <MdContentCopy style={{ marginRight: 8 }} />
+              Duplicate
+            </div>
           </LocalWorkspaceTooltip>
         ),
         onClick: (itemInfo) => {
@@ -97,7 +117,10 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
         disabled: isLocalSyncEnabled,
         label: (
           <LocalWorkspaceTooltip featureName="Move to Collection">
-            <div>Move to Collection</div>
+            <div>
+              <MdDriveFileMoveOutline style={{ marginRight: 8 }} />
+              Move to Collection
+            </div>
           </LocalWorkspaceTooltip>
         ),
         onClick: (itemInfo) => {
@@ -108,7 +131,12 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
       },
       {
         key: "3",
-        label: <div>Delete</div>,
+        label: (
+          <div>
+            <MdOutlineDelete style={{ marginRight: 8 }} />
+            Delete
+          </div>
+        ),
         danger: true,
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
@@ -169,22 +197,37 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, bulkActionOptions
                 : record.data.request?.method}
             </Typography.Text>
             <div className="request-url">{record.name || record.data.request?.url}</div>
-            <div className="request-options">
-              <Dropdown trigger={["click"]} menu={{ items: requestOptions }} placement="bottomRight">
-                <RQButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowSelection(false);
-                  }}
-                  size="small"
-                  type="transparent"
-                  icon={<MdOutlineMoreHoriz />}
-                />
-              </Dropdown>
-            </div>
+
+            <Conditional condition={!isReadOnly}>
+              <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
+                <Dropdown
+                  trigger={["click"]}
+                  menu={{ items: requestOptions }}
+                  placement="bottomRight"
+                  open={isDropdownVisible}
+                  onOpenChange={handleDropdownVisibleChange}
+                >
+                  <RQButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowSelection(false);
+                    }}
+                    size="small"
+                    type="transparent"
+                    icon={<MdOutlineMoreHoriz />}
+                  />
+                </Dropdown>
+              </div>
+            </Conditional>
           </NavLink>
         </div>
       )}
     </>
   );
 };
+
+/* Remove this notes before prod
+1. request options(children) stay till hover is on its parent class
+2. as cursor moves hover state is lost & visibilty set to hidden
+3. need to make something, that can continue the hover state till the dropdown is closed
+*/

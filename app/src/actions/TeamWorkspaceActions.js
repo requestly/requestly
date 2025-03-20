@@ -18,6 +18,7 @@ import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
 import { tabsLayoutActions } from "store/slices/tabs-layout";
 import { WorkspaceType } from "types";
+import { workspaceActions } from "store/slices/workspaces/slice";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -97,6 +98,7 @@ export const switchWorkspace = async (
     // We are switching to pvt workspace
     // Clear team members info
     dispatch(teamsActions.setCurrentlyActiveWorkspaceMembers({}));
+    dispatch(workspaceActions.setActiveWorkspacesMembers({}));
   }
 
   dispatch(
@@ -107,6 +109,7 @@ export const switchWorkspace = async (
       workspaceType: workspaceType,
     })
   );
+  dispatch(workspaceActions.setActiveWorkspaceIds(teamId ? [teamId] : []));
 
   //Refresh Rules List
   dispatch(globalActions.updateHardRefreshPendingStatus({ type: "rules" }));

@@ -130,6 +130,10 @@ const Editor: React.FC<EditorProps> = ({
         isEditorContentSet.current = true;
       }
     }
+
+    return () => {
+      isEditorContentSet.current = false;
+    };
   }, [defaultValue, value]);
 
   // Had to keep both useEffects because some cases were not handled with the above useEffect
