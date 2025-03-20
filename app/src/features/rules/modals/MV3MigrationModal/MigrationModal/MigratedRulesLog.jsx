@@ -4,7 +4,6 @@ import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { StorageService } from "init";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 import { Popover, Typography } from "antd";
 
@@ -14,6 +13,7 @@ import { RxExternalLink } from "@react-icons/all-files/rx/RxExternalLink";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { RuleMigrationChange, getMV3MigrationData } from "modules/extension/utils";
 import { isEmpty } from "lodash";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
   const navigate = useNavigate();
@@ -74,7 +74,7 @@ const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
 };
 
 const MigratedRules = () => {
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const appMode = useSelector(getAppMode);
 
   const [rulesData, setRulesData] = useState({});
@@ -82,12 +82,12 @@ const MigratedRules = () => {
   const migratedRulesLogs = useMemo(() => {
     const migrationData = getMV3MigrationData();
 
-    const migratedRulesLogs = migrationData?.[currentlyActiveWorkspace?.id ?? "private"]?.rulesMigrationLogs;
+    const migratedRulesLogs = migrationData?.[activeWorkspaceId ?? "private"]?.rulesMigrationLogs;
 
     if (isEmpty(migratedRulesLogs)) return {};
 
     return migratedRulesLogs;
-  }, [currentlyActiveWorkspace]);
+  }, [activeWorkspaceId]);
 
   useEffect(() => {
     if (Object.keys(migratedRulesLogs).length) {

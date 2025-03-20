@@ -20,6 +20,7 @@ const DEFAULT_SCRIPT_VALUES = {
     "// **********************************************\n// 🛠️ Use JavaScript to visualize responses: https://docs.requestly.com/general/api-client/scripts\n// **********************************************\n",
 };
 
+// FIX: Editor does not re-render when scripts are undefined
 export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts }) => {
   const activeScriptType = scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST

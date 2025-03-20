@@ -2,12 +2,13 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import APIClientView from "./components/clientView/APIClientView";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
-import { RQAPI } from "features/apiClient/types";
+import { QueryParamSyncType, RQAPI } from "features/apiClient/types";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import Logger from "lib/logger";
 import { Skeleton } from "antd";
-import { getEmptyAPIEntry } from "./utils";
+import { getEmptyAPIEntry, syncQueryParams } from "./utils";
 import "./apiClient.scss";
+import { isEmpty } from "lodash";
 
 interface Props {}
 
@@ -117,8 +118,22 @@ export const APIClient: React.FC<Props> = React.memo(() => {
   ]);
 
   const entryDetailsToView = useMemo(() => {
-    if (isCreateMode) return getEmptyAPIEntry();
-    else return entryDetails?.data;
+    if (isCreateMode) {
+      return getEmptyAPIEntry();
+    }
+
+    const entry = entryDetails?.data;
+    if (entry) {
+      entry.request = {
+        ...entry.request,
+        ...syncQueryParams(
+          entry.request.queryParams,
+          entry.request.url,
+          isEmpty(entry.request.queryParams) ? QueryParamSyncType.TABLE : QueryParamSyncType.SYNC
+        ),
+      };
+    }
+    return entry;
   }, [isCreateMode, entryDetails?.data]);
 
   const handleAppRequestFinished = useCallback(

@@ -10,6 +10,7 @@ import { desktopTrafficTableReducerWithLocalSync } from "./features/desktop-traf
 import { recordsReducer } from "./features/rules/slice";
 import { billingReducer } from "./features/billing/slice";
 import { harPreviewReducer } from "./features/network-sessions/slice";
+import { workspaceReducerWithLocal } from "./slices/workspaces/slice";
 import { variablesReducer } from "./features/variables/slice";
 
 import { globalReducers } from "./slices/global/slice";
@@ -25,6 +26,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.RULES]: recordsReducer, // SLICE ALSO CONTAINS GROUP RECORDS
     [ReducerKeys.BILLING]: billingReducer,
     [ReducerKeys.INCENTIVIZATION]: incentivizationReducer,
+    [ReducerKeys.WORKSPACE]: workspaceReducerWithLocal,
     [ReducerKeys.VARIABLES]: variablesReducer,
     [ReducerKeys.TABS_LAYOUT]: tabsLayoutReducerWithLocalSync,
   },

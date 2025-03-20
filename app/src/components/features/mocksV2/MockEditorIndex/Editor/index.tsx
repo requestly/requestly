@@ -19,7 +19,6 @@ import { MockEditorDataSchema, RequestMethod, ValidationErrors } from "../types"
 import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateHeaders, validateStatusCode } from "../utils";
 import "./index.css";
 import { trackMockEditorOpened, trackTestMockClicked } from "modules/analytics/events/features/mocksV2";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { APIClient, APIClientRequest } from "features/apiClient/components/common/APIClient";
 import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
@@ -31,6 +30,7 @@ import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { ExportMocksModalWrapper } from "features/mocks/modals";
 import { globalActions } from "store/slices/global/slice";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import LazyEditor from "componentsV2/CodeEditor/components/Editor";
 
 interface Props {
@@ -62,8 +62,7 @@ const MockEditor: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const username = user?.details?.username;
 
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const areLogsVisible = useFeatureValue("mock_logs", false);
 
@@ -93,8 +92,16 @@ const MockEditor: React.FC<Props> = ({
   const collectionPath = mockCollectionData?.path ?? "";
 
   const finalUrl = useMemo(
-    () => generateFinalUrl({ endpoint, uid: user?.details?.profile?.uid, username, teamId, password, collectionPath }),
-    [endpoint, teamId, user?.details?.profile?.uid, username, password, collectionPath]
+    () =>
+      generateFinalUrl({
+        endpoint,
+        uid: user?.details?.profile?.uid,
+        username,
+        teamId: activeWorkspaceId,
+        password,
+        collectionPath,
+      }),
+    [endpoint, activeWorkspaceId, user?.details?.profile?.uid, username, password, collectionPath]
   );
 
   const apiRequest = useMemo<APIClientRequest>(() => {
@@ -250,6 +257,7 @@ const MockEditor: React.FC<Props> = ({
           Method
         </label>
         <Select
+          disabled={isEditorReadOnly}
           id="method"
           size="large"
           options={requestMethodDropdownOptions}
@@ -268,6 +276,7 @@ const MockEditor: React.FC<Props> = ({
           Latency
         </label>
         <InputNumber
+          disabled={isEditorReadOnly}
           id="latency"
           size="large"
           type="text"
@@ -290,6 +299,7 @@ const MockEditor: React.FC<Props> = ({
           Status code
         </label>
         <AutoComplete
+          disabled={isEditorReadOnly}
           ref={statusCodeRef}
           id="status-code"
           size="large"
@@ -316,6 +326,7 @@ const MockEditor: React.FC<Props> = ({
           Content type
         </label>
         <AutoComplete
+          disabled={isEditorReadOnly}
           id="content-type"
           size="large"
           placeholder="content"
@@ -331,6 +342,7 @@ const MockEditor: React.FC<Props> = ({
     return (
       <MockEditorEndpoint
         isNew={isNew}
+        disabled={isEditorReadOnly}
         errors={errors}
         collectionPath={collectionPath}
         endpoint={endpoint}
@@ -376,11 +388,12 @@ const MockEditor: React.FC<Props> = ({
             handleChange={setHeadersString}
             language={EditorLanguage.JSON}
             analyticEventProperties={{ source: "mocks", mock_type: type }}
+            isReadOnly={isEditorReadOnly}
           />
         </Col>
       </Row>
     );
-  }, [headersString, type, id]);
+  }, [headersString, type, id, isEditorReadOnly]);
 
   const renderBodyRow = useCallback((): ReactNode => {
     return (
@@ -450,6 +463,7 @@ const MockEditor: React.FC<Props> = ({
               handleTest={handleTest}
               setPassword={setPassword}
               password={password}
+              isEditorReadOnly={isEditorReadOnly}
             />
             <BottomSheetLayout
               layout={SheetLayout.SPLIT}
@@ -501,9 +515,11 @@ const MockEditor: React.FC<Props> = ({
             handleTest={handleTest}
             setPassword={setPassword}
             password={password}
+            isEditorReadOnly={isEditorReadOnly}
           />
           <Col className="mock-editor-title-container">
             <RQEditorTitle
+              disabled={isEditorReadOnly}
               name={name}
               mode={isNew ? "create" : "edit"}
               description={desc}

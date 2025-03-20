@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
@@ -29,6 +28,7 @@ import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWi
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
@@ -47,7 +47,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   );
 
   const user = useSelector(getUserAuthDetails);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const appMode = useSelector(getAppMode);
 
   const [inviteEmails, setInviteEmails] = useState<string[]>([]);
@@ -106,7 +106,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
             },
             dispatch,
             {
-              isWorkspaceMode,
+              isWorkspaceMode: isSharedWorkspaceMode,
               isSyncEnabled: true,
             },
             appMode,
@@ -119,7 +119,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           trackAddTeamMemberFailure(defaultTeamData?.teamId ?? newTeamId, inviteEmails, null, "onboarding");
         });
     },
-    [appMode, dispatch, isWorkspaceMode, inviteEmails, defaultTeamData?.teamId, makeUserAdmin]
+    [appMode, dispatch, isSharedWorkspaceMode, inviteEmails, defaultTeamData?.teamId, makeUserAdmin]
   );
 
   const handleCreateNewTeam = useCallback(() => {
@@ -143,13 +143,13 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           teamMembersCount: response?.data?.accessCount,
         },
         dispatch,
-        { isWorkspaceMode, isSyncEnabled: true },
+        { isWorkspaceMode: isSharedWorkspaceMode, isSyncEnabled: true },
         appMode,
         null,
         "onboarding"
       );
     });
-  }, [appMode, dispatch, isWorkspaceMode, newWorkspaceName, inviteEmails?.length, handleAddMembers]);
+  }, [appMode, dispatch, isSharedWorkspaceMode, newWorkspaceName, inviteEmails?.length, handleAddMembers]);
 
   const handleDomainToggle = useCallback(
     (enabled: boolean) => {

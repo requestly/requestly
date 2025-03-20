@@ -2,10 +2,6 @@ import React, { useCallback, useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { InlineInput } from "componentsV2/InlineInput/InlineInput";
 import { Input, Tabs } from "antd";
-import { upsertApiRecord } from "backend/apiClient";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { useDebounce } from "hooks/useDebounce";
 import ReactMarkdown from "react-markdown";
@@ -13,8 +9,9 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import { useOutsideClick } from "hooks";
 import "./collectionOverview.scss";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
+import { toast } from "utils/Toast";
+import { useRBAC } from "features/rbac";
 
 interface CollectionOverviewProps {
   collection: RQAPI.CollectionRecord;
@@ -23,30 +20,35 @@ interface CollectionOverviewProps {
 const COLLECTION_DETAILS_PLACEHOLDER = "Collection description";
 
 export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collection }) => {
-  const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
   const { closeTab } = useTabsLayoutContext();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_collection", "create");
 
   const [collectionName, setCollectionName] = useState(collection?.name || "");
   const [collectionDescription, setCollectionDescription] = useState(collection?.description || "");
   const [showEditor, setShowEditor] = useState(false);
-  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const { ref: collectionDescriptionRef } = useOutsideClick<HTMLDivElement>(() => setShowEditor(false));
 
   const handleDescriptionChange = useCallback(
     async (value: string) => {
       const newDescription = value;
-      const updatedCollection = {
-        ...collection,
-        description: newDescription,
-      };
-      return upsertApiRecord(user.details?.profile?.uid, updatedCollection, team?.id).then((result) => {
-        onSaveRecord(result.data);
-      });
+
+      return apiClientRecordsRepository
+        .updateCollectionDescription(collection.id, newDescription)
+        .then((result) => {
+          const updatedCollection = {
+            ...collection,
+            description: result.data,
+          };
+          onSaveRecord(updatedCollection);
+        })
+        .catch((error) => {
+          toast.error("Error updating collection description");
+        });
     },
-    [collection, onSaveRecord, user.details?.profile?.uid, team?.id]
+    [collection, onSaveRecord, apiClientRecordsRepository]
   );
 
   const debouncedDescriptionChange = useDebounce(handleDescriptionChange, 1500);
@@ -98,6 +100,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
     <div className="collection-overview-wrapper">
       <div className="collection-overview-container">
         <InlineInput
+          disabled={!isValidPermission}
           value={collectionName}
           onChange={(value) => {
             setCollectionName(value);
@@ -105,46 +108,53 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
           onBlur={handleCollectionNameChange}
           placeholder="Collection name"
         />
-        {!isLocalSyncEnabled && (
-          <div ref={collectionDescriptionRef} className="collection-overview-description">
-            {showEditor ? (
-              <>
-                <Tabs
-                  size="small"
-                  defaultActiveKey="markdown"
-                  items={[
-                    {
-                      key: "markdown",
-                      label: "Markdown",
-                      children: (
-                        <Input.TextArea
-                          autoFocus
-                          value={collectionDescription}
-                          placeholder={COLLECTION_DETAILS_PLACEHOLDER}
-                          className="collection-overview-description-textarea"
-                          autoSize={{ minRows: 15 }}
-                          onChange={(e) => {
-                            setCollectionDescription(e.target.value);
-                            debouncedDescriptionChange(e.target.value);
-                          }}
-                        />
-                      ),
-                    },
-                    {
-                      key: "preview",
-                      label: "Preview",
-                      children: <div className="collection-overview-description-markdown-preview">{markdown}</div>,
-                    },
-                  ]}
-                />
-              </>
-            ) : (
-              <div className="collection-overview-description-markdown" onClick={() => setShowEditor(true)}>
-                {markdown}
-              </div>
-            )}
-          </div>
-        )}
+        <div ref={collectionDescriptionRef} className="collection-overview-description">
+          {showEditor ? (
+            <>
+              <Tabs
+                size="small"
+                defaultActiveKey="markdown"
+                items={[
+                  {
+                    key: "markdown",
+                    label: "Markdown",
+                    children: (
+                      <Input.TextArea
+                        autoFocus
+                        value={collectionDescription}
+                        placeholder={COLLECTION_DETAILS_PLACEHOLDER}
+                        className="collection-overview-description-textarea"
+                        autoSize={{ minRows: 15 }}
+                        onChange={(e) => {
+                          setCollectionDescription(e.target.value);
+                          debouncedDescriptionChange(e.target.value);
+                        }}
+                      />
+                    ),
+                  },
+                  {
+                    key: "preview",
+                    label: "Preview",
+                    children: <div className="collection-overview-description-markdown-preview">{markdown}</div>,
+                  },
+                ]}
+              />
+            </>
+          ) : (
+            <div
+              className="collection-overview-description-markdown"
+              onClick={() => {
+                if (!isValidPermission) {
+                  return;
+                }
+
+                setShowEditor(true);
+              }}
+            >
+              {markdown}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

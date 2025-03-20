@@ -8,6 +8,14 @@
   margin: 0 auto;
 }
 
+.mock-editor-layout-container .read-only-mode-alert {
+  display: none;
+}
+
+.mock-editor-layout-container:hover .read-only-mode-alert {
+  display: flex;
+}
+
 .mock-editor-wrapper {
   display: flex;
   justify-content: center;
@@ -71,6 +79,7 @@
 }
 
 .mock-editor-body .ant-input-group-addon,
+.mock-editor-body .ant-input-number.ant-input-number-disabled .ant-input-number-input,
 .mock-editor-body .ant-input-number-group-addon {
   background: #3e3f42;
   color: var(--text-gray);
@@ -112,7 +121,8 @@
 
 .meta-data-option .ant-input-disabled,
 .meta-data-option .ant-input-group-wrapper .ant-input {
-  background: var(--component-dark-background);
+  background: #3e3f42;
+  color: var(--text-gray);
   box-shadow: var(--input-box-shadow);
 }
 

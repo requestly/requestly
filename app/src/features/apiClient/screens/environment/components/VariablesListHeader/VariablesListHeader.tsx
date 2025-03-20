@@ -9,6 +9,8 @@ import { useLocation } from "react-router-dom";
 import "./variablesListHeader.scss";
 import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { RoleBasedComponent } from "features/rbac";
+
 interface VariablesListHeaderProps {
   searchValue: string;
   currentEnvironmentName: string;
@@ -59,6 +61,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
       ) : (
         <div />
       )}
+
       <div className="variables-list-action-container">
         <Input
           placeholder="Search"
@@ -67,6 +70,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           value={searchValue}
           onChange={(e) => onSearchValueChange(e.target.value)}
         />
+
         <div className="variables-list-btn-actions-container">
           <RQButton
             showHotKeyText
@@ -78,11 +82,14 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           >
             Save
           </RQButton>
-          {exportActions?.showExport && (
-            <RQButton type="primary" onClick={exportActions?.onExportClick} disabled={!exportActions?.enableExport}>
-              Export
-            </RQButton>
-          )}
+
+          <RoleBasedComponent resource="api_client_environment" permission="update">
+            {exportActions?.showExport && (
+              <RQButton type="primary" onClick={exportActions?.onExportClick} disabled={!exportActions?.enableExport}>
+                Export
+              </RQButton>
+            )}
+          </RoleBasedComponent>
         </div>
       </div>
     </div>
