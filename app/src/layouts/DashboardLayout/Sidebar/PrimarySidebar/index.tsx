@@ -63,21 +63,21 @@ export const PrimarySidebar: React.FC = () => {
       },
       {
         id: 1,
-        title: "Network traffic",
+        title: "Network",
         path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
         icon: <NetworkTrafficIcon />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       },
       {
         id: 2,
-        title: "Network inspector",
+        title: "Network",
         path: PATHS.NETWORK_INSPECTOR.RELATIVE,
         icon: <NetworkTrafficInspectorIcon />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
       {
         id: 3,
-        title: "HTTP Rules",
+        title: "Rules",
         path: PATHS.RULES.INDEX,
         icon: (
           <SafariComingSoonTooltip isVisible={isSafariExtension()}>
@@ -85,11 +85,10 @@ export const PrimarySidebar: React.FC = () => {
           </SafariComingSoonTooltip>
         ),
         display: true,
-        activeColor: "var(--http-rules)",
       },
       {
         id: 4,
-        title: "API client",
+        title: "APIs",
         path: PATHS.API_CLIENT.INDEX,
         icon: (
           <span className="icon-with-badge">
@@ -98,15 +97,13 @@ export const PrimarySidebar: React.FC = () => {
           </span>
         ),
         display: true,
-        activeColor: "var(--api-client)",
       },
       {
         id: 5,
-        title: "Mock server",
+        title: "Mocks",
         path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
         display: true,
-        activeColor: "var(--mock-server)",
       },
       {
         id: 6,
@@ -118,13 +115,10 @@ export const PrimarySidebar: React.FC = () => {
             open={isSavingNetworkSession}
             title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
           >
-            <span className="icon-with-badge">
-              <SessionIcon />
-            </span>
+            <SessionIcon />
           </Tooltip>
         ),
         display: true,
-        activeColor: "var(--session-recording)",
       },
     ];
 
@@ -143,7 +137,6 @@ export const PrimarySidebar: React.FC = () => {
           </Tooltip>
         ),
         display: true,
-        activeColor: "var(--desktop-sessions)",
       };
     }
     return items;
