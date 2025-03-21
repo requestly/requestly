@@ -1,7 +1,7 @@
 import { RQAPI } from "features/apiClient/types";
 import { isApiCollection, isApiRequest } from "../../../utils";
-import { generateDocumentId } from "backend/utils";
 import { EnvironmentVariableValue } from "backend/environment/types";
+import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
 interface ImportData {
   records: (RQAPI.ApiRecord | RQAPI.CollectionRecord)[];
@@ -15,7 +15,8 @@ interface UpdatedApiRecordsToImport {
 
 export const processRqImportData = (
   fileContent: ImportData,
-  uid: string | null
+  uid: string | null,
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
 ): {
   apis: RQAPI.ApiRecord[];
   collections: RQAPI.CollectionRecord[];
@@ -49,7 +50,7 @@ export const processRqImportData = (
   collections.forEach((collection: RQAPI.CollectionRecord) => {
     const oldId = collection.id;
     delete collection.id;
-    const newId = generateDocumentId("apis");
+    const newId = apiClientRecordsRepository.generateCollectionId(collection.name, "");
     collection.id = newId;
     oldToNewIdMap[oldId] = newId;
   });
