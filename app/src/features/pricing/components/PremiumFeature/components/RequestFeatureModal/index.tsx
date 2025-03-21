@@ -58,6 +58,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeams[0]?.id, billingTeams[0]?.owner));
   const isIncentivizationEnabled = useIsIncentivizationEnabled();
   const billingTeamDetails = useSelector(getBillingTeamById(billingTeams[0].id));
+  const isAcceleratorTeam = billingTeamDetails?.isAcceleratorTeam;
 
   const requestEnterprisePlanFromAdmin = useMemo(
     () =>
@@ -65,14 +66,14 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
     []
   );
 
-  const requestJoinAcceleratorTeam = useMemo(
-    () => httpsCallable<{ userEmails: string[]; billingId: string }>(getFunctions(), "billing-joinAcceleratorTeam"),
-    []
-  );
-
   const handleJoinAcceleratorTeam = useCallback(() => {
     setIsLoading(true);
     const emails = user?.details?.profile?.email ? [user.details.profile.email] : [];
+
+    const requestJoinAcceleratorTeam = httpsCallable<{ userEmails: string[]; billingId: string }>(
+      getFunctions(),
+      "billing-joinAcceleratorTeam"
+    );
 
     requestJoinAcceleratorTeam({
       userEmails: emails,
@@ -92,7 +93,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
           message: <>Unable to join the {billingTeamDetails.name} team, contact support!</>,
         });
       });
-  }, [billingTeamDetails.name, billingTeams, requestJoinAcceleratorTeam, user.details.profile.email]);
+  }, [billingTeamDetails.name, billingTeams, user.details.profile.email]);
 
   const handleSendRequest = useCallback(() => {
     setIsLoading(true);
@@ -214,7 +215,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               >
                 Checkout billing teams
               </RQButton>
-            ) : billingTeamDetails?.isAcceleratorTeam ? (
+            ) : isAcceleratorTeam ? (
               // if there is only one billing team & is accelerator team
               <RQButton
                 loading={isLoading}
@@ -243,7 +244,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
     isIncentivizationEnabled,
     isLoading,
     billingTeams,
-    billingTeamDetails?.isAcceleratorTeam,
+    isAcceleratorTeam,
     handleJoinAcceleratorTeam,
     handleSendRequest,
     onUpgradeForFreeClickCallback,
@@ -295,7 +296,6 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         </Col>
       ) : (
         <>
-          {console.log(billingTeamDetails)}
           {billingTeams.length > 1 ? (
             <>
               <Typography.Text>
@@ -304,7 +304,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               </Typography.Text>
               {ModalActionButtons}
             </>
-          ) : billingTeamDetails?.isAcceleratorTeam ? (
+          ) : isAcceleratorTeam ? (
             <>
               <Typography.Text>
                 Your organization is currently on the Requestly Premium Plan. You can join the team to access premium

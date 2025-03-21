@@ -33,14 +33,16 @@ export const OtherBillingTeamDetails: React.FC = () => {
   ]);
   const hasBillingIdChanged = useHasChanged(billingId);
   const [isLoading, setIsLoading] = useState(false);
-
-  const requestJoinAcceleratorTeam = useMemo(
-    () => httpsCallable<{ userEmails: string[]; billingId: string }>(getFunctions(), "billing-joinAcceleratorTeam"),
-    []
-  );
+  const isAcceleratorTeam = billingTeamDetails?.isAcceleratorTeam;
 
   const handleJoinAcceleratorTeam = useCallback(() => {
     const emails = user?.details?.profile?.email ? [user.details.profile.email] : [];
+
+    const requestJoinAcceleratorTeam = httpsCallable<{ userEmails: string[]; billingId: string }>(
+      getFunctions(),
+      "billing-joinAcceleratorTeam"
+    );
+
     requestJoinAcceleratorTeam({
       userEmails: emails,
       billingId: billingTeams[0].id,
@@ -53,7 +55,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
         setIsLoading(true);
         toast.error("Failed to join the team! Please try again, or contact support if the problem persists");
       });
-  }, [billingTeamDetails.name, billingTeams, requestJoinAcceleratorTeam, user.details.profile.email]);
+  }, [billingTeamDetails.name, billingTeams, user.details.profile.email]);
 
   const columns = useMemo(
     () => [
@@ -72,7 +74,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
                   <span className="text-bold text-white">{`${record.displayName ?? "User"}`}</span>
                 </Col>
                 <Col>
-                  {(billingTeamDetails?.isAcceleratorTeam && record.role === BillingTeamRoles.Manager) ||
+                  {(isAcceleratorTeam && record.role === BillingTeamRoles.Manager) ||
                   record.role === BillingTeamRoles.Admin ? (
                     <Row className="icon__wrapper warning" align="middle">
                       <MdOutlineAdminPanelSettings style={{ marginRight: "2px" }} />
@@ -103,7 +105,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
         ),
       },
     ],
-    [membersTableSource.length, billingTeamDetails?.isAcceleratorTeam]
+    [membersTableSource.length, isAcceleratorTeam]
   );
 
   useEffect(() => {
@@ -164,7 +166,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
 
               {!hasJoinedAnyTeam && (
                 <Col>
-                  {!billingTeamDetails?.isAcceleratorTeam ? (
+                  {!isAcceleratorTeam ? (
                     <Tooltip title="On clicking, we'll notify the billing manager and admins to assign a license to you.">
                       <RQButton
                         className="request-billing-team-btn"
