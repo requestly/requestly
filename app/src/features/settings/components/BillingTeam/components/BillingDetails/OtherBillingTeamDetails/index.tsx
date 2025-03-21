@@ -1,5 +1,5 @@
 import { Avatar, Col, Popover, Row, Table, Tooltip } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useHasChanged } from "hooks";
@@ -15,6 +15,8 @@ import { getLongFormatDateString } from "utils/DateTimeUtils";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { RequestBillingTeamAccessModal } from "../modals/RequestBillingTeamAccessModal/RequestBillingTeamAccessModal";
 import "./index.scss";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { toast } from "utils/Toast";
 
 export const OtherBillingTeamDetails: React.FC = () => {
   const { billingId } = useParams();
@@ -30,6 +32,30 @@ export const OtherBillingTeamDetails: React.FC = () => {
     user?.details?.profile?.uid,
   ]);
   const hasBillingIdChanged = useHasChanged(billingId);
+  const [isLoading, setIsLoading] = useState(false);
+  const isAcceleratorTeam = billingTeamDetails?.isAcceleratorTeam;
+
+  const handleJoinAcceleratorTeam = useCallback(() => {
+    const emails = user?.details?.profile?.email ? [user.details.profile.email] : [];
+
+    const requestJoinAcceleratorTeam = httpsCallable<{ userEmails: string[]; billingId: string }>(
+      getFunctions(),
+      "billing-joinAcceleratorTeam"
+    );
+
+    requestJoinAcceleratorTeam({
+      userEmails: emails,
+      billingId: billingTeams[0].id,
+    })
+      .then(() => {
+        setIsLoading(true);
+        toast.success(`${billingTeamDetails.name} joined successfully!`);
+      })
+      .catch((err) => {
+        setIsLoading(true);
+        toast.error("Failed to join the team! Please try again, or contact support if the problem persists");
+      });
+  }, [billingTeamDetails.name, billingTeams, user.details.profile.email]);
 
   const columns = useMemo(
     () => [
@@ -48,7 +74,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
                   <span className="text-bold text-white">{`${record.displayName ?? "User"}`}</span>
                 </Col>
                 <Col>
-                  {(billingTeamDetails?.isAcceleratorTeam && record.role === BillingTeamRoles.Manager) ||
+                  {(isAcceleratorTeam && record.role === BillingTeamRoles.Manager) ||
                   record.role === BillingTeamRoles.Admin ? (
                     <Row className="icon__wrapper warning" align="middle">
                       <MdOutlineAdminPanelSettings style={{ marginRight: "2px" }} />
@@ -79,7 +105,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
         ),
       },
     ],
-    [membersTableSource.length, billingTeamDetails?.isAcceleratorTeam]
+    [membersTableSource.length, isAcceleratorTeam]
   );
 
   useEffect(() => {
@@ -140,16 +166,30 @@ export const OtherBillingTeamDetails: React.FC = () => {
 
               {!hasJoinedAnyTeam && (
                 <Col>
-                  <Tooltip title="On clicking, we'll notify the billing manager and admins to assign a license to you.">
-                    <RQButton
-                      className="request-billing-team-btn"
-                      type="default"
-                      icon={<IoMdAdd />}
-                      onClick={() => setIsRequestModalOpen(true)}
-                    >
-                      Request Premium access
-                    </RQButton>
-                  </Tooltip>
+                  {!isAcceleratorTeam ? (
+                    <Tooltip title="On clicking, we'll notify the billing manager and admins to assign a license to you.">
+                      <RQButton
+                        className="request-billing-team-btn"
+                        type="default"
+                        icon={<IoMdAdd />}
+                        onClick={() => setIsRequestModalOpen(true)}
+                      >
+                        Request Premium access
+                      </RQButton>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title="On clicking, you will join the team">
+                      <RQButton
+                        className="request-billing-team-btn"
+                        type="default"
+                        icon={<IoMdAdd />}
+                        onClick={handleJoinAcceleratorTeam}
+                        loading={isLoading}
+                      >
+                        Join Team
+                      </RQButton>
+                    </Tooltip>
+                  )}
                 </Col>
               )}
             </Row>
