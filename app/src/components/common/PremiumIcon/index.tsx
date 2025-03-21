@@ -11,7 +11,7 @@ export const PremiumIcon: React.FC<
 > = (props) => {
   return (
     <span className="premium-icon">
-      <img width={16} height={16} src={"/assets/media/components/crown.svg"} alt="Premium icon" />
+      <img width={16} height={16} src={"/assets/media/components/diamond.svg"} alt="Premium icon" />
     </span>
   );
 };
