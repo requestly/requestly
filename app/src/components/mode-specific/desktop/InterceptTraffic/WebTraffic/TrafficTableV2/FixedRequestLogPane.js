@@ -6,9 +6,9 @@ import { CloseOutlined } from "@ant-design/icons";
 import RequestPayloadPreview from "./Preview/PayloadPreview";
 import RequestSummary from "./RequestSummary";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import Editor from "componentsV2/CodeEditor/components/Editor/Editor";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import "./FixedRequestLogPane.css";
+import Editor from "componentsV2/CodeEditor/components/Editor";
 
 const { Text } = Typography;
 
