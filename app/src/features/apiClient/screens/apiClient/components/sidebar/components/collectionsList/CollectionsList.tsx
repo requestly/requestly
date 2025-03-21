@@ -164,7 +164,15 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           break;
       }
     },
-    [selectedRecords, onSaveRecord, updatedRecords, onSaveBulkRecords]
+    [
+      selectedRecords,
+      updatedRecords.childParentMap,
+      updatedRecords.recordsMap,
+      setIsDeleteModalOpen,
+      updateRecordsToBeDeleted,
+      onSaveRecord,
+      onSaveBulkRecords,
+    ]
   );
 
   // Main toggle handler

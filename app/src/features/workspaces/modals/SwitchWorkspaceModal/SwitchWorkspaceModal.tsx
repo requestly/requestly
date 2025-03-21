@@ -1,19 +1,17 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { Avatar, Button, Col, Row } from "antd";
+import { Button, Col, Row } from "antd";
 import { RQModal } from "lib/design-system/components";
 import { LearnMoreLink } from "components/common/LearnMoreLink";
 import { PlusOutlined } from "@ant-design/icons";
-import { getUniqueColorForWorkspace } from "utils/teams";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import "./switchWorkspaceModal.css";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
 interface SwitchWorkspaceModalProps {
   isOpen: boolean;
@@ -24,12 +22,8 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
   const dispatch = useDispatch();
 
   const availableWorkspaces = useSelector(getAllWorkspaces);
-  const appMode = useSelector(getAppMode);
-  const user = useSelector(getUserAuthDetails);
 
-  const sortedTeams: Workspace[] = availableWorkspaces
-    ? [...availableWorkspaces].sort((a: Workspace, b: Workspace) => b.accessCount - a.accessCount)
-    : [];
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const handleCreateNewWorkspaceClick = () => {
     trackCreateNewTeamClicked("switch_workspace_modal");
@@ -43,30 +37,10 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
     );
   };
 
-  const handleSwitchWorkspaceClick = (team: Workspace) => {
-    toggleModal();
-    switchWorkspace(
-      {
-        teamId: team.id,
-        teamName: team.name,
-        teamMembersCount: team.accessCount,
-      },
-      dispatch,
-      {
-        isSyncEnabled: user?.details?.isSyncEnabled,
-        isWorkspaceMode: true,
-      },
-      appMode,
-      null,
-      "switch_workspace_modal"
-    );
-    dispatch(
-      globalActions.toggleActiveModal({
-        modalName: "inviteMembersModal",
-        newValue: true,
-        newProps: { source: "switch_workspace_modal" },
-      })
-    );
+  const handleSwitchWorkspaceClick = (workspace: Workspace) => {
+    switchWorkspace(workspace.id).then(() => {
+      toggleModal();
+    });
   };
 
   return (
@@ -76,24 +50,16 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
 
         {availableWorkspaces?.length > 0 ? (
           <ul className="teams-list">
-            {sortedTeams.map((team: Workspace) => (
-              <li key={team.inviteId}>
+            {availableWorkspaces.map((workspace: Workspace) => (
+              <li key={workspace?.id}>
                 <div className="w-full teams-list-row">
                   <Col>
-                    <Avatar
-                      size={28}
-                      shape="square"
-                      className="workspace-avatar"
-                      icon={team.name?.[0]?.toUpperCase() ?? "W"}
-                      style={{
-                        backgroundColor: `${getUniqueColorForWorkspace(team.id, team.name)}`,
-                      }}
-                    />
-                    <div>{team.name}</div>
+                    <WorkspaceAvatar workspace={workspace} />
+                    <div>{workspace.name}</div>
                   </Col>
-                  <Col>{`${Object.keys(team.members).length} members`}</Col>
+                  <Col>{`${Object.keys(workspace?.members)?.length} members`}</Col>
 
-                  <Button type="primary" onClick={() => handleSwitchWorkspaceClick(team)}>
+                  <Button type="primary" onClick={() => handleSwitchWorkspaceClick(workspace)}>
                     Switch
                   </Button>
                 </div>

@@ -91,7 +91,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
           trackSharingModalRulesDuplicated("personal", selectedRules.length);
           setPostShareViewData({
             type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED,
-            targetTeamData: { teamId, teamName: teamData.name, accessCount: teamData.accessCount },
+            targetTeamData: { ...teamData, id: teamId } as Workspace,
           });
 
           onRulesShared();
@@ -120,7 +120,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
         trackSharingModalRulesDuplicated("personal", selectedRules.length);
         setPostShareViewData({
           type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
-          targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
+          targetTeamData: teamData,
           sourceTeamData: activeWorkspace,
         });
 
@@ -141,7 +141,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
           style={{ backgroundColor: "#1E69FF" }}
         />
         <span className="workspace-card-description">
-          <div className="text-white">Private workspace</div>
+          <div className="text-white">Personal Workspace</div>
           <div className="text-gray">Not shared with anyone</div>
         </span>
       </Row>

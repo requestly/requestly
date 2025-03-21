@@ -54,7 +54,7 @@ const ApiClientCard = () => {
       navigate(PATHS.API_CLIENT.ABSOLUTE, user?.details?.isLoggedIn ? { state: { modal } } : {});
       trackHomeApisActionClicked(`${modal.toLowerCase()}_importer_clicked`);
     },
-    [navigate]
+    [navigate, user?.details?.isLoggedIn]
   );
 
   const items: MenuProps["items"] = [

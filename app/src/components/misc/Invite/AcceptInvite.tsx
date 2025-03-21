@@ -1,34 +1,27 @@
-import { Avatar, Col, Row } from "antd";
+import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUniqueColorForWorkspace } from "utils/teams";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { toast } from "utils/Toast";
 import "./index.css";
 import { redirectToTeam } from "utils/RedirectionUtils";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { useDispatch, useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { acceptTeamInvite } from "backend/workspace";
 import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
 import InviteAcceptAnimation from "../LottieAnimation/InviteAcceptAnimation";
-import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { Workspace } from "features/workspaces/types";
 
 interface Props {
   inviteId: string;
   ownerName: string;
-  workspaceId: string;
-  workspaceName: string;
+  workspace: Workspace;
   invitedEmail?: string;
 }
 
-const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props) => {
+const AcceptInvite = ({ inviteId, ownerName, workspace }: Props) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
-  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const [inProgress, setInProgress] = useState(false);
 
@@ -48,21 +41,7 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
           );
 
           if (res?.data?.invite.type === "teams") {
-            switchWorkspace(
-              {
-                teamId: res?.data?.invite?.metadata?.teamId,
-                teamName: res?.data?.invite?.metadata?.teamName,
-                teamMembersCount: 1,
-              },
-              dispatch,
-              {
-                isSyncEnabled: user?.details?.isSyncEnabled,
-                isWorkspaceMode: isSharedWorkspaceMode,
-              },
-              appMode,
-              null,
-              "invite_screen"
-            );
+            switchWorkspace(res?.data?.invite?.metadata?.teamId as string, "invite_screen");
             redirectToTeam(navigate, res?.data?.invite?.metadata?.teamId, {
               state: {
                 isNewTeam: false,
@@ -86,17 +65,10 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
             No, I'll skip
           </RQButton>
           <div className="workspace-image invite-accept-avatar-image">
-            <Avatar
-              size={56}
-              shape="square"
-              icon={workspaceName ? workspaceName?.[0]?.toUpperCase() : "P"}
-              style={{
-                backgroundColor: `${getUniqueColorForWorkspace(workspaceId ?? "", workspaceName)}`,
-              }}
-            />
+            <WorkspaceAvatar workspace={workspace} size={56} />
           </div>
           <div className="header invite-header">
-            {ownerName} has invited you to join workspace {workspaceName}
+            {ownerName} has invited you to join workspace {workspace?.name}
           </div>
           <p className="text-gray invite-subheader">Accept to start collaborating together</p>
 

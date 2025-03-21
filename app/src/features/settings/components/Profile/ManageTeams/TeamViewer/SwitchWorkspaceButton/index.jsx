@@ -1,50 +1,20 @@
 import { SyncOutlined } from "@ant-design/icons";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Button } from "antd";
-import { isWorkspacesFeatureEnabled } from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { useSelector } from "react-redux";
+import { getActiveWorkspaceIds } from "store/slices/workspaces/selectors";
 
 const SwitchWorkspaceButton = ({ teamName, selectedTeamId, teamMembersCount, isTeamArchived = false }) => {
-  const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
   // Global State
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
-  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const activeWorkspaceIds = useSelector(getActiveWorkspaceIds);
 
-  let isButtonDisabled = true;
-  if (!isSharedWorkspaceMode) {
-    // This means there is not currently selected workspace (ie it's personal workspace)
-    // Do offer user to switch the workspace
-    isButtonDisabled = false;
-  }
-  if (activeWorkspaceId && activeWorkspaceId !== selectedTeamId) {
-    // This means user has current selected a workspace that it different from what we're showing him rn on screen
-    isButtonDisabled = false;
-  }
+  const { switchWorkspace } = useWorkspaceHelpers();
 
-  if (!isWorkspacesFeatureEnabled(user?.details?.profile?.email)) {
-    return null;
-  }
+  let isButtonDisabled = activeWorkspaceIds?.includes(selectedTeamId) ? true : false;
 
   const handleSwitchWorkspace = () => {
-    switchWorkspace(
-      {
-        teamId: selectedTeamId,
-        teamName,
-        teamMembersCount,
-      },
-      dispatch,
-      {
-        isSyncEnabled: user?.details?.isSyncEnabled,
-        isWorkspaceMode: isSharedWorkspaceMode,
-      },
-      appMode
-    );
+    switchWorkspace(selectedTeamId);
   };
 
   return (

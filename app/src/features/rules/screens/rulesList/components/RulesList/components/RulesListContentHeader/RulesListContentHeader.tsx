@@ -184,7 +184,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
     if (state?.modal) {
       importRecordsAction();
     }
-  }, [state?.modal]);
+  }, [importRecordsAction, state?.modal]);
 
   return (
     <ContentListHeader
