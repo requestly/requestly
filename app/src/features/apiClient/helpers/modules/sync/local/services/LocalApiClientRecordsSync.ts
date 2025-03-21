@@ -452,10 +452,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         message: result.error.message,
       };
     }
-    const parsedRecords = this.parseAPIEntities([result.content as APIEntity]);
+    const [parsedRecords] = this.parseAPIEntities([result.content as APIEntity]);
     return {
       success: true,
-      data: parsedRecords[0],
+      data: parsedRecords,
     };
   }
 
