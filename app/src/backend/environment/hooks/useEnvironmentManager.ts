@@ -185,8 +185,8 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       } else {
         dispatch(variablesActions.updateAllEnvironmentData({ environmentMap: result.data.environments, ownerId }));
       }
-      console.log("result.data.errorFiles", result.data.errorFiles);
-      dispatch(variablesActions.setErrorEnvFiles(result.data.errorFiles));
+      console.log("result.data.errorFiles", result.data.erroredRecords);
+      dispatch(variablesActions.setErrorEnvFiles(result.data.erroredRecords));
 
       if (newCurrentEnvironmentId) {
         unsubscribeListener?.();
