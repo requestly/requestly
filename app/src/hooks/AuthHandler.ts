@@ -19,7 +19,6 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { getUser } from "backend/user/getUser";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { StorageService } from "init";
-import { isAppOpenedInIframe } from "utils/AppUtils";
 import { getEmailType } from "utils/mailCheckerUtils";
 import { EmailType } from "@requestly/shared/types/common";
 
@@ -193,7 +192,7 @@ const AuthHandler: React.FC<{}> = () => {
   );
 
   useEffect(() => {
-    if (queryPrarams.get("refreshToken") && isAppOpenedInIframe()) {
+    if (queryPrarams.get("refreshToken")) {
       const refreshToken = queryPrarams.get("refreshToken");
       const getCustomToken = httpsCallable(getFunctions(), "auth-generateCustomToken");
       getCustomToken({ refreshToken }).then(
