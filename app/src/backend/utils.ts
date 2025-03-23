@@ -1,9 +1,16 @@
 import { collection, doc, getFirestore, writeBatch } from "firebase/firestore";
 import firebaseApp from "../firebase";
+import { isPersonalWorkspaceId } from "features/workspaces/utils";
 import { updateRecordMetaData } from "./apiClient/utils";
 
 export const getOwnerId = (uid: string, teamId?: string) => {
   if (teamId) {
+    // For backward compatibility, we are using teamId as ownerId for team workspaces only
+    // FIXME-syncing: Find a longterm fix for this. What should be the owner id of personal workspace?
+    if (isPersonalWorkspaceId(teamId)) {
+      return uid;
+    }
+
     return `team-${teamId}`;
   }
   return uid;

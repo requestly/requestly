@@ -124,7 +124,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     if (defaultExpandedRowKeys.length > 0) {
       setExpandedRowsKeys(defaultExpandedRowKeys);
     }
-  }, [defaultExpandedRowKeys.length]);
+  }, [defaultExpandedRowKeys]);
 
   const expandRow = useCallback(
     (expanded: boolean, record: DataType) => {

@@ -6,7 +6,6 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useHasChanged } from "hooks";
 import { redirectToRuleEditor, redirectToRules } from "utils/RedirectionUtils";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
-import { StorageService } from "init";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
@@ -21,6 +20,8 @@ import {
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/components/RulesList/components";
+import "./rulesCard.scss";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 import { Rule, RuleType } from "@requestly/shared/types/entities/rules";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { Card } from "../Card";
@@ -96,8 +97,8 @@ export const RulesCard = () => {
 
   useEffect(() => {
     if (isExtensionInstalled() && !isRulesLoading) {
-      StorageService(appMode)
-        .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
+      clientRuleStorageService
+        .getRecordsByObjectType(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
         .then((res) => {
           setRules(
             res

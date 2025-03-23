@@ -1,7 +1,8 @@
+// FIXME-syncing-cleanup: Needs Refractoring
+
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -13,7 +14,6 @@ import { getDomainFromEmail } from "utils/FormattingHelper";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import { generateDefaultTeamName } from "utils/teams";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import {
   trackAddTeamMemberSuccess,
   trackNewTeamCreateFailure,
@@ -27,17 +27,23 @@ import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import "./CreateWorkspaceModal.css";
-import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
-const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
+interface Props {
+  isOpen: boolean;
+  toggleModal: () => void;
+  callback?: () => void;
+  source?: string;
+}
+
+const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, callback, source }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [form] = Form.useForm();
 
   const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
-  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const availableWorkspaces = useSelector(getAllWorkspaces);
 
@@ -50,48 +56,35 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
 
   const { claimIncentiveRewards } = useIncentiveActions();
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const createOrgTeamInvite = useMemo(() => httpsCallable(getFunctions(), "invites-createOrganizationTeamInvite"), []);
   const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
 
-  const handleFormValuesChange = (_, data) => {
+  const handleFormValuesChange = (_: any, data: any) => {
     setCreateWorkspaceFormData(data);
   };
 
   const handlePostTeamCreation = useCallback(
-    (teamId, newTeamName, hasMembersInSameDomain) => {
-      switchWorkspace(
-        {
-          teamId: teamId,
-          teamName: newTeamName,
-          teamMembersCount: 1,
-        },
-        dispatch,
-        {
-          isSyncEnabled: user?.details?.isSyncEnabled,
-          isWorkspaceMode: isSharedWorkspaceMode,
-        },
-        appMode,
-        null,
-        "create_workspace_modal"
-      );
+    (teamId: string, hasMembersInSameDomain: boolean) => {
+      switchWorkspace(teamId);
       redirectToTeam(navigate, teamId, {
         state: {
           isNewTeam: !isNotifyAllSelected || !hasMembersInSameDomain,
         },
       });
     },
-    [dispatch, appMode, isNotifyAllSelected, isSharedWorkspaceMode, navigate, user?.details?.isSyncEnabled]
+    [switchWorkspace, navigate, isNotifyAllSelected]
   );
 
   const handleFinishClick = useCallback(
-    async (details) => {
+    async (details: any) => {
       setIsLoading(true);
       const newTeamName = details.workspaceName;
       const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
 
       try {
-        const response = await createTeam({
+        const response: any = await createTeam({
           teamName: newTeamName,
         });
 
@@ -123,13 +116,13 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         if (isNotifyAllSelected) {
           try {
             const domain = getDomainFromEmail(user?.details?.profile?.email);
-            const inviteRes = await createOrgTeamInvite({ domain, teamId });
+            const inviteRes: any = await createOrgTeamInvite({ domain, teamId });
             await upsertTeamCommonInvite({ teamId, domainEnabled: isNotifyAllSelected });
             if (inviteRes.data.success) {
               toast.success(`All users from ${domain} have been invited to join this workspace.`);
               trackAddTeamMemberSuccess({
                 team_id: teamId,
-                emails: user?.details?.profile?.email,
+                email: user?.details?.profile?.email,
                 is_admin: true,
                 source: "notify_all_teammates",
                 num_users_added: 1,
@@ -152,7 +145,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         }
 
         trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal", isNotifyAllSelected);
-        handlePostTeamCreation(teamId, newTeamName, hasMembersInSameDomain);
+        handlePostTeamCreation(teamId, hasMembersInSameDomain);
 
         callback?.();
         toggleModal();
@@ -164,17 +157,17 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       }
     },
     [
-      dispatch,
+      claimIncentiveRewards,
+      availableWorkspaces?.length,
       isNotifyAllSelected,
-      createOrgTeamInvite,
+      handlePostTeamCreation,
       callback,
       toggleModal,
-      upsertTeamCommonInvite,
+      dispatch,
       user?.details?.profile?.email,
-      handlePostTeamCreation,
+      createOrgTeamInvite,
+      upsertTeamCommonInvite,
       billingTeams,
-      availableWorkspaces?.length,
-      claimIncentiveRewards,
     ]
   );
 

@@ -49,7 +49,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
       emails: memberEmails,
       role: TeamRole.write,
       teamName: activeWorkspace.name,
-      numberOfMembers: activeWorkspace.membersCount,
+      numberOfMembers: activeWorkspace?.membersCount,
       source: "sharing_modal_from_workspace",
     }).then((res: any) => {
       const hasSuccessfulInvite = res?.data.results.some((result: any) => result.success);
@@ -87,7 +87,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
         trackSharingModalRulesDuplicated("team", selectedRules.length);
         setPostShareViewData({
           type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
-          targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
+          targetTeamData: teamData,
           sourceTeamData: activeWorkspace,
         });
 

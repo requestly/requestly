@@ -196,7 +196,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
         onClick: () => trackMocksListFilterChanged("starred"),
       },
     ],
-    [mockRecords]
+    [mockRecords, records]
   );
 
   const contentListHeaderSearchProps = mockType

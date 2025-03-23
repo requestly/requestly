@@ -33,9 +33,9 @@ import "./index.css";
 import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/misc/onboarding";
 import { trackNewTeamCreateSuccess, trackWorkspaceOnboardingViewed } from "modules/analytics/events/features/teams";
 import { capitalize } from "lodash";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
-import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface OnboardingProps {
   isOpen: boolean;
@@ -47,7 +47,6 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const step = useSelector(getWorkspaceOnboardingStep);
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
@@ -56,6 +55,8 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   const [isNewUserFromEmailLinkSignIn, setIsNewUserFromEmailLinkSignIn] = useState(false);
   const [defaultTeamData, setDefaultTeamData] = useState(null);
   const [pendingInvites, setPendingInvites] = useState<Invite[] | null>(null);
+
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const createTeam = useMemo(
     () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
@@ -106,18 +107,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
             })
           );
           trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "onboarding");
-          switchWorkspace(
-            {
-              teamId: response?.data?.teamId,
-              teamName: newTeamName,
-              teamMembersCount: response?.data?.accessCount,
-            },
-            dispatch,
-            { isWorkspaceMode: isSharedWorkspaceMode, isSyncEnabled: true },
-            appMode,
-            null,
-            "onboarding"
-          );
+          switchWorkspace(response?.data?.teamId, "onboarding");
           setTimeout(() => {
             dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
           }, 50);
@@ -137,8 +127,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     userEmailDomain,
     createTeam,
     upsertTeamCommonInvite,
-    isSharedWorkspaceMode,
-    appMode,
+    switchWorkspace,
   ]);
 
   useEffect(() => {
