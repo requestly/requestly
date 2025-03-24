@@ -22,6 +22,7 @@ type TabServiceState = {
   setActiveTabId: (tabId: TabId) => void;
   _generateNewTabId: () => TabId;
   incrementVersion: () => void;
+  getSourceByTabId: (tabId: TabId) => AbstractTabSource;
 };
 
 const createTabServiceStore = () => {
@@ -133,6 +134,15 @@ const createTabServiceStore = () => {
 
     incrementVersion() {
       set({ _version: get()._version + 1 });
+    },
+
+    getSourceByTabId(tabId) {
+      const { tabs } = get();
+      const tab = tabs.get(tabId);
+      if (!tab) {
+        throw new Error(`Tab with id ${tabId} not found`);
+      }
+      return tab.getState().source;
     },
   }));
 };
