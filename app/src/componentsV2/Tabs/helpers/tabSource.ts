@@ -8,4 +8,5 @@ export abstract class AbstractTabSource {
   abstract getSourceName(): string;
   abstract render(): React.ReactNode;
   abstract getDefaultTitle(): string;
+  abstract getUrlPath(): string;
 }
