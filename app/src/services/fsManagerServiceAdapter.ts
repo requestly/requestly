@@ -1,9 +1,12 @@
 // import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import {
   API,
+  APIEntity,
   Collection,
   EnvironmentEntity,
+  ErroredRecords,
   FileSystemResult,
+  FileType,
 } from "features/apiClient/helpers/modules/sync/local/services/types";
 import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackgroundService";
 import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
@@ -20,7 +23,9 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
 
   async getAllRecords() {
-    return this.invokeProcedureInBG("getAllRecords") as Promise<any>;
+    return this.invokeProcedureInBG("getAllRecords") as Promise<
+      FileSystemResult<{ records: APIEntity[]; erroredRecords: ErroredRecords[] }>
+    >;
   }
 
   async getRecord(id: string) {
@@ -42,11 +47,11 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
 
   async deleteRecord(id: string) {
-    return this.invokeProcedureInBG("deleteRecord", id) as Promise<FileSystemResult<API>>;
+    return this.invokeProcedureInBG("deleteRecord", id) as Promise<FileSystemResult<void>>;
   }
 
   async deleteRecords(ids: string[]) {
-    return this.invokeProcedureInBG("deleteRecords", ids) as Promise<FileSystemResult<API>>;
+    return this.invokeProcedureInBG("deleteRecords", ids) as Promise<FileSystemResult<void>>;
   }
 
   async getCollection(id: string) {
@@ -62,7 +67,9 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
 
   async getAllEnvironments() {
-    return this.invokeProcedureInBG("getAllEnvironments") as Promise<any>;
+    return this.invokeProcedureInBG("getAllEnvironments") as Promise<
+      FileSystemResult<{ environments: EnvironmentEntity[]; erroredRecords: ErroredRecords[] }>
+    >;
   }
 
   async createEnvironment(environmentName: string, isGlobal?: boolean) {
@@ -94,6 +101,14 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
   async updateCollectionAuthData(id: string, newAuth: RQAPI.Auth) {
     return this.invokeProcedureInBG("updateCollectionAuthData", id, newAuth) as Promise<FileSystemResult<RQAPI.Auth>>;
+  }
+
+  async writeRawRecord(id: string, record: any, fileType: FileType) {
+    return this.invokeProcedureInBG("writeRawRecord", id, record, fileType) as Promise<FileSystemResult<unknown>>;
+  }
+
+  async getRawFileData(id: string) {
+    return this.invokeProcedureInBG("getRawFileData", id) as Promise<FileSystemResult<unknown>>;
   }
 }
 

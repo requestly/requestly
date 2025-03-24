@@ -12,6 +12,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   }
 
   private parseEnvironmentEntitiesToMap(entities: EnvironmentEntity[]): EnvironmentMap {
+    console.log("env entities", entities);
     const environmentsMap = entities.reduce((acc, cur) => {
       acc[cur.id] = {
         id: cur.id,
@@ -36,17 +37,29 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
 
   async getAllEnvironments() {
     const service = await this.getAdapter();
-    const result: FileSystemResult<EnvironmentEntity[]> = await service.getAllEnvironments();
+    const result = await service.getAllEnvironments();
     if (result.type === "success") {
-      const parsedEnvs = this.parseEnvironmentEntitiesToMap(result.content);
+      const parsedEnvs = this.parseEnvironmentEntitiesToMap(result.content.environments);
       const globalEnvPath = `${this.meta.rootPath}/environments/global.json`;
       if (!parsedEnvs[globalEnvPath]) {
         const globalEnv = await this.createGlobalEnvironment();
         parsedEnvs[globalEnvPath] = globalEnv;
       }
-      return parsedEnvs;
+      return {
+        success: true,
+        data: {
+          environments: parsedEnvs,
+          erroredRecords: result.content.erroredRecords,
+        },
+      };
     } else {
-      return {};
+      return {
+        success: true,
+        data: {
+          environments: {},
+          erroredRecords: [],
+        },
+      };
     }
   }
 
@@ -71,12 +84,13 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     return null;
   }
 
-  async deleteEnvironment(envId: string): Promise<void> {
+  async deleteEnvironment(envId: string) {
     const service = await this.getAdapter();
     const result = await service.deleteRecord(envId);
-
-    if (result.type === "error") {
-      throw new Error("Something went wrong while deleting environment");
+    if (result.type === "success") {
+      return { success: true };
+    } else {
+      return { success: false, message: "Something went wrong while deleting environment" };
     }
   }
 
