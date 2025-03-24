@@ -1,10 +1,13 @@
 .collections-list-container {
   width: 100%;
-  height: calc(100% - 50px);
+  height: inherit;
   overflow: auto;
   overflow-x: hidden;
   padding: 8px 8px 8px 0;
   flex: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 
   &.selection-enabled {
     padding-bottom: 50px;
@@ -27,6 +30,8 @@
   }
 
   .collections-list-content {
+    overflow: auto;
+
     .collections-list-item + .collections-list-item {
       margin-top: 4px;
     }
