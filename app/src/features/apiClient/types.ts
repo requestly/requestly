@@ -138,6 +138,7 @@ export namespace RQAPI {
   }
 
   export type ExecutionError = {
+    type: RQAPI.ApiClientErrorType;
     source: string;
     name: Error["name"];
     message: Error["message"];
@@ -214,4 +215,11 @@ export namespace RQAPI {
     data: { records: Record[]; erroredRecords: ErroredRecords[] };
     message?: string;
   }>;
+
+  export enum ApiClientErrorType {
+    PRE_VALIDATION = "pre_validation",
+    CORE = "core",
+    ABORT = "abort",
+    SCRIPT = "script",
+  }
 }
