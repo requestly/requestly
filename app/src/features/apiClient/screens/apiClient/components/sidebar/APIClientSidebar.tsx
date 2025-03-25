@@ -62,7 +62,6 @@ const APIClientSidebar: React.FC<Props> = () => {
           // onNewClick(analyticEventSource, RQAPI.RecordType.API);
           openTab(
             new DraftRequestContainerSource({
-              id: "draft-req-id",
               title: "Neww Draft request",
             })
           );

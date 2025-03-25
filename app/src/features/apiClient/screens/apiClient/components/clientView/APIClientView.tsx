@@ -419,8 +419,10 @@ const APIClientView: React.FC<Props> = ({
       record.id = apiEntryDetails?.id;
     }
 
+    console.log("!!!debug", "checking", record);
+
     const result = isCreateMode
-      ? await apiClientRecordsRepository.createRecordWithId(record, requestId)
+      ? await apiClientRecordsRepository.createRecordWithId(record, record.id)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
@@ -440,11 +442,21 @@ const APIClientView: React.FC<Props> = ({
       // onSaveCallback(record.id,entry);
       toast.success("Request saved!");
     } else {
+      console.log("!!!debug", "result", result);
       toast.error(result?.message || `Could not save Request.`);
     }
 
     setIsRequestSaving(false);
-  }, [apiClientRecordsRepository, apiEntryDetails, entry, isCreateMode, onSaveCallback, onSaveRecord, resetChanges]);
+  }, [
+    apiClientRecordsRepository,
+    apiEntryDetails,
+    entry,
+    isCreateMode,
+    onSaveCallback,
+    onSaveRecord,
+    requestId,
+    resetChanges,
+  ]);
 
   const cancelRequest = useCallback(() => {
     apiClientExecutor.abort();

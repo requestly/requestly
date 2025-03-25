@@ -1,7 +1,6 @@
 import PATHS from "config/constants/sub/paths";
 import { DraftRequestContainer } from "features/apiClient/screens/apiClient/components/clientView/components/DraftRequestContainer";
 import React from "react";
-import { updateUrlPath } from "../utils";
 
 export abstract class AbstractTabSource {
   abstract component: NonNullable<React.ReactNode>;
@@ -13,7 +12,6 @@ export abstract class AbstractTabSource {
   abstract render(): React.ReactNode;
   abstract getDefaultTitle(): string;
   abstract getUrlPath(): string;
-  abstract setUrlPath(path: string): void;
 }
 
 export class DraftRequestContainerSource extends AbstractTabSource {
@@ -25,7 +23,7 @@ export class DraftRequestContainerSource extends AbstractTabSource {
     super();
     this.component = <DraftRequestContainer />;
     this.metadata = {
-      id: metadata.id,
+      id: Date.now(),
       name: "New Request",
       title: metadata.title,
     };
