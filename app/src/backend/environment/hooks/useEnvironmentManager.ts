@@ -11,6 +11,7 @@ import {
   getAllEnvironmentData,
   getCollectionVariables,
   getCurrentEnvironmentId,
+  getErrorEnvFiles,
 } from "store/features/variables/selectors";
 import { variablesActions } from "store/features/variables/slice";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
@@ -42,6 +43,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const errorEnvFiles = useSelector(getErrorEnvFiles);
 
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
@@ -150,56 +152,72 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     return () => {};
   }, [dispatch, ownerId, syncRepository.environmentVariablesRepository]);
 
+  const fetchAndUpdateEnvironments = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const result = await syncRepository.environmentVariablesRepository.getAllEnvironments();
+      let newCurrentEnvironmentId = currentEnvironmentId;
+      if (Object.keys(result.data.environments).length > 0 && !result.data.environments[currentEnvironmentId]) {
+        // setting the first environment as the current environment if the current environment is not found in environmentMap
+        // do not set global env as active
+        newCurrentEnvironmentId = Object.keys(result.data.environments).filter(
+          (key) => !isGlobalEnvironment(result.data.environments[key].id)
+        )[0];
+        setCurrentEnvironment(newCurrentEnvironmentId);
+      }
+
+      // Tracking user properties for analytics (excluding global variables)
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ENVIRONMENTS, Object.keys(result.data.environments).length - 1);
+
+      const updatedEnvironmentMap: EnvironmentMap = {};
+
+      if (!isEmpty(activeOwnerEnvironmentsRef.current)) {
+        Object.keys(result.data.environments).forEach((key) => {
+          updatedEnvironmentMap[key] = {
+            ...result.data.environments[key],
+            variables: mergeLocalAndSyncVariables(
+              activeOwnerEnvironmentsRef.current[key]?.variables ?? {},
+              result.data.environments[key].variables
+            ),
+          };
+        });
+        dispatch(variablesActions.updateAllEnvironmentData({ environmentMap: updatedEnvironmentMap, ownerId }));
+      } else {
+        dispatch(variablesActions.updateAllEnvironmentData({ environmentMap: result.data.environments, ownerId }));
+      }
+      console.log("result.data.errorFiles", result.data.erroredRecords);
+      dispatch(variablesActions.setErrorEnvFiles(result.data.erroredRecords));
+
+      if (newCurrentEnvironmentId) {
+        unsubscribeListener?.();
+        unsubscribeListener = attachEnvironmentListener(newCurrentEnvironmentId);
+      }
+
+      // Attach global and collection listeners
+      unsubscribeGlobalVariablesListener = attachGlobalVariablesListener();
+    } catch (err) {
+      console.log("env fetch error", err);
+      Logger.log("fetch all env details error", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    attachEnvironmentListener,
+    attachGlobalVariablesListener,
+    currentEnvironmentId,
+    dispatch,
+    ownerId,
+    setCurrentEnvironment,
+    syncRepository.environmentVariablesRepository,
+  ]);
+
+  const forceRefreshEnvironments = useCallback(() => {
+    fetchAndUpdateEnvironments();
+  }, [fetchAndUpdateEnvironments]);
+
   useEffect(() => {
     if (ownerId && initFetchers) {
-      setIsLoading(true);
-      syncRepository.environmentVariablesRepository
-        .getAllEnvironments()
-        .then((environmentMap) => {
-          let newCurrentEnvironmentId = currentEnvironmentId;
-          if (Object.keys(environmentMap).length > 0 && !environmentMap[currentEnvironmentId]) {
-            // setting the first environment as the current environment if the current environment is not found in environmentMap
-            // do not set global env as active
-            newCurrentEnvironmentId = Object.keys(environmentMap).filter(
-              (key) => !isGlobalEnvironment(environmentMap[key].id)
-            )[0];
-            setCurrentEnvironment(newCurrentEnvironmentId);
-          }
-
-          // Tracking user properties for analytics (excluding global variables)
-          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ENVIRONMENTS, Object.keys(environmentMap).length - 1);
-
-          const updatedEnvironmentMap: EnvironmentMap = {};
-
-          if (!isEmpty(activeOwnerEnvironmentsRef.current)) {
-            Object.keys(environmentMap).forEach((key) => {
-              updatedEnvironmentMap[key] = {
-                ...environmentMap[key],
-                variables: mergeLocalAndSyncVariables(
-                  activeOwnerEnvironmentsRef.current[key]?.variables ?? {},
-                  environmentMap[key].variables
-                ),
-              };
-            });
-            dispatch(variablesActions.updateAllEnvironmentData({ environmentMap: updatedEnvironmentMap, ownerId }));
-          } else {
-            dispatch(variablesActions.updateAllEnvironmentData({ environmentMap, ownerId }));
-          }
-
-          if (newCurrentEnvironmentId) {
-            unsubscribeListener?.();
-            unsubscribeListener = attachEnvironmentListener(newCurrentEnvironmentId);
-          }
-
-          // Attach global and collection listeners
-          unsubscribeGlobalVariablesListener = attachGlobalVariablesListener();
-        })
-        .catch((err) => {
-          Logger.log("fetch all env details error", err);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+      fetchAndUpdateEnvironments();
     }
 
     return () => {
@@ -211,6 +229,8 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     attachGlobalVariablesListener,
     currentEnvironmentId,
     dispatch,
+    fetchAndUpdateEnvironments,
+    forceRefreshEnvironments,
     initFetchers,
     ownerId,
     setCurrentEnvironment,
@@ -474,6 +494,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   );
 
   return {
+    errorEnvFiles,
     setCurrentEnvironment,
     addNewEnvironment,
     getCurrentEnvironment,
@@ -492,6 +513,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     setCollectionVariables,
     getCollectionVariables: getCurrentCollectionVariables,
     environmentSyncRepository: syncRepository.environmentVariablesRepository,
+    forceRefreshEnvironments,
   };
 };
 
