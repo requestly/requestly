@@ -110,6 +110,12 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   async getRawFileData(id: string) {
     return this.invokeProcedureInBG("getRawFileData", id) as Promise<FileSystemResult<unknown>>;
   }
+
+  async createCollectionFromCompleteRecord(collection: RQAPI.CollectionRecord, id: string) {
+    return this.invokeProcedureInBG("createCollectionFromCompleteRecord", collection, id) as Promise<
+      FileSystemResult<RQAPI.Record>
+    >;
+  }
 }
 
 class FsManagerServiceAdapterProvider {
