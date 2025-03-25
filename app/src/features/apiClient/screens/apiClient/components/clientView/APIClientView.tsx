@@ -51,6 +51,8 @@ interface Props {
   apiEntry?: RQAPI.Entry;
   notifyApiRequestFinished?: (apiEntry: RQAPI.Entry) => void;
   apiEntryDetails?: RQAPI.ApiRecord;
+  onSaveCallback: (requestId: string) => void;
+  requestId?: string;
 }
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
@@ -58,7 +60,14 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   label: method,
 }));
 
-const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRequestFinished, openInModal }) => {
+const APIClientView: React.FC<Props> = ({
+  apiEntry,
+  apiEntryDetails,
+  notifyApiRequestFinished,
+  openInModal,
+  onSaveCallback,
+  requestId,
+}) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const appMode = useSelector(getAppMode);
@@ -66,7 +75,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const user = useSelector(getUserAuthDetails);
   const [searchParams] = useSearchParams();
   const isCreateMode = searchParams.has("create");
-  const { requestId } = useParams();
+  // const { requestId } = useParams();
 
   const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
   const {
@@ -397,10 +406,20 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       type: RQAPI.RecordType.API,
       data: { ...sanitizeEntry(entry, false) },
     };
+    record.id = "newId";
 
+    //  Is this check necessary?
     if (apiEntryDetails?.id) {
       record.id = apiEntryDetails?.id;
     }
+
+    console.log("!!!debug", "save", {
+      record,
+      apiEntryDetails,
+    });
+
+    onSaveCallback(record.id);
+    // return;
 
     const result = isCreateMode
       ? await apiClientRecordsRepository.createRecordWithId(record, requestId)
@@ -425,14 +444,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
 
     setIsRequestSaving(false);
   }, [
-    entry,
-    apiEntryDetails,
-    onSaveRecord,
-    setEntry,
-    resetChanges,
-    isCreateMode,
     apiClientRecordsRepository,
+    apiEntryDetails,
+    entry,
+    isCreateMode,
+    onSaveCallback,
+    onSaveRecord,
     requestId,
+    resetChanges,
   ]);
 
   const cancelRequest = useCallback(() => {

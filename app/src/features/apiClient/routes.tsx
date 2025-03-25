@@ -8,6 +8,7 @@ import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImport
 import { TabOutletHOC } from "layouts/TabsLayout/hoc/TabOutletHOC";
 import { CollectionView } from "./screens/apiClient/components/clientView/components/Collection/CollectionView";
 import { ApiClientEmptyView } from "./screens/apiClient/components/clientView/components/ApiClientEmptyView/ApiClientEmptyView";
+import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
 
 export const apiClientRoutes: RouteObject[] = [
   {
@@ -22,39 +23,46 @@ export const apiClientRoutes: RouteObject[] = [
       {
         index: true,
         element: (
-          <TabOutletHOC>
-            <ApiClientEmptyView />
-          </TabOutletHOC>
+          // <TabOutletHOC>
+          //   <ApiClientEmptyView />
+          // </TabOutletHOC>
+          // <TabServiceStoreContext.Provider >
+          <TabsContainer />
+          // </TabServiceProvider.Provider>
+          //
         ),
       },
       {
-        path: PATHS.API_CLIENT.REQUEST.INDEX,
-        element: (
-          <TabOutletHOC>
-            <ProtectedRoute component={APIClient} />
-          </TabOutletHOC>
-        ),
-        handle: {
-          breadcrumb: {
-            label: "Request",
-            isEditable: true,
-          },
-        },
+        path: PATHS.ANY,
       },
-      {
-        path: PATHS.API_CLIENT.COLLECTION.INDEX,
-        element: (
-          <TabOutletHOC>
-            <ProtectedRoute component={CollectionView} />
-          </TabOutletHOC>
-        ),
-        handle: {
-          breadcrumb: {
-            label: "Collection", // TODO: Fix, change it to collection, when collection view is added
-            isEditable: true,
-          },
-        },
-      },
+      // {
+      //   path: PATHS.API_CLIENT.REQUEST.INDEX,
+      //   element: (
+      //     <TabOutletHOC>
+      //       <ProtectedRoute component={APIClient} />
+      //     </TabOutletHOC>
+      //   ),
+      //   handle: {
+      //     breadcrumb: {
+      //       label: "Request",
+      //       isEditable: true,
+      //     },
+      //   },
+      // },
+      // {
+      //   path: PATHS.API_CLIENT.COLLECTION.INDEX,
+      //   element: (
+      //     <TabOutletHOC>
+      //       <ProtectedRoute component={CollectionView} />
+      //     </TabOutletHOC>
+      //   ),
+      //   handle: {
+      //     breadcrumb: {
+      //       label: "Collection", // TODO: Fix, change it to collection, when collection view is added
+      //       isEditable: true,
+      //     },
+      //   },
+      // },
       {
         path: PATHS.API_CLIENT.HISTORY.INDEX,
         element: (

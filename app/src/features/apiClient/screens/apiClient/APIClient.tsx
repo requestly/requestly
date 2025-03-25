@@ -10,12 +10,17 @@ import { getEmptyAPIEntry, syncQueryParams } from "./utils";
 import "./apiClient.scss";
 import { isEmpty } from "lodash";
 
-interface Props {}
+interface Props {
+  isCreateMode: boolean;
+  requestId?: string;
+  onSaveCallback?: (requestId: string) => void;
+}
 
-export const APIClient: React.FC<Props> = React.memo(() => {
+export const APIClient: React.FC<Props> = React.memo((props) => {
   const location = useLocation();
-  const { requestId } = useParams();
-  const [searchParams] = useSearchParams();
+  const { requestId, isCreateMode } = props;
+  // const { requestId } = useParams();
+  // const [searchParams] = useSearchParams();
   const {
     apiClientRecords,
     history,
@@ -26,14 +31,14 @@ export const APIClient: React.FC<Props> = React.memo(() => {
   const [persistedRequestId, setPersistedRequestId] = useState<string>(() => requestId);
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
   const isHistoryPath = location.pathname.includes("history");
-  const isNewRequest = searchParams.has("new");
-  const isCreateMode = searchParams.has("create");
+  // const isNewRequest = searchParams.has("new");
+  // const isCreateMode = searchParams.has("create");
 
   useEffect(() => {
-    if (isNewRequest) {
+    if (requestId) {
       setPersistedRequestId(requestId);
     }
-  }, [isNewRequest, requestId]);
+  }, [requestId]);
 
   const requestHistoryEntry = useMemo(() => {
     if (!isHistoryPath) {
@@ -161,6 +166,8 @@ export const APIClient: React.FC<Props> = React.memo(() => {
           apiEntry={entryDetailsToView}
           apiEntryDetails={entryDetails}
           notifyApiRequestFinished={handleAppRequestFinished}
+          onSaveCallback={props.onSaveCallback}
+          isCreateMode={isCreateMode}
         />
       </div>
     </BottomSheetProvider>

@@ -10,9 +10,13 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
   return (
     <GenericStateContext.Provider
       value={{
-        setTitle: (title: string) => {
+        updateTitle: (title: string) => {
           props.store.getState().setTitle(title);
           incrementVersion();
+        },
+        updateUrl: (path: string) => {
+          props.store.getState().source.setUrlPath(path);
+          props.store.getState().source.updateUrl();
         },
       }}
     >
