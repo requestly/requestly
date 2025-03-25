@@ -116,6 +116,14 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
       FileSystemResult<RQAPI.Record>
     >;
   }
+
+  async moveRecord(id: string, newParentId: string) {
+    return this.invokeProcedureInBG("moveRecord", id, newParentId) as Promise<FileSystemResult<RQAPI.Record>>;
+  }
+
+  async moveCollection(id: string, newParentId: string) {
+    return this.invokeProcedureInBG("moveCollection", id, newParentId) as Promise<FileSystemResult<RQAPI.Record>>;
+  }
 }
 
 class FsManagerServiceAdapterProvider {

@@ -478,4 +478,39 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       success: true,
     };
   }
+
+  async duplicateApiEntities(entities: RQAPI.Record[]) {
+    const result: RQAPI.Record[] = [];
+    for (const entity of entities) {
+      const duplicationResult = await (async () => {
+        if (entity.type === RQAPI.RecordType.API) {
+          return this.createRecordWithId(entity, entity.id);
+        }
+        return this.createCollectionFromImport(entity, entity.id);
+      })();
+      if (duplicationResult.success) {
+        result.push(duplicationResult.data);
+      }
+    }
+    return result;
+  }
+
+  async moveAPIEntities(entities: RQAPI.Record[], newParentId: string) {
+    const service = await this.getAdapter();
+    const result: RQAPI.Record[] = [];
+    for (const entity of entities) {
+      const moveResult = await (async () => {
+        if (entity.type === RQAPI.RecordType.API) {
+          return service.moveRecord(entity.id, newParentId);
+        }
+        return service.moveCollection(entity.id, newParentId);
+      })();
+
+      if (moveResult.type === "success") {
+        const parsedCollection = this.parseAPIEntities([moveResult.content as APIEntity]);
+        result.push(parsedCollection[0]);
+      }
+    }
+    return result;
+  }
 }
