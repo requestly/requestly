@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { Tabs, TabsProps } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
+import { useTabsRouter } from "../hooks/useTabsRouter";
 
 const updateUrlPath = (path: string) => {
   window.history.pushState({}, "", path);
@@ -33,6 +34,8 @@ export const TabsContainer: React.FC = () => {
       updateUrlPath(newPath);
     }
   }, [activeTabId, getSourceByTabId]);
+
+  useTabsRouter();
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     return Array.from(tabs.values()).map((tabStore) => {
