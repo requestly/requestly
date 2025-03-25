@@ -11,9 +11,9 @@ import { MdClear } from "@react-icons/all-files/md/MdClear";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentVariables } from "backend/environment/types";
 
-import "./authorizationView.scss";
 import { AuthConfig, AuthConfigMeta, Authorization } from "./types/AuthConfig";
 import { getDefaultAuthType } from "./defaults";
+import "./authorizationView.scss";
 
 interface Props {
   wrapperClass?: string;

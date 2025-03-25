@@ -15,6 +15,7 @@ import { ImportSessionModal } from "features/sessionBook/modals/ImportSessionMod
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
+import { useRBAC } from "features/rbac";
 import "./sessionsListContentHeader.scss";
 
 interface SessionsListContentHeaderProps {
@@ -33,6 +34,8 @@ export const SessionsListContentHeader: React.FC<SessionsListContentHeaderProps>
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
   const appFlavour = getAppFlavour();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("session_recording", "update");
 
   const openDownloadedSessionModalBtn = useMemo(() => {
     return isDesktopSessionsCompatible ? (
@@ -54,26 +57,30 @@ export const SessionsListContentHeader: React.FC<SessionsListContentHeaderProps>
         <ContentListHeader
           searchValue={searchValue}
           setSearchValue={handleSearchValueUpdate}
-          actions={[
-            <RQButton
-              type="default"
-              onClick={() => redirectToSessionSettings(navigate, location.pathname)}
-              icon={<MdOutlineSettings />}
-            >
-              Settings
-            </RQButton>,
-            openDownloadedSessionModalBtn,
-            <RQButton
-              icon={<IoMdAdd />}
-              type="primary"
-              onClick={() => {
-                setIsNewSessionModalOpen(true);
-                trackNewSessionClicked();
-              }}
-            >
-              New Session
-            </RQButton>,
-          ]}
+          actions={
+            isValidPermission
+              ? [
+                  <RQButton
+                    type="default"
+                    onClick={() => redirectToSessionSettings(navigate, location.pathname)}
+                    icon={<MdOutlineSettings />}
+                  >
+                    Settings
+                  </RQButton>,
+                  openDownloadedSessionModalBtn,
+                  <RQButton
+                    icon={<IoMdAdd />}
+                    type="primary"
+                    onClick={() => {
+                      setIsNewSessionModalOpen(true);
+                      trackNewSessionClicked();
+                    }}
+                  >
+                    New Session
+                  </RQButton>,
+                ]
+              : null
+          }
         />
       </div>
       <NewSessionModal isOpen={isNewSessionModalOpen} toggleModal={() => setIsNewSessionModalOpen(false)} />

@@ -7,7 +7,6 @@ import { getAllRecordsMap } from "store/features/rules/selectors";
 import { Group, RecordStatus, Rule } from "@requestly/shared/types/entities/rules";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { UserAvatar } from "componentsV2/UserAvatar";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { MdOutlineShare } from "@react-icons/all-files/md/MdOutlineShare";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
@@ -26,10 +25,12 @@ import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { WarningOutlined } from "@ant-design/icons";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import RuleNameColumn from "../components/RulesColumn/RulesColumn";
+import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { RoleBasedComponent } from "features/rbac";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const allRecordsMap = useSelector(getAllRecordsMap);
   const {
     recordsChangeGroupAction,
@@ -82,7 +83,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     {
       title: "Rules",
       key: "name",
-      width: isWorkspaceMode ? 322 : 376,
+      width: isSharedWorkspaceMode ? 322 : 376,
       ellipsis: true,
       render: (record: RuleTableRecord) => {
         return <RuleNameColumn record={record} />;
@@ -239,7 +240,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         }
         const dateToDisplay = record.modificationDate ? record.modificationDate : record.creationDate;
         const beautifiedDate = moment(dateToDisplay).format("MMM DD, YYYY");
-        if (currentlyActiveWorkspace?.id && !options?.hideLastModifiedBy) {
+        if (activeWorkspaceId && !options?.hideLastModifiedBy) {
           return (
             <span className="rule-updated-on-cell">
               {beautifiedDate} <UserAvatar uid={record.lastModifiedBy} />
@@ -384,41 +385,43 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           },
         ];
         return (
-          <Row align="middle" wrap={false} className="rules-actions-container">
-            {isRule(record) ? (
-              <Button
-                type="text"
-                icon={<MdOutlineShare />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  recordsShareAction([normalizeRecord(record)]);
-                }}
-              />
-            ) : null}
+          <RoleBasedComponent resource="http_rule" permission="create">
+            <Row align="middle" wrap={false} className="rules-actions-container">
+              {isRule(record) ? (
+                <Button
+                  type="text"
+                  icon={<MdOutlineShare />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    recordsShareAction([normalizeRecord(record)]);
+                  }}
+                />
+              ) : null}
 
-            <Dropdown
-              menu={{ items: isRule(record) ? ruleActions : groupActions }}
-              trigger={["click"]}
-              overlayClassName="rule-more-actions-dropdown"
-            >
-              <Button
-                type="text"
-                className="more-rule-actions-btn"
-                icon={<MdOutlineMoreHoriz />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  trackRulesListActionsClicked(record.objectType);
-                }}
-              />
-            </Dropdown>
-          </Row>
+              <Dropdown
+                menu={{ items: isRule(record) ? ruleActions : groupActions }}
+                trigger={["click"]}
+                overlayClassName="rule-more-actions-dropdown"
+              >
+                <Button
+                  type="text"
+                  className="more-rule-actions-btn"
+                  icon={<MdOutlineMoreHoriz />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    trackRulesListActionsClicked(record.objectType);
+                  }}
+                />
+              </Dropdown>
+            </Row>
+          </RoleBasedComponent>
         );
       },
     },
   ];
 
   // FIXME: Extend the column type to also support custom fields eg hidden property to hide the column
-  if (isWorkspaceMode && !options.hideCreatedBy) {
+  if (isSharedWorkspaceMode && !options.hideCreatedBy) {
     columns.splice(6, 0, {
       title: "Author",
       width: 92,
@@ -429,7 +432,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           return null;
         }
         const uid = record.createdBy ?? null;
-        return currentlyActiveWorkspace?.id ? <UserAvatar uid={uid} /> : null;
+        return activeWorkspaceId ? <UserAvatar uid={uid} /> : null;
       },
     });
   }

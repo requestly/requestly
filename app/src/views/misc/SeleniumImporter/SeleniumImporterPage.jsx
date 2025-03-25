@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useTransition } from "react";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./SeleniumImporterPage.css";
-import { clearStorage, isExtensionInstalled, saveStorageObject } from "actions/ExtensionActions";
+import { isExtensionInstalled } from "actions/ExtensionActions";
 import removePreloader from "actions/UI/removePreloader";
+import { clientStorageService, initClientStorageService } from "services/clientStorageService";
+
+initClientStorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION);
 
 const SeleniumImporterPage = () => {
   const [isPending, startTransition] = useTransition();
@@ -103,7 +107,8 @@ const SeleniumImporterPage = () => {
     setStep3({ inProgress: true, success: false, error: null });
     notifySelenium("STEP_3_IN_PROGRESS");
     return new Promise((resolve, reject) => {
-      clearStorage()
+      clientStorageService
+        .clearStorage()
         .then(() => {
           notifySelenium("STEP_3_SUCCESS");
           setStep3({ inProgress: false, success: true, error: null });
@@ -129,7 +134,8 @@ const SeleniumImporterPage = () => {
         return acc;
       }, {});
 
-      saveStorageObject(formattedObject)
+      clientStorageService
+        .saveStorageObject(formattedObject)
         .then(() => {
           notifySelenium("STEP_4_SUCCESS");
           setStep4({ inProgress: false, success: true, error: null });

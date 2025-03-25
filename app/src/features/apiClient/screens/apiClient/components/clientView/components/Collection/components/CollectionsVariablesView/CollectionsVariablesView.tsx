@@ -8,8 +8,8 @@ import { VariablesListHeader } from "features/apiClient/screens/environment/comp
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
-import "./collectionsVariablesView.scss";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
+import "./collectionsVariablesView.scss";
 
 interface CollectionsVariablesViewProps {
   collection: RQAPI.CollectionRecord;
@@ -28,6 +28,12 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   useEffect(() => {
     updateTab(collection.id, { hasUnsavedChanges: hasUnsavedChanges });
   }, [updateTab, collection.id, hasUnsavedChanges]);
+
+  useEffect(() => {
+    if (!isSaving) {
+      setPendingVariables(collectionVariables[collection.id]?.variables || {});
+    }
+  }, [collection.id, collectionVariables, isSaving]);
 
   const handleSaveVariables = async () => {
     setIsSaving(true);
@@ -62,11 +68,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
         hasUnsavedChanges={hasUnsavedChanges}
         isSaving={isSaving}
       />
-      <VariablesList
-        variables={collectionVariables[collection.id]?.variables || {}}
-        onVariablesChange={setPendingVariables}
-        searchValue={searchValue}
-      />
+      <VariablesList variables={pendingVariables} onVariablesChange={setPendingVariables} searchValue={searchValue} />
     </div>
   );
 };

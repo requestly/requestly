@@ -23,7 +23,6 @@ import {
 } from "features/onboarding/analytics";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
-import { isCompanyEmail } from "utils/FormattingHelper";
 import { getUserPersona, setUserPersona, updateUserIndustry } from "backend/onboarding";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -31,6 +30,7 @@ import { IndustryInput } from "../IndustryInput";
 import "./index.scss";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface Props {
   isOpen: boolean;
@@ -57,7 +57,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
       return;
     }
 
-    if (user?.loggedIn && isCompanyEmail(user?.details?.profile?.email) && user?.details?.profile?.isEmailVerified) {
+    if (user?.loggedIn && isCompanyEmail(user.details?.emailType) && user?.details?.profile?.isEmailVerified) {
       dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.TEAMS));
     } else {
       redirectToWebAppHomePage(navigate);
@@ -69,7 +69,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
         })
       );
     }
-  }, [dispatch, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified, user?.loggedIn]);
+  }, [dispatch, navigate, user.details?.emailType, user.details?.profile?.isEmailVerified, user?.loggedIn]);
 
   const handleSetPersona = useCallback(() => {
     if (persona) {

@@ -28,6 +28,7 @@ import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";
 import { ErrorFilesList } from "../ErrorFilesList/ErrorFileslist";
+import { useRBAC } from "features/rbac";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -37,6 +38,8 @@ interface Props {
 export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated }) => {
   const navigate = useNavigate();
   const { collectionId, requestId } = useParams();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_request", "create");
 
   const location = useLocation();
   const { openTab, tabs } = useTabsLayoutContext();
@@ -111,7 +114,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   }, [setSelectedRecords, setShowSelection]);
 
   const multiSelectOptions = {
-    showMultiSelect: true,
+    showMultiSelect: isValidPermission,
     toggleMultiSelect: toggleSelection,
   };
 
@@ -165,12 +168,13 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     },
     [
       selectedRecords,
-      onSaveRecord,
-      updatedRecords,
-      onSaveBulkRecords,
-      updateRecordsToBeDeleted,
+      updatedRecords.childParentMap,
+      updatedRecords.recordsMap,
       setIsDeleteModalOpen,
+      updateRecordsToBeDeleted,
       apiClientRecordsRepository,
+      onSaveRecord,
+      onSaveBulkRecords,
     ]
   );
 
@@ -283,6 +287,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               {updatedRecords.collections.map((record) => {
                 return (
                   <CollectionRow
+                    isReadOnly={!isValidPermission}
                     openTab={openTab}
                     key={record.id}
                     record={record}
@@ -308,6 +313,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     key={record.id}
                     record={record}
                     openTab={openTab}
+                    isReadOnly={!isValidPermission}
                     bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />
                 );
@@ -321,6 +327,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             </div>
           ) : (
             <ApiRecordEmptyState
+              disabled={!isValidPermission}
               newRecordBtnText="New collection"
               message={searchValue ? "No collection or request found" : "No collections created yet"}
               onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.COLLECTION)}

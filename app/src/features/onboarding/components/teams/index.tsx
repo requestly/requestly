@@ -4,10 +4,8 @@ import { getAppMode, getAppOnboardingDetails } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { DefaultTeamView } from "./components/defaultTeamView";
 import { JoinTeamView } from "./components/joinTeamsView";
-import { isCompanyEmail } from "utils/FormattingHelper";
 import { getPendingInvites } from "backend/workspace";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
 import { OnboardingLoader } from "../loader";
@@ -18,6 +16,8 @@ import "./index.scss";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { Invite } from "types";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 interface WorkspaceOnboardingViewProps {
   isOpen: boolean;
@@ -27,7 +27,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const user = useSelector(getUserAuthDetails);
   const [pendingInvites, setPendingInvites] = useState(null);
@@ -42,13 +42,13 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
           teamMembersCount: 1,
         },
         dispatch,
-        { isWorkspaceMode, isSyncEnabled: true },
+        { isWorkspaceMode: isSharedWorkspaceMode, isSyncEnabled: true },
         appMode,
         null,
         "app_onboarding"
       );
     },
-    [dispatch, isWorkspaceMode, appMode]
+    [dispatch, isSharedWorkspaceMode, appMode]
   );
 
   const handlePendingInvites = useCallback(
@@ -76,7 +76,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
       return;
     }
 
-    if (!isCompanyEmail(user?.details?.profile?.email) || !user?.details?.profile?.isEmailVerified) {
+    if (isCompanyEmail(user.details?.emailType) || !user?.details?.profile?.isEmailVerified) {
       setIsLoading(false);
       redirectToWebAppHomePage(navigate);
       dispatch(globalActions.updateAppOnboardingCompleted());
@@ -97,17 +97,19 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
         setPendingInvites([]);
       });
   }, [
-    user?.details?.profile?.email,
-    user?.details?.profile?.isEmailVerified,
+    user.details?.profile?.email,
+    user.details?.profile?.isEmailVerified,
     user.loggedIn,
     dispatch,
     handleSwitchWorkspace,
     handlePendingInvites,
+    user.details?.emailType,
+    navigate,
   ]);
 
   useEffect(() => {
     if (!isNull(pendingInvites)) {
-      if (!isCompanyEmail(user?.details?.profile?.email)) {
+      if (!isCompanyEmail(user.details?.emailType)) {
         trackAppOnboardingTeamsViewed("no_workspaces");
         return;
       }
@@ -120,7 +122,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
         return;
       }
     }
-  }, [pendingInvites, user?.details?.profile?.email, appOnboardingDetails.createdWorkspace]);
+  }, [pendingInvites, user.details?.profile?.email, appOnboardingDetails.createdWorkspace, user.details?.emailType]);
 
   useEffect(() => {
     if (isOpen) {

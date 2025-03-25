@@ -6,18 +6,18 @@ import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
 import { Tooltip } from "antd";
 import { getPrettyPlanName } from "utils/FormattingHelper";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import firebaseApp from "../../../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./premiumPlanBadge.scss";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const PremiumPlanBadge = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const teamId = useSelector(getCurrentlyActiveWorkspace)?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const userPlanDetails = user?.details?.planDetails;
   const planId = userPlanDetails?.planId;
   const planStatus = userPlanDetails?.status;
@@ -44,10 +44,10 @@ const PremiumPlanBadge = () => {
   }, [dispatch, planStatus]);
 
   useEffect(() => {
-    if (!teamId) return;
+    if (!activeWorkspaceId) return;
 
     const db = getFirestore(firebaseApp);
-    const teamsRef = doc(db, "teams", teamId);
+    const teamsRef = doc(db, "teams", activeWorkspaceId);
 
     getDoc(teamsRef)
       .then((docSnap) => {
@@ -61,7 +61,7 @@ const PremiumPlanBadge = () => {
       .catch(() => {
         Logger.log("Error while fetching appsumo details for team");
       });
-  }, [teamId]);
+  }, [activeWorkspaceId]);
 
   try {
     const planEndDate = new Date(planEndDateString);
