@@ -29,7 +29,7 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
     apiClientRecordsRepository,
   } = useApiClientContext();
   const [persistedRequestId, setPersistedRequestId] = useState<string>(() => requestId);
-  const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>();
+  const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>(props?.entry);
   const isHistoryPath = location.pathname.includes("history");
   // const isNewRequest = searchParams.has("new");
   // const isCreateMode = searchParams.has("create");
@@ -147,6 +147,12 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
     },
     [addToHistory, isHistoryPath]
   );
+
+  useEffect(() => {
+    console.log("!!!debug", "entrydetailstoview", {
+      entryDetailsToView,
+    });
+  }, [entryDetailsToView]);
 
   if (!entryDetailsToView) {
     return (

@@ -53,6 +53,7 @@ interface Props {
   apiEntryDetails?: RQAPI.ApiRecord;
   onSaveCallback: (requestId: string) => void;
   requestId?: string;
+  isCreateMode: boolean;
 }
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
@@ -67,15 +68,23 @@ const APIClientView: React.FC<Props> = ({
   openInModal,
   onSaveCallback,
   requestId,
+  isCreateMode,
 }) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
-  const [searchParams] = useSearchParams();
-  const isCreateMode = searchParams.has("create");
+  // const [searchParams] = useSearchParams();
+  // const isCreateMode = searchParams.has("create");
   // const { requestId } = useParams();
+  //
+  useEffect(() => {
+    console.log("!!!debug", "entry", {
+      apiEntry,
+      apiEntryDetails,
+    });
+  });
 
   const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
   const {
@@ -406,7 +415,8 @@ const APIClientView: React.FC<Props> = ({
       type: RQAPI.RecordType.API,
       data: { ...sanitizeEntry(entry, false) },
     };
-    record.id = "newId";
+    const requestId = apiClientRecordsRepository.generateApiRecordId();
+    record.id = requestId;
 
     //  Is this check necessary?
     if (apiEntryDetails?.id) {
@@ -418,9 +428,6 @@ const APIClientView: React.FC<Props> = ({
       apiEntryDetails,
     });
 
-    onSaveCallback(record.id);
-    // return;
-
     const result = isCreateMode
       ? await apiClientRecordsRepository.createRecordWithId(record, requestId)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
@@ -430,6 +437,7 @@ const APIClientView: React.FC<Props> = ({
         { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
         isCreateMode ? "replace" : "open"
       );
+      // const callbackEntry = { ...result.data.data, response: entry.response, testResults: entry.testResults };
       setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
       resetChanges();
       trackRequestSaved({
@@ -437,22 +445,15 @@ const APIClientView: React.FC<Props> = ({
         has_scripts: Boolean(entry.scripts?.preRequest),
         auth_type: entry?.auth?.currentAuthType,
       });
+      onSaveCallback(record.id);
+      // onSaveCallback(record.id,entry);
       toast.success("Request saved!");
     } else {
       toast.error(result?.message || `Could not save Request.`);
     }
 
     setIsRequestSaving(false);
-  }, [
-    apiClientRecordsRepository,
-    apiEntryDetails,
-    entry,
-    isCreateMode,
-    onSaveCallback,
-    onSaveRecord,
-    requestId,
-    resetChanges,
-  ]);
+  }, [apiClientRecordsRepository, apiEntryDetails, entry, isCreateMode, onSaveCallback, onSaveRecord, resetChanges]);
 
   const cancelRequest = useCallback(() => {
     apiClientExecutor.abort();
