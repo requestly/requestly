@@ -206,9 +206,11 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         const newApi = await apiClientRecordsRepository.createRecordWithId(updatedApi, updatedApi.id);
         onSaveRecord(newApi.data, "none");
         importedApisCount++;
+        return newApi.data.id;
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing API:", error);
+        return null;
       }
     };
 
