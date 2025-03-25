@@ -46,8 +46,14 @@ const AuthPage = (props) => {
     if (params.has("redirectUrl")) {
       const url = params.get("redirectUrl");
       const urlObj = new URL(url);
-      const navigateParams = urlObj.pathname + urlObj.search;
-      navigate(navigateParams);
+      if (window.location.hostname === urlObj.hostname) {
+        // in app migration:
+        const navigateParams = urlObj.pathname + urlObj.search;
+        navigate(navigateParams);
+      } else {
+        // external migration:
+        window.open(url, "_self");
+      }
     } else {
       redirectToRules(navigate);
     }
@@ -62,10 +68,10 @@ const AuthPage = (props) => {
   }, [user.loggedIn, stablePostSignInSteps, authMode]);
 
   useEffect(() => {
-    if (params.get("refreshToken")) {
-      const refreshToken = params.get("refreshToken");
+    if (params.get("idToken")) {
+      const authToken = params.get("idToken");
       const getCustomToken = httpsCallable(getFunctions(), "auth-generateCustomToken");
-      getCustomToken({ refreshToken })
+      getCustomToken({ refreshToken: authToken })
         .then((res) => {
           if (res.data.success) {
             const auth = getAuth(firebaseApp);
@@ -82,7 +88,7 @@ const AuthPage = (props) => {
           }
         })
         .finally(() => {
-          params.delete("refreshToken");
+          params.delete("idToken");
         });
     }
   }, [params]);
