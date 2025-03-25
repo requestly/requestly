@@ -29,8 +29,8 @@ export const TabsContainer: React.FC = () => {
   useEffect(() => {
     if (activeTabId) {
       const tabSource = getSourceByTabId(activeTabId);
-      const path = tabSource.getUrlPath();
-      updateUrlPath(path);
+      const newPath = tabSource.getUrlPath();
+      updateUrlPath(newPath);
     }
   }, [activeTabId, getSourceByTabId]);
 
