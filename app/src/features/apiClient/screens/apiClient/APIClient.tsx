@@ -148,12 +148,6 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
     [addToHistory, isHistoryPath]
   );
 
-  useEffect(() => {
-    console.log("!!!debug", "entrydetailstoview", {
-      entryDetailsToView,
-    });
-  }, [entryDetailsToView]);
-
   if (!entryDetailsToView) {
     return (
       <>

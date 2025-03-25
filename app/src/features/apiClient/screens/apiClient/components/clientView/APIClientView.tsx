@@ -78,13 +78,6 @@ const APIClientView: React.FC<Props> = ({
   // const [searchParams] = useSearchParams();
   // const isCreateMode = searchParams.has("create");
   // const { requestId } = useParams();
-  //
-  useEffect(() => {
-    console.log("!!!debug", "entry", {
-      apiEntry,
-      apiEntryDetails,
-    });
-  });
 
   const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
   const {
@@ -415,18 +408,16 @@ const APIClientView: React.FC<Props> = ({
       type: RQAPI.RecordType.API,
       data: { ...sanitizeEntry(entry, false) },
     };
-    const requestId = apiClientRecordsRepository.generateApiRecordId();
-    record.id = requestId;
+
+    if (isCreateMode) {
+      const requestId = apiClientRecordsRepository.generateApiRecordId();
+      record.id = requestId;
+    }
 
     //  Is this check necessary?
     if (apiEntryDetails?.id) {
       record.id = apiEntryDetails?.id;
     }
-
-    console.log("!!!debug", "save", {
-      record,
-      apiEntryDetails,
-    });
 
     const result = isCreateMode
       ? await apiClientRecordsRepository.createRecordWithId(record, requestId)
