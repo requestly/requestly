@@ -283,9 +283,9 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
           ) : (
             <RiCloseCircleLine className="danger" />
           )}
-          {postRequestMessage.message && (
+          {postRequestMessage.message ? (
             <Typography.Text className="post-request-message">{postRequestMessage.message}</Typography.Text>
-          )}
+          ) : null}
           <RQButton
             type="primary"
             onClick={() => {

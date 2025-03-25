@@ -162,6 +162,10 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     [sendNotification, planName, source, user.loggedIn]
   );
 
+  const cardSubtitle = (
+    <>{planCardSubtitle ? <Typography.Text type="secondary">{planCardSubtitle}</Typography.Text> : null}</>
+  );
+
   return (
     <Col
       key={planName}
@@ -237,12 +241,12 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         <Row className="annual-bill mt-8" style={{ display: planCardSubtitle ? "flex" : "none" }}>
           {duration === PRICING.DURATION.MONTHLY ? (
             planName === PRICING.PLAN_NAMES.LITE ? (
-              <>{planCardSubtitle ? <Typography.Text type="secondary">{planCardSubtitle}</Typography.Text> : null}</>
+              cardSubtitle
             ) : (
               <Typography.Text>Billed monthly</Typography.Text>
             )
           ) : (
-            <>{planCardSubtitle ? <Typography.Text>{planCardSubtitle}</Typography.Text> : null}</>
+            cardSubtitle
           )}
         </Row>
         <Row
