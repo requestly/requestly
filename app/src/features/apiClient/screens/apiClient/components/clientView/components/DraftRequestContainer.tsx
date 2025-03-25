@@ -9,17 +9,17 @@ export const DraftRequestContainer: React.FC = () => {
   const [requestId, setRequestId] = useState<string>(null);
   // const [cbEntry, setCbEntry] = useState({});
 
-  const { updateTitle, updateUrl } = useGenericState();
+  const { setTitle, setUrl } = useGenericState();
 
   const onSaveCallback = useCallback(
     (requestId: string) => {
       setIsCreateMode(false);
       setRequestId(requestId);
       // setCbEntry(callbackEntry);
-      updateTitle(requestId);
-      updateUrl(`${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}`);
+      setTitle(requestId);
+      setUrl(`${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}`);
     },
-    [updateTitle, updateUrl]
+    [setTitle, setUrl]
   );
 
   if (isCreateMode) {

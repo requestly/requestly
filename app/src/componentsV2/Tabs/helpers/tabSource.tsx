@@ -14,7 +14,6 @@ export abstract class AbstractTabSource {
   abstract getDefaultTitle(): string;
   abstract getUrlPath(): string;
   abstract setUrlPath(path: string): void;
-  abstract updateUrl(): void;
 }
 
 export class DraftRequestContainerSource extends AbstractTabSource {
@@ -27,7 +26,7 @@ export class DraftRequestContainerSource extends AbstractTabSource {
     this.component = <DraftRequestContainer />;
     this.metadata = {
       id: metadata.id,
-      name: "Neww Request",
+      name: "New Request",
       title: metadata.title,
     };
   }
@@ -54,9 +53,5 @@ export class DraftRequestContainerSource extends AbstractTabSource {
 
   setUrlPath(path: string) {
     this.urlPath = path;
-  }
-
-  updateUrl() {
-    updateUrlPath(this.urlPath);
   }
 }
