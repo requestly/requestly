@@ -13,8 +13,8 @@ import { useDispatch } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import TeamWorkSolvePuzzleAnimation from "components/misc/LottieAnimation/TeamWorkSolvePuzzleAnimation";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const CreateWorkspace = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const CreateWorkspace = () => {
 
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
 
   // Component State
   const [isSubmitProcess, setIsSubmitProcess] = useState(false);
@@ -51,7 +51,7 @@ const CreateWorkspace = () => {
           dispatch,
           {
             isSyncEnabled: user?.details?.isSyncEnabled,
-            isWorkspaceMode,
+            isWorkspaceMode: isSharedWorkspaceMode,
           },
           appMode
         );

@@ -14,7 +14,6 @@ import {
   getErrorEnvFiles,
 } from "store/features/variables/selectors";
 import { variablesActions } from "store/features/variables/slice";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
@@ -26,6 +25,7 @@ import { isGlobalEnvironment } from "features/apiClient/screens/environment/util
 import { useGetApiClientSyncRepo } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -46,15 +46,15 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const errorEnvFiles = useSelector(getErrorEnvFiles);
 
   const user = useSelector(getUserAuthDetails);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
   const collectionVariables = useSelector(getCollectionVariables);
 
-  const ownerId = useMemo(
-    () => (currentlyActiveWorkspace.id ? `team-${currentlyActiveWorkspace.id}` : user?.details?.profile?.uid),
-    [currentlyActiveWorkspace.id, user?.details?.profile?.uid]
-  );
+  const ownerId = useMemo(() => (activeWorkspaceId ? `team-${activeWorkspaceId}` : user?.details?.profile?.uid), [
+    activeWorkspaceId,
+    user?.details?.profile?.uid,
+  ]);
 
   const syncRepository = useGetApiClientSyncRepo();
 
@@ -185,8 +185,8 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       } else {
         dispatch(variablesActions.updateAllEnvironmentData({ environmentMap: result.data.environments, ownerId }));
       }
-      console.log("result.data.errorFiles", result.data.errorFiles);
-      dispatch(variablesActions.setErrorEnvFiles(result.data.errorFiles));
+      console.log("result.data.errorFiles", result.data.erroredRecords);
+      dispatch(variablesActions.setErrorEnvFiles(result.data.erroredRecords));
 
       if (newCurrentEnvironmentId) {
         unsubscribeListener?.();

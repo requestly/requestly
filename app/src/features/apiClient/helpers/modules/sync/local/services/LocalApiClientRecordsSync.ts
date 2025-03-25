@@ -1,7 +1,7 @@
 import { ApiClientLocalMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { RQAPI } from "features/apiClient/types";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
-import { API, APIEntity, ErrorFile, FileSystemResult, FileType } from "./types";
+import { API, APIEntity, FileSystemResult, FileType } from "./types";
 import { parseEntityVariables, parseFsId, parseNativeId } from "../../utils";
 import { v4 as uuidv4 } from "uuid";
 import { EnvironmentVariables } from "backend/environment/types";
@@ -106,16 +106,13 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
   async getAllRecords(): RQAPI.RecordsPromise {
     const service = await this.getAdapter();
-    const result: FileSystemResult<{
-      records: APIEntity[];
-      errorFiles: ErrorFile[];
-    }> = await service.getAllRecords();
+    const result = await service.getAllRecords();
     if (result.type === "error") {
       return {
         success: false,
         data: {
           records: [],
-          errorFiles: [],
+          erroredRecords: [],
         },
         message: `Error: ${result.error.message} in ${result.error.path}`,
       };
@@ -126,7 +123,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       success: true,
       data: {
         records: parsedRecords,
-        errorFiles: result.content.errorFiles || [],
+        erroredRecords: result.content.erroredRecords || [],
       },
     };
   }
@@ -275,21 +272,19 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {
+  async deleteRecords(recordIds: string[]) {
     const service = await this.getAdapter();
     const result = await service.deleteRecords(recordIds);
 
     if (result.type === "error") {
       return {
         success: false,
-        data: undefined,
         message: result.error.message,
       };
     }
 
     return {
       success: true,
-      data: undefined,
     };
   }
 
@@ -414,7 +409,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     fileType: FileType
   ): Promise<{ success: boolean; data: unknown; message?: string }> {
     const service = await this.getAdapter();
-    const result = await service.writeToRawFile(id, record, fileType);
+    const result = await service.writeRawRecord(id, record, fileType);
     if (result.type === "error") {
       return {
         success: false,
@@ -444,7 +439,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async createCollectionFromCompleteRecord(
+  async createCollectionFromImport(
     collection: RQAPI.CollectionRecord,
     id: string
   ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
@@ -457,10 +452,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         message: result.error.message,
       };
     }
-    const parsedRecords = this.parseAPIEntities([result.content as APIEntity]);
+    const [parsedRecords] = this.parseAPIEntities([result.content as APIEntity]);
     return {
       success: true,
-      data: parsedRecords[0],
+      data: parsedRecords,
     };
   }
 
@@ -491,7 +486,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         if (entity.type === RQAPI.RecordType.API) {
           return this.createRecordWithId(entity, entity.id);
         }
-        return this.createCollectionFromCompleteRecord(entity, entity.id);
+        return this.createCollectionFromImport(entity, entity.id);
       })();
       if (duplicationResult.success) {
         result.push(duplicationResult.data);

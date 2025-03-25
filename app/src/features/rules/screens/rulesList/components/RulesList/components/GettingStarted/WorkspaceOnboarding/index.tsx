@@ -8,7 +8,6 @@ import {
   getUserPersonaSurveyDetails,
 } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { FullPageHeader } from "components/common/FullPageHeader";
 import { AuthFormHero } from "components/authentication/AuthForm/AuthFormHero";
@@ -23,7 +22,7 @@ import { isEmailVerified } from "utils/AuthUtils";
 import { shouldShowOnboarding } from "components/misc/PersonaSurvey/utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { OnboardingSteps } from "./types";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import { getPendingInvites } from "backend/workspace";
 import { globalActions } from "store/slices/global/slice";
 import { Invite, InviteUsage } from "types";
@@ -35,6 +34,8 @@ import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/misc/onbo
 import { trackNewTeamCreateSuccess, trackWorkspaceOnboardingViewed } from "modules/analytics/events/features/teams";
 import { capitalize } from "lodash";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
+import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 interface OnboardingProps {
   isOpen: boolean;
@@ -46,8 +47,8 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const currentTeams = useSelector(getAvailableTeams);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const step = useSelector(getWorkspaceOnboardingStep);
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -86,7 +87,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
 
     const verifiedUser = await isEmailVerified(user?.details?.profile?.uid);
     if (verifiedUser && pendingInvites != null) {
-      if (!isCompanyEmail(user?.details?.profile?.email)) {
+      if (isCompanyEmail(user.details?.emailType)) {
         dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
         return;
       }
@@ -112,7 +113,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
               teamMembersCount: response?.data?.accessCount,
             },
             dispatch,
-            { isWorkspaceMode, isSyncEnabled: true },
+            { isWorkspaceMode: isSharedWorkspaceMode, isSyncEnabled: true },
             appMode,
             null,
             "onboarding"
@@ -128,16 +129,16 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
       dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
     }
   }, [
-    pendingInvites,
     isPendingEmailInvite,
-    user?.details?.profile?.uid,
-    user?.details?.profile?.email,
+    user.details?.profile?.uid,
+    user.details?.emailType,
+    pendingInvites,
+    dispatch,
     userEmailDomain,
     createTeam,
-    dispatch,
-    appMode,
-    isWorkspaceMode,
     upsertTeamCommonInvite,
+    isSharedWorkspaceMode,
+    appMode,
   ]);
 
   useEffect(() => {
@@ -171,12 +172,12 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
 
   useEffect(() => {
     if (user?.loggedIn && step === OnboardingSteps.AUTH) {
-      if (currentTeams?.length) dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
+      if (availableWorkspaces?.length) dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
       else if (isNewUserFromEmailLinkSignIn)
         dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
       else dispatch(globalActions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
     }
-  }, [dispatch, user?.loggedIn, currentTeams?.length, step, isNewUserFromEmailLinkSignIn]);
+  }, [dispatch, user?.loggedIn, availableWorkspaces?.length, step, isNewUserFromEmailLinkSignIn]);
 
   useEffect(() => {
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {

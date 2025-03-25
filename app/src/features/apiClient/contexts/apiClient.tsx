@@ -1,6 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
 import Logger from "lib/logger";
@@ -29,11 +28,13 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
 import { variablesActions } from "store/features/variables/slice";
 import { EnvironmentVariables } from "backend/environment/types";
-import { ErrorFile } from "../helpers/modules/sync/local/services/types";
+import { ErroredRecords } from "../helpers/modules/sync/local/services/types";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { RBAC, useRBAC } from "features/rbac";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
-  errorFiles: ErrorFile[];
+  errorFiles: ErroredRecords[];
   isLoadingApiClientRecords: boolean;
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
@@ -112,7 +113,6 @@ interface ApiClientProviderProps {
 }
 
 const trackUserProperties = (records: RQAPI.Record[]) => {
-  console.log("Tracking user properties");
   const totalCollections = records.filter((record) => isApiCollection(record)).length;
   const totalRequests = records.length - totalCollections;
   submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_COLLECTIONS, totalCollections);
@@ -123,8 +123,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_request", "create");
 
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -209,7 +210,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           return;
         } else {
           setApiClientRecords(result.data.records);
-          setErrorFiles(result.data.errorFiles);
+          setErrorFiles(result.data.erroredRecords);
           updateCollectionVariablesOnInit(result.data.records);
         }
       })
@@ -358,6 +359,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onNewClick = useCallback(
     async (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId = "") => {
+      if (!isValidPermission) {
+        toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, recordType), 5);
+        return;
+      }
+
       switch (recordType) {
         case RQAPI.RecordType.API: {
           trackNewRequestClicked(analyticEventSource);
@@ -368,18 +374,22 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(uid, teamId, recordType, collectionId, apiClientRecordsRepository).then(
-            (result) => {
-              setIsRecordBeingCreated(null);
-              onSaveRecord(result.data);
-            }
-          );
+          return createBlankApiRecord(
+            uid,
+            activeWorkspaceId,
+            recordType,
+            collectionId,
+            apiClientRecordsRepository
+          ).then((result) => {
+            setIsRecordBeingCreated(null);
+            onSaveRecord(result.data);
+          });
         }
 
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(uid, teamId, recordType, collectionId, apiClientRecordsRepository)
+          return createBlankApiRecord(uid, activeWorkspaceId, recordType, collectionId, apiClientRecordsRepository)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
@@ -416,7 +426,18 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [uid, teamId, apiClientRecordsRepository, openDraftRequest, onSaveRecord, dispatch, addNewEnvironment, openTab]
+    [
+      uid,
+      activeWorkspaceId,
+      apiClientRecordsRepository,
+      openDraftRequest,
+      onSaveRecord,
+      dispatch,
+      addNewEnvironment,
+      openTab,
+      getRBACValidationFailureErrorMessage,
+      isValidPermission,
+    ]
   );
 
   const forceRefreshApiClientRecords = useCallback(async () => {
@@ -425,7 +446,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       return false;
     }
     setApiClientRecords(() => recordsToRefresh.data.records);
-    setErrorFiles(() => recordsToRefresh.data.errorFiles);
+    setErrorFiles(() => recordsToRefresh.data.erroredRecords);
     return true;
   }, [apiClientRecordsRepository]);
 

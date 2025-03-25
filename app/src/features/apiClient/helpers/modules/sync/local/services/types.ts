@@ -71,7 +71,7 @@ export enum FileType {
   UNKNOWN = "unknown",
 }
 
-export type ErrorFile = {
+export type ErroredRecords = {
   name: string;
   path: string;
   error: string;

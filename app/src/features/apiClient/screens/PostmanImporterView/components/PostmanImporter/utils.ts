@@ -130,7 +130,7 @@ const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentC
     const apiKeyOptions = item[item.type];
     let keyLabel: PostmanAuth.KV<"key">;
     let apiKey: PostmanAuth.KV<"value">;
-    let addTo: Authorization.API_KEY_CONFIG["addTo"];
+    let addTo: Authorization.API_KEY_CONFIG["addTo"] = "HEADER";
 
     apiKeyOptions.forEach((option) => {
       if (option.key === "key") {
@@ -298,7 +298,7 @@ export const processPostmanCollectionData = (
     return result;
   };
 
-  const rootCollectionId = apiClientRecordsRepository.generateCollectionId(fileContent.info.name, "");
+  const rootCollectionId = apiClientRecordsRepository.generateCollectionId(fileContent.info.name);
   const rootCollection = createCollectionRecord(
     fileContent.info.name,
     fileContent.info?.description || "",
