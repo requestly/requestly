@@ -110,6 +110,8 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     return null;
   };
 
+  const planCardSubtitle = getPricingPlanAnnualBillingSubtitle(planName);
+
   const EVENTS = {
     PRICING_QUANTITY_CHANGED: "pricing_quantity_changed",
   };
@@ -158,6 +160,10 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       sendNotification(value);
     },
     [sendNotification, planName, source, user.loggedIn]
+  );
+
+  const cardSubtitle = (
+    <>{planCardSubtitle ? <Typography.Text type="secondary">{planCardSubtitle}</Typography.Text> : null}</>
   );
 
   return (
@@ -225,17 +231,23 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             </Typography.Text>
           </Row>
         )}
-        <Row
-          className="annual-bill mt-8"
-          style={{ display: getPricingPlanAnnualBillingSubtitle(planName) ? "flex" : "none" }}
-        >
-          <Typography.Text type="secondary">
-            {duration === PRICING.DURATION.MONTHLY
-              ? planName === PRICING.PLAN_NAMES.LITE
-                ? getPricingPlanAnnualBillingSubtitle(planName) || ""
-                : "Billed monthly"
-              : getPricingPlanAnnualBillingSubtitle(planName) || ""}
-          </Typography.Text>
+        {/* 
+        `  Avoid returning null or empty sting inside a Typography component
+           This breaks the app when page is translated to some other language than english
+
+           In case if rendering of empty string is required:
+           Typography component should be wrapped inside a condition instead of writing a condition inside Typography component
+        */}
+        <Row className="annual-bill mt-8" style={{ display: planCardSubtitle ? "flex" : "none" }}>
+          {duration === PRICING.DURATION.MONTHLY ? (
+            planName === PRICING.PLAN_NAMES.LITE ? (
+              cardSubtitle
+            ) : (
+              <Typography.Text>Billed monthly</Typography.Text>
+            )
+          ) : (
+            cardSubtitle
+          )}
         </Row>
         <Row
           style={{
