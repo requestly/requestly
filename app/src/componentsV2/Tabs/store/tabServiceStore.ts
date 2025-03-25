@@ -1,4 +1,5 @@
 import { create, StoreApi, UseBoundStore, useStore } from "zustand";
+import { useShallow } from "zustand/shallow";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { createContext, ReactNode, useContext } from "react";
@@ -184,7 +185,7 @@ export const createTabServiceProvider = () => {
  */
 export const useTabServiceWithSelector = <T>(selector: (state: TabServiceState) => T) => {
   const store = useContext(TabServiceStoreContext);
-  return useStore(store, selector);
+  return useStore(store, useShallow(selector));
 };
 
 /**
