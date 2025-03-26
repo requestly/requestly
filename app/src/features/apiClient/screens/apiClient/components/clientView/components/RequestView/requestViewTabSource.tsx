@@ -22,16 +22,6 @@ export class RequestViewTabSource extends BaseTabSource {
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${this.metadata.id}`;
   }
 
-  // static create(matchedPath: MatchedTabSource["matchedPath"]): CollectionViewTabSource {
-  //   const { collectionId } = matchedPath.params;
-
-  //   if (!collectionId) {
-  //     throw new Error("Collection id not found!");
-  //   }
-
-  //   return new CollectionViewTabSource({ id: collectionId, title: "Collection" });
-  // }
-
   static create(matchedPath: MatchedTabSource["matchedPath"]): RequestViewTabSource {
     const { requestId } = matchedPath.params;
 
