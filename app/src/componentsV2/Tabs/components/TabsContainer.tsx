@@ -3,10 +3,7 @@ import { Tabs, TabsProps } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
-
-const updateUrlPath = (path: string) => {
-  window.history.pushState({}, "", path);
-};
+import { updateUrlPath } from "../utils";
 
 export const TabsContainer: React.FC = () => {
   const [
