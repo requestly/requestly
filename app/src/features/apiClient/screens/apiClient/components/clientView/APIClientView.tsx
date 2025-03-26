@@ -39,7 +39,7 @@ import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomShe
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
-import { useLocation, useParams, useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
@@ -51,7 +51,7 @@ interface Props {
   apiEntry?: RQAPI.Entry;
   notifyApiRequestFinished?: (apiEntry: RQAPI.Entry) => void;
   apiEntryDetails?: RQAPI.ApiRecord;
-  onSaveCallback: (requestId: string) => void;
+  onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
   requestId?: string;
   isCreateMode: boolean;
 }
@@ -419,8 +419,6 @@ const APIClientView: React.FC<Props> = ({
       record.id = apiEntryDetails?.id;
     }
 
-    console.log("!!!debug", "checking", record);
-
     const result = isCreateMode
       ? await apiClientRecordsRepository.createRecordWithId(record, record.id)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
@@ -438,8 +436,9 @@ const APIClientView: React.FC<Props> = ({
         has_scripts: Boolean(entry.scripts?.preRequest),
         auth_type: entry?.auth?.currentAuthType,
       });
-      onSaveCallback(record.id);
-      // onSaveCallback(record.id,entry);
+      if (isCreateMode) {
+        onSaveCallback(result.data);
+      }
       toast.success("Request saved!");
     } else {
       console.log("!!!debug", "result", result);
@@ -447,16 +446,7 @@ const APIClientView: React.FC<Props> = ({
     }
 
     setIsRequestSaving(false);
-  }, [
-    apiClientRecordsRepository,
-    apiEntryDetails,
-    entry,
-    isCreateMode,
-    onSaveCallback,
-    onSaveRecord,
-    requestId,
-    resetChanges,
-  ]);
+  }, [apiClientRecordsRepository, apiEntryDetails, entry, isCreateMode, onSaveCallback, onSaveRecord, resetChanges]);
 
   const cancelRequest = useCallback(() => {
     apiClientExecutor.abort();

@@ -3,7 +3,7 @@ import APIClientView from "./components/clientView/APIClientView";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { QueryParamSyncType, RQAPI } from "features/apiClient/types";
-import { useLocation, useParams, useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Logger from "lib/logger";
 import { Skeleton } from "antd";
 import { getEmptyAPIEntry, syncQueryParams } from "./utils";
@@ -12,13 +12,14 @@ import { isEmpty } from "lodash";
 
 interface Props {
   isCreateMode: boolean;
-  requestId?: string;
-  onSaveCallback?: (requestId: string) => void;
+  apiEntryDetails?: RQAPI.ApiRecord;
+  onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
+  requestId?: string; //@TODO@nafees : to be removed after discussing with Rohan
 }
 
 export const APIClient: React.FC<Props> = React.memo((props) => {
   const location = useLocation();
-  const { requestId, isCreateMode } = props;
+  const { isCreateMode, requestId } = props;
   // const { requestId } = useParams();
   // const [searchParams] = useSearchParams();
   const {
@@ -28,10 +29,11 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
     addToHistory,
     apiClientRecordsRepository,
   } = useApiClientContext();
-  const [persistedRequestId, setPersistedRequestId] = useState<string>(() => requestId);
-  const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>(props?.entry);
+  const [persistedRequestId, setPersistedRequestId] = useState<string>(props.apiEntryDetails?.id);
+  // const persistedRequestId = useMemo(() => props.apiEntryDetails?.id, [props.apiEntryDetails?.id]);
+  const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>(props?.apiEntryDetails);
   const isHistoryPath = location.pathname.includes("history");
-  // const isNewRequest = searchParams.has("new");
+  // const isNewRequest = searchParams.has("new"); // TODO@nafees why have 2 modes i NewRequest and isCreatemode
   // const isCreateMode = searchParams.has("create");
 
   useEffect(() => {
