@@ -2,7 +2,7 @@ import { BaseTabSource } from "componentsV2/Tabs/helpers/baseTabSource";
 import { EnvironmentView } from "./EnvironmentView";
 import PATHS from "config/constants/sub/paths";
 
-export class DraftRequestContainerSource extends BaseTabSource {
+export class EnvironmentViewTabSource extends BaseTabSource {
   constructor(metadata: Record<string, any>) {
     super();
     this.component = <EnvironmentView />;
