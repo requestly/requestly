@@ -2,15 +2,16 @@ import React, { useRef, useState, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Radio, Tooltip } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { formatJSONString } from "utils/CodeEditorUtils";
 import { globalActions } from "store/slices/global/slice";
-import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
+import { EditorLanguage } from "componentsV2/CodeEditor";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { RuleType } from "@requestly/shared/types/entities/rules";
+import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
   const codeFormattedFlag = useRef(null);
+  const editorBodyValue = useRef(pair.request.value);
 
   const [requestBodies, setRequestBodies] = useState({
     static: "{}",
@@ -53,14 +54,14 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
   }, [pair.request.type]);
 
   const requestBodyChangeHandler = (value) => {
+    editorBodyValue.current = value;
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         triggerUnsavedChangesIndication: !codeFormattedFlag.current,
         updates: {
           "request.type": pair.request.type,
-          "request.value":
-            pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? formatJSONString(value) : value,
+          "request.value": editorBodyValue.current,
         },
       })
     );
@@ -129,15 +130,14 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
             }}
           >
             <Col xl="12" span={24}>
-              <CodeEditor
+              <Editor
                 // key={pair.request.type}
                 language={
                   pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
                     ? EditorLanguage.JAVASCRIPT
                     : EditorLanguage.JSON
                 }
-                defaultValue={getEditorDefaultValue()}
-                value={pair.request.value}
+                value={editorBodyValue.current ?? getEditorDefaultValue()}
                 handleChange={requestBodyChangeHandler}
                 prettifyOnInit={true}
                 isReadOnly={isInputDisabled}
