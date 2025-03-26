@@ -31,6 +31,7 @@ export const TabsContainer: React.FC = () => {
       return;
     }
 
+    // TODO: Have a factory for all the tab sources which returns metadata
     openTab(matchedTabSource.sourceFactory({ id: "test", name: "Empty view", title: "Empty view" }));
   }, [matchedTabSource, openTab]);
 
