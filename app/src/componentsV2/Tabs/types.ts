@@ -16,6 +16,11 @@ export interface MatchedTabSource {
   matchedPath: PathMatch<string>;
 }
 
+export interface MatchedTabSource {
+  sourceFactory: TabSourceFactory;
+  matchedPath: PathMatch<string>;
+}
+
 export type TabSource =
   | DraftRequestContainerTabSource
   | RequestViewTabSource
