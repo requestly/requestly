@@ -1,8 +1,8 @@
 import { Result, Skeleton, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
-import { useCallback, useMemo } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import React, { useCallback, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
@@ -20,8 +20,11 @@ const TAB_KEYS = {
   AUTHORIZATION: "authorization",
 };
 
-export const CollectionView = () => {
-  const { collectionId } = useParams();
+interface CollectionViewProps {
+  collectionId: string;
+}
+
+export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
   const {
     apiClientRecords,
     onSaveRecord,

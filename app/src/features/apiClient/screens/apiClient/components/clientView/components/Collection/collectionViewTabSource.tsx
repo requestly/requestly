@@ -10,7 +10,7 @@ interface CollectionViewTabSourceMetadata {
 export class CollectionViewTabSource extends BaseTabSource {
   constructor(metadata: CollectionViewTabSourceMetadata) {
     super();
-    this.component = <CollectionView />;
+    this.component = <CollectionView collectionId={metadata.id} />;
     this.metadata = {
       id: metadata.id,
       name: "collection",
