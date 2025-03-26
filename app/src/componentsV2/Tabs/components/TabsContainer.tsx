@@ -3,6 +3,7 @@ import { Tabs, TabsProps } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
+import { Outlet } from "react-router-dom";
 
 const updateUrlPath = (path: string) => {
   window.history.pushState({}, "", path);
@@ -59,7 +60,9 @@ export const TabsContainer: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabs, _version]);
 
-  return (
+  return tabItems.length === 0 ? (
+    <Outlet />
+  ) : (
     <Tabs
       type="editable-card"
       items={tabItems}
