@@ -17,7 +17,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./apiClientSidebar.scss";
 import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
-import { DraftRequestContainerSource } from "../clientView/components/DraftRequestContainer";
+import { DraftRequestContainerSource } from "../clientView/components/DraftRequestContainer/draftRequestContainerSource";
 
 interface Props {}
 
