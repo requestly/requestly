@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { matchPath, PathMatch } from "react-router-dom";
-import { tabRoutes, TabSourceFactory } from "../routes";
+import { tabRoutes } from "../routes";
+import { TabSourceFactory } from "../types";
 
 export const useMatchedTabSource = (): {
   sourceFactory: TabSourceFactory;
