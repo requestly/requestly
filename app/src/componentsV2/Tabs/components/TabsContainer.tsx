@@ -34,8 +34,6 @@ export const TabsContainer: React.FC = () => {
       return;
     }
 
-    // console.log({ matchedTabSource });
-
     openTab(matchedTabSource.tabSource({ id: "test", name: "Empty view", title: "Empty view" }));
   }, [matchedTabSource, openTab]);
 
