@@ -18,4 +18,16 @@ export class CollectionViewTabSource extends BaseTabSource {
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${this.metadata.id}`;
   }
+
+  static create(metadata: CollectionViewTabSourceMetadata): CollectionViewTabSource {
+    if (!metadata.id) {
+      throw new Error("Collection id not found!");
+    }
+
+    if (!metadata.title) {
+      throw new Error("Collection title not found!");
+    }
+
+    return new CollectionViewTabSource(metadata);
+  }
 }

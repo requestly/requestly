@@ -19,4 +19,16 @@ export class RequestViewTabSource extends BaseTabSource {
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${this.metadata.id}`;
   }
+
+  static create(metadata: RequestViewTabSourceMetadata): RequestViewTabSource {
+    if (!metadata.title) {
+      throw new Error("Request title not found!");
+    }
+
+    if (!metadata.apiEntryDetails) {
+      throw new Error("Entry details not found!");
+    }
+
+    return new RequestViewTabSource(metadata);
+  }
 }
