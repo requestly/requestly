@@ -1,21 +1,19 @@
 import { useMemo } from "react";
-import { matchPath, PathMatch, useLocation } from "react-router-dom";
-import { tabRoutes, TabSource } from "../routes";
+import { matchPath, PathMatch } from "react-router-dom";
+import { tabRoutes, TabSourceFactory } from "../routes";
 
 export const useMatchedTabSource = (): {
-  tabSource: TabSource;
+  sourceFactory: TabSourceFactory;
   matchedPath: PathMatch<string>;
 } | null => {
-  const location = useLocation();
-
   const matchedRoute = useMemo(() => {
     for (const route of tabRoutes) {
-      const matchedPath = matchPath(route.path, location.pathname);
+      const matchedPath = matchPath(route.path, window.location.pathname);
       if (matchedPath) {
-        return { matchedPath, tabSource: route.tabSource };
+        return { matchedPath, sourceFactory: route.tabSourceFactory };
       }
     }
-  }, [location.pathname]);
+  }, []);
 
   return matchedRoute;
 };

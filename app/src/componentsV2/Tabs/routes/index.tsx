@@ -4,14 +4,15 @@ import { ApiClientEmptyViewSource } from "../hooks/ApiClientEmptyViewSource";
 // TODO: move types into "types" file
 type ViewSource = ApiClientEmptyViewSource;
 
-export type TabSource = (...args: unknown[]) => ViewSource;
+export type TabSourceFactory = (...args: unknown[]) => ViewSource;
 
 export const tabRoutes: {
   path: string;
-  tabSource: TabSource;
+  tabSourceFactory: TabSourceFactory;
 }[] = [
   {
-    path: PATHS.API_CLIENT.INDEX,
-    tabSource: ApiClientEmptyViewSource.create,
+    // path: PATHS.API_CLIENT.INDEX,
+    path: PATHS.API_CLIENT.REQUEST.ABSOLUTE,
+    tabSourceFactory: ApiClientEmptyViewSource.create,
   },
 ];

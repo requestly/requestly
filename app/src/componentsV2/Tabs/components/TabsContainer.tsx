@@ -34,7 +34,7 @@ export const TabsContainer: React.FC = () => {
       return;
     }
 
-    openTab(matchedTabSource.tabSource({ id: "test", name: "Empty view", title: "Empty view" }));
+    openTab(matchedTabSource.sourceFactory({ id: "test", name: "Empty view", title: "Empty view" }));
   }, [matchedTabSource, openTab]);
 
   useEffect(() => {
