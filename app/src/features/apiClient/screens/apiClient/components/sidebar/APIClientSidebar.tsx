@@ -17,7 +17,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./apiClientSidebar.scss";
 import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
-import { DraftRequestContainerSource } from "componentsV2/Tabs/helpers/tabSource";
+import { DraftRequestContainerSource } from "../clientView/components/DraftRequestContainer";
 
 interface Props {}
 
@@ -62,7 +62,7 @@ const APIClientSidebar: React.FC<Props> = () => {
           // onNewClick(analyticEventSource, RQAPI.RecordType.API);
           openTab(
             new DraftRequestContainerSource({
-              title: "Neww Draft request",
+              title: "New request",
             })
           );
           return;
