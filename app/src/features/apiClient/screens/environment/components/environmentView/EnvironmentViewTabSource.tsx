@@ -10,7 +10,7 @@ interface EnvironmentViewTabSourceMetadata {
 export class EnvironmentViewTabSource extends BaseTabSource {
   constructor(metadata: EnvironmentViewTabSourceMetadata) {
     super();
-    this.component = <EnvironmentView />;
+    this.component = <EnvironmentView envId={metadata.id} />;
     this.metadata = {
       id: metadata.id,
       name: "environment",
