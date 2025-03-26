@@ -22,6 +22,24 @@ const container = document.getElementById("root");
 const root = createRoot(container);
 const appFlavour = getAppFlavour();
 
+if (typeof Node === "function" && Node.prototype) {
+  const originalRemoveChild = Node.prototype.removeChild;
+  Node.prototype.removeChild = function (child) {
+    if (child.parentNode !== this) {
+      return child;
+    }
+    return originalRemoveChild.apply(this, arguments);
+  };
+
+  const originalInsertBefore = Node.prototype.insertBefore;
+  Node.prototype.insertBefore = function (newNode, referenceNode) {
+    if (referenceNode && referenceNode.parentNode !== this) {
+      return newNode;
+    }
+    return originalInsertBefore.apply(this, arguments);
+  };
+}
+
 root.render(
   <Provider store={reduxStore}>
     <PersistGate loading={null} persistor={persistor}>
