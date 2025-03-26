@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { Tabs, TabsProps } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
-import { useTabsRouter } from "../hooks/useTabsRouter";
+import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 
 const updateUrlPath = (path: string) => {
   window.history.pushState({}, "", path);
@@ -27,6 +27,18 @@ export const TabsContainer: React.FC = () => {
     state.getSourceByTabId,
   ]);
 
+  const matchedTabSource = useMatchedTabSource();
+
+  useEffect(() => {
+    if (!matchedTabSource) {
+      return;
+    }
+
+    // console.log({ matchedTabSource });
+
+    openTab(matchedTabSource.tabSource({ id: "test", name: "Empty view", title: "Empty view" }));
+  }, [matchedTabSource, openTab]);
+
   useEffect(() => {
     if (activeTabId) {
       const tabSource = getSourceByTabId(activeTabId);
@@ -34,8 +46,6 @@ export const TabsContainer: React.FC = () => {
       updateUrlPath(newPath);
     }
   }, [activeTabId, getSourceByTabId]);
-
-  useTabsRouter();
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     return Array.from(tabs.values()).map((tabStore) => {

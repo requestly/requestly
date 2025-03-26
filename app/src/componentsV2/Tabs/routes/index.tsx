@@ -1,44 +1,17 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
-import ProtectedRoute from "components/authentication/ProtectedRoute";
 import PATHS from "config/constants/sub/paths";
-import { APIClient } from "features/apiClient/screens/apiClient/APIClient";
-import { ApiClientEmptyView } from "features/apiClient/screens/apiClient/components/clientView/components/ApiClientEmptyView/ApiClientEmptyView";
-import { CollectionView } from "features/apiClient/screens/apiClient/components/clientView/components/Collection/CollectionView";
-import { EnvironmentView } from "features/apiClient/screens/environment/components/environmentView/EnvironmentView";
-import { PostmanImporterView } from "features/apiClient/screens/PostmanImporterView/PostmanImporterView";
+import { ApiClientEmptyViewSource } from "../hooks/ApiClientEmptyViewSource";
 
-// TODO: handle 404 route
+// TODO: move types into "types" file
+type ViewSource = ApiClientEmptyViewSource;
+
+export type TabSource = (...args: unknown[]) => ViewSource;
+
 export const tabRoutes: {
   path: string;
-  element: React.ReactNode;
+  tabSource: TabSource;
 }[] = [
   {
     path: PATHS.API_CLIENT.INDEX,
-    element: <ApiClientEmptyView />,
-  },
-  {
-    path: PATHS.API_CLIENT.REQUEST.ABSOLUTE,
-    element: <ProtectedRoute component={APIClient} />,
-  },
-  {
-    path: PATHS.API_CLIENT.COLLECTION.ABSOLUTE,
-    element: <ProtectedRoute component={CollectionView} />,
-  },
-  {
-    path: PATHS.API_CLIENT.HISTORY.ABSOLUTE,
-    element: <APIClient />,
-  },
-  {
-    path: PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE + "/:envId",
-    element: <EnvironmentView />,
-  },
-  {
-    path: PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE,
-    element: <Navigate to={PATHS.API_CLIENT.RELATIVE} />,
-  },
-  {
-    path: PATHS.API_CLIENT.IMPORT_FROM_POSTMAN.ABSOLUTE,
-    element: <ProtectedRoute component={PostmanImporterView} />,
+    tabSource: ApiClientEmptyViewSource.create,
   },
 ];
