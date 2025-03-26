@@ -6,6 +6,11 @@ import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 
 interface EnvironmentViewTabSourceMetadata extends TabSourceMetadata {}
 
+interface EnvironmentViewTabSourceMetadata {
+  id: string;
+  title: string;
+}
+
 export class EnvironmentViewTabSource extends BaseTabSource {
   constructor(metadata: EnvironmentViewTabSourceMetadata) {
     super();
