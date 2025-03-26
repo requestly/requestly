@@ -8,6 +8,11 @@ interface EnvironmentViewTabSourceMetadata {
   title: string;
 }
 
+interface EnvironmentViewTabSourceMetadata {
+  id: string;
+  title: string;
+}
+
 export class EnvironmentViewTabSource extends BaseTabSource {
   constructor(metadata: EnvironmentViewTabSourceMetadata) {
     super();
