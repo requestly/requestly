@@ -1,6 +1,7 @@
 import { RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import ApiClientFeatureContainer from "./container";
+import { ApiClientEmptyView } from "./screens/apiClient/components/clientView/components/ApiClientEmptyView/ApiClientEmptyView";
 
 export const apiClientRoutes: RouteObject[] = [
   {
@@ -11,5 +12,11 @@ export const apiClientRoutes: RouteObject[] = [
         label: "API Client",
       },
     },
+    children: [
+      {
+        index: true,
+        element: <ApiClientEmptyView />,
+      },
+    ],
   },
 ];
