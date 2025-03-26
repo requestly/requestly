@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { Tabs, TabsProps } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
+import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 
 const updateUrlPath = (path: string) => {
   window.history.pushState({}, "", path);
@@ -25,6 +26,16 @@ export const TabsContainer: React.FC = () => {
     state.closeTabById,
     state.getSourceByTabId,
   ]);
+
+  const matchedTabSource = useMatchedTabSource();
+
+  useEffect(() => {
+    if (!matchedTabSource) {
+      return;
+    }
+
+    openTab(matchedTabSource.sourceFactory({ id: "test", name: "Empty view", title: "Empty view" }));
+  }, [matchedTabSource, openTab]);
 
   useEffect(() => {
     if (activeTabId) {
