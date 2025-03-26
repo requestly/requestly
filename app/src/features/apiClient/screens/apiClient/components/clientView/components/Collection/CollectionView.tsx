@@ -78,6 +78,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         disabled: isLocalSyncEnabled,
         children: (
           <CollectionAuthorizationView
+            collectionId={collectionId}
             authOptions={collection?.data?.auth}
             updateAuthData={updateCollectionAuthData}
             rootLevelRecord={!collection?.collectionId}
@@ -85,7 +86,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         ),
       },
     ];
-  }, [collection, updateCollectionAuthData, isLocalSyncEnabled]);
+  }, [collection, collectionId, updateCollectionAuthData, isLocalSyncEnabled]);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
