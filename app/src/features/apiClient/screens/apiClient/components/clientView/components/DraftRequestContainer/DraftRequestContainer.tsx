@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
-import { RequestView } from "../RequestContainer";
-import { DraftRequestView } from "../DraftRequestView";
+import { RequestView } from "../RequestView/RequestView";
+import { DraftRequestView } from "./DraftRequestView";
 import { useGenericState } from "hooks/useGenericState";
 import PATHS from "config/constants/sub/paths";
 import { RQAPI } from "features/apiClient/types";
