@@ -10,5 +10,5 @@ jobs:
   runs-on: ubuntu-latest
 
   steps:
-    -name: Run type check in app
-    run: npm run type-check
+    - name: Run type check in app
+      run: npm run type-check
