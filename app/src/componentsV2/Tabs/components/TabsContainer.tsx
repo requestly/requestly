@@ -5,19 +5,27 @@ import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 import { updateUrlPath } from "../utils";
 import { Outlet } from "react-router-dom";
+import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
 import "./tabsContainer.scss";
 
 export const TabsContainer: React.FC = () => {
-  const [activeTabId, setActiveTabId, tabs, _version, openTab, closeTabById, getSourceByTabId] =
-    useTabServiceWithSelector((state) => [
-      state.activeTabId,
-      state.setActiveTabId,
-      state.tabs,
-      state._version,
-      state.openTab,
-      state.closeTabById,
-      state.getSourceByTabId,
-    ]);
+  const [
+    activeTabId,
+    setActiveTabId,
+    tabs,
+    _version,
+    openTab,
+    closeTabById,
+    getSourceByTabId,
+  ] = useTabServiceWithSelector((state) => [
+    state.activeTabId,
+    state.setActiveTabId,
+    state.tabs,
+    state._version,
+    state.openTab,
+    state.closeTabById,
+    state.getSourceByTabId,
+  ]);
 
   const matchedTabSource = useMatchedTabSource();
 
@@ -69,7 +77,7 @@ export const TabsContainer: React.FC = () => {
             const id = parseInt(key as string);
             closeTabById(id);
           } else if (action === "add") {
-            // openTab();
+            openTab(new DraftRequestContainerTabSource());
           }
         }}
       />
