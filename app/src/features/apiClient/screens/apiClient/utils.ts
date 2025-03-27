@@ -7,7 +7,6 @@ import * as curlconverter from "curlconverter";
 import { forEach, isEmpty, omit, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
-import { generateDocumentId } from "backend/utils";
 import { getDefaultAuth } from "./components/clientView/components/request/components/AuthorizationView/defaults";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
@@ -568,7 +567,10 @@ export const filterOutChildrenRecords = (
     .filter((id) => !childParentMap[id] || !selectedRecords.has(childParentMap[id]))
     .map((id) => recordsMap[id]);
 
-export const processRecordsForDuplication = (recordsToProcess: RQAPI.Record[]) => {
+export const processRecordsForDuplication = (
+  recordsToProcess: RQAPI.Record[],
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
+) => {
   const recordsToDuplicate: RQAPI.Record[] = [];
   const queue: RQAPI.Record[] = [...recordsToProcess];
 
@@ -576,7 +578,7 @@ export const processRecordsForDuplication = (recordsToProcess: RQAPI.Record[]) =
     const record = queue.shift()!;
 
     if (record.type === RQAPI.RecordType.COLLECTION) {
-      const newId = generateDocumentId("apis");
+      const newId = apiClientRecordsRepository.generateCollectionId(`(Copy) ${record.name}`, record.collectionId);
 
       const collectionToDuplicate: RQAPI.CollectionRecord = Object.assign({}, record, {
         id: newId,
@@ -594,7 +596,7 @@ export const processRecordsForDuplication = (recordsToProcess: RQAPI.Record[]) =
       }
     } else {
       const requestToDuplicate: RQAPI.Record = Object.assign({}, record, {
-        id: generateDocumentId("apis"),
+        id: apiClientRecordsRepository.generateApiRecordId(record.collectionId),
         name: `(Copy) ${record.name}`,
       });
 

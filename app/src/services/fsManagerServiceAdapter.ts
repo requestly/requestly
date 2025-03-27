@@ -4,7 +4,7 @@ import {
   APIEntity,
   Collection,
   EnvironmentEntity,
-  ErroredRecords,
+  ErroredRecord,
   FileSystemResult,
   FileType,
 } from "features/apiClient/helpers/modules/sync/local/services/types";
@@ -24,7 +24,7 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 
   async getAllRecords() {
     return this.invokeProcedureInBG("getAllRecords") as Promise<
-      FileSystemResult<{ records: APIEntity[]; erroredRecords: ErroredRecords[] }>
+      FileSystemResult<{ records: APIEntity[]; erroredRecords: ErroredRecord[] }>
     >;
   }
 
@@ -68,7 +68,7 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 
   async getAllEnvironments() {
     return this.invokeProcedureInBG("getAllEnvironments") as Promise<
-      FileSystemResult<{ environments: EnvironmentEntity[]; erroredRecords: ErroredRecords[] }>
+      FileSystemResult<{ environments: EnvironmentEntity[]; erroredRecords: ErroredRecord[] }>
     >;
   }
 
@@ -109,6 +109,20 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 
   async getRawFileData(id: string) {
     return this.invokeProcedureInBG("getRawFileData", id) as Promise<FileSystemResult<unknown>>;
+  }
+
+  async createCollectionFromCompleteRecord(collection: RQAPI.CollectionRecord, id: string) {
+    return this.invokeProcedureInBG("createCollectionFromCompleteRecord", collection, id) as Promise<
+      FileSystemResult<RQAPI.Record>
+    >;
+  }
+
+  async moveRecord(id: string, newParentId: string) {
+    return this.invokeProcedureInBG("moveRecord", id, newParentId) as Promise<FileSystemResult<RQAPI.Record>>;
+  }
+
+  async moveCollection(id: string, newParentId: string) {
+    return this.invokeProcedureInBG("moveCollection", id, newParentId) as Promise<FileSystemResult<RQAPI.Record>>;
   }
 }
 
