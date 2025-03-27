@@ -118,9 +118,7 @@ const APIClientView: React.FC<Props> = ({
   ]);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
-  const [entry, setEntry] = useState<RQAPI.Entry>(
-    !apiEntryDetails?.data && isCreateMode ? getEmptyAPIEntry() : apiEntryDetails.data
-  );
+  const [entry, setEntry] = useState<RQAPI.Entry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.ExecutionError>(null);
   const [warning, setWarning] = useState<RQAPI.ExecutionWarning>(null);
