@@ -1,9 +1,12 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { RequestView } from "../RequestView/RequestView";
 import { DraftRequestView } from "./DraftRequestView";
 import { useGenericState } from "hooks/useGenericState";
 import PATHS from "config/constants/sub/paths";
 import { RQAPI } from "features/apiClient/types";
+import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { DraftRequestContainerTabSource } from "./draftRequestContainerTabSource";
+import { updateUrlPath } from "componentsV2/Tabs/utils";
 
 type RequestViewState =
   | {
@@ -14,13 +17,24 @@ type RequestViewState =
       isCreateMode: true;
     };
 
-//TODO: losing focus in the apiClientViewer on first focus
-export const DraftRequestContainer: React.FC = () => {
+export const DraftRequestContainer: React.FC<{ draftId: string }> = ({ draftId }) => {
   const [requestViewState, setRequestViewState] = useState<RequestViewState>({
     isCreateMode: true,
   });
 
-  const { setTitle, setUrl } = useGenericState();
+  const { setTitle } = useGenericState();
+  const tabsIndex = useTabServiceStore().use.tabsIndex();
+  const tabs = useTabServiceStore().use.tabs();
+
+  const setUrl = useCallback(
+    (path: string) => {
+      const tabId = tabsIndex.get("request").get(draftId);
+      const tabSource = tabs.get(tabId).getState().source as DraftRequestContainerTabSource;
+      tabSource.setUrlPath(path);
+      updateUrlPath(path);
+    },
+    [draftId, tabs, tabsIndex]
+  );
 
   const onSaveCallback = useCallback(
     (apiEntryDetails: RQAPI.ApiRecord) => {
