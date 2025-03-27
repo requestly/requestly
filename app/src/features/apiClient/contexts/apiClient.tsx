@@ -28,13 +28,13 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
 import { variablesActions } from "store/features/variables/slice";
 import { EnvironmentVariables } from "backend/environment/types";
-import { ErroredRecords } from "../helpers/modules/sync/local/services/types";
+import { ErroredRecord } from "../helpers/modules/sync/local/services/types";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { RBAC, useRBAC } from "features/rbac";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
-  errorFiles: ErroredRecords[];
+  errorFiles: ErroredRecord[];
   isLoadingApiClientRecords: boolean;
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
