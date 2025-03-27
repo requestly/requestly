@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import APIClientView from "./components/clientView/APIClientView";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { QueryParamSyncType, RQAPI } from "features/apiClient/types";
 import { useLocation } from "react-router-dom";
-import Logger from "lib/logger";
 import { Skeleton } from "antd";
-import { getEmptyAPIEntry, syncQueryParams } from "./utils";
+import { syncQueryParams } from "./utils";
 import "./apiClient.scss";
 import { isEmpty } from "lodash";
 
@@ -30,20 +29,12 @@ type Props = CreateModeProps | EditModeProps;
 export const APIClient: React.FC<Props> = React.memo((props) => {
   const location = useLocation();
   const { isCreateMode } = props;
-  // const { requestId } = useParams();
-  // const [searchParams] = useSearchParams();
-  const {
-    apiClientRecords,
-    history,
-    selectedHistoryIndex,
-    addToHistory,
-    apiClientRecordsRepository,
-  } = useApiClientContext();
+  const { apiClientRecords, history, selectedHistoryIndex, addToHistory } = useApiClientContext();
   // const persistedRequestId = useMemo(() => props.apiEntryDetails?.id, [props.apiEntryDetails?.id]);
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>(props?.apiEntryDetails);
   const isHistoryPath = location.pathname.includes("history");
 
-  const requestId = props.apiEntryDetails?.id ?? null;
+  const requestId = isCreateMode === false ? props.requestId : null;
   const onSaveCallback = props.onSaveCallback ?? (() => {});
 
   const requestHistoryEntry = useMemo(() => {
@@ -87,7 +78,6 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
   //   console.log("e3 end");
   // }, [persistedRequestId, apiClientRecords]);
 
-  const isRequestFetched = useRef(false);
   // useEffect(() => {
   //   if (isCreateMode) {
   //     return;
@@ -122,14 +112,15 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
   //     .finally(() => {});
   // }, [persistedRequestId, isCreateMode, apiClientRecordsRepository]);
   //
+  // const isRequestFetched = useRef(false);
   useEffect(() => {
     if (isCreateMode) {
       return;
     }
 
-    if (isRequestFetched.current) {
-      return;
-    }
+    // if (isRequestFetched.current) {
+    //   return;
+    // }
 
     const record = apiClientRecords.find((record) => record.id === requestId) as RQAPI.ApiRecord;
     if (record) {
@@ -147,6 +138,7 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
       record.data = entry;
       setSelectedEntryDetails(record);
     }
+    // isRequestFetched.current = true;
   }, [apiClientRecords, isCreateMode, requestId]);
 
   const entryDetails = useMemo(() => (isHistoryPath ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord, [
@@ -198,7 +190,7 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
           // key={persistedRequestId}
           apiEntryDetails={entryDetails}
           notifyApiRequestFinished={handleAppRequestFinished}
-          onSaveCallback={props.onSaveCallback}
+          onSaveCallback={onSaveCallback}
           isCreateMode={isCreateMode}
         />
       </div>

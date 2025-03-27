@@ -450,7 +450,6 @@ const APIClientView: React.FC<Props> = ({
       }
       toast.success("Request saved!");
     } else {
-      console.log("!!!debug", "result", result);
       toast.error(result?.message || `Could not save Request.`);
     }
 
@@ -624,7 +623,7 @@ const APIClientView: React.FC<Props> = ({
         layout={SheetLayout.SPLIT}
         bottomSheet={
           <ApiClientBottomSheet
-            key={apiEntryDetails?.id}
+            // key={apiEntryDetails?.id}
             response={entry.response}
             testResults={testResults}
             isLoading={isLoadingResponse}
@@ -642,7 +641,7 @@ const APIClientView: React.FC<Props> = ({
       >
         <div className="api-client-body">
           <RequestTabs
-            key={apiEntryDetails?.id}
+            // key={apiEntryDetails?.id}
             requestId={apiEntryDetails?.id}
             collectionId={apiEntryDetails?.collectionId}
             requestEntry={entry}
