@@ -6,6 +6,7 @@ import { QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "..
 import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
 import {
   getContentTypeFromResponseHeaders,
+  getEmptyAPIEntry,
   getEmptyPair,
   sanitizeEntry,
   supportsRequestBody,
@@ -46,38 +47,45 @@ import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/
 import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 
-interface Props {
-  openInModal?: boolean;
-  apiEntry?: RQAPI.Entry;
-  notifyApiRequestFinished?: (apiEntry: RQAPI.Entry) => void;
-  apiEntryDetails?: RQAPI.ApiRecord;
-  onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
-  requestId?: string;
-  isCreateMode: boolean;
-}
-
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
   label: method,
 }));
 
+type BaseProps = {
+  openInModal?: boolean;
+  onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
+  notifyApiRequestFinished?: (apiEntry: RQAPI.Entry) => void;
+};
+
+type CreateModeProps = BaseProps & {
+  isCreateMode: true;
+  apiEntryDetails:
+    | null
+    | ({
+        data: RQAPI.Entry; // If you want to prefill the details then only data can be passed in create mode
+      } & Partial<RQAPI.ApiRecord>);
+};
+
+type EditModeProps = BaseProps & {
+  isCreateMode: false;
+  apiEntryDetails: RQAPI.ApiRecord;
+};
+
+type Props = CreateModeProps | EditModeProps;
+
 const APIClientView: React.FC<Props> = ({
-  apiEntry,
-  apiEntryDetails,
-  notifyApiRequestFinished,
-  openInModal,
-  onSaveCallback,
-  requestId,
   isCreateMode,
+  openInModal = false,
+  onSaveCallback,
+  notifyApiRequestFinished,
+  apiEntryDetails,
 }) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
-  // const [searchParams] = useSearchParams();
-  // const isCreateMode = searchParams.has("create");
-  // const { requestId } = useParams();
 
   const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
   const {
@@ -104,7 +112,9 @@ const APIClientView: React.FC<Props> = ({
   ]);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
-  const [entry, setEntry] = useState<RQAPI.Entry>(apiEntry);
+  const [entry, setEntry] = useState<RQAPI.Entry>(
+    !apiEntryDetails?.data && isCreateMode ? getEmptyAPIEntry() : apiEntryDetails.data
+  );
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.ExecutionError>(null);
   const [warning, setWarning] = useState<RQAPI.ExecutionWarning>(null);
@@ -113,12 +123,14 @@ const APIClientView: React.FC<Props> = ({
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
 
+  // const requestId = apiEntryDetails?.id;
+
   // const abortControllerRef = useRef<AbortController>(null);
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse));
-  const { updateTab, activeTab } = useTabsLayoutContext();
+  // const { updateTab, activeTab } = useTabsLayoutContext();
 
   const [copyAsModalOpen, setCopyAsModalOpen] = useState(false);
 
@@ -135,25 +147,25 @@ const APIClientView: React.FC<Props> = ({
     };
   }, [toggleSheetPlacement]);
 
+  // useEffect(() => {
+  //   const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
+
+  //   updateTab(tabId, { hasUnsavedChanges: hasUnsavedChanges });
+  // }, [updateTab, isCreateMode, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
+
+  // useEffect(() => {
+  //   const tabId = apiEntryDetails?.id;
+
+  //   if (activeTab?.id === tabId && hasUnsavedChanges) {
+  //     updateTab(tabId, { isPreview: false });
+  //   }
+  // }, [updateTab, activeTab?.id, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
+
   useEffect(() => {
-    const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
-
-    updateTab(tabId, { hasUnsavedChanges: hasUnsavedChanges });
-  }, [updateTab, isCreateMode, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
-
-  useEffect(() => {
-    const tabId = apiEntryDetails?.id;
-
-    if (activeTab?.id === tabId && hasUnsavedChanges) {
-      updateTab(tabId, { isPreview: false });
-    }
-  }, [updateTab, activeTab?.id, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
-
-  useEffect(() => {
-    if (apiEntry) {
+    if (entry) {
       setRequestName("");
     }
-  }, [apiEntry]);
+  }, [entry]);
 
   const setUrl = useCallback((url: string) => {
     setEntry((entry) => ({
@@ -255,7 +267,7 @@ const APIClientView: React.FC<Props> = ({
   );
 
   const onSendButtonClick = useCallback(async () => {
-    updateTab(apiEntryDetails?.id, { isPreview: false });
+    // updateTab(apiEntryDetails?.id, { isPreview: false });
 
     if (!entry.request.url) {
       return;
@@ -351,7 +363,6 @@ const APIClientView: React.FC<Props> = ({
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
-    updateTab,
     apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
     entry,
@@ -381,10 +392,8 @@ const APIClientView: React.FC<Props> = ({
       record.name = requestName;
     }
 
-    console.log("kkkk", apiEntryDetails, record);
-
     const result = isCreateMode
-      ? await apiClientRecordsRepository.createRecordWithId(record, requestId)
+      ? await apiClientRecordsRepository.createRecordWithId(record, apiEntryDetails?.id)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
@@ -441,7 +450,6 @@ const APIClientView: React.FC<Props> = ({
       }
       toast.success("Request saved!");
     } else {
-      console.log("!!!debug", "result", result);
       toast.error(result?.message || `Could not save Request.`);
     }
 
@@ -615,7 +623,7 @@ const APIClientView: React.FC<Props> = ({
         layout={SheetLayout.SPLIT}
         bottomSheet={
           <ApiClientBottomSheet
-            key={requestId}
+            // key={apiEntryDetails?.id}
             response={entry.response}
             testResults={testResults}
             isLoading={isLoadingResponse}
@@ -633,7 +641,7 @@ const APIClientView: React.FC<Props> = ({
       >
         <div className="api-client-body">
           <RequestTabs
-            key={requestId}
+            // key={apiEntryDetails?.id}
             requestId={apiEntryDetails?.id}
             collectionId={apiEntryDetails?.collectionId}
             requestEntry={entry}
