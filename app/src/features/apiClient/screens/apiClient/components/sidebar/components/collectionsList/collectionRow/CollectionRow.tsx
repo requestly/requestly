@@ -10,24 +10,23 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
-import { TabsLayoutContextInterface } from "layouts/TabsLayout";
-import PATHS from "config/constants/sub/paths";
 import { useParams } from "react-router-dom";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { isEmpty } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
-import "./CollectionRow.scss";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 import { Conditional } from "components/common/Conditional";
+import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { CollectionViewTabSource } from "../../../../clientView/components/Collection/collectionViewTabSource";
+import "./CollectionRow.scss";
 
 interface Props {
   record: RQAPI.CollectionRecord;
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
   onExportClick: (collection: RQAPI.CollectionRecord) => void;
-  openTab: TabsLayoutContextInterface["openTab"];
   setExpandedRecordIds: (keys: RQAPI.Record["id"][]) => void;
   expandedRecordIds: string[];
   isReadOnly: boolean;
@@ -43,7 +42,6 @@ export const CollectionRow: React.FC<Props> = ({
   record,
   onNewClick,
   onExportClick,
-  openTab,
   expandedRecordIds,
   setExpandedRecordIds,
   bulkActionOptions,
@@ -57,6 +55,7 @@ export const CollectionRow: React.FC<Props> = ({
   const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
   const { collectionId } = useParams();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const openTab = useTabServiceStore().use.openTab();
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);
@@ -187,10 +186,7 @@ export const CollectionRow: React.FC<Props> = ({
                 onMouseEnter={() => setHoveredId(record.id)}
                 onMouseLeave={() => setHoveredId("")}
                 onClick={() => {
-                  openTab(record.id, {
-                    title: record.name || "New Collection",
-                    url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(record.id)}`,
-                  });
+                  openTab(new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }));
                 }}
               >
                 <div className="collection-name" title={record.name}>
@@ -271,7 +267,6 @@ export const CollectionRow: React.FC<Props> = ({
                       isReadOnly={isReadOnly}
                       key={apiRecord.id}
                       record={apiRecord}
-                      openTab={openTab}
                       bulkActionOptions={bulkActionOptions}
                     />
                   );
@@ -280,7 +275,6 @@ export const CollectionRow: React.FC<Props> = ({
                     <CollectionRow
                       isReadOnly={isReadOnly}
                       key={apiRecord.id}
-                      openTab={openTab}
                       record={apiRecord}
                       onNewClick={onNewClick}
                       onExportClick={onExportClick}
