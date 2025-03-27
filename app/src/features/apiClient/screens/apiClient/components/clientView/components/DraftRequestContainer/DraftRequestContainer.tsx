@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
-import { RequestView } from "../RequestContainer";
-import { DraftRequestView } from "../DraftRequestView";
+import { RequestView } from "../RequestView/RequestView";
+import { DraftRequestView } from "./DraftRequestView";
 import { useGenericState } from "hooks/useGenericState";
 import PATHS from "config/constants/sub/paths";
 import { RQAPI } from "features/apiClient/types";
@@ -37,6 +37,6 @@ export const DraftRequestContainer: React.FC = () => {
   if (requestViewState.isCreateMode === true) {
     return <DraftRequestView onSaveCallback={onSaveCallback} />;
   } else {
-    return <RequestView apiEntryDetails={requestViewState.entryDetails} />;
+    return <RequestView requestId={requestViewState.entryDetails.id} apiEntryDetails={requestViewState.entryDetails} />;
   }
 };

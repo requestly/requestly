@@ -3,30 +3,20 @@ import { Tabs, TabsProps } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
+import { updateUrlPath } from "../utils";
 import { Outlet } from "react-router-dom";
 
-const updateUrlPath = (path: string) => {
-  window.history.pushState({}, "", path);
-};
-
 export const TabsContainer: React.FC = () => {
-  const [
-    activeTabId,
-    setActiveTabId,
-    tabs,
-    _version,
-    openTab,
-    closeTabById,
-    getSourceByTabId,
-  ] = useTabServiceWithSelector((state) => [
-    state.activeTabId,
-    state.setActiveTabId,
-    state.tabs,
-    state._version,
-    state.openTab,
-    state.closeTabById,
-    state.getSourceByTabId,
-  ]);
+  const [activeTabId, setActiveTabId, tabs, _version, openTab, closeTabById, getSourceByTabId] =
+    useTabServiceWithSelector((state) => [
+      state.activeTabId,
+      state.setActiveTabId,
+      state.tabs,
+      state._version,
+      state.openTab,
+      state.closeTabById,
+      state.getSourceByTabId,
+    ]);
 
   const matchedTabSource = useMatchedTabSource();
 
@@ -35,7 +25,7 @@ export const TabsContainer: React.FC = () => {
       return;
     }
 
-    openTab(matchedTabSource.sourceFactory({ id: "test", name: "Empty view", title: "Empty view" }));
+    openTab(matchedTabSource.sourceFactory(matchedTabSource.matchedPath));
   }, [matchedTabSource, openTab]);
 
   useEffect(() => {
