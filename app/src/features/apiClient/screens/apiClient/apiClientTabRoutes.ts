@@ -4,6 +4,7 @@ import { DraftRequestContainerTabSource } from "./components/clientView/componen
 import { RequestViewTabSource } from "./components/clientView/components/RequestView/requestViewTabSource";
 import { CollectionViewTabSource } from "./components/clientView/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "../environment/components/environmentView/EnvironmentViewTabSource";
+import { HistoryViewTabSource } from "./components/clientView/components/request/HistoryView/historyViewTabSource";
 
 export const apiClientTabRoutes: TabRoute[] = [
   {
@@ -13,6 +14,10 @@ export const apiClientTabRoutes: TabRoute[] = [
   {
     path: PATHS.API_CLIENT.REQUEST.ABSOLUTE,
     tabSourceFactory: RequestViewTabSource.create,
+  },
+  {
+    path: PATHS.API_CLIENT.HISTORY.ABSOLUTE,
+    tabSourceFactory: HistoryViewTabSource.create,
   },
   {
     path: PATHS.API_CLIENT.COLLECTION.ABSOLUTE,

@@ -42,7 +42,6 @@ import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { useLocation } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
 import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
@@ -74,7 +73,12 @@ type EditModeProps = BaseProps & {
   apiEntryDetails: RQAPI.ApiRecord;
 };
 
-type Props = CreateModeProps | EditModeProps;
+type HistoryModeProps = BaseProps & {
+  isCreateMode: false;
+  apiEntryDetails: RQAPI.ApiRecord;
+};
+
+type Props = CreateModeProps | EditModeProps | HistoryModeProps;
 
 const APIClientView: React.FC<Props> = ({
   isCreateMode,
@@ -524,7 +528,7 @@ const APIClientView: React.FC<Props> = ({
   ]);
 
   const handleRevertChanges = () => {
-    setEntry(apiEntry);
+    setEntry(apiEntryDetails?.data);
   };
 
   return isExtensionEnabled ? (
