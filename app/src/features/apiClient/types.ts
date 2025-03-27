@@ -6,7 +6,7 @@ import {
   BasicAuthAuthorizationConfig,
   BearerTokenAuthorizationConfig,
 } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
-import { ErroredRecords } from "./helpers/modules/sync/local/services/types";
+import { ErroredRecord } from "./helpers/modules/sync/local/services/types";
 
 export enum RequestMethod {
   GET = "GET",
@@ -211,7 +211,7 @@ export namespace RQAPI {
 
   export type RecordsPromise = Promise<{
     success: boolean;
-    data: { records: Record[]; erroredRecords: ErroredRecords[] };
+    data: { records: Record[]; erroredRecords: ErroredRecord[] };
     message?: string;
   }>;
 }

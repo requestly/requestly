@@ -1,12 +1,12 @@
 import { EnvironmentData, EnvironmentMap, EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
-import { ErroredRecords, FileType } from "./local/services/types";
+import { ErroredRecord, FileType } from "./local/services/types";
 
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
   meta: Meta;
   getAllEnvironments(): Promise<{
     success: boolean;
-    data: { environments: EnvironmentMap; erroredRecords: ErroredRecords[] };
+    data: { environments: EnvironmentMap; erroredRecords: ErroredRecord[] };
   }>;
   createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData>;
   createGlobalEnvironment(): Promise<EnvironmentData>;

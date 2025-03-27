@@ -4,7 +4,7 @@ import {
   APIEntity,
   Collection,
   EnvironmentEntity,
-  ErroredRecords,
+  ErroredRecord,
   FileSystemResult,
   FileType,
 } from "features/apiClient/helpers/modules/sync/local/services/types";
@@ -24,7 +24,7 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 
   async getAllRecords() {
     return this.invokeProcedureInBG("getAllRecords") as Promise<
-      FileSystemResult<{ records: APIEntity[]; erroredRecords: ErroredRecords[] }>
+      FileSystemResult<{ records: APIEntity[]; erroredRecords: ErroredRecord[] }>
     >;
   }
 
@@ -68,7 +68,7 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 
   async getAllEnvironments() {
     return this.invokeProcedureInBG("getAllEnvironments") as Promise<
-      FileSystemResult<{ environments: EnvironmentEntity[]; erroredRecords: ErroredRecords[] }>
+      FileSystemResult<{ environments: EnvironmentEntity[]; erroredRecords: ErroredRecord[] }>
     >;
   }
 

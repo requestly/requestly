@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal } from "antd";
 import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
-import { ErroredRecords, FileType } from "features/apiClient/helpers/modules/sync/local/services/types";
+import { ErroredRecord, FileType } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { RQButton } from "lib/design-system-v2/components";
@@ -12,7 +12,7 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 
 interface ErrorFileViewerModalProps {
   isOpen: boolean;
-  errorFile: ErroredRecords;
+  errorFile: ErroredRecord;
   onClose: () => void;
 }
 
