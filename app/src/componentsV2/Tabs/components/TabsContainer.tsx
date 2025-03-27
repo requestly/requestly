@@ -5,6 +5,7 @@ import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 import { updateUrlPath } from "../utils";
 import { Outlet } from "react-router-dom";
+import "./tabsContainer.scss";
 
 export const TabsContainer: React.FC = () => {
   const [activeTabId, setActiveTabId, tabs, _version, openTab, closeTabById, getSourceByTabId] =
@@ -53,21 +54,25 @@ export const TabsContainer: React.FC = () => {
   return tabItems.length === 0 ? (
     <Outlet />
   ) : (
-    <Tabs
-      type="editable-card"
-      items={tabItems}
-      activeKey={activeTabId.toString()}
-      onChange={(key) => {
-        setActiveTabId(parseInt(key));
-      }}
-      onEdit={(key, action) => {
-        if (action === "remove") {
-          const id = parseInt(key as string);
-          closeTabById(id);
-        } else if (action === "add") {
-          // openTab();
-        }
-      }}
-    />
+    <div className="tabs-container">
+      <Tabs
+        type="editable-card"
+        items={tabItems}
+        activeKey={activeTabId.toString()}
+        className="tabs-content"
+        popupClassName="tabs-content-more-dropdown"
+        onChange={(key) => {
+          setActiveTabId(parseInt(key));
+        }}
+        onEdit={(key, action) => {
+          if (action === "remove") {
+            const id = parseInt(key as string);
+            closeTabById(id);
+          } else if (action === "add") {
+            // openTab();
+          }
+        }}
+      />
+    </div>
   );
 };
