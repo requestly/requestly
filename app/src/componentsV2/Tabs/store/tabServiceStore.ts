@@ -8,7 +8,7 @@ type TabId = number;
 type SourceName = string;
 type SourceId = string;
 type SourceMap = Map<SourceId, TabId>;
-type TabServiceState = {
+export type TabServiceState = {
   tabIdSequence: TabId;
   activeTabId: TabId;
   tabsIndex: Map<SourceName, SourceMap>; // Type: SourceName -> sourceId -> tabId eg: Request -> [requestId,tabId]

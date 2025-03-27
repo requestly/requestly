@@ -1,9 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Typography, Dropdown, MenuProps, Checkbox } from "antd";
-import PATHS from "config/constants/sub/paths";
 import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RequestMethod, RQAPI } from "features/apiClient/types";
-import { NavLink } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -16,17 +14,17 @@ import {
   trackMoveRequestToCollectionClicked,
   trackRequestDuplicated,
 } from "modules/analytics/events/features/apiClient";
-import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 import { LocalWorkspaceTooltip } from "../../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import "./RequestRow.scss";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdContentCopy } from "@react-icons/all-files/md/MdContentCopy";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { Conditional } from "components/common/Conditional";
+import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { RequestViewTabSource } from "../../../../clientView/components/RequestView/requestViewTabSource";
 
 interface Props {
   record: RQAPI.ApiRecord;
-  openTab: TabsLayoutContextInterface["openTab"];
   isReadOnly: boolean;
   bulkActionOptions: {
     showSelection: boolean;
@@ -36,7 +34,7 @@ interface Props {
   };
 }
 
-export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkActionOptions }) => {
+export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOptions }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
@@ -47,6 +45,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
     apiClientRecordsRepository,
   } = useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const openTab = useTabServiceStore().use.openTab();
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);
@@ -161,16 +160,18 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
           {showSelection && (
             <Checkbox onChange={recordsSelectionHandler.bind(this, record)} checked={selectedRecords.has(record.id)} />
           )}
-          <NavLink
+          <div
             title={record.name || record.data.request?.url}
-            to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(record.id)}`}
-            className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
+            className={`collections-list-item api`}
             onClick={() => {
-              openTab(record.id, {
-                isPreview: true,
-                title: record.name || record.data.request?.url,
-                url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(record.id)}`,
-              });
+              console.log("clicked!!!");
+              openTab(
+                new RequestViewTabSource({
+                  id: record.id,
+                  apiEntryDetails: record,
+                  title: record.name || record.data.request?.url,
+                })
+              );
             }}
           >
             <Typography.Text
@@ -208,7 +209,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
                 </Dropdown>
               </div>
             </Conditional>
-          </NavLink>
+          </div>
         </div>
       )}
     </>
