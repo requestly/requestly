@@ -1,15 +1,15 @@
 import { RequestContentType, RQAPI } from "features/apiClient/types";
+import { Modal, Select } from "antd";
 import { Request as HarRequest } from "har-format";
 import { HTTPSnippet, availableTargets } from "@readme/httpsnippet";
-import { RQModal } from "lib/design-system/components";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { apiRequestToHarRequestAdapter } from "../../../utils";
-import { Select } from "antd";
-import "./copyAsModal.scss";
 import CopyButton from "components/misc/CopyButton";
 import { trackRequestCurlCopied } from "modules/analytics/events/features/apiClient";
+import Editor from "componentsV2/CodeEditor";
+import "./apiClientSnippetModal.scss";
 
-interface CopyAsModalProps {
+interface ApiClientSnippetModalProps {
   open: boolean;
   onClose: () => void;
   apiRequest: RQAPI.Request;
@@ -18,7 +18,7 @@ interface CopyAsModalProps {
 type TargetId = ReturnType<typeof availableTargets>[number]["key"];
 type ClientId = ReturnType<typeof availableTargets>[number]["clients"][number]["key"];
 
-const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
+export const ApiClientSnippetModal = ({ apiRequest, onClose, open }: ApiClientSnippetModalProps) => {
   const [harRequest, setHarRequest] = useState<HarRequest>();
   const [snippetTypeId, setSnippetTypeId] = useState<string>("shell-curl");
   useEffect(() => {
@@ -30,7 +30,7 @@ const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
     setHarRequest(harRequest);
   }, [apiRequest]);
 
-  const getSnippet = useCallback(() => {
+  const snippet = useMemo(() => {
     if (!harRequest) {
       return "Some error occured while generating snippet.";
     }
@@ -44,23 +44,25 @@ const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
         {}
       );
     } catch (err) {
-      snippet = "Some error occured while generating snippet.";
+      snippet = ["Some error occured while generating snippet."];
     }
 
-    return snippet;
+    return snippet[0];
   }, [snippetTypeId, harRequest]);
 
   return (
-    <RQModal
-      width={500}
+    <Modal
+      title="Get client code snippet"
+      width={520}
       open={open}
       maskClosable={false}
       destroyOnClose={true}
-      className="copy-as-modal"
+      className="api-client-snippet-modal"
       onCancel={onClose}
+      footer={null}
     >
-      <div className="snippet-container">
-        <div className="snippet-actions">
+      <div className="api-client-snippet-container">
+        <div className="api-client-snippet-actions">
           <Select showSearch onChange={(value) => setSnippetTypeId(value)} value={snippetTypeId}>
             {availableTargets().map((target) => {
               return target.clients.map((client) => {
@@ -72,12 +74,24 @@ const CopyAsModal = ({ apiRequest, onClose, open }: CopyAsModalProps) => {
               });
             })}
           </Select>
-          <CopyButton copyText={getSnippet()} trackCopiedEvent={() => trackRequestCurlCopied(snippetTypeId)} />
+          <CopyButton
+            type="secondary"
+            title="Copy"
+            copyText={snippet}
+            trackCopiedEvent={() => trackRequestCurlCopied(snippetTypeId)}
+          />
         </div>
-        <div className="snippet-content">{getSnippet()}</div>
+        <div className="api-client-snippet-content">
+          <Editor
+            hideCharacterCount
+            isResizable
+            config={{ hideToolbar: true }}
+            value={snippet}
+            defaultValue=""
+            language={null}
+          />
+        </div>
       </div>
-    </RQModal>
+    </Modal>
   );
 };
-
-export default CopyAsModal;

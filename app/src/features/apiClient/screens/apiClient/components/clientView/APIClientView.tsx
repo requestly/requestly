@@ -43,7 +43,7 @@ import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
-import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
+import { ApiClientSnippetModal } from "../modals/ApiClientSnippetModal/ApiClientSnippetModal";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
@@ -111,7 +111,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse));
   const { updateTab, activeTab } = useTabsLayoutContext();
 
-  const [copyAsModalOpen, setCopyAsModalOpen] = useState(false);
+  const [isSnippetModalVisible, setIsSnippetModalVisible] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -543,7 +543,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                   recordId: apiEntryDetails?.id,
                   collectionId: apiEntryDetails?.collectionId,
                 });
-                setCopyAsModalOpen(true);
+                setIsSnippetModalVisible(true);
               }}
             >
               Get client code
@@ -639,11 +639,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           />
         </div>
       </BottomSheetLayout>
-      {copyAsModalOpen ? (
-        <CopyAsModal
+      {isSnippetModalVisible ? (
+        <ApiClientSnippetModal
           apiRequest={apiClientExecutor.prepareRequest()}
-          open={copyAsModalOpen}
-          onClose={() => setCopyAsModalOpen(false)}
+          open={isSnippetModalVisible}
+          onClose={() => setIsSnippetModalVisible(false)}
         />
       ) : null}
     </div>
