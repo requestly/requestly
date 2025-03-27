@@ -1,0 +1,14 @@
+name: typescript type check
+
+on:
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  type_check:
+  name: Run tsc in app
+  runs-on: ubuntu-latest
+
+  steps:
+    -name: Run type check in app
+    run: npm run type-check
