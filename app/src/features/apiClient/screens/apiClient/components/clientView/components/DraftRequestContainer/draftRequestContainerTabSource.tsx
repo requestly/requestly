@@ -14,6 +14,10 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/new`;
   }
 
+  static create(): DraftRequestContainerTabSource {
+    return new DraftRequestContainerTabSource();
+  }
+
   setUrlPath(path: string) {
     this.urlPath = path;
   }

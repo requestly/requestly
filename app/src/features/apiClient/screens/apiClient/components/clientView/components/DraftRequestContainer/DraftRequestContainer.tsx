@@ -37,6 +37,6 @@ export const DraftRequestContainer: React.FC = () => {
   if (requestViewState.isCreateMode === true) {
     return <DraftRequestView onSaveCallback={onSaveCallback} />;
   } else {
-    return <RequestView apiEntryDetails={requestViewState.entryDetails} />;
+    return <RequestView requestId={requestViewState.entryDetails.id} apiEntryDetails={requestViewState.entryDetails} />;
   }
 };
