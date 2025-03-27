@@ -1,6 +1,8 @@
 import lazyWithRetry from "utils/lazyWithRetry";
+import { RQSingleLineEditorProps } from "./SingleLineEditor";
+import React from "react";
 
-const LazySingleLineEditor = lazyWithRetry(
+const SingleLineEditor: React.FC<RQSingleLineEditorProps> = lazyWithRetry(
   () =>
     import(/* webpackChunkName: "SingleLineEditor"*/ "./SingleLineEditor").then((module) => {
       return { default: module.RQSingleLineEditor };
@@ -8,4 +10,4 @@ const LazySingleLineEditor = lazyWithRetry(
   null
 );
 
-export default LazySingleLineEditor;
+export default SingleLineEditor;

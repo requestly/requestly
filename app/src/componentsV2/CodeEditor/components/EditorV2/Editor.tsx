@@ -154,7 +154,6 @@ const Editor: React.FC<EditorProps> = ({
 
   useEffect(() => {
     if (isEditorInitialized) {
-      //IIFE
       (async () => {
         if (!isDefaultPrettificationDone.current && prettifyOnInit) {
           await applyPrettification();

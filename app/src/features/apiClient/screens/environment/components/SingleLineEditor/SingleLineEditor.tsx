@@ -7,7 +7,7 @@ import { EditorPopover } from "componentsV2/CodeEditor/components/Editor/compone
 import "componentsV2/CodeEditor/components/Editor/components/PopOver/popover.scss";
 import generateCompletionsForVariables from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
 import "./singleLineEditor.scss";
-interface RQSingleLineEditorProps {
+export interface RQSingleLineEditorProps {
   defaultValue?: string;
   className?: string;
   onChange: (value: string) => void;

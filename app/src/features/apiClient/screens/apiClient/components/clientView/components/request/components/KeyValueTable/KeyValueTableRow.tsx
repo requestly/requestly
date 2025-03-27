@@ -1,9 +1,8 @@
 import React, { useContext } from "react";
 import { Checkbox, Form, FormInstance } from "antd";
 import { KeyValuePair } from "features/apiClient/types";
-import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 import { EnvironmentVariables } from "backend/environment/types";
-import LazySingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
+import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -69,11 +68,11 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
             }}
           />
         ) : (
-          <LazySingleLineEditor
+          <SingleLineEditor
             className={`key-value-table-input ${record.isEnabled === false ? "key-value-table-input-disabled" : ""}`}
             placeholder={dataIndex === "key" ? "Key" : "Value"}
             defaultValue={record?.[dataIndex] as string}
-            onChange={(value: string) => {
+            onChange={(value) => {
               form.setFieldsValue({ [dataIndex]: value });
               save();
             }}

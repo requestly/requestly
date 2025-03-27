@@ -34,7 +34,6 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
@@ -47,7 +46,7 @@ import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
-import LazySingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
+import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 
 interface Props {
   openInModal?: boolean;
@@ -583,12 +582,12 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               onBlur={onUrlInputBlur}
               prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
             /> */}
-            <LazySingleLineEditor
+            <SingleLineEditor
               className="api-request-url"
               placeholder="https://example.com"
               //value={entry.request.url}
               defaultValue={entry.request.url}
-              onChange={(text: string) => {
+              onChange={(text) => {
                 setUrl(text);
               }}
               onPressEnter={onUrlInputEnterPressed}
