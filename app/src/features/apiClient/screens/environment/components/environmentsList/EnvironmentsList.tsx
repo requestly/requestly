@@ -1,5 +1,4 @@
 import { useCallback, useState, useMemo } from "react";
-import { useLocation } from "react-router-dom";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
@@ -16,14 +15,13 @@ import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { SidebarPlaceholderItem } from "features/apiClient/screens/apiClient/components/sidebar/components/SidebarPlaceholderItem/SidebarPlaceholderItem";
-import "./environmentsList.scss";
 import { isGlobalEnvironment } from "../../utils";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { EnvironmentData } from "backend/environment/types";
+import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
   const dispatch = useDispatch();
-  const location = useLocation();
   const user = useSelector(getUserAuthDetails);
   const {
     getAllEnvironments,
@@ -36,7 +34,7 @@ export const EnvironmentsList = () => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const { setIsRecordBeingCreated, isRecordBeingCreated } = useApiClientContext();
 
-  const { openTab, replaceTab } = useTabsLayoutContext();
+  const { openTab } = useTabsLayoutContext();
 
   const environments = useMemo(() => getAllEnvironments(), [getAllEnvironments]);
   const filteredEnvironments = useMemo(
@@ -69,12 +67,7 @@ export const EnvironmentsList = () => {
               url: targetPath,
             };
 
-            if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE)) {
-              replaceTab("environments/new", tabConfig);
-            } else {
-              openTab(newEnvironment.id, tabConfig);
-            }
-
+            openTab(newEnvironment.id, tabConfig);
             trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
           }
         })
@@ -82,15 +75,7 @@ export const EnvironmentsList = () => {
           setIsRecordBeingCreated(null);
         });
     },
-    [
-      addNewEnvironment,
-      environments.length,
-      setCurrentEnvironment,
-      replaceTab,
-      openTab,
-      location.pathname,
-      setIsRecordBeingCreated,
-    ]
+    [addNewEnvironment, environments.length, setCurrentEnvironment, openTab, setIsRecordBeingCreated]
   );
 
   const handleAddEnvironmentClick = useCallback(() => {

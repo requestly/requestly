@@ -1,10 +1,11 @@
 import { CollectionView } from "./CollectionView";
 import PATHS from "config/constants/sub/paths";
 import { BaseTabSource } from "componentsV2/Tabs/helpers/baseTabSource";
+import { MatchedTabSource } from "componentsV2/Tabs/types";
 
 interface CollectionViewTabSourceMetadata {
-  title: string;
   id: string;
+  title: string;
 }
 
 export class CollectionViewTabSource extends BaseTabSource {
@@ -19,15 +20,13 @@ export class CollectionViewTabSource extends BaseTabSource {
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${this.metadata.id}`;
   }
 
-  static create(metadata: CollectionViewTabSourceMetadata): CollectionViewTabSource {
-    if (!metadata.id) {
+  static create(matchedPath: MatchedTabSource["matchedPath"]): CollectionViewTabSource {
+    const { collectionId } = matchedPath.params;
+
+    if (!collectionId) {
       throw new Error("Collection id not found!");
     }
 
-    if (!metadata.title) {
-      throw new Error("Collection title not found!");
-    }
-
-    return new CollectionViewTabSource(metadata);
+    return new CollectionViewTabSource({ id: collectionId, title: "Collection" });
   }
 }
