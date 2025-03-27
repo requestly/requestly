@@ -135,11 +135,13 @@ const Editor: React.FC<EditorProps> = ({
 
   const updateContent = useCallback((code: string): void => {
     const view = editorRef.current?.view;
-    if (!view) {
+    const doc = view?.state?.doc;
+
+    if (!view || !doc) {
       return null;
     }
     const transaction = view.state.update({
-      changes: { from: 0, to: view.state.doc.length, insert: code },
+      changes: { from: 0, to: doc.length, insert: code },
     });
     view.dispatch(transaction);
   }, []);
