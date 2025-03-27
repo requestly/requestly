@@ -88,8 +88,6 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
     [isHistoryPath, requestHistoryEntry, selectedEntryDetails, requestId]
   );
 
-  console.log({ selectedEntryDetails, entryDetails, isHistoryPath: location.pathname, requestId });
-
   const handleAppRequestFinished = useCallback(
     (entry: RQAPI.Entry) => {
       if (!isHistoryPath) addToHistory(entry);
