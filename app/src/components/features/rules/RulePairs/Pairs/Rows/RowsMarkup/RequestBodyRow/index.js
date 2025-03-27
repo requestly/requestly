@@ -7,6 +7,7 @@ import { globalActions } from "store/slices/global/slice";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { RuleType } from "@requestly/shared/types/entities/rules";
+import Editor from "componentsV2/CodeEditor/components/Editor";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
@@ -52,7 +53,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     return null;
   }, [pair.request.type]);
 
-  const requestBodyChangeHandler = (value) => {
+  const requestBodyChangeHandler = async (value) => {
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
@@ -60,7 +61,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
         updates: {
           "request.type": pair.request.type,
           "request.value":
-            pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? formatJSONString(value) : value,
+            pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? await formatJSONString(value) : value,
         },
       })
     );
@@ -129,7 +130,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
             }}
           >
             <Col xl="12" span={24}>
-              <CodeEditor
+              <Editor
                 // key={pair.request.type}
                 language={
                   pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE

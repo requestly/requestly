@@ -1,11 +1,11 @@
 import { Select } from "antd";
-import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 import React from "react";
 import { EnvironmentVariables } from "backend/environment/types";
 import { AuthForm } from "./formStructure/types";
 import { AuthConfig, AuthConfigMeta, Authorization } from "../types/AuthConfig";
 import { useAuthFormState } from "./hooks/useAuthFormState";
 import { RQAPI } from "features/apiClient/types";
+import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 
 interface AuthorizationFormProps<AuthType extends AuthConfigMeta.AuthWithConfig> {
   defaultAuthValues?: RQAPI.Auth;
@@ -49,12 +49,12 @@ function generateFields(
   switch (field.type) {
     case AuthForm.FIELD_TYPE.INPUT:
       return (
-        <RQSingleLineEditor
+        <SingleLineEditor
           key={`${formType}-${index}`}
           className={field.className ?? ""}
           placeholder={field.placeholder}
           defaultValue={value}
-          onChange={(value: any) => onChangeHandler(value, field.id)}
+          onChange={(value) => onChangeHandler(value, field.id)}
           variables={currentEnvironmentVariables}
         />
       );

@@ -146,10 +146,10 @@ const Editor: React.FC<EditorProps> = ({
     view.dispatch(transaction);
   }, []);
 
-  const applyPrettification = useCallback(() => {
+  const applyPrettification = useCallback(async () => {
     if (showOptions?.enablePrettify) {
       if (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT) {
-        const prettified = prettifyCode(value, language);
+        const prettified = await prettifyCode(value, language);
         setIsCodePrettified(true);
         updateContent(prettified.code);
       }
@@ -158,10 +158,12 @@ const Editor: React.FC<EditorProps> = ({
 
   useEffect(() => {
     if (isEditorInitialized) {
-      if (!isDefaultPrettificationDone.current && prettifyOnInit) {
-        applyPrettification();
-        isDefaultPrettificationDone.current = true;
-      }
+      (async () => {
+        if (!isDefaultPrettificationDone.current && prettifyOnInit) {
+          await applyPrettification();
+          isDefaultPrettificationDone.current = true;
+        }
+      })();
     }
   }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit, isFullScreen]);
 

@@ -1,25 +1,18 @@
-import prettier from "prettier";
-// @ts-ignore
-import parserBabel from "prettier/parser-babel";
-// @ts-ignore
-import parserHtml from "prettier/parser-html";
-// @ts-ignore
-import parserCss from "prettier/parser-postcss";
 import { EditorLanguage } from "./types";
 import Logger from "lib/logger";
 
-export const getEditorParserConfig = (language: EditorLanguage) => {
+export const getEditorParserConfig = async (language: EditorLanguage) => {
   let parser = "babel";
-  let parserPlugin = parserBabel;
+  let parserPlugin = await import("prettier/parser-babel");
 
   switch (language) {
     case EditorLanguage.HTML:
       parser = "html";
-      parserPlugin = parserHtml;
+      parserPlugin = await import("prettier/parser-html");
       break;
     case EditorLanguage.CSS:
       parser = "css";
-      parserPlugin = parserCss;
+      parserPlugin = await import("prettier/parser-postcss");
       break;
     case EditorLanguage.JSON:
       parser = "json";
@@ -30,13 +23,14 @@ export const getEditorParserConfig = (language: EditorLanguage) => {
   return { parser, parserPlugin };
 };
 
-export const prettifyCode = (code: string, language: EditorLanguage) => {
+export const prettifyCode = async (code: string, language: EditorLanguage) => {
   try {
-    const { parser, parserPlugin } = getEditorParserConfig(language);
+    const prettier = await import("prettier");
+    const { parser, parserPlugin } = await getEditorParserConfig(language);
 
     const prettifiedCode = prettier.format(code, {
       parser: parser,
-      plugins: [parserPlugin],
+      plugins: parserPlugin,
     }) as string;
 
     return { code: prettifiedCode, success: true, language };
