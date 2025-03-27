@@ -38,12 +38,8 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
-  const {
-    updateRecordsToBeDeleted,
-    setIsDeleteModalOpen,
-    onSaveRecord,
-    apiClientRecordsRepository,
-  } = useApiClientContext();
+  const { updateRecordsToBeDeleted, setIsDeleteModalOpen, onSaveRecord, apiClientRecordsRepository } =
+    useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const [activeTabSource, openTab] = useTabServiceWithSelector((state) => [state.activeTabSource, state.openTab]);
@@ -222,9 +218,3 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
     </>
   );
 };
-
-/* Remove this notes before prod
-1. request options(children) stay till hover is on its parent class
-2. as cursor moves hover state is lost & visibilty set to hidden
-3. need to make something, that can continue the hover state till the dropdown is closed
-*/
