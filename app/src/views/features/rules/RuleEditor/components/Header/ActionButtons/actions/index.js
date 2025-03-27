@@ -13,10 +13,23 @@ import { HTML_ERRORS } from "../CreateRuleButton/actions/insertScriptValidators"
 import { globalActions } from "store/slices/global/slice";
 import { ToastType } from "componentsV2/CodeEditor/components/EditorToast/types";
 import { toast } from "utils/Toast";
+import { minifyCode } from "utils/CodeEditorUtils";
 
 export const saveRule = async (appMode, dispatch, ruleObject) => {
   let ruleToSave = cloneDeep(ruleObject);
   delete ruleToSave["schemaVersion"];
+
+  if (ruleToSave.ruleType === "request") {
+    if (ruleToSave.pairs[0].request.type === "static") {
+      ruleToSave.pairs[0].request.value = minifyCode(ruleToSave.pairs[0].request.value);
+    }
+  }
+
+  if (ruleToSave.ruleType === "response") {
+    if (ruleToSave.pairs[0].response.type === "static") {
+      ruleToSave.pairs[0].response.value = minifyCode(ruleToSave.pairs[0].response.value);
+    }
+  }
 
   //Pre-validation: regex fix + trim whitespaces
   const fixedRuleData = runMinorFixesOnRule(dispatch, ruleToSave);
