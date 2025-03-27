@@ -6,7 +6,7 @@ import { omit } from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { sanitizeRecord, updateApiRecord } from "backend/apiClient/upsertApiRecord";
 import { EnvironmentVariables } from "backend/environment/types";
-import { ErroredRecords } from "../../local/services/types";
+import { ErroredRecord } from "../../local/services/types";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -33,7 +33,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
       success: result.success,
       data: {
         records: result.data,
-        erroredRecords: [] as ErroredRecords[],
+        erroredRecords: [] as ErroredRecord[],
       },
     };
   }

@@ -10,7 +10,7 @@ import {
   updateEnvironmentInDB,
 } from "backend/environment";
 import { getOwnerId } from "backend/utils";
-import { ErroredRecords } from "../../local/services/types";
+import { ErroredRecord } from "../../local/services/types";
 
 export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -29,7 +29,7 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
       success: true,
       data: {
         environments: result,
-        erroredRecords: [] as ErroredRecords[],
+        erroredRecords: [] as ErroredRecord[],
       },
     };
   }
