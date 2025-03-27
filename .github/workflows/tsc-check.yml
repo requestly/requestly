@@ -10,6 +10,7 @@ jobs:
   type_check:
     name: Run tsc in app
     runs-on: ubuntu-latest
+    working-directory: ./app
 
     steps:
       - name: Run type check in app
