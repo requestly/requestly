@@ -62,14 +62,12 @@ const ApiClientFeatureContainer: React.FC = () => {
 
   return (
     <TabsLayoutContainer id="apiClient">
-      <TabServiceProvider>
-        <ApiClientProvider>
-          <div className="api-client-container">
-            <APIClientSidebar />
-            {user.loggedIn ? <TabsContainer /> : <>{loggedOutView}</>}
-          </div>
-        </ApiClientProvider>
-      </TabServiceProvider>
+      <ApiClientProvider>
+        <div className="api-client-container">
+          <APIClientSidebar />
+          {user.loggedIn ? <TabsContainer /> : <>{loggedOutView}</>}
+        </div>
+      </ApiClientProvider>
     </TabsLayoutContainer>
   );
 };
