@@ -8,29 +8,21 @@ import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
-import "./tabsContainer.scss";
 import PATHS from "config/constants/sub/paths";
+import "./tabsContainer.scss";
 
 export const TabsContainer: React.FC = () => {
-  const [
-    activeTabId,
-    activeTabSource,
-    setActiveTab,
-    tabs,
-    _version,
-    openTab,
-    closeTabById,
-    incrementVersion,
-  ] = useTabServiceWithSelector((state) => [
-    state.activeTabId,
-    state.activeTabSource,
-    state.setActiveTab,
-    state.tabs,
-    state._version,
-    state.openTab,
-    state.closeTabById,
-    state.incrementVersion,
-  ]);
+  const [activeTabId, activeTabSource, setActiveTab, tabs, _version, openTab, closeTabById, incrementVersion] =
+    useTabServiceWithSelector((state) => [
+      state.activeTabId,
+      state.activeTabSource,
+      state.setActiveTab,
+      state.tabs,
+      state._version,
+      state.openTab,
+      state.closeTabById,
+      state.incrementVersion,
+    ]);
 
   const isInitialLoadRef = useRef(true);
   const matchedTabSource = useMatchedTabSource();
