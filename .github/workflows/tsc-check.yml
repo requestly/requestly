@@ -8,9 +8,9 @@ on:
 
 jobs:
   type_check:
-  name: Run tsc in app
-  runs-on: ubuntu-latest
+    name: Run tsc in app
+    runs-on: ubuntu-latest
 
-  steps:
-    - name: Run type check in app
-      run: npm run type-check
+    steps:
+      - name: Run type check in app
+        run: npm run type-check
