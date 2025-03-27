@@ -1,8 +1,8 @@
+import { PathMatch } from "react-router-dom";
 import { CollectionViewTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/Collection/collectionViewTabSource";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { RequestViewTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/RequestView/requestViewTabSource";
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
-import { PathMatch } from "react-router-dom";
 
 export interface MatchedTabSource {
   sourceFactory: TabSourceFactory;
@@ -16,3 +16,8 @@ export type TabSource =
   | EnvironmentViewTabSource;
 
 export type TabSourceFactory = (matchedPath: MatchedTabSource["matchedPath"]) => TabSource;
+
+export interface TabRoute {
+  path: string;
+  tabSourceFactory: TabSourceFactory;
+}
