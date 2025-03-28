@@ -11,8 +11,7 @@ import AuthorizationView from "../AuthorizationView";
 import { QueryParamsTable } from "./components/QueryParamsTable/QueryParamsTable";
 import { HeadersTable } from "./components/HeadersTable/HeadersTable";
 import { useDeepLinkState } from "hooks";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
-import PATHS from "config/constants/sub/paths";
+import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -48,21 +47,35 @@ const RequestTabs: React.FC<Props> = ({
   setContentType,
   handleAuthChange,
 }) => {
-  const { activeTab, updateTab } = useTabsLayoutContext();
   const [selectedTab, setSelectedTab] = useDeepLinkState({ tab: RequestTab.QUERY_PARAMS });
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
-  useEffect(() => {
-    if (requestId !== activeTab?.id) {
-      return;
+  const getTabIdBySourceId = useTabServiceStore().use.getTabIdBySourceId();
+  const getSourceByTabId = useTabServiceStore().use.getSourceByTabId();
+  const tabId = useMemo(() => {
+    if (requestId) {
+      return getTabIdBySourceId(requestId);
+    } else {
+      return null;
     }
+  }, [getTabIdBySourceId, requestId]);
+  const tabSourceId = useMemo(() => {
+    if (tabId) {
+      return getSourceByTabId(tabId).getSourceId();
+    } else {
+      return null;
+    }
+  }, [getSourceByTabId, tabId]);
 
-    if (selectedTab.tab === RequestTab.BODY && !supportsRequestBody(requestEntry.request.method)) {
-      setSelectedTab({ tab: RequestTab.QUERY_PARAMS });
+  useEffect(() => {
+    if (tabSourceId && requestId && tabSourceId === requestId) {
+      if (selectedTab.tab === RequestTab.BODY && !supportsRequestBody(requestEntry.request.method)) {
+        setSelectedTab({ tab: RequestTab.QUERY_PARAMS });
+      }
     }
-  }, [requestId, activeTab?.id, requestEntry.request.method, selectedTab.tab, setSelectedTab]);
+  }, [requestId, requestEntry.request.method, selectedTab.tab, setSelectedTab, tabSourceId]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     const isRequestBodySupported = supportsRequestBody(requestEntry.request.method);
@@ -157,9 +170,9 @@ const RequestTabs: React.FC<Props> = ({
           return;
         }
 
-        updateTab(requestId, {
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?tab=${tab}`,
-        });
+        // updateTab(requestId, {
+        //   url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?tab=${tab}`,
+        // });
       }}
       items={tabItems}
       size="small"
