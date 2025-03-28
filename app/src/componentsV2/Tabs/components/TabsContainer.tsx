@@ -4,7 +4,7 @@ import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 import { useSetUrl } from "../tabUtils";
-import { Outlet } from "react-router-dom";
+import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
@@ -34,6 +34,25 @@ export const TabsContainer: React.FC = () => {
   const isInitialLoadRef = useRef(true);
   const matchedTabSource = useMatchedTabSource();
   const { setUrl } = useSetUrl();
+
+  const hasUnsavedChanges = Array.from(tabs.values()).some((tab) => tab.getState().saved);
+
+  unstable_useBlocker(({ nextLocation }) => {
+    const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
+    const shouldBlock = !isNextLocationApiClientView && hasUnsavedChanges;
+
+    if (isNextLocationApiClientView) {
+      return false;
+    }
+
+    if (shouldBlock) {
+      const shouldDiscardChanges = window.confirm("Discard changes? Changes you made will not be saved.");
+      const blockNavigation = !shouldDiscardChanges;
+      return blockNavigation;
+    }
+
+    return false;
+  });
 
   useEffect(() => {
     if (!matchedTabSource) {
@@ -88,7 +107,7 @@ export const TabsContainer: React.FC = () => {
                 }}
                 icon={<MdClose />}
               />
-              {/* {tab.hasUnsavedChanges ? <div className="unsaved-changes-indicator" /> : null} */}
+              {tabState.saved ? <div className="unsaved-changes-indicator" /> : null}
             </div>
           </div>
         ),

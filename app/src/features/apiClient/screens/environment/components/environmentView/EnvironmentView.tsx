@@ -1,20 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { Skeleton } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { VariablesList } from "../VariablesList/VariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
-import PATHS from "config/constants/sub/paths";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useSelector } from "react-redux";
 import { EnvironmentVariables } from "backend/environment/types";
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { isEmpty } from "lodash";
 import { isGlobalEnvironment } from "../../utils";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
+import { useGenericState } from "hooks/useGenericState";
 import "./environmentView.scss";
 
 interface EnvironmentViewProps {
@@ -22,22 +18,13 @@ interface EnvironmentViewProps {
 }
 
 export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const {
-    isEnvironmentsLoading,
-    getEnvironmentName,
-    getAllEnvironments,
-    getEnvironmentVariables,
-    setVariables,
-  } = useEnvironmentManager();
-  const { updateTab, tabs } = useTabsLayoutContext();
+  const { isEnvironmentsLoading, getEnvironmentName, getEnvironmentVariables, setVariables } = useEnvironmentManager();
 
-  const user = useSelector(getUserAuthDetails);
   const [searchValue, setSearchValue] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const environmentName = getEnvironmentName(envId);
   const variables = getEnvironmentVariables(envId);
+  const { setPreview, setSaved } = useGenericState();
 
   const [pendingVariables, setPendingVariables] = useState<EnvironmentVariables>(variables);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -45,32 +32,18 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
 
   useEffect(() => {
-    updateTab(envId, { hasUnsavedChanges: hasUnsavedChanges });
-  }, [updateTab, envId, hasUnsavedChanges]);
+    setSaved(hasUnsavedChanges);
+
+    if (hasUnsavedChanges) {
+      setPreview(false);
+    }
+  }, [setSaved, setPreview, hasUnsavedChanges]);
 
   useEffect(() => {
     if (!isSaving) {
       setPendingVariables(variables);
     }
   }, [variables, isSaving]);
-
-  useEffect(() => {
-    if (!isEnvironmentsLoading) {
-      if (!user.loggedIn) {
-        navigate(PATHS.API_CLIENT.ABSOLUTE);
-        return;
-      }
-
-      const environments = getAllEnvironments();
-      const hasAccessToEnvironment = environments?.some((env) => env.id === envId);
-      if (environments?.length === 0 || !hasAccessToEnvironment) {
-        if (!tabs.length) {
-          navigate(PATHS.API_CLIENT.ABSOLUTE);
-          return;
-        }
-      }
-    }
-  }, [getAllEnvironments, navigate, isEnvironmentsLoading, user.loggedIn, envId, location.pathname, tabs.length]);
 
   const handleSaveVariables = async () => {
     setIsSaving(true);
