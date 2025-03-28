@@ -23,9 +23,6 @@ jobs:
       - name: Install root dependencies
         run: npm install
 
-      - name: Build root dependencies
-        run: npm run build
-
       - name: Install shared dependencies
         run: npm install
         working-directory: ./shared
