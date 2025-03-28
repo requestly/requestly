@@ -43,7 +43,7 @@ const AuthHandler: React.FC<{}> = () => {
       ),
     []
   );
-  const emailTypeRef = useRef<string | null>(null);
+  const emailTypeRef = useRef<string>(null);
 
   const nonBlockingOperations = useCallback(
     async (user: User) => {

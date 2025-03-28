@@ -2,9 +2,9 @@ name: typescript compiler
 
 on:
   push:
-    branches: ["**"]
+    branches: master
   pull_request:
-    branches: ["**"]
+    branches: master
 
 jobs:
   type_check:
