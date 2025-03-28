@@ -19,6 +19,7 @@ export const TabsContainer: React.FC = () => {
     openTab,
     closeTabById,
     getSourceByTabId,
+    incrementVersion,
   ] = useTabServiceWithSelector((state) => [
     state.activeTabId,
     state.setActiveTabId,
@@ -27,6 +28,7 @@ export const TabsContainer: React.FC = () => {
     state.openTab,
     state.closeTabById,
     state.getSourceByTabId,
+    state.incrementVersion,
   ]);
 
   const isInitialLoadRef = useRef(true);
@@ -66,7 +68,7 @@ export const TabsContainer: React.FC = () => {
             onDoubleClick={() => {
               if (tabState.preview) {
                 tabState.setPreview(false);
-                console.log("toggle preview!!!");
+                incrementVersion();
               }
             }}
           >
