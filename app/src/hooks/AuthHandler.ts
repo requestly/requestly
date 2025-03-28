@@ -46,7 +46,7 @@ const AuthHandler: React.FC<{}> = () => {
   const emailTypeRef = useRef<string | null>(null);
 
   const nonBlockingOperations = useCallback(
-    async (user: User) => {
+    async (user) => {
       Logger.time("AuthHandler-nonBlockingOperations");
       Logger.timeLog("AuthHandler-nonBlockingOperations", "START");
 
