@@ -14,6 +14,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { processRqImportData } from "features/apiClient/screens/apiClient/components/modals/importModal/utils";
 import { EnvironmentVariableValue } from "backend/environment/types";
+import * as Sentry from "@sentry/react";
 
 const BATCH_SIZE = 25;
 
@@ -112,6 +113,10 @@ const useApiClientFileImporter = (importer: ImporterType) => {
             } else {
               trackImportParseFailed(ApiClientImporterType.REQUESTLY, result.reason);
               console.error("Error processing file:", result.reason);
+              Sentry.withScope((scope) => {
+                scope.setTag("error_type", "api_client_rq_processing");
+                Sentry.captureException("Error processing file:", result.reason);
+              });
             }
           });
 
@@ -121,6 +126,10 @@ const useApiClientFileImporter = (importer: ImporterType) => {
           trackImportParseFailed(ApiClientImporterType.REQUESTLY, error.message);
           setError(error.message);
           setProcessingStatus("idle");
+          Sentry.withScope((scope) => {
+            scope.setTag("error_type", "api_client_rq_processing");
+            Sentry.captureException(error);
+          });
         });
     },
     [processors, importer, uid, apiClientRecordsRepository]
@@ -274,6 +283,10 @@ const useApiClientFileImporter = (importer: ImporterType) => {
         Logger.error("Data import failed:", error);
         setError("Something went wrong! Couldn't import data");
         trackImportFailed(ApiClientImporterType.REQUESTLY, JSON.stringify(error));
+        Sentry.withScope((scope) => {
+          scope.setTag("error_type", "api_client_bruno_processing");
+          Sentry.captureException(error);
+        });
       } finally {
         setIsImporting(false);
       }
