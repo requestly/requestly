@@ -195,7 +195,9 @@ export const CollectionRow: React.FC<Props> = ({
                 onMouseEnter={() => setHoveredId(record.id)}
                 onMouseLeave={() => setHoveredId("")}
                 onClick={() => {
-                  openTab(new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }));
+                  openTab(new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }), {
+                    preview: true,
+                  });
                 }}
               >
                 <div className="collection-name" title={record.name}>
