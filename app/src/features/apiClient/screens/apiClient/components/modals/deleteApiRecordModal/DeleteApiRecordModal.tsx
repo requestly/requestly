@@ -8,6 +8,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { trackCollectionDeleted } from "modules/analytics/events/features/apiClient";
 import "./deleteApiRecordModal.scss";
 import { isEmpty, partition } from "lodash";
+import * as Sentry from "@sentry/react";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
@@ -77,6 +78,12 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
     } else {
       const erroredResult = !recordDeletionResult.success ? recordDeletionResult : collectionsDeletionResult;
       toast.error(erroredResult.message || `Error deleting ${records.length === 1 ? "record" : "records"}`);
+      Sentry.withScope((scope) => {
+        scope.setTag("error_type", "api_client_record_deletion");
+        Sentry.captureException(
+          erroredResult.message || `Error deleting ${records.length === 1 ? "record" : "records"}`
+        );
+      });
     }
 
     setIsDeleting(false);

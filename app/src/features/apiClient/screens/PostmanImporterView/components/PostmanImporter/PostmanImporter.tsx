@@ -18,6 +18,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
 import "./postmanImporter.scss";
+import * as Sentry from "@sentry/react";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableValue>; isGlobal: boolean }[];
@@ -87,6 +88,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
             } catch (error) {
               Logger.error("Error processing postman file:", error);
               reject(error);
+              Sentry.withScope((scope) => {
+                scope.setTag("error_type", "api_client_postman_processing");
+                Sentry.captureException(error);
+              });
             }
           };
           reader.readAsText(file);
@@ -130,6 +135,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         .catch((error) => {
           trackImportParseFailed(ApiClientImporterType.POSTMAN, error.message);
           setImportError(error.message);
+          Sentry.withScope((scope) => {
+            scope.setTag("error_type", "api_client_postman_import");
+            Sentry.captureException(error);
+          });
         })
         .finally(() => {
           if (importError) {
@@ -286,6 +295,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         Logger.error("Postman data import failed:", error);
         setImportError("Something went wrong!, Couldn't import Postman data");
         trackImportFailed(ApiClientImporterType.POSTMAN, JSON.stringify(error));
+        Sentry.withScope((scope) => {
+          scope.setTag("error_type", "api_client_postman_import");
+          Sentry.captureException(error);
+        });
       })
       .finally(() => {
         setIsImporting(false);
