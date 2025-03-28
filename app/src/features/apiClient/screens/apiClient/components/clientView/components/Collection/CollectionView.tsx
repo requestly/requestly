@@ -130,12 +130,14 @@ export const CollectionView = () => {
         />
       ) : (
         <>
-          <RQBreadcrumb
-            placeholder="New Collection"
-            recordName={collection?.name || "New Collection"}
-            onBlur={(newName) => handleCollectionNameChange(newName)}
-            autoFocus={location.search.includes("new")}
-          />
+          <div className="collection-view-breadcrumb-container">
+            <RQBreadcrumb
+              placeholder="New Collection"
+              recordName={collection?.name || "New Collection"}
+              onBlur={(newName) => handleCollectionNameChange(newName)}
+              autoFocus={location.search.includes("new")}
+            />
+          </div>
           <div className="collection-view-content">
             <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} />
           </div>
