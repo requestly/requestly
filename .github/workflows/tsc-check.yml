@@ -20,6 +20,9 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install root dependencies
+        run: npm install
+
       - name: Install dependencies
         run: npm install
         working-directory: ./app
