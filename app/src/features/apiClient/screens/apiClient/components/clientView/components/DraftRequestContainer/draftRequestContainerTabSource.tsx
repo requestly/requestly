@@ -1,6 +1,7 @@
 import PATHS from "config/constants/sub/paths";
 import { DraftRequestContainer } from "./DraftRequestContainer";
 import { BaseTabSource } from "componentsV2/Tabs/helpers/baseTabSource";
+import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 
 export class DraftRequestContainerTabSource extends BaseTabSource {
   constructor() {
@@ -12,6 +13,7 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
     };
     this.component = <DraftRequestContainer draftId={this.metadata.id} />;
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/new`;
+    this.icon = <MdOutlineSyncAlt />;
   }
 
   static create(): DraftRequestContainerTabSource {
