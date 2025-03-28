@@ -23,6 +23,10 @@ jobs:
       - name: Install root dependencies
         run: npm install
 
+      - name: Install common dependencies
+        run: npm install
+        working-directory: ./common/rule-processor
+
       - name: Build common dependencies
         run: npm run build
         working-directory: ./common/rule-processor
