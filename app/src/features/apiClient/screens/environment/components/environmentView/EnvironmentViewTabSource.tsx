@@ -2,11 +2,7 @@ import { BaseTabSource } from "componentsV2/Tabs/helpers/baseTabSource";
 import { EnvironmentView } from "./EnvironmentView";
 import PATHS from "config/constants/sub/paths";
 import { MatchedTabSource } from "componentsV2/Tabs/types";
-
-interface EnvironmentViewTabSourceMetadata {
-  id: string;
-  title: string;
-}
+import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 
 export class EnvironmentViewTabSource extends BaseTabSource {
   constructor(metadata: EnvironmentViewTabSourceMetadata) {
@@ -18,6 +14,7 @@ export class EnvironmentViewTabSource extends BaseTabSource {
       title: metadata.title,
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
+    this.icon = <MdHorizontalSplit />;
   }
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): EnvironmentViewTabSource {

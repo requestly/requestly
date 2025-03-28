@@ -2,6 +2,7 @@ import { CollectionView } from "./CollectionView";
 import PATHS from "config/constants/sub/paths";
 import { BaseTabSource } from "componentsV2/Tabs/helpers/baseTabSource";
 import { MatchedTabSource } from "componentsV2/Tabs/types";
+import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 
 interface CollectionViewTabSourceMetadata {
   id: string;
@@ -18,6 +19,7 @@ export class CollectionViewTabSource extends BaseTabSource {
       title: metadata.title,
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
+    this.icon = <MdOutlineFolder />;
   }
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): CollectionViewTabSource {
