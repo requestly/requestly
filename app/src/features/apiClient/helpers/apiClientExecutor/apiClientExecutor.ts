@@ -17,6 +17,7 @@ import {
 import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient";
 import { isMethodSupported, isOnline, isUrlProtocolValid, isUrlValid } from "./apiClientExecutorHelpers";
 import { isEmpty } from "lodash";
+import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 
 type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
@@ -179,36 +180,43 @@ export class ApiClientExecutor {
         executedEntry: { ...this.entryDetails },
         status: RQAPI.ExecutionStatus.ERROR,
         error: {
+          type: RQAPI.ApiClientErrorType.PRE_VALIDATION,
           source: "request",
           name: error.name,
           message: error.message,
         },
       };
     }
+    let preRequestScriptResult;
+    let responseScriptResult;
 
-    trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
-    const preRequestScriptResult = await this.executePreRequestScript(
-      this.internalFunctions.postScriptExecutionCallback
-    );
+    if (
+      this.entryDetails.scripts.preRequest.length &&
+      this.entryDetails.scripts.preRequest !== DEFAULT_SCRIPT_VALUES.preRequest
+    ) {
+      trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
+      preRequestScriptResult = await this.executePreRequestScript(this.internalFunctions.postScriptExecutionCallback);
 
-    if (preRequestScriptResult.type === WorkResultType.ERROR) {
-      trackScriptExecutionFailed(
-        RQAPI.ScriptType.PRE_REQUEST,
-        preRequestScriptResult.error.type,
-        preRequestScriptResult.error.message
-      );
+      if (preRequestScriptResult.type === WorkResultType.ERROR) {
+        trackScriptExecutionFailed(
+          RQAPI.ScriptType.PRE_REQUEST,
+          preRequestScriptResult.error.type,
+          preRequestScriptResult.error.message
+        );
 
-      return {
-        executedEntry: {
-          ...this.entryDetails,
-        },
-        status: RQAPI.ExecutionStatus.ERROR,
-        error: {
-          source: "Pre-request script",
-          name: preRequestScriptResult.error.name,
-          message: preRequestScriptResult.error.message,
-        },
-      };
+        return {
+          executedEntry: {
+            ...this.entryDetails,
+          },
+          status: RQAPI.ExecutionStatus.ERROR,
+          error: {
+            type: RQAPI.ApiClientErrorType.SCRIPT,
+            source: "Pre-request script",
+            name: preRequestScriptResult.error.name,
+            message: preRequestScriptResult.error.message,
+          },
+        };
+      }
     }
 
     try {
@@ -223,6 +231,7 @@ export class ApiClientExecutor {
         status: RQAPI.ExecutionStatus.ERROR,
         executedEntry: { ...this.entryDetails },
         error: {
+          type: RQAPI.ApiClientErrorType.CORE,
           source: "request",
           name: e.name,
           message: e.message,
@@ -230,31 +239,35 @@ export class ApiClientExecutor {
       };
     }
 
-    trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
-    const responseScriptResult = await this.executePostResponseScript(
-      this.internalFunctions.postScriptExecutionCallback
-    );
+    if (
+      this.entryDetails.scripts.postResponse.length &&
+      this.entryDetails.scripts.preRequest !== DEFAULT_SCRIPT_VALUES.postResponse
+    ) {
+      trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
+      responseScriptResult = await this.executePostResponseScript(this.internalFunctions.postScriptExecutionCallback);
 
-    if (responseScriptResult.type === WorkResultType.SUCCESS) {
-      trackScriptExecutionCompleted(RQAPI.ScriptType.POST_RESPONSE);
-    }
+      if (responseScriptResult.type === WorkResultType.SUCCESS) {
+        trackScriptExecutionCompleted(RQAPI.ScriptType.POST_RESPONSE);
+      }
 
-    if (responseScriptResult.type === WorkResultType.ERROR) {
-      trackScriptExecutionFailed(
-        RQAPI.ScriptType.POST_RESPONSE,
-        responseScriptResult.error.type,
-        responseScriptResult.error.message
-      );
+      if (responseScriptResult.type === WorkResultType.ERROR) {
+        trackScriptExecutionFailed(
+          RQAPI.ScriptType.POST_RESPONSE,
+          responseScriptResult.error.type,
+          responseScriptResult.error.message
+        );
 
-      return {
-        status: RQAPI.ExecutionStatus.ERROR,
-        executedEntry: this.entryDetails,
-        error: {
-          source: "Post-response script",
-          name: responseScriptResult.error.name,
-          message: responseScriptResult.error.message,
-        },
-      };
+        return {
+          status: RQAPI.ExecutionStatus.ERROR,
+          executedEntry: this.entryDetails,
+          error: {
+            type: RQAPI.ApiClientErrorType.SCRIPT,
+            source: "Post-response script",
+            name: responseScriptResult.error.name,
+            message: responseScriptResult.error.message,
+          },
+        };
+      }
     }
 
     const executionResult: RQAPI.ExecutionResult = {
@@ -262,8 +275,8 @@ export class ApiClientExecutor {
       executedEntry: {
         ...this.entryDetails,
         testResults: [
-          ...(preRequestScriptResult.testExecutionResults || []),
-          ...(responseScriptResult.testExecutionResults || []),
+          ...(preRequestScriptResult ? preRequestScriptResult.testExecutionResults : []),
+          ...(responseScriptResult ? responseScriptResult.testExecutionResults : []),
         ],
       },
     };
@@ -286,8 +299,9 @@ export class ApiClientExecutor {
       return {
         status: RQAPI.ExecutionStatus.ERROR,
         error: {
-          source: "Rerun Pre-request script",
           ...preRequestScriptResult.error,
+          source: "Rerun Pre-request script",
+          type: RQAPI.ApiClientErrorType.SCRIPT,
         },
       };
     }
@@ -298,8 +312,9 @@ export class ApiClientExecutor {
       return {
         status: RQAPI.ExecutionStatus.ERROR,
         error: {
-          source: "Rerun Pre-request script",
           ...responseScriptResult.error,
+          source: "Rerun Pre-request script",
+          type: RQAPI.ApiClientErrorType.SCRIPT,
         },
       };
     }
