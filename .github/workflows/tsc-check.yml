@@ -25,7 +25,7 @@ jobs:
 
       - name: Build common dependencies
         run: npm run build
-        working-directory: ./common
+        working-directory: ./common/rule-processor
 
       - name: Build root dependencies
         run: npm run build
