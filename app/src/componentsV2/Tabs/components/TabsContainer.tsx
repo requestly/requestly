@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Tabs, TabsProps } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
-import { updateUrlPath } from "../utils";
+import { useSetUrl } from "../tabUtils";
 import { Outlet } from "react-router-dom";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
 import "./tabsContainer.scss";
@@ -27,7 +27,9 @@ export const TabsContainer: React.FC = () => {
     state.getSourceByTabId,
   ]);
 
+  const isInitialLoadRef = useRef(true);
   const matchedTabSource = useMatchedTabSource();
+  const { setUrl } = useSetUrl();
 
   useEffect(() => {
     if (!matchedTabSource) {
@@ -41,9 +43,13 @@ export const TabsContainer: React.FC = () => {
     if (activeTabId) {
       const tabSource = getSourceByTabId(activeTabId);
       const newPath = tabSource.getUrlPath();
-      updateUrlPath(newPath);
+      setUrl(newPath, isInitialLoadRef.current);
     }
-  }, [activeTabId, getSourceByTabId]);
+
+    if (activeTabId && isInitialLoadRef.current) {
+      isInitialLoadRef.current = false;
+    }
+  }, [activeTabId, getSourceByTabId, setUrl]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     return Array.from(tabs.values()).map((tabStore) => {
