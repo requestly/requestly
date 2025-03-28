@@ -10,6 +10,7 @@ import "./moveToCollectionModal.scss";
 import { isApiCollection } from "../../../utils";
 import { head, isEmpty, omit } from "lodash";
 import { Authorization } from "../../clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import * as Sentry from "@sentry/react";
 
 interface Props {
   recordsToMove: RQAPI.Record[];
@@ -110,6 +111,10 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
     } catch (error) {
       console.error("Error moving request to collection:", error);
       toast.error(error.message || "Error moving records to collection");
+      Sentry.withScope((scope) => {
+        scope.setTag("error_type", "api_client_move_to_collection");
+        Sentry.captureException(error);
+      });
       trackMoveRequestToCollectionFailed(selectedCollection?.__isNew__ ? "new_collection" : "existing_collection");
     } finally {
       setIsLoading(false);
