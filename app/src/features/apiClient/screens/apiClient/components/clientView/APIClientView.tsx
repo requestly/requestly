@@ -139,6 +139,10 @@ const APIClientView: React.FC<Props> = ({
   const [copyAsModalOpen, setCopyAsModalOpen] = useState(false);
 
   useEffect(() => {
+    setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
+  }, [apiEntryDetails?.data]);
+
+  useEffect(() => {
     const handleResize = () => {
       const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
       toggleSheetPlacement(bottomSheetPlacement);
@@ -648,7 +652,7 @@ const APIClientView: React.FC<Props> = ({
         layout={SheetLayout.SPLIT}
         bottomSheet={
           <ApiClientBottomSheet
-            // key={apiEntryDetails?.id}
+            key={apiEntryDetails?.id}
             response={entry.response}
             testResults={testResults}
             isLoading={isLoadingResponse}
@@ -666,7 +670,7 @@ const APIClientView: React.FC<Props> = ({
       >
         <div className="api-client-body">
           <RequestTabs
-            // key={apiEntryDetails?.id}
+            key={apiEntryDetails?.id}
             requestId={apiEntryDetails?.id}
             collectionId={apiEntryDetails?.collectionId}
             requestEntry={entry}
