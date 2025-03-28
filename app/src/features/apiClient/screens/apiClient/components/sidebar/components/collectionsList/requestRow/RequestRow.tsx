@@ -158,9 +158,6 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
         />
       ) : (
         <div className="request-row">
-          {showSelection && (
-            <Checkbox onChange={recordsSelectionHandler.bind(this, record)} checked={selectedRecords.has(record.id)} />
-          )}
           <NavLink
             title={record.name || record.data.request?.url}
             to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(record.id)}`}
@@ -173,6 +170,12 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
               });
             }}
           >
+            {showSelection && (
+              <Checkbox
+                onChange={recordsSelectionHandler.bind(this, record)}
+                checked={selectedRecords.has(record.id)}
+              />
+            )}
             <Typography.Text
               strong
               className="request-method"
