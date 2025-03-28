@@ -27,9 +27,6 @@ const PricingPageFooter: React.FC = () => {
 
   return (
     <div className="pricing-page-footer">
-      <div className="banner">
-        <img className="backed-by" width={880} height={142} src={backedBy} alt="Backed by the best" />
-      </div>
       <div className="footer">
         <img
           className="mascot"
@@ -144,7 +141,7 @@ const PricingPageFooter: React.FC = () => {
                 </Link>
                 <Link href="https://requestly.com/alternatives/fiddler/">Fiddler VS Requestly</Link>
                 <Link href="https://requestly.com/alternatives/a-better-and-well-documented-alternate-to-modheader/">
-                  MohHeader VS Requestly
+                  ModHeader VS Requestly
                 </Link>
                 <Link href="https://requestly.com/alternatives/proxyman/">Proxyman VS Requestly</Link>
                 <Link href="https://requestly.com/alternatives/wireshark/">WireShark VS Requestly</Link>
@@ -190,7 +187,7 @@ const PricingPageFooter: React.FC = () => {
           </Row>
 
           <div className="socials-continer">
-            <div className="copyright">Copyright © 2024 RQ Labs, Inc. All rights reserved.</div>
+            <div className="copyright">Copyright © 2025 RQ Labs, Inc. All rights reserved.</div>
 
             <div className="socials">
               <span className="follow-us">Follow us on</span>
