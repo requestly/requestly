@@ -8,11 +8,6 @@ interface EnvironmentViewTabSourceMetadata {
   title: string;
 }
 
-interface EnvironmentViewTabSourceMetadata {
-  id: string;
-  title: string;
-}
-
 export class EnvironmentViewTabSource extends BaseTabSource {
   constructor(metadata: EnvironmentViewTabSourceMetadata) {
     super();
@@ -22,7 +17,7 @@ export class EnvironmentViewTabSource extends BaseTabSource {
       name: "environment",
       title: metadata.title,
     };
-    this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${this.metadata.id}`;
+    this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
   }
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): EnvironmentViewTabSource {
