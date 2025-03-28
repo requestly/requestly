@@ -30,6 +30,7 @@ The following domains are eligible for the student programme:
     "lakeheadu.ca",
     "estg.ipp.pt",
     "duke.edu",
-    "fau.de"
+    "fau.de",
+    "sch.gr"
   ]
 }
