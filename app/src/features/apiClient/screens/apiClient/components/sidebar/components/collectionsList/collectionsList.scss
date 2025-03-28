@@ -15,7 +15,13 @@
 
   .collection-panel.active {
     & > .ant-collapse-header {
-      background: var(--requestly-color-surface-1);
+      background: var(--requestly-color-white-t-20);
+      box-shadow: inset 2px 0px 0px 0px var(--requestly-color-primary);
+      transition: unset;
+
+      &:hover {
+        background: var(--requestly-color-white-t-20) !important;
+      }
     }
   }
 
@@ -32,8 +38,9 @@
   .collections-list-content {
     overflow: auto;
 
-    .collections-list-item + .collections-list-item {
-      margin-top: 4px;
+    .collections-list {
+      display: flex;
+      flex-direction: column;
     }
 
     .ant-collapse-expand-icon {
@@ -46,7 +53,6 @@
     }
 
     .ant-checkbox-wrapper {
-      margin-right: 2px;
       .ant-checkbox-input {
         width: 12px;
         height: 12px;
@@ -78,7 +84,7 @@
     }
 
     .empty-state-wrapper {
-      margin-bottom: 4px;
+      margin: 2px 0;
     }
 
     .collections-list-item {
@@ -88,11 +94,21 @@
       cursor: pointer;
       padding: 2px 6px;
       border-radius: 4px;
-      color: var(--requestly-color-text-subtle);
       font-size: var(--requestly-font-size-sm, 13px);
-      min-height: 28px;
+      min-height: 26px;
+      margin-top: 2px;
 
       &.api {
+        height: 26px;
+        padding: var(--space-2, 4px);
+
+        .ant-checkbox-wrapper {
+          margin-left: 2px;
+          .ant-checkbox {
+            top: unset;
+          }
+        }
+
         .request-method {
           flex-shrink: 0;
           font-size: 8px;
@@ -132,6 +148,15 @@
           visibility: visible;
           opacity: 1;
         }
+
+        &:hover {
+          background: var(--requestly-color-white-t-10);
+        }
+
+        &.active {
+          background: var(--requestly-color-white-t-20);
+          box-shadow: inset 2px 0px 0px 0px var(--requestly-color-primary);
+        }
       }
 
       &.collection.ant-collapse {
@@ -146,7 +171,8 @@
         width: 100%;
 
         .ant-collapse-header {
-          min-height: 28px;
+          height: 26px;
+          color: var(--requestly-color-text-default);
         }
 
         &.ant-collapse-item-active {
@@ -169,7 +195,7 @@
           }
 
           &:hover {
-            background: var(--requestly-color-surface-1);
+            background: var(--requestly-color-white-t-10);
           }
 
           .ant-collapse-expand-icon {
