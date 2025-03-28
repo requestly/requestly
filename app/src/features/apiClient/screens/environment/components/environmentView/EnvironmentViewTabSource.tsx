@@ -4,6 +4,11 @@ import PATHS from "config/constants/sub/paths";
 import { MatchedTabSource } from "componentsV2/Tabs/types";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 
+interface EnvironmentViewTabSourceMetadata {
+  id: string;
+  title: string;
+}
+
 export class EnvironmentViewTabSource extends BaseTabSource {
   constructor(metadata: EnvironmentViewTabSourceMetadata) {
     super();
