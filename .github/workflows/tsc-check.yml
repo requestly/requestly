@@ -23,6 +23,13 @@ jobs:
       - name: Install root dependencies
         run: npm install
 
+      - name: Build common dependencies
+        run: npm run build
+        working-directory: ./common
+
+      - name: Build root dependencies
+        run: npm run build
+
       - name: Install shared dependencies
         run: npm install
         working-directory: ./shared
