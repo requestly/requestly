@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Tabs, TabsProps } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
@@ -27,6 +27,7 @@ export const TabsContainer: React.FC = () => {
     state.getSourceByTabId,
   ]);
 
+  const isInitialLoadRef = useRef(true);
   const matchedTabSource = useMatchedTabSource();
 
   useEffect(() => {
@@ -41,7 +42,11 @@ export const TabsContainer: React.FC = () => {
     if (activeTabId) {
       const tabSource = getSourceByTabId(activeTabId);
       const newPath = tabSource.getUrlPath();
-      updateUrlPath(newPath);
+      updateUrlPath(newPath, isInitialLoadRef.current);
+    }
+
+    if (activeTabId && isInitialLoadRef.current) {
+      // isInitialLoadRef.current = false;
     }
   }, [activeTabId, getSourceByTabId]);
 

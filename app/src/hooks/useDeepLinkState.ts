@@ -20,8 +20,11 @@ export const useDeepLinkState = <T = Record<string, string>>(
         Object.entries(updatedParams).forEach(([key, value]) => {
           newParams.set(key, value);
         });
-
-        setSearchParams(newParams, { replace: true });
+        // Preserve the existing pathname
+        setSearchParams(newParams, {
+          replace: true,
+          state: { path: window.location.pathname },
+        });
       } catch (error) {
         // NOOP
       }

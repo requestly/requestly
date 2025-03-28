@@ -164,7 +164,6 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
             title={record.name || record.data.request?.url}
             className={`collections-list-item api`}
             onClick={() => {
-              console.log("clicked!!!");
               openTab(
                 new RequestViewTabSource({
                   id: record.id,
