@@ -165,14 +165,6 @@ const RequestTabs: React.FC<Props> = ({
       activeKey={selectedTab.tab}
       onChange={(tab: RequestTab) => {
         setSelectedTab({ tab: tab });
-
-        if (!requestId) {
-          return;
-        }
-
-        // updateTab(requestId, {
-        //   url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}?tab=${tab}`,
-        // });
       }}
       items={tabItems}
       size="small"
