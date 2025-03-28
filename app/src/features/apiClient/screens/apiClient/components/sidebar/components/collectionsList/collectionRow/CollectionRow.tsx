@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Checkbox, Collapse, Dropdown, MenuProps, Tooltip } from "antd";
 import { RQAPI } from "features/apiClient/types";
@@ -53,9 +53,18 @@ export const CollectionRow: React.FC<Props> = ({
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
-  const { collectionId } = useParams();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
   const openTab = useTabServiceStore().use.openTab();
+  const activeTabId = useTabServiceStore().use.activeTabId();
+  const getSourceByTabId = useTabServiceStore().use.getSourceByTabId();
+
+  const activeTabSourceId = useMemo(() => {
+    if (activeTabId) {
+      const source = getSourceByTabId(activeTabId);
+      return source.getSourceId();
+    }
+  }, [activeTabId, getSourceByTabId]);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);
@@ -178,7 +187,7 @@ export const CollectionRow: React.FC<Props> = ({
           }}
         >
           <Collapse.Panel
-            className={`collection-panel ${record.id === collectionId ? "active" : ""}`}
+            className={`collection-panel ${record.id === activeTabSourceId ? "active" : ""}`}
             key={record.id}
             header={
               <div
