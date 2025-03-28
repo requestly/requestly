@@ -6,6 +6,8 @@ import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 import { useSetUrl } from "../tabUtils";
 import { Outlet } from "react-router-dom";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
+import { RQButton } from "lib/design-system-v2/components";
+import { MdClose } from "@react-icons/all-files/md/MdClose";
 import "./tabsContainer.scss";
 
 export const TabsContainer: React.FC = () => {
@@ -56,9 +58,39 @@ export const TabsContainer: React.FC = () => {
       const tabState = tabStore.getState();
       return {
         key: tabState.id.toString(),
-        label: tabState.title,
+        closable: false,
+        label: (
+          <div
+            title={tabState.title}
+            className="tab-title-container"
+            onDoubleClick={() => {
+              if (tabState.preview) {
+                tabState.setPreview(false);
+                console.log("toggle preview!!!");
+              }
+            }}
+          >
+            <div className="tab-title">
+              {<div className="icon">{tabState.source.getIcon()}</div>}
+              <div className="title">{tabState.preview ? <i>{tabState.title}</i> : tabState.title}</div>
+            </div>
+
+            <div className="tab-actions">
+              <RQButton
+                size="small"
+                type="transparent"
+                className="tab-close-button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeTabById(tabState.id);
+                }}
+                icon={<MdClose />}
+              />
+              {/* {tab.hasUnsavedChanges ? <div className="unsaved-changes-indicator" /> : null} */}
+            </div>
+          </div>
+        ),
         children: <TabItem store={tabStore}>{tabState.source.render()}</TabItem>,
-        closable: true,
       };
     });
     // We need _version in the dependency array
