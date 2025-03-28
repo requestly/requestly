@@ -88,7 +88,7 @@ export const TabsContainer: React.FC = () => {
                 }}
                 icon={<MdClose />}
               />
-              {/* {tab.hasUnsavedChanges ? <div className="unsaved-changes-indicator" /> : null} */}
+              {tabState.saved ? <div className="unsaved-changes-indicator" /> : null}
             </div>
           </div>
         ),

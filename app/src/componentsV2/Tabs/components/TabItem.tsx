@@ -19,6 +19,11 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
           props.store.getState().setPreview(preview);
           incrementVersion();
         },
+
+        setSaved: (saved: boolean) => {
+          props.store.getState().setSaved(saved);
+          incrementVersion();
+        },
       }}
     >
       {props.children}
