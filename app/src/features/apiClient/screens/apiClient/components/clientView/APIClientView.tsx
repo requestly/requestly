@@ -42,12 +42,12 @@ import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { useLocation } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
 import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
+import { useGenericState } from "hooks/useGenericState";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -74,7 +74,12 @@ type EditModeProps = BaseProps & {
   apiEntryDetails: RQAPI.ApiRecord;
 };
 
-type Props = CreateModeProps | EditModeProps;
+type HistoryModeProps = BaseProps & {
+  isCreateMode: false;
+  apiEntryDetails: RQAPI.ApiRecord;
+};
+
+type Props = CreateModeProps | EditModeProps | HistoryModeProps;
 
 const APIClientView: React.FC<Props> = ({
   isCreateMode,
@@ -114,9 +119,7 @@ const APIClientView: React.FC<Props> = ({
   ]);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
-  const [entry, setEntry] = useState<RQAPI.Entry>(
-    !apiEntryDetails?.data && isCreateMode ? getEmptyAPIEntry() : apiEntryDetails.data
-  );
+  const [entry, setEntry] = useState<RQAPI.Entry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.ExecutionError>(null);
   const [warning, setWarning] = useState<RQAPI.ExecutionWarning>(null);
@@ -124,17 +127,18 @@ const APIClientView: React.FC<Props> = ({
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
+  const { setPreview, setSaved } = useGenericState();
 
-  // const requestId = apiEntryDetails?.id;
-
-  // const abortControllerRef = useRef<AbortController>(null);
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse));
-  // const { updateTab, activeTab } = useTabsLayoutContext();
 
   const [copyAsModalOpen, setCopyAsModalOpen] = useState(false);
+
+  useEffect(() => {
+    setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
+  }, [apiEntryDetails?.data]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -149,19 +153,13 @@ const APIClientView: React.FC<Props> = ({
     };
   }, [toggleSheetPlacement]);
 
-  // useEffect(() => {
-  //   const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
+  useEffect(() => {
+    setSaved(hasUnsavedChanges);
 
-  //   updateTab(tabId, { hasUnsavedChanges: hasUnsavedChanges });
-  // }, [updateTab, isCreateMode, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
-
-  // useEffect(() => {
-  //   const tabId = apiEntryDetails?.id;
-
-  //   if (activeTab?.id === tabId && hasUnsavedChanges) {
-  //     updateTab(tabId, { isPreview: false });
-  //   }
-  // }, [updateTab, activeTab?.id, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
+    if (hasUnsavedChanges) {
+      setPreview(false);
+    }
+  }, [setSaved, setPreview, hasUnsavedChanges]);
 
   useEffect(() => {
     if (entry) {
@@ -524,7 +522,7 @@ const APIClientView: React.FC<Props> = ({
   ]);
 
   const handleRevertChanges = () => {
-    setEntry(apiEntry);
+    setEntry(apiEntryDetails?.data);
   };
 
   return isExtensionEnabled ? (
@@ -646,7 +644,7 @@ const APIClientView: React.FC<Props> = ({
         layout={SheetLayout.SPLIT}
         bottomSheet={
           <ApiClientBottomSheet
-            // key={apiEntryDetails?.id}
+            key={apiEntryDetails?.id}
             response={entry.response}
             testResults={testResults}
             isLoading={isLoadingResponse}
@@ -664,7 +662,7 @@ const APIClientView: React.FC<Props> = ({
       >
         <div className="api-client-body">
           <RequestTabs
-            // key={apiEntryDetails?.id}
+            key={apiEntryDetails?.id}
             requestId={apiEntryDetails?.id}
             collectionId={apiEntryDetails?.collectionId}
             requestEntry={entry}

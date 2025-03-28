@@ -119,16 +119,16 @@
           visibility: hidden;
           opacity: 0;
           transition: opacity 0.3s;
-
-          &:hover,
-          &.active {
-            background: var(--requestly-color-surface-1);
-            visibility: visible;
-            opacity: 1;
-          }
         }
 
         &:hover .request-options {
+          visibility: visible;
+          opacity: 1;
+        }
+
+        &:hover,
+        &.active {
+          background: var(--requestly-color-surface-1);
           visibility: visible;
           opacity: 1;
         }

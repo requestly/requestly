@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 import { BulkActions, RQAPI } from "features/apiClient/types";
 import { Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -15,8 +15,6 @@ import {
   processRecordsForDuplication,
 } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
-import PATHS from "config/constants/sub/paths";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { sessionStorage } from "utils/sessionStorage";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
@@ -36,13 +34,9 @@ interface Props {
 }
 
 export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated }) => {
-  const navigate = useNavigate();
   const { collectionId, requestId } = useParams();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-
-  const location = useLocation();
-  const { openTab, tabs } = useTabsLayoutContext();
   const {
     isLoadingApiClientRecords,
     apiClientRecords,
@@ -232,39 +226,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   );
 
   useEffect(() => {
-    if (isLoadingApiClientRecords) {
-      return;
-    }
-
-    if (tabs.length === 0) {
-      navigate(PATHS.API_CLIENT.ABSOLUTE);
-    }
-  }, [tabs.length, navigate, isLoadingApiClientRecords]);
-
-  const hasOpenedDefaultTab = useRef(false);
-
-  useEffect(() => {
-    if (location.pathname === PATHS.API_CLIENT.ABSOLUTE) {
-      // TODO: Improve logic
-      hasOpenedDefaultTab.current = false;
-    }
-
-    if (isLoadingApiClientRecords) {
-      return;
-    }
-
-    if (hasOpenedDefaultTab.current) {
-      return;
-    }
-
-    hasOpenedDefaultTab.current = true;
-
-    if (tabs.length > 0) {
-      return;
-    }
-  }, [updatedRecords.requests, isLoadingApiClientRecords, openTab, location.pathname, tabs.length]);
-
-  useEffect(() => {
     const id = requestId || collectionId;
     setExpandedRecordIds((prev: RQAPI.Record["id"][]) =>
       union(prev, getRecordIdsToBeExpanded(id, prev, apiClientRecords))
@@ -288,7 +249,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                 return (
                   <CollectionRow
                     isReadOnly={!isValidPermission}
-                    openTab={openTab}
                     key={record.id}
                     record={record}
                     onNewClick={onNewClick}
@@ -312,7 +272,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                   <RequestRow
                     key={record.id}
                     record={record}
-                    openTab={openTab}
                     isReadOnly={!isValidPermission}
                     bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />

@@ -8,7 +8,11 @@ type TabId = number;
 type SourceName = string;
 type SourceId = string;
 type SourceMap = Map<SourceId, TabId>;
-type TabServiceState = {
+type TabConfig = {
+  preview: boolean;
+};
+
+export type TabServiceState = {
   tabIdSequence: TabId;
   activeTabId: TabId;
   tabsIndex: Map<SourceName, SourceMap>; // Type: SourceName -> sourceId -> tabId eg: Request -> [requestId,tabId]
@@ -16,7 +20,8 @@ type TabServiceState = {
 
   _version: number;
 
-  openTab: (source: AbstractTabSource) => void;
+  _registerTab: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
+  openTab: (source: AbstractTabSource, config?: TabConfig) => void;
   closeTab: (source: AbstractTabSource) => void;
   closeAllTabs: () => void;
   closeTabById: (tabId: TabId) => void;
@@ -24,6 +29,7 @@ type TabServiceState = {
   _generateNewTabId: () => TabId;
   incrementVersion: () => void;
   getSourceByTabId: (tabId: TabId) => AbstractTabSource;
+  getTabIdBySourceId: (sourceId: SourceId) => TabId;
 };
 
 const createTabServiceStore = () => {
@@ -35,10 +41,39 @@ const createTabServiceStore = () => {
 
     _version: 0,
 
-    openTab(source) {
-      const { _generateNewTabId, tabsIndex, tabs, setActiveTabId } = get();
+    _registerTab(tabId, source, config) {
+      const { tabsIndex, tabs, setActiveTabId } = get();
       const sourceId = source.getSourceId();
       const sourceName = source.getSourceName();
+      const tab = createTabStore(tabId, source, source.getDefaultTitle(), config?.preview);
+
+      if (tabsIndex.has(sourceName)) {
+        tabsIndex.get(sourceName)?.set(sourceId, tabId);
+      } else {
+        tabsIndex.set(sourceName, new Map().set(sourceId, tabId));
+      }
+
+      tabs.set(tabId, tab);
+      setActiveTabId(tabId);
+
+      set({
+        tabs: new Map(tabs),
+        activeTabId: tabId,
+      });
+    },
+
+    openTab(source, config) {
+      const { _generateNewTabId, tabsIndex, tabs, setActiveTabId, _registerTab } = get();
+      const sourceId = source.getSourceId();
+      const sourceName = source.getSourceName();
+
+      if (config?.preview) {
+        const previousPreviewTab = Array.from(tabs.values()).find((tab) => tab.getState().preview);
+        const tabId = previousPreviewTab ? previousPreviewTab.getState().id : _generateNewTabId();
+
+        _registerTab(tabId, source, config);
+        return;
+      }
 
       const existingTabId = tabsIndex.get(sourceName)?.get(sourceId);
       if (existingTabId) {
@@ -47,20 +82,7 @@ const createTabServiceStore = () => {
       }
 
       const newTabId = _generateNewTabId();
-      const tab = createTabStore(newTabId, source, source.getDefaultTitle());
-
-      if (tabsIndex.has(sourceName)) {
-        tabsIndex.get(sourceName)?.set(sourceId, newTabId);
-      } else {
-        tabsIndex.set(sourceName, new Map().set(sourceId, newTabId));
-      }
-      tabs.set(newTabId, tab);
-      setActiveTabId(newTabId);
-
-      set({
-        tabs: new Map(tabs),
-        activeTabId: newTabId,
-      });
+      _registerTab(newTabId, source);
     },
 
     closeTab(source) {
@@ -93,6 +115,16 @@ const createTabServiceStore = () => {
       const tabState = tabStore.getState();
       const sourceName = tabState.source.getSourceName();
       const sourceId = tabState.source.getSourceId();
+
+      if (tabState.saved) {
+        // TODO: update alert message for RBAC viewer role
+        const result = window.confirm("Discard changes? Changes you made will not be saved.");
+
+        if (!result) {
+          return;
+        }
+      }
+
       tabsIndex.get(sourceName)?.delete(sourceId);
 
       if (tabsIndex.get(sourceName)?.size === 0) {
@@ -144,6 +176,16 @@ const createTabServiceStore = () => {
         throw new Error(`Tab with id ${tabId} not found`);
       }
       return tab.getState().source;
+    },
+
+    getTabIdBySourceId(sourceId: SourceId): TabId {
+      const { tabs } = get();
+      for (const [id, tab] of tabs) {
+        if (tab.getState().source.getSourceId() === sourceId) {
+          return id;
+        }
+      }
+      return null;
     },
   }));
 };

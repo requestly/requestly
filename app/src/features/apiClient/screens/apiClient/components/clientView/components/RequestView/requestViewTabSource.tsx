@@ -3,6 +3,7 @@ import PATHS from "config/constants/sub/paths";
 import { RequestView } from "./RequestView";
 import { RQAPI } from "features/apiClient/types";
 import { MatchedTabSource } from "componentsV2/Tabs/types";
+import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 
 interface RequestViewTabSourceMetadata {
   apiEntryDetails?: RQAPI.ApiRecord;
@@ -19,18 +20,9 @@ export class RequestViewTabSource extends BaseTabSource {
       name: "request",
       title: metadata.title,
     };
-    this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${this.metadata.id}`;
+    this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
+    this.icon = <MdOutlineSyncAlt />;
   }
-
-  // static create(matchedPath: MatchedTabSource["matchedPath"]): CollectionViewTabSource {
-  //   const { collectionId } = matchedPath.params;
-
-  //   if (!collectionId) {
-  //     throw new Error("Collection id not found!");
-  //   }
-
-  //   return new CollectionViewTabSource({ id: collectionId, title: "Collection" });
-  // }
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): RequestViewTabSource {
     const { requestId } = matchedPath.params;

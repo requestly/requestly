@@ -9,6 +9,7 @@ import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
+import { useGenericState } from "hooks/useGenericState";
 import "./collectionsVariablesView.scss";
 
 interface CollectionsVariablesViewProps {
@@ -23,7 +24,16 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
+  const { setPreview, setSaved } = useGenericState();
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
+
+  useEffect(() => {
+    setSaved(hasUnsavedChanges);
+
+    if (hasUnsavedChanges) {
+      setPreview(false);
+    }
+  }, [setSaved, setPreview, hasUnsavedChanges]);
 
   useEffect(() => {
     updateTab(collection.id, { hasUnsavedChanges: hasUnsavedChanges });
