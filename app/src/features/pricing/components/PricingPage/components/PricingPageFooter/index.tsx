@@ -3,7 +3,6 @@ import { Row, Col, Typography, Space, Button } from "antd";
 import { EVENTS, trackAddToChromeClicked, trackRequestDocumentClicked } from "./analytics";
 import RequestDocsModal from "./RequestDocsModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
-// import backedBy from "assets/icons/backed-by.webp";
 import LINKS from "config/constants/sub/links";
 import "./PricingPageFooter.scss";
 
