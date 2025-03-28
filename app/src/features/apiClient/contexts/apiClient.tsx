@@ -10,7 +10,6 @@ import {
   trackImportCurlClicked,
   trackNewCollectionClicked,
   trackNewRequestClicked,
-  trackNewTabOpened,
 } from "modules/analytics/events/features/apiClient";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
@@ -146,7 +145,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const debouncedTrackUserProperties = debounce(() => trackUserProperties(apiClientRecords), 1000);
 
-  const { deleteTabs, updateTab, updateAddTabBtnCallback } = useTabsLayoutContext();
+  const { deleteTabs, updateTab } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
 
   const { apiClientRecordsRepository } = useGetApiClientSyncRepo();
@@ -161,17 +160,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       setApiClientRecords([]);
     }
   }, [user.loggedIn]);
-
-  useEffect(() => {
-    if (!user.loggedIn) {
-      return;
-    }
-
-    updateAddTabBtnCallback(() => {
-      trackNewTabOpened();
-      openDraftRequest();
-    });
-  }, [user.loggedIn, updateAddTabBtnCallback, openDraftRequest]);
 
   // TODO: Create modal context
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
