@@ -521,7 +521,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
         />
         <div className="api-client-header-container__header">
           <div className="api-client-breadcrumb-container">
-            {user.loggedIn && !openInModal ? (
+            <Conditional condition={user.loggedIn && !openInModal}>
               <RQBreadcrumb
                 placeholder="New Request"
                 recordName={apiEntryDetails?.name}
@@ -530,7 +530,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
                 // Auto focus breadcrumb input when a new record is created
                 autoFocus={location.search.includes("new")}
               />
-            ) : null}
+            </Conditional>
+
             <RQButton
               type="transparent"
               icon={<IoMdCode />}

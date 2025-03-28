@@ -21,6 +21,7 @@ type ClientId = ReturnType<typeof availableTargets>[number]["clients"][number]["
 export const ApiClientSnippetModal = ({ apiRequest, onClose, open }: ApiClientSnippetModalProps) => {
   const [harRequest, setHarRequest] = useState<HarRequest>();
   const [snippetTypeId, setSnippetTypeId] = useState<string>("shell-curl");
+
   useEffect(() => {
     if (!apiRequest) {
       return;
