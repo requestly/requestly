@@ -3,7 +3,6 @@ import { useTabsLayoutContext } from "layouts/TabsLayout/contexts";
 import { Tabs, TabsProps } from "antd";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { RQButton } from "lib/design-system-v2/components";
-import { unstable_useBlocker } from "react-router-dom";
 import { getTabIconFromUrl } from "./utils";
 import "./tabsLayoutContent.scss";
 
@@ -13,25 +12,6 @@ interface Props {
 
 export const TabsLayoutContent: React.FC<Props> = ({ Outlet }) => {
   const { tabs, activeTab, switchToTab, closeTab, updateTab, onTabsEdit } = useTabsLayoutContext();
-
-  const hasUnsavedChanges = tabs.some((tab) => tab.hasUnsavedChanges);
-
-  unstable_useBlocker(({ nextLocation }) => {
-    const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
-    const shouldBlock = !isNextLocationApiClientView && hasUnsavedChanges;
-
-    if (isNextLocationApiClientView) {
-      return false;
-    }
-
-    if (shouldBlock) {
-      const shouldDiscardChanges = window.confirm("Discard changes? Changes you made will not be saved.");
-      const blockNavigation = !shouldDiscardChanges;
-      return blockNavigation;
-    }
-
-    return false;
-  });
 
   const items: TabsProps["items"] = tabs.map((tab) => {
     const tabIcon = getTabIconFromUrl(tab.url);

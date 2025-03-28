@@ -115,6 +115,16 @@ const createTabServiceStore = () => {
       const tabState = tabStore.getState();
       const sourceName = tabState.source.getSourceName();
       const sourceId = tabState.source.getSourceId();
+
+      if (tabState.saved) {
+        // TODO: update alert message for RBAC viewer role
+        const result = window.confirm("Discard changes? Changes you made will not be saved.");
+
+        if (!result) {
+          return;
+        }
+      }
+
       tabsIndex.get(sourceName)?.delete(sourceId);
 
       if (tabsIndex.get(sourceName)?.size === 0) {
