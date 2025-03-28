@@ -3,7 +3,7 @@ import { Row, Col, Typography, Space, Button } from "antd";
 import { EVENTS, trackAddToChromeClicked, trackRequestDocumentClicked } from "./analytics";
 import RequestDocsModal from "./RequestDocsModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import backedBy from "assets/icons/backed-by.webp";
+// import backedBy from "assets/icons/backed-by.webp";
 import LINKS from "config/constants/sub/links";
 import "./PricingPageFooter.scss";
 
@@ -28,7 +28,7 @@ const PricingPageFooter: React.FC = () => {
   return (
     <div className="pricing-page-footer">
       <div className="banner">
-        <img className="backed-by" width={880} height={142} src={backedBy} alt="Backed by the best" />
+        {/* <img className="backed-by" width={880} height={142} src={backedBy} alt="Backed by the best" /> */}
       </div>
       <div className="footer">
         <img
