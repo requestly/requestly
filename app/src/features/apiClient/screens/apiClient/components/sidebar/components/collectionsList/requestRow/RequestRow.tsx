@@ -45,7 +45,17 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
     apiClientRecordsRepository,
   } = useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
   const openTab = useTabServiceStore().use.openTab();
+  const activeTabId = useTabServiceStore().use.activeTabId();
+  const getSourceByTabId = useTabServiceStore().use.getSourceByTabId();
+
+  const activeTabSourceId = useMemo(() => {
+    if (activeTabId) {
+      const source = getSourceByTabId(activeTabId);
+      return source.getSourceId();
+    }
+  }, [activeTabId, getSourceByTabId]);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);
@@ -156,15 +166,14 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
           }}
         />
       ) : (
-        <div className="request-row">
+        <div className={`request-row`}>
           {showSelection && (
             <Checkbox onChange={recordsSelectionHandler.bind(this, record)} checked={selectedRecords.has(record.id)} />
           )}
           <div
             title={record.name || record.data.request?.url}
-            className={`collections-list-item api`}
+            className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""}`}
             onClick={() => {
-              console.log("clicked!!!");
               openTab(
                 new RequestViewTabSource({
                   id: record.id,
