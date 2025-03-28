@@ -372,8 +372,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.name = requestName;
     }
 
-    console.log("kkkk", apiEntryDetails, record);
-
     const result = isCreateMode
       ? await apiClientRecordsRepository.createRecordWithId(record, requestId)
       : await apiClientRecordsRepository.updateRecord(record, record.id);

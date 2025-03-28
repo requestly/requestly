@@ -21,6 +21,7 @@ import {
   trackImportParseFailed,
   trackImportSuccess,
 } from "modules/analytics/events/features/apiClient";
+import * as Sentry from "@sentry/react";
 
 interface BrunoImporterProps {
   onSuccess?: () => void;
@@ -121,6 +122,11 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
           trackImportParseFailed(ApiClientImporterType.BRUNO, error.message);
           setImportError(error.message);
           setProcessingStatus("idle");
+
+          Sentry.withScope((scope) => {
+            scope.setTag("error_type", "api_client_bruno_processing");
+            Sentry.captureException(error);
+          });
         });
     },
     [apiClientRecordsRepository]
@@ -244,6 +250,10 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
         Logger.error("Bruno data import failed:", error);
         setImportError("Something went wrong! Couldn't import Bruno data");
         trackImportFailed(ApiClientImporterType.BRUNO, JSON.stringify(error));
+        Sentry.withScope((scope) => {
+          scope.setTag("error_type", "api_client_bruno_import");
+          Sentry.captureException(error);
+        });
       })
       .finally(() => {
         setIsImporting(false);
