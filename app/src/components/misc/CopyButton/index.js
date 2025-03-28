@@ -1,6 +1,6 @@
 import { CheckCircleFilled, CopyOutlined } from "@ant-design/icons";
 import { Tooltip } from "antd";
-import { RQButton } from "lib/design-system/components";
+import { RQButton } from "lib/design-system-v2/components";
 import { useState } from "react";
 
 const CopyButton = ({
