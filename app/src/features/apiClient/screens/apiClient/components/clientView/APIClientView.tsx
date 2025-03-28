@@ -47,6 +47,7 @@ import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
+import { useGenericState } from "hooks/useGenericState";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -126,15 +127,12 @@ const APIClientView: React.FC<Props> = ({
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
+  const { setPreview } = useGenericState();
 
-  // const requestId = apiEntryDetails?.id;
-
-  // const abortControllerRef = useRef<AbortController>(null);
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse));
-  // const { updateTab, activeTab } = useTabsLayoutContext();
 
   const [copyAsModalOpen, setCopyAsModalOpen] = useState(false);
 
@@ -155,19 +153,11 @@ const APIClientView: React.FC<Props> = ({
     };
   }, [toggleSheetPlacement]);
 
-  // useEffect(() => {
-  //   const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
-
-  //   updateTab(tabId, { hasUnsavedChanges: hasUnsavedChanges });
-  // }, [updateTab, isCreateMode, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
-
-  // useEffect(() => {
-  //   const tabId = apiEntryDetails?.id;
-
-  //   if (activeTab?.id === tabId && hasUnsavedChanges) {
-  //     updateTab(tabId, { isPreview: false });
-  //   }
-  // }, [updateTab, activeTab?.id, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
+  useEffect(() => {
+    if (hasUnsavedChanges) {
+      setPreview(false);
+    }
+  }, [setPreview, hasUnsavedChanges]);
 
   useEffect(() => {
     if (entry) {
