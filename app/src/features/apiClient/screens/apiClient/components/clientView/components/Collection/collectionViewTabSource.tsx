@@ -17,7 +17,7 @@ export class CollectionViewTabSource extends BaseTabSource {
       name: "collection",
       title: metadata.title,
     };
-    this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${this.metadata.id}`;
+    this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
   }
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): CollectionViewTabSource {
