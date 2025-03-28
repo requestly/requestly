@@ -179,7 +179,8 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
                   id: record.id,
                   apiEntryDetails: record,
                   title: record.name || record.data.request?.url,
-                })
+                }),
+                { preview: true }
               );
             }}
           >

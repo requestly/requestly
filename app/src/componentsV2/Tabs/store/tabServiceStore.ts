@@ -8,6 +8,10 @@ type TabId = number;
 type SourceName = string;
 type SourceId = string;
 type SourceMap = Map<SourceId, TabId>;
+type TabConfig = {
+  preview: boolean;
+};
+
 export type TabServiceState = {
   tabIdSequence: TabId;
   activeTabId: TabId;
@@ -16,7 +20,8 @@ export type TabServiceState = {
 
   _version: number;
 
-  openTab: (source: AbstractTabSource) => void;
+  _registerTab: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
+  openTab: (source: AbstractTabSource, config?: TabConfig) => void;
   closeTab: (source: AbstractTabSource) => void;
   closeAllTabs: () => void;
   closeTabById: (tabId: TabId) => void;
@@ -36,10 +41,39 @@ const createTabServiceStore = () => {
 
     _version: 0,
 
-    openTab(source) {
-      const { _generateNewTabId, tabsIndex, tabs, setActiveTabId } = get();
+    _registerTab(tabId, source, config) {
+      const { tabsIndex, tabs, setActiveTabId } = get();
       const sourceId = source.getSourceId();
       const sourceName = source.getSourceName();
+      const tab = createTabStore(tabId, source, source.getDefaultTitle(), config?.preview);
+
+      if (tabsIndex.has(sourceName)) {
+        tabsIndex.get(sourceName)?.set(sourceId, tabId);
+      } else {
+        tabsIndex.set(sourceName, new Map().set(sourceId, tabId));
+      }
+
+      tabs.set(tabId, tab);
+      setActiveTabId(tabId);
+
+      set({
+        tabs: new Map(tabs),
+        activeTabId: tabId,
+      });
+    },
+
+    openTab(source, config) {
+      const { _generateNewTabId, tabsIndex, tabs, setActiveTabId, _registerTab } = get();
+      const sourceId = source.getSourceId();
+      const sourceName = source.getSourceName();
+
+      if (config?.preview) {
+        const previousPreviewTab = Array.from(tabs.values()).find((tab) => tab.getState().preview);
+        const tabId = previousPreviewTab ? previousPreviewTab.getState().id : _generateNewTabId();
+
+        _registerTab(tabId, source, config);
+        return;
+      }
 
       const existingTabId = tabsIndex.get(sourceName)?.get(sourceId);
       if (existingTabId) {
@@ -48,20 +82,7 @@ const createTabServiceStore = () => {
       }
 
       const newTabId = _generateNewTabId();
-      const tab = createTabStore(newTabId, source, source.getDefaultTitle());
-
-      if (tabsIndex.has(sourceName)) {
-        tabsIndex.get(sourceName)?.set(sourceId, newTabId);
-      } else {
-        tabsIndex.set(sourceName, new Map().set(sourceId, newTabId));
-      }
-      tabs.set(newTabId, tab);
-      setActiveTabId(newTabId);
-
-      set({
-        tabs: new Map(tabs),
-        activeTabId: newTabId,
-      });
+      _registerTab(newTabId, source);
     },
 
     closeTab(source) {
