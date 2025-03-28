@@ -1,4 +1,4 @@
-name: typescript type check
+name: typescript compiler
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   type_check:
-    name: Run tsc in app
+    name: Run tsc
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +21,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install:clean
+        run: npm install
         working-directory: ./app
 
       - name: Run type check in app
