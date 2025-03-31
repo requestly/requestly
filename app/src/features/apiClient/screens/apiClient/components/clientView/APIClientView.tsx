@@ -136,6 +136,10 @@ const APIClientView: React.FC<Props> = ({
 
   const [copyAsModalOpen, setCopyAsModalOpen] = useState(false);
 
+  useEffect(() => {
+    setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
+  }, [apiEntryDetails?.data]);
+
   useLayoutEffect(() => {
     const handleResize = () => {
       const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
