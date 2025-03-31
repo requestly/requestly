@@ -146,6 +146,8 @@ const APIClientView: React.FC<Props> = ({
       toggleSheetPlacement(bottomSheetPlacement);
     };
 
+    handleResize();
+
     window.addEventListener("resize", handleResize);
 
     return () => {
@@ -154,12 +156,10 @@ const APIClientView: React.FC<Props> = ({
   }, [toggleSheetPlacement]);
 
   useEffect(() => {
-    setSaved(hasUnsavedChanges);
-
     if (hasUnsavedChanges) {
       setPreview(false);
     }
-  }, [setSaved, setPreview, hasUnsavedChanges]);
+  }, [setPreview, hasUnsavedChanges]);
 
   useEffect(() => {
     if (entry) {
