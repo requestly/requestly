@@ -1,5 +1,5 @@
 import { Dropdown, Row, Select, Space } from "antd";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
 import { QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
@@ -136,11 +136,7 @@ const APIClientView: React.FC<Props> = ({
 
   const [copyAsModalOpen, setCopyAsModalOpen] = useState(false);
 
-  useEffect(() => {
-    setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
-  }, [apiEntryDetails?.data]);
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     const handleResize = () => {
       const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
       toggleSheetPlacement(bottomSheetPlacement);
@@ -154,6 +150,10 @@ const APIClientView: React.FC<Props> = ({
       window.removeEventListener("resize", handleResize);
     };
   }, [toggleSheetPlacement]);
+
+  useLayoutEffect(() => {
+    setSaved(hasUnsavedChanges);
+  }, [setSaved, hasUnsavedChanges]);
 
   useEffect(() => {
     if (hasUnsavedChanges) {
