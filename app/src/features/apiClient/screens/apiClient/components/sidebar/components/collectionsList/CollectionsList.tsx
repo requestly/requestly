@@ -27,8 +27,9 @@ import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExpor
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";
-import { firebaseBatchWrite } from "backend/utils";
+import { ErrorFilesList } from "../ErrorFilesList/ErrorFileslist";
 import { useRBAC } from "features/rbac";
+import * as Sentry from "@sentry/react";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -47,10 +48,12 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     isLoadingApiClientRecords,
     apiClientRecords,
     isRecordBeingCreated,
+    errorFiles,
     setIsDeleteModalOpen,
     updateRecordsToBeDeleted,
     onSaveRecord,
     onSaveBulkRecords,
+    apiClientRecordsRepository,
   } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.Record[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -130,16 +133,20 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       );
       switch (action) {
         case BulkActions.DUPLICATE: {
-          const recordsToDuplicate = processRecordsForDuplication(processedRecords);
+          const recordsToDuplicate = processRecordsForDuplication(processedRecords, apiClientRecordsRepository);
 
           try {
-            const result = await firebaseBatchWrite("apis", recordsToDuplicate);
+            const result = await apiClientRecordsRepository.duplicateApiEntities(recordsToDuplicate);
 
             toast.success("Records Duplicated successfully");
             result.length === 1 ? onSaveRecord(head(result)) : onSaveBulkRecords(result);
           } catch (error) {
             console.error("Error Duplicating records: ", error);
             toast.error("Failed to duplicate some records");
+            Sentry.withScope((scope) => {
+              scope.setTag("error_type", "api_client_record_duplication");
+              Sentry.captureException(error);
+            });
           }
 
           break;
@@ -164,7 +171,16 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           break;
       }
     },
-    [selectedRecords, onSaveRecord, updatedRecords, onSaveBulkRecords]
+    [
+      selectedRecords,
+      updatedRecords.childParentMap,
+      updatedRecords.recordsMap,
+      setIsDeleteModalOpen,
+      updateRecordsToBeDeleted,
+      apiClientRecordsRepository,
+      onSaveRecord,
+      onSaveBulkRecords,
+    ]
   );
 
   // Main toggle handler
@@ -324,7 +340,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             />
           )}
         </div>
+        {errorFiles.length > 0 && <ErrorFilesList errorFiles={errorFiles} />}
       </div>
+
       {isExportModalOpen && (
         <ApiClientExportModal
           exportType="collection"

@@ -43,6 +43,7 @@ interface EditorProps {
   envVariables?: EnvironmentVariables;
   config?: {
     enablePrettify?: boolean;
+    hideToolbar?: boolean;
   };
 }
 
@@ -60,7 +61,7 @@ const Editor: React.FC<EditorProps> = ({
   analyticEventProperties = {},
   prettifyOnInit = false,
   envVariables,
-  config = { enablePrettify: true },
+  config = { enablePrettify: true, hideToolbar: false },
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -276,19 +277,21 @@ const Editor: React.FC<EditorProps> = ({
     </>
   ) : (
     <>
-      <CodeEditorToolbar
-        language={language}
-        code={editorContent}
-        isFullScreen={isFullScreen}
-        onCodeFormat={(formattedCode: string) => {
-          setEditorContent(formattedCode);
-        }}
-        isCodePrettified={isCodePrettified}
-        setIsCodePrettified={setIsCodePrettified}
-        handleFullScreenToggle={handleFullScreenToggle}
-        customOptions={toolbarOptions}
-        enablePrettify={config?.enablePrettify}
-      />
+      {config.hideToolbar ? null : (
+        <CodeEditorToolbar
+          language={language}
+          code={editorContent}
+          isFullScreen={isFullScreen}
+          onCodeFormat={(formattedCode: string) => {
+            setEditorContent(formattedCode);
+          }}
+          isCodePrettified={isCodePrettified}
+          setIsCodePrettified={setIsCodePrettified}
+          handleFullScreenToggle={handleFullScreenToggle}
+          customOptions={toolbarOptions}
+          enablePrettify={config?.enablePrettify}
+        />
+      )}
       <ResizableBox
         height={editorHeight}
         width={Infinity}

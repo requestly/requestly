@@ -21,4 +21,11 @@ export const supportedBrowserExtensions = [
     title: "Edge Extension",
     alt: `Requestly for edge |  proxyman alternatives | mocky.io alternative | Fiddler Alternative | charles proxy alternative`,
   },
+  {
+    name: "Safari",
+    iconURL: "https://img.icons8.com/color/128/000000/safari.png",
+    downloadURL: "https://apps.apple.com/in/app/requestly-api-dev-toolkit/id6741503024",
+    title: "Safari Extension",
+    alt: `Requestly for safari |  proxyman alternatives | mocky.io alternative | Fiddler Alternative | charles proxy alternative`,
+  },
 ];

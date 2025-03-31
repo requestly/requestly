@@ -17,12 +17,10 @@ import {
   trackRequestDuplicated,
 } from "modules/analytics/events/features/apiClient";
 import { TabsLayoutContextInterface } from "layouts/TabsLayout";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LocalWorkspaceTooltip } from "../../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import "./RequestRow.scss";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdContentCopy } from "@react-icons/all-files/md/MdContentCopy";
-import { MdDriveFileMoveOutline } from "@react-icons/all-files/md/MdDriveFileMoveOutline";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { Conditional } from "components/common/Conditional";
 
@@ -48,7 +46,6 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
     onSaveRecord,
     apiClientRecordsRepository,
   } = useApiClientContext();
-  const isLocalSyncEnabled = useCheckLocalSyncSupport();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
@@ -114,15 +111,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
       },
       {
         key: "2",
-        disabled: isLocalSyncEnabled,
-        label: (
-          <LocalWorkspaceTooltip featureName="Move to Collection">
-            <div>
-              <MdDriveFileMoveOutline style={{ marginRight: 8 }} />
-              Move to Collection
-            </div>
-          </LocalWorkspaceTooltip>
-        ),
+        label: <div>Move to Collection</div>,
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setRecordToMove(record);
@@ -145,7 +134,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
         },
       },
     ];
-  }, [record, updateRecordsToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest, isLocalSyncEnabled]);
+  }, [record, updateRecordsToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest]);
 
   return (
     <>

@@ -20,25 +20,27 @@ export type Collection = {
   auth?: RQAPI.Auth;
 };
 
+export type APIRequestDetails = {
+  name: string;
+  url: string;
+  method: string;
+  queryParams: KeyValuePair[];
+  headers: KeyValuePair[];
+  body?: RQAPI.RequestBody;
+  bodyContainer: RQAPI.RequestBodyContainer;
+  contentType: RequestContentType;
+  auth?: RQAPI.Auth;
+  scripts: {
+    preRequest: string;
+    postResponse: string;
+  };
+};
+
 export type API = {
   type: "api";
   collectionId?: string;
   id: string;
-  request: {
-    name: string;
-    url: string;
-    method: string;
-    queryParams: KeyValuePair[];
-    headers: KeyValuePair[];
-    body?: RQAPI.RequestBody;
-    bodyContainer: RQAPI.RequestBodyContainer;
-    contentType: RequestContentType;
-    auth?: RQAPI.Auth;
-    scripts: {
-      preRequest: string;
-      postResponse: string;
-    };
-  };
+  request: APIRequestDetails;
 };
 
 export type VariableEntity = Record<
@@ -59,3 +61,19 @@ export type EnvironmentEntity = {
 };
 
 export type APIEntity = Collection | API;
+
+export enum FileType {
+  API = "api",
+  ENVIRONMENT = "environment",
+  COLLECTION_VARIABLES = "collection_variables",
+  DESCRIPTION = "description",
+  AUTH = "auth",
+  UNKNOWN = "unknown",
+}
+
+export type ErroredRecord = {
+  name: string;
+  path: string;
+  error: string;
+  type: FileType;
+};

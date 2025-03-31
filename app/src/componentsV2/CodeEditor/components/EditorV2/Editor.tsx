@@ -45,6 +45,7 @@ interface EditorProps {
     enablePrettify?: boolean;
   };
   isFullScreen?: boolean;
+  hideToolbar?: boolean;
   onFullScreenChange?: () => void;
 }
 const Editor: React.FC<EditorProps> = ({
@@ -63,6 +64,7 @@ const Editor: React.FC<EditorProps> = ({
   showOptions = { enablePrettify: true },
   isFullScreen = false,
   onFullScreenChange = () => {},
+  hideToolbar = false,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -133,11 +135,13 @@ const Editor: React.FC<EditorProps> = ({
 
   const updateContent = useCallback((code: string): void => {
     const view = editorRef.current?.view;
-    if (!view) {
+    const doc = view?.state?.doc;
+
+    if (!view || !doc) {
       return null;
     }
     const transaction = view.state.update({
-      changes: { from: 0, to: view.state.doc.length, insert: code },
+      changes: { from: 0, to: doc.length, insert: code },
     });
     view.dispatch(transaction);
   }, []);
@@ -321,14 +325,14 @@ const Editor: React.FC<EditorProps> = ({
         maskStyle={{ background: "var(--requestly-color-surface-0, #212121)" }}
         footer={<div className="code-editor-character-count">{getByteSize(value)} characters</div>}
       >
-        {toolbar}
+        {!hideToolbar && toolbar}
         {toastContainer}
         {editor}
       </Modal>
     </>
   ) : (
     <>
-      {toolbar}
+      {!hideToolbar && toolbar}
       <ResizableBox
         height={editorHeight}
         width={Infinity}

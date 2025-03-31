@@ -28,11 +28,13 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
 import { variablesActions } from "store/features/variables/slice";
 import { EnvironmentVariables } from "backend/environment/types";
+import { ErroredRecord } from "../helpers/modules/sync/local/services/types";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { RBAC, useRBAC } from "features/rbac";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
+  errorFiles: ErroredRecord[];
   isLoadingApiClientRecords: boolean;
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
@@ -70,6 +72,7 @@ interface ApiClientContextInterface {
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
   apiClientRecords: [],
+  errorFiles: [],
   isLoadingApiClientRecords: false,
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
@@ -129,6 +132,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [locationState, setLocationState] = useState(location?.state);
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(!!locationState?.action);
   const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
+  const [errorFiles, setErrorFiles] = useState([]);
   const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.Record[]>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
@@ -195,6 +199,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     apiClientRecordsRepository
       .getAllRecords()
       .then((result) => {
+        console.log("fetch result", result);
         if (!result.success) {
           notification.error({
             message: "Could not fetch records!",
@@ -204,8 +209,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setApiClientRecords([]);
           return;
         } else {
-          setApiClientRecords(result.data);
-          updateCollectionVariablesOnInit(result.data);
+          setApiClientRecords(result.data.records);
+          setErrorFiles(result.data.erroredRecords);
+          updateCollectionVariablesOnInit(result.data.records);
         }
       })
       .catch((error) => {
@@ -286,10 +292,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const onSaveRecord = useCallback(
     (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open") => {
-      console.log("on save", apiClientRecord, onSaveTabAction);
       const recordId = apiClientRecord.id;
       const isRecordExist = apiClientRecords.find((record) => record.id === recordId);
-      console.log("on save id", recordId, isRecordExist, apiClientRecords);
       const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
       const requestTab = searchParams.get("tab") || RequestTab.QUERY_PARAMS;
 
@@ -299,9 +303,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           title: apiClientRecord.name,
           url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${encodeURIComponent(recordId)}?tab=${requestTab}`,
         });
-        console.log("called replace tab 1", recordId);
       } else {
-        console.log("calling on new");
         onNewRecord(apiClientRecord);
 
         if (onSaveTabAction === "replace") {
@@ -309,7 +311,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             title: apiClientRecord.name,
             url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${encodeURIComponent(recordId)}?tab=${requestTab}`,
           });
-          console.log("called replace tab 1", recordId);
           return;
         }
 
@@ -444,7 +445,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     if (!recordsToRefresh || !recordsToRefresh.success) {
       return false;
     }
-    setApiClientRecords(() => [...recordsToRefresh.data]);
+    setApiClientRecords(() => recordsToRefresh.data.records);
+    setErrorFiles(() => recordsToRefresh.data.erroredRecords);
     return true;
   }, [apiClientRecordsRepository]);
 
@@ -459,6 +461,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const value = {
     apiClientRecords,
+    errorFiles,
     isLoadingApiClientRecords,
     onNewRecord,
     onRemoveRecord,
@@ -471,7 +474,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     onDeleteModalClose,
-
     history,
     addToHistory,
     clearHistory,
