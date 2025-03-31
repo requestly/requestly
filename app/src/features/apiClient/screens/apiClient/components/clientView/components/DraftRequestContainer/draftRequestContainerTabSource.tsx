@@ -11,7 +11,7 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
       name: "request",
       title: "Untitled request",
     };
-    this.component = <DraftRequestContainer draftId={this.metadata.id} />;
+    this.component = <DraftRequestContainer key={this.metadata.id} draftId={this.metadata.id} />;
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/new`;
     this.icon = <MdOutlineSyncAlt />;
   }
