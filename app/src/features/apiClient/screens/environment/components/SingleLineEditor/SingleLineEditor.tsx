@@ -7,17 +7,9 @@ import { EditorPopover } from "componentsV2/CodeEditor/components/Editor/compone
 import "componentsV2/CodeEditor/components/Editor/components/PopOver/popover.scss";
 import generateCompletionsForVariables from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
 import "./singleLineEditor.scss";
-interface RQSingleLineEditorProps {
-  defaultValue?: string;
-  className?: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  onPressEnter?: (event: KeyboardEvent, text: string) => void;
-  onBlur?: (text: string) => void;
-  variables?: Record<string, any>;
-}
+import { SingleLineEditorProps } from "./types";
 
-export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
+export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
   defaultValue,
   onChange,

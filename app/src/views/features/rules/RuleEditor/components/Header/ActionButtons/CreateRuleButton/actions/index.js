@@ -460,15 +460,16 @@ export const validateRule = (rule, dispatch, appMode) => {
             ? EditorLanguage.JAVASCRIPT
             : EditorLanguage.JSON;
 
-        const result = prettifyCode(pair.response.value, language);
-
-        if (!result.success) {
-          output = {
-            result: false,
-            message: "Response body contains invalid syntax!",
-            error: "invalid syntax",
-          };
-        }
+        //const result = prettifyCode(pair.response.value, language);
+        prettifyCode(pair.response.value, language).then((result) => {
+          if (!result.success) {
+            output = {
+              result: false,
+              message: "Response body contains invalid syntax!",
+              error: "invalid syntax",
+            };
+          }
+        });
       }
     });
   }
@@ -500,15 +501,16 @@ export const validateRule = (rule, dispatch, appMode) => {
             ? EditorLanguage.JAVASCRIPT
             : EditorLanguage.JSON;
 
-        const result = prettifyCode(pair.request.value, language);
-
-        if (!result.success) {
-          output = {
-            result: false,
-            message: "Request body contains invalid syntax!",
-            error: "invalid syntax",
-          };
-        }
+        //const result = prettifyCode(pair.request.value, language);
+        prettifyCode(pair.request.value, language).then((result) => {
+          if (!result.success) {
+            output = {
+              result: false,
+              message: "Request body contains invalid syntax!",
+              error: "invalid syntax",
+            };
+          }
+        });
       }
     });
   }
