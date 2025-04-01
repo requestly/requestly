@@ -124,6 +124,8 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
     );
   }
 
+  const collectionName = collection?.name || "New Collection";
+
   return (
     <div className="collection-view-container">
       {!collection && collectionId !== "new" ? (
@@ -136,9 +138,17 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         <>
           <RQBreadcrumb
             placeholder="New Collection"
-            recordName={collection?.name || "New Collection"}
+            recordName={collectionName}
             onBlur={(newName) => handleCollectionNameChange(newName)}
             autoFocus={location.search.includes("new")}
+            defaultBreadcrumbs={[
+              { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+              {
+                isEditable: true,
+                pathname: window.location.pathname,
+                label: collectionName,
+              },
+            ]}
           />
           <div className="collection-view-content">
             <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} />

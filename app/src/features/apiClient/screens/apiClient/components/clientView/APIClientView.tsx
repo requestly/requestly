@@ -48,6 +48,7 @@ import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { useGenericState } from "hooks/useGenericState";
+import PATHS from "config/constants/sub/paths";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -93,6 +94,7 @@ const APIClientView: React.FC<Props> = ({
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
+  const isHistoryPath = location.pathname.includes("history");
 
   const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
   const {
@@ -548,12 +550,19 @@ const APIClientView: React.FC<Props> = ({
         <div className="api-client-breadcrumb-container">
           {user.loggedIn && !openInModal ? (
             <RQBreadcrumb
-              placeholder="New Request"
+              placeholder="Untitled request"
               recordName={apiEntryDetails?.name}
               onRecordNameUpdate={setRequestName}
               onBlur={handleRecordNameUpdate}
-              // Auto focus breadcrumb input when a new record is created
-              autoFocus={location.search.includes("new")}
+              autoFocus={location.pathname.includes("new")}
+              defaultBreadcrumbs={[
+                { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+                {
+                  isEditable: !isHistoryPath,
+                  pathname: window.location.pathname,
+                  label: isHistoryPath ? "History" : apiEntryDetails?.name || "Untitled request",
+                },
+              ]}
             />
           ) : null}
           <Dropdown
