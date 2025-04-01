@@ -20,7 +20,7 @@ import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderC
 import { MdContentCopy } from "@react-icons/all-files/md/MdContentCopy";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { Conditional } from "components/common/Conditional";
-import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RequestViewTabSource } from "../../../../clientView/components/RequestView/requestViewTabSource";
 
 interface Props {
@@ -46,16 +46,21 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
   } = useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  const openTab = useTabServiceStore().use.openTab();
-  const activeTabId = useTabServiceStore().use.activeTabId();
-  const getSourceByTabId = useTabServiceStore().use.getSourceByTabId();
+  const [activeTabId, _version, openTab, getSourceByTabId] = useTabServiceWithSelector((state) => [
+    state.activeTabId,
+    state._version,
+    state.openTab,
+    state.getSourceByTabId,
+  ]);
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabId) {
       const source = getSourceByTabId(activeTabId);
       return source.getSourceId();
     }
-  }, [activeTabId, getSourceByTabId]);
+    // Also react on version change as preview tabs trigger version change on update
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTabId, getSourceByTabId, _version]);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);

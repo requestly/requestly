@@ -18,7 +18,7 @@ import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderC
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 import { Conditional } from "components/common/Conditional";
-import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "../../../../clientView/components/Collection/collectionViewTabSource";
 import "./CollectionRow.scss";
 
@@ -54,16 +54,21 @@ export const CollectionRow: React.FC<Props> = ({
   const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  const openTab = useTabServiceStore().use.openTab();
-  const activeTabId = useTabServiceStore().use.activeTabId();
-  const getSourceByTabId = useTabServiceStore().use.getSourceByTabId();
+  const [openTab, activeTabId, getSourceByTabId, _version] = useTabServiceWithSelector((state) => [
+    state.openTab,
+    state.activeTabId,
+    state.getSourceByTabId,
+    state._version,
+  ]);
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabId) {
       const source = getSourceByTabId(activeTabId);
       return source.getSourceId();
     }
-  }, [activeTabId, getSourceByTabId]);
+    // Also react on version change as preview tabs trigger version change on update
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTabId, getSourceByTabId, _version]);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);

@@ -29,7 +29,7 @@ import { EnvironmentVariables } from "backend/environment/types";
 import { ErroredRecord } from "../helpers/modules/sync/local/services/types";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { RBAC, useRBAC } from "features/rbac";
-import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { DraftRequestContainerTabSource } from "../screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { RequestViewTabSource } from "../screens/apiClient/components/clientView/components/RequestView/requestViewTabSource";
 import { CollectionViewTabSource } from "../screens/apiClient/components/clientView/components/Collection/collectionViewTabSource";
@@ -149,7 +149,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const { addNewEnvironment } = useEnvironmentManager();
 
   const { apiClientRecordsRepository } = useGetApiClientSyncRepo();
-  const openTab = useTabServiceStore().use.openTab();
+  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
   const openDraftRequest = useCallback(() => {
     openTab(new DraftRequestContainerTabSource());

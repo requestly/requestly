@@ -11,7 +11,7 @@ import AuthorizationView from "../AuthorizationView";
 import { QueryParamsTable } from "./components/QueryParamsTable/QueryParamsTable";
 import { HeadersTable } from "./components/HeadersTable/HeadersTable";
 import { useDeepLinkState } from "hooks";
-import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -52,8 +52,11 @@ const RequestTabs: React.FC<Props> = ({
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
-  const getTabIdBySourceId = useTabServiceStore().use.getTabIdBySourceId();
-  const getSourceByTabId = useTabServiceStore().use.getSourceByTabId();
+  const [getTabIdBySourceId, getSourceByTabId] = useTabServiceWithSelector((state) => [
+    state.getTabIdBySourceId,
+    state.getSourceByTabId,
+  ]);
+
   const tabId = useMemo(() => {
     if (requestId) {
       return getTabIdBySourceId(requestId);
@@ -61,6 +64,7 @@ const RequestTabs: React.FC<Props> = ({
       return null;
     }
   }, [getTabIdBySourceId, requestId]);
+
   const tabSourceId = useMemo(() => {
     if (tabId) {
       return getSourceByTabId(tabId).getSourceId();
