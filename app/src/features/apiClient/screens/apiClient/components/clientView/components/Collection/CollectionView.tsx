@@ -5,12 +5,12 @@ import React, { useCallback, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
-import "./collectionView.scss";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 import { toast } from "utils/Toast";
+import { useGenericState } from "hooks/useGenericState";
+import "./collectionView.scss";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -28,9 +28,8 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
     onSaveRecord,
     isLoadingApiClientRecords,
     apiClientRecordsRepository,
-    forceRefreshApiClientRecords,
   } = useApiClientContext();
-  const { replaceTab, closeTab } = useTabsLayoutContext();
+  const { setTitle } = useGenericState();
   const location = useLocation();
 
   const collection = useMemo(() => {
@@ -99,21 +98,10 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         }
 
         onSaveRecord(result.data);
-
-        const wasForceRefreshed = await forceRefreshApiClientRecords();
-        if (wasForceRefreshed) {
-          closeTab(record.id);
-          return;
-        }
-
-        replaceTab(result.data.id, {
-          id: result.data.id,
-          title: result.data.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(result.data.id)}`,
-        });
+        setTitle(result.data.name);
       });
     },
-    [collection, apiClientRecordsRepository, onSaveRecord, forceRefreshApiClientRecords, replaceTab, closeTab]
+    [collection, setTitle, apiClientRecordsRepository, onSaveRecord]
   );
 
   if (isLoadingApiClientRecords) {

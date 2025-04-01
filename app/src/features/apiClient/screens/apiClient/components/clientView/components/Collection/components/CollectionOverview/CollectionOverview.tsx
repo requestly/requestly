@@ -8,10 +8,11 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import { useOutsideClick } from "hooks";
-import "./collectionOverview.scss";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { toast } from "utils/Toast";
 import { useRBAC } from "features/rbac";
+import { useGenericState } from "hooks/useGenericState";
+import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import "./collectionOverview.scss";
 
 interface CollectionOverviewProps {
   collection: RQAPI.CollectionRecord;
@@ -21,9 +22,10 @@ const COLLECTION_DETAILS_PLACEHOLDER = "Collection description";
 
 export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collection }) => {
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const { closeTab } = useTabsLayoutContext();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_collection", "create");
+  const { id, setTitle } = useGenericState();
+  const closeTabById = useTabServiceStore().use.closeTabById();
 
   const [collectionName, setCollectionName] = useState(collection?.name || "");
   const [collectionDescription, setCollectionDescription] = useState(collection?.description || "");
@@ -54,22 +56,25 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
   const debouncedDescriptionChange = useDebounce(handleDescriptionChange, 1500);
 
   const handleCollectionNameChange = async () => {
+    const updatedCollectionName = collectionName || "Untitled Collection";
     const updatedCollection = {
       ...collection,
-      name: collectionName || "Untitled Collection",
+      name: updatedCollectionName,
     };
 
     if (collectionName === "") {
-      setCollectionName("Untitled Collection");
+      setCollectionName(updatedCollectionName);
     }
 
     const result = await apiClientRecordsRepository.renameCollection(updatedCollection.id, collectionName);
     if (result.success) {
       onSaveRecord(result.data);
+      setTitle(updatedCollectionName);
     }
+
     const wasForceRefreshed = await forceRefreshApiClientRecords();
     if (wasForceRefreshed) {
-      closeTab(collection.id);
+      closeTabById(id);
     }
   };
 
