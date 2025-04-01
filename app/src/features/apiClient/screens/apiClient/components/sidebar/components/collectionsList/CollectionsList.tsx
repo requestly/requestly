@@ -29,6 +29,7 @@ import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/Mov
 import ActionMenu from "./BulkActionsMenu";
 import { ErrorFilesList } from "../ErrorFilesList/ErrorFileslist";
 import { useRBAC } from "features/rbac";
+import * as Sentry from "@sentry/react";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -142,6 +143,10 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           } catch (error) {
             console.error("Error Duplicating records: ", error);
             toast.error("Failed to duplicate some records");
+            Sentry.withScope((scope) => {
+              scope.setTag("error_type", "api_client_record_duplication");
+              Sentry.captureException(error);
+            });
           }
 
           break;
