@@ -68,14 +68,8 @@ const createTabServiceStore = () => {
       const { _generateNewTabId, tabsIndex, tabs, setActiveTab, _registerTab } = get();
       const sourceId = source.getSourceId();
       const sourceName = source.getSourceName();
-      console.log("!!!debug", "array", Array.from(tabsIndex), Array.from(tabs));
 
       const existingTabId = tabsIndex.get(sourceName)?.get(sourceId);
-      console.log("!!!debug", "existingTabId", {
-        existingTabId,
-        config,
-        sourceId,
-      });
       if (existingTabId) {
         setActiveTabId(existingTabId);
         return;
