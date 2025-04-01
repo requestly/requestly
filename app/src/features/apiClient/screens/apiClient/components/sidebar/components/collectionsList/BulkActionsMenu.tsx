@@ -10,11 +10,12 @@ import { RQButton } from "lib/design-system-v2/components";
 import "./bulkActionsMenu.scss";
 
 interface Props {
+  isAllRecordsSelected: boolean;
   toggleSelection: () => void;
   bulkActionsHandler: (arg: BulkActions) => void;
 }
 
-const ActionMenu: React.FC<Props> = ({ toggleSelection, bulkActionsHandler }) => {
+const ActionMenu: React.FC<Props> = ({ isAllRecordsSelected, toggleSelection, bulkActionsHandler }) => {
   const actionsItems = [
     {
       title: "Duplicate",
@@ -46,7 +47,8 @@ const ActionMenu: React.FC<Props> = ({ toggleSelection, bulkActionsHandler }) =>
   return (
     <div className="api-client-actions-menu">
       <div className="api-client-select-all-container">
-        <Checkbox /> <label>Select all</label>
+        <Checkbox checked={isAllRecordsSelected} onChange={() => bulkActionsHandler(BulkActions.SELECT_ALL)} />
+        <label>Select all</label>
       </div>
       <div className="api-client-actions-container">
         {actionsItems.map((item, index) => (
