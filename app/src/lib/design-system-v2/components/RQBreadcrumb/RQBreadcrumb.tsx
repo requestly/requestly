@@ -56,7 +56,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
   }, [autoFocus]);
 
   const breadcrumbs: ({
-    pathname: MatchedRoute["pathname"];
+    pathname: string;
   } & MatchedRoute["handle"]["breadcrumb"])[] = matchedRoutes.reduce((result, route) => {
     return route.handle?.breadcrumb ? [...result, { ...route.handle.breadcrumb, pathname: route.pathname }] : result;
   }, []);
