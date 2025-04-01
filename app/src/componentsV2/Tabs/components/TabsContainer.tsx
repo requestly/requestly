@@ -67,9 +67,11 @@ export const TabsContainer: React.FC = () => {
     if (activeTabId) {
       const tabSource = getSourceByTabId(activeTabId);
       const newPath = tabSource.getUrlPath();
-      setUrl(newPath, isInitialLoadRef.current);
+      if (newPath !== window.location.pathname) {
+        setUrl(newPath, isInitialLoadRef.current);
+      }
     } else {
-      setUrl(PATHS.API_CLIENT.ABSOLUTE, false);
+      setUrl(PATHS.API_CLIENT.ABSOLUTE, isInitialLoadRef.current);
     }
 
     if (activeTabId && isInitialLoadRef.current) {
