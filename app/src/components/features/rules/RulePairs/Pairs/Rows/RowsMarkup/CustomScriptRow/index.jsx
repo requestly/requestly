@@ -16,6 +16,7 @@ import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { MockPickerModal } from "features/mocks/modals";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { RuleType } from "@requestly/shared/types/entities/rules";
+import Editor from "componentsV2/CodeEditor/components/Editor";
 
 const { Text } = Typography;
 
@@ -238,7 +239,7 @@ const CustomScriptRow = ({
           }}
         >
           <Col xl="12" span={24}>
-            <CodeEditor
+            <Editor
               isResizable
               id={script.id}
               height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 125 : 300}

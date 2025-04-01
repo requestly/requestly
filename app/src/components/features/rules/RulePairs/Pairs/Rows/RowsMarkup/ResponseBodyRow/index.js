@@ -23,6 +23,7 @@ import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { RuleType } from "@requestly/shared/types/entities/rules";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import "./ResponseBodyRow.css";
+import Editor from "componentsV2/CodeEditor/components/Editor";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const theme = useTheme();
@@ -191,14 +192,14 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     return null;
   };
 
-  const responseBodyChangeHandler = (value) => {
+  const responseBodyChangeHandler = async (value) => {
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           "response.type": pair.response.type,
           "response.value":
-            pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? formatJSONString(value) : value,
+            pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? await formatJSONString(value) : value,
         },
         triggerUnsavedChangesIndication: !codeFormattedFlag.current,
       })
@@ -321,7 +322,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             }}
           >
             <Col xl="12" span={24}>
-              <CodeEditor
+              <Editor
                 // key={pair.response.type}
                 language={
                   pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
