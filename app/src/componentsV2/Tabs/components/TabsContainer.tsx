@@ -9,6 +9,7 @@ import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiCl
 import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import "./tabsContainer.scss";
+import PATHS from "config/constants/sub/paths";
 
 export const TabsContainer: React.FC = () => {
   const [
@@ -67,12 +68,15 @@ export const TabsContainer: React.FC = () => {
       const tabSource = getSourceByTabId(activeTabId);
       const newPath = tabSource.getUrlPath();
       setUrl(newPath, isInitialLoadRef.current);
+    } else {
+      setUrl(PATHS.API_CLIENT.ABSOLUTE, false);
     }
 
     if (activeTabId && isInitialLoadRef.current) {
       isInitialLoadRef.current = false;
     }
-  }, [activeTabId, getSourceByTabId, setUrl]);
+    // version change should also trigger url change
+  }, [activeTabId, getSourceByTabId, setUrl, _version]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     return Array.from(tabs.values()).map((tabStore) => {

@@ -66,18 +66,32 @@ const createTabServiceStore = () => {
       const { _generateNewTabId, tabsIndex, tabs, setActiveTabId, _registerTab } = get();
       const sourceId = source.getSourceId();
       const sourceName = source.getSourceName();
+      console.log("!!!debug", "array", Array.from(tabsIndex), Array.from(tabs));
+
+      const existingTabId = tabsIndex.get(sourceName)?.get(sourceId);
+      console.log("!!!debug", "existingTabId", {
+        existingTabId,
+        config,
+        sourceId,
+      });
+      if (existingTabId) {
+        setActiveTabId(existingTabId);
+        return;
+      }
 
       if (config?.preview) {
         const previousPreviewTab = Array.from(tabs.values()).find((tab) => tab.getState().preview);
         const tabId = previousPreviewTab ? previousPreviewTab.getState().id : _generateNewTabId();
+        const previousPreviewTabSource = previousPreviewTab?.getState().source;
+        if (previousPreviewTabSource) {
+          tabsIndex.get(previousPreviewTabSource.getSourceName())?.delete(previousPreviewTabSource.getSourceId());
+        }
+        console.log("!!!debug", "prev", {
+          previousPreviewTab,
+          tabId,
+        });
 
         _registerTab(tabId, source, config);
-        return;
-      }
-
-      const existingTabId = tabsIndex.get(sourceName)?.get(sourceId);
-      if (existingTabId) {
-        setActiveTabId(existingTabId);
         return;
       }
 
@@ -137,6 +151,10 @@ const createTabServiceStore = () => {
         }
 
         const tabsArray = Array.from(tabs.keys());
+        if (tabsArray.length - 1 === 0) {
+          return null;
+        }
+
         const currentIndex = tabsArray.indexOf(tabId);
         if (currentIndex === tabsArray.length - 1) {
           return tabsArray[currentIndex - 1];
