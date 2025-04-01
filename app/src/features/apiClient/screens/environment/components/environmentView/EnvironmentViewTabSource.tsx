@@ -15,7 +15,7 @@ export class EnvironmentViewTabSource extends BaseTabSource {
     this.component = <EnvironmentView key={metadata.id} envId={metadata.id} />;
     this.metadata = {
       id: metadata.id,
-      name: "environment",
+      name: "environments", // FIXME: Its legacy, should be "environment"
       title: metadata.title,
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
