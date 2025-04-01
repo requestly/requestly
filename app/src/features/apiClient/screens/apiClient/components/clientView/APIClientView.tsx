@@ -596,15 +596,6 @@ const APIClientView: React.FC<Props> = ({
               value={entry.request.method}
               onChange={setMethod}
             />
-            {/* <Input
-              className="api-request-url"
-              placeholder="https://example.com"
-              value={entry.request.url}
-              onChange={(evt) => setUrl(evt.target.value)}
-              onPressEnter={onUrlInputEnterPressed}
-              onBlur={onUrlInputBlur}
-              prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
-            /> */}
             <RQSingleLineEditor
               className="api-request-url"
               placeholder="https://example.com"
