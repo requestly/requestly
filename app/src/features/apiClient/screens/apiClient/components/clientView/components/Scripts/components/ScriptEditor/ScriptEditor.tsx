@@ -5,20 +5,13 @@ import { RQAPI } from "features/apiClient/types";
 import { Radio, Tooltip } from "antd";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import "./scriptEditor.scss";
+import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import Editor from "componentsV2/CodeEditor/components/Editor";
 
 interface ScriptEditorProps {
   scripts: RQAPI.Entry["scripts"];
   setScripts: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
 }
-
-const DEFAULT_SCRIPT_VALUES = {
-  [RQAPI.ScriptType.PRE_REQUEST]:
-    "// **********************************************\n// 🛠️ Learn more about scripts and snippets: https://docs.requestly.com/general/api-client/scripts\n// **********************************************\n",
-  [RQAPI.ScriptType.POST_RESPONSE]:
-    "// **********************************************\n// 🛠️ Use JavaScript to visualize responses: https://docs.requestly.com/general/api-client/scripts\n// **********************************************\n",
-};
-
 // FIX: Editor does not re-render when scripts are undefined
 export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts }) => {
   const activeScriptType = scripts?.[RQAPI.ScriptType.PRE_REQUEST]

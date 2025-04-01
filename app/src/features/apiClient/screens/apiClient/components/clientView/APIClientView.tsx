@@ -19,6 +19,7 @@ import {
   trackInstallExtensionDialogShown,
   trackRequestSaved,
   trackRequestRenamed,
+  trackApiRequestDone,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
@@ -304,6 +305,11 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           type: getContentTypeFromResponseHeaders(executedEntry.response.headers),
           time: Math.round(executedEntry.response.time / 1000),
         });
+        trackApiRequestDone({
+          url: executedEntry.request.url,
+          method: executedEntry.request.method,
+          status: executedEntry.response.status,
+        });
         trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
         trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
       } else if (apiClientExecutionResult.status === "error") {
@@ -323,7 +329,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
           });
         }
-        trackRequestFailed(error.message);
+        trackRequestFailed(
+          error.message,
+          error.type,
+          entryWithResponse.request.url,
+          entryWithResponse.request.method,
+          entryWithResponse.response?.status
+        );
         trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
         trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
       }
@@ -332,6 +344,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     } catch (e) {
       setIsFailed(true);
       setError({
+        type: e.type,
         source: "request",
         name: e.name,
         message: e.message,
