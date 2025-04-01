@@ -14,19 +14,20 @@ import { globalActions } from "store/slices/global/slice";
 import { ToastType } from "componentsV2/CodeEditor/components/EditorToast/types";
 import { toast } from "utils/Toast";
 import { minifyCode } from "utils/CodeEditorUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 export const saveRule = async (appMode, dispatch, ruleObject) => {
   let ruleToSave = cloneDeep(ruleObject);
   delete ruleToSave["schemaVersion"];
 
-  if (ruleToSave.ruleType === "request") {
-    if (ruleToSave.pairs[0].request.type === "static") {
+  if (ruleToSave.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST) {
+    if (ruleToSave.pairs[0].request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
       ruleToSave.pairs[0].request.value = minifyCode(ruleToSave.pairs[0].request.value);
     }
   }
 
-  if (ruleToSave.ruleType === "response") {
-    if (ruleToSave.pairs[0].response.type === "static") {
+  if (ruleToSave.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
+    if (ruleToSave.pairs[0].response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
       ruleToSave.pairs[0].response.value = minifyCode(ruleToSave.pairs[0].response.value);
     }
   }
