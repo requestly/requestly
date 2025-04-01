@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useMemo } from "react";
+import React, { useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Radio, Tooltip } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -11,34 +11,29 @@ import Editor from "componentsV2/CodeEditor";
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
   const codeFormattedFlag = useRef(null);
-  const editorBodyValue = useRef(pair.request.value);
-
-  const [requestBodies, setRequestBodies] = useState({
-    static: "{}",
-    code: ruleDetails["REQUEST_BODY_JAVASCRIPT_DEFAULT_VALUE"],
-    local_file: "",
+  const editorBodyValues = useRef({
+    static: pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? pair.request.value : "{}",
+    code:
+      pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
+        ? pair.request.value
+        : ruleDetails["REQUEST_BODY_JAVASCRIPT_DEFAULT_VALUE"],
+    local_file: pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.LOCAL_FILE ? pair.request.value : "",
   });
 
   const onChangeRequestType = useCallback(
     (requestType) => {
-      setRequestBodies((prev) => ({
-        ...prev,
-        [pair.request.type]: pair.request.value,
-      }));
-
-      const value = requestBodies[requestType];
       dispatch(
         globalActions.updateRulePairAtGivenPath({
           pairIndex,
           triggerUnsavedChangesIndication: false,
           updates: {
             "request.type": requestType,
-            "request.value": value,
+            "request.value": editorBodyValues.current[requestType],
           },
         })
       );
     },
-    [dispatch, pair.request.type, pair.request.value, pairIndex, requestBodies]
+    [dispatch, pairIndex]
   );
 
   const getEditorDefaultValue = useCallback(() => {
@@ -54,14 +49,14 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
   }, [pair.request.type]);
 
   const requestBodyChangeHandler = (value) => {
-    editorBodyValue.current = value;
+    editorBodyValues.current[pair.request.type] = value;
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         triggerUnsavedChangesIndication: !codeFormattedFlag.current,
         updates: {
           "request.type": pair.request.type,
-          "request.value": editorBodyValue.current,
+          "request.value": editorBodyValues.current[pair.request.type],
         },
       })
     );
@@ -137,7 +132,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                     ? EditorLanguage.JAVASCRIPT
                     : EditorLanguage.JSON
                 }
-                value={editorBodyValue.current ?? getEditorDefaultValue()}
+                value={editorBodyValues.current[pair.request.type] ?? getEditorDefaultValue()}
                 handleChange={requestBodyChangeHandler}
                 prettifyOnInit={true}
                 isReadOnly={isInputDisabled}
