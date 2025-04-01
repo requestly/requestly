@@ -1,11 +1,11 @@
 import React from "react";
 import { EditorLanguage } from "componentsV2/CodeEditor";
-import Editor from "componentsV2/CodeEditor/components/Editor/Editor";
 import { useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { Radio, Tooltip } from "antd";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import "./scriptEditor.scss";
+import Editor from "componentsV2/CodeEditor/components/Editor";
 
 interface ScriptEditorProps {
   scripts: RQAPI.Entry["scripts"];
@@ -59,7 +59,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts 
     <div className=" api-client-code-editor-container api-client-script-editor-container">
       <Editor
         value={scripts?.[scriptType] || ""}
-        handleChange={(value) => setScripts((prev) => ({ ...prev, scripts: { ...prev.scripts, [scriptType]: value } }))}
+        handleChange={(value: string) =>
+          setScripts((prev) => ({ ...prev, scripts: { ...prev.scripts, [scriptType]: value } }))
+        }
         defaultValue={DEFAULT_SCRIPT_VALUES[scriptType]}
         language={EditorLanguage.JAVASCRIPT}
         toolbarOptions={{

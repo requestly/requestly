@@ -1,6 +1,3 @@
-import prettier from "prettier";
-import parserBabel from "prettier/parser-babel";
-
 export const minifyCode = (value) => {
   try {
     return JSON.stringify(JSON.parse(value));
@@ -9,7 +6,10 @@ export const minifyCode = (value) => {
   }
 };
 
-export const formatJSONString = (value, tabSize = 0) => {
+export const formatJSONString = async (value, tabSize = 0) => {
+  const prettier = await import("prettier");
+  const parserBabel = await import("prettier/parser-babel");
+
   try {
     return JSON.stringify(JSON.parse(value), null, tabSize); //convert string to JSON if in correct JSON format
   } catch (e) {
