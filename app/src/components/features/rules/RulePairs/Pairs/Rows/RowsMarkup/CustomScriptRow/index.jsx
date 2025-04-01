@@ -16,7 +16,7 @@ import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { MockPickerModal } from "features/mocks/modals";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { RuleType } from "@requestly/shared/types/entities/rules";
-import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
+import Editor from "componentsV2/CodeEditor";
 
 const { Text } = Typography;
 

@@ -31,7 +31,7 @@ import { useFeatureValue } from "@growthbook/growthbook-react";
 import { ExportMocksModalWrapper } from "features/mocks/modals";
 import { globalActions } from "store/slices/global/slice";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
-import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
+import Editor from "componentsV2/CodeEditor";
 
 interface Props {
   isNew?: boolean;
