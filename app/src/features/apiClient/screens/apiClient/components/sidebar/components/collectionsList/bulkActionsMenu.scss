@@ -8,12 +8,12 @@
   background: var(--requestly-color-surface-1);
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.16);
   margin-bottom: 8px;
+  padding: 0 8px;
 
   .api-client-select-all-container {
     display: flex;
     align-items: center;
     gap: var(--space-2, 4px);
-    padding: var(--space-1, 2px) var(--space-1, 2px) var(--space-1, 2px) var(--space-4, 8px);
 
     .ant-checkbox-inner {
       width: 13px;
