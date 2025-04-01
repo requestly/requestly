@@ -202,6 +202,7 @@ export const API_CLIENT = {
   MOVE_REQUEST_TO_COLLECTION_FAILED: "api_client_move_request_to_collection_failed",
   INSTALL_EXTENSION_DIALOG_SHOWN: "api_client_install_extension_dialog_shown",
   RESPONSE_LOADED: "api_client_response_loaded",
+  REQUEST_DONE: "api_client_request_done",
   RAW_RESPONSE_VIEWED: "api_client_raw_response_viewed",
   REQUEST_SELECTED_FROM_HISTORY: "api_client_request_selected_from_history",
   HISTORY_CLEARED: "api_client_history_cleared",
