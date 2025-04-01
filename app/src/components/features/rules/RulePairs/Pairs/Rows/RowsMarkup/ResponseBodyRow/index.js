@@ -28,42 +28,37 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   const theme = useTheme();
   const dispatch = useDispatch();
   const [isSelectedFileInputVisible, setIsSelectedFileInputVisible] = useState(false);
-  const editorBodyValue = useRef(pair.response.value);
+  const editorBodyValues = useRef({
+    static: pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? pair.response.value : "{}",
+    code:
+      pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
+        ? pair.response.value
+        : ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"],
+    local_file: pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE ? pair.response.value : "",
+  });
 
   const isServeWithoutRequestSupported = useMemo(
     () => isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST),
     []
   );
 
-  const [responseBodies, setResponseBodies] = useState({
-    static: "{}",
-    code: ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"],
-    local_file: "",
-  });
-
   const codeFormattedFlag = useRef(null);
 
   const onChangeResponseType = useCallback(
     (responseBodyType) => {
-      setResponseBodies((prev) => ({
-        ...prev,
-        [pair.response.type]: pair.response.value,
-      }));
-
-      const value = responseBodies[responseBodyType];
       dispatch(
         globalActions.updateRulePairAtGivenPath({
           pairIndex,
           triggerUnsavedChangesIndication: false,
           updates: {
             "response.type": responseBodyType,
-            "response.value": value,
+            "response.value": editorBodyValues.current[responseBodyType],
             "response.serveWithoutRequest": undefined,
           },
         })
       );
     },
-    [dispatch, pair.response.type, pair.response.value, pairIndex, responseBodies]
+    [dispatch, pairIndex]
   );
 
   const handleFileSelectCallback = (selectedFile) => {
@@ -193,13 +188,13 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   };
 
   const responseBodyChangeHandler = (value) => {
-    editorBodyValue.current = value;
+    editorBodyValues.current[pair.response.type] = value;
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           "response.type": pair.response.type,
-          "response.value": editorBodyValue.current,
+          "response.value": editorBodyValues.current[pair.response.type],
         },
         triggerUnsavedChangesIndication: !codeFormattedFlag.current,
       })
@@ -329,7 +324,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                     ? EditorLanguage.JAVASCRIPT
                     : EditorLanguage.JSON
                 }
-                value={editorBodyValue.current ?? getEditorDefaultValue()}
+                value={editorBodyValues.current[pair.response.type] ?? getEditorDefaultValue()}
                 isReadOnly={isInputDisabled}
                 prettifyOnInit={true}
                 handleChange={responseBodyChangeHandler}
