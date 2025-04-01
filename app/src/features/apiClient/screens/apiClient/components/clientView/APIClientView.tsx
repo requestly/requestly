@@ -34,7 +34,6 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
@@ -47,6 +46,7 @@ import { ApiClientSnippetModal } from "../modals/ApiClientSnippetModal/ApiClient
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
+import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 
 interface Props {
   openInModal?: boolean;
@@ -568,7 +568,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               onBlur={onUrlInputBlur}
               prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
             /> */}
-              <RQSingleLineEditor
+              <SingleLineEditor
                 className="api-request-url"
                 placeholder="https://example.com"
                 //value={entry.request.url}
