@@ -235,7 +235,10 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   return (
     <>
       {apiClientRecords.length > 0 && (
-        <SidebarListHeader onSearch={setSearchValue} multiSelectOptions={multiSelectOptions} />
+        <div className="api-client-sidebar-header-container">
+          <SidebarListHeader onSearch={setSearchValue} multiSelectOptions={multiSelectOptions} />
+          {showSelection && <ActionMenu toggleSelection={toggleSelection} bulkActionsHandler={bulkActionHandler} />}
+        </div>
       )}
       <div className={`collections-list-container ${showSelection ? "selection-enabled" : ""}`}>
         <div className="collections-list-content">
@@ -321,7 +324,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           }}
         />
       )}
-      {showSelection && <ActionMenu toggleSelection={toggleSelection} bulkActionsHandler={bulkActionHandler} />}
     </>
   );
 };
