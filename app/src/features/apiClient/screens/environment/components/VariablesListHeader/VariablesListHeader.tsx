@@ -3,13 +3,13 @@ import { Input } from "antd";
 import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import { useLocation } from "react-router-dom";
-import "./variablesListHeader.scss";
 import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { RoleBasedComponent } from "features/rbac";
+import { useGenericState } from "hooks/useGenericState";
+import "./variablesListHeader.scss";
 
 interface VariablesListHeaderProps {
   searchValue: string;
@@ -35,16 +35,13 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   exportActions,
 }) => {
   const { renameEnvironment } = useEnvironmentManager();
-  const { replaceTab } = useTabsLayoutContext();
+  const { setTitle } = useGenericState();
   const location = useLocation();
 
   const handleNewEnvironmentNameChange = (newName: string) => {
-    renameEnvironment(environmentId, newName).then(() => {
-      replaceTab(environmentId, {
-        id: environmentId,
-        title: newName,
-        url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(environmentId)}`,
-      });
+    const updatedName = newName || "New Environment";
+    renameEnvironment(environmentId, updatedName).then(() => {
+      setTitle(updatedName);
     });
   };
 
