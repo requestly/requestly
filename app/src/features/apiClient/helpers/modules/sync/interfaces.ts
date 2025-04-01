@@ -1,12 +1,12 @@
 import { EnvironmentData, EnvironmentMap, EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
-import { ErroredRecords, FileType } from "./local/services/types";
+import { ErroredRecord, FileType } from "./local/services/types";
 
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
   meta: Meta;
   getAllEnvironments(): Promise<{
     success: boolean;
-    data: { environments: EnvironmentMap; erroredRecords: ErroredRecords[] };
+    data: { environments: EnvironmentMap; erroredRecords: ErroredRecord[] };
   }>;
   createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData>;
   createGlobalEnvironment(): Promise<EnvironmentData>;
@@ -55,6 +55,19 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     fileType: FileType
   ): Promise<{ success: boolean; data: unknown; message?: string }>;
   getRawFileData(id: string): Promise<{ success: boolean; data: unknown; message?: string }>;
+  createCollectionFromImport(
+    collection: RQAPI.CollectionRecord,
+    id: string
+  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }>;
+  generateCollectionId(name: string, parentId?: string): string;
+  generateApiRecordId(parentId?: string): string;
+  batchWriteApiEntities(
+    batchSize: number,
+    entities: Partial<RQAPI.Record>[],
+    writeFunction: (entity: RQAPI.Record) => Promise<unknown>
+  ): Promise<{ success: boolean; message?: string }>;
+  duplicateApiEntities(entities: Partial<RQAPI.Record>[]): Promise<RQAPI.Record[]>;
+  moveAPIEntities(entities: Partial<RQAPI.Record>[], newParentId: string): Promise<RQAPI.Record[]>;
 }
 
 export interface ApiClientRepositoryInterface {

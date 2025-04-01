@@ -9,6 +9,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import "./FixedRequestLogPane.css";
+import Editor from "componentsV2/CodeEditor/components/Editor";
 
 const { Text } = Typography;
 

@@ -1,8 +1,8 @@
 import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
-import { generateDocumentId } from "backend/utils";
 import { Bruno } from "./types";
 import { Authorization } from "../apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
 export const processBrunoScripts = (request: Bruno.Request) => {
   const scripts = {
@@ -62,7 +62,11 @@ const processParams = (params: Bruno.Param[]) => {
 };
 
 type OmitDBFields<T> = Omit<T, "ownerId" | "deleted" | "createdBy" | "updatedBy" | "createdTs" | "updatedTs">;
-const createApiRecord = (item: Bruno.Item, parentCollectionId: string): OmitDBFields<RQAPI.ApiRecord> => {
+const createApiRecord = (
+  item: Bruno.Item,
+  parentCollectionId: string,
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
+): OmitDBFields<RQAPI.ApiRecord> => {
   if (!item.request) throw new Error(`Invalid API item: ${item.name}`);
 
   const { request } = item;
@@ -90,7 +94,7 @@ const createApiRecord = (item: Bruno.Item, parentCollectionId: string): OmitDBFi
   }
 
   return {
-    id: generateDocumentId("apis"),
+    id: apiClientRecordsRepository.generateApiRecordId(parentCollectionId),
     collectionId: parentCollectionId,
     name: item.name,
     type: RQAPI.RecordType.API,
@@ -109,12 +113,10 @@ const createApiRecord = (item: Bruno.Item, parentCollectionId: string): OmitDBFi
   };
 };
 
-type NewGeneratedId = ReturnType<typeof generateDocumentId>;
-
 const createCollectionRecord = (
   name: string,
-  id: NewGeneratedId,
-  parentCollectionId?: NewGeneratedId,
+  id: string,
+  parentCollectionId?: string,
   auth?: Bruno.Auth,
   vars?: { req?: Bruno.Variable[]; res?: Bruno.Variable[] },
   additionalVars?: Bruno.Variable[]
@@ -152,7 +154,8 @@ const createCollectionRecord = (
 };
 
 export const processBrunoCollectionData = (
-  fileContent: Bruno.RootCollection
+  fileContent: Bruno.RootCollection,
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
 ): {
   collections: Partial<RQAPI.CollectionRecord>[];
   apis: Partial<RQAPI.ApiRecord>[];
@@ -175,7 +178,11 @@ export const processBrunoCollectionData = (
     }, {} as Record<string, EnvironmentVariableValue>),
   }));
 
-  const processItems = (items: Bruno.Item[], parentCollectionId: string) => {
+  const processItems = (
+    items: Bruno.Item[],
+    parentCollectionId: string,
+    apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
+  ) => {
     const result = {
       collections: [] as Partial<RQAPI.CollectionRecord>[],
       apis: [] as Partial<RQAPI.ApiRecord>[],
@@ -184,9 +191,9 @@ export const processBrunoCollectionData = (
 
     items.forEach((item) => {
       if (item.type === "folder" || (item.items && item.items.length > 0)) {
-        const id = generateDocumentId("apis");
+        const id = apiClientRecordsRepository.generateCollectionId(item.name, parentCollectionId);
         const subItems = item.items?.length
-          ? processItems(item.items, id)
+          ? processItems(item.items, id, apiClientRecordsRepository)
           : { collections: [], apis: [], variables: [] };
 
         const subCollection = createCollectionRecord(
@@ -202,7 +209,7 @@ export const processBrunoCollectionData = (
         result.collections.push(...subItems.collections);
         result.apis.push(...subItems.apis);
       } else if (item.type === "http") {
-        result.apis.push(createApiRecord(item, parentCollectionId));
+        result.apis.push(createApiRecord(item, parentCollectionId, apiClientRecordsRepository));
         if (item.request?.vars) {
           result.variables.push(...(item.request.vars.res || []), ...(item.request.vars.req || []));
         }
@@ -212,8 +219,8 @@ export const processBrunoCollectionData = (
     return result;
   };
 
-  const rootCollectionId = generateDocumentId("apis");
-  const processedItems = processItems(fileContent.items, rootCollectionId);
+  const rootCollectionId = apiClientRecordsRepository.generateCollectionId(fileContent.name, "");
+  const processedItems = processItems(fileContent.items, rootCollectionId, apiClientRecordsRepository);
   // Create root collection with both root vars and all nested vars
   const rootCollection = createCollectionRecord(
     fileContent.name,

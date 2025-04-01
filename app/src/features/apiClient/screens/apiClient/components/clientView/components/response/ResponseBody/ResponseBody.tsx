@@ -1,11 +1,11 @@
 import React, { ReactElement, memo, useCallback, useMemo, useState } from "react";
 import { Radio, RadioChangeEvent, Tooltip } from "antd";
 import { trackRawResponseViewed } from "modules/analytics/events/features/apiClient";
-import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
 import { getEditorLanguageFromContentType } from "componentsV2/CodeEditor";
 import "./responseBody.scss";
 import { RQButton } from "lib/design-system-v2/components";
 import { IoMdCopy } from "@react-icons/all-files/io/IoMdCopy";
+import EditorV2 from "componentsV2/CodeEditor/components/EditorV2";
 
 interface Props {
   responseText: string;
@@ -82,7 +82,7 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
 
     return (
       <div className="api-client-code-editor-container api-response-body-editor-container">
-        <Editor
+        <EditorV2
           prettifyOnInit
           value={responseText}
           language={editorLanguage}
