@@ -11,4 +11,5 @@ export abstract class AbstractTabSource {
   abstract getDefaultTitle(): string;
   abstract getUrlPath(): string;
   abstract getIcon(): React.ReactNode;
+  abstract getIsNewTab(): boolean;
 }
