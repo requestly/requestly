@@ -14,21 +14,21 @@ import PATHS from "config/constants/sub/paths";
 export const TabsContainer: React.FC = () => {
   const [
     activeTabId,
-    setActiveTabId,
+    activeTabSource,
+    setActiveTab,
     tabs,
     _version,
     openTab,
     closeTabById,
-    getSourceByTabId,
     incrementVersion,
   ] = useTabServiceWithSelector((state) => [
     state.activeTabId,
-    state.setActiveTabId,
+    state.activeTabSource,
+    state.setActiveTab,
     state.tabs,
     state._version,
     state.openTab,
     state.closeTabById,
-    state.getSourceByTabId,
     state.incrementVersion,
   ]);
 
@@ -64,9 +64,8 @@ export const TabsContainer: React.FC = () => {
   }, [matchedTabSource, openTab]);
 
   useEffect(() => {
-    if (activeTabId) {
-      const tabSource = getSourceByTabId(activeTabId);
-      const newPath = tabSource.getUrlPath();
+    if (activeTabSource) {
+      const newPath = activeTabSource.getUrlPath();
       if (newPath !== window.location.pathname) {
         setUrl(newPath, isInitialLoadRef.current);
       }
@@ -74,11 +73,10 @@ export const TabsContainer: React.FC = () => {
       setUrl(PATHS.API_CLIENT.ABSOLUTE, isInitialLoadRef.current);
     }
 
-    if (activeTabId && isInitialLoadRef.current) {
+    if (activeTabSource && isInitialLoadRef.current) {
       isInitialLoadRef.current = false;
     }
-    // version change should also trigger url change
-  }, [activeTabId, getSourceByTabId, setUrl, _version]);
+  }, [activeTabSource, setUrl]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     return Array.from(tabs.values()).map((tabStore) => {
@@ -135,7 +133,7 @@ export const TabsContainer: React.FC = () => {
         className="tabs-content"
         popupClassName="tabs-content-more-dropdown"
         onChange={(key) => {
-          setActiveTabId(parseInt(key));
+          setActiveTab(parseInt(key));
         }}
         onEdit={(key, action) => {
           if (action === "remove") {

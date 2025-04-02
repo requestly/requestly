@@ -54,21 +54,13 @@ export const CollectionRow: React.FC<Props> = ({
   const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  const [openTab, activeTabId, getSourceByTabId, _version] = useTabServiceWithSelector((state) => [
-    state.openTab,
-    state.activeTabId,
-    state.getSourceByTabId,
-    state._version,
-  ]);
+  const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
 
   const activeTabSourceId = useMemo(() => {
-    if (activeTabId) {
-      const source = getSourceByTabId(activeTabId);
-      return source.getSourceId();
+    if (activeTabSource) {
+      return activeTabSource.getSourceId();
     }
-    // Also react on version change as preview tabs trigger version change on update
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTabId, getSourceByTabId, _version]);
+  }, [activeTabSource]);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);

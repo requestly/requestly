@@ -15,6 +15,7 @@ type TabConfig = {
 export type TabServiceState = {
   tabIdSequence: TabId;
   activeTabId: TabId;
+  activeTabSource: AbstractTabSource;
   tabsIndex: Map<SourceName, SourceMap>; // Type: SourceName -> sourceId -> tabId eg: Request -> [requestId,tabId]
   tabs: Map<TabId, StoreApi<TabState>>;
 
@@ -25,7 +26,7 @@ export type TabServiceState = {
   closeTab: (source: AbstractTabSource) => void;
   closeAllTabs: () => void;
   closeTabById: (tabId: TabId) => void;
-  setActiveTabId: (tabId: TabId) => void;
+  setActiveTab: (tabId: TabId) => void;
   _generateNewTabId: () => TabId;
   incrementVersion: () => void;
   getSourceByTabId: (tabId: TabId) => AbstractTabSource;
@@ -36,13 +37,14 @@ const createTabServiceStore = () => {
   return create<TabServiceState>((set, get) => ({
     tabIdSequence: 0,
     activeTabId: 0,
+    activeTabSource: null,
     tabsIndex: new Map(),
     tabs: new Map(),
 
     _version: 0,
 
     _registerTab(tabId, source, config) {
-      const { tabsIndex, tabs, setActiveTabId } = get();
+      const { tabsIndex, tabs, setActiveTab } = get();
       const sourceId = source.getSourceId();
       const sourceName = source.getSourceName();
       const tab = createTabStore(tabId, source, source.getDefaultTitle(), config?.preview);
@@ -54,7 +56,7 @@ const createTabServiceStore = () => {
       }
 
       tabs.set(tabId, tab);
-      setActiveTabId(tabId);
+      setActiveTab(tabId);
 
       set({
         tabs: new Map(tabs),
@@ -63,13 +65,13 @@ const createTabServiceStore = () => {
     },
 
     openTab(source, config) {
-      const { _generateNewTabId, tabsIndex, tabs, setActiveTabId, _registerTab } = get();
+      const { _generateNewTabId, tabsIndex, tabs, setActiveTab, _registerTab } = get();
       const sourceId = source.getSourceId();
       const sourceName = source.getSourceName();
 
       const existingTabId = tabsIndex.get(sourceName)?.get(sourceId);
       if (existingTabId) {
-        setActiveTabId(existingTabId);
+        setActiveTab(existingTabId);
         return;
       }
 
@@ -110,7 +112,7 @@ const createTabServiceStore = () => {
     },
 
     closeTabById(tabId) {
-      const { tabs, tabsIndex, activeTabId } = get();
+      const { tabs, tabsIndex, activeTabId, setActiveTab } = get();
       const tabStore = tabs.get(tabId);
       if (!tabStore) {
         return;
@@ -155,14 +157,19 @@ const createTabServiceStore = () => {
 
       set({
         tabs: new Map(tabs),
-        activeTabId: newActiveTabId,
       });
+      setActiveTab(newActiveTabId);
     },
 
-    setActiveTabId(id: TabId) {
+    setActiveTab(id: TabId) {
       const { tabs } = get();
       if (tabs.has(id)) {
-        set({ activeTabId: id });
+        set({ activeTabId: id, activeTabSource: tabs.get(id).getState().source });
+      } else {
+        set({
+          activeTabId: 0,
+          activeTabSource: null,
+        });
       }
     },
 

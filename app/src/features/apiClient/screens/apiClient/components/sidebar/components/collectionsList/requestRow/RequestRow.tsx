@@ -46,21 +46,13 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
   } = useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  const [activeTabId, _version, openTab, getSourceByTabId] = useTabServiceWithSelector((state) => [
-    state.activeTabId,
-    state._version,
-    state.openTab,
-    state.getSourceByTabId,
-  ]);
+  const [activeTabSource, openTab] = useTabServiceWithSelector((state) => [state.activeTabSource, state.openTab]);
 
   const activeTabSourceId = useMemo(() => {
-    if (activeTabId) {
-      const source = getSourceByTabId(activeTabId);
-      return source.getSourceId();
+    if (activeTabSource) {
+      return activeTabSource.getSourceId();
     }
-    // Also react on version change as preview tabs trigger version change on update
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTabId, getSourceByTabId, _version]);
+  }, [activeTabSource]);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);
