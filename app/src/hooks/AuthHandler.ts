@@ -160,6 +160,10 @@ const AuthHandler: React.FC<{}> = () => {
           submitAttrUtil(TRACKING.ATTR.PLAN_ID, planDetails.planId ?? "Missing Value");
           submitAttrUtil(TRACKING.ATTR.IS_TRIAL, planDetails.status === "trialing");
           submitAttrUtil(TRACKING.ATTR.SUBSCRIPTION_STATUS, planDetails.status);
+          submitAttrUtil(
+            TRACKING.ATTR.RQ_SUBSCRIPTION_TYPE,
+            firestorePlanDetails?.rqSubscriptionType ?? firestorePlanDetails?.type
+          );
 
           if (planDetails.subscription) {
             submitAttrUtil(TRACKING.ATTR.PLAN_START_DATE, planDetails.subscription.startDate ?? "Missing Value");
