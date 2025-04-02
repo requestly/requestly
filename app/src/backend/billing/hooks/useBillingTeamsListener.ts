@@ -56,8 +56,8 @@ export const useBillingTeamsListener = () => {
       });
 
       // Seed the attribute lazily
-      const userActiveBillingTeam = billingTeamDetails.find(
-        (team) => team.subscriptionDetails?.subscriptionStatus === "active"
+      const userActiveBillingTeam = billingTeamDetails.find((team) =>
+        ["active", "past_due", "trialing"].includes(team.subscriptionDetails?.subscriptionStatus)
       );
       const isAcceleratorBillingTeam = billingTeamDetails.some((team) => team.isAcceleratorTeam === true);
       if (isAcceleratorBillingTeam) {
