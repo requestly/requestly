@@ -4,7 +4,6 @@ import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import PATHS from "config/constants/sub/paths";
-import { useLocation } from "react-router-dom";
 import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { RoleBasedComponent } from "features/rbac";
@@ -35,8 +34,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   exportActions,
 }) => {
   const { renameEnvironment } = useEnvironmentManager();
-  const { setTitle } = useGenericState();
-  const location = useLocation();
+  const { setTitle, isNewTab } = useGenericState();
 
   const handleNewEnvironmentNameChange = (newName: string) => {
     const updatedName = newName || "New Environment";
@@ -49,7 +47,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
     <div className="variables-list-header">
       {!hideBreadcrumb ? (
         <RQBreadcrumb
-          autoFocus={location.search.includes("new")}
+          autoFocus={isNewTab}
           placeholder="New Environment"
           recordName={currentEnvironmentName}
           onBlur={handleNewEnvironmentNameChange}

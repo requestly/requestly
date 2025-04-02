@@ -2,7 +2,6 @@ import { Result, Skeleton, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import React, { useCallback, useMemo } from "react";
-import { useLocation } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
 import PATHS from "config/constants/sub/paths";
@@ -29,8 +28,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
     isLoadingApiClientRecords,
     apiClientRecordsRepository,
   } = useApiClientContext();
-  const { setTitle } = useGenericState();
-  const location = useLocation();
+  const { setTitle, isNewTab } = useGenericState();
 
   const collection = useMemo(() => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
@@ -128,7 +126,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
             placeholder="New Collection"
             recordName={collectionName}
             onBlur={(newName) => handleCollectionNameChange(newName)}
-            autoFocus={location.search.includes("new")}
+            autoFocus={isNewTab}
             defaultBreadcrumbs={[
               { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
               {
