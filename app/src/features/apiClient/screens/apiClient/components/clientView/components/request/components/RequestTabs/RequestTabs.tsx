@@ -52,34 +52,15 @@ const RequestTabs: React.FC<Props> = ({
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
-  const [getTabIdBySourceId, getSourceByTabId] = useTabServiceWithSelector((state) => [
-    state.getTabIdBySourceId,
-    state.getSourceByTabId,
-  ]);
-
-  const tabId = useMemo(() => {
-    if (requestId) {
-      return getTabIdBySourceId(requestId);
-    } else {
-      return null;
-    }
-  }, [getTabIdBySourceId, requestId]);
-
-  const tabSourceId = useMemo(() => {
-    if (tabId) {
-      return getSourceByTabId(tabId).getSourceId();
-    } else {
-      return null;
-    }
-  }, [getSourceByTabId, tabId]);
+  const [activeTabSource] = useTabServiceWithSelector((state) => [state.activeTabSource]);
 
   useEffect(() => {
-    if (tabSourceId && requestId && tabSourceId === requestId) {
+    if (requestId && activeTabSource.getSourceId() === requestId) {
       if (selectedTab.tab === RequestTab.BODY && !supportsRequestBody(requestEntry.request.method)) {
         setSelectedTab({ tab: RequestTab.QUERY_PARAMS });
       }
     }
-  }, [requestId, requestEntry.request.method, selectedTab.tab, setSelectedTab, tabSourceId]);
+  }, [activeTabSource, requestEntry.request.method, requestId, selectedTab.tab, setSelectedTab]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     const isRequestBodySupported = supportsRequestBody(requestEntry.request.method);
