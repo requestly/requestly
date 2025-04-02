@@ -71,7 +71,7 @@ const createTabServiceStore = () => {
 
       const existingTabId = tabsIndex.get(sourceName)?.get(sourceId);
       if (existingTabId) {
-        setActiveTabId(existingTabId);
+        setActiveTab(existingTabId);
         return;
       }
 
