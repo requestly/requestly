@@ -160,9 +160,7 @@ const AuthHandler: React.FC<{}> = () => {
           submitAttrUtil(TRACKING.ATTR.PLAN_ID, planDetails.planId ?? "Missing Value");
           submitAttrUtil(TRACKING.ATTR.IS_TRIAL, planDetails.status === "trialing");
           submitAttrUtil(TRACKING.ATTR.SUBSCRIPTION_STATUS, planDetails.status);
-          if (planDetails.status === "canceled") {
-            submitAttrUtil(TRACKING.ATTR.RQ_SUBSCRIPTION_TYPE, "no_subscription");
-          } else if (planDetails.type !== "team") {
+          if (planDetails.type !== "team") {
             submitAttrUtil(
               TRACKING.ATTR.RQ_SUBSCRIPTION_TYPE,
               firestorePlanDetails.rqSubscriptionType ?? planDetails.type
@@ -173,6 +171,10 @@ const AuthHandler: React.FC<{}> = () => {
             submitAttrUtil(TRACKING.ATTR.PLAN_START_DATE, planDetails.subscription.startDate ?? "Missing Value");
             submitAttrUtil(TRACKING.ATTR.PLAN_END_DATE, planDetails.subscription.endDate ?? "Missing Value");
           }
+        }
+
+        if (!isUserPremium) {
+          submitAttrUtil(TRACKING.ATTR.RQ_SUBSCRIPTION_TYPE, "no_subscription");
         }
         Logger.timeEnd("AuthHandler-blockingOperations");
         return true;
