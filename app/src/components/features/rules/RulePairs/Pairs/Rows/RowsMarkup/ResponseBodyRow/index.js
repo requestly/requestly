@@ -28,7 +28,8 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   const theme = useTheme();
   const dispatch = useDispatch();
   const [isSelectedFileInputVisible, setIsSelectedFileInputVisible] = useState(false);
-  const editorBodyValues = useRef({
+
+  const [responseBodies, setResponseBodies] = useState({
     static: pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? pair.response.value : "{}",
     code:
       pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
@@ -46,19 +47,25 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
 
   const onChangeResponseType = useCallback(
     (responseBodyType) => {
+      setResponseBodies((prev) => ({
+        ...prev,
+        [pair.response.type]: pair.response.value,
+      }));
+
+      const value = responseBodies[responseBodyType];
       dispatch(
         globalActions.updateRulePairAtGivenPath({
           pairIndex,
           triggerUnsavedChangesIndication: false,
           updates: {
             "response.type": responseBodyType,
-            "response.value": editorBodyValues.current[responseBodyType],
+            "response.value": value,
             "response.serveWithoutRequest": undefined,
           },
         })
       );
     },
-    [dispatch, pairIndex]
+    [dispatch, pair.response.type, pair.response.value, pairIndex, responseBodies]
   );
 
   const handleFileSelectCallback = (selectedFile) => {
@@ -188,13 +195,12 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   };
 
   const responseBodyChangeHandler = (value) => {
-    editorBodyValues.current[pair.response.type] = value;
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           "response.type": pair.response.type,
-          "response.value": editorBodyValues.current[pair.response.type],
+          "response.value": value,
         },
         triggerUnsavedChangesIndication: !codeFormattedFlag.current,
       })
@@ -324,7 +330,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                     ? EditorLanguage.JAVASCRIPT
                     : EditorLanguage.JSON
                 }
-                value={editorBodyValues.current[pair.response.type] ?? getEditorDefaultValue()}
+                value={pair.response.value ?? getEditorDefaultValue()}
                 isReadOnly={isInputDisabled}
                 prettifyOnInit={true}
                 handleChange={responseBodyChangeHandler}
