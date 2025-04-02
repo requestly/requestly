@@ -6,7 +6,7 @@ import { Radio, Tooltip } from "antd";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import "./scriptEditor.scss";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
-import Editor from "componentsV2/CodeEditor/components/Editor";
+import Editor from "componentsV2/CodeEditor";
 
 interface ScriptEditorProps {
   scripts: RQAPI.Entry["scripts"];
@@ -51,11 +51,10 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts 
   return (
     <div className=" api-client-code-editor-container api-client-script-editor-container">
       <Editor
-        value={scripts?.[scriptType] || ""}
+        value={scripts?.[scriptType] || DEFAULT_SCRIPT_VALUES[scriptType]}
         handleChange={(value: string) =>
           setScripts((prev) => ({ ...prev, scripts: { ...prev.scripts, [scriptType]: value } }))
         }
-        defaultValue={DEFAULT_SCRIPT_VALUES[scriptType]}
         language={EditorLanguage.JAVASCRIPT}
         toolbarOptions={{
           title: "",
