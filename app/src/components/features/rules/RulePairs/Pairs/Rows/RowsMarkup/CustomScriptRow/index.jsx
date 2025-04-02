@@ -14,9 +14,9 @@ import FEATURES from "config/constants/sub/features";
 import { getDefaultScriptRender, createRenderedScript } from "./utils";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { MockPickerModal } from "features/mocks/modals";
-import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
+import { EditorLanguage } from "componentsV2/CodeEditor";
 import { RuleType } from "@requestly/shared/types/entities/rules";
-import Editor from "componentsV2/CodeEditor/components/Editor";
+import Editor from "componentsV2/CodeEditor";
 
 const { Text } = Typography;
 
@@ -31,7 +31,6 @@ const CustomScriptRow = ({
   pair,
 }) => {
   const dispatch = useDispatch();
-
   const isFirstRender = useRef(true); // to maintain a state for unsaved changes
   const [isCodeTypePopupVisible, setIsCodeTypePopupVisible] = useState(false);
   const [isSourceTypePopupVisible, setIsSourceTypePopupVisible] = useState(false);
@@ -241,11 +240,10 @@ const CustomScriptRow = ({
           <Col xl="12" span={24}>
             <Editor
               isResizable
-              id={script.id}
+              scriptId={script.id}
               height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 125 : 300}
               language={codeEditorLanguage}
-              defaultValue={initialCodeEditorValue ?? scriptEditorBoilerCode}
-              value={initialCodeEditorValue}
+              value={initialCodeEditorValue ?? scriptEditorBoilerCode}
               handleChange={handleEditorUpdate}
               isReadOnly={isInputDisabled}
               analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.SCRIPT }}
