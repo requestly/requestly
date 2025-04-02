@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal } from "antd";
-import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
+import Editor from "componentsV2/CodeEditor";
 import { ErroredRecord, FileType } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { EditorLanguage } from "componentsV2/CodeEditor";
