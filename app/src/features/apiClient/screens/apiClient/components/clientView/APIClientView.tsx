@@ -19,7 +19,6 @@ import {
   trackInstallExtensionDialogShown,
   trackRequestSaved,
   trackRequestRenamed,
-  trackApiRequestDone,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
@@ -35,6 +34,7 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
+import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
@@ -47,7 +47,6 @@ import { ApiClientSnippetModal } from "../modals/ApiClientSnippetModal/ApiClient
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
-import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 
 interface Props {
   openInModal?: boolean;
@@ -305,11 +304,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           type: getContentTypeFromResponseHeaders(executedEntry.response.headers),
           time: Math.round(executedEntry.response.time / 1000),
         });
-        trackApiRequestDone({
-          url: executedEntry.request.url,
-          method: executedEntry.request.method,
-          status: executedEntry.response.status,
-        });
         trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
         trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
       } else if (apiClientExecutionResult.status === "error") {
@@ -329,13 +323,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
             Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
           });
         }
-        trackRequestFailed(
-          error.message,
-          error.type,
-          entryWithResponse.request.url,
-          entryWithResponse.request.method,
-          entryWithResponse.response?.status
-        );
+        trackRequestFailed(error.message);
         trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
         trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
       }
@@ -344,7 +332,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     } catch (e) {
       setIsFailed(true);
       setError({
-        type: e.type,
         source: "request",
         name: e.name,
         message: e.message,
@@ -581,7 +568,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
               onBlur={onUrlInputBlur}
               prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
             /> */}
-              <SingleLineEditor
+              <RQSingleLineEditor
                 className="api-request-url"
                 placeholder="https://example.com"
                 //value={entry.request.url}

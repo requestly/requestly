@@ -1,2 +1,2 @@
-export { default } from "./components/EditorV2/index";
+export { default } from "./components/Editor/Editor";
 export * from "./types";

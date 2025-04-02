@@ -10,6 +10,7 @@ import {
 } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { formatJSONString } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
 import InfoIcon from "components/misc/InfoIcon";
 import { trackServeResponseWithoutRequestEnabled } from "modules/analytics/events/features/ruleEditor";
@@ -17,53 +18,51 @@ import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExtern
 import { InfoTag } from "components/misc/InfoTag";
 import { RQButton } from "lib/design-system-v2/components";
 import LINKS from "config/constants/sub/links";
-import { EditorLanguage } from "componentsV2/CodeEditor";
+import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { RuleType } from "@requestly/shared/types/entities/rules";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import "./ResponseBodyRow.css";
-import Editor from "componentsV2/CodeEditor";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const [isSelectedFileInputVisible, setIsSelectedFileInputVisible] = useState(false);
 
-  /*
-  useRef is not the idle way to handle this, useState should be used to control the behaviour of updating the value in
-  state - this needs to be fixed
-  */
-  const responseBodyValues = useRef({
-    static: pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? pair.response.value : "{}",
-    code:
-      pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
-        ? pair.response.value
-        : ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"],
-    local_file: pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE ? pair.response.value : "",
-  });
-
   const isServeWithoutRequestSupported = useMemo(
     () => isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST),
     []
   );
 
+  const [responseBodies, setResponseBodies] = useState({
+    static: "{}",
+    code: ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"],
+    local_file: "",
+  });
+
   const codeFormattedFlag = useRef(null);
 
   const onChangeResponseType = useCallback(
     (responseBodyType) => {
+      setResponseBodies((prev) => ({
+        ...prev,
+        [pair.response.type]: pair.response.value,
+      }));
+
+      const value = responseBodies[responseBodyType];
       dispatch(
         globalActions.updateRulePairAtGivenPath({
           pairIndex,
           triggerUnsavedChangesIndication: false,
           updates: {
             "response.type": responseBodyType,
-            "response.value": responseBodyValues.current[responseBodyType],
+            "response.value": value,
             "response.serveWithoutRequest": undefined,
           },
         })
       );
     },
-    [dispatch, pairIndex]
+    [dispatch, pair.response.type, pair.response.value, pairIndex, responseBodies]
   );
 
   const handleFileSelectCallback = (selectedFile) => {
@@ -193,13 +192,13 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   };
 
   const responseBodyChangeHandler = (value) => {
-    responseBodyValues.current[pair.response.type] = value;
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           "response.type": pair.response.type,
-          "response.value": responseBodyValues.current[pair.response.type],
+          "response.value":
+            pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? formatJSONString(value) : value,
         },
         triggerUnsavedChangesIndication: !codeFormattedFlag.current,
       })
@@ -322,14 +321,15 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             }}
           >
             <Col xl="12" span={24}>
-              <Editor
+              <CodeEditor
                 // key={pair.response.type}
                 language={
                   pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
                     ? EditorLanguage.JAVASCRIPT
                     : EditorLanguage.JSON
                 }
-                value={responseBodyValues.current[pair.response.type] ?? getEditorDefaultValue()}
+                defaultValue={getEditorDefaultValue()}
+                value={pair.response.value}
                 isReadOnly={isInputDisabled}
                 prettifyOnInit={true}
                 handleChange={responseBodyChangeHandler}

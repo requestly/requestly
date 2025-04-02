@@ -83,7 +83,14 @@ export const ApiClientSnippetModal = ({ apiRequest, onClose, open }: ApiClientSn
           />
         </div>
         <div className="api-client-snippet-content">
-          <Editor hideCharacterCount isResizable config={{ hideToolbar: true }} value={snippet ?? ""} language={null} />
+          <Editor
+            hideCharacterCount
+            isResizable
+            config={{ hideToolbar: true }}
+            value={snippet}
+            defaultValue=""
+            language={null}
+          />
         </div>
       </div>
     </Modal>

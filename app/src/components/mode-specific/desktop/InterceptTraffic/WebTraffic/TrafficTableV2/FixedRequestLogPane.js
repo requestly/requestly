@@ -6,7 +6,8 @@ import { CloseOutlined } from "@ant-design/icons";
 import RequestPayloadPreview from "./Preview/PayloadPreview";
 import RequestSummary from "./RequestSummary";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import Editor, { EditorLanguage } from "componentsV2/CodeEditor";
+import Editor from "componentsV2/CodeEditor/components/Editor/Editor";
+import { EditorLanguage } from "componentsV2/CodeEditor";
 import "./FixedRequestLogPane.css";
 
 const { Text } = Typography;
@@ -161,8 +162,9 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
       body: (
         <div className="navigation-panel-wrapper">
           <Editor
-            scriptId={`${title}-${log_id}`}
+            id={`${title}-${log_id}`}
             value={body || "{}"}
+            defaultValue={body || "{}"}
             language={EditorLanguage.JSON}
             isReadOnly
             isResizable={false}
