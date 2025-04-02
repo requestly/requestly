@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useMemo, useState } from "react";
+import React, { useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Radio, Tooltip } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -12,35 +12,32 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
   const dispatch = useDispatch();
   const codeFormattedFlag = useRef(null);
 
-  const [requestBodies, setRequestBodies] = useState({
-    static: pair.request.type === GLOBAL_CONSTANTS.REQUEST_TYPES.STATIC ? pair.request.value : "{}",
+  /*
+  useRef is not the idle way to handle this, useState should be used to control the behaviour of updating the value in
+  state - this needs to be fixed
+  */
+  const requestBodyValues = useRef({
+    static: pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? pair.request.value : "{}",
     code:
-      pair.request.type === GLOBAL_CONSTANTS.REQUEST_TYPES.CODE
+      pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
         ? pair.request.value
         : ruleDetails["REQUEST_BODY_JAVASCRIPT_DEFAULT_VALUE"],
-    local_file: pair.request.type === GLOBAL_CONSTANTS.REQUEST_TYPES.LOCAL_FILE ? pair.request.value : "",
   });
 
   const onChangeRequestType = useCallback(
     (requestType) => {
-      setRequestBodies((prev) => ({
-        ...prev,
-        [pair.request.type]: pair.request.value,
-      }));
-      // deriving value from the state
-      const value = requestBodies[requestType];
       dispatch(
         globalActions.updateRulePairAtGivenPath({
           pairIndex,
           triggerUnsavedChangesIndication: false,
           updates: {
             "request.type": requestType,
-            "request.value": value,
+            "request.value": requestBodyValues.current[requestType],
           },
         })
       );
     },
-    [dispatch, pair.request.type, pair.request.value, pairIndex, requestBodies]
+    [dispatch, pairIndex]
   );
 
   const getEditorDefaultValue = useCallback(() => {
@@ -55,14 +52,15 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     return null;
   }, [pair.request.type]);
 
-  const requestBodyChangeHandler = async (value) => {
+  const requestBodyChangeHandler = (value) => {
+    requestBodyValues.current[pair.request.type] = value;
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         triggerUnsavedChangesIndication: !codeFormattedFlag.current,
         updates: {
           "request.type": pair.request.type,
-          "request.value": value,
+          "request.value": requestBodyValues.current[pair.request.type],
         },
       })
     );
@@ -138,7 +136,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                     ? EditorLanguage.JAVASCRIPT
                     : EditorLanguage.JSON
                 }
-                value={pair.request.value ?? getEditorDefaultValue()}
+                value={requestBodyValues.current[pair.request.type] ?? getEditorDefaultValue()}
                 handleChange={requestBodyChangeHandler}
                 prettifyOnInit={true}
                 isReadOnly={isInputDisabled}

@@ -29,7 +29,11 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   const dispatch = useDispatch();
   const [isSelectedFileInputVisible, setIsSelectedFileInputVisible] = useState(false);
 
-  const [responseBodies, setResponseBodies] = useState({
+  /*
+  useRef is not the idle way to handle this, useState should be used to control the behaviour of updating the value in
+  state - this needs to be fixed
+  */
+  const responseBodyValues = useRef({
     static: pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? pair.response.value : "{}",
     code:
       pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
@@ -47,25 +51,19 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
 
   const onChangeResponseType = useCallback(
     (responseBodyType) => {
-      setResponseBodies((prev) => ({
-        ...prev,
-        [pair.response.type]: pair.response.value,
-      }));
-
-      const value = responseBodies[responseBodyType];
       dispatch(
         globalActions.updateRulePairAtGivenPath({
           pairIndex,
           triggerUnsavedChangesIndication: false,
           updates: {
             "response.type": responseBodyType,
-            "response.value": value,
+            "response.value": responseBodyValues.current[responseBodyType],
             "response.serveWithoutRequest": undefined,
           },
         })
       );
     },
-    [dispatch, pair.response.type, pair.response.value, pairIndex, responseBodies]
+    [dispatch, pairIndex]
   );
 
   const handleFileSelectCallback = (selectedFile) => {
@@ -195,12 +193,13 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   };
 
   const responseBodyChangeHandler = (value) => {
+    responseBodyValues.current[pair.response.type] = value;
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           "response.type": pair.response.type,
-          "response.value": value,
+          "response.value": responseBodyValues.current[pair.response.type],
         },
         triggerUnsavedChangesIndication: !codeFormattedFlag.current,
       })
@@ -330,7 +329,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                     ? EditorLanguage.JAVASCRIPT
                     : EditorLanguage.JSON
                 }
-                value={pair.response.value ?? getEditorDefaultValue()}
+                value={responseBodyValues.current[pair.response.type] ?? getEditorDefaultValue()}
                 isReadOnly={isInputDisabled}
                 prettifyOnInit={true}
                 handleChange={responseBodyChangeHandler}
