@@ -19,7 +19,7 @@ export enum RequestMethod {
 }
 
 export enum RequestContentType {
-  //RAW = "text/plain",
+  RAW = "text/plain",
   JSON = "application/json",
   FORM = "application/x-www-form-urlencoded",
 }
