@@ -22,13 +22,15 @@ export const saveRule = async (appMode, dispatch, ruleObject) => {
 
   if (ruleToSave.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST) {
     if (ruleToSave.pairs[0].request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
-      ruleToSave.pairs[0].request.value = minifyCode(ruleToSave.pairs[0].request.value);
+      const minifiedValue = minifyCode(ruleToSave.pairs[0].request.value);
+      ruleToSave.pairs[0].request.value = minifiedValue;
     }
   }
 
   if (ruleToSave.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
     if (ruleToSave.pairs[0].response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
-      ruleToSave.pairs[0].response.value = minifyCode(ruleToSave.pairs[0].response.value);
+      const minifiedValue = minifyCode(ruleToSave.pairs[0].response.value);
+      ruleToSave.pairs[0].response.value = minifiedValue;
     }
   }
 
