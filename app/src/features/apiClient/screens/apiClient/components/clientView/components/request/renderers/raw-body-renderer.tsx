@@ -4,7 +4,7 @@ import { EnvironmentVariables } from "backend/environment/types";
 import { useDebounce } from "hooks/useDebounce";
 import { RequestBodyContext, useTextBody } from "../request-body-state-manager";
 import { RequestBodyProps } from "../request-body-types";
-import EditorV2 from "componentsV2/CodeEditor/components/EditorV2";
+import Editor from "componentsV2/CodeEditor";
 
 export function RawBody(props: {
   contentType: "text/plain" | "application/json";
@@ -41,7 +41,7 @@ export function RawBody(props: {
 
   return (
     <div className="api-client-code-editor-container api-request-body-editor-container">
-      <EditorV2
+      <Editor
         language={editorLanguage}
         value={text}
         handleChange={handleTextChange}
