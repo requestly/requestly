@@ -11,7 +11,7 @@ import { useOutsideClick } from "hooks";
 import { toast } from "utils/Toast";
 import { useRBAC } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
-import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import "./collectionOverview.scss";
 
 interface CollectionOverviewProps {
@@ -25,7 +25,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_collection", "create");
   const { id, setTitle } = useGenericState();
-  const closeTabById = useTabServiceStore().use.closeTabById();
+  const closeTabById = useTabServiceWithSelector((state) => state.closeTabById);
 
   const [collectionName, setCollectionName] = useState(collection?.name || "");
   const [collectionDescription, setCollectionDescription] = useState(collection?.description || "");
