@@ -1,10 +1,7 @@
 .api-client-empty-view-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   padding: var(--space-12, 56px) 0px;
   gap: var(--space-8, 24px);
+  width: 100%;
 
   .api-client-empty-view-header {
     text-align: center;

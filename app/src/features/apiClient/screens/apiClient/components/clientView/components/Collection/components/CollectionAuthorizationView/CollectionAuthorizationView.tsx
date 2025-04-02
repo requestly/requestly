@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { useTabsLayoutContext } from "layouts/TabsLayout";
 import AuthorizationView from "../../../request/components/AuthorizationView";
@@ -10,6 +9,7 @@ import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constan
 import { RoleBasedComponent } from "features/rbac";
 
 interface Props {
+  collectionId: string;
   authOptions?: RQAPI.Auth;
   updateAuthData: (authOptions: RQAPI.Auth) => any;
   rootLevelRecord: boolean;
@@ -23,8 +23,12 @@ interface Props {
  * and remain separated from the main Collection View
  *
  */
-const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthData, rootLevelRecord }) => {
-  const { collectionId } = useParams();
+const CollectionAuthorizationView: React.FC<Props> = ({
+  collectionId,
+  authOptions,
+  updateAuthData,
+  rootLevelRecord,
+}) => {
   const [authOptionsState, setAuthOptionsState] = useState<RQAPI.Auth>(authOptions);
   const [isSaving, setIsSaving] = useState(false);
 

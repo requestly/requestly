@@ -16,6 +16,8 @@ import { toast } from "utils/Toast";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./apiClientSidebar.scss";
+import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { DraftRequestContainerTabSource } from "../clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
 
 interface Props {}
 
@@ -48,6 +50,8 @@ const APIClientSidebar: React.FC<Props> = () => {
     apiClientRecordsRepository,
   } = useApiClientContext();
 
+  const openTab = useTabServiceStore().use.openTab();
+
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
       setRecordTypeToBeCreated(recordType);
@@ -55,7 +59,8 @@ const APIClientSidebar: React.FC<Props> = () => {
       switch (recordType) {
         case RQAPI.RecordType.API: {
           setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
-          onNewClick(analyticEventSource, RQAPI.RecordType.API);
+          // onNewClick(analyticEventSource, RQAPI.RecordType.API);
+          openTab(new DraftRequestContainerTabSource());
           return;
         }
 
@@ -75,7 +80,7 @@ const APIClientSidebar: React.FC<Props> = () => {
           return;
       }
     },
-    [onNewClick]
+    [onNewClick, openTab]
   );
 
   useEffect(() => {
