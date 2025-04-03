@@ -20,7 +20,7 @@ import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderC
 import { MdContentCopy } from "@react-icons/all-files/md/MdContentCopy";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { Conditional } from "components/common/Conditional";
-import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RequestViewTabSource } from "../../../../clientView/components/RequestView/requestViewTabSource";
 
 interface Props {
@@ -46,16 +46,13 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
   } = useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  const openTab = useTabServiceStore().use.openTab();
-  const activeTabId = useTabServiceStore().use.activeTabId();
-  const getSourceByTabId = useTabServiceStore().use.getSourceByTabId();
+  const [activeTabSource, openTab] = useTabServiceWithSelector((state) => [state.activeTabSource, state.openTab]);
 
   const activeTabSourceId = useMemo(() => {
-    if (activeTabId) {
-      const source = getSourceByTabId(activeTabId);
-      return source.getSourceId();
+    if (activeTabSource) {
+      return activeTabSource.getSourceId();
     }
-  }, [activeTabId, getSourceByTabId]);
+  }, [activeTabSource]);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);

@@ -19,7 +19,7 @@ import { EnvironmentData } from "backend/environment/types";
 import { ErrorFilesList } from "features/apiClient/screens/apiClient/components/sidebar/components/ErrorFilesList/ErrorFileslist";
 import { toast } from "utils/Toast";
 import { RBAC, useRBAC } from "features/rbac";
-import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { EnvironmentViewTabSource } from "../environmentView/EnvironmentViewTabSource";
 import "./environmentsList.scss";
 
@@ -40,7 +40,7 @@ export const EnvironmentsList = () => {
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_environment", "update");
 
-  const openTab = useTabServiceStore().use.openTab();
+  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
   const environments = useMemo(() => getAllEnvironments(), [getAllEnvironments]);
   const filteredEnvironments = useMemo(

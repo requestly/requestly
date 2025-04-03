@@ -4,36 +4,56 @@ import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 import { useSetUrl } from "../tabUtils";
-import { Outlet } from "react-router-dom";
+import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import "./tabsContainer.scss";
+import PATHS from "config/constants/sub/paths";
 
 export const TabsContainer: React.FC = () => {
   const [
     activeTabId,
-    setActiveTabId,
+    activeTabSource,
+    setActiveTab,
     tabs,
     _version,
     openTab,
     closeTabById,
-    getSourceByTabId,
     incrementVersion,
   ] = useTabServiceWithSelector((state) => [
     state.activeTabId,
-    state.setActiveTabId,
+    state.activeTabSource,
+    state.setActiveTab,
     state.tabs,
     state._version,
     state.openTab,
     state.closeTabById,
-    state.getSourceByTabId,
     state.incrementVersion,
   ]);
 
   const isInitialLoadRef = useRef(true);
   const matchedTabSource = useMatchedTabSource();
   const { setUrl } = useSetUrl();
+
+  const hasUnsavedChanges = Array.from(tabs.values()).some((tab) => tab.getState().saved);
+
+  unstable_useBlocker(({ nextLocation }) => {
+    const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
+    const shouldBlock = !isNextLocationApiClientView && hasUnsavedChanges;
+
+    if (isNextLocationApiClientView) {
+      return false;
+    }
+
+    if (shouldBlock) {
+      const shouldDiscardChanges = window.confirm("Discard changes? Changes you made will not be saved.");
+      const blockNavigation = !shouldDiscardChanges;
+      return blockNavigation;
+    }
+
+    return false;
+  });
 
   useEffect(() => {
     if (!matchedTabSource) {
@@ -44,16 +64,19 @@ export const TabsContainer: React.FC = () => {
   }, [matchedTabSource, openTab]);
 
   useEffect(() => {
-    if (activeTabId) {
-      const tabSource = getSourceByTabId(activeTabId);
-      const newPath = tabSource.getUrlPath();
-      setUrl(newPath, isInitialLoadRef.current);
+    if (activeTabSource) {
+      const newPath = activeTabSource.getUrlPath();
+      if (newPath !== window.location.pathname) {
+        setUrl(newPath, isInitialLoadRef.current);
+      }
+    } else {
+      setUrl(PATHS.API_CLIENT.ABSOLUTE, isInitialLoadRef.current);
     }
 
-    if (activeTabId && isInitialLoadRef.current) {
+    if (activeTabSource && isInitialLoadRef.current) {
       isInitialLoadRef.current = false;
     }
-  }, [activeTabId, getSourceByTabId, setUrl]);
+  }, [activeTabSource, setUrl]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     return Array.from(tabs.values()).map((tabStore) => {
@@ -88,7 +111,7 @@ export const TabsContainer: React.FC = () => {
                 }}
                 icon={<MdClose />}
               />
-              {/* {tab.hasUnsavedChanges ? <div className="unsaved-changes-indicator" /> : null} */}
+              {tabState.saved ? <div className="unsaved-changes-indicator" /> : null}
             </div>
           </div>
         ),
@@ -110,7 +133,7 @@ export const TabsContainer: React.FC = () => {
         className="tabs-content"
         popupClassName="tabs-content-more-dropdown"
         onChange={(key) => {
-          setActiveTabId(parseInt(key));
+          setActiveTab(parseInt(key));
         }}
         onEdit={(key, action) => {
           if (action === "remove") {

@@ -6,6 +6,7 @@ export class BaseTabSource implements AbstractTabSource {
   metadata: Record<string, any>;
   urlPath: string;
   icon: React.ReactNode;
+  type = this.constructor.name;
 
   getSourceId(): string {
     return this.metadata.id;
@@ -29,5 +30,9 @@ export class BaseTabSource implements AbstractTabSource {
 
   getIcon(): React.ReactNode {
     return this.icon;
+  }
+
+  getIsNewTab(): boolean {
+    return this.metadata.isNewTab ?? false;
   }
 }

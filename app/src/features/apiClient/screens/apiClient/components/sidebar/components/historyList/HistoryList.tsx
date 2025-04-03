@@ -6,7 +6,7 @@ import { trackRequestSelectedFromHistory } from "modules/analytics/events/featur
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
-import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { HistoryViewTabSource } from "../../../clientView/components/request/HistoryView/historyViewTabSource";
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, onSelectionFromHistory }) => {
-  const openTab = useTabServiceStore().use.openTab();
+  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
   const [dismissNote, setDismissNote] = useState(false);
 
   const onHistoryLinkClick = useCallback(

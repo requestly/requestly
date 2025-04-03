@@ -15,7 +15,7 @@ import {
   trackEnvironmentDuplicated,
   trackEnvironmentRenamed,
 } from "modules/analytics/events/features/apiClient";
-import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { EnvironmentViewTabSource } from "../../../environmentView/EnvironmentViewTabSource";
 
 interface EnvironmentsListItemProps {
@@ -54,8 +54,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
   const [isRenaming, setIsRenaming] = useState(false);
-  const openTab = useTabServiceStore().use.openTab();
-  const activeTabId = useTabServiceStore().use.activeTabId();
+  const [openTab, activeTabId] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabId]);
 
   const { closeTab } = useTabsLayoutContext();
 

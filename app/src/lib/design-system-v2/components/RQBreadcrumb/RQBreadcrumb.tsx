@@ -14,6 +14,12 @@ interface Props {
   placeholder?: string;
   onRecordNameUpdate?: (updatedRecordName: string) => void;
   autoFocus?: boolean;
+  defaultBreadcrumbs?: {
+    pathname: string;
+    label: string;
+    disabled?: boolean;
+    isEditable?: boolean;
+  }[];
 }
 
 interface MatchedRoute {
@@ -38,6 +44,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
   placeholder,
   onRecordNameUpdate,
   autoFocus = false,
+  defaultBreadcrumbs = [],
 }) => {
   const [name, setName] = useState(recordName || "");
   const [isEditRecord, setIsEditRecord] = useState(false);
@@ -56,10 +63,15 @@ export const RQBreadcrumb: React.FC<Props> = ({
   }, [autoFocus]);
 
   const breadcrumbs: ({
-    pathname: MatchedRoute["pathname"];
-  } & MatchedRoute["handle"]["breadcrumb"])[] = matchedRoutes.reduce((result, route) => {
-    return route.handle?.breadcrumb ? [...result, { ...route.handle.breadcrumb, pathname: route.pathname }] : result;
-  }, []);
+    pathname: string;
+  } & MatchedRoute["handle"]["breadcrumb"])[] =
+    defaultBreadcrumbs.length > 0
+      ? defaultBreadcrumbs
+      : matchedRoutes.reduce((result, route) => {
+          return route.handle?.breadcrumb
+            ? [...result, { ...route.handle.breadcrumb, pathname: route.pathname }]
+            : result;
+        }, []);
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const updatedValue = e.target.value;

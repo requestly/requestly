@@ -18,7 +18,7 @@ import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderC
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 import { Conditional } from "components/common/Conditional";
-import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "../../../../clientView/components/Collection/collectionViewTabSource";
 import "./CollectionRow.scss";
 
@@ -54,16 +54,13 @@ export const CollectionRow: React.FC<Props> = ({
   const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  const openTab = useTabServiceStore().use.openTab();
-  const activeTabId = useTabServiceStore().use.activeTabId();
-  const getSourceByTabId = useTabServiceStore().use.getSourceByTabId();
+  const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
 
   const activeTabSourceId = useMemo(() => {
-    if (activeTabId) {
-      const source = getSourceByTabId(activeTabId);
-      return source.getSourceId();
+    if (activeTabSource) {
+      return activeTabSource.getSourceId();
     }
-  }, [activeTabId, getSourceByTabId]);
+  }, [activeTabSource]);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);
