@@ -17,7 +17,7 @@ type TabConfig = {
 export type TabServiceState = {
   tabIdSequence: TabId;
   activeTabId: TabId;
-  activeTabSource: AbstractTabSource | null;
+  activeTabSource: AbstractTabSource;
   tabsIndex: Map<SourceName, SourceMap>; // Type: SourceName -> sourceId -> tabId eg: Request -> [requestId,tabId]
   tabs: Map<TabId, StoreApi<TabState>>;
 
@@ -219,18 +219,22 @@ const createTabServiceStore = () => {
 
         storage: {
           setItem: (name, newValue: StorageValue<TabServiceState>) => {
+            const tabs = Array.from(newValue.state.tabs.entries()).map(([tabId, tabStore]) => [
+              tabId,
+              tabStore.getState(),
+            ]);
+
+            const tabsIndex = Array.from(newValue.state.tabsIndex.entries()).map(([sourceName, sourceMap]) => [
+              sourceName,
+              Array.from(sourceMap.entries()),
+            ]);
+
             const stateString = JSON.stringify({
               ...newValue,
               state: {
                 ...newValue.state,
-                tabsIndex: Array.from(newValue.state.tabsIndex.entries()).map(([sourceName, sourceMap]) => [
-                  sourceName,
-                  Array.from(sourceMap.entries()),
-                ]),
-                tabs: Array.from(newValue.state.tabs.entries()).map(([tabId, tabStore]) => [
-                  tabId,
-                  tabStore.getState(),
-                ]),
+                tabs,
+                tabsIndex,
               },
             });
             localStorage.setItem(name, stateString);
