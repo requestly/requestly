@@ -22,7 +22,7 @@ export const DraftRequestContainer: React.FC<{ draftId: string }> = ({ draftId }
     isCreateMode: true,
   });
 
-  const { setTitle } = useGenericState();
+  const { setTitle = () => {} } = useGenericState();
   const [tabsIndex, tabs] = useTabServiceWithSelector((state) => [state.tabsIndex, state.tabs]);
   const { setUrl } = useSetUrl();
 

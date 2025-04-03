@@ -28,7 +28,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
     isLoadingApiClientRecords,
     apiClientRecordsRepository,
   } = useApiClientContext();
-  const { setTitle, isNewTab } = useGenericState();
+  const { setTitle = () => {}, isNewTab = false } = useGenericState();
 
   const collection = useMemo(() => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
