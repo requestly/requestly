@@ -93,7 +93,7 @@ export const PrimarySidebar: React.FC = () => {
         icon: (
           <span className="icon-with-badge">
             <ApiOutlined />
-            <RQBadge badgeText="NEW" />
+            <RQBadge badgeText="BETA" />
           </span>
         ),
         display: true,
