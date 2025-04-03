@@ -2,11 +2,10 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Modal } from "antd";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { AuthScreen } from "features/onboarding";
 import APP_CONSTANTS from "../../../config/constants";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 import "./AuthModal.css";
-import { AuthScreenV2 } from "features/onboarding/components/authv2/AuthScreen";
+import { AuthScreen } from "features/onboarding/screens/auth/AuthScreen";
 
 const AuthModal = ({
   isOpen,
@@ -53,7 +52,7 @@ const AuthModal = ({
         bodyStyle={{ padding: "0" }}
         wrapClassName="auth-modal-wrapper"
         closable={false}
-        width={920}
+        width={670}
         maskClosable={false}
       >
         {/* <AuthScreen
@@ -64,7 +63,7 @@ const AuthModal = ({
           toggleAuthModal={toggle}
           warningMessage={warningMessage}
         /> */}
-        <AuthScreenV2 />
+        <AuthScreen />
       </Modal>
     </>
   );

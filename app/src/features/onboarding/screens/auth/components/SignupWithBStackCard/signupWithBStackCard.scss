@@ -1,0 +1,52 @@
+.signup-with-bstack-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &-description {
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--requestly-font-size-sm);
+    margin: 8px 0 16px 0;
+    text-align: center;
+  }
+
+  .ant-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--requestly-font-size-md);
+    font-weight: var(--requestly-font-weight-medium);
+    position: relative;
+  }
+
+  .bstack-help-link {
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--requestly-font-size-sm);
+    margin-top: 16px;
+    text-align: center;
+  }
+
+  .ant-btn::after {
+    content: "";
+    background: #04123056;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+  }
+
+  .auto-redirect-btn-transition.ant-btn::after {
+    animation: redirect-animation 5s ease-in-out;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes redirect-animation {
+    0% {
+      width: 0%;
+    }
+    100% {
+      width: 100%;
+    }
+  }
+}

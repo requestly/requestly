@@ -553,7 +553,7 @@ export const redirectToUrl = (url, newTab = false) => {
     return window.open(url, "_blank");
   }
 
-  return window.open(url);
+  return window.open(url, "_self");
 };
 
 export const navigateBack = (navigate, location, fallback) => {

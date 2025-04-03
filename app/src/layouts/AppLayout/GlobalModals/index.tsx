@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
-import AuthModal from "components/authentication/AuthModal";
 import { globalActions } from "store/slices/global/slice";
 import { getActiveModals } from "store/slices/global/modals/selectors";
+import { AuthModal } from "features/onboarding/screens/auth/modals/AuthModal/AuthModal";
 
 export const GlobalModals = () => {
   const dispatch = useDispatch();
@@ -11,15 +11,5 @@ export const GlobalModals = () => {
     dispatch(globalActions.toggleActiveModal({ modalName: "authModal" }));
   };
 
-  return (
-    <>
-      {activeModals.authModal.isActive ? (
-        <AuthModal
-          isOpen={activeModals.authModal.isActive}
-          toggle={() => toggleAuthModal()}
-          {...activeModals.authModal.props}
-        />
-      ) : null}
-    </>
-  );
+  return <>{activeModals.authModal.isActive ? <AuthModal /> : null}</>;
 };
