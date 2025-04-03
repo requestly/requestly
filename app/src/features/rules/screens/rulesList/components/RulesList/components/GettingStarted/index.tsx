@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Divider, Tooltip } from "antd";
@@ -11,10 +11,7 @@ import { ImportRulesModal } from "../../../../../../modals/ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import PersonaRecommendation from "./PersonaRecommendation";
-import { shouldShowRecommendationScreen } from "features/personaSurvey/utils";
 import {
   trackGettingStartedVideoPlayed,
   trackNewRuleButtonClicked,
@@ -53,8 +50,6 @@ export const GettingStarted: React.FC = () => {
   const { state } = useLocation();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const gettingStartedVideo = useRef(null);
@@ -70,11 +65,6 @@ export const GettingStarted: React.FC = () => {
   };
 
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
-
-  const isRecommendationScreenVisible = useMemo(
-    () => shouldShowRecommendationScreen(userPersona, appMode, state?.src),
-    [appMode, state?.src, userPersona]
-  );
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive((prev) => !prev);
@@ -128,10 +118,6 @@ export const GettingStarted: React.FC = () => {
       });
     }
   }, []);
-
-  if (isRecommendationScreenVisible) {
-    return <PersonaRecommendation handleUploadRulesClick={handleUploadRulesClick} />;
-  }
 
   const suggestedRules = [
     {

@@ -6,6 +6,7 @@ import { AuthScreen } from "features/onboarding";
 import APP_CONSTANTS from "../../../config/constants";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 import "./AuthModal.css";
+import { AuthScreenV2 } from "features/onboarding/components/authv2/AuthScreen";
 
 const AuthModal = ({
   isOpen,
@@ -55,14 +56,15 @@ const AuthModal = ({
         width={920}
         maskClosable={false}
       >
-        <AuthScreen
+        {/* <AuthScreen
           isOpen={false}
           defaultAuthMode={authMode}
           source={eventSource}
           callback={callback}
           toggleAuthModal={toggle}
           warningMessage={warningMessage}
-        />
+        /> */}
+        <AuthScreenV2 />
       </Modal>
     </>
   );

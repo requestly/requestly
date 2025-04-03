@@ -3,9 +3,6 @@ import { FaCheck } from "@react-icons/all-files/fa/FaCheck";
 import { FaExclamationCircle } from "@react-icons/all-files/fa/FaExclamationCircle";
 import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import { Container, Row, Col, Card, CardBody } from "reactstrap";
-import { useSelector, useDispatch } from "react-redux";
-import { getUserPersonaSurveyDetails } from "store/selectors";
-import { syncUserPersona } from "components/misc/PersonaSurvey/utils";
 // Firebase
 // import firebase from "../../../firebase";
 import firebaseApp from "../../../firebase";
@@ -36,67 +33,61 @@ const DesktopSignIn = () => {
   //Component State
   const [allDone, setAllDone] = useState(false);
   const [isError, setIsError] = useState(false);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleDoneSignIn = useCallback(
-    async (firebaseUser, isNewUser = false) => {
-      const params = new URLSearchParams(window.location.search);
-      const token = await firebaseUser?.getIdToken();
-      const code = params.get("ot-auth-code");
-      const source = params.get("source").replace(/ /g, "_");
-      const functions = getFunctions();
-      const createAuthToken = httpsCallable(functions, "auth-createAuthToken");
+  const handleDoneSignIn = useCallback(async (firebaseUser, isNewUser = false) => {
+    const params = new URLSearchParams(window.location.search);
+    const token = await firebaseUser?.getIdToken();
+    const code = params.get("ot-auth-code");
+    const source = params.get("source").replace(/ /g, "_");
+    const functions = getFunctions();
+    const createAuthToken = httpsCallable(functions, "auth-createAuthToken");
 
-      let uid = firebaseUser?.uid || null;
-      let email = firebaseUser?.email || null;
+    let uid = firebaseUser?.uid || null;
+    let email = firebaseUser?.email || null;
 
-      const emailType = await getEmailType(email);
+    const emailType = await getEmailType(email);
 
-      createAuthToken({
-        oneTimeCode: code,
-        idToken: token,
-      })
-        .then(() => {
-          setAllDone(true);
-          syncUserPersona(uid, dispatch, userPersona);
-          if (isNewUser) {
-            trackSignUpAttemptedEvent({
-              auth_provider: AUTH_PROVIDERS.GMAIL,
-              source,
-            });
-            trackSignupSuccessEvent({
-              auth_provider: AUTH_PROVIDERS.GMAIL,
-              email,
-              uid,
-              email_type: emailType,
-              domain: email.split("@")[1],
-              source,
-            });
-          } else {
-            trackLoginAttemptedEvent({
-              auth_provider: AUTH_PROVIDERS.GMAIL,
-            });
-            trackLoginSuccessEvent({
-              auth_provider: AUTH_PROVIDERS.GMAIL,
-            });
-          }
-          // window.close();
-          redirectToDesktopApp();
-        })
-        .catch((err) => {
-          setIsError(true);
-          trackSignUpFailedEvent({
+    createAuthToken({
+      oneTimeCode: code,
+      idToken: token,
+    })
+      .then(() => {
+        setAllDone(true);
+        if (isNewUser) {
+          trackSignUpAttemptedEvent({
             auth_provider: AUTH_PROVIDERS.GMAIL,
-            error_message: err.message,
             source,
           });
-          // window.close();
+          trackSignupSuccessEvent({
+            auth_provider: AUTH_PROVIDERS.GMAIL,
+            email,
+            uid,
+            email_type: emailType,
+            domain: email.split("@")[1],
+            source,
+          });
+        } else {
+          trackLoginAttemptedEvent({
+            auth_provider: AUTH_PROVIDERS.GMAIL,
+          });
+          trackLoginSuccessEvent({
+            auth_provider: AUTH_PROVIDERS.GMAIL,
+          });
+        }
+        // window.close();
+        redirectToDesktopApp();
+      })
+      .catch((err) => {
+        setIsError(true);
+        trackSignUpFailedEvent({
+          auth_provider: AUTH_PROVIDERS.GMAIL,
+          error_message: err.message,
+          source,
         });
-    },
-    [dispatch, userPersona]
-  );
+        // window.close();
+      });
+  }, []);
 
   const renderLoading = () => {
     if (isError) {
