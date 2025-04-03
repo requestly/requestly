@@ -4,8 +4,6 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { GlobalSliceState } from "./types";
 import appListJson from "../../initial-state/sub/appsList.json";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
-import { SurveyPage } from "components/misc/PersonaSurvey/types";
-import { OnboardingSteps } from "features/rules/screens/rulesList/components/RulesList/components/GettingStarted/WorkspaceOnboarding/types";
 
 const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   /* User */
@@ -15,13 +13,6 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   },
 
   syncingV2: false,
-
-  userPersona: {
-    page: SurveyPage.GETTING_STARTED,
-    persona: "",
-    isSurveyCompleted: false,
-    useCases: {},
-  },
 
   isExtensionEnabled: true,
 
@@ -175,12 +166,6 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
 
   userAttributes: {
     deviceId: null,
-  },
-
-  workspaceOnboarding: {
-    step: OnboardingSteps.AUTH,
-    isOnboardingCompleted: false,
-    workspace: {},
   },
 
   appOnboarding: {

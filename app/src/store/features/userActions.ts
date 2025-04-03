@@ -1,8 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { SurveyPage } from "components/misc/PersonaSurvey/types";
 import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
-import { OnboardingSteps } from "features/rules/screens/rulesList/components/RulesList/components/GettingStarted/WorkspaceOnboarding/types";
 import { GlobalSliceState } from "store/slices/global/types";
 import { UserAuth } from "store/slices/global/user/types";
 
@@ -128,10 +126,6 @@ export const updateIsPersonaSurveyCompleted = (prevState: GlobalSliceState, acti
   prevState.userPersona.isSurveyCompleted = action.payload;
 };
 
-export const updatePersonaSurveyPage = (prevState: GlobalSliceState, action: PayloadAction<SurveyPage>) => {
-  prevState.userPersona.page = action.payload;
-};
-
 export const updateUserAttributes = (
   prevState: GlobalSliceState,
   action: PayloadAction<GlobalSliceState["userAttributes"]>
@@ -170,10 +164,6 @@ export const updateNetworkSessionTooltipShown = (prevState: GlobalSliceState) =>
 export const updateIsWorkspaceOnboardingCompleted = (prevState: GlobalSliceState) => {
   prevState.workspaceOnboarding.isOnboardingCompleted = true;
   prevState.workspaceOnboarding.workspace = {};
-};
-
-export const updateWorkspaceOnboardingStep = (prevState: GlobalSliceState, action: PayloadAction<OnboardingSteps>) => {
-  prevState.workspaceOnboarding.step = action.payload;
 };
 
 export const updateAppOnboardingCompleted = (prevState: GlobalSliceState) => {

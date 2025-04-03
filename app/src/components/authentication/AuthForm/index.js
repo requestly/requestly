@@ -12,8 +12,6 @@ import { HiArrowLeft } from "@react-icons/all-files/hi/HiArrowLeft";
 // import MicrosoftIcon from "../../../assets/img/icons/common/microsoft.svg";
 // import GithubIcon from "../../../assets/img/icons/common/github.svg";
 
-//UTILS
-// import { syncUserPersona } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey/utils";
 import { getGreeting } from "utils/FormattingHelper";
 import { getAuthErrorMessage, AuthTypes } from "../utils";
 
