@@ -1,6 +1,7 @@
 export enum Provider {
-  GOOGLE = "google",
+  GOOGLE = "google.com",
   EMAIL_LINK = "email_link",
+  PASSWORD = "password",
 }
 
 export type AuthSyncMetadata = {
