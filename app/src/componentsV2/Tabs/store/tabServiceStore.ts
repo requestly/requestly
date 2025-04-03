@@ -17,7 +17,7 @@ type TabConfig = {
 export type TabServiceState = {
   tabIdSequence: TabId;
   activeTabId: TabId;
-  activeTabSource: AbstractTabSource;
+  activeTabSource: AbstractTabSource | null;
   tabsIndex: Map<SourceName, SourceMap>; // Type: SourceName -> sourceId -> tabId eg: Request -> [requestId,tabId]
   tabs: Map<TabId, StoreApi<TabState>>;
 
@@ -212,7 +212,6 @@ const createTabServiceStore = () => {
         partialize: (state) => ({
           tabIdSequence: state.tabIdSequence,
           activeTabId: state.activeTabId,
-          activeTabSource: state.activeTabSource,
           tabsIndex: state.tabsIndex,
           tabs: state.tabs,
           _version: state._version,
@@ -246,29 +245,34 @@ const createTabServiceStore = () => {
 
             const existingValue = JSON.parse(stateString);
 
+            const tabsIndex: TabServiceState["tabsIndex"] = new Map(
+              existingValue.state.tabsIndex.map(
+                // eslint-disable-next-line
+                ([sourceName, sourceMap]: [string, MapIterator<[SourceId, TabId]>]) => [sourceName, new Map(sourceMap)]
+              )
+            );
+
+            const tabs: TabServiceState["tabs"] = new Map(
+              existingValue.state.tabs.map(([tabId, tabState]: [TabId, TabState]) => [
+                tabId,
+                create<TabState>((set) => ({
+                  ...tabState,
+                  source: new tabSources[tabState.source.type](tabState.source.metadata as any), // FIXME: fix type
+                  ...tabStateSetters(set),
+                })),
+              ])
+            );
+
+            const activeTab = tabs.get(existingValue.state.activeTabId).getState();
+            const activeTabSource = new tabSources[activeTab.source.type](activeTab.source.metadata as any);
+
             return {
               ...existingValue,
               state: {
                 ...existingValue.state,
-                tabsIndex: new Map(
-                  existingValue.state.tabsIndex.map(
-                    // eslint-disable-next-line
-                    ([sourceName, sourceMap]: [string, MapIterator<[SourceId, TabId]>]) => [
-                      sourceName,
-                      new Map(sourceMap),
-                    ]
-                  )
-                ),
-                tabs: new Map(
-                  existingValue.state.tabs.map(([tabId, tabState]: [TabId, TabState]) => [
-                    tabId,
-                    create<TabState>((set) => ({
-                      ...tabState,
-                      source: new tabSources[tabState.source.type](tabState.source.metadata as any), // FIXME: fix type
-                      ...tabStateSetters(set),
-                    })),
-                  ])
-                ),
+                tabs,
+                tabsIndex,
+                activeTabSource,
               },
             };
           },
