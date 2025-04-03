@@ -81,8 +81,6 @@ export const RQBreadcrumb: React.FC<Props> = ({
             : result;
         }, []);
 
-  console.log({ autoFocus, breadcrumbs, isEditRecord });
-
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const updatedValue = e.target.value;
 
