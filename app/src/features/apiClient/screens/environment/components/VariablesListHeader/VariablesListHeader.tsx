@@ -34,7 +34,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   exportActions,
 }) => {
   const { renameEnvironment } = useEnvironmentManager();
-  const { setTitle, isNewTab } = useGenericState();
+  const { setTitle = () => {}, isNewTab = () => {} } = useGenericState();
 
   const handleNewEnvironmentNameChange = (newName: string) => {
     const updatedName = newName || "New Environment";
