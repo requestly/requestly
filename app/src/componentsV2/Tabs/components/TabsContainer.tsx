@@ -59,11 +59,6 @@ export const TabsContainer: React.FC = () => {
     if (!matchedTabSource) {
       return;
     }
-    const matchedF = matchedTabSource.sourceFactory(matchedTabSource.matchedPath);
-    Array.from(tabs).forEach((tab, i) => {
-      console.log("!!!debug", "tab", i, tab[1].getState());
-    });
-    console.log("!!!debug", "matchedf", matchedTabSource, matchedF);
 
     if (isInitialLoadRef.current) {
       openTab(matchedTabSource.sourceFactory(matchedTabSource.matchedPath));
