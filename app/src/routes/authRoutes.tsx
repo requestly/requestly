@@ -6,8 +6,13 @@ import DesktopSignIn from "components/authentication/DesktopSignIn";
 import EmailAction from "components/misc/EmailAction";
 import VerifyEmail from "components/misc/VerifyEmail";
 import SignInViaEmailLink from "components/misc/SignInViaEmailLink";
+import LoginHandler from "components/authentication/LoginHandler";
 
 export const authRoutes: RouteObject[] = [
+  {
+    path: PATHS.AUTH.LOGIN.RELATIVE,
+    element: <LoginHandler />,
+  },
   {
     path: PATHS.AUTH.SIGN_IN.RELATIVE,
     element: <AuthPage authMode={AUTH.ACTION_LABELS.LOG_IN} />,
