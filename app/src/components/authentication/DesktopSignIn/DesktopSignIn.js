@@ -43,22 +43,22 @@ const DesktopSignIn = () => {
   const handleDoneSignIn = useCallback(
     async (firebaseUser, isNewUser = false) => {
       const params = new URLSearchParams(window.location.search);
-      const token = await firebaseUser?.getIdToken();
       const code = params.get("ot-auth-code");
       const source = params.get("source").replace(/ /g, "_");
       const functions = getFunctions();
-      const createAuthToken = httpsCallable(functions, "auth-createAuthToken");
+      try {
+        const token = await firebaseUser?.getIdToken();
+        const createAuthToken = httpsCallable(functions, "auth-createAuthToken");
 
-      let uid = firebaseUser?.uid || null;
-      let email = firebaseUser?.email || null;
+        let uid = firebaseUser?.uid || null;
+        let email = firebaseUser?.email || null;
 
-      const emailType = await getEmailType(email);
+        const emailType = await getEmailType(email);
 
-      createAuthToken({
-        oneTimeCode: code,
-        idToken: token,
-      })
-        .then(() => {
+        await createAuthToken({
+          oneTimeCode: code,
+          idToken: token,
+        }).then(() => {
           setAllDone(true);
           syncUserPersona(uid, dispatch, userPersona);
           if (isNewUser) {
@@ -84,16 +84,21 @@ const DesktopSignIn = () => {
           }
           // window.close();
           redirectToDesktopApp();
-        })
-        .catch((err) => {
+        });
+      } catch (e) {
+        const bubbleAuthError = httpsCallable(functions, "auth-bubbleDesktopAuthError");
+        bubbleAuthError({
+          oneTimeCode: code,
+          errorMessage: e.message,
+        }).finally(() => {
           setIsError(true);
           trackSignUpFailedEvent({
             auth_provider: AUTH_PROVIDERS.GMAIL,
-            error_message: err.message,
+            error_message: e.message,
             source,
           });
-          // window.close();
         });
+      }
     },
     [dispatch, userPersona]
   );
