@@ -10,7 +10,7 @@ import { toast } from "utils/Toast";
 import PATHS from "config/constants/sub/paths";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { trackEnvironmentSwitched } from "modules/analytics/events/features/apiClient";
-import { useTabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
 import "./environmentSwitcher.scss";
 
@@ -19,7 +19,7 @@ export const EnvironmentSwitcher = () => {
   const { getAllEnvironments, getCurrentEnvironment, setCurrentEnvironment } = useEnvironmentManager();
   const { currentEnvironmentId, currentEnvironmentName } = getCurrentEnvironment();
   const environments = getAllEnvironments();
-  const openTab = useTabServiceStore().use.openTab();
+  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
   const dropdownItems = useMemo(() => {
     return environments
