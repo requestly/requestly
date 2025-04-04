@@ -10,6 +10,8 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
   return (
     <GenericStateContext.Provider
       value={{
+        isNewTab: props.store.getState().source.getIsNewTab(),
+
         setTitle: (title: string) => {
           props.store.getState().setTitle(title);
           incrementVersion();

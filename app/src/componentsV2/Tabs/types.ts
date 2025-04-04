@@ -4,9 +4,10 @@ import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiCl
 import { RequestViewTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/RequestView/requestViewTabSource";
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
 
-export interface MatchedTabSource {
-  sourceFactory: TabSourceFactory;
-  matchedPath: PathMatch<string>;
+export interface TabSourceMetadata {
+  id: string;
+  title: string;
+  isNewTab?: boolean;
 }
 
 export interface MatchedTabSource {

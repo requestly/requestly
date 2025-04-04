@@ -48,6 +48,7 @@ import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { useGenericState } from "hooks/useGenericState";
+import PATHS from "config/constants/sub/paths";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -93,6 +94,7 @@ const APIClientView: React.FC<Props> = ({
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
+  const isHistoryPath = location.pathname.includes("history");
 
   const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
   const {
@@ -127,7 +129,7 @@ const APIClientView: React.FC<Props> = ({
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
-  const { setPreview, setSaved } = useGenericState();
+  const { setPreview, setSaved, setTitle } = useGenericState();
 
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
@@ -401,6 +403,7 @@ const APIClientView: React.FC<Props> = ({
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
+      setTitle(requestName);
       onSaveRecord(
         { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
         isCreateMode ? "replace" : "open"
@@ -548,12 +551,19 @@ const APIClientView: React.FC<Props> = ({
         <div className="api-client-breadcrumb-container">
           {user.loggedIn && !openInModal ? (
             <RQBreadcrumb
-              placeholder="New Request"
+              placeholder="Untitled request"
               recordName={apiEntryDetails?.name}
               onRecordNameUpdate={setRequestName}
               onBlur={handleRecordNameUpdate}
-              // Auto focus breadcrumb input when a new record is created
-              autoFocus={location.search.includes("new")}
+              autoFocus={location.pathname.includes("new")}
+              defaultBreadcrumbs={[
+                { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+                {
+                  isEditable: !isHistoryPath,
+                  pathname: window.location.pathname,
+                  label: isHistoryPath ? "History" : apiEntryDetails?.name || "Untitled request",
+                },
+              ]}
             />
           ) : null}
           <Dropdown
@@ -596,15 +606,6 @@ const APIClientView: React.FC<Props> = ({
               value={entry.request.method}
               onChange={setMethod}
             />
-            {/* <Input
-              className="api-request-url"
-              placeholder="https://example.com"
-              value={entry.request.url}
-              onChange={(evt) => setUrl(evt.target.value)}
-              onPressEnter={onUrlInputEnterPressed}
-              onBlur={onUrlInputBlur}
-              prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
-            /> */}
             <RQSingleLineEditor
               className="api-request-url"
               placeholder="https://example.com"
