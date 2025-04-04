@@ -30,4 +30,8 @@ export class BaseTabSource implements AbstractTabSource {
   getIcon(): React.ReactNode {
     return this.icon;
   }
+
+  getIsNewTab(): boolean {
+    return this.metadata.isNewTab ?? false;
+  }
 }

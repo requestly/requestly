@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { AbstractTabSource } from "../helpers/tabSource";
 
 export type TabState = {
+  /** Tab id */
   id: number;
   source: AbstractTabSource;
   saved: boolean;
