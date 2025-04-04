@@ -1,10 +1,11 @@
 import { useCallback, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 
 export const useDeepLinkState = <T = Record<string, string>>(
   defaultValues: T
 ): [T, (updatedValues: Partial<T>) => void] => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
 
   const updateParams = useCallback(
     (params: Partial<T>) => {
@@ -21,12 +22,15 @@ export const useDeepLinkState = <T = Record<string, string>>(
           newParams.set(key, value);
         });
 
-        setSearchParams(newParams, { replace: true });
+        setSearchParams(newParams, {
+          replace: true,
+          state: { path: location.pathname }, // Preserve the existing pathname
+        });
       } catch (error) {
         // NOOP
       }
     },
-    [searchParams, setSearchParams]
+    [location, searchParams, setSearchParams]
   );
 
   const params: T = useMemo(() => {
