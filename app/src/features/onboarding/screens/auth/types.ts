@@ -12,3 +12,13 @@ export type AuthSyncMetadata = {
     providers: Provider[];
   };
 };
+export interface CredentialResponse {
+  credential: string;
+  select_by: string;
+  client_id: string;
+}
+
+export enum FailedLoginCode {
+  DIFFERENT_USER = "different_user",
+  UNKNOWN = "unknown",
+}

@@ -22,7 +22,6 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ email, onEmailCh
       .then(({ data }: { data: AuthSyncMetadata }) => {
         if (data.success) {
           const metadata = data.syncData;
-          console.log("metadata", metadata);
           onAuthSyncVerification(metadata);
           return;
         }

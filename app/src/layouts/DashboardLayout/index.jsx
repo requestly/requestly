@@ -7,7 +7,7 @@ import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
 import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
-import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
+// import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe, isDesktopMode } from "utils/AppUtils";
 import { AppNotificationBanner } from "../../componentsV2/AppNotificationBanner";
@@ -32,18 +32,18 @@ const DashboardLayout = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const { pathname } = location;
-  const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
+  // const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
   const user = useSelector(getUserAuthDetails);
   const { isDesktopAppConnected } = useDesktopAppConnection();
   const { role } = useCurrentWorkspaceUserRole();
   const isReadRole = role === TeamRole.read;
 
   useRootPathRedirector();
-  initializeOneTap();
+  // initializeOneTap();
 
-  if (shouldShowOneTapPrompt()) {
-    promptOneTap();
-  }
+  // if (shouldShowOneTapPrompt()) {
+  //   promptOneTap();
+  // }
 
   const isSidebarVisible = useMemo(
     () => !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isSettingsPage(pathname)),

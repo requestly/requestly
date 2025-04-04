@@ -7,7 +7,8 @@ import APP_CONSTANTS from "config/constants";
 import { EnterEmailCard } from "./components/EnterEmailCard/EnterEmailCard";
 import { SignupWithBStackCard } from "./components/SignupWithBStackCard/SignupWithBStackCard";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
-import { AuthSyncMetadata } from "./types";
+import { AuthSyncMetadata, FailedLoginCode } from "./types";
+import { RQAuthCard } from "./components/RQAuthCard/RQAuthCard";
 import "./authScreen.scss";
 
 interface AuthScreenProps {
@@ -71,7 +72,26 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
             <SignupWithBStackCard autoRedirect />
           </OnboardingCard>
         ) : showRQAuthForm ? (
-          <div>SHOW RQ AUTH FORM VIEW HERE</div>
+          <OnboardingCard>
+            <RQAuthCard
+              email={email}
+              authProviders={authProviders}
+              successfulLoginCallback={() => {
+                setShowRQAuthForm(false);
+                setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+              }}
+              failedLoginCallback={(code: FailedLoginCode) => {
+                if (code === FailedLoginCode.DIFFERENT_USER) {
+                  setShowRQAuthForm(false);
+                  setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+                }
+              }}
+              onBackClick={() => {
+                setShowRQAuthForm(false);
+                setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+              }}
+            />
+          </OnboardingCard>
         ) : (
           <>
             <div className="auth-screen-account-does-not-exist-message">
