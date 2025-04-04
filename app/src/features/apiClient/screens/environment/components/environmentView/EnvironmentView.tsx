@@ -34,6 +34,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
 
   useEffect(() => {
+    // To sync title for tabs opened from deeplinks
     if (environmentName) {
       setTitle(environmentName);
     }

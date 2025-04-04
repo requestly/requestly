@@ -36,6 +36,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
   }, [apiClientRecords, collectionId]);
 
   useEffect(() => {
+    // To sync title for tabs opened from deeplinks
     if (collection) {
       setTitle(collection.name);
     }

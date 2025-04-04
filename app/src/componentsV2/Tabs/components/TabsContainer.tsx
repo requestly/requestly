@@ -78,7 +78,7 @@ export const TabsContainer: React.FC = () => {
     if (activeTabSource && isInitialLoadRef.current) {
       isInitialLoadRef.current = false;
     }
-  }, [activeTabSource, setUrl, tabs]);
+  }, [activeTabSource, setUrl]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     return Array.from(tabs.values()).map((tabStore) => {
