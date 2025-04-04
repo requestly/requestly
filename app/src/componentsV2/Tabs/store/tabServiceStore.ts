@@ -100,6 +100,7 @@ const createTabServiceStore = () => {
             }
 
             registerTabSource(tabId, source, config);
+
             return;
           }
 
