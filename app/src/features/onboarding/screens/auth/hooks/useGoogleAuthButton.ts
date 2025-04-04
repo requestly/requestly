@@ -14,9 +14,7 @@ export const useGoogleAuthButton = ({ callback }: { callback: (credential: Crede
       client_id: window.location.host.includes("app.requestly.io")
         ? "911299702852-u365fa2rdf8g64q144gtccna87rmd8ji.apps.googleusercontent.com"
         : "553216647714-b34rhgl06o7vokpebigjttrgebmm495h.apps.googleusercontent.com",
-      //   disabled: isAppOpenedInIframe() || user?.loggedIn || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       callback: callback,
-      // use_fedcm_for_prompt: true,
     };
   }, [callback]);
 

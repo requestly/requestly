@@ -15,14 +15,19 @@ interface AuthScreenProps {
   authModeOnMount?: string;
 }
 
+enum AuthScreenError {
+  ACCOUNT_DOES_NOT_EXIST = "ACCOUNT_DOES_NOT_EXIST",
+  DIFFERENT_USER = "DIFFERENT_USER",
+}
+
 export const AuthScreen: React.FC<AuthScreenProps> = ({
   authModeOnMount = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
 }) => {
   const [email, setEmail] = useState("");
   const [authMode, setAuthMode] = useState(authModeOnMount);
-  const [showAccountDoesNotExistMessage, setShowAccountDoesNotExistMessage] = useState(false);
+  const [authErrorMessage, setAuthErrorMessage] = useState("");
 
-  const [autoSignupWithBStack, setAutoSignupWithBStack] = useState(false);
+  const [autoSignupWithBStack] = useState(false);
   const [showRQAuthForm, setShowRQAuthForm] = useState(false);
   const [authProviders, setAuthProviders] = useState([]);
 
@@ -30,18 +35,38 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     setEmail(value);
   }, []);
 
-  const handlePostAuthSyncVerification = useCallback((metadata: AuthSyncMetadata["syncData"]) => {
-    // TODO: REFACTOR THIS
-    setAuthProviders(metadata.providers);
-    if (metadata.isSyncedUser) {
-      setShowAccountDoesNotExistMessage(true);
-    } else if (!metadata.isExistingUser) {
-      setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
-      setAutoSignupWithBStack(true);
-    } else {
-      setShowRQAuthForm(true);
+  const handleShowErrorMessage = useCallback((code: AuthScreenError) => {
+    switch (code) {
+      case AuthScreenError.ACCOUNT_DOES_NOT_EXIST:
+        setAuthErrorMessage("No account exist for the provided email");
+        break;
+      case AuthScreenError.DIFFERENT_USER:
+        setAuthErrorMessage(
+          "You're trying to use a different Google account than the one originally entered. Please try again with the correct email."
+        );
+        break;
+      default:
+        setAuthErrorMessage("");
+        break;
     }
   }, []);
+
+  const handlePostAuthSyncVerification = useCallback(
+    (metadata: AuthSyncMetadata["syncData"]) => {
+      setAuthErrorMessage("");
+      // TODO: REFACTOR THIS
+      setAuthProviders(metadata.providers);
+      if (metadata.isSyncedUser) {
+        setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
+      } else if (!metadata.isExistingUser) {
+        handleShowErrorMessage(AuthScreenError.ACCOUNT_DOES_NOT_EXIST);
+        setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
+      } else {
+        setShowRQAuthForm(true);
+      }
+    },
+    [handleShowErrorMessage]
+  );
 
   const authModeToggleText = (
     <div className="auth-mode-toggle">
@@ -63,6 +88,26 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     </div>
   );
 
+  const handleOnBackClick = useCallback(() => {
+    setShowRQAuthForm(false);
+    setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+    setAuthErrorMessage("");
+  }, []);
+
+  const handleFailedLogin = useCallback(
+    (code: FailedLoginCode) => {
+      if (code === FailedLoginCode.DIFFERENT_USER) {
+        handleShowErrorMessage(AuthScreenError.DIFFERENT_USER);
+      }
+    },
+    [handleShowErrorMessage]
+  );
+
+  const handleSuccessfulLogin = useCallback(() => {
+    setShowRQAuthForm(false);
+    setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+  }, []);
+
   return (
     <div className="auth-screen-container">
       <div className="auth-screen-content">
@@ -76,45 +121,32 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
             <RQAuthCard
               email={email}
               authProviders={authProviders}
-              successfulLoginCallback={() => {
-                setShowRQAuthForm(false);
-                setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
-              }}
-              failedLoginCallback={(code: FailedLoginCode) => {
-                if (code === FailedLoginCode.DIFFERENT_USER) {
-                  setShowRQAuthForm(false);
-                  setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
-                }
-              }}
-              onBackClick={() => {
-                setShowRQAuthForm(false);
-                setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
-              }}
+              successfulLoginCallback={handleSuccessfulLogin}
+              failedLoginCallback={handleFailedLogin}
+              onBackClick={handleOnBackClick}
             />
           </OnboardingCard>
         ) : (
           <>
-            <div className="auth-screen-account-does-not-exist-message">
-              {showAccountDoesNotExistMessage ? (
-                <>
+            <div className="w-full">
+              {authErrorMessage.length ? (
+                <div className="auth-screen-error-message">
                   <MdOutlineInfo />
-                  <span>No account exist for the provided email</span>
-                </>
-              ) : (
-                ""
-              )}
+                  <span>{authErrorMessage}</span>
+                </div>
+              ) : null}
+              <OnboardingCard height={211}>
+                {authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN ? (
+                  <EnterEmailCard
+                    email={email}
+                    onEmailChange={handleEmailChange}
+                    onAuthSyncVerification={handlePostAuthSyncVerification}
+                  />
+                ) : (
+                  <SignupWithBStackCard />
+                )}
+              </OnboardingCard>
             </div>
-            <OnboardingCard height={211}>
-              {authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN ? (
-                <EnterEmailCard
-                  email={email}
-                  onEmailChange={handleEmailChange}
-                  onAuthSyncVerification={handlePostAuthSyncVerification}
-                />
-              ) : (
-                <SignupWithBStackCard />
-              )}
-            </OnboardingCard>
             {authModeToggleText}
           </>
         )}

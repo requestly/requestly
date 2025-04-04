@@ -18,12 +18,27 @@
     }
   }
 
-  .auth-screen-account-does-not-exist-message {
+  .auth-screen-error-message {
     display: flex;
+    justify-content: center;
     align-items: center;
     gap: var(--space-2, 8px);
     align-self: stretch;
     color: var(--requestly-color-warning-300);
-    font-size: var(--requestly-font-size-xs);
+    font-size: var(--requestly-font-size-sm);
+    margin-bottom: 12px;
+
+    span {
+      align-self: flex-start;
+    }
+
+    svg {
+      flex-shrink: 0;
+      align-self: flex-start;
+      width: 16px;
+      height: 16px;
+      position: relative;
+      top: 2px;
+    }
   }
 }
