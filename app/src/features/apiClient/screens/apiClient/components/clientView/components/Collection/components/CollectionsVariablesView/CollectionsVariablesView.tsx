@@ -26,7 +26,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  const { setPreview, setSaved } = useGenericState();
+  const { setPreview = () => {}, setSaved = () => {} } = useGenericState();
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
 
   useEffect(() => {
