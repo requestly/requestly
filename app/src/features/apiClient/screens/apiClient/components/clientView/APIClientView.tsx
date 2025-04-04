@@ -129,7 +129,7 @@ const APIClientView: React.FC<Props> = ({
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
-  const { setPreview, setSaved, setTitle } = useGenericState();
+  const { setPreview = () => {}, setSaved = () => {}, setTitle = () => {} } = useGenericState();
 
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 

@@ -153,6 +153,7 @@ const RequestTabs: React.FC<Props> = ({
       }}
       items={tabItems}
       size="small"
+      moreIcon={null}
     />
   );
 };

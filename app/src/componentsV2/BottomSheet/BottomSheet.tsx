@@ -55,6 +55,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
       </div>
 
       <Tabs
+        moreIcon={null}
         data-tour-id={tourId}
         defaultActiveKey={defaultActiveKey}
         items={items}
