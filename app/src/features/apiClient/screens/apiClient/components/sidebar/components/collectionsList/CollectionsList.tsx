@@ -169,8 +169,22 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             setSelectedRecords(new Set());
           } else {
             const newSelectedRecords: Set<RQAPI.Record["id"]> = new Set();
-            updatedRecords.collections.forEach((record) => {
+            console.log(newSelectedRecords);
+
+            const addNestedCollection = (record: RQAPI.CollectionRecord) => {
               newSelectedRecords.add(record.id);
+              if (record.data.children) {
+                record.data.children.forEach((child) => {
+                  if (child.type === "collection") {
+                    addNestedCollection(child);
+                  } else {
+                    newSelectedRecords.add(child.id);
+                  }
+                });
+              }
+            };
+            updatedRecords.collections.forEach((record) => {
+              addNestedCollection(record);
             });
             updatedRecords.requests.forEach((record) => {
               newSelectedRecords.add(record.id);
@@ -185,10 +199,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     },
     [
       selectedRecords,
-      updatedRecords.childParentMap,
-      updatedRecords.recordsMap,
-      updatedRecords.collections,
-      updatedRecords.requests,
+      updatedRecords,
       setIsDeleteModalOpen,
       updateRecordsToBeDeleted,
       isAllRecordsSelected,
