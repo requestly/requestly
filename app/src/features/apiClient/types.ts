@@ -54,6 +54,7 @@ export enum BulkActions {
   DELETE = "DELETE",
   MOVE = "MOVE",
   EXPORT = "EXPORT",
+  SELECT_ALL = "SELECT_ALL",
 }
 
 export enum ApiClientImporterType {
