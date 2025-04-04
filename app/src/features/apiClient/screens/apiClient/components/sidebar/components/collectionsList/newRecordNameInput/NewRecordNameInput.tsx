@@ -152,16 +152,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
         ? await apiClientRecordsRepository.updateRecord(record, record.id)
         : await apiClientRecordsRepository.renameCollection(record.id, record.name);
 
-    // const updatedRecords = await repository.reactToRename(records);
-    // if(updatedRecords) {
-    // 	setState(updatedRecords);
-    // }
-    //
-    // await forceRefreshApilClientRecords(){
-    // repo.getAllRecords()
-    // setApiClientRecords()
-    // }
-
     if (result.success) {
       // False is passed to not open the tab when renaming the record from sidebar
       onSaveRecord(result.data);
