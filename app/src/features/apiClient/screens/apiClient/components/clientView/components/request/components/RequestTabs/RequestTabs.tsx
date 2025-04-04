@@ -55,7 +55,7 @@ const RequestTabs: React.FC<Props> = ({
   const [activeTabSource] = useTabServiceWithSelector((state) => [state.activeTabSource]);
 
   useEffect(() => {
-    if (requestId && activeTabSource.getSourceId() === requestId) {
+    if (requestId && activeTabSource?.getSourceId() === requestId) {
       if (selectedTab.tab === RequestTab.BODY && !supportsRequestBody(requestEntry.request.method)) {
         setSelectedTab({ tab: RequestTab.QUERY_PARAMS });
       }
@@ -153,6 +153,7 @@ const RequestTabs: React.FC<Props> = ({
       }}
       items={tabItems}
       size="small"
+      moreIcon={null}
     />
   );
 };

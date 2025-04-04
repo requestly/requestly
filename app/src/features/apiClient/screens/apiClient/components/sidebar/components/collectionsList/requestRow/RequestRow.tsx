@@ -38,8 +38,12 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
-  const { updateRecordsToBeDeleted, setIsDeleteModalOpen, onSaveRecord, apiClientRecordsRepository } =
-    useApiClientContext();
+  const {
+    updateRecordsToBeDeleted,
+    setIsDeleteModalOpen,
+    onSaveRecord,
+    apiClientRecordsRepository,
+  } = useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const [activeTabSource, openTab] = useTabServiceWithSelector((state) => [state.activeTabSource, state.openTab]);
