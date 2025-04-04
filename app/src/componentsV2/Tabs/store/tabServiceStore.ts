@@ -14,7 +14,7 @@ type TabConfig = {
   preview: boolean;
 };
 
-export type TabServiceState = {
+type TabsState = {
   tabIdSequence: TabId;
   activeTabId: TabId;
   activeTabSource: AbstractTabSource | null;
@@ -22,7 +22,10 @@ export type TabServiceState = {
   tabs: Map<TabId, StoreApi<TabState>>;
 
   _version: number;
+};
 
+type TabsAction = {
+  reset: () => void;
   registerTabSource: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
   openTab: (source: AbstractTabSource, config?: TabConfig) => void;
   closeTab: (source: AbstractTabSource) => void;
@@ -35,17 +38,27 @@ export type TabServiceState = {
   getTabIdBySourceId: (sourceId: SourceId) => TabId;
 };
 
+export type TabServiceState = TabsState & TabsAction;
+
+const initialState: TabsState = {
+  tabIdSequence: 0,
+  activeTabId: 0,
+  activeTabSource: null,
+  tabsIndex: new Map(),
+  tabs: new Map(),
+
+  _version: 0,
+};
+
 const createTabServiceStore = () => {
   return create<TabServiceState>()(
     persist(
       (set, get) => ({
-        tabIdSequence: 0,
-        activeTabId: 0,
-        activeTabSource: null as TabServiceState["activeTabSource"],
-        tabsIndex: new Map(),
-        tabs: new Map(),
+        ...initialState,
 
-        _version: 0,
+        reset() {
+          set(initialState);
+        },
 
         registerTabSource(tabId, source, config) {
           const { tabsIndex, tabs, setActiveTab } = get();
@@ -298,7 +311,7 @@ const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) =
   return store;
 };
 
-const tabServiceStore = createTabServiceStore();
+export const tabServiceStore = createTabServiceStore();
 const tabServiceStoreWithAutoSelectors = createSelectors(tabServiceStore);
 
 // Creating and passing the store through context to ensure context's value can be mocked easily
