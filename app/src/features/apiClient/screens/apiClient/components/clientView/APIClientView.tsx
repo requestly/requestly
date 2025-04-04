@@ -404,12 +404,11 @@ const APIClientView: React.FC<Props> = ({
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       setTitle(requestName);
-      onSaveRecord(
-        { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
-        isCreateMode ? "replace" : "open"
-      );
+      const savedRecord = { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } };
+      onSaveRecord(savedRecord, isCreateMode ? "replace" : "open");
       trackRequestRenamed("breadcrumb");
       setRequestName("");
+      onSaveCallback(savedRecord);
 
       toast.success("Request name updated!");
     } else {

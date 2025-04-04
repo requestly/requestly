@@ -4,7 +4,9 @@ import { BaseTabSource } from "componentsV2/Tabs/helpers/baseTabSource";
 import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 
-interface CollectionViewTabSourceMetadata extends TabSourceMetadata {}
+interface CollectionViewTabSourceMetadata extends TabSourceMetadata {
+  isNewTab?: boolean;
+}
 
 export class CollectionViewTabSource extends BaseTabSource {
   constructor(metadata: CollectionViewTabSourceMetadata) {
