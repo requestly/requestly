@@ -69,6 +69,7 @@ import {
 } from "modules/analytics/events/common/auth/logout";
 import { toast } from "utils/Toast";
 import { getUserProfilePath } from "utils/db/UserModel";
+import { FailedLoginCode } from "features/onboarding/screens/auth/types";
 
 const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 /**
@@ -316,6 +317,20 @@ export function resetPassword(oobCode, password) {
       return Promise.reject({ status: false, msg: errorMessage });
     });
 }
+
+export const handleCustomGoogleSignIn = async (credential, successfulLoginCallback, failedLoginCallback) => {
+  try {
+    const auth = getAuth(firebaseApp);
+    const OAuthCredential = GoogleAuthProvider.credential(credential);
+    const result = await signInWithCredential(auth, OAuthCredential);
+
+    toast.success(`Welcome back ${result.user.displayName}`);
+    successfulLoginCallback();
+  } catch (error) {
+    toast.error("Something went wrong. Please try again.");
+    failedLoginCallback(FailedLoginCode.UNKNOWN);
+  }
+};
 
 export const handleOnetapSignIn = async ({ credential }) => {
   try {

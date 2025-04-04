@@ -3,8 +3,7 @@ import { useGoogleAuthButton } from "features/onboarding/screens/auth/hooks/useG
 import { CredentialResponse, FailedLoginCode } from "features/onboarding/screens/auth/types";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "utils/Toast";
-import { getAuth, GoogleAuthProvider, signInWithCredential } from "firebase/auth";
-import firebaseApp from "firebase";
+import { handleCustomGoogleSignIn } from "actions/FirebaseActions";
 
 interface GoogleAuthButtonProps {
   email: string;
@@ -30,17 +29,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
         return;
       }
 
-      const auth = getAuth(firebaseApp);
-      const OAuthCredential = GoogleAuthProvider.credential(credentialResponse.credential);
-      signInWithCredential(auth, OAuthCredential)
-        .then((result) => {
-          toast.success(`Welcome back ${result.user.displayName}`);
-          successfulLoginCallback();
-        })
-        .catch(() => {
-          toast.error("Something went wrong. Please try again.");
-          failedLoginCallback(FailedLoginCode.UNKNOWN);
-        });
+      handleCustomGoogleSignIn(credentialResponse.credential, successfulLoginCallback, failedLoginCallback);
     },
     [email, failedLoginCallback, successfulLoginCallback]
   );
