@@ -9,7 +9,6 @@ import { trackCollectionDeleted } from "modules/analytics/events/features/apiCli
 import "./deleteApiRecordModal.scss";
 import { isEmpty, partition } from "lodash";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { RequestView } from "../../clientView/components/RequestView/RequestView";
 import { RequestViewTabSource } from "../../clientView/components/RequestView/requestViewTabSource";
 import { CollectionViewTabSource } from "../../clientView/components/Collection/collectionViewTabSource";
 
