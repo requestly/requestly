@@ -27,6 +27,7 @@ type TabsState = {
 type TabsAction = {
   reset: () => void;
   registerTabSource: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
+  updateTabBySourceId: (sourceId: SourceId, updates: Partial<Pick<TabState, "preview" | "saved" | "title">>) => void;
   openTab: (source: AbstractTabSource, config?: TabConfig) => void;
   closeTab: (source: AbstractTabSource) => void;
   closeAllTabs: () => void;
@@ -78,6 +79,25 @@ const createTabServiceStore = () => {
           set({
             tabs: new Map(tabs),
           });
+        },
+
+        updateTabBySourceId(sourceId, updates) {
+          const { tabs, getTabIdBySourceId } = get();
+          const tabId = getTabIdBySourceId(sourceId);
+
+          const tabStore = tabs.get(tabId);
+          if (!tabStore) {
+            return;
+          }
+
+          const tabState = tabStore.getState();
+          const updatedTitle = updates?.title ?? tabState.title;
+          const updatedPreview = updates?.preview ?? tabState.preview;
+
+          const updatedTabStore = createTabStore(tabId, tabState.source, updatedTitle, updatedPreview);
+
+          tabs.set(tabId, updatedTabStore);
+          set({ tabs: new Map(tabs) });
         },
 
         openTab(source, config) {
