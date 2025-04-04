@@ -14,16 +14,19 @@ type TabConfig = {
   preview: boolean;
 };
 
-export type TabServiceState = {
+type TabsState = {
   tabIdSequence: TabId;
   activeTabId: TabId;
-  activeTabSource: AbstractTabSource;
+  activeTabSource: AbstractTabSource | null;
   tabsIndex: Map<SourceName, SourceMap>; // Type: SourceName -> sourceId -> tabId eg: Request -> [requestId,tabId]
   tabs: Map<TabId, StoreApi<TabState>>;
 
   _version: number;
+};
 
-  _registerTab: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
+type TabsAction = {
+  reset: () => void;
+  registerTabSource: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
   openTab: (source: AbstractTabSource, config?: TabConfig) => void;
   closeTab: (source: AbstractTabSource) => void;
   closeAllTabs: () => void;
@@ -35,19 +38,29 @@ export type TabServiceState = {
   getTabIdBySourceId: (sourceId: SourceId) => TabId;
 };
 
+export type TabServiceState = TabsState & TabsAction;
+
+const initialState: TabsState = {
+  tabIdSequence: 0,
+  activeTabId: 0,
+  activeTabSource: null,
+  tabsIndex: new Map(),
+  tabs: new Map(),
+
+  _version: 0,
+};
+
 const createTabServiceStore = () => {
   return create<TabServiceState>()(
     persist(
       (set, get) => ({
-        tabIdSequence: 0,
-        activeTabId: 0,
-        activeTabSource: null,
-        tabsIndex: new Map(),
-        tabs: new Map(),
+        ...initialState,
 
-        _version: 0,
+        reset() {
+          set(initialState);
+        },
 
-        _registerTab(tabId, source, config) {
+        registerTabSource(tabId, source, config) {
           const { tabsIndex, tabs, setActiveTab } = get();
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
@@ -64,12 +77,11 @@ const createTabServiceStore = () => {
 
           set({
             tabs: new Map(tabs),
-            activeTabId: tabId,
           });
         },
 
         openTab(source, config) {
-          const { _generateNewTabId, tabsIndex, tabs, setActiveTab, _registerTab } = get();
+          const { _generateNewTabId, tabsIndex, tabs, setActiveTab, registerTabSource } = get();
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
 
@@ -87,12 +99,13 @@ const createTabServiceStore = () => {
               tabsIndex.get(previousPreviewTabSource.getSourceName())?.delete(previousPreviewTabSource.getSourceId());
             }
 
-            _registerTab(tabId, source, config);
+            registerTabSource(tabId, source, config);
+
             return;
           }
 
           const newTabId = _generateNewTabId();
-          _registerTab(newTabId, source);
+          registerTabSource(newTabId, source);
         },
 
         closeTab(source) {
@@ -299,7 +312,7 @@ const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) =
   return store;
 };
 
-const tabServiceStore = createTabServiceStore();
+export const tabServiceStore = createTabServiceStore();
 const tabServiceStoreWithAutoSelectors = createSelectors(tabServiceStore);
 
 // Creating and passing the store through context to ensure context's value can be mocked easily

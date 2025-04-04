@@ -12,17 +12,25 @@ import "./tabsContainer.scss";
 import PATHS from "config/constants/sub/paths";
 
 export const TabsContainer: React.FC = () => {
-  const [activeTabId, activeTabSource, setActiveTab, tabs, _version, openTab, closeTabById, incrementVersion] =
-    useTabServiceWithSelector((state) => [
-      state.activeTabId,
-      state.activeTabSource,
-      state.setActiveTab,
-      state.tabs,
-      state._version,
-      state.openTab,
-      state.closeTabById,
-      state.incrementVersion,
-    ]);
+  const [
+    activeTabId,
+    activeTabSource,
+    setActiveTab,
+    tabs,
+    _version,
+    openTab,
+    closeTabById,
+    incrementVersion,
+  ] = useTabServiceWithSelector((state) => [
+    state.activeTabId,
+    state.activeTabSource,
+    state.setActiveTab,
+    state.tabs,
+    state._version,
+    state.openTab,
+    state.closeTabById,
+    state.incrementVersion,
+  ]);
 
   const isInitialLoadRef = useRef(true);
   const matchedTabSource = useMatchedTabSource();
@@ -51,9 +59,14 @@ export const TabsContainer: React.FC = () => {
     if (!matchedTabSource) {
       return;
     }
+    const matchedF = matchedTabSource.sourceFactory(matchedTabSource.matchedPath);
+    Array.from(tabs).forEach((tab, i) => {
+      console.log("!!!debug", "tab", i, tab[1].getState());
+    });
+    console.log("!!!debug", "matchedf", matchedTabSource, matchedF);
 
-    openTab(matchedTabSource.sourceFactory(matchedTabSource.matchedPath));
-  }, [matchedTabSource, openTab]);
+    openTab(matchedF);
+  }, [matchedTabSource, openTab, tabs]);
 
   useEffect(() => {
     if (activeTabSource) {
