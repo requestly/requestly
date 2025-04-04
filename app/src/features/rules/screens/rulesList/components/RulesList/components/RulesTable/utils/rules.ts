@@ -105,7 +105,7 @@ export const checkIsRuleGroupDisabled = (allRecordsMap: Record<string, StorageRe
   } else return false;
 };
 
-export const getSampleRules = async (fromDb: boolean = true) => {
+export const getSampleRules = async (fromDb: boolean = false) => {
   try {
     const sampleRuleIds = Object.keys(sampleRuleDetails);
 
