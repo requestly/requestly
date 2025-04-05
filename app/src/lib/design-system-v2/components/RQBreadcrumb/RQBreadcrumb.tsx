@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, Params, useMatches } from "react-router-dom";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import { Input, Skeleton, Typography } from "antd";
@@ -56,10 +56,18 @@ export const RQBreadcrumb: React.FC<Props> = ({
     setName(recordName);
   }, [recordName]);
 
+  const autoFocusRef = useRef(false);
   useEffect(() => {
+    if (autoFocusRef.current) {
+      return;
+    }
+
     if (autoFocus) {
+      autoFocusRef.current = true;
       setIsEditRecord(true);
     }
+
+    return () => setIsEditRecord(false);
   }, [autoFocus]);
 
   const breadcrumbs: ({
