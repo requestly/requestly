@@ -8,25 +8,24 @@ import { Skeleton } from "antd";
 import { syncQueryParams } from "./utils";
 import "./apiClient.scss";
 import { isEmpty } from "lodash";
+import { useGenericState } from "hooks/useGenericState";
 
 type BaseProps = {
   onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
+  apiEntryDetails?: RQAPI.ApiRecord;
 };
 
 type CreateModeProps = BaseProps & {
   isCreateMode: true;
-  apiEntryDetails?: RQAPI.ApiRecord;
 };
 
 type EditModeProps = BaseProps & {
   isCreateMode: false;
-  apiEntryDetails: RQAPI.ApiRecord;
   requestId: string;
 };
 
 type HistoryModeProps = BaseProps & {
   isCreateMode: false;
-  apiEntryDetails?: RQAPI.ApiRecord;
   requestId?: string;
 };
 
@@ -38,6 +37,8 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
   const { apiClientRecords, history, selectedHistoryIndex, addToHistory } = useApiClientContext();
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>(props?.apiEntryDetails);
   const isHistoryPath = location.pathname.includes("history");
+
+  const { setTitle } = useGenericState();
 
   const requestId = isCreateMode === false ? props.requestId : null;
   const onSaveCallback = props.onSaveCallback ?? (() => {});
@@ -80,8 +81,13 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
       }
       record.data = entry;
       setSelectedEntryDetails(record);
+
+      // To sync title for tabs opened from deeplinks
+      if (!props.apiEntryDetails?.name) {
+        setTitle(record.name);
+      }
     }
-  }, [apiClientRecords, isCreateMode, requestId]);
+  }, [apiClientRecords, isCreateMode, props.apiEntryDetails?.name, requestId, setTitle]);
 
   const entryDetails = useMemo(
     () => (isHistoryPath && !requestId ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord,
