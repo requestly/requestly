@@ -1,7 +1,7 @@
 import { Result, Skeleton, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
 import PATHS from "config/constants/sub/paths";
@@ -34,6 +34,13 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
   const collection = useMemo(() => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
   }, [apiClientRecords, collectionId]);
+
+  useEffect(() => {
+    // To sync title for tabs opened from deeplinks
+    if (collection) {
+      setTitle(collection.name);
+    }
+  }, [collection, setTitle]);
 
   const updateCollectionAuthData = useCallback(
     async (newAuthOptions: RQAPI.Auth) => {
@@ -138,7 +145,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
             ]}
           />
           <div className="collection-view-content">
-            <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} />
+            <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} moreIcon={null} />
           </div>
         </>
       )}
