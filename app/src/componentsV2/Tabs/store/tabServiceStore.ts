@@ -52,13 +52,14 @@ const initialState: TabsState = {
 };
 
 const createTabServiceStore = () => {
-  return create<TabServiceState>()(
+  const tabServiceStore = create<TabServiceState>()(
     persist(
       (set, get) => ({
         ...initialState,
 
         reset() {
           set(initialState);
+          tabServiceStore.persist.clearStorage();
         },
 
         registerTabSource(tabId, source, config) {
@@ -318,6 +319,8 @@ const createTabServiceStore = () => {
       }
     )
   );
+
+  return tabServiceStore;
 };
 
 // https://zustand.docs.pmnd.rs/guides/auto-generating-selectors
