@@ -88,7 +88,7 @@ export const localSampleRules: RuleTemplate[] = [
         isSample: false,
         schemaVersion: "3.0.0",
         groupId: "Group_rg78s",
-        lastModifiedBy: "UJFMjUmi4ISufSoiukDPN2fac8O2",
+        lastModifiedBy: null,
         description: "",
         creationDate: 1742403283719,
         pairs: [
@@ -129,7 +129,7 @@ export const localSampleRules: RuleTemplate[] = [
         isSample: false,
         schemaVersion: "3.0.2",
         groupId: "Group_rg78s",
-        lastModifiedBy: "UJFMjUmi4ISufSoiukDPN2fac8O2",
+        lastModifiedBy: null,
         extensionRules: [
           {
             condition: {
@@ -179,8 +179,8 @@ export const localSampleRules: RuleTemplate[] = [
         ],
         objectType: "rule",
         modificationDate: 1743579347396,
-        createdBy: "UJFMjUmi4ISufSoiukDPN2fac8O2",
-        currentOwner: "IKZZIdgUCjORNkDgkzXWzTXctku2",
+        createdBy: null,
+        currentOwner: null,
         ruleType: "Replace",
         name: "Replace a part of the URL",
         id: "Replace_6tb3l",
@@ -196,7 +196,7 @@ export const localSampleRules: RuleTemplate[] = [
         isSample: false,
         schemaVersion: "3.0.0",
         groupId: "Group_rg78s",
-        lastModifiedBy: "UJFMjUmi4ISufSoiukDPN2fac8O2",
+        lastModifiedBy: null,
         description: "",
         creationDate: 1742403283719,
         pairs: [
@@ -227,8 +227,8 @@ export const localSampleRules: RuleTemplate[] = [
         ],
         objectType: "rule",
         modificationDate: 1743578293046,
-        createdBy: "UJFMjUmi4ISufSoiukDPN2fac8O2",
-        currentOwner: "IKZZIdgUCjORNkDgkzXWzTXctku2",
+        createdBy: null,
+        currentOwner: null,
         ruleType: "Response",
         name: "Override GraphQL API Response",
         id: "Response_jtdff",
@@ -241,9 +241,9 @@ export const localSampleRules: RuleTemplate[] = [
   {
     data: {
       ruleData: {
-        createdBy: "UJFMjUmi4ISufSoiukDPN2fac8O2",
+        createdBy: null,
         creationDate: 1742403283719,
-        currentOwner: "IKZZIdgUCjORNkDgkzXWzTXctku2",
+        currentOwner: null,
         description: "",
         extensionRules: [
           {
@@ -268,7 +268,7 @@ export const localSampleRules: RuleTemplate[] = [
         groupId: "Group_rg78s",
         id: "Script_2c6rd",
         isSample: false,
-        lastModifiedBy: "UJFMjUmi4ISufSoiukDPN2fac8O2",
+        lastModifiedBy: null,
         modificationDate: 1743579375423,
         name: "Inject CSS/JS on a websites",
         objectType: "rule",
@@ -314,7 +314,7 @@ export const localSampleRules: RuleTemplate[] = [
         isSample: false,
         schemaVersion: "3.0.0",
         groupId: "Group_rg78s",
-        lastModifiedBy: "UJFMjUmi4ISufSoiukDPN2fac8O2",
+        lastModifiedBy: null,
         description: "",
         creationDate: 1742403283719,
         pairs: [
@@ -337,8 +337,8 @@ export const localSampleRules: RuleTemplate[] = [
         ],
         objectType: "rule",
         modificationDate: 1743578326333,
-        createdBy: "UJFMjUmi4ISufSoiukDPN2fac8O2",
-        currentOwner: "IKZZIdgUCjORNkDgkzXWzTXctku2",
+        createdBy: null,
+        currentOwner: null,
         ruleType: "Response",
         name: "Override REST API Response",
         id: "Response_b6gml",
@@ -353,7 +353,7 @@ export const localSampleRules: RuleTemplate[] = [
       ruleData: {
         createdBy: null,
         creationDate: 1742403283719,
-        currentOwner: "IKZZIdgUCjORNkDgkzXWzTXctku2",
+        currentOwner: null,
         description: "",
         extensionRules: [
           {
@@ -406,7 +406,7 @@ export const localSampleRules: RuleTemplate[] = [
         modificationDate: 1743579375725,
         children: [],
         createdBy: null,
-        currentOwner: "IKZZIdgUCjORNkDgkzXWzTXctku2",
+        currentOwner: null,
         lastModifiedBy: null,
         name: "Sample Rules",
         description: "",
