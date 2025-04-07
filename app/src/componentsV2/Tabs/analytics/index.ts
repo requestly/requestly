@@ -29,6 +29,10 @@ export const trackResetTabServiceStore = (source: "workspace_switch" | "sign_out
   trackEvent(TAB_EVENTS.RESET_TAB_SERVICE_STORE, { source });
 };
 
+export const trackTabActionEarlyReturn = (source: string, reason: string) => {
+  trackEvent(TAB_EVENTS.TAB_ACTION_EARLY_RETURN, { source, reason });
+};
+
 export const trackTabsRehydrationStarted = () => {
   trackEvent(TAB_EVENTS.TABS_REHYDRATION_STARTED, {});
 };
