@@ -129,7 +129,7 @@ const APIClientView: React.FC<Props> = ({
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
-  const { setPreview, setSaved, setTitle } = useGenericState();
+  const { tabId, activeTabId, setPreview = () => {}, setSaved = () => {}, setTitle = () => {} } = useGenericState();
 
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
@@ -405,7 +405,7 @@ const APIClientView: React.FC<Props> = ({
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       setTitle(requestName);
       const savedRecord = { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } };
-      onSaveRecord(savedRecord, isCreateMode ? "replace" : "open");
+      onSaveRecord(savedRecord, "none");
       trackRequestRenamed("breadcrumb");
       setRequestName("");
       onSaveCallback(savedRecord);
@@ -441,7 +441,7 @@ const APIClientView: React.FC<Props> = ({
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord(
         { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
-        isCreateMode ? "replace" : "open"
+        "none"
       );
       // const callbackEntry = { ...result.data.data, response: entry.response, testResults: entry.testResults };
       setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
@@ -637,6 +637,7 @@ const APIClientView: React.FC<Props> = ({
               hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
               onClick={onSaveButtonClick}
               loading={isRequestSaving}
+              enableHotKey={tabId === activeTabId}
               tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
             >
               Save

@@ -2,11 +2,9 @@ import React, { useCallback, useState } from "react";
 import { RequestView } from "../RequestView/RequestView";
 import { DraftRequestView } from "./DraftRequestView";
 import { useGenericState } from "hooks/useGenericState";
-import PATHS from "config/constants/sub/paths";
 import { RQAPI } from "features/apiClient/types";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { DraftRequestContainerTabSource } from "./draftRequestContainerTabSource";
-import { useSetUrl } from "componentsV2/Tabs/tabUtils";
+import { RequestViewTabSource } from "../RequestView/requestViewTabSource";
 
 type RequestViewState =
   | {
@@ -22,18 +20,22 @@ export const DraftRequestContainer: React.FC<{ draftId: string }> = ({ draftId }
     isCreateMode: true,
   });
 
-  const { setTitle } = useGenericState();
-  const [tabsIndex, tabs] = useTabServiceWithSelector((state) => [state.tabsIndex, state.tabs]);
-  const { setUrl } = useSetUrl();
+  const { setTitle = () => {} } = useGenericState();
+  const [tabsIndex, registerTab] = useTabServiceWithSelector((state) => [state.tabsIndex, state.registerTabSource]);
 
-  const updateTabUrl = useCallback(
-    (newPath: string) => {
+  const updateTabSource = useCallback(
+    (apiEntryDetails: RQAPI.ApiRecord) => {
       const currentTabId = tabsIndex.get("request").get(draftId);
-      const tabSource = tabs.get(currentTabId).getState().source as DraftRequestContainerTabSource;
-      tabSource.setUrlPath(newPath);
-      setUrl(newPath, true);
+      registerTab(
+        currentTabId,
+        new RequestViewTabSource({
+          id: apiEntryDetails.id,
+          title: apiEntryDetails.name,
+          apiEntryDetails: apiEntryDetails,
+        })
+      );
     },
-    [draftId, setUrl, tabs, tabsIndex]
+    [draftId, registerTab, tabsIndex]
   );
 
   const onSaveCallback = useCallback(
@@ -43,9 +45,9 @@ export const DraftRequestContainer: React.FC<{ draftId: string }> = ({ draftId }
         entryDetails: apiEntryDetails,
       });
       setTitle(apiEntryDetails.name);
-      updateTabUrl(`${PATHS.API_CLIENT.ABSOLUTE}/request/${apiEntryDetails.id}`);
+      updateTabSource(apiEntryDetails);
     },
-    [setTitle, updateTabUrl]
+    [setTitle, updateTabSource]
   );
 
   if (requestViewState.isCreateMode === true) {

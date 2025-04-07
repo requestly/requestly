@@ -24,8 +24,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_collection", "create");
-  const { id, setTitle } = useGenericState();
-
+  const { id, setTitle = () => {} } = useGenericState();
   const closeTabById = useTabServiceWithSelector((state) => state.closeTabById);
 
   const [collectionName, setCollectionName] = useState(collection?.name || "");

@@ -60,8 +60,10 @@ export const TabsContainer: React.FC = () => {
       return;
     }
 
-    openTab(matchedTabSource.sourceFactory(matchedTabSource.matchedPath));
-  }, [matchedTabSource, openTab]);
+    if (isInitialLoadRef.current) {
+      openTab(matchedTabSource.sourceFactory(matchedTabSource.matchedPath));
+    }
+  }, [matchedTabSource, openTab, tabs]);
 
   useEffect(() => {
     if (activeTabSource) {

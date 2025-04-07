@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Skeleton } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { VariablesList } from "../VariablesList/VariablesList";
@@ -20,16 +20,25 @@ interface EnvironmentViewProps {
 export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   const { isEnvironmentsLoading, getEnvironmentName, getEnvironmentVariables, setVariables } = useEnvironmentManager();
 
+  const pendingVariablesRef = useRef<EnvironmentVariables>(null);
+
   const [searchValue, setSearchValue] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const environmentName = getEnvironmentName(envId);
-  const variables = getEnvironmentVariables(envId);
-  const { setPreview, setSaved } = useGenericState();
+  const variables = pendingVariablesRef.current ?? getEnvironmentVariables(envId);
+  const { setPreview = () => {}, setSaved = () => {}, setTitle } = useGenericState();
 
   const [pendingVariables, setPendingVariables] = useState<EnvironmentVariables>(variables);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
+
+  useEffect(() => {
+    // To sync title for tabs opened from deeplinks
+    if (environmentName) {
+      setTitle(environmentName);
+    }
+  }, [environmentName, setTitle]);
 
   useEffect(() => {
     setSaved(hasUnsavedChanges);
@@ -44,6 +53,11 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
       setPendingVariables(variables);
     }
   }, [variables, isSaving]);
+
+  const handleSetPendingVariables = useCallback((variables: EnvironmentVariables) => {
+    setPendingVariables(variables);
+    pendingVariablesRef.current = variables;
+  }, []);
 
   const handleSaveVariables = async () => {
     setIsSaving(true);
@@ -89,7 +103,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
             <VariablesList
               searchValue={searchValue}
               variables={pendingVariables}
-              onVariablesChange={setPendingVariables}
+              onVariablesChange={handleSetPendingVariables}
             />
             {isExportModalOpen && (
               <ApiClientExportModal
