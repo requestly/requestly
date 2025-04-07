@@ -87,7 +87,7 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
         >
           {countdown > 0 ? `Send email again in ${countdown}` : "Send email again"}
         </RQButton>
-        {!providers.includes(AuthProvider.GOOGLE) ? (
+        {providers.includes(AuthProvider.GOOGLE) ? (
           <>
             <span className="verify-email-card-body__description">Or</span>
             {googleAuthButton}

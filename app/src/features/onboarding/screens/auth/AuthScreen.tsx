@@ -31,7 +31,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   const [authMode, setAuthMode] = useState(authModeOnMount);
   const [authErrorMessage, setAuthErrorMessage] = useState("");
 
-  const [autoSignupWithBStack] = useState(false);
+  const [autoSignupWithBStack, setAutoSignupWithBStack] = useState(false);
   const [showRQAuthForm, setShowRQAuthForm] = useState(false);
   const [authProviders, setAuthProviders] = useState([]);
 
@@ -61,6 +61,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
       setAuthProviders(metadata.providers);
       if (metadata.isSyncedUser) {
         setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
+        setAutoSignupWithBStack(true);
       } else if (!metadata.isExistingUser) {
         handleShowErrorMessage(AuthScreenError.ACCOUNT_DOES_NOT_EXIST);
         setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
@@ -101,6 +102,8 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     (code: FailedLoginCode) => {
       if (code === FailedLoginCode.DIFFERENT_USER) {
         handleShowErrorMessage(AuthScreenError.DIFFERENT_USER);
+        setShowRQAuthForm(false);
+        setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
       }
     },
     [handleShowErrorMessage]
