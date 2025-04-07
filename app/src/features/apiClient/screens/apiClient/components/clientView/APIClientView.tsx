@@ -129,7 +129,7 @@ const APIClientView: React.FC<Props> = ({
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
-  const { setPreview = () => {}, setSaved = () => {}, setTitle = () => {} } = useGenericState();
+  const { tabId, activeTabId, setPreview = () => {}, setSaved = () => {}, setTitle = () => {} } = useGenericState();
 
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
@@ -637,6 +637,7 @@ const APIClientView: React.FC<Props> = ({
               hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
               onClick={onSaveButtonClick}
               loading={isRequestSaving}
+              enableHotKey={tabId === activeTabId}
               tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
             >
               Save

@@ -34,7 +34,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   exportActions,
 }) => {
   const { renameEnvironment } = useEnvironmentManager();
-  const { setTitle = () => {}, isNewTab = () => {} } = useGenericState();
+  const { tabId, activeTabId, setTitle = () => {}, isNewTab = () => {} } = useGenericState();
 
   const handleNewEnvironmentNameChange = (newName: string) => {
     const updatedName = newName || "New Environment";
@@ -78,6 +78,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           <RQButton
             showHotKeyText
             hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+            enableHotKey={tabId === activeTabId}
             type="primary"
             onClick={onSave}
             disabled={!hasUnsavedChanges}
