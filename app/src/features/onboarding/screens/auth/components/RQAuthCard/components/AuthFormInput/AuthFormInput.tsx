@@ -11,6 +11,9 @@ interface InputProps {
   onValueChange: (value: string) => void;
   onPressEnter?: () => void;
   status?: "error" | "warning";
+  disabled?: boolean;
+  suffix?: string;
+  autoFocus?: boolean;
 }
 
 export const AuthFormInput: React.FC<InputProps> = ({
@@ -22,6 +25,9 @@ export const AuthFormInput: React.FC<InputProps> = ({
   onPressEnter,
   type,
   status,
+  disabled = false,
+  suffix,
+  autoFocus = false,
 }) => {
   return (
     <div className="auth-form-input-wrapper">
@@ -35,6 +41,9 @@ export const AuthFormInput: React.FC<InputProps> = ({
         value={value}
         onChange={(e) => onValueChange(e.target.value)}
         status={status ?? ""}
+        disabled={disabled}
+        suffix={suffix}
+        autoFocus={autoFocus}
       />
     </div>
   );

@@ -11,10 +11,10 @@
     gap: var(--space-9, 32px);
   }
   .auth-mode-toggle {
-    font-size: var(--requestly-font-size-xs);
+    font-size: var(--requestly-font-size-sm);
     .ant-btn {
       padding: 0;
-      font-size: var(--requestly-font-size-xs);
+      font-size: var(--requestly-font-size-sm);
     }
   }
 

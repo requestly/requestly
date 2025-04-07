@@ -1,6 +1,5 @@
-export enum Provider {
+export enum AuthProvider {
   GOOGLE = "google.com",
-  EMAIL_LINK = "email_link",
   PASSWORD = "password",
 }
 
@@ -9,7 +8,7 @@ export type AuthSyncMetadata = {
   syncData: {
     isExistingUser: boolean;
     isSyncedUser: boolean;
-    providers: Provider[];
+    providers: AuthProvider[];
   };
 };
 export interface CredentialResponse {

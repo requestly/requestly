@@ -1,14 +1,17 @@
-import React from "react";
-import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
-import { FailedLoginCode, Provider } from "../../types";
-import { GoogleAuthButton } from "./components/GoogleAuthButton/GoogleAuthButton";
+import React, { useCallback, useState } from "react";
 import { Divider } from "antd";
+import { GoogleAuthButton } from "./components/GoogleAuthButton/GoogleAuthButton";
 import { EmailAuthForm } from "./components/EmailAuthForm/EmailAuthForm";
+import { EmailVerificationCard } from "./components/EmailVerificationCard/EmailVerificationCard";
+import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
+import { FailedLoginCode, AuthProvider } from "../../types";
+import { sendEmailLinkForSignin } from "actions/FirebaseActions";
+import { toast } from "utils/Toast";
 import "./rqAuthCard.scss";
 
 interface RQAuthCardProps {
   email: string;
-  authProviders: Provider[];
+  authProviders: AuthProvider[];
   onBackClick: () => void;
   successfulLoginCallback: () => void;
   failedLoginCallback: (code: FailedLoginCode) => void;
@@ -21,9 +24,27 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
   successfulLoginCallback,
   failedLoginCallback,
 }) => {
-  const renderAuthProvider = (provider: Provider) => {
+  const [isEmailVerificationScreenVisible, setIsEmailVerificationScreenVisible] = useState(false);
+  const [isSendEmailInProgress, setIsSendEmailInProgress] = useState(false);
+
+  const handleSendEmailLink = useCallback(async () => {
+    setIsSendEmailInProgress(true);
+    // TODO: ADD SOURCE
+    return sendEmailLinkForSignin(email, "")
+      .then(() => {
+        setIsEmailVerificationScreenVisible(true);
+      })
+      .catch(() => {
+        toast.error("Something went wrong, Could not send email link");
+      })
+      .finally(() => {
+        setIsSendEmailInProgress(false);
+      });
+  }, [email]);
+
+  const renderAuthProvider = (provider: AuthProvider) => {
     switch (provider.toLowerCase()) {
-      case Provider.GOOGLE:
+      case AuthProvider.GOOGLE:
         return (
           <GoogleAuthButton
             email={email}
@@ -31,12 +52,32 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
             failedLoginCallback={failedLoginCallback}
           />
         );
-      case Provider.PASSWORD:
-        return <EmailAuthForm />;
+      case AuthProvider.PASSWORD:
+        return (
+          <EmailAuthForm
+            email={email}
+            isLoading={isSendEmailInProgress}
+            onSendEmailClick={handleSendEmailLink}
+            onEditEmailClick={onBackClick}
+            authProviders={authProviders}
+          />
+        );
       default:
         return null;
     }
   };
+
+  if (isEmailVerificationScreenVisible) {
+    return (
+      <EmailVerificationCard
+        email={email}
+        providers={authProviders}
+        onBackClick={() => setIsEmailVerificationScreenVisible(false)}
+        onResendEmailClick={handleSendEmailLink}
+        isSendEmailInProgress={isSendEmailInProgress}
+      />
+    );
+  }
 
   return (
     <div className="rq-auth-card">

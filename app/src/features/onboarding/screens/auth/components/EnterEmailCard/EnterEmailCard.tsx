@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { RQButton } from "lib/design-system-v2/components";
-import { AuthFormInput } from "../AuthFormInput/AuthFormInput";
+import { AuthFormInput } from "../RQAuthCard/components/AuthFormInput/AuthFormInput";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { AuthSyncMetadata } from "../../types";
@@ -42,6 +42,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ email, onEmailCh
         <AuthFormInput
           placeholder="example@work.com"
           label="Your work email"
+          autoFocus
           value={email}
           onValueChange={onEmailChange}
           onPressEnter={handleOnContinue}
