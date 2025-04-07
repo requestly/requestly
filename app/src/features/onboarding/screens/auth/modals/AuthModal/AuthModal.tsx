@@ -1,13 +1,16 @@
+import React from "react";
 import { Modal } from "antd";
 import { AuthScreen } from "../../AuthScreen";
 import "./authModal.scss";
-import { useTheme } from "styled-components";
 
-export const AuthModal = () => {
-  const theme = useTheme();
+interface AuthModalProps {
+  isOpen: boolean;
+}
+
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen }) => {
   return (
     <Modal
-      open={true}
+      open={isOpen}
       width={670}
       closable={false}
       footer={null}

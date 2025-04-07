@@ -9,6 +9,8 @@ import { SignupWithBStackCard } from "./components/SignupWithBStackCard/SignupWi
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { AuthSyncMetadata, FailedLoginCode } from "./types";
 import { RQAuthCard } from "./components/RQAuthCard/RQAuthCard";
+import { useDispatch } from "react-redux";
+import { globalActions } from "store/slices/global/slice";
 import "./authScreen.scss";
 
 interface AuthScreenProps {
@@ -23,6 +25,8 @@ enum AuthScreenError {
 export const AuthScreen: React.FC<AuthScreenProps> = ({
   authModeOnMount = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
 }) => {
+  const dispatch = useDispatch();
+
   const [email, setEmail] = useState("");
   const [authMode, setAuthMode] = useState(authModeOnMount);
   const [authErrorMessage, setAuthErrorMessage] = useState("");
@@ -108,10 +112,25 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
   }, []);
 
+  const handleOnHeaderButtonClick = useCallback(() => {
+    dispatch(
+      globalActions.toggleActiveModal({
+        modalName: "authModal",
+        newValue: false,
+        newProps: {
+          src: APP_CONSTANTS.FEATURES.API_CLIENT,
+          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+          // TODO: Add event source
+          eventSource: "",
+        },
+      })
+    );
+  }, [dispatch]);
+
   return (
     <div className="auth-screen-container">
       <div className="auth-screen-content">
-        <AuthModalHeader />
+        <AuthModalHeader onHeaderButtonClick={handleOnHeaderButtonClick} />
         {autoSignupWithBStack ? (
           <OnboardingCard>
             <SignupWithBStackCard autoRedirect />
