@@ -1,16 +1,15 @@
 import { Result, Skeleton, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
-import React, { useCallback, useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
-import "./collectionView.scss";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 import { toast } from "utils/Toast";
+import { useGenericState } from "hooks/useGenericState";
+import "./collectionView.scss";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -23,19 +22,21 @@ interface CollectionViewProps {
 }
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
-  const {
-    apiClientRecords,
-    onSaveRecord,
-    isLoadingApiClientRecords,
-    apiClientRecordsRepository,
-    forceRefreshApiClientRecords,
-  } = useApiClientContext();
-  const { replaceTab, closeTab } = useTabsLayoutContext();
-  const location = useLocation();
+  const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords, apiClientRecordsRepository } =
+    useApiClientContext();
+
+  const { setTitle = () => {}, isNewTab = false } = useGenericState();
 
   const collection = useMemo(() => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
   }, [apiClientRecords, collectionId]);
+
+  useEffect(() => {
+    // To sync title for tabs opened from deeplinks
+    if (collection) {
+      setTitle(collection.name);
+    }
+  }, [collection, setTitle]);
 
   const updateCollectionAuthData = useCallback(
     async (newAuthOptions: RQAPI.Auth) => {
@@ -99,21 +100,10 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         }
 
         onSaveRecord(result.data);
-
-        const wasForceRefreshed = await forceRefreshApiClientRecords();
-        if (wasForceRefreshed) {
-          closeTab(record.id);
-          return;
-        }
-
-        replaceTab(result.data.id, {
-          id: result.data.id,
-          title: result.data.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(result.data.id)}`,
-        });
+        setTitle(result.data.name);
       });
     },
-    [collection, apiClientRecordsRepository, onSaveRecord, forceRefreshApiClientRecords, replaceTab, closeTab]
+    [collection, setTitle, apiClientRecordsRepository, onSaveRecord]
   );
 
   if (isLoadingApiClientRecords) {
@@ -123,6 +113,8 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
       </div>
     );
   }
+
+  const collectionName = collection?.name || "New Collection";
 
   return (
     <div className="collection-view-container">
@@ -137,13 +129,21 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           <div className="collection-view-breadcrumb-container">
             <RQBreadcrumb
               placeholder="New Collection"
-              recordName={collection?.name || "New Collection"}
+              recordName={collectionName}
               onBlur={(newName) => handleCollectionNameChange(newName)}
-              autoFocus={location.search.includes("new")}
+              autoFocus={isNewTab}
+              defaultBreadcrumbs={[
+                { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+                {
+                  isEditable: true,
+                  pathname: window.location.pathname,
+                  label: collectionName,
+                },
+              ]}
             />
           </div>
           <div className="collection-view-content">
-            <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} />
+            <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} moreIcon={null} />
           </div>
         </>
       )}

@@ -1,23 +1,25 @@
 import { CollectionView } from "./CollectionView";
 import PATHS from "config/constants/sub/paths";
 import { BaseTabSource } from "componentsV2/Tabs/helpers/baseTabSource";
-import { MatchedTabSource } from "componentsV2/Tabs/types";
+import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
+import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 
-interface CollectionViewTabSourceMetadata {
-  id: string;
-  title: string;
+interface CollectionViewTabSourceMetadata extends TabSourceMetadata {
+  isNewTab?: boolean;
 }
 
 export class CollectionViewTabSource extends BaseTabSource {
   constructor(metadata: CollectionViewTabSourceMetadata) {
     super();
-    this.component = <CollectionView collectionId={metadata.id} />;
+    this.component = <CollectionView key={metadata.id} collectionId={metadata.id} />;
     this.metadata = {
       id: metadata.id,
       name: "collection",
       title: metadata.title,
+      isNewTab: metadata.isNewTab,
     };
-    this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${this.metadata.id}`;
+    this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
+    this.icon = <MdOutlineFolder />;
   }
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): CollectionViewTabSource {
