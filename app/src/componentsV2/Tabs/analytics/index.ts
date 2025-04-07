@@ -13,8 +13,16 @@ export const trackTabCloseClicked = (sourceId: string, sourceType: string) => {
   trackEvent(TAB_EVENTS.TAB_CLOSE_CLICKED, { sourceId, sourceType });
 };
 
-export const trackTabCloseed = (sourceId: string, sourceType: string) => {
+export const trackTabClosed = (sourceId: string, sourceType: string) => {
   trackEvent(TAB_EVENTS.TAB_CLOSED, { sourceId, sourceType });
+};
+
+export const trackTabCloseById = (sourceId: string, sourceType: string) => {
+  trackEvent(TAB_EVENTS.TAB_CLOSE_BY_ID, { sourceId, sourceType });
+};
+
+export const trackTabClosedById = (sourceId: string, sourceType: string) => {
+  trackEvent(TAB_EVENTS.TAB_CLOSED_BY_ID, { sourceId, sourceType });
 };
 
 export const trackResetTabServiceStore = (source: "workspace_switch" | "sign_out") => {
