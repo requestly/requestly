@@ -1,10 +1,12 @@
+import { createContext, ReactNode, useContext } from "react";
 import { create, StoreApi, UseBoundStore, useStore } from "zustand";
 import { persist, StorageValue } from "zustand/middleware";
 import { useShallow } from "zustand/shallow";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
-import { createContext, useContext } from "react";
 import { TAB_SOURCES_MAP } from "../constants";
+import { tabSources } from "../constants";
+import { trackTabOpenClicked, trackTabOpened } from "../analytics";
 
 type TabId = number;
 type SourceName = string;
@@ -98,6 +100,8 @@ const createTabServiceStore = () => {
           set({
             tabs: new Map(tabs),
           });
+
+          trackTabOpened(sourceId, source.type, config?.preview);
         },
 
         updateTabBySource(sourceId, sourceName, updates) {
@@ -119,6 +123,10 @@ const createTabServiceStore = () => {
         },
 
         openTab(source, config) {
+          const sourceId = source.getSourceId();
+          const sourceName = source.getSourceName();
+          trackTabOpenClicked(sourceId, source.type, config?.preview);
+
           const {
             _generateNewTabId,
             tabsIndex,
@@ -129,12 +137,11 @@ const createTabServiceStore = () => {
             setPreviewTab,
             getTabIdBySource,
           } = get();
-          const sourceId = source.getSourceId();
-          const sourceName = source.getSourceName();
 
           const existingTabId = getTabIdBySource(sourceId, sourceName);
           if (existingTabId) {
             setActiveTab(existingTabId);
+            trackTabOpened(sourceId, source.type, config?.preview);
             return;
           }
 
