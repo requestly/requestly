@@ -171,7 +171,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
         )}
       </div>
       <div className="auth-screen-footer">
-        {/* TEMPORARY */}
         <CompaniesLogoBanner />
       </div>
     </div>

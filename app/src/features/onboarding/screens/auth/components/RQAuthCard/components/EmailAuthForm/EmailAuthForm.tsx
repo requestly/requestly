@@ -40,7 +40,6 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({
       if (result.user.uid) {
         const greatingName = result.user.displayName?.split(" ")?.[0];
         toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome back!");
-        toast.success("Signed in successfully");
       }
     } catch (error) {
       toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, error.errorCode));
