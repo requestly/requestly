@@ -3,21 +3,25 @@ import { TabState } from "../store/tabStore";
 import { StoreApi } from "zustand";
 import { GenericStateContext } from "hooks/useGenericState";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
+import {
+  trackTabGenericStateSetPreviewMode,
+  trackTabGenericStateSetSaved,
+  trackTabGenericStateSetTitle,
+} from "../analytics";
 
 export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabState> }>> = React.memo((props) => {
-  const [
-    activeTabId,
-    incrementVersion,
-    resetPreviewTab,
-    closeTabById,
-    upsertTabSource,
-  ] = useTabServiceWithSelector((state) => [
-    state.activeTabId,
-    state.incrementVersion,
-    state.resetPreviewTab,
-    state.closeTabById,
-    state.upsertTabSource,
-  ]);
+  const [activeTabId, incrementVersion, resetPreviewTab, closeTabById, upsertTabSource] = useTabServiceWithSelector(
+    (state) => [
+      state.activeTabId,
+      state.incrementVersion,
+      state.resetPreviewTab,
+      state.closeTabById,
+      state.upsertTabSource,
+    ]
+  );
+
+  const sourceId = props.store.getState().source.getSourceId();
+  const sourceType = props.store.getState().source.type;
 
   return (
     <GenericStateContext.Provider
@@ -39,11 +43,13 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
         },
 
         setTitle: (title: string) => {
+          trackTabGenericStateSetTitle(sourceId, sourceType);
           props.store.getState().setTitle(title);
           incrementVersion();
         },
 
         setPreview: (preview: boolean) => {
+          trackTabGenericStateSetPreviewMode(sourceId, sourceType, preview);
           props.store.getState().setPreview(preview);
           if (!preview) {
             resetPreviewTab();
@@ -52,6 +58,7 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
         },
 
         setUnSaved: (unsaved: boolean) => {
+          trackTabGenericStateSetSaved(sourceId, sourceType, unsaved);
           props.store.getState().setUnSaved(unsaved);
           incrementVersion();
         },
