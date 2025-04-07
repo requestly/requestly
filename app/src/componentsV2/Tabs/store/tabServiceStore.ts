@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
 import { create, StoreApi, UseBoundStore, useStore } from "zustand";
 import { persist, StorageValue } from "zustand/middleware";
+import * as Sentry from "@sentry/react";
 import { useShallow } from "zustand/shallow";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
@@ -338,7 +339,14 @@ const createTabServiceStore = () => {
 
           return (state, error) => {
             if (error) {
-              throw new Error(`Tabs rehydration failed - error:${error}`);
+              // Cross check if this is logged on sentry or not
+              Sentry.withScope((scope) => {
+                scope.setTag("error_type", "tabs_rehydration_failed");
+                scope.setContext("tab_service_store_details", {
+                  tabServiceStore: state,
+                });
+                Sentry.captureException(new Error(`Tabs rehydration failed - error:${error}`));
+              });
             } else {
               trackTabsRehydrationCompleted();
             }
