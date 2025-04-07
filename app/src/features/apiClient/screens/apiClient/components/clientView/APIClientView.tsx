@@ -398,8 +398,10 @@ const APIClientView: React.FC<Props> = ({
       record.name = requestName;
     }
 
+    console.log("record", record);
+
     const result = isCreateMode
-      ? await apiClientRecordsRepository.createRecordWithId(record, apiEntryDetails?.id)
+      ? await apiClientRecordsRepository.createRecordWithId(record, apiClientRecordsRepository.generateApiRecordId())
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
