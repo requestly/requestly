@@ -3,7 +3,6 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../../../apiClient/components/sidebar/components/sidebarListHeader/SidebarListHeader";
-import PATHS from "config/constants/sub/paths";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
@@ -11,7 +10,6 @@ import { EmptyState } from "features/apiClient/screens/apiClient/components/side
 import { ListEmptySearchView } from "features/apiClient/screens/apiClient/components/sidebar/components/listEmptySearchView/ListEmptySearchView";
 import { EnvironmentAnalyticsSource } from "../../types";
 import { EnvironmentsListItem } from "./components/environmentsListItem/EnvironmentsListItem";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { SidebarPlaceholderItem } from "features/apiClient/screens/apiClient/components/sidebar/components/SidebarPlaceholderItem/SidebarPlaceholderItem";
@@ -21,13 +19,20 @@ import { EnvironmentData } from "backend/environment/types";
 import { ErrorFilesList } from "features/apiClient/screens/apiClient/components/sidebar/components/ErrorFilesList/ErrorFileslist";
 import { toast } from "utils/Toast";
 import { RBAC, useRBAC } from "features/rbac";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { EnvironmentViewTabSource } from "../environmentView/EnvironmentViewTabSource";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const { getAllEnvironments, addNewEnvironment, setCurrentEnvironment, getEnvironmentVariables, errorEnvFiles } =
-    useEnvironmentManager();
+  const {
+    getAllEnvironments,
+    addNewEnvironment,
+    setCurrentEnvironment,
+    getEnvironmentVariables,
+    errorEnvFiles,
+  } = useEnvironmentManager();
   const [searchValue, setSearchValue] = useState("");
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -35,7 +40,7 @@ export const EnvironmentsList = () => {
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_environment", "update");
 
-  const { openTab } = useTabsLayoutContext();
+  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
   const environments = useMemo(() => getAllEnvironments(), [getAllEnvironments]);
   const filteredEnvironments = useMemo(
@@ -61,14 +66,9 @@ export const EnvironmentsList = () => {
               setCurrentEnvironment(newEnvironment.id);
             }
 
-            const targetPath = `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(newEnvironment.id)}`;
-            const tabConfig = {
-              id: newEnvironment.id,
-              title: newEnvironment.name,
-              url: targetPath,
-            };
+            // const targetPath = `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(newEnvironment.id)}`;
 
-            openTab(newEnvironment.id, tabConfig);
+            openTab(new EnvironmentViewTabSource({ id: newEnvironment.id, title: newEnvironment.name }));
             trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
           }
         })
@@ -136,14 +136,9 @@ export const EnvironmentsList = () => {
                 <>
                   {filteredEnvironments.map((environment) =>
                     isGlobalEnvironment(environment.id) ? (
-                      <EnvironmentsListItem
-                        openTab={openTab}
-                        environment={environment}
-                        isReadOnly={!isValidPermission}
-                      />
+                      <EnvironmentsListItem environment={environment} isReadOnly={!isValidPermission} />
                     ) : (
                       <EnvironmentsListItem
-                        openTab={openTab}
                         environment={environment}
                         isReadOnly={!isValidPermission}
                         onExportClick={handleExportEnvironments}
