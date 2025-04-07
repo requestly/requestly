@@ -327,13 +327,13 @@ const createTabServiceStore = () => {
         }),
 
         onRehydrateStorage: (state) => {
-          // trackTabsRehydrationStarted();
+          trackTabsRehydrationStarted();
 
           return (state, error) => {
             if (error) {
               throw new Error(`Tabs rehydration failed - error:${error}`);
             } else {
-              // trackTabsRehydrationCompleted();
+              trackTabsRehydrationCompleted();
             }
           };
         },
