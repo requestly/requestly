@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { tabServiceStore } from "./store/tabServiceStore";
+import PATHS from "config/constants/sub/paths";
 
 export const useSetUrl = () => {
   const navigate = useNavigate();
@@ -27,8 +28,15 @@ export const useSetUrl = () => {
   return { setUrl };
 };
 
+const navigate = (path: string) => {
+  window.history.pushState({}, "", path);
+};
+
 export const getTabServiceActions = () => {
-  const resetTabs = tabServiceStore.getState().reset;
+  const resetTabs = () => {
+    tabServiceStore.getState().reset();
+    navigate(PATHS.API_CLIENT.RELATIVE);
+  };
 
   return { resetTabs };
 };
