@@ -17,7 +17,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ email, onEmailCh
   const handleOnContinue = async () => {
     setIsLoading(true);
     // TODO: rename function
-    const getUserAuthSyncDetails = httpsCallable(getFunctions(), "users-getRQUserDetails");
+    const getUserAuthSyncDetails = httpsCallable(getFunctions(), "users-getAuthSyncData");
     getUserAuthSyncDetails({ email })
       .then(({ data }: { data: AuthSyncMetadata }) => {
         if (data.success) {

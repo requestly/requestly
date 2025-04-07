@@ -58,7 +58,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   const handlePostAuthSyncVerification = useCallback(
     (metadata: AuthSyncMetadata["syncData"]) => {
       setAuthErrorMessage("");
-      // TODO: REFACTOR THIS
       setAuthProviders(metadata.providers);
       if (metadata.isSyncedUser) {
         setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
