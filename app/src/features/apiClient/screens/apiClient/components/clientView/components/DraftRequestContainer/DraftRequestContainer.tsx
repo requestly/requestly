@@ -2,8 +2,9 @@ import React, { useCallback, useState } from "react";
 import { RequestView } from "../RequestView/RequestView";
 import { DraftRequestView } from "./DraftRequestView";
 import { useGenericState } from "hooks/useGenericState";
-import PATHS from "config/constants/sub/paths";
 import { RQAPI } from "features/apiClient/types";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { RequestViewTabSource } from "../RequestView/requestViewTabSource";
 
 type RequestViewState =
   | {
@@ -14,13 +15,28 @@ type RequestViewState =
       isCreateMode: true;
     };
 
-//TODO: losing focus in the apiClientViewer on first focus
-export const DraftRequestContainer: React.FC = () => {
+export const DraftRequestContainer: React.FC<{ draftId: string }> = ({ draftId }) => {
   const [requestViewState, setRequestViewState] = useState<RequestViewState>({
     isCreateMode: true,
   });
 
-  const { setTitle, setUrl } = useGenericState();
+  const { setTitle = () => {} } = useGenericState();
+  const [tabsIndex, registerTab] = useTabServiceWithSelector((state) => [state.tabsIndex, state.registerTabSource]);
+
+  const updateTabSource = useCallback(
+    (apiEntryDetails: RQAPI.ApiRecord) => {
+      const currentTabId = tabsIndex.get("request").get(draftId);
+      registerTab(
+        currentTabId,
+        new RequestViewTabSource({
+          id: apiEntryDetails.id,
+          title: apiEntryDetails.name,
+          apiEntryDetails: apiEntryDetails,
+        })
+      );
+    },
+    [draftId, registerTab, tabsIndex]
+  );
 
   const onSaveCallback = useCallback(
     (apiEntryDetails: RQAPI.ApiRecord) => {
@@ -29,9 +45,9 @@ export const DraftRequestContainer: React.FC = () => {
         entryDetails: apiEntryDetails,
       });
       setTitle(apiEntryDetails.name);
-      setUrl(`${PATHS.API_CLIENT.ABSOLUTE}/request/${apiEntryDetails.id}`);
+      updateTabSource(apiEntryDetails);
     },
-    [setTitle, setUrl]
+    [setTitle, updateTabSource]
   );
 
   if (requestViewState.isCreateMode === true) {
