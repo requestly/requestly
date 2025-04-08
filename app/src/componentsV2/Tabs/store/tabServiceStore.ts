@@ -31,7 +31,11 @@ type TabServiceState = {
 type TabActions = {
   reset: () => void;
   upsertTabSource: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
-  updateTabBySourceId: (sourceId: SourceId, updates: Partial<Pick<TabState, "preview" | "unsaved" | "title">>) => void;
+  updateTabBySource: (
+    sourceId: SourceId,
+    sourceName: SourceName,
+    updates: Partial<Pick<TabState, "preview" | "unsaved" | "title">>
+  ) => void;
   openTab: (source: AbstractTabSource, config?: TabConfig) => void;
   closeTab: (source: AbstractTabSource, skipUnsavedPrompt?: boolean) => void;
   closeAllTabs: (skipUnsavedPrompt?: boolean) => void;
@@ -43,7 +47,7 @@ type TabActions = {
   _generateNewTabId: () => TabId;
   incrementVersion: () => void;
   getSourceByTabId: (tabId: TabId) => AbstractTabSource | undefined;
-  getTabIdBySourceId: (sourceId: SourceId) => TabId | undefined;
+  getTabIdBySource: (sourceId: SourceId, sourceName: SourceName) => TabId | undefined;
 };
 
 export type TabServiceStore = TabServiceState & TabActions;
@@ -91,9 +95,9 @@ const createTabServiceStore = () => {
           });
         },
 
-        updateTabBySourceId(sourceId, updates) {
-          const { tabs, getTabIdBySourceId } = get();
-          const tabId = getTabIdBySourceId(sourceId);
+        updateTabBySource(sourceId, sourceName, updates) {
+          const { tabs, getTabIdBySource, incrementVersion } = get();
+          const tabId = getTabIdBySource(sourceId, sourceName);
 
           const tabStore = tabs.get(tabId);
           if (!tabStore) {
@@ -104,10 +108,9 @@ const createTabServiceStore = () => {
           const updatedTitle = updates?.title ?? tabState.title;
           const updatedPreview = updates?.preview ?? tabState.preview;
 
-          const updatedTabStore = createTabStore(tabId, tabState.source, updatedTitle, updatedPreview);
-
-          tabs.set(tabId, updatedTabStore);
-          set({ tabs: new Map(tabs) });
+          tabStore.getState().setTitle(updatedTitle);
+          tabStore.getState().setPreview(updatedPreview);
+          incrementVersion();
         },
 
         openTab(source, config) {
@@ -119,11 +122,12 @@ const createTabServiceStore = () => {
             previewTabId,
             previewTabSource,
             setPreviewTab,
+            getTabIdBySource,
           } = get();
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
 
-          const existingTabId = tabsIndex.get(sourceName)?.get(sourceId);
+          const existingTabId = getTabIdBySource(sourceId, sourceName);
           if (existingTabId) {
             setActiveTab(existingTabId);
             return;
@@ -146,11 +150,11 @@ const createTabServiceStore = () => {
         },
 
         closeTab(source, skipUnsavedPrompt = false) {
-          const { tabsIndex, closeTabById } = get();
+          const { closeTabById, getTabIdBySource } = get();
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
 
-          const existingTabId = tabsIndex.get(sourceName)?.get(sourceId);
+          const existingTabId = getTabIdBySource(sourceId, sourceName);
           if (!existingTabId) {
             return;
           }
@@ -166,9 +170,9 @@ const createTabServiceStore = () => {
         },
 
         closeTabBySource(sourceId, sourceName, skipUnsavedPrompt) {
-          const { tabsIndex, closeTabById } = get();
+          const { closeTabById, getTabIdBySource } = get();
 
-          const tabId = tabsIndex.get(sourceName)?.get(sourceId);
+          const tabId = getTabIdBySource(sourceId, sourceName);
           if (!tabId) {
             return;
           }
@@ -277,14 +281,9 @@ const createTabServiceStore = () => {
           return tab.getState().source;
         },
 
-        getTabIdBySourceId(sourceId: SourceId) {
-          const { tabs } = get();
-          for (const [id, tab] of tabs) {
-            if (tab.getState().source.getSourceId() === sourceId) {
-              return id;
-            }
-          }
-          return;
+        getTabIdBySource(sourceId, sourceName) {
+          const { tabsIndex } = get();
+          return tabsIndex.get(sourceName)?.get(sourceId);
         },
       }),
       {

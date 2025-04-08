@@ -36,8 +36,8 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const [updateTabBySourceId, closeTabBySource] = useTabServiceWithSelector((state) => [
-    state.updateTabBySourceId,
+  const [updateTabBySource, closeTabBySource] = useTabServiceWithSelector((state) => [
+    state.updateTabBySource,
     state.closeTabBySource,
   ]);
 
@@ -81,7 +81,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
     if (result.success) {
       onSaveRecord(result.data, "open");
-      updateTabBySourceId(result.data.id, { title: result.data.name });
+
       if (recordType === RQAPI.RecordType.API) {
         trackRequestSaved({
           src: analyticEventSource,
@@ -114,7 +114,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     onSaveRecord,
     analyticEventSource,
     dispatch,
-    updateTabBySourceId,
   ]);
 
   const updateRecord = useCallback(async () => {
@@ -141,8 +140,9 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
         : await apiClientRecordsRepository.renameCollection(record.id, record.name);
 
     if (result.success) {
+      const tabSourceName = record.type === RQAPI.RecordType.API ? "request" : "collection";
       onSaveRecord(result.data);
-      updateTabBySourceId(result.data.id, { title: result.data.name });
+      updateTabBySource(result.data.id, tabSourceName, { title: result.data.name });
 
       const wasForceRefreshed = await forceRefreshApiClientRecords();
       if (wasForceRefreshed && recordType === RQAPI.RecordType.COLLECTION) {
@@ -173,7 +173,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     apiClientRecordsRepository,
     forceRefreshApiClientRecords,
     closeTabBySource,
-    updateTabBySourceId,
+    updateTabBySource,
   ]);
 
   const onBlur = isEditMode ? updateRecord : saveNewRecord;
