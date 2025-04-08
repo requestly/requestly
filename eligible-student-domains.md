@@ -29,6 +29,8 @@ The following domains are eligible for the student programme:
     "yonsei.ac.kr",
     "lakeheadu.ca",
     "estg.ipp.pt",
+    "utm.md",
+    "fernuni-hagen.de",
     "duke.edu",
     "fau.de",
     "sch.gr"

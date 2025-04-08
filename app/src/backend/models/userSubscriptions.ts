@@ -5,4 +5,5 @@ export interface UserSubscription {
   subscriptionCurrentPeriodEnd: number;
   stripeActiveSubscriptionID: string;
   type: "individual" | "team";
+  rqSubscriptionType: string;
 }
