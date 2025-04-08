@@ -331,7 +331,8 @@ const createTabServiceStore = () => {
               })
             );
 
-            const activeTab = tabs.get(existingValue.state.activeTabId).getState();
+            const activeTabId = existingValue.state.activeTabId;
+            const activeTabSource = activeTabId ? tabs.get(activeTabId).getState().source : null;
 
             return {
               ...existingValue,
@@ -339,7 +340,7 @@ const createTabServiceStore = () => {
                 ...existingValue.state,
                 tabs,
                 tabsIndex,
-                activeTabSource: activeTab.source,
+                activeTabSource,
               },
             };
           },
