@@ -49,7 +49,6 @@ import { Conditional } from "components/common/Conditional";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import { useGenericState } from "hooks/useGenericState";
 import PATHS from "config/constants/sub/paths";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -130,12 +129,8 @@ const APIClientView: React.FC<Props> = ({
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
-  const { setPreview, setUnSaved, setTitle } = useGenericState();
-  const [activeTabId, getTabStateBySource] = useTabServiceWithSelector((state) => [
-    state.activeTabId,
-    state.getTabStateBySource,
-  ]);
-  const tabId = getTabStateBySource(apiEntryDetails?.id, "request")?.id;
+
+  const { setPreview, setUnSaved, setTitle, getIsActive } = useGenericState();
 
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
@@ -546,6 +541,8 @@ const APIClientView: React.FC<Props> = ({
     setEntry(apiEntryDetails?.data);
   };
 
+  const enableHotkey = getIsActive();
+
   return isExtensionEnabled ? (
     <div className="api-client-view">
       <div className="api-client-header-container">
@@ -624,7 +621,7 @@ const APIClientView: React.FC<Props> = ({
                 onClick={onSaveButtonClick}
                 loading={isRequestSaving}
                 tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
-                enableHotKey={tabId === activeTabId}
+                enableHotKey={enableHotkey}
               >
                 Save
               </RBACButton>

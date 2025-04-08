@@ -11,7 +11,6 @@ import { useOutsideClick } from "hooks";
 import { toast } from "utils/Toast";
 import { useRBAC } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import "./collectionOverview.scss";
 
 interface CollectionOverviewProps {
@@ -24,12 +23,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_collection", "create");
-  const { setTitle } = useGenericState();
-  const [closeTabById, getTabStateBySource] = useTabServiceWithSelector((state) => [
-    state.closeTabById,
-    state.getTabStateBySource,
-  ]);
-  const tabId = getTabStateBySource(collection?.id, "collection")?.id;
+  const { setTitle, close } = useGenericState();
 
   const [collectionName, setCollectionName] = useState(collection?.name || "");
   const [collectionDescription, setCollectionDescription] = useState(collection?.description || "");
@@ -78,7 +72,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
 
     const wasForceRefreshed = await forceRefreshApiClientRecords();
     if (wasForceRefreshed) {
-      closeTabById(tabId);
+      close();
     }
   };
 

@@ -30,7 +30,7 @@ type TabServiceState = {
 
 type TabActions = {
   reset: () => void;
-  upsertTabSource: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
+  upsertTabSource: (tabId: TabId | undefined, source: AbstractTabSource, config?: TabConfig) => void;
   updateTabBySource: (
     sourceId: SourceId,
     sourceName: SourceName,
@@ -79,6 +79,11 @@ const createTabServiceStore = () => {
           const { tabsIndex, tabs, setActiveTab } = get();
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
+
+          if (!tabId) {
+            return;
+          }
+
           const tab = createTabStore(tabId, source, source.getDefaultTitle(), config?.preview);
 
           if (tabsIndex.has(sourceName)) {

@@ -4,12 +4,21 @@ export interface GenericState {
   setTitle: (title: string) => void;
   setPreview: (preview: boolean) => void;
   setUnSaved: (unsaved: boolean) => void;
+  getIsNew: () => boolean;
+  getIsActive: () => boolean;
+
+  replace: (args: unknown) => void; // TODO: make type generic
+  close: () => void;
 }
 
 const defaultGenericState: GenericState = {
   setTitle: () => {},
   setPreview: () => {},
   setUnSaved: () => {},
+  getIsNew: () => false,
+  getIsActive: () => false,
+  replace: () => {},
+  close: () => {},
 };
 
 /**
