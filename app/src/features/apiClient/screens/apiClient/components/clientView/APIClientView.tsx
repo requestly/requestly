@@ -97,8 +97,12 @@ const APIClientView: React.FC<Props> = ({
   const isHistoryPath = location.pathname.includes("history");
 
   const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
-  const { apiClientRecords, onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } =
-    useApiClientContext();
+  const {
+    apiClientRecords,
+    onSaveRecord,
+    apiClientWorkloadManager,
+    apiClientRecordsRepository,
+  } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const {
     getVariablesWithPrecedence,
@@ -111,10 +115,10 @@ const APIClientView: React.FC<Props> = ({
     renderVariables,
     environmentSyncRepository,
   } = environmentManager;
-  const currentEnvironmentVariables = useMemo(
-    () => getVariablesWithPrecedence(apiEntryDetails?.collectionId),
-    [apiEntryDetails?.collectionId, getVariablesWithPrecedence]
-  );
+  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
+    apiEntryDetails?.collectionId,
+    getVariablesWithPrecedence,
+  ]);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
@@ -616,6 +620,7 @@ const APIClientView: React.FC<Props> = ({
                   onClick={onSaveButtonClick}
                   loading={isRequestSaving}
                   tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
+                  enableHotKey={tabId === activeTabId}
                 >
                   Save
                 </RBACButton>
