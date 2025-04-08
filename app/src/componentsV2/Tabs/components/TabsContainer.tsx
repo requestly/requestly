@@ -138,10 +138,7 @@ export const TabsContainer: React.FC = () => {
           setActiveTab(parseInt(key));
         }}
         onEdit={(key, action) => {
-          if (action === "remove") {
-            const id = parseInt(key as string);
-            closeTabById(id);
-          } else if (action === "add") {
+          if (action === "add") {
             openTab(new DraftRequestContainerTabSource());
           }
         }}
