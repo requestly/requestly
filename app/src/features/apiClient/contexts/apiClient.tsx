@@ -296,7 +296,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
 
         if (apiClientRecord.type === RQAPI.RecordType.COLLECTION) {
-          openTab(new CollectionViewTabSource({ id: recordId, title: apiClientRecord.name, isNewTab: !isRecordExist }));
+          openTab(
+            new CollectionViewTabSource({ id: recordId, title: apiClientRecord.name, focusBreadcrumb: !isRecordExist })
+          );
           return;
         }
       }
@@ -390,7 +392,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             .then((newEnvironment: { id: string; name: string }) => {
               setIsRecordBeingCreated(null);
               openTab(
-                new EnvironmentViewTabSource({ id: newEnvironment.id, title: newEnvironment.name, isNewTab: true })
+                new EnvironmentViewTabSource({
+                  id: newEnvironment.id,
+                  title: newEnvironment.name,
+                  focusBreadcrumb: true,
+                })
               );
             })
             .catch((error) => {
