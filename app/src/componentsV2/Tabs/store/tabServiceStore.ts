@@ -28,10 +28,10 @@ type TabActions = {
   reset: () => void;
   upsertTabSource: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
   updateTabBySourceId: (sourceId: SourceId, updates: Partial<Pick<TabState, "preview" | "unsaved" | "title">>) => void;
-  openTab: (source: AbstractTabSource, config?: TabConfig) => void;
-  closeTab: (source: AbstractTabSource) => void;
-  closeAllTabs: () => void;
-  closeTabById: (tabId: TabId) => void;
+  openTab: (source: AbstractTabSource, config: TabConfig) => void;
+  closeTab: (source: AbstractTabSource, skipUnsavedPrompt: boolean) => void;
+  closeAllTabs: (skipUnsavedPrompt: boolean) => void;
+  closeTabById: (tabId: TabId, skipUnsavedPrompt: boolean) => void;
   setActiveTab: (tabId: TabId) => void;
   _generateNewTabId: () => TabId;
   incrementVersion: () => void;
@@ -129,7 +129,7 @@ const createTabServiceStore = () => {
           upsertTabSource(newTabId, source);
         },
 
-        closeTab(source) {
+        closeTab(source, skipUnsavedPrompt = false) {
           const { tabsIndex, closeTabById } = get();
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
@@ -139,17 +139,17 @@ const createTabServiceStore = () => {
             return;
           }
 
-          closeTabById(existingTabId);
+          closeTabById(existingTabId, skipUnsavedPrompt);
         },
 
-        closeAllTabs() {
+        closeAllTabs(skipUnsavedPrompt) {
           const { tabs, closeTabById } = get();
           tabs.forEach((_, tabId) => {
-            closeTabById(tabId);
+            closeTabById(tabId, skipUnsavedPrompt);
           });
         },
 
-        closeTabById(tabId) {
+        closeTabById(tabId, skipUnsavedPrompt) {
           const { tabs, tabsIndex, activeTabId, setActiveTab } = get();
           const tabStore = tabs.get(tabId);
           if (!tabStore) {
@@ -160,7 +160,7 @@ const createTabServiceStore = () => {
           const sourceName = tabState.source.getSourceName();
           const sourceId = tabState.source.getSourceId();
 
-          if (tabState.unsaved) {
+          if (tabState.unsaved && !skipUnsavedPrompt) {
             // TODO: update alert message for RBAC viewer role
             const result = window.confirm("Discard changes? Changes you made will not be saved.");
 
