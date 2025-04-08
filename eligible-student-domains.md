@@ -32,6 +32,7 @@ The following domains are eligible for the student programme:
     "utm.md",
     "fernuni-hagen.de",
     "duke.edu",
-    "fau.de"
+    "fau.de",
+    "sch.gr"
   ]
 }
