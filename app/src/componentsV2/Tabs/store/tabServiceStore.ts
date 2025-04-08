@@ -16,7 +16,7 @@ type TabConfig = {
 
 type TabServiceState = {
   tabIdSequence: TabId;
-  activeTabId: TabId;
+  activeTabId: TabId | undefined;
   activeTabSource: AbstractTabSource | null;
   tabsIndex: Map<SourceName, SourceMap>; // Type: SourceName -> sourceId -> tabId eg: Request -> [requestId,tabId]
   tabs: Map<TabId, StoreApi<TabState>>;
@@ -43,7 +43,7 @@ export type TabServiceStore = TabServiceState & TabActions;
 
 const initialState: TabServiceState = {
   tabIdSequence: 0,
-  activeTabId: 0,
+  activeTabId: undefined,
   activeTabSource: null,
   tabsIndex: new Map(),
   tabs: new Map(),
@@ -205,7 +205,7 @@ const createTabServiceStore = () => {
             set({ activeTabId: id, activeTabSource: tabs.get(id).getState().source });
           } else {
             set({
-              activeTabId: 0,
+              activeTabId: undefined,
               activeTabSource: null,
             });
           }
