@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import "./OnboardingCard.scss";
+import "./onboardingCard.scss";
 
 interface OnboardingCardProps {
   children: ReactNode;
