@@ -1,9 +1,10 @@
 import React from "react";
 import { AbstractTabSource } from "./tabSource";
+import { TabSourceMetadata } from "../types";
 
 export class BaseTabSource implements AbstractTabSource {
   component: NonNullable<React.ReactNode>;
-  metadata: Record<string, any>;
+  metadata: TabSourceMetadata;
   urlPath: string;
   icon: React.ReactNode;
   type = this.constructor.name;
