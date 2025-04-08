@@ -94,7 +94,6 @@ const APIClientView: React.FC<Props> = ({
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
-  const isHistoryPath = location.pathname.includes("history");
 
   const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
   const { apiClientRecords, onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } =
