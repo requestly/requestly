@@ -5,9 +5,10 @@ import { GenericStateContext } from "hooks/useGenericState";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 
 export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabState> }>> = React.memo((props) => {
-  const [incrementVersion, activeTabId] = useTabServiceWithSelector((state) => [
+  const [incrementVersion, activeTabId, resetPreviewTab] = useTabServiceWithSelector((state) => [
     state.incrementVersion,
     state.activeTabId,
+    state.resetPreviewTab,
   ]);
 
   return (
@@ -25,6 +26,9 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
 
         setPreview: (preview: boolean) => {
           props.store.getState().setPreview(preview);
+          if (!preview) {
+            resetPreviewTab();
+          }
           incrementVersion();
         },
 

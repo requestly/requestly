@@ -1,4 +1,4 @@
-import { create, StateCreator } from "zustand";
+import { create } from "zustand";
 import { AbstractTabSource } from "../helpers/tabSource";
 
 export type TabState = {
@@ -14,14 +14,6 @@ export type TabState = {
   setPreview: (preview: boolean) => void;
 };
 
-export const tabStateSetters = (set: Parameters<StateCreator<TabState>>["0"]) => {
-  return {
-    setTitle: (title: string) => set({ title }),
-    setUnSaved: (unsaved: boolean) => set({ unsaved }),
-    setPreview: (preview: boolean) => set({ preview }),
-  };
-};
-
 export const createTabStore = (id: number, source: any, title: string, preview: boolean = false) => {
   return create<TabState>((set) => ({
     id,
@@ -29,6 +21,9 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     source,
     preview,
     unsaved: false,
-    ...tabStateSetters(set),
+
+    setTitle: (title: string) => set({ title }),
+    setUnSaved: (unsaved: boolean) => set({ unsaved }),
+    setPreview: (preview: boolean) => set({ preview }),
   }));
 };

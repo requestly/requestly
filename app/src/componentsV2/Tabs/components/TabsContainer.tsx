@@ -21,6 +21,7 @@ export const TabsContainer: React.FC = () => {
     openTab,
     closeTabById,
     incrementVersion,
+    resetPreviewTab,
   ] = useTabServiceWithSelector((state) => [
     state.activeTabId,
     state.activeTabSource,
@@ -30,6 +31,7 @@ export const TabsContainer: React.FC = () => {
     state.openTab,
     state.closeTabById,
     state.incrementVersion,
+    state.resetPreviewTab,
   ]);
 
   const isInitialLoadRef = useRef(true);
@@ -94,6 +96,7 @@ export const TabsContainer: React.FC = () => {
               if (tabState.preview) {
                 tabState.setPreview(false);
                 incrementVersion();
+                resetPreviewTab();
               }
             }}
           >
