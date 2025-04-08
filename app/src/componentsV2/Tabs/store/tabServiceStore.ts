@@ -7,6 +7,8 @@ import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { TAB_SOURCES_MAP } from "../constants";
 import {
+  ResetTabSource,
+  trackResetTabServiceStore,
   trackTabActionEarlyReturn,
   trackTabCloseById,
   trackTabCloseClicked,
@@ -43,7 +45,7 @@ type TabServiceState = {
 };
 
 type TabActions = {
-  reset: () => void;
+  reset: (source: ResetTabSource) => void;
   upsertTabSource: (tabId: TabId | undefined, source: AbstractTabSource, config?: TabConfig) => void;
   updateTabBySource: (
     sourceId: SourceId,
@@ -84,9 +86,10 @@ const createTabServiceStore = () => {
       (set, get) => ({
         ...initialState,
 
-        reset() {
+        reset(source) {
           set(initialState);
           tabServiceStore.persist.clearStorage();
+          trackResetTabServiceStore(source);
         },
 
         upsertTabSource(tabId, source, config) {

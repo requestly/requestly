@@ -1,6 +1,8 @@
 import { trackEvent } from "modules/analytics";
 import { TAB_EVENTS } from "./constants";
 
+export type ResetTabSource = "workspace_switch" | "sign_out";
+
 export const trackTabOpenClicked = (sourceId: string, sourceType: string, previewMode: boolean) => {
   trackEvent(TAB_EVENTS.TAB_OPEN_CLICKED, { sourceId, sourceType, previewMode });
 };
@@ -25,7 +27,7 @@ export const trackTabClosedById = (sourceId: string, sourceType: string) => {
   trackEvent(TAB_EVENTS.TAB_CLOSED_BY_ID, { sourceId, sourceType });
 };
 
-export const trackResetTabServiceStore = (source: "workspace_switch" | "sign_out") => {
+export const trackResetTabServiceStore = (source: ResetTabSource) => {
   trackEvent(TAB_EVENTS.RESET_TAB_SERVICE_STORE, { source });
 };
 
