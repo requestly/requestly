@@ -21,12 +21,12 @@ export const DraftRequestContainer: React.FC<{ draftId: string }> = ({ draftId }
   });
 
   const { setTitle = () => {} } = useGenericState();
-  const [tabsIndex, registerTab] = useTabServiceWithSelector((state) => [state.tabsIndex, state.registerTabSource]);
+  const [tabsIndex, upsertTab] = useTabServiceWithSelector((state) => [state.tabsIndex, state.upsertTabSource]);
 
   const updateTabSource = useCallback(
     (apiEntryDetails: RQAPI.ApiRecord) => {
       const currentTabId = tabsIndex.get("request").get(draftId);
-      registerTab(
+      upsertTab(
         currentTabId,
         new RequestViewTabSource({
           id: apiEntryDetails.id,
@@ -35,7 +35,7 @@ export const DraftRequestContainer: React.FC<{ draftId: string }> = ({ draftId }
         })
       );
     },
-    [draftId, registerTab, tabsIndex]
+    [draftId, upsertTab, tabsIndex]
   );
 
   const onSaveCallback = useCallback(
