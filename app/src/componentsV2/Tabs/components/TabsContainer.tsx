@@ -3,13 +3,13 @@ import { Tabs, TabsProps } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
-import { useSetUrl } from "../tabUtils";
 import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
-import "./tabsContainer.scss";
+import { useSetUrl } from "../hooks/useSetUrl";
 import PATHS from "config/constants/sub/paths";
+import "./tabsContainer.scss";
 
 export const TabsContainer: React.FC = () => {
   const [
