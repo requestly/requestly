@@ -3,7 +3,7 @@ import { persist, StorageValue } from "zustand/middleware";
 import { useShallow } from "zustand/shallow";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, useContext } from "react";
 import { TAB_SOURCES_MAP } from "../constants";
 
 type TabId = number;
@@ -366,22 +366,10 @@ const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) =
 };
 
 export const tabServiceStore = createTabServiceStore();
-const tabServiceStoreWithAutoSelectors = createSelectors(tabServiceStore);
+export const tabServiceStoreWithAutoSelectors = createSelectors(tabServiceStore);
 
 // Creating and passing the store through context to ensure context's value can be mocked easily
-const TabServiceStoreContext = createContext(tabServiceStoreWithAutoSelectors);
-
-export const createTabServiceProvider = () => {
-  return (props: { children: ReactNode }) => {
-    return {
-      type: TabServiceStoreContext.Provider,
-      props: {
-        value: tabServiceStoreWithAutoSelectors,
-        children: props.children,
-      },
-    };
-  };
-};
+export const TabServiceStoreContext = createContext(tabServiceStoreWithAutoSelectors);
 
 /**
  * Usage: const [a, b] = useTabServiceSelector(state => [ state.a, state.b ])
