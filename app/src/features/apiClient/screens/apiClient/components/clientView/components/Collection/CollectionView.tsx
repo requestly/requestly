@@ -22,8 +22,12 @@ interface CollectionViewProps {
 }
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
-  const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords, apiClientRecordsRepository } =
-    useApiClientContext();
+  const {
+    apiClientRecords,
+    onSaveRecord,
+    isLoadingApiClientRecords,
+    apiClientRecordsRepository,
+  } = useApiClientContext();
 
   const { setTitle = () => {}, isNewTab = false } = useGenericState();
 
@@ -51,7 +55,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         .updateCollectionAuthData(record)
         .then((result) => {
           if (result.success) {
-            onSaveRecord(result.data);
+            onSaveRecord(result.data, "open");
           } else {
             toast.error(result.message || "Could not update collection authorization changes!");
           }
@@ -99,7 +103,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           return;
         }
 
-        onSaveRecord(result.data);
+        onSaveRecord(result.data, "open");
         setTitle(result.data.name);
       });
     },

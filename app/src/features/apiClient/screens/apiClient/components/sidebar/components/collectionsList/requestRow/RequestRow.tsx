@@ -71,7 +71,7 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
           if (!result.success) {
             throw new Error("Failed to duplicate request");
           }
-          onSaveRecord(result.data);
+          onSaveRecord(result.data, "open");
           toast.success("Request duplicated successfully");
           trackRequestDuplicated();
         })

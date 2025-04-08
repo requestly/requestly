@@ -44,7 +44,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
             ...collection,
             description: result.data,
           };
-          onSaveRecord(updatedCollection);
+          onSaveRecord(updatedCollection, "open");
         })
         .catch((error) => {
           toast.error("Error updating collection description");
@@ -68,7 +68,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
 
     const result = await apiClientRecordsRepository.renameCollection(updatedCollection.id, collectionName);
     if (result.success) {
-      onSaveRecord(result.data);
+      onSaveRecord(result.data, "open");
       setTitle(updatedCollectionName);
     }
 

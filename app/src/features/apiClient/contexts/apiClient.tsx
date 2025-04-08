@@ -41,7 +41,7 @@ interface ApiClientContextInterface {
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => void;
-  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => void;
+  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open") => void;
   onSaveBulkRecords: (apiClientRecords: RQAPI.Record[]) => void;
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => void;
   recordsToBeDeleted: RQAPI.Record[];
@@ -79,7 +79,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => {},
-  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => {},
+  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open") => {},
   onSaveBulkRecords: (apiClientRecords: RQAPI.Record[]) => {},
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => {},
   recordsToBeDeleted: null,
@@ -276,8 +276,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     [updateTab, setApiClientRecords]
   );
 
-  const onSaveRecord = useCallback(
-    (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "none" = "open") => {
+  const onSaveRecord: ApiClientContextInterface["onSaveRecord"] = useCallback(
+    (apiClientRecord, onSaveTabAction) => {
       const recordId = apiClientRecord.id;
       const isRecordExist = apiClientRecords.find((record) => record.id === recordId);
 
@@ -288,14 +288,17 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       }
 
       if (onSaveTabAction === "open") {
-        if (apiClientRecord.type === RQAPI.RecordType.API)
+        if (apiClientRecord.type === RQAPI.RecordType.API) {
           openTab(
             new RequestViewTabSource({ id: recordId, apiEntryDetails: apiClientRecord, title: apiClientRecord.name })
           );
-        else if (apiClientRecord.type === RQAPI.RecordType.COLLECTION) {
-          openTab(new CollectionViewTabSource({ id: recordId, title: apiClientRecord.name, isNewTab: !isRecordExist }));
+          return;
         }
-        return;
+
+        if (apiClientRecord.type === RQAPI.RecordType.COLLECTION) {
+          openTab(new CollectionViewTabSource({ id: recordId, title: apiClientRecord.name, isNewTab: !isRecordExist }));
+          return;
+        }
       }
     },
     [apiClientRecords, onUpdateRecord, onNewRecord, openTab]
@@ -357,7 +360,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             apiClientRecordsRepository
           ).then((result) => {
             setIsRecordBeingCreated(null);
-            onSaveRecord(result.data);
+            onSaveRecord(result.data, "open");
           });
         }
 
@@ -368,7 +371,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
-                onSaveRecord(result.data);
+                onSaveRecord(result.data, "open");
                 dispatch(variablesActions.updateCollectionVariables({ collectionId: result.data.id, variables: {} }));
               } else {
                 toast.error(result.message || "Could not create collection.", 5);

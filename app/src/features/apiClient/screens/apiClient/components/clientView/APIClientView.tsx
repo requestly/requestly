@@ -417,7 +417,7 @@ const APIClientView: React.FC<Props> = ({
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       setTitle(requestName);
       const savedRecord = { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } };
-      onSaveRecord(savedRecord, "none");
+      onSaveRecord(savedRecord);
       trackRequestRenamed("breadcrumb");
       setRequestName("");
       onSaveCallback(savedRecord);
@@ -451,11 +451,8 @@ const APIClientView: React.FC<Props> = ({
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
-      onSaveRecord(
-        { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
-        "none"
-      );
-      // const callbackEntry = { ...result.data.data, response: entry.response, testResults: entry.testResults };
+      onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
+
       setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
       resetChanges();
       trackRequestSaved({
