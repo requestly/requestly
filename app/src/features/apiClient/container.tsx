@@ -1,7 +1,6 @@
 import React, { useCallback } from "react";
 import { ApiClientProvider } from "./contexts";
 import APIClientSidebar from "./screens/apiClient/components/sidebar/APIClientSidebar";
-import { TabsLayoutContainer } from "layouts/TabsLayout";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { NudgePrompt } from "componentsV2/Nudge/NudgePrompt";
@@ -61,16 +60,14 @@ const ApiClientFeatureContainer: React.FC = () => {
   }
 
   return (
-    <TabsLayoutContainer id="apiClient">
-      <TabServiceProvider>
-        <ApiClientProvider>
-          <div className="api-client-container">
-            <APIClientSidebar />
-            {user.loggedIn ? <TabsContainer /> : <>{loggedOutView}</>}
-          </div>
-        </ApiClientProvider>
-      </TabServiceProvider>
-    </TabsLayoutContainer>
+    <TabServiceProvider>
+      <ApiClientProvider>
+        <div className="api-client-container">
+          <APIClientSidebar />
+          {user.loggedIn ? <TabsContainer /> : <>{loggedOutView}</>}
+        </div>
+      </ApiClientProvider>
+    </TabServiceProvider>
   );
 };
 
