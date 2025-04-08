@@ -36,7 +36,7 @@ export const TabsContainer: React.FC = () => {
   const matchedTabSource = useMatchedTabSource();
   const { setUrl } = useSetUrl();
 
-  const hasUnsavedChanges = Array.from(tabs.values()).some((tab) => tab.getState().saved);
+  const hasUnsavedChanges = Array.from(tabs.values()).some((tab) => tab.getState().unsaved);
 
   unstable_useBlocker(({ nextLocation }) => {
     const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
@@ -113,7 +113,7 @@ export const TabsContainer: React.FC = () => {
                 }}
                 icon={<MdClose />}
               />
-              {tabState.saved ? <div className="unsaved-changes-indicator" /> : null}
+              {tabState.unsaved ? <div className="unsaved-changes-indicator" /> : null}
             </div>
           </div>
         ),

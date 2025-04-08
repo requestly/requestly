@@ -5,19 +5,19 @@ export type TabState = {
   /** Tab id */
   id: number;
   source: AbstractTabSource;
-  saved: boolean;
+  unsaved: boolean;
   preview: boolean;
   title: string;
 
   setTitle: (title: string) => void;
-  setSaved: (saved: boolean) => void;
+  setUnSaved: (saved: boolean) => void;
   setPreview: (preview: boolean) => void;
 };
 
 export const tabStateSetters = (set: Parameters<StateCreator<TabState>>["0"]) => {
   return {
     setTitle: (title: string) => set({ title }),
-    setSaved: (saved: boolean) => set({ saved }),
+    setUnSaved: (unsaved: boolean) => set({ unsaved }),
     setPreview: (preview: boolean) => set({ preview }),
   };
 };
@@ -28,7 +28,7 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     title,
     source,
     preview,
-    saved: false,
+    unsaved: false,
     ...tabStateSetters(set),
   }));
 };
