@@ -52,6 +52,7 @@ const RequestTabs: React.FC<Props> = ({
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
+  // TODO: remove tabs state
   const [activeTabSource] = useTabServiceWithSelector((state) => [state.activeTabSource]);
 
   useEffect(() => {
