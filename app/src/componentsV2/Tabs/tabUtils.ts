@@ -1,7 +1,7 @@
 import PATHS from "config/constants/sub/paths";
 import { tabServiceStore } from "./store/tabServiceStore";
 
-const navigate = (path: string) => {
+export const navigate = (path: string) => {
   window.history.pushState({}, "", path);
 };
 

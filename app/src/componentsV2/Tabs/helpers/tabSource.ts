@@ -6,6 +6,7 @@ export abstract class AbstractTabSource {
   abstract metadata: TabSourceMetadata;
   abstract urlPath: string;
   abstract type: string;
+  abstract icon: React.ReactNode;
 
   abstract getSourceId(): string; // Identifier of the entity
   abstract getSourceName(): string;
