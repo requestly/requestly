@@ -7,7 +7,7 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
   constructor() {
     super();
     this.metadata = {
-      id: Date.now(),
+      id: `${Date.now()}`,
       name: "request",
       title: "Untitled request",
     };

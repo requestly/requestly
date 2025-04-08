@@ -9,6 +9,7 @@ export class HistoryViewTabSource extends BaseTabSource {
     super();
     this.component = <HistoryView />;
     this.metadata = {
+      id: `${Date.now()}`,
       name: "history",
       title: "History",
     };
