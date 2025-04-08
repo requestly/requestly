@@ -14,7 +14,7 @@ type TabConfig = {
   preview: boolean;
 };
 
-type TabsState = {
+type TabServiceState = {
   tabIdSequence: TabId;
   activeTabId: TabId;
   activeTabSource: AbstractTabSource | null;
@@ -24,7 +24,7 @@ type TabsState = {
   _version: number;
 };
 
-type TabsAction = {
+type TabActions = {
   reset: () => void;
   upsertTabSource: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
   updateTabBySourceId: (sourceId: SourceId, updates: Partial<Pick<TabState, "preview" | "saved" | "title">>) => void;
@@ -39,9 +39,9 @@ type TabsAction = {
   getTabIdBySourceId: (sourceId: SourceId) => TabId;
 };
 
-export type TabServiceState = TabsState & TabsAction;
+export type TabServiceStore = TabServiceState & TabActions;
 
-const initialState: TabsState = {
+const initialState: TabServiceState = {
   tabIdSequence: 0,
   activeTabId: 0,
   activeTabSource: null,
@@ -52,7 +52,7 @@ const initialState: TabsState = {
 };
 
 const createTabServiceStore = () => {
-  const tabServiceStore = create<TabServiceState>()(
+  const tabServiceStore = create<TabServiceStore>()(
     persist(
       (set, get) => ({
         ...initialState,
@@ -252,7 +252,7 @@ const createTabServiceStore = () => {
         }),
 
         storage: {
-          setItem: (name, newValue: StorageValue<TabServiceState>) => {
+          setItem: (name, newValue: StorageValue<TabServiceStore>) => {
             const tabs = Array.from(newValue.state.tabs.entries()).map(([tabId, tabStore]) => [
               tabId,
               tabStore.getState(),
@@ -283,14 +283,14 @@ const createTabServiceStore = () => {
 
             const existingValue = JSON.parse(stateString);
 
-            const tabsIndex: TabServiceState["tabsIndex"] = new Map(
+            const tabsIndex: TabServiceStore["tabsIndex"] = new Map(
               existingValue.state.tabsIndex.map(
                 // eslint-disable-next-line
                 ([sourceName, sourceMap]: [string, MapIterator<[SourceId, TabId]>]) => [sourceName, new Map(sourceMap)]
               )
             );
 
-            const tabs: TabServiceState["tabs"] = new Map(
+            const tabs: TabServiceStore["tabs"] = new Map(
               existingValue.state.tabs.map(([tabId, tabState]: [TabId, TabState]) => [
                 tabId,
                 create<TabState>((set) => ({
@@ -357,7 +357,7 @@ export const createTabServiceProvider = () => {
  * @param selector
  * @returns selector
  */
-export const useTabServiceWithSelector = <T>(selector: (state: TabServiceState) => T) => {
+export const useTabServiceWithSelector = <T>(selector: (state: TabServiceStore) => T) => {
   const store = useContext(TabServiceStoreContext);
   return useStore(store, useShallow(selector));
 };
