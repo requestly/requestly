@@ -577,55 +577,55 @@ const APIClientView: React.FC<Props> = ({
                 ]}
               />
             </Conditional>
+          </div>
 
-            <div className="api-client-header">
-              <Space.Compact className="api-client-url-container">
-                <Select
-                  popupClassName="api-request-method-selector"
-                  className="api-request-method-selector"
-                  options={requestMethodOptions}
-                  value={entry.request.method}
-                  onChange={setMethod}
-                />
-                <SingleLineEditor
-                  className="api-request-url"
-                  placeholder="https://example.com"
-                  //value={entry.request.url}
-                  defaultValue={entry.request.url}
-                  onChange={(text) => {
-                    setUrl(text);
-                  }}
-                  onPressEnter={onUrlInputEnterPressed}
-                  variables={currentEnvironmentVariables}
-                  // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
-                />
-              </Space.Compact>
-              <RQButton
+          <div className="api-client-header">
+            <Space.Compact className="api-client-url-container">
+              <Select
+                popupClassName="api-request-method-selector"
+                className="api-request-method-selector"
+                options={requestMethodOptions}
+                value={entry.request.method}
+                onChange={setMethod}
+              />
+              <SingleLineEditor
+                className="api-request-url"
+                placeholder="https://example.com"
+                //value={entry.request.url}
+                defaultValue={entry.request.url}
+                onChange={(text) => {
+                  setUrl(text);
+                }}
+                onPressEnter={onUrlInputEnterPressed}
+                variables={currentEnvironmentVariables}
+                // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
+              />
+            </Space.Compact>
+            <RQButton
+              showHotKeyText
+              onClick={onSendButtonClick}
+              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
+              type="primary"
+              className="text-bold"
+              disabled={!entry.request.url}
+            >
+              Send
+            </RQButton>
+
+            <Conditional condition={user.loggedIn && !openInModal}>
+              <RBACButton
+                permission="create"
+                resource="api_client_request"
                 showHotKeyText
-                onClick={onSendButtonClick}
-                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
-                type="primary"
-                className="text-bold"
-                disabled={!entry.request.url}
+                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
+                onClick={onSaveButtonClick}
+                loading={isRequestSaving}
+                tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
+                enableHotKey={tabId === activeTabId}
               >
-                Send
-              </RQButton>
-
-              <Conditional condition={user.loggedIn && !openInModal}>
-                <RBACButton
-                  permission="create"
-                  resource="api_client_request"
-                  showHotKeyText
-                  hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
-                  onClick={onSaveButtonClick}
-                  loading={isRequestSaving}
-                  tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
-                  enableHotKey={tabId === activeTabId}
-                >
-                  Save
-                </RBACButton>
-              </Conditional>
-            </div>
+                Save
+              </RBACButton>
+            </Conditional>
           </div>
         </div>
       </div>
