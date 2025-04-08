@@ -80,7 +80,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
         : await apiClientRecordsRepository.createCollection(record);
 
     if (result.success) {
-      onSaveRecord(result.data);
+      onSaveRecord(result.data, "open");
       updateTabBySourceId(result.data.id, { title: result.data.name });
       if (recordType === RQAPI.RecordType.API) {
         trackRequestSaved({
@@ -153,7 +153,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
         : await apiClientRecordsRepository.renameCollection(record.id, record.name);
 
     if (result.success) {
-      // False is passed to not open the tab when renaming the record from sidebar
       onSaveRecord(result.data);
       updateTabBySourceId(result.data.id, { title: result.data.name });
 
