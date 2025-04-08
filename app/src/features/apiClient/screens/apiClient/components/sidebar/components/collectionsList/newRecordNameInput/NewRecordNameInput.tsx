@@ -14,10 +14,9 @@ import {
   trackRequestSaved,
   trackRequestRenamed,
 } from "modules/analytics/events/features/apiClient";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
-import PATHS from "config/constants/sub/paths";
 import { variablesActions } from "store/features/variables/slice";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { CollectionViewTabSource } from "../../../../clientView/components/Collection/collectionViewTabSource";
 
 export interface NewRecordNameInputProps {
   recordToBeEdited?: RQAPI.Record;
@@ -38,8 +37,10 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const { replaceTab, closeTab } = useTabsLayoutContext();
-  const updateTabBySourceId = useTabServiceWithSelector((state) => state.updateTabBySourceId);
+  const [updateTabBySourceId, closeTab] = useTabServiceWithSelector((state) => [
+    state.updateTabBySourceId,
+    state.closeTab,
+  ]);
 
   const defaultRecordName = recordType === RQAPI.RecordType.API ? "Untitled request" : "New collection";
   const [recordName, setRecordName] = useState(recordToBeEdited?.name || defaultRecordName);
@@ -88,20 +89,9 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
           has_scripts: Boolean(record?.data?.scripts?.preRequest?.length),
           auth_type: record?.data?.auth?.currentAuthType,
         });
-
-        replaceTab("request/new", {
-          id: result.data.id,
-          title: result.data.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(result.data.id)}`,
-        });
       } else {
         trackCollectionSaved(analyticEventSource);
         dispatch(variablesActions.updateCollectionVariables({ collectionId: result.data.id, variables: {} }));
-        replaceTab("collection/new", {
-          id: result.data.id,
-          title: result.data.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(result.data.id)}`,
-        });
       }
 
       const toastSuccessMessage = recordType === RQAPI.RecordType.API ? "Request created!" : "Collection Created!";
@@ -124,7 +114,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     onSuccess,
     onSaveRecord,
     analyticEventSource,
-    replaceTab,
     dispatch,
     updateTabBySourceId,
   ]);
@@ -158,7 +147,12 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
       const wasForceRefreshed = await forceRefreshApiClientRecords();
       if (wasForceRefreshed && recordType === RQAPI.RecordType.COLLECTION) {
-        closeTab(record.id);
+        closeTab(
+          new CollectionViewTabSource({
+            id: record.id,
+            title: "",
+          })
+        );
       }
 
       if (recordType === RQAPI.RecordType.API) {
