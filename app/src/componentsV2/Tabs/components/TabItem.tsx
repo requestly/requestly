@@ -32,8 +32,8 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
           incrementVersion();
         },
 
-        setUnSaved: (saved: boolean) => {
-          props.store.getState().setUnSaved(saved);
+        setUnSaved: (unsaved: boolean) => {
+          props.store.getState().setUnSaved(unsaved);
           incrementVersion();
         },
       }}
