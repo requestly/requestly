@@ -9,6 +9,8 @@ import { CollectionsVariablesView } from "./components/CollectionsVariablesView/
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 import { toast } from "utils/Toast";
 import { useGenericState } from "hooks/useGenericState";
+import { CollectionViewTabSource } from "./collectionViewTabSource";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import "./collectionView.scss";
 
 const TAB_KEYS = {
@@ -27,7 +29,10 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
     onSaveRecord,
     isLoadingApiClientRecords,
     apiClientRecordsRepository,
+    forceRefreshApiClientRecords,
   } = useApiClientContext();
+
+  const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 
   const { setTitle = () => {}, isNewTab = false } = useGenericState();
 
@@ -102,12 +107,20 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           toast.error(result.message || "Could not rename collection!");
           return;
         }
-
         onSaveRecord(result.data);
+        const wasForceRefreshed = await forceRefreshApiClientRecords();
+        if (wasForceRefreshed) {
+          closeTab(
+            new CollectionViewTabSource({
+              id: record.id,
+              title: "",
+            })
+          );
+        }
         setTitle(result.data.name);
       });
     },
-    [collection, setTitle, apiClientRecordsRepository, onSaveRecord]
+    [collection, setTitle, apiClientRecordsRepository, onSaveRecord, forceRefreshApiClientRecords, closeTab]
   );
 
   if (isLoadingApiClientRecords) {
