@@ -134,6 +134,9 @@ const Editor: React.FC<EditorProps> = ({
   };
 
   const updateContent = useCallback((code: string): void => {
+    if (code == null || code === undefined) {
+      return;
+    }
     const view = editorRef.current?.view;
     const doc = view?.state?.doc;
 
