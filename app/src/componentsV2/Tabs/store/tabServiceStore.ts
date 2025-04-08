@@ -295,14 +295,13 @@ const createTabServiceStore = () => {
                 tabId,
                 create<TabState>((set) => ({
                   ...tabState,
-                  source: new TAB_SOURCES_MAP[tabState.source.type](tabState.source.metadata as any), // FIXME: fix type
+                  source: new TAB_SOURCES_MAP[tabState.source.type](tabState.source.metadata),
                   ...tabStateSetters(set),
                 })),
               ])
             );
 
             const activeTab = tabs.get(existingValue.state.activeTabId).getState();
-            const activeTabSource = new TAB_SOURCES_MAP[activeTab.source.type](activeTab.source.metadata as any);
 
             return {
               ...existingValue,
@@ -310,7 +309,7 @@ const createTabServiceStore = () => {
                 ...existingValue.state,
                 tabs,
                 tabsIndex,
-                activeTabSource,
+                activeTabSource: activeTab.source,
               },
             };
           },
