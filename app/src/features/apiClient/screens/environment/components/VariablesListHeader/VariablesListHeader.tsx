@@ -8,7 +8,6 @@ import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { RoleBasedComponent } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import "./variablesListHeader.scss";
 
 interface VariablesListHeaderProps {
@@ -35,13 +34,9 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   exportActions,
 }) => {
   const { renameEnvironment } = useEnvironmentManager();
-  const { setTitle } = useGenericState();
-  const [activeTabId, getTabStateBySource] = useTabServiceWithSelector((state) => [
-    state.activeTabId,
-    state.getTabStateBySource,
-  ]);
-  const tabId = getTabStateBySource(environmentId, "environments")?.id;
-  const isNewTab = getTabStateBySource(environmentId, "environments")?.source.getIsNewTab();
+  const { setTitle, getIsActive, getIsNew } = useGenericState();
+  const enableHotKey = getIsActive();
+  const isNewEnvironment = getIsNew();
 
   const handleNewEnvironmentNameChange = (newName: string) => {
     const updatedName = newName || "New Environment";
@@ -54,7 +49,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
     <div className="variables-list-header">
       {!hideBreadcrumb ? (
         <RQBreadcrumb
-          autoFocus={isNewTab}
+          autoFocus={isNewEnvironment}
           placeholder="New Environment"
           recordName={currentEnvironmentName}
           onBlur={handleNewEnvironmentNameChange}
@@ -85,7 +80,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           <RQButton
             showHotKeyText
             hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
-            enableHotKey={tabId === activeTabId}
+            enableHotKey={enableHotKey}
             type="primary"
             onClick={onSave}
             disabled={!hasUnsavedChanges}
