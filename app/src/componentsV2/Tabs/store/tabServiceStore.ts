@@ -46,8 +46,8 @@ type TabActions = {
   setActiveTab: (tabId: TabId) => void;
   _generateNewTabId: () => TabId;
   incrementVersion: () => void;
-  getSourceByTabId: (tabId: TabId) => AbstractTabSource | undefined;
   getTabIdBySource: (sourceId: SourceId, sourceName: SourceName) => TabId | undefined;
+  getTabStateBySource: (sourceId: SourceId, sourceName: SourceName) => TabState | undefined;
 };
 
 export type TabServiceStore = TabServiceState & TabActions;
@@ -270,20 +270,24 @@ const createTabServiceStore = () => {
           set({ _version: get()._version + 1 });
         },
 
-        getSourceByTabId(tabId) {
-          const { tabs } = get();
-          const tab = tabs.get(tabId);
-
-          if (!tab) {
+        getTabIdBySource(sourceId, sourceName) {
+          const { tabsIndex } = get();
+          if (!sourceId) {
             return;
           }
 
-          return tab.getState().source;
+          return tabsIndex.get(sourceName)?.get(sourceId);
         },
 
-        getTabIdBySource(sourceId, sourceName) {
-          const { tabsIndex } = get();
-          return tabsIndex.get(sourceName)?.get(sourceId);
+        getTabStateBySource(sourceId, sourceName) {
+          const { tabs, getTabIdBySource } = get();
+          const tabId = getTabIdBySource(sourceId, sourceName);
+
+          if (!tabId) {
+            return;
+          }
+
+          return tabs.get(tabId)?.getState();
         },
       }),
       {

@@ -8,6 +8,7 @@ import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { RoleBasedComponent } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import "./variablesListHeader.scss";
 
 interface VariablesListHeaderProps {
@@ -34,7 +35,13 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   exportActions,
 }) => {
   const { renameEnvironment } = useEnvironmentManager();
-  const { tabId, activeTabId, setTitle = () => {}, isNewTab = () => {} } = useGenericState();
+  const { setTitle } = useGenericState();
+  const [activeTabId, getTabStateBySource] = useTabServiceWithSelector((state) => [
+    state.activeTabId,
+    state.getTabStateBySource,
+  ]);
+  const tabId = getTabStateBySource(environmentId, "environments")?.id;
+  const isNewTab = getTabStateBySource(environmentId, "environments")?.source.getIsNewTab();
 
   const handleNewEnvironmentNameChange = (newName: string) => {
     const updatedName = newName || "New Environment";

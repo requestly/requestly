@@ -26,7 +26,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const environmentName = getEnvironmentName(envId);
   const variables = pendingVariablesRef.current ?? getEnvironmentVariables(envId);
-  const { setPreview = () => {}, setUnSaved = () => {}, setTitle } = useGenericState();
+  const { setPreview, setUnSaved, setTitle } = useGenericState();
 
   const [pendingVariables, setPendingVariables] = useState<EnvironmentVariables>(variables);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
