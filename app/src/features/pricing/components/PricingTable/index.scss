@@ -52,10 +52,19 @@
 
 .plan-price-row {
   margin-top: 4px;
-}
-
-.plan-price-row .ant-space-item:first-child {
-  min-width: 40px;
+  .plan-price-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .price-wrapper {
+    text-align: center;
+  }
+  .additional-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 }
 
 .plan-price.enterprice-plan-price {
