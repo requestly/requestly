@@ -33,6 +33,7 @@ The following domains are eligible for the student programme:
     "fernuni-hagen.de",
     "duke.edu",
     "fau.de",
-    "sch.gr"
+    "sch.gr",
+    "edu.co"
   ]
 }
