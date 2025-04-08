@@ -75,7 +75,7 @@ export const TabsContainer: React.FC = () => {
       setUrl(PATHS.API_CLIENT.ABSOLUTE, isInitialLoadRef.current);
     }
 
-    if (activeTabSource && isInitialLoadRef.current) {
+    if (isInitialLoadRef.current) {
       isInitialLoadRef.current = false;
     }
   }, [activeTabSource, setUrl]);
