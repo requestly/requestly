@@ -4,7 +4,7 @@ import { useShallow } from "zustand/shallow";
 import { createTabStore, TabState, tabStateSetters } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { createContext, ReactNode, useContext } from "react";
-import { tabSources } from "../constants";
+import { TAB_SOURCES_MAP } from "../constants";
 
 type TabId = number;
 type SourceName = string;
@@ -295,14 +295,14 @@ const createTabServiceStore = () => {
                 tabId,
                 create<TabState>((set) => ({
                   ...tabState,
-                  source: new tabSources[tabState.source.type](tabState.source.metadata as any), // FIXME: fix type
+                  source: new TAB_SOURCES_MAP[tabState.source.type](tabState.source.metadata as any), // FIXME: fix type
                   ...tabStateSetters(set),
                 })),
               ])
             );
 
             const activeTab = tabs.get(existingValue.state.activeTabId).getState();
-            const activeTabSource = new tabSources[activeTab.source.type](activeTab.source.metadata as any);
+            const activeTabSource = new TAB_SOURCES_MAP[activeTab.source.type](activeTab.source.metadata as any);
 
             return {
               ...existingValue,
