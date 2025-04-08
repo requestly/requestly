@@ -27,7 +27,7 @@ type TabServiceState = {
 type TabActions = {
   reset: () => void;
   upsertTabSource: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
-  updateTabBySourceId: (sourceId: SourceId, updates: Partial<Pick<TabState, "preview" | "saved" | "title">>) => void;
+  updateTabBySourceId: (sourceId: SourceId, updates: Partial<Pick<TabState, "preview" | "unsaved" | "title">>) => void;
   openTab: (source: AbstractTabSource, config?: TabConfig) => void;
   closeTab: (source: AbstractTabSource) => void;
   closeAllTabs: () => void;
@@ -160,7 +160,7 @@ const createTabServiceStore = () => {
           const sourceName = tabState.source.getSourceName();
           const sourceId = tabState.source.getSourceId();
 
-          if (tabState.saved) {
+          if (tabState.unsaved) {
             // TODO: update alert message for RBAC viewer role
             const result = window.confirm("Discard changes? Changes you made will not be saved.");
 
