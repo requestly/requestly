@@ -16,7 +16,6 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { variablesActions } from "store/features/variables/slice";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { CollectionViewTabSource } from "../../../../clientView/components/Collection/collectionViewTabSource";
 
 export interface NewRecordNameInputProps {
   recordToBeEdited?: RQAPI.Record;
@@ -37,9 +36,9 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const [updateTabBySourceId, closeTab] = useTabServiceWithSelector((state) => [
+  const [updateTabBySourceId, closeTabBySource] = useTabServiceWithSelector((state) => [
     state.updateTabBySourceId,
-    state.closeTab,
+    state.closeTabBySource,
   ]);
 
   const defaultRecordName = recordType === RQAPI.RecordType.API ? "Untitled request" : "New collection";
@@ -147,12 +146,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
       const wasForceRefreshed = await forceRefreshApiClientRecords();
       if (wasForceRefreshed && recordType === RQAPI.RecordType.COLLECTION) {
-        closeTab(
-          new CollectionViewTabSource({
-            id: record.id,
-            title: "",
-          })
-        );
+        closeTabBySource(record.id, "collection", true);
       }
 
       if (recordType === RQAPI.RecordType.API) {
@@ -178,7 +172,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     onSuccess,
     apiClientRecordsRepository,
     forceRefreshApiClientRecords,
-    closeTab,
+    closeTabBySource,
     updateTabBySourceId,
   ]);
 

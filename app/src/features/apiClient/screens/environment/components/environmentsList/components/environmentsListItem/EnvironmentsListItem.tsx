@@ -53,10 +53,10 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
   const [isRenaming, setIsRenaming] = useState(false);
-  const [openTab, activeTabId, closeTab] = useTabServiceWithSelector((state) => [
+  const [openTab, activeTabId, closeTabBySource] = useTabServiceWithSelector((state) => [
     state.openTab,
     state.activeTabId,
-    state.closeTab,
+    state.closeTabBySource,
   ]);
 
   const handleEnvironmentRename = useCallback(async () => {
@@ -96,12 +96,8 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     toast.loading("Deleting environment...");
     deleteEnvironment(environment.id)
       .then(() => {
-        closeTab(
-          new EnvironmentViewTabSource({
-            id: environment.id,
-            title: "",
-          })
-        );
+        closeTabBySource(environment.id, "environments");
+
         trackEnvironmentDeleted();
         toast.success("Environment deleted successfully");
         const availableEnvironments = allEnvironments.filter((env) => env.id !== environment.id);
@@ -125,7 +121,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     envId,
     currentEnvironmentId,
     setCurrentEnvironment,
-    closeTab,
+    closeTabBySource,
   ]);
 
   const menuItems = useMemo(() => {
