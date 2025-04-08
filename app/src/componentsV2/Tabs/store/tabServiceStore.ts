@@ -1,7 +1,7 @@
 import { create, StoreApi, UseBoundStore, useStore } from "zustand";
 import { persist, StorageValue } from "zustand/middleware";
 import { useShallow } from "zustand/shallow";
-import { createTabStore, TabState, tabStateSetters } from "./tabStore";
+import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { createContext, ReactNode, useContext } from "react";
 import { TAB_SOURCES_MAP } from "../constants";
@@ -10,6 +10,8 @@ type TabId = number;
 type SourceName = string;
 type SourceId = string;
 type SourceMap = Map<SourceId, TabId>;
+
+type TabStore = StoreApi<TabState>;
 type TabConfig = {
   preview: boolean;
 };
@@ -18,8 +20,10 @@ type TabServiceState = {
   tabIdSequence: TabId;
   activeTabId: TabId | undefined;
   activeTabSource: AbstractTabSource | null;
+  previewTabId: TabId | undefined;
+  previewTabSource: AbstractTabSource | null;
   tabsIndex: Map<SourceName, SourceMap>; // Type: SourceName -> sourceId -> tabId eg: Request -> [requestId,tabId]
-  tabs: Map<TabId, StoreApi<TabState>>;
+  tabs: Map<TabId, TabStore>;
 
   _version: number;
 };
@@ -32,6 +36,8 @@ type TabActions = {
   closeTab: (source: AbstractTabSource, skipUnsavedPrompt?: boolean) => void;
   closeAllTabs: (skipUnsavedPrompt?: boolean) => void;
   closeTabById: (tabId: TabId, skipUnsavedPrompt?: boolean) => void;
+  resetPreviewTab: () => void;
+  setPreviewTab: (tabId: TabId) => void;
   setActiveTab: (tabId: TabId) => void;
   _generateNewTabId: () => TabId;
   incrementVersion: () => void;
@@ -45,6 +51,8 @@ const initialState: TabServiceState = {
   tabIdSequence: 0,
   activeTabId: undefined,
   activeTabSource: null,
+  previewTabId: undefined,
+  previewTabSource: null,
   tabsIndex: new Map(),
   tabs: new Map(),
 
@@ -102,7 +110,15 @@ const createTabServiceStore = () => {
         },
 
         openTab(source, config) {
-          const { _generateNewTabId, tabsIndex, tabs, setActiveTab, upsertTabSource } = get();
+          const {
+            _generateNewTabId,
+            tabsIndex,
+            setActiveTab,
+            upsertTabSource,
+            previewTabId,
+            previewTabSource,
+            setPreviewTab,
+          } = get();
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
 
@@ -113,15 +129,14 @@ const createTabServiceStore = () => {
           }
 
           if (config?.preview) {
-            const previousPreviewTab = Array.from(tabs.values()).find((tab) => tab.getState().preview);
-            const tabId = previousPreviewTab ? previousPreviewTab.getState().id : _generateNewTabId();
-            const previousPreviewTabSource = previousPreviewTab?.getState().source;
-            if (previousPreviewTabSource) {
-              tabsIndex.get(previousPreviewTabSource.getSourceName())?.delete(previousPreviewTabSource.getSourceId());
+            if (previewTabId) {
+              // Remove previous preview tab source from tabsIndex
+              tabsIndex.get(previewTabSource.getSourceName())?.delete(previewTabSource.getSourceId());
             }
 
+            const tabId = previewTabId ?? _generateNewTabId();
             upsertTabSource(tabId, source, config);
-
+            setPreviewTab(tabId);
             return;
           }
 
@@ -197,6 +212,23 @@ const createTabServiceStore = () => {
             tabs: new Map(tabs),
           });
           setActiveTab(newActiveTabId);
+        },
+
+        resetPreviewTab() {
+          set({
+            previewTabId: undefined,
+            previewTabSource: null,
+          });
+        },
+
+        setPreviewTab(id: TabId) {
+          const { tabs, resetPreviewTab } = get();
+
+          if (tabs.has(id)) {
+            set({ previewTabId: id, previewTabSource: tabs.get(id).getState().source });
+          } else {
+            resetPreviewTab();
+          }
         },
 
         setActiveTab(id: TabId) {
@@ -293,14 +325,10 @@ const createTabServiceStore = () => {
             );
 
             const tabs: TabServiceStore["tabs"] = new Map(
-              existingValue.state.tabs.map(([tabId, tabState]: [TabId, TabState]) => [
-                tabId,
-                create<TabState>((set) => ({
-                  ...tabState,
-                  source: new TAB_SOURCES_MAP[tabState.source.type](tabState.source.metadata),
-                  ...tabStateSetters(set),
-                })),
-              ])
+              existingValue.state.tabs.map(([tabId, tabState]: [TabId, TabState]) => {
+                const source = new TAB_SOURCES_MAP[tabState.source.type](tabState.source.metadata);
+                return [tabId, createTabStore(tabId, source, tabState.title)];
+              })
             );
 
             const activeTab = tabs.get(existingValue.state.activeTabId).getState();
