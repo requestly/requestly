@@ -191,16 +191,19 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         )}
         {planPrice !== undefined && (
           <Row align="middle" className="items-center plan-price-row">
-            <Space size="small">
-              <Typography.Text className="plan-price">
-                ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
-              </Typography.Text>
-              {((product === PRICING.PRODUCTS.HTTP_RULES &&
-                planName !== PRICING.PLAN_NAMES.FREE &&
-                planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
-                planName !== PRICING.PLAN_NAMES.LITE) ||
-                (product === PRICING.PRODUCTS.API_CLIENT && planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE)) && (
-                <Space>
+            <Space size="small" className="plan-price-container">
+              <div className="price-wrapper">
+                <Typography.Text className="plan-price">
+                  ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
+                </Typography.Text>
+              </div>
+              <div className="additional-info">
+                {((product === PRICING.PRODUCTS.HTTP_RULES &&
+                  planName !== PRICING.PLAN_NAMES.FREE &&
+                  planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
+                  planName !== PRICING.PLAN_NAMES.LITE) ||
+                  (product === PRICING.PRODUCTS.API_CLIENT &&
+                    planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE)) && (
                   <InputNumber
                     style={{ width: "65px", height: "30px", display: "flex", alignItems: "center" }}
                     size="small"
@@ -214,12 +217,12 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                       handleQuantityChange(value);
                     }}
                   />
-                </Space>
-              )}
-              <div className="caption text-white">
-                {planName !== PRICING.PLAN_NAMES.FREE && (
-                  <div>{planName === PRICING.PLAN_NAMES.LITE ? "/ month" : "member / month"}</div>
                 )}
+                <div className="caption text-white">
+                  {planName !== PRICING.PLAN_NAMES.FREE && (
+                    <div>{planName === PRICING.PLAN_NAMES.LITE ? "/ month" : "member / month"}</div>
+                  )}
+                </div>
               </div>
             </Space>
           </Row>
