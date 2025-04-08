@@ -4,7 +4,7 @@ import { HistoryViewTabSource } from "features/apiClient/screens/apiClient/compo
 import { RequestViewTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/RequestView/requestViewTabSource";
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
 
-export const tabSources = {
+export const TAB_SOURCES_MAP = {
   [DraftRequestContainerTabSource.name]: DraftRequestContainerTabSource,
   [RequestViewTabSource.name]: RequestViewTabSource,
   [HistoryViewTabSource.name]: HistoryViewTabSource,
