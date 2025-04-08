@@ -39,6 +39,15 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     setEmail(value);
   }, []);
 
+  const handleCloseAuthModal = useCallback(() => {
+    dispatch(
+      globalActions.toggleActiveModal({
+        modalName: "authModal",
+        newValue: false,
+      })
+    );
+  }, [dispatch]);
+
   const handleShowErrorMessage = useCallback((code: AuthScreenError) => {
     switch (code) {
       case AuthScreenError.ACCOUNT_DOES_NOT_EXIST:
@@ -112,22 +121,12 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   const handleSuccessfulLogin = useCallback(() => {
     setShowRQAuthForm(false);
     setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
-  }, []);
+    handleCloseAuthModal();
+  }, [handleCloseAuthModal]);
 
   const handleOnHeaderButtonClick = useCallback(() => {
-    dispatch(
-      globalActions.toggleActiveModal({
-        modalName: "authModal",
-        newValue: false,
-        newProps: {
-          src: APP_CONSTANTS.FEATURES.API_CLIENT,
-          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-          // TODO: Add event source
-          eventSource: "",
-        },
-      })
-    );
-  }, [dispatch]);
+    handleCloseAuthModal();
+  }, [handleCloseAuthModal]);
 
   return (
     <div className="auth-screen-container">
@@ -145,6 +144,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
               successfulLoginCallback={handleSuccessfulLogin}
               failedLoginCallback={handleFailedLogin}
               onBackClick={handleOnBackClick}
+              toggleAuthModal={handleCloseAuthModal}
             />
           </OnboardingCard>
         ) : (

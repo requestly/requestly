@@ -16,17 +16,19 @@ import "./emailAuthForm.scss";
 interface EmailAuthFormProps {
   email: string;
   isLoading: boolean;
+  authProviders: AuthProvider[];
   onSendEmailClick: () => Promise<void>;
   onEditEmailClick: () => void;
-  authProviders: AuthProvider[];
+  toggleAuthModal: () => void;
 }
 
 export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({
   email,
   isLoading,
+  authProviders,
   onSendEmailClick,
   onEditEmailClick,
-  authProviders,
+  toggleAuthModal,
 }) => {
   const appMode = useSelector(getAppMode);
   const [password, setPassword] = useState("");
@@ -40,13 +42,14 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({
       if (result.user.uid) {
         const greatingName = result.user.displayName?.split(" ")?.[0];
         toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome back!");
+        toggleAuthModal();
       }
     } catch (error) {
       toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, error.errorCode));
     } finally {
       setIsSignInInProgress(false);
     }
-  }, [email, password]);
+  }, [email, password, toggleAuthModal]);
 
   return (
     <div className="email-auth-form-container">

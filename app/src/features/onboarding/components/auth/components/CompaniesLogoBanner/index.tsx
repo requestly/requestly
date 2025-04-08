@@ -6,7 +6,7 @@ const companyLogos = [
   "/assets/media/common/atnt.svg",
   "/assets/media/common/verizon.svg",
   "/assets/media/common/intuit.svg",
-  "/assets/media/common/intuit.svg",
+  "/assets/media/common/zalando.svg",
 ];
 
 export const CompaniesLogoBanner: React.FC = () => {

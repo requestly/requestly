@@ -15,6 +15,7 @@ interface RQAuthCardProps {
   onBackClick: () => void;
   successfulLoginCallback: () => void;
   failedLoginCallback: (code: FailedLoginCode) => void;
+  toggleAuthModal: () => void;
 }
 
 export const RQAuthCard: React.FC<RQAuthCardProps> = ({
@@ -23,6 +24,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
   email,
   successfulLoginCallback,
   failedLoginCallback,
+  toggleAuthModal,
 }) => {
   const [isEmailVerificationScreenVisible, setIsEmailVerificationScreenVisible] = useState(false);
   const [isSendEmailInProgress, setIsSendEmailInProgress] = useState(false);
@@ -60,6 +62,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
             onSendEmailClick={handleSendEmailLink}
             onEditEmailClick={onBackClick}
             authProviders={authProviders}
+            toggleAuthModal={toggleAuthModal}
           />
         );
       default:
@@ -75,6 +78,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
         onBackClick={() => setIsEmailVerificationScreenVisible(false)}
         onResendEmailClick={handleSendEmailLink}
         isSendEmailInProgress={isSendEmailInProgress}
+        toggleAuthModal={toggleAuthModal}
       />
     );
   }

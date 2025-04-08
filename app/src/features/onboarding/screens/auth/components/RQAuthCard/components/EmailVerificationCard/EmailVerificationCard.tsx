@@ -13,14 +13,16 @@ interface EmailVerificationCardProps {
   onBackClick: () => void;
   onResendEmailClick: () => Promise<void>;
   isSendEmailInProgress: boolean;
+  toggleAuthModal: () => void;
 }
 
 export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
   email,
   providers,
+  isSendEmailInProgress,
   onBackClick,
   onResendEmailClick,
-  isSendEmailInProgress,
+  toggleAuthModal,
 }) => {
   const [countdown, setCountdown] = useState(20);
 
@@ -31,13 +33,13 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
     return (
       <GoogleAuthButton
         email={email}
-        successfulLoginCallback={() => {}}
+        successfulLoginCallback={toggleAuthModal}
         failedLoginCallback={() => {
           toast.error("Something went wrong while signing you in, please try again or contact support");
         }}
       />
     );
-  }, [email]);
+  }, [email, toggleAuthModal]);
 
   useEffect(() => {
     const interval = setInterval(() => {
