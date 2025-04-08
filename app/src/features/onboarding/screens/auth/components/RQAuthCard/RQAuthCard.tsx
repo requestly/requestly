@@ -79,6 +79,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
         onResendEmailClick={handleSendEmailLink}
         isSendEmailInProgress={isSendEmailInProgress}
         toggleAuthModal={toggleAuthModal}
+        failedLoginCallback={failedLoginCallback}
       />
     );
   }

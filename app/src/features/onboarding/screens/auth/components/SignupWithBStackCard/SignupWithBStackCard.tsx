@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { RQButton } from "lib/design-system/components";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import "./signupWithBStackCard.scss";
@@ -8,7 +8,10 @@ interface SignupWithBStackCardProps {
 }
 
 export const SignupWithBStackCard: React.FC<SignupWithBStackCardProps> = ({ autoRedirect = false }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleCreateBStackAccount = useCallback(() => {
+    setIsLoading(true);
     redirectToUrl("https://us-central1-requestly-dev.cloudfunctions.net/oauth/authorize");
   }, []);
 
@@ -31,14 +34,15 @@ export const SignupWithBStackCard: React.FC<SignupWithBStackCardProps> = ({ auto
           : "Requestly is now part of BrowserStack. Please create a new BrowserStack account to continue."}
       </div>
       <RQButton
+        loading={isLoading}
         block
         size="large"
-        icon={<img src="/assets/media/common/browserstack_logo.svg" alt="browserstack logo" />}
         type="primary"
         onClick={handleCreateBStackAccount}
         className={autoRedirect ? "auto-redirect-btn-transition" : ""}
       >
-        Create BrowserStack Account
+        <img src="/assets/media/common/browserstack_logo.svg" alt="browserstack logo" />
+        {autoRedirect ? "Go to BrowserStack sign-in" : "Create BrowserStack Account"}
       </RQButton>
       {!autoRedirect ? (
         <div className="bstack-help-link">

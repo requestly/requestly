@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Divider } from "antd";
-import { AuthProvider } from "features/onboarding/screens/auth/types";
+import { AuthProvider, FailedLoginCode } from "features/onboarding/screens/auth/types";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import { RQButton } from "lib/design-system-v2/components";
 import { GoogleAuthButton } from "../GoogleAuthButton/GoogleAuthButton";
-import { toast } from "utils/Toast";
 import "./emailVerificationCard.scss";
 
 interface EmailVerificationCardProps {
@@ -14,6 +13,7 @@ interface EmailVerificationCardProps {
   onResendEmailClick: () => Promise<void>;
   isSendEmailInProgress: boolean;
   toggleAuthModal: () => void;
+  failedLoginCallback: (code: FailedLoginCode) => void;
 }
 
 export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
@@ -23,6 +23,7 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
   onBackClick,
   onResendEmailClick,
   toggleAuthModal,
+  failedLoginCallback,
 }) => {
   const [countdown, setCountdown] = useState(20);
 
@@ -34,12 +35,10 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
       <GoogleAuthButton
         email={email}
         successfulLoginCallback={toggleAuthModal}
-        failedLoginCallback={() => {
-          toast.error("Something went wrong while signing you in, please try again or contact support");
-        }}
+        failedLoginCallback={failedLoginCallback}
       />
     );
-  }, [email, toggleAuthModal]);
+  }, [email, toggleAuthModal, failedLoginCallback]);
 
   useEffect(() => {
     const interval = setInterval(() => {
