@@ -35,7 +35,7 @@ type TabActions = {
   setActiveTab: (tabId: TabId) => void;
   _generateNewTabId: () => TabId;
   incrementVersion: () => void;
-  getSourceByTabId: (tabId: TabId) => AbstractTabSource;
+  getSourceByTabId: (tabId: TabId) => AbstractTabSource | undefined;
   getTabIdBySourceId: (sourceId: SourceId) => TabId | undefined;
 };
 
