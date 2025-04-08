@@ -10,6 +10,7 @@ import CollectionAuthorizationView from "./components/CollectionAuthorizationVie
 import { toast } from "utils/Toast";
 import { useGenericState } from "hooks/useGenericState";
 import "./collectionView.scss";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -29,7 +30,9 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
     apiClientRecordsRepository,
   } = useApiClientContext();
 
-  const { setTitle = () => {}, isNewTab = false } = useGenericState();
+  const { setTitle } = useGenericState();
+  const [getTabStateBySource] = useTabServiceWithSelector((state) => [state.getTabStateBySource]);
+  const isNewTab = getTabStateBySource(collectionId, "collection")?.source.getIsNewTab();
 
   const collection = useMemo(() => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;

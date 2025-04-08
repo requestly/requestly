@@ -20,7 +20,7 @@ export const DraftRequestContainer: React.FC<{ draftId: string }> = ({ draftId }
     isCreateMode: true,
   });
 
-  const { setTitle = () => {} } = useGenericState();
+  const { setTitle } = useGenericState();
   const [tabsIndex, upsertTab] = useTabServiceWithSelector((state) => [state.tabsIndex, state.upsertTabSource]);
 
   const updateTabSource = useCallback(
