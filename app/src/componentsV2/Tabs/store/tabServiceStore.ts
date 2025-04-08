@@ -26,7 +26,7 @@ type TabsState = {
 
 type TabsAction = {
   reset: () => void;
-  registerTabSource: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
+  upsertTabSource: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
   updateTabBySourceId: (sourceId: SourceId, updates: Partial<Pick<TabState, "preview" | "saved" | "title">>) => void;
   openTab: (source: AbstractTabSource, config?: TabConfig) => void;
   closeTab: (source: AbstractTabSource) => void;
@@ -62,7 +62,7 @@ const createTabServiceStore = () => {
           tabServiceStore.persist.clearStorage();
         },
 
-        registerTabSource(tabId, source, config) {
+        upsertTabSource(tabId, source, config) {
           const { tabsIndex, tabs, setActiveTab } = get();
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
@@ -102,7 +102,7 @@ const createTabServiceStore = () => {
         },
 
         openTab(source, config) {
-          const { _generateNewTabId, tabsIndex, tabs, setActiveTab, registerTabSource } = get();
+          const { _generateNewTabId, tabsIndex, tabs, setActiveTab, upsertTabSource } = get();
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
 
@@ -120,13 +120,13 @@ const createTabServiceStore = () => {
               tabsIndex.get(previousPreviewTabSource.getSourceName())?.delete(previousPreviewTabSource.getSourceId());
             }
 
-            registerTabSource(tabId, source, config);
+            upsertTabSource(tabId, source, config);
 
             return;
           }
 
           const newTabId = _generateNewTabId();
-          registerTabSource(newTabId, source);
+          upsertTabSource(newTabId, source);
         },
 
         closeTab(source) {
