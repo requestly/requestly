@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Dropdown, Col, Avatar, Spin } from "antd";
+import { Dropdown, Col, Avatar, Spin, Row } from "antd";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { globalActions } from "store/slices/global/slice";
@@ -137,40 +137,44 @@ export default function HeaderUser() {
   return hideUserDropDown ? null : (
     <section>
       {user.loggedIn && user?.details?.profile ? (
-        <Col>
-          <Dropdown
-            trigger={["click"]}
-            overlayClassName="header-profile-dropdown"
-            menu={{ items: menuPropItems }}
-            placement="bottomLeft"
-            className="header-profile-dropdown-trigger no-drag"
-            onOpenChange={(open) => {
-              open && trackHeaderClicked("user_menu");
-            }}
-          >
-            <Avatar size={28} src={userPhoto} shape="square" className="cursor-pointer" />
-          </Dropdown>
-          {!isSafariBrowser() &&
-          (!planDetails?.planId || !["active", "past_due"].includes(planDetails?.status)) &&
-          appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY ? (
-            <RQButton
-              type="primary"
-              className="header-upgrade-btn"
-              onClick={() => {
-                trackUpgradeClicked("header");
-                dispatch(
-                  globalActions.toggleActiveModal({
-                    modalName: "pricingModal",
-                    newValue: true,
-                    newProps: { selectedPlan: null, source: "header_upgrade_button" },
-                  })
-                );
+        <Row align="middle" gutter={4}>
+          <Col>
+            <Dropdown
+              trigger={["click"]}
+              overlayClassName="header-profile-dropdown"
+              menu={{ items: menuPropItems }}
+              placement="bottomLeft"
+              className="header-profile-dropdown-trigger no-drag"
+              onOpenChange={(open) => {
+                open && trackHeaderClicked("user_menu");
               }}
             >
-              Upgrade
-            </RQButton>
-          ) : null}
-        </Col>
+              <Avatar size={28} src={userPhoto} shape="square" className="cursor-pointer" style={{ marginTop: 2 }} />
+            </Dropdown>
+          </Col>
+          <Col>
+            {!isSafariBrowser() &&
+            (!planDetails?.planId || !["active", "past_due"].includes(planDetails?.status)) &&
+            appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY ? (
+              <RQButton
+                type="primary"
+                className="header-upgrade-btn"
+                onClick={() => {
+                  trackUpgradeClicked("header");
+                  dispatch(
+                    globalActions.toggleActiveModal({
+                      modalName: "pricingModal",
+                      newValue: true,
+                      newProps: { selectedPlan: null, source: "header_upgrade_button" },
+                    })
+                  );
+                }}
+              >
+                Upgrade
+              </RQButton>
+            ) : null}
+          </Col>
+        </Row>
       ) : (
         <div className="auth-button-group">
           <RQButton
