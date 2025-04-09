@@ -3,6 +3,11 @@ import { TabState } from "../store/tabStore";
 import { StoreApi } from "zustand";
 import { GenericStateContext } from "hooks/useGenericState";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
+import {
+  trackTabGenericStateSetPreviewMode,
+  trackTabGenericStateSetUnsaved,
+  trackTabGenericStateSetTitle,
+} from "../analytics";
 
 export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabState> }>> = React.memo((props) => {
   const [
@@ -18,6 +23,9 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
     state.closeTabById,
     state.upsertTabSource,
   ]);
+
+  const sourceId = props.store.getState().source.getSourceId();
+  const sourceName = props.store.getState().source.metadata.name;
 
   return (
     <GenericStateContext.Provider
@@ -39,11 +47,13 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
         },
 
         setTitle: (title: string) => {
+          trackTabGenericStateSetTitle(sourceId, sourceName);
           props.store.getState().setTitle(title);
           incrementVersion();
         },
 
         setPreview: (preview: boolean) => {
+          trackTabGenericStateSetPreviewMode(sourceId, sourceName, preview);
           props.store.getState().setPreview(preview);
           if (!preview) {
             resetPreviewTab();
@@ -52,6 +62,7 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
         },
 
         setUnSaved: (unsaved: boolean) => {
+          trackTabGenericStateSetUnsaved(sourceId, sourceName, unsaved);
           props.store.getState().setUnSaved(unsaved);
           incrementVersion();
         },

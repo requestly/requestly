@@ -96,7 +96,7 @@ export default function HeaderUser() {
                 })
               );
 
-              getTabServiceActions().resetTabs();
+              getTabServiceActions().resetTabs("sign_out");
               dispatch(incentivizationActions.resetState());
             })
             .finally(() => setLoading(false));

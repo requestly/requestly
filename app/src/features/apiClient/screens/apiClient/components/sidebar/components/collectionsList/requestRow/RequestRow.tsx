@@ -222,9 +222,3 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
     </>
   );
 };
-
-/* Remove this notes before prod
-1. request options(children) stay till hover is on its parent class
-2. as cursor moves hover state is lost & visibilty set to hidden
-3. need to make something, that can continue the hover state till the dropdown is closed
-*/

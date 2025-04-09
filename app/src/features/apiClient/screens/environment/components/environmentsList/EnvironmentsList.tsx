@@ -26,13 +26,8 @@ import "./environmentsList.scss";
 export const EnvironmentsList = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const {
-    getAllEnvironments,
-    addNewEnvironment,
-    setCurrentEnvironment,
-    getEnvironmentVariables,
-    errorEnvFiles,
-  } = useEnvironmentManager();
+  const { getAllEnvironments, addNewEnvironment, setCurrentEnvironment, getEnvironmentVariables, errorEnvFiles } =
+    useEnvironmentManager();
   const [searchValue, setSearchValue] = useState("");
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
