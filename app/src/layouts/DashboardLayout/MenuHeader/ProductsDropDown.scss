@@ -44,6 +44,12 @@
   font-size: 16px;
 }
 
+.product-title-with-badge {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .product-description {
   margin: 0;
   font-size: 14px;
@@ -65,20 +71,20 @@
 }
 
 /* overiding the RQ Badge*/
-.beta-badge {
+.beta-badging {
+  border: 1px solid #ffffff1f;
+  background: var(--requestly-color-neutral-700);
+  padding: 2px 4px;
+}
+
+.beta-badging span {
   font-size: 9px;
   font-family: var(--requestly-font-family-default);
   font-weight: 600;
-  text-align: center;
   font-style: normal;
-  line-height: var(--requestly-font-line-height-2xs, 13px);
   letter-spacing: 0.5px;
-  border: 1px solid #ffffff1f;
-  background: var(--requestly-color-neutral-700);
-}
-
-.beta-badge span {
   color: var(--requestly-color-neutral-300);
   background: none;
+  line-height: var(--line-height-2xs, 13px);
   -webkit-text-fill-color: var(--requestly-color-neutral-300);
 }

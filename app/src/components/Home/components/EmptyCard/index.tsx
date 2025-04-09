@@ -40,7 +40,7 @@ export const HomepageEmptyCard: React.FC<Props> = ({
           <div className="header-content">
             <div className="title-badge-container">
               <h1 className="homepage-emptycard-title">{title}</h1>
-              <RQBadge badgeText="BETA" className="beta-badge" />
+              {title === "API client" && <RQBadge badgeText="BETA" className="beta-badge" />}
             </div>
             <p className="mt-8 text-center homepage-emptycard-description">{description}</p>
           </div>
