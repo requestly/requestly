@@ -195,30 +195,36 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
               <Typography.Text className="plan-price">
                 ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
               </Typography.Text>
-              {((product === PRICING.PRODUCTS.HTTP_RULES &&
-                planName !== PRICING.PLAN_NAMES.FREE &&
-                planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
-                planName !== PRICING.PLAN_NAMES.LITE) ||
-                (product === PRICING.PRODUCTS.API_CLIENT && planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE)) && (
-                <Space>
-                  <InputNumber
-                    style={{ width: "65px", height: "30px", display: "flex", alignItems: "center" }}
-                    size="small"
-                    type="number"
-                    min={1}
-                    max={1000}
-                    maxLength={4}
-                    defaultValue={1}
-                    value={quantity}
-                    onChange={(value: number) => {
-                      handleQuantityChange(value);
-                    }}
-                  />
-                </Space>
-              )}
-              <div className="caption text-white">
-                {planName !== PRICING.PLAN_NAMES.FREE && (
-                  <div>{planName === PRICING.PLAN_NAMES.LITE ? "/ month" : "member / month"}</div>
+              <div className="caption text-white">/ month</div>
+            </Space>
+          </Row>
+        )}
+        {planPrice !== undefined && (
+          <Row align="middle" className="quantity-container">
+            <Space>
+              <div className="quantity-selector">
+                {((product === PRICING.PRODUCTS.HTTP_RULES &&
+                  planName !== PRICING.PLAN_NAMES.FREE &&
+                  planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
+                  planName !== PRICING.PLAN_NAMES.LITE) ||
+                  (product === PRICING.PRODUCTS.API_CLIENT &&
+                    planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE)) && (
+                  <>
+                    <InputNumber
+                      style={{ width: "104px", height: "32px", display: "flex", alignItems: "center" }}
+                      size="small"
+                      type="number"
+                      min={1}
+                      max={1000}
+                      maxLength={4}
+                      defaultValue={1}
+                      value={quantity}
+                      onChange={(value: number) => {
+                        handleQuantityChange(value);
+                      }}
+                    />
+                    <div className="members">Members</div>
+                  </>
                 )}
               </div>
             </Space>
@@ -251,7 +257,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         </Row>
         <Row
           style={{
-            marginTop: "auto",
+            marginTop: "24px",
           }}
         >
           <PricingTableButtons
