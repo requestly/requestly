@@ -157,7 +157,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         const result = await apiClientRecordsRepository.createRecord(record);
 
         if (result.success) {
-          onSaveRecord(result.data);
+          onSaveRecord(result.data, "open");
 
           setIsImportModalOpen(false);
         } else {

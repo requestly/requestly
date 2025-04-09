@@ -16,9 +16,9 @@ import { getValueAsPromise } from "./FirebaseActions";
 import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUtils";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
-import { tabsLayoutActions } from "store/slices/tabs-layout";
 import { WorkspaceType } from "types";
 import { workspaceActions } from "store/slices/workspaces/slice";
+import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -88,7 +88,7 @@ export const switchWorkspace = async (
     await StorageService(appMode).clearDB();
   }
 
-  dispatch(tabsLayoutActions.resetState());
+  getTabServiceActions().resetTabs("workspace_switch");
 
   // Just in case
   window.skipSyncListenerForNextOneTime = false;
