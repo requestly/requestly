@@ -68,15 +68,16 @@ export const TabsContainer: React.FC = () => {
   useEffect(() => {
     if (activeTabSource) {
       const newPath = activeTabSource.getUrlPath();
+
       if (newPath !== window.location.pathname) {
         setUrl(newPath, isInitialLoadRef.current);
       }
+
+      if (isInitialLoadRef.current) {
+        isInitialLoadRef.current = false;
+      }
     } else {
       setUrl(PATHS.API_CLIENT.ABSOLUTE, isInitialLoadRef.current);
-    }
-
-    if (isInitialLoadRef.current) {
-      isInitialLoadRef.current = false;
     }
   }, [activeTabSource, setUrl]);
 
