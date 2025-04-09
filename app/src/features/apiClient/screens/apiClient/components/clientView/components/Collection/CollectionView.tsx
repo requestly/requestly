@@ -9,6 +9,8 @@ import { CollectionsVariablesView } from "./components/CollectionsVariablesView/
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 import { toast } from "utils/Toast";
 import { useGenericState } from "hooks/useGenericState";
+import { CollectionViewTabSource } from "./collectionViewTabSource";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import "./collectionView.scss";
 
 const TAB_KEYS = {
@@ -22,8 +24,15 @@ interface CollectionViewProps {
 }
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
-  const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords, apiClientRecordsRepository } =
-    useApiClientContext();
+  const {
+    apiClientRecords,
+    onSaveRecord,
+    isLoadingApiClientRecords,
+    apiClientRecordsRepository,
+    forceRefreshApiClientRecords,
+  } = useApiClientContext();
+
+  const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 
   const { setTitle, getIsNew } = useGenericState();
   const isNewCollection = getIsNew();
@@ -101,10 +110,19 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         }
 
         onSaveRecord(result.data, "open");
+        const wasForceRefreshed = await forceRefreshApiClientRecords();
+        if (wasForceRefreshed) {
+          closeTab(
+            new CollectionViewTabSource({
+              id: record.id,
+              title: "",
+            })
+          );
+        }
         setTitle(result.data.name);
       });
     },
-    [collection, setTitle, apiClientRecordsRepository, onSaveRecord]
+    [collection, setTitle, apiClientRecordsRepository, onSaveRecord, forceRefreshApiClientRecords, closeTab]
   );
 
   if (isLoadingApiClientRecords) {
