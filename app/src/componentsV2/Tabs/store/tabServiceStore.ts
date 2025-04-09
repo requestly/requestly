@@ -116,7 +116,7 @@ const createTabServiceStore = () => {
             tabs: new Map(tabs),
           });
 
-          trackTabOpened(sourceId, source.type, config?.preview);
+          trackTabOpened(sourceId, sourceName, config?.preview);
         },
 
         updateTabBySource(sourceId, sourceName, updates) {
@@ -125,7 +125,7 @@ const createTabServiceStore = () => {
 
           const tabStore = tabs.get(tabId);
           if (!tabStore) {
-            trackTabActionEarlyReturn("updateTabBySourceId", "Tab store not found");
+            trackTabActionEarlyReturn("updateTabBySourceId", "Tab store not found.");
             return;
           }
 
@@ -141,7 +141,7 @@ const createTabServiceStore = () => {
         openTab(source, config) {
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
-          trackTabOpenClicked(sourceId, source.type, config?.preview);
+          trackTabOpenClicked(sourceId, sourceName, config?.preview);
 
           const {
             _generateNewTabId,
@@ -157,8 +157,8 @@ const createTabServiceStore = () => {
           const existingTabId = getTabIdBySource(sourceId, sourceName);
           if (existingTabId) {
             setActiveTab(existingTabId);
-            trackTabOpened(sourceId, source.type, config?.preview);
-            trackTabActionEarlyReturn("openTab", "Tab found");
+            trackTabOpened(sourceId, sourceName, config?.preview);
+            trackTabActionEarlyReturn("openTab", "Tab found.");
             return;
           }
 
@@ -171,7 +171,7 @@ const createTabServiceStore = () => {
             const tabId = previewTabId ?? _generateNewTabId();
             upsertTabSource(tabId, source, config);
             setPreviewTab(tabId);
-            trackTabActionEarlyReturn("openTab", "Registering preview tab");
+            trackTabActionEarlyReturn("openTab", "Registering preview tab.");
             return;
           }
 
@@ -182,18 +182,18 @@ const createTabServiceStore = () => {
         closeTab(source, skipUnsavedPrompt = false) {
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
-          trackTabCloseClicked(sourceId, source.type);
+          trackTabCloseClicked(sourceId, sourceName);
 
           const { closeTabById, getTabIdBySource } = get();
 
           const existingTabId = getTabIdBySource(sourceId, sourceName);
           if (!existingTabId) {
-            trackTabActionEarlyReturn("closeTab", "Tab id not found");
+            trackTabActionEarlyReturn("closeTab", "Tab id not found.");
             return;
           }
 
           closeTabById(existingTabId, skipUnsavedPrompt);
-          trackTabClosed(sourceId, source.type);
+          trackTabClosed(sourceId, sourceName);
         },
 
         closeAllTabs(skipUnsavedPrompt) {
@@ -204,10 +204,12 @@ const createTabServiceStore = () => {
         },
 
         closeTabBySource(sourceId, sourceName, skipUnsavedPrompt) {
+          trackTabCloseClicked(sourceId, sourceName);
           const { closeTabById, getTabIdBySource } = get();
 
           const tabId = getTabIdBySource(sourceId, sourceName);
           if (!tabId) {
+            trackTabActionEarlyReturn("closeTabBySource", "Tab id not found.");
             return;
           }
 
@@ -218,14 +220,14 @@ const createTabServiceStore = () => {
           const { tabs, tabsIndex, activeTabId, setActiveTab } = get();
           const tabStore = tabs.get(tabId);
           if (!tabStore) {
-            trackTabActionEarlyReturn("closeTabById", "Tab store not found");
+            trackTabActionEarlyReturn("closeTabById", "Tab store not found.");
             return;
           }
 
           const tabState = tabStore.getState();
           const sourceName = tabState.source.getSourceName();
           const sourceId = tabState.source.getSourceId();
-          trackTabCloseById(sourceId, tabState.source.type);
+          trackTabCloseById(sourceId, sourceName);
 
           if (tabState.unsaved && !skipUnsavedPrompt) {
             // TODO: update alert message for RBAC viewer role
@@ -264,7 +266,7 @@ const createTabServiceStore = () => {
             tabs: new Map(tabs),
           });
           setActiveTab(newActiveTabId);
-          trackTabClosedById(sourceId, tabState.source.type);
+          trackTabClosedById(sourceId, sourceName);
         },
 
         resetPreviewTab() {
@@ -310,6 +312,7 @@ const createTabServiceStore = () => {
         getTabIdBySource(sourceId, sourceName) {
           const { tabsIndex } = get();
           if (!sourceId) {
+            trackTabActionEarlyReturn("getTabIdBySource", `For source: ${sourceName}, source Id id not found.`);
             return;
           }
 
@@ -321,6 +324,7 @@ const createTabServiceStore = () => {
           const tabId = getTabIdBySource(sourceId, sourceName);
 
           if (!tabId) {
+            trackTabActionEarlyReturn("getTabStateBySource", `For source: ${sourceName}, tab id not found.`);
             return;
           }
 
@@ -337,16 +341,15 @@ const createTabServiceStore = () => {
           _version: state._version,
         }),
 
-        onRehydrateStorage: (state) => {
+        onRehydrateStorage: (store) => {
           trackTabsRehydrationStarted();
 
-          return (state, error) => {
+          return (store, error) => {
             if (error) {
-              // Cross check if this is logged on sentry or not
               Sentry.withScope((scope) => {
                 scope.setTag("error_type", "tabs_rehydration_failed");
                 scope.setContext("tab_service_store_details", {
-                  tabServiceStore: state,
+                  tabServiceStore: store,
                 });
                 Sentry.captureException(new Error(`Tabs rehydration failed - error:${error}`));
               });
@@ -396,12 +399,10 @@ const createTabServiceStore = () => {
               const existingValue = JSON.parse(stateString);
 
               const tabsIndex: TabServiceStore["tabsIndex"] = new Map(
-                existingValue.state.tabsIndex.map(
-                  ([sourceName, sourceMap]: [string, MapIterator<[SourceId, TabId]>]) => [
-                    sourceName,
-                    new Map(sourceMap),
-                  ]
-                )
+                existingValue.state.tabsIndex.map(([sourceName, sourceMap]: [string, Iterable<[SourceId, TabId]>]) => [
+                  sourceName,
+                  new Map(sourceMap),
+                ])
               );
 
               const tabs: TabServiceStore["tabs"] = new Map(
