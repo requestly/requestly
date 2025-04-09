@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Checkbox, Collapse, Dropdown, MenuProps, Tooltip } from "antd";
 import { RQAPI } from "features/apiClient/types";
@@ -10,24 +10,22 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
-import { TabsLayoutContextInterface } from "layouts/TabsLayout";
-import PATHS from "config/constants/sub/paths";
-import { useParams } from "react-router-dom";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { isEmpty } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
-import "./CollectionRow.scss";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 import { Conditional } from "components/common/Conditional";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { CollectionViewTabSource } from "../../../../clientView/components/Collection/collectionViewTabSource";
+import "./CollectionRow.scss";
 
 interface Props {
   record: RQAPI.CollectionRecord;
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
   onExportClick: (collection: RQAPI.CollectionRecord) => void;
-  openTab: TabsLayoutContextInterface["openTab"];
   setExpandedRecordIds: (keys: RQAPI.Record["id"][]) => void;
   expandedRecordIds: string[];
   isReadOnly: boolean;
@@ -43,7 +41,6 @@ export const CollectionRow: React.FC<Props> = ({
   record,
   onNewClick,
   onExportClick,
-  openTab,
   expandedRecordIds,
   setExpandedRecordIds,
   bulkActionOptions,
@@ -55,8 +52,15 @@ export const CollectionRow: React.FC<Props> = ({
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
-  const { collectionId } = useParams();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+  const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
+
+  const activeTabSourceId = useMemo(() => {
+    if (activeTabSource) {
+      return activeTabSource.getSourceId();
+    }
+  }, [activeTabSource]);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);
@@ -162,7 +166,7 @@ export const CollectionRow: React.FC<Props> = ({
             return (
               <>
                 {showSelection && (
-                  <div onClick={(event) => event.stopPropagation()}>
+                  <div className="collection-checkbox-container" onClick={(event) => event.stopPropagation()}>
                     <Checkbox
                       onChange={recordsSelectionHandler.bind(this, record)}
                       checked={selectedRecords.has(record.id)}
@@ -179,7 +183,7 @@ export const CollectionRow: React.FC<Props> = ({
           }}
         >
           <Collapse.Panel
-            className={`collection-panel ${record.id === collectionId ? "active" : ""}`}
+            className={`collection-panel ${record.id === activeTabSourceId ? "active" : ""}`}
             key={record.id}
             header={
               <div
@@ -187,9 +191,8 @@ export const CollectionRow: React.FC<Props> = ({
                 onMouseEnter={() => setHoveredId(record.id)}
                 onMouseLeave={() => setHoveredId("")}
                 onClick={() => {
-                  openTab(record.id, {
-                    title: record.name || "New Collection",
-                    url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${encodeURIComponent(record.id)}`,
+                  openTab(new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }), {
+                    preview: true,
                   });
                 }}
               >
@@ -271,7 +274,6 @@ export const CollectionRow: React.FC<Props> = ({
                       isReadOnly={isReadOnly}
                       key={apiRecord.id}
                       record={apiRecord}
-                      openTab={openTab}
                       bulkActionOptions={bulkActionOptions}
                     />
                   );
@@ -280,7 +282,6 @@ export const CollectionRow: React.FC<Props> = ({
                     <CollectionRow
                       isReadOnly={isReadOnly}
                       key={apiRecord.id}
-                      openTab={openTab}
                       record={apiRecord}
                       onNewClick={onNewClick}
                       onExportClick={onExportClick}

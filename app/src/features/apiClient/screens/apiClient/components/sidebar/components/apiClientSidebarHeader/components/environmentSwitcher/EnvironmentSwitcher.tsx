@@ -8,17 +8,18 @@ import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { MdOutlineCheckCircleOutline } from "@react-icons/all-files/md/MdOutlineCheckCircleOutline";
 import { toast } from "utils/Toast";
 import PATHS from "config/constants/sub/paths";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
-import "./environmentSwitcher.scss";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { trackEnvironmentSwitched } from "modules/analytics/events/features/apiClient";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
+import "./environmentSwitcher.scss";
 
 export const EnvironmentSwitcher = () => {
   const location = useLocation();
   const { getAllEnvironments, getCurrentEnvironment, setCurrentEnvironment } = useEnvironmentManager();
   const { currentEnvironmentId, currentEnvironmentName } = getCurrentEnvironment();
   const environments = getAllEnvironments();
-  const { openTab } = useTabsLayoutContext();
+  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
   const dropdownItems = useMemo(() => {
     return environments
@@ -45,12 +46,12 @@ export const EnvironmentSwitcher = () => {
           setCurrentEnvironment(environment.id);
           trackEnvironmentSwitched();
           if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
-            openTab(environment.id, {
-              title: environment.name,
-              url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(environment.id)}`,
-            });
-            // Removed the below redirect as openTab handles redirection internally
-            // redirectToEnvironment(navigate, environment.id);
+            openTab(
+              new EnvironmentViewTabSource({
+                id: environment.id,
+                title: environment.name,
+              })
+            );
           }
           toast.success(`Switched to ${environment.name} environment`);
         },
