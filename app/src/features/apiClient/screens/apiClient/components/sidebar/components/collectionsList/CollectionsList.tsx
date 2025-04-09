@@ -58,6 +58,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, [])
   );
   const [searchValue, setSearchValue] = useState("");
+  const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
@@ -106,6 +107,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const toggleSelection = useCallback(() => {
     setSelectedRecords(new Set());
     setShowSelection((prev) => !prev);
+    setIsAllRecordsSelected(false);
   }, [setSelectedRecords, setShowSelection]);
 
   const multiSelectOptions = {
@@ -113,9 +115,25 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     toggleMultiSelect: toggleSelection,
   };
 
+  const addNestedCollection = useCallback(
+    (record: RQAPI.CollectionRecord, newSelectedRecords: Set<RQAPI.Record["id"]>) => {
+      newSelectedRecords.add(record.id);
+      if (record.data.children) {
+        record.data.children.forEach((child) => {
+          if (child.type === "collection") {
+            addNestedCollection(child, newSelectedRecords);
+          } else {
+            newSelectedRecords.add(child.id);
+          }
+        });
+      }
+    },
+    []
+  );
+
   const bulkActionHandler = useCallback(
     async (action: BulkActions) => {
-      if (isEmpty(selectedRecords)) {
+      if (isEmpty(selectedRecords) && action !== BulkActions.SELECT_ALL) {
         toast.error("Please Select Records");
         return;
       }
@@ -161,6 +179,22 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           setIsMoveCollectionModalOpen(true);
           break;
 
+        case BulkActions.SELECT_ALL:
+          setIsAllRecordsSelected((prev) => !prev);
+          if (isAllRecordsSelected) {
+            setSelectedRecords(new Set());
+          } else {
+            const newSelectedRecords: Set<RQAPI.Record["id"]> = new Set();
+            updatedRecords.collections.forEach((record) => {
+              addNestedCollection(record, newSelectedRecords);
+            });
+            updatedRecords.requests.forEach((record) => {
+              newSelectedRecords.add(record.id);
+            });
+            setSelectedRecords(newSelectedRecords);
+          }
+          break;
+
         default:
           break;
       }
@@ -169,11 +203,15 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       selectedRecords,
       updatedRecords.childParentMap,
       updatedRecords.recordsMap,
+      updatedRecords.collections,
+      updatedRecords.requests,
       setIsDeleteModalOpen,
       updateRecordsToBeDeleted,
+      isAllRecordsSelected,
       apiClientRecordsRepository,
       onSaveRecord,
       onSaveBulkRecords,
+      addNestedCollection,
     ]
   );
 
@@ -220,12 +258,19 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         }
       };
 
+      // Keeping track of selected records to auto check/uncheck select all checkbox in bulk action menu
+      let newSelection = new Set();
+
       setSelectedRecords((prevSelected) => {
         let newSelectedRecords = new Set(prevSelected);
         updateSelection(record, checked, newSelectedRecords);
         record.collectionId && checkParentSelection(record.id, checked, newSelectedRecords);
+        newSelection = newSelectedRecords;
         return newSelectedRecords;
       });
+
+      const totalRecordsCount = updatedRecords.collections.length + updatedRecords.requests.length;
+      setIsAllRecordsSelected(newSelection.size === totalRecordsCount);
     },
     [updatedRecords]
   );
@@ -240,7 +285,16 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   return (
     <>
       {apiClientRecords.length > 0 && (
-        <SidebarListHeader onSearch={setSearchValue} multiSelectOptions={multiSelectOptions} />
+        <div className="api-client-sidebar-header-container">
+          <SidebarListHeader onSearch={setSearchValue} multiSelectOptions={multiSelectOptions} />
+          {showSelection && (
+            <ActionMenu
+              isAllRecordsSelected={isAllRecordsSelected}
+              toggleSelection={toggleSelection}
+              bulkActionsHandler={bulkActionHandler}
+            />
+          )}
+        </div>
       )}
       <div className={`collections-list-container ${showSelection ? "selection-enabled" : ""}`}>
         <div className="collections-list-content">
@@ -326,7 +380,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           }}
         />
       )}
-      {showSelection && <ActionMenu toggleSelection={toggleSelection} bulkActionsHandler={bulkActionHandler} />}
     </>
   );
 };

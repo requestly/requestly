@@ -166,7 +166,7 @@ export const CollectionRow: React.FC<Props> = ({
             return (
               <>
                 {showSelection && (
-                  <div onClick={(event) => event.stopPropagation()}>
+                  <div className="collection-checkbox-container" onClick={(event) => event.stopPropagation()}>
                     <Checkbox
                       onChange={recordsSelectionHandler.bind(this, record)}
                       checked={selectedRecords.has(record.id)}

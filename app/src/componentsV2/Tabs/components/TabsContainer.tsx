@@ -132,7 +132,7 @@ export const TabsContainer: React.FC = () => {
       <Tabs
         type="editable-card"
         items={tabItems}
-        activeKey={activeTabId.toString()}
+        activeKey={activeTabId?.toString()}
         className="tabs-content"
         popupClassName="tabs-content-more-dropdown"
         onChange={(key) => {

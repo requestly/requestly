@@ -34,7 +34,6 @@ export const EnvironmentsList = () => {
   const { setIsRecordBeingCreated, isRecordBeingCreated } = useApiClientContext();
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_environment", "update");
-
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
   const environments = useMemo(() => getAllEnvironments(), [getAllEnvironments]);
