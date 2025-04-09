@@ -20,6 +20,8 @@ import {
   trackTabOpened,
   trackTabsRehydrationCompleted,
   trackTabsRehydrationStarted,
+  trackUpsertTabSourceCalled,
+  trackUpsertTabSourceCompleted,
 } from "../analytics";
 
 type TabId = number;
@@ -93,9 +95,11 @@ const createTabServiceStore = () => {
         },
 
         upsertTabSource(tabId, source, config) {
-          const { tabsIndex, tabs, setActiveTab } = get();
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
+          trackUpsertTabSourceCalled(sourceId, sourceName);
+
+          const { tabsIndex, tabs, setActiveTab } = get();
 
           if (!tabId) {
             return;
@@ -116,7 +120,7 @@ const createTabServiceStore = () => {
             tabs: new Map(tabs),
           });
 
-          trackTabOpened(sourceId, sourceName, config?.preview);
+          trackUpsertTabSourceCompleted(sourceId, sourceName);
         },
 
         updateTabBySource(sourceId, sourceName, updates) {
@@ -177,6 +181,7 @@ const createTabServiceStore = () => {
 
           const newTabId = _generateNewTabId();
           upsertTabSource(newTabId, source);
+          trackTabOpened(sourceId, sourceName, config?.preview);
         },
 
         closeTab(source, skipUnsavedPrompt = false) {
