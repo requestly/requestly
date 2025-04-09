@@ -88,7 +88,7 @@ export const switchWorkspace = async (
     await StorageService(appMode).clearDB();
   }
 
-  getTabServiceActions().resetTabs();
+  getTabServiceActions().resetTabs("workspace_switch");
 
   // Just in case
   window.skipSyncListenerForNextOneTime = false;
