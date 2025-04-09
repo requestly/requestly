@@ -3,28 +3,28 @@ import { TAB_EVENTS } from "./constants";
 
 export type ResetTabSource = "workspace_switch" | "sign_out";
 
-export const trackTabOpenClicked = (sourceId: string, sourceType: string, previewMode: boolean) => {
-  trackEvent(TAB_EVENTS.TAB_OPEN_CLICKED, { sourceId, sourceType, previewMode });
+export const trackTabOpenClicked = (sourceId: string, sourceName: string, previewMode: boolean) => {
+  trackEvent(TAB_EVENTS.TAB_OPEN_CLICKED, { sourceId, sourceName, previewMode });
 };
 
-export const trackTabOpened = (sourceId: string, sourceType: string, previewMode: boolean) => {
-  trackEvent(TAB_EVENTS.TAB_OPENED, { sourceId, sourceType, previewMode });
+export const trackTabOpened = (sourceId: string, sourceName: string, previewMode: boolean) => {
+  trackEvent(TAB_EVENTS.TAB_OPENED, { sourceId, sourceName, previewMode });
 };
 
-export const trackTabCloseClicked = (sourceId: string, sourceType: string) => {
-  trackEvent(TAB_EVENTS.TAB_CLOSE_CLICKED, { sourceId, sourceType });
+export const trackTabCloseClicked = (sourceId: string, sourceName: string) => {
+  trackEvent(TAB_EVENTS.TAB_CLOSE_CLICKED, { sourceId, sourceName });
 };
 
-export const trackTabClosed = (sourceId: string, sourceType: string) => {
-  trackEvent(TAB_EVENTS.TAB_CLOSED, { sourceId, sourceType });
+export const trackTabClosed = (sourceId: string, sourceName: string) => {
+  trackEvent(TAB_EVENTS.TAB_CLOSED, { sourceId, sourceName });
 };
 
-export const trackTabCloseById = (sourceId: string, sourceType: string) => {
-  trackEvent(TAB_EVENTS.TAB_CLOSE_BY_ID, { sourceId, sourceType });
+export const trackTabCloseById = (sourceId: string, sourceName: string) => {
+  trackEvent(TAB_EVENTS.TAB_CLOSE_BY_ID, { sourceId, sourceName });
 };
 
-export const trackTabClosedById = (sourceId: string, sourceType: string) => {
-  trackEvent(TAB_EVENTS.TAB_CLOSED_BY_ID, { sourceId, sourceType });
+export const trackTabClosedById = (sourceId: string, sourceName: string) => {
+  trackEvent(TAB_EVENTS.TAB_CLOSED_BY_ID, { sourceId, sourceName });
 };
 
 export const trackResetTabServiceStore = (source: ResetTabSource) => {
@@ -51,14 +51,14 @@ export const trackTabLocalStorageGetItemCalled = () => {
   trackEvent(TAB_EVENTS.TABS_LOCAL_STORAGE_GET_ITEM_CALLED, {});
 };
 
-export const trackTabGenericStateSetTitle = (sourceId: string, sourceType: string) => {
-  trackEvent(TAB_EVENTS.TAB_GENERIC_STATE_SET_TITLE, { sourceId, sourceType });
+export const trackTabGenericStateSetTitle = (sourceId: string, sourceName: string) => {
+  trackEvent(TAB_EVENTS.TAB_GENERIC_STATE_SET_TITLE, { sourceId, sourceName });
 };
 
-export const trackTabGenericStateSetPreviewMode = (sourceId: string, sourceType: string, value: boolean) => {
-  trackEvent(TAB_EVENTS.TAB_GENERIC_STATE_SET_PREVIEW_MODE, { sourceId, sourceType, value });
+export const trackTabGenericStateSetPreviewMode = (sourceId: string, sourceName: string, value: boolean) => {
+  trackEvent(TAB_EVENTS.TAB_GENERIC_STATE_SET_PREVIEW_MODE, { sourceId, sourceName, value });
 };
 
-export const trackTabGenericStateSetSaved = (sourceId: string, sourceType: string, value: boolean) => {
-  trackEvent(TAB_EVENTS.TAB_GENERIC_STATE_SET_SAVED, { sourceId, sourceType, value });
+export const trackTabGenericStateSetSaved = (sourceId: string, sourceName: string, value: boolean) => {
+  trackEvent(TAB_EVENTS.TAB_GENERIC_STATE_SET_SAVED, { sourceId, sourceName, value });
 };
