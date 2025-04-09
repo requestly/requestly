@@ -1,49 +1,32 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Skeleton } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { VariablesList } from "../VariablesList/VariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
-import PATHS from "config/constants/sub/paths";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useSelector } from "react-redux";
 import { EnvironmentVariables } from "backend/environment/types";
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
-import "./environmentView.scss";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { isEmpty } from "lodash";
 import { isGlobalEnvironment } from "../../utils";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
+import { useGenericState } from "hooks/useGenericState";
+import "./environmentView.scss";
 
-export const EnvironmentView = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
-  const {
-    isEnvironmentsLoading,
-    getEnvironmentName,
-    getAllEnvironments,
-    getEnvironmentVariables,
-    setVariables,
-  } = useEnvironmentManager();
-  const { updateTab, tabs } = useTabsLayoutContext();
-  const { envId } = useParams();
-  const [persistedEnvId, setPersistedEnvId] = useState<string>(envId);
+interface EnvironmentViewProps {
+  envId: string;
+}
 
-  const user = useSelector(getUserAuthDetails);
+export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
+  const { isEnvironmentsLoading, getEnvironmentName, getEnvironmentVariables, setVariables } = useEnvironmentManager();
+
+  const pendingVariablesRef = useRef<EnvironmentVariables>(null);
+
   const [searchValue, setSearchValue] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const environmentName = getEnvironmentName(persistedEnvId);
-  const variables = getEnvironmentVariables(persistedEnvId);
-  const isNewEnv = searchParams.has("new");
-
-  useEffect(() => {
-    if (isNewEnv) {
-      setPersistedEnvId(envId);
-    }
-  }, [isNewEnv, envId]);
+  const environmentName = getEnvironmentName(envId);
+  const variables = pendingVariablesRef.current ?? getEnvironmentVariables(envId);
+  const { setPreview, setUnsaved, setTitle } = useGenericState();
 
   const [pendingVariables, setPendingVariables] = useState<EnvironmentVariables>(variables);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -51,8 +34,19 @@ export const EnvironmentView = () => {
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
 
   useEffect(() => {
-    updateTab(envId, { hasUnsavedChanges: hasUnsavedChanges });
-  }, [updateTab, envId, hasUnsavedChanges]);
+    // To sync title for tabs opened from deeplinks
+    if (environmentName) {
+      setTitle(environmentName);
+    }
+  }, [environmentName, setTitle]);
+
+  useEffect(() => {
+    setUnsaved(hasUnsavedChanges);
+
+    if (hasUnsavedChanges) {
+      setPreview(false);
+    }
+  }, [setUnsaved, setPreview, hasUnsavedChanges]);
 
   useEffect(() => {
     if (!isSaving) {
@@ -60,38 +54,14 @@ export const EnvironmentView = () => {
     }
   }, [variables, isSaving]);
 
-  useEffect(() => {
-    if (!isEnvironmentsLoading) {
-      if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE)) {
-        return;
-      }
-      if (!user.loggedIn) {
-        navigate(PATHS.API_CLIENT.ABSOLUTE);
-        return;
-      }
-
-      const environments = getAllEnvironments();
-      const hasAccessToEnvironment = environments?.some((env) => env.id === persistedEnvId);
-      if (environments?.length === 0 || !hasAccessToEnvironment) {
-        if (!tabs.length) {
-          navigate(PATHS.API_CLIENT.ABSOLUTE);
-          return;
-        }
-      }
-    }
-  }, [
-    getAllEnvironments,
-    navigate,
-    isEnvironmentsLoading,
-    user.loggedIn,
-    persistedEnvId,
-    location.pathname,
-    tabs.length,
-  ]);
+  const handleSetPendingVariables = useCallback((variables: EnvironmentVariables) => {
+    setPendingVariables(variables);
+    pendingVariablesRef.current = variables;
+  }, []);
 
   const handleSaveVariables = async () => {
     setIsSaving(true);
-    return setVariables(persistedEnvId, pendingVariables)
+    return setVariables(envId, pendingVariables)
       .then(() => {
         toast.success("Variables updated successfully");
         trackVariablesSaved({
@@ -110,7 +80,7 @@ export const EnvironmentView = () => {
   };
 
   return (
-    <div key={persistedEnvId} className="variables-list-view-container">
+    <div key={envId} className="variables-list-view-container">
       <div className="variables-list-view">
         {isEnvironmentsLoading ? (
           <Skeleton active />
@@ -120,7 +90,7 @@ export const EnvironmentView = () => {
               searchValue={searchValue}
               onSearchValueChange={setSearchValue}
               currentEnvironmentName={environmentName}
-              environmentId={persistedEnvId}
+              environmentId={envId}
               onSave={handleSaveVariables}
               hasUnsavedChanges={hasUnsavedChanges}
               isSaving={isSaving}
@@ -133,7 +103,7 @@ export const EnvironmentView = () => {
             <VariablesList
               searchValue={searchValue}
               variables={pendingVariables}
-              onVariablesChange={setPendingVariables}
+              onVariablesChange={handleSetPendingVariables}
             />
             {isExportModalOpen && (
               <ApiClientExportModal
