@@ -217,8 +217,17 @@
 }
 
 .quantity-container {
-  margin-top: 8px; /* Adjust spacing as needed */
-  display: flex;
+  margin-top: 8px;
   align-items: center;
   margin-bottom: 16px;
+}
+
+.quantity-selector {
+  display: flex;
+
+  .members {
+    margin-left: 8px;
+    margin-top: 4px;
+    color: var(--requestly-color-text-subtle);
+  }
 }

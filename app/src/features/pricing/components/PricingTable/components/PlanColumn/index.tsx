@@ -209,22 +209,24 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                   planName !== PRICING.PLAN_NAMES.LITE) ||
                   (product === PRICING.PRODUCTS.API_CLIENT &&
                     planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE)) && (
-                  <InputNumber
-                    style={{ width: "104px", height: "32px", display: "flex", alignItems: "center" }}
-                    size="small"
-                    type="number"
-                    min={1}
-                    max={1000}
-                    maxLength={4}
-                    defaultValue={1}
-                    value={quantity}
-                    onChange={(value: number) => {
-                      handleQuantityChange(value);
-                    }}
-                  />
+                  <>
+                    <InputNumber
+                      style={{ width: "104px", height: "32px", display: "flex", alignItems: "center" }}
+                      size="small"
+                      type="number"
+                      min={1}
+                      max={1000}
+                      maxLength={4}
+                      defaultValue={1}
+                      value={quantity}
+                      onChange={(value: number) => {
+                        handleQuantityChange(value);
+                      }}
+                    />
+                    <div className="members">Members</div>
+                  </>
                 )}
               </div>
-              {planName !== PRICING.PLAN_NAMES.FREE && planName !== PRICING.PLAN_NAMES.LITE && <div>Members</div>}
             </Space>
           </Row>
         )}
