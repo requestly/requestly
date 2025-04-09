@@ -5,9 +5,9 @@ import { REQUEST_METHOD_COLORS } from "../../../../../../../../constants";
 import { trackRequestSelectedFromHistory } from "modules/analytics/events/features/apiClient";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
-import PATHS from "config/constants/sub/paths";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { HistoryViewTabSource } from "../../../clientView/components/request/HistoryView/historyViewTabSource";
 
 interface Props {
   history: RQAPI.Entry[];
@@ -16,14 +16,14 @@ interface Props {
 }
 
 export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, onSelectionFromHistory }) => {
-  const { openTab } = useTabsLayoutContext();
+  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
   const [dismissNote, setDismissNote] = useState(false);
 
   const onHistoryLinkClick = useCallback(
     (index: number) => {
       onSelectionFromHistory(index);
 
-      openTab("history", { title: "History", url: `${PATHS.API_CLIENT.HISTORY.ABSOLUTE}` });
+      openTab(new HistoryViewTabSource());
       trackRequestSelectedFromHistory();
       trackRQLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
       trackRQDesktopLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);

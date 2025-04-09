@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, Params, useMatches } from "react-router-dom";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import { Input, Skeleton, Typography } from "antd";
@@ -14,6 +14,12 @@ interface Props {
   placeholder?: string;
   onRecordNameUpdate?: (updatedRecordName: string) => void;
   autoFocus?: boolean;
+  defaultBreadcrumbs?: {
+    pathname: string;
+    label: string;
+    disabled?: boolean;
+    isEditable?: boolean;
+  }[];
 }
 
 interface MatchedRoute {
@@ -38,6 +44,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
   placeholder,
   onRecordNameUpdate,
   autoFocus = false,
+  defaultBreadcrumbs = [],
 }) => {
   const [name, setName] = useState(recordName || "");
   const [isEditRecord, setIsEditRecord] = useState(false);
@@ -49,17 +56,30 @@ export const RQBreadcrumb: React.FC<Props> = ({
     setName(recordName);
   }, [recordName]);
 
+  const autoFocusRef = useRef(false);
   useEffect(() => {
+    if (autoFocusRef.current) {
+      return;
+    }
+
     if (autoFocus) {
+      autoFocusRef.current = true;
       setIsEditRecord(true);
     }
+
+    return () => setIsEditRecord(false);
   }, [autoFocus]);
 
   const breadcrumbs: ({
-    pathname: MatchedRoute["pathname"];
-  } & MatchedRoute["handle"]["breadcrumb"])[] = matchedRoutes.reduce((result, route) => {
-    return route.handle?.breadcrumb ? [...result, { ...route.handle.breadcrumb, pathname: route.pathname }] : result;
-  }, []);
+    pathname: string;
+  } & MatchedRoute["handle"]["breadcrumb"])[] =
+    defaultBreadcrumbs.length > 0
+      ? defaultBreadcrumbs
+      : matchedRoutes.reduce((result, route) => {
+          return route.handle?.breadcrumb
+            ? [...result, { ...route.handle.breadcrumb, pathname: route.pathname }]
+            : result;
+        }, []);
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const updatedValue = e.target.value;

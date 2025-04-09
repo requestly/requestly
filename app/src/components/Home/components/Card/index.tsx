@@ -5,12 +5,12 @@ import { HomepageEmptyCard } from "../EmptyCard";
 import { m, AnimatePresence } from "framer-motion";
 import { CardType } from "./types";
 import { Rule } from "@requestly/shared/types/entities/rules";
-import { TabsLayout } from "layouts/TabsLayout";
 import { RQDropdown } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import { Conditional } from "components/common/Conditional";
+import { AbstractTabSource } from "componentsV2/Tabs/helpers/tabSource";
 
 interface CardProps {
   contentLoading?: boolean;
@@ -30,8 +30,8 @@ interface CardProps {
   cardIcon: string;
   bodyTitle: string;
   actionButtons: React.ReactNode;
-  contentList: Rule[] | TabsLayout.Tab[];
-  listItemClickHandler: (listItem: Rule | TabsLayout.Tab) => void;
+  contentList: Rule[] | AbstractTabSource[];
+  listItemClickHandler: (listItem: Rule | AbstractTabSource) => void;
   viewAllCta: string;
   viewAllCtaLink: string;
   viewAllCtaOnClick: () => void;
@@ -97,10 +97,19 @@ export const Card: React.FC<CardProps> = ({
               <div className="list">
                 {contentList
                   .slice(0, MAX_LIST_ITEMS_TO_SHOW)
-                  .map((listItem: Rule & TabsLayout.Tab & { icon: string; title: string }, index: number) => (
+                  .map((listItem: Rule & { icon: string; title: string } & AbstractTabSource, index: number) => (
                     <div key={index} className="list-item" onClick={() => listItemClickHandler(listItem)}>
-                      <div className="list-item-icon">{listItem.icon}</div>
-                      <p className="item-title">{listItem.title}</p>
+                      {listItem?.ruleType ? (
+                        <>
+                          <div className="list-item-icon">{listItem.icon}</div>
+                          <p className="item-title">{listItem.title}</p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="list-item-icon">{listItem.icon}</div>
+                          <p className="item-title">{listItem.metadata?.title}</p>
+                        </>
+                      )}
                     </div>
                   ))}
               </div>
