@@ -71,8 +71,19 @@
   font-size: 32px;
 }
 
-.plan-price.enterprice-plan-price {
-  margin-inline: 8px;
+.plan-price.enterprise-pricing-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 32px;
+
+  .enterprise-pricing-details {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+  }
+}
+.plan-price.caption {
+  margin-top: 10px;
 }
 
 .plan-card {
