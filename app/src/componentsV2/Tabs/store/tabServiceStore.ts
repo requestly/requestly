@@ -90,7 +90,7 @@ const createTabServiceStore = () => {
         ...initialState,
 
         reset(source) {
-          set(initialState);
+          set({ ...initialState, tabsIndex: new Map(), tabs: new Map() });
           tabServiceStore.persist.clearStorage();
           trackResetTabServiceStore(source);
         },
