@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { VariablesList } from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
 import { getCollectionVariables } from "store/features/variables/selectors";
@@ -7,33 +7,46 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { VariablesListHeader } from "features/apiClient/screens/environment/components/VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
+import { useGenericState } from "hooks/useGenericState";
 import "./collectionsVariablesView.scss";
+import { EnvironmentVariables } from "backend/environment/types";
 
 interface CollectionsVariablesViewProps {
   collection: RQAPI.CollectionRecord;
 }
 
 export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> = ({ collection }) => {
-  const { updateTab } = useTabsLayoutContext();
   const { setCollectionVariables } = useEnvironmentManager();
   const collectionVariables = useSelector(getCollectionVariables);
+
+  const pendingVariablesRef = useRef<EnvironmentVariables>(null);
+
   const [pendingVariables, setPendingVariables] = useState(collectionVariables[collection.id]?.variables || {});
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
+  const { setPreview, setUnsaved } = useGenericState();
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
 
   useEffect(() => {
-    updateTab(collection.id, { hasUnsavedChanges: hasUnsavedChanges });
-  }, [updateTab, collection.id, hasUnsavedChanges]);
+    setUnsaved(hasUnsavedChanges);
+
+    if (hasUnsavedChanges) {
+      setPreview(false);
+    }
+  }, [setUnsaved, setPreview, hasUnsavedChanges]);
 
   useEffect(() => {
     if (!isSaving) {
-      setPendingVariables(collectionVariables[collection.id]?.variables || {});
+      handleSetPendingVariables(pendingVariablesRef.current ?? collectionVariables[collection.id]?.variables);
     }
   }, [collection.id, collectionVariables, isSaving]);
+
+  const handleSetPendingVariables = (variables: EnvironmentVariables = {}) => {
+    setPendingVariables(variables);
+    pendingVariablesRef.current = variables;
+  };
 
   const handleSaveVariables = async () => {
     setIsSaving(true);
@@ -68,7 +81,11 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
         hasUnsavedChanges={hasUnsavedChanges}
         isSaving={isSaving}
       />
-      <VariablesList variables={pendingVariables} onVariablesChange={setPendingVariables} searchValue={searchValue} />
+      <VariablesList
+        variables={pendingVariables}
+        onVariablesChange={handleSetPendingVariables}
+        searchValue={searchValue}
+      />
     </div>
   );
 };

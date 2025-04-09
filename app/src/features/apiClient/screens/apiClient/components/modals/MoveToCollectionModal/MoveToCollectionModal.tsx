@@ -69,7 +69,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
     };
     const newCollection = await apiClientRecordsRepository.createCollection(collectionToBeCreated);
     if (newCollection.success) {
-      onSaveRecord(newCollection.data);
+      onSaveRecord(newCollection.data, "open");
       return newCollection.data.id;
     } else {
       throw new Error("Failed to create a new collection");
@@ -90,7 +90,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
 
         trackRequestMoved(isNewCollection ? "new_collection" : "existing_collection");
         toast.success("Requests moved to collection successfully");
-        result.length === 1 ? onSaveRecord(head(result)) : onSaveBulkRecords(result);
+        result.length === 1 ? onSaveRecord(head(result), "open") : onSaveBulkRecords(result);
         forceRefreshApiClientRecords();
       } catch (error) {
         console.error("Error moving records: ", error);
