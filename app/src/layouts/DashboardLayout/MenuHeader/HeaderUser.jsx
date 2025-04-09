@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Dropdown, Col, Avatar, Spin, Button } from "antd";
+import { Dropdown, Col, Avatar, Spin } from "antd";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { globalActions } from "store/slices/global/slice";
@@ -17,7 +17,6 @@ import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { parseGravatarImage } from "utils/Misc";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
-import { RQButton } from "lib/design-system/components";
 import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationExperiment";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { getAppFlavour } from "utils/AppUtils";
@@ -25,6 +24,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { tabsLayoutActions } from "store/slices/tabs-layout";
 import { isSafariBrowser } from "actions/ExtensionActions";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { RQButton } from "lib/design-system-v2/components";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -106,6 +106,20 @@ export default function HeaderUser() {
     [appMode, dispatch, isSharedWorkspaceMode, navigate, userEmail, userPhoto, userName, appFlavour]
   );
 
+  const handleAuthButtonClick = (authMode) => {
+    dispatch(
+      globalActions.toggleActiveModal({
+        modalName: "authModal",
+        newValue: true,
+        newProps: {
+          redirectURL: window.location.href,
+          authMode,
+          eventSource: SOURCE.NAVBAR,
+        },
+      })
+    );
+  };
+
   if (loading) {
     return (
       <span>
@@ -158,31 +172,21 @@ export default function HeaderUser() {
           ) : null}
         </Col>
       ) : (
-        <>
-          <Col>
-            <Button
-              style={{ fontWeight: 500 }}
-              type="primary"
-              className="layout-header-signup-btn no-drag"
-              onClick={(e) => {
-                e.preventDefault();
-                dispatch(
-                  globalActions.toggleActiveModal({
-                    modalName: "authModal",
-                    newValue: true,
-                    newProps: {
-                      redirectURL: window.location.href,
-                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-                      eventSource: SOURCE.NAVBAR,
-                    },
-                  })
-                );
-              }}
-            >
-              Sign Up
-            </Button>
-          </Col>
-        </>
+        <div className="auth-button-group">
+          <RQButton
+            className="layout-header-signup-btn no-drag"
+            onClick={() => handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN)}
+          >
+            Sign in
+          </RQButton>
+          <RQButton
+            type="primary"
+            className="layout-header-signup-btn no-drag"
+            onClick={() => handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP)}
+          >
+            Sign up
+          </RQButton>
+        </div>
       )}
     </section>
   );
