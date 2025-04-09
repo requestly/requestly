@@ -22,9 +22,9 @@ import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationE
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { tabsLayoutActions } from "store/slices/tabs-layout";
 import { isSafariBrowser } from "actions/ExtensionActions";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -96,8 +96,8 @@ export default function HeaderUser() {
                 })
               );
 
+              getTabServiceActions().resetTabs("sign_out");
               dispatch(incentivizationActions.resetState());
-              dispatch(tabsLayoutActions.resetState());
             })
             .finally(() => setLoading(false));
         },

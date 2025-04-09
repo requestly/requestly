@@ -1,11 +1,11 @@
-.tabs-layout-container {
+.tabs-container {
   flex: auto;
   width: 100%;
   height: 100%;
   overflow-y: hidden;
 
-  .ant-tabs.tabs-layout-tabs-container,
-  .tabs-layout-tabs-container > .ant-tabs-content-holder {
+  .ant-tabs.tabs-content,
+  .tabs-content > .ant-tabs-content-holder {
     height: 100%;
 
     .ant-tabs-content,
@@ -14,7 +14,7 @@
     }
   }
 
-  .ant-tabs.tabs-layout-tabs-container {
+  .ant-tabs.tabs-content {
     & > .ant-tabs-nav {
       margin-bottom: 0;
 
@@ -202,16 +202,41 @@
   }
 }
 
-.tabs-layout-more-dropdown {
+.tabs-content-more-dropdown {
   .ant-tabs-dropdown-menu {
+    max-width: 250px;
+
     .ant-tabs-dropdown-menu-item {
       .tab-title-container {
         display: flex;
         align-items: center;
         gap: 4px;
         flex-wrap: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-size: var(--requestly-font-size-xs, 11px);
+        max-width: 250px;
+
+        .tab-title {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          flex-wrap: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+
+          .icon {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+          }
+
+          .title {
+            font-size: inherit;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 170px;
+          }
+        }
       }
 
       .tab-actions {

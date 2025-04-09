@@ -1,18 +1,17 @@
 import React, { useCallback } from "react";
-import { Outlet } from "react-router-dom";
 import { ApiClientProvider } from "./contexts";
 import APIClientSidebar from "./screens/apiClient/components/sidebar/APIClientSidebar";
-import { TabsLayoutContainer } from "layouts/TabsLayout";
-import "./container.scss";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { NudgePrompt } from "componentsV2/Nudge/NudgePrompt";
-// import mandatoryLoginIcon from "./assets/mandatory-login.svg";
 import { Typography } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { globalActions } from "store/slices/global/slice";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import LINKS from "config/constants/sub/links";
+import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
+import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceContextProvider";
+import "./container.scss";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
@@ -61,18 +60,14 @@ const ApiClientFeatureContainer: React.FC = () => {
   }
 
   return (
-    <TabsLayoutContainer id="apiClient">
+    <TabServiceProvider>
       <ApiClientProvider>
         <div className="api-client-container">
           <APIClientSidebar />
-          {user.loggedIn ? (
-            <TabsLayoutContainer.TabsLayoutContent Outlet={(props: any) => <Outlet {...props} />} />
-          ) : (
-            <>{loggedOutView}</>
-          )}
+          {user.loggedIn ? <TabsContainer /> : <>{loggedOutView}</>}
         </div>
       </ApiClientProvider>
-    </TabsLayoutContainer>
+    </TabServiceProvider>
   );
 };
 
