@@ -531,7 +531,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             terms
           </a>
           . Learn about how we use and protect your data in our{" "}
-          <a href="https://requestly.com/privacy/">privacy policy</a>.
+          <a href="https://requestly.com/privacy/" target="_blank" rel="noreferrer">
+            privacy policy
+          </a>
+          .
         </div>
       )}
     </div>
