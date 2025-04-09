@@ -115,6 +115,22 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     toggleMultiSelect: toggleSelection,
   };
 
+  const addNestedCollection = useCallback(
+    (record: RQAPI.CollectionRecord, newSelectedRecords: Set<RQAPI.Record["id"]>) => {
+      newSelectedRecords.add(record.id);
+      if (record.data.children) {
+        record.data.children.forEach((child) => {
+          if (child.type === "collection") {
+            addNestedCollection(child, newSelectedRecords);
+          } else {
+            newSelectedRecords.add(child.id);
+          }
+        });
+      }
+    },
+    []
+  );
+
   const bulkActionHandler = useCallback(
     async (action: BulkActions) => {
       if (isEmpty(selectedRecords) && action !== BulkActions.SELECT_ALL) {
@@ -169,22 +185,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             setSelectedRecords(new Set());
           } else {
             const newSelectedRecords: Set<RQAPI.Record["id"]> = new Set();
-            console.log(newSelectedRecords);
-
-            const addNestedCollection = (record: RQAPI.CollectionRecord) => {
-              newSelectedRecords.add(record.id);
-              if (record.data.children) {
-                record.data.children.forEach((child) => {
-                  if (child.type === "collection") {
-                    addNestedCollection(child);
-                  } else {
-                    newSelectedRecords.add(child.id);
-                  }
-                });
-              }
-            };
             updatedRecords.collections.forEach((record) => {
-              addNestedCollection(record);
+              addNestedCollection(record, newSelectedRecords);
             });
             updatedRecords.requests.forEach((record) => {
               newSelectedRecords.add(record.id);
@@ -199,13 +201,17 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     },
     [
       selectedRecords,
-      updatedRecords,
+      updatedRecords.childParentMap,
+      updatedRecords.recordsMap,
+      updatedRecords.collections,
+      updatedRecords.requests,
       setIsDeleteModalOpen,
       updateRecordsToBeDeleted,
       isAllRecordsSelected,
       apiClientRecordsRepository,
       onSaveRecord,
       onSaveBulkRecords,
+      addNestedCollection,
     ]
   );
 
