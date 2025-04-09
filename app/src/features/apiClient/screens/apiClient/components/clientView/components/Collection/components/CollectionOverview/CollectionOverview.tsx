@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { InlineInput } from "componentsV2/InlineInput/InlineInput";
 import { Input, Tabs } from "antd";
@@ -30,6 +30,10 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
   const [showEditor, setShowEditor] = useState(false);
 
   const { ref: collectionDescriptionRef } = useOutsideClick<HTMLDivElement>(() => setShowEditor(false));
+
+  useEffect(() => {
+    setCollectionName(collection?.name);
+  }, [collection?.name]);
 
   const handleDescriptionChange = useCallback(
     async (value: string) => {
