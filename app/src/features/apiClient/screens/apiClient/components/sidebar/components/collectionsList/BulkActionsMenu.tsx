@@ -47,8 +47,10 @@ const ActionMenu: React.FC<Props> = ({ isAllRecordsSelected, toggleSelection, bu
   return (
     <div className="api-client-actions-menu">
       <div className="api-client-select-all-container">
-        <Checkbox checked={isAllRecordsSelected} onChange={() => bulkActionsHandler(BulkActions.SELECT_ALL)} />
-        <label>Select all</label>
+        <label>
+          <Checkbox checked={isAllRecordsSelected} onChange={() => bulkActionsHandler(BulkActions.SELECT_ALL)} /> Select
+          all
+        </label>
       </div>
       <div className="api-client-actions-container">
         {actionsItems.map((item, index) => (
