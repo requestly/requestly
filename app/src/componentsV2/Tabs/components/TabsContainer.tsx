@@ -34,8 +34,6 @@ export const TabsContainer: React.FC = () => {
     state.resetPreviewTab,
   ]);
 
-  const isInitialLoadRef = useRef(true);
-  const matchedTabSource = useMatchedTabSource();
   const { setUrl } = useSetUrl();
 
   const hasUnsavedChanges = Array.from(tabs.values()).some((tab) => tab.getState().unsaved);
@@ -57,6 +55,7 @@ export const TabsContainer: React.FC = () => {
     return false;
   });
 
+  const matchedTabSource = useMatchedTabSource();
   useEffect(() => {
     if (!matchedTabSource) {
       return;
@@ -65,6 +64,7 @@ export const TabsContainer: React.FC = () => {
     openTab(matchedTabSource.sourceFactory(matchedTabSource.matchedPath));
   }, [matchedTabSource, openTab]);
 
+  const isInitialLoadRef = useRef(true);
   useEffect(() => {
     if (activeTabSource) {
       const newPath = activeTabSource.getUrlPath();
