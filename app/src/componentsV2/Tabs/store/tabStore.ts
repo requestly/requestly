@@ -10,7 +10,7 @@ export type TabState = {
   title: string;
 
   setTitle: (title: string) => void;
-  setUnSaved: (saved: boolean) => void;
+  setUnsaved: (saved: boolean) => void;
   setPreview: (preview: boolean) => void;
 };
 
@@ -23,7 +23,7 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     unsaved: false,
 
     setTitle: (title: string) => set({ title }),
-    setUnSaved: (unsaved: boolean) => set({ unsaved }),
+    setUnsaved: (unsaved: boolean) => set({ unsaved }),
     setPreview: (preview: boolean) => set({ preview }),
   }));
 };

@@ -31,7 +31,7 @@ const CollectionAuthorizationView: React.FC<Props> = ({
 }) => {
   const [authOptionsState, setAuthOptionsState] = useState<RQAPI.Auth>(authOptions);
   const [isSaving, setIsSaving] = useState(false);
-  const { setPreview, setUnSaved } = useGenericState();
+  const { setPreview, setUnsaved } = useGenericState();
 
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
@@ -39,12 +39,12 @@ const CollectionAuthorizationView: React.FC<Props> = ({
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(authOptionsState);
 
   useEffect(() => {
-    setUnSaved(hasUnsavedChanges);
+    setUnsaved(hasUnsavedChanges);
 
     if (hasUnsavedChanges) {
       setPreview(false);
     }
-  }, [setUnSaved, setPreview, hasUnsavedChanges]);
+  }, [setUnsaved, setPreview, hasUnsavedChanges]);
 
   const onSaveAuthData = useCallback(() => {
     setIsSaving(true);
