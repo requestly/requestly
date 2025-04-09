@@ -9,6 +9,7 @@ import { trackCollectionDeleted } from "modules/analytics/events/features/apiCli
 import "./deleteApiRecordModal.scss";
 import { isEmpty, partition } from "lodash";
 import * as Sentry from "@sentry/react";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
@@ -19,6 +20,7 @@ interface DeleteApiRecordModalProps {
 
 export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open, records, onClose, onSuccess }) => {
   const { onDeleteRecords, apiClientRecordsRepository } = useApiClientContext();
+  const closeTabBySource = useTabServiceWithSelector((state) => state.closeTabBySource);
 
   const [isDeleting, setIsDeleting] = useState(false);
   if (isEmpty(records)) {
@@ -64,6 +66,15 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
     if (recordDeletionResult.success && collectionsDeletionResult.success) {
       onDeleteRecords([...apiRecordIds, ...collectionRecordIds]);
       trackCollectionDeleted();
+
+      apiRecordIds.forEach((recordId) => {
+        closeTabBySource(recordId, "request", true);
+      });
+
+      collectionRecordIds.forEach((recordId) => {
+        closeTabBySource(recordId, "collection", true);
+      });
+
       toast.success(
         records.length === 1
           ? records[0].type === RQAPI.RecordType.API

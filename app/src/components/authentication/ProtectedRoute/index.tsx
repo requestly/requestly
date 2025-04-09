@@ -21,7 +21,7 @@ function ProtectedRoute<P>({
   routeSrc,
   hardRedirect = false,
   ...rest
-}: Props<P> & P) {
+}: Props<P> & Partial<P>) {
   // Global State
   const user = useSelector(getUserAuthDetails);
 

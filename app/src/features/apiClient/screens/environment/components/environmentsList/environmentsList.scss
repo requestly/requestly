@@ -6,6 +6,10 @@
 }
 
 .environments-list {
+  padding: 0 8px;
+  height: inherit;
+  overflow-y: auto;
+
   &-item {
     color: var(--requestly-color-text-default);
     padding: var(--space-2, 4px) var(--space-4, 8px);
@@ -63,9 +67,6 @@
       justify-content: space-between;
     }
   }
-  height: inherit;
-  overflow-y: auto;
-  padding-right: 2px;
 }
 
 .environment-input.ant-input {

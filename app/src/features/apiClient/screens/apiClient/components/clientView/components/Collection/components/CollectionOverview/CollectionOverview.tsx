@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { InlineInput } from "componentsV2/InlineInput/InlineInput";
 import { Input, Tabs } from "antd";
@@ -8,10 +8,10 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import { useOutsideClick } from "hooks";
-import "./collectionOverview.scss";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { toast } from "utils/Toast";
 import { useRBAC } from "features/rbac";
+import { useGenericState } from "hooks/useGenericState";
+import "./collectionOverview.scss";
 
 interface CollectionOverviewProps {
   collection: RQAPI.CollectionRecord;
@@ -21,15 +21,19 @@ const COLLECTION_DETAILS_PLACEHOLDER = "Collection description";
 
 export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collection }) => {
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const { closeTab } = useTabsLayoutContext();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_collection", "create");
+  const { setTitle, close } = useGenericState();
 
   const [collectionName, setCollectionName] = useState(collection?.name || "");
   const [collectionDescription, setCollectionDescription] = useState(collection?.description || "");
   const [showEditor, setShowEditor] = useState(false);
 
   const { ref: collectionDescriptionRef } = useOutsideClick<HTMLDivElement>(() => setShowEditor(false));
+
+  useEffect(() => {
+    setCollectionName(collection?.name);
+  }, [collection?.name]);
 
   const handleDescriptionChange = useCallback(
     async (value: string) => {
@@ -42,7 +46,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
             ...collection,
             description: result.data,
           };
-          onSaveRecord(updatedCollection);
+          onSaveRecord(updatedCollection, "open");
         })
         .catch((error) => {
           toast.error("Error updating collection description");
@@ -54,22 +58,25 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
   const debouncedDescriptionChange = useDebounce(handleDescriptionChange, 1500);
 
   const handleCollectionNameChange = async () => {
+    const updatedCollectionName = collectionName || "Untitled Collection";
     const updatedCollection = {
       ...collection,
-      name: collectionName || "Untitled Collection",
+      name: updatedCollectionName,
     };
 
     if (collectionName === "") {
-      setCollectionName("Untitled Collection");
+      setCollectionName(updatedCollectionName);
     }
 
     const result = await apiClientRecordsRepository.renameCollection(updatedCollection.id, collectionName);
     if (result.success) {
-      onSaveRecord(result.data);
+      onSaveRecord(result.data, "open");
+      setTitle(updatedCollectionName);
     }
+
     const wasForceRefreshed = await forceRefreshApiClientRecords();
     if (wasForceRefreshed) {
-      closeTab(collection.id);
+      close();
     }
   };
 
