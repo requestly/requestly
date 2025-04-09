@@ -38,12 +38,8 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
-  const {
-    updateRecordsToBeDeleted,
-    setIsDeleteModalOpen,
-    onSaveRecord,
-    apiClientRecordsRepository,
-  } = useApiClientContext();
+  const { updateRecordsToBeDeleted, setIsDeleteModalOpen, onSaveRecord, apiClientRecordsRepository } =
+    useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const [activeTabSource, openTab] = useTabServiceWithSelector((state) => [state.activeTabSource, state.openTab]);
@@ -164,9 +160,6 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
         />
       ) : (
         <div className={`request-row`}>
-          {showSelection && (
-            <Checkbox onChange={recordsSelectionHandler.bind(this, record)} checked={selectedRecords.has(record.id)} />
-          )}
           <div
             title={record.name || record.data.request?.url}
             className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""}`}
@@ -181,6 +174,12 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
               );
             }}
           >
+            {showSelection && (
+              <Checkbox
+                onChange={recordsSelectionHandler.bind(this, record)}
+                checked={selectedRecords.has(record.id)}
+              />
+            )}
             <Typography.Text
               strong
               className="request-method"
