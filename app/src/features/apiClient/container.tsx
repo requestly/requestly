@@ -9,8 +9,8 @@ import { RQButton } from "lib/design-system-v2/components";
 import { globalActions } from "store/slices/global/slice";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import LINKS from "config/constants/sub/links";
-import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceContextProvider";
 import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
+import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceContextProvider";
 import "./container.scss";
 
 const ApiClientFeatureContainer: React.FC = () => {
