@@ -25,6 +25,10 @@ const detectHeadless = () => {
   return /HeadlessChrome/.test(window.navigator.userAgent) === true;
 };
 
+function bypassAutomation() {
+  return localStorage.getItem("__BYPASS_AUTOMATION___");
+}
+
 export const isEnvAutomation = () => {
-  return window.navigator.webdriver === true || detectHeadless();
+  return !bypassAutomation() && (window.navigator.webdriver === true || detectHeadless());
 };
