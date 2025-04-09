@@ -22,10 +22,15 @@ interface CollectionViewProps {
 }
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
-  const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords, apiClientRecordsRepository } =
-    useApiClientContext();
+  const {
+    apiClientRecords,
+    onSaveRecord,
+    isLoadingApiClientRecords,
+    apiClientRecordsRepository,
+  } = useApiClientContext();
 
-  const { setTitle = () => {}, isNewTab = false } = useGenericState();
+  const { setTitle, getIsNew } = useGenericState();
+  const isNewCollection = getIsNew();
 
   const collection = useMemo(() => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
@@ -51,7 +56,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         .updateCollectionAuthData(record)
         .then((result) => {
           if (result.success) {
-            onSaveRecord(result.data);
+            onSaveRecord(result.data, "open");
           } else {
             toast.error(result.message || "Could not update collection authorization changes!");
           }
@@ -99,7 +104,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           return;
         }
 
-        onSaveRecord(result.data);
+        onSaveRecord(result.data, "open");
         setTitle(result.data.name);
       });
     },
@@ -131,7 +136,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
               placeholder="New Collection"
               recordName={collectionName}
               onBlur={(newName) => handleCollectionNameChange(newName)}
-              autoFocus={isNewTab}
+              autoFocus={isNewCollection}
               defaultBreadcrumbs={[
                 { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
                 {

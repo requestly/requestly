@@ -3,32 +3,42 @@ import { Tabs, TabsProps } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
-import { useSetUrl } from "../tabUtils";
 import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
+import { useSetUrl } from "../hooks/useSetUrl";
 import PATHS from "config/constants/sub/paths";
 import "./tabsContainer.scss";
 
 export const TabsContainer: React.FC = () => {
-  const [activeTabId, activeTabSource, setActiveTab, tabs, _version, openTab, closeTabById, incrementVersion] =
-    useTabServiceWithSelector((state) => [
-      state.activeTabId,
-      state.activeTabSource,
-      state.setActiveTab,
-      state.tabs,
-      state._version,
-      state.openTab,
-      state.closeTabById,
-      state.incrementVersion,
-    ]);
+  const [
+    activeTabId,
+    activeTabSource,
+    setActiveTab,
+    tabs,
+    _version,
+    openTab,
+    closeTabById,
+    incrementVersion,
+    resetPreviewTab,
+  ] = useTabServiceWithSelector((state) => [
+    state.activeTabId,
+    state.activeTabSource,
+    state.setActiveTab,
+    state.tabs,
+    state._version,
+    state.openTab,
+    state.closeTabById,
+    state.incrementVersion,
+    state.resetPreviewTab,
+  ]);
 
   const isInitialLoadRef = useRef(true);
   const matchedTabSource = useMatchedTabSource();
   const { setUrl } = useSetUrl();
 
-  const hasUnsavedChanges = Array.from(tabs.values()).some((tab) => tab.getState().saved);
+  const hasUnsavedChanges = Array.from(tabs.values()).some((tab) => tab.getState().unsaved);
 
   unstable_useBlocker(({ nextLocation }) => {
     const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
@@ -52,10 +62,8 @@ export const TabsContainer: React.FC = () => {
       return;
     }
 
-    if (isInitialLoadRef.current) {
-      openTab(matchedTabSource.sourceFactory(matchedTabSource.matchedPath));
-    }
-  }, [matchedTabSource, openTab, tabs]);
+    openTab(matchedTabSource.sourceFactory(matchedTabSource.matchedPath));
+  }, [matchedTabSource, openTab]);
 
   useEffect(() => {
     if (activeTabSource) {
@@ -67,7 +75,7 @@ export const TabsContainer: React.FC = () => {
       setUrl(PATHS.API_CLIENT.ABSOLUTE, isInitialLoadRef.current);
     }
 
-    if (activeTabSource && isInitialLoadRef.current) {
+    if (isInitialLoadRef.current) {
       isInitialLoadRef.current = false;
     }
   }, [activeTabSource, setUrl]);
@@ -86,6 +94,7 @@ export const TabsContainer: React.FC = () => {
               if (tabState.preview) {
                 tabState.setPreview(false);
                 incrementVersion();
+                resetPreviewTab();
               }
             }}
           >
@@ -105,7 +114,7 @@ export const TabsContainer: React.FC = () => {
                 }}
                 icon={<MdClose />}
               />
-              {tabState.saved ? <div className="unsaved-changes-indicator" /> : null}
+              {tabState.unsaved ? <div className="unsaved-changes-indicator" /> : null}
             </div>
           </div>
         ),
@@ -130,10 +139,7 @@ export const TabsContainer: React.FC = () => {
           setActiveTab(parseInt(key));
         }}
         onEdit={(key, action) => {
-          if (action === "remove") {
-            const id = parseInt(key as string);
-            closeTabById(id);
-          } else if (action === "add") {
+          if (action === "add") {
             openTab(new DraftRequestContainerTabSource());
           }
         }}

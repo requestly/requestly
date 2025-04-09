@@ -11,7 +11,6 @@ import { useOutsideClick } from "hooks";
 import { toast } from "utils/Toast";
 import { useRBAC } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import "./collectionOverview.scss";
 
 interface CollectionOverviewProps {
@@ -24,8 +23,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_collection", "create");
-  const { id, setTitle = () => {} } = useGenericState();
-  const closeTabById = useTabServiceWithSelector((state) => state.closeTabById);
+  const { setTitle, close } = useGenericState();
 
   const [collectionName, setCollectionName] = useState(collection?.name || "");
   const [collectionDescription, setCollectionDescription] = useState(collection?.description || "");
@@ -44,7 +42,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
             ...collection,
             description: result.data,
           };
-          onSaveRecord(updatedCollection);
+          onSaveRecord(updatedCollection, "open");
         })
         .catch((error) => {
           toast.error("Error updating collection description");
@@ -68,13 +66,13 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
 
     const result = await apiClientRecordsRepository.renameCollection(updatedCollection.id, collectionName);
     if (result.success) {
-      onSaveRecord(result.data);
+      onSaveRecord(result.data, "open");
       setTitle(updatedCollectionName);
     }
 
     const wasForceRefreshed = await forceRefreshApiClientRecords();
     if (wasForceRefreshed) {
-      closeTabById(id);
+      close();
     }
   };
 

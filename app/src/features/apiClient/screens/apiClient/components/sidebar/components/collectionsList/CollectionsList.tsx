@@ -135,7 +135,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             const result = await apiClientRecordsRepository.duplicateApiEntities(recordsToDuplicate);
 
             toast.success("Records Duplicated successfully");
-            result.length === 1 ? onSaveRecord(head(result)) : onSaveBulkRecords(result);
+            result.length === 1 ? onSaveRecord(head(result), "open") : onSaveBulkRecords(result);
           } catch (error) {
             console.error("Error Duplicating records: ", error);
             toast.error("Failed to duplicate some records");

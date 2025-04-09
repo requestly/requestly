@@ -5,18 +5,38 @@ import { GenericStateContext } from "hooks/useGenericState";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 
 export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabState> }>> = React.memo((props) => {
-  const [incrementVersion, activeTabId] = useTabServiceWithSelector((state) => [
-    state.incrementVersion,
+  const [
+    activeTabId,
+    incrementVersion,
+    resetPreviewTab,
+    closeTabById,
+    upsertTabSource,
+  ] = useTabServiceWithSelector((state) => [
     state.activeTabId,
+    state.incrementVersion,
+    state.resetPreviewTab,
+    state.closeTabById,
+    state.upsertTabSource,
   ]);
 
   return (
     <GenericStateContext.Provider
       value={{
-        activeTabId: activeTabId,
-        tabId: props.store.getState().id,
-        sourceId: props.store.getState().source.metadata.id,
-        isNewTab: props.store.getState().source.getIsNewTab(),
+        close: () => {
+          closeTabById(props.store.getState().id);
+        },
+
+        replace: (tabSource: TabState["source"]) => {
+          upsertTabSource(props.store.getState().id, tabSource);
+        },
+
+        getIsNew: () => {
+          return props.store.getState().source.getIsNewTab();
+        },
+
+        getIsActive: () => {
+          return activeTabId === props.store.getState().id;
+        },
 
         setTitle: (title: string) => {
           props.store.getState().setTitle(title);
@@ -25,11 +45,14 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
 
         setPreview: (preview: boolean) => {
           props.store.getState().setPreview(preview);
+          if (!preview) {
+            resetPreviewTab();
+          }
           incrementVersion();
         },
 
-        setSaved: (saved: boolean) => {
-          props.store.getState().setSaved(saved);
+        setUnSaved: (unsaved: boolean) => {
+          props.store.getState().setUnSaved(unsaved);
           incrementVersion();
         },
       }}

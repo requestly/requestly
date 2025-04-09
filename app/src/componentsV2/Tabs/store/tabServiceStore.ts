@@ -1,50 +1,63 @@
 import { create, StoreApi, UseBoundStore, useStore } from "zustand";
 import { persist, StorageValue } from "zustand/middleware";
 import { useShallow } from "zustand/shallow";
-import { createTabStore, TabState, tabStateSetters } from "./tabStore";
+import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
-import { createContext, ReactNode, useContext } from "react";
-import { tabSources } from "../constants";
+import { createContext, useContext } from "react";
+import { TAB_SOURCES_MAP } from "../constants";
 
 type TabId = number;
 type SourceName = string;
 type SourceId = string;
 type SourceMap = Map<SourceId, TabId>;
+
+type TabStore = StoreApi<TabState>;
 type TabConfig = {
   preview: boolean;
 };
 
-type TabsState = {
+type TabServiceState = {
   tabIdSequence: TabId;
-  activeTabId: TabId;
-  activeTabSource: AbstractTabSource;
+  activeTabId: TabId | undefined;
+  activeTabSource: AbstractTabSource | null;
+  previewTabId: TabId | undefined;
+  previewTabSource: AbstractTabSource | null;
   tabsIndex: Map<SourceName, SourceMap>; // Type: SourceName -> sourceId -> tabId eg: Request -> [requestId,tabId]
-  tabs: Map<TabId, StoreApi<TabState>>;
+  tabs: Map<TabId, TabStore>;
 
   _version: number;
 };
 
-type TabsAction = {
+type TabActions = {
   reset: () => void;
-  registerTabSource: (tabId: TabId, source: AbstractTabSource, config?: TabConfig) => void;
-  updateTabBySourceId: (sourceId: SourceId, updates: Partial<Pick<TabState, "preview" | "saved" | "title">>) => void;
+  upsertTabSource: (tabId: TabId | undefined, source: AbstractTabSource, config?: TabConfig) => void;
+  updateTabBySource: (
+    sourceId: SourceId,
+    sourceName: SourceName,
+    updates: Partial<Pick<TabState, "preview" | "unsaved" | "title">>
+  ) => void;
   openTab: (source: AbstractTabSource, config?: TabConfig) => void;
-  closeTab: (source: AbstractTabSource) => void;
-  closeAllTabs: () => void;
-  closeTabById: (tabId: TabId) => void;
+  closeTab: (source: AbstractTabSource, skipUnsavedPrompt?: boolean) => void;
+  closeAllTabs: (skipUnsavedPrompt?: boolean) => void;
+  closeTabById: (tabId: TabId, skipUnsavedPrompt?: boolean) => void;
+  closeTabBySource: (sourceId: SourceId, sourceName: SourceName, skipUnsavedPrompt?: boolean) => void;
+  resetPreviewTab: () => void;
+  setPreviewTab: (tabId: TabId) => void;
   setActiveTab: (tabId: TabId) => void;
   _generateNewTabId: () => TabId;
   incrementVersion: () => void;
-  getSourceByTabId: (tabId: TabId) => AbstractTabSource;
-  getTabIdBySourceId: (sourceId: SourceId) => TabId;
+  getTabIdBySource: (sourceId: SourceId, sourceName: SourceName) => TabId | undefined;
+  getTabStateBySource: (sourceId: SourceId, sourceName: SourceName) => TabState | undefined;
 };
 
-export type TabServiceState = TabsState & TabsAction;
+export type TabServiceStore = TabServiceState & TabActions;
 
-const initialState: TabsState = {
+const initialState: TabServiceState = {
   tabIdSequence: 0,
-  activeTabId: 0,
+  activeTabId: undefined,
   activeTabSource: null,
+  previewTabId: undefined,
+  previewTabSource: null,
   tabsIndex: new Map(),
   tabs: new Map(),
 
@@ -52,7 +65,7 @@ const initialState: TabsState = {
 };
 
 const createTabServiceStore = () => {
-  const tabServiceStore = create<TabServiceState>()(
+  const tabServiceStore = create<TabServiceStore>()(
     persist(
       (set, get) => ({
         ...initialState,
@@ -62,10 +75,15 @@ const createTabServiceStore = () => {
           tabServiceStore.persist.clearStorage();
         },
 
-        registerTabSource(tabId, source, config) {
+        upsertTabSource(tabId, source, config) {
           const { tabsIndex, tabs, setActiveTab } = get();
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
+
+          if (!tabId) {
+            return;
+          }
+
           const tab = createTabStore(tabId, source, source.getDefaultTitle(), config?.preview);
 
           if (tabsIndex.has(sourceName)) {
@@ -82,9 +100,9 @@ const createTabServiceStore = () => {
           });
         },
 
-        updateTabBySourceId(sourceId, updates) {
-          const { tabs, getTabIdBySourceId } = get();
-          const tabId = getTabIdBySourceId(sourceId);
+        updateTabBySource(sourceId, sourceName, updates) {
+          const { tabs, getTabIdBySource, incrementVersion } = get();
+          const tabId = getTabIdBySource(sourceId, sourceName);
 
           const tabStore = tabs.get(tabId);
           if (!tabStore) {
@@ -95,61 +113,79 @@ const createTabServiceStore = () => {
           const updatedTitle = updates?.title ?? tabState.title;
           const updatedPreview = updates?.preview ?? tabState.preview;
 
-          const updatedTabStore = createTabStore(tabId, tabState.source, updatedTitle, updatedPreview);
-
-          tabs.set(tabId, updatedTabStore);
-          set({ tabs: new Map(tabs) });
+          tabStore.getState().setTitle(updatedTitle);
+          tabStore.getState().setPreview(updatedPreview);
+          incrementVersion();
         },
 
         openTab(source, config) {
-          const { _generateNewTabId, tabsIndex, tabs, setActiveTab, registerTabSource } = get();
+          const {
+            _generateNewTabId,
+            tabsIndex,
+            setActiveTab,
+            upsertTabSource,
+            previewTabId,
+            previewTabSource,
+            setPreviewTab,
+            getTabIdBySource,
+          } = get();
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
 
-          const existingTabId = tabsIndex.get(sourceName)?.get(sourceId);
+          const existingTabId = getTabIdBySource(sourceId, sourceName);
           if (existingTabId) {
             setActiveTab(existingTabId);
             return;
           }
 
           if (config?.preview) {
-            const previousPreviewTab = Array.from(tabs.values()).find((tab) => tab.getState().preview);
-            const tabId = previousPreviewTab ? previousPreviewTab.getState().id : _generateNewTabId();
-            const previousPreviewTabSource = previousPreviewTab?.getState().source;
-            if (previousPreviewTabSource) {
-              tabsIndex.get(previousPreviewTabSource.getSourceName())?.delete(previousPreviewTabSource.getSourceId());
+            if (previewTabId) {
+              // Remove previous preview tab source from tabsIndex
+              tabsIndex.get(previewTabSource.getSourceName())?.delete(previewTabSource.getSourceId());
             }
 
-            registerTabSource(tabId, source, config);
-
+            const tabId = previewTabId ?? _generateNewTabId();
+            upsertTabSource(tabId, source, config);
+            setPreviewTab(tabId);
             return;
           }
 
           const newTabId = _generateNewTabId();
-          registerTabSource(newTabId, source);
+          upsertTabSource(newTabId, source);
         },
 
-        closeTab(source) {
-          const { tabsIndex, closeTabById } = get();
+        closeTab(source, skipUnsavedPrompt = false) {
+          const { closeTabById, getTabIdBySource } = get();
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
 
-          const existingTabId = tabsIndex.get(sourceName)?.get(sourceId);
+          const existingTabId = getTabIdBySource(sourceId, sourceName);
           if (!existingTabId) {
             return;
           }
 
-          closeTabById(existingTabId);
+          closeTabById(existingTabId, skipUnsavedPrompt);
         },
 
-        closeAllTabs() {
+        closeAllTabs(skipUnsavedPrompt) {
           const { tabs, closeTabById } = get();
           tabs.forEach((_, tabId) => {
-            closeTabById(tabId);
+            closeTabById(tabId, skipUnsavedPrompt);
           });
         },
 
-        closeTabById(tabId) {
+        closeTabBySource(sourceId, sourceName, skipUnsavedPrompt) {
+          const { closeTabById, getTabIdBySource } = get();
+
+          const tabId = getTabIdBySource(sourceId, sourceName);
+          if (!tabId) {
+            return;
+          }
+
+          closeTabById(tabId, skipUnsavedPrompt);
+        },
+
+        closeTabById(tabId, skipUnsavedPrompt) {
           const { tabs, tabsIndex, activeTabId, setActiveTab } = get();
           const tabStore = tabs.get(tabId);
           if (!tabStore) {
@@ -160,7 +196,7 @@ const createTabServiceStore = () => {
           const sourceName = tabState.source.getSourceName();
           const sourceId = tabState.source.getSourceId();
 
-          if (tabState.saved) {
+          if (tabState.unsaved && !skipUnsavedPrompt) {
             // TODO: update alert message for RBAC viewer role
             const result = window.confirm("Discard changes? Changes you made will not be saved.");
 
@@ -199,13 +235,30 @@ const createTabServiceStore = () => {
           setActiveTab(newActiveTabId);
         },
 
+        resetPreviewTab() {
+          set({
+            previewTabId: undefined,
+            previewTabSource: null,
+          });
+        },
+
+        setPreviewTab(id: TabId) {
+          const { tabs, resetPreviewTab } = get();
+
+          if (tabs.has(id)) {
+            set({ previewTabId: id, previewTabSource: tabs.get(id).getState().source });
+          } else {
+            resetPreviewTab();
+          }
+        },
+
         setActiveTab(id: TabId) {
           const { tabs } = get();
           if (tabs.has(id)) {
             set({ activeTabId: id, activeTabSource: tabs.get(id).getState().source });
           } else {
             set({
-              activeTabId: 0,
+              activeTabId: undefined,
               activeTabSource: null,
             });
           }
@@ -222,23 +275,24 @@ const createTabServiceStore = () => {
           set({ _version: get()._version + 1 });
         },
 
-        getSourceByTabId(tabId) {
-          const { tabs } = get();
-          const tab = tabs.get(tabId);
-          if (!tab) {
-            throw new Error(`Tab with id ${tabId} not found`);
+        getTabIdBySource(sourceId, sourceName) {
+          const { tabsIndex } = get();
+          if (!sourceId) {
+            return;
           }
-          return tab.getState().source;
+
+          return tabsIndex.get(sourceName)?.get(sourceId);
         },
 
-        getTabIdBySourceId(sourceId: SourceId): TabId {
-          const { tabs } = get();
-          for (const [id, tab] of tabs) {
-            if (tab.getState().source.getSourceId() === sourceId) {
-              return id;
-            }
+        getTabStateBySource(sourceId, sourceName) {
+          const { tabs, getTabIdBySource } = get();
+          const tabId = getTabIdBySource(sourceId, sourceName);
+
+          if (!tabId) {
+            return;
           }
-          return null;
+
+          return tabs.get(tabId)?.getState();
         },
       }),
       {
@@ -252,7 +306,7 @@ const createTabServiceStore = () => {
         }),
 
         storage: {
-          setItem: (name, newValue: StorageValue<TabServiceState>) => {
+          setItem: (name, newValue: StorageValue<TabServiceStore>) => {
             const tabs = Array.from(newValue.state.tabs.entries()).map(([tabId, tabStore]) => [
               tabId,
               tabStore.getState(),
@@ -283,26 +337,22 @@ const createTabServiceStore = () => {
 
             const existingValue = JSON.parse(stateString);
 
-            const tabsIndex: TabServiceState["tabsIndex"] = new Map(
+            const tabsIndex: TabServiceStore["tabsIndex"] = new Map(
               existingValue.state.tabsIndex.map(
                 // eslint-disable-next-line
                 ([sourceName, sourceMap]: [string, MapIterator<[SourceId, TabId]>]) => [sourceName, new Map(sourceMap)]
               )
             );
 
-            const tabs: TabServiceState["tabs"] = new Map(
-              existingValue.state.tabs.map(([tabId, tabState]: [TabId, TabState]) => [
-                tabId,
-                create<TabState>((set) => ({
-                  ...tabState,
-                  source: new tabSources[tabState.source.type](tabState.source.metadata as any), // FIXME: fix type
-                  ...tabStateSetters(set),
-                })),
-              ])
+            const tabs: TabServiceStore["tabs"] = new Map(
+              existingValue.state.tabs.map(([tabId, tabState]: [TabId, TabState]) => {
+                const source = new TAB_SOURCES_MAP[tabState.source.type](tabState.source.metadata);
+                return [tabId, createTabStore(tabId, source, tabState.title)];
+              })
             );
 
-            const activeTab = tabs.get(existingValue.state.activeTabId).getState();
-            const activeTabSource = new tabSources[activeTab.source.type](activeTab.source.metadata as any);
+            const activeTabId = existingValue.state.activeTabId;
+            const activeTabSource = activeTabId ? tabs.get(activeTabId).getState().source : null;
 
             return {
               ...existingValue,
@@ -336,29 +386,17 @@ const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) =
 };
 
 export const tabServiceStore = createTabServiceStore();
-const tabServiceStoreWithAutoSelectors = createSelectors(tabServiceStore);
+export const tabServiceStoreWithAutoSelectors = createSelectors(tabServiceStore);
 
 // Creating and passing the store through context to ensure context's value can be mocked easily
-const TabServiceStoreContext = createContext(tabServiceStoreWithAutoSelectors);
-
-export const createTabServiceProvider = () => {
-  return (props: { children: ReactNode }) => {
-    return {
-      type: TabServiceStoreContext.Provider,
-      props: {
-        value: tabServiceStoreWithAutoSelectors,
-        children: props.children,
-      },
-    };
-  };
-};
+export const TabServiceStoreContext = createContext(tabServiceStoreWithAutoSelectors);
 
 /**
  * Usage: const [a, b] = useTabServiceSelector(state => [ state.a, state.b ])
  * @param selector
  * @returns selector
  */
-export const useTabServiceWithSelector = <T>(selector: (state: TabServiceState) => T) => {
+export const useTabServiceWithSelector = <T>(selector: (state: TabServiceStore) => T) => {
   const store = useContext(TabServiceStoreContext);
   return useStore(store, useShallow(selector));
 };

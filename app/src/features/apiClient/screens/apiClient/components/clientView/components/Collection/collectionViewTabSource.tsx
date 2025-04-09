@@ -5,7 +5,7 @@ import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 
 interface CollectionViewTabSourceMetadata extends TabSourceMetadata {
-  isNewTab?: boolean;
+  focusBreadcrumb?: boolean;
 }
 
 export class CollectionViewTabSource extends BaseTabSource {
@@ -16,7 +16,7 @@ export class CollectionViewTabSource extends BaseTabSource {
       id: metadata.id,
       name: "collection",
       title: metadata.title,
-      isNewTab: metadata.isNewTab,
+      isNewTab: metadata.focusBreadcrumb,
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
     this.icon = <MdOutlineFolder />;

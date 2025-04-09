@@ -3,7 +3,6 @@ import { RequestView } from "../RequestView/RequestView";
 import { DraftRequestView } from "./DraftRequestView";
 import { useGenericState } from "hooks/useGenericState";
 import { RQAPI } from "features/apiClient/types";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RequestViewTabSource } from "../RequestView/requestViewTabSource";
 
 type RequestViewState =
@@ -20,14 +19,11 @@ export const DraftRequestContainer: React.FC<{ draftId: string }> = ({ draftId }
     isCreateMode: true,
   });
 
-  const { setTitle = () => {} } = useGenericState();
-  const [tabsIndex, registerTab] = useTabServiceWithSelector((state) => [state.tabsIndex, state.registerTabSource]);
+  const { setTitle, replace } = useGenericState();
 
   const updateTabSource = useCallback(
     (apiEntryDetails: RQAPI.ApiRecord) => {
-      const currentTabId = tabsIndex.get("request").get(draftId);
-      registerTab(
-        currentTabId,
+      replace(
         new RequestViewTabSource({
           id: apiEntryDetails.id,
           title: apiEntryDetails.name,
@@ -35,7 +31,7 @@ export const DraftRequestContainer: React.FC<{ draftId: string }> = ({ draftId }
         })
       );
     },
-    [draftId, registerTab, tabsIndex]
+    [replace]
   );
 
   const onSaveCallback = useCallback(

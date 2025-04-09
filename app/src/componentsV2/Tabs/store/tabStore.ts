@@ -1,25 +1,17 @@
-import { create, StateCreator } from "zustand";
+import { create } from "zustand";
 import { AbstractTabSource } from "../helpers/tabSource";
 
 export type TabState = {
   /** Tab id */
   id: number;
   source: AbstractTabSource;
-  saved: boolean;
+  unsaved: boolean;
   preview: boolean;
   title: string;
 
   setTitle: (title: string) => void;
-  setSaved: (saved: boolean) => void;
+  setUnSaved: (saved: boolean) => void;
   setPreview: (preview: boolean) => void;
-};
-
-export const tabStateSetters = (set: Parameters<StateCreator<TabState>>["0"]) => {
-  return {
-    setTitle: (title: string) => set({ title }),
-    setSaved: (saved: boolean) => set({ saved }),
-    setPreview: (preview: boolean) => set({ preview }),
-  };
 };
 
 export const createTabStore = (id: number, source: any, title: string, preview: boolean = false) => {
@@ -28,7 +20,10 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     title,
     source,
     preview,
-    saved: false,
-    ...tabStateSetters(set),
+    unsaved: false,
+
+    setTitle: (title: string) => set({ title }),
+    setUnSaved: (unsaved: boolean) => set({ unsaved }),
+    setPreview: (preview: boolean) => set({ preview }),
   }));
 };

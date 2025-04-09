@@ -129,7 +129,8 @@ const APIClientView: React.FC<Props> = ({
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
-  const { tabId, activeTabId, setPreview = () => {}, setSaved = () => {}, setTitle = () => {} } = useGenericState();
+
+  const { setPreview, setUnSaved, setTitle, getIsActive } = useGenericState();
 
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
@@ -158,8 +159,8 @@ const APIClientView: React.FC<Props> = ({
   }, [toggleSheetPlacement]);
 
   useLayoutEffect(() => {
-    setSaved(hasUnsavedChanges);
-  }, [setSaved, hasUnsavedChanges]);
+    setUnSaved(hasUnsavedChanges);
+  }, [setUnSaved, hasUnsavedChanges]);
 
   useEffect(() => {
     if (hasUnsavedChanges) {
@@ -417,7 +418,7 @@ const APIClientView: React.FC<Props> = ({
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       setTitle(requestName);
       const savedRecord = { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } };
-      onSaveRecord(savedRecord, "none");
+      onSaveRecord(savedRecord);
       trackRequestRenamed("breadcrumb");
       setRequestName("");
       onSaveCallback(savedRecord);
@@ -451,11 +452,8 @@ const APIClientView: React.FC<Props> = ({
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
-      onSaveRecord(
-        { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
-        "none"
-      );
-      // const callbackEntry = { ...result.data.data, response: entry.response, testResults: entry.testResults };
+      onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
+
       setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
       resetChanges();
       trackRequestSaved({
@@ -543,6 +541,8 @@ const APIClientView: React.FC<Props> = ({
     setEntry(apiEntryDetails?.data);
   };
 
+  const enableHotkey = getIsActive();
+
   return isExtensionEnabled ? (
     <div className="api-client-view">
       <div className="api-client-header-container">
@@ -577,55 +577,55 @@ const APIClientView: React.FC<Props> = ({
                 ]}
               />
             </Conditional>
+          </div>
 
-            <div className="api-client-header">
-              <Space.Compact className="api-client-url-container">
-                <Select
-                  popupClassName="api-request-method-selector"
-                  className="api-request-method-selector"
-                  options={requestMethodOptions}
-                  value={entry.request.method}
-                  onChange={setMethod}
-                />
-                <SingleLineEditor
-                  className="api-request-url"
-                  placeholder="https://example.com"
-                  //value={entry.request.url}
-                  defaultValue={entry.request.url}
-                  onChange={(text) => {
-                    setUrl(text);
-                  }}
-                  onPressEnter={onUrlInputEnterPressed}
-                  variables={currentEnvironmentVariables}
-                  // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
-                />
-              </Space.Compact>
-              <RQButton
+          <div className="api-client-header">
+            <Space.Compact className="api-client-url-container">
+              <Select
+                popupClassName="api-request-method-selector"
+                className="api-request-method-selector"
+                options={requestMethodOptions}
+                value={entry.request.method}
+                onChange={setMethod}
+              />
+              <SingleLineEditor
+                className="api-request-url"
+                placeholder="https://example.com"
+                //value={entry.request.url}
+                defaultValue={entry.request.url}
+                onChange={(text) => {
+                  setUrl(text);
+                }}
+                onPressEnter={onUrlInputEnterPressed}
+                variables={currentEnvironmentVariables}
+                // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
+              />
+            </Space.Compact>
+            <RQButton
+              showHotKeyText
+              onClick={onSendButtonClick}
+              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
+              type="primary"
+              className="text-bold"
+              disabled={!entry.request.url}
+            >
+              Send
+            </RQButton>
+
+            <Conditional condition={user.loggedIn && !openInModal}>
+              <RBACButton
+                permission="create"
+                resource="api_client_request"
                 showHotKeyText
-                onClick={onSendButtonClick}
-                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
-                type="primary"
-                className="text-bold"
-                disabled={!entry.request.url}
+                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
+                onClick={onSaveButtonClick}
+                loading={isRequestSaving}
+                tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
+                enableHotKey={enableHotkey}
               >
-                Send
-              </RQButton>
-
-              <Conditional condition={user.loggedIn && !openInModal}>
-                <RBACButton
-                  permission="create"
-                  resource="api_client_request"
-                  showHotKeyText
-                  hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
-                  onClick={onSaveButtonClick}
-                  loading={isRequestSaving}
-                  tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
-                  enableHotKey={tabId === activeTabId}
-                >
-                  Save
-                </RBACButton>
-              </Conditional>
-            </div>
+                Save
+              </RBACButton>
+            </Conditional>
           </div>
         </div>
       </div>

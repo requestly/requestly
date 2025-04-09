@@ -10,8 +10,6 @@ import "./deleteApiRecordModal.scss";
 import { isEmpty, partition } from "lodash";
 import * as Sentry from "@sentry/react";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { RequestViewTabSource } from "../../clientView/components/RequestView/requestViewTabSource";
-import { CollectionViewTabSource } from "../../clientView/components/Collection/collectionViewTabSource";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
@@ -22,8 +20,7 @@ interface DeleteApiRecordModalProps {
 
 export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open, records, onClose, onSuccess }) => {
   const { onDeleteRecords, apiClientRecordsRepository } = useApiClientContext();
-
-  const closeTab = useTabServiceWithSelector((state) => state.closeTab);
+  const closeTabBySource = useTabServiceWithSelector((state) => state.closeTabBySource);
 
   const [isDeleting, setIsDeleting] = useState(false);
   if (isEmpty(records)) {
@@ -71,21 +68,11 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
       trackCollectionDeleted();
 
       apiRecordIds.forEach((recordId) => {
-        closeTab(
-          new RequestViewTabSource({
-            id: recordId,
-            title: "",
-          })
-        );
+        closeTabBySource(recordId, "request", true);
       });
 
       collectionRecordIds.forEach((recordId) => {
-        closeTab(
-          new CollectionViewTabSource({
-            id: recordId,
-            title: "",
-          })
-        );
+        closeTabBySource(recordId, "collection", true);
       });
 
       toast.success(

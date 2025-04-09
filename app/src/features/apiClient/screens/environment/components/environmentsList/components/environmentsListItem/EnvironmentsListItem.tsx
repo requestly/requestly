@@ -4,7 +4,6 @@ import { IoMdGlobe } from "@react-icons/all-files/io/IoMdGlobe";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { Dropdown, Input, Tooltip, Typography } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useCallback, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -54,9 +53,11 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
   const [isRenaming, setIsRenaming] = useState(false);
-  const [openTab, activeTabId] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabId]);
-
-  const { closeTab } = useTabsLayoutContext();
+  const [openTab, activeTabId, closeTabBySource] = useTabServiceWithSelector((state) => [
+    state.openTab,
+    state.activeTabId,
+    state.closeTabBySource,
+  ]);
 
   const handleEnvironmentRename = useCallback(async () => {
     if (newEnvironmentName === environment.name) {
@@ -95,7 +96,8 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     toast.loading("Deleting environment...");
     deleteEnvironment(environment.id)
       .then(() => {
-        closeTab(environment.id);
+        closeTabBySource(environment.id, "environments");
+
         trackEnvironmentDeleted();
         toast.success("Environment deleted successfully");
         const availableEnvironments = allEnvironments.filter((env) => env.id !== environment.id);
@@ -119,7 +121,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     envId,
     currentEnvironmentId,
     setCurrentEnvironment,
-    closeTab,
+    closeTabBySource,
   ]);
 
   const menuItems = useMemo(() => {
