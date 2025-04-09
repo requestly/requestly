@@ -19,6 +19,7 @@ import {
   trackTabOpenClicked,
   trackTabOpened,
   trackTabsRehydrationCompleted,
+  trackTabsRehydrationError,
   trackTabsRehydrationStarted,
   trackUpsertTabSourceCalled,
   trackUpsertTabSourceCompleted,
@@ -239,6 +240,7 @@ const createTabServiceStore = () => {
             const result = window.confirm("Discard changes? Changes you made will not be saved.");
 
             if (!result) {
+              trackTabActionEarlyReturn("closeTabById", `Unsaved prompt discarded.`);
               return;
             }
           }
@@ -349,8 +351,10 @@ const createTabServiceStore = () => {
         onRehydrateStorage: (store) => {
           trackTabsRehydrationStarted();
 
-          return (store, error) => {
+          return (store, error: Error) => {
             if (error) {
+              trackTabsRehydrationError(error?.message);
+
               Sentry.withScope((scope) => {
                 scope.setTag("error_type", "tabs_rehydration_failed");
                 scope.setContext("tab_service_store_details", {

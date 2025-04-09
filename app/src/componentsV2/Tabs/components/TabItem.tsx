@@ -5,23 +5,27 @@ import { GenericStateContext } from "hooks/useGenericState";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import {
   trackTabGenericStateSetPreviewMode,
-  trackTabGenericStateSetSaved,
+  trackTabGenericStateSetUnsaved,
   trackTabGenericStateSetTitle,
 } from "../analytics";
 
 export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabState> }>> = React.memo((props) => {
-  const [activeTabId, incrementVersion, resetPreviewTab, closeTabById, upsertTabSource] = useTabServiceWithSelector(
-    (state) => [
-      state.activeTabId,
-      state.incrementVersion,
-      state.resetPreviewTab,
-      state.closeTabById,
-      state.upsertTabSource,
-    ]
-  );
+  const [
+    activeTabId,
+    incrementVersion,
+    resetPreviewTab,
+    closeTabById,
+    upsertTabSource,
+  ] = useTabServiceWithSelector((state) => [
+    state.activeTabId,
+    state.incrementVersion,
+    state.resetPreviewTab,
+    state.closeTabById,
+    state.upsertTabSource,
+  ]);
 
   const sourceId = props.store.getState().source.getSourceId();
-  const sourceType = props.store.getState().source.type;
+  const sourceName = props.store.getState().source.metadata.name;
 
   return (
     <GenericStateContext.Provider
@@ -43,13 +47,13 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
         },
 
         setTitle: (title: string) => {
-          trackTabGenericStateSetTitle(sourceId, sourceType);
+          trackTabGenericStateSetTitle(sourceId, sourceName);
           props.store.getState().setTitle(title);
           incrementVersion();
         },
 
         setPreview: (preview: boolean) => {
-          trackTabGenericStateSetPreviewMode(sourceId, sourceType, preview);
+          trackTabGenericStateSetPreviewMode(sourceId, sourceName, preview);
           props.store.getState().setPreview(preview);
           if (!preview) {
             resetPreviewTab();
@@ -58,7 +62,7 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
         },
 
         setUnSaved: (unsaved: boolean) => {
-          trackTabGenericStateSetSaved(sourceId, sourceType, unsaved);
+          trackTabGenericStateSetUnsaved(sourceId, sourceName, unsaved);
           props.store.getState().setUnSaved(unsaved);
           incrementVersion();
         },

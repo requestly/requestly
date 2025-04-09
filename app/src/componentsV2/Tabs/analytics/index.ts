@@ -11,6 +11,14 @@ export const trackTabOpened = (sourceId: string, sourceName: string, previewMode
   trackEvent(TAB_EVENTS.TAB_OPENED, { sourceId, sourceName, previewMode });
 };
 
+export const trackUpsertTabSourceCalled = (sourceId: string, sourceName: string) => {
+  trackEvent(TAB_EVENTS.UPSERT_TAB_SOURCE_CALLED, { sourceId, sourceName });
+};
+
+export const trackUpsertTabSourceCompleted = (sourceId: string, sourceName: string) => {
+  trackEvent(TAB_EVENTS.UPSERT_TAB_SOURCE_COMPLETED, { sourceId, sourceName });
+};
+
 export const trackTabCloseClicked = (sourceId: string, sourceName: string) => {
   trackEvent(TAB_EVENTS.TAB_CLOSE_CLICKED, { sourceId, sourceName });
 };
@@ -39,6 +47,10 @@ export const trackTabsRehydrationStarted = () => {
   trackEvent(TAB_EVENTS.TABS_REHYDRATION_STARTED, {});
 };
 
+export const trackTabsRehydrationError = (error: string) => {
+  trackEvent(TAB_EVENTS.TABS_REHYDRATION_ERROR, { error });
+};
+
 export const trackTabsRehydrationCompleted = () => {
   trackEvent(TAB_EVENTS.TABS_REHYDRATION_COMPLETED, {});
 };
@@ -59,6 +71,6 @@ export const trackTabGenericStateSetPreviewMode = (sourceId: string, sourceName:
   trackEvent(TAB_EVENTS.TAB_GENERIC_STATE_SET_PREVIEW_MODE, { sourceId, sourceName, value });
 };
 
-export const trackTabGenericStateSetSaved = (sourceId: string, sourceName: string, value: boolean) => {
-  trackEvent(TAB_EVENTS.TAB_GENERIC_STATE_SET_SAVED, { sourceId, sourceName, value });
+export const trackTabGenericStateSetUnsaved = (sourceId: string, sourceName: string, value: boolean) => {
+  trackEvent(TAB_EVENTS.TAB_GENERIC_STATE_SET_UNSAVED, { sourceId, sourceName, value });
 };
