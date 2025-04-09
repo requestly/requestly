@@ -130,7 +130,7 @@ const APIClientView: React.FC<Props> = ({
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
 
-  const { setPreview, setUnSaved, setTitle, getIsActive } = useGenericState();
+  const { setPreview, setUnsaved, setTitle, getIsActive } = useGenericState();
 
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
@@ -159,8 +159,8 @@ const APIClientView: React.FC<Props> = ({
   }, [toggleSheetPlacement]);
 
   useLayoutEffect(() => {
-    setUnSaved(hasUnsavedChanges);
-  }, [setUnSaved, hasUnsavedChanges]);
+    setUnsaved(hasUnsavedChanges);
+  }, [setUnsaved, hasUnsavedChanges]);
 
   useEffect(() => {
     if (hasUnsavedChanges) {

@@ -3,7 +3,7 @@ import { createContext, useContext } from "react";
 export interface GenericState {
   setTitle: (title: string) => void;
   setPreview: (preview: boolean) => void;
-  setUnSaved: (unsaved: boolean) => void;
+  setUnsaved: (unsaved: boolean) => void;
   getIsNew: () => boolean;
   getIsActive: () => boolean;
 
@@ -14,7 +14,7 @@ export interface GenericState {
 const defaultGenericState: GenericState = {
   setTitle: () => {},
   setPreview: () => {},
-  setUnSaved: () => {},
+  setUnsaved: () => {},
   getIsNew: () => false,
   getIsActive: () => false,
   replace: () => {},
