@@ -9,9 +9,8 @@ import { CollectionsVariablesView } from "./components/CollectionsVariablesView/
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 import { toast } from "utils/Toast";
 import { useGenericState } from "hooks/useGenericState";
-import "./collectionView.scss";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "./collectionViewTabSource";
+import "./collectionView.scss";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -32,9 +31,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
     forceRefreshApiClientRecords,
   } = useApiClientContext();
 
-  const closeTab = useTabServiceWithSelector((state) => state.closeTab);
-
-  const { setTitle, getIsNew } = useGenericState();
+  const { setTitle, getIsNew, replace } = useGenericState();
   const isNewCollection = getIsNew();
 
   const collection = useMemo(() => {
@@ -109,12 +106,12 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           return;
         }
 
-        onSaveRecord(result.data, "open");
+        onSaveRecord(result.data);
         const wasForceRefreshed = await forceRefreshApiClientRecords();
         if (wasForceRefreshed) {
-          closeTab(
+          replace(
             new CollectionViewTabSource({
-              id: record.id,
+              id: result.data.id,
               title: "",
             })
           );
@@ -122,7 +119,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         setTitle(result.data.name);
       });
     },
-    [collection, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab, forceRefreshApiClientRecords]
+    [collection, setTitle, apiClientRecordsRepository, onSaveRecord, replace, forceRefreshApiClientRecords]
   );
 
   if (isLoadingApiClientRecords) {
