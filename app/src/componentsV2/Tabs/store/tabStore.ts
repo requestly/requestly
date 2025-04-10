@@ -22,8 +22,8 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     preview,
     unsaved: false,
 
-    setTitle: (title: string) => set({ title }),
-    setUnsaved: (unsaved: boolean) => set({ unsaved }),
-    setPreview: (preview: boolean) => set({ preview }),
+    setTitle: (title) => set({ title }),
+    setUnsaved: (unsaved) => set({ unsaved }),
+    setPreview: (preview) => set({ preview }),
   }));
 };
