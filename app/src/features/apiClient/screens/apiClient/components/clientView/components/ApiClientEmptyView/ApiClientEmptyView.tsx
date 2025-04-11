@@ -48,7 +48,7 @@ export const ApiClientEmptyView = () => {
     createBlankApiRecord(user?.details?.profile?.uid, activeWorkspaceId, recordType, "", apiClientRecordsRepository)
       .then((result) => {
         if (result.success) {
-          onSaveRecord(result.data);
+          onSaveRecord(result.data, "open");
           if (recordType === RQAPI.RecordType.COLLECTION) {
             dispatch(variablesActions.updateCollectionVariables({ collectionId: result.data.id, variables: {} }));
           }

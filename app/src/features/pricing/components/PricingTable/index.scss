@@ -52,34 +52,56 @@
 
 .plan-price-row {
   margin-top: 4px;
+  font-size: 12px;
+
+  .caption {
+    &.text-white {
+      color: var(--requestly-color-text-subtle);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 18px;
+      font-style: normal;
+      font-family: var(--requestly-font-family-default);
+    }
+  }
 }
 
 .plan-price-row .ant-space-item:first-child {
   min-width: 40px;
+  font-size: 32px;
 }
 
-.plan-price.enterprice-plan-price {
-  margin-inline: 8px;
+.plan-price.enterprise-pricing-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 32px;
+
+  .enterprise-pricing-details {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+  }
+}
+.plan-price.caption {
+  margin-top: 10px;
 }
 
 .plan-card {
   min-width: 310px;
   height: auto;
-  padding-top: 48px;
   border-radius: var(--border-radius-md);
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: var(--requestly-color-background);
   position: relative;
+  padding: 32px 24px;
 
   .plan-card-middle-section {
-    padding: 0 24px;
     display: flex;
     flex-direction: column;
     min-height: 175px;
   }
 
   .plan-card-details {
-    padding: 0 24px;
     padding-bottom: 24px;
   }
 
@@ -89,6 +111,10 @@
     justify-content: center;
     padding: var(--space-6, 16px);
     gap: 8px;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
 
@@ -117,9 +143,10 @@
 }
 
 .plan-name.ant-typography {
-  font-size: 22px;
-  line-height: 34px;
+  font-size: 16px;
+  line-height: 22px;
   font-weight: 500;
+  font-style: normal;
   color: var(--white);
 }
 
@@ -165,7 +192,7 @@
 }
 
 .plan-features-list {
-  margin-top: 40px;
+  margin-top: 10px;
 }
 
 .plan-feature-item {
@@ -202,4 +229,20 @@
 .only-annual-text {
   color: var(--requestly-color-primary-300);
   opacity: 1;
+}
+
+.quantity-container {
+  margin-top: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.quantity-selector {
+  display: flex;
+
+  .members {
+    margin-left: 8px;
+    margin-top: 4px;
+    color: var(--requestly-color-text-subtle);
+  }
 }
