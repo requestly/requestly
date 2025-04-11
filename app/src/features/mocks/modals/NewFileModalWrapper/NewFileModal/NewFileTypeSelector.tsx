@@ -37,7 +37,7 @@ const NewFileTypeSelector: React.FC<{ handleTypeSelection?: (type: string) => vo
 
   const fileTypeCard = useMemo(() => {
     return Object.entries(FILE_TYPES_CONFIG).map(([type, data]) => (
-      <Col xs={12} lg={8} key={type} className="file-type-cards-container">
+      <Col push={1} key={type} className="file-type-cards-container">
         <Card
           loading={false}
           size="small"
@@ -96,7 +96,7 @@ const NewFileTypeSelector: React.FC<{ handleTypeSelection?: (type: string) => vo
           </Link>
         </Typography.Text>
       </div>
-      <Row gutter={[16, 16]}>{fileTypeCard}</Row>
+      <Row gutter={[32, 16]}>{fileTypeCard}</Row>
     </>
   );
 };
