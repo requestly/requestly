@@ -98,7 +98,7 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
           "mocksTable",
           activeWorkspace?.id,
           activeWorkspace?.name,
-          activeWorkspace?.membersCount
+          activeWorkspace?.accessCount
         );
         return handleMoveMocks(collection.id, collection.name);
       })
