@@ -102,10 +102,6 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
         if (!activeWorkspaceId) return;
 
         const found = records.find((team) => team.id === activeWorkspaceId);
-        console.log("!!!debug", "fofund", {
-          found,
-          records,
-        });
         if (!found) {
           if (!window.hasUserRemovedHimselfRecently)
             alert("You no longer have access to this workspace. Please contact your team admin.");
