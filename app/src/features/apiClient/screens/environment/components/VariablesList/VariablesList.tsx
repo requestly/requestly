@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import { EnvironmentVariableValue, EnvironmentVariableType, EnvironmentVariables } from "backend/environment/types";
+import { EnvironmentVariableValue, EnvironmentVariableType } from "backend/environment/types";
 import { useVariablesListColumns } from "./hooks/useVariablesListColumns";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -15,9 +15,9 @@ import { useRBAC } from "features/rbac";
 import "./variablesList.scss";
 
 interface VariablesListProps {
-  variables: EnvironmentVariables;
+  variables: EnvironmentVariableTableRow[];
   searchValue?: string;
-  onVariablesChange: (variables: EnvironmentVariables) => void;
+  onVariablesChange: (variables: EnvironmentVariableTableRow[]) => void;
 }
 
 export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string };
@@ -78,15 +78,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
         variableRows.splice(index, 1, updatedRow);
         setDataSource(variableRows);
 
-        const allVariables = variableRows.reduce((acc, variable, index) => {
-          if (variable.key) {
-            const { key, ...newVariable } = variable;
-            acc[variable.key] = newVariable;
-          }
-          return acc;
-        }, {} as EnvironmentVariables);
-
-        onVariablesChange(allVariables);
+        onVariablesChange(variableRows);
       }
     },
     [dataSource, onVariablesChange, user.loggedIn]
@@ -112,15 +104,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
       setDataSource(newData);
 
-      const remainingVariables = newData.reduce((acc, variable, index) => {
-        if (variable.key) {
-          const { key, ...newVariable } = variable;
-          acc[variable.key] = newVariable;
-        }
-        return acc;
-      }, {} as EnvironmentVariables);
-
-      onVariablesChange(remainingVariables);
+      onVariablesChange(newData);
 
       if (newData.length === 0) {
         handleAddNewRow([]);
@@ -151,17 +135,10 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
   useEffect(() => {
     if (variables) {
-      const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables)
-        .map(([key, value]) => ({
-          key,
-          type: value.type,
-          localValue: value.localValue,
-          syncValue: value.syncValue,
-          id: value.id,
-        }))
-        .sort((a, b) => {
-          return a.id - b.id; // Sort by id if both ids are defined
-        });
+      const formattedDataSource = [...variables].sort((a, b) => {
+        return a.id - b.id; // Sort by id if both ids are defined
+      });
+
       if (formattedDataSource.length === 0) {
         formattedDataSource.push({
           id: 0,
