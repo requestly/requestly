@@ -100,7 +100,7 @@ export const PrimarySidebar: React.FC = () => {
       },
       {
         id: 5,
-        title: "Mocks",
+        title: "Files",
         path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
         display: true,
