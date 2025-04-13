@@ -1,9 +1,10 @@
 import React from "react";
 import "./RQBadge.css";
 
-export const RQBadge: React.FC<{ badgeText: string; className?: string }> = ({ badgeText, className, ...props }) => {
+export const RQBadge: React.FC<{ badgeText: string }> = ({ badgeText, ...props }) => {
   return (
-    <div {...props} className={`rq-badge ${className ?? ""}`}>
+    //@ts-ignore
+    <div {...props} className={`rq-badge ${props?.className ?? ""}`}>
       <span>{badgeText}</span>
     </div>
   );
