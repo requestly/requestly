@@ -40,7 +40,7 @@ export const MockUploaderModal: React.FC<Props> = ({
     toast.loading(`Creating Mock from file ${uploadOptions.file.name}`);
     await createMockFromUploadedFile(uid, uploadOptions.file, activeWorkspaceId)
       .then((mock: RQMockSchema) => {
-        toast.success("Mock Created Successfully");
+        toast.success("File Created Successfully");
         uploadOptions.onSuccess("OK");
         trackCreateMockEvent(mock.id, mockType, mock.fileType, "uploader");
         trackMockUploaded(mockType);

@@ -159,14 +159,6 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
                 <FiArrowUpRight /> Browse docs
               </a>
               <a
-                href="https://www.youtube.com/watch?v=l2RxXQxQ3SI"
-                target="_blank"
-                rel="noreferrer"
-                className="helper-item"
-              >
-                <FiArrowUpRight /> See demo
-              </a>
-              <a
                 href="https://requestly.com/products/mock-server/"
                 target="_blank"
                 rel="noreferrer"

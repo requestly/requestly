@@ -112,7 +112,7 @@ const MockEditorIndex: React.FC<Props> = ({
       return createMock(uid, { ...finalMockData, collectionId }, activeWorkspaceId, collectionId).then((mockId) => {
         setSavingInProgress(false);
         if (mockId) {
-          toast.success("Mock Created Successfully");
+          toast.success("File Created Successfully");
           trackCreateMockEvent(mockId, mockType, fileType, "editor");
 
           claimIncentiveRewards({
