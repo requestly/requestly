@@ -180,7 +180,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           }}
           disabled={isInputDisabled}
         >
-          {pair.destination ? "Change file" : " Select File"}
+          {pair.destination ? "Change file" : " Select file"}
         </RQButton>
         <span className="destination-file-path">{pair.destination.length ? pair.destination : " No file chosen"}</span>
         {pair.destination && (
@@ -426,7 +426,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                       Local file
                     </Radio>
                   </MoreInfo>
-                  <Radio value={RedirectRule.DestinationType.MOCK_OR_FILE_PICKER}>Pick from File Server</Radio>
+                  <Radio value={RedirectRule.DestinationType.MOCK_OR_FILE_PICKER}>Pick from File server</Radio>
                 </Radio.Group>
               )}
             </Col>

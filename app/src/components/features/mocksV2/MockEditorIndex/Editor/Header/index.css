@@ -13,6 +13,14 @@
 .mock-editor-layout-header .header-left-section {
   display: flex;
 }
+.mock-editor-layout-header .header-left-section .rq-breadcrumb {
+  gap: 1px;
+}
+
+.mock-editor-layout-header .header-left-section .rq-breadcrumb-separator {
+  padding: 4px 0px;
+  margin-bottom: 12px;
+}
 
 .mock-editor-layout-header .header-right-section {
   display: flex;

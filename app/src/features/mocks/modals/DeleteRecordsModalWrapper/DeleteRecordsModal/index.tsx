@@ -32,8 +32,8 @@ export const DeleteRecordsModal: React.FC<Props> = ({ visible, records, toggleMo
     records.length === 1
       ? isMock(records[0])
         ? records[0]?.type === MockType.API
-          ? "JSON File"
-          : "JS/CSS File"
+          ? "JSON file"
+          : "JS/CSS file"
         : "Collection"
       : "Records";
 

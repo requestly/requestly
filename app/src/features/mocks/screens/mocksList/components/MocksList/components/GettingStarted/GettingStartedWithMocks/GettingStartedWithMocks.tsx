@@ -44,7 +44,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
         return "Create JS/CSS file";
 
       case MockType.API:
-        return "Create JSON File";
+        return "Create JSON file";
 
       default:
         return "Create new mock API"; //for mock picker modal

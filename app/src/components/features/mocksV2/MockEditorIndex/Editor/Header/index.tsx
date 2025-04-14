@@ -75,7 +75,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
       </div>
     </Menu>
   );
-  console.log("mockType", mockType);
+
   return (
     <Layout.Header className="mock-editor-layout-header">
       <Row className="w-full">
@@ -91,30 +91,9 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
               }}
             />
           </Tooltip>
-          {!location.pathname.includes("rules") &&
-            (mockType === MockType.API ? (
-              <RQBreadcrumb
-                defaultBreadcrumbs={[
-                  {
-                    pathname: "",
-                    label: "File Server > JSON file",
-                    disabled: true,
-                    isEditable: false,
-                  },
-                ]}
-              />
-            ) : (
-              <RQBreadcrumb
-                defaultBreadcrumbs={[
-                  {
-                    pathname: "",
-                    label: "File Server > JS/CSS file",
-                    disabled: true,
-                    isEditable: false,
-                  },
-                ]}
-              />
-            ))}
+          <Conditional condition={!location.pathname.includes("rules")}>
+            <RQBreadcrumb />
+          </Conditional>
         </Col>
         <Col className="header-right-section">
           <Conditional condition={!isEditorReadOnly}>

@@ -122,7 +122,7 @@ const MockPickerIndex: React.FC<Props> = ({
   } else if (showCreateMockState) {
     return (
       <div className="empty-mocks-picker-container">
-        <Typography.Title level={4}>{mockRecords?.length ? "Create File" : "No files created yet"}</Typography.Title>
+        <Typography.Title level={4}>{mockRecords?.length ? "Create file" : "No files created yet"}</Typography.Title>
         <Typography.Text type="secondary" className="mt-8">
           Host JSON, JS or CSS files on Requestly and serve them in place of original requests by setting up a Redirect
           Rule.
