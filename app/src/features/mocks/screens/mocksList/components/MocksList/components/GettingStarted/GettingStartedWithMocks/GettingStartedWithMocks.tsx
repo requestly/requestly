@@ -30,9 +30,9 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
   const renderDescription = () => {
     switch (mockType) {
       case MockType.FILE:
-        return "Host your JS/CSS/HTML files online and use them anywhere for debugging";
+        return "Host your JS/CSS files online and use them anywhere - prefect for debugging or overriding live assets";
       case MockType.API:
-        return "Create mocks for your APIs with different status codes, delay, response headers or body";
+        return "Store and serve JSON responses from the cloud to power your frontend development - no backend setup needed";
       default:
         return "Create mocks APIs or files with different status codes, delay, response headers or body";
     }
@@ -41,10 +41,10 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
   const renderCreateMockText = () => {
     switch (mockType) {
       case MockType.FILE:
-        return "Create new mock file";
+        return "Create JS/CSS file";
 
       case MockType.API:
-        return "Create new mock API";
+        return "Create JSON File";
 
       default:
         return "Create new mock API"; //for mock picker modal
@@ -57,20 +57,20 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
         return "File Server";
 
       case MockType.API:
-        return "Mock Server";
+        return "File Server";
 
       default:
-        return "Mock Server"; //for mock picker modal
+        return "File Server"; //for mock picker modal
     }
   };
 
   const renderNoMocksText = () => {
     switch (mockType) {
       case MockType.FILE:
-        return "No mock files created yet";
+        return "No JS/CSS Files created yet";
 
       case MockType.API:
-        return "No mock APIs created yet";
+        return "No JSON Files created yet";
 
       default:
         return "No mocks created yet"; //for mock picker modal
@@ -100,7 +100,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
           <p className="empty-mocks-description">{renderDescription()}</p>
           <div className="btns-container">
             <AuthConfirmationPopover
-              title="You need to sign up to upload mocks"
+              title="You need to sign up to upload file"
               callback={handleUploadAction}
               source={mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK}
             >
@@ -114,7 +114,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
               </RQButton>
             </AuthConfirmationPopover>
             <AuthConfirmationPopover
-              title="You need to sign up to import mocks"
+              title="You need to sign up to import file"
               callback={handleImportAction}
               source={SOURCE.MOCKS_GETTING_STARTED}
             >
@@ -127,7 +127,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
               </RQButton>
             </AuthConfirmationPopover>
             <AuthConfirmationPopover
-              title="You need to sign up to create API mocks"
+              title="You need to sign up to create JSON file"
               disabled={mockType === MockType.FILE}
               callback={handleCreateNew}
               source={SOURCE.CREATE_API_MOCK}
@@ -164,7 +164,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
                 rel="noreferrer"
                 className="helper-item"
               >
-                <AiOutlineQuestionCircle /> Learn more about {mockType === MockType.API ? "mock" : "file"} server
+                <AiOutlineQuestionCircle /> Learn more about file server
               </a>
             </div>
           </>

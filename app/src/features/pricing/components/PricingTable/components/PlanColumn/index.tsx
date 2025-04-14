@@ -181,10 +181,14 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         {planName === PRICING.PLAN_NAMES.ENTERPRISE && (
           <Row align="middle" className="items-center plan-price-row mt-8">
             <Space size={0}>
-              <span className="text-bold">Starts at</span>
-              <Typography.Text className="plan-price enterprice-plan-price">$59</Typography.Text>
-              <div className="caption">
-                <Typography.Text>member / month</Typography.Text>
+              <div className="plan-price enterprise-pricing-container">
+                <span className="text-bold">Starts at</span>
+                <div className="enterprise-pricing-details">
+                  <Typography.Text className="plan-price enterprice-plan-price">$59</Typography.Text>
+                  <div className="plan-price caption">
+                    <Typography.Text>member / month</Typography.Text>
+                  </div>
+                </div>
               </div>
             </Space>
           </Row>
