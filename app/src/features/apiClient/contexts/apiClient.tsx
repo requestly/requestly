@@ -10,15 +10,11 @@ import {
   trackImportCurlClicked,
   trackNewCollectionClicked,
   trackNewRequestClicked,
-  trackNewTabOpened,
 } from "modules/analytics/events/features/apiClient";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
-import PATHS from "config/constants/sub/paths";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { clearExpandedRecordIdsFromSession, createBlankApiRecord, isApiCollection } from "../screens/apiClient/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
-import { useLocation, useSearchParams } from "react-router-dom";
-import { RequestTab } from "../screens/apiClient/components/clientView/components/request/components/RequestTabs/RequestTabs";
+import { useLocation } from "react-router-dom";
 import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
 import { useGetApiClientSyncRepo } from "../helpers/modules/sync/useApiClientSyncRepo";
 import { notification } from "antd";
@@ -31,6 +27,11 @@ import { EnvironmentVariables } from "backend/environment/types";
 import { ErroredRecord } from "../helpers/modules/sync/local/services/types";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { RBAC, useRBAC } from "features/rbac";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { DraftRequestContainerTabSource } from "../screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
+import { RequestViewTabSource } from "../screens/apiClient/components/clientView/components/RequestView/requestViewTabSource";
+import { CollectionViewTabSource } from "../screens/apiClient/components/clientView/components/Collection/collectionViewTabSource";
+import { EnvironmentViewTabSource } from "../screens/environment/components/environmentView/EnvironmentViewTabSource";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -39,7 +40,7 @@ interface ApiClientContextInterface {
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => void;
-  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => void;
+  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open") => void;
   onSaveBulkRecords: (apiClientRecords: RQAPI.Record[]) => void;
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => void;
   recordsToBeDeleted: RQAPI.Record[];
@@ -77,7 +78,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => {},
-  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open" | "replace" | "none") => {},
+  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open") => {},
   onSaveBulkRecords: (apiClientRecords: RQAPI.Record[]) => {},
   onDeleteRecords: (ids: RQAPI.Record["id"][]) => {},
   recordsToBeDeleted: null,
@@ -127,7 +128,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
 
-  const [searchParams] = useSearchParams();
   const location = useLocation();
   const [locationState, setLocationState] = useState(location?.state);
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(!!locationState?.action);
@@ -141,37 +141,20 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
 
   const debouncedTrackUserProperties = debounce(() => trackUserProperties(apiClientRecords), 1000);
-
-  const { openTab, deleteTabs, updateTab, replaceTab, updateAddTabBtnCallback } = useTabsLayoutContext();
   const { addNewEnvironment } = useEnvironmentManager();
 
   const { apiClientRecordsRepository } = useGetApiClientSyncRepo();
+  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
   const openDraftRequest = useCallback(() => {
-    const requestId = apiClientRecordsRepository.generateApiRecordId();
-
-    openTab(requestId, {
-      title: "Untitled request",
-      url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(requestId)}?create=true`,
-    });
-  }, [openTab, apiClientRecordsRepository]);
+    openTab(new DraftRequestContainerTabSource());
+  }, [openTab]);
 
   useEffect(() => {
     if (!user.loggedIn) {
       setApiClientRecords([]);
     }
   }, [user.loggedIn]);
-
-  useEffect(() => {
-    if (!user.loggedIn) {
-      return;
-    }
-
-    updateAddTabBtnCallback(() => {
-      trackNewTabOpened();
-      openDraftRequest();
-    });
-  }, [user.loggedIn, updateAddTabBtnCallback, openDraftRequest]);
 
   // TODO: Create modal context
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -199,7 +182,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     apiClientRecordsRepository
       .getAllRecords()
       .then((result) => {
-        console.log("fetch result", result);
         if (!result.success) {
           notification.error({
             message: "Could not fetch records!",
@@ -240,90 +222,64 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     setApiClientRecords((prev) => prev.filter((record) => record.id !== apiClientRecord.id));
   }, []);
 
-  const onUpdateRecord = useCallback(
-    (apiClientRecord: RQAPI.Record) => {
-      setApiClientRecords((prev) =>
-        prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record))
-      );
+  const onUpdateRecord = useCallback((apiClientRecord: RQAPI.Record) => {
+    setApiClientRecords((prev) =>
+      prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record))
+    );
+  }, []);
 
-      updateTab(apiClientRecord.id, {
-        title: apiClientRecord.name,
-        hasUnsavedChanges: false,
-        isPreview: false,
-      });
-    },
-    [updateTab]
-  );
+  const onDeleteRecords = useCallback((recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
+    clearExpandedRecordIdsFromSession(recordIdsToBeDeleted);
 
-  const onDeleteRecords = useCallback(
-    (recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
-      deleteTabs(recordIdsToBeDeleted);
-      clearExpandedRecordIdsFromSession(recordIdsToBeDeleted);
-
-      setApiClientRecords((prev) =>
-        prev.filter((record) => {
-          return !recordIdsToBeDeleted.includes(record.id);
-        })
-      );
-    },
-    [deleteTabs]
-  );
+    setApiClientRecords((prev) =>
+      prev.filter((record) => {
+        return !recordIdsToBeDeleted.includes(record.id);
+      })
+    );
+  }, []);
 
   const onSaveBulkRecords = useCallback(
     (records: RQAPI.Record[]) => {
       setApiClientRecords((previousRecords: RQAPI.Record[]) => {
         const currentRecordsMap = new Map(previousRecords.map((record) => [record.id, record]));
         records.forEach((record) => {
-          if (currentRecordsMap.has(record.id)) {
-            updateTab(record.id, {
-              title: record.name,
-              hasUnsavedChanges: false,
-              isPreview: false,
-            });
-          }
           currentRecordsMap.set(record.id, record);
         });
 
         return Array.from(currentRecordsMap.values());
       });
     },
-    [updateTab, setApiClientRecords]
+    [setApiClientRecords]
   );
 
-  const onSaveRecord = useCallback(
-    (apiClientRecord: RQAPI.Record, onSaveTabAction: "open" | "replace" | "none" = "open") => {
+  const onSaveRecord: ApiClientContextInterface["onSaveRecord"] = useCallback(
+    (apiClientRecord, onSaveTabAction) => {
       const recordId = apiClientRecord.id;
       const isRecordExist = apiClientRecords.find((record) => record.id === recordId);
-      const urlPath = apiClientRecord.type === RQAPI.RecordType.API ? "request" : "collection";
-      const requestTab = searchParams.get("tab") || RequestTab.QUERY_PARAMS;
 
       if (isRecordExist) {
         onUpdateRecord(apiClientRecord);
-        replaceTab(recordId, {
-          title: apiClientRecord.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${encodeURIComponent(recordId)}?tab=${requestTab}`,
-        });
       } else {
         onNewRecord(apiClientRecord);
+      }
 
-        if (onSaveTabAction === "replace") {
-          replaceTab(recordId, {
-            title: apiClientRecord.name,
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${encodeURIComponent(recordId)}?tab=${requestTab}`,
-          });
+      if (onSaveTabAction === "open") {
+        if (apiClientRecord.type === RQAPI.RecordType.API) {
+          openTab(
+            new RequestViewTabSource({ id: recordId, apiEntryDetails: apiClientRecord, title: apiClientRecord.name })
+          );
           return;
         }
 
-        if (onSaveTabAction === "open") {
-          openTab(recordId, {
-            title: apiClientRecord.name,
-            url: `${PATHS.API_CLIENT.ABSOLUTE}/${urlPath}/${encodeURIComponent(recordId)}?new`,
-          });
+        if (apiClientRecord.type === RQAPI.RecordType.COLLECTION) {
+          openTab(
+            new CollectionViewTabSource({ id: recordId, title: apiClientRecord.name, focusBreadcrumb: !isRecordExist })
+          );
           return;
         }
       }
     },
-    [apiClientRecords, onUpdateRecord, onNewRecord, openTab, replaceTab, searchParams]
+    [apiClientRecords, onUpdateRecord, onNewRecord, openTab]
   );
 
   const updateRecordsToBeDeleted = useCallback((record: RQAPI.Record[]) => {
@@ -364,11 +320,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         return;
       }
 
+      console.log({ recordType });
+
       switch (recordType) {
         case RQAPI.RecordType.API: {
           trackNewRequestClicked(analyticEventSource);
 
-          if (analyticEventSource === "api_client_sidebar_header") {
+          if (["api_client_sidebar_header", "home_screen"].includes(analyticEventSource)) {
             openDraftRequest();
             return;
           }
@@ -382,7 +340,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             apiClientRecordsRepository
           ).then((result) => {
             setIsRecordBeingCreated(null);
-            onSaveRecord(result.data);
+            onSaveRecord(result.data, "open");
           });
         }
 
@@ -393,7 +351,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
-                onSaveRecord(result.data);
+                onSaveRecord(result.data, "open");
                 dispatch(variablesActions.updateCollectionVariables({ collectionId: result.data.id, variables: {} }));
               } else {
                 toast.error(result.message || "Could not create collection.", 5);
@@ -411,10 +369,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           return addNewEnvironment("New Environment")
             .then((newEnvironment: { id: string; name: string }) => {
               setIsRecordBeingCreated(null);
-              openTab(newEnvironment.id, {
-                title: newEnvironment.name,
-                url: `${PATHS.API_CLIENT.ABSOLUTE}/environments/${encodeURIComponent(newEnvironment.id)}?new`,
-              });
+              openTab(
+                new EnvironmentViewTabSource({
+                  id: newEnvironment.id,
+                  title: newEnvironment.name,
+                  focusBreadcrumb: true,
+                })
+              );
             })
             .catch((error) => {
               console.error("Error adding new environment", error);
