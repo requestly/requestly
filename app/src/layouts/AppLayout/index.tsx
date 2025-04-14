@@ -31,8 +31,15 @@ import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
 import useClientStorageService from "services/clientStorageService/hooks/useClientStorageService";
+import { isProductionUI } from "utils/AppUtils";
 
 const { PATHS } = APP_CONSTANTS;
+
+if (isProductionUI) {
+  // Added to avoid debugging on prod with the help of console.log
+  // use logger.log if you really need to.
+  console.log = function () {};
+}
 
 const App: React.FC = () => {
   useEffect(() => {
