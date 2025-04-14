@@ -2,13 +2,10 @@ import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { MenuProps } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { getTabs, tabsLayoutActions } from "store/slices/tabs-layout";
+import { useSelector } from "react-redux";
 import { isEmpty } from "lodash";
 import { useCallback, useState } from "react";
 import { getOptions } from "./utils";
-import { FormatType } from "./types";
-import { TabsLayout } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
@@ -24,20 +21,20 @@ import { CreateType } from "features/apiClient/types";
 import { trackHomeApisActionClicked } from "components/Home/analytics";
 import { RoleBasedComponent, useRBAC } from "features/rbac";
 import { RQTooltip } from "lib/design-system-v2/components";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { AbstractTabSource } from "componentsV2/Tabs/helpers/tabSource";
 
 interface CardOptions {
-  contentList: TabsLayout.Tab[];
   bodyTitle: string;
-  type: FormatType;
+  contentList: AbstractTabSource[];
 }
 
 const ApiClientCard = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isLoggedIn = user?.details?.isLoggedIn;
-  const tabs = useSelector(getTabs("apiClient"));
-  const [cardOptions] = useState<CardOptions>(!isEmpty(tabs) ? getOptions(tabs, FormatType.TABS) : null);
+  const [tabs] = useTabServiceWithSelector((state) => [state.tabs]);
+  const [cardOptions] = useState<CardOptions>(!isEmpty(tabs) ? getOptions(tabs) : null);
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
 
@@ -54,7 +51,7 @@ const ApiClientCard = () => {
       navigate(PATHS.API_CLIENT.ABSOLUTE, user?.details?.isLoggedIn ? { state: { modal } } : {});
       trackHomeApisActionClicked(`${modal.toLowerCase()}_importer_clicked`);
     },
-    [navigate]
+    [navigate, user?.details?.isLoggedIn]
   );
 
   const items: MenuProps["items"] = [
@@ -102,7 +99,7 @@ const ApiClientCard = () => {
   return (
     <Card
       showFooter={isValidPermission}
-      wrapperClass={`${cardOptions?.type === FormatType.HISTORY ? "history-card" : ""} api-client-card`}
+      wrapperClass={`api-client-card`}
       cardType={CardType.API_CLIENT}
       defaultImportClickHandler={() => importTriggerHandler(ApiClientImporterType.REQUESTLY)}
       title={"API Client"}
@@ -138,9 +135,8 @@ const ApiClientCard = () => {
           </DropdownButton>
         </RQTooltip>
       }
-      listItemClickHandler={(item: TabsLayout.Tab) => {
-        navigate(item.url);
-        dispatch(tabsLayoutActions.setActiveTab({ featureId: "apiClient", tab: { ...item } }));
+      listItemClickHandler={(tabSource: AbstractTabSource) => {
+        navigate(tabSource.getUrlPath());
         trackHomeApisActionClicked("recent_tab_clicked");
       }}
       viewAllCta={"View all APIs"}

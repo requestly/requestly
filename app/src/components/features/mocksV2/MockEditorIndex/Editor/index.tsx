@@ -474,7 +474,7 @@ const MockEditor: React.FC<Props> = ({
                   name={name}
                   mode={isNew ? "create" : "edit"}
                   description={desc}
-                  namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
+                  namePlaceholder="File name"
                   descriptionPlaceholder="Add your description here."
                   nameChangeCallback={onNameChange}
                   descriptionChangeCallback={onDescriptionChange}
@@ -521,7 +521,7 @@ const MockEditor: React.FC<Props> = ({
               name={name}
               mode={isNew ? "create" : "edit"}
               description={desc}
-              namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
+              namePlaceholder="File name"
               descriptionPlaceholder="Add your description here."
               nameChangeCallback={onNameChange}
               descriptionChangeCallback={onDescriptionChange}

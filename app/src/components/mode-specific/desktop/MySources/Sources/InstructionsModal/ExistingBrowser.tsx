@@ -24,7 +24,10 @@ const ExistingBrowserInstructionModal: React.FC<{
                   <List.Item.Meta
                     title={
                       <>
-                        a. Install Requestly Extension from <a href="https://requestly.com">requestly.com</a>
+                        a. Install Requestly Extension from{" "}
+                        <a href="https://requestly.com" target="__blank">
+                          requestly.com
+                        </a>
                       </>
                     }
                   />
