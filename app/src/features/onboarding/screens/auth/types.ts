@@ -1,6 +1,7 @@
 export enum AuthProvider {
   GOOGLE = "google.com",
   PASSWORD = "password",
+  SSO = "sso",
 }
 
 export type AuthSyncMetadata = {
@@ -17,7 +18,8 @@ export interface CredentialResponse {
   client_id: string;
 }
 
-export enum FailedLoginCode {
-  DIFFERENT_USER = "different_user",
+export enum AuthErrorCode {
+  NONE = "none",
   UNKNOWN = "unknown",
+  DIFFERENT_USER = "different_user",
 }

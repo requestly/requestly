@@ -3,10 +3,34 @@
   flex-direction: column;
   align-items: center;
 
-  &-description {
-    color: var(--requestly-color-text-subtle);
+  &-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    span {
+      letter-spacing: 0.3px;
+      font-size: var(--requestly-font-size-md);
+    }
+  }
+
+  &-sub_heading {
+    margin-top: 8px;
+    text-align: center;
     font-size: var(--requestly-font-size-sm);
-    margin: 8px 0 16px 0;
+    color: var(--requestly-color-text-subtle);
+  }
+
+  &-description {
+    color: var(--requestly-color-text-placeholder);
+    font-size: var(--requestly-font-size-xs);
+    margin-top: 16px;
     text-align: center;
   }
 
@@ -17,6 +41,7 @@
     font-size: var(--requestly-font-size-md);
     font-weight: var(--requestly-font-weight-medium);
     position: relative;
+    margin-top: 16px;
   }
 
   .bstack-help-link {

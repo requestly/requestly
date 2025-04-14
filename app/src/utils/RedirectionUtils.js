@@ -576,3 +576,7 @@ export const navigateBack = (navigate, location, fallback) => {
 export const redirectToProductSpecificPricing = (navigate, product) => {
   navigate(`${PATHS.PRICING.RELATIVE}?product=${product}`);
 };
+
+export const redirectToOAuthUrl = (navigate) => {
+  redirectToUrl(LINKS.OAUTH_REDIRECT_URL);
+};

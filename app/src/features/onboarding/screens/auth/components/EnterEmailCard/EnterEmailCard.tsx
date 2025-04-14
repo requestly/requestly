@@ -4,35 +4,59 @@ import { AuthFormInput } from "../RQAuthCard/components/AuthFormInput/AuthFormIn
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { AuthSyncMetadata } from "../../types";
+import { AuthProvider } from "../../types";
+import { getSSOProviderId } from "backend/auth/sso";
+import { isEmailValid } from "utils/FormattingHelper";
 
 interface EnterEmailCardProps {
   email: string;
   onEmailChange: (email: string) => void;
   onAuthSyncVerification: (metadata: any) => void;
+  setSSOProviderId: (providerId: string) => void;
 }
 
-export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ email, onEmailChange, onAuthSyncVerification }) => {
+export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({
+  email,
+  onEmailChange,
+  onAuthSyncVerification,
+  setSSOProviderId,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleOnContinue = async () => {
     setIsLoading(true);
-    // TODO: rename function
+
+    const processedEmail = email.trim();
+
+    if (!isEmailValid(processedEmail)) {
+      toast.error("Please enter a valid email address");
+      setIsLoading(false);
+      return;
+    }
+
     const getUserAuthSyncDetails = httpsCallable(getFunctions(), "users-getAuthSyncData");
-    getUserAuthSyncDetails({ email })
-      .then(({ data }: { data: AuthSyncMetadata }) => {
+    try {
+      const ssoProviderId = await getSSOProviderId(processedEmail);
+      getUserAuthSyncDetails({ email }).then(({ data }: { data: AuthSyncMetadata }) => {
         if (data.success) {
           const metadata = data.syncData;
+          if (ssoProviderId) {
+            metadata.providers = [...(metadata.providers || []), AuthProvider.SSO];
+            setSSOProviderId(ssoProviderId);
+          }
           onAuthSyncVerification(metadata);
+          if (!metadata.isSyncedUser) {
+            setIsLoading(false);
+          }
           return;
         }
-        toast.error("Something went wrong! Please try again later or contact support.");
-      })
-      .catch((err) => {
-        toast.error("Something went wrong! Please try again later or contact support.");
-      })
-      .finally(() => {
+        toast.error("Something went wrong! Please try again or contact support.");
         setIsLoading(false);
       });
+    } catch (error) {
+      toast.error("Something went wrong! Please try again or contact support.");
+      setIsLoading(false);
+    }
   };
 
   return (

@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import AuthModalHeader from "features/onboarding/components/OnboardingHeader/OnboardingHeader";
 import { CompaniesLogoBanner } from "features/onboarding/components/auth/components/CompaniesLogoBanner";
@@ -7,33 +8,29 @@ import APP_CONSTANTS from "config/constants";
 import { EnterEmailCard } from "./components/EnterEmailCard/EnterEmailCard";
 import { SignupWithBStackCard } from "./components/SignupWithBStackCard/SignupWithBStackCard";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
-import { AuthSyncMetadata, FailedLoginCode } from "./types";
+import { AuthErrorCode, AuthSyncMetadata } from "./types";
 import { RQAuthCard } from "./components/RQAuthCard/RQAuthCard";
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
+import { redirectToOAuthUrl } from "utils/RedirectionUtils";
 import "./authScreen.scss";
 
 interface AuthScreenProps {
   authModeOnMount?: string;
 }
 
-enum AuthScreenError {
-  ACCOUNT_DOES_NOT_EXIST = "ACCOUNT_DOES_NOT_EXIST",
-  DIFFERENT_USER = "DIFFERENT_USER",
-}
-
 export const AuthScreen: React.FC<AuthScreenProps> = ({
   authModeOnMount = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
 }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [email, setEmail] = useState("");
   const [authMode, setAuthMode] = useState(authModeOnMount);
-  const [authErrorMessage, setAuthErrorMessage] = useState("");
-
-  const [autoSignupWithBStack, setAutoSignupWithBStack] = useState(false);
+  const [authErrorCode, setAuthErrorCode] = useState<AuthErrorCode>(AuthErrorCode.NONE);
   const [showRQAuthForm, setShowRQAuthForm] = useState(false);
   const [authProviders, setAuthProviders] = useState([]);
+  const [ssoProviderId, setSSOProviderId] = useState<string | null>(null);
 
   const handleEmailChange = useCallback((value: string) => {
     setEmail(value);
@@ -48,37 +45,28 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     );
   }, [dispatch]);
 
-  const handleShowErrorMessage = useCallback((code: AuthScreenError) => {
-    switch (code) {
-      case AuthScreenError.ACCOUNT_DOES_NOT_EXIST:
-        setAuthErrorMessage("No account exist for the provided email");
-        break;
-      case AuthScreenError.DIFFERENT_USER:
-        setAuthErrorMessage(
-          "You're trying to use a different Google account than the one originally entered. Please try again with the correct email."
-        );
-        break;
+  const authErrorMessage = useMemo(() => {
+    switch (authErrorCode) {
+      case AuthErrorCode.DIFFERENT_USER:
+        return "You're trying to use a different Google account than the one originally entered. Please try again with the correct email.";
       default:
-        setAuthErrorMessage("");
-        break;
+        return "";
     }
-  }, []);
+  }, [authErrorCode]);
 
   const handlePostAuthSyncVerification = useCallback(
     (metadata: AuthSyncMetadata["syncData"]) => {
-      setAuthErrorMessage("");
+      setAuthErrorCode(AuthErrorCode.NONE);
       setAuthProviders(metadata.providers);
       if (metadata.isSyncedUser) {
-        setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
-        setAutoSignupWithBStack(true);
+        redirectToOAuthUrl(navigate);
       } else if (!metadata.isExistingUser) {
-        handleShowErrorMessage(AuthScreenError.ACCOUNT_DOES_NOT_EXIST);
         setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
       } else {
         setShowRQAuthForm(true);
       }
     },
-    [handleShowErrorMessage]
+    [navigate]
   );
 
   const authModeToggleText = (
@@ -104,19 +92,16 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   const handleOnBackClick = useCallback(() => {
     setShowRQAuthForm(false);
     setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
-    setAuthErrorMessage("");
+    setAuthErrorCode(AuthErrorCode.NONE);
   }, []);
 
-  const handleFailedLogin = useCallback(
-    (code: FailedLoginCode) => {
-      if (code === FailedLoginCode.DIFFERENT_USER) {
-        handleShowErrorMessage(AuthScreenError.DIFFERENT_USER);
-        setShowRQAuthForm(false);
-        setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
-      }
-    },
-    [handleShowErrorMessage]
-  );
+  const handleFailedLogin = useCallback((code: AuthErrorCode) => {
+    if (code === AuthErrorCode.DIFFERENT_USER) {
+      setAuthErrorCode(AuthErrorCode.DIFFERENT_USER);
+      setShowRQAuthForm(false);
+      setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+    }
+  }, []);
 
   const handleSuccessfulLogin = useCallback(() => {
     setShowRQAuthForm(false);
@@ -132,11 +117,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     <div className="auth-screen-container">
       <div className="auth-screen-content">
         <AuthModalHeader onHeaderButtonClick={handleOnHeaderButtonClick} />
-        {autoSignupWithBStack ? (
-          <OnboardingCard>
-            <SignupWithBStackCard autoRedirect />
-          </OnboardingCard>
-        ) : showRQAuthForm ? (
+        {showRQAuthForm ? (
           <OnboardingCard>
             <RQAuthCard
               email={email}
@@ -145,6 +126,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
               failedLoginCallback={handleFailedLogin}
               onBackClick={handleOnBackClick}
               toggleAuthModal={handleCloseAuthModal}
+              ssoProviderId={ssoProviderId}
             />
           </OnboardingCard>
         ) : (
@@ -162,13 +144,14 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
                     email={email}
                     onEmailChange={handleEmailChange}
                     onAuthSyncVerification={handlePostAuthSyncVerification}
+                    setSSOProviderId={setSSOProviderId}
                   />
                 ) : (
-                  <SignupWithBStackCard />
+                  <SignupWithBStackCard onBackButtonClick={handleOnBackClick} />
                 )}
               </OnboardingCard>
             </div>
-            {authModeToggleText}
+            {authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP ? authModeToggleText : null}
           </>
         )}
       </div>

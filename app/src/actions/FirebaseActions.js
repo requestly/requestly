@@ -69,7 +69,7 @@ import {
 } from "modules/analytics/events/common/auth/logout";
 import { toast } from "utils/Toast";
 import { getUserProfilePath } from "utils/db/UserModel";
-import { FailedLoginCode } from "features/onboarding/screens/auth/types";
+import { AuthErrorCode } from "features/onboarding/screens/auth/types";
 
 const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 /**
@@ -328,7 +328,7 @@ export const handleCustomGoogleSignIn = async (credential, successfulLoginCallba
     successfulLoginCallback();
   } catch (error) {
     toast.error("Something went wrong. Please try again.");
-    failedLoginCallback(FailedLoginCode.UNKNOWN);
+    failedLoginCallback(AuthErrorCode.UNKNOWN);
   }
 };
 

@@ -150,6 +150,8 @@ const LINKS = {
   API_CLIENT_LOCAL_FIRST_ANNOUNCEMENT: "https://github.com/requestly/requestly/issues/2629",
 
   REQUESTLY_GITHUB: "https://github.com/requestly/requestly",
+
+  OAUTH_REDIRECT_URL: "https://us-central1-requestly-dev.cloudfunctions.net/oauth/authorize",
 };
 
 export default LINKS;

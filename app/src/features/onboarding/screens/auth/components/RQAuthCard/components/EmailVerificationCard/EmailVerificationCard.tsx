@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Divider } from "antd";
-import { AuthProvider, FailedLoginCode } from "features/onboarding/screens/auth/types";
+import { AuthProvider, AuthErrorCode } from "features/onboarding/screens/auth/types";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import { RQButton } from "lib/design-system-v2/components";
 import { GoogleAuthButton } from "../GoogleAuthButton/GoogleAuthButton";
@@ -9,11 +9,11 @@ import "./emailVerificationCard.scss";
 interface EmailVerificationCardProps {
   email: string;
   providers: AuthProvider[];
+  isSendEmailInProgress: boolean;
   onBackClick: () => void;
   onResendEmailClick: () => Promise<void>;
-  isSendEmailInProgress: boolean;
   toggleAuthModal: () => void;
-  failedLoginCallback: (code: FailedLoginCode) => void;
+  failedLoginCallback: (code: AuthErrorCode) => void;
 }
 
 export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({

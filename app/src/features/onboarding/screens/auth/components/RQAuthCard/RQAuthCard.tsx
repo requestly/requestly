@@ -4,30 +4,34 @@ import { GoogleAuthButton } from "./components/GoogleAuthButton/GoogleAuthButton
 import { EmailAuthForm } from "./components/EmailAuthForm/EmailAuthForm";
 import { EmailVerificationCard } from "./components/EmailVerificationCard/EmailVerificationCard";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
-import { FailedLoginCode, AuthProvider } from "../../types";
-import { sendEmailLinkForSignin } from "actions/FirebaseActions";
+import { AuthErrorCode, AuthProvider } from "../../types";
+import { loginWithSSO, sendEmailLinkForSignin } from "actions/FirebaseActions";
 import { toast } from "utils/Toast";
+import { RQButton } from "lib/design-system-v2/components";
 import "./rqAuthCard.scss";
 
 interface RQAuthCardProps {
   email: string;
   authProviders: AuthProvider[];
+  ssoProviderId: string | null;
   onBackClick: () => void;
   successfulLoginCallback: () => void;
-  failedLoginCallback: (code: FailedLoginCode) => void;
+  failedLoginCallback: (code: AuthErrorCode) => void;
   toggleAuthModal: () => void;
 }
 
 export const RQAuthCard: React.FC<RQAuthCardProps> = ({
   authProviders,
-  onBackClick,
   email,
+  ssoProviderId,
+  onBackClick,
   successfulLoginCallback,
   failedLoginCallback,
   toggleAuthModal,
 }) => {
   const [isEmailVerificationScreenVisible, setIsEmailVerificationScreenVisible] = useState(false);
   const [isSendEmailInProgress, setIsSendEmailInProgress] = useState(false);
+  const [isSSOLoginInProgress, setIsSSOLoginInProgress] = useState(false);
 
   const handleSendEmailLink = useCallback(async () => {
     setIsSendEmailInProgress(true);
@@ -43,6 +47,19 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
         setIsSendEmailInProgress(false);
       });
   }, [email]);
+
+  const handleSSOLogin = useCallback(async () => {
+    setIsSSOLoginInProgress(true);
+    try {
+      await loginWithSSO(ssoProviderId, email);
+      setIsSSOLoginInProgress(false);
+      successfulLoginCallback();
+    } catch (err) {
+      failedLoginCallback(AuthErrorCode.UNKNOWN);
+      toast.error("Something went wrong, Could not sign in with SSO");
+      setIsSSOLoginInProgress(false);
+    }
+  }, [email, ssoProviderId, successfulLoginCallback, failedLoginCallback]);
 
   const renderAuthProvider = (provider: AuthProvider) => {
     switch (provider.toLowerCase()) {
@@ -64,6 +81,12 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
             authProviders={authProviders}
             toggleAuthModal={toggleAuthModal}
           />
+        );
+      case AuthProvider.SSO:
+        return (
+          <RQButton loading={isSSOLoginInProgress} onClick={handleSSOLogin} className="mt-16" size="large" block>
+            Sign in with SSO
+          </RQButton>
         );
       default:
         return null;
@@ -95,7 +118,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
           return (
             <React.Fragment key={index}>
               {renderAuthProvider(provider)}
-              {index !== authProviders.length - 1 ? <Divider plain>Or</Divider> : null}
+              {index === 0 && authProviders.length > 1 ? <Divider plain>Or</Divider> : null}
             </React.Fragment>
           );
         })}

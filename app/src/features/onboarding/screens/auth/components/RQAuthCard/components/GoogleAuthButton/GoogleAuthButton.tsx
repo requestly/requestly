@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useGoogleAuthButton } from "features/onboarding/screens/auth/hooks/useGoogleAuthButton";
-import { CredentialResponse, FailedLoginCode } from "features/onboarding/screens/auth/types";
+import { CredentialResponse, AuthErrorCode } from "features/onboarding/screens/auth/types";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "utils/Toast";
 import { handleCustomGoogleSignIn } from "actions/FirebaseActions";
@@ -10,7 +10,7 @@ import "./googleAuthButton.scss";
 interface GoogleAuthButtonProps {
   email: string;
   successfulLoginCallback: () => void;
-  failedLoginCallback: (code: FailedLoginCode) => void;
+  failedLoginCallback: (code: AuthErrorCode) => void;
 }
 
 export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
@@ -30,7 +30,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
       const decodedCredential = jwtDecode(credentialResponse.credential);
       // @ts-ignore
       if (decodedCredential.email !== email) {
-        failedLoginCallback(FailedLoginCode.DIFFERENT_USER);
+        failedLoginCallback(AuthErrorCode.DIFFERENT_USER);
         setIsLoading(false);
         return;
       }

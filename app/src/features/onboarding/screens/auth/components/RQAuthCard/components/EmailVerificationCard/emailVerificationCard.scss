@@ -26,10 +26,10 @@
       font-size: var(--requestly-font-size-sm);
       font-weight: var(--requestly-font-weight-regular);
       line-height: 20px; /* 125% */
-      text-align: center;
       color: var(--requestly-color-text-subtle);
+      text-align: center;
 
-      &-email {
+      span {
         font-weight: var(--requestly-font-weight-medium);
         color: var(--requestly-color-text-default);
       }
