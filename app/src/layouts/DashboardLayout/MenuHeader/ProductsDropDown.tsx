@@ -114,7 +114,10 @@ const Products: React.FC<ProductsProps> = (props) => {
       {
         title: (
           <>
-            API Client <RQBadge badgeText="BETA" />
+            <div className="product-title-with-badge">
+              <span>API Client</span>
+              <RQBadge badgeText="BETA" />
+            </div>
           </>
         ),
         icon: ApiClientImg,
