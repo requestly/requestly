@@ -5,19 +5,16 @@ import { jwtDecode } from "jwt-decode";
 import { toast } from "utils/Toast";
 import { handleCustomGoogleSignIn } from "actions/FirebaseActions";
 import { Spin } from "antd";
+import { useAuthScreenContext } from "features/onboarding/screens/auth/context";
 import "./googleAuthButton.scss";
 
 interface GoogleAuthButtonProps {
-  email: string;
   successfulLoginCallback: () => void;
   failedLoginCallback: (code: AuthErrorCode) => void;
 }
 
-export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
-  successfulLoginCallback,
-  failedLoginCallback,
-  email,
-}) => {
+export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({ successfulLoginCallback, failedLoginCallback }) => {
+  const { email } = useAuthScreenContext();
   const [isLoading, setIsLoading] = useState(false);
   const handleGoogleAuth = useCallback(
     (credentialResponse: CredentialResponse) => {

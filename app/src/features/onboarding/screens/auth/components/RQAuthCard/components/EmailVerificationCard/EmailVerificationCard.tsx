@@ -4,41 +4,29 @@ import { AuthProvider, AuthErrorCode } from "features/onboarding/screens/auth/ty
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import { RQButton } from "lib/design-system-v2/components";
 import { GoogleAuthButton } from "../GoogleAuthButton/GoogleAuthButton";
+import { useAuthScreenContext } from "features/onboarding/screens/auth/context";
 import "./emailVerificationCard.scss";
 
 interface EmailVerificationCardProps {
-  email: string;
-  providers: AuthProvider[];
-  isSendEmailInProgress: boolean;
   onBackClick: () => void;
   onResendEmailClick: () => Promise<void>;
-  toggleAuthModal: () => void;
   failedLoginCallback: (code: AuthErrorCode) => void;
 }
 
 export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
-  email,
-  providers,
-  isSendEmailInProgress,
   onBackClick,
   onResendEmailClick,
-  toggleAuthModal,
   failedLoginCallback,
 }) => {
   const [countdown, setCountdown] = useState(20);
+  const { email, authProviders, isSendEmailInProgress, toggleAuthModal } = useAuthScreenContext();
 
   /* Memoized google auth button component because countdown triggers re-render 
     which causes google auth button to be re-rendered (causes flicker in button) 
   */
   const googleAuthButton = useMemo(() => {
-    return (
-      <GoogleAuthButton
-        email={email}
-        successfulLoginCallback={toggleAuthModal}
-        failedLoginCallback={failedLoginCallback}
-      />
-    );
-  }, [email, toggleAuthModal, failedLoginCallback]);
+    return <GoogleAuthButton successfulLoginCallback={toggleAuthModal} failedLoginCallback={failedLoginCallback} />;
+  }, [toggleAuthModal, failedLoginCallback]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -88,7 +76,7 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
         >
           {countdown > 0 ? `Send email again in ${countdown}` : "Send email again"}
         </RQButton>
-        {providers.includes(AuthProvider.GOOGLE) ? (
+        {authProviders.includes(AuthProvider.GOOGLE) ? (
           <>
             <span className="verify-email-card-body__description">Or</span>
             {googleAuthButton}

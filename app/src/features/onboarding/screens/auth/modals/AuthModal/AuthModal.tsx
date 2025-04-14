@@ -1,13 +1,16 @@
 import React from "react";
 import { Modal } from "antd";
 import { AuthScreen } from "../../AuthScreen";
+import { AuthScreenContextProvider } from "../../context";
+import APP_CONSTANTS from "config/constants";
 import "./authModal.scss";
 
 interface AuthModalProps {
   isOpen: boolean;
+  authMode?: string;
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen }) => {
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, authMode = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN }) => {
   return (
     <Modal
       open={isOpen}
@@ -18,7 +21,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen }) => {
       wrapClassName="rq-auth-modal-wrapper"
       maskStyle={{ background: "#1a1a1a" }}
     >
-      <AuthScreen />
+      <AuthScreenContextProvider initialAuthMode={authMode}>
+        <AuthScreen />
+      </AuthScreenContextProvider>
     </Modal>
   );
 };

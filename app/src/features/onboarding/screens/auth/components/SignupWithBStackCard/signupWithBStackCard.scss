@@ -20,16 +20,9 @@
     }
   }
 
-  &-sub_heading {
-    margin-top: 8px;
-    text-align: center;
-    font-size: var(--requestly-font-size-sm);
-    color: var(--requestly-color-text-subtle);
-  }
-
   &-description {
-    color: var(--requestly-color-text-placeholder);
-    font-size: var(--requestly-font-size-xs);
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--requestly-font-size-sm);
     margin-top: 16px;
     text-align: center;
   }

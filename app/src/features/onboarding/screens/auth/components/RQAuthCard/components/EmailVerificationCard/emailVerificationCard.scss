@@ -1,10 +1,10 @@
 .rq-auth-card {
   &.email-verification-card {
     .rq-auth-card-header {
-      color: var(--requestly-color-text-subtle);
+      color: var(--requestly-color-text-default);
       span {
         font-size: var(--requestly-font-size-sm);
-        color: var(--requestly-color-text-subtle);
+        color: var(--requestly-color-text-default);
       }
     }
   }

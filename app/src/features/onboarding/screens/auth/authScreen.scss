@@ -48,4 +48,9 @@
     align-items: center;
     justify-content: center;
   }
+  .enter-email-card-footer {
+    margin-top: 16px;
+    font-size: var(--requestly-font-size-xs);
+    color: var(--requestly-color-text-placeholder);
+  }
 }

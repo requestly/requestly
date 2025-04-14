@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import AuthModalHeader from "features/onboarding/components/OnboardingHeader/OnboardingHeader";
@@ -8,42 +8,31 @@ import APP_CONSTANTS from "config/constants";
 import { EnterEmailCard } from "./components/EnterEmailCard/EnterEmailCard";
 import { SignupWithBStackCard } from "./components/SignupWithBStackCard/SignupWithBStackCard";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
-import { AuthErrorCode, AuthSyncMetadata } from "./types";
+import { AuthErrorCode, AuthProvider, AuthSyncMetadata } from "./types";
 import { RQAuthCard } from "./components/RQAuthCard/RQAuthCard";
-import { useDispatch } from "react-redux";
-import { globalActions } from "store/slices/global/slice";
 import { redirectToOAuthUrl } from "utils/RedirectionUtils";
+import { useAuthScreenContext } from "./context";
+import { EmailVerificationCard } from "./components/RQAuthCard/components/EmailVerificationCard/EmailVerificationCard";
+import { sendEmailLinkForSignin } from "actions/FirebaseActions";
+import { toast } from "utils/Toast";
 import "./authScreen.scss";
 
-interface AuthScreenProps {
-  authModeOnMount?: string;
-}
-
-export const AuthScreen: React.FC<AuthScreenProps> = ({
-  authModeOnMount = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-}) => {
+export const AuthScreen = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const {
+    email,
+    authMode,
+    authProviders,
+    handleEmailChange,
+    setAuthMode,
+    setAuthProviders,
+    toggleAuthModal,
+    setIsSendEmailInProgress,
+  } = useAuthScreenContext();
 
-  const [email, setEmail] = useState("");
-  const [authMode, setAuthMode] = useState(authModeOnMount);
   const [authErrorCode, setAuthErrorCode] = useState<AuthErrorCode>(AuthErrorCode.NONE);
   const [showRQAuthForm, setShowRQAuthForm] = useState(false);
-  const [authProviders, setAuthProviders] = useState([]);
-  const [ssoProviderId, setSSOProviderId] = useState<string | null>(null);
-
-  const handleEmailChange = useCallback((value: string) => {
-    setEmail(value);
-  }, []);
-
-  const handleCloseAuthModal = useCallback(() => {
-    dispatch(
-      globalActions.toggleActiveModal({
-        modalName: "authModal",
-        newValue: false,
-      })
-    );
-  }, [dispatch]);
+  const [isEmailVerificationScreenVisible, setIsEmailVerificationScreenVisible] = useState(false);
 
   const authErrorMessage = useMemo(() => {
     switch (authErrorCode) {
@@ -54,6 +43,31 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     }
   }, [authErrorCode]);
 
+  const handleSuccessfulLogin = useCallback(() => {
+    setShowRQAuthForm(false);
+    setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+    toggleAuthModal();
+  }, [toggleAuthModal, setAuthMode]);
+
+  const handleOnHeaderButtonClick = useCallback(() => {
+    toggleAuthModal();
+  }, [toggleAuthModal]);
+
+  const handleSendEmailLink = useCallback(async () => {
+    setIsSendEmailInProgress(true);
+    // TODO: ADD SOURCE
+    return sendEmailLinkForSignin(email, "")
+      .then(() => {
+        setIsEmailVerificationScreenVisible(true);
+      })
+      .catch(() => {
+        toast.error("Something went wrong, Could not send email link");
+      })
+      .finally(() => {
+        setIsSendEmailInProgress(false);
+      });
+  }, [email, setIsSendEmailInProgress]);
+
   const handlePostAuthSyncVerification = useCallback(
     (metadata: AuthSyncMetadata["syncData"]) => {
       setAuthErrorCode(AuthErrorCode.NONE);
@@ -63,10 +77,14 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
       } else if (!metadata.isExistingUser) {
         setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
       } else {
-        setShowRQAuthForm(true);
+        if (authProviders.length === 1 && authProviders[0] === AuthProvider.PASSWORD) {
+          handleSendEmailLink();
+        } else {
+          setShowRQAuthForm(true);
+        }
       }
     },
-    [navigate]
+    [navigate, setAuthMode, setAuthProviders, authProviders, handleSendEmailLink]
   );
 
   const authModeToggleText = (
@@ -74,7 +92,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
       {authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN ? (
         <>
           Don't have an account?{" "}
-          <Button onClick={() => setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP)} size="small" type="link">
+          <Button onClick={() => redirectToOAuthUrl(navigate)} size="small" type="link">
             Sign up
           </Button>
         </>
@@ -93,40 +111,44 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     setShowRQAuthForm(false);
     setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
     setAuthErrorCode(AuthErrorCode.NONE);
-  }, []);
+  }, [setAuthMode]);
 
-  const handleFailedLogin = useCallback((code: AuthErrorCode) => {
-    if (code === AuthErrorCode.DIFFERENT_USER) {
-      setAuthErrorCode(AuthErrorCode.DIFFERENT_USER);
-      setShowRQAuthForm(false);
-      setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
-    }
-  }, []);
-
-  const handleSuccessfulLogin = useCallback(() => {
-    setShowRQAuthForm(false);
-    setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
-    handleCloseAuthModal();
-  }, [handleCloseAuthModal]);
-
-  const handleOnHeaderButtonClick = useCallback(() => {
-    handleCloseAuthModal();
-  }, [handleCloseAuthModal]);
+  const handleFailedLogin = useCallback(
+    (code: AuthErrorCode) => {
+      setAuthErrorCode(code);
+      if (code === AuthErrorCode.DIFFERENT_USER) {
+        setShowRQAuthForm(false);
+        setIsEmailVerificationScreenVisible(false);
+        setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+      }
+    },
+    [setAuthMode]
+  );
 
   return (
     <div className="auth-screen-container">
       <div className="auth-screen-content">
         <AuthModalHeader onHeaderButtonClick={handleOnHeaderButtonClick} />
-        {showRQAuthForm ? (
+        {isEmailVerificationScreenVisible ? (
+          <OnboardingCard>
+            <EmailVerificationCard
+              onBackClick={() => {
+                setIsEmailVerificationScreenVisible(false);
+                if (authProviders.length > 1) {
+                  setShowRQAuthForm(true);
+                }
+              }}
+              onResendEmailClick={handleSendEmailLink}
+              failedLoginCallback={handleFailedLogin}
+            />
+          </OnboardingCard>
+        ) : showRQAuthForm ? (
           <OnboardingCard>
             <RQAuthCard
-              email={email}
-              authProviders={authProviders}
+              handleSendEmailLink={handleSendEmailLink}
               successfulLoginCallback={handleSuccessfulLogin}
               failedLoginCallback={handleFailedLogin}
               onBackClick={handleOnBackClick}
-              toggleAuthModal={handleCloseAuthModal}
-              ssoProviderId={ssoProviderId}
             />
           </OnboardingCard>
         ) : (
@@ -138,20 +160,18 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
                   <span>{authErrorMessage}</span>
                 </div>
               ) : null}
-              <OnboardingCard height={211}>
+              <OnboardingCard>
                 {authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN ? (
                   <EnterEmailCard
-                    email={email}
                     onEmailChange={handleEmailChange}
                     onAuthSyncVerification={handlePostAuthSyncVerification}
-                    setSSOProviderId={setSSOProviderId}
                   />
                 ) : (
                   <SignupWithBStackCard onBackButtonClick={handleOnBackClick} />
                 )}
               </OnboardingCard>
             </div>
-            {authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP ? authModeToggleText : null}
+            {authModeToggleText}
           </>
         )}
       </div>

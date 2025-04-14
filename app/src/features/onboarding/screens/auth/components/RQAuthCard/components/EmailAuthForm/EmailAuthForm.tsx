@@ -10,26 +10,17 @@ import { AuthTypes, getAuthErrorMessage } from "components/authentication/utils"
 import { getGreeting } from "utils/FormattingHelper";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
-import { AuthProvider } from "features/onboarding/screens/auth/types";
 import "./emailAuthForm.scss";
+import { useAuthScreenContext } from "features/onboarding/screens/auth/context";
 
 interface EmailAuthFormProps {
-  email: string;
   isLoading: boolean;
-  authProviders: AuthProvider[];
   onSendEmailClick: () => Promise<void>;
   onEditEmailClick: () => void;
-  toggleAuthModal: () => void;
 }
 
-export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({
-  email,
-  isLoading,
-  authProviders,
-  onSendEmailClick,
-  onEditEmailClick,
-  toggleAuthModal,
-}) => {
+export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ isLoading, onSendEmailClick, onEditEmailClick }) => {
+  const { email, toggleAuthModal } = useAuthScreenContext();
   const appMode = useSelector(getAppMode);
   const [password, setPassword] = useState("");
   const [isSignInInProgress, setIsSignInInProgress] = useState(false);

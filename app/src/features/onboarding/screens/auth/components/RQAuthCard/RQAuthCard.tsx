@@ -2,51 +2,29 @@ import React, { useCallback, useState } from "react";
 import { Divider } from "antd";
 import { GoogleAuthButton } from "./components/GoogleAuthButton/GoogleAuthButton";
 import { EmailAuthForm } from "./components/EmailAuthForm/EmailAuthForm";
-import { EmailVerificationCard } from "./components/EmailVerificationCard/EmailVerificationCard";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import { AuthErrorCode, AuthProvider } from "../../types";
-import { loginWithSSO, sendEmailLinkForSignin } from "actions/FirebaseActions";
+import { loginWithSSO } from "actions/FirebaseActions";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import "./rqAuthCard.scss";
+import { useAuthScreenContext } from "../../context";
 
 interface RQAuthCardProps {
-  email: string;
-  authProviders: AuthProvider[];
-  ssoProviderId: string | null;
   onBackClick: () => void;
+  handleSendEmailLink: () => Promise<void>;
   successfulLoginCallback: () => void;
   failedLoginCallback: (code: AuthErrorCode) => void;
-  toggleAuthModal: () => void;
 }
 
 export const RQAuthCard: React.FC<RQAuthCardProps> = ({
-  authProviders,
-  email,
-  ssoProviderId,
   onBackClick,
+  handleSendEmailLink,
   successfulLoginCallback,
   failedLoginCallback,
-  toggleAuthModal,
 }) => {
-  const [isEmailVerificationScreenVisible, setIsEmailVerificationScreenVisible] = useState(false);
-  const [isSendEmailInProgress, setIsSendEmailInProgress] = useState(false);
+  const { email, authProviders, ssoProviderId, isSendEmailInProgress } = useAuthScreenContext();
   const [isSSOLoginInProgress, setIsSSOLoginInProgress] = useState(false);
-
-  const handleSendEmailLink = useCallback(async () => {
-    setIsSendEmailInProgress(true);
-    // TODO: ADD SOURCE
-    return sendEmailLinkForSignin(email, "")
-      .then(() => {
-        setIsEmailVerificationScreenVisible(true);
-      })
-      .catch(() => {
-        toast.error("Something went wrong, Could not send email link");
-      })
-      .finally(() => {
-        setIsSendEmailInProgress(false);
-      });
-  }, [email]);
 
   const handleSSOLogin = useCallback(async () => {
     setIsSSOLoginInProgress(true);
@@ -66,7 +44,6 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
       case AuthProvider.GOOGLE:
         return (
           <GoogleAuthButton
-            email={email}
             successfulLoginCallback={successfulLoginCallback}
             failedLoginCallback={failedLoginCallback}
           />
@@ -74,12 +51,9 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
       case AuthProvider.PASSWORD:
         return (
           <EmailAuthForm
-            email={email}
             isLoading={isSendEmailInProgress}
             onSendEmailClick={handleSendEmailLink}
             onEditEmailClick={onBackClick}
-            authProviders={authProviders}
-            toggleAuthModal={toggleAuthModal}
           />
         );
       case AuthProvider.SSO:
@@ -92,20 +66,6 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
         return null;
     }
   };
-
-  if (isEmailVerificationScreenVisible) {
-    return (
-      <EmailVerificationCard
-        email={email}
-        providers={authProviders}
-        onBackClick={() => setIsEmailVerificationScreenVisible(false)}
-        onResendEmailClick={handleSendEmailLink}
-        isSendEmailInProgress={isSendEmailInProgress}
-        toggleAuthModal={toggleAuthModal}
-        failedLoginCallback={failedLoginCallback}
-      />
-    );
-  }
 
   return (
     <div className="rq-auth-card">

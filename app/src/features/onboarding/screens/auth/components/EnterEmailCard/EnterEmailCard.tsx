@@ -7,20 +7,15 @@ import { AuthSyncMetadata } from "../../types";
 import { AuthProvider } from "../../types";
 import { getSSOProviderId } from "backend/auth/sso";
 import { isEmailValid } from "utils/FormattingHelper";
+import { useAuthScreenContext } from "../../context";
 
 interface EnterEmailCardProps {
-  email: string;
   onEmailChange: (email: string) => void;
   onAuthSyncVerification: (metadata: any) => void;
-  setSSOProviderId: (providerId: string) => void;
 }
 
-export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({
-  email,
-  onEmailChange,
-  onAuthSyncVerification,
-  setSSOProviderId,
-}) => {
+export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, onAuthSyncVerification }) => {
+  const { email, setSSOProviderId } = useAuthScreenContext();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleOnContinue = async () => {
@@ -45,9 +40,6 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({
             setSSOProviderId(ssoProviderId);
           }
           onAuthSyncVerification(metadata);
-          if (!metadata.isSyncedUser) {
-            setIsLoading(false);
-          }
           return;
         }
         toast.error("Something went wrong! Please try again or contact support.");
@@ -83,6 +75,10 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({
       >
         Continue
       </RQButton>
+      <div className="enter-email-card-footer">
+        {/* TODO: Add links */}
+        By signing in , you agree to our <a href="#">Terms</a> and <a href="#">Privacy statement</a>
+      </div>
     </div>
   );
 };

@@ -23,7 +23,7 @@ export const useGoogleAuthButton = ({ callback }: { callback: (credential: Crede
       window.google.accounts.id.initialize({ ...config });
       window.google.accounts.id.renderButton(document.getElementById("rq-google-auth-button"), {
         type: "standard",
-        theme: "filled_blue",
+        theme: "filled_black",
         size: "large",
         text: "continue_with",
         shape: "rectangular",
