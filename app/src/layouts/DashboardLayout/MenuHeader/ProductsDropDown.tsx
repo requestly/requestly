@@ -102,11 +102,7 @@ const Products: React.FC<ProductsProps> = (props) => {
         },
       },
       {
-        title: (
-          <>
-            SessionBook <RQBadge badgeText="BETA" />
-          </>
-        ),
+        title: <>SessionBook</>,
         icon: SessionImg,
         description: "Capture, report and debug with screen recording, network logs and console logs.",
         handleClick: () => {
@@ -116,9 +112,16 @@ const Products: React.FC<ProductsProps> = (props) => {
         },
       },
       {
-        title: "API Client",
+        title: (
+          <>
+            <div className="product-title-with-badge">
+              <span>API Client</span>
+              <RQBadge badgeText="BETA" />
+            </div>
+          </>
+        ),
         icon: ApiClientImg,
-        description: "Minimalistic Postman-like API client to test APIs.",
+        description: "A lightweight API Client to test APIs faster and share with teams.",
         handleClick: () => {
           trackProductClickedInDropDown("api_client");
           props.toggleDropDown();

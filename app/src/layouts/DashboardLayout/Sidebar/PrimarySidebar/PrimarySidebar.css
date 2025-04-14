@@ -89,13 +89,17 @@
   position: absolute;
   top: -7px;
   right: -30px;
-  font-size: 8px;
+  font-size: 9px;
   padding: 1px 2px;
   z-index: 1;
-  background: var(--requestly-color-surface-2);
+  background: var(--requestly-color-neutral-700);
   border: 1px solid var(--requestly-color-surface-3);
 }
-
+.primary-sidebar-link .icon-with-badge .rq-badge span {
+  color: var(--requestly-color-neutral-300);
+  background: none;
+  -webkit-text-fill-color: var(--requestly-color-neutral-300);
+}
 .primary-sidebar-bottom-btns {
   display: flex;
   flex-direction: column;

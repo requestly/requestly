@@ -1,9 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Typography, Dropdown, MenuProps, Checkbox } from "antd";
-import PATHS from "config/constants/sub/paths";
 import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RequestMethod, RQAPI } from "features/apiClient/types";
-import { NavLink } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -16,17 +14,17 @@ import {
   trackMoveRequestToCollectionClicked,
   trackRequestDuplicated,
 } from "modules/analytics/events/features/apiClient";
-import { TabsLayoutContextInterface } from "layouts/TabsLayout";
 import { LocalWorkspaceTooltip } from "../../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import "./RequestRow.scss";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdContentCopy } from "@react-icons/all-files/md/MdContentCopy";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { Conditional } from "components/common/Conditional";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { RequestViewTabSource } from "../../../../clientView/components/RequestView/requestViewTabSource";
 
 interface Props {
   record: RQAPI.ApiRecord;
-  openTab: TabsLayoutContextInterface["openTab"];
   isReadOnly: boolean;
   bulkActionOptions: {
     showSelection: boolean;
@@ -36,17 +34,21 @@ interface Props {
   };
 }
 
-export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkActionOptions }) => {
+export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOptions }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
-  const {
-    updateRecordsToBeDeleted,
-    setIsDeleteModalOpen,
-    onSaveRecord,
-    apiClientRecordsRepository,
-  } = useApiClientContext();
+  const { updateRecordsToBeDeleted, setIsDeleteModalOpen, onSaveRecord, apiClientRecordsRepository } =
+    useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+  const [activeTabSource, openTab] = useTabServiceWithSelector((state) => [state.activeTabSource, state.openTab]);
+
+  const activeTabSourceId = useMemo(() => {
+    if (activeTabSource) {
+      return activeTabSource.getSourceId();
+    }
+  }, [activeTabSource]);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);
@@ -65,7 +67,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
           if (!result.success) {
             throw new Error("Failed to duplicate request");
           }
-          onSaveRecord(result.data);
+          onSaveRecord(result.data, "open");
           toast.success("Request duplicated successfully");
           trackRequestDuplicated();
         })
@@ -157,22 +159,27 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
           }}
         />
       ) : (
-        <div className="request-row">
-          {showSelection && (
-            <Checkbox onChange={recordsSelectionHandler.bind(this, record)} checked={selectedRecords.has(record.id)} />
-          )}
-          <NavLink
+        <div className={`request-row`}>
+          <div
             title={record.name || record.data.request?.url}
-            to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(record.id)}`}
-            className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
+            className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""}`}
             onClick={() => {
-              openTab(record.id, {
-                isPreview: true,
-                title: record.name || record.data.request?.url,
-                url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(record.id)}`,
-              });
+              openTab(
+                new RequestViewTabSource({
+                  id: record.id,
+                  apiEntryDetails: record,
+                  title: record.name || record.data.request?.url,
+                }),
+                { preview: true }
+              );
             }}
           >
+            {showSelection && (
+              <Checkbox
+                onChange={recordsSelectionHandler.bind(this, record)}
+                checked={selectedRecords.has(record.id)}
+              />
+            )}
             <Typography.Text
               strong
               className="request-method"
@@ -208,15 +215,9 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
                 </Dropdown>
               </div>
             </Conditional>
-          </NavLink>
+          </div>
         </div>
       )}
     </>
   );
 };
-
-/* Remove this notes before prod
-1. request options(children) stay till hover is on its parent class
-2. as cursor moves hover state is lost & visibilty set to hidden
-3. need to make something, that can continue the hover state till the dropdown is closed
-*/

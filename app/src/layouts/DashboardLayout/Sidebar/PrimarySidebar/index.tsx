@@ -93,14 +93,14 @@ export const PrimarySidebar: React.FC = () => {
         icon: (
           <span className="icon-with-badge">
             <ApiOutlined />
-            <RQBadge badgeText="NEW" />
+            <RQBadge badgeText="BETA" />
           </span>
         ),
         display: true,
       },
       {
         id: 5,
-        title: "Mocks",
+        title: "Files",
         path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
         display: true,
