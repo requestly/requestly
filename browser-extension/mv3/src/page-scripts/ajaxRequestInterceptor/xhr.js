@@ -121,7 +121,7 @@ export const initXhrInterceptor = (debug) => {
         }
 
         if (typeof customResponse === "undefined") {
-          return;
+          customResponse = this.response;
         }
 
         // Convert customResponse back to rawText
