@@ -7,8 +7,8 @@ import { AuthErrorCode, AuthProvider } from "../../types";
 import { loginWithSSO } from "actions/FirebaseActions";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
-import "./rqAuthCard.scss";
 import { useAuthScreenContext } from "../../context";
+import "./rqAuthCard.scss";
 
 interface RQAuthCardProps {
   onBackClick: () => void;

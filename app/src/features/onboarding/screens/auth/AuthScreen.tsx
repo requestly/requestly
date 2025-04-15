@@ -77,14 +77,14 @@ export const AuthScreen = () => {
       } else if (!metadata.isExistingUser) {
         setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
       } else {
-        if (authProviders.length === 1 && authProviders[0] === AuthProvider.PASSWORD) {
+        if (metadata.providers.length === 1 && metadata.providers[0] === AuthProvider.PASSWORD) {
           handleSendEmailLink();
         } else {
           setShowRQAuthForm(true);
         }
       }
     },
-    [navigate, setAuthMode, setAuthProviders, authProviders, handleSendEmailLink]
+    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink]
   );
 
   const authModeToggleText = (
