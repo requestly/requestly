@@ -92,7 +92,7 @@ const NewFileTypeSelector: React.FC<{ handleTypeSelection?: (type: string) => vo
         </Typography.Text>
         <br />
         <Typography.Text type="secondary" className="new-file-modal-description">
-          To host JSON or mock API responses, you can use our Mock Server&nbsp;
+          To host JSON or mock API responses, you can use our File Server&nbsp;
           <Link
             to={"#"}
             onClick={(e) => {

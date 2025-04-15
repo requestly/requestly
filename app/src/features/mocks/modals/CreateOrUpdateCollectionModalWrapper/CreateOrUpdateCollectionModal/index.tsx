@@ -107,7 +107,7 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
           "mocksTable",
           activeWorkspace?.id,
           activeWorkspace?.name,
-          activeWorkspace?.membersCount,
+          activeWorkspace?.accessCount,
           !!cleanedUpPath
         );
         toast.success("Collection updated!");
@@ -127,7 +127,7 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
           "mocksTable",
           activeWorkspace?.id,
           activeWorkspace?.name,
-          activeWorkspace?.membersCount,
+          activeWorkspace?.accessCount,
           !!cleanedUpPath
         );
         toast.success("Collection created!");
