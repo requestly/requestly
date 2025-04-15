@@ -2,5 +2,6 @@ const STORAGE = {};
 STORAGE.LOCAL_STORAGE = {};
 
 STORAGE.LOCAL_STORAGE.LAST_REMINDER_DATE = "last_reminder_date";
+STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY = "authTriggerSource";
 
 export default STORAGE;
