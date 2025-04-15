@@ -1,13 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Skeleton } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { VariablesList } from "../VariablesList/VariablesList";
+import { EnvironmentVariableTableRow, VariablesList } from "../VariablesList/VariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
-import { EnvironmentVariables } from "backend/environment/types";
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
 import { isEmpty } from "lodash";
-import { isGlobalEnvironment } from "../../utils";
+import { convertEnvironmentToMap, isGlobalEnvironment, mapToEnvironmentArray } from "../../utils";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 import { useGenericState } from "hooks/useGenericState";
@@ -20,18 +19,23 @@ interface EnvironmentViewProps {
 export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   const { isEnvironmentsLoading, getEnvironmentName, getEnvironmentVariables, setVariables } = useEnvironmentManager();
 
-  const pendingVariablesRef = useRef<EnvironmentVariables>(null);
+  const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
 
   const [searchValue, setSearchValue] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const environmentName = getEnvironmentName(envId);
-  const variables = pendingVariablesRef.current ?? getEnvironmentVariables(envId);
-  const { setPreview, setUnsaved, setTitle } = useGenericState();
+  const variables = useMemo(() => {
+    return pendingVariablesRef.current.length > 0
+      ? pendingVariablesRef.current
+      : mapToEnvironmentArray(getEnvironmentVariables(envId));
+  }, [getEnvironmentVariables, envId]);
 
-  const [pendingVariables, setPendingVariables] = useState<EnvironmentVariables>(variables);
+  const [pendingVariables, setPendingVariables] = useState<EnvironmentVariableTableRow[]>(variables);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
+
+  const { setPreview, setUnsaved, setTitle } = useGenericState();
 
   useEffect(() => {
     // To sync title for tabs opened from deeplinks
@@ -54,14 +58,15 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
     }
   }, [variables, isSaving]);
 
-  const handleSetPendingVariables = useCallback((variables: EnvironmentVariables) => {
+  const handleSetPendingVariables = useCallback((variables: EnvironmentVariableTableRow[]) => {
     setPendingVariables(variables);
     pendingVariablesRef.current = variables;
   }, []);
 
   const handleSaveVariables = async () => {
     setIsSaving(true);
-    return setVariables(envId, pendingVariables)
+    const variablesToSave = convertEnvironmentToMap(pendingVariables);
+    return setVariables(envId, variablesToSave)
       .then(() => {
         toast.success("Variables updated successfully");
         trackVariablesSaved({
@@ -108,7 +113,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
             {isExportModalOpen && (
               <ApiClientExportModal
                 exportType="environment"
-                environments={[{ id: envId, name: environmentName, variables }]}
+                environments={[{ id: envId, name: environmentName, variables: convertEnvironmentToMap(variables) }]}
                 isOpen={isExportModalOpen}
                 onClose={() => {
                   setIsExportModalOpen(false);
