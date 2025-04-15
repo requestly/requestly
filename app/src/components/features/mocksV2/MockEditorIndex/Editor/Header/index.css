@@ -15,11 +15,17 @@
 }
 .mock-editor-layout-header .header-left-section .rq-breadcrumb {
   gap: 1px;
+  margin-top: 22px;
+  margin-left: 2px;
+}
+
+.mock-editor-layout-header .header-left-section .rq-breadcrumb .rq-breadcrumb-item {
+  padding: 1px;
 }
 
 .mock-editor-layout-header .header-left-section .rq-breadcrumb-separator {
   padding: 4px 0px;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
 
 .mock-editor-layout-header .header-right-section {
