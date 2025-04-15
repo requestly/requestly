@@ -35,7 +35,7 @@ export const mockServerRoutes: RouteObject[] = [
         element: <MocksListScreen type={MockType.API} />,
         handle: {
           breadcrumb: {
-            label: "JSON file",
+            label: "All",
             navigateTo: PATHS.MOCK_SERVER_V2.RELATIVE,
           },
         },
@@ -66,7 +66,7 @@ export const mockServerRoutes: RouteObject[] = [
         element: <MocksListScreen type={MockType.FILE} />,
         handle: {
           breadcrumb: {
-            label: "JS/CSS file",
+            label: "All",
             navigateTo: PATHS.FILE_SERVER_V2.RELATIVE,
           },
         },
