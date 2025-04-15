@@ -32,8 +32,8 @@ export const DeleteRecordsModal: React.FC<Props> = ({ visible, records, toggleMo
     records.length === 1
       ? isMock(records[0])
         ? records[0]?.type === MockType.API
-          ? "Mock"
-          : "File"
+          ? "JSON file"
+          : "JS/CSS file"
         : "Collection"
       : "Records";
 
@@ -58,7 +58,7 @@ export const DeleteRecordsModal: React.FC<Props> = ({ visible, records, toggleMo
           onSuccess?.();
         })
         .catch((err) => {
-          Logger.log("Error while deleting mock", err);
+          Logger.log("Error while deleting File", err);
         });
     }
   };
