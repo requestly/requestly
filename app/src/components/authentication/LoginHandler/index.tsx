@@ -9,13 +9,12 @@ import { useNavigate } from "react-router-dom";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToHome } from "utils/RedirectionUtils";
+import STORAGE from "config/constants/sub/storage";
 
 const ARGUMENTS = {
   REDIRECT_URL: "redirectURL",
   ACCESS_TOKEN: "accessToken",
 };
-
-const AUTH_TRIGGER_SOURCE_LOCAL_KEY = "authTriggerSource";
 
 const LoginHandler: React.FC = () => {
   const navigate = useNavigate();
@@ -45,9 +44,11 @@ const LoginHandler: React.FC = () => {
 
   const postLoginActions = useCallback(() => {
     const redirectURLFromParam = params.get(ARGUMENTS.REDIRECT_URL);
-    const redirectURLFromLocalStorage = window.localStorage.getItem(AUTH_TRIGGER_SOURCE_LOCAL_KEY);
+    const redirectURLFromLocalStorage = window.localStorage.getItem(
+      STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY
+    );
     if (redirectURLFromLocalStorage) {
-      window.localStorage.removeItem(AUTH_TRIGGER_SOURCE_LOCAL_KEY);
+      window.localStorage.removeItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY);
     }
     redirect(redirectURLFromParam ?? redirectURLFromLocalStorage);
   }, [redirect, params]);

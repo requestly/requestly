@@ -7,11 +7,16 @@ import EmailAction from "components/misc/EmailAction";
 import VerifyEmail from "components/misc/VerifyEmail";
 import SignInViaEmailLink from "components/misc/SignInViaEmailLink";
 import LoginHandler from "components/authentication/LoginHandler";
+import { BStackAuthInitHandler } from "features/onboarding/screens/BStackAuthInitHandler/BStackAuthInitHandler";
 
 export const authRoutes: RouteObject[] = [
   {
     path: PATHS.AUTH.LOGIN.RELATIVE,
     element: <LoginHandler />,
+  },
+  {
+    path: PATHS.AUTH.START.RELATIVE,
+    element: <BStackAuthInitHandler />,
   },
   {
     path: PATHS.AUTH.SIGN_IN.RELATIVE,

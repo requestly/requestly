@@ -27,7 +27,7 @@ export const useGoogleAuthButton = ({ callback }: { callback: (credential: Crede
         size: "large",
         text: "continue_with",
         shape: "rectangular",
-        logo_alignment: "left",
+        logo_alignment: "right",
         width: 336,
         height: 40,
       });
