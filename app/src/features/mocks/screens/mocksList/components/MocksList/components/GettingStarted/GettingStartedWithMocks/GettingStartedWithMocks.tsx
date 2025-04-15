@@ -44,7 +44,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
         return "Create JS/CSS file";
 
       case MockType.API:
-        return "Create JSON File";
+        return "Create JSON file";
 
       default:
         return "Create new mock API"; //for mock picker modal
@@ -157,14 +157,6 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
                 className="helper-item"
               >
                 <FiArrowUpRight /> Browse docs
-              </a>
-              <a
-                href="https://www.youtube.com/watch?v=l2RxXQxQ3SI"
-                target="_blank"
-                rel="noreferrer"
-                className="helper-item"
-              >
-                <FiArrowUpRight /> See demo
               </a>
               <a
                 href="https://requestly.com/products/mock-server/"
