@@ -9,12 +9,12 @@ import { globalActions } from "store/slices/global/slice";
 
 const mocksSidebarItems = [
   {
-    title: "My Mock APIs",
+    title: "JSON Files",
     path: PATHS.MOCK_SERVER_V2.ABSOLUTE,
     icon: <IoDocumentTextOutline />,
   },
   {
-    title: "My Files",
+    title: "JS/CSS Files",
     path: PATHS.FILE_SERVER_V2.ABSOLUTE,
     icon: <MdOutlineUploadFile />,
   },
