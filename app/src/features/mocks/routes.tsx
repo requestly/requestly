@@ -53,6 +53,12 @@ export const mockServerRoutes: RouteObject[] = [
       {
         path: PATHS.MOCK_SERVER_V2.EDIT.RELATIVE,
         element: <ProtectedRoute component={MockEditorIndex} mockType={MockType.API} />,
+        handle: {
+          breadcrumb: {
+            label: "JSON file",
+            navigateTo: PATHS.MOCK_SERVER_V2.EDIT.RELATIVE,
+          },
+        },
       },
       // FILES V2
       {
