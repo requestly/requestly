@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Row, Layout, Col, Tooltip, Dropdown, Menu, Button } from "antd";
 import { ExperimentOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
-import { RQButton, RQBreadcrumb } from "lib/design-system/components";
+import { RQButton } from "lib/design-system/components";
+import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { MockType } from "components/features/mocksV2/types";
 import "./index.css";
 import { trackMockEditorClosed, trackMockPasswordGenerateClicked } from "modules/analytics/events/features/mocksV2";
@@ -90,7 +91,9 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
               }}
             />
           </Tooltip>
-          {!location.pathname.includes("rules") && <RQBreadcrumb />}
+          <Conditional condition={!location.pathname.includes("rules")}>
+            <RQBreadcrumb />
+          </Conditional>
         </Col>
         <Col className="header-right-section">
           <Conditional condition={!isEditorReadOnly}>
