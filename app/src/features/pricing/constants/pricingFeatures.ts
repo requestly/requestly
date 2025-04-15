@@ -24,7 +24,7 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "There is no limit on header modification rules, they only count as one towards your total rule",
         },
         {
-          title: "5 API Mocks",
+          title: "5 Files",
           enabled: true,
         },
         {
@@ -48,7 +48,7 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts + Standard HTTP Modifications",
         },
         {
-          title: "5 API Mocks",
+          title: "5 Files",
           enabled: true,
         },
         {
@@ -72,7 +72,7 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts + Standard HTTP Modifications",
         },
         {
-          title: "10 API Mocks",
+          title: "10 Files",
           enabled: true,
         },
         {
@@ -94,7 +94,7 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "Unlimited mocks",
+          title: "Unlimited Files",
           enabled: true,
         },
         {
