@@ -1,6 +1,6 @@
 {
   "name": "@requestly/browser-extension-mv3",
-  "version": "24.11.25",
+  "version": "25.4.15",
   "description": "Browser extension acting as Web Debugging Proxy to Intercept & Modify HTTP(s) Requests",
   "homepage": "https://requestly.com",
   "private": true,
