@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "Requestly - Free API Testing & Mocking Tool",
+    "message": "Requestly: HTTP Interception & Mocking Tool",
     "description": "Requestly browser extension name which is visible in Web Stores"
   },
   "extDesc": {
@@ -8,7 +8,7 @@
     "description": "Requestly browser extension description visible in Web Stores"
   },
   "extIconTitle": {
-    "message": "Requestly - Free API Testing & Mocking Tool",
+    "message": "Requestly: HTTP Interception & Mocking Tool",
     "description": "Tooltip text shown on hovering Requestly browser extension icon"
   }
 }
