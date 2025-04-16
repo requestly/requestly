@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getBillingTeamMemberById } from "store/features/billing/selectors";
-import { Col, Popover, Row } from "antd";
+import { Badge, Col, Popover, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { TeamPlanStatus } from "../../../../TeamPlanStatus";
 import { TeamPlanDetailsPopover } from "../TeamPlanDetailsPopover";
@@ -14,11 +14,49 @@ import { getLongFormatDateString } from "utils/DateTimeUtils";
 import { trackBillingTeamActionClicked } from "features/settings/analytics";
 import "./index.scss";
 import { TeamPlanActionButtons } from "./components/TeamPlanActionButtons";
+import { globalActions } from "store/slices/global/slice";
+
+const FreeTeamDetails: React.FC<{
+  isUserManager?: boolean;
+}> = ({ isUserManager }) => {
+  const dispatch = useDispatch();
+
+  return (
+    <>
+      <Col className="billing-teams-primary-card team-plan-details-card">
+        <Row className="team-plan-details-card-header" justify="space-between" align="middle">
+          <Col className="text-white text-bold display-flex items-center" style={{ gap: "8px" }}>
+            Your Plan <Badge count="Free" status="default" />
+          </Col>
+          {isUserManager && (
+            <RQButton
+              type="primary"
+              onClick={() => {
+                dispatch(
+                  globalActions.toggleActiveModal({
+                    modalName: "pricingModal",
+                    newValue: true,
+                    newProps: { selectedPlan: null, source: "billing_team" },
+                  })
+                );
+              }}
+              icon={<img src={"/assets/media/settings/upgrade.svg"} alt="upgrade" />}
+            >
+              Buy plan
+            </RQButton>
+          )}
+        </Row>
+      </Col>
+    </>
+  );
+};
 
 export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
   const user = useSelector(getUserAuthDetails);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeamDetails.id, billingTeamDetails.owner));
   const [isPlanDetailsPopoverVisible, setIsPlanDetailsPopoverVisible] = useState(false);
+
+  const isUserManager = billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
 
   const isAnnualPlan = useMemo(() => {
     const startDate = new Date(billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodStart * 1000);
@@ -32,7 +70,10 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
     billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodStart,
   ]);
 
-  const isUserManager = billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
+  // No active plan case
+  if (!billingTeamDetails.subscriptionDetails) {
+    return <FreeTeamDetails isUserManager={isUserManager} />;
+  }
 
   return (
     <>

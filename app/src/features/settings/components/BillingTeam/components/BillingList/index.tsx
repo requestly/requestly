@@ -21,7 +21,7 @@ export const BillingList = () => {
       const team = billingTeams.find((team) => {
         return user?.details?.profile?.uid in team.members;
       });
-      if (team?.id && user?.details?.planDetails?.type === PRICING.CHECKOUT.MODES.TEAM)
+      if (team?.id && user?.details?.planDetails?.type !== PRICING.CHECKOUT.MODES.INDIVIDUAL)
         navigate(`${APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE}/${team.id}`);
       else {
         // Show user plan details if the user is not a member of any billing team
