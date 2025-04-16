@@ -8,6 +8,16 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "25.4.15",
+    logs: [
+      "fix: xs-leak (#2905)",
+      "[ENGG-2547] Improvement: error messaging in API client (#2687)",
+      "Updated all documentation links (#2655)",
+      "fix: also add the original domain to the bypass list (#2609)",
+      "fix: Resource type not visible in Firefox Requestly Devtools (#2153)",
+    ],
+  },
+  {
     version: "24.11.25",
     logs: [
       "[ENGG-2394] [ENGG-2366] [ENGG-2367] fix: socket connection breaking between desktop app and extension",
