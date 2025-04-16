@@ -20,7 +20,7 @@ export const BStackAuthInitHandler = () => {
       redirectToHome(appMode, navigate);
       return;
     }
-    const redirectURI = params.current.get("redirectUri");
+    const redirectURI = params.current.get("redirectURI");
     if (redirectURI) {
       window.localStorage.setItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY, redirectURI);
       redirectToOAuthUrl(navigate);
