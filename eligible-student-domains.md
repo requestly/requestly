@@ -34,6 +34,7 @@ The following domains are eligible for the student programme:
     "duke.edu",
     "fau.de",
     "sch.gr",
-    "edu.co"
+    "edu.co",
+    "hunterschools.org"
   ]
 }

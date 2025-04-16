@@ -122,9 +122,10 @@ const MockPickerIndex: React.FC<Props> = ({
   } else if (showCreateMockState) {
     return (
       <div className="empty-mocks-picker-container">
-        <Typography.Title level={4}>{mockRecords?.length ? "Create mock" : "No mocks created yet"}</Typography.Title>
+        <Typography.Title level={4}>{mockRecords?.length ? "Create file" : "No files created yet"}</Typography.Title>
         <Typography.Text type="secondary" className="mt-8">
-          Create mocks APIs or files with different status codes, delay, response headers or body.
+          Host JSON, JS or CSS files on Requestly and serve them in place of original requests by setting up a Redirect
+          Rule.
         </Typography.Text>
         <Space className="mt-8">
           <AuthConfirmationPopover
@@ -138,7 +139,7 @@ const MockPickerIndex: React.FC<Props> = ({
               className="upload-btn"
               onClick={() => user?.loggedIn && uploadMockAction(mockType)}
             >
-              <span> Upload file/JSON</span>
+              <span> Upload File</span>
             </RQButton>
           </AuthConfirmationPopover>
           <AuthConfirmationPopover
@@ -147,7 +148,7 @@ const MockPickerIndex: React.FC<Props> = ({
             source={SOURCE.CREATE_FILE_MOCK}
           >
             <RQButton type="default" className="getting-started-btn" onClick={user?.loggedIn && handleCreateNewFile}>
-              Create new mock file
+              Create JS/CSS file
             </RQButton>
           </AuthConfirmationPopover>
           <AuthConfirmationPopover
@@ -156,7 +157,7 @@ const MockPickerIndex: React.FC<Props> = ({
             source={SOURCE.CREATE_API_MOCK}
           >
             <RQButton type="primary" className="getting-started-btn" onClick={user?.loggedIn && handleCreateNewMock}>
-              Create new mock API
+              Create JSON file
             </RQButton>
           </AuthConfirmationPopover>
         </Space>

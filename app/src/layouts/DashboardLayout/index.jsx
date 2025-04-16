@@ -6,7 +6,6 @@ import { isPricingPage, isGoodbyePage, isInvitePage, isSettingsPage } from "util
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
 import { Sidebar } from "./Sidebar";
-import MenuHeader from "./MenuHeader";
 // import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe, isDesktopMode } from "utils/AppUtils";
@@ -27,6 +26,7 @@ import { ViewOnlyModeBanner } from "components/common/ViewOnlyModeBanner/ViewOnl
 import { useCurrentWorkspaceUserRole } from "hooks";
 import { TeamRole } from "types";
 import { Conditional } from "components/common/Conditional";
+import { MenuHeader } from "./MenuHeader/MenuHeader";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
