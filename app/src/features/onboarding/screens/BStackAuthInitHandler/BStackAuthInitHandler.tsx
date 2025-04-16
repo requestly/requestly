@@ -23,8 +23,8 @@ export const BStackAuthInitHandler = () => {
     const redirectURI = params.current.get("redirectURI");
     if (redirectURI) {
       window.localStorage.setItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY, redirectURI);
-      redirectToOAuthUrl(navigate);
     }
+    redirectToOAuthUrl(navigate);
   }, [user.loggedIn, navigate, appMode]);
 
   return <PageLoader message="Redirecting ..." />;
