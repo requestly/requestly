@@ -8,6 +8,7 @@ import { globalActions } from "store/slices/global/slice";
 import {
   redirectToAccountDetails,
   redirectToBillingTeamSettings,
+  redirectToOAuthUrl,
   redirectToProfileSettings,
   redirectToSettings,
   redirectToWorkspaceSettings,
@@ -44,6 +45,7 @@ export default function HeaderUser() {
   // Component State
   const [loading, setLoading] = useState(false);
   const [hideUserDropDown, setHideUserDropdown] = useState(false);
+  const [isSignupButtonLoading, setIsSignupButtonLoading] = useState(false);
   const appFlavour = useMemo(() => getAppFlavour(), []);
 
   useEffect(() => {
@@ -134,6 +136,16 @@ export default function HeaderUser() {
     );
   }
 
+  const handleSignupClick = () => {
+    /*
+    TODO:
+    - Add feature flag
+    - open OAuth URL in web in case of desktop app
+    */
+    setIsSignupButtonLoading(true);
+    redirectToOAuthUrl(navigate);
+  };
+
   return hideUserDropDown ? null : (
     <section>
       {user.loggedIn && user?.details?.profile ? (
@@ -184,9 +196,10 @@ export default function HeaderUser() {
             Sign in
           </RQButton>
           <RQButton
+            loading={isSignupButtonLoading}
             type="primary"
             className="layout-header-signup-btn no-drag"
-            onClick={() => handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP)}
+            onClick={handleSignupClick}
           >
             Sign up
           </RQButton>
