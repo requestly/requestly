@@ -136,7 +136,10 @@ export const AuthScreen = () => {
   return (
     <div className="auth-screen-container">
       <div className="auth-screen-content">
-        <AuthModalHeader onHeaderButtonClick={handleOnHeaderButtonClick} />
+        <AuthModalHeader
+          hideCloseBtn={authScreenMode !== AuthScreenMode.MODAL}
+          onHeaderButtonClick={handleOnHeaderButtonClick}
+        />
         {isEmailVerificationScreenVisible ? (
           <OnboardingCard>
             <EmailVerificationCard
