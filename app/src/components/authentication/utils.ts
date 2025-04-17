@@ -1,4 +1,5 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import STORAGE from "config/constants/sub/storage";
 
 export enum AuthTypes {
   FORGOT_PASSWORD = "forgot-password",
@@ -75,4 +76,8 @@ export const getAuthErrorMessage = (authType: string, errorCode: string) => {
     default:
       return "An unexpected has occurred. Please write us to " + GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL;
   }
+};
+
+export const getDesktopAppAuthParams = () => {
+  return window.localStorage.getItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS);
 };

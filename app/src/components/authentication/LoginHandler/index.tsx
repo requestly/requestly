@@ -12,14 +12,11 @@ import { redirectToHome } from "utils/RedirectionUtils";
 import STORAGE from "config/constants/sub/storage";
 import { AuthMode } from "features/onboarding/screens/auth/types";
 import PATHS from "config/constants/sub/paths";
+import { getDesktopAppAuthParams } from "../utils";
 
 const ARGUMENTS = {
   REDIRECT_URL: "redirectURL",
   ACCESS_TOKEN: "accessToken",
-};
-
-const getDesktopAuthParams = () => {
-  return window.localStorage.getItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS);
 };
 
 const LoginHandler: React.FC = () => {
@@ -32,7 +29,7 @@ const LoginHandler: React.FC = () => {
   const params = useMemo(() => new URLSearchParams(window.location.search), []);
 
   const postLoginDesktopAppRedirect = useCallback(() => {
-    const desktopAuthParams = getDesktopAuthParams();
+    const desktopAuthParams = getDesktopAppAuthParams();
     const params = new URLSearchParams(desktopAuthParams);
 
     const authMode = params.get("auth_mode");
@@ -63,7 +60,7 @@ const LoginHandler: React.FC = () => {
   );
 
   const postLoginActions = useCallback(() => {
-    const desktopAuthParams = getDesktopAuthParams();
+    const desktopAuthParams = getDesktopAppAuthParams();
 
     if (desktopAuthParams) {
       postLoginDesktopAppRedirect();
@@ -93,7 +90,7 @@ const LoginHandler: React.FC = () => {
       redirectToHome(appMode, navigate);
     }
 
-    const desktopAuthParams = getDesktopAuthParams();
+    const desktopAuthParams = getDesktopAppAuthParams();
     if (!desktopAuthParams && user.loggedIn && !loginComplete) {
       const overrideCurrentAuth = window.confirm(
         "You will be logged out from the current session, do you want to continue?"
