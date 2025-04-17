@@ -15,26 +15,40 @@ import { AUTH_PROVIDERS } from "modules/analytics/constants";
 import { trackLoginAttemptedEvent, trackLoginSuccessEvent } from "modules/analytics/events/common/auth/login";
 import { redirectToDesktopApp, redirectToOAuthUrl, redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { AuthModal } from "features/onboarding/screens/auth/modals/AuthModal/AuthModal";
 import { AuthMode } from "features/onboarding/screens/auth/types";
 import { OnboardingCard } from "features/onboarding/components/OnboardingCard/OnboardingCard";
 import { AuthMessageCard } from "./AuthMessageCard/AuthMessageCard";
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import STORAGE from "config/constants/sub/storage";
+import { globalActions } from "store/slices/global/slice";
+import { getDesktopAppAuthParams } from "../utils";
 import "./desktopSignIn.scss";
 
 const DesktopSignIn = () => {
+  const dispatch = useDispatch();
   const [allDone, setAllDone] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const [authUser, setAuthUser] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const auth = getAuth(firebaseApp);
   const user = useSelector(getUserAuthDetails);
+
+  const toggleAuthModal = useCallback(
+    (value) => {
+      // TODO: add event source in modal props
+      dispatch(
+        globalActions.toggleActiveModal({
+          modalName: "authModal",
+          newValue: value,
+        })
+      );
+    },
+    [dispatch]
+  );
 
   useLayoutEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -53,99 +67,105 @@ const DesktopSignIn = () => {
       return;
     }
 
-    if (authMode === AuthMode.LOG_IN) {
-      setShowAuthModal(true);
-      return;
+    if (params.has("ot-auth-code")) {
+      toggleAuthModal(true);
+    } else {
+      redirectToWebAppHomePage(navigate);
     }
-  }, [navigate]);
+  }, [navigate, toggleAuthModal]);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setAuthUser(user);
-        setShowAuthModal(false);
+        toggleAuthModal(false);
         setLoading(false);
       }
     });
-  }, [auth]);
 
-  const handleDoneSignIn = useCallback(async (firebaseUser, isNewUser = false) => {
-    setLoading(true);
-    const params = new URLSearchParams(window.localStorage.getItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS));
-    const token = await firebaseUser?.getIdToken();
+    return () => {
+      unsubscribe();
+    };
+  }, [auth, toggleAuthModal]);
 
-    const code = params.get("ot-auth-code");
-    const source = params.get("source").replace(/ /g, "_");
+  const handleDoneSignIn = useCallback(
+    async (firebaseUser, isNewUser = false) => {
+      setLoading(true);
+      const params = new URLSearchParams(getDesktopAppAuthParams());
+      const token = await firebaseUser?.getIdToken();
 
-    const functions = getFunctions();
-    const createAuthToken = httpsCallable(functions, "auth-createAuthToken");
+      const code = params.get("ot-auth-code");
+      const source = params.get("source").replace(/ /g, "_");
 
-    let uid = firebaseUser?.uid || null;
-    let email = firebaseUser?.email || null;
+      const functions = getFunctions();
+      const createAuthToken = httpsCallable(functions, "auth-createAuthToken");
 
-    const emailType = await getEmailType(email);
+      let uid = firebaseUser?.uid || null;
+      let email = firebaseUser?.email || null;
 
-    createAuthToken({
-      oneTimeCode: code,
-      idToken: token,
-    })
-      .then(() => {
-        setAllDone(true);
-        if (isNewUser) {
-          trackSignUpAttemptedEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
-            source,
-          });
-          trackSignupSuccessEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
-            email,
-            uid,
-            email_type: emailType,
-            domain: email.split("@")[1],
-            source,
-          });
-        } else {
-          trackLoginAttemptedEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
-          });
-          trackLoginSuccessEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
-          });
-        }
-        redirectToDesktopApp();
+      const emailType = await getEmailType(email);
+
+      createAuthToken({
+        oneTimeCode: code,
+        idToken: token,
       })
-      .catch((err) => {
-        setIsError(true);
-        trackSignUpFailedEvent({
-          auth_provider: AUTH_PROVIDERS.GMAIL,
-          error_message: err.message,
-          source,
+        .then(() => {
+          setAllDone(true);
+          if (isNewUser) {
+            trackSignUpAttemptedEvent({
+              auth_provider: AUTH_PROVIDERS.GMAIL,
+              source,
+            });
+            trackSignupSuccessEvent({
+              auth_provider: AUTH_PROVIDERS.GMAIL,
+              email,
+              uid,
+              email_type: emailType,
+              domain: email.split("@")[1],
+              source,
+            });
+          } else {
+            trackLoginAttemptedEvent({
+              auth_provider: AUTH_PROVIDERS.GMAIL,
+            });
+            trackLoginSuccessEvent({
+              auth_provider: AUTH_PROVIDERS.GMAIL,
+            });
+          }
+          redirectToDesktopApp();
+        })
+        .catch((err) => {
+          setIsError(true);
+          trackSignUpFailedEvent({
+            auth_provider: AUTH_PROVIDERS.GMAIL,
+            error_message: err.message,
+            source,
+          });
+        })
+        .finally(() => {
+          toggleAuthModal(false);
+          setLoading(false);
+          window.localStorage.removeItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS);
         });
-      })
-      .finally(() => {
-        setShowAuthModal(false);
-        setLoading(false);
-        window.localStorage.removeItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS);
-      });
-  }, []);
+    },
+    [toggleAuthModal]
+  );
 
   useEffect(() => {
     if (allDone) {
       return;
     }
 
-    const params = new URLSearchParams(window.location.search);
-    if (params.has("ot-auth-code")) {
-      setShowAuthModal(true);
-
-      // triggering signin only if this was triggered properly from the desktop app
-      if (user.loggedIn && authUser) {
-        handleDoneSignIn(authUser);
-      }
-    } else {
-      redirectToWebAppHomePage(navigate);
+    // triggering signin only if this was triggered properly from the desktop app
+    const desktopAppAuthParams = getDesktopAppAuthParams();
+    if (!desktopAppAuthParams) {
+      return;
     }
-  }, [allDone, handleDoneSignIn, navigate, user.loggedIn, authUser]);
+
+    if (user.loggedIn && authUser) {
+      handleDoneSignIn(authUser);
+    }
+  }, [allDone, handleDoneSignIn, navigate, user.loggedIn, authUser, toggleAuthModal]);
 
   const renderLoading = (
     <AuthMessageCard showCloseBtn={false} icon={<FaSpinner className="icon-spin" />} message="Authenticating..." />
@@ -167,8 +187,6 @@ const DesktopSignIn = () => {
 
   return (
     <>
-      {loading ? null : <AuthModal isOpen={showAuthModal} />}
-
       <div className="desktop-app-auth-sign-in-container">
         <div className="desktop-app-auth-sign-in-content">
           <AuthModalHeader onHeaderButtonClick={() => redirectToWebAppHomePage(navigate)} />
