@@ -15,9 +15,9 @@ import { useAuthScreenContext } from "./context";
 import { EmailVerificationCard } from "./components/RQAuthCard/components/EmailVerificationCard/EmailVerificationCard";
 import { sendEmailLinkForSignin } from "actions/FirebaseActions";
 import { toast } from "utils/Toast";
-import "./authScreen.scss";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
+import "./authScreen.scss";
 
 export const AuthScreen = () => {
   const navigate = useNavigate();
