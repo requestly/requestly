@@ -21,7 +21,6 @@ export const BillingTeamContainer: React.FC = () => {
   const isBillingTeamsLoading = useSelector(getIsBillingTeamsLoading);
   const joinRequestAction = queryParams.get("joinRequestAction");
 
-  console.log("BillingTeamContainer", { billingTeams });
   const isBillingTeamSidebarVisible = useMemo(() => {
     if (
       billingTeams.length > 1 ||
