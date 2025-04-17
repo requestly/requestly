@@ -22,7 +22,7 @@ export const HelpCard: React.FC = () => {
       {
         icon: <AiOutlineYoutube className="help-card-react-icon" />,
         title: "See video tutorials",
-        href: "https://www.youtube.com/playlist?list=PLmHjVvTu_7ddFIIT9AkZ7p0lrC5gBuyb6",
+        href: "https://rqst.ly/http-rules-yt-tutorials",
       },
       {
         icon: <img src={"/assets/media/components/community.svg"} alt="community" />,
