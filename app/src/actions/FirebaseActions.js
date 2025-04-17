@@ -469,7 +469,7 @@ export const googleSignInDesktopApp = (callback, MODE, source, oneTimeCode) => {
     // TODO: refactor - indicates triggered from new auth flow
     if (oneTimeCode) {
       desktopSignInAuthUrl = new URL(desktopSignInAuthUrl);
-      desktopSignInAuthUrl.searchParams.append("auth_source", "desktop");
+      desktopSignInAuthUrl.searchParams.append("auth_mode", MODE);
       desktopSignInAuthUrl = desktopSignInAuthUrl.toString();
     }
 
