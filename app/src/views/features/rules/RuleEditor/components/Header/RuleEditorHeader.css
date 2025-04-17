@@ -52,6 +52,7 @@
   justify-content: flex-end;
   column-gap: 8px;
   flex-wrap: wrap;
+  margin-left: -8px;
 }
 
 .rule-editor-back-btn {
