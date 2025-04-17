@@ -56,7 +56,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
       <div className="onboarding-card-title">Sign in to your account</div>
       <div style={{ marginTop: "16px" }}>
         <AuthFormInput
-          placeholder="example@work.com"
+          placeholder="name@company.com"
           label="Your work email"
           autoFocus
           value={email}

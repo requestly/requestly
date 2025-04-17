@@ -78,7 +78,7 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
         </RQButton>
         {authProviders.includes(AuthProvider.GOOGLE) ? (
           <>
-            <span className="verify-email-card-body__description">Or</span>
+            <span className="verify-email-card-body__description">or</span>
             {googleAuthButton}
           </>
         ) : null}
