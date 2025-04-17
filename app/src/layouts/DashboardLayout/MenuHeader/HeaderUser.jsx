@@ -137,6 +137,11 @@ export default function HeaderUser() {
   }
 
   const handleSignupClick = () => {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
+      return;
+    }
+
     /*
     TODO:
     - Add feature flag
