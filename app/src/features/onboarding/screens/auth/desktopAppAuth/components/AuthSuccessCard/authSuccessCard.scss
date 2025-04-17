@@ -1,0 +1,28 @@
+.desktop-app-auth-success-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  svg.desktop-app-auth-success-icon {
+    color: var(--requestly-color-success);
+    width: 32px;
+    height: 32px;
+  }
+
+  .desktop-app-auth-success-description {
+    color: var(--requestly-color-text-default);
+    font-size: var(--font-size-md, 14px);
+    font-weight: 500;
+    line-height: 20px; /* 142.857% */
+    text-align: center;
+  }
+
+  .desktop-app-auth-success-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 32px;
+  }
+}
