@@ -18,8 +18,6 @@ interface AuthInProgressCardProp {
 export const AuthInProgressCard: React.FC<AuthInProgressCardProp> = ({ authMode, eventSource, onGoBackClick }) => {
   const [desktopSignInAuthUrl, setDesktopSignInAuthUrl] = useState("");
 
-  // console.log({ desktopSignInAuthUrl, authMode });
-
   useEffect(() => {
     if (!authMode) {
       return;
@@ -33,8 +31,8 @@ export const AuthInProgressCard: React.FC<AuthInProgressCardProp> = ({ authMode,
     desktopSignInAuthUrl.searchParams.append("auth_mode", updatedAuthMode);
 
     setDesktopSignInAuthUrl(desktopSignInAuthUrl.toString());
-    googleSignInDesktopApp(() => {}, updatedAuthMode, eventSource, oneTimeCode);
-  }, [authMode, eventSource]);
+    googleSignInDesktopApp(() => {}, updatedAuthMode, eventSource, oneTimeCode).then(onGoBackClick);
+  }, [authMode, eventSource, onGoBackClick]);
 
   const handleCopyUrlClick = () => {
     navigator.clipboard.writeText(desktopSignInAuthUrl);
