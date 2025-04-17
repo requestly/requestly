@@ -70,6 +70,7 @@ const DesktopSignIn = () => {
   }, [auth]);
 
   const handleDoneSignIn = useCallback(async (firebaseUser, isNewUser = false) => {
+    setLoading(true);
     const params = new URLSearchParams(window.localStorage.getItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS));
     const token = await firebaseUser?.getIdToken();
 
@@ -123,25 +124,26 @@ const DesktopSignIn = () => {
       })
       .finally(() => {
         setShowAuthModal(false);
+        setLoading(false);
         window.localStorage.removeItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS);
       });
   }, []);
 
   useEffect(() => {
-    if (!allDone) {
-      const params = new URLSearchParams(window.location.search);
-      if (params.has("ot-auth-code")) {
-        setShowAuthModal(true); // Toggle auth screen modal
+    if (allDone) {
+      return;
+    }
 
-        // triggering signin only if this was triggered properly from the desktop app
-        if (user.loggedIn && authUser) {
-          handleDoneSignIn(authUser);
-        } else {
-          setShowAuthModal(true);
-        }
-      } else {
-        redirectToWebAppHomePage(navigate);
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("ot-auth-code")) {
+      setShowAuthModal(true);
+
+      // triggering signin only if this was triggered properly from the desktop app
+      if (user.loggedIn && authUser) {
+        handleDoneSignIn(authUser);
       }
+    } else {
+      redirectToWebAppHomePage(navigate);
     }
   }, [allDone, handleDoneSignIn, navigate, user.loggedIn, authUser]);
 
@@ -165,7 +167,7 @@ const DesktopSignIn = () => {
 
   return (
     <>
-      <AuthModal isOpen={showAuthModal} />
+      {loading ? null : <AuthModal isOpen={showAuthModal} />}
 
       <div className="desktop-app-auth-sign-in-container">
         <div className="desktop-app-auth-sign-in-content">
