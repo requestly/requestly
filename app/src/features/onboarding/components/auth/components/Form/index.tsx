@@ -282,7 +282,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         </RQButton>
         {renderSignInWithApple()}
         <Divider plain className="onboarding-auth-form-divider">
-          Or
+          or
         </Divider>
 
         <AuthFormInput
@@ -430,7 +430,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       </RQButton>
       {renderSignInWithApple()}
       <Divider plain className="onboarding-auth-form-divider">
-        Or
+        or
       </Divider>
 
       <AuthFormInput

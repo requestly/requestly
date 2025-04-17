@@ -8,21 +8,25 @@ import APP_CONSTANTS from "config/constants";
 import { EnterEmailCard } from "./components/EnterEmailCard/EnterEmailCard";
 import { SignupWithBStackCard } from "./components/SignupWithBStackCard/SignupWithBStackCard";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
-import { AuthErrorCode, AuthProvider, AuthSyncMetadata } from "./types";
+import { AuthErrorCode, AuthProvider, AuthScreenMode, AuthSyncMetadata } from "./types";
 import { RQAuthCard } from "./components/RQAuthCard/RQAuthCard";
-import { redirectToOAuthUrl } from "utils/RedirectionUtils";
+import { redirectToHome, redirectToOAuthUrl } from "utils/RedirectionUtils";
 import { useAuthScreenContext } from "./context";
 import { EmailVerificationCard } from "./components/RQAuthCard/components/EmailVerificationCard/EmailVerificationCard";
 import { sendEmailLinkForSignin } from "actions/FirebaseActions";
 import { toast } from "utils/Toast";
+import { useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
 import "./authScreen.scss";
 
 export const AuthScreen = () => {
   const navigate = useNavigate();
+  const appMode = useSelector(getAppMode);
   const {
     email,
     authMode,
     authProviders,
+    authScreenMode,
     handleEmailChange,
     setAuthMode,
     setAuthProviders,
@@ -46,8 +50,12 @@ export const AuthScreen = () => {
   const handleSuccessfulLogin = useCallback(() => {
     setShowRQAuthForm(false);
     setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
-    toggleAuthModal();
-  }, [toggleAuthModal, setAuthMode]);
+    if (authScreenMode === AuthScreenMode.MODAL) {
+      toggleAuthModal();
+    } else {
+      redirectToHome(appMode, navigate);
+    }
+  }, [toggleAuthModal, setAuthMode, appMode, navigate, authScreenMode]);
 
   const handleOnHeaderButtonClick = useCallback(() => {
     toggleAuthModal();
@@ -128,7 +136,10 @@ export const AuthScreen = () => {
   return (
     <div className="auth-screen-container">
       <div className="auth-screen-content">
-        <AuthModalHeader onHeaderButtonClick={handleOnHeaderButtonClick} />
+        <AuthModalHeader
+          hideCloseBtn={authScreenMode !== AuthScreenMode.MODAL}
+          onHeaderButtonClick={handleOnHeaderButtonClick}
+        />
         {isEmailVerificationScreenVisible ? (
           <OnboardingCard>
             <EmailVerificationCard

@@ -4,6 +4,7 @@ import { AuthScreen } from "../../AuthScreen";
 import { AuthScreenContextProvider } from "../../context";
 import APP_CONSTANTS from "config/constants";
 import "./authModal.scss";
+import { AuthScreenMode } from "../../types";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -21,7 +22,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, authMode = APP_CON
       wrapClassName="rq-auth-modal-wrapper"
       maskStyle={{ background: "#1a1a1a" }}
     >
-      <AuthScreenContextProvider initialAuthMode={authMode}>
+      <AuthScreenContextProvider initialAuthMode={authMode} screenMode={AuthScreenMode.MODAL}>
         <AuthScreen />
       </AuthScreenContextProvider>
     </Modal>
