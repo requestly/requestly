@@ -4,9 +4,9 @@ import { MdOutlineFileCopy } from "@react-icons/all-files/md/MdOutlineFileCopy";
 import { MdOutlineArrowBack } from "@react-icons/all-files/md/MdOutlineArrowBack";
 import { googleSignInDesktopApp } from "actions/FirebaseActions";
 import { v4 as uuidv4 } from "uuid";
-import PATHS from "config/constants/sub/paths";
 import { getDesktopSignInAuthPath } from "utils/PathUtils";
 import { toast } from "utils/Toast";
+import { snakeCase } from "lodash";
 import "./authInProgressCard.scss";
 
 interface AuthInProgressCardProp {
@@ -16,27 +16,24 @@ interface AuthInProgressCardProp {
 }
 
 export const AuthInProgressCard: React.FC<AuthInProgressCardProp> = ({ authMode, eventSource, onGoBackClick }) => {
-  const [desktopSignInAuthUrl, setDesktopSignInAuthUrl] = useState(
-    `${window.location.origin}${PATHS.AUTH.DEKSTOP_SIGN_IN.ABSOLUTE}?auth_source=desktop`
-  );
+  const [desktopSignInAuthUrl, setDesktopSignInAuthUrl] = useState("");
 
-  console.log({ desktopSignInAuthUrl });
+  // console.log({ desktopSignInAuthUrl, authMode });
 
   useEffect(() => {
     if (!authMode) {
       return;
     }
 
-    if (!eventSource) {
-      return;
-    }
-
     const oneTimeCode = uuidv4();
+    const updatedAuthMode = snakeCase(authMode).toLowerCase();
     const baseUrl = `${window.location.origin}${getDesktopSignInAuthPath(oneTimeCode, eventSource)}`;
+
     const desktopSignInAuthUrl = new URL(baseUrl);
-    desktopSignInAuthUrl.searchParams.append("auth_source", "desktop");
+    desktopSignInAuthUrl.searchParams.append("auth_mode", updatedAuthMode);
+
     setDesktopSignInAuthUrl(desktopSignInAuthUrl.toString());
-    googleSignInDesktopApp(() => {}, authMode, eventSource, oneTimeCode);
+    googleSignInDesktopApp(() => {}, updatedAuthMode, eventSource, oneTimeCode);
   }, [authMode, eventSource]);
 
   const handleCopyUrlClick = () => {
