@@ -436,12 +436,13 @@ export const googleSignInDesktopApp = (callback, MODE, source) => {
     const oneTimeCodeRef = ref(database, `ot-auth-codes/${id}`);
     // Wait for changes
     onValue(oneTimeCodeRef, async (snapshot) => {
-      const authToken = snapshot.val();
-      if (!authToken) {
-        return;
+      const result = snapshot.val();
+      if (!result.authToken) {
+        const error = result.errorMessage || "Unable to authenticate";
+        reject(new Error(error));
       }
       const auth = getAuth(firebaseApp);
-      const credential = await signInWithCustomToken(auth, authToken);
+      const credential = await signInWithCustomToken(auth, result.authToken);
       // Remove auth code from db as we no longer need it
       remove(oneTimeCodeRef);
 
