@@ -33,7 +33,6 @@ export const AuthScreen = () => {
     toggleAuthModal,
     setIsSendEmailInProgress,
   } = useAuthScreenContext();
-
   const [authErrorCode, setAuthErrorCode] = useState<AuthErrorCode>(AuthErrorCode.NONE);
   const [showRQAuthForm, setShowRQAuthForm] = useState(false);
   const [isEmailVerificationScreenVisible, setIsEmailVerificationScreenVisible] = useState(false);

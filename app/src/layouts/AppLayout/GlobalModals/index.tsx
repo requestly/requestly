@@ -5,5 +5,15 @@ import { useSelector } from "react-redux";
 export const GlobalModals = () => {
   const activeModals = useSelector(getActiveModals);
 
-  return <>{activeModals.authModal.isActive ? <AuthModal isOpen={activeModals.authModal.isActive} /> : null}</>;
+  return (
+    <>
+      {activeModals.authModal.isActive ? (
+        <AuthModal
+          isOpen={activeModals.authModal.isActive}
+          authMode={activeModals.authModal.props.authMode}
+          eventSource={activeModals.authModal.props.eventSource}
+        />
+      ) : null}
+    </>
+  );
 };

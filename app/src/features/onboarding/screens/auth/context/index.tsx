@@ -17,6 +17,8 @@ interface AuthScreenContextType {
   setSSOProviderId: (id: string | null) => void;
   setIsSendEmailInProgress: (isInProgress: boolean) => void;
   toggleAuthModal: () => void;
+  eventSource: string;
+  setEventSource: (source: string) => void;
 }
 
 const AuthScreenContext = createContext<AuthScreenContextType | undefined>(undefined);
@@ -25,17 +27,20 @@ interface AuthScreenContextProviderProps {
   children: ReactNode;
   initialAuthMode?: string;
   screenMode: AuthScreenMode;
+  initialEventSource?: string;
 }
 
 export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps> = ({
   children,
   screenMode,
+  initialEventSource,
   initialAuthMode = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
 }) => {
   const dispatch = useDispatch();
 
   const [email, setEmail] = useState("");
   const [authMode, setAuthMode] = useState(initialAuthMode);
+  const [eventSource, setEventSource] = useState(initialEventSource);
   const [ssoProviderId, setSSOProviderId] = useState<string | null>(null);
   const [isSendEmailInProgress, setIsSendEmailInProgress] = useState(false);
   const [authProviders, setAuthProviders] = useState([]);
@@ -69,6 +74,8 @@ export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps>
     setIsSendEmailInProgress,
     setAuthProviders,
     toggleAuthModal,
+    eventSource,
+    setEventSource,
   };
 
   return <AuthScreenContext.Provider value={value}>{children}</AuthScreenContext.Provider>;
