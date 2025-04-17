@@ -10,10 +10,16 @@ import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToHome } from "utils/RedirectionUtils";
 import STORAGE from "config/constants/sub/storage";
+import { AuthMode } from "features/onboarding/screens/auth/types";
+import PATHS from "config/constants/sub/paths";
 
 const ARGUMENTS = {
   REDIRECT_URL: "redirectURL",
   ACCESS_TOKEN: "accessToken",
+};
+
+const getDesktopAuthParams = () => {
+  return window.localStorage.getItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS);
 };
 
 const LoginHandler: React.FC = () => {
@@ -24,6 +30,20 @@ const LoginHandler: React.FC = () => {
   const [loginComplete, setLoginComplete] = useState(false);
 
   const params = useMemo(() => new URLSearchParams(window.location.search), []);
+
+  const postLoginDesktopAppRedirect = useCallback(() => {
+    const desktopAuthParams = getDesktopAuthParams();
+    const params = new URLSearchParams(desktopAuthParams);
+
+    const authMode = params.get("auth_mode");
+    const oneTimeCode = params.get("ot-auth-code");
+
+    if (oneTimeCode && authMode === AuthMode.SIGN_UP) {
+      params.append("skip", "true");
+      navigate(`${PATHS.AUTH.DEKSTOP_SIGN_IN.ABSOLUTE}?${params.toString()}`);
+      return;
+    }
+  }, [navigate]);
 
   const redirect = useCallback(
     (url: string) => {
@@ -43,6 +63,13 @@ const LoginHandler: React.FC = () => {
   );
 
   const postLoginActions = useCallback(() => {
+    const desktopAuthParams = getDesktopAuthParams();
+
+    if (desktopAuthParams) {
+      postLoginDesktopAppRedirect();
+      return;
+    }
+
     const redirectURLFromParam = params.get(ARGUMENTS.REDIRECT_URL);
     const redirectURLFromLocalStorage = window.localStorage.getItem(
       STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY
@@ -51,7 +78,7 @@ const LoginHandler: React.FC = () => {
       window.localStorage.removeItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY);
     }
     redirect(redirectURLFromParam ?? redirectURLFromLocalStorage);
-  }, [redirect, params]);
+  }, [redirect, params, postLoginDesktopAppRedirect]);
 
   useEffect(() => {
     if (user.loggedIn && loginComplete) {
@@ -66,7 +93,8 @@ const LoginHandler: React.FC = () => {
       redirectToHome(appMode, navigate);
     }
 
-    if (user.loggedIn && !loginComplete) {
+    const desktopAuthParams = getDesktopAuthParams();
+    if (!desktopAuthParams && user.loggedIn && !loginComplete) {
       const overrideCurrentAuth = window.confirm(
         "You will be logged out from the current session, do you want to continue?"
       );
