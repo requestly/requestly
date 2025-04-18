@@ -4,11 +4,12 @@ import { AuthScreen } from "../../AuthScreen";
 import { AuthScreenContextProvider } from "../../context";
 import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { DesktopAppAuthScreen } from "../../desktopAppAuth/DesktopAppAuthScreen";
 import { AuthScreenMode } from "../../types";
 import "./authModal.scss";
+import { globalActions } from "store/slices/global/slice";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -22,6 +23,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   authMode = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
 }) => {
   const appMode = useSelector(getAppMode);
+  const dispatch = useDispatch();
+
+  const toggleModal = () => {
+    dispatch(globalActions.toggleActiveModal({ modalName: "authModal" }));
+  };
 
   return (
     <Modal
@@ -38,6 +44,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           initialEventSource={eventSource}
           initialAuthMode={authMode}
           screenMode={AuthScreenMode.MODAL}
+          toggleModal={toggleModal}
         >
           {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? <DesktopAppAuthScreen /> : <AuthScreen />}
         </AuthScreenContextProvider>

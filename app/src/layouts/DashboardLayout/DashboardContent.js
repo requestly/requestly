@@ -32,6 +32,7 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { RequestBot } from "features/requestBot";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { OnboardingModal, PersonaSurveyModal } from "features/onboarding";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -211,14 +212,16 @@ const DashboardContent = () => {
             />
           ) : null}
 
-          {onboardingVariation !== "variant1" &&
+          {/* {onboardingVariation !== "variant1" &&
             shouldShowOnboarding() &&
             !appOnboardingDetails.isOnboardingCompleted && (
               <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
-            )}
+            )} */}
           <RequestBillingTeamAccessReminder />
 
           <RequestBot isOpen={isRequestBotVisible} onClose={closeRequestBot} modelType={requestBotDetails?.modelType} />
+          <OnboardingModal />
+          <PersonaSurveyModal />
         </>
       )}
     </>

@@ -1,14 +1,12 @@
 import React, { useCallback } from "react";
 import AuthModalHeader from "features/onboarding/components/OnboardingHeader/OnboardingHeader";
-import { OnboardingCard } from "features/onboarding/components/OnboardingCard/OnboardingCard";
+import { OnboardingCard } from "features/onboarding/componentsV2/OnboardingCard/OnboardingCard";
 import { AuthInProgressCard } from "./components/AuthInProgress/AuthInProgressCard";
 import { useAuthScreenContext } from "../context";
 import "./desktopAppAuthScreen.scss";
 
 export const DesktopAppAuthScreen: React.FC = () => {
   const { authMode, eventSource, toggleAuthModal } = useAuthScreenContext();
-
-  // console.log({ authMode, eventSource });
 
   const handleOnHeaderButtonClick = useCallback(() => {
     toggleAuthModal();

@@ -276,3 +276,15 @@ export const updateBillingTeamNudgeLastSeenTs = (prevState: GlobalSliceState, ac
 export const updateIsSlackConnectButtonVisible = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.misc.persist.isSlackConnectButtonVisible = action.payload;
 };
+
+export const updateIsNewUser = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
+  prevState.onboarding.isNewUser = action.payload;
+};
+
+export const updateNewUserPersona = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
+  prevState.onboarding.userPersona = action.payload;
+};
+
+export const updateHasSeenOnboardingModal = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
+  prevState.onboarding.hasSeenOnboardingModal = action.payload;
+};

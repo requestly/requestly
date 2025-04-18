@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback } from "react";
 import APP_CONSTANTS from "config/constants";
 import { AuthProvider, AuthScreenMode } from "../types";
-import { useDispatch } from "react-redux";
-import { globalActions } from "store/slices/global/slice";
 
 interface AuthScreenContextType {
   email: string;
@@ -11,6 +9,7 @@ interface AuthScreenContextType {
   isSendEmailInProgress: boolean;
   authProviders: AuthProvider[];
   authScreenMode: AuthScreenMode;
+  isOnboardingScreenVisible: boolean;
   setAuthProviders: (providers: AuthProvider[]) => void;
   handleEmailChange: (email: string) => void;
   setAuthMode: (mode: string) => void;
@@ -19,6 +18,7 @@ interface AuthScreenContextType {
   toggleAuthModal: () => void;
   eventSource: string;
   setEventSource: (source: string) => void;
+  setIsOnboardingScreenVisible: (visible: boolean) => void;
 }
 
 const AuthScreenContext = createContext<AuthScreenContextType | undefined>(undefined);
@@ -28,6 +28,8 @@ interface AuthScreenContextProviderProps {
   initialAuthMode?: string;
   screenMode: AuthScreenMode;
   initialEventSource?: string;
+  isOnboarding?: boolean;
+  toggleModal?: () => void;
 }
 
 export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps> = ({
@@ -35,15 +37,16 @@ export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps>
   screenMode,
   initialEventSource,
   initialAuthMode = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+  isOnboarding = false,
+  toggleModal,
 }) => {
-  const dispatch = useDispatch();
-
   const [email, setEmail] = useState("");
   const [authMode, setAuthMode] = useState(initialAuthMode);
   const [eventSource, setEventSource] = useState(initialEventSource);
   const [ssoProviderId, setSSOProviderId] = useState<string | null>(null);
   const [isSendEmailInProgress, setIsSendEmailInProgress] = useState(false);
   const [authProviders, setAuthProviders] = useState([]);
+  const [isOnboardingScreenVisible, setIsOnboardingScreenVisible] = useState(isOnboarding);
 
   const handleEmailChange = useCallback(
     (value: string) => {
@@ -52,15 +55,6 @@ export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps>
     [setEmail]
   );
 
-  const toggleAuthModal = useCallback(() => {
-    dispatch(
-      globalActions.toggleActiveModal({
-        modalName: "authModal",
-        newValue: false,
-      })
-    );
-  }, [dispatch]);
-
   const value = {
     email,
     authMode,
@@ -68,14 +62,16 @@ export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps>
     isSendEmailInProgress,
     authProviders,
     authScreenMode: screenMode,
+    isOnboardingScreenVisible,
+    eventSource,
     handleEmailChange,
     setAuthMode,
     setSSOProviderId,
     setIsSendEmailInProgress,
     setAuthProviders,
-    toggleAuthModal,
-    eventSource,
+    toggleAuthModal: toggleModal,
     setEventSource,
+    setIsOnboardingScreenVisible,
   };
 
   return <AuthScreenContext.Provider value={value}>{children}</AuthScreenContext.Provider>;
