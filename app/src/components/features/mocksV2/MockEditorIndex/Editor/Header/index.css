@@ -23,6 +23,7 @@
 .mock-editor-layout-header .header-right-section {
   display: flex;
   gap: 12px;
+  align-items: center;
 }
 
 .mock-editor-layout-header .header-right-section .ant-btn-icon-only svg {
