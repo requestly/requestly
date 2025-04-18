@@ -123,14 +123,14 @@ const LINKS = {
   },
 
   /** TUTORIALS */
-  YOUTUBE_TUTORIALS: "https://www.youtube.com/playlist?list=PLmHjVvTu_7ddFIIT9AkZ7p0lrC5gBuyb6",
+  YOUTUBE_TUTORIALS: "https://rqst.ly/http-rules-yt-tutorials",
 
   TUTORIALS: {
-    REDIRECT_RULE: "https://youtu.be/lOt1kGKTq-w",
+    REDIRECT_RULE: "https://rqst.ly/redirect-rule-yt",
   },
 
   DEMO_VIDEOS: {
-    TEAM_WORKSPACES: "https://www.youtube.com/watch?v=xF5M_z4O5zg",
+    TEAM_WORKSPACES: "https://rqst.ly/team-collaboration-yt-tutorial",
   },
 
   DOWNLOAD_DESKTOP_APP: {

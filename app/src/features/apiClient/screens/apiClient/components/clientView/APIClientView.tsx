@@ -49,6 +49,7 @@ import { Conditional } from "components/common/Conditional";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import { useGenericState } from "hooks/useGenericState";
 import PATHS from "config/constants/sub/paths";
+import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -577,6 +578,24 @@ const APIClientView: React.FC<Props> = ({
                 ]}
               />
             </Conditional>
+
+            <RQButton
+              type="transparent"
+              icon={<IoMdCode />}
+              size="small"
+              className="api-client-view_get-code-btn"
+              onClick={() => {
+                apiClientExecutor.updateApiRecords(apiClientRecords);
+                apiClientExecutor.updateEntryDetails({
+                  entry: sanitizeEntry(entry),
+                  recordId: apiEntryDetails?.id,
+                  collectionId: apiEntryDetails?.collectionId,
+                });
+                setIsSnippetModalVisible(true);
+              }}
+            >
+              Get client code
+            </RQButton>
           </div>
 
           <div className="api-client-header">
