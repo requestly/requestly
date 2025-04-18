@@ -12,12 +12,14 @@ import "./authModal.scss";
 
 interface AuthModalProps {
   isOpen: boolean;
+  closable?: boolean;
   authMode?: string;
   eventSource: string;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
+  closable = true,
   eventSource = "",
   authMode = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
 }) => {
@@ -35,6 +37,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     >
       <>
         <AuthScreenContextProvider
+          isClosable={closable}
           initialEventSource={eventSource}
           initialAuthMode={authMode}
           screenMode={AuthScreenMode.MODAL}

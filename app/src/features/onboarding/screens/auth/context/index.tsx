@@ -18,6 +18,7 @@ interface AuthScreenContextType {
   setIsSendEmailInProgress: (isInProgress: boolean) => void;
   toggleAuthModal: () => void;
   eventSource: string;
+  isClosable: boolean;
   setEventSource: (source: string) => void;
 }
 
@@ -28,6 +29,7 @@ interface AuthScreenContextProviderProps {
   initialAuthMode?: string;
   screenMode: AuthScreenMode;
   initialEventSource?: string;
+  isClosable?: boolean;
 }
 
 export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps> = ({
@@ -35,6 +37,7 @@ export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps>
   screenMode,
   initialEventSource,
   initialAuthMode = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+  isClosable = true,
 }) => {
   const dispatch = useDispatch();
 
@@ -76,6 +79,7 @@ export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps>
     toggleAuthModal,
     eventSource,
     setEventSource,
+    isClosable,
   };
 
   return <AuthScreenContext.Provider value={value}>{children}</AuthScreenContext.Provider>;

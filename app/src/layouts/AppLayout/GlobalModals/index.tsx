@@ -12,6 +12,7 @@ export const GlobalModals = () => {
           isOpen={activeModals.authModal.isActive}
           authMode={activeModals.authModal.props.authMode}
           eventSource={activeModals.authModal.props.eventSource}
+          closable={activeModals.authModal.props.closable}
         />
       ) : null}
     </>
