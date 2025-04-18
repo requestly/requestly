@@ -38,7 +38,6 @@ const DashboardContent = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   //Global state
-  const isBrowserstackIntegrationEnabled = useFeatureIsOn("browserstack_integration");
   const dispatch = useDispatch();
   const activeModals = useSelector(getActiveModals);
   const incentiveActiveModals = useSelector(getIncentivizationActiveModals);
@@ -48,6 +47,7 @@ const DashboardContent = () => {
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
   const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
   const requestBotDetails = useSelector(getRequestBot);
+  const isBrowserstackIntegrationEnabled = useFeatureIsOn("browserstack_integration");
   const isRequestBotVisible = requestBotDetails?.isActive;
 
   const toggleIncentiveTasksListModal = () => {

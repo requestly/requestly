@@ -34,6 +34,7 @@ export const AuthScreen = () => {
     setAuthProviders,
     toggleAuthModal,
     setIsSendEmailInProgress,
+    isClosable,
   } = useAuthScreenContext();
   const [authErrorCode, setAuthErrorCode] = useState<AuthErrorCode>(AuthErrorCode.NONE);
   const [showRQAuthForm, setShowRQAuthForm] = useState(false);
@@ -138,7 +139,7 @@ export const AuthScreen = () => {
     <div className="auth-screen-container">
       <div className="auth-screen-content">
         <AuthModalHeader
-          hideCloseBtn={authScreenMode !== AuthScreenMode.MODAL}
+          hideCloseBtn={isClosable || authScreenMode !== AuthScreenMode.MODAL}
           onHeaderButtonClick={handleOnHeaderButtonClick}
         />
         {isEmailVerificationScreenVisible ? (

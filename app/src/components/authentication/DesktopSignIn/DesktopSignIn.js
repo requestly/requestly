@@ -46,6 +46,9 @@ const DesktopSignIn = () => {
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: value,
+          newProps: {
+            isClosable: false,
+          },
         })
       );
     },
