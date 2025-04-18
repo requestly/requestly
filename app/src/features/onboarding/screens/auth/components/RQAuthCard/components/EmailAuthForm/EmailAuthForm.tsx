@@ -60,6 +60,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ isLoading, onSendE
           placeholder="password"
           label="Password"
           value={password}
+          type="password"
           onValueChange={setPassword}
           onPressEnter={handleSignInWithEmailAndPassword}
         />
