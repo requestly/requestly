@@ -41,7 +41,7 @@ export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps>
   initialAuthMode = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
   isOnboarding = false,
   toggleModal,
-  isClosable = true,
+  isClosable = false,
 }) => {
   const [email, setEmail] = useState("");
   const [authMode, setAuthMode] = useState(initialAuthMode);
