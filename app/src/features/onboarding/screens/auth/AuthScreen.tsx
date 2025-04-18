@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import AuthModalHeader from "features/onboarding/components/OnboardingHeader/OnboardingHeader";
 import { CompaniesLogoBanner } from "features/onboarding/components/auth/components/CompaniesLogoBanner";
-import { OnboardingCard } from "features/onboarding/components/OnboardingCard/OnboardingCard";
+import { OnboardingCard } from "features/onboarding/componentsV2/OnboardingCard/OnboardingCard";
 import APP_CONSTANTS from "config/constants";
 import { EnterEmailCard } from "./components/EnterEmailCard/EnterEmailCard";
 import { SignupWithBStackCard } from "./components/SignupWithBStackCard/SignupWithBStackCard";
@@ -17,6 +17,7 @@ import { sendEmailLinkForSignin } from "actions/FirebaseActions";
 import { toast } from "utils/Toast";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
+import { NewSignupCard } from "./components/NewSignupCard/NewSignupCard";
 import "./authScreen.scss";
 
 export const AuthScreen = () => {
@@ -27,13 +28,14 @@ export const AuthScreen = () => {
     authMode,
     authProviders,
     authScreenMode,
+    isOnboardingScreenVisible,
     handleEmailChange,
     setAuthMode,
     setAuthProviders,
     toggleAuthModal,
     setIsSendEmailInProgress,
+    isClosable,
   } = useAuthScreenContext();
-
   const [authErrorCode, setAuthErrorCode] = useState<AuthErrorCode>(AuthErrorCode.NONE);
   const [showRQAuthForm, setShowRQAuthForm] = useState(false);
   const [isEmailVerificationScreenVisible, setIsEmailVerificationScreenVisible] = useState(false);
@@ -137,7 +139,7 @@ export const AuthScreen = () => {
     <div className="auth-screen-container">
       <div className="auth-screen-content">
         <AuthModalHeader
-          hideCloseBtn={authScreenMode !== AuthScreenMode.MODAL}
+          hideCloseBtn={isClosable || authScreenMode !== AuthScreenMode.MODAL}
           onHeaderButtonClick={handleOnHeaderButtonClick}
         />
         {isEmailVerificationScreenVisible ? (
@@ -164,25 +166,31 @@ export const AuthScreen = () => {
           </OnboardingCard>
         ) : (
           <>
-            <div className="w-full">
-              {authErrorMessage.length ? (
-                <div className="auth-screen-error-message">
-                  <MdOutlineInfo />
-                  <span>{authErrorMessage}</span>
+            {isOnboardingScreenVisible ? (
+              <NewSignupCard />
+            ) : (
+              <>
+                <div className="w-full">
+                  {authErrorMessage.length ? (
+                    <div className="auth-screen-error-message">
+                      <MdOutlineInfo />
+                      <span>{authErrorMessage}</span>
+                    </div>
+                  ) : null}
+                  <OnboardingCard>
+                    {authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN ? (
+                      <EnterEmailCard
+                        onEmailChange={handleEmailChange}
+                        onAuthSyncVerification={handlePostAuthSyncVerification}
+                      />
+                    ) : (
+                      <SignupWithBStackCard onBackButtonClick={handleOnBackClick} />
+                    )}
+                  </OnboardingCard>
                 </div>
-              ) : null}
-              <OnboardingCard>
-                {authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN ? (
-                  <EnterEmailCard
-                    onEmailChange={handleEmailChange}
-                    onAuthSyncVerification={handlePostAuthSyncVerification}
-                  />
-                ) : (
-                  <SignupWithBStackCard onBackButtonClick={handleOnBackClick} />
-                )}
-              </OnboardingCard>
-            </div>
-            {authModeToggleText}
+                {authModeToggleText}
+              </>
+            )}
           </>
         )}
       </div>

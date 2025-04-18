@@ -32,6 +32,11 @@ export interface GlobalSliceState {
     createdWorkspace: any;
     isOnboardingCompleted: boolean;
   };
+  onboarding: {
+    hasSeenOnboardingModal: boolean;
+    isNewUser: boolean;
+    userPersona: string | null;
+  };
   misc: {
     persist: {
       isOrgBannerDismissed: boolean;

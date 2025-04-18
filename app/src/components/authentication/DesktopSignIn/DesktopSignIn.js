@@ -1,176 +1,206 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { FaCheck } from "@react-icons/all-files/fa/FaCheck";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { FaExclamationCircle } from "@react-icons/all-files/fa/FaExclamationCircle";
 import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
-import { Container, Row, Col, Card, CardBody } from "reactstrap";
-// Firebase
-// import firebase from "../../../firebase";
 import firebaseApp from "../../../firebase";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import {
-  getAdditionalUserInfo,
-  getAuth,
-  getRedirectResult,
-  GoogleAuthProvider,
-  signInWithRedirect,
-} from "firebase/auth";
-import Jumbotron from "components/bootstrap-legacy/jumbotron";
-//UTILS
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import AuthModalHeader from "features/onboarding/components/OnboardingHeader/OnboardingHeader";
 import { getEmailType } from "utils/mailCheckerUtils";
-//EVENTS
 import {
   trackSignupSuccessEvent,
   trackSignUpAttemptedEvent,
   trackSignUpFailedEvent,
 } from "modules/analytics/events/common/auth/signup";
-//CONSTANTS
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
 import { trackLoginAttemptedEvent, trackLoginSuccessEvent } from "modules/analytics/events/common/auth/login";
-import { redirectToDesktopApp, redirectToWebAppHomePage } from "utils/RedirectionUtils";
+import { redirectToDesktopApp, redirectToOAuthUrl, redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { AuthMode } from "features/onboarding/screens/auth/types";
+import { OnboardingCard } from "features/onboarding/componentsV2/OnboardingCard/OnboardingCard";
+import { AuthMessageCard } from "./AuthMessageCard/AuthMessageCard";
+import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
+import STORAGE from "config/constants/sub/storage";
+import { globalActions } from "store/slices/global/slice";
+import { getDesktopAppAuthParams } from "../utils";
+import "./desktopSignIn.scss";
 
 const DesktopSignIn = () => {
-  //Component State
+  const dispatch = useDispatch();
   const [allDone, setAllDone] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [authUser, setAuthUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
+  const auth = getAuth(firebaseApp);
+  const user = useSelector(getUserAuthDetails);
 
-  const handleDoneSignIn = useCallback(async (firebaseUser, isNewUser = false) => {
-    const params = new URLSearchParams(window.location.search);
-    const token = await firebaseUser?.getIdToken();
-    const code = params.get("ot-auth-code");
-    const source = params.get("source").replace(/ /g, "_");
-    const functions = getFunctions();
-    const createAuthToken = httpsCallable(functions, "auth-createAuthToken");
+  const params = useMemo(() => new URLSearchParams(window.location.search), []);
 
-    let uid = firebaseUser?.uid || null;
-    let email = firebaseUser?.email || null;
+  const toggleAuthModal = useCallback(
+    (value) => {
+      // TODO: add event source in modal props
+      dispatch(
+        globalActions.toggleActiveModal({
+          modalName: "authModal",
+          newValue: value,
+          newProps: {
+            isClosable: false,
+          },
+        })
+      );
+    },
+    [dispatch]
+  );
 
-    const emailType = await getEmailType(email);
-
-    createAuthToken({
-      oneTimeCode: code,
-      idToken: token,
-    })
-      .then(() => {
-        setAllDone(true);
-        if (isNewUser) {
-          trackSignUpAttemptedEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
-            source,
-          });
-          trackSignupSuccessEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
-            email,
-            uid,
-            email_type: emailType,
-            domain: email.split("@")[1],
-            source,
-          });
-        } else {
-          trackLoginAttemptedEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
-          });
-          trackLoginSuccessEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
-          });
-        }
-        // window.close();
-        redirectToDesktopApp();
-      })
-      .catch((err) => {
-        setIsError(true);
-        trackSignUpFailedEvent({
-          auth_provider: AUTH_PROVIDERS.GMAIL,
-          error_message: err.message,
-          source,
-        });
-        // window.close();
-      });
-  }, []);
-
-  const renderLoading = () => {
-    if (isError) {
-      return renderErrorMessage();
-    } else if (allDone) {
-      return renderAllDone();
+  useLayoutEffect(() => {
+    // Avoids cyclic loop, if we are comming from "/login" ie sign up flow
+    if (params.has("skip")) {
+      setLoading(true);
+      return;
     }
-    return (
-      <h4 className="display-6 desktop-auth-message">
-        <FaSpinner className="icon-spin mr-2" />
-        Authenticating
-      </h4>
-    );
-  };
 
-  const renderAllDone = () => {
-    return (
-      <h4 className="display-6 desktop-auth-message">
-        <FaCheck className="mr-2" />
-        You're now logged into the desktop app. This window can now be safely closed.
-      </h4>
-    );
-  };
+    window.localStorage.setItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS, params.toString());
+    const authMode = params.get("auth_mode");
 
-  const renderErrorMessage = () => {
-    return (
-      <h4 className="display-6 desktop-auth-message">
-        <FaExclamationCircle className="mr-2" />
-        An unexpected error has occurred. Please close this window and try logging in again
-      </h4>
-    );
-  };
+    if (authMode === AuthMode.SIGN_UP) {
+      redirectToOAuthUrl(navigate);
+      return;
+    }
+
+    if (params.has("ot-auth-code")) {
+      toggleAuthModal(true);
+    } else {
+      redirectToWebAppHomePage(navigate);
+    }
+  }, [navigate, toggleAuthModal, params]);
 
   useEffect(() => {
-    if (!allDone) {
-      const params = new URLSearchParams(window.location.search);
-      if (params.has("ot-auth-code")) {
-        // triggering signin only if this was triggered properly from the desktop app
-        const auth = getAuth(firebaseApp);
-        getRedirectResult(auth).then(async (result) => {
-          if (result && result.user) {
-            let isNewUser = getAdditionalUserInfo(result).isNewUser || false;
-            // User just signed in. we can get the result.credential or result.user
-            await handleDoneSignIn(result.user, isNewUser);
-          } else if (auth.currentUser) {
-            // User already signed in.
-            await handleDoneSignIn(auth.currentUser);
-          } else {
-            // No user signed in, update your UI, show the sign in button.
-            // Initiate Google Sign-in for desktop app.
-            // At this state, a unique code has already been generated by the desktop app, passed here as a qury param
-            const provider = new GoogleAuthProvider();
-            signInWithRedirect(auth, provider);
-          }
-        });
-      } else {
-        redirectToWebAppHomePage(navigate);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setAuthUser(user);
+        toggleAuthModal(false);
+        setLoading(false);
       }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [auth, toggleAuthModal]);
+
+  const handleDoneSignIn = useCallback(
+    async (firebaseUser) => {
+      setLoading(true);
+      const desktopAuthParams = new URLSearchParams(getDesktopAppAuthParams());
+      const token = await firebaseUser?.getIdToken();
+
+      const isNewUser = params.get("isNewUser");
+
+      const code = desktopAuthParams.get("ot-auth-code");
+      const source = desktopAuthParams.get("source").replace(/ /g, "_");
+
+      const functions = getFunctions();
+      const createAuthToken = httpsCallable(functions, "auth-createAuthToken");
+
+      let uid = firebaseUser?.uid || null;
+      let email = firebaseUser?.email || null;
+
+      const emailType = await getEmailType(email);
+
+      createAuthToken({
+        oneTimeCode: code,
+        idToken: token,
+      })
+        .then(() => {
+          setAllDone(true);
+          if (isNewUser) {
+            trackSignUpAttemptedEvent({
+              auth_provider: AUTH_PROVIDERS.GMAIL,
+              source,
+            });
+            trackSignupSuccessEvent({
+              auth_provider: AUTH_PROVIDERS.GMAIL,
+              email,
+              uid,
+              email_type: emailType,
+              domain: email.split("@")[1],
+              source,
+            });
+          } else {
+            trackLoginAttemptedEvent({
+              auth_provider: AUTH_PROVIDERS.GMAIL,
+            });
+            trackLoginSuccessEvent({
+              auth_provider: AUTH_PROVIDERS.GMAIL,
+            });
+          }
+          redirectToDesktopApp(`?isNewUser=${isNewUser}`);
+        })
+        .catch((err) => {
+          setIsError(true);
+          trackSignUpFailedEvent({
+            auth_provider: AUTH_PROVIDERS.GMAIL,
+            error_message: err.message,
+            source,
+          });
+        })
+        .finally(() => {
+          toggleAuthModal(false);
+          setLoading(false);
+          window.localStorage.removeItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS);
+        });
+    },
+    [toggleAuthModal, params]
+  );
+
+  useEffect(() => {
+    if (allDone) {
+      return;
     }
-  }, [allDone, handleDoneSignIn, navigate]);
+
+    // triggering signin only if this was triggered properly from the desktop app
+    const desktopAppAuthParams = getDesktopAppAuthParams();
+    if (!desktopAppAuthParams) {
+      return;
+    }
+
+    if (user.loggedIn && authUser) {
+      handleDoneSignIn(authUser);
+    }
+  }, [allDone, handleDoneSignIn, navigate, user.loggedIn, authUser, toggleAuthModal]);
+
+  const renderLoading = (
+    <AuthMessageCard showCloseBtn={false} icon={<FaSpinner className="icon-spin" />} message="Authenticating..." />
+  );
+
+  const renderErrorMessage = (
+    <AuthMessageCard
+      icon={<FaExclamationCircle />}
+      message="An unexpected error has occurred. Please close this window and try logging in again."
+    />
+  );
+
+  const renderAllDone = (
+    <AuthMessageCard
+      icon={<MdOutlineCheckCircle style={{ color: "var(--requestly-color-success)" }} />}
+      message=" You are now logged into the Requestly desktop app. You can safely close this window."
+    />
+  );
 
   return (
-    <React.Fragment>
-      {/* Page content */}
-      <Container className=" mt--5" fluid>
-        {/* Table */}
-        <Row>
-          <div className=" col">
-            <Card className=" shadow">
-              <CardBody>
-                <Row>
-                  <Col lg="12" md="12" className="text-center">
-                    <Jumbotron style={{ background: "transparent" }} className="text-center">
-                      {renderLoading()}
-                    </Jumbotron>
-                  </Col>
-                </Row>
-              </CardBody>
-            </Card>
-          </div>
-        </Row>
-      </Container>
-    </React.Fragment>
+    <>
+      <div className="desktop-app-auth-sign-in-container">
+        <div className="desktop-app-auth-sign-in-content">
+          <AuthModalHeader onHeaderButtonClick={() => redirectToWebAppHomePage(navigate)} />
+          <OnboardingCard>
+            {loading ? renderLoading : isError ? renderErrorMessage : allDone ? renderAllDone : renderLoading}
+          </OnboardingCard>
+        </div>
+      </div>
+    </>
   );
 };
 
