@@ -25,7 +25,7 @@ import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLink
 import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 import { RequestBillingTeamAccessReminder } from "features/settings";
-import { useFeatureValue } from "@growthbook/growthbook-react";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { IncentiveTaskCompletedModal, IncentiveTasksListModal } from "features/incentivization";
 import { getIncentivizationActiveModals } from "store/features/incentivization/selectors";
 import { incentivizationActions } from "store/features/incentivization/slice";
@@ -38,6 +38,7 @@ const DashboardContent = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   //Global state
+  const isBrowserstackIntegrationEnabled = useFeatureIsOn("browserstack_integration");
   const dispatch = useDispatch();
   const activeModals = useSelector(getActiveModals);
   const incentiveActiveModals = useSelector(getIncentivizationActiveModals);
@@ -211,17 +212,24 @@ const DashboardContent = () => {
               {...activeModals.pricingModal.props}
             />
           ) : null}
+          {isBrowserstackIntegrationEnabled ? (
+            <>
+              <OnboardingModal />
+              <PersonaSurveyModal />
+            </>
+          ) : (
+            <>
+              {onboardingVariation !== "variant1" &&
+                shouldShowOnboarding() &&
+                !appOnboardingDetails.isOnboardingCompleted && (
+                  <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
+                )}{" "}
+            </>
+          )}
 
-          {/* {onboardingVariation !== "variant1" &&
-            shouldShowOnboarding() &&
-            !appOnboardingDetails.isOnboardingCompleted && (
-              <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
-            )} */}
           <RequestBillingTeamAccessReminder />
 
           <RequestBot isOpen={isRequestBotVisible} onClose={closeRequestBot} modelType={requestBotDetails?.modelType} />
-          <OnboardingModal />
-          <PersonaSurveyModal />
         </>
       )}
     </>

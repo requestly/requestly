@@ -8,9 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { DesktopAppAuthScreen } from "../../desktopAppAuth/DesktopAppAuthScreen";
 import { AuthScreenMode } from "../../types";
-import "./authModal.scss";
 import { globalActions } from "store/slices/global/slice";
-
+import "./authModal.scss";
 interface AuthModalProps {
   isOpen: boolean;
   authMode?: string;

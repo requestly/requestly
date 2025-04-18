@@ -26,6 +26,7 @@ import { isSafariBrowser } from "actions/ExtensionActions";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -35,6 +36,7 @@ export default function HeaderUser() {
   const user = useSelector(getUserAuthDetails);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const appMode = useSelector(getAppMode);
+  const isBrowserstackIntegrationEnabled = useFeatureIsOn("browserstack_integration");
 
   const userName = user.loggedIn ? user?.details?.profile?.displayName ?? "User" : null;
   const userPhoto =
@@ -114,8 +116,8 @@ export default function HeaderUser() {
         modalName: "authModal",
         newValue: true,
         newProps: {
-          redirectURL: window.location.href,
           authMode,
+          redirectURL: window.location.href,
           eventSource: SOURCE.NAVBAR,
         },
       })
@@ -142,13 +144,13 @@ export default function HeaderUser() {
       return;
     }
 
-    /*
-    TODO:
-    - Add feature flag
-    - open OAuth URL in web in case of desktop app
-    */
-    setIsSignupButtonLoading(true);
-    redirectToOAuthUrl(navigate);
+    if (isBrowserstackIntegrationEnabled) {
+      setIsSignupButtonLoading(true);
+      redirectToOAuthUrl(navigate);
+      return;
+    } else {
+      handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
+    }
   };
 
   return hideUserDropDown ? null : (

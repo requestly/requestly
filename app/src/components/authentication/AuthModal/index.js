@@ -5,7 +5,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import APP_CONSTANTS from "../../../config/constants";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 import "./AuthModal.css";
-import { AuthScreen } from "features/onboarding/screens/auth/AuthScreen";
+import { AuthScreen } from "features/onboarding";
 
 const AuthModal = ({
   isOpen,
@@ -55,15 +55,14 @@ const AuthModal = ({
         width={670}
         maskClosable={false}
       >
-        {/* <AuthScreen
+        <AuthScreen
           isOpen={false}
           defaultAuthMode={authMode}
           source={eventSource}
           callback={callback}
           toggleAuthModal={toggle}
           warningMessage={warningMessage}
-        /> */}
-        <AuthScreen />
+        />
       </Modal>
     </>
   );

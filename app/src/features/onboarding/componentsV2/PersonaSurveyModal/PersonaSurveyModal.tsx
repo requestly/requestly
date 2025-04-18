@@ -8,9 +8,12 @@ import { TiArrowRight } from "@react-icons/all-files/ti/TiArrowRight";
 import { useRef, useState } from "react";
 import { globalActions } from "store/slices/global/slice";
 import "./personaSurveyModal.scss";
+import { useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
 
 export const PersonaSurveyModal = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const isNewUser = useSelector(getIsNewUser);
   const user = useSelector(getUserAuthDetails);
   const [selectedPersona, setSelectedPersona] = useState("Front-end developer");
@@ -30,6 +33,10 @@ export const PersonaSurveyModal = () => {
     dispatch(globalActions.updateNewUserPersona(selectedPersona));
     dispatch(globalActions.updateIsNewUser(false));
   };
+
+  if (location.pathname.includes(PATHS.AUTH.LOGIN.RELATIVE)) {
+    return null;
+  }
 
   if (!isNewUser) {
     return null;
