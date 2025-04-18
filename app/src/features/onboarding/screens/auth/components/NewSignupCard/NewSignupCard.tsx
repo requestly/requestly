@@ -3,21 +3,38 @@ import { OnboardingCard } from "features/onboarding/componentsV2/OnboardingCard/
 import { RQButton } from "lib/design-system-v2/components";
 import { useAuthScreenContext } from "../../context";
 import { getAppMode } from "store/selectors";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { redirectToOAuthUrl } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { globalActions } from "store/slices/global/slice";
+import APP_CONSTANTS from "config/constants";
 import "./newSignupCard.scss";
 
 export const NewSignupCard = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
 
   const { setIsOnboardingScreenVisible, toggleAuthModal } = useAuthScreenContext();
 
+  const handleAuthButtonClick = (authMode: string) => {
+    dispatch(
+      globalActions.toggleActiveModal({
+        modalName: "authModal",
+        newValue: true,
+        newProps: {
+          redirectURL: window.location.href,
+          authMode,
+          eventSource: "new_sign_up_card", // TODO: @parth update the event source
+        },
+      })
+    );
+  };
+
   const handleCreateNewAccountClick = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      // TODO: Implement desktop app auth
+      handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
     } else {
       redirectToOAuthUrl(navigate);
     }
@@ -25,7 +42,7 @@ export const NewSignupCard = () => {
 
   const handleSignInClick = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      // TODO: Implement desktop app auth
+      handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
     } else {
       setIsOnboardingScreenVisible(false);
     }
