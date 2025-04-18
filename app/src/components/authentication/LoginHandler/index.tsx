@@ -4,15 +4,15 @@ import firebaseApp from "firebase";
 import { getAuth, signInWithCustomToken } from "firebase/auth";
 import Logger from "lib/logger";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToHome } from "utils/RedirectionUtils";
 import STORAGE from "config/constants/sub/storage";
-import { AuthMode } from "features/onboarding/screens/auth/types";
 import PATHS from "config/constants/sub/paths";
 import { getDesktopAppAuthParams } from "../utils";
+import { globalActions } from "store/slices/global/slice";
 
 const ARGUMENTS = {
   REDIRECT_URL: "redirectURL",
@@ -20,6 +20,7 @@ const ARGUMENTS = {
 };
 
 const LoginHandler: React.FC = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
@@ -27,20 +28,24 @@ const LoginHandler: React.FC = () => {
   const [loginComplete, setLoginComplete] = useState(false);
 
   const params = useMemo(() => new URLSearchParams(window.location.search), []);
+  const isNewUser = params.get("isNewUser") === "true";
 
   const postLoginDesktopAppRedirect = useCallback(() => {
-    const desktopAuthParams = getDesktopAppAuthParams();
-    const params = new URLSearchParams(desktopAuthParams);
+    const rawDesktopAuthParams = getDesktopAppAuthParams();
+    const desktopAuthParams = new URLSearchParams(rawDesktopAuthParams);
 
-    const authMode = params.get("auth_mode");
-    const oneTimeCode = params.get("ot-auth-code");
+    const authMode = desktopAuthParams.get("auth_mode");
+    const oneTimeCode = desktopAuthParams.get("ot-auth-code");
 
-    if (oneTimeCode && authMode === AuthMode.SIGN_UP) {
-      params.append("skip", "true");
-      navigate(`${PATHS.AUTH.DEKSTOP_SIGN_IN.ABSOLUTE}?${params.toString()}`);
+    if (oneTimeCode && authMode) {
+      if (isNewUser) {
+        desktopAuthParams.set("isNewUser", "true");
+      }
+      desktopAuthParams.append("skip", "true");
+      navigate(`${PATHS.AUTH.DEKSTOP_SIGN_IN.ABSOLUTE}?${desktopAuthParams.toString()}`);
       return;
     }
-  }, [navigate]);
+  }, [navigate, isNewUser]);
 
   const redirect = useCallback(
     (url: string) => {
@@ -90,8 +95,8 @@ const LoginHandler: React.FC = () => {
       redirectToHome(appMode, navigate);
     }
 
-    const desktopAuthParams = getDesktopAppAuthParams();
-    if (!desktopAuthParams && user.loggedIn && !loginComplete) {
+    const rawDesktopAuthParams = getDesktopAppAuthParams();
+    if (!rawDesktopAuthParams && user.loggedIn && !loginComplete) {
       const overrideCurrentAuth = window.confirm(
         "You will be logged out from the current session, do you want to continue?"
       );
@@ -100,11 +105,18 @@ const LoginHandler: React.FC = () => {
         return;
       }
     }
+    const desktopAuthParams = new URLSearchParams(rawDesktopAuthParams);
     const auth = getAuth(firebaseApp);
     signInWithCustomToken(auth, accessToken)
       .then((user) => {
         Logger.log("User logged in successfully", user);
         setLoginComplete(true);
+        /* Auth flow was triggered from web app, 
+        "auth_mode" param check is added to make sure persona modal is triggered only for web app
+        */
+        if (!desktopAuthParams.get("auth_mode") && isNewUser) {
+          dispatch(globalActions.updateIsNewUser(true));
+        }
       })
       .catch((error) => {
         Logger.error("Error signing in with custom token:", error);
@@ -112,7 +124,7 @@ const LoginHandler: React.FC = () => {
         // todo: setup error monitoring
         setLoginComplete(true);
       });
-  }, [params, postLoginActions, user.loggedIn, loginComplete, navigate, appMode]);
+  }, [params, postLoginActions, user.loggedIn, loginComplete, navigate, appMode, dispatch, isNewUser]);
 
   return <PageLoader message="Logging in..." />;
 };

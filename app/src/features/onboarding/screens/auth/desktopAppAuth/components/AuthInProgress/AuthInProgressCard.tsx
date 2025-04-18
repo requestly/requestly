@@ -8,6 +8,9 @@ import { getDesktopSignInAuthPath } from "utils/PathUtils";
 import { toast } from "utils/Toast";
 import { snakeCase } from "lodash";
 import "./authInProgressCard.scss";
+import { useLocation } from "react-router-dom";
+import { globalActions } from "store/slices/global/slice";
+import { useDispatch } from "react-redux";
 
 interface AuthInProgressCardProp {
   authMode: string;
@@ -16,6 +19,8 @@ interface AuthInProgressCardProp {
 }
 
 export const AuthInProgressCard: React.FC<AuthInProgressCardProp> = ({ authMode, eventSource, onGoBackClick }) => {
+  const dispatch = useDispatch();
+  const location = useLocation();
   const [desktopSignInAuthUrl, setDesktopSignInAuthUrl] = useState("");
 
   useEffect(() => {
@@ -31,8 +36,15 @@ export const AuthInProgressCard: React.FC<AuthInProgressCardProp> = ({ authMode,
     desktopSignInAuthUrl.searchParams.append("auth_mode", updatedAuthMode);
 
     setDesktopSignInAuthUrl(desktopSignInAuthUrl.toString());
-    googleSignInDesktopApp(() => {}, updatedAuthMode, eventSource, oneTimeCode).then(onGoBackClick);
-  }, [authMode, eventSource, onGoBackClick]);
+    googleSignInDesktopApp(() => {}, updatedAuthMode, eventSource, oneTimeCode).then(() => {
+      const searchParams = new URLSearchParams(location.search);
+      const isNewUser = searchParams.get("isNewUser") === "true";
+      if (isNewUser) {
+        dispatch(globalActions.updateIsNewUser(true));
+      }
+      onGoBackClick();
+    });
+  }, [authMode, eventSource, onGoBackClick, location.search, dispatch]);
 
   const handleCopyUrlClick = () => {
     navigator.clipboard.writeText(desktopSignInAuthUrl);

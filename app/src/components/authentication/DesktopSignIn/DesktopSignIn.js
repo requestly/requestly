@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { FaExclamationCircle } from "@react-icons/all-files/fa/FaExclamationCircle";
 import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import firebaseApp from "../../../firebase";
@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { AuthMode } from "features/onboarding/screens/auth/types";
-import { OnboardingCard } from "features/onboarding/components/OnboardingCard/OnboardingCard";
+import { OnboardingCard } from "features/onboarding/componentsV2/OnboardingCard/OnboardingCard";
 import { AuthMessageCard } from "./AuthMessageCard/AuthMessageCard";
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import STORAGE from "config/constants/sub/storage";
@@ -37,6 +37,8 @@ const DesktopSignIn = () => {
   const auth = getAuth(firebaseApp);
   const user = useSelector(getUserAuthDetails);
 
+  const params = useMemo(() => new URLSearchParams(window.location.search), []);
+
   const toggleAuthModal = useCallback(
     (value) => {
       // TODO: add event source in modal props
@@ -54,8 +56,6 @@ const DesktopSignIn = () => {
   );
 
   useLayoutEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-
     // Avoids cyclic loop, if we are comming from "/login" ie sign up flow
     if (params.has("skip")) {
       setLoading(true);
@@ -75,7 +75,7 @@ const DesktopSignIn = () => {
     } else {
       redirectToWebAppHomePage(navigate);
     }
-  }, [navigate, toggleAuthModal]);
+  }, [navigate, toggleAuthModal, params]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -92,13 +92,15 @@ const DesktopSignIn = () => {
   }, [auth, toggleAuthModal]);
 
   const handleDoneSignIn = useCallback(
-    async (firebaseUser, isNewUser = false) => {
+    async (firebaseUser) => {
       setLoading(true);
-      const params = new URLSearchParams(getDesktopAppAuthParams());
+      const desktopAuthParams = new URLSearchParams(getDesktopAppAuthParams());
       const token = await firebaseUser?.getIdToken();
 
-      const code = params.get("ot-auth-code");
-      const source = params.get("source").replace(/ /g, "_");
+      const isNewUser = params.get("isNewUser");
+
+      const code = desktopAuthParams.get("ot-auth-code");
+      const source = desktopAuthParams.get("source").replace(/ /g, "_");
 
       const functions = getFunctions();
       const createAuthToken = httpsCallable(functions, "auth-createAuthToken");
@@ -135,7 +137,7 @@ const DesktopSignIn = () => {
               auth_provider: AUTH_PROVIDERS.GMAIL,
             });
           }
-          redirectToDesktopApp();
+          redirectToDesktopApp(`?isNewUser=${isNewUser}`);
         })
         .catch((err) => {
           setIsError(true);
@@ -151,7 +153,7 @@ const DesktopSignIn = () => {
           window.localStorage.removeItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS);
         });
     },
-    [toggleAuthModal]
+    [toggleAuthModal, params]
   );
 
   useEffect(() => {

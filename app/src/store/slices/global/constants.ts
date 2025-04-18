@@ -178,6 +178,12 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
     isOnboardingCompleted: false,
   },
 
+  onboarding: {
+    hasSeenOnboardingModal: false,
+    isNewUser: false,
+    userPersona: null,
+  },
+
   editorToast: {},
 
   misc: {
