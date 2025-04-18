@@ -3,15 +3,33 @@ import { Modal } from "antd";
 import { AuthScreen } from "../../AuthScreen";
 import { AuthScreenContextProvider } from "../../context";
 import APP_CONSTANTS from "config/constants";
-import "./authModal.scss";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { useDispatch, useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
+import { DesktopAppAuthScreen } from "../../desktopAppAuth/DesktopAppAuthScreen";
 import { AuthScreenMode } from "../../types";
-
+import { globalActions } from "store/slices/global/slice";
+import "./authModal.scss";
 interface AuthModalProps {
   isOpen: boolean;
+  closable?: boolean;
   authMode?: string;
+  eventSource: string;
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, authMode = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN }) => {
+export const AuthModal: React.FC<AuthModalProps> = ({
+  isOpen,
+  closable = true,
+  eventSource = "",
+  authMode = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+}) => {
+  const appMode = useSelector(getAppMode);
+  const dispatch = useDispatch();
+
+  const toggleModal = () => {
+    dispatch(globalActions.toggleActiveModal({ modalName: "authModal" }));
+  };
+
   return (
     <Modal
       open={isOpen}
@@ -22,9 +40,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, authMode = APP_CON
       wrapClassName="rq-auth-modal-wrapper"
       maskStyle={{ background: "#1a1a1a" }}
     >
-      <AuthScreenContextProvider initialAuthMode={authMode} screenMode={AuthScreenMode.MODAL}>
-        <AuthScreen />
-      </AuthScreenContextProvider>
+      <>
+        <AuthScreenContextProvider
+          isClosable={closable}
+          initialEventSource={eventSource}
+          initialAuthMode={authMode}
+          screenMode={AuthScreenMode.MODAL}
+          toggleModal={toggleModal}
+        >
+          {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? <DesktopAppAuthScreen /> : <AuthScreen />}
+        </AuthScreenContextProvider>
+      </>
     </Modal>
   );
 };

@@ -11,4 +11,10 @@
     font-size: var(--requestly-font-size-md);
     line-height: 22px;
   }
+
+  .onboarding-card-description {
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--requestly-font-size-sm);
+    margin-top: 16px;
+  }
 }

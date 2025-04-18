@@ -350,3 +350,11 @@ export const getIsSlackConnectButtonVisible = (state) => {
 export const getLastUsedFeaturePath = (state) => {
   return getGlobalState(state)?.misc?.persist?.lastUsedFeaturePath || "/";
 };
+
+export const getIsNewUser = (state) => {
+  return getGlobalState(state).onboarding.isNewUser;
+};
+
+export const getHasSeenOnboardingModal = (state) => {
+  return getGlobalState(state).onboarding.hasSeenOnboardingModal;
+};

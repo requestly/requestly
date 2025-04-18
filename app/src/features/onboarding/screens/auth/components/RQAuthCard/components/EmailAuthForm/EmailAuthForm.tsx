@@ -1,6 +1,4 @@
 import React, { useCallback, useState } from "react";
-import { useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
 import { Button } from "antd";
 import { AuthFormInput } from "../AuthFormInput/AuthFormInput";
 import { RQButton } from "lib/design-system/components";
@@ -8,10 +6,11 @@ import { emailSignIn } from "actions/FirebaseActions";
 import { toast } from "utils/Toast";
 import { AuthTypes, getAuthErrorMessage } from "components/authentication/utils";
 import { getGreeting } from "utils/FormattingHelper";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
-import "./emailAuthForm.scss";
 import { useAuthScreenContext } from "features/onboarding/screens/auth/context";
+import { useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
+import "./emailAuthForm.scss";
 
 interface EmailAuthFormProps {
   isLoading: boolean;
@@ -20,10 +19,11 @@ interface EmailAuthFormProps {
 }
 
 export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ isLoading, onSendEmailClick, onEditEmailClick }) => {
+  const location = useLocation();
   const { email, toggleAuthModal } = useAuthScreenContext();
-  const appMode = useSelector(getAppMode);
   const [password, setPassword] = useState("");
   const [isSignInInProgress, setIsSignInInProgress] = useState(false);
+  const isDesktopSignIn = location.pathname.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE);
 
   const handleSignInWithEmailAndPassword = useCallback(async () => {
     try {
@@ -55,26 +55,27 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ isLoading, onSendE
         </Button>
         <AuthFormInput placeholder="" label="Your work email" value={email} onValueChange={() => {}} disabled />
       </div>
-      {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+      {isDesktopSignIn ? (
         <AuthFormInput
-          placeholder=""
+          placeholder="password"
           label="Password"
           value={password}
+          type="password"
           onValueChange={setPassword}
           onPressEnter={handleSignInWithEmailAndPassword}
         />
       ) : null}
       <RQButton
         block
-        disabled={appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !password.length}
+        disabled={isDesktopSignIn && !password.length}
         loading={isLoading || isSignInInProgress}
         className="email-auth-form-signin-btn"
         type="primary"
         // TODO: Add source
-        onClick={appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? handleSignInWithEmailAndPassword : onSendEmailClick}
+        onClick={isDesktopSignIn ? handleSignInWithEmailAndPassword : onSendEmailClick}
         size="large"
       >
-        {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? "Sign In" : "Continue with email"}
+        {isDesktopSignIn ? "Sign In" : "Continue with email"}
       </RQButton>
     </div>
   );

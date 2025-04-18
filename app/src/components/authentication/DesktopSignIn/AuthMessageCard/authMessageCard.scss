@@ -1,0 +1,29 @@
+.desktop-app-auth-message-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  .desktop-app-auth-message-card-icon {
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .desktop-app-auth-message-card-description {
+    color: var(--requestly-color-text-default);
+    font-size: var(--font-size-md, 14px);
+    font-weight: 500;
+    line-height: 20px; /* 142.857% */
+    text-align: center;
+  }
+
+  .desktop-app-auth-message-card-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 32px;
+  }
+}

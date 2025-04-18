@@ -28,3 +28,8 @@ export enum AuthScreenMode {
   MODAL = "modal",
   PAGE = "page",
 }
+
+export enum AuthMode {
+  LOG_IN = "log_in",
+  SIGN_UP = "sign_up",
+}
