@@ -34,6 +34,10 @@ export const PersonaSurveyModal = () => {
     dispatch(globalActions.updateIsNewUser(false));
   };
 
+  if (!user.loggedIn) {
+    return null;
+  }
+
   if (location.pathname.includes(PATHS.AUTH.LOGIN.RELATIVE)) {
     return null;
   }
