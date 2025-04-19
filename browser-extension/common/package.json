@@ -62,7 +62,7 @@
     "@requestly/analytics-vendors": "file:../../common/analytics-vendors/dist",
     "@uiw/codemirror-theme-vscode": "^4.23.0",
     "@uiw/react-codemirror": "^4.23.0",
-    "antd": "^5.0.4",
+    "antd": "^5.23.4",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
