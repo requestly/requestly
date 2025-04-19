@@ -45,7 +45,9 @@
     }
 
     .grr-warning-message-contact-mail {
+      display: inline-block;
       color: var(--requestly-color-primary-text);
+      padding: 0 3px;
     }
   }
 }
