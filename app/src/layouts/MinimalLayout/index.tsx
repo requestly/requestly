@@ -1,3 +1,4 @@
+import React from "react";
 import { Layout } from "antd";
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
 import { redirectToRoot } from "utils/RedirectionUtils";
@@ -5,7 +6,11 @@ import { Outlet, useNavigate } from "react-router-dom";
 import Footer from "components/sections/Footer";
 import "./index.scss";
 
-const MinimalLayout = () => {
+interface MinimalLayoutProps {
+  children?: React.ReactNode;
+}
+
+const MinimalLayout: React.FC<MinimalLayoutProps> = ({ children = null }) => {
   const navigate = useNavigate();
 
   return (
@@ -20,9 +25,7 @@ const MinimalLayout = () => {
         <HeaderUser />
       </Layout.Header>
 
-      <div className="minimal-layout-main">
-        <Outlet />
-      </div>
+      <div className="minimal-layout-main">{children ?? <Outlet />}</div>
       <div className="minimal-layout-footer">
         <Footer />
       </div>
