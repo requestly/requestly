@@ -25,8 +25,8 @@
     "build": "vite build",
     "preview": "npm run build && vite preview",
     "start": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'vite'",
-    "dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=DEV npm start'",
-    "emulated-dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=EMULATOR npm start'"
+    "dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=DEV vite'",
+    "emulated-dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=EMULATOR vite --mode dev-emulator'"
   },
   "browserslist": [
     ">0.2%",
