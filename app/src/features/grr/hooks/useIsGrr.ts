@@ -12,10 +12,12 @@ export const useIsGrr = () => {
 
   useEffect(() => {
     if (!isLoggedIn) {
+      setIsGrr(false);
       return;
     }
 
     if (!uid) {
+      setIsGrr(false);
       return;
     }
 
