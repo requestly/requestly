@@ -1,1 +1,1 @@
-export { GrrWarningScreenContainer } from "./container";
+export { GrrWarningHoc } from "./components";
