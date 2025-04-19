@@ -1,14 +1,15 @@
 import { Layout } from "antd";
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
-import "./index.scss";
 import { redirectToRoot } from "utils/RedirectionUtils";
 import { Outlet, useNavigate } from "react-router-dom";
+import Footer from "components/sections/Footer";
+import "./index.scss";
 
 const MinimalLayout = () => {
   const navigate = useNavigate();
 
   return (
-    <>
+    <div className="minimal-layout">
       <Layout.Header className="minimal-layout-navbar">
         <img
           className="logo"
@@ -18,8 +19,14 @@ const MinimalLayout = () => {
         />
         <HeaderUser />
       </Layout.Header>
-      <Outlet />
-    </>
+
+      <div className="minimal-layout-main">
+        <Outlet />
+      </div>
+      <div className="minimal-layout-footer">
+        <Footer />
+      </div>
+    </div>
   );
 };
 
