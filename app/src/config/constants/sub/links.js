@@ -151,7 +151,7 @@ const LINKS = {
 
   REQUESTLY_GITHUB: "https://github.com/requestly/requestly",
 
-  OAUTH_REDIRECT_URL: "https://us-central1-requestly-dev.cloudfunctions.net/oauth/authorize",
+  OAUTH_REDIRECT_URL: `${process.env.BACKEND_BASE_URL}/oauth/authorize`,
 };
 
 export default LINKS;
