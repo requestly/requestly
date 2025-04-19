@@ -62,7 +62,7 @@ export const AuthInProgressCard: React.FC<AuthInProgressCardProp> = ({ authMode,
       </div>
       <div className="auth-in-progess-card-actions">
         <RQButton onClick={handleCopyUrlClick} block size="large" icon={<MdOutlineFileCopy />}>
-          copy the URL
+          Copy the URL
         </RQButton>
 
         <RQButton onClick={onGoBackClick} type="transparent" size="small" icon={<MdOutlineArrowBack />}>

@@ -8,7 +8,13 @@ declare global {
   }
 }
 
-export const useGoogleAuthButton = ({ callback }: { callback: (credential: CredentialResponse) => void }) => {
+export const useGoogleAuthButton = ({
+  callback,
+  type,
+}: {
+  callback: (credential: CredentialResponse) => void;
+  type: "primary" | "secondary";
+}) => {
   const config = useMemo(() => {
     return {
       client_id: window.location.host.includes("app.requestly.io")
@@ -23,7 +29,7 @@ export const useGoogleAuthButton = ({ callback }: { callback: (credential: Crede
       window.google.accounts.id.initialize({ ...config });
       window.google.accounts.id.renderButton(document.getElementById("rq-google-auth-button"), {
         type: "standard",
-        theme: "filled_black",
+        theme: type === "primary" ? "filled_blue" : "filled_black",
         size: "large",
         text: "continue_with",
         shape: "rectangular",
@@ -32,5 +38,5 @@ export const useGoogleAuthButton = ({ callback }: { callback: (credential: Crede
         height: 40,
       });
     }
-  }, [config]);
+  }, [config, type]);
 };

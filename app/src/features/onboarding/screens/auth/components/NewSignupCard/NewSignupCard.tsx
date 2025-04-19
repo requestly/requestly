@@ -51,9 +51,11 @@ export const NewSignupCard = () => {
   return (
     <OnboardingCard>
       <div className="onboarding-card-title">Create your free account</div>
-      <div className="onboarding-card-description">
-        You will be redirected to your browser to securely complete the sign-up process in a few simple steps.
-      </div>
+      {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+        <div className="onboarding-card-description">
+          You will be redirected to your browser to securely complete the sign-up process in a few simple steps.
+        </div>
+      ) : null}
       <div className="new-signup-card-actions">
         <RQButton size="large" block type="primary" onClick={handleCreateNewAccountClick}>
           Create new account

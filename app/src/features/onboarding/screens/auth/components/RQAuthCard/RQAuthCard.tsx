@@ -46,6 +46,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
           <GoogleAuthButton
             successfulLoginCallback={successfulLoginCallback}
             failedLoginCallback={failedLoginCallback}
+            type="primary"
           />
         );
       case AuthProvider.PASSWORD:

@@ -16,13 +16,13 @@ export const BStackAuthInitHandler = () => {
   const params = useRef(new URLSearchParams(window.location.search));
 
   useEffect(() => {
-    if (user.loggedIn) {
-      redirectToHome(appMode, navigate);
-      return;
-    }
     const redirectURI = params.current.get("redirectURI");
     if (redirectURI) {
       window.localStorage.setItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY, redirectURI);
+    }
+    if (user.loggedIn) {
+      redirectToHome(appMode, navigate);
+      return;
     }
     redirectToOAuthUrl(navigate);
   }, [user.loggedIn, navigate, appMode]);

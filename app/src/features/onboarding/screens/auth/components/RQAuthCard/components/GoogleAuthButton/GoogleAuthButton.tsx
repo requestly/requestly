@@ -11,9 +11,14 @@ import "./googleAuthButton.scss";
 interface GoogleAuthButtonProps {
   successfulLoginCallback: () => void;
   failedLoginCallback: (code: AuthErrorCode) => void;
+  type: "primary" | "secondary";
 }
 
-export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({ successfulLoginCallback, failedLoginCallback }) => {
+export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
+  successfulLoginCallback,
+  failedLoginCallback,
+  type,
+}) => {
   const { email } = useAuthScreenContext();
   const [isLoading, setIsLoading] = useState(false);
   const handleGoogleAuth = useCallback(
@@ -41,7 +46,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({ successfulLo
     [email, failedLoginCallback, successfulLoginCallback]
   );
 
-  useGoogleAuthButton({ callback: handleGoogleAuth });
+  useGoogleAuthButton({ callback: handleGoogleAuth, type });
 
   return (
     <div className="rq-google-auth-button-container">

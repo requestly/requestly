@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import AuthModalHeader from "features/onboarding/components/OnboardingHeader/OnboardingHeader";
 import { CompaniesLogoBanner } from "features/onboarding/components/auth/components/CompaniesLogoBanner";
@@ -18,9 +18,11 @@ import { toast } from "utils/Toast";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { NewSignupCard } from "./components/NewSignupCard/NewSignupCard";
+import PATHS from "config/constants/sub/paths";
 import "./authScreen.scss";
 
 export const AuthScreen = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const {
@@ -39,6 +41,7 @@ export const AuthScreen = () => {
   const [authErrorCode, setAuthErrorCode] = useState<AuthErrorCode>(AuthErrorCode.NONE);
   const [showRQAuthForm, setShowRQAuthForm] = useState(false);
   const [isEmailVerificationScreenVisible, setIsEmailVerificationScreenVisible] = useState(false);
+  const isDesktopSignIn = location.pathname.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE);
 
   const authErrorMessage = useMemo(() => {
     switch (authErrorCode) {
@@ -87,14 +90,14 @@ export const AuthScreen = () => {
       } else if (!metadata.isExistingUser) {
         setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
       } else {
-        if (metadata.providers.length === 1 && metadata.providers[0] === AuthProvider.PASSWORD) {
+        if (metadata.providers.length === 1 && metadata.providers[0] === AuthProvider.PASSWORD && !isDesktopSignIn) {
           handleSendEmailLink();
         } else {
           setShowRQAuthForm(true);
         }
       }
     },
-    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink]
+    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn]
   );
 
   const authModeToggleText = (
@@ -139,7 +142,7 @@ export const AuthScreen = () => {
     <div className="auth-screen-container">
       <div className="auth-screen-content">
         <AuthModalHeader
-          hideCloseBtn={isClosable || authScreenMode !== AuthScreenMode.MODAL}
+          hideCloseBtn={!isClosable || authScreenMode !== AuthScreenMode.MODAL}
           onHeaderButtonClick={handleOnHeaderButtonClick}
         />
         {isEmailVerificationScreenVisible ? (
