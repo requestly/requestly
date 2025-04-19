@@ -43,5 +43,9 @@
       font-size: var(--font-size-sm, 12px);
       line-height: 18px; /* 150% */
     }
+
+    .grr-warning-message-contact-mail {
+      color: var(--requestly-color-primary-text);
+    }
   }
 }
