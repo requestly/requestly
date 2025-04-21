@@ -24,7 +24,7 @@ const SubscriptionInfo = ({
   const dispatch = useDispatch();
   //Global State
   const user = useSelector(getUserAuthDetails);
-  const { planId, validFrom, validTill, status, type, planName } = subscriptionDetails;
+  const { planId, validFrom, validTill, status, type, planName } = subscriptionDetails ?? {};
   const isUserPremium = user.details?.isPremium || status === "active";
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [isConfirmationModalLoading, setIsConfirmationModalLoading] = useState(false);

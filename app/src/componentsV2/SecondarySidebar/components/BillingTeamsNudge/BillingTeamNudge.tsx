@@ -43,14 +43,16 @@ export const BillingTeamNudge: React.FC = () => {
     () =>
       billingTeams.filter(
         (team) =>
-          team.subscriptionDetails.subscriptionStatus === PlanStatus.ACTIVE && !team.members[user.details?.profile?.uid]
+          team.subscriptionDetails &&
+          team.subscriptionDetails.subscriptionStatus === PlanStatus.ACTIVE &&
+          !team.members[user.details?.profile?.uid]
       ),
     [billingTeams, user.details?.profile?.uid]
   );
 
   const planNameToShow = useMemo(() => {
     const hasProfessionalPlan = availableBillingTeams.some(
-      (team) => team.subscriptionDetails.plan === PRICING.PLAN_NAMES.PROFESSIONAL
+      (team) => team.subscriptionDetails?.plan === PRICING.PLAN_NAMES.PROFESSIONAL
     );
     const plan = hasProfessionalPlan ? PRICING.PLAN_NAMES.PROFESSIONAL : PRICING.PLAN_NAMES.BASIC_V2;
     return getPrettyPlanName(plan);

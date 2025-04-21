@@ -104,7 +104,7 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
             className="team-plan-details-card-actions-cancel"
             icon={<MdOutlineCancel />}
             onClick={() => setIsCancelPlanModalOpen(true)}
-            disabled={subscriptionDetails.cancel_at_period_end}
+            disabled={subscriptionDetails?.cancel_at_period_end}
           >
             Cancel plan
           </RQButton>
@@ -131,7 +131,7 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
       <CancelPlanModal
         isOpen={isCancelPlanModalOpen}
         closeModal={() => setIsCancelPlanModalOpen(false)}
-        billingTeamQuantity={subscriptionDetails.quantity}
+        billingTeamQuantity={subscriptionDetails?.quantity}
         currentPlanName={getPlanNameFromId(subscriptionDetails?.plan)}
         currentPlanEndDate={subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000}
       />
