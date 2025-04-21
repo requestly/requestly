@@ -9,6 +9,7 @@ export interface ExtensionConfig {
   WEB_URL: string;
   OTHER_WEB_URLS?: string[];
   logLevel: "debug" | "info";
+  LANDING_PAGE_BASE_URL: string;
 }
 
 export default config as ExtensionConfig;
