@@ -24,7 +24,7 @@ export const useIsGrrEnabled = () => {
     getUser(uid).then((profile) => {
       // TODO: update User type on UI
       // @ts-ignore
-      if (profile?.["block-config"]?.grr) {
+      if (profile?.["block-config"]?.grr?.isBlocked) {
         setIsGrrEnabled(true);
       }
     });
