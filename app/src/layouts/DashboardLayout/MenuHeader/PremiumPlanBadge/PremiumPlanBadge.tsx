@@ -13,6 +13,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./premiumPlanBadge.scss";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { PRICING } from "features/pricing";
 
 const PremiumPlanBadge = () => {
   const dispatch = useDispatch();
@@ -86,10 +87,12 @@ const PremiumPlanBadge = () => {
           onKeyDown={handleBadgeClick}
           onClick={handleBadgeClick}
         >
-          <div className="premium-plan-name">{getPrettyPlanName(getPlanNameFromId(planId))}</div>
+          {getPrettyPlanName(getPlanNameFromId(planId)) === PRICING.PLAN_NAMES.PROFESSIONAL && (
+            <div className="premium-plan-name">{"Pro (Trial)"}</div>
+          )}
           <div className="premium-plan-days-left">
             {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
-              ? `${daysLeft} days left in  ${isIncentivizationEnabled ? "plan" : "trial"}`
+              ? `${daysLeft}d left in  ${isIncentivizationEnabled ? "plan" : "trial"}`
               : "Plan Expired"}
           </div>
         </div>
