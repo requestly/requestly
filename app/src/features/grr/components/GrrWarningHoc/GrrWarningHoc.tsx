@@ -1,5 +1,5 @@
 import React from "react";
-import { useIsGrr } from "features/grr/hooks/useIsGrr";
+import { useIsGrrEnabled } from "features/grr/hooks/useIsGrrEnabled";
 import { GrrWarningScreenContainer } from "features/grr/container";
 
 interface GrrWarningHocProps {
@@ -7,7 +7,7 @@ interface GrrWarningHocProps {
 }
 
 export const GrrWarningHoc: React.FC<GrrWarningHocProps> = ({ children }) => {
-  const { isGrr } = useIsGrr();
+  const { isGrrEnabled } = useIsGrrEnabled();
 
-  return isGrr ? <GrrWarningScreenContainer /> : children;
+  return isGrrEnabled ? <GrrWarningScreenContainer /> : children;
 };
