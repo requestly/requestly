@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { Modal } from "antd";
 import { AuthScreen } from "../../AuthScreen";
 import { AuthScreenContextProvider } from "../../context";
@@ -9,6 +9,7 @@ import { getAppMode } from "store/selectors";
 import { DesktopAppAuthScreen } from "../../desktopAppAuth/DesktopAppAuthScreen";
 import { AuthScreenMode } from "../../types";
 import { globalActions } from "store/slices/global/slice";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./authModal.scss";
 interface AuthModalProps {
   isOpen: boolean;
@@ -25,10 +26,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 }) => {
   const appMode = useSelector(getAppMode);
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
 
-  const toggleModal = (value?: boolean) => {
-    dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: value }));
-  };
+  const toggleModal = useCallback(
+    (value?: boolean) => {
+      dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: value }));
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    if (user.loggedIn) {
+      toggleModal(false);
+    }
+  }, [user.loggedIn, toggleModal]);
 
   return (
     <Modal
