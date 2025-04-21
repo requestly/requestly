@@ -15,7 +15,7 @@ interface AuthScreenContextType {
   setAuthMode: (mode: string) => void;
   setSSOProviderId: (id: string | null) => void;
   setIsSendEmailInProgress: (isInProgress: boolean) => void;
-  toggleAuthModal: () => void;
+  toggleAuthModal: (value?: boolean) => void;
   eventSource: string;
   isClosable: boolean;
   setEventSource: (source: string) => void;

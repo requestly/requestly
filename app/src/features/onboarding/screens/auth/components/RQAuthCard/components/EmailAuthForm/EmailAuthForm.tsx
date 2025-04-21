@@ -33,7 +33,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ isLoading, onSendE
       if (result.user.uid) {
         const greatingName = result.user.displayName?.split(" ")?.[0];
         toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome back!");
-        toggleAuthModal();
+        toggleAuthModal(false);
       }
     } catch (error) {
       toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, error.errorCode));

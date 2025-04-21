@@ -21,15 +21,15 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
   const [countdown, setCountdown] = useState(20);
   const { email, authProviders, isSendEmailInProgress, toggleAuthModal } = useAuthScreenContext();
 
-  /* Memoized google auth button component because countdown triggers re-render 
-    which causes google auth button to be re-rendered (causes flicker in button) 
+  /* Memoized google auth button component because countdown triggers re-render
+    which causes google auth button to be re-rendered (causes flicker in button)
   */
   const googleAuthButton = useMemo(() => {
     return (
       <GoogleAuthButton
-        successfulLoginCallback={toggleAuthModal}
-        failedLoginCallback={failedLoginCallback}
         type="secondary"
+        successfulLoginCallback={() => toggleAuthModal(false)}
+        failedLoginCallback={failedLoginCallback}
       />
     );
   }, [toggleAuthModal, failedLoginCallback]);

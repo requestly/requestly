@@ -56,14 +56,14 @@ export const AuthScreen = () => {
     setShowRQAuthForm(false);
     setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
     if (authScreenMode === AuthScreenMode.MODAL) {
-      toggleAuthModal();
+      toggleAuthModal(false);
     } else {
       redirectToHome(appMode, navigate);
     }
   }, [toggleAuthModal, setAuthMode, appMode, navigate, authScreenMode]);
 
   const handleOnHeaderButtonClick = useCallback(() => {
-    toggleAuthModal();
+    toggleAuthModal(false);
   }, [toggleAuthModal]);
 
   const handleSendEmailLink = useCallback(async () => {

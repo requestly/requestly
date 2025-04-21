@@ -8,16 +8,16 @@ import "./desktopAppAuthScreen.scss";
 export const DesktopAppAuthScreen: React.FC = () => {
   const { authMode, eventSource, toggleAuthModal } = useAuthScreenContext();
 
-  const handleOnHeaderButtonClick = useCallback(() => {
-    toggleAuthModal();
+  const onGoBackClick = useCallback(() => {
+    toggleAuthModal(false);
   }, [toggleAuthModal]);
 
   return (
     <div className="desktop-app-auth-screen-container">
       <div className="desktop-app-auth-screen-content">
-        <AuthModalHeader onHeaderButtonClick={handleOnHeaderButtonClick} />
+        <AuthModalHeader onHeaderButtonClick={onGoBackClick} />
         <OnboardingCard>
-          <AuthInProgressCard eventSource={eventSource} authMode={authMode} onGoBackClick={handleOnHeaderButtonClick} />
+          <AuthInProgressCard eventSource={eventSource} authMode={authMode} onGoBackClick={onGoBackClick} />
         </OnboardingCard>
       </div>
     </div>
