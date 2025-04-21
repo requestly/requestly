@@ -73,6 +73,8 @@ const AuthHandler: React.FC<{}> = () => {
         submitAttrUtil(TRACKING.ATTR.DAYS_SINCE_SIGNUP, moment().diff(signupDate, "days"));
       }
 
+      submitAttrUtil(TRACKING.ATTR.BROWSERSTACK_ID, userData?.browserstackId ?? null);
+
       if (userData?.username) {
         dispatch(globalActions.updateUsername({ username: userData.username }));
       }

@@ -1,7 +1,7 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
-import { Col, InputNumber, Row, Space, Tooltip, Typography } from "antd";
+import { Col, Row, Space, Tooltip, Typography } from "antd";
 import { PricingTableButtons } from "../../PricingTableButtons";
 import { CloseOutlined } from "@ant-design/icons";
 import { capitalize, kebabCase } from "lodash";
@@ -12,6 +12,9 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import GiftIcon from "../../../../assets/gift-icon.svg?react";
 import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
+import { PlanQuantitySelector } from "../PlanQuantitySelector/PlanQuantitySelector";
+import { shouldShowNewCheckoutFlow } from "features/pricing/utils";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 interface PlanColumnProps {
   planName: string;
@@ -38,6 +41,14 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   const [quantity, setQuantity] = useState(1);
   const [disbaleUpgradeButton, setDisbaleUpgradeButton] = useState(false);
   const hasFiddledWithQuantity = useRef(false);
+
+  const isBrowserstackIntegrationEnabled = useFeatureIsOn("browserstack_integration");
+  const isBrowserstackCheckoutEnabled = useFeatureIsOn("browserstack_checkout");
+
+  const isNewCheckoutFlowEnabled = useMemo(
+    () => shouldShowNewCheckoutFlow(isBrowserstackIntegrationEnabled, isBrowserstackCheckoutEnabled),
+    [isBrowserstackIntegrationEnabled, isBrowserstackCheckoutEnabled]
+  );
 
   const getHeaderPlanName = () => {
     const pricingPlansOrder = [
@@ -144,6 +155,10 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
 
   const handleQuantityChange = useCallback(
     (value: number) => {
+      if (value === Infinity) {
+        setQuantity(value);
+        return;
+      }
       if (value < 1 || value > 1000) {
         setDisbaleUpgradeButton(true);
       } else setDisbaleUpgradeButton(false);
@@ -162,9 +177,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     [sendNotification, planName, source, user.loggedIn]
   );
 
-  const cardSubtitle = (
-    <>{planCardSubtitle ? <Typography.Text type="secondary">{planCardSubtitle}</Typography.Text> : null}</>
-  );
+  const cardSubtitle = <>{planCardSubtitle ? <Typography.Text>{planCardSubtitle}</Typography.Text> : null}</>;
 
   return (
     <Col
@@ -175,8 +188,21 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     >
       <div className="plan-card-middle-section">
         <Space size={8}>
-          <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
-          {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">MOST VALUE</span>}
+          {quantity === Infinity ? (
+            <Typography.Text className="plan-name">Large team?</Typography.Text>
+          ) : (
+            <>
+              <Typography.Text className="plan-name">
+                {capitalize(planDetails.planTitle)}
+                {planName === PRICING.PLAN_NAMES.LITE
+                  ? " - For individuals"
+                  : planName === PRICING.PLAN_NAMES.BASIC
+                  ? " - Small teams"
+                  : ""}
+              </Typography.Text>
+              {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">MOST VALUE</span>}
+            </>
+          )}
         </Space>
         {planName === PRICING.PLAN_NAMES.ENTERPRISE && (
           <Row align="middle" className="items-center plan-price-row mt-8">
@@ -196,42 +222,36 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         {planPrice !== undefined && (
           <Row align="middle" className="items-center plan-price-row">
             <Space size="small">
-              <Typography.Text className="plan-price">
-                ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
-              </Typography.Text>
-              <div className="caption text-white">/ month</div>
+              {quantity === Infinity ? (
+                <Typography.Title level={3} style={{ marginTop: "8px" }}>
+                  Get in touch with us
+                </Typography.Title>
+              ) : (
+                <>
+                  <Typography.Text className="plan-price">
+                    ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
+                  </Typography.Text>
+                  <div className="caption text-white">/ month</div>
+                </>
+              )}
             </Space>
           </Row>
         )}
         {planPrice !== undefined && (
           <Row align="middle" className="quantity-container">
-            <Space>
-              <div className="quantity-selector">
-                {((product === PRICING.PRODUCTS.HTTP_RULES &&
-                  planName !== PRICING.PLAN_NAMES.FREE &&
-                  planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
-                  planName !== PRICING.PLAN_NAMES.LITE) ||
-                  (product === PRICING.PRODUCTS.API_CLIENT &&
-                    planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE)) && (
-                  <>
-                    <InputNumber
-                      style={{ width: "104px", height: "32px", display: "flex", alignItems: "center" }}
-                      size="small"
-                      type="number"
-                      min={1}
-                      max={1000}
-                      maxLength={4}
-                      defaultValue={1}
-                      value={quantity}
-                      onChange={(value: number) => {
-                        handleQuantityChange(value);
-                      }}
-                    />
-                    <div className="members">Members</div>
-                  </>
-                )}
-              </div>
-            </Space>
+            <>
+              {((product === PRICING.PRODUCTS.HTTP_RULES &&
+                planName !== PRICING.PLAN_NAMES.FREE &&
+                planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
+                planName !== PRICING.PLAN_NAMES.LITE) ||
+                (product === PRICING.PRODUCTS.API_CLIENT && planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE)) && (
+                <PlanQuantitySelector
+                  isNewCheckoutFlowEnabled={isNewCheckoutFlowEnabled}
+                  quantity={quantity}
+                  handleQuantityChange={handleQuantityChange}
+                />
+              )}
+            </>
           </Row>
         )}
         {planDetails?.planDescription && (
@@ -241,24 +261,19 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             </Typography.Text>
           </Row>
         )}
-        {/* 
-        `  Avoid returning null or empty sting inside a Typography component
-           This breaks the app when page is translated to some other language than english
-
-           In case if rendering of empty string is required:
-           Typography component should be wrapped inside a condition instead of writing a condition inside Typography component
-        */}
-        <Row className="annual-bill mt-8" style={{ display: planCardSubtitle ? "flex" : "none" }}>
-          {duration === PRICING.DURATION.MONTHLY ? (
-            planName === PRICING.PLAN_NAMES.LITE ? (
-              cardSubtitle
+        {quantity !== Infinity ? (
+          <Row className="annual-bill mt-8" style={{ display: planCardSubtitle ? "flex" : "none" }}>
+            {duration === PRICING.DURATION.MONTHLY ? (
+              planName === PRICING.PLAN_NAMES.LITE ? (
+                cardSubtitle
+              ) : (
+                <Typography.Text>Billed monthly</Typography.Text>
+              )
             ) : (
-              <Typography.Text>Billed monthly</Typography.Text>
-            )
-          ) : (
-            cardSubtitle
-          )}
-        </Row>
+              cardSubtitle
+            )}
+          </Row>
+        ) : null}
         <Row
           style={{
             marginTop: "24px",
@@ -273,6 +288,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             quantity={quantity}
             setIsContactUsModalOpen={setIsContactUsModalOpen}
             disabled={disbaleUpgradeButton}
+            isNewCheckoutFlowEnabled={isNewCheckoutFlowEnabled}
           />
         </Row>
       </div>

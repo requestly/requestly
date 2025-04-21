@@ -18,7 +18,8 @@ import { ChangePlanRequestConfirmationModal } from "../ChangePlanRequestConfirma
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { trackPricingPlanCTAClicked } from "modules/analytics/events/misc/business";
 import APP_CONSTANTS from "config/constants";
-import { redirectToPricingPlans } from "utils/RedirectionUtils";
+import { redirectToPricingPlans, redirectToUrl } from "utils/RedirectionUtils";
+import { createBStackCheckoutUrl } from "features/pricing/utils";
 
 const CTA_ONCLICK_FUNCTIONS = {
   MANAGE_SUBSCRIPTION: "manage-subscription",
@@ -171,6 +172,7 @@ interface PricingTableButtonsProps {
   source: string;
   quantity: number;
   disabled: boolean;
+  isNewCheckoutFlowEnabled: boolean;
   setIsContactUsModalOpen: (value: boolean) => void;
 }
 
@@ -181,6 +183,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   source,
   quantity,
   disabled,
+  isNewCheckoutFlowEnabled,
   setIsContactUsModalOpen,
 }) => {
   const dispatch = useDispatch();
@@ -248,18 +251,29 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       }
       case CTA_ONCLICK_FUNCTIONS.CHECKOUT: {
         trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
-        dispatch(
-          globalActions.toggleActiveModal({
-            modalName: "pricingModal",
-            newValue: true,
-            newProps: {
-              selectedPlan: columnPlanName,
-              planDuration: duration,
-              quantity,
-              source,
-            },
-          })
-        );
+        if (isNewCheckoutFlowEnabled) {
+          const checkoutUrl = createBStackCheckoutUrl(
+            columnPlanName,
+            quantity,
+            duration === PRICING.DURATION.ANNUALLY,
+            window.location.href
+          );
+          redirectToUrl(checkoutUrl);
+        } else {
+          dispatch(
+            globalActions.toggleActiveModal({
+              modalName: "pricingModal",
+              newValue: true,
+              newProps: {
+                selectedPlan: columnPlanName,
+                planDuration: duration,
+                quantity,
+                source,
+              },
+            })
+          );
+        }
+
         setIsButtonLoading(false);
         break;
       }
@@ -383,7 +397,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     }
   }
 
-  if (product === PRICING.PRODUCTS.SESSION_REPLAY) {
+  if (product === PRICING.PRODUCTS.SESSION_REPLAY || quantity === Infinity) {
     if (columnPlanName === PRICING.PLAN_NAMES.FREE) {
       return (
         <Space size={8}>

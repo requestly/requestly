@@ -6,6 +6,7 @@ export interface User {
   photoURL: string;
   signupTs: number;
   username: string;
+  browserstackId?: string;
   "block-config"?: {
     grr: {
       isBlocked: boolean;
