@@ -6,4 +6,10 @@ export interface User {
   photoURL: string;
   signupTs: number;
   username: string;
+  "block-config"?: {
+    grr: {
+      isBlocked: boolean;
+      reason: string;
+    };
+  };
 }
