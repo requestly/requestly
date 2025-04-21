@@ -24,6 +24,7 @@ import MinimalLayout from "layouts/MinimalLayout";
 import { paymentRoutes } from "./paymentRoutes";
 import { networkInspectorRoutes } from "features/networkInspector";
 import RouterError from "components/misc/PageError/RouterError";
+import { BStackAuthStart } from "features/onboarding/screens/BStackAuthStart/BStackAuthStart";
 
 export const routesV2: RouteObject[] = [
   /** Misc **/
@@ -59,6 +60,17 @@ export const routesV2: RouteObject[] = [
         path: "",
         element: <MinimalLayout />,
         children: [...inviteRoutes, ...paymentRoutes],
+      },
+      /**  non-iframe full screen routes **/
+      {
+        path: "",
+        element: <FullScreenLayout />,
+        children: [
+          {
+            path: PATHS.AUTH.START.RELATIVE,
+            element: <BStackAuthStart />,
+          },
+        ],
       },
       /** Iframe paths  - Without Header, Footer **/
       {
