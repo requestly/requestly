@@ -15,6 +15,7 @@ import { trackBillingTeamActionClicked } from "features/settings/analytics";
 import "./index.scss";
 import { TeamPlanActionButtons } from "./components/TeamPlanActionButtons";
 import { globalActions } from "store/slices/global/slice";
+import { BstackTeamPlanActionButtons } from "./components/BstackTeamPlanActionButtons";
 
 const FreeTeamDetails: React.FC<{
   isUserManager?: boolean;
@@ -87,12 +88,16 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
               cancelAtPeriodEnd={billingTeamDetails?.subscriptionDetails?.cancel_at_period_end}
             />
           </Col>
-          {isUserManager && (
-            <TeamPlanActionButtons
-              subscriptionDetails={billingTeamDetails?.subscriptionDetails}
-              isAnnualPlan={isAnnualPlan}
-            />
-          )}
+          {isUserManager ? (
+            billingTeamDetails.browserstackGroupId ? (
+              <BstackTeamPlanActionButtons subscriptionDetails={billingTeamDetails.subscriptionDetails} />
+            ) : (
+              <TeamPlanActionButtons
+                subscriptionDetails={billingTeamDetails?.subscriptionDetails}
+                isAnnualPlan={isAnnualPlan}
+              />
+            )
+          ) : null}
         </Row>
         <div className="team-plan-details-sections-wrapper">
           <div className="team-plan-details-section">

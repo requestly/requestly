@@ -61,11 +61,12 @@ export const MyBillingTeamDetails: React.FC = () => {
             <BillingInvoiceCard />
           </Col>
         )}
-        {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role === BillingTeamRoles.Manager && (
-          <Col style={{ marginTop: "24px" }}>
-            <BillingInformation />
-          </Col>
-        )}
+        {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role === BillingTeamRoles.Manager &&
+          !billingTeamDetails.browserstackGroupId && (
+            <Col style={{ marginTop: "24px" }}>
+              <BillingInformation />
+            </Col>
+          )}
 
         <AppMembersDrawer isOpen={isMembersDrawerOpen} onClose={() => setIsMembersDrawerOpen(false)} />
       </div>

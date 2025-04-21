@@ -13,10 +13,13 @@ import {
   trackBillingTeamInvoiceRequestSent,
 } from "features/settings/analytics";
 import "./index.scss";
+import { getBillingTeamById } from "store/features/billing/selectors";
+import { redirectToUrl } from "utils/RedirectionUtils";
 
 export const BillingInvoiceCard: React.FC = () => {
   const { billingId } = useParams();
   const user = useSelector(getUserAuthDetails);
+  const billingTeamDetails = useSelector(getBillingTeamById(billingId));
   const [isLoading, setIsLoading] = useState(false);
   const [isRequestProcessed, setIsRequestProcessed] = useState(false);
   const [isRequestSent, setIsRequestSent] = useState(false);
@@ -44,25 +47,41 @@ export const BillingInvoiceCard: React.FC = () => {
     <Col className="billing-teams-primary-card billing-team-invoice-card">
       <div className="billing-team-invoice-card-body">
         <img src={"/assets/media/settings/invoice.svg"} alt="invoice" />
-        <div className="text-bold text-white billing-invoice-card-title">Get your invoice via email</div>
-        <div className="text-bold text-white billing-invoice-card-description">
-          We will send invoice to your registered email address, {user?.details?.profile?.email}.
-        </div>
-        {isRequestProcessed ? (
-          isRequestSent ? (
-            <div className="request-result success">
-              {" "}
-              <MdCheckCircleOutline /> Request sent successfully, invoice will be sent shortly.
+        {billingTeamDetails.browserstackGroupId ? (
+          <>
+            <div className="text-bold text-white billing-invoice-card-title">Invoices</div>
+            <RQButton
+              type="default"
+              onClick={() => {
+                redirectToUrl(`${process.env.BROWSERSTACK_BASE_URL}/accounts/billing`, true);
+              }}
+            >
+              Manage Invoices
+            </RQButton>
+          </>
+        ) : (
+          <>
+            <div className="text-bold text-white billing-invoice-card-title">Get your invoice via email</div>
+            <div className="text-bold text-white billing-invoice-card-description">
+              We will send invoice to your registered email address, {user?.details?.profile?.email}.
             </div>
-          ) : (
-            <div className="request-result error">
-              <MdErrorOutline /> Couldn't send the email. Please retry or contact us
-            </div>
-          )
-        ) : null}
-        <RQButton type="default" loading={isLoading} onClick={handleSendInvoiceRequest}>
-          Get Invoice
-        </RQButton>
+            {isRequestProcessed ? (
+              isRequestSent ? (
+                <div className="request-result success">
+                  {" "}
+                  <MdCheckCircleOutline /> Request sent successfully, invoice will be sent shortly.
+                </div>
+              ) : (
+                <div className="request-result error">
+                  <MdErrorOutline /> Couldn't send the email. Please retry or contact us
+                </div>
+              )
+            ) : null}
+            <RQButton type="default" loading={isLoading} onClick={handleSendInvoiceRequest}>
+              Get Invoice
+            </RQButton>
+          </>
+        )}
       </div>
 
       <div className="billing-team-invoice-card-footer">

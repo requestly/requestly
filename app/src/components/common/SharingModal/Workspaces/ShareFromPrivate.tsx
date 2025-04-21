@@ -39,6 +39,9 @@ export const ShareFromPrivate: React.FC<Props> = ({
   const activeWorkspace = useSelector(getActiveWorkspace);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const _availableWorkspaces = useRef(availableWorkspaces);
+  const filteredAvailableWorkspaces = _availableWorkspaces.current.filter(
+    (workspace) => !workspace.browserstackDetails
+  ); // Filtering our Browserstack Workspaces)
 
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -145,7 +148,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
           <div className="text-gray">Not shared with anyone</div>
         </span>
       </Row>
-      {_availableWorkspaces.current.length ? (
+      {filteredAvailableWorkspaces.length ? (
         <>
           <div className="mt-1">Copy rules into a workspace to start collaborating</div>
           <WorkspaceShareMenu isLoading={isLoading} defaultActiveWorkspaces={2} onTransferClick={handleRulesTransfer} />

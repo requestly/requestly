@@ -142,10 +142,12 @@ const WorkspaceSelector = () => {
   const user = useSelector(getUserAuthDetails);
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const _availableWorkspaces = availableWorkspaces || [];
-  const sortedAvailableWorkspaces = [
-    ..._availableWorkspaces.filter((team) => !team?.archived),
-    ..._availableWorkspaces.filter((team) => team?.archived),
+  let sortedAvailableWorkspaces = _availableWorkspaces.filter((team) => !team.browserstackDetails); // Filtering our Browserstack Workspaces)
+  sortedAvailableWorkspaces = [
+    ...sortedAvailableWorkspaces.filter((team) => !team?.archived),
+    ...sortedAvailableWorkspaces.filter((team) => team?.archived),
   ];
+  
   const appMode = useSelector(getAppMode);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const activeWorkspace = useSelector(getActiveWorkspace);

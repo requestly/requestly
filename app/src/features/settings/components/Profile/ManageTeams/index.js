@@ -7,12 +7,13 @@ import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 const ManageTeams = () => {
   // Global State
   const availableWorkspaces = useSelector(getAllWorkspaces);
+  const filteredAvailableWorkspace = availableWorkspaces?.filter((workspace) => !workspace.browserstackDetails);
 
   return (
     <>
       <div>
-        {availableWorkspaces && availableWorkspaces.length > 0 ? (
-          <TeamsList teams={availableWorkspaces} />
+        {filteredAvailableWorkspace && filteredAvailableWorkspace.length > 0 ? (
+          <TeamsList teams={filteredAvailableWorkspace} />
         ) : (
           <>
             <CreateFirstTeam />
