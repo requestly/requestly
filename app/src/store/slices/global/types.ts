@@ -36,6 +36,7 @@ export interface GlobalSliceState {
     hasSeenOnboardingModal: boolean;
     isNewUser: boolean;
     userPersona: string | null;
+    isAcquisitionAnnouncementModalVisible: boolean;
   };
   misc: {
     persist: {

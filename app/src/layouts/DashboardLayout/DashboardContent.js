@@ -32,7 +32,7 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { RequestBot } from "features/requestBot";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
-import { OnboardingModal, PersonaSurveyModal } from "features/onboarding";
+import { OnboardingModal, PersonaSurveyModal, AcquisitionAnnouncementModal } from "features/onboarding";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -216,6 +216,7 @@ const DashboardContent = () => {
             <>
               <OnboardingModal />
               <PersonaSurveyModal />
+              <AcquisitionAnnouncementModal />
             </>
           ) : (
             <>

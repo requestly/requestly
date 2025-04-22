@@ -288,3 +288,10 @@ export const updateNewUserPersona = (prevState: GlobalSliceState, action: Payloa
 export const updateHasSeenOnboardingModal = (prevState: GlobalSliceState, action: PayloadAction<boolean>) => {
   prevState.onboarding.hasSeenOnboardingModal = action.payload;
 };
+
+export const updateIsAcquisitionAnnouncementModalVisible = (
+  prevState: GlobalSliceState,
+  action: PayloadAction<boolean>
+) => {
+  prevState.onboarding.isAcquisitionAnnouncementModalVisible = action.payload;
+};
