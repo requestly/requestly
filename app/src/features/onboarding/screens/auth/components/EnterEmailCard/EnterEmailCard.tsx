@@ -22,9 +22,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
   const handleOnContinue = async () => {
     setIsLoading(true);
 
-    const processedEmail = email.trim();
-
-    if (!isEmailValid(processedEmail)) {
+    if (!isEmailValid(email)) {
       toast.error("Please enter a valid email address");
       setIsLoading(false);
       return;
@@ -32,7 +30,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
 
     const getUserAuthSyncDetails = httpsCallable(getFunctions(), "users-getAuthSyncData");
     try {
-      const ssoProviderId = await getSSOProviderId(processedEmail);
+      const ssoProviderId = await getSSOProviderId(email);
       getUserAuthSyncDetails({ email }).then(({ data }: { data: AuthSyncMetadata }) => {
         if (data.success) {
           const metadata = data.syncData;
