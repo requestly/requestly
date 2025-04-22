@@ -22,16 +22,15 @@
   align-items: center;
 
   .pricing-navbar {
-    position: fixed;
+    position: relative;
     top: 0;
-    left: 0;
-    right: 0;
     display: flex;
     align-items: center;
+    width: 100%;
+
     padding: 8px 1rem;
     background: var(--black);
     border-bottom: 1px solid var(--requestly-color-surface-1);
-    z-index: 5;
 
     &-content {
       display: flex;

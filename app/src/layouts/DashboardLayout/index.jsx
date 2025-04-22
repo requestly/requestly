@@ -87,7 +87,7 @@ const DashboardLayout = () => {
               : ""
           }`}
         >
-          <MenuHeader />
+          {isPricingPage(pathname) ? null : <MenuHeader />}
           <Conditional condition={isReadRole}>
             <ViewOnlyModeBanner />
           </Conditional>
