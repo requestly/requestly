@@ -8,6 +8,7 @@ import { AuthProvider } from "../../types";
 import { getSSOProviderId } from "backend/auth/sso";
 import { isEmailValid } from "utils/FormattingHelper";
 import { useAuthScreenContext } from "../../context";
+import LINKS from "config/constants/sub/links";
 
 interface EnterEmailCardProps {
   onEmailChange: (email: string) => void;
@@ -76,8 +77,14 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
         Continue
       </RQButton>
       <div className="enter-email-card-footer">
-        {/* TODO: Add links */}
-        By signing in , you agree to our <a href="#">Terms</a> and <a href="#">Privacy statement</a>
+        By signing in , you agree to our{" "}
+        <a href={LINKS.REQUESTLY_TERMS_AND_CONDITIONS} target="_blank" rel="noreferrer">
+          Terms
+        </a>{" "}
+        and{" "}
+        <a href={LINKS.REQUESTLY_PRIVACY_STATEMENT} target="_blank" rel="noreferrer">
+          Privacy statement
+        </a>
       </div>
     </div>
   );
