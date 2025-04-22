@@ -1,5 +1,8 @@
 .rq-acquisition-announcement-modal {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   .ant-modal-content {
     border-radius: 8px;
