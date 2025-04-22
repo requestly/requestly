@@ -20,6 +20,11 @@ export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileVi
   const [fileContent, setFileContent] = useState(null);
   const { apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
   const { forceRefreshEnvironments } = useEnvironmentManager({ initFetchers: false });
+  const [fullScreen, setFullScreen] = useState(false);
+
+  const handleFullScreenChange = () => {
+    setFullScreen((prev) => !prev);
+  };
 
   useEffect(() => {
     const fetchErrorFileData = async () => {
@@ -88,6 +93,8 @@ export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileVi
                 handleChange={setFileContent}
                 value={fileContent}
                 isResizable={true}
+                isFullScreen={fullScreen}
+                onFullScreenChange={handleFullScreenChange}
                 hideCharacterCount
                 hideToolbar
               />

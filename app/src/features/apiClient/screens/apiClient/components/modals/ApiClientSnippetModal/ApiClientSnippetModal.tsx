@@ -21,6 +21,11 @@ type ClientId = ReturnType<typeof availableTargets>[number]["clients"][number]["
 export const ApiClientSnippetModal = ({ apiRequest, onClose, open }: ApiClientSnippetModalProps) => {
   const [harRequest, setHarRequest] = useState<HarRequest>();
   const [snippetTypeId, setSnippetTypeId] = useState<string>("shell-curl");
+  const [fullScreen, setFullScreen] = useState(false);
+
+  const handleFullScreenChange = () => {
+    setFullScreen((prev) => !prev);
+  };
 
   useEffect(() => {
     if (!apiRequest) {
@@ -83,7 +88,15 @@ export const ApiClientSnippetModal = ({ apiRequest, onClose, open }: ApiClientSn
           />
         </div>
         <div className="api-client-snippet-content">
-          <Editor hideCharacterCount isResizable config={{ hideToolbar: true }} value={snippet ?? ""} language={null} />
+          <Editor
+            hideCharacterCount
+            isResizable
+            config={{ hideToolbar: true }}
+            value={snippet ?? ""}
+            language={null}
+            isFullScreen={fullScreen}
+            onFullScreenChange={handleFullScreenChange}
+          />
         </div>
       </div>
     </Modal>

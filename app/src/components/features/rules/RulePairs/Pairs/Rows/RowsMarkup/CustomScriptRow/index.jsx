@@ -38,6 +38,7 @@ const CustomScriptRow = ({
   const [sourceTypeSelection, setSourceTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE);
   const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(false);
   const [initialCodeEditorValue, setInitialCodeEditorValue] = useState(null);
+  const [fullScreen, setFullScreen] = useState(false);
 
   const isCompatibleWithAttributes = isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT);
 
@@ -54,6 +55,10 @@ const CustomScriptRow = ({
   }, [script.codeType, isCompatibleWithAttributes]);
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
+
+  const handleFullScreenChange = () => {
+    setFullScreen((prev) => !prev);
+  };
 
   useEffect(() => {
     /* USED TO SET THE CORRECT RENDERED VALUE OF THE RULE, ON EVERY UPDATE */
@@ -245,6 +250,8 @@ const CustomScriptRow = ({
               language={codeEditorLanguage}
               value={initialCodeEditorValue ?? scriptEditorBoilerCode}
               handleChange={handleEditorUpdate}
+              isFullScreen={fullScreen}
+              onFullScreenChange={handleFullScreenChange}
               isReadOnly={isInputDisabled}
               analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.SCRIPT }}
               toolbarOptions={{

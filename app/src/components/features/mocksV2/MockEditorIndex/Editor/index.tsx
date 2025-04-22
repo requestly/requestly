@@ -78,6 +78,7 @@ const MockEditor: React.FC<Props> = ({
   const [headersString, setHeadersString] = useState<string>(JSON.stringify(mockData.headers));
   const [body, setBody] = useState<string>(mockData.body);
   const [password, setPassword] = useState<string>(mockData.password ?? "");
+  const [fullScreen, setFullScreen] = useState(false);
 
   const [fileType] = useState<FileType>(mockData?.fileType || null);
   const [errors, setErrors] = useState<ValidationErrors>({
@@ -88,6 +89,10 @@ const MockEditor: React.FC<Props> = ({
   });
 
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
+
+  const handleFullScreenChange = () => {
+    setFullScreen((prev) => !prev);
+  };
 
   const collectionPath = mockCollectionData?.path ?? "";
 
@@ -405,6 +410,8 @@ const MockEditor: React.FC<Props> = ({
             handleChange={setBody}
             language={getEditorLanguage(fileType)}
             isReadOnly={isEditorReadOnly}
+            isFullScreen={fullScreen}
+            onFullScreenChange={handleFullScreenChange}
             prettifyOnInit={true}
             analyticEventProperties={{ source: "mocks", mock_type: mockType }}
             toolbarOptions={{
@@ -415,7 +422,7 @@ const MockEditor: React.FC<Props> = ({
         </Col>
       </Row>
     );
-  }, [body, fileType, isEditorReadOnly, mockType]);
+  }, [body, fileType, fullScreen, isEditorReadOnly, mockType]);
 
   const editors: TabsProps["items"] = useMemo(
     () => [
