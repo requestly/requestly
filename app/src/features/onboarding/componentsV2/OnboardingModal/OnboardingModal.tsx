@@ -18,6 +18,12 @@ export const OnboardingModal = () => {
   const hasSeenOnboardingModal = useSelector(getHasSeenOnboardingModal);
 
   useEffect(() => {
+    if (user.loggedIn) {
+      setIsModalVisible(false);
+    }
+  }, [user.loggedIn]);
+
+  useEffect(() => {
     getAndUpdateInstallationDate(appMode, false, false)
       .then((install_date) => {
         if (install_date) {

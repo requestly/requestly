@@ -55,12 +55,10 @@ export const AuthScreen = () => {
   const handleSuccessfulLogin = useCallback(() => {
     setShowRQAuthForm(false);
     setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
-    if (authScreenMode === AuthScreenMode.MODAL) {
-      toggleAuthModal(false);
-    } else {
+    if (authScreenMode === AuthScreenMode.PAGE) {
       redirectToHome(appMode, navigate);
     }
-  }, [toggleAuthModal, setAuthMode, appMode, navigate, authScreenMode]);
+  }, [setAuthMode, appMode, navigate, authScreenMode]);
 
   const handleOnHeaderButtonClick = useCallback(() => {
     toggleAuthModal(false);
