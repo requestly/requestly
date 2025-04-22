@@ -53,7 +53,7 @@ export const AuthScreen = () => {
   }, [authErrorCode]);
 
   const handleSuccessfulLogin = useCallback(() => {
-    setShowRQAuthForm(false);
+    // setShowRQAuthForm(false);
     setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
     if (authScreenMode === AuthScreenMode.PAGE) {
       redirectToHome(appMode, navigate);
