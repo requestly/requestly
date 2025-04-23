@@ -152,6 +152,8 @@ const LINKS = {
   REQUESTLY_GITHUB: "https://github.com/requestly/requestly",
 
   OAUTH_REDIRECT_URL: `${process.env.BACKEND_BASE_URL}/oauth/authorize`,
+
+  ACQUISITION_DETAILS: "#", // TODO: Update link
 };
 
 export default LINKS;

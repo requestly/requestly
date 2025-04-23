@@ -182,6 +182,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
     hasSeenOnboardingModal: false,
     isNewUser: false,
     userPersona: null,
+    isAcquisitionAnnouncementModalVisible: true,
   },
 
   editorToast: {},
