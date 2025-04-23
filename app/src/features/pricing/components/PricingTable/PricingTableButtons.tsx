@@ -255,12 +255,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       case CTA_ONCLICK_FUNCTIONS.CHECKOUT: {
         trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
         if (isNewCheckoutFlowEnabled) {
-          const checkoutUrl = createBStackCheckoutUrl(
-            columnPlanName,
-            quantity,
-            duration === PRICING.DURATION.ANNUALLY,
-            window.location.href
-          );
+          const checkoutUrl = createBStackCheckoutUrl(columnPlanName, quantity, duration === PRICING.DURATION.ANNUALLY);
           redirectToUrl(checkoutUrl);
         } else {
           dispatch(
@@ -282,12 +277,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       }
       case CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION: {
         if (isNewCheckoutFlowEnabled) {
-          const checkoutUrl = createBStackCheckoutUrl(
-            columnPlanName,
-            quantity,
-            duration === PRICING.DURATION.ANNUALLY,
-            window.location.href
-          );
+          const checkoutUrl = createBStackCheckoutUrl(columnPlanName, quantity, duration === PRICING.DURATION.ANNUALLY);
           redirectToUrl(checkoutUrl);
         } else {
           trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);

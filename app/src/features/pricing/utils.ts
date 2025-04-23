@@ -8,7 +8,7 @@ export const createBStackCheckoutUrl = (
   planName: string,
   quantity: number,
   isAnnual: boolean,
-  sourceUrl: string
+  sourceUrl: string = window.location.origin + "/pricing"
 ): string => {
   const searchParams = new URLSearchParams({
     source: sourceUrl,
