@@ -1,14 +1,20 @@
 import React from "react";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
-import "./onboardingHeader.scss";
+import { IoMdArrowForward } from "@react-icons/all-files/io/IoMdArrowForward";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import "./onboardingHeader.scss";
 
 interface OnboardingHeaderProps {
   hideCloseBtn?: boolean;
+  isOnboarding?: boolean;
   onHeaderButtonClick: () => void;
 }
 
-const OnboardingHeader: React.FC<OnboardingHeaderProps> = ({ hideCloseBtn = false, onHeaderButtonClick }) => {
+const OnboardingHeader: React.FC<OnboardingHeaderProps> = ({
+  hideCloseBtn = false,
+  isOnboarding = false,
+  onHeaderButtonClick,
+}) => {
   const isBrowserstackIntegrationEnabled = useFeatureIsOn("browserstack_integration");
   return (
     <div className="onboarding-header">
@@ -26,6 +32,11 @@ const OnboardingHeader: React.FC<OnboardingHeaderProps> = ({ hideCloseBtn = fals
           <IoMdClose />
         </span>
       )}
+      {isOnboarding ? (
+        <div className="onboarding-header-action skip-onboarding-btn" onClick={onHeaderButtonClick}>
+          <span>Skip for now</span> <IoMdArrowForward />
+        </div>
+      ) : null}
     </div>
   );
 };

@@ -42,10 +42,15 @@ const LoginHandler: React.FC = () => {
         desktopAuthParams.set("isNewUser", "true");
       }
       desktopAuthParams.append("skip", "true");
+      /* 
+       marking onboarding as completed because user is authenticating from desktop app
+       so onboarding is going to be visible in desktop app
+       */
+      dispatch(globalActions.updateIsOnboardingCompleted(true));
       navigate(`${PATHS.AUTH.DEKSTOP_SIGN_IN.ABSOLUTE}?${desktopAuthParams.toString()}`);
       return;
     }
-  }, [navigate, isNewUser]);
+  }, [navigate, isNewUser, dispatch]);
 
   const redirect = useCallback(
     (url: string) => {

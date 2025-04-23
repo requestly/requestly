@@ -6,5 +6,18 @@
 
   &-action {
     cursor: pointer;
+
+    &.skip-onboarding-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-sm);
+
+      span {
+        text-decoration: underline;
+        text-underline-offset: 5px;
+      }
+    }
   }
 }

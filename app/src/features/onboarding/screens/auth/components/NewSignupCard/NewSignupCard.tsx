@@ -67,7 +67,14 @@ export const NewSignupCard = () => {
 
       <div className="new-signup-card-footer">
         Use your local Scratch Pad -{" "}
-        <Button type="link" size="small" onClick={() => toggleAuthModal(false)}>
+        <Button
+          type="link"
+          size="small"
+          onClick={() => {
+            dispatch(globalActions.updateIsOnboardingCompleted(true));
+            toggleAuthModal(false);
+          }}
+        >
           Continue without an account
         </Button>
       </div>

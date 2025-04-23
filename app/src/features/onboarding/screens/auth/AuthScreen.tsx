@@ -15,13 +15,15 @@ import { useAuthScreenContext } from "./context";
 import { EmailVerificationCard } from "./components/RQAuthCard/components/EmailVerificationCard/EmailVerificationCard";
 import { sendEmailLinkForSignin } from "actions/FirebaseActions";
 import { toast } from "utils/Toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { NewSignupCard } from "./components/NewSignupCard/NewSignupCard";
 import PATHS from "config/constants/sub/paths";
+import { globalActions } from "store/slices/global/slice";
 import "./authScreen.scss";
 
 export const AuthScreen = () => {
+  const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
@@ -37,6 +39,7 @@ export const AuthScreen = () => {
     toggleAuthModal,
     setIsSendEmailInProgress,
     isClosable,
+    isOnboarding,
   } = useAuthScreenContext();
   const [authErrorCode, setAuthErrorCode] = useState<AuthErrorCode>(AuthErrorCode.NONE);
   const [showRQAuthForm, setShowRQAuthForm] = useState(false);
@@ -61,8 +64,11 @@ export const AuthScreen = () => {
   }, [setAuthMode, appMode, navigate, authScreenMode]);
 
   const handleOnHeaderButtonClick = useCallback(() => {
+    if (isOnboarding) {
+      dispatch(globalActions.updateIsOnboardingCompleted(true));
+    }
     toggleAuthModal(false);
-  }, [toggleAuthModal]);
+  }, [toggleAuthModal, isOnboarding, dispatch]);
 
   const handleSendEmailLink = useCallback(async () => {
     setIsSendEmailInProgress(true);
@@ -142,6 +148,7 @@ export const AuthScreen = () => {
         <AuthModalHeader
           hideCloseBtn={!isClosable || authScreenMode !== AuthScreenMode.MODAL}
           onHeaderButtonClick={handleOnHeaderButtonClick}
+          isOnboarding={isOnboarding}
         />
         {isEmailVerificationScreenVisible ? (
           <OnboardingCard>

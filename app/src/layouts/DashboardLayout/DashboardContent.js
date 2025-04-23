@@ -4,7 +4,7 @@ import { useLocation, useSearchParams, Outlet } from "react-router-dom";
 import SpinnerModal from "components/misc/SpinnerModal";
 import { globalActions } from "store/slices/global/slice";
 //UTILS
-import { getAppOnboardingDetails, getRequestBot } from "store/selectors";
+import { getAppOnboardingDetails, getIsOnboardingCompleted, getRequestBot } from "store/selectors";
 import { getActiveModals } from "store/slices/global/modals/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
@@ -49,6 +49,7 @@ const DashboardContent = () => {
   const requestBotDetails = useSelector(getRequestBot);
   const isBrowserstackIntegrationEnabled = useFeatureIsOn("browserstack_integration");
   const isRequestBotVisible = requestBotDetails?.isActive;
+  const isOnboardingCompleted = useSelector(getIsOnboardingCompleted);
 
   const toggleIncentiveTasksListModal = () => {
     dispatch(incentivizationActions.toggleActiveModal({ modalName: IncentivizationModal.TASKS_LIST_MODAL }));
@@ -214,7 +215,7 @@ const DashboardContent = () => {
           ) : null}
           {isBrowserstackIntegrationEnabled ? (
             <>
-              <OnboardingModal />
+              {!isOnboardingCompleted ? <OnboardingModal /> : null}
               <PersonaSurveyModal />
               <AcquisitionAnnouncementModal />
             </>

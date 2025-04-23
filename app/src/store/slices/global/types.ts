@@ -33,7 +33,7 @@ export interface GlobalSliceState {
     isOnboardingCompleted: boolean;
   };
   onboarding: {
-    hasSeenOnboardingModal: boolean;
+    isOnboardingCompleted: boolean;
     isNewUser: boolean;
     userPersona: string | null;
     isAcquisitionAnnouncementModalVisible: boolean;

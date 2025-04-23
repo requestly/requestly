@@ -355,8 +355,8 @@ export const getIsNewUser = (state) => {
   return getGlobalState(state).onboarding.isNewUser;
 };
 
-export const getHasSeenOnboardingModal = (state) => {
-  return getGlobalState(state).onboarding.hasSeenOnboardingModal;
+export const getIsOnboardingCompleted = (state) => {
+  return getGlobalState(state).onboarding.isOnboardingCompleted;
 };
 
 export const getIsAcquisitionAnnouncementModalVisible = (state) => {

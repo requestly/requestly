@@ -10,6 +10,7 @@ interface AuthScreenContextType {
   authProviders: AuthProvider[];
   authScreenMode: AuthScreenMode;
   isOnboardingScreenVisible: boolean;
+  isOnboarding: boolean;
   setAuthProviders: (providers: AuthProvider[]) => void;
   handleEmailChange: (email: string) => void;
   setAuthMode: (mode: string) => void;
@@ -65,6 +66,7 @@ export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps>
     isSendEmailInProgress,
     authProviders,
     authScreenMode: screenMode,
+    isOnboarding,
     isOnboardingScreenVisible,
     eventSource,
     handleEmailChange,
