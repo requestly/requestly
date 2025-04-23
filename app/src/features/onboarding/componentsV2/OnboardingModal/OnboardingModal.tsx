@@ -21,8 +21,9 @@ export const OnboardingModal = () => {
   useEffect(() => {
     if (user.loggedIn) {
       setIsModalVisible(false);
+      dispatch(globalActions.updateIsOnboardingCompleted(true));
     }
-  }, [user.loggedIn]);
+  }, [user.loggedIn, dispatch]);
 
   useEffect(() => {
     getAndUpdateInstallationDate(appMode, false, false)
