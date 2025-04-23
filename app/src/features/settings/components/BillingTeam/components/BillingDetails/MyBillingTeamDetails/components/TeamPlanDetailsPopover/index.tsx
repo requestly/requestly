@@ -5,15 +5,18 @@ import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import { PricingFeatures } from "features/pricing";
 import { PRICING } from "features/pricing";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
+import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
 // import { PricingPlans } from "features/pricing";
 
 interface Props {
-  planDetails: Record<string, any>;
+  billingTeamDetails: BillingTeamDetails;
   closePopover: () => void;
   isAnnualPlan: boolean;
 }
 
-export const TeamPlanDetailsPopover: React.FC<Props> = ({ planDetails, closePopover, isAnnualPlan }) => {
+export const TeamPlanDetailsPopover: React.FC<Props> = ({ billingTeamDetails, closePopover, isAnnualPlan }) => {
+  const planDetails = billingTeamDetails?.subscriptionDetails;
+
   const planName = useMemo(() => {
     return getPlanNameFromId(planDetails.plan) === "basic-v2" ? "basic" : getPlanNameFromId(planDetails.plan);
   }, [planDetails.plan]);
@@ -47,20 +50,22 @@ export const TeamPlanDetailsPopover: React.FC<Props> = ({ planDetails, closePopo
           ))}
         </Col>
       </Col>
-      <Col className="team-plan-popover-footer">
-        <div className="team-plan-popover-footer-section">
-          <Col>Plan start date</Col>
-          <Col className="header">
-            {getLongFormatDateString(new Date(planDetails.subscriptionCurrentPeriodStart * 1000))}
-          </Col>
-        </div>
-        <div className="team-plan-popover-footer-section">
-          <Col>Plan renewal date</Col>
-          <Col className="header">
-            {getLongFormatDateString(new Date(planDetails.subscriptionCurrentPeriodEnd * 1000))}
-          </Col>
-        </div>
-      </Col>
+      {!billingTeamDetails?.browserstackGroupId ? (
+        <Col className="team-plan-popover-footer">
+          <div className="team-plan-popover-footer-section">
+            <Col>Plan start date</Col>
+            <Col className="header">
+              {getLongFormatDateString(new Date(planDetails.subscriptionCurrentPeriodStart * 1000))}
+            </Col>
+          </div>
+          <div className="team-plan-popover-footer-section">
+            <Col>Plan renewal date</Col>
+            <Col className="header">
+              {getLongFormatDateString(new Date(planDetails.subscriptionCurrentPeriodEnd * 1000))}
+            </Col>
+          </div>
+        </Col>
+      ) : null}
     </>
   );
 };

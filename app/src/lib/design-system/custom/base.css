@@ -75,6 +75,10 @@
   font-weight: 500;
 }
 
+.text-subtle {
+  color: var(--requestly-color-text-subtle);
+}
+
 .text-primary {
   color: var(--primary);
 }

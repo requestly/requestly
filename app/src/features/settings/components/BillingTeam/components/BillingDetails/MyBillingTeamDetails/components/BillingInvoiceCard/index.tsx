@@ -49,14 +49,15 @@ export const BillingInvoiceCard: React.FC = () => {
         <img src={"/assets/media/settings/invoice.svg"} alt="invoice" />
         {billingTeamDetails.browserstackGroupId ? (
           <>
-            <div className="text-bold text-white billing-invoice-card-title">Invoices</div>
+            <div className="text-bold text-white billing-invoice-card-title">Your Invoices</div>
+            <div className="text-subtle"> To view or manage you invoices, please visit the billing dashboard.</div>
             <RQButton
               type="default"
               onClick={() => {
                 redirectToUrl(`${process.env.BROWSERSTACK_BASE_URL}/accounts/billing`, true);
               }}
             >
-              Manage Invoices
+              Go to billing dashboard
             </RQButton>
           </>
         ) : (

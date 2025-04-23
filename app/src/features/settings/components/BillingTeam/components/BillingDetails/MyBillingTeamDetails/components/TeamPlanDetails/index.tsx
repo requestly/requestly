@@ -99,17 +99,22 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
             )
           ) : null}
         </Row>
-        <div className="team-plan-details-sections-wrapper">
+        <div
+          className={`team-plan-details-sections-wrapper ${
+            billingTeamDetails?.browserstackGroupId ? "two-part-grid" : "three-part-grid"
+          }`}
+        >
           <div className="team-plan-details-section">
             <Row align="middle" gutter={8}>
               <Col className="team-plan-details-section-plan-name">
+                {`${billingTeamDetails?.subscriptionDetails?.subscriptionStatus === "trialing" ? "Trial - " : ""}`}
                 {getPrettyPlanName(getPlanNameFromId(billingTeamDetails?.subscriptionDetails?.plan))} team plan
               </Col>
               <Col>
                 <Popover
                   content={
                     <TeamPlanDetailsPopover
-                      planDetails={billingTeamDetails?.subscriptionDetails}
+                      billingTeamDetails={billingTeamDetails}
                       closePopover={() => setIsPlanDetailsPopoverVisible(false)}
                       isAnnualPlan={isAnnualPlan}
                     />
@@ -174,16 +179,18 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
               ) : null}
             </div>
           </div>
-          <div className="team-plan-details-section display-row-center items-center">
-            <div>
-              <Col className="text-center caption">Plan renewal date</Col>
-              <Col className="mt-8 text-center text-bold header">
-                {getLongFormatDateString(
-                  new Date(billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000)
-                )}
-              </Col>
+          {!billingTeamDetails?.browserstackGroupId ? (
+            <div className="team-plan-details-section display-row-center items-center">
+              <div>
+                <Col className="text-center caption">Plan renewal date</Col>
+                <Col className="mt-8 text-center text-bold header">
+                  {getLongFormatDateString(
+                    new Date(billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000)
+                  )}
+                </Col>
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       </Col>
     </>
