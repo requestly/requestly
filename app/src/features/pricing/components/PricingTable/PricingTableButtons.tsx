@@ -20,6 +20,8 @@ import { trackPricingPlanCTAClicked } from "modules/analytics/events/misc/busine
 import APP_CONSTANTS from "config/constants";
 import { redirectToPricingPlans, redirectToUrl } from "utils/RedirectionUtils";
 import { createBStackCheckoutUrl } from "features/pricing/utils";
+import { getAppMode } from "store/selectors";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const CTA_ONCLICK_FUNCTIONS = {
   MANAGE_SUBSCRIPTION: "manage-subscription",
@@ -189,6 +191,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   const dispatch = useDispatch();
   const firebaseFunction = getFunctions();
   const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
   const navigate = useNavigate();
 
   const [isButtonLoading, setIsButtonLoading] = useState(false);
@@ -201,6 +204,11 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   const userPlanType = ["team", "individual"].includes(user?.details?.planDetails?.type)
     ? user?.details?.planDetails?.type
     : "individual";
+
+  const redirectToCheckoutUrl = (url: string) => {
+    const newTab = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+    redirectToUrl(url, newTab);
+  };
 
   const onButtonClick = (functionName: string) => {
     trackPricingPlanCTAClicked(
@@ -256,7 +264,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
         if (isNewCheckoutFlowEnabled) {
           const checkoutUrl = createBStackCheckoutUrl(columnPlanName, quantity, duration === PRICING.DURATION.ANNUALLY);
-          redirectToUrl(checkoutUrl);
+          redirectToCheckoutUrl(checkoutUrl);
         } else {
           dispatch(
             globalActions.toggleActiveModal({
@@ -278,7 +286,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       case CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION: {
         if (isNewCheckoutFlowEnabled) {
           const checkoutUrl = createBStackCheckoutUrl(columnPlanName, quantity, duration === PRICING.DURATION.ANNUALLY);
-          redirectToUrl(checkoutUrl);
+          redirectToCheckoutUrl(checkoutUrl);
         } else {
           trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
           const manageSubscription = httpsCallable(firebaseFunction, "subscription-manageSubscription");
