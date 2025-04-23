@@ -278,34 +278,44 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION: {
-        trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
-        const manageSubscription = httpsCallable(firebaseFunction, "subscription-manageSubscription");
-        manageSubscription({
-          planName: columnPlanName,
-          duration,
-          portalFlowType: "update_subscription",
-        })
-          .then((res: any) => {
-            if (res?.data?.success) {
-              window.location.href = res?.data?.data?.portalUrl;
+        if (isNewCheckoutFlowEnabled) {
+          const checkoutUrl = createBStackCheckoutUrl(
+            columnPlanName,
+            quantity,
+            duration === PRICING.DURATION.ANNUALLY,
+            window.location.href
+          );
+          redirectToUrl(checkoutUrl);
+        } else {
+          trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
+          const manageSubscription = httpsCallable(firebaseFunction, "subscription-manageSubscription");
+          manageSubscription({
+            planName: columnPlanName,
+            duration,
+            portalFlowType: "update_subscription",
+          })
+            .then((res: any) => {
+              if (res?.data?.success) {
+                window.location.href = res?.data?.data?.portalUrl;
 
-              trackCheckoutInitiated({
-                plan_name: columnPlanName,
-                duration,
-                currency: "usd",
-                quantity: quantity,
-                is_user_on_trial: isUserTrialing,
-                source,
-              });
-            }
-          })
-          .catch((err) => {
-            toast.error("Error in managing subscription. Please contact support contact@requestly.io");
-            trackCheckoutFailedEvent(quantity, source);
-          })
-          .finally(() => {
-            setIsButtonLoading(false);
-          });
+                trackCheckoutInitiated({
+                  plan_name: columnPlanName,
+                  duration,
+                  currency: "usd",
+                  quantity: quantity,
+                  is_user_on_trial: isUserTrialing,
+                  source,
+                });
+              }
+            })
+            .catch((err) => {
+              toast.error("Error in managing subscription. Please contact support contact@requestly.io");
+              trackCheckoutFailedEvent(quantity, source);
+            })
+            .finally(() => {
+              setIsButtonLoading(false);
+            });
+        }
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN: {
