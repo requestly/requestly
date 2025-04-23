@@ -10,6 +10,10 @@ import LINKS from "config/constants/sub/links";
 import { getIsAcquisitionAnnouncementModalVisible } from "store/selectors";
 import { getUser } from "backend/user/getUser";
 import "./acquisitionAnnouncementModal.scss";
+import {
+  trackAcquisitionAnnouncementModalClosed,
+  trackAcquisitionAnnouncementModalViewed,
+} from "features/onboarding/analytics";
 
 export const AcquisitionAnnouncementModal = () => {
   const dispatch = useDispatch();
@@ -28,15 +32,23 @@ export const AcquisitionAnnouncementModal = () => {
       return;
     }
 
+    if (!isModalVisible) {
+      return;
+    }
+
     getUser(uid).then((user) => {
-      setIsUserDetailsLoading(false);
       if (user?.browserstackId) {
         dispatch(globalActions.updateIsAcquisitionAnnouncementModalVisible(false));
+        return;
       }
+
+      trackAcquisitionAnnouncementModalViewed();
+      setIsUserDetailsLoading(false);
     });
-  }, [uid, isLoggedIn, dispatch]);
+  }, [uid, isLoggedIn, dispatch, isModalVisible]);
 
   const onCloseClick = () => {
+    trackAcquisitionAnnouncementModalClosed();
     dispatch(globalActions.updateIsAcquisitionAnnouncementModalVisible(false));
   };
 
