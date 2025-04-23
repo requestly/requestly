@@ -220,7 +220,10 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
           newValue: true,
           newProps: {
             callback: () => redirectToPricingPlans(navigate),
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+            authMode:
+              functionName === CTA_ONCLICK_FUNCTIONS.SIGNUP
+                ? APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP
+                : APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
             eventSource: "pricing_table",
           },
         })

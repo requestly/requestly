@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Divider } from "antd";
 import { GoogleAuthButton } from "./components/GoogleAuthButton/GoogleAuthButton";
 import { EmailAuthForm } from "./components/EmailAuthForm/EmailAuthForm";
@@ -26,6 +26,10 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
   const { email, authProviders, ssoProviderId, isSendEmailInProgress } = useAuthScreenContext();
   const [isSSOLoginInProgress, setIsSSOLoginInProgress] = useState(false);
 
+  const isPasswordProviderUsed = useMemo(() => {
+    return authProviders.includes(AuthProvider.PASSWORD);
+  }, [authProviders]);
+
   const handleSSOLogin = useCallback(async () => {
     setIsSSOLoginInProgress(true);
     try {
@@ -46,7 +50,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
           <GoogleAuthButton
             successfulLoginCallback={successfulLoginCallback}
             failedLoginCallback={failedLoginCallback}
-            type="primary"
+            type={isPasswordProviderUsed ? "secondary" : "primary"}
           />
         );
       case AuthProvider.PASSWORD:
