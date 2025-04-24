@@ -25,6 +25,7 @@ import STORAGE from "config/constants/sub/storage";
 import { globalActions } from "store/slices/global/slice";
 import { getDesktopAppAuthParams } from "../utils";
 import PATHS from "config/constants/sub/paths";
+import { toast } from "utils/Toast";
 import "./desktopSignIn.scss";
 
 const DesktopSignIn = () => {
@@ -63,7 +64,10 @@ const DesktopSignIn = () => {
       return;
     }
 
-    window.localStorage.setItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS, params.toString());
+    window.localStorage.setItem(
+      STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS,
+      JSON.stringify({ params: params.toString(), createdAt: Date.now() })
+    );
     const authMode = params.get("auth_mode");
 
     if (authMode === AuthMode.SIGN_UP) {
@@ -95,7 +99,12 @@ const DesktopSignIn = () => {
   const handleDoneSignIn = useCallback(
     async (firebaseUser) => {
       setLoading(true);
-      const desktopAuthParams = new URLSearchParams(getDesktopAppAuthParams());
+      const desktopAuthParams = getDesktopAppAuthParams();
+
+      if (!desktopAuthParams) {
+        throw new Error("Desktop app auth params not found!");
+      }
+
       const token = await firebaseUser?.getIdToken();
 
       const isNewUser = params.get("isNewUser");
@@ -146,8 +155,9 @@ const DesktopSignIn = () => {
         })
         .catch((err) => {
           setIsError(true);
+          toast.error("Something went wrong, please try again from desktop app");
           trackSignUpFailedEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
+            auth_provider: AUTH_PROVIDERS.GMAIL, // TODO: update provider
             error_message: err.message,
             source,
           });
