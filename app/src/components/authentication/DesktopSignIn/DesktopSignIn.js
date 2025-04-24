@@ -100,12 +100,17 @@ const DesktopSignIn = () => {
     async (firebaseUser) => {
       setLoading(true);
       const desktopAuthParams = getDesktopAppAuthParams();
+
+      if (!desktopAuthParams) {
+        throw new Error("Desktop app auth params not found!");
+      }
+
       const token = await firebaseUser?.getIdToken();
 
       const isNewUser = params.get("isNewUser");
 
-      const code = desktopAuthParams?.get("ot-auth-code");
-      const source = desktopAuthParams?.get("source")?.replace(/ /g, "_");
+      const code = desktopAuthParams.get("ot-auth-code");
+      const source = desktopAuthParams.get("source").replace(/ /g, "_");
 
       const functions = getFunctions();
       const createAuthToken = httpsCallable(functions, "auth-createAuthToken");
@@ -150,9 +155,9 @@ const DesktopSignIn = () => {
         })
         .catch((err) => {
           setIsError(true);
-          toast.error("Something went wrong. Please try again.");
+          toast.error("Something went wrong, please try again from desktop app");
           trackSignUpFailedEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
+            auth_provider: AUTH_PROVIDERS.GMAIL, // TODO: update provider
             error_message: err.message,
             source,
           });
