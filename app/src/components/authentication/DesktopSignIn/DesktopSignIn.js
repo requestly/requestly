@@ -49,7 +49,7 @@ const DesktopSignIn = () => {
           modalName: "authModal",
           newValue: value,
           newProps: {
-            isClosable: false,
+            closable: false,
           },
         })
       );
