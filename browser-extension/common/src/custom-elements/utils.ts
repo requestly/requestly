@@ -10,6 +10,15 @@ import scriptRuleIcon from "../../resources/icons/rule-icons/script.svg";
 import responRuleIcon from "../../resources/icons/rule-icons/response.svg";
 import requestRuleIcon from "../../resources/icons/rule-icons/request.svg";
 
+function sanitize(input: string) {
+  return input
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 export const registerCustomElement = (tagName: string, elementConstructor: CustomElementConstructor) => {
   if (!customElements.get(tagName)) {
     customElements.define(tagName, elementConstructor);
@@ -17,6 +26,7 @@ export const registerCustomElement = (tagName: string, elementConstructor: Custo
 };
 
 export const setInnerHTML = (element: InnerHTML, content: string) => {
+  content = sanitize(content);
   try {
     element.innerHTML = content;
   } catch (e) {
