@@ -78,6 +78,18 @@ export const getAuthErrorMessage = (authType: string, errorCode: string) => {
   }
 };
 
-export const getDesktopAppAuthParams = () => {
-  return window.localStorage.getItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS);
+export const getDesktopAppAuthParams = (): URLSearchParams | null => {
+  try {
+    const EXPIRY_DURATION = 3 * 60 * 1000; // 3mins -> milliseconds
+    const value = window.localStorage.getItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS);
+    const paramsObj = JSON.parse(value) as { params: string; createdAt: number };
+
+    if (Date.now() - paramsObj.createdAt > EXPIRY_DURATION) {
+      return null;
+    }
+
+    return new URLSearchParams(paramsObj.params);
+  } catch (error) {
+    return null;
+  }
 };
