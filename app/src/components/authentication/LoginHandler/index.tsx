@@ -31,8 +31,11 @@ const LoginHandler: React.FC = () => {
   const isNewUser = params.get("isNewUser") === "true";
 
   const postLoginDesktopAppRedirect = useCallback(() => {
-    const rawDesktopAuthParams = getDesktopAppAuthParams();
-    const desktopAuthParams = new URLSearchParams(rawDesktopAuthParams);
+    let desktopAuthParams = getDesktopAppAuthParams();
+
+    if (!desktopAuthParams) {
+      return;
+    }
 
     const authMode = desktopAuthParams.get("auth_mode");
     const oneTimeCode = desktopAuthParams.get("ot-auth-code");
@@ -42,7 +45,7 @@ const LoginHandler: React.FC = () => {
         desktopAuthParams.set("isNewUser", "true");
       }
       desktopAuthParams.append("skip", "true");
-      /* 
+      /*
        marking onboarding as completed because user is authenticating from desktop app
        so onboarding is going to be visible in desktop app
        */
@@ -100,8 +103,8 @@ const LoginHandler: React.FC = () => {
       redirectToHome(appMode, navigate);
     }
 
-    const rawDesktopAuthParams = getDesktopAppAuthParams();
-    if (!rawDesktopAuthParams && user.loggedIn && !loginComplete) {
+    const desktopAuthParams = getDesktopAppAuthParams();
+    if (!desktopAuthParams && user.loggedIn && !loginComplete) {
       const overrideCurrentAuth = window.confirm(
         "You will be logged out from the current session, do you want to continue?"
       );
@@ -110,13 +113,13 @@ const LoginHandler: React.FC = () => {
         return;
       }
     }
-    const desktopAuthParams = new URLSearchParams(rawDesktopAuthParams);
+
     const auth = getAuth(firebaseApp);
     signInWithCustomToken(auth, accessToken)
       .then((user) => {
         Logger.log("User logged in successfully", user);
         setLoginComplete(true);
-        /* Auth flow was triggered from web app, 
+        /* Auth flow was triggered from web app,
         "auth_mode" param check is added to make sure persona modal is triggered only for web app
         */
         if (!desktopAuthParams.get("auth_mode") && isNewUser) {
