@@ -36,7 +36,7 @@ export const createRule = <T extends Rule>(
             inputSelectorToFocus,
           },
         },
-        "*"
+        config.WEB_URL
       );
       window.removeEventListener("message", onMessageReceived);
     }
