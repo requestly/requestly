@@ -75,7 +75,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ isLoading, onSendE
         onClick={isDesktopSignIn ? handleSignInWithEmailAndPassword : onSendEmailClick}
         size="large"
       >
-        {isDesktopSignIn ? "Sign In" : "Continue with email"}
+        {isDesktopSignIn ? "Sign In" : "Send sign in link"}
       </RQButton>
     </div>
   );
