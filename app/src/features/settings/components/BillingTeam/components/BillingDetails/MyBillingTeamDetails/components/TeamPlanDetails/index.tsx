@@ -156,33 +156,31 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
               <Col className="text-white caption">Licences</Col>
             </Row>
           </div>
-          <div className="team-plan-details-section">
-            <Col className="team-plan-details-section__team-name">{billingTeamDetails.name}</Col>
-            <div className="team-plan-details-section__team-details">
-              {teamOwnerDetails?.displayName ? (
+          {teamOwnerDetails?.email && teamOwnerDetails?.displayName ? (
+            <div className="team-plan-details-section">
+              <Col className="team-plan-details-section__team-name">{billingTeamDetails.name}</Col>
+              <div className="team-plan-details-section__team-details">
                 <Col>
                   <div className="team-plan-details-section-label">
                     {billingTeamDetails?.isAcceleratorTeam ? "Admin" : "Billing manager"}
                   </div>
                   <div className="text-white">{teamOwnerDetails?.displayName}</div>
                 </Col>
-              ) : null}
-              {teamOwnerDetails?.email ? (
                 <Col>
                   <div className="team-plan-details-section-label">
                     {billingTeamDetails?.isAcceleratorTeam ? "Admin" : "Billing"} email
                   </div>
                   <div className="text-white">{teamOwnerDetails?.email}</div>
                 </Col>
-              ) : null}
-              {billingTeamDetails.description ? (
-                <Col>
-                  <div className="team-plan-details-section-label">Description</div>
-                  <div className="text-white">{billingTeamDetails.description}</div>
-                </Col>
-              ) : null}
+                {billingTeamDetails.description ? (
+                  <Col>
+                    <div className="team-plan-details-section-label">Description</div>
+                    <div className="text-white">{billingTeamDetails.description}</div>
+                  </Col>
+                ) : null}
+              </div>
             </div>
-          </div>
+          ) : null}
           {!billingTeamDetails?.browserstackGroupId ? (
             <div className="team-plan-details-section display-row-center items-center">
               <div>
