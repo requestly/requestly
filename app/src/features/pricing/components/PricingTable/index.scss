@@ -140,6 +140,20 @@
       flex-shrink: 0;
     }
   }
+
+  .plan-card-current-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--requestly-color-surface-2);
+    color: var(--requestly-color-text-default);
+    font-weight: var(--requestly-font-weight-bold);
+    font-size: var(--requestly-font-size-xs);
+    padding: 2px 0;
+    text-align: center;
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+  }
 }
 
 .plan-name.ant-typography {
@@ -234,6 +248,7 @@
 .quantity-container {
   margin-top: 8px;
   margin-bottom: 16px;
+  min-height: 32px;
 
   .pricing-plan-quantity-selector__select {
     width: 100%;

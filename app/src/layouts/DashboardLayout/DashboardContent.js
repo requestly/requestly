@@ -25,7 +25,7 @@ import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLink
 import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 import { RequestBillingTeamAccessReminder } from "features/settings";
-import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { IncentiveTaskCompletedModal, IncentiveTasksListModal } from "features/incentivization";
 import { getIncentivizationActiveModals } from "store/features/incentivization/selectors";
 import { incentivizationActions } from "store/features/incentivization/slice";
@@ -33,6 +33,7 @@ import { IncentivizationModal } from "store/features/incentivization/types";
 import { RequestBot } from "features/requestBot";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { OnboardingModal, PersonaSurveyModal, AcquisitionAnnouncementModal } from "features/onboarding";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -47,7 +48,7 @@ const DashboardContent = () => {
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
   const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
   const requestBotDetails = useSelector(getRequestBot);
-  const isBrowserstackIntegrationEnabled = useFeatureIsOn("browserstack_integration");
+  const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
   const isRequestBotVisible = requestBotDetails?.isActive;
   const isOnboardingCompleted = useSelector(getIsOnboardingCompleted);
 
@@ -213,7 +214,7 @@ const DashboardContent = () => {
               {...activeModals.pricingModal.props}
             />
           ) : null}
-          {isBrowserstackIntegrationEnabled ? (
+          {isBrowserstackIntegrationOn ? (
             <>
               {!isOnboardingCompleted ? <OnboardingModal /> : null}
               <PersonaSurveyModal />

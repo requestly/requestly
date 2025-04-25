@@ -3,12 +3,12 @@ import { AuthModal } from "features/onboarding/screens/auth/modals/AuthModal/Aut
 import RQAuthModal from "components/authentication/AuthModal";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 
 export const GlobalModals = () => {
   const dispatch = useDispatch();
   const activeModals = useSelector(getActiveModals);
-  const isBrowserstackIntegrationEnabled = useFeatureIsOn("browserstack_integration");
+  const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
 
   const toggleAuthModal = () => {
     dispatch(globalActions.toggleActiveModal({ modalName: "authModal" }));
@@ -18,7 +18,7 @@ export const GlobalModals = () => {
     <>
       {activeModals.authModal.isActive ? (
         <>
-          {isBrowserstackIntegrationEnabled ? (
+          {isBrowserstackIntegrationOn ? (
             <AuthModal
               isOpen={activeModals.authModal.isActive}
               authMode={activeModals.authModal.props.authMode}

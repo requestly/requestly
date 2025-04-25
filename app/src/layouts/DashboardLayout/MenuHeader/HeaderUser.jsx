@@ -26,7 +26,7 @@ import { isSafariBrowser } from "actions/ExtensionActions";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export default function HeaderUser() {
   const user = useSelector(getUserAuthDetails);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const appMode = useSelector(getAppMode);
-  const isBrowserstackIntegrationEnabled = useFeatureIsOn("browserstack_integration");
+  const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
 
   const userName = user.loggedIn ? user?.details?.profile?.displayName ?? "User" : null;
   const userPhoto =
@@ -144,7 +144,7 @@ export default function HeaderUser() {
       return;
     }
 
-    if (isBrowserstackIntegrationEnabled) {
+    if (isBrowserstackIntegrationOn) {
       setIsSignupButtonLoading(true);
       redirectToOAuthUrl(navigate);
       return;

@@ -19,6 +19,7 @@ import ProductSwitcher from "../ProductSwitcher";
 import { kebabCase } from "lodash";
 import { StudentProgram } from "./components/StudentProgram";
 import { isSafariBrowser } from "actions/ExtensionActions";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
 import "./pricingIndexPage.scss";
@@ -26,6 +27,7 @@ import "./pricingIndexPage.scss";
 export const PricingIndexPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const isBrowserStackIntegrationOn = useIsBrowserStackIntegrationOn();
   const checkoutErrorMessage = searchParams.get("errorMsg");
   const [isErrorBannerClosed, setIsErrorBannerClosed] = useState(false);
 
@@ -50,7 +52,7 @@ export const PricingIndexPage = () => {
           <div className="pricing-navbar-content">
             <img
               className="logo"
-              src={"/assets/media/common/rq_logo_full.svg"}
+              src={`/assets/media/common/${isBrowserStackIntegrationOn ? "RQ-BStack Logo.svg" : "rq_logo_full.svg"}`}
               alt="requestly logo"
               onClick={() => redirectToRules(navigate)}
             />

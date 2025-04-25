@@ -1,7 +1,7 @@
 import React from "react";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { IoMdArrowForward } from "@react-icons/all-files/io/IoMdArrowForward";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 import "./onboardingHeader.scss";
 
 interface OnboardingHeaderProps {
@@ -15,10 +15,10 @@ const OnboardingHeader: React.FC<OnboardingHeaderProps> = ({
   isOnboarding = false,
   onHeaderButtonClick,
 }) => {
-  const isBrowserstackIntegrationEnabled = useFeatureIsOn("browserstack_integration");
+  const isBrowserStackIntegrationOn = useIsBrowserStackIntegrationOn();
   return (
     <div className="onboarding-header">
-      {isBrowserstackIntegrationEnabled ? (
+      {isBrowserStackIntegrationOn ? (
         <img src="/assets/media/common/RQ-BStack Logo.svg" alt="Requestly by Browserstack" />
       ) : (
         <img
