@@ -9,6 +9,7 @@ import { getAndUpdateInstallationDate } from "utils/Misc";
 import { getAppMode } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { useIsAuthSkipped } from "hooks";
+import { shouldShowOnboarding } from "features/onboarding/utils";
 import "./OnboardingModal.scss";
 
 export const OnboardingModal = () => {
@@ -43,7 +44,7 @@ export const OnboardingModal = () => {
       });
   }, [appMode, dispatch, isAuthSkipped, user.loggedIn]);
 
-  if (!user.loggedIn) {
+  if (!user.loggedIn && shouldShowOnboarding()) {
     return (
       <Modal
         open={isModalVisible}
