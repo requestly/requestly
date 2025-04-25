@@ -14,6 +14,12 @@
   border-radius: inherit;
 }
 
+.create-workspace-form .rq-modal-footer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
 .create-workspace-form.ant-form .ant-form-item-label label {
   font-size: var(--requestly-font-size-sm, 13px);
   font-weight: 500;
