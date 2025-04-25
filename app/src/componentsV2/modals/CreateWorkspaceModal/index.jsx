@@ -253,12 +253,14 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
           <Col>
             {isVerifiedBusinessUser ? (
               <>
-                <Checkbox checked={isNotifyAllSelected} onChange={(e) => setIsNotifyAllSelected(e.target.checked)} />
-                <span className="ml-2 text-gray text-sm">
-                  Notify all{" "}
-                  <span className="text-white text-bold">{getDomainFromEmail(user?.details?.profile?.email)}</span>{" "}
-                  users to join this workspace
-                </span>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <Checkbox checked={isNotifyAllSelected} onChange={(e) => setIsNotifyAllSelected(e.target.checked)} />
+                  <span style={{ lineHeight: "1.5em" }} className="ml-2 text-gray text-sm">
+                    Notify all{" "}
+                    <span className="text-white text-bold">{getDomainFromEmail(user?.details?.profile?.email)}</span>{" "}
+                    users to join this workspace
+                  </span>
+                </div>
               </>
             ) : (
               <LearnMoreLink
