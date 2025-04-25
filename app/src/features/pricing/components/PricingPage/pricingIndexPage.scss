@@ -140,3 +140,36 @@
   gap: 16px;
   margin-top: 56px;
 }
+
+.pricing-page-error-message-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #a41f1f;
+  width: 100%;
+  height: 56px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--requestly-color-text-default);
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  span {
+    font-size: var(--requestly-font-size-sm);
+  }
+
+  &-close-icon {
+    cursor: pointer;
+    position: absolute;
+    align-self: center;
+    top: 20px;
+    right: 16px;
+  }
+}
