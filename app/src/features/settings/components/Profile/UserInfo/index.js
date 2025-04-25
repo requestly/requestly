@@ -1,45 +1,67 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Row, Card, CardHeader, Col, CardBody, FormGroup, Form, Input } from "reactstrap";
-import { Button, Typography } from "antd";
+import { Typography } from "antd";
 import { toast } from "utils/Toast.js";
-// UTILS
-import DataStoreUtils from "../../../../../utils/DataStoreUtils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-// ACTIONS
 import { updateUserProfile } from "./actions";
-// CONSTANTS
-import { getUsername, updateUsername } from "backend/auth/username";
+import { updateUsername } from "backend/auth/username";
 import { globalActions } from "store/slices/global/slice";
 import { trackUsernameUpdated } from "modules/analytics/events/misc/username";
 import { getUser } from "backend/user/getUser";
+import { RQButton } from "lib/design-system-v2/components";
 
 const UserInfo = ({ customHeading, shadow }) => {
-  //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const uid = user?.details?.profile?.uid;
 
-  //Component State
-  const [username, setUsername] = useState("");
+  const [userProfile, setUserProfile] = useState(null);
   const [usernameError, setUsernameError] = useState("");
 
   const [areChangesPending, setAreChangesPending] = useState(false);
   const [savingChanges, setSavingChanges] = useState(false);
-  const [userFullName, setUserFullName] = useState("");
 
+  const userFullName = userProfile?.displayName ?? "";
+  const username = userProfile?.username ?? "";
+  const isBrowserstackUser = !!userProfile?.browserstackId;
+
+  // TODO: get user profile from redux
   useEffect(() => {
-    // TODO: This should ideally come from redux
-    getUsername(user?.details?.profile?.uid).then((username) => {
-      setUsername(username);
+    if (!uid) {
+      return;
+    }
+
+    // Initial values. Fetch full profile
+    getUser(uid).then((profile) => {
+      if (profile) {
+        setUserProfile(profile);
+      }
     });
-  }, [user?.details?.profile?.uid]);
+  }, [uid]);
 
   const handleOnUsernameChange = (username) => {
-    setUsername(username);
+    setAreChangesPending(true);
+    setUserProfile((prev) => ({ ...(prev ?? {}), username }));
+  };
+
+  const handleDisplayNameChange = (displayName) => {
+    if (isBrowserstackUser) {
+      return;
+    }
+
+    setAreChangesPending(true);
+    setUserProfile((prev) => ({ ...(prev ?? {}), displayName }));
   };
 
   const handleSaveProfileOnClick = () => {
+    if (!userFullName) {
+      toast.warn("Name cannot be empty!");
+      return;
+    }
+
     setSavingChanges(true);
+
     Promise.all([
       updateUserProfile(user.details.profile.uid, {
         displayName: userFullName,
@@ -75,31 +97,20 @@ const UserInfo = ({ customHeading, shadow }) => {
       });
   };
 
-  const renderSaveButton = () => {
-    return (
-      <Row className="align-items-center">
-        <Col className="text-center" xs="12">
-          <Button
-            disabled={!areChangesPending}
-            onClick={handleSaveProfileOnClick}
-            type={"primary"}
-            loading={savingChanges}
-          >
-            {savingChanges ? "Saving" : "Save"}
-          </Button>
-        </Col>
-      </Row>
-    );
-  };
-
-  useEffect(() => {
-    // Initial values. Fetch full profile
-    getUser(user?.details?.profile?.uid).then((profile) => {
-      if (profile && profile?.["displayName"]) {
-        setUserFullName(profile["displayName"]);
-      }
-    });
-  }, [user?.details?.profile?.uid]);
+  const renderSaveButton = (
+    <Row className="align-items-center">
+      <Col className="text-center" xs="12">
+        <RQButton
+          type="primary"
+          disabled={!areChangesPending}
+          onClick={handleSaveProfileOnClick}
+          loading={savingChanges}
+        >
+          {savingChanges ? "Saving" : "Save"}
+        </RQButton>
+      </Col>
+    </Row>
+  );
 
   return (
     <Card className={`profile-card ${shadow ? "profile-card-shadow" : ""}`}>
@@ -122,12 +133,12 @@ const UserInfo = ({ customHeading, shadow }) => {
                 <Input
                   className="form-control-alternative"
                   value={userFullName}
+                  disabled={isBrowserstackUser}
                   id="input-name"
                   placeholder="Full Name"
                   type="text"
                   onChange={(e) => {
-                    setAreChangesPending(true);
-                    setUserFullName(e.target.value);
+                    handleDisplayNameChange(e.target.value);
                   }}
                   style={{ textTransform: "capitalize" }}
                 />
@@ -159,7 +170,6 @@ const UserInfo = ({ customHeading, shadow }) => {
                   value={username}
                   style={{ textTransform: "lowercase" }}
                   onChange={(e) => {
-                    setAreChangesPending(true);
                     handleOnUsernameChange(e.target.value);
                   }}
                 />
@@ -167,8 +177,7 @@ const UserInfo = ({ customHeading, shadow }) => {
               </FormGroup>
             </Row>
           </div>
-
-          {renderSaveButton()}
+          {renderSaveButton}
         </Form>
       </CardBody>
     </Card>
