@@ -159,18 +159,22 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
           <div className="team-plan-details-section">
             <Col className="team-plan-details-section__team-name">{billingTeamDetails.name}</Col>
             <div className="team-plan-details-section__team-details">
-              <Col>
-                <div className="team-plan-details-section-label">
-                  {billingTeamDetails?.isAcceleratorTeam ? "Admin" : "Billing manager"}
-                </div>
-                <div className="text-white">{teamOwnerDetails?.displayName ?? "User"}</div>
-              </Col>
-              <Col>
-                <div className="team-plan-details-section-label">
-                  {billingTeamDetails?.isAcceleratorTeam ? "Admin" : "Billing"} email
-                </div>
-                <div className="text-white">{teamOwnerDetails?.email}</div>
-              </Col>
+              {teamOwnerDetails?.displayName ? (
+                <Col>
+                  <div className="team-plan-details-section-label">
+                    {billingTeamDetails?.isAcceleratorTeam ? "Admin" : "Billing manager"}
+                  </div>
+                  <div className="text-white">{teamOwnerDetails?.displayName}</div>
+                </Col>
+              ) : null}
+              {teamOwnerDetails?.email ? (
+                <Col>
+                  <div className="team-plan-details-section-label">
+                    {billingTeamDetails?.isAcceleratorTeam ? "Admin" : "Billing"} email
+                  </div>
+                  <div className="text-white">{teamOwnerDetails?.email}</div>
+                </Col>
+              ) : null}
               {billingTeamDetails.description ? (
                 <Col>
                   <div className="team-plan-details-section-label">Description</div>
