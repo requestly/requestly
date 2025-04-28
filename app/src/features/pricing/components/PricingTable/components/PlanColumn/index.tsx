@@ -191,11 +191,16 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     >
       {planName === user.details?.planDetails?.planName ? (
         <div className="plan-card-current-header">
-          {" "}
-          CURRENT PLAN{" "}
-          {planName === PRICING.PLAN_NAMES.BASIC || planName === PRICING.PLAN_NAMES.PROFESSIONAL
-            ? `- ${user.details?.planDetails?.subscription?.quantity} SEATS`
-            : ""}
+          {user?.details?.planDetails?.status === "trialing" ? (
+            "TRIAL"
+          ) : (
+            <>
+              CURRENT PLAN{" "}
+              {planName === PRICING.PLAN_NAMES.BASIC || planName === PRICING.PLAN_NAMES.PROFESSIONAL
+                ? `- ${user.details?.planDetails?.subscription?.quantity} SEATS`
+                : ""}
+            </>
+          )}
         </div>
       ) : null}
       <div className="plan-card-middle-section">

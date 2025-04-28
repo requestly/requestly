@@ -68,10 +68,11 @@ export const PlanQuantitySelector: React.FC<PlanQuantitySelectorProps> = ({
   handleQuantityChange,
 }) => {
   const user = useSelector(getUserAuthDetails);
+  const isUserTrialing = user?.details?.planDetails?.status === "trialing";
 
   const isNonPremiumOrTrialing = useMemo(() => {
-    return user?.details?.planDetails?.status === "trialing" || !isPremiumUser(user?.details?.planDetails);
-  }, [user?.details?.planDetails]);
+    return isUserTrialing || !isPremiumUser(user?.details?.planDetails);
+  }, [user?.details?.planDetails, isUserTrialing]);
 
   const isUpgradingSamePlan =
     currentPlanName === columnPlanName &&
@@ -91,13 +92,13 @@ export const PlanQuantitySelector: React.FC<PlanQuantitySelectorProps> = ({
   }, [isNonPremiumOrTrialing, isUpgradingSamePlan, currentSeats]);
 
   const filteredOptions = useMemo(() => {
-    if (!currentPlanName) return DEFAULT_QUANTITY_OPTIONS;
+    if (!currentPlanName || isNonPremiumOrTrialing) return DEFAULT_QUANTITY_OPTIONS;
     return DEFAULT_QUANTITY_OPTIONS.filter((option) => {
       if (option.value === Infinity) return true;
       if (columnPlanName === currentPlanName) return option.value > minQuantity;
       return option.value >= minQuantity;
     });
-  }, [minQuantity, currentPlanName, columnPlanName]);
+  }, [minQuantity, currentPlanName, columnPlanName, isNonPremiumOrTrialing]);
 
   const handleInitialQuantity = useCallback(() => {
     if (!currentPlanName) return;
@@ -113,7 +114,12 @@ export const PlanQuantitySelector: React.FC<PlanQuantitySelectorProps> = ({
     handleInitialQuantity();
   }, [handleInitialQuantity]);
 
-  if (currentPlanName === PRICING.PLAN_NAMES.PROFESSIONAL && columnPlanName === PRICING.PLAN_NAMES.BASIC) return null;
+  if (
+    !isUserTrialing &&
+    currentPlanName === PRICING.PLAN_NAMES.PROFESSIONAL &&
+    columnPlanName === PRICING.PLAN_NAMES.BASIC
+  )
+    return null;
   if (isNewCheckoutFlowEnabled) {
     return <QuantitySelect options={filteredOptions} handleQuantityChange={handleQuantityChange} />;
   }
