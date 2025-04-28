@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getPlanNameFromId } from "utils/PremiumUtils";
 import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
 import { Tooltip } from "antd";
-import { getPrettyPlanName } from "utils/FormattingHelper";
 import firebaseApp from "../../../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import APP_CONSTANTS from "config/constants";
@@ -13,7 +11,6 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./premiumPlanBadge.scss";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
-import { PRICING } from "features/pricing";
 
 const PremiumPlanBadge = () => {
   const dispatch = useDispatch();
@@ -87,9 +84,7 @@ const PremiumPlanBadge = () => {
           onKeyDown={handleBadgeClick}
           onClick={handleBadgeClick}
         >
-          {getPrettyPlanName(getPlanNameFromId(planId)) === PRICING.PLAN_NAMES.PROFESSIONAL && (
-            <div className="premium-plan-name">{"Pro (Trial)"}</div>
-          )}
+          <div className="premium-plan-name">{"Pro (Trial)"}</div>
           <div className="premium-plan-days-left">
             {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
               ? `${daysLeft}d left ${isIncentivizationEnabled ? "plan" : ""}`
