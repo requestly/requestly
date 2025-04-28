@@ -24,6 +24,7 @@ The following domains are eligible for the student programme:
     ".edu.kh",
     ".edu.tw",
     ".edu.cn",
+    ".edu.al",
     ".ac.id",
     "bennington.edu",
     "yonsei.ac.kr",
@@ -35,6 +36,7 @@ The following domains are eligible for the student programme:
     "fau.de",
     "sch.gr",
     "edu.co",
-    "hunterschools.org"
+    "hunterschools.org",
+    "epitech.eu"
   ]
 }
