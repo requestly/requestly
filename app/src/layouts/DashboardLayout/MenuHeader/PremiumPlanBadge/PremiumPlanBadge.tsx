@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getPlanNameFromId } from "utils/PremiumUtils";
 import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
 import { Tooltip } from "antd";
-import { getPrettyPlanName } from "utils/FormattingHelper";
 import firebaseApp from "../../../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import APP_CONSTANTS from "config/constants";
@@ -86,11 +84,11 @@ const PremiumPlanBadge = () => {
           onKeyDown={handleBadgeClick}
           onClick={handleBadgeClick}
         >
-          <div className="premium-plan-name">{getPrettyPlanName(getPlanNameFromId(planId))}</div>
+          <div className="premium-plan-name">{"Pro (Trial)"}</div>
           <div className="premium-plan-days-left">
             {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
-              ? `${daysLeft} days left in  ${isIncentivizationEnabled ? "plan" : "trial"}`
-              : "Plan Expired"}
+              ? `${daysLeft}d left ${isIncentivizationEnabled ? "plan" : ""}`
+              : "Expired"}
           </div>
         </div>
       </Tooltip>
