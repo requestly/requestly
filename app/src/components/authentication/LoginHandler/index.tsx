@@ -60,6 +60,7 @@ const LoginHandler: React.FC = () => {
       if (!url) {
         // just in case
         redirectToHome(appMode, navigate);
+        return;
       }
       const urlObj = new URL(url);
       if (window.location.hostname === urlObj.hostname) {
