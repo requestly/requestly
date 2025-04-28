@@ -21,11 +21,6 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts 
     : RQAPI.ScriptType.PRE_REQUEST;
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
-  const [fullScreen, setFullScreen] = useState(false);
-
-  const handleFullScreenChange = () => {
-    setFullScreen((prev) => !prev);
-  };
 
   const scriptTypeOptions = useMemo(() => {
     return (
@@ -61,8 +56,6 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts 
           setScripts((prev) => ({ ...prev, scripts: { ...prev.scripts, [scriptType]: value } }))
         }
         language={EditorLanguage.JAVASCRIPT}
-        isFullScreen={fullScreen}
-        onFullScreenChange={handleFullScreenChange}
         toolbarOptions={{
           title: "",
           options: [scriptTypeOptions],

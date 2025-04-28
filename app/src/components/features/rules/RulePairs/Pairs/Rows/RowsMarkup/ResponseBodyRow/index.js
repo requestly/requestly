@@ -28,11 +28,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   const theme = useTheme();
   const dispatch = useDispatch();
   const [isSelectedFileInputVisible, setIsSelectedFileInputVisible] = useState(false);
-  const [fullScreen, setFullScreen] = useState(false);
-
-  const handleFullScreenChange = () => {
-    setFullScreen((prev) => !prev);
-  };
 
   /*
   useRef is not the idle way to handle this, useState should be used to control the behaviour of updating the value in
@@ -337,8 +332,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                 value={responseBodyValues.current[pair.response.type] ?? getEditorDefaultValue()}
                 isReadOnly={isInputDisabled}
                 prettifyOnInit={true}
-                isFullScreen={fullScreen}
-                onFullScreenChange={handleFullScreenChange}
                 handleChange={responseBodyChangeHandler}
                 isResizable
                 analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.RESPONSE }}

@@ -85,11 +85,6 @@ const BodyTabView = ({ body, requestState, timestamp }) => {
 const LogPane = ({ log_id, title, requestState, timestamp, data: request_data }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
   const { queryParams, headers, body } = request_data;
-  const [fullScreen, setFullScreen] = useState(false);
-
-  const handleFullScreenChange = () => {
-    setFullScreen((prev) => !prev);
-  };
 
   const tabs = [
     {
@@ -170,8 +165,6 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
             value={body || "{}"}
             language={EditorLanguage.JSON}
             isReadOnly
-            isFullScreen={fullScreen}
-            onFullScreenChange={handleFullScreenChange}
             isResizable={false}
             analyticEventProperties={{ source: "traffic_table" }}
           />

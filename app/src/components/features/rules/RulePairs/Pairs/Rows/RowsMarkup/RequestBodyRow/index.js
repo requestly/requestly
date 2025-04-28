@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useMemo, useState } from "react";
+import React, { useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Radio, Tooltip } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -11,16 +11,11 @@ import Editor from "componentsV2/CodeEditor";
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
   const codeFormattedFlag = useRef(null);
-  const [fullScreen, setFullScreen] = useState(false);
 
   /*
   useRef is not the idle way to handle this, useState should be used to control the behaviour of updating the value in
   state - this needs to be fixed
   */
-
-  const handleFullScreenChange = () => {
-    setFullScreen((prev) => !prev);
-  };
 
   const requestBodyValues = useRef({
     static: pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? pair.request.value : "{}",
@@ -146,8 +141,6 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                 handleChange={requestBodyChangeHandler}
                 prettifyOnInit={true}
                 isReadOnly={isInputDisabled}
-                isFullScreen={fullScreen}
-                onFullScreenChange={handleFullScreenChange}
                 analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.REQUEST }}
                 toolbarOptions={{
                   title: "Request Body",
