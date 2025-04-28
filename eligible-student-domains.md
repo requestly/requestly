@@ -35,6 +35,7 @@ The following domains are eligible for the student programme:
     "fau.de",
     "sch.gr",
     "edu.co",
-    "hunterschools.org"
+    "hunterschools.org",
+    "epitech.eu"
   ]
 }
