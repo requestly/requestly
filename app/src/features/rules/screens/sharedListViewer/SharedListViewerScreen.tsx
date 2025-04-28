@@ -16,6 +16,7 @@ import APP_CONSTANTS from "config/constants";
 import PATHS from "config/constants/sub/paths";
 import "./sharedListViewerScreen.css";
 import { ContentListScreen } from "componentsV2/ContentList";
+import { RQButton } from "lib/design-system-v2/components";
 
 export const SharedListViewerScreen = () => {
   const sharedListId = getSharedListIdFromURL(window.location.pathname);
@@ -37,14 +38,14 @@ export const SharedListViewerScreen = () => {
     return getFilterSharedListRecords([...sharedListGroups, ...sharedListRules], searchValue);
   }, [searchValue, sharedListGroups, sharedListRules]);
 
-  const promptUserToSignup = (source: string) => {
+  const promptUserToSignIn = (source: string) => {
     dispatch(
       globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {
           redirectURL: window.location.href,
-          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
           eventSource: source,
         },
       })
@@ -77,10 +78,8 @@ export const SharedListViewerScreen = () => {
           </h1>
           {!user.loggedIn ? (
             <>
-              <h2>This list is private. Please login to access it</h2>
-              <button className="ant-btn ant-btn-primary" onClick={() => promptUserToSignup(SOURCE.ACCESS_SHARED_LIST)}>
-                Login
-              </button>
+              <h2>This list is private. Please sign in to access it</h2>
+              <RQButton onClick={() => promptUserToSignIn(SOURCE.ACCESS_SHARED_LIST)}>Sign in</RQButton>
             </>
           ) : (
             <>

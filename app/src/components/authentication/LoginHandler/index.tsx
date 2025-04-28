@@ -106,7 +106,7 @@ const LoginHandler: React.FC = () => {
     const desktopAuthParams = getDesktopAppAuthParams();
     if (!desktopAuthParams && user.loggedIn && !loginComplete) {
       const overrideCurrentAuth = window.confirm(
-        "You will be logged out from the current session, do you want to continue?"
+        "You will be signed out from the current session, do you want to continue?"
       );
       if (!overrideCurrentAuth) {
         setLoginComplete(true);

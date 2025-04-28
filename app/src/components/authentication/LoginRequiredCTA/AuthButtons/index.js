@@ -1,12 +1,12 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { Button, Space } from "antd";
-//CONSTANTS
+import { Space } from "antd";
 import APP_CONSTANTS from "../../../../config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { globalActions } from "store/slices/global/slice";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
+import { RQButton } from "lib/design-system-v2/components";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
@@ -56,12 +56,10 @@ const AuthButtons = ({ src, hardRedirect = false, autoPrompt = true }) => {
 
   return (
     <Space>
-      <Button type="primary" onClick={handleLoginButtonOnClick}>
-        Login
-      </Button>
-      <Button type="primary" onClick={handleSignUpButtonOnClick}>
+      <RQButton onClick={handleLoginButtonOnClick}>Sign in</RQButton>
+      <RQButton type="primary" onClick={handleSignUpButtonOnClick}>
         Sign up
-      </Button>
+      </RQButton>
     </Space>
   );
 };

@@ -269,7 +269,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
                     </Col>
                     <Col>
                       <Typography.Title level={4} style={{ fontWeight: 500, marginBottom: 0 }}>
-                        You’re logged in successfully!
+                        You’re signed in successfully!
                       </Typography.Title>
                     </Col>
                   </Row>

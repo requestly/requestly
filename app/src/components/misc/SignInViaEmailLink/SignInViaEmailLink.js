@@ -49,9 +49,9 @@ const SignInViaEmailLink = () => {
 
   const renderAlreadyLoggedInWarning = useCallback(() => {
     const shouldLogout = window.confirm(
-      `You are already logged in${
+      `You are already signed in${
         user.email ? ` as ${user.email}` : ""
-      }. Do you want to continue login as ${userEmailfromLocalStorage}?`
+      }. Do you want to continue sign in as ${userEmailfromLocalStorage}?`
     );
     if (shouldLogout === true) {
       logOutUser();
@@ -145,7 +145,7 @@ const SignInViaEmailLink = () => {
             }}
             loading={isProcessing}
           >
-            Login
+            Sign in
           </RQButton>
         </Row>
       </div>

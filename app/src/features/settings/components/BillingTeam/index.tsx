@@ -35,15 +35,15 @@ export const BillingTeamContainer: React.FC = () => {
     if (!user.loggedIn) {
       toast.warn(
         joinRequestAction
-          ? `You need to login to review this joining request`
-          : `You need to login to view this billing team`
+          ? `You need to sign in to review this joining request`
+          : `You need to sign in to view this billing team`
       );
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
             eventSource: SOURCE.BILLING_TEAM,
           },
         })
@@ -59,8 +59,8 @@ export const BillingTeamContainer: React.FC = () => {
           status="error"
           title={
             joinRequestAction
-              ? `You need to login to review this joining request`
-              : "You need to login to view this billing team"
+              ? `You need to sign in to review this joining request`
+              : "You need to sign in to view this billing team"
           }
           extra={
             <RQButton
@@ -71,14 +71,14 @@ export const BillingTeamContainer: React.FC = () => {
                     modalName: "authModal",
                     newValue: true,
                     newProps: {
-                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
                       eventSource: SOURCE.BILLING_TEAM,
                     },
                   })
                 );
               }}
             >
-              Login
+              Sign in
             </RQButton>
           }
         />

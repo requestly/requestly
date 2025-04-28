@@ -64,10 +64,10 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
           <p className="text-gray invite-subheader">
             {invitedEmail ? (
               <>
-                To accept the invitation, please login as <b>{invitedEmail}</b>
+                To accept the invitation, please sign in as <b>{invitedEmail}</b>
               </>
             ) : (
-              <>To accept the invitation, please signup.</>
+              <>To accept the invitation, please sign up.</>
             )}
           </p>
         </div>

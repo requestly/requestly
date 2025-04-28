@@ -65,7 +65,7 @@ export const UpgradeToAnnual: React.FC = () => {
           newProps: {
             eventSource: "upgrade_to_annual",
             authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-            warningMessage: `Please login to switch to annual plan!`,
+            warningMessage: `Please sign in to switch to annual plan!`,
             closable: false,
           },
         })

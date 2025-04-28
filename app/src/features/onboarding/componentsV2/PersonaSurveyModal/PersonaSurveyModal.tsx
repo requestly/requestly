@@ -55,7 +55,7 @@ export const PersonaSurveyModal = () => {
       maskStyle={{ background: "rgba(0, 0, 0, 0.7)" }}
     >
       <div className="rq-persona-survey-modal__title">
-        <PiSealCheckFill /> <span> Welcome, {user.details?.profile.displayName}! You're logged in successfully</span>
+        <PiSealCheckFill /> <span> Welcome, {user.details?.profile.displayName}! You're signed in successfully</span>
       </div>
       <div className="rq-persona-survey-modal__description">Help us in optimizing your experience</div>
 

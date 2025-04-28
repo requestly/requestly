@@ -201,7 +201,7 @@ const DesktopSignIn = () => {
   const renderAllDone = (
     <AuthMessageCard
       icon={<MdOutlineCheckCircle style={{ color: "var(--requestly-color-success)" }} />}
-      message=" You are now logged into the Requestly desktop app. You can safely close this window."
+      message="You are now signed in to the Requestly desktop app. You can safely close this window."
     />
   );
 
