@@ -92,8 +92,8 @@ const PremiumPlanBadge = () => {
           )}
           <div className="premium-plan-days-left">
             {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
-              ? `${daysLeft}d left in  ${isIncentivizationEnabled ? "plan" : "trial"}`
-              : "Plan Expired"}
+              ? `${daysLeft}d left ${isIncentivizationEnabled ? "plan" : ""}`
+              : "Expired"}
           </div>
         </div>
       </Tooltip>
