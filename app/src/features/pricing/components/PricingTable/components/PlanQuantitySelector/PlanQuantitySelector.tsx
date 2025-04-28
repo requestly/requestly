@@ -1,6 +1,9 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useCallback } from "react";
 import { InputNumber, Select } from "antd";
 import { PRICING } from "features/pricing/constants/pricing";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { useSelector } from "react-redux";
+import { isPremiumUser } from "utils/PremiumUtils";
 
 interface PlanQuantityOption {
   label: string;
@@ -64,35 +67,51 @@ export const PlanQuantitySelector: React.FC<PlanQuantitySelectorProps> = ({
   isNewCheckoutFlowEnabled,
   handleQuantityChange,
 }) => {
+  const user = useSelector(getUserAuthDetails);
+
+  const isNonPremiumOrTrialing = useMemo(() => {
+    return user?.details?.planDetails?.status === "trialing" || !isPremiumUser(user?.details?.planDetails);
+  }, [user?.details?.planDetails]);
+
+  const isUpgradingSamePlan =
+    currentPlanName === columnPlanName &&
+    columnPlanName !== PRICING.PLAN_NAMES.FREE &&
+    columnPlanName !== PRICING.PLAN_NAMES.LITE;
+
   const minQuantity = useMemo(() => {
-    if (
-      currentPlanName === columnPlanName &&
-      columnPlanName !== PRICING.PLAN_NAMES.FREE &&
-      columnPlanName !== PRICING.PLAN_NAMES.LITE
-    ) {
+    if (isNonPremiumOrTrialing) {
+      return 1;
+    }
+
+    if (isUpgradingSamePlan) {
       return currentSeats + 1;
     }
-    return currentSeats ?? 1;
-  }, [currentPlanName, columnPlanName, currentSeats]);
+
+    return currentSeats;
+  }, [isNonPremiumOrTrialing, isUpgradingSamePlan, currentSeats]);
 
   const filteredOptions = useMemo(() => {
     if (!currentPlanName) return DEFAULT_QUANTITY_OPTIONS;
     return DEFAULT_QUANTITY_OPTIONS.filter((option) => {
       if (option.value === Infinity) return true;
-      if (columnPlanName === currentPlanName) return option.value > currentSeats;
-      return option.value >= currentSeats;
+      if (columnPlanName === currentPlanName) return option.value > minQuantity;
+      return option.value >= minQuantity;
     });
-  }, [currentSeats, currentPlanName, columnPlanName]);
+  }, [minQuantity, currentPlanName, columnPlanName]);
+
+  const handleInitialQuantity = useCallback(() => {
+    if (!currentPlanName) return;
+
+    const newQuantity = isNewCheckoutFlowEnabled
+      ? filteredOptions.find((option) => option.value >= minQuantity)?.value ?? minQuantity
+      : minQuantity;
+
+    handleQuantityChange(newQuantity);
+  }, [currentPlanName, isNewCheckoutFlowEnabled, filteredOptions, minQuantity, handleQuantityChange]);
 
   useEffect(() => {
-    if (!currentPlanName) return;
-    if (isNewCheckoutFlowEnabled) {
-      const ceilValue = filteredOptions.find((option) => option.value >= minQuantity);
-      handleQuantityChange(ceilValue?.value ?? minQuantity);
-    } else {
-      handleQuantityChange(minQuantity);
-    }
-  }, [currentPlanName, handleQuantityChange, minQuantity, isNewCheckoutFlowEnabled, filteredOptions]);
+    handleInitialQuantity();
+  }, [handleInitialQuantity]);
 
   if (currentPlanName === PRICING.PLAN_NAMES.PROFESSIONAL && columnPlanName === PRICING.PLAN_NAMES.BASIC) return null;
   if (isNewCheckoutFlowEnabled) {

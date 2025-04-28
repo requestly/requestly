@@ -1,20 +1,23 @@
 import PATHS from "config/constants/sub/paths";
 import { isEnvAutomation } from "utils/EnvUtils";
 
-export const shouldShowOnboarding = () => {
-  if (
-    isEnvAutomation() ||
-    window.location.href.includes(PATHS.AUTH.SIGN_IN.RELATIVE) ||
-    window.location.href.includes(PATHS.AUTH.SIGN_UP.RELATIVE) ||
-    window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE) ||
-    window.location.href.includes("/invite") ||
-    window.location.href.includes(PATHS.AUTH.EMAIL_ACTION.RELATIVE) ||
-    window.location.href.includes(PATHS.AUTH.EMAIL_LINK_SIGNIN.RELATIVE) ||
-    window.location.href.includes(PATHS.SESSIONS.SAVED.RELATIVE) ||
-    window.location.href.includes(PATHS.APPSUMO.RELATIVE) ||
-    window.location.href.includes(PATHS.PRICING.RELATIVE)
-  )
-    return false;
+const EXCLUDED_PATHS = [
+  PATHS.AUTH.SIGN_IN.RELATIVE,
+  PATHS.AUTH.SIGN_UP.RELATIVE,
+  PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE,
+  "/invite",
+  PATHS.AUTH.EMAIL_ACTION.RELATIVE,
+  PATHS.AUTH.EMAIL_LINK_SIGNIN.RELATIVE,
+  PATHS.SESSIONS.SAVED.RELATIVE,
+  PATHS.APPSUMO.RELATIVE,
+  PATHS.PRICING.RELATIVE,
+  PATHS.AUTH.START.RELATIVE,
+  PATHS.AUTH.LOGIN.RELATIVE,
+];
 
-  return true;
+export const shouldShowOnboarding = () => {
+  if (isEnvAutomation()) return false;
+
+  const currentPath = window.location.href;
+  return !EXCLUDED_PATHS.some((path) => currentPath.includes(path));
 };

@@ -19,12 +19,16 @@
     border: 1px solid var(--success);
   }
   .recommended-tag {
+    position: relative;
+    bottom: 2px;
+    align-self: flex-start;
     padding: 4px;
     border-radius: var(--border-radius-sm);
     background: var(--success);
-    font-weight: 700;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-size: var(--requestly-font-size-2xs);
     color: var(--black);
-    font-size: var(--requestly-font-size-xs, 11px);
   }
 
   & .ant-input-number-handler-wrap {
@@ -53,6 +57,7 @@
 .plan-price-row {
   margin-top: 4px;
   font-size: 12px;
+  min-height: 60px;
 
   .caption {
     &.text-white {

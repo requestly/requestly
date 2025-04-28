@@ -46,7 +46,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
   const isBrowserstackCheckoutEnabled = useFeatureIsOn("browserstack_checkout");
 
-  const currentSeats = user.details?.planDetails?.subscription?.quantity;
+  const currentSeats = user.details?.planDetails?.subscription?.quantity ?? 1;
 
   const isNewCheckoutFlowEnabled = useMemo(
     () => shouldShowNewCheckoutFlow(isBrowserstackIntegrationOn, isBrowserstackCheckoutEnabled),
@@ -200,21 +200,15 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       ) : null}
       <div className="plan-card-middle-section">
         <Space size={8}>
-          {quantity === Infinity ? (
-            <Typography.Text className="plan-name">Large team?</Typography.Text>
-          ) : (
-            <>
-              <Typography.Text className="plan-name">
-                {capitalize(planDetails.planTitle)}
-                {planName === PRICING.PLAN_NAMES.LITE
-                  ? " - For individuals"
-                  : planName === PRICING.PLAN_NAMES.BASIC
-                  ? " - Small teams"
-                  : ""}
-              </Typography.Text>
-              {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">MOST VALUE</span>}
-            </>
-          )}
+          <Typography.Text className="plan-name">
+            {capitalize(planDetails.planTitle)}
+            {planName === PRICING.PLAN_NAMES.LITE
+              ? " - For individuals"
+              : planName === PRICING.PLAN_NAMES.BASIC
+              ? " - Small teams"
+              : ""}
+          </Typography.Text>
+          {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">MOST VALUE</span>}
         </Space>
         {planName === PRICING.PLAN_NAMES.ENTERPRISE && (
           <Row align="middle" className="items-center plan-price-row mt-8">
@@ -233,20 +227,23 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         )}
         {planPrice !== undefined && (
           <Row align="middle" className="items-center plan-price-row">
-            <Space size="small">
+            <>
               {quantity === Infinity ? (
-                <Typography.Title level={3} style={{ marginTop: "8px" }}>
-                  Get in touch with us
-                </Typography.Title>
+                <Space direction="vertical">
+                  <Typography.Title level={3} style={{ marginBottom: 0 }}>
+                    Large team?
+                  </Typography.Title>
+                  <Typography.Text>Get in touch with us</Typography.Text>
+                </Space>
               ) : (
-                <>
+                <Space size="small">
                   <Typography.Text className="plan-price">
                     ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
                   </Typography.Text>
                   <div className="caption text-white">/ month</div>
-                </>
+                </Space>
               )}
-            </Space>
+            </>
           </Row>
         )}
         {planPrice !== undefined && (
@@ -276,19 +273,21 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             </Typography.Text>
           </Row>
         )}
-        {quantity !== Infinity ? (
-          <Row className="annual-bill mt-8" style={{ display: "flex", minHeight: "17px" }}>
-            {duration === PRICING.DURATION.MONTHLY ? (
-              planName === PRICING.PLAN_NAMES.LITE ? (
-                cardSubtitle
+        <Row className="annual-bill mt-8" style={{ display: "flex", minHeight: "17px" }}>
+          {quantity !== Infinity ? (
+            <>
+              {duration === PRICING.DURATION.MONTHLY ? (
+                planName === PRICING.PLAN_NAMES.LITE ? (
+                  cardSubtitle
+                ) : (
+                  <Typography.Text>Billed monthly</Typography.Text>
+                )
               ) : (
-                <Typography.Text>Billed monthly</Typography.Text>
-              )
-            ) : (
-              cardSubtitle
-            )}
-          </Row>
-        ) : null}
+                cardSubtitle
+              )}
+            </>
+          ) : null}
+        </Row>
         <Row
           style={{
             marginTop: "24px",
