@@ -153,7 +153,7 @@ const LINKS = {
 
   OAUTH_REDIRECT_URL: `${process.env.BACKEND_BASE_URL}/oauth/authorize`,
 
-  ACQUISITION_DETAILS: "#", // TODO: Update link
+  ACQUISITION_DETAILS: "https://rqst.ly/rq-bstack-acq",
 };
 
 export default LINKS;
