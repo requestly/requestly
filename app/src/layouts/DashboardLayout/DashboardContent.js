@@ -32,7 +32,7 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { RequestBot } from "features/requestBot";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
-import { OnboardingModal, PersonaSurveyModal, AcquisitionAnnouncementModal } from "features/onboarding";
+import { OnboardingModal, PersonaSurveyModal } from "features/onboarding";
 import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 
 const DashboardContent = () => {
@@ -218,7 +218,7 @@ const DashboardContent = () => {
             <>
               {!isOnboardingCompleted ? <OnboardingModal /> : null}
               <PersonaSurveyModal />
-              <AcquisitionAnnouncementModal />
+              {/* <AcquisitionAnnouncementModal /> */}
             </>
           ) : (
             <>
