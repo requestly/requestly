@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { RQButton } from "lib/design-system-v2/components";
 import { AuthFormInput } from "../RQAuthCard/components/AuthFormInput/AuthFormInput";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -9,6 +9,7 @@ import { getSSOProviderId } from "backend/auth/sso";
 import { isEmailValid } from "utils/FormattingHelper";
 import { useAuthScreenContext } from "../../context";
 import LINKS from "config/constants/sub/links";
+import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 
 interface EnterEmailCardProps {
   onEmailChange: (email: string) => void;
@@ -16,8 +17,14 @@ interface EnterEmailCardProps {
 }
 
 export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, onAuthSyncVerification }) => {
-  const { email, setSSOProviderId } = useAuthScreenContext();
+  const { email, setSSOProviderId, isOnboarding, eventSource } = useAuthScreenContext();
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOnboarding) {
+      trackAuthModalShownEvent(eventSource, "login");
+    }
+  }, [isOnboarding, eventSource]);
 
   const handleOnContinue = async () => {
     setIsLoading(true);
