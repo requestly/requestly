@@ -1,10 +1,12 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RQButton } from "lib/design-system/components";
 import { redirectToOAuthUrl } from "utils/RedirectionUtils";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import { useAuthScreenContext } from "../../context";
+import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 import "./signupWithBStackCard.scss";
+import { AuthScreenMode } from "../../types";
 
 interface SignupWithBStackCardProps {
   onBackButtonClick: () => void;
@@ -12,7 +14,7 @@ interface SignupWithBStackCardProps {
 
 export const SignupWithBStackCard = ({ onBackButtonClick }: SignupWithBStackCardProps) => {
   const navigate = useNavigate();
-  const { email } = useAuthScreenContext();
+  const { email, authScreenMode, eventSource } = useAuthScreenContext();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -20,6 +22,12 @@ export const SignupWithBStackCard = ({ onBackButtonClick }: SignupWithBStackCard
     setIsLoading(true);
     redirectToOAuthUrl(navigate);
   }, [navigate]);
+
+  useEffect(() => {
+    if (authScreenMode === AuthScreenMode.MODAL) {
+      trackAuthModalShownEvent(eventSource, "signup");
+    }
+  }, [authScreenMode, eventSource]);
 
   return (
     <div className="signup-with-bstack-card">
