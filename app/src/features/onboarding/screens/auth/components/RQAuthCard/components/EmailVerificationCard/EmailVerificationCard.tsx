@@ -5,7 +5,10 @@ import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import { RQButton } from "lib/design-system-v2/components";
 import { GoogleAuthButton } from "../GoogleAuthButton/GoogleAuthButton";
 import { useAuthScreenContext } from "features/onboarding/screens/auth/context";
-import { trackMagicLinkResendRequested } from "modules/analytics/events/common/auth/emailLinkSignin";
+import {
+  trackMagicLinkLoginWithGoogleInstead,
+  trackMagicLinkResendRequested,
+} from "modules/analytics/events/common/auth/emailLinkSignin";
 import "./emailVerificationCard.scss";
 
 interface EmailVerificationCardProps {
@@ -31,6 +34,7 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
         type="secondary"
         successfulLoginCallback={() => toggleAuthModal(false)}
         failedLoginCallback={failedLoginCallback}
+        onGoogleAuthClick={() => trackMagicLinkLoginWithGoogleInstead()}
       />
     );
   }, [toggleAuthModal, failedLoginCallback]);

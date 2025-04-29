@@ -9,6 +9,7 @@ import { useAuthScreenContext } from "features/onboarding/screens/auth/context";
 import "./googleAuthButton.scss";
 
 interface GoogleAuthButtonProps {
+  onGoogleAuthClick?: () => void;
   successfulLoginCallback: () => void;
   failedLoginCallback: (code: AuthErrorCode) => void;
   type: "primary" | "secondary";
@@ -18,12 +19,15 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
   successfulLoginCallback,
   failedLoginCallback,
   type,
+  onGoogleAuthClick = () => {},
 }) => {
   const { email } = useAuthScreenContext();
   const [isLoading, setIsLoading] = useState(false);
+
   const handleGoogleAuth = useCallback(
     (credentialResponse: CredentialResponse) => {
       setIsLoading(true);
+      onGoogleAuthClick();
       if (!credentialResponse) {
         toast.error("Something went wrong. Please try again.");
         setIsLoading(false);
@@ -43,7 +47,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
         }
       );
     },
-    [email, failedLoginCallback, successfulLoginCallback]
+    [email, failedLoginCallback, onGoogleAuthClick, successfulLoginCallback]
   );
 
   useGoogleAuthButton({ callback: handleGoogleAuth, type });

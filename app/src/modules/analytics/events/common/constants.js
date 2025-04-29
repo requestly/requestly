@@ -45,6 +45,9 @@ export const AUTH = {
     SEEN: "email_link_signin_form_seen",
     SUBMITTED: "email_link_signin_form_submitted",
     LINK_RESEND_REQUESTED: "magic_link_resend_requested",
+
+    // New
+    LOGIN_WITH_GOOGLE_INSTEAD: "magic_link_login_with_google_instead",
   },
 
   VERIFY_OOBCODE: {
