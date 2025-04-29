@@ -5,11 +5,13 @@ import { PiSealCheckFill } from "@react-icons/all-files/pi/PiSealCheckFill";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { TiArrowRight } from "@react-icons/all-files/ti/TiArrowRight";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { globalActions } from "store/slices/global/slice";
 import "./personaSurveyModal.scss";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
+import { trackPersonaSurveyCompleted, trackPersonaSurveyViewed } from "features/onboarding/analytics";
+import { snakeCase } from "lodash";
 
 const PersonaSurvey = () => {
   const dispatch = useDispatch();
@@ -27,8 +29,13 @@ const PersonaSurvey = () => {
     "Sales",
   ]);
 
+  useEffect(() => {
+    trackPersonaSurveyViewed();
+  }, []);
+
   const handleContinue = () => {
     dispatch(globalActions.updateNewUserPersona(selectedPersona));
+    trackPersonaSurveyCompleted(snakeCase(selectedPersona));
     dispatch(globalActions.updateIsNewUser(false));
   };
 
