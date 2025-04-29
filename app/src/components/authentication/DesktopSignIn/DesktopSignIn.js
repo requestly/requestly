@@ -42,14 +42,14 @@ const DesktopSignIn = () => {
   const params = useMemo(() => new URLSearchParams(window.location.search), []);
 
   const toggleAuthModal = useCallback(
-    (value) => {
-      // TODO: add event source in modal props
+    (value, eventSource) => {
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: value,
           newProps: {
             closable: false,
+            eventSource,
           },
         })
       );
@@ -69,6 +69,7 @@ const DesktopSignIn = () => {
       JSON.stringify({ params: params.toString(), createdAt: Date.now() })
     );
     const authMode = params.get("auth_mode");
+    const source = params.get("source");
 
     if (authMode === AuthMode.SIGN_UP) {
       redirectToOAuthUrl(navigate);
@@ -76,7 +77,7 @@ const DesktopSignIn = () => {
     }
 
     if (params.has("ot-auth-code")) {
-      toggleAuthModal(true);
+      toggleAuthModal(true, source);
     } else {
       redirectToWebAppHomePage(navigate);
     }
