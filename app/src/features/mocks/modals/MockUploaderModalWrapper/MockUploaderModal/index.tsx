@@ -69,7 +69,7 @@ export const MockUploaderModal: React.FC<Props> = ({
 
   const uploadProps: UploadProps = {
     name: "file",
-    accept: mockType === MockType.FILE ? ".css, .js, .html" : ".json",
+    accept: mockType === MockType.FILE ? ".css, .js" : ".json",
     multiple: false,
     customRequest: handleFileSelection,
   };
