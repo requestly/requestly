@@ -120,7 +120,8 @@ export const SOURCE = {
   INCENTIVIZATION_TASK_LIST: "incentivization_task_list",
   API_CLIENT_EMPTY_STATE: "api_client_empty_state",
   SHARED_LIST_SCREEN: "shared_list_screen",
-  ONBOARDING: "onboarding",
+  EXTENSION_ONBOARDING: "extension_onboarding",
+  DESKTOP_ONBOARDING: "desktop_onboarding",
 };
 
 export const RULES = {

@@ -52,7 +52,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     if (isOpen) {
       trackAuthModalShownEvent(eventSource, "login");
     }
-  }, [isOpen, isWebApp, eventSource]);
+  }, [isOpen, eventSource]);
 
   useLayoutEffect(() => {
     if (isWebAppSignup && isOpen) {

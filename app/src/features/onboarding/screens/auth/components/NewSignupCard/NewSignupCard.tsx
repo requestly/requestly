@@ -20,6 +20,8 @@ export const NewSignupCard = () => {
   const { setIsOnboardingScreenVisible } = useAuthScreenContext();
 
   const handleAuthButtonClick = (authMode: string) => {
+    const isDesktopApp = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+
     dispatch(
       globalActions.toggleActiveModal({
         modalName: "authModal",
@@ -27,7 +29,7 @@ export const NewSignupCard = () => {
         newProps: {
           redirectURL: window.location.href,
           authMode,
-          eventSource: SOURCE.ONBOARDING,
+          eventSource: isDesktopApp ? SOURCE.DESKTOP_ONBOARDING : SOURCE.EXTENSION_ONBOARDING,
         },
       })
     );
@@ -42,11 +44,11 @@ export const NewSignupCard = () => {
   };
 
   const handleSignInClick = () => {
-    trackLoginButtonClicked(SOURCE.ONBOARDING);
-
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      trackLoginButtonClicked(SOURCE.DESKTOP_ONBOARDING);
       handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
     } else {
+      trackLoginButtonClicked(SOURCE.EXTENSION_ONBOARDING);
       setIsOnboardingScreenVisible(false);
     }
   };
