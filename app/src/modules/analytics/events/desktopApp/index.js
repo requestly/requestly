@@ -9,6 +9,7 @@ import {
   USER_DENIED_CLOSING_LAUNCHED_APPS,
   PROXY_PORT_CHANGE_REQUESTED,
   TRAFFIC_TABLE,
+  AUTH,
 } from "./constants";
 
 export const trackProxyServerStartedEvent = () => {
@@ -101,4 +102,14 @@ export const trackTrafficTableFilterApplied = (filter_type, filter_value, count)
 export const trackSavingTooManyLogsAlertShown = (logsCount, src) => {
   const params = { logsCount, src };
   trackEvent(TRAFFIC_TABLE.TRAFFIC_TABLE_SAVING_EXCESS_LOGS_ALERT_SHOWN, params);
+};
+
+export const trackAuthRedirectedFromDesktopApp = () => {
+  const params = {};
+  trackEvent(AUTH.REDIRECTED, params);
+};
+
+export const trackAuthRedirectUrlCopied = () => {
+  const params = {};
+  trackEvent(AUTH.REDIRECT_URL_COPIED, params);
 };
