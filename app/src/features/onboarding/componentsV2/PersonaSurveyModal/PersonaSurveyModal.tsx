@@ -11,10 +11,8 @@ import "./personaSurveyModal.scss";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 
-export const PersonaSurveyModal = () => {
+const PersonaSurvey = () => {
   const dispatch = useDispatch();
-  const location = useLocation();
-  const isNewUser = useSelector(getIsNewUser);
   const user = useSelector(getUserAuthDetails);
   const [selectedPersona, setSelectedPersona] = useState("Front-end developer");
 
@@ -33,6 +31,37 @@ export const PersonaSurveyModal = () => {
     dispatch(globalActions.updateNewUserPersona(selectedPersona));
     dispatch(globalActions.updateIsNewUser(false));
   };
+
+  return (
+    <>
+      <div className="rq-persona-survey-modal__title">
+        <PiSealCheckFill /> <span> Welcome, {user.details?.profile.displayName}! You're signed in successfully</span>
+      </div>
+      <div className="rq-persona-survey-modal__description">Help us in optimizing your experience</div>
+      <Radio.Group
+        className="persona-options-container"
+        value={selectedPersona}
+        onChange={(e) => setSelectedPersona(e.target.value)}
+      >
+        {options.current.map((option) => (
+          <Radio className="persona-option" key={option} value={option}>
+            {option}
+          </Radio>
+        ))}
+      </Radio.Group>
+      <div className="rq-persona-survey-modal-footer">
+        <RQButton type="primary" icon={<TiArrowRight />} onClick={handleContinue}>
+          Continue
+        </RQButton>
+      </div>
+    </>
+  );
+};
+
+export const PersonaSurveyModal = () => {
+  const location = useLocation();
+  const isNewUser = useSelector(getIsNewUser);
+  const user = useSelector(getUserAuthDetails);
 
   if (!user.loggedIn) {
     return null;
@@ -54,27 +83,7 @@ export const PersonaSurveyModal = () => {
       closable={false}
       maskStyle={{ background: "rgba(0, 0, 0, 0.7)" }}
     >
-      <div className="rq-persona-survey-modal__title">
-        <PiSealCheckFill /> <span> Welcome, {user.details?.profile.displayName}! You're signed in successfully</span>
-      </div>
-      <div className="rq-persona-survey-modal__description">Help us in optimizing your experience</div>
-
-      <Radio.Group
-        className="persona-options-container"
-        value={selectedPersona}
-        onChange={(e) => setSelectedPersona(e.target.value)}
-      >
-        {options.current.map((option) => (
-          <Radio className="persona-option" key={option} value={option}>
-            {option}
-          </Radio>
-        ))}
-      </Radio.Group>
-      <div className="rq-persona-survey-modal-footer">
-        <RQButton type="primary" icon={<TiArrowRight />} onClick={handleContinue}>
-          Continue
-        </RQButton>
-      </div>
+      <PersonaSurvey />
     </Modal>
   );
 };
