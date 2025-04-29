@@ -27,7 +27,7 @@
         window.navigator.webdriver === true || /HeadlessChrome/.test(window.navigator.userAgent) === true;
 
       if (!isHeadless && "https://app.requestly.io/goodbye/" === window.location.href && deviceId) {
-        const a = { api_key: "62ff1b46909e50358cfca0668d41f011", events: [eventObject], user_properties: attributes };
+        const a = { api_key: "6d37003f0cdb1921422bc474c634c135", events: [eventObject], user_properties: attributes };
         const b = new Blob([JSON.stringify(a)]);
         navigator.sendBeacon("https://api2.amplitude.com/2/httpapi", b);
       }
