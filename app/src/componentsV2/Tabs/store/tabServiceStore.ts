@@ -14,13 +14,9 @@ import {
   trackTabCloseClicked,
   trackTabClosed,
   trackTabClosedById,
-  trackTabLocalStorageGetItemCalled,
-  trackTabLocalStorageSetItemCalled,
   trackTabOpenClicked,
   trackTabOpened,
-  trackTabsRehydrationCompleted,
   trackTabsRehydrationError,
-  trackTabsRehydrationStarted,
   trackUpsertTabSourceCalled,
   trackUpsertTabSourceCompleted,
 } from "../analytics";
@@ -349,8 +345,6 @@ const createTabServiceStore = () => {
         }),
 
         onRehydrateStorage: (store) => {
-          trackTabsRehydrationStarted();
-
           return (store, error: Error) => {
             if (error) {
               trackTabsRehydrationError(error?.message);
@@ -362,8 +356,6 @@ const createTabServiceStore = () => {
                 });
                 Sentry.captureException(new Error(`Tabs rehydration failed - error:${error}`));
               });
-            } else {
-              trackTabsRehydrationCompleted();
             }
           };
         },
@@ -371,7 +363,6 @@ const createTabServiceStore = () => {
         storage: {
           setItem: (name, newValue: StorageValue<TabServiceState>) => {
             try {
-              trackTabLocalStorageSetItemCalled();
               const tabs = Array.from(newValue.state.tabs.entries()).map(([tabId, tabStore]) => [
                 tabId,
                 tabStore.getState(),
@@ -398,7 +389,6 @@ const createTabServiceStore = () => {
 
           getItem: (name) => {
             try {
-              trackTabLocalStorageGetItemCalled();
               const stateString = localStorage.getItem(name);
 
               if (!stateString) {

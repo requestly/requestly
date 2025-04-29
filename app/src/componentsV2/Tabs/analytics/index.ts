@@ -43,24 +43,8 @@ export const trackTabActionEarlyReturn = (source: string, reason: string) => {
   trackEvent(TAB_EVENTS.TAB_ACTION_EARLY_RETURN, { source, reason });
 };
 
-export const trackTabsRehydrationStarted = () => {
-  trackEvent(TAB_EVENTS.TABS_REHYDRATION_STARTED, {});
-};
-
 export const trackTabsRehydrationError = (error: string) => {
   trackEvent(TAB_EVENTS.TABS_REHYDRATION_ERROR, { error });
-};
-
-export const trackTabsRehydrationCompleted = () => {
-  trackEvent(TAB_EVENTS.TABS_REHYDRATION_COMPLETED, {});
-};
-
-export const trackTabLocalStorageSetItemCalled = () => {
-  trackEvent(TAB_EVENTS.TABS_LOCAL_STORAGE_SET_ITEM_CALLED, {});
-};
-
-export const trackTabLocalStorageGetItemCalled = () => {
-  trackEvent(TAB_EVENTS.TABS_LOCAL_STORAGE_GET_ITEM_CALLED, {});
 };
 
 export const trackTabGenericStateSetTitle = (sourceId: string, sourceName: string) => {
