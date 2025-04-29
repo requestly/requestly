@@ -1,4 +1,3 @@
-import { Button } from "antd";
 import { OnboardingCard } from "features/onboarding/componentsV2/OnboardingCard/OnboardingCard";
 import { RQButton } from "lib/design-system-v2/components";
 import { useAuthScreenContext } from "../../context";
@@ -16,7 +15,7 @@ export const NewSignupCard = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
 
-  const { setIsOnboardingScreenVisible, toggleAuthModal } = useAuthScreenContext();
+  const { setIsOnboardingScreenVisible } = useAuthScreenContext();
 
   const handleAuthButtonClick = (authMode: string) => {
     dispatch(
@@ -63,20 +62,6 @@ export const NewSignupCard = () => {
         <RQButton size="large" block onClick={handleSignInClick}>
           Already have an account? Sign in
         </RQButton>
-      </div>
-
-      <div className="new-signup-card-footer">
-        Use your local Scratch Pad -{" "}
-        <Button
-          type="link"
-          size="small"
-          onClick={() => {
-            dispatch(globalActions.updateIsOnboardingCompleted(true));
-            toggleAuthModal(false);
-          }}
-        >
-          Continue without an account
-        </Button>
       </div>
     </OnboardingCard>
   );
