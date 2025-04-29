@@ -58,7 +58,6 @@ function uploadFile(newFile, fileDetails) {
     "application/json",
     "application/javascript",
     "text/javascript",
-    "text/html",
     "text/css",
     "text/plain",
     "image/jpeg",
