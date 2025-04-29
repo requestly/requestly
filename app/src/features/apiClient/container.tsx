@@ -11,6 +11,8 @@ import { redirectToUrl } from "utils/RedirectionUtils";
 import LINKS from "config/constants/sub/links";
 import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
 import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceContextProvider";
+import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import "./container.scss";
 
 const ApiClientFeatureContainer: React.FC = () => {
@@ -18,6 +20,7 @@ const ApiClientFeatureContainer: React.FC = () => {
   const dispatch = useDispatch();
 
   const handleSignUp = useCallback(() => {
+    trackLoginButtonClicked(SOURCE.API_CLIENT_EMPTY_STATE);
     dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
   }, [dispatch]);
 

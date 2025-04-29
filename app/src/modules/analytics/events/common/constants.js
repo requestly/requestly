@@ -10,6 +10,9 @@ export const AUTH = {
     REQUESTED: "login_requested",
     SUCCESS: "login_success",
     FAILED: "login_failed",
+
+    // new
+    BUTTON_CLICKED: "login_button_clicked",
   },
 
   LOGOUT: {
@@ -115,6 +118,9 @@ export const SOURCE = {
   PLAN_EXPIRED_BANNER: "plan_expired_banner",
   MV3_MODAL: "mv3_modal",
   INCENTIVIZATION_TASK_LIST: "incentivization_task_list",
+  API_CLIENT_EMPTY_STATE: "api_client_empty_state",
+  SHARED_LIST_SCREEN: "shared_list_screen",
+  ONBOARDING: "onboarding",
 };
 
 export const RULES = {

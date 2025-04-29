@@ -11,6 +11,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { toast } from "utils/Toast";
 import { BillingTeamsSidebar } from "./components/BillingTeamsSidebar";
 import { SettingsSecondarySidebar } from "../SettingsSecondarySidebar";
+import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 import "./index.scss";
 
 export const BillingTeamContainer: React.FC = () => {
@@ -66,6 +67,7 @@ export const BillingTeamContainer: React.FC = () => {
             <RQButton
               type="primary"
               onClick={() => {
+                trackLoginButtonClicked(SOURCE.BILLING_TEAM);
                 dispatch(
                   globalActions.toggleActiveModal({
                     modalName: "authModal",

@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
+import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import "./newSignupCard.scss";
 
 export const NewSignupCard = () => {
@@ -25,7 +27,7 @@ export const NewSignupCard = () => {
         newProps: {
           redirectURL: window.location.href,
           authMode,
-          eventSource: "new_sign_up_card", // TODO: @parth update the event source
+          eventSource: SOURCE.ONBOARDING,
         },
       })
     );
@@ -40,6 +42,8 @@ export const NewSignupCard = () => {
   };
 
   const handleSignInClick = () => {
+    trackLoginButtonClicked(SOURCE.ONBOARDING);
+
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
     } else {

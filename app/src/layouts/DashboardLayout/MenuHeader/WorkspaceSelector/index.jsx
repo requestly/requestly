@@ -147,7 +147,7 @@ const WorkspaceSelector = () => {
     ...sortedAvailableWorkspaces.filter((team) => !team?.archived),
     ...sortedAvailableWorkspaces.filter((team) => team?.archived),
   ];
-  
+
   const appMode = useSelector(getAppMode);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const activeWorkspace = useSelector(getActiveWorkspace);
@@ -412,7 +412,7 @@ const WorkspaceSelector = () => {
         }}
         icon={<UserOutlined className="icon-wrapper" />}
       >
-        Sign in
+        Sign up
       </Menu.Item>
     </Menu>
   );
