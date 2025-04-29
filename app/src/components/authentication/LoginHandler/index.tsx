@@ -123,7 +123,7 @@ const LoginHandler: React.FC = () => {
         /* Auth flow was triggered from web app,
         "auth_mode" param check is added to make sure persona modal is triggered only for web app
         */
-        if (!desktopAuthParams.get("auth_mode") && isNewUser) {
+        if (!desktopAuthParams?.has("auth_mode") && isNewUser) {
           dispatch(globalActions.updateIsNewUser(true));
         }
       })
