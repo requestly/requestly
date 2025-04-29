@@ -38,6 +38,7 @@ export const AuthScreen = () => {
     setAuthProviders,
     toggleAuthModal,
     setIsSendEmailInProgress,
+    eventSource,
     isClosable,
     isOnboarding,
   } = useAuthScreenContext();
@@ -72,8 +73,7 @@ export const AuthScreen = () => {
 
   const handleSendEmailLink = useCallback(async () => {
     setIsSendEmailInProgress(true);
-    // TODO: ADD SOURCE
-    return sendEmailLinkForSignin(email, "")
+    return sendEmailLinkForSignin(email, eventSource)
       .then(() => {
         setIsEmailVerificationScreenVisible(true);
       })
@@ -83,7 +83,7 @@ export const AuthScreen = () => {
       .finally(() => {
         setIsSendEmailInProgress(false);
       });
-  }, [email, setIsSendEmailInProgress]);
+  }, [email, setIsSendEmailInProgress, eventSource]);
 
   const handlePostAuthSyncVerification = useCallback(
     (metadata: AuthSyncMetadata["syncData"]) => {
