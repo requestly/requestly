@@ -49,10 +49,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   }, [user.loggedIn, toggleModal]);
 
   useEffect(() => {
-    if (isOpen) {
+    if (!isWebAppSignup && isOpen) {
       trackAuthModalShownEvent(eventSource, "login");
     }
-  }, [isOpen, eventSource]);
+  }, [isOpen, isWebAppSignup, eventSource]);
 
   useLayoutEffect(() => {
     if (isWebAppSignup && isOpen) {
