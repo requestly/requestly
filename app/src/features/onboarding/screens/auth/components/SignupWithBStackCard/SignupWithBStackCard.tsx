@@ -27,7 +27,7 @@ export const SignupWithBStackCard = ({ onBackButtonClick }: SignupWithBStackCard
         <IoMdArrowBack onClick={onBackButtonClick} /> <span>No account found. Create a new account</span>
       </div>
       <div className="signup-with-bstack-card-description">
-        We couldn’t find an account associated with "{email}". Please sign up to create a new one.
+        We couldn’t find an account associated with "{email.trim()}". Please sign up to create a new one.
       </div>
       <RQButton loading={isLoading} block size="large" type="primary" onClick={handleCreateBStackAccount}>
         Sign up
