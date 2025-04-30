@@ -3,6 +3,9 @@ export const AUTH = {
     ATTEMPTED: "signup_attempted",
     FAILED: "signup_failed",
     SUCCESS: "signup_success",
+
+    // new
+    BUTTON_CLICKED: "signup_button_clicked",
   },
 
   LOGIN: {
@@ -125,6 +128,7 @@ export const SOURCE = {
   SHARED_LIST_SCREEN: "shared_list_screen",
   EXTENSION_ONBOARDING: "extension_onboarding",
   DESKTOP_ONBOARDING: "desktop_onboarding",
+  PRICING_TABLE: "pricing_table",
 };
 
 export const RULES = {

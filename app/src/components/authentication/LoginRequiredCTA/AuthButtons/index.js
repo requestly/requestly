@@ -7,6 +7,7 @@ import { globalActions } from "store/slices/global/slice";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { RQButton } from "lib/design-system-v2/components";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
@@ -36,6 +37,7 @@ const AuthButtons = ({ src, hardRedirect = false, autoPrompt = true }) => {
   };
 
   const handleSignUpButtonOnClick = (e) => {
+    trackSignUpButtonClicked(SOURCE.SIGNUP_CTA); // TODO: fix source
     if (hardRedirect) {
       navigate(PATHS.AUTH.SIGN_UP.ABSOLUTE);
       return;

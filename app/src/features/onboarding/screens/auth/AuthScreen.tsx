@@ -20,6 +20,8 @@ import { getAppMode } from "store/selectors";
 import { NewSignupCard } from "./components/NewSignupCard/NewSignupCard";
 import PATHS from "config/constants/sub/paths";
 import { globalActions } from "store/slices/global/slice";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 import "./authScreen.scss";
 
 export const AuthScreen = () => {
@@ -109,14 +111,28 @@ export const AuthScreen = () => {
       {authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN ? (
         <>
           Don't have an account?{" "}
-          <Button onClick={() => redirectToOAuthUrl(navigate)} size="small" type="link">
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              trackSignUpButtonClicked(eventSource);
+              redirectToOAuthUrl(navigate);
+            }}
+          >
             Sign up
           </Button>
         </>
       ) : (
         <>
           Already have an account?{" "}
-          <Button onClick={() => setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN)} size="small" type="link">
+          <Button
+            onClick={() => {
+              trackLoginButtonClicked(eventSource);
+              setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+            }}
+            size="small"
+            type="link"
+          >
             Log in
           </Button>
         </>

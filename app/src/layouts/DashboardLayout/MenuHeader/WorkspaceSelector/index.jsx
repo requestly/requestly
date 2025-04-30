@@ -49,6 +49,7 @@ import {
   isActiveWorkspaceShared,
 } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -407,8 +408,9 @@ const WorkspaceSelector = () => {
         key="2"
         className="workspace-menu-item"
         onClick={() => {
+          trackSignUpButtonClicked(SOURCE.WORKSPACE_SIDEBAR);
           promptUserSignupModal(() => {}, SOURCE.WORKSPACE_SIDEBAR);
-          trackWorkspaceDropdownClicked("sign_in");
+          trackWorkspaceDropdownClicked("sign_up");
         }}
         icon={<UserOutlined className="icon-wrapper" />}
       >

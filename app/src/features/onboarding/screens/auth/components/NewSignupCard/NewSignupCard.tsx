@@ -11,6 +11,7 @@ import APP_CONSTANTS from "config/constants";
 import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import "./newSignupCard.scss";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 
 export const NewSignupCard = () => {
   const navigate = useNavigate();
@@ -18,10 +19,9 @@ export const NewSignupCard = () => {
   const appMode = useSelector(getAppMode);
 
   const { setIsOnboardingScreenVisible } = useAuthScreenContext();
+  const isDesktopApp = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   const handleAuthButtonClick = (authMode: string) => {
-    const isDesktopApp = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
-
     dispatch(
       globalActions.toggleActiveModal({
         modalName: "authModal",
@@ -37,8 +37,10 @@ export const NewSignupCard = () => {
 
   const handleCreateNewAccountClick = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      trackSignUpButtonClicked(SOURCE.DESKTOP_ONBOARDING);
       handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
     } else {
+      trackSignUpButtonClicked(SOURCE.EXTENSION_ONBOARDING);
       redirectToOAuthUrl(navigate);
     }
   };

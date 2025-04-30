@@ -8,6 +8,7 @@ import APP_CONSTANTS from "config/constants";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
 import { getAppMode } from "store/selectors";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 
 interface Props {
   inviteId: string;
@@ -22,6 +23,7 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
   const appMode = useSelector(getAppMode);
 
   const openAuthModal = () => {
+    trackSignUpButtonClicked("bad_login_invite");
     handleLogoutButtonOnClick(appMode, isSharedWorkspaceMode, dispatch).then(() => {
       dispatch(
         globalActions.toggleActiveModal({
