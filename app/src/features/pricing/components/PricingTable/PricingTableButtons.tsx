@@ -220,7 +220,6 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       },
       source
     );
-    setIsButtonLoading(true);
     if (!user?.details?.isLoggedIn) {
       dispatch(
         globalActions.toggleActiveModal({
@@ -263,6 +262,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       case CTA_ONCLICK_FUNCTIONS.CHECKOUT: {
         trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
         if (isNewCheckoutFlowEnabled) {
+          setIsButtonLoading(true);
           const checkoutUrl = createBStackCheckoutUrl(columnPlanName, quantity, duration === PRICING.DURATION.ANNUALLY);
           redirectToCheckoutUrl(checkoutUrl);
         } else {
@@ -279,11 +279,10 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
             })
           );
         }
-
-        setIsButtonLoading(false);
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION: {
+        setIsButtonLoading(true);
         if (isNewCheckoutFlowEnabled) {
           const checkoutUrl = createBStackCheckoutUrl(columnPlanName, quantity, duration === PRICING.DURATION.ANNUALLY);
           redirectToCheckoutUrl(checkoutUrl);
@@ -320,6 +319,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN: {
+        setIsButtonLoading(true);
         Modal.confirm({
           title: "Switch Plan",
           content: `You are about to switch from ${getPrettyPlanName(userPlanName)} plan to ${getPrettyPlanName(
@@ -353,6 +353,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.ADD_PLAN: {
+        setIsButtonLoading(true);
         Modal.confirm({
           title: "Confirm Plan Upgrade",
           content: `Would you like to get access to ${getPrettyPlanName(
