@@ -19,7 +19,6 @@ import {
   trackEnvironmentCreatedInDB,
   trackEnvironmentDeletedFromDB,
   trackEnvironmentUpdatedInDB,
-  trackEnvironmentsFetchedFromDB,
 } from "features/apiClient/screens/environment/analytics";
 import { fetchLock } from "./fetch-lock";
 import { patchMissingIdInVariables } from "backend/apiClient/utils";
@@ -168,7 +167,6 @@ export const fetchAllEnvironmentDetails = async (ownerId: string) => {
     return environmentDetails;
   } finally {
     releaseLock();
-    trackEnvironmentsFetchedFromDB();
   }
 };
 
