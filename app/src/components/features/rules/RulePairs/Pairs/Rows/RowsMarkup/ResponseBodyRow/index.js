@@ -28,6 +28,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   const theme = useTheme();
   const dispatch = useDispatch();
   const [isSelectedFileInputVisible, setIsSelectedFileInputVisible] = useState(false);
+  const effectTriggered = useRef(false);
 
   /*
   useRef is not the idle way to handle this, useState should be used to control the behaviour of updating the value in
@@ -201,7 +202,9 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
           "response.type": pair.response.type,
           "response.value": responseBodyValues.current[pair.response.type],
         },
-        triggerUnsavedChangesIndication: !codeFormattedFlag.current,
+        triggerUnsavedChangesIndication: effectTriggered.current
+          ? codeFormattedFlag.current
+          : !codeFormattedFlag.current,
       })
     );
   };
@@ -334,6 +337,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                 prettifyOnInit={true}
                 handleChange={responseBodyChangeHandler}
                 isResizable
+                effectTriggered={effectTriggered}
                 analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.RESPONSE }}
                 toolbarOptions={{
                   title: "Response Body",

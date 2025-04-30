@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CodeMirror, { EditorView, ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { Prec } from "@codemirror/state";
 import { keymap } from "@codemirror/view";
@@ -47,6 +47,7 @@ interface EditorProps {
   isFullScreen?: boolean;
   hideToolbar?: boolean;
   onFullScreenChange?: () => void;
+  effectTriggered?: MutableRefObject<boolean>;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -65,6 +66,7 @@ const Editor: React.FC<EditorProps> = ({
   isFullScreen = false,
   onFullScreenChange = () => {},
   hideToolbar = false,
+  effectTriggered,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -151,10 +153,12 @@ const Editor: React.FC<EditorProps> = ({
       if (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT) {
         const prettified = await prettifyCode(value, language);
         setIsCodePrettified(true);
+        // no unsave changes as prettification on mount is there
+        effectTriggered.current = true;
         updateContent(prettified.code);
       }
     }
-  }, [showOptions?.enablePrettify, language, value, updateContent]);
+  }, [showOptions?.enablePrettify, language, value, effectTriggered, updateContent]);
 
   useEffect(() => {
     if (isEditorInitialized) {
@@ -162,10 +166,20 @@ const Editor: React.FC<EditorProps> = ({
         if (!isDefaultPrettificationDone.current && prettifyOnInit) {
           await applyPrettification();
           isDefaultPrettificationDone.current = true;
+        } else {
+          // unsave changes to be shown since typing in editor
+          effectTriggered.current = false;
         }
       })();
     }
-  }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit, isFullScreen]);
+  }, [
+    isEditorInitialized,
+    isDefaultPrettificationDone,
+    applyPrettification,
+    prettifyOnInit,
+    isFullScreen,
+    effectTriggered,
+  ]);
 
   // Reinitializing the fullscreen editor
   useEffect(() => {

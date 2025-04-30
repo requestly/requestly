@@ -11,6 +11,7 @@ import Editor from "componentsV2/CodeEditor";
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
   const codeFormattedFlag = useRef(null);
+  const effectTriggered = useRef(false);
 
   /*
   useRef is not the idle way to handle this, useState should be used to control the behaviour of updating the value in
@@ -57,7 +58,9 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
-        triggerUnsavedChangesIndication: !codeFormattedFlag.current,
+        triggerUnsavedChangesIndication: effectTriggered.current
+          ? codeFormattedFlag.current
+          : !codeFormattedFlag.current,
         updates: {
           "request.type": pair.request.type,
           "request.value": requestBodyValues.current[pair.request.type],
@@ -140,6 +143,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                 handleChange={requestBodyChangeHandler}
                 prettifyOnInit={true}
                 isReadOnly={isInputDisabled}
+                effectTriggered={effectTriggered}
                 analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.REQUEST }}
                 toolbarOptions={{
                   title: "Request Body",
