@@ -293,7 +293,7 @@ const APIClientView: React.FC<Props> = ({
       return;
     }
 
-    toggleBottomSheet(true);
+    toggleBottomSheet({ isOpen: true, isTrack: false, action: "on_send_request_bottom_sheet" });
 
     setIsFailed(false);
     setError(null);
