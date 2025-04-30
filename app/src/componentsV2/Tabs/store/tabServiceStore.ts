@@ -6,7 +6,6 @@ import { useShallow } from "zustand/shallow";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { TAB_SOURCES_MAP } from "../constants";
-import { ResetTabSource } from "../analytics";
 
 type TabId = number;
 type SourceName = string;
@@ -31,7 +30,7 @@ type TabServiceState = {
 };
 
 type TabActions = {
-  reset: (source: ResetTabSource) => void;
+  reset: () => void;
   upsertTabSource: (tabId: TabId | undefined, source: AbstractTabSource, config?: TabConfig) => void;
   updateTabBySource: (
     sourceId: SourceId,
@@ -72,7 +71,7 @@ const createTabServiceStore = () => {
       (set, get) => ({
         ...initialState,
 
-        reset(source) {
+        reset() {
           set({ ...initialState, tabsIndex: new Map(), tabs: new Map() });
           tabServiceStore.persist.clearStorage();
         },
