@@ -21,7 +21,7 @@ import { NewSignupCard } from "./components/NewSignupCard/NewSignupCard";
 import PATHS from "config/constants/sub/paths";
 import { globalActions } from "store/slices/global/slice";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
-import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
+import { trackLoginAttemptedEvent, trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 import "./authScreen.scss";
 
 export const AuthScreen = () => {
@@ -92,6 +92,12 @@ export const AuthScreen = () => {
       setAuthErrorCode(AuthErrorCode.NONE);
       setAuthProviders(metadata.providers);
       if (metadata.isSyncedUser) {
+        // @ts-ignore
+        trackLoginAttemptedEvent({
+          auth_provider: "browserstack",
+          source: eventSource,
+        });
+
         redirectToOAuthUrl(navigate);
       } else if (!metadata.isExistingUser) {
         setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
@@ -103,7 +109,7 @@ export const AuthScreen = () => {
         }
       }
     },
-    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn]
+    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn, eventSource]
   );
 
   const authModeToggleText = (
