@@ -105,11 +105,9 @@ export const trackSavingTooManyLogsAlertShown = (logsCount, src) => {
 };
 
 export const trackAuthRedirectedFromDesktopApp = () => {
-  const params = {};
-  trackEvent(AUTH.REDIRECTED, params);
+  trackEvent(AUTH.REDIRECTED, {});
 };
 
 export const trackAuthRedirectUrlCopied = () => {
-  const params = {};
-  trackEvent(AUTH.REDIRECT_URL_COPIED, params);
+  trackEvent(AUTH.REDIRECT_URL_COPIED, {});
 };
