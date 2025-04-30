@@ -26,6 +26,7 @@ import {
   trackBillingTeamActionClicked,
   trackBillingTeamMemberRemoved,
   trackBillingTeamRoleChanged,
+  trackBillingTeamManageLicenseClicked,
 } from "features/settings/analytics";
 import { UserOutlined } from "@ant-design/icons";
 import { BsPersonFillExclamation } from "@react-icons/all-files/bs/BsPersonFillExclamation";
@@ -356,6 +357,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
                 icon={<HiOutlineUsers />}
                 className="billing-team-members-section-header-btn"
                 onClick={() => {
+                  trackBillingTeamManageLicenseClicked();
                   redirectToUrl(`${process.env.BROWSERSTACK_BASE_URL}/accounts/manage-users/users`, true);
                 }}
                 disabled={!isUserAdmin}

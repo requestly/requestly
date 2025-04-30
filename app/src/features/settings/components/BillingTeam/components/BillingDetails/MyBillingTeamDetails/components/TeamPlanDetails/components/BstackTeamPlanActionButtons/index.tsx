@@ -3,6 +3,7 @@ import { Col } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { FaRegCreditCard } from "@react-icons/all-files/fa/FaRegCreditCard";
 import { redirectToUrl } from "utils/RedirectionUtils";
+import { trackBillingTeamManagePlanClicked } from "features/settings/analytics";
 
 interface Props {
   subscriptionDetails: any;
@@ -16,7 +17,10 @@ export const BstackTeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetai
           type="text"
           className=""
           icon={<FaRegCreditCard />}
-          onClick={() => redirectToUrl(`${process.env.BROWSERSTACK_BASE_URL}/accounts/profile/overview`, true)}
+          onClick={() => {
+            trackBillingTeamManagePlanClicked();
+            redirectToUrl(`${process.env.BROWSERSTACK_BASE_URL}/accounts/profile/overview`, true);
+          }}
         >
           Manage Plan
         </RQButton>

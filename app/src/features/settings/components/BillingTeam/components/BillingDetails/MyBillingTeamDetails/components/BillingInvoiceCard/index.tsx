@@ -10,6 +10,7 @@ import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
 import {
   trackBillingTeamInvoiceRequestClicked,
   trackBillingTeamInvoiceRequestFailed,
+  trackBillingTeamInvoiceDashboardClicked,
   trackBillingTeamInvoiceRequestSent,
 } from "features/settings/analytics";
 import "./index.scss";
@@ -54,6 +55,7 @@ export const BillingInvoiceCard: React.FC = () => {
             <RQButton
               type="default"
               onClick={() => {
+                trackBillingTeamInvoiceDashboardClicked();
                 redirectToUrl(`${process.env.BROWSERSTACK_BASE_URL}/accounts/billing`, true);
               }}
             >
