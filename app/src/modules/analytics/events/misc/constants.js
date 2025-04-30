@@ -40,6 +40,8 @@ export const BUSINESS = {
     // Suffix "frontend" to differentiate events from backend
     CHECKOUT_INITIATIED: "checkout_initiated_frontend",
     CHECKOUT_COMPLETED: "checkout_completed_frontend",
+
+    BSTACK_STRIPE_CHECKOUT_INITIATED: "bstack_stripe_checkout_initiated",
   },
 
   TRIAL_MODE_EXPIRED_MODAL_SHOWN: "trial_mode_expired_modal_shown",

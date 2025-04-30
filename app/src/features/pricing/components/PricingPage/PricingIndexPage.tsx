@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Col, Layout, Row, Switch } from "antd";
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -22,6 +22,7 @@ import { isSafariBrowser } from "actions/ExtensionActions";
 import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
+import { trackCheckoutFailedEvent } from "modules/analytics/events/misc/business/checkout";
 import "./pricingIndexPage.scss";
 
 export const PricingIndexPage = () => {
@@ -35,6 +36,15 @@ export const PricingIndexPage = () => {
     isSafariBrowser() ? PRICING.PRODUCTS.API_CLIENT : PRICING.PRODUCTS.HTTP_RULES
   );
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
+
+  const isCheckoutFailedEventSent = useRef(false);
+
+  useEffect(() => {
+    if (isBrowserStackIntegrationOn && checkoutErrorMessage && !isCheckoutFailedEventSent.current) {
+      trackCheckoutFailedEvent(1, "browserstack_checkout_page", "browserstack");
+      isCheckoutFailedEventSent.current = true;
+    }
+  }, [isBrowserStackIntegrationOn, checkoutErrorMessage]);
 
   return (
     <div className="pricing-page-wrapper">

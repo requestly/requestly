@@ -7,8 +7,8 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
 import {
   trackCheckoutFailedEvent,
-  trackCheckoutButtonClicked,
   trackCheckoutInitiated,
+  trackBStackStripeCheckoutInitiated,
 } from "modules/analytics/events/misc/business/checkout";
 import { useState } from "react";
 import { globalActions } from "store/slices/global/slice";
@@ -263,10 +263,10 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.CHECKOUT: {
-        trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
         if (isNewCheckoutFlowEnabled) {
           setIsButtonLoading(true);
           const checkoutUrl = createBStackCheckoutUrl(columnPlanName, quantity, duration === PRICING.DURATION.ANNUALLY);
+          trackBStackStripeCheckoutInitiated();
           redirectToCheckoutUrl(checkoutUrl);
         } else {
           dispatch(
@@ -288,9 +288,9 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         setIsButtonLoading(true);
         if (isNewCheckoutFlowEnabled) {
           const checkoutUrl = createBStackCheckoutUrl(columnPlanName, quantity, duration === PRICING.DURATION.ANNUALLY);
+          trackBStackStripeCheckoutInitiated();
           redirectToCheckoutUrl(checkoutUrl);
         } else {
-          trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
           const manageSubscription = httpsCallable(firebaseFunction, "subscription-manageSubscription");
           manageSubscription({
             planName: columnPlanName,
@@ -313,7 +313,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
             })
             .catch((err) => {
               toast.error("Error in managing subscription. Please contact support contact@requestly.io");
-              trackCheckoutFailedEvent(quantity, source);
+              trackCheckoutFailedEvent(quantity, source, "requestly");
             })
             .finally(() => {
               setIsButtonLoading(false);

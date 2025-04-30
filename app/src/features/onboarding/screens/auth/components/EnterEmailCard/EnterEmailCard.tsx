@@ -83,7 +83,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
         Continue
       </RQButton>
       <div className="enter-email-card-footer">
-        By signing in , you agree to our{" "}
+        By signing in, you agree to our{" "}
         <a href={LINKS.REQUESTLY_TERMS_AND_CONDITIONS} target="_blank" rel="noreferrer">
           Terms
         </a>{" "}
