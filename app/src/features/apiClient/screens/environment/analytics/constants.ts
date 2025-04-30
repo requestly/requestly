@@ -9,7 +9,6 @@ export const ENVIRONMENT = {
   ENVIRONMENT_CREATED_IN_DB: "environment_created_in_db",
   ENVIRONMENT_DELETED_FROM_DB: "environment_deleted_from_db",
   ENVIRONMENT_UPDATED_IN_DB: "environment_updated_in_db",
-  ENVIRONMENTS_FETCHED_FROM_DB: "environments_fetched_from_db",
 
   ENVIRONMENT_SWITCHED: "environment_switched",
 };
