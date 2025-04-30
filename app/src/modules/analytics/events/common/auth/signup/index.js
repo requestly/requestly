@@ -35,3 +35,8 @@ export const trackSignUpFailedEvent = ({ auth_provider, email, error, source }) 
   };
   trackEvent(AUTH.SIGNUP.FAILED, params);
 };
+
+export const trackSignUpButtonClicked = (source) => {
+  const params = { source };
+  trackEvent(AUTH.SIGNUP.BUTTON_CLICKED, params);
+};

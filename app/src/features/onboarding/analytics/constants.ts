@@ -14,3 +14,8 @@ export const ANNOUNCEMENTS = {
   ACQUISITION_ANNOUNCEMENT_MODAL_VIEWED: "acquisition_announcement_modal_viewed",
   ACQUISITION_ANNOUNCEMENT_MODAL_CLOSED: "acquisition_announcement_modal_closed",
 };
+
+export const PERSONA_SURVEY = {
+  VIEWED: "persona_survey_viewed",
+  COMPLETED: "persona_survey_completed",
+};

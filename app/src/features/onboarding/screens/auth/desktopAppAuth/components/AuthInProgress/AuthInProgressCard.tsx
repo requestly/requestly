@@ -7,8 +7,9 @@ import { v4 as uuidv4 } from "uuid";
 import { getDesktopSignInAuthPath } from "utils/PathUtils";
 import { toast } from "utils/Toast";
 import { snakeCase } from "lodash";
-import "./authInProgressCard.scss";
 import { useDispatch } from "react-redux";
+import { trackAuthRedirectedFromDesktopApp, trackAuthRedirectUrlCopied } from "modules/analytics/events/desktopApp";
+import "./authInProgressCard.scss";
 
 interface AuthInProgressCardProp {
   authMode: string;
@@ -24,6 +25,8 @@ export const AuthInProgressCard: React.FC<AuthInProgressCardProp> = ({ authMode,
     if (!authMode) {
       return;
     }
+
+    trackAuthRedirectedFromDesktopApp();
 
     const oneTimeCode = uuidv4();
     const updatedAuthMode = snakeCase(authMode).toLowerCase();
@@ -41,6 +44,7 @@ export const AuthInProgressCard: React.FC<AuthInProgressCardProp> = ({ authMode,
   const handleCopyUrlClick = () => {
     navigator.clipboard.writeText(desktopSignInAuthUrl);
     toast.info("Copied to clipboard");
+    trackAuthRedirectUrlCopied();
   };
 
   return (

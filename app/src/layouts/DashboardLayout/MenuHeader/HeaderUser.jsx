@@ -27,6 +27,8 @@ import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
+import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -139,6 +141,7 @@ export default function HeaderUser() {
   }
 
   const handleSignupClick = () => {
+    trackSignUpButtonClicked(SOURCE.NAVBAR);
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
       return;
@@ -198,7 +201,10 @@ export default function HeaderUser() {
         <div className="auth-button-group">
           <RQButton
             className="layout-header-signup-btn no-drag"
-            onClick={() => handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN)}
+            onClick={() => {
+              trackLoginButtonClicked(SOURCE.NAVBAR);
+              handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+            }}
           >
             Sign in
           </RQButton>

@@ -3,6 +3,9 @@ export const AUTH = {
     ATTEMPTED: "signup_attempted",
     FAILED: "signup_failed",
     SUCCESS: "signup_success",
+
+    // new
+    BUTTON_CLICKED: "signup_button_clicked",
   },
 
   LOGIN: {
@@ -10,6 +13,9 @@ export const AUTH = {
     REQUESTED: "login_requested",
     SUCCESS: "login_success",
     FAILED: "login_failed",
+
+    // new
+    BUTTON_CLICKED: "login_button_clicked",
   },
 
   LOGOUT: {
@@ -42,6 +48,9 @@ export const AUTH = {
     SEEN: "email_link_signin_form_seen",
     SUBMITTED: "email_link_signin_form_submitted",
     LINK_RESEND_REQUESTED: "magic_link_resend_requested",
+
+    // New
+    LOGIN_WITH_GOOGLE_INSTEAD: "magic_link_login_with_google_instead",
   },
 
   VERIFY_OOBCODE: {
@@ -115,6 +124,11 @@ export const SOURCE = {
   PLAN_EXPIRED_BANNER: "plan_expired_banner",
   MV3_MODAL: "mv3_modal",
   INCENTIVIZATION_TASK_LIST: "incentivization_task_list",
+  API_CLIENT_EMPTY_STATE: "api_client_empty_state",
+  SHARED_LIST_SCREEN: "shared_list_screen",
+  EXTENSION_ONBOARDING: "extension_onboarding",
+  DESKTOP_ONBOARDING: "desktop_onboarding",
+  PRICING_TABLE: "pricing_table",
 };
 
 export const RULES = {

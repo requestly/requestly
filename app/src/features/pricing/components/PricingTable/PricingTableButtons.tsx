@@ -22,6 +22,8 @@ import { redirectToPricingPlans, redirectToUrl } from "utils/RedirectionUtils";
 import { createBStackCheckoutUrl } from "features/pricing/utils";
 import { getAppMode } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 const CTA_ONCLICK_FUNCTIONS = {
   MANAGE_SUBSCRIPTION: "manage-subscription",
@@ -245,6 +247,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.SIGNUP: {
+        trackSignUpButtonClicked(SOURCE.PRICING_TABLE);
         dispatch(
           globalActions.toggleActiveModal({
             modalName: "authModal",
@@ -252,7 +255,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
             newProps: {
               authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
               callback: () => redirectToPricingPlans(navigate),
-              eventSource: "pricing_table",
+              eventSource: SOURCE.PRICING_TABLE,
             },
           })
         );

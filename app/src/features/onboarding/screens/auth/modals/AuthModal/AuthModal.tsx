@@ -12,6 +12,7 @@ import { AuthScreenMode } from "../../types";
 import { globalActions } from "store/slices/global/slice";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToOAuthUrl } from "utils/RedirectionUtils";
+import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 import "./authModal.scss";
 interface AuthModalProps {
   isOpen: boolean;
@@ -38,8 +39,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     [dispatch]
   );
 
-  const isWebAppSignup =
-    appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP;
+  const isWebApp = appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+  const isWebAppSignup = isWebApp && authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP;
 
   useEffect(() => {
     if (user.loggedIn) {
@@ -47,11 +48,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   }, [user.loggedIn, toggleModal]);
 
+  useEffect(() => {
+    if (!isWebAppSignup && isOpen) {
+      trackAuthModalShownEvent(eventSource, "login");
+    }
+  }, [isOpen, isWebAppSignup, eventSource]);
+
   useLayoutEffect(() => {
     if (isWebAppSignup && isOpen) {
       redirectToOAuthUrl(navigate);
     }
-  }, [isWebAppSignup, isOpen, navigate]);
+  }, [isWebAppSignup, isOpen, eventSource, navigate]);
 
   if (isWebAppSignup) {
     return null;

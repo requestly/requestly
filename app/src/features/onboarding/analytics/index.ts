@@ -1,5 +1,5 @@
 import { trackEvent } from "modules/analytics";
-import { ANNOUNCEMENTS, APP_ONBOARDING } from "./constants";
+import { ANNOUNCEMENTS, APP_ONBOARDING, PERSONA_SURVEY } from "./constants";
 
 export const trackAppOnboardingViewed = (step: string) => {
   trackEvent(APP_ONBOARDING.APP_ONBOARDING_VIEWED, { step });
@@ -43,4 +43,12 @@ export const trackAcquisitionAnnouncementModalViewed = () => {
 
 export const trackAcquisitionAnnouncementModalClosed = () => {
   trackEvent(ANNOUNCEMENTS.ACQUISITION_ANNOUNCEMENT_MODAL_CLOSED, {});
+};
+
+export const trackPersonaSurveyViewed = () => {
+  trackEvent(PERSONA_SURVEY.VIEWED, {});
+};
+
+export const trackPersonaSurveyCompleted = (persona: string) => {
+  trackEvent(PERSONA_SURVEY.COMPLETED, { persona });
 };

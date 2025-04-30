@@ -10,6 +10,9 @@ import { getAppMode } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { useIsAuthSkipped } from "hooks";
 import { shouldShowOnboarding } from "features/onboarding/utils";
+import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import "./OnboardingModal.scss";
 
 export const OnboardingModal = () => {
@@ -36,6 +39,10 @@ export const OnboardingModal = () => {
               return;
             }
             setIsModalVisible(true);
+
+            const eventType =
+              appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? SOURCE.DESKTOP_ONBOARDING : SOURCE.EXTENSION_ONBOARDING;
+            trackAuthModalShownEvent("onboarding", eventType);
           }
         }
       })
@@ -57,6 +64,7 @@ export const OnboardingModal = () => {
           screenMode={AuthScreenMode.MODAL}
           isOnboarding={true}
           toggleModal={() => setIsModalVisible(false)}
+          initialEventSource="onboarding"
         >
           <AuthScreen />
         </AuthScreenContextProvider>

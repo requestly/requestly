@@ -8,7 +8,10 @@ import { useNavigate } from "react-router-dom";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
+import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import "./newSignupCard.scss";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 
 export const NewSignupCard = () => {
   const navigate = useNavigate();
@@ -16,6 +19,7 @@ export const NewSignupCard = () => {
   const appMode = useSelector(getAppMode);
 
   const { setIsOnboardingScreenVisible } = useAuthScreenContext();
+  const isDesktopApp = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   const handleAuthButtonClick = (authMode: string) => {
     dispatch(
@@ -25,7 +29,7 @@ export const NewSignupCard = () => {
         newProps: {
           redirectURL: window.location.href,
           authMode,
-          eventSource: "new_sign_up_card", // TODO: @parth update the event source
+          eventSource: isDesktopApp ? SOURCE.DESKTOP_ONBOARDING : SOURCE.EXTENSION_ONBOARDING,
         },
       })
     );
@@ -33,16 +37,20 @@ export const NewSignupCard = () => {
 
   const handleCreateNewAccountClick = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      trackSignUpButtonClicked(SOURCE.DESKTOP_ONBOARDING);
       handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
     } else {
+      trackSignUpButtonClicked(SOURCE.EXTENSION_ONBOARDING);
       redirectToOAuthUrl(navigate);
     }
   };
 
   const handleSignInClick = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      trackLoginButtonClicked(SOURCE.DESKTOP_ONBOARDING);
       handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
     } else {
+      trackLoginButtonClicked(SOURCE.EXTENSION_ONBOARDING);
       setIsOnboardingScreenVisible(false);
     }
   };

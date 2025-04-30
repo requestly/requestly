@@ -20,6 +20,8 @@ import { getAppMode } from "store/selectors";
 import { NewSignupCard } from "./components/NewSignupCard/NewSignupCard";
 import PATHS from "config/constants/sub/paths";
 import { globalActions } from "store/slices/global/slice";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { trackLoginAttemptedEvent, trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 import "./authScreen.scss";
 
 export const AuthScreen = () => {
@@ -38,6 +40,7 @@ export const AuthScreen = () => {
     setAuthProviders,
     toggleAuthModal,
     setIsSendEmailInProgress,
+    eventSource,
     isClosable,
     isOnboarding,
   } = useAuthScreenContext();
@@ -72,8 +75,7 @@ export const AuthScreen = () => {
 
   const handleSendEmailLink = useCallback(async () => {
     setIsSendEmailInProgress(true);
-    // TODO: ADD SOURCE
-    return sendEmailLinkForSignin(email, "")
+    return sendEmailLinkForSignin(email, eventSource)
       .then(() => {
         setIsEmailVerificationScreenVisible(true);
       })
@@ -83,13 +85,19 @@ export const AuthScreen = () => {
       .finally(() => {
         setIsSendEmailInProgress(false);
       });
-  }, [email, setIsSendEmailInProgress]);
+  }, [email, setIsSendEmailInProgress, eventSource]);
 
   const handlePostAuthSyncVerification = useCallback(
     (metadata: AuthSyncMetadata["syncData"]) => {
       setAuthErrorCode(AuthErrorCode.NONE);
       setAuthProviders(metadata.providers);
       if (metadata.isSyncedUser) {
+        // @ts-ignore
+        trackLoginAttemptedEvent({
+          auth_provider: "browserstack",
+          source: eventSource,
+        });
+
         redirectToOAuthUrl(navigate);
       } else if (!metadata.isExistingUser) {
         setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
@@ -101,7 +109,7 @@ export const AuthScreen = () => {
         }
       }
     },
-    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn]
+    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn, eventSource]
   );
 
   const authModeToggleText = (
@@ -109,14 +117,28 @@ export const AuthScreen = () => {
       {authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN ? (
         <>
           Don't have an account?{" "}
-          <Button onClick={() => redirectToOAuthUrl(navigate)} size="small" type="link">
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              trackSignUpButtonClicked(eventSource);
+              redirectToOAuthUrl(navigate);
+            }}
+          >
             Sign up
           </Button>
         </>
       ) : (
         <>
           Already have an account?{" "}
-          <Button onClick={() => setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN)} size="small" type="link">
+          <Button
+            onClick={() => {
+              trackLoginButtonClicked(eventSource);
+              setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+            }}
+            size="small"
+            type="link"
+          >
             Log in
           </Button>
         </>

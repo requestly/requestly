@@ -54,3 +54,8 @@ export const trackEmailLoginLinkGenerated = (email, source) => {
 export const trackGenerateMagicLinkFailed = (email, source, errMsg) => {
   trackEvent(AUTH.AUTH_MODAL.GENERATE_MAGIC_LINK_FAILED, { email, source, errMsg });
 };
+
+export const trackLoginButtonClicked = (source) => {
+  const params = { source };
+  trackEvent(AUTH.LOGIN.BUTTON_CLICKED, params);
+};

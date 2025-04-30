@@ -17,6 +17,7 @@ import PATHS from "config/constants/sub/paths";
 import "./sharedListViewerScreen.css";
 import { ContentListScreen } from "componentsV2/ContentList";
 import { RQButton } from "lib/design-system-v2/components";
+import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 
 export const SharedListViewerScreen = () => {
   const sharedListId = getSharedListIdFromURL(window.location.pathname);
@@ -39,6 +40,7 @@ export const SharedListViewerScreen = () => {
   }, [searchValue, sharedListGroups, sharedListRules]);
 
   const promptUserToSignIn = (source: string) => {
+    trackLoginButtonClicked(SOURCE.SHARED_LIST_SCREEN);
     dispatch(
       globalActions.toggleActiveModal({
         modalName: "authModal",
