@@ -20,10 +20,10 @@ export const SignupWithBStackCard = ({ onBackButtonClick }: SignupWithBStackCard
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCreateBStackAccount = useCallback(() => {
-    trackSignUpButtonClicked(eventSource);
+    trackSignUpButtonClicked(`no_account_found`);
     setIsLoading(true);
     redirectToOAuthUrl(navigate);
-  }, [navigate, eventSource]);
+  }, [navigate]);
 
   useEffect(() => {
     if (authScreenMode === AuthScreenMode.MODAL) {
