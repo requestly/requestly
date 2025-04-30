@@ -136,7 +136,7 @@ export const TestThisRule = () => {
         fetchAndUpdateTestReports(message?.record ? message.testReportId : null);
         trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType, message.appliedStatus);
         if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
-          toggleBottomSheet(true);
+          toggleBottomSheet({ isOpen: true, isTrack: true, action: "test_rule_bottom_sheet" });
         }
         if (message.record && user.loggedIn) {
           handleSaveTestSession(parseInt(message.testPageTabId), message.testReportId, message.appliedStatus);
