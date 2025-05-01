@@ -8,6 +8,10 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "25.4.21",
+    logs: ["chore: update extension installed url #2921"],
+  },
+  {
     version: "25.4.15",
     logs: [
       "fix: xs-leak (#2905)",
