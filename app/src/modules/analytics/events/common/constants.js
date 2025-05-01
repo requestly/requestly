@@ -16,6 +16,13 @@ export const AUTH = {
 
     // new
     BUTTON_CLICKED: "login_button_clicked",
+    EMAIL_ENTERED: "login_email_entered",
+    BSTACK_LOGIN_INITIATED: "bstack_login_initiated",
+    USER_NOT_FOUND: "login_user_not_found",
+    LOGIN_WITH_SSO_CLICKED: "login_with_sso_clicked",
+    LOGIN_WITH_GOOGLE_CLICKED: "login_with_google_clicked",
+    LOGIN_WITH_MAGIC_LINK_CLICKED: "login_with_magic_link_clicked",
+    LOGIN_WITH_PASSWORD_CLICKED: "login_with_password_clicked",
   },
 
   LOGOUT: {

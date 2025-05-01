@@ -13,6 +13,7 @@ import STORAGE from "config/constants/sub/storage";
 import PATHS from "config/constants/sub/paths";
 import { getDesktopAppAuthParams } from "../utils";
 import { globalActions } from "store/slices/global/slice";
+import { trackSignUpFailedEvent, trackSignupSuccessEvent } from "modules/analytics/events/common/auth/signup";
 
 const ARGUMENTS = {
   REDIRECT_URL: "redirectURL",
@@ -117,9 +118,13 @@ const LoginHandler: React.FC = () => {
 
     const auth = getAuth(firebaseApp);
     signInWithCustomToken(auth, accessToken)
-      .then((user) => {
-        Logger.log("User logged in successfully", user);
+      .then((result) => {
+        Logger.log("User logged in successfully", result);
         setLoginComplete(true);
+        if (isNewUser) {
+          // @ts-ignore
+          trackSignupSuccessEvent({ email: result.user.email, domain: result.user.email.split("@")[1] });
+        }
         /* Auth flow was triggered from web app,
         "auth_mode" param check is added to make sure persona modal is triggered only for web app
         */
@@ -129,6 +134,8 @@ const LoginHandler: React.FC = () => {
       })
       .catch((error) => {
         Logger.error("Error signing in with custom token:", error);
+        // @ts-ignore
+        trackSignUpFailedEvent({ error: error?.message });
         // for now redirecting even when facing errors
         // todo: setup error monitoring
         setLoginComplete(true);

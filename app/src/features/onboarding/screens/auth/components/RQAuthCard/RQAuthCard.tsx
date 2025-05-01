@@ -8,6 +8,7 @@ import { loginWithSSO } from "actions/FirebaseActions";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { useAuthScreenContext } from "../../context";
+import { trackLoginWithSSOClicked } from "modules/analytics/events/common/auth/signup";
 import "./rqAuthCard.scss";
 
 interface RQAuthCardProps {
@@ -31,6 +32,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
   }, [authProviders]);
 
   const handleSSOLogin = useCallback(async () => {
+    trackLoginWithSSOClicked();
     setIsSSOLoginInProgress(true);
     try {
       await loginWithSSO(ssoProviderId, email);

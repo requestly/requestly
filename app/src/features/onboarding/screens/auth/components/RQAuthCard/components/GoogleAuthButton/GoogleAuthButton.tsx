@@ -6,6 +6,7 @@ import { toast } from "utils/Toast";
 import { handleCustomGoogleSignIn } from "actions/FirebaseActions";
 import { Spin } from "antd";
 import { useAuthScreenContext } from "features/onboarding/screens/auth/context";
+import { trackLoginWithGoogleClicked } from "modules/analytics/events/common/auth/signup";
 import "./googleAuthButton.scss";
 
 interface GoogleAuthButtonProps {
@@ -26,6 +27,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
 
   const handleGoogleAuth = useCallback(
     (credentialResponse: CredentialResponse) => {
+      trackLoginWithGoogleClicked();
       setIsLoading(true);
       onGoogleAuthClick();
       if (!credentialResponse) {

@@ -10,6 +10,7 @@ import { isEmailValid } from "utils/FormattingHelper";
 import { useAuthScreenContext } from "../../context";
 import LINKS from "config/constants/sub/links";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
+import { trackLoginEmailEntered } from "modules/analytics/events/common/auth/signup";
 
 interface EnterEmailCardProps {
   onEmailChange: (email: string) => void;
@@ -27,6 +28,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
   }, [isOnboarding, eventSource]);
 
   const handleOnContinue = async () => {
+    trackLoginEmailEntered();
     setIsLoading(true);
     const processedEmail = email.trim();
 

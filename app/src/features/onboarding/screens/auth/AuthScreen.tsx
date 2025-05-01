@@ -20,8 +20,13 @@ import { getAppMode } from "store/selectors";
 import { NewSignupCard } from "./components/NewSignupCard/NewSignupCard";
 import PATHS from "config/constants/sub/paths";
 import { globalActions } from "store/slices/global/slice";
-import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
-import { trackLoginAttemptedEvent, trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
+import {
+  trackBstackLoginInitiated,
+  trackLoginUserNotFound,
+  trackSignInWithMagicLinkClicked,
+  trackSignUpButtonClicked,
+} from "modules/analytics/events/common/auth/signup";
+import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 import "./authScreen.scss";
 
 export const AuthScreen = () => {
@@ -59,7 +64,6 @@ export const AuthScreen = () => {
   }, [authErrorCode]);
 
   const handleSuccessfulLogin = useCallback(() => {
-    // setShowRQAuthForm(false);
     setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
     if (authScreenMode === AuthScreenMode.PAGE) {
       redirectToHome(appMode, navigate);
@@ -75,6 +79,7 @@ export const AuthScreen = () => {
 
   const handleSendEmailLink = useCallback(async () => {
     setIsSendEmailInProgress(true);
+    trackSignInWithMagicLinkClicked();
     return sendEmailLinkForSignin(email, eventSource)
       .then(() => {
         setIsEmailVerificationScreenVisible(true);
@@ -92,14 +97,10 @@ export const AuthScreen = () => {
       setAuthErrorCode(AuthErrorCode.NONE);
       setAuthProviders(metadata.providers);
       if (metadata.isSyncedUser) {
-        // @ts-ignore
-        trackLoginAttemptedEvent({
-          auth_provider: "browserstack",
-          source: eventSource,
-        });
-
+        trackBstackLoginInitiated();
         redirectToOAuthUrl(navigate);
       } else if (!metadata.isExistingUser) {
+        trackLoginUserNotFound(email);
         setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
       } else {
         if (metadata.providers.length === 1 && metadata.providers[0] === AuthProvider.PASSWORD && !isDesktopSignIn) {
@@ -109,7 +110,7 @@ export const AuthScreen = () => {
         }
       }
     },
-    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn, eventSource]
+    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn, email]
   );
 
   const authModeToggleText = (

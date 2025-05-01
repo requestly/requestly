@@ -11,6 +11,7 @@ import { useAuthScreenContext } from "features/onboarding/screens/auth/context";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import "./emailAuthForm.scss";
+import { trackLoginWithPasswordClicked } from "modules/analytics/events/common/auth/signup";
 
 interface EmailAuthFormProps {
   isLoading: boolean;
@@ -20,16 +21,17 @@ interface EmailAuthFormProps {
 
 export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ isLoading, onSendEmailClick, onEditEmailClick }) => {
   const location = useLocation();
-  const { email, toggleAuthModal } = useAuthScreenContext();
+  const { email, toggleAuthModal, eventSource } = useAuthScreenContext();
   const [password, setPassword] = useState("");
   const [isSignInInProgress, setIsSignInInProgress] = useState(false);
   const isDesktopSignIn = location.pathname.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE);
 
   const handleSignInWithEmailAndPassword = useCallback(async () => {
     try {
+      trackLoginWithPasswordClicked();
       setIsSignInInProgress(true);
       // TODO: Add source
-      const { result } = await emailSignIn(email, password, false, "");
+      const { result } = await emailSignIn(email, password, false, eventSource);
       if (result.user.uid) {
         const greatingName = result.user.displayName?.split(" ")?.[0];
         toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome back!");
@@ -40,7 +42,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ isLoading, onSendE
     } finally {
       setIsSignInInProgress(false);
     }
-  }, [email, password, toggleAuthModal]);
+  }, [email, password, toggleAuthModal, eventSource]);
 
   return (
     <div className="email-auth-form-container">
