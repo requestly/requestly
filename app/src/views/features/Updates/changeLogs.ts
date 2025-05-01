@@ -8,7 +8,7 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
-    version: "25.5.1",
+    version: "25.5.2",
     logs: ["Added config.WEB_URL as origin (#2931)", "chore: update extension popup icon (#2943)"],
   },
   {
