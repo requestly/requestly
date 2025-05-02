@@ -16,6 +16,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
   useRef is not the idle way to handle this, useState should be used to control the behaviour of updating the value in
   state - this needs to be fixed
   */
+
   const requestBodyValues = useRef({
     static: pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? pair.request.value : "{}",
     code:
