@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useContext } from "react";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { EnvironmentVariables } from "backend/environment/types";
 import { useDebounce } from "hooks/useDebounce";
@@ -16,11 +16,6 @@ export function RawBody(props: {
 
   const { requestBodyStateManager } = useContext(RequestBodyContext);
   const { text, setText } = useTextBody(requestBodyStateManager);
-  const [isRequestBodyFullScreen, setIsRequestBodyFullScreen] = useState(false);
-
-  const handleFullScreenChange = () => {
-    setIsRequestBodyFullScreen((prev) => !prev);
-  };
 
   const handleTextChange = useDebounce(
     useCallback(
@@ -50,8 +45,6 @@ export function RawBody(props: {
         hideCharacterCount
         envVariables={environmentVariables}
         toolbarOptions={{ title: "", options: [editorOptions] }}
-        isFullScreen={isRequestBodyFullScreen}
-        onFullScreenChange={handleFullScreenChange}
         analyticEventProperties={{ source: "api_client" }}
         showOptions={{
           enablePrettify: contentType === "application/json",
