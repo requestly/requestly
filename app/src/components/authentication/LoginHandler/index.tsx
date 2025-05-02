@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import PageLoader from "components/misc/PageLoader";
 import firebaseApp from "firebase";
 import { getAuth, signInWithCustomToken } from "firebase/auth";
@@ -25,6 +25,8 @@ const LoginHandler: React.FC = () => {
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+
+  const isAuthenticationAttempted = useRef(false);
 
   const [loginComplete, setLoginComplete] = useState(false);
 
@@ -99,6 +101,11 @@ const LoginHandler: React.FC = () => {
   }, [postLoginActions, user.loggedIn, loginComplete]);
 
   useEffect(() => {
+    if (isAuthenticationAttempted.current) {
+      return;
+    }
+
+    isAuthenticationAttempted.current = true;
     const accessToken = params.get(ARGUMENTS.ACCESS_TOKEN);
     if (!accessToken) {
       // this route is only meant to be accessed programmatically
