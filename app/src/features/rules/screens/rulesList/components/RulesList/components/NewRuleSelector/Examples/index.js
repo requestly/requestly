@@ -1,6 +1,7 @@
 import { Button } from "antd";
 import React from "react";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { getLinkWithMetadata } from "modules/analytics";
 const { RULE_TYPES } = GLOBAL_CONSTANTS;
 
 const ExampleContent = (props) => {
@@ -21,7 +22,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.com/products/web-debugger/redirect-urls/", "blank");
+                window.open(getLinkWithMetadata("https://requestly.com/products/web-debugger/redirect-urls/"), "blank");
               }}
             >
               View More
@@ -105,7 +106,10 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.com/products/web-debugger/modify-query-params/", "blank");
+                window.open(
+                  getLinkWithMetadata("https://requestly.com/products/web-debugger/modify-query-params/"),
+                  "blank"
+                );
               }}
             >
               View More
@@ -127,7 +131,10 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.com/products/web-debugger/insert-script-rule/", "blank");
+                window.open(
+                  getLinkWithMetadata("https://requestly.com/products/web-debugger/insert-script-rule/"),
+                  "blank"
+                );
               }}
             >
               View More
@@ -151,7 +158,10 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.com/products/web-debugger/override-api-response/", "blank");
+                window.open(
+                  getLinkWithMetadata("https://requestly.com/products/web-debugger/override-api-response/"),
+                  "blank"
+                );
               }}
             >
               View More
@@ -192,7 +202,10 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.com/products/web-debugger/delay-http-request/", "blank");
+                window.open(
+                  getLinkWithMetadata("https://requestly.com/products/web-debugger/delay-http-request/"),
+                  "blank"
+                );
               }}
             >
               View More

@@ -14,6 +14,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackNewRuleButtonClicked, trackRulesEmptyStateClicked } from "modules/analytics/events/common/rules";
 import "./CreateTeamRuleCTA.css";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { getLinkWithMetadata } from "modules/analytics";
 
 export const CreateTeamRuleCTA = () => {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ export const CreateTeamRuleCTA = () => {
               <p className="lead">
                 Rules created here can be accessed by your teammates. To manage your teammates click{" "}
                 <a
-                  href="https://requestly.com/"
+                  href={getLinkWithMetadata("https://requestly.com/")}
                   className="cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();

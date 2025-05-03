@@ -42,6 +42,7 @@ import "./AuthForm.css";
 import GenerateLoginLinkBtn from "./GenerateLoginLinkButton";
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
+import { getLinkWithMetadata } from "modules/analytics";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS, METHODS: AUTH_METHODS } = APP_CONSTANTS.AUTH;
 
@@ -473,11 +474,21 @@ const AuthForm = ({
                 <FormSubmitButton />
                 <Typography.Text className="secondary-text form-elements-margin">
                   I agree to the{" "}
-                  <a className="auth-modal-link" href="https://requestly.com/terms" target="_blank" rel="noreferrer">
+                  <a
+                    className="auth-modal-link"
+                    href={getLinkWithMetadata("https://requestly.com/terms")}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Requestly Terms
                   </a>
                   . Learn about how we use and protect your data in our{" "}
-                  <a className="auth-modal-link" href="https://requestly.com/privacy" target="_blank" rel="noreferrer">
+                  <a
+                    className="auth-modal-link"
+                    href={getLinkWithMetadata("https://requestly.com/privacy")}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Privacy Policy
                   </a>
                   .

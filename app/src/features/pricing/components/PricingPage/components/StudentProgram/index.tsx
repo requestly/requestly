@@ -2,6 +2,7 @@ import React from "react";
 import StudentPlanIcon from "../../../../assets/student-plan-icon.svg?react";
 import { trackStudentProgramClicked } from "features/pricing/analytics";
 import "./studentProgram.scss";
+import { getLinkWithMetadata } from "modules/analytics";
 
 export const StudentProgram: React.FC<{ source: string }> = ({ source }) => {
   return (
@@ -14,7 +15,7 @@ export const StudentProgram: React.FC<{ source: string }> = ({ source }) => {
         onClick={() => {
           trackStudentProgramClicked(source);
         }}
-        href="https://requestly.com/student-program/"
+        href={getLinkWithMetadata("https://requestly.com/student-program/")}
       >
         Know more
       </a>
