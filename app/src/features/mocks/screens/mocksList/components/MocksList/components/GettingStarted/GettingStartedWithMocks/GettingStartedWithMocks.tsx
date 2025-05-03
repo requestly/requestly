@@ -11,6 +11,7 @@ import { LuImport } from "@react-icons/all-files/lu/LuImport";
 import { SOURCE } from "modules/analytics/events/common/constants.js";
 import { MockType } from "components/features/mocksV2/types";
 import "./gettingStartedWithMocks.scss";
+import { getLinkWithMetadata } from "modules/analytics";
 
 interface Props {
   mockType: MockType;
@@ -159,7 +160,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
                 <FiArrowUpRight /> Browse docs
               </a>
               <a
-                href="https://requestly.com/products/mock-server/"
+                href={getLinkWithMetadata("https://requestly.com/products/mock-server/")}
                 target="_blank"
                 rel="noreferrer"
                 className="helper-item"

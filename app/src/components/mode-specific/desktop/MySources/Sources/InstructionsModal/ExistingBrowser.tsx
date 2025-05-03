@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { Button, Col, Image, List, Row, Steps } from "antd";
 import InstructionsHeader from "./InstructionsHeader";
+import { getLinkWithMetadata } from "modules/analytics";
 
 const ExistingBrowserInstructionModal: React.FC<{
   setShowInstructions: () => void;
@@ -25,7 +26,7 @@ const ExistingBrowserInstructionModal: React.FC<{
                     title={
                       <>
                         a. Install Requestly Extension from{" "}
-                        <a href="https://requestly.com" target="__blank">
+                        <a href={getLinkWithMetadata("https://requestly.com")} target="__blank">
                           requestly.com
                         </a>
                       </>
