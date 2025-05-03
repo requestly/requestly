@@ -7,6 +7,7 @@ The following domains are eligible for the student programme:
   "eligible_domains": [
     ".edu",
     ".ac.in",
+    ".ac.at",
     ".edu.au",
     ".ac.uk",
     ".ac.nz",
@@ -28,7 +29,7 @@ The following domains are eligible for the student programme:
     ".edu.es",
     ".ac.id",
     "bennington.edu",
-    "yonsei.ac.kr",
+    ".ac.kr",
     "lakeheadu.ca",
     "estg.ipp.pt",
     "utm.md",
