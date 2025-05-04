@@ -567,6 +567,12 @@ PATHS.NETWORK_LOGS.HAR.ABSOLUTE = joinPaths(PATHS.NETWORK_LOGS.ABSOLUTE, PATHS.N
 
 PATHS.AUTH = {};
 
+// login - superseeds /signin
+// for automatic handling of redirects in authentication flow
+PATHS.AUTH.LOGIN = {};
+PATHS.AUTH.LOGIN.RELATIVE = "/login";
+PATHS.AUTH.LOGIN.ABSOLUTE = joinPaths(PATHS.DASHBOARD, PATHS.AUTH.LOGIN.RELATIVE);
+
 // Sign in
 PATHS.AUTH.SIGN_IN = {};
 PATHS.AUTH.SIGN_IN.RELATIVE = "/signin";
