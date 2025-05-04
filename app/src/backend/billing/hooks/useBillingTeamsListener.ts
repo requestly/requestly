@@ -55,19 +55,6 @@ export const useBillingTeamsListener = () => {
         };
       });
 
-      // Seed the attribute lazily
-      const userActiveBillingTeam = billingTeamDetails.find((team) =>
-        ["active", "past_due", "trialing"].includes(team.subscriptionDetails?.subscriptionStatus)
-      );
-      const isAcceleratorBillingTeam = billingTeamDetails.some((team) => team.isAcceleratorTeam === true);
-      if (isAcceleratorBillingTeam) {
-        submitAttrUtil(TRACKING.ATTR.RQ_SUBSCRIPTION_TYPE, "accelerator");
-      }
-      if (userActiveBillingTeam) {
-        const rqSubscriptionType = userActiveBillingTeam.subscriptionDetails?.quantity > 1 ? "team" : "individual";
-        submitAttrUtil(TRACKING.ATTR.RQ_SUBSCRIPTION_TYPE, rqSubscriptionType);
-      }
-
       if (isCompanyEmail(user.details?.emailType)) {
         const domainBillingTeamsQuery = query(
           collection(db, "billing"),
