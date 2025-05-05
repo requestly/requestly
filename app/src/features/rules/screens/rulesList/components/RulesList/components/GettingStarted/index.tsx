@@ -45,6 +45,7 @@ import { RuleType } from "@requestly/shared/types/entities/rules";
 import { ImportFromResourceOverrideModal } from "../ImporterComponents/ResourceOverrideImporter";
 import { ImporterType } from "components/Home/types";
 import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -170,7 +171,7 @@ export const GettingStarted: React.FC = () => {
               <div className="lead">
                 Rules created here can be accessed by your teammates. To manage your teammates{" "}
                 <a
-                  href="https://requestly.com/"
+                  href={getLinkWithMetadata("https://requestly.com/")}
                   className="cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();

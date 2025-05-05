@@ -4,6 +4,7 @@ import { Col } from "antd";
 import { AiOutlineYoutube } from "@react-icons/all-files/ai/AiOutlineYoutube";
 import { trackHomeHelpClicked } from "components/Home/analytics";
 import "./helpCard.scss";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 export const HelpCard: React.FC = () => {
   const helperLinks = useMemo(
@@ -12,12 +13,12 @@ export const HelpCard: React.FC = () => {
       {
         icon: <img src={"/assets/media/components/info.svg"} alt="info" />,
         title: "What is Requestly?",
-        href: "https://requestly.com/blog/what-is-requestly/",
+        href: getLinkWithMetadata("https://requestly.com/blog/what-is-requestly/"),
       },
       {
         icon: <img src={"/assets/media/components/book.svg"} alt="community" />,
         title: "Read official documentation",
-        href: "https://https://docs.requestly.com/",
+        href: "https://docs.requestly.com/",
       },
       {
         icon: <AiOutlineYoutube className="help-card-react-icon" />,
