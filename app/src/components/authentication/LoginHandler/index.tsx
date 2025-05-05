@@ -14,6 +14,7 @@ import PATHS from "config/constants/sub/paths";
 import { getDesktopAppAuthParams } from "../utils";
 import { globalActions } from "store/slices/global/slice";
 import { trackSignUpFailedEvent, trackSignupSuccessEvent } from "modules/analytics/events/common/auth/signup";
+import { trackLoginSuccessEvent } from "modules/analytics/events/common/auth/login";
 
 const ARGUMENTS = {
   REDIRECT_URL: "redirectURL",
@@ -84,6 +85,11 @@ const LoginHandler: React.FC = () => {
       return;
     }
 
+    if (!isNewUser) {
+      // @ts-ignore
+      trackLoginSuccessEvent({ auth_provider: "browserstack" });
+    }
+
     const redirectURLFromParam = params.get(ARGUMENTS.REDIRECT_URL);
     const redirectURLFromLocalStorage = window.localStorage.getItem(
       STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY
@@ -92,7 +98,7 @@ const LoginHandler: React.FC = () => {
       window.localStorage.removeItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY);
     }
     redirect(redirectURLFromParam ?? redirectURLFromLocalStorage);
-  }, [redirect, params, postLoginDesktopAppRedirect]);
+  }, [redirect, params, postLoginDesktopAppRedirect, isNewUser]);
 
   useEffect(() => {
     if (user.loggedIn && loginComplete) {
@@ -147,7 +153,7 @@ const LoginHandler: React.FC = () => {
         // todo: setup error monitoring
         setLoginComplete(true);
       });
-  }, [params, postLoginActions, user.loggedIn, loginComplete, navigate, appMode, dispatch, isNewUser]);
+  }, [params, user.loggedIn, loginComplete, navigate, appMode, dispatch, isNewUser]);
 
   return <PageLoader message="Logging in..." />;
 };
