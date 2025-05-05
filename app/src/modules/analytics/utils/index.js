@@ -1,4 +1,3 @@
-import { getDomainFromEmail } from "utils/FormattingHelper";
 import { EmailType } from "@requestly/shared/types/common";
 
 export function buildBasicUserProperties(user) {
@@ -11,7 +10,7 @@ export function buildBasicUserProperties(user) {
 
     if (email && emailType === EmailType.BUSINESS) {
       isBusinessAccount = true;
-      company = getDomainFromEmail(email);
+      company = email.split("@")[1];
     }
 
     return {

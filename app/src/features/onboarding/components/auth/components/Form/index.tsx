@@ -32,6 +32,7 @@ import LINKS from "config/constants/sub/links";
 import "./index.scss";
 import { isSafariBrowser } from "actions/ExtensionActions";
 import { EmailType } from "@requestly/shared/types/common";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 interface AuthFormProps {
   authMode: string;
@@ -527,11 +528,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
         <div className="onboarding-terms-text">
           I agree to the{" "}
-          <a href="https://requestly.com/terms/" target="_blank" rel="noreferrer">
+          <a href={getLinkWithMetadata("https://requestly.com/terms/")} target="_blank" rel="noreferrer">
             terms
           </a>
           . Learn about how we use and protect your data in our{" "}
-          <a href="https://requestly.com/privacy/" target="_blank" rel="noreferrer">
+          <a href={getLinkWithMetadata("https://requestly.com/privacy/")} target="_blank" rel="noreferrer">
             privacy policy
           </a>
           .
