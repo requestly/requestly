@@ -12,14 +12,13 @@
   background-color: var(--body-background);
 }
 .request-log-pane-header .request-method {
-  flex-shrink: 0;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: var(--requestly-font-weight-semibold);
-  line-height: 14px;
+  line-height: 20px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   display: flex;
-  width: 32px;
+  width: 38px;
   justify-content: center;
   align-items: center;
   border-radius: 2px;

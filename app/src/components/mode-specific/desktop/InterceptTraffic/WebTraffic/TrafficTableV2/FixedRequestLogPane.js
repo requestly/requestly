@@ -18,7 +18,6 @@ const Header = (props) => {
     <Row className="request-log-pane-header" align="middle" wrap={false}>
       <Space>
         <Typography.Text
-          strong
           className="request-method"
           style={{
             color: REQUEST_METHOD_COLORS[props.method],
