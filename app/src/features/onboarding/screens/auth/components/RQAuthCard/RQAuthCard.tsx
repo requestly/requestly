@@ -11,6 +11,7 @@ import { useAuthScreenContext } from "../../context";
 import { trackLoginWithSSOClicked } from "modules/analytics/events/common/auth/signup";
 import "./rqAuthCard.scss";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
+import { trackLoginAttemptedEvent } from "modules/analytics/events/common/auth/login";
 
 interface RQAuthCardProps {
   onBackClick: () => void;
@@ -25,7 +26,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
   successfulLoginCallback,
   failedLoginCallback,
 }) => {
-  const { email, authProviders, ssoProviderId, isSendEmailInProgress } = useAuthScreenContext();
+  const { email, authProviders, ssoProviderId, isSendEmailInProgress, eventSource } = useAuthScreenContext();
   const [isSSOLoginInProgress, setIsSSOLoginInProgress] = useState(false);
 
   const isPasswordProviderUsed = useMemo(() => {
@@ -34,6 +35,12 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
 
   const handleSSOLogin = useCallback(async () => {
     trackLoginWithSSOClicked();
+
+    //@ts-ignore
+    trackLoginAttemptedEvent({
+      auth_provider: AUTH_PROVIDERS.SSO,
+      source: eventSource,
+    });
     setIsSSOLoginInProgress(true);
     try {
       await loginWithSSO(ssoProviderId, email);
@@ -44,7 +51,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
       toast.error("Something went wrong, Could not sign in with SSO");
       setIsSSOLoginInProgress(false);
     }
-  }, [email, ssoProviderId, successfulLoginCallback, failedLoginCallback]);
+  }, [email, eventSource, ssoProviderId, successfulLoginCallback, failedLoginCallback]);
 
   const renderAuthProvider = (provider: AuthProvider) => {
     switch (provider.toLowerCase()) {
