@@ -10,11 +10,13 @@ import {
   trackMagicLinkResendRequested,
 } from "modules/analytics/events/common/auth/emailLinkSignin";
 import "./emailVerificationCard.scss";
+import { trackLoginSuccessEvent } from "modules/analytics/events/common/auth/login";
+import { AUTH_PROVIDERS } from "modules/analytics/constants";
 
 interface EmailVerificationCardProps {
   onBackClick: () => void;
   onResendEmailClick: () => Promise<void>;
-  failedLoginCallback: (code: AuthErrorCode) => void;
+  failedLoginCallback: (code: AuthErrorCode, authProvider: string) => void;
 }
 
 export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
@@ -23,7 +25,7 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
   failedLoginCallback,
 }) => {
   const [countdown, setCountdown] = useState(20);
-  const { email, authProviders, isSendEmailInProgress, toggleAuthModal } = useAuthScreenContext();
+  const { email, authProviders, isSendEmailInProgress, toggleAuthModal, eventSource } = useAuthScreenContext();
 
   /* Memoized google auth button component because countdown triggers re-render
     which causes google auth button to be re-rendered (causes flicker in button)
@@ -32,12 +34,16 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
     return (
       <GoogleAuthButton
         type="secondary"
-        successfulLoginCallback={() => toggleAuthModal(false)}
+        successfulLoginCallback={() => {
+          // @ts-ignore
+          trackLoginSuccessEvent({ auth_provider: AUTH_PROVIDERS.GMAIL, source: eventSource });
+          toggleAuthModal(false);
+        }}
         failedLoginCallback={failedLoginCallback}
         onGoogleAuthClick={() => trackMagicLinkLoginWithGoogleInstead()}
       />
     );
-  }, [toggleAuthModal, failedLoginCallback]);
+  }, [toggleAuthModal, failedLoginCallback, eventSource]);
 
   useEffect(() => {
     const interval = setInterval(() => {

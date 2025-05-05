@@ -23,6 +23,7 @@ export const AUTH = {
     LOGIN_WITH_GOOGLE_CLICKED: "login_with_google_clicked",
     LOGIN_WITH_MAGIC_LINK_CLICKED: "login_with_magic_link_clicked",
     LOGIN_WITH_PASSWORD_CLICKED: "login_with_password_clicked",
+    USER_SWITCHED_EMAIL: "login_user_switched_email",
   },
 
   LOGOUT: {

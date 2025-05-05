@@ -10,12 +10,14 @@ import { RQButton } from "lib/design-system-v2/components";
 import { useAuthScreenContext } from "../../context";
 import { trackLoginWithSSOClicked } from "modules/analytics/events/common/auth/signup";
 import "./rqAuthCard.scss";
+import { AUTH_PROVIDERS } from "modules/analytics/constants";
+import { trackLoginAttemptedEvent } from "modules/analytics/events/common/auth/login";
 
 interface RQAuthCardProps {
   onBackClick: () => void;
   handleSendEmailLink: () => Promise<void>;
-  successfulLoginCallback: () => void;
-  failedLoginCallback: (code: AuthErrorCode) => void;
+  successfulLoginCallback: (provider: string) => void;
+  failedLoginCallback: (code: AuthErrorCode, authProvider: string) => void;
 }
 
 export const RQAuthCard: React.FC<RQAuthCardProps> = ({
@@ -24,7 +26,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
   successfulLoginCallback,
   failedLoginCallback,
 }) => {
-  const { email, authProviders, ssoProviderId, isSendEmailInProgress } = useAuthScreenContext();
+  const { email, authProviders, ssoProviderId, isSendEmailInProgress, eventSource } = useAuthScreenContext();
   const [isSSOLoginInProgress, setIsSSOLoginInProgress] = useState(false);
 
   const isPasswordProviderUsed = useMemo(() => {
@@ -33,17 +35,23 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
 
   const handleSSOLogin = useCallback(async () => {
     trackLoginWithSSOClicked();
+
+    //@ts-ignore
+    trackLoginAttemptedEvent({
+      auth_provider: AUTH_PROVIDERS.SSO,
+      source: eventSource,
+    });
     setIsSSOLoginInProgress(true);
     try {
       await loginWithSSO(ssoProviderId, email);
       setIsSSOLoginInProgress(false);
-      successfulLoginCallback();
+      successfulLoginCallback(AUTH_PROVIDERS.SSO);
     } catch (err) {
-      failedLoginCallback(AuthErrorCode.UNKNOWN);
+      failedLoginCallback(AuthErrorCode.UNKNOWN, AUTH_PROVIDERS.SSO);
       toast.error("Something went wrong, Could not sign in with SSO");
       setIsSSOLoginInProgress(false);
     }
-  }, [email, ssoProviderId, successfulLoginCallback, failedLoginCallback]);
+  }, [email, eventSource, ssoProviderId, successfulLoginCallback, failedLoginCallback]);
 
   const renderAuthProvider = (provider: AuthProvider) => {
     switch (provider.toLowerCase()) {

@@ -14,11 +14,12 @@ export const trackLoginAttemptedEvent = ({ auth_provider, email, place, email_ty
   trackEvent(AUTH.LOGIN.ATTEMPTED, params);
 };
 
-export const trackLoginFailedEvent = ({ auth_provider, place, email, error_message, source }) => {
+export const trackLoginFailedEvent = ({ auth_provider, place, email, error_code, error_message, source }) => {
   const params = {
     auth_provider,
     place,
     email,
+    error_code,
     error_message,
     source,
   };
@@ -58,4 +59,9 @@ export const trackGenerateMagicLinkFailed = (email, source, errMsg) => {
 export const trackLoginButtonClicked = (source) => {
   const params = { source };
   trackEvent(AUTH.LOGIN.BUTTON_CLICKED, params);
+};
+
+export const trackLoginUserSwitchedEmail = (source) => {
+  const params = { source };
+  trackEvent(AUTH.LOGIN.USER_SWITCHED_EMAIL, params);
 };

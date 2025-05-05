@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import AuthModalHeader from "features/onboarding/components/OnboardingHeader/OnboardingHeader";
@@ -26,7 +26,12 @@ import {
   trackSignInWithMagicLinkClicked,
   trackSignUpButtonClicked,
 } from "modules/analytics/events/common/auth/signup";
-import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
+import {
+  trackLoginButtonClicked,
+  trackLoginFailedEvent,
+  trackLoginSuccessEvent,
+  trackLoginUserSwitchedEmail,
+} from "modules/analytics/events/common/auth/login";
 import "./authScreen.scss";
 
 export const AuthScreen = () => {
@@ -54,21 +59,32 @@ export const AuthScreen = () => {
   const [isEmailVerificationScreenVisible, setIsEmailVerificationScreenVisible] = useState(false);
   const isDesktopSignIn = location.pathname.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE);
 
-  const authErrorMessage = useMemo(() => {
-    switch (authErrorCode) {
-      case AuthErrorCode.DIFFERENT_USER:
-        return "You're trying to use a different Google account than the one originally entered. Please try again with the correct email.";
-      default:
-        return "";
-    }
-  }, [authErrorCode]);
+  const getAuthErrorMessage = useCallback(
+    (authErrorCode: AuthErrorCode) => {
+      switch (authErrorCode) {
+        case AuthErrorCode.DIFFERENT_USER: {
+          trackLoginUserSwitchedEmail(eventSource);
+          return "You're trying to use a different Google account than the one originally entered. Please try again with the correct email.";
+        }
+        default: {
+          return "";
+        }
+      }
+    },
+    [eventSource]
+  );
 
-  const handleSuccessfulLogin = useCallback(() => {
-    setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
-    if (authScreenMode === AuthScreenMode.PAGE) {
-      redirectToHome(appMode, navigate);
-    }
-  }, [setAuthMode, appMode, navigate, authScreenMode]);
+  const handleSuccessfulLogin = useCallback(
+    (authProvider: string) => {
+      setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+      // @ts-ignore
+      trackLoginSuccessEvent({ auth_provider: authProvider, source: eventSource });
+      if (authScreenMode === AuthScreenMode.PAGE) {
+        redirectToHome(appMode, navigate);
+      }
+    },
+    [setAuthMode, appMode, navigate, authScreenMode, eventSource]
+  );
 
   const handleOnHeaderButtonClick = useCallback(() => {
     if (isOnboarding) {
@@ -154,16 +170,20 @@ export const AuthScreen = () => {
   }, [setAuthMode]);
 
   const handleFailedLogin = useCallback(
-    (code: AuthErrorCode) => {
+    (code: AuthErrorCode, authProvider: string) => {
       setAuthErrorCode(code);
+      // @ts-ignore
+      trackLoginFailedEvent({ auth_provider: authProvider, error_code: code, source: eventSource });
       if (code === AuthErrorCode.DIFFERENT_USER) {
         setShowRQAuthForm(false);
         setIsEmailVerificationScreenVisible(false);
         setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
       }
     },
-    [setAuthMode]
+    [setAuthMode, eventSource]
   );
+
+  const authErrorMessage = getAuthErrorMessage(authErrorCode);
 
   return (
     <div className="auth-screen-container">

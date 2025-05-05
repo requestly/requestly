@@ -111,7 +111,8 @@ const DesktopSignIn = () => {
       const isNewUser = params.get("isNewUser");
 
       const code = desktopAuthParams.get("ot-auth-code");
-      const source = desktopAuthParams.get("source").replace(/ /g, "_");
+      let source = desktopAuthParams.get("source").replace(/ /g, "_");
+      source = `desktop_app_${source}`;
 
       const functions = getFunctions();
       const createAuthToken = httpsCallable(functions, "auth-createAuthToken");
@@ -143,9 +144,11 @@ const DesktopSignIn = () => {
           } else {
             trackLoginAttemptedEvent({
               auth_provider: AUTH_PROVIDERS.GMAIL,
+              source,
             });
             trackLoginSuccessEvent({
               auth_provider: AUTH_PROVIDERS.GMAIL,
+              source,
             });
           }
           /*

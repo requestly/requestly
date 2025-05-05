@@ -8,11 +8,12 @@ import { Spin } from "antd";
 import { useAuthScreenContext } from "features/onboarding/screens/auth/context";
 import { trackLoginWithGoogleClicked } from "modules/analytics/events/common/auth/signup";
 import "./googleAuthButton.scss";
+import { AUTH_PROVIDERS } from "modules/analytics/constants";
 
 interface GoogleAuthButtonProps {
   onGoogleAuthClick?: () => void;
-  successfulLoginCallback: () => void;
-  failedLoginCallback: (code: AuthErrorCode) => void;
+  successfulLoginCallback: (authProvider: string) => void;
+  failedLoginCallback: (code: AuthErrorCode, authProvider?: string) => void;
   type: "primary" | "secondary";
 }
 
@@ -24,6 +25,17 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
 }) => {
   const { email } = useAuthScreenContext();
   const [isLoading, setIsLoading] = useState(false);
+
+  const onSuccess = useCallback(() => {
+    successfulLoginCallback(AUTH_PROVIDERS.GMAIL);
+  }, [successfulLoginCallback]);
+
+  const onFail = useCallback(
+    (code: AuthErrorCode) => {
+      failedLoginCallback(code, AUTH_PROVIDERS.GMAIL);
+    },
+    [failedLoginCallback]
+  );
 
   const handleGoogleAuth = useCallback(
     (credentialResponse: CredentialResponse) => {
@@ -38,18 +50,16 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
       const decodedCredential = jwtDecode(credentialResponse.credential);
       // @ts-ignore
       if (decodedCredential.email !== email) {
-        failedLoginCallback(AuthErrorCode.DIFFERENT_USER);
+        onFail(AuthErrorCode.DIFFERENT_USER);
         setIsLoading(false);
         return;
       }
 
-      handleCustomGoogleSignIn(credentialResponse.credential, successfulLoginCallback, failedLoginCallback).finally(
-        () => {
-          setIsLoading(false);
-        }
-      );
+      handleCustomGoogleSignIn(credentialResponse.credential, onSuccess, onFail).finally(() => {
+        setIsLoading(false);
+      });
     },
-    [email, failedLoginCallback, onGoogleAuthClick, successfulLoginCallback]
+    [email, onGoogleAuthClick, onFail, onSuccess]
   );
 
   useGoogleAuthButton({ callback: handleGoogleAuth, type });
