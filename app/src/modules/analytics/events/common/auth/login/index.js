@@ -14,11 +14,12 @@ export const trackLoginAttemptedEvent = ({ auth_provider, email, place, email_ty
   trackEvent(AUTH.LOGIN.ATTEMPTED, params);
 };
 
-export const trackLoginFailedEvent = ({ auth_provider, place, email, error_message, source }) => {
+export const trackLoginFailedEvent = ({ auth_provider, place, email, error_code, error_message, source }) => {
   const params = {
     auth_provider,
     place,
     email,
+    error_code,
     error_message,
     source,
   };

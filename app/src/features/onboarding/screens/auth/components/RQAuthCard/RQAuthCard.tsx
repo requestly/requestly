@@ -10,12 +10,13 @@ import { RQButton } from "lib/design-system-v2/components";
 import { useAuthScreenContext } from "../../context";
 import { trackLoginWithSSOClicked } from "modules/analytics/events/common/auth/signup";
 import "./rqAuthCard.scss";
+import { AUTH_PROVIDERS } from "modules/analytics/constants";
 
 interface RQAuthCardProps {
   onBackClick: () => void;
   handleSendEmailLink: () => Promise<void>;
-  successfulLoginCallback: () => void;
-  failedLoginCallback: (code: AuthErrorCode) => void;
+  successfulLoginCallback: (provider: string) => void;
+  failedLoginCallback: (code: AuthErrorCode, authProvider: string) => void;
 }
 
 export const RQAuthCard: React.FC<RQAuthCardProps> = ({
@@ -37,9 +38,9 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
     try {
       await loginWithSSO(ssoProviderId, email);
       setIsSSOLoginInProgress(false);
-      successfulLoginCallback();
+      successfulLoginCallback(AUTH_PROVIDERS.SSO);
     } catch (err) {
-      failedLoginCallback(AuthErrorCode.UNKNOWN);
+      failedLoginCallback(AuthErrorCode.UNKNOWN, AUTH_PROVIDERS.SSO);
       toast.error("Something went wrong, Could not sign in with SSO");
       setIsSSOLoginInProgress(false);
     }

@@ -26,7 +26,11 @@ import {
   trackSignInWithMagicLinkClicked,
   trackSignUpButtonClicked,
 } from "modules/analytics/events/common/auth/signup";
-import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
+import {
+  trackLoginButtonClicked,
+  trackLoginFailedEvent,
+  trackLoginSuccessEvent,
+} from "modules/analytics/events/common/auth/login";
 import "./authScreen.scss";
 
 export const AuthScreen = () => {
@@ -63,12 +67,17 @@ export const AuthScreen = () => {
     }
   }, [authErrorCode]);
 
-  const handleSuccessfulLogin = useCallback(() => {
-    setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
-    if (authScreenMode === AuthScreenMode.PAGE) {
-      redirectToHome(appMode, navigate);
-    }
-  }, [setAuthMode, appMode, navigate, authScreenMode]);
+  const handleSuccessfulLogin = useCallback(
+    (authProvider: string) => {
+      setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+      // @ts-ignore
+      trackLoginSuccessEvent({ auth_provider: authProvider, source: eventSource });
+      if (authScreenMode === AuthScreenMode.PAGE) {
+        redirectToHome(appMode, navigate);
+      }
+    },
+    [setAuthMode, appMode, navigate, authScreenMode, eventSource]
+  );
 
   const handleOnHeaderButtonClick = useCallback(() => {
     if (isOnboarding) {
@@ -154,15 +163,17 @@ export const AuthScreen = () => {
   }, [setAuthMode]);
 
   const handleFailedLogin = useCallback(
-    (code: AuthErrorCode) => {
+    (code: AuthErrorCode, authProvider: string) => {
       setAuthErrorCode(code);
+      // @ts-ignore
+      trackLoginFailedEvent({ auth_provider: authProvider, error_code: code, source: eventSource });
       if (code === AuthErrorCode.DIFFERENT_USER) {
         setShowRQAuthForm(false);
         setIsEmailVerificationScreenVisible(false);
         setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
       }
     },
-    [setAuthMode]
+    [setAuthMode, eventSource]
   );
 
   return (

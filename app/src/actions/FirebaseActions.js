@@ -774,6 +774,10 @@ export async function updateUserInFirebaseAuthUser(data) {
 }
 
 export const loginWithSSO = async (providerId, email) => {
+  trackLoginAttemptedEvent({
+    auth_provider: AUTH_PROVIDERS.SSO,
+  });
+
   const provider = new SAMLAuthProvider(providerId);
 
   const auth = getAuth(firebaseApp);
