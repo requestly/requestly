@@ -1,10 +1,11 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const LINKS = {
   /** DOCS */
 
   // Download
-  REQUESTLY_DOWNLOAD_PAGE: "https://requestly.com/downloads",
+  REQUESTLY_DOWNLOAD_PAGE: getLinkWithMetadata("https://requestly.com/downloads"),
   REQUESTLY_DOCS: "https://docs.requestly.com/",
   //Docs - Using Rules
   REQUESTLY_DOCS_USING_RULES: "https://docs.requestly.com/general/http-rules/overview/",
@@ -77,21 +78,21 @@ const LINKS = {
   /** LANDING PAGES **/
 
   // Home
-  REQUESTLY_LANDING_HOME: "https://requestly.com/",
+  REQUESTLY_LANDING_HOME: getLinkWithMetadata("https://requestly.com/"),
   //Blog
-  REQUESTLY_BLOG: "https://requestly.com/blog/",
+  REQUESTLY_BLOG: getLinkWithMetadata("https://requestly.com/blog/"),
   //Desktop App
-  REQUESTLY_DESKTOP_APP: "https://requestly.com/desktop",
+  REQUESTLY_DESKTOP_APP: getLinkWithMetadata("https://requestly.com/desktop"),
   //Privacy Policy
-  REQUESTLY_PRIVACY_POLICY: "https://requestly.com/privacy",
+  REQUESTLY_PRIVACY_POLICY: getLinkWithMetadata("https://requestly.com/privacy"),
   // Terms and Conditions
-  REQUESTLY_TERMS_AND_CONDITIONS: "https://requestly.com/terms/",
+  REQUESTLY_TERMS_AND_CONDITIONS: getLinkWithMetadata("https://requestly.com/terms/"),
   //Privacy Statement
-  REQUESTLY_PRIVACY_STATEMENT: "https://requestly.com/privacy/",
+  REQUESTLY_PRIVACY_STATEMENT: getLinkWithMetadata("https://requestly.com/privacy/"),
   //Contact Us
   CONTACT_US: "mailto:" + GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL,
   // Contact Us Page
-  CONTACT_US_PAGE: "https://requestly.com/contact-us/",
+  CONTACT_US_PAGE: getLinkWithMetadata("https://requestly.com/contact-us/"),
   // Book A Demo
   BOOK_A_DEMO: "https://calendly.com/requestly/sagar",
 
