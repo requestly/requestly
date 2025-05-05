@@ -45,7 +45,7 @@ import { RuleType } from "@requestly/shared/types/entities/rules";
 import { ImportFromResourceOverrideModal } from "../ImporterComponents/ResourceOverrideImporter";
 import { ImporterType } from "components/Home/types";
 import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
-import { getLinkWithMetadata } from "modules/analytics";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const { PATHS } = APP_CONSTANTS;
 

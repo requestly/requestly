@@ -1,4 +1,4 @@
-import { getLinkWithMetadata } from "modules/analytics";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 import { VersionedChangeLogs } from "./types";
 
 export const VERSION_NEXT = "next";

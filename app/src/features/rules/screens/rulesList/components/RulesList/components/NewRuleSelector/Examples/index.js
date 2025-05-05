@@ -1,7 +1,7 @@
 import { Button } from "antd";
 import React from "react";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getLinkWithMetadata } from "modules/analytics";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 const { RULE_TYPES } = GLOBAL_CONSTANTS;
 
 const ExampleContent = (props) => {

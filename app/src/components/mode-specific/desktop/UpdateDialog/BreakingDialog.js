@@ -1,6 +1,6 @@
 import { Button, Modal, Typography, Row, Col } from "antd";
 import "./BreakingDialog.scss";
-import { getLinkWithMetadata } from "modules/analytics";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const { Text, Title } = Typography;
 

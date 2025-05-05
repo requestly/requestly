@@ -42,7 +42,7 @@ import "./AuthForm.css";
 import GenerateLoginLinkBtn from "./GenerateLoginLinkButton";
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
-import { getLinkWithMetadata } from "modules/analytics";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS, METHODS: AUTH_METHODS } = APP_CONSTANTS.AUTH;
 

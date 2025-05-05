@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Button, Col, Image, List, Row, Steps } from "antd";
 import InstructionsHeader from "./InstructionsHeader";
-import { getLinkWithMetadata } from "modules/analytics";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const ExistingBrowserInstructionModal: React.FC<{
   setShowInstructions: () => void;

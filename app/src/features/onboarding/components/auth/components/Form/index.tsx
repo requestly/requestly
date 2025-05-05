@@ -32,7 +32,7 @@ import LINKS from "config/constants/sub/links";
 import "./index.scss";
 import { isSafariBrowser } from "actions/ExtensionActions";
 import { EmailType } from "@requestly/shared/types/common";
-import { getLinkWithMetadata } from "modules/analytics";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 interface AuthFormProps {
   authMode: string;
