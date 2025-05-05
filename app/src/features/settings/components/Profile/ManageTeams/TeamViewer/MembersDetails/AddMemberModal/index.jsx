@@ -29,7 +29,7 @@ import { Conditional } from "components/common/Conditional";
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
   const [userEmail, setUserEmail] = useState([]);
-  const [userInviteRole, setUserInviteRole] = useState(WorkspaceMemberRole.read);
+  const [userInviteRole, setUserInviteRole] = useState(WorkspaceMemberRole.write);
   const [isInviteErrorModalActive, setInviteErrorModalActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [inviteErrors, setInviteErrors] = useState([]);
@@ -277,6 +277,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                       >
                         <div className="access-dropdown-container">
                           <MemberRoleDropdown
+                            memberRole={userInviteRole}
                             loggedInUserTeamRole={loggedInUserTeamRole}
                             placement="bottomRight"
                             isAdmin={isAdmin(userInviteRole)}
