@@ -10,7 +10,6 @@ import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 import { RQButton } from "lib/design-system-v2/components";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { useLocation } from "react-router-dom";
 
 interface Props {
   inviteId: string;
@@ -23,7 +22,6 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
   const dispatch = useDispatch();
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const appMode = useSelector(getAppMode);
-  const location = useLocation();
 
   const openAuthModal = (authMode: string) => {
     trackSignUpButtonClicked("bad_login_invite");
@@ -32,12 +30,9 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newProps: {
+            authMode,
+            redirectURL: window.location.href,
             eventSource: SOURCE.TEAM_WORKSPACE_BAD_INVITE_SCREEN,
-            redirectURL: location.pathname,
-            callback: () => {
-              // setVisible(false);
-            },
-            authMode: authMode,
           },
         })
       );
