@@ -60,3 +60,8 @@ export const trackLoginButtonClicked = (source) => {
   const params = { source };
   trackEvent(AUTH.LOGIN.BUTTON_CLICKED, params);
 };
+
+export const trackLoginUserSwitchedEmail = (source) => {
+  const params = { source };
+  trackEvent(AUTH.LOGIN.USER_SWITCHED_EMAIL, params);
+};
