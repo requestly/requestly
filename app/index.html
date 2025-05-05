@@ -10,7 +10,7 @@
         window.location.hostname !== "app.sessionbear.com" &&
         window.location.hostname !== "beta.sessionbear.com" &&
         window.location.hostname !== "localhost" &&
-        !window.location.hostname.contains("web.app") &&
+        !window.location.hostname.includes("web.app") &&
         isNaN(parseInt(window.location.hostname.replace(/\./g, ""))) // dumb check for an IP (or any number really)
       ) {
         window.location.href = "https://app.requestly.io";

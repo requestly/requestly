@@ -29,7 +29,7 @@ export const isProductionUI =
     window.location.host.includes("beta.requestly.io") ||
     window.location.host.includes("app.sessionbear.com") ||
     window.location.host.includes("beta.sessionbear.com") ||
-    window.location.hostname.contains("web.app")) &&
+    window.location.hostname.includes("web.app")) &&
   !window.testMode;
 
 export const isLocalStoragePresent = (appMode) => {
