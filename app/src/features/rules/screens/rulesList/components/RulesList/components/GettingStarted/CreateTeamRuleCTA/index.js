@@ -14,7 +14,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackNewRuleButtonClicked, trackRulesEmptyStateClicked } from "modules/analytics/events/common/rules";
 import "./CreateTeamRuleCTA.css";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
-import { getLinkWithMetadata } from "modules/analytics";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 export const CreateTeamRuleCTA = () => {
   const navigate = useNavigate();

@@ -11,7 +11,7 @@ import { LuImport } from "@react-icons/all-files/lu/LuImport";
 import { SOURCE } from "modules/analytics/events/common/constants.js";
 import { MockType } from "components/features/mocksV2/types";
 import "./gettingStartedWithMocks.scss";
-import { getLinkWithMetadata } from "modules/analytics";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 interface Props {
   mockType: MockType;

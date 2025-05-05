@@ -4,7 +4,7 @@ import { Col } from "antd";
 import { AiOutlineYoutube } from "@react-icons/all-files/ai/AiOutlineYoutube";
 import { trackHomeHelpClicked } from "components/Home/analytics";
 import "./helpCard.scss";
-import { getLinkWithMetadata } from "modules/analytics";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 export const HelpCard: React.FC = () => {
   const helperLinks = useMemo(
