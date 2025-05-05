@@ -277,6 +277,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                       >
                         <div className="access-dropdown-container">
                           <MemberRoleDropdown
+                            memberRole={userInviteRole}
                             loggedInUserTeamRole={loggedInUserTeamRole}
                             placement="bottomRight"
                             isAdmin={isAdmin(userInviteRole)}
