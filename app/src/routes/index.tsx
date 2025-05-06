@@ -25,9 +25,14 @@ import { paymentRoutes } from "./paymentRoutes";
 import { networkInspectorRoutes } from "features/networkInspector";
 import RouterError from "components/misc/PageError/RouterError";
 import { BStackAuthStart } from "features/onboarding/screens/BStackAuthStart/BStackAuthStart";
+import ExtensionInstalledScreen from "views/misc/ExtensionInstalledScreen/";
 
 export const routesV2: RouteObject[] = [
   /** Misc **/
+  {
+    path: PATHS._INSTALLED_EXTENSION.RELATIVE,
+    element: <ExtensionInstalledScreen />,
+  },
   {
     path: PATHS.SELENIUM_IMPORTER.RELATIVE,
     element: <SeleniumImporter />,
