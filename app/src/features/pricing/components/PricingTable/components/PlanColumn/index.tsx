@@ -45,6 +45,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
 
   const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
   const isBrowserstackCheckoutEnabled = useFeatureIsOn("browserstack_checkout");
+  const isAcceleratorProgramEnabled = useFeatureIsOn("display_accelerator_on_pricing");
 
   const currentSeats = user.details?.planDetails?.subscription?.quantity ?? 1;
 
@@ -330,7 +331,8 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         </Space>
       </div>
 
-      {[PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE].includes(planName) ? (
+      {[PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE].includes(planName) &&
+      isAcceleratorProgramEnabled ? (
         <div className="student-plan-footer">
           <GiftIcon className="gift-plan-icon" width={16} height={16} />
           <a
