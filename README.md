@@ -1,7 +1,4 @@
-
-
-
-![Requestly Logo](https://github.com/user-attachments/assets/5bccaf91-2d9b-4969-91ee-aaa957f976e5)
+![Requestly Logo](https://github.com/user-attachments/assets/d0f13ec3-ca42-4b6c-ab6c-16e380ad04b3)
 
 <br/>
 
