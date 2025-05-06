@@ -225,7 +225,7 @@ const PricingPageFooter: React.FC = () => {
           </Row>
 
           <div className="socials-continer">
-            <div className="copyright">Copyright © 2025 RQ Labs, Inc. All rights reserved.</div>
+            <div className="copyright">Copyright © 2025 BrowserStack. All rights reserved.</div>
 
             <div className="socials">
               <span className="follow-us">Follow us on</span>
