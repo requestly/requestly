@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from "react";
 import { useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getUserAttributes } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Col, Row } from "antd";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -21,6 +21,7 @@ const { PATHS } = APP_CONSTANTS;
 export const SettingsPrimarySidebar: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const userAttributes = useSelector(getUserAttributes);
   const navigate = useNavigate();
   const location = useLocation();
   const { state } = location;
@@ -74,7 +75,9 @@ export const SettingsPrimarySidebar: React.FC = () => {
             id: "members",
             name: "Members",
             path: PATHS.SETTINGS.MEMBERS.RELATIVE,
-            ishidden: !(user?.details?.profile?.isEmailVerified && isCompanyEmail(user.details?.emailType)),
+            ishidden:
+              !(user?.details?.profile?.isEmailVerified && isCompanyEmail(user.details?.emailType)) ||
+              userAttributes?.browserstack_id,
           },
           {
             id: "workspaces",
@@ -90,7 +93,13 @@ export const SettingsPrimarySidebar: React.FC = () => {
         ],
       },
     ],
-    [appMode, user.details?.emailType, user.details?.profile?.isEmailVerified, user.loggedIn]
+    [
+      appMode,
+      user.details?.emailType,
+      user.details?.profile?.isEmailVerified,
+      user.loggedIn,
+      userAttributes?.browserstack_id,
+    ]
   );
 
   return (

@@ -3,8 +3,8 @@ import { Row, Col, Typography, Space, Button } from "antd";
 import { EVENTS, trackAddToChromeClicked, trackRequestDocumentClicked } from "./analytics";
 import RequestDocsModal from "./RequestDocsModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import backedBy from "./assets/backed-by.webp";
 import LINKS from "config/constants/sub/links";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 import "./PricingPageFooter.scss";
 import { getLinkWithMetadata } from "modules/analytics/metadata";
 
@@ -12,6 +12,7 @@ const { Title, Link } = Typography;
 
 const PricingPageFooter: React.FC = () => {
   const [isRequestDocsModalOpen, setisRequestDocsModalOpen] = useState(false);
+  const isBrowserStackIntegrationOn = useIsBrowserStackIntegrationOn();
 
   const handleDocRequiredOnClick = () => {
     trackRequestDocumentClicked();
@@ -42,7 +43,7 @@ const PricingPageFooter: React.FC = () => {
               className="rq-logo"
               width={200}
               height={48}
-              src={"/assets/media/common/rq_logo_full.svg"}
+              src={`/assets/media/common/${isBrowserStackIntegrationOn ? "RQ-BStack Logo.svg" : "rq_logo_full.svg"}`}
               alt="Requestly logo"
             />
             <div className="caption">
@@ -225,7 +226,7 @@ const PricingPageFooter: React.FC = () => {
           </Row>
 
           <div className="socials-continer">
-            <div className="copyright">Copyright © 2025 RQ Labs, Inc. All rights reserved.</div>
+            <div className="copyright">Copyright © 2025 BrowserStack. All rights reserved.</div>
 
             <div className="socials">
               <span className="follow-us">Follow us on</span>

@@ -35,15 +35,6 @@ const PricingFAQs = () => {
       ),
     },
     {
-      question: <React.Fragment>How is my payment information handled and secured?</React.Fragment>,
-      answer: (
-        <React.Fragment>
-          Your transaction is processed securely through Stripe. All payments are encrypted, and your credentials and
-          payment method are isolated for security. We do not save any card info.
-        </React.Fragment>
-      ),
-    },
-    {
       question: <>I want to modify only HTTP Headers, Is there a discounted plan for me?</>,
       answer: (
         <>

@@ -29,6 +29,7 @@ export interface BillingTeamDetails {
     };
   };
   isAcceleratorTeam?: boolean;
+  browserstackGroupId?: string;
 }
 
 export enum BillingTeamRoles {

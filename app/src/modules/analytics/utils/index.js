@@ -20,6 +20,7 @@ export function buildBasicUserProperties(user) {
       isBusinessAccount,
       company,
       workspaceId: window.currentlyActiveWorkspaceTeamId ? window.currentlyActiveWorkspaceTeamId : null,
+      browserstackId: user.browserstackId,
     };
   }
 }
