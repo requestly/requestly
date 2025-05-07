@@ -2,7 +2,7 @@ import { EnvironmentVariables } from "backend/environment/types";
 import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
 import { RQAPI } from "../../types";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
-import { processAuthForEntry, updateRequestWithAuthOptions } from "../auth";
+import { processHeaderAndQueryParams, processAuth, updateRequestWithAuthOptions } from "../auth";
 import {
   PostResponseScriptWorkload,
   PreRequestScriptWorkload,
@@ -25,10 +25,10 @@ type InternalFunctions = {
   getGlobalVariables(): EnvironmentVariables;
   postScriptExecutionCallback(state: any): Promise<void>;
   renderVariables(
-    request: RQAPI.Request,
+    request: RQAPI.Entry,
     collectionId: string
   ): {
-    renderedRequest: RQAPI.Request;
+    renderedEntryDetails: RQAPI.Entry;
     renderedVariables?: Record<string, unknown>;
   };
 };
@@ -50,24 +50,28 @@ export class ApiClientExecutor {
     this.entryDetails.request.queryParams = [];
     this.renderedVariables = {};
 
-    const { headers, queryParams } = processAuthForEntry(
+    const processedAuth = processAuth(
       this.entryDetails,
       { id: this.recordId, parentId: this.collectionId },
       this.apiRecords
     );
+    this.entryDetails.auth = processedAuth;
+
+    const { renderVariables } = this.internalFunctions;
+    const { renderedEntryDetails, renderedVariables } = renderVariables(this.entryDetails, this.collectionId);
+
+    this.entryDetails = renderedEntryDetails;
+    this.renderedVariables = renderedVariables;
+
+    const { headers, queryParams } = processHeaderAndQueryParams(this.entryDetails.auth);
+
     this.entryDetails.request.headers = updateRequestWithAuthOptions(this.entryDetails.request.headers, headers);
     this.entryDetails.request.queryParams = updateRequestWithAuthOptions(
       this.entryDetails.request.queryParams,
       queryParams
     );
 
-    const { renderVariables } = this.internalFunctions;
-
-    // Process request configuration with environment variables
-    const { renderedRequest, renderedVariables } = renderVariables(this.entryDetails.request, this.collectionId);
-    this.entryDetails.request = renderedRequest;
-    this.renderedVariables = renderedVariables;
-    return renderedRequest;
+    return this.entryDetails.request;
   }
 
   private buildBaseSnapshot(): BaseSnapshot {

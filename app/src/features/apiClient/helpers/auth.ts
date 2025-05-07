@@ -4,7 +4,7 @@ import { KeyValuePair, RQAPI } from "../types";
 import { Authorization } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 import { getDefaultAuth } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
 
-export const processAuthForEntry = (
+export const processAuth = (
   entry: RQAPI.Entry,
   entryDetails: {
     id: RQAPI.Record["id"];
@@ -12,26 +12,28 @@ export const processAuthForEntry = (
   },
   allRecords: RQAPI.Record[]
 ) => {
-  const entryCopy = JSON.parse(JSON.stringify(entry)) as RQAPI.Entry; // Deep Copy
-
+  const entryCopy = JSON.parse(JSON.stringify(entry)) as RQAPI.Entry;
   const currentAuth = entryCopy.auth;
+
   let finalAuth: RQAPI.Auth | null = currentAuth;
   if (isEmpty(currentAuth)) {
     finalAuth = getDefaultAuth(entryDetails.parentId === null);
   }
-
   if (finalAuth.currentAuthType === Authorization.Type.INHERIT) {
     finalAuth = inheritAuthFromParent(entryDetails, allRecords);
   }
-  finalAuth = pruneConfig(finalAuth);
 
+  finalAuth = pruneConfig(finalAuth);
+  return finalAuth;
+};
+
+export const processHeaderAndQueryParams = (finalAuth: RQAPI.Auth) => {
   if (!finalAuth) {
     return {
       headers: [],
       queryParams: [],
     };
   }
-
   return extractAuthHeadersAndParams(finalAuth);
 };
 
