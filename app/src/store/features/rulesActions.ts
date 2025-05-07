@@ -1,6 +1,5 @@
 import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
-//@ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+// import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { get, set } from "lodash";
 import { GlobalSliceState } from "store/slices/global/types";
 import { Group, QueryParamRule, Rule, ScriptRule } from "@requestly/shared/types/entities/rules";
@@ -151,16 +150,27 @@ export const updateRulePairAtGivenPath = (
 ) => {
   const { pairIndex, updates = {}, triggerUnsavedChangesIndication = true } = action.payload;
 
+  let updated = false;
   for (const [modificationPath, value] of Object.entries(updates)) {
-    set(
-      (prevState.rules.currentlySelectedRule.data as Rule)?.pairs?.[pairIndex],
-      getFilterObjectPath(modificationPath),
-      value
-    );
+    if (isRuleModificationAllowed(prevState.rules.currentlySelectedRule.data as Rule, modificationPath)) {
+      set(
+        (prevState.rules.currentlySelectedRule.data as Rule)?.pairs?.[pairIndex],
+        getFilterObjectPath(modificationPath),
+        value
+      );
+      updated = true;
+    }
   }
 
-  if (triggerUnsavedChangesIndication) {
+  if (updated && triggerUnsavedChangesIndication) {
     prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
+  }
+
+  function isRuleModificationAllowed(rule: Rule, _modificationPath: string) {
+    if (!rule || rule.isSample) {
+      return false;
+    }
+    return true;
   }
 };
 
