@@ -1,0 +1,51 @@
+name: typescript compiler
+
+on:
+  push:
+    branches: master
+  pull_request:
+    branches: master
+
+jobs:
+  type_check:
+    name: Run tsc
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install root dependencies
+        run: npm install
+
+      - name: Install common dependencies
+        run: npm install
+        working-directory: ./common/rule-processor
+
+      - name: Build common dependencies
+        run: npm run build
+        working-directory: ./common/rule-processor
+
+      - name: Build root dependencies
+        run: npm run build
+
+      - name: Install shared dependencies
+        run: npm install
+        working-directory: ./shared
+
+      - name: build shared dependencies
+        run: npm run build
+        working-directory: ./shared
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./app
+
+      - name: Run type check in app
+        run: npm run type-check
+        working-directory: ./app
