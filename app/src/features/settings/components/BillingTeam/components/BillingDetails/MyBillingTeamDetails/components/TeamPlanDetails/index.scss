@@ -24,7 +24,13 @@
 
   & .team-plan-details-sections-wrapper {
     display: grid;
-    grid-template-columns: 1.1fr 1.5fr 0.5fr;
+    &.two-part-grid {
+      grid-template-columns: 1.5fr 1.5fr;
+    }
+
+    &.three-part-grid {
+      grid-template-columns: 1.1fr 1.5fr 0.5fr;
+    }
 
     & .team-plan-details-section {
       padding: 1rem;
@@ -72,7 +78,10 @@
 
     & .team-plan-details-section:nth-child(2) {
       border-left: 1px solid var(--surface-2);
-      border-right: 1px solid var(--surface-2);
+    }
+
+    & .team-plan-details-section:nth-child(3) {
+      border-left: 1px solid var(--surface-2);
     }
   }
 }
@@ -92,7 +101,7 @@
   .team-plan-popover-header,
   .team-plan-popover-body {
     padding: 1rem !important;
-    border-bottom: 1px solid var(--surface-2);
+    // border-bottom: 1px solid var(--surface-2);
   }
 
   .team-plan-popover-close-icon {

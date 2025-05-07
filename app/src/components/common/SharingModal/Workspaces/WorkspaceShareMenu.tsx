@@ -30,16 +30,18 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
+  const filteredAvailableWorkspaces = availableWorkspaces.filter((workspace) => !workspace.browserstackDetails); // Filtering our Browserstack Workspaces)
+
   const activeTeamData: Workspace = useMemo(
-    () => availableWorkspaces?.find((team: Workspace) => team?.id === activeWorkspaceId),
-    [activeWorkspaceId, availableWorkspaces]
+    () => filteredAvailableWorkspaces?.find((team: Workspace) => team?.id === activeWorkspaceId),
+    [activeWorkspaceId, filteredAvailableWorkspaces]
   );
   const sortedTeams: Workspace[] = useMemo(
     () =>
-      availableWorkspaces
-        ? [...availableWorkspaces].sort((a: Workspace, b: Workspace) => b.accessCount - a.accessCount)
+      filteredAvailableWorkspaces
+        ? [...filteredAvailableWorkspaces].sort((a: Workspace, b: Workspace) => b.accessCount - a.accessCount)
         : [],
-    [availableWorkspaces]
+    [filteredAvailableWorkspaces]
   );
 
   const menuItems: MenuProps["items"] = useMemo(() => {
@@ -103,13 +105,13 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
           menu={{ items: menuItems }}
           placement="bottom"
           overlayClassName="workspace-share-menu-wrapper"
-          trigger={availableWorkspaces?.length > 1 ? ["click"] : [null]}
+          trigger={filteredAvailableWorkspaces?.length > 1 ? ["click"] : [null]}
           onOpenChange={(open) => {
             if (open) trackShareModalWorkspaceDropdownClicked();
           }}
         >
           <div>
-            <WorkspaceItem team={activeTeamData} showArrow availableTeams={availableWorkspaces} />
+            <WorkspaceItem team={activeTeamData} showArrow availableTeams={filteredAvailableWorkspaces} />
           </div>
         </Dropdown>
       )}
