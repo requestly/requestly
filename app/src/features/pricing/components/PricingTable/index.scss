@@ -19,12 +19,16 @@
     border: 1px solid var(--success);
   }
   .recommended-tag {
+    position: relative;
+    bottom: 2px;
+    align-self: flex-start;
     padding: 4px;
     border-radius: var(--border-radius-sm);
     background: var(--success);
-    font-weight: 700;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-size: var(--requestly-font-size-2xs);
     color: var(--black);
-    font-size: var(--requestly-font-size-xs, 11px);
   }
 
   & .ant-input-number-handler-wrap {
@@ -53,6 +57,7 @@
 .plan-price-row {
   margin-top: 4px;
   font-size: 12px;
+  min-height: 60px;
 
   .caption {
     &.text-white {
@@ -139,6 +144,19 @@
       height: 14px;
       flex-shrink: 0;
     }
+  }
+
+  .plan-card-current-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--requestly-color-surface-2);
+    color: var(--requestly-color-text-default);
+    font-weight: var(--requestly-font-weight-bold);
+    font-size: var(--requestly-font-size-xs);
+    text-align: center;
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
   }
 }
 
@@ -233,8 +251,22 @@
 
 .quantity-container {
   margin-top: 8px;
-  align-items: center;
   margin-bottom: 16px;
+  min-height: 32px;
+
+  .pricing-plan-quantity-selector__select {
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid var(--requestly-color-surface-3);
+    background: var(--requestly-color-surface-3);
+
+    .ant-select-selector {
+      border: none !important;
+    }
+    .ant-select-arrow {
+      color: var(--requestly-color-text-default);
+    }
+  }
 }
 
 .quantity-selector {

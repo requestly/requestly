@@ -88,7 +88,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
         .catch((err) => {
           setStripeError(err);
           setIsLoading(false);
-          trackCheckoutFailedEvent("individual", source);
+          trackCheckoutFailedEvent(quantity, source, "requestly");
         });
     },
     [duration, toggleModal, source, quantity]

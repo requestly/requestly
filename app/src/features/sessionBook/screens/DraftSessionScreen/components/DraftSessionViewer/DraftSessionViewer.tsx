@@ -16,6 +16,7 @@ import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { RQTooltip } from "lib/design-system-v2/components";
 import { useRBAC } from "features/rbac";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 import "./draftSessionViewer.scss";
 
 interface DraftSessionViewerProps {
@@ -34,6 +35,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
   const isOpenedInIframe = location.pathname.includes("iframe");
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("session_recording", "create");
+  const isBrowserStackIntegrationOn = useIsBrowserStackIntegrationOn();
 
   if (!isDesktopMode) {
     unstable_usePrompt({
@@ -79,7 +81,13 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
               {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
                 <img src={"/assets/media/common/sessionBearLogoFull.svg"} alt="SessionBear Logo" width={150} />
               ) : (
-                <img src={"/assets/media/common/rq_logo_full.svg"} alt="Requestly Logo" width={120} />
+                <img
+                  src={`/assets/media/common/${
+                    isBrowserStackIntegrationOn ? "RQ-BStack Logo.svg" : "rq_logo_full.svg"
+                  }`}
+                  alt="Requestly Logo"
+                  width={120}
+                />
               )}
             </>
           ) : (

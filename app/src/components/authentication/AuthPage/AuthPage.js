@@ -1,12 +1,12 @@
 import React, { useEffect, useCallback, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 // reactstrap components
 import { Col, Row } from "antd";
 //SUB COMPONENTS
 import AuthForm from "../AuthForm";
 //UTILS
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToRules } from "../../../utils/RedirectionUtils";
 //CONSTANTS
 import APP_CONSTANTS from "../../../config/constants";

@@ -29,6 +29,7 @@ import { updateGroupOfSelectedRules } from "components/features/rules/ChangeRule
 import { getAllRulesOfGroup } from "utils/rules/misc";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { Group, RecordStatus, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 
 // FIXME: Make all bulk actions async to handle loading state properly
 type RulesActionContextType = {
@@ -173,6 +174,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
           })
         );
       } else {
+        trackSignUpButtonClicked(SOURCE.RULES_LIST);
         dispatch(
           globalActions.toggleActiveModal({
             modalName: "authModal",
@@ -182,7 +184,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
               src: APP_CONSTANTS.FEATURES.RULES,
               userActionMessage: "Sign up to generate a public shareable link",
               authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-              eventSource: "rules_list",
+              eventSource: SOURCE.RULES_LIST,
             },
           })
         );
@@ -371,6 +373,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
           })
         );
       } else {
+        trackSignUpButtonClicked(SOURCE.RULES_LIST);
         dispatch(
           globalActions.toggleActiveModal({
             modalName: "authModal",
@@ -380,7 +383,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
               src: APP_CONSTANTS.FEATURES.RULES,
               userActionMessage: "Sign up to generate a public shareable link",
               authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-              eventSource: "rules_list",
+              eventSource: SOURCE.RULES_LIST,
             },
           })
         );

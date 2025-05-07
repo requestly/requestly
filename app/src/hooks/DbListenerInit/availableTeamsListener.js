@@ -92,6 +92,13 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
               workspaceType: teamData?.workspaceType || WorkspaceType.SHARED,
             };
 
+            if (teamData?.browserstackDetails) {
+              formattedTeamData.browserstackDetails = {
+                groupId: teamData.browserstackDetails?.groupId,
+                subGroupId: teamData.browserstackDetails?.subGroupId,
+              };
+            }
+
             return formattedTeamData;
           })
           .filter(Boolean);

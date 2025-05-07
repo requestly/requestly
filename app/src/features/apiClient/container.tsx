@@ -11,6 +11,8 @@ import { redirectToUrl } from "utils/RedirectionUtils";
 import LINKS from "config/constants/sub/links";
 import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
 import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceContextProvider";
+import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import "./container.scss";
 
 const ApiClientFeatureContainer: React.FC = () => {
@@ -18,6 +20,7 @@ const ApiClientFeatureContainer: React.FC = () => {
   const dispatch = useDispatch();
 
   const handleSignUp = useCallback(() => {
+    trackLoginButtonClicked(SOURCE.API_CLIENT_EMPTY_STATE);
     dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
   }, [dispatch]);
 
@@ -34,12 +37,12 @@ const ApiClientFeatureContainer: React.FC = () => {
             Read announcement
           </RQButton>,
           <RQButton type="primary" onClick={handleSignUp}>
-            Sign up to get started
+            Sign in to get started
           </RQButton>,
         ]}
       >
         <div className="api-client-logged-out-view_content">
-          <Typography.Title level={5}>Please login first to use API client</Typography.Title>
+          <Typography.Title level={5}>Please sign in first to use API client</Typography.Title>
           <Typography.Text className="api-client-logged-out-view_description">
             Requestly API client requires an account for <span className="success">secure</span> workspace
             collaboration. A <span className="success">local-first</span> version is coming soon, and creating an

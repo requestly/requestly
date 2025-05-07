@@ -52,7 +52,11 @@ export const UpgradeToAnnual: React.FC = () => {
       })
       .catch(() => {
         toast.error("Error in converting to annual plan. Please contact support contact@requestly.io");
-        trackCheckoutFailedEvent(user?.details?.planDetails?.subscription?.quantity, "monthly_to_annual_conversion");
+        trackCheckoutFailedEvent(
+          user?.details?.planDetails?.subscription?.quantity,
+          "monthly_to_annual_conversion",
+          "requestly"
+        );
       });
   }, [firebaseFunction, user?.details?.planDetails?.planName, user?.details?.planDetails?.subscription?.quantity]);
 
@@ -65,7 +69,7 @@ export const UpgradeToAnnual: React.FC = () => {
           newProps: {
             eventSource: "upgrade_to_annual",
             authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-            warningMessage: `Please login to switch to annual plan!`,
+            warningMessage: `Please sign in to switch to annual plan!`,
             closable: false,
           },
         })

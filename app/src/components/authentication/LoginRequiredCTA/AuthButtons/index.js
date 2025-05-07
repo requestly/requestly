@@ -1,12 +1,13 @@
-import React, { useCallback, useEffect } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
-import { Button, Space } from "antd";
-//CONSTANTS
+import { Space } from "antd";
 import APP_CONSTANTS from "../../../../config/constants";
-import { SOURCE } from "modules/analytics/events/common/constants";
 import { globalActions } from "store/slices/global/slice";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
+import { RQButton } from "lib/design-system-v2/components";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
@@ -17,6 +18,8 @@ const AuthButtons = ({ src, hardRedirect = false, autoPrompt = true }) => {
   const dispatch = useDispatch();
 
   const handleLoginButtonOnClick = (e) => {
+    trackLoginButtonClicked(window.location.href);
+
     if (hardRedirect) {
       navigate(PATHS.AUTH.SIGN_IN.ABSOLUTE);
       return;
@@ -29,13 +32,15 @@ const AuthButtons = ({ src, hardRedirect = false, autoPrompt = true }) => {
           redirectURL: window.location.href,
           authMode: AUTH_ACTION_LABELS.LOG_IN,
           src: src,
-          eventSource: SOURCE.LOGIN_CTA,
+          eventSource: window.location.href,
         },
       })
     );
   };
 
   const handleSignUpButtonOnClick = (e) => {
+    trackSignUpButtonClicked(window.location.href);
+
     if (hardRedirect) {
       navigate(PATHS.AUTH.SIGN_UP.ABSOLUTE);
       return;
@@ -48,30 +53,18 @@ const AuthButtons = ({ src, hardRedirect = false, autoPrompt = true }) => {
           redirectURL: window.location.href,
           authMode: AUTH_ACTION_LABELS.SIGN_UP,
           src: src,
-          eventSource: SOURCE.SIGNUP_CTA,
+          eventSource: window.location.href,
         },
       })
     );
   };
-  const stableHandleSignUpButtonOnClick = useCallback(handleSignUpButtonOnClick, [
-    dispatch,
-    hardRedirect,
-    navigate,
-    src,
-  ]);
-
-  useEffect(() => {
-    if (autoPrompt && !hardRedirect) stableHandleSignUpButtonOnClick();
-  }, [autoPrompt, hardRedirect, stableHandleSignUpButtonOnClick]);
 
   return (
     <Space>
-      <Button type="primary" onClick={handleLoginButtonOnClick}>
-        Login
-      </Button>
-      <Button type="primary" onClick={handleSignUpButtonOnClick}>
+      <RQButton onClick={handleLoginButtonOnClick}>Sign in</RQButton>
+      <RQButton type="primary" onClick={handleSignUpButtonOnClick}>
         Sign up
-      </Button>
+      </RQButton>
     </Space>
   );
 };

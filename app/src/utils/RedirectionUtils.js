@@ -454,6 +454,14 @@ export const redirectToWebAppHomePage = (navigate) => {
   navigate(PATHS.HOME.ABSOLUTE);
 };
 
+export function redirectToHome(appMode, navigate) {
+  if (appMode === "desktop") {
+    redirectToDesktopHomepage(navigate);
+  } else {
+    redirectToWebAppHomePage(navigate);
+  }
+}
+
 // route should be choosen from APP_CONSTANTS.PATH.<your-route>.ABSOLUTE
 export const redirectToDesktopApp = (route) => {
   let redirectedRoute = "requestly://open-url";
@@ -553,7 +561,7 @@ export const redirectToUrl = (url, newTab = false) => {
     return window.open(url, "_blank");
   }
 
-  return window.open(url);
+  return window.open(url, "_self");
 };
 
 export const navigateBack = (navigate, location, fallback) => {
@@ -567,4 +575,8 @@ export const navigateBack = (navigate, location, fallback) => {
 
 export const redirectToProductSpecificPricing = (navigate, product) => {
   navigate(`${PATHS.PRICING.RELATIVE}?product=${product}`);
+};
+
+export const redirectToOAuthUrl = (navigate) => {
+  redirectToUrl(LINKS.OAUTH_REDIRECT_URL);
 };
