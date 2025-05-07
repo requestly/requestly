@@ -11,6 +11,7 @@ import {
 } from "modules/analytics/events/common/auth/authPopover";
 
 import { TooltipPlacement } from "antd/lib/tooltip";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 import "./popover.scss";
 
 interface Props {
@@ -41,6 +42,7 @@ export const AuthConfirmationPopover: React.FC<Props> = ({
   flag.current = false;
 
   const openAuthModal = () => {
+    trackSignUpButtonClicked(source);
     dispatch(
       globalActions.toggleActiveModal({
         modalName: "authModal",

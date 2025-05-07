@@ -69,6 +69,7 @@ import {
 } from "modules/analytics/events/common/auth/logout";
 import { toast } from "utils/Toast";
 import { getUserProfilePath } from "utils/db/UserModel";
+import { AuthErrorCode } from "features/onboarding/screens/auth/types";
 
 const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 /**
@@ -317,6 +318,20 @@ export function resetPassword(oobCode, password) {
     });
 }
 
+export const handleCustomGoogleSignIn = async (credential, successfulLoginCallback, failedLoginCallback) => {
+  try {
+    const auth = getAuth(firebaseApp);
+    const OAuthCredential = GoogleAuthProvider.credential(credential);
+    const result = await signInWithCredential(auth, OAuthCredential);
+
+    toast.success(`Welcome back ${result.user.displayName}`);
+    successfulLoginCallback();
+  } catch (error) {
+    toast.error("Something went wrong. Please try again.");
+    failedLoginCallback(AuthErrorCode.UNKNOWN);
+  }
+};
+
 export const handleOnetapSignIn = async ({ credential }) => {
   try {
     const auth = getAuth(firebaseApp);
@@ -429,9 +444,9 @@ export async function googleSignIn(callback, MODE, source) {
     });
 }
 
-export const googleSignInDesktopApp = (callback, MODE, source) => {
+export const googleSignInDesktopApp = (callback, MODE, source, oneTimeCode) => {
   return new Promise((resolve, reject) => {
-    const id = uuidv4();
+    const id = oneTimeCode || uuidv4();
     const database = getDatabase();
     const oneTimeCodeRef = ref(database, `ot-auth-codes/${id}`);
     // Wait for changes
@@ -449,7 +464,16 @@ export const googleSignInDesktopApp = (callback, MODE, source) => {
       resolve(credential.user);
     });
 
-    window.open(getDesktopSignInAuthPath(id, source), "_blank");
+    let desktopSignInAuthUrl = `${window.location.origin}${getDesktopSignInAuthPath(id, source)}`;
+
+    // TODO: refactor - indicates triggered from new auth flow
+    if (oneTimeCode) {
+      desktopSignInAuthUrl = new URL(desktopSignInAuthUrl);
+      desktopSignInAuthUrl.searchParams.append("auth_mode", MODE);
+      desktopSignInAuthUrl = desktopSignInAuthUrl.toString();
+    }
+
+    window.open(desktopSignInAuthUrl, "_blank");
   });
 };
 

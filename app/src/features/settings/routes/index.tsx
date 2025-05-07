@@ -46,7 +46,7 @@ export const settingRoutes: RouteObject[] = [
       },
       {
         path: PATHS.SETTINGS.BILLING.RELATIVE,
-        element: <BillingTeamContainer />,
+        element: <ProtectedRoute component={BillingTeamContainer} />,
         children: [
           {
             index: true,

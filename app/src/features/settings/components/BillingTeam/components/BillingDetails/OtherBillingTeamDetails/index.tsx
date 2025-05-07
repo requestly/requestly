@@ -120,79 +120,83 @@ export const OtherBillingTeamDetails: React.FC = () => {
         <div className="w-full" style={{ maxWidth: "1000px" }}>
           <Col className="my-billing-team-title">{billingTeamDetails.name}</Col>
           <Col className="billing-teams-primary-card mt-8">
-            <Row
-              className="items-center other-team-members-table-header"
-              align="middle"
-              justify="space-between"
-              gutter={8}
-            >
-              <Col>
-                <Row align="middle" gutter={8}>
-                  <Col
-                    style={{
-                      paddingRight: 0,
-                      paddingLeft: 0,
-                    }}
-                  >
-                    <TeamPlanStatus subscriptionStatus={billingTeamDetails?.subscriptionDetails?.subscriptionStatus} />
-                  </Col>
-                  <Col>
-                    <Popover
-                      overlayClassName="team-details-popover"
-                      open={isPlanDetailsPopoverOpen}
-                      content={
-                        <TeamDetailsPopover
-                          teamDetails={billingTeamDetails}
-                          closePopover={() => setIsPlanDetailsPopoverOpen(false)}
-                        />
-                      }
-                      showArrow={false}
-                      trigger="click"
-                      placement="bottomLeft"
-                      title={null}
-                    >
-                      <RQButton
-                        type="text"
-                        size="small"
-                        className="view-team-details-btn"
-                        onClick={() => setIsPlanDetailsPopoverOpen(true)}
-                      >
-                        View details
-                      </RQButton>
-                    </Popover>
-                  </Col>
-                </Row>
-              </Col>
-
-              {!hasJoinedAnyTeam && (
+            {billingTeamDetails?.subscriptionDetails ? (
+              <Row
+                className="items-center other-team-members-table-header"
+                align="middle"
+                justify="space-between"
+                gutter={8}
+              >
                 <Col>
-                  {!isAcceleratorTeam ? (
-                    <Tooltip title="On clicking, we'll notify the billing manager and admins to assign a license to you.">
-                      <RQButton
-                        className="request-billing-team-btn"
-                        type="default"
-                        icon={<IoMdAdd />}
-                        onClick={() => setIsRequestModalOpen(true)}
+                  <Row align="middle" gutter={8}>
+                    <Col
+                      style={{
+                        paddingRight: 0,
+                        paddingLeft: 0,
+                      }}
+                    >
+                      <TeamPlanStatus
+                        subscriptionStatus={billingTeamDetails?.subscriptionDetails?.subscriptionStatus}
+                      />
+                    </Col>
+                    <Col>
+                      <Popover
+                        overlayClassName="team-details-popover"
+                        open={isPlanDetailsPopoverOpen}
+                        content={
+                          <TeamDetailsPopover
+                            teamDetails={billingTeamDetails}
+                            closePopover={() => setIsPlanDetailsPopoverOpen(false)}
+                          />
+                        }
+                        showArrow={false}
+                        trigger="click"
+                        placement="bottomLeft"
+                        title={null}
                       >
-                        Request Premium access
-                      </RQButton>
-                    </Tooltip>
-                  ) : (
-                    <Tooltip title="On clicking, you will join the team">
-                      <RQButton
-                        className="request-billing-team-btn"
-                        type="default"
-                        icon={<IoMdAdd />}
-                        onClick={handleJoinAcceleratorTeam}
-                        loading={isLoading}
-                      >
-                        Join Team
-                      </RQButton>
-                    </Tooltip>
-                  )}
+                        <RQButton
+                          type="text"
+                          size="small"
+                          className="view-team-details-btn"
+                          onClick={() => setIsPlanDetailsPopoverOpen(true)}
+                        >
+                          View details
+                        </RQButton>
+                      </Popover>
+                    </Col>
+                  </Row>
                 </Col>
-              )}
-            </Row>
+
+                {!hasJoinedAnyTeam && (
+                  <Col>
+                    {!isAcceleratorTeam ? (
+                      <Tooltip title="On clicking, we'll notify the billing manager and admins to assign a license to you.">
+                        <RQButton
+                          className="request-billing-team-btn"
+                          type="default"
+                          icon={<IoMdAdd />}
+                          onClick={() => setIsRequestModalOpen(true)}
+                        >
+                          Request Premium access
+                        </RQButton>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip title="On clicking, you will join the team">
+                        <RQButton
+                          className="request-billing-team-btn"
+                          type="default"
+                          icon={<IoMdAdd />}
+                          onClick={handleJoinAcceleratorTeam}
+                          loading={isLoading}
+                        >
+                          Join Team
+                        </RQButton>
+                      </Tooltip>
+                    )}
+                  </Col>
+                )}
+              </Row>
+            ) : null}
             <Table
               className="billing-table"
               dataSource={membersTableSource}

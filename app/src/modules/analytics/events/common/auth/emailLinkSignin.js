@@ -12,3 +12,7 @@ export const trackSignInWithLinkCustomFormSubmitted = () => {
 export const trackMagicLinkResendRequested = () => {
   trackEvent(AUTH.EMAIL_LINK_SIGNIN_FORM.LINK_RESEND_REQUESTED);
 };
+
+export const trackMagicLinkLoginWithGoogleInstead = () => {
+  trackEvent(AUTH.EMAIL_LINK_SIGNIN_FORM.LOGIN_WITH_GOOGLE_INSTEAD);
+};
