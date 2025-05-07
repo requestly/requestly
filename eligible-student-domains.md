@@ -34,6 +34,7 @@ The following domains are eligible for the student programme:
     "estg.ipp.pt",
     "utm.md",
     "fernuni-hagen.de",
+    "univ-lorraine.fr",
     "duke.edu",
     "fau.de",
     "sch.gr",
