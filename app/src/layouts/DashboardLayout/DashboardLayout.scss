@@ -83,6 +83,10 @@
   height: 100%;
 }
 
+#dashboardMainContent {
+  overflow: hidden;
+}
+
 .app-layout .ant-layout-footer {
   height: 1.5rem;
   font-size: var(--requestly-font-size-xs, 11px);

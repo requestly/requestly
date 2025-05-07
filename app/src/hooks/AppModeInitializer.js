@@ -269,11 +269,11 @@ const AppModeInitializer = () => {
       isProxyServerRunning &&
       appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
       !hasConnectedAppBefore &&
-      userPersona.isSurveyCompleted
+      userPersona?.isSurveyCompleted
     ) {
       dispatch(globalActions.toggleActiveModal({ modalName: "connectedAppsModal" }));
     }
-  }, [appMode, dispatch, hasConnectedAppBefore, isProxyServerRunning, userPersona.isSurveyCompleted]);
+  }, [appMode, dispatch, hasConnectedAppBefore, isProxyServerRunning, userPersona?.isSurveyCompleted]);
 
   // Set app mode to "DESKTOP" if required. Default is "EXTENSION"
   useEffect(() => {
