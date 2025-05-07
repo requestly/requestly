@@ -284,13 +284,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                             isLoggedInUserAdmin={isLoggedInUserAdmin}
                             loggedInUserId={loggedInUserId}
                             handleMemberRoleChange={(_, updatedRole) => {
-                              let role = updatedRole;
-
-                              if (role === "user") {
-                                role = WorkspaceMemberRole.write;
-                              }
-
-                              setUserInviteRole(role);
+                              setUserInviteRole(updatedRole);
                             }}
                           />
                         </div>
