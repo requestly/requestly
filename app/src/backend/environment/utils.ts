@@ -4,17 +4,17 @@ import Logger from "lib/logger";
 import { isEmpty } from "lodash";
 
 type Variables = Record<string, string | number | boolean>;
-interface RenderResult {
-  renderedTemplate: string | Record<string, any>;
+interface RenderResult<T> {
+  renderedTemplate: T;
   usedVariables: Record<string, unknown>;
 }
 
-export const renderTemplate = (
-  template: string | Record<string, any>,
+export const renderTemplate = <T extends string | Record<string, T>>(
+  template: T,
   variables: Record<string, EnvironmentVariableValue> = {}
 ): {
   renderedVariables?: Record<string, unknown>;
-  renderedTemplate: string | Record<string, any>;
+  renderedTemplate: T;
 } => {
   if (!variables || Object.keys(variables).length === 0) {
     return {
@@ -40,7 +40,7 @@ export const renderTemplate = (
   };
 };
 
-const recursiveRender = (input: string | Record<string, any>, variables: Variables): RenderResult => {
+const recursiveRender = <T>(input: T, variables: Variables): RenderResult<T> => {
   if (typeof input === "string") {
     return processTemplateString(input, variables);
   } else if (typeof input === "object" && input !== null) {
@@ -52,7 +52,7 @@ const recursiveRender = (input: string | Record<string, any>, variables: Variabl
   };
 };
 
-const processObject = (input: Record<string, any>, variables: Variables): RenderResult => {
+const processObject = <T extends Record<string, any>>(input: T, variables: Variables): RenderResult<T> => {
   const result = Object.entries(input).reduce(
     (
       acc: {
@@ -73,16 +73,16 @@ const processObject = (input: Record<string, any>, variables: Variables): Render
   );
 
   return {
-    renderedTemplate: result.rendered,
+    renderedTemplate: result.rendered as T, // need assertion since rendered is also being treated as array above?
     usedVariables: result.variables,
   };
 };
 
-const processTemplateString = (input: string, variables: Variables): RenderResult => {
+const processTemplateString = <T extends string>(input: T, variables: Variables): RenderResult<T> => {
   try {
     const { wrappedTemplate, usedVariables } = collectAndEscapeVariablesFromTemplate(input, variables);
     const hbsTemplate = compile(wrappedTemplate);
-    const renderedTemplate = hbsTemplate(variables);
+    const renderedTemplate = hbsTemplate(variables) as T; // since handlebars generic types resolve to any; not string.
 
     return {
       renderedTemplate,
