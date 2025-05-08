@@ -150,7 +150,7 @@ export const updateRulePairAtGivenPath = (
 ) => {
   const { pairIndex, updates = {}, triggerUnsavedChangesIndication = true } = action.payload;
 
-  let updated = false;
+  let ruleDataModified = false;
   for (const [modificationPath, value] of Object.entries(updates)) {
     if (isRuleModificationAllowed(prevState.rules.currentlySelectedRule.data as Rule, modificationPath)) {
       set(
@@ -158,11 +158,11 @@ export const updateRulePairAtGivenPath = (
         getFilterObjectPath(modificationPath),
         value
       );
-      updated = true;
+      ruleDataModified = true;
     }
   }
 
-  if (updated && triggerUnsavedChangesIndication) {
+  if (ruleDataModified && triggerUnsavedChangesIndication) {
     prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
   }
 
