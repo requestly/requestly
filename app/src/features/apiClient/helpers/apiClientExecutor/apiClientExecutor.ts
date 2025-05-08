@@ -2,7 +2,7 @@ import { EnvironmentVariables } from "backend/environment/types";
 import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
 import { RQAPI } from "../../types";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
-import { processHeaderAndQueryParams, processAuth, updateRequestWithAuthOptions } from "../auth";
+import { getHeadersAndQueryParams, getEffectiveAuthForEntry, updateRequestWithAuthOptions } from "../auth";
 import {
   PostResponseScriptWorkload,
   PreRequestScriptWorkload,
@@ -50,20 +50,23 @@ export class ApiClientExecutor {
     this.entryDetails.request.queryParams = [];
     this.renderedVariables = {};
 
-    const processedAuth = processAuth(
+    const effectiveAuth = getEffectiveAuthForEntry(
       this.entryDetails,
       { id: this.recordId, parentId: this.collectionId },
       this.apiRecords
     );
-    this.entryDetails.auth = processedAuth;
+
+    // is this line over riding the entryDetails
+    this.entryDetails.auth = effectiveAuth;
 
     const { renderVariables } = this.internalFunctions;
     const { renderedEntryDetails, renderedVariables } = renderVariables(this.entryDetails, this.collectionId);
 
     this.entryDetails = renderedEntryDetails;
+
     this.renderedVariables = renderedVariables;
 
-    const { headers, queryParams } = processHeaderAndQueryParams(this.entryDetails.auth);
+    const { headers, queryParams } = getHeadersAndQueryParams(this.entryDetails.auth);
 
     this.entryDetails.request.headers = updateRequestWithAuthOptions(this.entryDetails.request.headers, headers);
     this.entryDetails.request.queryParams = updateRequestWithAuthOptions(

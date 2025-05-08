@@ -4,7 +4,7 @@ import { KeyValuePair, RQAPI } from "../types";
 import { Authorization } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 import { getDefaultAuth } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
 
-export const processAuth = (
+export const getEffectiveAuthForEntry = (
   entry: RQAPI.Entry,
   entryDetails: {
     id: RQAPI.Record["id"];
@@ -27,14 +27,14 @@ export const processAuth = (
   return finalAuth;
 };
 
-export const processHeaderAndQueryParams = (finalAuth: RQAPI.Auth) => {
-  if (!finalAuth) {
+export const getHeadersAndQueryParams = (auth: RQAPI.Auth) => {
+  if (!auth) {
     return {
       headers: [],
       queryParams: [],
     };
   }
-  return extractAuthHeadersAndParams(finalAuth);
+  return extractAuthHeadersAndParams(auth);
 };
 
 function inheritAuthFromParent(
