@@ -18,7 +18,7 @@ interface MemberRoleDropdownProps extends DropDownProps {
   loggedInUserId?: string;
   handleMemberRoleChange: (
     makeUserAdmin: boolean,
-    updatedRole: "admin" | "user" | "read",
+    updatedRole: TeamRole,
     setIsLoading: (status: boolean) => void
   ) => void;
 }
@@ -51,7 +51,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
             className="dropdown-access-type-menu-item"
             onClick={() => {
               setCurrentRole(TeamRole.admin);
-              handleMemberRoleChange(true, "admin", setIsLoading);
+              handleMemberRoleChange(true, TeamRole.admin, setIsLoading);
             }}
           >
             <div>
@@ -73,7 +73,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
             className="dropdown-access-type-menu-item"
             onClick={() => {
               setCurrentRole(TeamRole.write);
-              handleMemberRoleChange(false, "user", setIsLoading);
+              handleMemberRoleChange(false, TeamRole.write, setIsLoading);
             }}
           >
             <div>
@@ -93,7 +93,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
           className="dropdown-access-type-menu-item"
           onClick={() => {
             setCurrentRole(TeamRole.read);
-            handleMemberRoleChange(false, "read", setIsLoading);
+            handleMemberRoleChange(false, TeamRole.read, setIsLoading);
           }}
         >
           <div>
