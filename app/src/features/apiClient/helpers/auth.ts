@@ -12,6 +12,7 @@ export const getEffectiveAuthForEntry = (
   },
   allRecords: RQAPI.Record[]
 ) => {
+  // this mainly finds out the auth type in case of "INHERIT"
   const entryCopy = JSON.parse(JSON.stringify(entry)) as RQAPI.Entry;
   const currentAuth = entryCopy.auth;
 
