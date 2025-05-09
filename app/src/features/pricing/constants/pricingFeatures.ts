@@ -27,10 +27,6 @@ export const PricingFeatures: PlanFeatures = {
           title: "5 Files",
           enabled: true,
         },
-        {
-          title: "Non-Commercial Use Only",
-          enabled: true,
-        },
       ],
     },
     lite: {
