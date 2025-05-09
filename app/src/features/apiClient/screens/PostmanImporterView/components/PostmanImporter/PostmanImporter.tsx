@@ -9,7 +9,7 @@ import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOut
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
-import { Row } from "antd";
+import { notification, Row } from "antd";
 import {
   trackImportFailed,
   trackImportParsed,
@@ -256,7 +256,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         const failedCollections = collectionsCount.current - importedCollectionsCount;
 
         if (!importedEnvironments && !importedCollectionsCount) {
-          toast.error("Failed to import Postman data");
+          notification.error({
+            message: "Failed to import Postman data",
+            placement: "bottomRight",
+          });
           return;
         }
 

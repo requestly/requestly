@@ -1,4 +1,4 @@
-import { Select, Space } from "antd";
+import { notification, Select, Space } from "antd";
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
@@ -426,7 +426,11 @@ const APIClientView: React.FC<Props> = ({
 
       toast.success("Request name updated!");
     } else {
-      toast.error(result?.message || `Could not rename Request.`);
+      notification.error({
+        message: `Could not rename Request.`,
+        description: result?.message,
+        placement: "bottomRight",
+      });
     }
   };
 
@@ -467,7 +471,11 @@ const APIClientView: React.FC<Props> = ({
       }
       toast.success("Request saved!");
     } else {
-      toast.error(result?.message || `Could not save Request.`);
+      notification.error({
+        message: `Could not save request.`,
+        description: result?.message,
+        placement: "bottomRight",
+      });
     }
 
     setIsRequestSaving(false);

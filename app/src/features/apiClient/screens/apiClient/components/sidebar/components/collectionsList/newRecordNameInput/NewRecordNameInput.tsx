@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
-import { Input } from "antd";
+import { Input, notification } from "antd";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -96,9 +96,10 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       const toastSuccessMessage = recordType === RQAPI.RecordType.API ? "Request created!" : "Collection Created!";
       toast.success(toastSuccessMessage);
     } else {
-      toast.error(
-        result?.message || `Could not save ${record.type === RQAPI.RecordType.COLLECTION ? "Collection" : "Request"}.`
-      );
+      notification.error({
+        message: `Could not save ${record.type === RQAPI.RecordType.COLLECTION ? "Collection" : "Request"}.`,
+        placement: "bottomRight",
+      });
     }
 
     setIsLoading(false);
