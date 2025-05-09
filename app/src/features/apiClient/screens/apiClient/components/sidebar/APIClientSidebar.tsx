@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { ApiClientImporterType, RQAPI } from "../../../../types";
 import { useLocation, useParams } from "react-router-dom";
-import { Tabs, TabsProps, Tooltip } from "antd";
+import { notification, Tabs, TabsProps, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
 import { CollectionsList } from "./components/collectionsList/CollectionsList";
@@ -12,7 +12,6 @@ import { EnvironmentsList } from "../../../environment/components/environmentsLi
 import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal, ImportRequestModal } from "../modals";
 import { getEmptyAPIEntry } from "../../utils";
-import { toast } from "utils/Toast";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./apiClientSidebar.scss";
@@ -166,7 +165,11 @@ const APIClientSidebar: React.FC<Props> = () => {
         return result.data;
       } catch (error) {
         console.error("Error importing request", error);
-        toast.error(error.message || "Error importing request");
+        notification.error({
+          message: `Error importing request`,
+          description: error?.message,
+          placement: "bottomRight",
+        });
         throw error;
       } finally {
         setIsLoading(false);
