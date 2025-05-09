@@ -56,7 +56,6 @@ export class ApiClientExecutor {
       this.apiRecords
     );
 
-    // is this line over riding the entryDetails
     this.entryDetails.auth = effectiveAuth;
 
     const { renderVariables } = this.internalFunctions;
