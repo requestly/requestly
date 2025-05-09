@@ -185,7 +185,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         if (!result.success) {
           notification.error({
             message: "Could not fetch records!",
-            description: result.message,
+            description: result?.message,
             placement: "bottomRight",
           });
           setApiClientRecords([]);
@@ -357,7 +357,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                 toast.error(result.message || "Could not create collection.", 5);
                 notification.error({
                   message: "Could not create collection!",
-                  description: result.message,
+                  description: result?.message,
                   placement: "bottomRight",
                 });
               }
