@@ -236,7 +236,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
       toggleModal();
     } catch (err) {
       console.error("Team creation failed", err);
-      toast.error("Unable to Create Team");
+      toast.error(err?.message || "Unable to Create Team");
       trackNewTeamCreateFailure(workspaceName);
     } finally {
       setIsLoading(false);

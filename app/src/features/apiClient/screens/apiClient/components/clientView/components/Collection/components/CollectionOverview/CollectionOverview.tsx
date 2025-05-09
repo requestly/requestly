@@ -1,14 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { InlineInput } from "componentsV2/InlineInput/InlineInput";
-import { Input, Tabs } from "antd";
+import { Input, notification, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { useDebounce } from "hooks/useDebounce";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import { useOutsideClick } from "hooks";
-import { toast } from "utils/Toast";
 import { useRBAC } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
 import "./collectionOverview.scss";
@@ -49,7 +48,11 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
           onSaveRecord(updatedCollection, "open");
         })
         .catch((error) => {
-          toast.error("Error updating collection description");
+          notification.error({
+            message: `Could not update collection description.`,
+            description: error?.message,
+            placement: "bottomRight",
+          });
         });
     },
     [collection, onSaveRecord, apiClientRecordsRepository]

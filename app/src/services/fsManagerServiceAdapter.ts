@@ -146,7 +146,7 @@ class FsManagerServiceAdapterProvider {
       return service;
     } catch (e) {
       console.error("build error", e);
-      // release();
+      throw e;
     }
   }
 }

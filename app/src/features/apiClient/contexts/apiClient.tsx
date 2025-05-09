@@ -185,7 +185,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         if (!result.success) {
           notification.error({
             message: "Could not fetch records!",
-            description: result.message,
+            description: result?.message,
             placement: "bottomRight",
           });
           setApiClientRecords([]);
@@ -199,7 +199,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       .catch((error) => {
         notification.error({
           message: "Could not fetch records!",
-          description: error.message,
+          description: typeof error ==="string" ? error : error.message,
           placement: "bottomRight",
         });
         setApiClientRecords([]);
@@ -355,10 +355,19 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                 dispatch(variablesActions.updateCollectionVariables({ collectionId: result.data.id, variables: {} }));
               } else {
                 toast.error(result.message || "Could not create collection.", 5);
+                notification.error({
+                  message: "Could not create collection!",
+                  description: result?.message,
+                  placement: "bottomRight",
+                });
               }
             })
             .catch((error) => {
-              toast.error(error.message || "Could not create collection.", 5);
+              notification.error({
+                message: "Could not create collection!",
+                description: error.message,
+                placement: "bottomRight",
+              });
               console.error("Error adding new collection", error);
             });
         }

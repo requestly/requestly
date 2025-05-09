@@ -89,45 +89,48 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
     }
   };
 
+  const tooltipTitle = activeWorkspace.workspaceType === WorkspaceType.LOCAL ? activeWorkspace.rootPath : prettifyWorkspaceName(activeWorkspaceName);
+
   return (
-    <Dropdown
-      overlay={menu}
-      trigger={["click"]}
-      className="workspace-selector-dropdown no-drag"
-      onOpenChange={handleWorkspaceDropdownClick}
+    <Tooltip
+      overlayClassName="workspace-selector-tooltip"
+      style={{ top: "35px" }}
+      title={tooltipTitle}
+      placement={"bottomRight"}
+      showArrow={false}
+      mouseEnterDelay={1}
     >
-      <div className="cursor-pointer items-center">
-        <Avatar
-          size={26}
-          shape="square"
-          icon={isLocalWorkspace ? <LuFolderSync /> : getWorkspaceIcon(activeWorkspaceName)}
-          className="workspace-avatar"
-          style={{
-            backgroundColor: user.loggedIn
-              ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                ? "#1E69FF"
-                : isLocalWorkspace
-                ? "#FFFFFF33"
-                : getUniqueColorForWorkspace(activeWorkspaceId, activeWorkspaceName)
-              : "#ffffff4d",
-          }}
-        />
-        <Tooltip
-          overlayClassName="workspace-selector-tooltip"
-          style={{ top: "35px" }}
-          title={prettifyWorkspaceName(activeWorkspaceName)}
-          placement={"bottomRight"}
-          showArrow={false}
-          mouseEnterDelay={2}
-        >
-          <span className="items-center active-workspace-name">
-            <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
-            {hasNewInvites ? <Badge dot={true} /> : null}
-            <DownOutlined className="active-workspace-name-down-icon" />
-          </span>
-        </Tooltip>
-      </div>
-    </Dropdown>
+      <Dropdown
+        overlay={menu}
+        trigger={["click"]}
+        className="workspace-selector-dropdown no-drag"
+        onOpenChange={handleWorkspaceDropdownClick}
+      >
+        <div className="cursor-pointer items-center">
+          <Avatar
+            size={26}
+            shape="square"
+            icon={isLocalWorkspace ? <LuFolderSync /> : getWorkspaceIcon(activeWorkspaceName)}
+            className="workspace-avatar"
+            style={{
+              backgroundColor: user.loggedIn
+                ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
+                  ? "#1E69FF"
+                  : isLocalWorkspace
+                  ? "#FFFFFF33"
+                  : getUniqueColorForWorkspace(activeWorkspaceId, activeWorkspaceName)
+                : "#ffffff4d",
+            }}
+          />
+
+            <span className="items-center active-workspace-name">
+              <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
+              {hasNewInvites ? <Badge dot={true} /> : null}
+              <DownOutlined className="active-workspace-name-down-icon" />
+            </span>
+        </div>
+      </Dropdown>
+    </Tooltip>
   );
 };
 
