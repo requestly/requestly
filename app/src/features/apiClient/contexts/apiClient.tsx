@@ -199,7 +199,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       .catch((error) => {
         notification.error({
           message: "Could not fetch records!",
-          description: error.message,
+          description: typeof error ==="string" ? error : error.message,
           placement: "bottomRight",
         });
         setApiClientRecords([]);
