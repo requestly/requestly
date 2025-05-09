@@ -8,6 +8,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import "./errorFilesList.scss";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { toast } from "utils/Toast";
+import { notification } from "antd";
 
 interface ErrorFilesListProps {
   errorFiles: ErroredRecord[];
@@ -29,7 +30,10 @@ export const ErrorFilesList: React.FC<ErrorFilesListProps> = ({ errorFiles }) =>
       }
       toast.success("Error file deleted successfully");
     } else {
-      toast.error("Failed to delete error file");
+      notification.error({
+        message: "Failed to delete error file",
+        placement: "bottomRight",
+      });
     }
   };
 

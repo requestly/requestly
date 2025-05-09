@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Modal } from "antd";
+import { Modal, notification } from "antd";
 import Editor from "componentsV2/CodeEditor";
 import { ErroredRecord, FileType } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
@@ -55,8 +55,11 @@ export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileVi
       }
       handlePostSuccessfulWrite();
     } catch (error) {
-      console.error("Error saving error file", error);
-      toast.error(error.message || "Failed to save error file");
+      notification.error({
+        message: `Failed to save error file`,
+        description: error?.message,
+        placement: "bottomRight",
+      });
     }
   };
 
