@@ -4,6 +4,8 @@
 
 .manage-workspace-container {
   margin-top: 2.5rem;
+  overflow: auto;
+  height: 100%;
 }
 
 .manage-workspace-header {
