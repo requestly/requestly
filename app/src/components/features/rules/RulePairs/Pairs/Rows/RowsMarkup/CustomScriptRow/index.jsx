@@ -108,7 +108,7 @@ const CustomScriptRow = ({
                 isInputDisabled ? null : (
                   <Tooltip title="Import a existing Mock API" onClick={() => setIsMockPickerVisible(true)}>
                     <FolderOpenOutlined />
-                    &nbsp; Pick from Mock Server
+                    &nbsp; Pick from File Server
                   </Tooltip>
                 )
               }

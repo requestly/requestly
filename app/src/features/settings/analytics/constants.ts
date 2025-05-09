@@ -22,6 +22,9 @@ export const SETTINGS = {
     BILLING_TEAM_INVOICE_REQUEST_SENT: "billing_team_invoice_request_sent",
     BILLING_TEAM_INVOICE_REQUEST_FAILED: "billing_team_invoice_request_failed",
     BILLING_TEAM_INVOICE_REQUEST_CLICKED: "billing_team_invoice_request_clicked",
+    BILLING_TEAM_MANAGE_PLAN_CLICKED: "billing_team_manage_plan_clicked",
+    BILLING_TEAM_MANAGE_LICENSES_CLICKED: "billing_team_manage_licenses_clicked",
+    BILLING_TEAM_INVOICE_DASHBOARD_CLICKED: "billing_team_invoice_dashboard_clicked",
   },
 
   WORKSPACE: {

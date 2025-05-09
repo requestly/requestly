@@ -1,3 +1,4 @@
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 import { VersionedChangeLogs } from "./types";
 
 export const VERSION_NEXT = "next";
@@ -6,6 +7,28 @@ const changeLogs: VersionedChangeLogs[] = [
   {
     version: VERSION_NEXT,
     logs: [],
+  },
+  {
+    version: "25.5.3",
+    logs: ["chore: add requestly.com in app domains (#2949)"],
+  },
+  {
+    version: "25.5.2",
+    logs: ["Added config.WEB_URL as origin (#2931)", "chore: update extension popup icon (#2943)"],
+  },
+  {
+    version: "25.4.21",
+    logs: ["chore: update extension installed url #2921"],
+  },
+  {
+    version: "25.4.15",
+    logs: [
+      "fix: xs-leak (#2905)",
+      "[ENGG-2547] Improvement: error messaging in API client (#2687)",
+      "Updated all documentation links (#2655)",
+      "fix: also add the original domain to the bypass list (#2609)",
+      "fix: Resource type not visible in Firefox Requestly Devtools (#2153)",
+    ],
   },
   {
     version: "24.11.25",
@@ -425,7 +448,7 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [
       {
         title: "Launched analytics debugger for android apps.",
-        link: "https://requestly.com/products/debug-android-apps/",
+        link: getLinkWithMetadata("https://requestly.com/products/debug-android-apps/"),
       },
       {
         title: "Added support for description and start time offset for session recording.",
@@ -442,15 +465,15 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [
       {
         title: "Report bugs with video, console logs, API logs and environment details.",
-        link: "https://requestly.com/products/session-book/",
+        link: getLinkWithMetadata("https://requestly.com/products/session-book/"),
       },
       {
         title: "Added support to modify response status code.",
-        link: "https://requestly.com/products/web-debugger/override-api-response/",
+        link: getLinkWithMetadata("https://requestly.com/products/web-debugger/override-api-response/"),
       },
       {
         title: "Improved modify headers rule experience.",
-        link: "https://requestly.com/products/web-debugger/modify-http-headers/",
+        link: getLinkWithMetadata("https://requestly.com/products/web-debugger/modify-http-headers/"),
       },
     ],
   },
@@ -462,7 +485,7 @@ const changeLogs: VersionedChangeLogs[] = [
       },
       {
         title: "Modify graphql query response using the modify response rule.",
-        link: "https://requestly.com/blog/mocking-graphql-apis-response/",
+        link: getLinkWithMetadata("https://requestly.com/blog/mocking-graphql-apis-response/"),
       },
       {
         title: "Support for logging for rule executions in the console.",
@@ -475,7 +498,7 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [
       {
         title: "Delay network requests.",
-        link: "https://requestly.com/products/web-debugger/delay-http-request/",
+        link: getLinkWithMetadata("https://requestly.com/products/web-debugger/delay-http-request/"),
       },
       {
         title: "Added support for fetch in Modify response rule.",

@@ -176,6 +176,7 @@ export const GA_EVENTS = {
     RQ_SUBSCRIPTION_TYPE: "rq_subscription_type",
     SUBSCRIPTION_STATUS: "subscription_status",
     IS_ACCELERATOR_AVAILABLE: "is_accelerator_available",
+    BROWSERSTACK_ID: "browserstack_id",
   },
   VALUES: {
     PAYPAL: "paypal",

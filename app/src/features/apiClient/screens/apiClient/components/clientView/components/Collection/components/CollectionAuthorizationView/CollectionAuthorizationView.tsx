@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import AuthorizationView from "../../../request/components/AuthorizationView";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constants/keyboardShortcuts";
 import { RoleBasedComponent } from "features/rbac";
+import { useGenericState } from "hooks/useGenericState";
 
 interface Props {
+  collectionId: string;
   authOptions?: RQAPI.Auth;
   updateAuthData: (authOptions: RQAPI.Auth) => any;
   rootLevelRecord: boolean;
@@ -23,21 +23,28 @@ interface Props {
  * and remain separated from the main Collection View
  *
  */
-const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthData, rootLevelRecord }) => {
-  const { collectionId } = useParams();
+const CollectionAuthorizationView: React.FC<Props> = ({
+  collectionId,
+  authOptions,
+  updateAuthData,
+  rootLevelRecord,
+}) => {
   const [authOptionsState, setAuthOptionsState] = useState<RQAPI.Auth>(authOptions);
   const [isSaving, setIsSaving] = useState(false);
+  const { setPreview, setUnsaved } = useGenericState();
 
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
-  const { updateTab } = useTabsLayoutContext();
-
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(authOptionsState);
 
   useEffect(() => {
-    updateTab(collectionId, { hasUnsavedChanges: hasUnsavedChanges });
-  }, [updateTab, collectionId, hasUnsavedChanges]);
+    setUnsaved(hasUnsavedChanges);
+
+    if (hasUnsavedChanges) {
+      setPreview(false);
+    }
+  }, [setUnsaved, setPreview, hasUnsavedChanges]);
 
   const onSaveAuthData = useCallback(() => {
     setIsSaving(true);

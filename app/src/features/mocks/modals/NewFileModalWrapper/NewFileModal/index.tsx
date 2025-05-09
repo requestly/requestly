@@ -18,8 +18,8 @@ export const NewFileModal: React.FC<Props> = ({ visible, toggleModalVisiblity, c
       footer={null}
       title="Host New File"
       wrapClassName="new-file-modal"
-      bodyStyle={{ padding: "1.875rem" }}
-      width={800}
+      bodyStyle={{ padding: "1.5rem" }}
+      width={400}
     >
       <NewFileTypeSelector collectionId={collectionId} />
     </RQModal>

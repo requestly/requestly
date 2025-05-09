@@ -143,7 +143,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
         const newCollection = await apiClientRecordsRepository.createCollectionFromImport(collection, collection.id);
-        onSaveRecord(newCollection.data, "none");
+        onSaveRecord(newCollection.data);
         importedCollectionsCount++;
         return newCollection.data.id;
       } catch (error) {
@@ -171,7 +171,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
         const newApi = await apiClientRecordsRepository.createRecordWithId(updatedApi, updatedApi.id);
-        onSaveRecord(newApi.data, "none");
+        onSaveRecord(newApi.data);
         importedApisCount++;
       } catch (error) {
         failedApisCount++;

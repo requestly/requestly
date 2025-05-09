@@ -2,6 +2,8 @@ import React, { ReactNode } from "react";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import { RQButton, RQDropdown } from "lib/design-system/components";
 import { DropDownProps } from "antd";
+import { RQBadge } from "lib/design-system/components/RQBadge";
+import "./EmptyCard.scss";
 
 interface Props {
   icon: string | ReactNode;
@@ -36,7 +38,10 @@ export const HomepageEmptyCard: React.FC<Props> = ({
             <div className="homepage-emptycard-icon">{icon}</div>
           )}
           <div className="header-content">
-            <h1 className="homepage-emptycard-title">{title}</h1>
+            <div className="title-badge-container">
+              <h1 className="homepage-emptycard-title">{title}</h1>
+              {title === "API client" && <RQBadge badgeText="BETA" />}
+            </div>
             <p className="mt-8 text-center homepage-emptycard-description">{description}</p>
           </div>
         </div>

@@ -99,12 +99,12 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       destroyOnClose
     >
       <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-        <APIClientView apiEntry={apiEntry} openInModal={openInModal} />
+        <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
       </BottomSheetProvider>
     </Modal>
   ) : (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-      <APIClientView apiEntry={apiEntry} />
+      <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} />
     </BottomSheetProvider>
   );
 };

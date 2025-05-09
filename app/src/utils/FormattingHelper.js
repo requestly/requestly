@@ -136,7 +136,7 @@ export const removeTrailingSlash = (url) => {
 };
 
 export const isEmailValid = (email) => {
-  return email && typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return email && typeof email === "string" && !/\s/.test(email) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
 // [[...],[...]] -> {id:[],id:[]}

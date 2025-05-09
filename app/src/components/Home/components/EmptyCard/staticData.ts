@@ -18,7 +18,7 @@ export const PRODUCT_FEATURES = {
     playIcon: {
       src: PlayIconRules,
       label: "See in action ",
-      url: "https://www.youtube.com/playlist?list=PLmHjVvTu_7ddFIIT9AkZ7p0lrC5gBuyb6",
+      url: "https://rqst.ly/http-rules-yt-tutorials",
       onClick: () => trackHomeRulesActionClicked("see_in_action"),
     },
   },
@@ -36,7 +36,7 @@ export const PRODUCT_FEATURES = {
     playIcon: {
       src: PlayIconApi,
       label: "See in action ",
-      url: "https://www.youtube.com/watch?v=xrqmAffe86k",
+      url: "https://rqst.ly/api-client-intro-yt",
       onClick: () => trackHomeApisActionClicked("see_in_action"),
     },
   },
