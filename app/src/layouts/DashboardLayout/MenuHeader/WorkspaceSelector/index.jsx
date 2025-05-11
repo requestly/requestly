@@ -89,7 +89,10 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
     }
   };
 
-  const tooltipTitle = activeWorkspace.workspaceType === WorkspaceType.LOCAL ? activeWorkspace.rootPath : prettifyWorkspaceName(activeWorkspaceName);
+  const tooltipTitle =
+    activeWorkspace?.workspaceType === WorkspaceType.LOCAL
+      ? activeWorkspace.rootPath
+      : prettifyWorkspaceName(activeWorkspaceName);
 
   return (
     <Tooltip
@@ -123,11 +126,11 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
             }}
           />
 
-            <span className="items-center active-workspace-name">
-              <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
-              {hasNewInvites ? <Badge dot={true} /> : null}
-              <DownOutlined className="active-workspace-name-down-icon" />
-            </span>
+          <span className="items-center active-workspace-name">
+            <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
+            {hasNewInvites ? <Badge dot={true} /> : null}
+            <DownOutlined className="active-workspace-name-down-icon" />
+          </span>
         </div>
       </Dropdown>
     </Tooltip>
