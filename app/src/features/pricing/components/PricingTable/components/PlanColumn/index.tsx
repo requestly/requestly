@@ -168,6 +168,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       } else setDisbaleUpgradeButton(false);
       setQuantity(value);
       trackPricingPlansQuantityChanged(value, planName, source);
+
+      const firstChange = !hasFiddledWithQuantity.current && value === 1;
+
       if (!hasFiddledWithQuantity.current && user.loggedIn) {
         const addToApolloSequence = httpsCallable(getFunctions(), "pricing-addToApolloPricingFiddleSequence");
         addToApolloSequence().catch((error) => {
@@ -175,8 +178,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         });
         hasFiddledWithQuantity.current = true;
       }
-
-      sendNotification(value);
+      if (!firstChange) {
+        sendNotification(value);
+      }
     },
     [sendNotification, planName, source, user.loggedIn]
   );
