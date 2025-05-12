@@ -158,7 +158,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   );
 
   const handleQuantityChange = useCallback(
-    (value: number) => {
+    (value: number, isNotificationSkip: boolean = false) => {
       if (value === Infinity) {
         setQuantity(value);
         return;
@@ -169,8 +169,6 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       setQuantity(value);
       trackPricingPlansQuantityChanged(value, planName, source);
 
-      const firstChange = !hasFiddledWithQuantity.current && value === 1;
-
       if (!hasFiddledWithQuantity.current && user.loggedIn) {
         const addToApolloSequence = httpsCallable(getFunctions(), "pricing-addToApolloPricingFiddleSequence");
         addToApolloSequence().catch((error) => {
@@ -178,7 +176,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         });
         hasFiddledWithQuantity.current = true;
       }
-      if (!firstChange) {
+      if (!isNotificationSkip) {
         sendNotification(value);
       }
     },
