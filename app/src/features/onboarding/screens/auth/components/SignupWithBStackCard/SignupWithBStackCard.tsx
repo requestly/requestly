@@ -8,6 +8,7 @@ import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/a
 import "./signupWithBStackCard.scss";
 import { AuthScreenMode } from "../../types";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { setRedirectURI } from "features/onboarding/utils";
 
 interface SignupWithBStackCardProps {
   onBackButtonClick: () => void;
@@ -22,6 +23,7 @@ export const SignupWithBStackCard = ({ onBackButtonClick }: SignupWithBStackCard
   const handleCreateBStackAccount = useCallback(() => {
     trackSignUpButtonClicked(`no_account_found`);
     setIsLoading(true);
+    setRedirectURI(window.location.href);
     redirectToOAuthUrl(navigate);
   }, [navigate]);
 
