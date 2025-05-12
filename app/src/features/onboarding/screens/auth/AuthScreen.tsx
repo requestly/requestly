@@ -54,6 +54,7 @@ export const AuthScreen = () => {
     eventSource,
     isClosable,
     isOnboarding,
+    redirectURL,
   } = useAuthScreenContext();
   const [authErrorCode, setAuthErrorCode] = useState<AuthErrorCode>(AuthErrorCode.NONE);
   const [showRQAuthForm, setShowRQAuthForm] = useState(false);
@@ -115,7 +116,7 @@ export const AuthScreen = () => {
       setAuthProviders(metadata.providers);
       if (metadata.isSyncedUser) {
         trackBstackLoginInitiated();
-        setRedirectURI(window.location.href);
+        setRedirectURI(redirectURL);
         redirectToOAuthUrl(navigate);
       } else if (!metadata.isExistingUser) {
         trackLoginUserNotFound(email);
@@ -128,7 +129,7 @@ export const AuthScreen = () => {
         }
       }
     },
-    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn, email]
+    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn, email, redirectURL]
   );
 
   const authModeToggleText = (
@@ -141,7 +142,7 @@ export const AuthScreen = () => {
             size="small"
             onClick={() => {
               trackSignUpButtonClicked(eventSource);
-              setRedirectURI(window.location.href);
+              setRedirectURI(redirectURL);
               redirectToOAuthUrl(navigate);
             }}
           >
