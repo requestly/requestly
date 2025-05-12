@@ -144,7 +144,6 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   const sendNotification = useCallback(
     debounce((value: number) => {
       if (user.loggedIn) {
-        console.log("notification triggered", value);
         const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
         try {
           salesInboundNotification({
