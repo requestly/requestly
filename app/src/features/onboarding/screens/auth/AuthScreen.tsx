@@ -32,8 +32,8 @@ import {
   trackLoginSuccessEvent,
   trackLoginUserSwitchedEmail,
 } from "modules/analytics/events/common/auth/login";
+import { setRedirectURI } from "features/onboarding/utils";
 import "./authScreen.scss";
-import STORAGE from "config/constants/sub/storage";
 
 export const AuthScreen = () => {
   const dispatch = useDispatch();
@@ -115,8 +115,7 @@ export const AuthScreen = () => {
       setAuthProviders(metadata.providers);
       if (metadata.isSyncedUser) {
         trackBstackLoginInitiated();
-        const redirectURI = window.location.href;
-        window.localStorage.setItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY, redirectURI);
+        setRedirectURI(window.location.href);
 
         redirectToOAuthUrl(navigate);
       } else if (!metadata.isExistingUser) {
