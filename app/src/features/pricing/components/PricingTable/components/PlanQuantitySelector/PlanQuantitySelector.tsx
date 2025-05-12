@@ -16,7 +16,7 @@ interface PlanQuantitySelectorProps {
   currentPlanName: string;
   quantity: number;
   isNewCheckoutFlowEnabled: boolean;
-  handleQuantityChange: (value: number, isNotificationSkip?: boolean) => void;
+  handleQuantityChange: (value: number, skipNotification?: boolean) => void;
 }
 
 const DEFAULT_QUANTITY_OPTIONS: PlanQuantityOption[] = [
@@ -50,13 +50,13 @@ const QuantityInput: React.FC<{
 
 const QuantitySelect: React.FC<{
   options: PlanQuantityOption[];
-  handleQuantityChange: (value: number, isNotificationSkip?: boolean) => void;
+  handleQuantityChange: (value: number, skipNotification?: boolean) => void;
 }> = ({ options, handleQuantityChange }) => (
   <Select
     className="pricing-plan-quantity-selector__select"
     options={options}
     defaultValue={options[0].value}
-    onChange={(value) => handleQuantityChange(value, false)}
+    onChange={(value) => handleQuantityChange(value)}
   />
 );
 

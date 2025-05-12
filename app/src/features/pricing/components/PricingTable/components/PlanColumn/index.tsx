@@ -144,6 +144,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   const sendNotification = useCallback(
     debounce((value: number) => {
       if (user.loggedIn) {
+        console.log("notification triggered", value);
         const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
         try {
           salesInboundNotification({
@@ -158,7 +159,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   );
 
   const handleQuantityChange = useCallback(
-    (value: number, isNotificationSkip: boolean = false) => {
+    (value: number, skipNotification: boolean = false) => {
       if (value === Infinity) {
         setQuantity(value);
         return;
@@ -176,7 +177,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         });
         hasFiddledWithQuantity.current = true;
       }
-      if (!isNotificationSkip) {
+      if (!skipNotification) {
         sendNotification(value);
       }
     },
