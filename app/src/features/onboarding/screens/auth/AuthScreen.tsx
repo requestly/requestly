@@ -116,7 +116,6 @@ export const AuthScreen = () => {
       if (metadata.isSyncedUser) {
         trackBstackLoginInitiated();
         setRedirectURI(window.location.href);
-
         redirectToOAuthUrl(navigate);
       } else if (!metadata.isExistingUser) {
         trackLoginUserNotFound(email);
@@ -142,6 +141,7 @@ export const AuthScreen = () => {
             size="small"
             onClick={() => {
               trackSignUpButtonClicked(eventSource);
+              setRedirectURI(window.location.href);
               redirectToOAuthUrl(navigate);
             }}
           >
