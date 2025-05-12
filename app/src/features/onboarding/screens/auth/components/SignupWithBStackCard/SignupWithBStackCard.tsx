@@ -16,16 +16,16 @@ interface SignupWithBStackCardProps {
 
 export const SignupWithBStackCard = ({ onBackButtonClick }: SignupWithBStackCardProps) => {
   const navigate = useNavigate();
-  const { email, authScreenMode, eventSource } = useAuthScreenContext();
+  const { email, authScreenMode, eventSource, redirectURL } = useAuthScreenContext();
 
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCreateBStackAccount = useCallback(() => {
     trackSignUpButtonClicked(`no_account_found`);
     setIsLoading(true);
-    setRedirectURI(window.location.href);
+    setRedirectURI(redirectURL);
     redirectToOAuthUrl(navigate);
-  }, [navigate]);
+  }, [navigate, redirectURL]);
 
   useEffect(() => {
     if (authScreenMode === AuthScreenMode.MODAL) {
