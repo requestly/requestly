@@ -1,3 +1,4 @@
+import STORAGE from "config/constants/sub/storage";
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +7,6 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { redirectToHome, redirectToOAuthUrl } from "utils/RedirectionUtils";
-import { setRedirectURI } from "features/onboarding/utils";
 import "./bstackAuthStart.scss";
 
 export const BStackAuthStart = () => {
@@ -20,7 +20,7 @@ export const BStackAuthStart = () => {
   useEffect(() => {
     const redirectURI = params.current.get("redirectURI");
     if (redirectURI) {
-      setRedirectURI(redirectURI);
+      window.localStorage.setItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY, redirectURI);
     }
     if (user.loggedIn) {
       redirectToHome(appMode, navigate);
