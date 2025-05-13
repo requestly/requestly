@@ -126,13 +126,12 @@
   }
 
   .api-request-tabs {
-    height: calc(100% - 35px);
     overflow: hidden;
     margin-top: 8px;
 
     .ant-tabs-content-holder {
       height: inherit;
-      padding: 0 16px 44px;
+      padding: 0 16px 5px;
 
       .ant-tabs-content-top {
         height: 100%;
