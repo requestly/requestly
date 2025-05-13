@@ -1,4 +1,5 @@
 import PATHS from "config/constants/sub/paths";
+import STORAGE from "config/constants/sub/storage";
 import { isEnvAutomation } from "utils/EnvUtils";
 
 const EXCLUDED_PATHS = [
@@ -21,4 +22,8 @@ export const shouldShowOnboarding = () => {
 
   const currentPath = window.location.href;
   return !EXCLUDED_PATHS.some((path) => currentPath.includes(path));
+};
+
+export const setRedirectURI = (redirectURI: string): void => {
+  window.localStorage.setItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY, redirectURI);
 };
