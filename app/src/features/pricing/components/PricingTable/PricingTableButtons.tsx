@@ -222,19 +222,12 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       },
       source
     );
-
     if (!user?.details?.isLoggedIn) {
-      let redirectURL = window.location.href;
-      if (functionName === CTA_ONCLICK_FUNCTIONS.CHECKOUT) {
-        redirectURL = createBStackCheckoutUrl(columnPlanName, quantity, duration === PRICING.DURATION.ANNUALLY);
-      }
-
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
-            redirectURL,
             callback: () => redirectToPricingPlans(navigate),
             authMode:
               functionName === CTA_ONCLICK_FUNCTIONS.SIGNUP
