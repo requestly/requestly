@@ -82,22 +82,22 @@ const DashboardContent = () => {
     dispatch(globalActions.updateRequestBot({ isActive: false }));
   };
 
-  const prevProps = usePrevious({ location });
+  const previousLocation = usePrevious(location);
 
   const disableOverflow = isPricingPage();
 
   useEffect(() => {
-    if (prevProps && prevProps.location !== location) {
+    if (previousLocation && previousLocation !== location) {
       document.documentElement.scrollTop = 0;
       document.scrollingElement.scrollTop = 0;
       document.getElementById("dashboardMainContent").scrollTop = 0;
     }
 
     // ANALYTICS
-    if (!prevProps || prevProps.location !== location) {
+    if (!previousLocation || previousLocation !== location) {
       trackPageViewEvent(getRouteFromCurrentPath(location.pathname), Object.fromEntries(searchParams));
     }
-  }, [location, prevProps, searchParams]);
+  }, [location, previousLocation, searchParams]);
 
   return (
     <>
