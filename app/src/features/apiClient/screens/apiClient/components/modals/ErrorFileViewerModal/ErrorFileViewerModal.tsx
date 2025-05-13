@@ -82,27 +82,23 @@ export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileVi
             <span>{errorFile.error}</span>
           </div>
         </div>
-        {fileContent && (
-          <>
-            {" "}
-            <div className="error-file-editor">
-              <Editor
-                language={EditorLanguage.JSON}
-                handleChange={setFileContent}
-                value={fileContent}
-                isResizable={true}
-                hideCharacterCount
-                hideToolbar
-              />
-            </div>
-            <div className="error-file-editor-footer">
-              <RQButton onClick={onClose}>Cancel</RQButton>
-              <RQButton type="primary" onClick={handleSave}>
-                Save and include
-              </RQButton>
-            </div>
-          </>
-        )}
+
+        <div className="error-file-editor">
+          <Editor
+            language={EditorLanguage.JSON}
+            handleChange={setFileContent}
+            value={fileContent}
+            isResizable={true}
+            hideCharacterCount
+            hideToolbar
+          />
+        </div>
+        <div className="error-file-editor-footer">
+          <RQButton onClick={onClose}>Cancel</RQButton>
+          <RQButton type="primary" onClick={handleSave}>
+            Save and include
+          </RQButton>
+        </div>
       </div>
     </Modal>
   );
