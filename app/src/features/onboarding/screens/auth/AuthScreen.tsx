@@ -32,8 +32,8 @@ import {
   trackLoginSuccessEvent,
   trackLoginUserSwitchedEmail,
 } from "modules/analytics/events/common/auth/login";
-import { setRedirectURI } from "features/onboarding/utils";
 import "./authScreen.scss";
+import STORAGE from "config/constants/sub/storage";
 
 export const AuthScreen = () => {
   const dispatch = useDispatch();
@@ -54,7 +54,6 @@ export const AuthScreen = () => {
     eventSource,
     isClosable,
     isOnboarding,
-    redirectURL,
   } = useAuthScreenContext();
   const [authErrorCode, setAuthErrorCode] = useState<AuthErrorCode>(AuthErrorCode.NONE);
   const [showRQAuthForm, setShowRQAuthForm] = useState(false);
@@ -116,7 +115,9 @@ export const AuthScreen = () => {
       setAuthProviders(metadata.providers);
       if (metadata.isSyncedUser) {
         trackBstackLoginInitiated();
-        setRedirectURI(redirectURL);
+        const redirectURI = window.location.href;
+        window.localStorage.setItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY, redirectURI);
+
         redirectToOAuthUrl(navigate);
       } else if (!metadata.isExistingUser) {
         trackLoginUserNotFound(email);
@@ -129,7 +130,7 @@ export const AuthScreen = () => {
         }
       }
     },
-    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn, email, redirectURL]
+    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn, email]
   );
 
   const authModeToggleText = (
@@ -142,7 +143,6 @@ export const AuthScreen = () => {
             size="small"
             onClick={() => {
               trackSignUpButtonClicked(eventSource);
-              setRedirectURI(redirectURL);
               redirectToOAuthUrl(navigate);
             }}
           >
