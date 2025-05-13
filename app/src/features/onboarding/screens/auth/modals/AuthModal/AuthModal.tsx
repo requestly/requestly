@@ -13,12 +13,15 @@ import { globalActions } from "store/slices/global/slice";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToOAuthUrl } from "utils/RedirectionUtils";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
+import { setRedirectURI } from "features/onboarding/utils";
 import "./authModal.scss";
+
 interface AuthModalProps {
   isOpen: boolean;
   closable?: boolean;
   authMode?: string;
   eventSource: string;
+  redirectURL?: string;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -26,6 +29,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   closable = true,
   eventSource = "",
   authMode = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+  redirectURL = window.location.href,
 }) => {
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
@@ -56,9 +60,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   useLayoutEffect(() => {
     if (isWebAppSignup && isOpen) {
+      setRedirectURI(redirectURL);
       redirectToOAuthUrl(navigate);
     }
-  }, [isWebAppSignup, isOpen, eventSource, navigate]);
+  }, [isWebAppSignup, isOpen, eventSource, navigate, redirectURL]);
 
   if (isWebAppSignup) {
     return null;
@@ -81,6 +86,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           initialAuthMode={authMode}
           screenMode={AuthScreenMode.MODAL}
           toggleModal={toggleModal}
+          redirectURL={redirectURL}
         >
           {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? <DesktopAppAuthScreen /> : <AuthScreen />}
         </AuthScreenContextProvider>
