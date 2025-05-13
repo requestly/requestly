@@ -77,6 +77,22 @@ const LoginHandler: React.FC = () => {
     [appMode, navigate]
   );
 
+  const handlePostLoginRedirection = useCallback(() => {
+    const redirectURLFromParam = params.get(ARGUMENTS.REDIRECT_URL);
+    const redirectURLFromLocalStorage = window.localStorage.getItem(
+      STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY
+    );
+    if (redirectURLFromLocalStorage) {
+      window.localStorage.removeItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY);
+    }
+
+    const hasRedirectDestination = redirectURLFromParam || redirectURLFromLocalStorage;
+
+    if (hasRedirectDestination) {
+      redirect(redirectURLFromParam ?? redirectURLFromLocalStorage);
+    } else redirectToHome(appMode, navigate);
+  }, [params, redirect, appMode, navigate]);
+
   const postLoginActions = useCallback(() => {
     const desktopAuthParams = getDesktopAppAuthParams();
 
@@ -89,16 +105,8 @@ const LoginHandler: React.FC = () => {
       // @ts-ignore
       trackLoginSuccessEvent({ auth_provider: "browserstack" });
     }
-
-    const redirectURLFromParam = params.get(ARGUMENTS.REDIRECT_URL);
-    const redirectURLFromLocalStorage = window.localStorage.getItem(
-      STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY
-    );
-    if (redirectURLFromLocalStorage) {
-      window.localStorage.removeItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY);
-    }
-    redirect(redirectURLFromParam ?? redirectURLFromLocalStorage);
-  }, [redirect, params, postLoginDesktopAppRedirect, isNewUser]);
+    handlePostLoginRedirection();
+  }, [postLoginDesktopAppRedirect, isNewUser, handlePostLoginRedirection]);
 
   useEffect(() => {
     if (user.loggedIn && loginComplete) {
