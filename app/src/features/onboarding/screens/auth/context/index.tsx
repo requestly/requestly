@@ -34,7 +34,7 @@ interface AuthScreenContextProviderProps {
   isOnboarding?: boolean;
   toggleModal?: () => void;
   isClosable?: boolean;
-  redirectURL: string;
+  redirectURL?: string;
 }
 
 export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps> = ({
@@ -45,7 +45,7 @@ export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps>
   isOnboarding = false,
   toggleModal,
   isClosable = false,
-  redirectURL,
+  redirectURL = window.location.href,
 }) => {
   const [email, setEmail] = useState("");
   const [authMode, setAuthMode] = useState(initialAuthMode);
