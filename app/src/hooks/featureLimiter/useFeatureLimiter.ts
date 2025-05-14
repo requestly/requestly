@@ -26,7 +26,7 @@ export const useFeatureLimiter = () => {
     }
 
     const isLimitReached = Object.values(FeatureLimitType).some((featureLimitType) =>
-      checkIfFeatureLimitReached(featureLimitType, "breached")
+      checkIfFeatureLimitReached(featureLimitType, "reached")
     );
     dispatch(globalActions.updateUserLimitReached(isLimitReached));
   };
