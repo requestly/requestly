@@ -10,7 +10,7 @@ import {
   getUserAttributes,
 } from "../../../../../../../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { trackRQLastActivity } from "../../../../../../../../utils/AnalyticsUtils";
+import { submitAttrUtil, trackRQLastActivity } from "../../../../../../../../utils/AnalyticsUtils";
 import { saveRule, validateSyntaxInRule } from "../actions";
 import {
   getModeData,
@@ -274,6 +274,7 @@ const CreateRuleButton = ({
             rule_type = finalRuleData.ruleType;
           }
           if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isRuleEditorModal) {
+            submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_RULES, userAttributes.num_rules + 1);
             trackRuleCreatedEvent({
               rule_type,
               description: finalRuleData.description,
