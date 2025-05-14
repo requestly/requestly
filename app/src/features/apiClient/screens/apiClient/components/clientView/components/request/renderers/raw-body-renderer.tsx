@@ -38,7 +38,7 @@ export function RawBody(props: {
     <div className="api-client-code-editor-container api-request-body-editor-container">
       <Editor
         language={editorLanguage}
-        value={text}
+        value={text ?? ""}
         handleChange={handleTextChange}
         prettifyOnInit={false}
         isResizable={false}
