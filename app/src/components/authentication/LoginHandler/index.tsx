@@ -15,6 +15,7 @@ import { getDesktopAppAuthParams } from "../utils";
 import { globalActions } from "store/slices/global/slice";
 import { trackSignUpFailedEvent, trackSignupSuccessEvent } from "modules/analytics/events/common/auth/signup";
 import { trackLoginSuccessEvent } from "modules/analytics/events/common/auth/login";
+import * as Sentry from "@sentry/react";
 
 const ARGUMENTS = {
   REDIRECT_URL: "redirectURL",
@@ -61,17 +62,20 @@ const LoginHandler: React.FC = () => {
 
   const redirect = useCallback(
     (url: string) => {
-      if (!url) {
-        // just in case
+      try {
+        const urlObj = new URL(url);
+        if (window.location.hostname === urlObj.hostname) {
+          const navigateParams = urlObj.pathname + urlObj.search;
+          navigate(navigateParams);
+        } else {
+          window.open(url, "_self");
+        }
+      } catch (error) {
+        Sentry.captureException(error, {
+          extra: { url },
+        });
+
         redirectToHome(appMode, navigate);
-        return;
-      }
-      const urlObj = new URL(url);
-      if (window.location.hostname === urlObj.hostname) {
-        const navigateParams = urlObj.pathname + urlObj.search;
-        navigate(navigateParams);
-      } else {
-        window.open(url, "_self");
       }
     },
     [appMode, navigate]
