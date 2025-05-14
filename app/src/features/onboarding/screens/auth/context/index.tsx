@@ -21,6 +21,7 @@ interface AuthScreenContextType {
   isClosable: boolean;
   setEventSource: (source: string) => void;
   setIsOnboardingScreenVisible: (visible: boolean) => void;
+  redirectURL: string;
 }
 
 const AuthScreenContext = createContext<AuthScreenContextType | undefined>(undefined);
@@ -33,6 +34,7 @@ interface AuthScreenContextProviderProps {
   isOnboarding?: boolean;
   toggleModal?: () => void;
   isClosable?: boolean;
+  redirectURL?: string;
 }
 
 export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps> = ({
@@ -43,6 +45,7 @@ export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps>
   isOnboarding = false,
   toggleModal,
   isClosable = false,
+  redirectURL = window.location.href,
 }) => {
   const [email, setEmail] = useState("");
   const [authMode, setAuthMode] = useState(initialAuthMode);
@@ -78,6 +81,7 @@ export const AuthScreenContextProvider: React.FC<AuthScreenContextProviderProps>
     setEventSource,
     setIsOnboardingScreenVisible,
     isClosable,
+    redirectURL,
   };
 
   return <AuthScreenContext.Provider value={value}>{children}</AuthScreenContext.Provider>;
