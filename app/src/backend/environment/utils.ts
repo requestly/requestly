@@ -82,7 +82,7 @@ const processTemplateString = <T extends string>(input: T, variables: Variables)
   try {
     const { wrappedTemplate, usedVariables } = collectAndEscapeVariablesFromTemplate(input, variables);
     const hbsTemplate = compile(wrappedTemplate);
-    const renderedTemplate = hbsTemplate(variables) as T;
+    const renderedTemplate = hbsTemplate(variables) as T; // since handlebars generic types resolve to any; not string
 
     return {
       renderedTemplate,
