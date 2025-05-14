@@ -4,7 +4,11 @@ import { KeyValuePair, RQAPI } from "../types";
 import { Authorization } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 import { getDefaultAuth } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
 
-export const processAuthForEntry = (
+/*
+  allRecords is passed to resolve the "INHERIT" auth type, to recursively
+  resolve the parent record's auth type
+*/
+export const getEffectiveAuthForEntry = (
   entry: RQAPI.Entry,
   entryDetails: {
     id: RQAPI.Record["id"];
@@ -12,27 +16,29 @@ export const processAuthForEntry = (
   },
   allRecords: RQAPI.Record[]
 ) => {
-  const entryCopy = JSON.parse(JSON.stringify(entry)) as RQAPI.Entry; // Deep Copy
-
+  const entryCopy = JSON.parse(JSON.stringify(entry)) as RQAPI.Entry;
   const currentAuth = entryCopy.auth;
+
   let finalAuth: RQAPI.Auth | null = currentAuth;
   if (isEmpty(currentAuth)) {
     finalAuth = getDefaultAuth(entryDetails.parentId === null);
   }
-
   if (finalAuth.currentAuthType === Authorization.Type.INHERIT) {
     finalAuth = inheritAuthFromParent(entryDetails, allRecords);
   }
-  finalAuth = pruneConfig(finalAuth);
 
-  if (!finalAuth) {
+  finalAuth = pruneConfig(finalAuth);
+  return finalAuth;
+};
+
+export const getHeadersAndQueryParams = (auth: RQAPI.Auth) => {
+  if (!auth) {
     return {
       headers: [],
       queryParams: [],
     };
   }
-
-  return extractAuthHeadersAndParams(finalAuth);
+  return extractAuthHeadersAndParams(auth);
 };
 
 function inheritAuthFromParent(
@@ -166,6 +172,13 @@ function pruneConfig(auth?: RQAPI.Auth): RQAPI.Auth | null {
       throw new Error("Invalid Auth Type");
   }
 
+  type validAuthType = keyof typeof authConfigStore;
+  Object.keys(authConfigStore).forEach((availableAuthType: validAuthType) => {
+    if (availableAuthType !== currentAuthType) {
+      delete authConfigStore[availableAuthType];
+    }
+  });
+  auth.authConfigStore = authConfigStore;
   return auth;
 }
 
