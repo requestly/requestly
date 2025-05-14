@@ -73,7 +73,7 @@ const processObject = <T extends Record<string, any>>(input: T, variables: Varia
   );
 
   return {
-    renderedTemplate: result.rendered as T,
+    renderedTemplate: result.rendered as T, // need assertion since rendered is also being treated as array
     usedVariables: result.variables,
   };
 };

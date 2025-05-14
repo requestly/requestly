@@ -4,6 +4,10 @@ import { KeyValuePair, RQAPI } from "../types";
 import { Authorization } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 import { getDefaultAuth } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
 
+/*
+  allRecords is passed to resolve the "INHERIT" auth type, to recursively
+  resolve the parent record's auth type
+*/
 export const getEffectiveAuthForEntry = (
   entry: RQAPI.Entry,
   entryDetails: {
@@ -12,7 +16,6 @@ export const getEffectiveAuthForEntry = (
   },
   allRecords: RQAPI.Record[]
 ) => {
-  // this mainly finds out the auth type in case of "INHERIT"
   const entryCopy = JSON.parse(JSON.stringify(entry)) as RQAPI.Entry;
   const currentAuth = entryCopy.auth;
 
