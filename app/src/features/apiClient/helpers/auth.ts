@@ -169,6 +169,13 @@ function pruneConfig(auth?: RQAPI.Auth): RQAPI.Auth | null {
       throw new Error("Invalid Auth Type");
   }
 
+  type validAuthType = keyof typeof authConfigStore;
+  Object.keys(authConfigStore).forEach((availableAuthType: validAuthType) => {
+    if (availableAuthType !== currentAuthType) {
+      delete authConfigStore[availableAuthType];
+    }
+  });
+  auth.authConfigStore = authConfigStore;
   return auth;
 }
 
