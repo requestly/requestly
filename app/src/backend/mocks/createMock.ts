@@ -64,9 +64,9 @@ const createMockFromFirebase = async (uid: string, mockData: RQMockSchema, teamI
     createdTs: Timestamp.now().toMillis(),
     updatedTs: Timestamp.now().toMillis(),
   })
-    .then((docRef) => {
+    .then(async (docRef) => {
       Logger.log(`Mock document created ${docRef.id}`);
-      updateDoc(docRef, {
+      await updateDoc(docRef, {
         id: docRef.id,
       });
       return docRef.id;
