@@ -41,7 +41,7 @@ const getMocksFromFirebase = async (ownerId: string, type?: MockType): Promise<R
     if (!data?.id) {
       erroredMockIds.push(doc.id);
     } else {
-      result.push(doc.data());
+      result.push({ ...data, id: doc.id });
     }
   });
 
