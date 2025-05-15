@@ -1,7 +1,7 @@
 import React from "react";
 import { FsAccessError } from "../../helpers/modules/sync/local/FsError/FsAccessError";
+import { RenderableError } from "./RenderableError";
 import { RQButton } from "lib/design-system-v2/components";
-import { FsAccessTroubleshoot } from "./components/FsAccessTroubleshoot";
 import "./errorboundary.scss";
 
 interface Props {
@@ -35,9 +35,9 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
     return { hasError: true, error };
   }
 
-  private showCustomErrorGuide(error: any) {
-    if (error instanceof FsAccessError) {
-      return <FsAccessTroubleshoot error={error} />;
+  private showCustomError(error: any) {
+    if (error instanceof RenderableError) {
+      return error.render();
     }
     return null;
   }
@@ -49,7 +49,9 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
     return "Oops! Something went wrong.";
   }
 
-  private handleRedirectionToHome = () => {};
+  private handleGoBack = () => {
+    this.setState({ hasError: false, error: null });
+  };
 
   render() {
     if (this.state.hasError) {
@@ -61,16 +63,22 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
             <img src="/assets/media/apiClient/request-error.svg" alt="Error screen" />
             <div className="api-client-error-boundary-content__body">
               <div className="error-boundary__header">{this.getErrorHeading(error)}</div>
-              <div className="error-boundary__subheading">{error?.message || "An unexpected error occurred"}</div>
+              <div className="error-boundary__error-message">
+                {error.message ? (
+                  <code>{error?.message}</code>
+                ) : (
+                  <div className="text-center">An unexpected error occurred</div>
+                )}
+              </div>
             </div>
-            {this.showCustomErrorGuide(error)}
+            {this.showCustomError(error)}
             <div className="error-boundary__contact">
               If the issue persists, contact <a href="mailto:contact@requestly.io">support</a>
             </div>
             <div className="error-boundary__actions">
-              <RQButton onClick={this.handleRedirectionToHome}>Back to home</RQButton>
-              <RQButton type="primary" onClick={() => window.location.reload()}>
-                Reload
+              <RQButton onClick={() => window.location.reload()}>Reload</RQButton>
+              <RQButton type="primary" onClick={this.handleGoBack}>
+                Go Back
               </RQButton>
             </div>
           </div>
