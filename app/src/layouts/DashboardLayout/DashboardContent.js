@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useSearchParams, Outlet } from "react-router-dom";
 import SpinnerModal from "components/misc/SpinnerModal";
@@ -82,22 +82,25 @@ const DashboardContent = () => {
     dispatch(globalActions.updateRequestBot({ isActive: false }));
   };
 
-  const prevProps = usePrevious({ location });
+  const previousLocation = usePrevious(location);
 
   const disableOverflow = isPricingPage();
 
+  const isFirstRenderRef = useRef(true);
   useEffect(() => {
-    if (prevProps && prevProps.location !== location) {
+    if (previousLocation && previousLocation !== location) {
       document.documentElement.scrollTop = 0;
       document.scrollingElement.scrollTop = 0;
       document.getElementById("dashboardMainContent").scrollTop = 0;
     }
 
     // ANALYTICS
-    if (!prevProps || prevProps.location !== location) {
+    if (isFirstRenderRef.current || (previousLocation && previousLocation !== location)) {
       trackPageViewEvent(getRouteFromCurrentPath(location.pathname), Object.fromEntries(searchParams));
     }
-  }, [location, prevProps, searchParams]);
+
+    isFirstRenderRef.current = false;
+  }, [location, previousLocation, searchParams]);
 
   return (
     <>
