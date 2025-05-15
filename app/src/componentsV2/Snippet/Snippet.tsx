@@ -1,15 +1,17 @@
 import React from "react";
 import "./snippet.scss";
+import CopyButton from "components/misc/CopyButton";
 
 interface Props {
-  children: React.ReactNode;
+  code: string;
   allowCopy?: boolean;
 }
 
-export const Snippet: React.FC<Props> = ({ children, allowCopy = true }) => {
+export const Snippet: React.FC<Props> = ({ code, allowCopy = false }) => {
   return (
     <div className="rq-snippet">
-      <code>{children}</code>
+      <code>{code}</code>
+      <div className="rq-snippet__copy-button">{allowCopy && <CopyButton copyText={code} />}</div>
     </div>
   );
 };

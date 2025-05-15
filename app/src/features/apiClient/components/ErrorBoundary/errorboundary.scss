@@ -17,19 +17,23 @@
     }
 
     &__body {
-      text-align: center;
-
       .error-boundary__header {
         font-size: var(--requestly-font-size-md);
         color: var(--requestly-color-text-default);
         font-weight: var(--requestly-font-weight-medium);
+        text-align: center;
       }
 
-      .error-boundary__subheading {
+      .error-boundary__error-message {
         margin-top: 8px;
         font-size: var(--requestly-font-size-sm);
         color: var(--requestly-color-text-subtle);
         max-width: 520px;
+        color: var(--requestly-color-error-200);
+        background: var(--requestly-color-error-800);
+        padding: 8px 16px;
+        border-radius: 4px;
+        word-break: break-all;
       }
     }
 

@@ -2,4 +2,15 @@
   background: var(--requestly-color-surface-0);
   padding: 12px 16px;
   border-radius: 8px;
+  position: relative;
+
+  code {
+    white-space: pre-line;
+  }
+
+  &__copy-button {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+  }
 }
