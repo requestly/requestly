@@ -38,15 +38,10 @@ const getMocksFromFirebase = async (ownerId: string, type?: MockType): Promise<R
   const erroredMockIds: string[] = [];
   snapshot.forEach((doc: any) => {
     const data = doc.data();
-    console.log("test", data);
-    if (!data?.id) {
-      data.id = doc.id;
-    }
     if (!data?.id) {
       erroredMockIds.push(doc.id);
-    } else {
-      result.push(doc.data());
     }
+    result.push({ ...data, id: doc.id });
   });
 
   if (erroredMockIds.length > 0) {
