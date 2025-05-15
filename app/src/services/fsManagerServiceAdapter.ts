@@ -11,8 +11,36 @@ import {
 import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackgroundService";
 import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
+import { FsAccessError } from "features/apiClient/helpers/modules/sync/local/FsError/FsAccessError";
+import { ErrorCode } from "features/apiClient/helpers/modules/sync/local/FsError/types";
 
 const LOCAL_SYNC_BUILDER_NAMESPACE = "local_sync_builder";
+
+function FsErrorHandler(_target: any, _key: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+
+  descriptor.value = async function (...args: any[]) {
+    try {
+      const result = await originalMethod.apply(this, args);
+      if (result.type === "error") {
+        if (result.error.code === ErrorCode.PERMISSION_DENIED) {
+          const message = result.error.message || "Permission denied for requested action";
+          throw FsAccessError.from(message, {
+            path: result.error.path,
+          });
+        }
+        return result;
+      }
+      return result;
+    } catch (error) {
+      if (error.code === "EACCESS" || error.code === ErrorCode.PERMISSION_DENIED) {
+        const message = error.message || "Permission denied for requested action";
+        throw FsAccessError.from(message, error.meta);
+      }
+      throw error;
+    }
+  };
+}
 
 export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   constructor(rootPath: string) {
@@ -32,13 +60,14 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
     return this.invokeProcedureInBG("getRecord", id) as Promise<FileSystemResult<API>>;
   }
 
+  @FsErrorHandler
   async createRecord(record: API["request"], collectionId?: string) {
-    console.log("ppp creating", record);
     return this.invokeProcedureInBG("createRecord", record, collectionId) as Promise<FileSystemResult<API>>;
   }
 
+  // @ts-ignore
+  @FsErrorHandler
   async createRecordWithId(record: API["request"], id: string) {
-    console.log("ppp1 creating with id", record);
     return this.invokeProcedureInBG("createRecordWithId", record, id) as Promise<FileSystemResult<API>>;
   }
 

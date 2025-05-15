@@ -1,0 +1,14 @@
+.fs-access-troubleshoot {
+  &__text {
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+    max-width: 540px;
+    text-align: center;
+    word-break: break-all;
+
+    .error-path {
+      font-weight: var(--requestly-font-weight-medium);
+      color: var(--requestly-color-text-default);
+    }
+  }
+}
