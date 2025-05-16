@@ -1,6 +1,7 @@
 import React from "react";
 import { RenderableError } from "./RenderableError";
 import { RQButton } from "lib/design-system-v2/components";
+import * as Sentry from "@sentry/react";
 import "./errorboundary.scss";
 
 interface Props {
@@ -26,8 +27,19 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
     window.removeEventListener("unhandledrejection", this.promiseRejectionHandler);
   }
 
+  componentDidCatch(error: unknown) {
+    Sentry.withScope((scope) => {
+      scope.setTag("errorType", "api_client_error_boundary");
+      Sentry.captureException(error);
+    });
+  }
+
   private promiseRejectionHandler = (event: PromiseRejectionEvent) => {
     this.setState({ hasError: true, error: event.reason });
+    Sentry.withScope((scope) => {
+      scope.setTag("errorType", "api_client_error_boundary");
+      Sentry.captureException(event.reason);
+    });
   };
 
   static getDerivedStateFromError(error: Error): State {
