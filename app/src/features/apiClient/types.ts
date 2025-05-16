@@ -7,7 +7,7 @@ import {
   BearerTokenAuthorizationConfig,
 } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 import { ErroredRecord } from "./helpers/modules/sync/local/services/types";
-import { ErrorMetaData } from "./helpers/modules/sync/local/FsError/types";
+import { ErrorMetaData } from "./errors/types";
 
 export enum RequestMethod {
   GET = "GET",

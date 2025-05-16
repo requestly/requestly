@@ -1,5 +1,4 @@
 import React from "react";
-import { FsAccessError } from "../../helpers/modules/sync/local/FsError/FsAccessError";
 import { RenderableError } from "./RenderableError";
 import { RQButton } from "lib/design-system-v2/components";
 import "./errorboundary.scss";
@@ -43,10 +42,11 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
   }
 
   private getErrorHeading(error: any) {
-    if (error instanceof FsAccessError) {
-      return "Permission denied: Unable to access the file";
+    const defaultHeading = "Oops! Something went wrong.";
+    if (error instanceof RenderableError) {
+      return error.getErrorHeading() || defaultHeading;
     }
-    return "Oops! Something went wrong.";
+    return defaultHeading;
   }
 
   private handleGoBack = () => {

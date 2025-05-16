@@ -1,6 +1,6 @@
 import { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RQAPI } from "features/apiClient/types";
-import { ErrorCode } from "../FsError/types";
+import { ErrorCode } from "../../../../../errors/types";
 
 export type FileSystemError = {
   type: "error";

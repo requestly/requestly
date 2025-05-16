@@ -1,6 +1,6 @@
-import { BaseError } from "./BaseError";
+import { NativeError } from "./NativeError";
 
-export type Constructable = { from: (...args: any) => BaseError };
+export type Constructable = { from: (...args: any) => NativeError };
 
 export type ErrorCodeMap = { [key: string]: Constructable };
 
