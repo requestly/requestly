@@ -4,11 +4,16 @@ import ApiClientFeatureContainer from "./container";
 import { ApiClientEmptyView } from "./screens/apiClient/components/clientView/components/ApiClientEmptyView/ApiClientEmptyView";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImporterView";
+import { ApiClientErrorBoundary } from "./components/ErrorBoundary/ErrorBoundary";
 
 export const apiClientRoutes: RouteObject[] = [
   {
     path: PATHS.API_CLIENT.RELATIVE + "/*",
-    element: <ApiClientFeatureContainer />,
+    element: (
+      <ApiClientErrorBoundary>
+        <ApiClientFeatureContainer />
+      </ApiClientErrorBoundary>
+    ),
     handle: {
       breadcrumb: {
         label: "API Client",
