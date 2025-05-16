@@ -104,3 +104,33 @@ export const trackBillingTeamManageLicenseClicked = () => {
 export const trackBillingTeamInvoiceDashboardClicked = () => {
   trackEvent(SETTINGS.BILLING.BILLING_TEAM_INVOICE_DASHBOARD_CLICKED);
 };
+
+/* OFFLINE LOGGING CONFIG */
+
+export const trackOfflineLogConfigToggled = (isEnabled: boolean) => {
+  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.TOGGLED, { isEnabled });
+};
+
+export const trackOfflineLogFilterAdded = () => {
+  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.FILTER.ADD);
+};
+
+export const trackOfflineLogFilterRemoved = () => {
+  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.FILTER.REMOVE);
+};
+
+export const trackOfflineLogStorePathFileSelectionStarted = () => {
+  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.STORE_PATH.FILE_SELECTION.STARTED);
+};
+
+export const trackOfflineLogStorePathFileSelectionCompleted = () => {
+  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.STORE_PATH.FILE_SELECTION.COMPLETED);
+};
+
+export const trackOfflineLogStorePathFileSelectionFailed = (failReason: "IPC" | "CANCELLED") => {
+  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.STORE_PATH.FILE_SELECTION.FAILED, { failReason });
+};
+
+export const trackOfflineLogStorePathCleared = () => {
+  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.STORE_PATH.CLEARED);
+};
