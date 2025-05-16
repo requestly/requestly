@@ -1,6 +1,7 @@
 import React from "react";
-import { BaseError } from "features/apiClient/helpers/modules/sync/local/FsError/BaseError";
+import { NativeError } from "../../errors/NativeError";
 
-export abstract class RenderableError extends BaseError {
+export abstract class RenderableError extends NativeError {
   abstract render(): React.ReactNode;
+  abstract getErrorHeading(): string;
 }
