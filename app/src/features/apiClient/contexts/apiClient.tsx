@@ -32,6 +32,7 @@ import { DraftRequestContainerTabSource } from "../screens/apiClient/components/
 import { RequestViewTabSource } from "../screens/apiClient/components/clientView/components/RequestView/requestViewTabSource";
 import { CollectionViewTabSource } from "../screens/apiClient/components/clientView/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "../screens/environment/components/environmentView/EnvironmentViewTabSource";
+import { FsAccessError } from "../errors/FsError/FsAccessError";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -195,17 +196,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setErrorFiles(result.data.erroredRecords);
           updateCollectionVariablesOnInit(result.data.records);
         }
-      })
-      .catch((error) => {
-        notification.error({
-          message: "Could not fetch records!",
-          description: typeof error ==="string" ? error : error.message,
-          placement: "bottomRight",
-        });
-        setApiClientRecords([]);
-        Logger.error("Error loading api records!", error);
-      })
-      .finally(() => {
         setIsLoadingApiClientRecords(false);
       });
   }, [apiClientRecordsRepository, uid, dispatch]);
