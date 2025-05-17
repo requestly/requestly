@@ -3,13 +3,16 @@
   padding: 12px 16px;
   border-radius: 8px;
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 
   code {
     white-space: pre-line;
   }
 
   &__copy-button {
-    position: absolute;
     right: 8px;
     top: 8px;
   }

@@ -25,9 +25,7 @@ function FsErrorHandler(_target: any, _key: string, descriptor: PropertyDescript
       if (result.type === "error") {
         if (result.error.code === ErrorCode.PERMISSION_DENIED) {
           const message = result.error.message || "Permission denied for requested action";
-          throw FsAccessError.from(message, {
-            path: result.error.path,
-          });
+          throw FsAccessError.from(message, result.error.path);
         }
         return result;
       }
@@ -50,6 +48,7 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
     // }
   }
 
+  @FsErrorHandler
   async getAllRecords() {
     return this.invokeProcedureInBG("getAllRecords") as Promise<
       FileSystemResult<{ records: APIEntity[]; erroredRecords: ErroredRecord[] }>
@@ -194,7 +193,11 @@ class FsManagerServiceAdapterProvider {
       this.cache.set(rootPath, service);
       return service;
     } catch (e) {
+      const isAccessIssue = (arg: any) => typeof arg === "string" && arg.includes("EACCES:");
       console.error("build error", e);
+      if(isAccessIssue(e) || isAccessIssue(e.message)) {
+        throw new FsAccessError(e.message || e, rootPath);
+      }
       throw e;
     }
   }
