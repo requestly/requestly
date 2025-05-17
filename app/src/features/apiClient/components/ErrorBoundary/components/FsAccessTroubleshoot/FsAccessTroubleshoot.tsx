@@ -10,25 +10,24 @@ interface Props {
 export const FsAccessTroubleshoot: React.FC<Props> = ({ error }) => {
   return (
     <div className="fs-access-troubleshoot">
-      <div className="fs-access-troubleshoot__text">
-        The file operation that you tried to perform on path <span className="error-path">{error.details.path}</span>{" "}
-        has failed due to access issue.
+      <div className="fs-access-troubleshoot__text" style={{ margin: "16px 0" }}>
+        You can try to give your user access to this by running the following command:
       </div>
-      <div className="fs-access-troubleshoot__text text-center" style={{ margin: "16px 0" }}>
-        You can try to give your user access to this by running the following command, to learn more about{" "}
+      <Snippet code={`chown $(whoami) ${error.path}`} allowCopy />
+      <div className="fs-access-troubleshoot__text" style={{ margin: "16px 0" }}>
+        To learn more about{" "}
         <span className="error-path">chown</span> refer{" "}
-        <a href="https://www.ibm.com/docs/en/aix/7.2.0?topic=c-chown-command" target="_blank" rel="noreferrer">
+        <a href="https://pubs.opengroup.org/onlinepubs/9799919799/utilities/chown.html" target="_blank" rel="noreferrer">
           here
         </a>
-        :
       </div>
-      <Snippet code="chown whoami <path>" allowCopy />
-      <div className="fs-access-troubleshoot__text text-center" style={{ margin: "16px 0" }}>
+      <br/>
+      <div className="fs-access-troubleshoot__text" style={{ margin: "16px 0" }}>
         If the above command doesn't work, you can try creating a new folder of which you will have write access and
         copying the files to it :
       </div>
       <Snippet
-        code={`mkdir folder  
+        code={`mkdir folder
         sudo cp -r original_folder folder`}
         allowCopy
       />
