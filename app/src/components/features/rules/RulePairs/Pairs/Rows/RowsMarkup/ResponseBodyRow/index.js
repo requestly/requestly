@@ -46,7 +46,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
       return isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST);
     } else if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE) {
-      return isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST_LOCAL_FILE) || true; // todo: remove OR
+      return isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST_LOCAL_FILE);
     } else {
       return false;
     }
