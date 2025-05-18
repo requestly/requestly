@@ -47,7 +47,6 @@ const OfflineLogConfig: React.FC = () => {
       if (isCompatible) {
         getAllConfig()
           .then((res) => {
-            console.log("DBG: Offline log config", res);
             setLogStorePath(res.storePath);
             setIsEnabled(res.isEnabled);
             setFilter(res.filter);
@@ -62,7 +61,6 @@ const OfflineLogConfig: React.FC = () => {
 
   /* HANDLERS */
   const handleToggle = useCallback((newStatus: boolean) => {
-    console.log("DBG: Toggle offline log config", newStatus);
     setIsEnabled(newStatus);
     setIsEnabledConfig(newStatus).catch((err) => {
       console.error("DBG: Error setting offline log config", err);
