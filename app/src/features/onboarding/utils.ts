@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import PATHS from "config/constants/sub/paths";
 import STORAGE from "config/constants/sub/storage";
 import { isEnvAutomation } from "utils/EnvUtils";
@@ -24,6 +25,39 @@ export const shouldShowOnboarding = () => {
   return !EXCLUDED_PATHS.some((path) => currentPath.includes(path));
 };
 
-export const setRedirectURI = (redirectURI: string): void => {
-  window.localStorage.setItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY, redirectURI);
+type RedirectMetadata = {
+  source: string;
+  redirectURL: string;
+};
+
+export const setRedirectMetadata = ({ source, redirectURL }: RedirectMetadata): void => {
+  const metadata = {
+    source,
+    redirectURL,
+  };
+
+  try {
+    window.localStorage.setItem(STORAGE.LOCAL_STORAGE.AUTH_REDIRECT_METADATA_KEY, JSON.stringify(metadata));
+  } catch (error) {
+    Sentry.captureException(error, {
+      extra: { metadata },
+    });
+  }
+};
+
+export const getRedirectMetadata = () => {
+  let metadata = null;
+
+  try {
+    metadata = window.localStorage.getItem(STORAGE.LOCAL_STORAGE.AUTH_REDIRECT_METADATA_KEY);
+    return JSON.parse(metadata) as RedirectMetadata;
+  } catch (error) {
+    Sentry.captureException(error, {
+      extra: { metadata },
+    });
+  }
+};
+
+export const clearRedirectMetadata = () => {
+  window.localStorage.removeItem(STORAGE.LOCAL_STORAGE.AUTH_REDIRECT_METADATA_KEY);
 };
