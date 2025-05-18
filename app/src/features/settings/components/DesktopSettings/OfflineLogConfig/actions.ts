@@ -1,7 +1,6 @@
 import { IOfflineLogConfig } from "./types";
 
 function makeIPCRequestForOfflineLogConfig(action: string, payloadData?: any) {
-  console.log("DBG: makeIPCRequestForOfflineLogConfig", JSON.stringify({ action, payloadData }, null, 2));
   return new Promise((resolve, reject) => {
     window?.RQ?.DESKTOP?.SERVICES?.IPC.invokeEventInMain("rq-storage:storage-action", {
       type: action,
