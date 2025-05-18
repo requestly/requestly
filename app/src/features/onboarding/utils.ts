@@ -31,7 +31,7 @@ type RedirectMetadata = {
 };
 
 export const setRedirectMetadata = ({ source, redirectURL }: RedirectMetadata): void => {
-  const metadata = {
+  const metadata: RedirectMetadata = {
     source,
     redirectURL,
   };
