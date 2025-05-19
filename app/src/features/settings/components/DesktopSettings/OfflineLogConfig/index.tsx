@@ -28,7 +28,7 @@ const OfflineLogConfig: React.FC = () => {
   const [filter, setFilter] = useState<string[]>([]);
   const [isSelectingFile, setIsSelectingFile] = useState<boolean>(false);
 
-  const isFlagForFeatureEnabled = useGrowthBook().getFeatureValue(FEATURES.OFFLINE_LOGS, true);
+  const isFlagForFeatureEnabled = useGrowthBook().getFeatureValue(FEATURES.OFFLINE_LOGS, true) || true;
   const isCompatible = isFeatureCompatible(FEATURES.OFFLINE_LOGS);
 
   const isFeatureVisible = useMemo(() => {
@@ -155,10 +155,14 @@ const OfflineLogConfig: React.FC = () => {
     <div className="w-full setting-item-container">
       <Row align="middle">
         <Col span={22}>
-          <div className="title">Dump Logs to a file</div>
+          <div className="title">Session Logs Storage</div>
+          <div className="setting-item-caption">
+            <span>Save the logs you need to a local file.</span>
+            <p>Remember, logs get cleared whenever the app is relaunched</p>
+          </div>
         </Col>
         <Col span={2} style={{ alignSelf: "self-start", marginTop: "8px" }}>
-          <Tooltip title="Enable to dump logs to a file">
+          <Tooltip title="Enable to start saving logs to the file">
             <Switch checked={isEnabled} onChange={handleToggle} />
           </Tooltip>
         </Col>
@@ -180,7 +184,9 @@ const OfflineLogConfig: React.FC = () => {
               </RQButton>
             </Col>
           </Row>
-          <Row className="filter-subheading">Add a substring to match for the URL to be stored</Row>
+          <Row className="filter-subheading">
+            Any Request URL that matches this keyword/domain will be saved in the file.
+          </Row>
           <div className="filter-container">
             {filter.map((blockedDomain, index) => (
               <Row className="filter-substring-container" align={"middle"} justify={"space-between"} key={index}>
@@ -200,7 +206,7 @@ const OfflineLogConfig: React.FC = () => {
               {logStorePath ? "Change File" : "Select File"}
             </RQButton>
           </Col>
-          <Col span={16}>{logStorePath ? <strong>Log directory: {logStorePath}</strong> : null}</Col>
+          <Col span={16}>{logStorePath ? <b>Log directory: {logStorePath}/logs.jsonl</b> : null}</Col>
           {logStorePath ? (
             <Col span={4} style={{ display: "flex", justifyContent: "flex-end" }}>
               <Tooltip title="stop storing logs">
