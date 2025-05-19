@@ -1,8 +1,4 @@
 import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "common/types";
-import { setVariable, Variable } from "../variable";
-import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
-import { stopRecordingOnAllTabs } from "./sessionRecording";
-import { updateActivationStatus } from "./contextMenu";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -153,37 +149,4 @@ export const injectJSAtRequestSource = (code: string, requestDetails: chrome.web
     },
     { tabId: requestDetails.tabId, frameIds: [requestDetails.frameId] }
   );
-};
-
-export const isNonBrowserTab = (tabId: number): boolean => {
-  // A special ID value given to tabs that are not browser tabs (for example, apps and devtools windows)
-  return tabId === chrome.tabs.TAB_ID_NONE;
-};
-
-export const toggleExtensionStatus = async (newStatus?: boolean) => {
-  const extensionEnabledStatus = await isExtensionEnabled();
-
-  const updatedStatus = newStatus ?? !extensionEnabledStatus;
-  setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
-  updateActivationStatus(updatedStatus);
-  // FIXME: Memory leak here. onVariableChange sets up a listener on every toggle
-  // onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, () => null);
-
-  if (!updatedStatus) {
-    stopRecordingOnAllTabs();
-  }
-
-  return updatedStatus;
-};
-
-export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
-  const webURLs = getAllSupportedWebURLs();
-  let appTabs: chrome.tabs.Tab[] = [];
-
-  for (const webURL of webURLs) {
-    const tabs = await chrome.tabs.query({ url: webURL + "/*" });
-    appTabs = [...appTabs, ...tabs];
-  }
-
-  return appTabs;
 };

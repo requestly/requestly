@@ -1,9 +1,11 @@
-import { SourceKey, SourceOperator, UrlSource } from "common/types";
+import { MenuItem, SourceKey, SourceOperator, ToggleActivationStatusLabel, UrlSource } from "common/types";
 import config from "common/config";
 import { matchSourceUrl } from "./common/ruleMatcher";
-import { Variable, getVariable } from "./service-worker/variable";
+import { Variable, getVariable, setVariable } from "./service-worker/variable";
 import { ChangeType, getRecord, onRecordChange } from "common/storage";
 import { STORAGE_KEYS } from "common/constants";
+import { stopRecordingOnAllTabs } from "./service-worker/services/sessionRecording";
+import extensionIconManager from "./service-worker/services/extensionIconManager";
 
 export const formatDate = (dateInMillis: number, format: string): string => {
   if (dateInMillis && format === "yyyy-mm-dd") {
@@ -139,4 +141,54 @@ export const onBlockListChange = (callback: () => void) => {
       });
     }
   );
+};
+
+export const sendMessageToApp = async (messageObject: unknown) => {
+  const appTabs = await getAppTabs();
+  return Promise.all(appTabs.map(({ id }) => chrome.tabs.sendMessage(id, messageObject)));
+};
+
+export const isNonBrowserTab = (tabId: number): boolean => {
+  // A special ID value given to tabs that are not browser tabs (for example, apps and devtools windows)
+  return tabId === chrome.tabs.TAB_ID_NONE;
+};
+
+export const toggleExtensionStatus = async (newStatus?: boolean) => {
+  const extensionEnabledStatus = await isExtensionEnabled();
+
+  const updatedStatus = newStatus ?? !extensionEnabledStatus;
+  setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
+  updateActivationStatus(updatedStatus);
+
+  if (!updatedStatus) {
+    stopRecordingOnAllTabs();
+  }
+
+  return updatedStatus;
+};
+
+export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
+  const webURLs = getAllSupportedWebURLs();
+  let appTabs: chrome.tabs.Tab[] = [];
+
+  for (const webURL of webURLs) {
+    const tabs = await chrome.tabs.query({ url: webURL + "/*" });
+    appTabs = [...appTabs, ...tabs];
+  }
+
+  return appTabs;
+};
+
+export const updateActivationStatus = (isExtensionEnabled: boolean) => {
+  chrome.contextMenus.update(MenuItem.TOGGLE_ACTIVATION_STATUS, {
+    title: isExtensionEnabled ? ToggleActivationStatusLabel.DEACTIVATE : ToggleActivationStatusLabel.ACTIVATE,
+  });
+
+  if (isExtensionEnabled) {
+    extensionIconManager.markExtensionEnabled();
+  } else {
+    extensionIconManager.markExtensionDisabled();
+  }
+
+  sendMessageToApp({ action: "isExtensionEnabled", isExtensionEnabled });
 };

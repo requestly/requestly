@@ -1,11 +1,10 @@
 import { EXTENSION_MESSAGES } from "common/constants";
-import { sendMessageToApp } from "../messageHandler";
 import { applyProxy, ProxyDetails } from "../proxy";
 import { WebSocketManager } from "./webSocketManager";
-import { toggleExtensionStatus } from "../utils";
 import extensionIconManager from "../extensionIconManager";
 import { getConnectedBrowserAppId } from "./utils";
 import { DESKTOP_APP_CONFIG } from "./desktopAppConfig";
+import { sendMessageToApp, toggleExtensionStatus } from "../../../utils";
 
 export class DesktopAppManager {
   private wsManager = new WebSocketManager();

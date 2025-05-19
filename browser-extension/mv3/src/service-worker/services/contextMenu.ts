@@ -1,33 +1,6 @@
 import { onVariableChange, setVariable, Variable } from "../variable";
-import extensionIconManager from "./extensionIconManager";
-import { isExtensionEnabled } from "../../utils";
-
-// TODO: fix circular dependency
-import { sendMessageToApp } from "./messageHandler";
-import { CLIENT_MESSAGES } from "common/constants";
-
-enum MenuItem {
-  TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
-}
-
-enum ToggleActivationStatusLabel {
-  ACTIVATE = "Activate Requestly",
-  DEACTIVATE = "Deactivate Requestly",
-}
-
-export const updateActivationStatus = (isExtensionEnabled: boolean) => {
-  chrome.contextMenus.update(MenuItem.TOGGLE_ACTIVATION_STATUS, {
-    title: isExtensionEnabled ? ToggleActivationStatusLabel.DEACTIVATE : ToggleActivationStatusLabel.ACTIVATE,
-  });
-
-  if (isExtensionEnabled) {
-    extensionIconManager.markExtensionEnabled();
-  } else {
-    extensionIconManager.markExtensionDisabled();
-  }
-
-  sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED, isExtensionEnabled });
-};
+import { isExtensionEnabled, updateActivationStatus } from "../../utils";
+import { MenuItem, ToggleActivationStatusLabel } from "common/types";
 
 export const initContextMenu = async () => {
   chrome.contextMenus.removeAll();

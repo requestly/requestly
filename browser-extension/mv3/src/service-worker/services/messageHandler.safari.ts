@@ -1,7 +1,6 @@
 import { EXTENSION_MESSAGES } from "common/constants";
-import { toggleExtensionStatus } from "./utils";
 import { getAPIResponse } from "./apiClient";
-import { isExtensionEnabled, isUrlInBlockList } from "../../utils";
+import { isExtensionEnabled, isUrlInBlockList, toggleExtensionStatus } from "../../utils";
 
 export const initMessageHandler = () => {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
