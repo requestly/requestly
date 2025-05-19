@@ -10,16 +10,23 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { PremiumFeature } from "features/pricing";
 import { trackRulePairCreated, trackRulePairCreationAttempted } from "modules/analytics/events/common/rules";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 import "./AddPairButton.css";
 
-const AddPairButton = (props) => {
+// TODO: fix prop types
+const AddPairButton: React.FC<any> = (props) => {
   const { disabled = false, currentlySelectedRuleConfig } = props;
 
   //Global State
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const { getFeatureLimitValue } = useFeatureLimiter();
-  const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.add_new_rule_pair);
+
+  const rulesWithoutLimits = [RuleType.HEADERS]; // TODO: move into common place
+  const isRuleHasNoLimits = rulesWithoutLimits.includes(currentlySelectedRuleConfig.TYPE);
+  const isPremiumFeature = !getFeatureLimitValue(
+    isRuleHasNoLimits ? FeatureLimitType.free : FeatureLimitType.add_new_rule_pair
+  );
 
   //STATE TO MAINTAIN CURRENTLY SELECTED RULE PAIR COUNT
   const [currentlySelectedRuleCount, setCurrentlySelectedRuleCount] = useState(0);
@@ -42,7 +49,7 @@ const AddPairButton = (props) => {
     <PremiumFeature
       popoverPlacement="top"
       onContinue={handleRulePairsOnClick}
-      features={[FeatureLimitType.add_new_rule_pair]}
+      features={[isRuleHasNoLimits ? FeatureLimitType.free : FeatureLimitType.add_new_rule_pair]}
       featureName="Multiple rule pairs"
       source="add_new_rule_pair"
       onClickCallback={() => trackRulePairCreationAttempted(currentlySelectedRuleData.ruleType)}
@@ -50,6 +57,7 @@ const AddPairButton = (props) => {
       <Button disabled={disabled} block type="dashed" className="add-pair-btn" icon={<PlusOutlined />}>
         <span>
           <Row align="middle" wrap={false} className="shrink-0">
+            {/* @ts-ignore */}
             Add a new condition{isPremiumFeature ? <PremiumIcon /> : null}
           </Row>
         </span>
