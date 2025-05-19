@@ -3,7 +3,8 @@ import extensionIconManager from "./extensionIconManager";
 import { isExtensionEnabled } from "../../utils";
 
 // TODO: fix circular dependency
-// import { sendMessageToApp } from "./messageHandler";
+import { sendMessageToApp } from "./messageHandler";
+import { CLIENT_MESSAGES } from "common/constants";
 
 enum MenuItem {
   TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
@@ -25,7 +26,7 @@ export const updateActivationStatus = (isExtensionEnabled: boolean) => {
     extensionIconManager.markExtensionDisabled();
   }
 
-  // sendMessageToApp({ isExtensionEnabled });
+  sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED, isExtensionEnabled });
 };
 
 export const initContextMenu = async () => {
