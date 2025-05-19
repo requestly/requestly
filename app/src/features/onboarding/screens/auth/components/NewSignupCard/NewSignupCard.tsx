@@ -12,7 +12,7 @@ import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/lo
 import { SOURCE } from "modules/analytics/events/common/constants";
 import "./newSignupCard.scss";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
-import { setRedirectURI } from "features/onboarding/utils";
+import { setRedirectMetadata } from "features/onboarding/utils";
 
 export const NewSignupCard = () => {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export const NewSignupCard = () => {
       handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
     } else {
       trackSignUpButtonClicked(SOURCE.EXTENSION_ONBOARDING);
-      setRedirectURI(redirectURL);
+      setRedirectMetadata({ source: SOURCE.EXTENSION_ONBOARDING, redirectURL });
       redirectToOAuthUrl(navigate);
     }
   };
