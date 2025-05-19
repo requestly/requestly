@@ -12,7 +12,6 @@ export const getSSOProviderId = async (email: string) => {
 
     if (snapshot.exists()) {
       const data = snapshot.data();
-      console.log({ data });
       return data?.providerId;
     } else {
       return null;

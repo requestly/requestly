@@ -5,6 +5,7 @@ import { globalActions } from "store/slices/global/slice";
 import PATHS from "config/constants/sub/paths";
 import { getAppMode, getLastUsedFeaturePath } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { useIsAuthSkipped } from "./useIsAuthSkipped";
 
 const useRootPathRedirector = () => {
   const dispatch = useDispatch();
@@ -12,6 +13,8 @@ const useRootPathRedirector = () => {
   const navigate = useNavigate();
   const storedFeaturePath = useSelector(getLastUsedFeaturePath);
   const appMode = useSelector(getAppMode);
+  const isAuthSkipped = useIsAuthSkipped();
+  const params = isAuthSkipped ? `skip_auth=${true}` : "";
 
   const LAST_KNOWN_PATHS = new Set([
     PATHS.API_CLIENT.INDEX,
@@ -30,10 +33,10 @@ const useRootPathRedirector = () => {
       } else {
         isOpenedInDesktopMode
           ? navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE, { replace: true })
-          : navigate(PATHS.HOME.ABSOLUTE, { replace: true });
+          : navigate(`${PATHS.HOME.ABSOLUTE}?${params}`, { replace: true });
       }
     }
-  }, [isOpenedInDesktopMode, location.pathname, navigate, storedFeaturePath]);
+  }, [isOpenedInDesktopMode, location.pathname, navigate, storedFeaturePath, params]);
 
   useEffect(() => {
     const pathSegments = location.pathname.split("/")?.filter(Boolean);

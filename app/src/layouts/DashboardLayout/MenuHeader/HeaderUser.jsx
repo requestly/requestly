@@ -8,6 +8,7 @@ import { globalActions } from "store/slices/global/slice";
 import {
   redirectToAccountDetails,
   redirectToBillingTeamSettings,
+  redirectToOAuthUrl,
   redirectToProfileSettings,
   redirectToSettings,
   redirectToWorkspaceSettings,
@@ -25,6 +26,10 @@ import { isSafariBrowser } from "actions/ExtensionActions";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
+import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { setRedirectURI } from "features/onboarding/utils";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -34,6 +39,7 @@ export default function HeaderUser() {
   const user = useSelector(getUserAuthDetails);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const appMode = useSelector(getAppMode);
+  const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
 
   const userName = user.loggedIn ? user?.details?.profile?.displayName ?? "User" : null;
   const userPhoto =
@@ -44,6 +50,7 @@ export default function HeaderUser() {
   // Component State
   const [loading, setLoading] = useState(false);
   const [hideUserDropDown, setHideUserDropdown] = useState(false);
+  const [isSignupButtonLoading, setIsSignupButtonLoading] = useState(false);
   const appFlavour = useMemo(() => getAppFlavour(), []);
 
   useEffect(() => {
@@ -96,7 +103,7 @@ export default function HeaderUser() {
                 })
               );
 
-              getTabServiceActions().resetTabs("sign_out");
+              getTabServiceActions().resetTabs();
               dispatch(incentivizationActions.resetState());
             })
             .finally(() => setLoading(false));
@@ -112,8 +119,8 @@ export default function HeaderUser() {
         modalName: "authModal",
         newValue: true,
         newProps: {
-          redirectURL: window.location.href,
           authMode,
+          redirectURL: window.location.href,
           eventSource: SOURCE.NAVBAR,
         },
       })
@@ -133,6 +140,23 @@ export default function HeaderUser() {
       </span>
     );
   }
+
+  const handleSignupClick = () => {
+    trackSignUpButtonClicked(SOURCE.NAVBAR);
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
+      return;
+    }
+
+    if (isBrowserstackIntegrationOn) {
+      setIsSignupButtonLoading(true);
+      setRedirectURI(window.location.href);
+      redirectToOAuthUrl(navigate);
+      return;
+    } else {
+      handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
+    }
+  };
 
   return hideUserDropDown ? null : (
     <section>
@@ -179,14 +203,18 @@ export default function HeaderUser() {
         <div className="auth-button-group">
           <RQButton
             className="layout-header-signup-btn no-drag"
-            onClick={() => handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN)}
+            onClick={() => {
+              trackLoginButtonClicked(SOURCE.NAVBAR);
+              handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+            }}
           >
             Sign in
           </RQButton>
           <RQButton
+            loading={isSignupButtonLoading}
             type="primary"
             className="layout-header-signup-btn no-drag"
-            onClick={() => handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP)}
+            onClick={handleSignupClick}
           >
             Sign up
           </RQButton>

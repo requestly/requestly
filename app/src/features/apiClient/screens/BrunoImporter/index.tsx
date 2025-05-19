@@ -7,7 +7,7 @@ import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
-import { Row } from "antd";
+import { notification, Row } from "antd";
 import Logger from "lib/logger";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./brunoImporter.scss";
@@ -224,7 +224,10 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
           importedEnvs === 0 &&
           recordsResult.importedCollectionsCount === 0
         ) {
-          toast.error("Failed to import Bruno data");
+          notification.error({
+            message: "Failed to import Bruno data",
+            placement: "bottomRight",
+          });
           return;
         }
 

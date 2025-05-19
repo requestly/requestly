@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Modal } from "antd";
+import { Modal, notification } from "antd";
 import Editor from "componentsV2/CodeEditor";
 import { ErroredRecord, FileType } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
@@ -55,8 +55,11 @@ export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileVi
       }
       handlePostSuccessfulWrite();
     } catch (error) {
-      console.error("Error saving error file", error);
-      toast.error(error.message || "Failed to save error file");
+      notification.error({
+        message: `Failed to save error file`,
+        description: error?.message,
+        placement: "bottomRight",
+      });
     }
   };
 
@@ -79,27 +82,23 @@ export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileVi
             <span>{errorFile.error}</span>
           </div>
         </div>
-        {fileContent && (
-          <>
-            {" "}
-            <div className="error-file-editor">
-              <Editor
-                language={EditorLanguage.JSON}
-                handleChange={setFileContent}
-                value={fileContent}
-                isResizable={true}
-                hideCharacterCount
-                hideToolbar
-              />
-            </div>
-            <div className="error-file-editor-footer">
-              <RQButton onClick={onClose}>Cancel</RQButton>
-              <RQButton type="primary" onClick={handleSave}>
-                Save and include
-              </RQButton>
-            </div>
-          </>
-        )}
+
+        <div className="error-file-editor">
+          <Editor
+            language={EditorLanguage.JSON}
+            handleChange={setFileContent}
+            value={fileContent}
+            isResizable={true}
+            hideCharacterCount
+            hideToolbar
+          />
+        </div>
+        <div className="error-file-editor-footer">
+          <RQButton onClick={onClose}>Cancel</RQButton>
+          <RQButton type="primary" onClick={handleSave}>
+            Save and include
+          </RQButton>
+        </div>
       </div>
     </Modal>
   );

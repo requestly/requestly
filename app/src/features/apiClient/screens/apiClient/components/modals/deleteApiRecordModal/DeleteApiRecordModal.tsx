@@ -10,6 +10,7 @@ import "./deleteApiRecordModal.scss";
 import { isEmpty, partition } from "lodash";
 import * as Sentry from "@sentry/react";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { notification } from "antd";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
@@ -47,7 +48,10 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
   const handleDeleteApiRecord = async () => {
     const recordsToBeDeleted = getAllRecordsToDelete();
     if (!recordsToBeDeleted.length) {
-      toast.error("Please select atleast one entity you want to delete.");
+      notification.error({
+        message: `Could not delete records.`,
+        placement: "bottomRight",
+      });
       return;
     }
 
@@ -88,7 +92,12 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
       // TODO: add analytics
     } else {
       const erroredResult = !recordDeletionResult.success ? recordDeletionResult : collectionsDeletionResult;
-      toast.error(erroredResult.message || `Error deleting ${records.length === 1 ? "record" : "records"}`);
+      notification.error({
+        message: `Error deleting ${records.length === 1 ? "record" : "records"}`,
+        description: erroredResult?.message,
+        placement: "bottomRight",
+      });
+
       Sentry.withScope((scope) => {
         scope.setTag("error_type", "api_client_record_deletion");
         Sentry.captureException(

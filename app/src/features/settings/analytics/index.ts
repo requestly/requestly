@@ -92,3 +92,15 @@ export const trackBillingTeamInvoiceRequestSent = (team_id: string) => {
 export const trackBillingTeamInvoiceRequestFailed = (team_id: string) => {
   trackEvent(SETTINGS.BILLING.BILLING_TEAM_INVOICE_REQUEST_FAILED, { team_id });
 };
+
+export const trackBillingTeamManagePlanClicked = () => {
+  trackEvent(SETTINGS.BILLING.BILLING_TEAM_MANAGE_PLAN_CLICKED);
+};
+
+export const trackBillingTeamManageLicenseClicked = () => {
+  trackEvent(SETTINGS.BILLING.BILLING_TEAM_MANAGE_LICENSES_CLICKED);
+};
+
+export const trackBillingTeamInvoiceDashboardClicked = () => {
+  trackEvent(SETTINGS.BILLING.BILLING_TEAM_INVOICE_DASHBOARD_CLICKED);
+};

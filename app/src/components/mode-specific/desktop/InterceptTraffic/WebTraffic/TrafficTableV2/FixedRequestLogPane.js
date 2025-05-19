@@ -8,6 +8,8 @@ import RequestSummary from "./RequestSummary";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Editor, { EditorLanguage } from "componentsV2/CodeEditor";
 import "./FixedRequestLogPane.css";
+import { REQUEST_METHOD_COLORS, REQUEST_METHOD_BACKGROUND_COLORS } from "../../../../../../constants";
+import { RequestMethod } from "features/apiClient/types";
 
 const { Text } = Typography;
 
@@ -15,7 +17,17 @@ const Header = (props) => {
   return (
     <Row className="request-log-pane-header" align="middle" wrap={false}>
       <Space>
-        <Badge count={props.method} style={{ backgroundColor: "grey" }} />
+        <Typography.Text
+          className="request-method"
+          style={{
+            color: REQUEST_METHOD_COLORS[props.method],
+            backgroundColor: REQUEST_METHOD_BACKGROUND_COLORS[props.method],
+          }}
+        >
+          {[RequestMethod.OPTIONS, RequestMethod.DELETE].includes(props.method)
+            ? props.method.slice(0, 3)
+            : props.method}
+        </Typography.Text>
         <Badge overflowCount={699} count={props.statusCode} style={{ backgroundColor: "#87d068" }} />
         <Text ellipsis={{ tooltip: props.url }} className="request-log-pane-url">
           {props.url}
@@ -162,7 +174,7 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
         <div className="navigation-panel-wrapper">
           <Editor
             scriptId={`${title}-${log_id}`}
-            value={body || "{}"}
+            value={typeof body === "object" ? JSON.stringify(body) : String(body ?? "")}
             language={EditorLanguage.JSON}
             isReadOnly
             isResizable={false}

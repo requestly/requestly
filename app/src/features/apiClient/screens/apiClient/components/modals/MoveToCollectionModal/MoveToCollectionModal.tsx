@@ -1,4 +1,4 @@
-import { Modal } from "antd";
+import { Modal, notification } from "antd";
 import CreatableReactSelect from "react-select/creatable";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
@@ -110,7 +110,11 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       }
     } catch (error) {
       console.error("Error moving request to collection:", error);
-      toast.error(error.message || "Error moving records to collection");
+      notification.error({
+        message: `Error moving records to collection`,
+        description: error?.message,
+        placement: "bottomRight",
+      });
       Sentry.withScope((scope) => {
         scope.setTag("error_type", "api_client_move_to_collection");
         Sentry.captureException(error);
