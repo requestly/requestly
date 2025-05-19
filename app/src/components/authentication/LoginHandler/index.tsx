@@ -159,7 +159,11 @@ const LoginHandler: React.FC = () => {
       .catch((error) => {
         Logger.error("Error signing in with custom token:", error);
         // @ts-ignore
-        trackSignUpFailedEvent({ error: error?.message, auth_provider: AUTH_PROVIDERS.BROWSERSTACK });
+        trackSignUpFailedEvent({
+          error: error?.message,
+          auth_provider: AUTH_PROVIDERS.BROWSERSTACK,
+          source: redirectMetadata?.source,
+        });
         // for now redirecting even when facing errors
         // todo: setup error monitoring
         setLoginComplete(true);
