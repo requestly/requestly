@@ -10,7 +10,7 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { PremiumFeature } from "features/pricing";
 import { trackRulePairCreated, trackRulePairCreationAttempted } from "modules/analytics/events/common/rules";
-import { RuleType } from "@requestly/shared/types/entities/rules";
+import { RULES_WITHOUT_LIMITS } from "features/rules";
 import "./AddPairButton.css";
 
 // TODO: fix prop types
@@ -22,8 +22,7 @@ const AddPairButton: React.FC<any> = (props) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const { getFeatureLimitValue } = useFeatureLimiter();
 
-  const rulesWithoutLimits = [RuleType.HEADERS]; // TODO: move into common place
-  const isRuleHasNoLimits = rulesWithoutLimits.includes(currentlySelectedRuleConfig.TYPE);
+  const isRuleHasNoLimits = RULES_WITHOUT_LIMITS.includes(currentlySelectedRuleConfig.TYPE);
   const isPremiumFeature = !getFeatureLimitValue(
     isRuleHasNoLimits ? FeatureLimitType.free : FeatureLimitType.add_new_rule_pair
   );
