@@ -1,0 +1,95 @@
+.rq-acquisition-announcement-modal {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .ant-modal-content {
+    border-radius: 8px;
+    width: 100%;
+    min-width: 320px;
+    max-width: 400px;
+
+    border: 1px solid var(--alias-tokens-color-white-t-10, rgba(255, 255, 255, 0.06));
+    background: var(--requestly-color-neutral-900);
+    box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
+
+    .ant-modal-body {
+      padding: 0;
+      border-radius: inherit;
+    }
+  }
+
+  &__close-btn {
+    position: absolute;
+    right: 3px;
+    top: 4px;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 24px;
+    gap: var(--space-6, 16px);
+
+    background: var(--requestly-color-neutral-800);
+    border-bottom: 1px solid var(--alias-tokens-color-white-t-10, #ffffff0f);
+
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+  }
+
+  &__logo {
+    width: 88px;
+    height: 24px;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-6, 16px);
+
+    padding: var(--space-8, 24px);
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+  }
+
+  &__title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    line-clamp: 1;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--requestly-color-text-default, #fff);
+
+    font-size: var(--requestly-font-size-base);
+    font-weight: var(--requestly-font-weight-medium);
+    line-height: 22px; /* 137.5% */
+  }
+
+  &__description {
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--font-size-sm, 12px);
+    line-height: 18px; /* 150% */
+  }
+
+  &__know-more-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--requestly-color-primary-text, #639ff9);
+    text-align: center;
+
+    font-size: var(--font-size-sm, 12px);
+    line-height: 18px; /* 150% */
+    align-self: flex-end;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      color: inherit;
+    }
+  }
+}

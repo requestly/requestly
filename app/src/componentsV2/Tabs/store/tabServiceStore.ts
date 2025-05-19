@@ -6,24 +6,6 @@ import { useShallow } from "zustand/shallow";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { TAB_SOURCES_MAP } from "../constants";
-import {
-  ResetTabSource,
-  trackResetTabServiceStore,
-  trackTabActionEarlyReturn,
-  trackTabCloseById,
-  trackTabCloseClicked,
-  trackTabClosed,
-  trackTabClosedById,
-  trackTabLocalStorageGetItemCalled,
-  trackTabLocalStorageSetItemCalled,
-  trackTabOpenClicked,
-  trackTabOpened,
-  trackTabsRehydrationCompleted,
-  trackTabsRehydrationError,
-  trackTabsRehydrationStarted,
-  trackUpsertTabSourceCalled,
-  trackUpsertTabSourceCompleted,
-} from "../analytics";
 
 type TabId = number;
 type SourceName = string;
@@ -48,7 +30,7 @@ type TabServiceState = {
 };
 
 type TabActions = {
-  reset: (source: ResetTabSource) => void;
+  reset: () => void;
   upsertTabSource: (tabId: TabId | undefined, source: AbstractTabSource, config?: TabConfig) => void;
   updateTabBySource: (
     sourceId: SourceId,
@@ -89,16 +71,14 @@ const createTabServiceStore = () => {
       (set, get) => ({
         ...initialState,
 
-        reset(source) {
+        reset() {
           set({ ...initialState, tabsIndex: new Map(), tabs: new Map() });
           tabServiceStore.persist.clearStorage();
-          trackResetTabServiceStore(source);
         },
 
         upsertTabSource(tabId, source, config) {
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
-          trackUpsertTabSourceCalled(sourceId, sourceName);
 
           const { tabsIndex, tabs, setActiveTab } = get();
 
@@ -120,8 +100,6 @@ const createTabServiceStore = () => {
           set({
             tabs: new Map(tabs),
           });
-
-          trackUpsertTabSourceCompleted(sourceId, sourceName);
         },
 
         updateTabBySource(sourceId, sourceName, updates) {
@@ -130,7 +108,6 @@ const createTabServiceStore = () => {
 
           const tabStore = tabs.get(tabId);
           if (!tabStore) {
-            trackTabActionEarlyReturn("updateTabBySourceId", "Tab store not found.");
             return;
           }
 
@@ -146,7 +123,6 @@ const createTabServiceStore = () => {
         openTab(source, config) {
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
-          trackTabOpenClicked(sourceId, sourceName, config?.preview);
 
           const {
             _generateNewTabId,
@@ -162,8 +138,6 @@ const createTabServiceStore = () => {
           const existingTabId = getTabIdBySource(sourceId, sourceName);
           if (existingTabId) {
             setActiveTab(existingTabId);
-            trackTabOpened(sourceId, sourceName, config?.preview);
-            trackTabActionEarlyReturn("openTab", "Tab found.");
             return;
           }
 
@@ -176,30 +150,25 @@ const createTabServiceStore = () => {
             const tabId = previewTabId ?? _generateNewTabId();
             upsertTabSource(tabId, source, config);
             setPreviewTab(tabId);
-            trackTabActionEarlyReturn("openTab", "Registering preview tab.");
             return;
           }
 
           const newTabId = _generateNewTabId();
           upsertTabSource(newTabId, source);
-          trackTabOpened(sourceId, sourceName, config?.preview);
         },
 
         closeTab(source, skipUnsavedPrompt = false) {
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
-          trackTabCloseClicked(sourceId, sourceName);
 
           const { closeTabById, getTabIdBySource } = get();
 
           const existingTabId = getTabIdBySource(sourceId, sourceName);
           if (!existingTabId) {
-            trackTabActionEarlyReturn("closeTab", "Tab id not found.");
             return;
           }
 
           closeTabById(existingTabId, skipUnsavedPrompt);
-          trackTabClosed(sourceId, sourceName);
         },
 
         closeAllTabs(skipUnsavedPrompt) {
@@ -210,12 +179,10 @@ const createTabServiceStore = () => {
         },
 
         closeTabBySource(sourceId, sourceName, skipUnsavedPrompt) {
-          trackTabCloseClicked(sourceId, sourceName);
           const { closeTabById, getTabIdBySource } = get();
 
           const tabId = getTabIdBySource(sourceId, sourceName);
           if (!tabId) {
-            trackTabActionEarlyReturn("closeTabBySource", "Tab id not found.");
             return;
           }
 
@@ -226,21 +193,18 @@ const createTabServiceStore = () => {
           const { tabs, tabsIndex, activeTabId, setActiveTab } = get();
           const tabStore = tabs.get(tabId);
           if (!tabStore) {
-            trackTabActionEarlyReturn("closeTabById", "Tab store not found.");
             return;
           }
 
           const tabState = tabStore.getState();
           const sourceName = tabState.source.getSourceName();
           const sourceId = tabState.source.getSourceId();
-          trackTabCloseById(sourceId, sourceName);
 
           if (tabState.unsaved && !skipUnsavedPrompt) {
             // TODO: update alert message for RBAC viewer role
             const result = window.confirm("Discard changes? Changes you made will not be saved.");
 
             if (!result) {
-              trackTabActionEarlyReturn("closeTabById", `Unsaved prompt discarded.`);
               return;
             }
           }
@@ -273,7 +237,6 @@ const createTabServiceStore = () => {
             tabs: new Map(tabs),
           });
           setActiveTab(newActiveTabId);
-          trackTabClosedById(sourceId, sourceName);
         },
 
         resetPreviewTab() {
@@ -319,7 +282,6 @@ const createTabServiceStore = () => {
         getTabIdBySource(sourceId, sourceName) {
           const { tabsIndex } = get();
           if (!sourceId) {
-            trackTabActionEarlyReturn("getTabIdBySource", `For source: ${sourceName}, source Id id not found.`);
             return;
           }
 
@@ -331,7 +293,6 @@ const createTabServiceStore = () => {
           const tabId = getTabIdBySource(sourceId, sourceName);
 
           if (!tabId) {
-            trackTabActionEarlyReturn("getTabStateBySource", `For source: ${sourceName}, tab id not found.`);
             return;
           }
 
@@ -349,12 +310,8 @@ const createTabServiceStore = () => {
         }),
 
         onRehydrateStorage: (store) => {
-          trackTabsRehydrationStarted();
-
           return (store, error: Error) => {
             if (error) {
-              trackTabsRehydrationError(error?.message);
-
               Sentry.withScope((scope) => {
                 scope.setTag("error_type", "tabs_rehydration_failed");
                 scope.setContext("tab_service_store_details", {
@@ -362,8 +319,6 @@ const createTabServiceStore = () => {
                 });
                 Sentry.captureException(new Error(`Tabs rehydration failed - error:${error}`));
               });
-            } else {
-              trackTabsRehydrationCompleted();
             }
           };
         },
@@ -371,7 +326,6 @@ const createTabServiceStore = () => {
         storage: {
           setItem: (name, newValue: StorageValue<TabServiceState>) => {
             try {
-              trackTabLocalStorageSetItemCalled();
               const tabs = Array.from(newValue.state.tabs.entries()).map(([tabId, tabStore]) => [
                 tabId,
                 tabStore.getState(),
@@ -398,7 +352,6 @@ const createTabServiceStore = () => {
 
           getItem: (name) => {
             try {
-              trackTabLocalStorageGetItemCalled();
               const stateString = localStorage.getItem(name);
 
               if (!stateString) {

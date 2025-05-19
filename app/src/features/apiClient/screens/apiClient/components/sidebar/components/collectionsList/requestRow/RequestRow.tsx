@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Typography, Dropdown, MenuProps, Checkbox } from "antd";
+import { Typography, Dropdown, MenuProps, Checkbox, notification } from "antd";
 import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RequestMethod, RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
@@ -77,7 +77,11 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
         })
         .catch((error) => {
           console.error("Error duplicating request:", error);
-          toast.error(error.message || "Unexpected error. Please contact support.");
+          notification.error({
+            message: "Error duplicating request",
+            description: error?.message || "Unexpected error. Please contact support.",
+            placement: "bottomRight",
+          });
           trackDuplicateRequestFailed();
         });
     },

@@ -52,6 +52,17 @@ export const UserPlanDetails = () => {
   }, []);
 
   useEffect(() => {
+    //@ts-ignore
+    if (type === "appsumo") {
+      setHasAppSumoSubscription(true);
+      setLifeTimeSubscriptionDetails({
+        startDate: new Date(user?.details?.planDetails?.subscription?.startDate).getTime(),
+        endDate: getSubscriptionEndDateForAppsumo(new Date(user?.details?.planDetails?.subscription?.endDate)),
+        type: "appsumo",
+        plan: user?.details?.planDetails?.planId,
+      });
+    }
+
     if (activeWorkspaceId) {
       const db = getFirestore(firebaseApp);
       const teamsRef = doc(db, "teams", activeWorkspaceId);
@@ -76,7 +87,14 @@ export const UserPlanDetails = () => {
         })
         .finally(() => setIsLoading(false));
     }
-  }, [getSubscriptionEndDateForAppsumo, activeWorkspaceId]);
+  }, [
+    getSubscriptionEndDateForAppsumo,
+    activeWorkspaceId,
+    type,
+    user?.details?.planDetails?.subscription?.startDate,
+    user?.details?.planDetails?.subscription?.endDate,
+    user?.details?.planDetails?.planId,
+  ]);
 
   let trialDuration = 0;
   try {

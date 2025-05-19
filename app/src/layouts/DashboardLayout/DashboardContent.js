@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useSearchParams, Outlet } from "react-router-dom";
 import SpinnerModal from "components/misc/SpinnerModal";
 import { globalActions } from "store/slices/global/slice";
 //UTILS
-import { getAppOnboardingDetails, getRequestBot } from "store/selectors";
+import { getAppOnboardingDetails, getIsOnboardingCompleted, getRequestBot } from "store/selectors";
 import { getActiveModals } from "store/slices/global/modals/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
@@ -32,6 +32,8 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { RequestBot } from "features/requestBot";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { OnboardingModal, PersonaSurveyModal } from "features/onboarding";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -46,7 +48,9 @@ const DashboardContent = () => {
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
   const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
   const requestBotDetails = useSelector(getRequestBot);
+  const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
   const isRequestBotVisible = requestBotDetails?.isActive;
+  const isOnboardingCompleted = useSelector(getIsOnboardingCompleted);
 
   const toggleIncentiveTasksListModal = () => {
     dispatch(incentivizationActions.toggleActiveModal({ modalName: IncentivizationModal.TASKS_LIST_MODAL }));
@@ -78,22 +82,25 @@ const DashboardContent = () => {
     dispatch(globalActions.updateRequestBot({ isActive: false }));
   };
 
-  const prevProps = usePrevious({ location });
+  const previousLocation = usePrevious(location);
 
   const disableOverflow = isPricingPage();
 
+  const isFirstRenderRef = useRef(true);
   useEffect(() => {
-    if (prevProps && prevProps.location !== location) {
+    if (previousLocation && previousLocation !== location) {
       document.documentElement.scrollTop = 0;
       document.scrollingElement.scrollTop = 0;
       document.getElementById("dashboardMainContent").scrollTop = 0;
     }
 
     // ANALYTICS
-    if (!prevProps || prevProps.location !== location) {
+    if (isFirstRenderRef.current || (previousLocation && previousLocation !== location)) {
       trackPageViewEvent(getRouteFromCurrentPath(location.pathname), Object.fromEntries(searchParams));
     }
-  }, [location, prevProps, searchParams]);
+
+    isFirstRenderRef.current = false;
+  }, [location, previousLocation, searchParams]);
 
   return (
     <>
@@ -210,12 +217,22 @@ const DashboardContent = () => {
               {...activeModals.pricingModal.props}
             />
           ) : null}
+          {isBrowserstackIntegrationOn ? (
+            <>
+              {!isOnboardingCompleted ? <OnboardingModal /> : null}
+              <PersonaSurveyModal />
+              {/* <AcquisitionAnnouncementModal /> */}
+            </>
+          ) : (
+            <>
+              {onboardingVariation !== "variant1" &&
+                shouldShowOnboarding() &&
+                !appOnboardingDetails.isOnboardingCompleted && (
+                  <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
+                )}{" "}
+            </>
+          )}
 
-          {onboardingVariation !== "variant1" &&
-            shouldShowOnboarding() &&
-            !appOnboardingDetails.isOnboardingCompleted && (
-              <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
-            )}
           <RequestBillingTeamAccessReminder />
 
           <RequestBot isOpen={isRequestBotVisible} onClose={closeRequestBot} modelType={requestBotDetails?.modelType} />

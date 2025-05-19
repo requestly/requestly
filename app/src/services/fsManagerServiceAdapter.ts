@@ -146,7 +146,7 @@ class FsManagerServiceAdapterProvider {
       return service;
     } catch (e) {
       console.error("build error", e);
-      // release();
+      throw e;
     }
   }
 }
@@ -168,6 +168,7 @@ export function createWorkspaceFolder(name: string, path: string) {
     {
       namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
       method: "createWorkspaceFolder",
+      timeout: 80000,
     },
     name,
     path
