@@ -13,7 +13,7 @@ import { globalActions } from "store/slices/global/slice";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToOAuthUrl } from "utils/RedirectionUtils";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
-import { setRedirectURI } from "features/onboarding/utils";
+import { setRedirectMetadata } from "features/onboarding/utils";
 import "./authModal.scss";
 
 interface AuthModalProps {
@@ -60,7 +60,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   useLayoutEffect(() => {
     if (isWebAppSignup && isOpen) {
-      setRedirectURI(redirectURL);
+      setRedirectMetadata({ source: eventSource, redirectURL });
       redirectToOAuthUrl(navigate);
     }
   }, [isWebAppSignup, isOpen, eventSource, navigate, redirectURL]);
