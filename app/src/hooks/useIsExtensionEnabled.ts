@@ -6,7 +6,8 @@ import Logger from "lib/logger";
 import { StorageService } from "init";
 import APP_CONSTANTS from "config/constants";
 import { globalActions } from "store/slices/global/slice";
-import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
+import { isExtensionEnabled, isExtensionManifestVersion3 } from "actions/ExtensionActions";
+import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 
 export const useIsExtensionEnabled = () => {
   const dispatch = useDispatch();
@@ -16,16 +17,18 @@ export const useIsExtensionEnabled = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       Logger.log(`Reading storage in App`);
       if (isExtensionManifestVersion3()) {
-        //TODO @nafees87n: donot read for extension var instead ask background to send the value
-        StorageService(appMode)
-          .getRecord("rq_var_isExtensionEnabled")
-          .then((value) => {
-            if (value !== undefined) {
-              dispatch(globalActions.updateIsExtensionEnabled(value));
-            } else {
-              dispatch(globalActions.updateIsExtensionEnabled(true));
-            }
-          });
+        isExtensionEnabled().then((isEnabled) => {
+          dispatch(globalActions.updateIsExtensionEnabled(isEnabled));
+        });
+
+        PageScriptMessageHandler.addMessageListener("notifyExtensionStatusUpdated", (message: any) => {
+          const { isExtensionEnabled } = message;
+          if (isExtensionEnabled !== undefined) {
+            dispatch(globalActions.updateIsExtensionEnabled(isExtensionEnabled));
+          } else {
+            dispatch(globalActions.updateIsExtensionEnabled(true));
+          }
+        });
       } else {
         //TODO @nafees87n: cleanup reading settings from storage
         StorageService(appMode)

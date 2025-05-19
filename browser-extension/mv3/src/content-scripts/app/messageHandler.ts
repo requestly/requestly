@@ -127,6 +127,7 @@ export const initMessageHandler = () => {
           case EXTENSION_MESSAGES.TEST_RULE_ON_URL:
           case EXTENSION_MESSAGES.IS_PROXY_APPLIED:
           case EXTENSION_MESSAGES.DISCONNECT_FROM_DESKTOP_APP:
+          case EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED:
             delegateMessageToBackground(event.data);
         }
       }

@@ -37,7 +37,11 @@ export const removeRecord = async (key: string): Promise<void> => {
 };
 
 export const clearAllRecords = async (): Promise<void> => {
+  const allRecords = await getSuperObject();
+  const variableKeys = Object.keys(allRecords).filter((key) => key.startsWith("rq_var_"));
+  const variableRecords = Object.fromEntries(variableKeys.map((key) => [key, allRecords[key]]));
   await chrome.storage[STORAGE_TYPE].clear();
+  await saveObject(variableRecords);
 };
 
 export enum ChangeType {
