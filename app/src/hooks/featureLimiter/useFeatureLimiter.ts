@@ -41,9 +41,9 @@ export const useFeatureLimiter = () => {
   const getFeatureCurrentValue = (featureLimitType: FeatureLimitType) => {
     switch (featureLimitType) {
       case FeatureLimitType.num_rules:
-        return userAttributes?.num_rules;
+        return userAttributes?.num_rules_excluding_free_rules;
       case FeatureLimitType.num_active_rules:
-        return userAttributes?.num_active_rules;
+        return userAttributes?.num_active_rules_excluding_free_rules;
       case FeatureLimitType.free:
         return 0;
     }
