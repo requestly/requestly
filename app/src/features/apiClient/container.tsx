@@ -21,7 +21,15 @@ const ApiClientFeatureContainer: React.FC = () => {
 
   const handleSignUp = useCallback(() => {
     trackLoginButtonClicked(SOURCE.API_CLIENT_EMPTY_STATE);
-    dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+    dispatch(
+      globalActions.toggleActiveModal({
+        modalName: "authModal",
+        newValue: true,
+        newProps: {
+          eventSource: SOURCE.API_CLIENT_EMPTY_STATE,
+        },
+      })
+    );
   }, [dispatch]);
 
   const handleReadAnnouncementClick = useCallback(() => {
