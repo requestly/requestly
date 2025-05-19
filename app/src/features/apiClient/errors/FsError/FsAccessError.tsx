@@ -1,16 +1,18 @@
 import { FsAccessTroubleshoot } from "features/apiClient/components/ErrorBoundary/components/FsAccessTroubleshoot/FsAccessTroubleshoot";
-import { ErrorCode, ErrorMetaData } from "../types";
+import { ErrorCode } from "../types";
 import { RenderableError } from "features/apiClient/components/ErrorBoundary/RenderableError";
 
 export class FsAccessError extends RenderableError {
-  constructor(message: string, meta?: ErrorMetaData) {
+  constructor(message: string, readonly path: string) {
     super(message);
     this.errorCode = ErrorCode.PERMISSION_DENIED;
-    this.addContext(meta);
+    this.addContext({
+      path
+    });
   }
 
-  static from(message: string, meta?: ErrorMetaData) {
-    return new FsAccessError(message, meta);
+  static from(message: string, path: string) {
+    return new FsAccessError(message, path);
   }
 
   render() {
@@ -18,6 +20,6 @@ export class FsAccessError extends RenderableError {
   }
 
   getErrorHeading() {
-    return "Permission denied: Unable to access the file";
+    return "Permission denied";
   }
 }
