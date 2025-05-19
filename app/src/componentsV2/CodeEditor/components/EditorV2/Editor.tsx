@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CodeMirror, { EditorView, ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { Prec } from "@codemirror/state";
 import { keymap } from "@codemirror/view";
@@ -37,7 +37,7 @@ interface EditorProps {
   scriptId?: string;
   toolbarOptions?: EditorCustomToolbar;
   hideCharacterCount?: boolean;
-  handleChange?: (value: string) => void;
+  handleChange?: (value: string, triggerUnsavedChanges?: boolean) => void;
   prettifyOnInit?: boolean;
   envVariables?: EnvironmentVariables;
   analyticEventProperties?: AnalyticEventProperties;
@@ -47,7 +47,6 @@ interface EditorProps {
   isFullScreen?: boolean;
   hideToolbar?: boolean;
   onFullScreenChange?: () => void;
-  effectTriggered?: MutableRefObject<boolean>;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -66,7 +65,6 @@ const Editor: React.FC<EditorProps> = ({
   isFullScreen = false,
   onFullScreenChange = () => {},
   hideToolbar = false,
-  effectTriggered,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -80,6 +78,7 @@ const Editor: React.FC<EditorProps> = ({
   const toastOverlay = useMemo(() => allEditorToast[scriptId], [allEditorToast, scriptId]); // todo: rename
   const [isCodePrettified, setIsCodePrettified] = useState(false);
   const isDefaultPrettificationDone = useRef(false);
+  const isUnsaveChange = useRef(true);
 
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
@@ -153,12 +152,12 @@ const Editor: React.FC<EditorProps> = ({
       if (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT) {
         const prettified = await prettifyCode(value, language);
         setIsCodePrettified(true);
-        // no unsave changes as prettification on mount is there
-        effectTriggered.current = true;
         updateContent(prettified.code);
+        //do not mark as unsaved change
+        isUnsaveChange.current = false;
       }
     }
-  }, [showOptions?.enablePrettify, language, value, effectTriggered, updateContent]);
+  }, [showOptions?.enablePrettify, language, value, updateContent]);
 
   useEffect(() => {
     if (isEditorInitialized) {
@@ -167,19 +166,12 @@ const Editor: React.FC<EditorProps> = ({
           await applyPrettification();
           isDefaultPrettificationDone.current = true;
         } else {
-          // unsave changes to be shown since typing in editor
-          effectTriggered.current = false;
+          // Typing in editor, no prettification, mark as unsaved change
+          isUnsaveChange.current = true;
         }
       })();
     }
-  }, [
-    isEditorInitialized,
-    isDefaultPrettificationDone,
-    applyPrettification,
-    prettifyOnInit,
-    isFullScreen,
-    effectTriggered,
-  ]);
+  }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit, isFullScreen]);
 
   // Reinitializing the fullscreen editor
   useEffect(() => {
@@ -194,7 +186,9 @@ const Editor: React.FC<EditorProps> = ({
     [dispatch]
   );
 
-  const debouncedhandleEditorBodyChange = useDebounce(handleChange, 200);
+  const debouncedhandleEditorBodyChange = useDebounce((value: string) => {
+    handleChange(value, isUnsaveChange.current);
+  }, 200);
 
   const customKeyBinding = useMemo(
     () =>
