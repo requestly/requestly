@@ -16,7 +16,6 @@ import {
 import { variablesActions } from "store/features/variables/slice";
 import { mergeLocalAndSyncVariables, renderTemplate } from "../utils";
 import Logger from "lib/logger";
-import { toast } from "utils/Toast";
 import { isEmpty } from "lodash";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -26,6 +25,7 @@ import { useGetApiClientSyncRepo } from "features/apiClient/helpers/modules/sync
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { notification } from "antd";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -97,7 +97,11 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
           };
         })
         .catch((err) => {
-          toast.error("Error while creating a new environment");
+          notification.error({
+            message: "Error while creating a new environment",
+            description: err?.message,
+            placement: "bottomRight",
+          });
           console.error("Error while setting environment in db", err);
         });
     },
@@ -301,7 +305,11 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
           })
         );
       } catch (err) {
-        toast.error("Error while setting environment variables.");
+        notification.error({
+          message: "Error while setting environment variables.",
+          description: err?.message,
+          placement: "bottomRight",
+        });
         Logger.error("Error while setting environment variables in db", err);
       }
     },
@@ -361,16 +369,16 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   );
 
   const renderVariables = useCallback(
-    (
-      template: RQAPI.Request,
+    <T extends string | Record<string, any>>(
+      template: T,
       requestCollectionId: string = ""
     ): {
       renderedVariables?: Record<string, unknown>;
-      renderedRequest: RQAPI.Request;
+      renderedEntryDetails: T;
     } => {
       const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
       const { renderedTemplate, renderedVariables } = renderTemplate(template, variablesWithPrecedence);
-      return { renderedVariables, renderedRequest: renderedTemplate as RQAPI.Request };
+      return { renderedVariables, renderedEntryDetails: renderedTemplate };
     },
     [getVariablesWithPrecedence]
   );
@@ -420,7 +428,11 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
         await syncRepository.environmentVariablesRepository.updateEnvironment(environmentId, { name: newName });
         dispatch(variablesActions.updateEnvironmentName({ environmentId, newName, ownerId }));
       } catch (err) {
-        toast.error("Error while renaming environment");
+        notification.error({
+          message: "Error while renaming environment",
+          description: err?.message,
+          placement: "bottomRight",
+        });
         console.error("Error while renaming environment", err);
       }
     },
@@ -451,7 +463,11 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
         await syncRepository.environmentVariablesRepository.deleteEnvironment(environmentId);
         dispatch(variablesActions.removeEnvironment({ environmentId, ownerId }));
       } catch (err) {
-        toast.error("Error while deleting environment");
+        notification.error({
+          message: "Error while deleting environment",
+          description: err?.message,
+          placement: "bottomRight",
+        });
         console.error("Error while deleting environment", err);
       }
     },
@@ -487,7 +503,10 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
           dispatch(variablesActions.updateCollectionVariables({ collectionId, variables }));
         })
         .catch(() => {
-          toast.error("error while updating collection variables");
+          notification.error({
+            message: "Error while updating collection variables",
+            placement: "bottomRight",
+          });
         });
     },
     [onSaveRecord, dispatch, syncRepository.apiClientRecordsRepository, apiClientRecords]

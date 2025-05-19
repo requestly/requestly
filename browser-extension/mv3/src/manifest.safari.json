@@ -5,7 +5,7 @@
   "manifest_version": 3,
   "content_scripts": [
     {
-      "matches": ["*://*.requestly.in/*", "*://*.requestly.io/*"],
+      "matches": ["*://*.requestly.in/*", "*://*.requestly.io/*", "*://requestly.com/*"],
       "js": ["app.cs.js"],
       "run_at": "document_start"
     },

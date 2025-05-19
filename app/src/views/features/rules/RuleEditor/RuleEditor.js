@@ -85,7 +85,7 @@ const RuleEditor = (props) => {
 
   useEffect(() => {
     if (isNewRuleCreated) {
-      toggleBottomSheet();
+      toggleBottomSheet({ isOpen: false, isTrack: false, action: "new_rule_created" });
       setIsNewRuleCreated(false);
     }
   }, [toggleBottomSheet, isNewRuleCreated]);
@@ -96,7 +96,7 @@ const RuleEditor = (props) => {
       state?.source !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE &&
       !isNewRuleCreated
     ) {
-      if (isBottomSheetOpen) toggleBottomSheet(false);
+      if (isBottomSheetOpen) toggleBottomSheet({ isOpen: false, isTrack: false, action: "new_rule_created" });
     }
   }, [toggleBottomSheet, MODE, state, isNewRuleCreated, isBottomSheetOpen]);
 

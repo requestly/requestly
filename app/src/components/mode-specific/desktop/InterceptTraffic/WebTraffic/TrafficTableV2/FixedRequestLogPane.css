@@ -11,7 +11,18 @@
   z-index: 1;
   background-color: var(--body-background);
 }
-
+.request-log-pane-header .request-method {
+  font-size: 10px;
+  font-weight: var(--requestly-font-weight-semibold);
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: flex;
+  width: 38px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 2px;
+}
 .request-log-pane {
   font-size: var(--requestly-font-size-sm, 13px);
   background-color: transparent;

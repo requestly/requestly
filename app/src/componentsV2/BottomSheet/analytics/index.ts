@@ -1,8 +1,8 @@
 import { BOTTOM_SHEET } from "./constants";
 import { trackEvent } from "modules/analytics";
 
-export const trackBottomSheetToggled = (isOpen: boolean) => {
-  trackEvent(BOTTOM_SHEET.BOTTOM_SHEET_TOGGLED, { isOpen });
+export const trackBottomSheetToggled = (isOpen: boolean, action: string) => {
+  trackEvent(BOTTOM_SHEET.BOTTOM_SHEET_TOGGLED, { isOpen, action });
 };
 
 export const trackViewBottomSheetOnRightClicked = () => {
