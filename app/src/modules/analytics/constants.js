@@ -16,4 +16,5 @@ export const AUTH_PROVIDERS = {
   MICROSOFT: "microsoft",
   EMAIL_LINK: "email_link",
   SSO: "sso",
+  BROWSERSTACK: "browserstack",
 };

@@ -16,6 +16,7 @@ import { globalActions } from "store/slices/global/slice";
 import { trackSignUpFailedEvent, trackSignupSuccessEvent } from "modules/analytics/events/common/auth/signup";
 import { trackLoginSuccessEvent } from "modules/analytics/events/common/auth/login";
 import * as Sentry from "@sentry/react";
+import { AUTH_PROVIDERS } from "modules/analytics/constants";
 
 const ARGUMENTS = {
   REDIRECT_URL: "redirectURL",
@@ -91,7 +92,7 @@ const LoginHandler: React.FC = () => {
 
     if (!isNewUser) {
       // @ts-ignore
-      trackLoginSuccessEvent({ auth_provider: "browserstack" });
+      trackLoginSuccessEvent({ auth_provider: AUTH_PROVIDERS.BROWSERSTACK });
     }
 
     const redirectURLFromParam = params.get(ARGUMENTS.REDIRECT_URL);
@@ -140,7 +141,11 @@ const LoginHandler: React.FC = () => {
         setLoginComplete(true);
         if (isNewUser) {
           // @ts-ignore
-          trackSignupSuccessEvent({ email: result.user.email, domain: result.user.email.split("@")[1] });
+          trackSignupSuccessEvent({
+            email: result.user.email,
+            domain: result.user.email.split("@")[1],
+            auth_provider: AUTH_PROVIDERS.BROWSERSTACK,
+          });
         }
         /* Auth flow was triggered from web app,
         "auth_mode" param check is added to make sure persona modal is triggered only for web app
@@ -152,7 +157,7 @@ const LoginHandler: React.FC = () => {
       .catch((error) => {
         Logger.error("Error signing in with custom token:", error);
         // @ts-ignore
-        trackSignUpFailedEvent({ error: error?.message });
+        trackSignUpFailedEvent({ error: error?.message, auth_provider: AUTH_PROVIDERS.BROWSERSTACK });
         // for now redirecting even when facing errors
         // todo: setup error monitoring
         setLoginComplete(true);
