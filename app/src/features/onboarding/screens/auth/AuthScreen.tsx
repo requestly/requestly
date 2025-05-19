@@ -32,7 +32,7 @@ import {
   trackLoginSuccessEvent,
   trackLoginUserSwitchedEmail,
 } from "modules/analytics/events/common/auth/login";
-import { setRedirectURI } from "features/onboarding/utils";
+import { setRedirectMetadata } from "features/onboarding/utils";
 import "./authScreen.scss";
 
 export const AuthScreen = () => {
@@ -116,7 +116,7 @@ export const AuthScreen = () => {
       setAuthProviders(metadata.providers);
       if (metadata.isSyncedUser) {
         trackBstackLoginInitiated();
-        setRedirectURI(redirectURL);
+        setRedirectMetadata({ source: eventSource, redirectURL });
         redirectToOAuthUrl(navigate);
       } else if (!metadata.isExistingUser) {
         trackLoginUserNotFound(email);
@@ -129,7 +129,7 @@ export const AuthScreen = () => {
         }
       }
     },
-    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn, email, redirectURL]
+    [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn, email, redirectURL, eventSource]
   );
 
   const authModeToggleText = (
@@ -142,7 +142,7 @@ export const AuthScreen = () => {
             size="small"
             onClick={() => {
               trackSignUpButtonClicked(eventSource);
-              setRedirectURI(redirectURL);
+              setRedirectMetadata({ source: eventSource, redirectURL });
               redirectToOAuthUrl(navigate);
             }}
           >

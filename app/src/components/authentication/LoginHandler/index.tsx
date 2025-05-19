@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToHome } from "utils/RedirectionUtils";
-import STORAGE from "config/constants/sub/storage";
 import PATHS from "config/constants/sub/paths";
 import { getDesktopAppAuthParams } from "../utils";
 import { globalActions } from "store/slices/global/slice";
@@ -17,6 +16,7 @@ import { trackSignUpFailedEvent, trackSignupSuccessEvent } from "modules/analyti
 import { trackLoginSuccessEvent } from "modules/analytics/events/common/auth/login";
 import * as Sentry from "@sentry/react";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
+import { clearRedirectMetadata, getRedirectMetadata } from "features/onboarding/utils";
 
 const ARGUMENTS = {
   REDIRECT_URL: "redirectURL",
@@ -84,24 +84,24 @@ const LoginHandler: React.FC = () => {
 
   const postLoginActions = useCallback(() => {
     const desktopAuthParams = getDesktopAppAuthParams();
-
     if (desktopAuthParams) {
       postLoginDesktopAppRedirect();
       return;
     }
 
+    const redirectMetadata = getRedirectMetadata();
     if (!isNewUser) {
       // @ts-ignore
-      trackLoginSuccessEvent({ auth_provider: AUTH_PROVIDERS.BROWSERSTACK });
+      trackLoginSuccessEvent({ auth_provider: AUTH_PROVIDERS.BROWSERSTACK, source: redirectMetadata?.source });
     }
 
     const redirectURLFromParam = params.get(ARGUMENTS.REDIRECT_URL);
-    const redirectURLFromLocalStorage = window.localStorage.getItem(
-      STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY
-    );
+
+    const redirectURLFromLocalStorage = redirectMetadata?.redirectURL;
     if (redirectURLFromLocalStorage) {
-      window.localStorage.removeItem(STORAGE.LOCAL_STORAGE.AUTH_TRIGGER_SOURCE_LOCAL_KEY);
+      clearRedirectMetadata();
     }
+
     redirect(redirectURLFromParam ?? redirectURLFromLocalStorage);
   }, [redirect, params, postLoginDesktopAppRedirect, isNewUser]);
 
@@ -134,6 +134,7 @@ const LoginHandler: React.FC = () => {
       }
     }
 
+    const redirectMetadata = getRedirectMetadata();
     const auth = getAuth(firebaseApp);
     signInWithCustomToken(auth, accessToken)
       .then((result) => {
@@ -145,6 +146,7 @@ const LoginHandler: React.FC = () => {
             email: result.user.email,
             domain: result.user.email.split("@")[1],
             auth_provider: AUTH_PROVIDERS.BROWSERSTACK,
+            source: redirectMetadata?.source,
           });
         }
         /* Auth flow was triggered from web app,
@@ -157,7 +159,11 @@ const LoginHandler: React.FC = () => {
       .catch((error) => {
         Logger.error("Error signing in with custom token:", error);
         // @ts-ignore
-        trackSignUpFailedEvent({ error: error?.message, auth_provider: AUTH_PROVIDERS.BROWSERSTACK });
+        trackSignUpFailedEvent({
+          error: error?.message,
+          auth_provider: AUTH_PROVIDERS.BROWSERSTACK,
+          source: redirectMetadata?.source,
+        });
         // for now redirecting even when facing errors
         // todo: setup error monitoring
         setLoginComplete(true);
