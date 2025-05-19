@@ -202,6 +202,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     } catch (err) {
       console.log("env fetch error", err);
       Logger.log("fetch all env details error", err);
+      throw err;
     } finally {
       setIsLoading(false);
     }
