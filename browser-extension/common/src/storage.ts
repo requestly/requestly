@@ -42,7 +42,7 @@ export const clearAllRecords = async (): Promise<void> => {
 };
 
 export const clearAllRecordsExceptVariables = async (): Promise<void> => {
-  const VARIABLE_KEYS = Object.values(Variable);
+  const VARIABLE_KEYS = Object.values(Variable).map((variable) => `rq_var_${variable}`);
 
   const variableValues = await getRecords(VARIABLE_KEYS);
   const variableRecords: StoreObject = {};
