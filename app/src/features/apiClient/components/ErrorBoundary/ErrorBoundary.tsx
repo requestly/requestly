@@ -3,6 +3,7 @@ import { RenderableError } from "./RenderableError";
 import { RQButton } from "lib/design-system-v2/components";
 import * as Sentry from "@sentry/react";
 import "./errorboundary.scss";
+import { NativeError } from "features/apiClient/errors/NativeError";
 
 interface Props {
   children: React.ReactNode;
@@ -11,6 +12,16 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
+}
+
+function sendErrorToSentry(error: any) {
+  Sentry.withScope((scope) => {
+    scope.setTag("caught_by", "api_client_error_boundary");
+    if (error instanceof NativeError) {
+      scope.setExtra("details", error.details);
+    }
+    Sentry.captureException(error);
+  });
 }
 
 export class ApiClientErrorBoundary extends React.Component<Props, State> {
@@ -28,18 +39,12 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: unknown) {
-    Sentry.withScope((scope) => {
-      scope.setTag("errorType", "api_client_error_boundary");
-      Sentry.captureException(error);
-    });
+    sendErrorToSentry(error);
   }
 
   private promiseRejectionHandler = (event: PromiseRejectionEvent) => {
     this.setState({ hasError: true, error: event.reason });
-    Sentry.withScope((scope) => {
-      scope.setTag("errorType", "api_client_error_boundary");
-      Sentry.captureException(event.reason);
-    });
+    sendErrorToSentry(event.reason);
   };
 
   static getDerivedStateFromError(error: Error): State {
