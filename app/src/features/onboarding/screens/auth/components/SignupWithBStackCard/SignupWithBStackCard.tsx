@@ -8,7 +8,7 @@ import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/a
 import "./signupWithBStackCard.scss";
 import { AuthScreenMode } from "../../types";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
-import { setRedirectURI } from "features/onboarding/utils";
+import { setRedirectMetadata } from "features/onboarding/utils";
 
 interface SignupWithBStackCardProps {
   onBackButtonClick: () => void;
@@ -23,9 +23,9 @@ export const SignupWithBStackCard = ({ onBackButtonClick }: SignupWithBStackCard
   const handleCreateBStackAccount = useCallback(() => {
     trackSignUpButtonClicked(`no_account_found`);
     setIsLoading(true);
-    setRedirectURI(redirectURL);
+    setRedirectMetadata({ source: eventSource, redirectURL });
     redirectToOAuthUrl(navigate);
-  }, [navigate, redirectURL]);
+  }, [navigate, eventSource, redirectURL]);
 
   useEffect(() => {
     if (authScreenMode === AuthScreenMode.MODAL) {
