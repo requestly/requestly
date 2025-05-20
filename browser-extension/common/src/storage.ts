@@ -1,4 +1,5 @@
 import { STORAGE_TYPE } from "./constants";
+import { Variable } from "./types";
 
 type StoreObject = { [key: string]: any };
 
@@ -40,11 +41,9 @@ export const clearAllRecords = async (): Promise<void> => {
   await chrome.storage[STORAGE_TYPE].clear();
 };
 
-// Variable keys used by the extension
-const VARIABLE_KEYS = ["rq_var_isExtensionEnabled", "rq_var_extensionRulesCount", "rq_var_testScript"];
-
 export const clearAllRecordsExceptVariables = async (): Promise<void> => {
-  // Get only variable records using getRecords
+  const VARIABLE_KEYS = Object.values(Variable);
+
   const variableValues = await getRecords(VARIABLE_KEYS);
   const variableRecords: StoreObject = {};
   VARIABLE_KEYS.forEach((key, idx) => {
@@ -52,9 +51,8 @@ export const clearAllRecordsExceptVariables = async (): Promise<void> => {
       variableRecords[key] = variableValues[idx];
     }
   });
-  // Clear all records
+
   await chrome.storage[STORAGE_TYPE].clear();
-  // Restore variable records
   await saveObject(variableRecords);
 };
 
