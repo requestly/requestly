@@ -23,6 +23,8 @@ export enum RequestContentType {
   JSON = "application/json",
   FORM = "application/x-www-form-urlencoded",
   HTML = "text/html",
+  XML = "application/xml",
+  JAVASCRIPT = "application/javascript",
 }
 
 export interface KeyValuePair {

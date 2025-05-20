@@ -162,6 +162,22 @@ const getContentTypeForRawBody = (bodyType: string) => {
   }
 };
 
+const addImplicitContentTypeHeader = (headers: KeyValuePair[], contentType: RequestContentType): KeyValuePair[] => {
+  const isContentTypeHeaderSet = headers.find((header: KeyValuePair) => header.key === "Content-Type");
+  if (!isContentTypeHeaderSet) {
+    return [
+      ...headers,
+      {
+        id: headers.length,
+        key: "Content-Type",
+        value: contentType,
+        isEnabled: true,
+      },
+    ];
+  }
+  return headers;
+};
+
 const createApiRecord = (
   item: any,
   parentCollectionId: string,
@@ -178,7 +194,7 @@ const createApiRecord = (
       isEnabled: true,
     })) ?? [];
 
-  const headers =
+  let headers =
     request.header?.map((header: any, index: number) => ({
       id: index,
       key: header.key,
@@ -189,50 +205,43 @@ const createApiRecord = (
   let contentType: RequestContentType | null = null;
   let requestBody: string | KeyValuePair[] | null = null;
 
-  const handleAddImplicitContentTypeHeader = (contentType: RequestContentType) => {
-    const isContentTypeHeaderSet = headers.find((header: KeyValuePair) => header.key === "Content-Type");
-    if (!isContentTypeHeaderSet) {
-      headers.push({
-        id: headers.length,
-        key: "Content-Type",
-        value: contentType,
-        isEnabled: true,
-      });
-    }
-  };
+  if (request.body) {
+    const { mode, raw, formdata, options, urlencoded } = request.body;
 
-  const { mode, raw, formdata, options, urlencoded } = request.body || {};
-
-  if (mode === "raw") {
-    requestBody = raw;
-    contentType = getContentTypeForRawBody(options?.raw.language);
-    if (raw.length) {
-      handleAddImplicitContentTypeHeader(contentType);
-    }
-  } else if (mode === "formdata") {
-    contentType = RequestContentType.FORM;
-    /* 
-    TODO: handle formdata content-type addition
-    Postman calculates this header when request is made
-    */
-    requestBody =
-      formdata?.map((formData: { key: string; value: string }) => ({
-        id: Date.now(),
-        key: formData.key,
-        value: formData.value,
+    if (mode === "raw") {
+      requestBody = raw;
+      contentType = getContentTypeForRawBody(options?.raw.language);
+      if (raw.length) {
+        headers = addImplicitContentTypeHeader(headers, contentType);
+      }
+    } else if (mode === "formdata") {
+      contentType = RequestContentType.FORM;
+      /* 
+      TODO: handle formdata content-type addition
+      Postman calculates this header when request is made
+      */
+      requestBody =
+        formdata?.map((formData: { key: string; value: string }) => ({
+          id: Date.now(),
+          key: formData.key,
+          value: formData.value,
+          isEnabled: true,
+        })) || [];
+    } else if (mode === "urlencoded") {
+      contentType = RequestContentType.FORM;
+      if (urlencoded.length) {
+        headers = addImplicitContentTypeHeader(headers, contentType);
+      }
+      requestBody = urlencoded.map((data: { key: string; value: string }) => ({
+        id: Date.now() + Math.random(),
+        key: data?.key || "",
+        value: data?.value || "",
         isEnabled: true,
-      })) || [];
-  } else if (mode === "urlencoded") {
-    contentType = RequestContentType.FORM;
-    if (urlencoded.length) {
-      handleAddImplicitContentTypeHeader(contentType);
+      }));
     }
-    requestBody = urlencoded.map((data: { key: string; value: string }) => ({
-      id: Date.now() + Math.random(),
-      key: data?.key || "",
-      value: data?.value || "",
-      isEnabled: true,
-    }));
+  } else {
+    requestBody = null;
+    contentType = RequestContentType.RAW;
   }
 
   return {
