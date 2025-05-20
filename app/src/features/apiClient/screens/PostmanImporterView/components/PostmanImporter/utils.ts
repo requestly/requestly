@@ -206,7 +206,9 @@ const createApiRecord = (
   if (mode === "raw") {
     requestBody = raw;
     contentType = getContentTypeForRawBody(options?.raw.language);
-    handleAddImplicitContentTypeHeader(contentType);
+    if (raw.length) {
+      handleAddImplicitContentTypeHeader(contentType);
+    }
   } else if (mode === "formdata") {
     contentType = RequestContentType.FORM;
     requestBody =
@@ -218,7 +220,9 @@ const createApiRecord = (
       })) || [];
   } else if (mode === "urlencoded") {
     contentType = RequestContentType.FORM;
-    handleAddImplicitContentTypeHeader(contentType);
+    if (urlencoded.length) {
+      handleAddImplicitContentTypeHeader(contentType);
+    }
     requestBody = urlencoded.map((data: { key: string; value: string }) => ({
       id: Date.now() + Math.random(),
       key: data?.key || "",
