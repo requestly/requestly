@@ -16,7 +16,22 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS:
-        updateExtensionStatus(message.newStatus).then(sendResponse);
+        updateExtensionStatus(message.newStatus)
+          .then((updatedStatus) => {
+            sendResponse({
+              success: true,
+              updatedStatus,
+            });
+          })
+          .catch((e) => {
+            sendResponse({
+              success: false,
+            });
+            console.log(
+              "[messageHandler.handleToggleExtensionStatus] Error occurred while updating extension status.",
+              e.message
+            );
+          });
         return true;
 
       case EXTENSION_MESSAGES.IS_EXTENSION_BLOCKED_ON_TAB: {

@@ -46,19 +46,22 @@ const Popup: React.FC = () => {
   }, [currentTab]);
 
   const handleToggleExtensionStatus = useCallback((newStatus: boolean) => {
-    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS, newStatus }, (updatedStatus) => {
-      if (updatedStatus === undefined) {
-        message.error("Cannot update extension status. Please contact support.", 0.75);
-        console.log(
-          "[handleToggleExtensionStatus] updatedStatus is undefined. Cannot update extension status. Returning..."
-        );
-        return;
+    chrome.runtime.sendMessage(
+      { action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS, newStatus },
+      ({ success, updatedStatus }) => {
+        if (!success) {
+          message.error("Cannot update extension status. Please contact support.", 0.75);
+          console.log(
+            "[handleToggleExtensionStatus] updatedStatus is undefined. Cannot update extension status. Returning..."
+          );
+          return;
+        }
+        setIsExtensionEnabled(updatedStatus);
+        sendEvent(EVENT.EXTENSION_STATUS_TOGGLED, {
+          isEnabled: updatedStatus,
+        });
       }
-      setIsExtensionEnabled(updatedStatus);
-      sendEvent(EVENT.EXTENSION_STATUS_TOGGLED, {
-        isEnabled: updatedStatus,
-      });
-    });
+    );
   }, []);
 
   return (
