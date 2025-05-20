@@ -35,6 +35,7 @@
   background-color: var(--requestly-color-background);
 
   .api-client-header-container {
+    position: sticky;
     border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
     &__header {
@@ -63,6 +64,7 @@
 
   .api-client-body {
     padding-top: 8px;
+    position: sticky;
     overflow: hidden;
 
     .ant-tabs {
