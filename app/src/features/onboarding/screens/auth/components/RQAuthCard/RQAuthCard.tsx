@@ -79,8 +79,6 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
             Sign in with SSO
           </RQButton>
         );
-      default:
-        return null;
     }
   };
 
