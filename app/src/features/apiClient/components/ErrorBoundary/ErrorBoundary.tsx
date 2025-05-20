@@ -1,9 +1,9 @@
 import React from "react";
-import { RenderableError } from "./RenderableError";
+import { RenderableError } from "../../../../errors/RenderableError";
 import { RQButton } from "lib/design-system-v2/components";
 import * as Sentry from "@sentry/react";
 import "./errorboundary.scss";
-import { NativeError } from "features/apiClient/errors/NativeError";
+import { NativeError } from "errors/NativeError";
 
 interface Props {
   children: React.ReactNode;

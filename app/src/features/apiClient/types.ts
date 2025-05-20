@@ -7,7 +7,6 @@ import {
   BearerTokenAuthorizationConfig,
 } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 import { ErroredRecord } from "./helpers/modules/sync/local/services/types";
-import { ErrorMetaData } from "./errors/types";
 
 export enum RequestMethod {
   GET = "GET",
@@ -144,7 +143,6 @@ export namespace RQAPI {
     source: string;
     name: Error["name"];
     message: Error["message"];
-    meta?: ErrorMetaData;
   };
 
   export type ExecutionWarning = {
