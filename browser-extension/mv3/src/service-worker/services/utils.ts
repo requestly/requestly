@@ -203,7 +203,6 @@ export const sendMessageToApp = async (messageObject: unknown) => {
 };
 
 export const updateActivationStatus = (isExtensionEnabled: boolean) => {
-  console.log("!!!debug", "activation");
   chrome.contextMenus.update(MenuItem.TOGGLE_ACTIVATION_STATUS, {
     title: isExtensionEnabled ? ToggleActivationStatusLabel.DEACTIVATE : ToggleActivationStatusLabel.ACTIVATE,
   });

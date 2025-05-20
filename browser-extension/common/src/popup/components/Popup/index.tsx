@@ -32,7 +32,7 @@ const Popup: React.FC = () => {
       });
     });
 
-    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED }, setIsExtensionEnabled); // false -> I toggled it to be true -> successfully toggled and enabled ->
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED }, setIsExtensionEnabled);
   }, []);
 
   useEffect(() => {

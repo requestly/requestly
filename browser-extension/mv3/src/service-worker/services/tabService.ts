@@ -16,7 +16,6 @@ class TabService {
   private map: Record<number, TabData> = {};
 
   constructor() {
-    console.log("!!!debug", "tabservice constructor called");
     this.initTabs();
     this.addEventListeners();
   }
@@ -89,8 +88,6 @@ class TabService {
 
   addOrUpdateTab(tab: TabData) {
     // A special ID value given to tabs that are not browser tabs (for example, apps and devtools windows)
-    // What are the cases where this is not a browser tab?
-    // What are the cases when tab id is null
     if (tab.id !== chrome.tabs.TAB_ID_NONE) {
       this.map[tab.id] = { ...this.map[tab.id], ...tab };
     }

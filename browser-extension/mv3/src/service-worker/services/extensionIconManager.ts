@@ -87,7 +87,6 @@ class ExtensionIconManager {
 
   #updateIconStateForAllTabs() {
     const tabsMap = tabService.getTabs();
-    console.log("!!!debug", "[updateIconStateForAllTabs] tabsMap", tabsMap);
     Object.values(tabsMap).forEach((tab) => this.#updateIconState(tab.id));
   }
 
@@ -107,11 +106,9 @@ class ExtensionIconManager {
   };
 
   markExtensionDisabled = () => {
-    console.log("!!!debug", "disabled call");
     this.#isExtensionDisabled = true;
-    this.#setExtensionIcon(this.#icons.DISABLED); // this does not work & somehow if state for all tabs does not work correctly then icon inconsistency will be present
+    this.#setExtensionIcon(this.#icons.DISABLED);
     this.#updateIconStateForAllTabs();
-    console.log("!!!debug", "icon state", this);
   };
 
   markRuleExecuted(tabId: number) {
