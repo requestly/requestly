@@ -20,7 +20,7 @@ function sendErrorToSentry(error: any) {
     if (error instanceof NativeError) {
       scope.setExtra("details", error.details);
     }
-    Sentry.captureException(error);
+    Sentry.captureException(new Error(`This is new! ${error.message}`));
   });
 }
 
