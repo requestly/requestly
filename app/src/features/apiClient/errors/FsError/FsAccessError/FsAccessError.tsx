@@ -1,6 +1,6 @@
 import { FsAccessTroubleshoot } from "features/apiClient/errors/FsError/FsAccessError/components/FsAccessTroubleshoot/FsAccessTroubleshoot";
-import { ErrorCode } from "../../types";
-import { RenderableError } from "features/apiClient/components/ErrorBoundary/RenderableError";
+import { ErrorCode } from "../../../../../errors/types";
+import { RenderableError } from "errors/RenderableError";
 
 export class FsAccessError extends RenderableError {
   constructor(message: string, readonly path: string) {
