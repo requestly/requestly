@@ -211,6 +211,10 @@ const createApiRecord = (
     }
   } else if (mode === "formdata") {
     contentType = RequestContentType.FORM;
+    /* 
+    TODO: handle formdata content-type addition
+    Postman calculates this header when request is made
+    */
     requestBody =
       formdata?.map((formData: { key: string; value: string }) => ({
         id: Date.now(),
