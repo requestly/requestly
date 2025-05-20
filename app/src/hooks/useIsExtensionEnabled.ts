@@ -56,5 +56,9 @@ export const useIsExtensionEnabled = () => {
           });
       }
     }
+
+    return () => {
+      PageScriptMessageHandler.removeMessageListener("notifyExtensionStatusUpdated");
+    };
   }, [appMode, dispatch]);
 };
