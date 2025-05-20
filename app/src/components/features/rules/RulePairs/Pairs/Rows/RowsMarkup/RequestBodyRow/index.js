@@ -10,7 +10,6 @@ import Editor from "componentsV2/CodeEditor";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
-  const codeFormattedFlag = useRef(null);
 
   /*
   useRef is not the idle way to handle this, useState should be used to control the behaviour of updating the value in
@@ -42,11 +41,6 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
   );
 
   const getEditorDefaultValue = useCallback(() => {
-    codeFormattedFlag.current = true;
-    setTimeout(() => {
-      codeFormattedFlag.current = false;
-    }, 2000);
-
     if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
       return "{}";
     }
@@ -58,7 +52,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,
-        triggerUnsavedChangesIndication: triggerUnsavedChanges ? !codeFormattedFlag.current : codeFormattedFlag.current,
+        triggerUnsavedChangesIndication: triggerUnsavedChanges,
         updates: {
           "request.type": pair.request.type,
           "request.value": requestBodyValues.current[pair.request.type],
