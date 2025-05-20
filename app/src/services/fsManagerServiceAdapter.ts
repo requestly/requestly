@@ -11,7 +11,7 @@ import {
 import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackgroundService";
 import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
-import { FsAccessError } from "features/apiClient/errors/FsError/FsAccessError";
+import { FsAccessError } from "features/apiClient/errors/FsError/FsAccessError/FsAccessError";
 import { ErrorCode } from "features/apiClient/errors/types";
 
 const LOCAL_SYNC_BUILDER_NAMESPACE = "local_sync_builder";
@@ -195,7 +195,7 @@ class FsManagerServiceAdapterProvider {
     } catch (e) {
       const isAccessIssue = (arg: any) => typeof arg === "string" && arg.includes("EACCES:");
       console.error("build error", e);
-      if(isAccessIssue(e) || isAccessIssue(e.message)) {
+      if (isAccessIssue(e) || isAccessIssue(e.message)) {
         throw new FsAccessError(e.message || e, rootPath);
       }
       throw e;
