@@ -2,7 +2,6 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
-import Logger from "lib/logger";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
   trackNewEnvironmentClicked,
@@ -195,17 +194,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setErrorFiles(result.data.erroredRecords);
           updateCollectionVariablesOnInit(result.data.records);
         }
-      })
-      .catch((error) => {
-        notification.error({
-          message: "Could not fetch records!",
-          description: typeof error ==="string" ? error : error.message,
-          placement: "bottomRight",
-        });
-        setApiClientRecords([]);
-        Logger.error("Error loading api records!", error);
-      })
-      .finally(() => {
         setIsLoadingApiClientRecords(false);
       });
   }, [apiClientRecordsRepository, uid, dispatch]);
