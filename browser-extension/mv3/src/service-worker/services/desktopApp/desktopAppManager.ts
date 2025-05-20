@@ -1,7 +1,7 @@
 import { EXTENSION_MESSAGES } from "common/constants";
 import { applyProxy, ProxyDetails } from "../proxy";
 import { WebSocketManager } from "./webSocketManager";
-import { sendMessageToApp, toggleExtensionStatus } from "../utils";
+import { sendMessageToApp, updateExtensionStatus } from "../utils";
 import extensionIconManager from "../extensionIconManager";
 import { getConnectedBrowserAppId } from "./utils";
 import { DESKTOP_APP_CONFIG } from "./desktopAppConfig";
@@ -24,7 +24,7 @@ export class DesktopAppManager {
         payload: true,
       });
 
-      toggleExtensionStatus(false);
+      updateExtensionStatus(false);
       extensionIconManager.markConnectedToDesktopApp();
 
       await this.wsManager.sendMessage({

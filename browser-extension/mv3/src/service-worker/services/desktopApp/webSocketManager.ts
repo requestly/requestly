@@ -1,7 +1,7 @@
 import { EXTENSION_MESSAGES } from "common/constants";
 import extensionIconManager from "../extensionIconManager";
 import { removeProxy } from "../proxy";
-import { sendMessageToApp, toggleExtensionStatus } from "../utils";
+import { sendMessageToApp, updateExtensionStatus } from "../utils";
 import { DESKTOP_APP_CONFIG } from "./desktopAppConfig";
 import { PortScanner } from "./portScanner";
 import { WebSocketMessage } from "./types";
@@ -134,7 +134,7 @@ export class WebSocketManager {
     }
     removeProxy();
     extensionIconManager.markDisconnectedFromDesktopApp();
-    toggleExtensionStatus(true);
+    updateExtensionStatus(true);
     sendMessageToApp({
       action: EXTENSION_MESSAGES.DESKTOP_APP_CONNECTION_STATUS_UPDATED,
       payload: false,

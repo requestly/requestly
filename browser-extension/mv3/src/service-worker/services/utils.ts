@@ -8,7 +8,7 @@ import {
   Variable,
 } from "common/types";
 import { setVariable } from "../variable";
-import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
+import { getAllSupportedWebURLs } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
 import extensionIconManager from "./extensionIconManager";
 import { CLIENT_MESSAGES } from "common/constants";
@@ -169,20 +169,20 @@ export const isNonBrowserTab = (tabId: number): boolean => {
   return tabId === chrome.tabs.TAB_ID_NONE;
 };
 
-export const toggleExtensionStatus = async (newStatus?: boolean) => {
-  const extensionEnabledStatus = await isExtensionEnabled();
+export const updateExtensionStatus = async (newStatus: boolean) => {
+  if (newStatus === undefined) {
+    console.log("[updateExtensionStatus] newStatus is undefined. returning...");
+    return newStatus;
+  }
 
-  const updatedStatus = newStatus ?? !extensionEnabledStatus; //TODO: undefined check is incorrect
-  setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
-  updateActivationStatus(updatedStatus);
-  // FIXME: Memory leak here. onVariableChange sets up a listener on every toggle
-  // onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, () => null);
+  await setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, newStatus);
+  updateActivationStatus(newStatus);
 
-  if (!updatedStatus) {
+  if (newStatus === false) {
     stopRecordingOnAllTabs();
   }
 
-  return updatedStatus;
+  return newStatus;
 };
 
 export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {

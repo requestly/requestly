@@ -1,6 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
-import { sendMessageToApp, toggleExtensionStatus } from "./utils";
+import { sendMessageToApp, updateExtensionStatus } from "./utils";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
   cacheRecordedSessionOnClientPageUnload,
@@ -99,7 +99,7 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS:
-        toggleExtensionStatus(message.newStatus).then(sendResponse);
+        updateExtensionStatus(message.newStatus).then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.WATCH_RECORDING:

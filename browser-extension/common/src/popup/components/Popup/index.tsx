@@ -44,7 +44,7 @@ const Popup: React.FC = () => {
       ?.then(setIsBlockedOnTab);
   }, [currentTab]);
 
-  const handleToggleExtensionStatus = useCallback((newStatus?: boolean) => {
+  const handleToggleExtensionStatus = useCallback((newStatus: boolean) => {
     chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS, newStatus }, (updatedStatus) => {
       setIsExtensionEnabled(updatedStatus);
       sendEvent(EVENT.EXTENSION_STATUS_TOGGLED, {
