@@ -151,6 +151,17 @@ const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentC
   return auth;
 };
 
+const getContentTypeForRawBody = (bodyType: string) => {
+  switch (bodyType) {
+    case "json":
+      return RequestContentType.JSON;
+    case "text":
+      return RequestContentType.RAW;
+    case "html":
+      return RequestContentType.HTML;
+  }
+};
+
 const createApiRecord = (
   item: any,
   parentCollectionId: string,
@@ -178,11 +189,24 @@ const createApiRecord = (
   let contentType: RequestContentType | null = null;
   let requestBody: string | KeyValuePair[] | null = null;
 
+  const handleAddImplicitContentTypeHeader = (contentType: RequestContentType) => {
+    const isContentTypeHeaderSet = headers.find((header: KeyValuePair) => header.key === "Content-Type");
+    if (!isContentTypeHeaderSet) {
+      headers.push({
+        id: headers.length,
+        key: "Content-Type",
+        value: contentType,
+        isEnabled: true,
+      });
+    }
+  };
+
   const { mode, raw, formdata, options, urlencoded } = request.body || {};
 
   if (mode === "raw") {
     requestBody = raw;
-    contentType = options?.raw.language === "json" ? RequestContentType.JSON : RequestContentType.RAW;
+    contentType = getContentTypeForRawBody(options?.raw.language);
+    handleAddImplicitContentTypeHeader(contentType);
   } else if (mode === "formdata") {
     contentType = RequestContentType.FORM;
     requestBody =
@@ -194,6 +218,7 @@ const createApiRecord = (
       })) || [];
   } else if (mode === "urlencoded") {
     contentType = RequestContentType.FORM;
+    handleAddImplicitContentTypeHeader(contentType);
     requestBody = urlencoded.map((data: { key: string; value: string }) => ({
       id: Date.now() + Math.random(),
       key: data?.key || "",

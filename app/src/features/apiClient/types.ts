@@ -22,6 +22,7 @@ export enum RequestContentType {
   RAW = "text/plain",
   JSON = "application/json",
   FORM = "application/x-www-form-urlencoded",
+  HTML = "text/html",
 }
 
 export interface KeyValuePair {
