@@ -1,5 +1,5 @@
-import { FsAccessTroubleshoot } from "features/apiClient/components/ErrorBoundary/components/FsAccessTroubleshoot/FsAccessTroubleshoot";
-import { ErrorCode } from "../types";
+import { FsAccessTroubleshoot } from "features/apiClient/errors/FsError/FsAccessError/components/FsAccessTroubleshoot/FsAccessTroubleshoot";
+import { ErrorCode } from "../../types";
 import { RenderableError } from "features/apiClient/components/ErrorBoundary/RenderableError";
 
 export class FsAccessError extends RenderableError {
@@ -7,7 +7,7 @@ export class FsAccessError extends RenderableError {
     super(message);
     this.errorCode = ErrorCode.PERMISSION_DENIED;
     this.addContext({
-      path
+      path,
     });
   }
 
