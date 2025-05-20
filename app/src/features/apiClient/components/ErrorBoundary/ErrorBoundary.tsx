@@ -43,6 +43,7 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
   }
 
   private promiseRejectionHandler = (event: PromiseRejectionEvent) => {
+    console.log("aaa", "yes");
     this.setState({ hasError: true, error: event.reason });
     sendErrorToSentry(event.reason);
   };
