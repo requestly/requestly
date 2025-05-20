@@ -40,11 +40,21 @@ export const clearAllRecords = async (): Promise<void> => {
   await chrome.storage[STORAGE_TYPE].clear();
 };
 
+// Variable keys used by the extension
+const VARIABLE_KEYS = ["rq_var_isExtensionEnabled", "rq_var_extensionRulesCount", "rq_var_testScript"];
+
 export const clearAllRecordsExceptVariables = async (): Promise<void> => {
-  const allRecords = await getSuperObject();
-  const variableKeys = Object.keys(allRecords).filter((key) => key.startsWith("rq_var_"));
-  const variableRecords = Object.fromEntries(variableKeys.map((key) => [key, allRecords[key]]));
+  // Get only variable records using getRecords
+  const variableValues = await getRecords(VARIABLE_KEYS);
+  const variableRecords: StoreObject = {};
+  VARIABLE_KEYS.forEach((key, idx) => {
+    if (typeof variableValues[idx] !== "undefined") {
+      variableRecords[key] = variableValues[idx];
+    }
+  });
+  // Clear all records
   await chrome.storage[STORAGE_TYPE].clear();
+  // Restore variable records
   await saveObject(variableRecords);
 };
 
