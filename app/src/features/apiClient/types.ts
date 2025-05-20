@@ -227,3 +227,9 @@ export namespace RQAPI {
     SCRIPT = "script",
   }
 }
+
+export enum PostmanBodyMode {
+  RAW = "raw",
+  FORMDATA = "formdata",
+  URL_ENCODED = "urlencoded",
+}
