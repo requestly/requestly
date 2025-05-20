@@ -28,6 +28,7 @@ The following domains are eligible for the student programme:
     ".edu.al",
     ".edu.es",
     ".edu.tr",
+    ".edu.vn",
     ".ac.id",
     "bennington.edu",
     ".ac.kr",

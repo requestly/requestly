@@ -6,12 +6,12 @@ import { RQAPI } from "features/apiClient/types";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { useState } from "react";
-import { toast } from "utils/Toast";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { variablesActions } from "store/features/variables/slice";
 import { RBACButton } from "features/rbac";
 import "./apiClientEmptyView.scss";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { notification } from "antd";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
@@ -53,12 +53,19 @@ export const ApiClientEmptyView = () => {
             dispatch(variablesActions.updateCollectionVariables({ collectionId: result.data.id, variables: {} }));
           }
         } else {
-          toast.error(result.message || "Could not create a collection.");
+          notification.error({
+            message: `Could not create collection.`,
+            description: result?.message,
+            placement: "bottomRight",
+          });
         }
       })
       .catch((error) => {
-        console.error("Error creating record", error);
-        toast.error(error.message || "Could not create a collection.");
+        notification.error({
+          message: `Could not create collection.`,
+          description: error?.message,
+          placement: "bottomRight",
+        });
       })
       .finally(() => {
         setIsRecordCreating(null);

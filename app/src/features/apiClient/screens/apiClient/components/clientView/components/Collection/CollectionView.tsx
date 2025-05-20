@@ -1,4 +1,4 @@
-import { Result, Skeleton, Tabs } from "antd";
+import { notification, Result, Skeleton, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import React, { useCallback, useEffect, useMemo } from "react";
@@ -7,7 +7,6 @@ import { CollectionOverview } from "./components/CollectionOverview/CollectionOv
 import PATHS from "config/constants/sub/paths";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
-import { toast } from "utils/Toast";
 import { useGenericState } from "hooks/useGenericState";
 import "./collectionView.scss";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
@@ -63,11 +62,19 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           if (result.success) {
             onSaveRecord(result.data, "open");
           } else {
-            toast.error(result.message || "Could not update collection authorization changes!");
+            notification.error({
+              message: `Could not update collection authorization changes!`,
+              description: result?.message,
+              placement: "bottomRight",
+            });
           }
         })
         .catch((e) => {
-          toast.error(e.message || "Could not update collection authorization changes!");
+          notification.error({
+            message: `Could not update collection authorization changes!`,
+            description: e?.message,
+            placement: "bottomRight",
+          });
         });
     },
     [collection, onSaveRecord, apiClientRecordsRepository]
@@ -105,7 +112,11 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
       const record = { ...collection, name };
       return apiClientRecordsRepository.renameCollection(record.id, name).then(async (result) => {
         if (!result.success) {
-          toast.error(result.message || "Could not rename collection!");
+          notification.error({
+            message: `Could not rename collection.`,
+            description: result?.message,
+            placement: "bottomRight",
+          });
           return;
         }
 

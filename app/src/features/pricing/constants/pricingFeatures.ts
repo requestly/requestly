@@ -21,14 +21,10 @@ export const PricingFeatures: PlanFeatures = {
         {
           title: "Unlimited Header Rules",
           enabled: true,
-          tooltip: "There is no limit on header modification rules, they only count as one towards your total rule",
+          tooltip: "Header rules are free and unlimited. They don't count toward your rule usage limits",
         },
         {
           title: "5 Files",
-          enabled: true,
-        },
-        {
-          title: "Non-Commercial Use Only",
           enabled: true,
         },
       ],

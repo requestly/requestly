@@ -12,13 +12,14 @@ import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/lo
 import { SOURCE } from "modules/analytics/events/common/constants";
 import "./newSignupCard.scss";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { setRedirectMetadata } from "features/onboarding/utils";
 
 export const NewSignupCard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
 
-  const { setIsOnboardingScreenVisible } = useAuthScreenContext();
+  const { setIsOnboardingScreenVisible, redirectURL } = useAuthScreenContext();
   const isDesktopApp = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   const handleAuthButtonClick = (authMode: string) => {
@@ -27,7 +28,7 @@ export const NewSignupCard = () => {
         modalName: "authModal",
         newValue: true,
         newProps: {
-          redirectURL: window.location.href,
+          redirectURL,
           authMode,
           eventSource: isDesktopApp ? SOURCE.DESKTOP_ONBOARDING : SOURCE.EXTENSION_ONBOARDING,
         },
@@ -41,6 +42,7 @@ export const NewSignupCard = () => {
       handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
     } else {
       trackSignUpButtonClicked(SOURCE.EXTENSION_ONBOARDING);
+      setRedirectMetadata({ source: SOURCE.EXTENSION_ONBOARDING, redirectURL });
       redirectToOAuthUrl(navigate);
     }
   };
