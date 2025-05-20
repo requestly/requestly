@@ -18,6 +18,7 @@ import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
 import { useGetApiClientSyncRepo } from "../helpers/modules/sync/useApiClientSyncRepo";
 import { notification } from "antd";
 import { toast } from "utils/Toast";
+import Logger from "lib/logger";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
@@ -194,6 +195,17 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setErrorFiles(result.data.erroredRecords);
           updateCollectionVariablesOnInit(result.data.records);
         }
+      })
+      .catch((error) => {
+        notification.error({
+          message: "Could not fetch records!",
+          description: typeof error === "string" ? error : error.message,
+          placement: "bottomRight",
+        });
+        setApiClientRecords([]);
+        Logger.error("Error loading api records!", error);
+      })
+      .finally(() => {
         setIsLoadingApiClientRecords(false);
       });
   }, [apiClientRecordsRepository, uid, dispatch]);

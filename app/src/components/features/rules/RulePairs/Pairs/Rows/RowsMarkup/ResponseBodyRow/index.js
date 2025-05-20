@@ -52,8 +52,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     }
   }, [pair.response.type]);
 
-  const codeFormattedFlag = useRef(null);
-
   const onChangeResponseType = useCallback(
     (responseBodyType) => {
       dispatch(
@@ -197,7 +195,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     return null;
   };
 
-  const responseBodyChangeHandler = (value) => {
+  const responseBodyChangeHandler = (value, triggerUnsavedChanges) => {
     responseBodyValues.current[pair.response.type] = value;
     dispatch(
       globalActions.updateRulePairAtGivenPath({
@@ -206,7 +204,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
           "response.type": pair.response.type,
           "response.value": responseBodyValues.current[pair.response.type],
         },
-        triggerUnsavedChangesIndication: !codeFormattedFlag.current,
+        triggerUnsavedChangesIndication: triggerUnsavedChanges,
       })
     );
   };
@@ -235,11 +233,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
 
   const getEditorDefaultValue = useCallback(() => {
     // handle unsaved changes trigger
-    codeFormattedFlag.current = true;
-    setTimeout(() => {
-      codeFormattedFlag.current = false;
-    }, 2000);
-
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
       return "{}";
     }
