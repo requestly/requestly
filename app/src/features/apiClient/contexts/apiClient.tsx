@@ -18,6 +18,7 @@ import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
 import { useGetApiClientSyncRepo } from "../helpers/modules/sync/useApiClientSyncRepo";
 import { notification } from "antd";
 import { toast } from "utils/Toast";
+import Logger from "lib/logger";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
