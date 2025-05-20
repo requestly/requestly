@@ -296,7 +296,7 @@ export const UserPlanDetails = () => {
                 <div className="user-plan-upgrade-card-description">
                   {user?.details?.planDetails?.status === "trialing" ? (
                     <>
-                      Your professional plan free trail will expire in {daysLeft} days.{" "}
+                      Your professional plan free trial will expire in {daysLeft} days.{" "}
                       {billingTeams.length
                         ? "Consider upgrading or reach out directly to your organization's billing team admins for a license."
                         : "Get access to premium rule types and extended rule limits"}
