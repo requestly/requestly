@@ -51,9 +51,6 @@ const Popup: React.FC = () => {
       ({ success, updatedStatus }) => {
         if (!success) {
           message.error("Cannot update extension status. Please contact support.", 0.75);
-          console.log(
-            "[handleToggleExtensionStatus] updatedStatus is undefined. Cannot update extension status. Returning..."
-          );
           return;
         }
         setIsExtensionEnabled(updatedStatus);

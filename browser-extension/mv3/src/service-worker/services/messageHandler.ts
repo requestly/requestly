@@ -112,7 +112,9 @@ export const initMessageHandler = () => {
             });
             console.log(
               "[messageHandler.handleToggleExtensionStatus] Error occurred while updating extension status.",
-              e.message
+              {
+                error: e.message,
+              }
             );
           });
         return true;

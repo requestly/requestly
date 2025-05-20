@@ -170,9 +170,9 @@ export const isNonBrowserTab = (tabId: number): boolean => {
 };
 
 export const updateExtensionStatus = async (newStatus: boolean) => {
-  if (newStatus === undefined) {
-    console.log("[updateExtensionStatus] newStatus is undefined. returning...");
-    throw new Error("[updateExtensionStatus] newStatus is undefined.");
+  if (typeof newStatus !== "boolean") {
+    console.log(`[updateExtensionStatus] newStatus is not boolean but ${typeof newStatus}. returning...`);
+    throw new Error(`[updateExtensionStatus] newStatus is not boolean but ${typeof newStatus}`);
   }
 
   await setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, newStatus);
