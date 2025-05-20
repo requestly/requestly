@@ -15,12 +15,21 @@ interface State {
 }
 
 function sendErrorToSentry(error: any) {
-  Sentry.withScope((scope) => {
-    scope.setTag("caught_by", "api_client_error_boundary");
-    if (error instanceof NativeError) {
-      scope.setExtra("details", error.details);
-    }
-    Sentry.captureException(new Error(`This is new! ${error.message}`));
+  // Sentry.withScope((scope) => {
+  //   // scope.setTag("caught_by", "api_client_error_boundary");
+  //   if (error instanceof NativeError) {
+  //     scope.setExtra("details", error.details);
+  //   }
+  //   Sentry.captureException(error, {
+  //     tags: {
+  //       "caught_by": "api_client_error_boundary",
+  //     },
+  //   });
+  // });
+  Sentry.captureException(error, {
+    tags: {
+      "caught_by": "api_client_error_boundary",
+    },
   });
 }
 
