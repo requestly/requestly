@@ -26,6 +26,7 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { notification } from "antd";
+import { MutexTimeoutError } from "../fetch-lock";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -202,6 +203,10 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     } catch (err) {
       console.log("env fetch error", err);
       Logger.log("fetch all env details error", err);
+      if (err instanceof MutexTimeoutError) {
+        return;
+      }
+      throw err;
     } finally {
       setIsLoading(false);
     }
