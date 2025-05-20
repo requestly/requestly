@@ -12,7 +12,7 @@ import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackground
 import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 import { FsAccessError } from "features/apiClient/errors/FsError/FsAccessError/FsAccessError";
-import { ErrorCode } from "features/apiClient/errors/types";
+import { ErrorCode } from "errors/types";
 
 const LOCAL_SYNC_BUILDER_NAMESPACE = "local_sync_builder";
 
