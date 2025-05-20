@@ -132,7 +132,7 @@ const Editor: React.FC<EditorProps> = ({
   (fx) sets the implicit change in the editor, prettification change is implicit change
   Typing edits in editor is controlled by handleChange
   */
-  const setImplicitChange = useCallback((code: string): void => {
+  const handleEditorSilentUpdate = useCallback((code: string): void => {
     const view = editorRef.current?.view;
     const doc = view?.state?.doc;
 
@@ -152,10 +152,10 @@ const Editor: React.FC<EditorProps> = ({
       if (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT) {
         const prettified = await prettifyCode(value, language);
         setIsCodePrettified(true);
-        setImplicitChange(prettified.code);
+        handleEditorSilentUpdate(prettified.code);
       }
     }
-  }, [showOptions?.enablePrettify, language, value, setImplicitChange]);
+  }, [showOptions?.enablePrettify, language, value, handleEditorSilentUpdate]);
 
   useEffect(() => {
     if (!isEditorInitialized) return;
@@ -229,7 +229,7 @@ const Editor: React.FC<EditorProps> = ({
         code={value}
         isFullScreen={isFullScreen}
         onCodeFormat={(formattedCode: string) => {
-          setImplicitChange(formattedCode);
+          handleEditorSilentUpdate(formattedCode);
         }}
         isCodePrettified={isCodePrettified}
         setIsCodePrettified={setIsCodePrettified}
@@ -245,7 +245,7 @@ const Editor: React.FC<EditorProps> = ({
       language,
       showOptions.enablePrettify,
       toolbarOptions,
-      setImplicitChange,
+      handleEditorSilentUpdate,
       value,
     ]
   );
