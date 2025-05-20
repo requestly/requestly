@@ -1,6 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
-import { getAppTabs, toggleExtensionStatus } from "./utils";
+import { sendMessageToApp, toggleExtensionStatus } from "./utils";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
   cacheRecordedSessionOnClientPageUnload,
@@ -31,11 +31,6 @@ import {
   disconnectFromDesktopAppAndRemoveProxy,
   checkIfDesktopAppOpen,
 } from "./desktopApp/index";
-
-export const sendMessageToApp = async (messageObject: unknown) => {
-  const appTabs = await getAppTabs();
-  return Promise.all(appTabs.map(({ id }) => chrome.tabs.sendMessage(id, messageObject)));
-};
 
 export const initMessageHandler = () => {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {

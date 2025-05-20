@@ -87,11 +87,13 @@ class ExtensionIconManager {
 
   #updateIconStateForAllTabs() {
     const tabsMap = tabService.getTabs();
+    console.log("!!!debug", "[updateIconStateForAllTabs] tabsMap", tabsMap);
     Object.values(tabsMap).forEach((tab) => this.#updateIconState(tab.id));
   }
 
   #setExtensionIcon(path: string, tabId?: number) {
     if (tabId === undefined) {
+      // Does not work
       chrome.action.setIcon({ path });
     } else {
       chrome.action.setIcon({ path, tabId });
@@ -105,9 +107,11 @@ class ExtensionIconManager {
   };
 
   markExtensionDisabled = () => {
+    console.log("!!!debug", "disabled call");
     this.#isExtensionDisabled = true;
-    this.#setExtensionIcon(this.#icons.DISABLED);
+    this.#setExtensionIcon(this.#icons.DISABLED); // this does not work & somehow if state for all tabs does not work correctly then icon inconsistency will be present
     this.#updateIconStateForAllTabs();
+    console.log("!!!debug", "icon state", this);
   };
 
   markRuleExecuted(tabId: number) {

@@ -1,8 +1,17 @@
-import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType, Variable } from "common/types";
+import {
+  MenuItem,
+  ScriptAttributes,
+  ScriptCodeType,
+  ScriptObject,
+  ScriptType,
+  ToggleActivationStatusLabel,
+  Variable,
+} from "common/types";
 import { setVariable } from "../variable";
 import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
-import { updateActivationStatus } from "./contextMenu";
+import extensionIconManager from "./extensionIconManager";
+import { CLIENT_MESSAGES } from "common/constants";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -163,7 +172,7 @@ export const isNonBrowserTab = (tabId: number): boolean => {
 export const toggleExtensionStatus = async (newStatus?: boolean) => {
   const extensionEnabledStatus = await isExtensionEnabled();
 
-  const updatedStatus = newStatus ?? !extensionEnabledStatus;
+  const updatedStatus = newStatus ?? !extensionEnabledStatus; //TODO: undefined check is incorrect
   setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
   updateActivationStatus(updatedStatus);
   // FIXME: Memory leak here. onVariableChange sets up a listener on every toggle
@@ -186,4 +195,24 @@ export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
   }
 
   return appTabs;
+};
+
+export const sendMessageToApp = async (messageObject: unknown) => {
+  const appTabs = await getAppTabs();
+  return Promise.all(appTabs.map(({ id }) => chrome.tabs.sendMessage(id, messageObject)));
+};
+
+export const updateActivationStatus = (isExtensionEnabled: boolean) => {
+  console.log("!!!debug", "activation");
+  chrome.contextMenus.update(MenuItem.TOGGLE_ACTIVATION_STATUS, {
+    title: isExtensionEnabled ? ToggleActivationStatusLabel.DEACTIVATE : ToggleActivationStatusLabel.ACTIVATE,
+  });
+
+  if (isExtensionEnabled) {
+    extensionIconManager.markExtensionEnabled();
+  } else {
+    extensionIconManager.markExtensionDisabled();
+  }
+
+  sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED, isExtensionEnabled });
 };
