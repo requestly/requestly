@@ -25,10 +25,10 @@ export const useFeatureLimiter = () => {
       return;
     }
 
-    const isLimitReached = Object.values(FeatureLimitType).some((featureLimitType) =>
-      checkIfFeatureLimitReached(featureLimitType, "reached")
+    const isLimitExceeded = Object.values(FeatureLimitType).some((featureLimitType) =>
+      checkIfFeatureLimitReached(featureLimitType, "breached")
     );
-    dispatch(globalActions.updateUserLimitReached(isLimitReached));
+    dispatch(globalActions.updateUserLimitReached(isLimitExceeded));
   };
 
   const checkIfFeatureLimitReached = (featureLimitType: FeatureLimitType, checkType: "breached" | "reached") => {
