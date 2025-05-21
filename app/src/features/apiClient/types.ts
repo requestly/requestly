@@ -22,6 +22,9 @@ export enum RequestContentType {
   RAW = "text/plain",
   JSON = "application/json",
   FORM = "application/x-www-form-urlencoded",
+  HTML = "text/html",
+  XML = "application/xml",
+  JAVASCRIPT = "application/javascript",
 }
 
 export interface KeyValuePair {
@@ -88,6 +91,9 @@ export namespace RQAPI {
   export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody; // in case of form data, body will be key-value pairs
   export type RequestJsonBody = string;
   export type RequestRawBody = string;
+  export type RequestHtmlBody = string;
+  export type RequestJavascriptBody = string;
+  export type RequestXmlBody = string;
   export type RequestFormBody = KeyValuePair[];
 
   export type RequestBodyContainer = {
@@ -223,4 +229,11 @@ export namespace RQAPI {
     ABORT = "abort",
     SCRIPT = "script",
   }
+}
+
+export enum PostmanBodyMode {
+  RAW = "raw",
+  FORMDATA = "formdata",
+  URL_ENCODED = "urlencoded",
+  GRAPHQL = "graphql",
 }
