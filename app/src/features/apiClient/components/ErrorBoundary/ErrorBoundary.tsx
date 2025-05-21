@@ -81,8 +81,8 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
             <div className="api-client-error-boundary-content__body">
               <div className="error-boundary__header">{this.getErrorHeading(error)}</div>
               <div className="error-boundary__error-message">
-                {error.message ? (
-                  <code>{error?.message}</code>
+                {error?.message ? (
+                  <code>{error.message}</code>
                 ) : (
                   <div className="text-center">An unexpected error occurred</div>
                 )}
