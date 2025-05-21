@@ -2,7 +2,6 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
-import Logger from "lib/logger";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
   trackNewEnvironmentClicked,
@@ -19,6 +18,7 @@ import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
 import { useGetApiClientSyncRepo } from "../helpers/modules/sync/useApiClientSyncRepo";
 import { notification } from "antd";
 import { toast } from "utils/Toast";
+import Logger from "lib/logger";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
@@ -199,7 +199,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       .catch((error) => {
         notification.error({
           message: "Could not fetch records!",
-          description: typeof error ==="string" ? error : error.message,
+          description: typeof error === "string" ? error : error.message,
           placement: "bottomRight",
         });
         setApiClientRecords([]);

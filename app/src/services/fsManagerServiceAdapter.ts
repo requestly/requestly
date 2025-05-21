@@ -11,8 +11,34 @@ import {
 import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackgroundService";
 import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
+import { FsAccessError } from "features/apiClient/errors/FsError/FsAccessError/FsAccessError";
+import { ErrorCode } from "errors/types";
 
 const LOCAL_SYNC_BUILDER_NAMESPACE = "local_sync_builder";
+
+function FsErrorHandler(_target: any, _key: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+
+  descriptor.value = async function (...args: any[]) {
+    try {
+      const result = await originalMethod.apply(this, args);
+      if (result.type === "error") {
+        if (result.error.code === ErrorCode.PERMISSION_DENIED) {
+          const message = result.error.message || "Permission denied for requested action";
+          throw FsAccessError.from(message, result.error.path);
+        }
+        return result;
+      }
+      return result;
+    } catch (error) {
+      if (error.code === "EACCESS" || error.code === ErrorCode.PERMISSION_DENIED) {
+        const message = error.message || "Permission denied for requested action";
+        throw FsAccessError.from(message, error.meta);
+      }
+      throw error;
+    }
+  };
+}
 
 export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   constructor(rootPath: string) {
@@ -22,105 +48,127 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
     // }
   }
 
+  @FsErrorHandler
   async getAllRecords() {
     return this.invokeProcedureInBG("getAllRecords") as Promise<
       FileSystemResult<{ records: APIEntity[]; erroredRecords: ErroredRecord[] }>
     >;
   }
 
+  @FsErrorHandler
   async getRecord(id: string) {
     return this.invokeProcedureInBG("getRecord", id) as Promise<FileSystemResult<API>>;
   }
 
+  @FsErrorHandler
   async createRecord(record: API["request"], collectionId?: string) {
-    console.log("ppp creating", record);
     return this.invokeProcedureInBG("createRecord", record, collectionId) as Promise<FileSystemResult<API>>;
   }
 
+  @FsErrorHandler
   async createRecordWithId(record: API["request"], id: string) {
-    console.log("ppp1 creating with id", record);
     return this.invokeProcedureInBG("createRecordWithId", record, id) as Promise<FileSystemResult<API>>;
   }
 
+  @FsErrorHandler
   async updateRecord(patch: Partial<API["request"]>, id: string) {
     return this.invokeProcedureInBG("updateRecord", patch, id) as Promise<FileSystemResult<API>>;
   }
 
+  @FsErrorHandler
   async deleteRecord(id: string) {
     return this.invokeProcedureInBG("deleteRecord", id) as Promise<FileSystemResult<void>>;
   }
 
+  @FsErrorHandler
   async deleteRecords(ids: string[]) {
     return this.invokeProcedureInBG("deleteRecords", ids) as Promise<FileSystemResult<void>>;
   }
 
+  @FsErrorHandler
   async getCollection(id: string) {
     return this.invokeProcedureInBG("getCollection", id) as Promise<FileSystemResult<Collection>>;
   }
 
+  @FsErrorHandler
   async createCollection(name: string, collectionId?: string) {
     return this.invokeProcedureInBG("createCollection", name, collectionId) as Promise<FileSystemResult<Collection>>;
   }
 
+  @FsErrorHandler
   async renameCollection(id: string, newName: string) {
     return this.invokeProcedureInBG("renameCollection", id, newName) as Promise<FileSystemResult<Collection>>;
   }
 
+  @FsErrorHandler
   async getAllEnvironments() {
     return this.invokeProcedureInBG("getAllEnvironments") as Promise<
       FileSystemResult<{ environments: EnvironmentEntity[]; erroredRecords: ErroredRecord[] }>
     >;
   }
 
+  @FsErrorHandler
   async createEnvironment(environmentName: string, isGlobal?: boolean) {
     return this.invokeProcedureInBG("createEnvironment", environmentName, isGlobal) as Promise<
       FileSystemResult<EnvironmentEntity>
     >;
   }
 
+  @FsErrorHandler
   async updateEnvironment(id: string, patch: Partial<Pick<EnvironmentData, "name" | "variables">>) {
     return this.invokeProcedureInBG("updateEnvironment", id, patch) as Promise<FileSystemResult<EnvironmentEntity>>;
   }
 
+  @FsErrorHandler
   async duplicateEnvironment(id: string) {
     return this.invokeProcedureInBG("duplicateEnvironment", id) as Promise<FileSystemResult<EnvironmentEntity>>;
   }
 
+  @FsErrorHandler
   async deleteCollections(ids: string[]) {
     return this.invokeProcedureInBG("deleteCollections", ids) as Promise<FileSystemResult<EnvironmentEntity>>;
   }
 
+  @FsErrorHandler
   async setCollectionVariables(id: string, variables: EnvironmentVariables) {
     return this.invokeProcedureInBG("setCollectionVariables", id, variables) as Promise<FileSystemResult<Collection>>;
   }
 
+  @FsErrorHandler
   async updateCollectionDescription(id: string, newDescription: string) {
     return this.invokeProcedureInBG("updateCollectionDescription", id, newDescription) as Promise<
       FileSystemResult<string>
     >;
   }
+
+  @FsErrorHandler
   async updateCollectionAuthData(id: string, newAuth: RQAPI.Auth) {
     return this.invokeProcedureInBG("updateCollectionAuthData", id, newAuth) as Promise<FileSystemResult<RQAPI.Auth>>;
   }
 
+  @FsErrorHandler
   async writeRawRecord(id: string, record: any, fileType: FileType) {
     return this.invokeProcedureInBG("writeRawRecord", id, record, fileType) as Promise<FileSystemResult<unknown>>;
   }
 
+  @FsErrorHandler
   async getRawFileData(id: string) {
     return this.invokeProcedureInBG("getRawFileData", id) as Promise<FileSystemResult<unknown>>;
   }
 
+  @FsErrorHandler
   async createCollectionFromCompleteRecord(collection: RQAPI.CollectionRecord, id: string) {
     return this.invokeProcedureInBG("createCollectionFromCompleteRecord", collection, id) as Promise<
       FileSystemResult<RQAPI.Record>
     >;
   }
 
+  @FsErrorHandler
   async moveRecord(id: string, newParentId: string) {
     return this.invokeProcedureInBG("moveRecord", id, newParentId) as Promise<FileSystemResult<RQAPI.Record>>;
   }
 
+  @FsErrorHandler
   async moveCollection(id: string, newParentId: string) {
     return this.invokeProcedureInBG("moveCollection", id, newParentId) as Promise<FileSystemResult<RQAPI.Record>>;
   }
@@ -145,7 +193,11 @@ class FsManagerServiceAdapterProvider {
       this.cache.set(rootPath, service);
       return service;
     } catch (e) {
+      const isAccessIssue = (arg: any) => typeof arg === "string" && arg.includes("EACCES:");
       console.error("build error", e);
+      if (isAccessIssue(e) || isAccessIssue(e.message)) {
+        throw new FsAccessError(e.message || e, rootPath);
+      }
       throw e;
     }
   }
