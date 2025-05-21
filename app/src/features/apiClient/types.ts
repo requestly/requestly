@@ -91,6 +91,9 @@ export namespace RQAPI {
   export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody; // in case of form data, body will be key-value pairs
   export type RequestJsonBody = string;
   export type RequestRawBody = string;
+  export type RequestHtmlBody = string;
+  export type RequestJavascriptBody = string;
+  export type RequestXmlBody = string;
   export type RequestFormBody = KeyValuePair[];
 
   export type RequestBodyContainer = {
