@@ -163,6 +163,12 @@ const getContentTypeForRawBody = (bodyType: string) => {
       return RequestContentType.JSON;
     case "text":
       return RequestContentType.RAW;
+    case "html":
+      return RequestContentType.HTML;
+    case "javascript":
+      return RequestContentType.JAVASCRIPT;
+    case "xml":
+      return RequestContentType.XML;
     default:
       return RequestContentType.RAW;
   }
@@ -233,7 +239,17 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
     };
   }
 
-  const { mode, raw, formdata, options, urlencoded } = request.body;
+  const processGraphqlBody = (graphql: any, headers: KeyValuePair[]): RequestBodyProcessingResult => {
+    const contentType = RequestContentType.JSON;
+    const updatedHeaders = addImplicitContentTypeHeader(headers, contentType);
+    return {
+      requestBody: "",
+      contentType,
+      headers: updatedHeaders,
+    };
+  };
+
+  const { mode, raw, formdata, options, urlencoded, graphql } = request.body;
   const headers =
     request.header?.map((header: KeyValuePair, index: number) => ({
       id: index,
@@ -249,6 +265,8 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
       return { ...processFormDataBody(formdata), headers };
     case PostmanBodyMode.URL_ENCODED:
       return processUrlEncodedBody(urlencoded, headers);
+    case PostmanBodyMode.GRAPHQL:
+      return processGraphqlBody(graphql, headers);
     default:
       return {
         requestBody: null,
