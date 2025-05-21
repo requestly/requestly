@@ -1,13 +1,6 @@
 import config from "common/config";
 import { APP_MESSAGES, EXTENSION_MESSAGES, STORAGE_TYPE } from "common/constants";
-import {
-  clearAllRecordsExceptVariables,
-  getAllRecords,
-  getRecord,
-  getSuperObject,
-  removeRecord,
-  saveObject,
-} from "common/storage";
+import { clearAllRecords, getAllRecords, getRecord, getSuperObject, removeRecord, saveObject } from "common/storage";
 import { isAppURL } from "../../utils";
 
 interface ContentScriptMessage {
@@ -124,7 +117,7 @@ export const initMessageHandler = () => {
             return;
           }
           case APP_MESSAGES.CLEAR_STORAGE: {
-            await clearAllRecordsExceptVariables();
+            await clearAllRecords();
             sendResponse(event.data);
             return;
           }

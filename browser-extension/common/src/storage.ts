@@ -1,5 +1,4 @@
 import { STORAGE_TYPE } from "./constants";
-import { Variable } from "./types";
 
 type StoreObject = { [key: string]: any };
 
@@ -38,22 +37,13 @@ export const removeRecord = async (key: string): Promise<void> => {
 };
 
 export const clearAllRecords = async (): Promise<void> => {
+  const VAR = "rq_var_isExtensionEnabled";
+  const isExtensionEnabledVariableValue = await getRecord(VAR);
   await chrome.storage[STORAGE_TYPE].clear();
-};
 
-export const clearAllRecordsExceptVariables = async (): Promise<void> => {
-  const VARIABLE_KEYS = Object.values(Variable).map((variable) => `rq_var_${variable}`);
-
-  const variableValues = await getRecords(VARIABLE_KEYS);
-  const variableRecords: StoreObject = {};
-  VARIABLE_KEYS.forEach((key, idx) => {
-    if (typeof variableValues[idx] !== "undefined") {
-      variableRecords[key] = variableValues[idx];
-    }
-  });
-
-  await chrome.storage[STORAGE_TYPE].clear();
-  await saveObject(variableRecords);
+  if (isExtensionEnabledVariableValue !== undefined) {
+    await saveObject({ [VAR]: isExtensionEnabledVariableValue });
+  }
 };
 
 export enum ChangeType {

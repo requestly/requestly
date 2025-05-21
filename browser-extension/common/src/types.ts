@@ -198,7 +198,3 @@ export interface UpdateDynamicRuleOptions {
   addRules?: (chrome.declarativeNetRequest.Rule & { rqRuleId?: string })[];
   removeRuleIds?: chrome.declarativeNetRequest.UpdateRuleOptions["removeRuleIds"];
 }
-
-export enum Variable {
-  IS_EXTENSION_ENABLED = "isExtensionEnabled",
-}
