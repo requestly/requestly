@@ -1,5 +1,5 @@
-import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType, Variable } from "common/types";
-import { setVariable } from "../variable";
+import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "common/types";
+import { setVariable, Variable } from "../variable";
 import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
 import { updateActivationStatus } from "./contextMenu";

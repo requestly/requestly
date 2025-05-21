@@ -1,9 +1,9 @@
-import { RuleType, Variable } from "common/types";
+import { RuleType } from "common/types";
 import { matchRuleWithRequest } from "../../common/ruleMatcher";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import rulesStorageService from "../../rulesStorageService";
 import { isUrlInBlockList, isExtensionEnabled } from "../../utils";
-import { onVariableChange } from "../variable";
+import { onVariableChange, Variable } from "../variable";
 
 const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails) => {
   // Firefox and Safari do not have documentLifecycle

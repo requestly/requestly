@@ -1,11 +1,10 @@
-import { onVariableChange, setVariable } from "../variable";
+import { onVariableChange, setVariable, Variable } from "../variable";
 import extensionIconManager from "./extensionIconManager";
 import { isExtensionEnabled } from "../../utils";
 
 // TODO: fix circular dependency
 import { sendMessageToApp } from "./messageHandler";
 import { CLIENT_MESSAGES } from "common/constants";
-import { Variable } from "common/types";
 
 enum MenuItem {
   TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
