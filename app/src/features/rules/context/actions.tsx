@@ -30,6 +30,7 @@ import { getAllRulesOfGroup } from "utils/rules/misc";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { Group, RecordStatus, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { RULES_WITHOUT_LIMITS } from "../constants";
 
 // FIXME: Make all bulk actions async to handle loading state properly
 type RulesActionContextType = {
@@ -227,19 +228,20 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
             return;
           }
 
+          const isFreeRule = isSampleRule || RULES_WITHOUT_LIMITS.includes(record.ruleType);
           if (newStatus.toLowerCase() === "active") {
             trackRQLastActivity("rule_activated");
 
             submitAttrUtil(
               APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES,
-              userAttributes.num_active_rules + (isSampleRule ? 0 : 1)
+              userAttributes.num_active_rules + (isFreeRule ? 0 : 1)
             );
             trackRuleToggled(record.ruleType, "rules_list", newStatus);
           } else {
             trackRQLastActivity("rule_deactivated");
             submitAttrUtil(
               APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES,
-              userAttributes.num_active_rules - (isSampleRule ? 0 : 1)
+              userAttributes.num_active_rules - (isFreeRule ? 0 : 1)
             );
             trackRuleToggled(record.ruleType, "rules_list", newStatus);
           }
