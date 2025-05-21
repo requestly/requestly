@@ -236,12 +236,20 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
               APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES,
               (userAttributes.num_active_rules ?? 0) + (isFreeRule ? 0 : 1)
             );
+            submitAttrUtil(
+              APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES_EXCLUDING_FREE_RULES,
+              (userAttributes.num_active_rules_excluding_free_rules ?? 0) + (isFreeRule ? 0 : 1)
+            );
             trackRuleToggled(record.ruleType, "rules_list", newStatus);
           } else {
             trackRQLastActivity("rule_deactivated");
             submitAttrUtil(
               APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES,
               (userAttributes.num_active_rules ?? 0) - (isFreeRule ? 0 : 1)
+            );
+            submitAttrUtil(
+              APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES_EXCLUDING_FREE_RULES,
+              (userAttributes.num_active_rules_excluding_free_rules ?? 0) - (isFreeRule ? 0 : 1)
             );
             trackRuleToggled(record.ruleType, "rules_list", newStatus);
           }
@@ -256,7 +264,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         onSuccess?.();
       });
     },
-    [updateRecordInStorage, userAttributes.num_active_rules]
+    [updateRecordInStorage, userAttributes.num_active_rules, userAttributes.num_active_rules_excluding_free_rules]
   );
 
   const recordStatusToggleAction = useCallback(
