@@ -41,17 +41,22 @@ export const useFeatureLimiter = () => {
   const getFeatureCurrentValue = (featureLimitType: FeatureLimitType) => {
     switch (featureLimitType) {
       case FeatureLimitType.num_rules:
-        return userAttributes?.num_rules;
+        return userAttributes?.num_rules_excluding_free_rules;
       case FeatureLimitType.num_active_rules:
-        return userAttributes?.num_active_rules;
+        return userAttributes?.num_active_rules_excluding_free_rules;
+      case FeatureLimitType.free:
+        return 0;
     }
   };
 
   const getFeatureLimitValue = (featureLimitType: FeatureLimitType) => {
-    if (!(featureLimitType in FeatureLimitType)) return true; // free feature
+    if (featureLimitType === FeatureLimitType.free) return Infinity; // free feature
+
+    if (!(featureLimitType in FeatureLimitType)) return Infinity; // free feature
 
     if (isUserPremium && !premiumPlansToCheckLimit.includes(userPlan)) return Infinity;
 
+    // FIXME: This returns number or boolean, ideally should be a number
     return (
       featureLimits[userPlan]?.[featureLimitType] ?? featureLimits[PRICING.PLAN_NAMES.BASIC_V2]?.[featureLimitType] // if plan is not found, return basic plan limit eg: for lite plan
     );
