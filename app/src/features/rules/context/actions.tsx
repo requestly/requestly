@@ -234,14 +234,14 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
             submitAttrUtil(
               APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES,
-              userAttributes.num_active_rules + (isFreeRule ? 0 : 1)
+              (userAttributes.num_active_rules ?? 0) + (isFreeRule ? 0 : 1)
             );
             trackRuleToggled(record.ruleType, "rules_list", newStatus);
           } else {
             trackRQLastActivity("rule_deactivated");
             submitAttrUtil(
               APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES,
-              userAttributes.num_active_rules - (isFreeRule ? 0 : 1)
+              (userAttributes.num_active_rules ?? 0) - (isFreeRule ? 0 : 1)
             );
             trackRuleToggled(record.ruleType, "rules_list", newStatus);
           }
