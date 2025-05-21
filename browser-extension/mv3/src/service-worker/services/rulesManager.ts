@@ -1,11 +1,11 @@
 import config from "common/config";
 import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
-import { onVariableChange } from "../variable";
+import { onVariableChange, Variable } from "../variable";
 import { debounce, getBlockedDomains, isExtensionEnabled, onBlockListChange } from "../../utils";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import { SessionRuleType } from "./requestProcessor/types";
 import { EXTENSION_MESSAGES } from "common/constants";
-import { UpdateDynamicRuleOptions, Variable } from "common/types";
+import { UpdateDynamicRuleOptions } from "common/types";
 import { sendMessageToApp } from "./utils";
 
 // Object.values(chrome.declarativeNetRequest.ResourceType) cannot be used because in some browsers like safari and firefox

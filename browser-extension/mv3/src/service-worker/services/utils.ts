@@ -5,9 +5,8 @@ import {
   ScriptObject,
   ScriptType,
   ToggleActivationStatusLabel,
-  Variable,
 } from "common/types";
-import { setVariable } from "../variable";
+import { setVariable, Variable } from "../variable";
 import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
 import extensionIconManager from "./extensionIconManager";

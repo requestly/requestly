@@ -1,6 +1,6 @@
-import { onVariableChange, setVariable } from "../variable";
+import { onVariableChange, setVariable, Variable } from "../variable";
 import { isExtensionEnabled } from "../../utils";
-import { MenuItem, ToggleActivationStatusLabel, Variable } from "common/types";
+import { MenuItem, ToggleActivationStatusLabel } from "common/types";
 import { updateActivationStatus } from "./utils";
 
 export const initContextMenu = async () => {

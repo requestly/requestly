@@ -199,10 +199,6 @@ export interface UpdateDynamicRuleOptions {
   removeRuleIds?: chrome.declarativeNetRequest.UpdateRuleOptions["removeRuleIds"];
 }
 
-export enum Variable {
-  IS_EXTENSION_ENABLED = "isExtensionEnabled",
-}
-
 export enum MenuItem {
   TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
 }
