@@ -71,7 +71,7 @@ const sendResponse = (originalEventData: ContentScriptMessage, response?: unknow
 const clearAllRecordsExpectExtensionEnabledVariable = async () => {
   const isExtensionEnabled = await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED);
 
-  clearAllRecords();
+  await clearAllRecords();
   if (isExtensionEnabled !== undefined) {
     await saveObject({
       [Variable.IS_EXTENSION_ENABLED]: isExtensionEnabled,
