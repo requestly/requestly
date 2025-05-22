@@ -24,6 +24,10 @@ export const updateActivationStatus = (isExtensionEnabled: boolean) => {
   } else {
     extensionIconManager.markExtensionDisabled();
   }
+
+  if (isExtensionEnabled === false) {
+    stopRecordingOnAllTabs();
+  }
 };
 
 export const initContextMenu = async () => {
@@ -38,10 +42,8 @@ export const initContextMenu = async () => {
   chrome.contextMenus.onClicked.addListener(async (info) => {
     if (info.menuItemId === MenuItem.TOGGLE_ACTIVATION_STATUS) {
       const isExtensionStatusEnabled = await isExtensionEnabled();
-      // Couldn't use updateExtensionStatus() here because of introducing circular dependency
       await setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, !isExtensionStatusEnabled);
       sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED, isExtensionEnabled });
-      stopRecordingOnAllTabs();
     }
   });
 

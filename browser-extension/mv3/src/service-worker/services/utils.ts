@@ -1,7 +1,5 @@
 import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "common/types";
 import { setVariable, Variable } from "../variable";
-import { stopRecordingOnAllTabs } from "./sessionRecording";
-import { updateActivationStatus } from "./contextMenu";
 import { sendMessageToApp } from "./messageHandler/sender";
 import { CLIENT_MESSAGES } from "common/constants";
 
@@ -168,12 +166,7 @@ export const updateExtensionStatus = async (newStatus: boolean) => {
   }
 
   await setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, newStatus);
-  updateActivationStatus(newStatus);
   sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED, isExtensionEnabled: newStatus });
-
-  if (newStatus === false) {
-    stopRecordingOnAllTabs();
-  }
 
   return newStatus;
 };
