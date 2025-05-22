@@ -34,7 +34,7 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
     this.#testRuleId = this.attributes.getNamedItem("rule-id")?.value;
 
     const ruleName = this.shadowRoot.getElementById("rule-name");
-    ruleName.textContent = "Testing " + this.attributes.getNamedItem("rule-name")?.value ?? null;
+    ruleName.textContent = "Testing " + (this.attributes.getNamedItem("rule-name")?.value || "rule");
 
     const appliedStatus = this.attributes.getNamedItem("applied-status")?.value;
     this.showRuleAppliedStatus(appliedStatus === "true");
