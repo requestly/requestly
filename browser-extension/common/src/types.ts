@@ -198,12 +198,3 @@ export interface UpdateDynamicRuleOptions {
   addRules?: (chrome.declarativeNetRequest.Rule & { rqRuleId?: string })[];
   removeRuleIds?: chrome.declarativeNetRequest.UpdateRuleOptions["removeRuleIds"];
 }
-
-export enum MenuItem {
-  TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
-}
-
-export enum ToggleActivationStatusLabel {
-  ACTIVATE = "Activate Requestly",
-  DEACTIVATE = "Deactivate Requestly",
-}
