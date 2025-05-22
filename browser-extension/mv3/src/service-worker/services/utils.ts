@@ -2,6 +2,8 @@ import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "comm
 import { setVariable, Variable } from "../variable";
 import { sendMessageToApp } from "./messageHandler/sender";
 import { CLIENT_MESSAGES } from "common/constants";
+import extensionIconManager from "./extensionIconManager";
+import { updateActivationStatus } from "./contextMenu";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -165,7 +167,13 @@ export const updateExtensionStatus = async (newStatus: boolean) => {
     throw new Error(`[updateExtensionStatus] newStatus is not boolean but ${typeof newStatus}`);
   }
 
+  console.log(`[updateExtensionStatus] starting...`, {
+    newStatus,
+    extensionIconState: extensionIconManager.getState(),
+  });
+
   await setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, newStatus);
+  updateActivationStatus(newStatus);
   sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED, isExtensionEnabled: newStatus });
 
   return newStatus;
