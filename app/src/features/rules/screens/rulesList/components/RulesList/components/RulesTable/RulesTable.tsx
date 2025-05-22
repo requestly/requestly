@@ -93,6 +93,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       return;
     }
 
+    // TODO: add event started
     importSampleRules(user, appMode).then((groupIdsToExpand: string[]) => {
       if (groupIdsToExpand?.length > 0) {
         setGroupIdsToExpand(groupIdsToExpand);
@@ -108,6 +109,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
           newValue: !isRulesListRefreshPending,
         })
       );
+      // TODO: add event completed
     });
   }, [user, appMode, isRuleExist, isSampleRulesImported, activeWorkspaceId, isRulesListRefreshPending, dispatch]);
 
