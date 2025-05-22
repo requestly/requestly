@@ -46,6 +46,7 @@ export const ImportFromCurlModal: React.FC<Props> = ({ isOpen, handleImportReque
 
       handleImportRequest(requestFromCurl);
       trackCurlImported();
+      setError(null);
       trackRQLastActivity(API_CLIENT.CURL_IMPORTED);
       trackRQDesktopLastActivity(API_CLIENT.CURL_IMPORTED);
     } catch (error) {
