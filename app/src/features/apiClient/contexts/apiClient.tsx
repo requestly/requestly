@@ -18,7 +18,6 @@ import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
 import { useGetApiClientSyncRepo } from "../helpers/modules/sync/useApiClientSyncRepo";
 import { notification } from "antd";
 import { toast } from "utils/Toast";
-import Logger from "lib/logger";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
@@ -179,35 +178,22 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     };
 
     setIsLoadingApiClientRecords(true);
-    apiClientRecordsRepository
-      .getAllRecords()
-      .then((result) => {
-        if (!result.success) {
-          notification.error({
-            message: "Could not fetch records!",
-            description: result?.message,
-            placement: "bottomRight",
-          });
-          setApiClientRecords([]);
-          return;
-        } else {
-          setApiClientRecords(result.data.records);
-          setErrorFiles(result.data.erroredRecords);
-          updateCollectionVariablesOnInit(result.data.records);
-        }
-      })
-      .catch((error) => {
+    apiClientRecordsRepository.getAllRecords().then((result) => {
+      if (!result.success) {
         notification.error({
           message: "Could not fetch records!",
-          description: typeof error === "string" ? error : error.message,
+          description: result?.message,
           placement: "bottomRight",
         });
         setApiClientRecords([]);
-        Logger.error("Error loading api records!", error);
-      })
-      .finally(() => {
-        setIsLoadingApiClientRecords(false);
-      });
+        return;
+      } else {
+        setApiClientRecords(result.data.records);
+        setErrorFiles(result.data.erroredRecords);
+        updateCollectionVariablesOnInit(result.data.records);
+      }
+      setIsLoadingApiClientRecords(false);
+    });
   }, [apiClientRecordsRepository, uid, dispatch]);
 
   useEffect(() => {
