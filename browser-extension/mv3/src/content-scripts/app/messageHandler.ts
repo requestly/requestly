@@ -2,7 +2,7 @@ import config from "common/config";
 import { APP_MESSAGES, EXTENSION_MESSAGES, STORAGE_TYPE } from "common/constants";
 import { clearAllRecords, getAllRecords, getRecord, getSuperObject, removeRecord, saveObject } from "common/storage";
 import { isAppURL } from "../../utils";
-import { getVariable, Variable } from "../../service-worker/variable";
+import { getVariable, setVariable, Variable } from "../../service-worker/variable";
 
 interface ContentScriptMessage {
   action: string;
@@ -73,9 +73,7 @@ const clearAllRecordsExpectExtensionEnabledVariable = async () => {
 
   await clearAllRecords();
   if (isExtensionEnabled !== undefined) {
-    await saveObject({
-      [Variable.IS_EXTENSION_ENABLED]: isExtensionEnabled,
-    });
+    await setVariable(Variable.IS_EXTENSION_ENABLED, isExtensionEnabled);
   }
 };
 
