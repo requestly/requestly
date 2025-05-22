@@ -14,7 +14,7 @@ interface State {
   error: Error | null;
 }
 
-function sendErrorToSentry(error: any) {
+function sendErrorToSentry(error: Error) {
   Sentry.withScope((scope) => {
     scope.setTag("caught_by", "api_client_error_boundary");
     if (error instanceof NativeError) {
@@ -22,6 +22,10 @@ function sendErrorToSentry(error: any) {
     }
     Sentry.captureException(error);
   });
+}
+
+function decorateErrorForSentry(error: Error & { tags?: Record<string, string> }) {
+  error.tags = { ...error.tags, "caught_by": "api_client_error_boundary" };
 }
 
 function createError(message?: string) {
@@ -67,7 +71,7 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
   private promiseRejectionHandler = (event: PromiseRejectionEvent) => {
     const error = sanitizeError(event.reason);
     this.setState({ hasError: true, error });
-    sendErrorToSentry(error);
+    decorateErrorForSentry(error);
   };
 
   static getDerivedStateFromError(error: Error): State {
