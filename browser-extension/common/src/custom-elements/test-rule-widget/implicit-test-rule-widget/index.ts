@@ -12,7 +12,8 @@ type AppliedRule = { ruleId: string; ruleName: string; ruleType: RuleType };
 class RQImplicitTestRuleWidget extends RQTestRuleWidget {
   #appliedRules: AppliedRule[] = [];
   #widgetDisplayTimerId: NodeJS.Timeout | null;
-  #progressBar: HTMLElement;
+  #widgetDisplayStartTime: number;
+  #widgetDisplayRemainingTime = IMPLICIT_WIDGET_DISPLAY_TIME;
 
   connectedCallback() {
     super.connectedCallback();
@@ -37,8 +38,6 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
     const closeButton = this.shadowRoot.getElementById("close-button");
     closeButton.classList.remove("hidden");
 
-    this.#progressBar = this.shadowRoot.querySelector(".test-rule-widget-progress-bar");
-
     this.addWidgetListeners();
 
     const appliedRules = JSON.parse(this.attributes.getNamedItem("applied-rules")?.value || "[]");
@@ -49,6 +48,16 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
   }
 
   addWidgetListeners() {
+    this.shadowRoot.getElementById("container").addEventListener("mouseenter", (event) => {
+      event.stopPropagation();
+      this.pauseWidgetTimer();
+    });
+
+    this.shadowRoot.getElementById("container").addEventListener("mouseleave", (event) => {
+      event.stopPropagation();
+      this.resumeWidgetTimer();
+    });
+
     this.addEventListener("new-rule-applied", (evt: CustomEvent) => {
       const isRuleAlreadyApplied = this.#appliedRules.some((rule) => rule.ruleId === evt.detail.appliedRuleId);
       if (isRuleAlreadyApplied) return;
@@ -76,31 +85,32 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
   show() {
     clearTimeout(this.#widgetDisplayTimerId);
     super.show();
-    this.startProgressBarAnimation();
+    this.#widgetDisplayStartTime = Date.now();
     this.#widgetDisplayTimerId = setTimeout(() => {
       super.hide();
-    }, IMPLICIT_WIDGET_DISPLAY_TIME);
+      this.#widgetDisplayRemainingTime = IMPLICIT_WIDGET_DISPLAY_TIME;
+    }, this.#widgetDisplayRemainingTime);
   }
 
   hide() {
     clearTimeout(this.#widgetDisplayTimerId);
     super.hide();
-    this.resetProgressBar();
   }
 
-  private startProgressBarAnimation() {
-    this.#progressBar.style.width = "100%";
-    setTimeout(() => {
-      this.#progressBar.style.width = "0%";
-    }, 50); // Small delay to ensure the transition is visible
+  pauseWidgetTimer() {
+    if (this.#widgetDisplayTimerId) {
+      clearTimeout(this.#widgetDisplayTimerId);
+
+      // Just to make sure we are not getting negative time
+      this.#widgetDisplayRemainingTime = Math.abs(
+        this.#widgetDisplayRemainingTime - (Date.now() - this.#widgetDisplayStartTime)
+      );
+      this.#widgetDisplayTimerId = null;
+    }
   }
 
-  private resetProgressBar() {
-    this.#progressBar.style.transition = "none";
-    this.#progressBar.style.width = "100%";
-    setTimeout(() => {
-      this.#progressBar.style.transition = "width 5s linear";
-    }, 50);
+  resumeWidgetTimer() {
+    this.show();
   }
 
   triggerAppliedRuleClickedEvent(detail: any) {

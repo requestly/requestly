@@ -364,5 +364,26 @@ a {
   left: 0;
   right: 0;
   width: 100%;
-  transition: width 5s linear;
+
+  animation-name: progressBar;
+  animation-delay: 50ms;
+  animation-direction: normal;
+  animation-duration: 5s;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+  animation-timing-function: linear;
+}
+
+#container:hover .test-rule-widget-progress-bar {
+  animation-play-state: paused;
+}
+
+@keyframes progressBar {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
 }
