@@ -1,6 +1,9 @@
 import { onVariableChange, setVariable, Variable } from "../variable";
 import { isExtensionEnabled } from "../../utils";
 import extensionIconManager from "./extensionIconManager";
+import { sendMessageToApp } from "./messageHandler/sender";
+import { CLIENT_MESSAGES } from "common/constants";
+import { stopRecordingOnAllTabs } from "./sessionRecording";
 
 enum MenuItem {
   TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
@@ -33,9 +36,12 @@ export const initContextMenu = async () => {
   });
 
   chrome.contextMenus.onClicked.addListener(async (info) => {
-    const isExtensionStatusEnabled = await isExtensionEnabled();
     if (info.menuItemId === MenuItem.TOGGLE_ACTIVATION_STATUS) {
-      setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, !isExtensionStatusEnabled);
+      const isExtensionStatusEnabled = await isExtensionEnabled();
+      // Couldn't use updateExtensionStatus() here because of introducing circular dependency
+      await setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, !isExtensionStatusEnabled);
+      sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED, isExtensionEnabled });
+      stopRecordingOnAllTabs();
     }
   });
 
