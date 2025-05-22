@@ -165,6 +165,8 @@ export const fetchAllEnvironmentDetails = async (ownerId: string) => {
     }
 
     return environmentDetails;
+  } catch (e) {
+    console.log("aaa", e);
   } finally {
     releaseLock();
   }
