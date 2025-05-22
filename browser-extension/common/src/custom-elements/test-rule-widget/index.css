@@ -124,14 +124,36 @@
 
 #info-container {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
   gap: 6px;
   margin-top: 8px;
+  padding: 8px 0px;
+  align-items: flex-start;
+  gap: 4px;
 }
 
 #info-icon {
   align-self: flex-start;
+  width: 16px;
+  height: 16px;
+  color: #bbb;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#info-text {
+  color: #fff;
+  font-size: 11px;
+  line-height: 17px;
+}
+
+#info-text .link {
+  color: #639ff9;
+  font-size: inherit;
+  line-height: 17px;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
 }
 
 #rule-status-comment {

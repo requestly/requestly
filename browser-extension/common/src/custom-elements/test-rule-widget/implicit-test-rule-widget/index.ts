@@ -62,6 +62,7 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
       const isRuleAlreadyApplied = this.#appliedRules.some((rule) => rule.ruleId === evt.detail.appliedRuleId);
       if (isRuleAlreadyApplied) return;
 
+      super.showInfoContainer();
       this.#appliedRules.push({
         ruleId: evt.detail.appliedRuleId,
         ruleName: evt.detail.appliedRuleName,

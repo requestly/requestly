@@ -38,14 +38,6 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
 
     const appliedStatus = this.attributes.getNamedItem("applied-status")?.value;
     this.showRuleAppliedStatus(appliedStatus === "true");
-
-    const infoTextContent = this.attributes.getNamedItem("rq-test-rule-text")?.value;
-    if (infoTextContent) {
-      const infoContainer = this.shadowRoot.getElementById("info-container");
-      const infoContainerText = this.shadowRoot.getElementById("info-text");
-      setInnerHTML(infoContainerText, infoTextContent);
-      infoContainer.classList.remove("hidden");
-    }
   }
 
   addWidgetListeners() {
