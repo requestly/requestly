@@ -43,23 +43,34 @@ export const ImplicitRuleTesting = () => {
     });
   }, [appMode]);
 
-  return (
-    isCompatible && (
-      <SettingsItem
-        isActive={isImplicitRuleTestingEnabled}
-        onChange={handleImplicitRuleTestingToggleChange}
-        title="Show widget when rule is applied"
-        caption="Enabling this option will display the widget on websites where any rules are enabled."
-        settingsBody={
-          <RuleTypesOptions
-            enabledRuleTypes={enabledRuleTypes}
-            setEnabledRuleTypes={setEnabledRuleTypes}
-            isImplicitRuleTestingEnabled={isImplicitRuleTestingEnabled}
-            widgetVisibility={widgetVisibility}
-            setWidgetVisibility={setWidgetVisibility}
-          />
-        }
-      />
-    )
-  );
+  const onConfirm = () => {
+    if (!isImplicitRuleTestingEnabled) {
+    }
+  };
+
+  return isCompatible ? (
+    <SettingsItem
+      isActive={isImplicitRuleTestingEnabled}
+      onChange={handleImplicitRuleTestingToggleChange}
+      title="Show widget when rule is applied"
+      caption="Enabling this option will display the widget on websites where any rules are enabled."
+      confirmation={{
+        title: <div></div>,
+        onConfirm,
+        icon: null,
+        showCancel: true,
+        okText: "Yes",
+        cancelText: "No",
+      }}
+      settingsBody={
+        <RuleTypesOptions
+          enabledRuleTypes={enabledRuleTypes}
+          setEnabledRuleTypes={setEnabledRuleTypes}
+          isImplicitRuleTestingEnabled={isImplicitRuleTestingEnabled}
+          widgetVisibility={widgetVisibility}
+          setWidgetVisibility={setWidgetVisibility}
+        />
+      }
+    />
+  ) : null;
 };
