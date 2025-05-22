@@ -19,6 +19,7 @@ import "./RequestRow.scss";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdContentCopy } from "@react-icons/all-files/md/MdContentCopy";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
+import { MdMoveDown } from "@react-icons/all-files/md/MdMoveDown";
 import { Conditional } from "components/common/Conditional";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RequestViewTabSource } from "../../../../clientView/components/RequestView/requestViewTabSource";
@@ -121,7 +122,12 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
       },
       {
         key: "2",
-        label: <div>Move to Collection</div>,
+        label: (
+          <div>
+            <MdMoveDown style={{ marginRight: 8 }} />
+            Move to Collection
+          </div>
+        ),
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setRecordToMove(record);
