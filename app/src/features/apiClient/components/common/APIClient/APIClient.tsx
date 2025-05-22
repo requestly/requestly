@@ -103,7 +103,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       destroyOnClose
     >
       <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-        {!user.loggedIn ? (
+        {user.loggedIn ? (
           <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
         ) : (
           <ApiClientLoggedOutView />
