@@ -37,13 +37,7 @@ export const removeRecord = async (key: string): Promise<void> => {
 };
 
 export const clearAllRecords = async (): Promise<void> => {
-  const VAR = "rq_var_isExtensionEnabled";
-  const isExtensionEnabledVariableValue = await getRecord(VAR);
   await chrome.storage[STORAGE_TYPE].clear();
-
-  if (isExtensionEnabledVariableValue !== undefined) {
-    await saveObject({ [VAR]: isExtensionEnabledVariableValue });
-  }
 };
 
 export enum ChangeType {

@@ -188,7 +188,7 @@ const CustomScriptRow = ({
   };
 
   const handleEditorUpdate = useCallback(
-    (value, triggerUnsavedChanges = true) => {
+    (value, triggerUnsavedChanges) => {
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
         /* THIS IS TEMPORARY REPRESENTATION OF SCRIPT ATTRIBUTE */
         dispatch(

@@ -2,7 +2,6 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
-import Logger from "lib/logger";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
   trackNewEnvironmentClicked,
@@ -179,35 +178,22 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     };
 
     setIsLoadingApiClientRecords(true);
-    apiClientRecordsRepository
-      .getAllRecords()
-      .then((result) => {
-        if (!result.success) {
-          notification.error({
-            message: "Could not fetch records!",
-            description: result?.message,
-            placement: "bottomRight",
-          });
-          setApiClientRecords([]);
-          return;
-        } else {
-          setApiClientRecords(result.data.records);
-          setErrorFiles(result.data.erroredRecords);
-          updateCollectionVariablesOnInit(result.data.records);
-        }
-      })
-      .catch((error) => {
+    apiClientRecordsRepository.getAllRecords().then((result) => {
+      if (!result.success) {
         notification.error({
           message: "Could not fetch records!",
-          description: typeof error ==="string" ? error : error.message,
+          description: result?.message,
           placement: "bottomRight",
         });
         setApiClientRecords([]);
-        Logger.error("Error loading api records!", error);
-      })
-      .finally(() => {
-        setIsLoadingApiClientRecords(false);
-      });
+        return;
+      } else {
+        setApiClientRecords(result.data.records);
+        setErrorFiles(result.data.erroredRecords);
+        updateCollectionVariablesOnInit(result.data.records);
+      }
+      setIsLoadingApiClientRecords(false);
+    });
   }, [apiClientRecordsRepository, uid, dispatch]);
 
   useEffect(() => {
