@@ -22,13 +22,13 @@ const container = document.getElementById("root");
 const root = createRoot(container);
 const appFlavour = getAppFlavour();
 
-/* Google translate replaces textNodes from the DOM  with <font> tag 
+/* Google translate replaces textNodes from the DOM  with <font> tag
   Beacuse of this, React throws error when re-rednering the component
   This is a workaround to fix the issue
 
 
-  It overrides the removeChild and insertBefore methods of Node.prototype if the child's parentNode is not the same as the current node. This patch swallows the error and return the child node. 
-  
+  It overrides the removeChild and insertBefore methods of Node.prototype if the child's parentNode is not the same as the current node. This patch swallows the error and return the child node.
+
   This is a workaround to fix the issue
 */
 
@@ -49,6 +49,34 @@ if (typeof Node === "function" && Node.prototype) {
     return originalInsertBefore.apply(this, arguments);
   };
 }
+
+window.globalUnhandledRejectionHandlers = new Set();
+
+/**
+* We are adding our own unhandledrejection handler before anyone does so that we have the ability
+* to act before everyone else.
+* This currently caters to our APIClientErrorBoundary where we need to decorate the error object
+* before it's captured by sentry.
+*/
+window.addEventListener("unhandledrejection", (event) => {
+  console.log("got rejection", window.globalUnhandledRejectionHandlers, Date.now());
+  if (!window.globalUnhandledRejectionHandlers && !(window.globalUnhandledRejectionHandlers instanceof Set)) {
+    Sentry.captureMessage("globalUnhandledRejectionHandlers is either not set or is not a Set", {
+      extra: {
+        value: window.globalUnhandledRejectionHandlers,
+      }
+    });
+    return;
+  }
+  for (const handler of window.globalUnhandledRejectionHandlers) {
+    try {
+      handler(event);
+    } catch (e) {
+      console.error("Could not execute a global unhandled rejection handler", e);
+      Sentry.captureException(e);
+    }
+  }
+});
 
 root.render(
   <Provider store={reduxStore}>
