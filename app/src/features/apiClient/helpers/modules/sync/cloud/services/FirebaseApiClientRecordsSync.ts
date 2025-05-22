@@ -28,7 +28,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async getAllRecords() {
-    throw new Error("testing something!");
+    throw new Error("testing something new!");
     const result = await getApiRecords(this.getPrimaryId());
     return {
       success: result.success,
