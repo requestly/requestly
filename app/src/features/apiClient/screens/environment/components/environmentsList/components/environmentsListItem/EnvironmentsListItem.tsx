@@ -142,7 +142,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       <Input
         className="environment-input"
         autoFocus
-        value={newEnvironmentName}
+        defaultValue={environment.name}
         onChange={(e) => setNewEnvironmentName(e.target.value)}
         onPressEnter={handleEnvironmentRename}
         onBlur={handleEnvironmentRename}
