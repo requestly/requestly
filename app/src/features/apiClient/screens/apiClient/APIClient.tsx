@@ -32,6 +32,7 @@ type HistoryModeProps = BaseProps & {
 type Props = CreateModeProps | EditModeProps | HistoryModeProps;
 
 export const APIClient: React.FC<Props> = React.memo((props) => {
+  throw new Error("zzz");
   const location = useLocation();
   const { isCreateMode } = props;
   const { apiClientRecords, history, selectedHistoryIndex, addToHistory } = useApiClientContext();
