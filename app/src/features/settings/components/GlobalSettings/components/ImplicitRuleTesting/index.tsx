@@ -86,7 +86,7 @@ export const ImplicitRuleTesting = () => {
       }
       confirmation={{
         open: showConfirmation,
-        placement: "bottom",
+        placement: "bottomRight",
         overlayClassName: "implicit-rule-switch-confirmation",
         title: (
           <>
