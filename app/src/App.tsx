@@ -16,6 +16,7 @@ window.globalUnhandledRejectionHandlers = new Set<(event: PromiseRejectionEvent)
 * before it's captured by sentry.
 */
 window.addEventListener("unhandledrejection", (event) => {
+  console.log("got rejection", globalUnhandledRejectionHandlers, Date.now());
   if (!globalUnhandledRejectionHandlers && !(globalUnhandledRejectionHandlers instanceof Set)) {
     Sentry.captureMessage("globalUnhandledRejectionHandlers is either not set or is not a Set", {
       extra: {
