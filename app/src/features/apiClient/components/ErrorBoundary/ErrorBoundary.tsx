@@ -72,6 +72,7 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
     const error = sanitizeError(event.reason);
     this.setState({ hasError: true, error });
     decorateErrorForSentry(error);
+    sendErrorToSentry(error);
   };
 
   static getDerivedStateFromError(error: Error): State {
