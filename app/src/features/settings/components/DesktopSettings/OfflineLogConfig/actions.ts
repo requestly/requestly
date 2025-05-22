@@ -18,19 +18,19 @@ function makeIPCRequestForOfflineLogConfig(action: string, payloadData?: any) {
 }
 
 export function getAllConfig(): Promise<IOfflineLogConfig> {
-  return makeIPCRequestForOfflineLogConfig("USER_PREFERENCE:OFFLINE_LOG_CONFIG:GET_ALL") as Promise<IOfflineLogConfig>;
+  return makeIPCRequestForOfflineLogConfig("USER_PREFERENCE:LOCAL_LOG_FILE:GET_ALL") as Promise<IOfflineLogConfig>;
 }
 
 export function setIsEnabledConfig(isLocalLoggingEnabled: boolean) {
-  return makeIPCRequestForOfflineLogConfig("USER_PREFERENCE:OFFLINE_LOG_CONFIG:SET_IS_ENABLED", {
+  return makeIPCRequestForOfflineLogConfig("USER_PREFERENCE:LOCAL_LOG_FILE:SET_IS_ENABLED", {
     isLocalLoggingEnabled,
   });
 }
 
 export function setLogStorePathConfig(logStorePath: string) {
-  return makeIPCRequestForOfflineLogConfig("USER_PREFERENCE:OFFLINE_LOG_CONFIG:SET_STORE_PATH", { logStorePath });
+  return makeIPCRequestForOfflineLogConfig("USER_PREFERENCE:LOCAL_LOG_FILE:SET_STORE_PATH", { logStorePath });
 }
 
 export function setFilterConfig(localLogFilterfilter: string[]) {
-  return makeIPCRequestForOfflineLogConfig("USER_PREFERENCE:OFFLINE_LOG_CONFIG:SET_FILTER", { localLogFilterfilter });
+  return makeIPCRequestForOfflineLogConfig("USER_PREFERENCE:LOCAL_LOG_FILE:SET_FILTER", { localLogFilterfilter });
 }
