@@ -42,8 +42,12 @@ export const initContextMenu = async () => {
   chrome.contextMenus.onClicked.addListener(async (info) => {
     if (info.menuItemId === MenuItem.TOGGLE_ACTIVATION_STATUS) {
       const isExtensionStatusEnabled = await isExtensionEnabled();
-      await setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, !isExtensionStatusEnabled);
-      sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED, isExtensionEnabled });
+      const extensionStatus = !isExtensionStatusEnabled;
+      await setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, extensionStatus);
+      sendMessageToApp({
+        action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED,
+        isExtensionEnabled: extensionStatus,
+      });
     }
   });
 
