@@ -26,7 +26,6 @@ function sendErrorToSentry(error: Error) {
 
 function decorateErrorForSentry(error: Error & { tags?: Record<string, string> }) {
   error.tags = { ...error.tags, "caught_by": "api_client_error_boundary" };
-  console.log("added tags", Date.now())
 }
 
 function createError(message?: string) {
