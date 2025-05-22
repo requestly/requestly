@@ -46,9 +46,16 @@ const Popup: React.FC = () => {
   }, [currentTab]);
 
   const handleToggleExtensionStatus = useCallback((newStatus: boolean) => {
+    console.log("[Popup] handleToggleExtensionStatus", {
+      newStatus,
+    });
     chrome.runtime.sendMessage(
       { action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS, newStatus },
       ({ success, updatedStatus }) => {
+        console.log("[Popup] handleToggleExtensionStatus callback", {
+          success,
+          updatedStatus,
+        });
         if (!success) {
           message.error("Cannot update extension status. Please contact support.", 0.75);
           return;

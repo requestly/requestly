@@ -32,6 +32,7 @@ import {
 } from "../desktopApp/index";
 import { sendMessageToApp } from "./sender";
 import { updateExtensionStatus } from "../utils";
+import extensionIconManager from "../extensionIconManager";
 
 export const initMessageHandler = () => {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -100,11 +101,19 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS:
+        console.log(`[Toggle extension status] message received`, {
+          message,
+        });
         updateExtensionStatus(message.newStatus)
           .then((updatedStatus) => {
-            sendResponse({
+            const response = {
               success: true,
               updatedStatus,
+            };
+            sendResponse(response);
+            console.log(`[Toggle extension status] response sent`, {
+              ...response,
+              extensionIconState: extensionIconManager.getState(),
             });
           })
           .catch((e) => {
@@ -115,6 +124,8 @@ export const initMessageHandler = () => {
               "[messageHandler.handleToggleExtensionStatus] Error occurred while updating extension status.",
               {
                 error: e.message,
+                extensionIconState: extensionIconManager.getState(),
+                message,
               }
             );
           });
