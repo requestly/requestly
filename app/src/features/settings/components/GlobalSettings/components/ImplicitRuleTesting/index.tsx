@@ -8,12 +8,14 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import APP_CONSTANTS from "config/constants";
 import { getImplicitRuleTestingWidgetConfig, updateImplictRuleTestingWidgetConfig } from "./utils";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 import "./implicitRuleTesting.scss";
 
 export const ImplicitRuleTesting = () => {
   const appMode = useSelector(getAppMode);
   const [isImplicitRuleTestingEnabled, setIsImplicitRuleTestingEnabled] = useState(false);
   const [enabledRuleTypes, setEnabledRuleTypes] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [widgetVisibility, setWidgetVisibility] = useState(
     GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.ALL
   );
@@ -22,6 +24,7 @@ export const ImplicitRuleTesting = () => {
 
   const handleImplicitRuleTestingToggleChange = useCallback(
     (status: boolean) => {
+      trackSettingsToggled("implicit_rule_applied_widget", status);
       setIsImplicitRuleTestingEnabled(status);
 
       updateImplictRuleTestingWidgetConfig(appMode, {
@@ -41,20 +44,33 @@ export const ImplicitRuleTesting = () => {
       setWidgetVisibility(data.visibility);
       if (data?.enabled) {
         setIsImplicitRuleTestingEnabled(true);
-      } else setIsImplicitRuleTestingEnabled(false);
+      } else {
+        setIsImplicitRuleTestingEnabled(false);
+      }
     });
   }, [appMode]);
 
   const onConfirm = () => {
-    if (!isImplicitRuleTestingEnabled) {
-      return;
+    handleImplicitRuleTestingToggleChange(false);
+    setShowConfirmation(false);
+  };
+
+  const onCancel = () => {
+    setShowConfirmation(false);
+  };
+
+  const onChange = (status: boolean) => {
+    if (status) {
+      handleImplicitRuleTestingToggleChange(true);
+    } else {
+      setShowConfirmation(true);
     }
   };
 
   return isCompatible ? (
     <SettingsItem
       isActive={isImplicitRuleTestingEnabled}
-      onChange={handleImplicitRuleTestingToggleChange}
+      onChange={onChange}
       title="Show widget when rule is applied"
       caption={
         <>
@@ -69,6 +85,7 @@ export const ImplicitRuleTesting = () => {
         </>
       }
       confirmation={{
+        open: showConfirmation,
         placement: "bottom",
         overlayClassName: "implicit-rule-switch-confirmation",
         title: (
@@ -83,6 +100,7 @@ export const ImplicitRuleTesting = () => {
             </div>
           </>
         ),
+        onCancel,
         onConfirm,
         icon: null,
         showCancel: true,
