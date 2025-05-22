@@ -1,7 +1,7 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
-import { getAppTabs, toggleExtensionStatus } from "./utils";
-import { applyScriptRules } from "./scriptRuleHandler";
+import { toggleExtensionStatus } from "../utils";
+import { applyScriptRules } from "../scriptRuleHandler";
 import {
   cacheRecordedSessionOnClientPageUnload,
   getTabSession,
@@ -13,29 +13,25 @@ import {
   startRecordingExplicitly,
   stopRecording,
   watchRecording,
-} from "./sessionRecording";
-import { initCustomWidgets } from "./customWidgets";
-import { getAPIResponse } from "./apiClient";
-import { requestProcessor } from "./requestProcessor";
+} from "../sessionRecording";
+import { initCustomWidgets } from "../customWidgets";
+import { getAPIResponse } from "../apiClient";
+import { requestProcessor } from "../requestProcessor";
 import {
   handleTestRuleOnClientPageLoad,
   launchUrlAndStartRuleTesting,
   saveTestRuleResult,
-} from "./testThisRuleHandler";
-import ruleExecutionHandler from "./ruleExecutionHandler";
-import { isExtensionEnabled, isUrlInBlockList } from "../../utils";
-import { globalStateManager } from "./globalStateManager";
-import { isProxyApplied } from "./proxy";
+} from "../testThisRuleHandler";
+import ruleExecutionHandler from "../ruleExecutionHandler";
+import { isExtensionEnabled, isUrlInBlockList } from "../../../utils";
+import { globalStateManager } from "../globalStateManager";
+import { isProxyApplied } from "../proxy";
 import {
   connectToDesktopAppAndApplyProxy,
   disconnectFromDesktopAppAndRemoveProxy,
   checkIfDesktopAppOpen,
-} from "./desktopApp/index";
-
-export const sendMessageToApp = async (messageObject: unknown) => {
-  const appTabs = await getAppTabs();
-  return Promise.all(appTabs.map(({ id }) => chrome.tabs.sendMessage(id, messageObject)));
-};
+} from "../desktopApp/index";
+import { sendMessageToApp } from "./sender";
 
 export const initMessageHandler = () => {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
