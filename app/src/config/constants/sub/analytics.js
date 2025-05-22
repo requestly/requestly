@@ -134,7 +134,13 @@ export const GA_EVENTS = {
     NUM_RULE_TYPES: "NUM_RULE_TYPES",
     NUM_RULES_PINNED: "num_rules_pinned",
     NUM_RULE_TYPES_TRIED: "num_rule_types_tried",
-    NUM_ACTIVE_RULES: "NUM_ACTIVE_RULES",
+    NUM_ACTIVE_RULES: "NUM_ACTIVE_RULES", // TODO: should be in smallcase
+
+    NUM_RULES_EXCLUDING_HEADERS: "num_rules_excluding_headers",
+    NUM_ACTIVE_RULES_EXCLUDING_HEADERS: "num_active_rules_excluding_headers",
+    NUM_RULES_EXCLUDING_FREE_RULES: "num_rules_excluding_free_rules",
+    NUM_ACTIVE_RULES_EXCLUDING_FREE_RULES: "num_active_rules_excluding_free_rules",
+
     NUM_GROUPS: "NUM_GROUPS",
     NUM_ACTIVE_GROUPS: "NUM_ACTIVE_GROUPS",
     NUM_SHARED_LISTS: "NUM_SHARED_LISTS",

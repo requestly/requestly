@@ -11,6 +11,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./premiumPlanBadge.scss";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { getPrettyPlanName } from "utils/FormattingHelper";
 
 const PremiumPlanBadge = () => {
   const dispatch = useDispatch();
@@ -76,6 +77,13 @@ const PremiumPlanBadge = () => {
     planId &&
     [APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING, APP_CONSTANTS.SUBSCRIPTION_STATUS.CANCELLED].includes(planStatus)
   ) {
+    if (daysLeft > 30) {
+      return null;
+    }
+
+    const planName =
+      userPlanDetails?.planName === "professional" ? "Pro" : getPrettyPlanName(userPlanDetails?.planName);
+
     return (
       <Tooltip title={"Click for more details"} destroyTooltipOnHide={true}>
         <div
@@ -84,7 +92,7 @@ const PremiumPlanBadge = () => {
           onKeyDown={handleBadgeClick}
           onClick={handleBadgeClick}
         >
-          <div className="premium-plan-name">{"Pro (Trial)"}</div>
+          <div className="premium-plan-name">{`${planName} (Trial)`}</div>
           <div className="premium-plan-days-left">
             {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
               ? `${daysLeft}d left ${isIncentivizationEnabled ? "plan" : ""}`

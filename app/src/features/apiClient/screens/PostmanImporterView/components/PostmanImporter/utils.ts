@@ -1,5 +1,5 @@
 import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
-import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
+import { KeyValuePair, PostmanBodyMode, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { POSTMAN_AUTH_TYPES_MAPPING, PostmanAuth } from "features/apiClient/constants";
 import { Authorization } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 import { isEmpty } from "lodash";
@@ -27,6 +27,12 @@ interface PostmanEnvironmentExport {
     enabled: boolean;
   }[];
   _postman_variable_scope: string;
+}
+
+interface RequestBodyProcessingResult {
+  requestBody: string | KeyValuePair[] | null;
+  contentType: RequestContentType;
+  headers: KeyValuePair[];
 }
 
 export const getUploadedPostmanFileType = (fileContent: PostmanCollectionExport | PostmanEnvironmentExport) => {
@@ -151,6 +157,125 @@ const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentC
   return auth;
 };
 
+const getContentTypeForRawBody = (bodyType: string) => {
+  switch (bodyType) {
+    case "json":
+      return RequestContentType.JSON;
+    case "text":
+      return RequestContentType.RAW;
+    case "html":
+      return RequestContentType.HTML;
+    case "javascript":
+      return RequestContentType.JAVASCRIPT;
+    case "xml":
+      return RequestContentType.XML;
+    default:
+      return RequestContentType.RAW;
+  }
+};
+
+const addImplicitContentTypeHeader = (headers: KeyValuePair[], contentType: RequestContentType): KeyValuePair[] => {
+  const isContentTypeHeaderSet = headers.find((header: KeyValuePair) => header.key === "Content-Type");
+  if (!isContentTypeHeaderSet) {
+    return [
+      ...headers,
+      {
+        id: headers.length,
+        key: "Content-Type",
+        value: contentType,
+        isEnabled: true,
+      },
+    ];
+  }
+  return headers;
+};
+
+const processRawRequestBody = (raw: string, options: any, headers: KeyValuePair[]): RequestBodyProcessingResult => {
+  const contentType = getContentTypeForRawBody(options?.raw.language);
+  const updatedHeaders = raw.length ? addImplicitContentTypeHeader(headers, contentType) : headers;
+
+  return {
+    requestBody: raw,
+    contentType,
+    headers: updatedHeaders,
+  };
+};
+
+const processFormDataBody = (formdata: any[]): Omit<RequestBodyProcessingResult, "headers"> => {
+  return {
+    requestBody:
+      formdata?.map((formData: { key: string; value: string }) => ({
+        id: Date.now(),
+        key: formData.key,
+        value: formData.value,
+        isEnabled: true,
+      })) || [],
+    contentType: RequestContentType.FORM,
+  };
+};
+
+const processUrlEncodedBody = (urlencoded: any[], headers: KeyValuePair[]): RequestBodyProcessingResult => {
+  const contentType = RequestContentType.FORM;
+  const updatedHeaders = urlencoded.length ? addImplicitContentTypeHeader(headers, contentType) : headers;
+
+  return {
+    requestBody: urlencoded.map((data: { key: string; value: string }) => ({
+      id: Date.now() + Math.random(),
+      key: data?.key || "",
+      value: data?.value || "",
+      isEnabled: true,
+    })),
+    contentType,
+    headers: updatedHeaders,
+  };
+};
+
+const processRequestBody = (request: any): RequestBodyProcessingResult => {
+  if (!request.body) {
+    return {
+      requestBody: null,
+      contentType: RequestContentType.RAW,
+      headers: request.header || [],
+    };
+  }
+
+  const processGraphqlBody = (graphql: any, headers: KeyValuePair[]): RequestBodyProcessingResult => {
+    const contentType = RequestContentType.JSON;
+    const updatedHeaders = addImplicitContentTypeHeader(headers, contentType);
+    return {
+      requestBody: "",
+      contentType,
+      headers: updatedHeaders,
+    };
+  };
+
+  const { mode, raw, formdata, options, urlencoded, graphql } = request.body;
+  const headers =
+    request.header?.map((header: KeyValuePair, index: number) => ({
+      id: index,
+      key: header.key,
+      value: header.value,
+      isEnabled: true,
+    })) ?? [];
+
+  switch (mode) {
+    case PostmanBodyMode.RAW:
+      return processRawRequestBody(raw, options, headers);
+    case PostmanBodyMode.FORMDATA:
+      return { ...processFormDataBody(formdata), headers };
+    case PostmanBodyMode.URL_ENCODED:
+      return processUrlEncodedBody(urlencoded, headers);
+    case PostmanBodyMode.GRAPHQL:
+      return processGraphqlBody(graphql, headers);
+    default:
+      return {
+        requestBody: null,
+        contentType: RequestContentType.RAW,
+        headers,
+      };
+  }
+};
+
 const createApiRecord = (
   item: any,
   parentCollectionId: string,
@@ -167,40 +292,7 @@ const createApiRecord = (
       isEnabled: true,
     })) ?? [];
 
-  const headers =
-    request.header?.map((header: any, index: number) => ({
-      id: index,
-      key: header.key,
-      value: header.value,
-      isEnabled: true,
-    })) ?? [];
-
-  let contentType: RequestContentType | null = null;
-  let requestBody: string | KeyValuePair[] | null = null;
-
-  const { mode, raw, formdata, options, urlencoded } = request.body || {};
-
-  if (mode === "raw") {
-    requestBody = raw;
-    contentType = options?.raw.language === "json" ? RequestContentType.JSON : RequestContentType.RAW;
-  } else if (mode === "formdata") {
-    contentType = RequestContentType.FORM;
-    requestBody =
-      formdata?.map((formData: { key: string; value: string }) => ({
-        id: Date.now(),
-        key: formData.key,
-        value: formData.value,
-        isEnabled: true,
-      })) || [];
-  } else if (mode === "urlencoded") {
-    contentType = RequestContentType.FORM;
-    requestBody = urlencoded.map((data: { key: string; value: string }) => ({
-      id: Date.now() + Math.random(),
-      key: data?.key || "",
-      value: data?.value || "",
-      isEnabled: true,
-    }));
-  }
+  const { requestBody, contentType, headers } = processRequestBody(request);
 
   return {
     id: apiClientRecordsRepository.generateApiRecordId(parentCollectionId),
