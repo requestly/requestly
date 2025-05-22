@@ -1,7 +1,27 @@
-import { onVariableChange, setVariable } from "../variable";
+import { onVariableChange, setVariable, Variable } from "../variable";
 import { isExtensionEnabled } from "../../utils";
-import { MenuItem, ToggleActivationStatusLabel, Variable } from "common/types";
-import { updateActivationStatus } from "./utils";
+import extensionIconManager from "./extensionIconManager";
+
+enum MenuItem {
+  TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
+}
+
+enum ToggleActivationStatusLabel {
+  ACTIVATE = "Activate Requestly",
+  DEACTIVATE = "Deactivate Requestly",
+}
+
+export const updateActivationStatus = (isExtensionEnabled: boolean) => {
+  chrome.contextMenus.update(MenuItem.TOGGLE_ACTIVATION_STATUS, {
+    title: isExtensionEnabled ? ToggleActivationStatusLabel.DEACTIVATE : ToggleActivationStatusLabel.ACTIVATE,
+  });
+
+  if (isExtensionEnabled) {
+    extensionIconManager.markExtensionEnabled();
+  } else {
+    extensionIconManager.markExtensionDisabled();
+  }
+};
 
 export const initContextMenu = async () => {
   chrome.contextMenus.removeAll();

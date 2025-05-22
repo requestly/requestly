@@ -1,14 +1,18 @@
 import { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RQAPI } from "features/apiClient/types";
+import { ErrorCode } from "../../../../../../../errors/types";
 
-export type FileSystemError = { message: string; path: string };
+export type FileSystemError = {
+  type: "error";
+  error: {
+    message: string;
+    path: string;
+    fileType: FileType;
+    code: ErrorCode;
+  };
+};
 export type ContentfulSuccess<T> = T extends void ? { type: "success" } : { type: "success"; content: T };
-export type FileSystemResult<T> =
-  | ContentfulSuccess<T>
-  | {
-      type: "error";
-      error: FileSystemError;
-    };
+export type FileSystemResult<T> = ContentfulSuccess<T> | FileSystemError;
 
 export type Collection = {
   type: "collection";

@@ -54,7 +54,7 @@ export const ApiClientEmptyView = () => {
           }
         } else {
           notification.error({
-            message: `Could not create collection.`,
+            message: `Could not create ${recordType === RQAPI.RecordType.API ? "request" : "collection"}.`,
             description: result?.message,
             placement: "bottomRight",
           });
@@ -62,7 +62,7 @@ export const ApiClientEmptyView = () => {
       })
       .catch((error) => {
         notification.error({
-          message: `Could not create collection.`,
+          message: `Could not create ${recordType === RQAPI.RecordType.API ? "request" : "collection"}.`,
           description: error?.message,
           placement: "bottomRight",
         });

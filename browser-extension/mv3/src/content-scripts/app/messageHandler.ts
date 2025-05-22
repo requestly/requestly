@@ -1,14 +1,8 @@
 import config from "common/config";
 import { APP_MESSAGES, EXTENSION_MESSAGES, STORAGE_TYPE } from "common/constants";
-import {
-  clearAllRecordsExceptVariables,
-  getAllRecords,
-  getRecord,
-  getSuperObject,
-  removeRecord,
-  saveObject,
-} from "common/storage";
+import { clearAllRecords, getAllRecords, getRecord, getSuperObject, removeRecord, saveObject } from "common/storage";
 import { isAppURL } from "../../utils";
+import { getVariable, Variable } from "../../service-worker/variable";
 
 interface ContentScriptMessage {
   action: string;
@@ -74,6 +68,17 @@ const sendResponse = (originalEventData: ContentScriptMessage, response?: unknow
   });
 };
 
+const clearAllRecordsExpectExtensionEnabledVariable = async () => {
+  const isExtensionEnabled = await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED);
+
+  clearAllRecords();
+  if (isExtensionEnabled !== undefined) {
+    await saveObject({
+      [Variable.IS_EXTENSION_ENABLED]: isExtensionEnabled,
+    });
+  }
+};
+
 export const initMessageHandler = () => {
   window.addEventListener(
     "message",
@@ -124,7 +129,7 @@ export const initMessageHandler = () => {
             return;
           }
           case APP_MESSAGES.CLEAR_STORAGE: {
-            await clearAllRecordsExceptVariables();
+            await clearAllRecordsExpectExtensionEnabledVariable();
             sendResponse(event.data);
             return;
           }

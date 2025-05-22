@@ -1,11 +1,12 @@
 import { EXTENSION_MESSAGES } from "common/constants";
 import extensionIconManager from "../extensionIconManager";
 import { removeProxy } from "../proxy";
-import { sendMessageToApp, updateExtensionStatus } from "../utils";
 import { DESKTOP_APP_CONFIG } from "./desktopAppConfig";
 import { PortScanner } from "./portScanner";
 import { WebSocketMessage } from "./types";
 import { getConnectedBrowserAppId } from "./utils";
+import { sendMessageToApp } from "../messageHandler/sender";
+import { updateExtensionStatus } from "../utils";
 
 export class WebSocketManager {
   private socket: WebSocket | null = null;
