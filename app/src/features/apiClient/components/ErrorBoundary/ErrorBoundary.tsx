@@ -57,11 +57,11 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidMount(): void {
-    window.addEventListener("unhandledrejection", this.promiseRejectionHandler);
+    globalUnhandledRejectionHandlers.add(this.promiseRejectionHandler);
   }
 
   componentWillUnmount(): void {
-    window.removeEventListener("unhandledrejection", this.promiseRejectionHandler);
+    globalUnhandledRejectionHandlers.delete(this.promiseRejectionHandler);
   }
 
   componentDidCatch(error: unknown) {
@@ -70,9 +70,8 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
 
   private promiseRejectionHandler = (event: PromiseRejectionEvent) => {
     const error = sanitizeError(event.reason);
-    this.setState({ hasError: true, error });
     decorateErrorForSentry(error);
-    sendErrorToSentry(error);
+    this.setState({ hasError: true, error });
   };
 
   static getDerivedStateFromError(error: Error): State {
