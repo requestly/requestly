@@ -348,13 +348,15 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               )}
             </div>
           ) : (
-            <ApiRecordEmptyState
-              disabled={!isValidPermission}
-              newRecordBtnText="New collection"
-              message={searchValue ? "No collection or request found" : "No collections created yet"}
-              onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.COLLECTION)}
-              analyticEventSource="collection_list_empty_state"
-            />
+            <div style={{ paddingTop: 6 }}>
+              <ApiRecordEmptyState
+                disabled={!isValidPermission}
+                newRecordBtnText="New collection"
+                message={searchValue ? "No collection or request found" : "No collections created yet"}
+                onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.COLLECTION)}
+                analyticEventSource="collection_list_empty_state"
+              />
+            </div>
           )}
         </div>
         {errorFiles.length > 0 && <ErrorFilesList errorFiles={errorFiles} />}
