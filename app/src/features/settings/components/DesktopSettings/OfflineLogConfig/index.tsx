@@ -28,7 +28,7 @@ const OfflineLogConfig: React.FC = () => {
   const [filter, setFilter] = useState<string[]>([]);
   const [isSelectingFile, setIsSelectingFile] = useState<boolean>(false);
 
-  const isFlagForFeatureEnabled = useGrowthBook().getFeatureValue(FEATURES.OFFLINE_LOGS, true) || true;
+  const isFlagForFeatureEnabled = useGrowthBook().getFeatureValue(FEATURES.OFFLINE_LOGS, true);
   const isCompatible = isFeatureCompatible(FEATURES.OFFLINE_LOGS);
 
   const isFeatureVisible = useMemo(() => {
@@ -203,7 +203,7 @@ const OfflineLogConfig: React.FC = () => {
           <Col span={4}>
             {/* select file button */}
             <RQButton type="primary" onClick={handleSelectFile} loading={isSelectingFile} disabled={!isEnabled}>
-              {logStorePath ? "Change File" : "Select File"}
+              {logStorePath ? "Change Folder" : "Select Folder"}
             </RQButton>
           </Col>
           <Col span={16}>{logStorePath ? <b>Log directory: {logStorePath}/logs.jsonl</b> : null}</Col>
