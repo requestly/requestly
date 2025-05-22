@@ -6,7 +6,7 @@ import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import { SessionRuleType } from "./requestProcessor/types";
 import { EXTENSION_MESSAGES } from "common/constants";
 import { UpdateDynamicRuleOptions } from "common/types";
-import { sendMessageToApp } from "./utils";
+import { sendMessageToApp } from "./messageHandler/sender";
 
 // Object.values(chrome.declarativeNetRequest.ResourceType) cannot be used because in some browsers like safari and firefox
 // chrome.declarativeNetRequest.ResourceType is not defined.

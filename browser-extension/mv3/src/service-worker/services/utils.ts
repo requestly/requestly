@@ -1,16 +1,10 @@
-import {
-  MenuItem,
-  ScriptAttributes,
-  ScriptCodeType,
-  ScriptObject,
-  ScriptType,
-  ToggleActivationStatusLabel,
-} from "common/types";
+import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "common/types";
 import { setVariable, Variable } from "../variable";
-import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
+import { isExtensionEnabled } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
-import extensionIconManager from "./extensionIconManager";
+import { updateActivationStatus } from "./contextMenu";
 import { CLIENT_MESSAGES } from "common/constants";
+import { sendMessageToApp } from "./messageHandler/sender";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -174,6 +168,7 @@ export const toggleExtensionStatus = async (newStatus?: boolean) => {
   const updatedStatus = newStatus ?? !extensionEnabledStatus; //TODO: undefined check is incorrect
   setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
   updateActivationStatus(updatedStatus);
+  sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED, isExtensionEnabled });
   // FIXME: Memory leak here. onVariableChange sets up a listener on every toggle
   // onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, () => null);
 
@@ -182,35 +177,4 @@ export const toggleExtensionStatus = async (newStatus?: boolean) => {
   }
 
   return updatedStatus;
-};
-
-export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
-  const webURLs = getAllSupportedWebURLs();
-  let appTabs: chrome.tabs.Tab[] = [];
-
-  for (const webURL of webURLs) {
-    const tabs = await chrome.tabs.query({ url: webURL + "/*" });
-    appTabs = [...appTabs, ...tabs];
-  }
-
-  return appTabs;
-};
-
-export const sendMessageToApp = async (messageObject: unknown) => {
-  const appTabs = await getAppTabs();
-  return Promise.all(appTabs.map(({ id }) => chrome.tabs.sendMessage(id, messageObject)));
-};
-
-export const updateActivationStatus = (isExtensionEnabled: boolean) => {
-  chrome.contextMenus.update(MenuItem.TOGGLE_ACTIVATION_STATUS, {
-    title: isExtensionEnabled ? ToggleActivationStatusLabel.DEACTIVATE : ToggleActivationStatusLabel.ACTIVATE,
-  });
-
-  if (isExtensionEnabled) {
-    extensionIconManager.markExtensionEnabled();
-  } else {
-    extensionIconManager.markExtensionDisabled();
-  }
-
-  sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED, isExtensionEnabled });
 };
