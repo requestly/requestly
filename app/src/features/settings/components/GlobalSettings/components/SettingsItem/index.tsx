@@ -4,7 +4,7 @@ import "./SettingsItem.css";
 
 interface SettingsItemProps extends SwitchProps {
   title: string;
-  caption?: string;
+  caption?: ReactNode;
   isActive: boolean;
   toolTipTitle?: ReactNode;
   settingsBody?: ReactNode;
@@ -37,7 +37,7 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
         <Col span={2} style={{ alignSelf: "self-start", marginTop: "8px" }}>
           {isChangeAble ? (
             <Tooltip title={toolTipTitle}>
-              {!!confirmation ? (
+              {confirmation ? (
                 <Popconfirm {...confirmation}>
                   <Switch checked={isActive} onChange={onChange} {...props} />
                 </Popconfirm>

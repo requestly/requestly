@@ -11,3 +11,12 @@
   margin: 8px 0 1.25rem 0;
   color: var(--text-dark-gray);
 }
+
+.setting-item-container a {
+  font-size: inherit;
+  color: var(--requestly-color-primary-text, #639ff9);
+}
+
+.setting-item-container a:hover {
+  text-decoration: underline;
+}

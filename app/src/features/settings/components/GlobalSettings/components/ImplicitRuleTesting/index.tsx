@@ -7,6 +7,8 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import APP_CONSTANTS from "config/constants";
 import { getImplicitRuleTestingWidgetConfig, updateImplictRuleTestingWidgetConfig } from "./utils";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import "./implicitRuleTesting.scss";
 
 export const ImplicitRuleTesting = () => {
   const appMode = useSelector(getAppMode);
@@ -45,6 +47,7 @@ export const ImplicitRuleTesting = () => {
 
   const onConfirm = () => {
     if (!isImplicitRuleTestingEnabled) {
+      return;
     }
   };
 
@@ -53,14 +56,46 @@ export const ImplicitRuleTesting = () => {
       isActive={isImplicitRuleTestingEnabled}
       onChange={handleImplicitRuleTestingToggleChange}
       title="Show widget when rule is applied"
-      caption="Enabling this option will display the widget on websites where any rules are enabled."
+      caption={
+        <>
+          Enabling this option will display the widget on websites where any rules are enabled.{" "}
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://docs.requestly.com/general/http-rules/advanced-usage/test-rules"
+          >
+            Read more
+          </a>
+        </>
+      }
       confirmation={{
-        title: <div></div>,
+        placement: "bottom",
+        overlayClassName: "implicit-rule-switch-confirmation",
+        title: (
+          <>
+            <div className="title-container">
+              <MdInfoOutline className="icon" />
+              <span className="title">Hide Requestly widget</span>
+            </div>
+            <div className="description">
+              This widget shows rule executions. Some changes, such as response body and header modifications, are not
+              visible in DevTools due to technical limitations. Do you still want to hide the widget?
+            </div>
+          </>
+        ),
         onConfirm,
         icon: null,
         showCancel: true,
-        okText: "Yes",
-        cancelText: "No",
+        okText: "Hide widget",
+        okButtonProps: {
+          size: "small",
+          className: "rq-custom-btn",
+        },
+        cancelText: "Cancel",
+        cancelButtonProps: {
+          size: "small",
+          className: "rq-custom-btn",
+        },
       }}
       settingsBody={
         <RuleTypesOptions
