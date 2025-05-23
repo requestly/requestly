@@ -9,6 +9,7 @@ import APP_CONSTANTS from "config/constants";
 import { getImplicitRuleTestingWidgetConfig, updateImplictRuleTestingWidgetConfig } from "./utils";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
+import LINKS from "config/constants/sub/links";
 import "./implicitRuleTesting.scss";
 
 export const ImplicitRuleTesting = () => {
@@ -67,6 +68,19 @@ export const ImplicitRuleTesting = () => {
     }
   };
 
+  const confirmationTitle = (
+    <>
+      <div className="title-container">
+        <MdInfoOutline className="icon" />
+        <span className="title">Hide Requestly widget</span>
+      </div>
+      <div className="description">
+        This widget shows rule executions. Some changes, such as response body and header modifications, are not visible
+        in DevTools due to technical limitations. Do you still want to hide the widget?
+      </div>
+    </>
+  );
+
   return isCompatible ? (
     <SettingsItem
       isActive={isImplicitRuleTestingEnabled}
@@ -75,45 +89,30 @@ export const ImplicitRuleTesting = () => {
       caption={
         <>
           Enabling this option will display the widget on websites where any rules are enabled.{" "}
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://docs.requestly.com/general/http-rules/advanced-usage/test-rules"
-          >
+          <a target="_blank" rel="noreferrer" href={LINKS.REQUESTLY_DOCS_TEST_RULES}>
             Read more
           </a>
         </>
       }
       confirmation={{
-        open: showConfirmation,
-        placement: "bottomRight",
-        overlayClassName: "implicit-rule-switch-confirmation",
-        title: (
-          <>
-            <div className="title-container">
-              <MdInfoOutline className="icon" />
-              <span className="title">Hide Requestly widget</span>
-            </div>
-            <div className="description">
-              This widget shows rule executions. Some changes, such as response body and header modifications, are not
-              visible in DevTools due to technical limitations. Do you still want to hide the widget?
-            </div>
-          </>
-        ),
-        onCancel,
-        onConfirm,
         icon: null,
-        showCancel: true,
+        open: showConfirmation,
+        title: confirmationTitle,
+        placement: "bottomRight",
+        onConfirm,
         okText: "Hide widget",
         okButtonProps: {
           size: "small",
           className: "rq-custom-btn",
         },
+        showCancel: true,
+        onCancel,
         cancelText: "Cancel",
         cancelButtonProps: {
           size: "small",
           className: "rq-custom-btn",
         },
+        overlayClassName: "implicit-rule-switch-confirmation",
       }}
       settingsBody={
         <RuleTypesOptions
