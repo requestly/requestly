@@ -17,7 +17,7 @@ import {
 import { AiOutlineClose } from "@react-icons/all-files/ai/AiOutlineClose";
 import { debounce } from "lodash";
 
-import "./OfflineLogConfig.scss";
+import "./localLogFile.scss";
 import {
   getAllConfig,
   setFilterConfig,

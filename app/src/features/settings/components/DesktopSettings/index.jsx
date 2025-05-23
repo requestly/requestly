@@ -16,7 +16,7 @@ import { toast } from "utils/Toast";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 import { RQButton } from "lib/design-system/components";
 import "./DesktopSettings.css";
-import OfflineLogConfig from "./OfflineLogConfig";
+import LocalLogFile from "./LocalLogFile";
 
 export const DesktopSettings = () => {
   const appMode = useSelector(getAppMode);
@@ -145,7 +145,7 @@ export const DesktopSettings = () => {
             </Row>
           </>
         ) : null}
-        <OfflineLogConfig />
+        <LocalLogFile />
       </div>
     </div>
   ) : null;
