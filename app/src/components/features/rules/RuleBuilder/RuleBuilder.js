@@ -62,6 +62,7 @@ const RuleBuilder = (props) => {
   const appMode = useSelector(getAppMode);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
+  const isReadOnly = currentlySelectedRuleData?.isReadOnly;
 
   const enableDocs = useMemo(() => {
     return !props.isSharedListViewRule;
@@ -245,7 +246,7 @@ const RuleBuilder = (props) => {
               source="new_rule_editor"
               handleSeeLiveRuleDemoClick={props.handleSeeLiveRuleDemoClick}
               ruleDetails={
-                isSampleRule
+                isSampleRule && isReadOnly
                   ? sampleRuleDetails[currentlySelectedRuleData.sampleId].details
                   : RULE_DETAILS[currentlySelectedRuleData?.ruleType]
               }
