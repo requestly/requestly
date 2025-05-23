@@ -64,7 +64,6 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
       await loginWithSSO(providerId, email);
     } else {
       setIsNoConnectionFoundCardVisible(true);
-      //@ts-ignore
       trackLoginFailedEvent({
         auth_provider: AUTH_PROVIDERS.SSO,
         email,
