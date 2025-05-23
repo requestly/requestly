@@ -169,46 +169,42 @@ export const filterHeadersToImport = (headers: KeyValuePair[]) => {
 };
 
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
-  try {
-    const requestJsonString = curlconverter.toJsonString(curl);
-    const requestJson = JSON.parse(requestJsonString);
+  const requestJsonString = curlconverter.toJsonString(curl);
+  const requestJson = JSON.parse(requestJsonString);
 
-    const queryParamsFromJson = generateKeyValuePairsFromJson(requestJson.queries);
-    /*
+  const queryParamsFromJson = generateKeyValuePairsFromJson(requestJson.queries);
+  /*
       cURL converter is not able to parse query params from url for some cURL requests
       so parsing it manually from URL and populating queryParams property
     */
-    const requestUrlParams = new URL(requestJson.url).searchParams;
-    const paramsFromUrl = generateKeyValuePairsFromJson(Object.fromEntries(requestUrlParams.entries()));
+  const requestUrlParams = new URL(requestJson.url).searchParams;
+  const paramsFromUrl = generateKeyValuePairsFromJson(Object.fromEntries(requestUrlParams.entries()));
 
-    const headers = filterHeadersToImport(generateKeyValuePairsFromJson(requestJson.headers));
-    const contentType = getContentTypeFromRequestHeaders(headers);
-    let body: RQAPI.RequestBody;
+  const headers = filterHeadersToImport(generateKeyValuePairsFromJson(requestJson.headers));
+  const contentType = getContentTypeFromRequestHeaders(headers);
+  let body: RQAPI.RequestBody;
 
-    if (contentType === RequestContentType.JSON) {
-      body = JSON.stringify(requestJson.data);
-    } else if (contentType === RequestContentType.FORM) {
-      body = generateKeyValuePairsFromJson(requestJson.data);
-    } else {
-      body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
-    }
-
-    // remove query params from url
-    const requestUrl = requestJson.url.split("?")[0];
-
-    const request: RQAPI.Request = {
-      url: requestUrl,
-      method: requestJson.method.toUpperCase() as RequestMethod,
-      queryParams: queryParamsFromJson.length ? queryParamsFromJson : paramsFromUrl,
-      headers,
-      contentType,
-      body: body ?? null,
-    };
-
-    return request;
-  } catch (e) {
-    return null;
+  if (contentType === RequestContentType.JSON) {
+    body = JSON.stringify(requestJson.data);
+  } else if (contentType === RequestContentType.FORM) {
+    body = generateKeyValuePairsFromJson(requestJson.data);
+  } else {
+    body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
   }
+
+  // remove query params from url
+  const requestUrl = requestJson.url.split("?")[0];
+
+  const request: RQAPI.Request = {
+    url: requestUrl,
+    method: requestJson.method.toUpperCase() as RequestMethod,
+    queryParams: queryParamsFromJson.length ? queryParamsFromJson : paramsFromUrl,
+    headers,
+    contentType,
+    body: body ?? null,
+  };
+
+  return request;
 };
 
 export const isApiRequest = (record: RQAPI.Record) => {
