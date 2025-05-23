@@ -105,32 +105,32 @@ export const trackBillingTeamInvoiceDashboardClicked = () => {
   trackEvent(SETTINGS.BILLING.BILLING_TEAM_INVOICE_DASHBOARD_CLICKED);
 };
 
-/* OFFLINE LOGGING CONFIG */
+/* LOCAL_LOG_FILE */
 
-export const trackOfflineLogConfigToggled = (isEnabled: boolean) => {
-  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.TOGGLED, { isEnabled });
+export const trackLocalLogFileConfigToggled = (isEnabled: boolean) => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.TOGGLED, { isEnabled });
 };
 
-export const trackOfflineLogFilterAdded = () => {
-  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.FILTER.ADD);
+export const trackLocalLogFileFilterAdded = () => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.FILTER.ADD);
 };
 
-export const trackOfflineLogFilterRemoved = () => {
-  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.FILTER.REMOVE);
+export const trackLocalLogFileFilterRemoved = () => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.FILTER.REMOVE);
 };
 
-export const trackOfflineLogStorePathFileSelectionStarted = () => {
-  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.STORE_PATH.FILE_SELECTION.STARTED);
+export const trackLocalLogFileStorePathSelectionStarted = () => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.STORE_PATH.FILE_SELECTION.STARTED);
 };
 
-export const trackOfflineLogStorePathFileSelectionCompleted = () => {
-  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.STORE_PATH.FILE_SELECTION.COMPLETED);
+export const trackLocalLogFileStorePathSelectionCompleted = () => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.STORE_PATH.FILE_SELECTION.COMPLETED);
 };
 
-export const trackOfflineLogStorePathFileSelectionFailed = (failReason: "IPC" | "CANCELLED") => {
-  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.STORE_PATH.FILE_SELECTION.FAILED, { failReason });
+export const trackLocalLogFileStorePathSelectionFailed = (failReason: "IPC" | "CANCELLED") => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.STORE_PATH.FILE_SELECTION.FAILED, { failReason });
 };
 
-export const trackOfflineLogStorePathCleared = () => {
-  trackEvent(SETTINGS.DESKTOP.OFFLINE_LOG_CONFIG.STORE_PATH.CLEARED);
+export const trackLocalLogFileStorePathCleared = () => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.STORE_PATH.CLEARED);
 };

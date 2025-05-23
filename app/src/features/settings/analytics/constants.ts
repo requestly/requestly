@@ -34,19 +34,19 @@ export const SETTINGS = {
   },
 
   DESKTOP: {
-    OFFLINE_LOG_CONFIG: {
-      TOGGLED: "offline_log_config_toggled",
+    LOCAL_LOG_FILE: {
+      TOGGLED: "local_log_file_config_toggled",
       FILTER: {
-        ADD: "offline_log_filter_added",
-        REMOVE: "offline_log_filter_removed",
+        ADD: "local_log_file_filter_added",
+        REMOVE: "local_log_file_filter_removed",
       },
       STORE_PATH: {
         FILE_SELECTION: {
-          STARTED: "offline_log_store_path_file_selection_started",
-          COMPLETED: "offline_log_store_path_file_selection_completed",
-          FAILED: "offline_log_store_path_file_selection_failed",
+          STARTED: "local_log_file_store_path_file_selection_started",
+          COMPLETED: "local_log_file_store_path_file_selection_completed",
+          FAILED: "local_log_file_store_path_file_selection_failed",
         },
-        CLEARED: "offline_log_store_path_cleared",
+        CLEARED: "local_log_file_store_path_cleared",
       },
     },
   },

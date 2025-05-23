@@ -5,13 +5,13 @@ import { useGrowthBook } from "@growthbook/growthbook-react";
 import { Col, Row, Switch, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import {
-  trackOfflineLogConfigToggled,
-  trackOfflineLogFilterAdded,
-  trackOfflineLogFilterRemoved,
-  // trackOfflineLogStorePathCleared,
-  // trackOfflineLogStorePathFileSelectionCompleted,
-  // trackOfflineLogStorePathFileSelectionFailed,
-  // trackOfflineLogStorePathFileSelectionStarted,
+  trackLocalLogFileConfigToggled,
+  trackLocalLogFileFilterAdded,
+  trackLocalLogFileFilterRemoved,
+  // trackLocalLogFileStorePathCleared,
+  // trackLocalLogFileStorePathSelectionCompleted,
+  // trackLocalLogFileStorePathSelectionFailed,
+  // trackLocalLogFileStorePathSelectionStarted,
 } from "features/settings/analytics";
 // import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { AiOutlineClose } from "@react-icons/all-files/ai/AiOutlineClose";
@@ -33,8 +33,8 @@ const OfflineLogConfig: React.FC = () => {
   const [filter, setFilter] = useState<string[]>([]);
   // const [isSelectingFile, setIsSelectingFile] = useState<boolean>(false);
 
-  const isFlagForFeatureEnabled = useGrowthBook().getFeatureValue(FEATURES.OFFLINE_LOGS, false);
-  const isCompatible = isFeatureCompatible(FEATURES.OFFLINE_LOGS);
+  const isFlagForFeatureEnabled = useGrowthBook().getFeatureValue(FEATURES.LOCAL_LOG_FILE, false);
+  const isCompatible = isFeatureCompatible(FEATURES.LOCAL_LOG_FILE);
 
   const isFeatureVisible = useMemo(() => {
     return isFlagForFeatureEnabled && isCompatible;
@@ -72,12 +72,12 @@ const OfflineLogConfig: React.FC = () => {
       toast.error("Error updating offline log config");
       setIsEnabled(!newStatus);
     });
-    trackOfflineLogConfigToggled(newStatus);
+    trackLocalLogFileConfigToggled(newStatus);
   }, []);
 
   // const handleSelectFile = () => {
   //   setIsSelectingFile(true);
-  //   trackOfflineLogStorePathFileSelectionStarted();
+  //   trackLocalLogFileStorePathSelectionStarted();
 
   //   displayFolderSelector(
   //     (dirPath: string) => {
@@ -86,14 +86,14 @@ const OfflineLogConfig: React.FC = () => {
   //       setLogStorePathConfig(dirPath).catch((err) => {
   //         console.error("DBG: Error setting log store path", err);
   //         toast.error("Error setting log directory");
-  //         trackOfflineLogStorePathFileSelectionFailed("IPC");
+  //         trackLocalLogFileStorePathSelectionFailed("IPC");
   //       });
-  //       trackOfflineLogStorePathFileSelectionCompleted();
+  //       trackLocalLogFileStorePathSelectionCompleted();
   //     },
   //     () => {
   //       // on cancelled
   //       setIsSelectingFile(false);
-  //       trackOfflineLogStorePathFileSelectionFailed("CANCELLED");
+  //       trackLocalLogFileStorePathSelectionFailed("CANCELLED");
   //     }
   //   );
   //   setTimeout(() => {
@@ -115,7 +115,7 @@ const OfflineLogConfig: React.FC = () => {
   //     toast.error("Error disabling offline logging");
   //   });
 
-  //   trackOfflineLogStorePathCleared();
+  //   trackLocalLogFileStorePathCleared();
   // };
 
   const handleAddFilter = useCallback(() => {
@@ -134,7 +134,7 @@ const OfflineLogConfig: React.FC = () => {
     });
 
     setFilterInputValue("");
-    trackOfflineLogFilterAdded();
+    trackLocalLogFileFilterAdded();
   }, [filter, filterInputValue]);
 
   const handleRemoveFilter = useCallback(
@@ -150,7 +150,7 @@ const OfflineLogConfig: React.FC = () => {
           setFilter(filter);
         });
       setFilter(newFilter);
-      trackOfflineLogFilterRemoved();
+      trackLocalLogFileFilterRemoved();
     },
     [filter]
   );
