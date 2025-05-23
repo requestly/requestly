@@ -174,7 +174,11 @@ export const updateExtensionStatus = async (newStatus: boolean) => {
 
   await setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, newStatus);
   updateActivationStatus(newStatus);
-  sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED, isExtensionEnabled: newStatus });
+  sendMessageToApp({
+    action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED,
+    isExtensionEnabled: newStatus,
+    extensionIconState: extensionIconManager.getState(),
+  });
 
   return newStatus;
 };
