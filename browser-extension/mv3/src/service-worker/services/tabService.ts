@@ -1,4 +1,5 @@
 import { EXTENSION_MESSAGES } from "common/constants";
+import { getAllSupportedWebURLs } from "../../utils";
 
 type TabId = chrome.tabs.Tab["id"];
 
@@ -84,6 +85,18 @@ class TabService {
 
   private sendMessage(tabId: TabId, ...args: [any, any?, ((response: any) => void)?]) {
     chrome.tabs.sendMessage(tabId, ...args);
+  }
+
+  async getAppTabs(): Promise<chrome.tabs.Tab[]> {
+    const webURLs = getAllSupportedWebURLs();
+    let appTabs: chrome.tabs.Tab[] = [];
+
+    for (const webURL of webURLs) {
+      const tabs = await chrome.tabs.query({ url: webURL + "/*" });
+      appTabs = [...appTabs, ...tabs];
+    }
+
+    return appTabs;
   }
 
   addOrUpdateTab(tab: TabData) {

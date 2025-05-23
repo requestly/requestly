@@ -10,7 +10,7 @@ import { HistoryList } from "./components/historyList/HistoryList";
 import { ApiClientSidebarHeader } from "./components/apiClientSidebarHeader/ApiClientSidebarHeader";
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { DeleteApiRecordModal, ImportRequestModal } from "../modals";
+import { DeleteApiRecordModal, ImportFromCurlModal } from "../modals";
 import { getEmptyAPIEntry } from "../../utils";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -208,7 +208,7 @@ const APIClientSidebar: React.FC<Props> = () => {
 
       <DeleteApiRecordModal open={isDeleteModalOpen} records={recordsToBeDeleted} onClose={onDeleteModalClose} />
 
-      <ImportRequestModal
+      <ImportFromCurlModal
         isRequestLoading={isLoading}
         isOpen={isImportModalOpen}
         handleImportRequest={handleImportRequest}
