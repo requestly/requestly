@@ -15,7 +15,7 @@ export const HistoryView: React.FC = () => {
           apiEntryDetails: entryDetails,
           title: entryDetails.name || entryDetails.data.request?.url,
         }),
-        { preview: true }
+        { preview: false }
       );
     },
     [openTab]
