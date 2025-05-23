@@ -150,7 +150,6 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
             hotKey={KEYBOARD_SHORTCUTS.FILE_SERVER.SAVE_FILE.hotKey}
             loading={savingInProgress}
             onClick={handleSave}
-            enableHotKey={true}
             tooltipTitle="Saving is not allowed in view-only mode. You can test mocks but cannot save them."
           >
             {isNewMock ? (savingInProgress ? "Creating" : "Create") : savingInProgress ? "Saving" : "Save"}
