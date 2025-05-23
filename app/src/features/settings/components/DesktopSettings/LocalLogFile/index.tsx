@@ -17,7 +17,7 @@ import {
 import { AiOutlineClose } from "@react-icons/all-files/ai/AiOutlineClose";
 import { debounce } from "lodash";
 
-import "./OfflineLogConfig.scss";
+import "./localLogFile.scss";
 import {
   getAllConfig,
   setFilterConfig,
@@ -26,7 +26,7 @@ import {
 } from "./actions";
 import { toast } from "utils/Toast";
 
-const OfflineLogConfig: React.FC = () => {
+const LocalLogFile: React.FC = () => {
   /* STATE */
   const [logStorePath, setLogStorePath] = useState<string>("");
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
@@ -229,4 +229,4 @@ const OfflineLogConfig: React.FC = () => {
   ) : null;
 };
 
-export default OfflineLogConfig;
+export default LocalLogFile;
