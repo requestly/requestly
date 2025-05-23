@@ -5,7 +5,7 @@ import { EVENT, sendEvent } from "../../events";
 
 interface PopupHeaderProps {
   isExtensionEnabled: boolean;
-  handleToggleExtensionStatus: () => void;
+  handleToggleExtensionStatus: (newStatus: boolean) => void;
 }
 
 const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleToggleExtensionStatus }) => {
