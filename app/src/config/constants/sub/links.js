@@ -53,6 +53,8 @@ const LINKS = {
 
   REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE: "https://docs.requestly.com/security-privacy/sessions/",
 
+  REQUESTLY_DOCS_TEST_RULES: "https://docs.requestly.com/general/http-rules/advanced-usage/test-rules",
+
   REQUESTLY_API_DOCS: "https://docs.requestly.com/public-apis/overview/",
 
   REQUESTLY_REDIRECT_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/redirect-rule",

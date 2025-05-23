@@ -1,16 +1,17 @@
 import React, { ReactNode } from "react";
-import { Col, Row, Switch, SwitchProps, Tooltip } from "antd";
+import { Col, Popconfirm, PopconfirmProps, Row, Switch, SwitchProps, Tooltip } from "antd";
 import "./SettingsItem.css";
 
 interface SettingsItemProps extends SwitchProps {
   title: string;
-  caption?: string;
+  caption?: ReactNode;
   isActive: boolean;
   toolTipTitle?: ReactNode;
   settingsBody?: ReactNode;
   onChange: (status: boolean, event?: React.MouseEvent<HTMLButtonElement>) => void;
   isChangeAble?: boolean;
   isTogglable?: boolean;
+  confirmation?: PopconfirmProps;
 }
 
 const SettingsItem: React.FC<SettingsItemProps> = ({
@@ -22,6 +23,7 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
   toolTipTitle = "",
   isChangeAble = true,
   isTogglable = true,
+  confirmation = null,
   ...props
 }) => {
   return (
@@ -35,7 +37,13 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
         <Col span={2} style={{ alignSelf: "self-start", marginTop: "8px" }}>
           {isChangeAble ? (
             <Tooltip title={toolTipTitle}>
-              <Switch checked={isActive} onChange={onChange} {...props} />
+              {confirmation ? (
+                <Popconfirm {...confirmation}>
+                  <Switch checked={isActive} onChange={onChange} {...props} />
+                </Popconfirm>
+              ) : (
+                <Switch checked={isActive} onChange={onChange} {...props} />
+              )}
             </Tooltip>
           ) : (
             <Tooltip title="Enforced organisation wide. Please contact support to change.">
