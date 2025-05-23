@@ -122,6 +122,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
           placeholder="E.g., you@company.com"
           label="Your work email"
           onPressEnter={handleLoginWithSSO}
+          type="email"
         />
       </div>
       <RQButton
