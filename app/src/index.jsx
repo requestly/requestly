@@ -1,4 +1,5 @@
 import React from "react";
+import "./pre-imports";
 import * as Sentry from "@sentry/react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
@@ -22,13 +23,13 @@ const container = document.getElementById("root");
 const root = createRoot(container);
 const appFlavour = getAppFlavour();
 
-/* Google translate replaces textNodes from the DOM  with <font> tag 
+/* Google translate replaces textNodes from the DOM  with <font> tag
   Beacuse of this, React throws error when re-rednering the component
   This is a workaround to fix the issue
 
 
-  It overrides the removeChild and insertBefore methods of Node.prototype if the child's parentNode is not the same as the current node. This patch swallows the error and return the child node. 
-  
+  It overrides the removeChild and insertBefore methods of Node.prototype if the child's parentNode is not the same as the current node. This patch swallows the error and return the child node.
+
   This is a workaround to fix the issue
 */
 
