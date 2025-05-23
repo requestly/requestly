@@ -1,4 +1,4 @@
-export interface IOfflineLogConfig {
+export interface ILocalLogFileConfig {
   isEnabled: boolean;
   storePath: string;
   filter: string[];
