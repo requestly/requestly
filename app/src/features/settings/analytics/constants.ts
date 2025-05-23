@@ -32,4 +32,22 @@ export const SETTINGS = {
     WORKSPACE_SETTINGS_LEARN_MORE_CLICKED: "workspace_settings_learn_about_billing_team_clicked",
     WORKSPACE_SETTINGS_AUTOMATIC_MAPPING_TOGGLE_CLICKED: "workspace_settings_automatic_mapping_to_billing_team_toggled",
   },
+
+  DESKTOP: {
+    LOCAL_LOG_FILE: {
+      TOGGLED: "local_log_file_config_toggled",
+      FILTER: {
+        ADD: "local_log_file_filter_added",
+        REMOVE: "local_log_file_filter_removed",
+      },
+      STORE_PATH: {
+        FILE_SELECTION: {
+          STARTED: "local_log_file_store_path_file_selection_started",
+          COMPLETED: "local_log_file_store_path_file_selection_completed",
+          FAILED: "local_log_file_store_path_file_selection_failed",
+        },
+        CLEARED: "local_log_file_store_path_cleared",
+      },
+    },
+  },
 };
