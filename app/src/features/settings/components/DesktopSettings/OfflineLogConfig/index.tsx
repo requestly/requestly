@@ -8,17 +8,22 @@ import {
   trackOfflineLogConfigToggled,
   trackOfflineLogFilterAdded,
   trackOfflineLogFilterRemoved,
-  trackOfflineLogStorePathCleared,
-  trackOfflineLogStorePathFileSelectionCompleted,
-  trackOfflineLogStorePathFileSelectionFailed,
-  trackOfflineLogStorePathFileSelectionStarted,
+  // trackOfflineLogStorePathCleared,
+  // trackOfflineLogStorePathFileSelectionCompleted,
+  // trackOfflineLogStorePathFileSelectionFailed,
+  // trackOfflineLogStorePathFileSelectionStarted,
 } from "features/settings/analytics";
-import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
+// import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { AiOutlineClose } from "@react-icons/all-files/ai/AiOutlineClose";
 import { debounce } from "lodash";
 
 import "./OfflineLogConfig.scss";
-import { getAllConfig, setFilterConfig, setIsEnabledConfig, setLogStorePathConfig } from "./actions";
+import {
+  getAllConfig,
+  setFilterConfig,
+  setIsEnabledConfig,
+  // setLogStorePathConfig
+} from "./actions";
 import { toast } from "utils/Toast";
 
 const OfflineLogConfig: React.FC = () => {
@@ -26,9 +31,9 @@ const OfflineLogConfig: React.FC = () => {
   const [logStorePath, setLogStorePath] = useState<string>("");
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const [filter, setFilter] = useState<string[]>([]);
-  const [isSelectingFile, setIsSelectingFile] = useState<boolean>(false);
+  // const [isSelectingFile, setIsSelectingFile] = useState<boolean>(false);
 
-  const isFlagForFeatureEnabled = useGrowthBook().getFeatureValue(FEATURES.OFFLINE_LOGS, true);
+  const isFlagForFeatureEnabled = useGrowthBook().getFeatureValue(FEATURES.OFFLINE_LOGS, false);
   const isCompatible = isFeatureCompatible(FEATURES.OFFLINE_LOGS);
 
   const isFeatureVisible = useMemo(() => {
@@ -70,48 +75,48 @@ const OfflineLogConfig: React.FC = () => {
     trackOfflineLogConfigToggled(newStatus);
   }, []);
 
-  const handleSelectFile = () => {
-    setIsSelectingFile(true);
-    trackOfflineLogStorePathFileSelectionStarted();
+  // const handleSelectFile = () => {
+  //   setIsSelectingFile(true);
+  //   trackOfflineLogStorePathFileSelectionStarted();
 
-    displayFolderSelector(
-      (dirPath: string) => {
-        setIsSelectingFile(false);
-        setLogStorePath(dirPath);
-        setLogStorePathConfig(dirPath).catch((err) => {
-          console.error("DBG: Error setting log store path", err);
-          toast.error("Error setting log directory");
-          trackOfflineLogStorePathFileSelectionFailed("IPC");
-        });
-        trackOfflineLogStorePathFileSelectionCompleted();
-      },
-      () => {
-        // on cancelled
-        setIsSelectingFile(false);
-        trackOfflineLogStorePathFileSelectionFailed("CANCELLED");
-      }
-    );
-    setTimeout(() => {
-      // safe-gaurd: just incase un-responsive channels are used somewhere
-      setIsSelectingFile(false);
-    }, 10000);
-  };
+  //   displayFolderSelector(
+  //     (dirPath: string) => {
+  //       setIsSelectingFile(false);
+  //       setLogStorePath(dirPath);
+  //       setLogStorePathConfig(dirPath).catch((err) => {
+  //         console.error("DBG: Error setting log store path", err);
+  //         toast.error("Error setting log directory");
+  //         trackOfflineLogStorePathFileSelectionFailed("IPC");
+  //       });
+  //       trackOfflineLogStorePathFileSelectionCompleted();
+  //     },
+  //     () => {
+  //       // on cancelled
+  //       setIsSelectingFile(false);
+  //       trackOfflineLogStorePathFileSelectionFailed("CANCELLED");
+  //     }
+  //   );
+  //   setTimeout(() => {
+  //     // safe-gaurd: just incase un-responsive channels are used somewhere
+  //     setIsSelectingFile(false);
+  //   }, 10000);
+  // };
 
-  const handleCleaSelectedFile = () => {
-    setLogStorePath("");
-    setLogStorePathConfig("").catch((err) => {
-      console.error("DBG: Error clearing log store path", err);
-      toast.error("Error clearing log directory");
-    });
+  // const handleCleaSelectedFile = () => {
+  //   setLogStorePath("");
+  //   setLogStorePathConfig("").catch((err) => {
+  //     console.error("DBG: Error clearing log store path", err);
+  //     toast.error("Error clearing log directory");
+  //   });
 
-    setIsEnabled(false);
-    setIsEnabledConfig(false).catch((err) => {
-      console.error("DBG: Error disabling offline log config", err);
-      toast.error("Error disabling offline logging");
-    });
+  //   setIsEnabled(false);
+  //   setIsEnabledConfig(false).catch((err) => {
+  //     console.error("DBG: Error disabling offline log config", err);
+  //     toast.error("Error disabling offline logging");
+  //   });
 
-    trackOfflineLogStorePathCleared();
-  };
+  //   trackOfflineLogStorePathCleared();
+  // };
 
   const handleAddFilter = useCallback(() => {
     const newFilter = filterInputValue.trim();
@@ -202,12 +207,14 @@ const OfflineLogConfig: React.FC = () => {
         <Row align="middle" justify="space-evenly" className="path-selector ">
           <Col span={4}>
             {/* select file button */}
-            <RQButton type="primary" onClick={handleSelectFile} loading={isSelectingFile} disabled={!isEnabled}>
+            {/* <RQButton type="primary" onClick={handleSelectFile} loading={isSelectingFile} disabled={!isEnabled}>
               {logStorePath ? "Change Folder" : "Select Folder"}
-            </RQButton>
+            </RQButton> */}
+
+            {logStorePath ? <b>Logs file: </b> : null}
           </Col>
-          <Col span={16}>{logStorePath ? <b>Log directory: {logStorePath}/logs.jsonl</b> : null}</Col>
-          {logStorePath ? (
+          <Col span={16}>{logStorePath ? <b>{logStorePath}/logs.jsonl</b> : null}</Col>
+          {/* {logStorePath ? (
             <Col span={4} style={{ display: "flex", justifyContent: "flex-end" }}>
               <Tooltip title="stop storing logs">
                 <RQButton type="default" onClick={handleCleaSelectedFile} disabled={!logStorePath}>
@@ -215,7 +222,7 @@ const OfflineLogConfig: React.FC = () => {
                 </RQButton>
               </Tooltip>
             </Col>
-          ) : null}
+          ) : null} */}
         </Row>
       </div>
     </div>
