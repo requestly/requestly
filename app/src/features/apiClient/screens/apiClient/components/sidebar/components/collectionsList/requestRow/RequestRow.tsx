@@ -102,6 +102,7 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setIsEditMode(true);
+          handleDropdownVisibleChange(false);
         },
       },
       {
@@ -118,6 +119,7 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
           itemInfo.domEvent?.stopPropagation?.();
           handleDuplicateRequest(record);
           trackDuplicateRequestClicked();
+          handleDropdownVisibleChange(false);
         },
       },
       {
@@ -132,6 +134,7 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
           itemInfo.domEvent?.stopPropagation?.();
           setRecordToMove(record);
           trackMoveRequestToCollectionClicked();
+          handleDropdownVisibleChange(false);
         },
       },
       {
@@ -147,6 +150,7 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
           itemInfo.domEvent?.stopPropagation?.();
           updateRecordsToBeDeleted([record]);
           setIsDeleteModalOpen(true);
+          handleDropdownVisibleChange(false);
         },
       },
     ];
