@@ -1,6 +1,5 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
-import { toggleExtensionStatus } from "../utils";
 import { applyScriptRules } from "../scriptRuleHandler";
 import {
   cacheRecordedSessionOnClientPageUnload,
@@ -32,6 +31,8 @@ import {
   checkIfDesktopAppOpen,
 } from "../desktopApp/index";
 import { sendMessageToApp } from "./sender";
+import { updateExtensionStatus } from "../utils";
+import extensionIconManager from "../extensionIconManager";
 
 export const initMessageHandler = () => {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -100,7 +101,34 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS:
-        toggleExtensionStatus(message.newStatus).then(sendResponse);
+        console.log(`[Toggle extension status] message received`, {
+          message,
+        });
+        updateExtensionStatus(message.newStatus)
+          .then((updatedStatus) => {
+            const response = {
+              success: true,
+              updatedStatus,
+            };
+            sendResponse(response);
+            console.log(`[Toggle extension status] response sent`, {
+              ...response,
+              extensionIconState: extensionIconManager.getState(),
+            });
+          })
+          .catch((e) => {
+            sendResponse({
+              success: false,
+            });
+            console.log(
+              "[messageHandler.handleToggleExtensionStatus] Error occurred while updating extension status.",
+              {
+                error: e.message,
+                extensionIconState: extensionIconManager.getState(),
+                message,
+              }
+            );
+          });
         return true;
 
       case EXTENSION_MESSAGES.WATCH_RECORDING:

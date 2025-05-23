@@ -1,5 +1,5 @@
 import { EXTENSION_MESSAGES } from "common/constants";
-import { toggleExtensionStatus } from "./utils";
+import { updateExtensionStatus } from "./utils";
 import { getAPIResponse } from "./apiClient";
 import { isExtensionEnabled, isUrlInBlockList } from "../../utils";
 
@@ -16,7 +16,24 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS:
-        toggleExtensionStatus(message.newStatus).then(sendResponse);
+        updateExtensionStatus(message.newStatus)
+          .then((updatedStatus) => {
+            sendResponse({
+              success: true,
+              updatedStatus,
+            });
+          })
+          .catch((e) => {
+            sendResponse({
+              success: false,
+            });
+            console.log(
+              "[messageHandler.handleToggleExtensionStatus] Error occurred while updating extension status.",
+              {
+                error: e.message,
+              }
+            );
+          });
         return true;
 
       case EXTENSION_MESSAGES.IS_EXTENSION_BLOCKED_ON_TAB: {

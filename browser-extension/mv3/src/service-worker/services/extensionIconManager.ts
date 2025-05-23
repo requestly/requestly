@@ -138,6 +138,13 @@ class ExtensionIconManager {
     this.#setExtensionIcon(this.#icons.DEFAULT);
     this.#updateIconStateForAllTabs();
   }
+
+  getState() {
+    return {
+      isExtensionDisabled: this.#isExtensionDisabled,
+      connectedToDesktopApp: this.#connectedToDesktopApp,
+    };
+  }
 }
 
 const extensionIconManager = new ExtensionIconManager();
