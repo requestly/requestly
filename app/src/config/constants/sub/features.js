@@ -51,6 +51,7 @@ FEATURES.DESKTOP_ANDROID_EMULATOR_SUPPORT = "desktop-android-emulator-support";
 FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT = "desktop-ios-simulator-support";
 FEATURES.SCRIPT_RULE_SOURCE_FILTER = "script-rule-source-filter";
 FEATURES.FRAMELESS_DESKTOP_APP = "frameless-desktop-app";
+FEATURES.EXTENSION_STATUS_NOTIFICATION = "extension-status-notification";
 
 FEATURES.SCRIPT_RULE = {};
 FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT = "script-rule-html-block";

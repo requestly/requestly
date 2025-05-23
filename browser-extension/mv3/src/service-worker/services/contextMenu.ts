@@ -1,9 +1,9 @@
-import { onVariableChange, setVariable, Variable } from "../variable";
-import extensionIconManager from "./extensionIconManager";
+import { setVariable, Variable } from "../variable";
 import { isExtensionEnabled } from "../../utils";
-
-// TODO: fix circular dependency
-// import { sendMessageToApp } from "./messageHandler";
+import extensionIconManager from "./extensionIconManager";
+import { sendMessageToApp } from "./messageHandler/sender";
+import { CLIENT_MESSAGES } from "common/constants";
+import { stopRecordingOnAllTabs } from "./sessionRecording";
 
 enum MenuItem {
   TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
@@ -19,13 +19,25 @@ export const updateActivationStatus = (isExtensionEnabled: boolean) => {
     title: isExtensionEnabled ? ToggleActivationStatusLabel.DEACTIVATE : ToggleActivationStatusLabel.ACTIVATE,
   });
 
+  console.log(`[updateActivationStatus] starting...`, {
+    isExtensionEnabled,
+    extensionIconState: extensionIconManager.getState(),
+  });
+
   if (isExtensionEnabled) {
     extensionIconManager.markExtensionEnabled();
   } else {
     extensionIconManager.markExtensionDisabled();
   }
 
-  // sendMessageToApp({ isExtensionEnabled });
+  console.log(`[updateActivationStatus] finished...`, {
+    isExtensionEnabled,
+    extensionIconState: extensionIconManager.getState(),
+  });
+
+  if (isExtensionEnabled === false) {
+    stopRecordingOnAllTabs();
+  }
 };
 
 export const initContextMenu = async () => {
@@ -38,14 +50,25 @@ export const initContextMenu = async () => {
   });
 
   chrome.contextMenus.onClicked.addListener(async (info) => {
-    const isExtensionStatusEnabled = await isExtensionEnabled();
     if (info.menuItemId === MenuItem.TOGGLE_ACTIVATION_STATUS) {
-      setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, !isExtensionStatusEnabled);
+      const isExtensionStatusEnabled = await isExtensionEnabled();
+      const extensionStatus = !isExtensionStatusEnabled;
+      console.log(`[initContextMenu.listener] context menu clicked`, {
+        extensionStatus,
+        extensionIconState: extensionIconManager.getState(),
+      });
+
+      await setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, extensionStatus);
+      updateActivationStatus(extensionStatus);
+      sendMessageToApp({
+        action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED,
+        isExtensionEnabled: extensionStatus,
+      });
     }
   });
 
   const isExtensionStatusEnabled = await isExtensionEnabled();
   updateActivationStatus(isExtensionStatusEnabled);
 
-  onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, updateActivationStatus);
+  // onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, updateActivationStatus);
 };

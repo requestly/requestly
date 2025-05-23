@@ -93,3 +93,9 @@ export function disconnectFromDesktopApp() {
     action: GLOBAL_CONSTANTS.EXTENSION_MESSAGES.DISCONNECT_FROM_DESKTOP_APP,
   });
 }
+
+export function isExtensionEnabled() {
+  return sendMessage({
+    action: GLOBAL_CONSTANTS.EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED,
+  });
+}
