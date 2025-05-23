@@ -1,8 +1,10 @@
 import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "common/types";
 import { setVariable, Variable } from "../variable";
-import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
+import { isExtensionEnabled } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
 import { updateActivationStatus } from "./contextMenu";
+import { CLIENT_MESSAGES } from "common/constants";
+import { sendMessageToApp } from "./messageHandler/sender";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -163,9 +165,10 @@ export const isNonBrowserTab = (tabId: number): boolean => {
 export const toggleExtensionStatus = async (newStatus?: boolean) => {
   const extensionEnabledStatus = await isExtensionEnabled();
 
-  const updatedStatus = newStatus ?? !extensionEnabledStatus;
+  const updatedStatus = newStatus ?? !extensionEnabledStatus; //TODO: undefined check is incorrect
   setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
   updateActivationStatus(updatedStatus);
+  sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED, isExtensionEnabled });
   // FIXME: Memory leak here. onVariableChange sets up a listener on every toggle
   // onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, () => null);
 
@@ -174,16 +177,4 @@ export const toggleExtensionStatus = async (newStatus?: boolean) => {
   }
 
   return updatedStatus;
-};
-
-export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
-  const webURLs = getAllSupportedWebURLs();
-  let appTabs: chrome.tabs.Tab[] = [];
-
-  for (const webURL of webURLs) {
-    const tabs = await chrome.tabs.query({ url: webURL + "/*" });
-    appTabs = [...appTabs, ...tabs];
-  }
-
-  return appTabs;
 };
