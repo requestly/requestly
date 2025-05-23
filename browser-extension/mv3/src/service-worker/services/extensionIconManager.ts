@@ -92,6 +92,7 @@ class ExtensionIconManager {
 
   #setExtensionIcon(path: string, tabId?: number) {
     if (tabId === undefined) {
+      // Does not work
       chrome.action.setIcon({ path });
     } else {
       chrome.action.setIcon({ path, tabId });

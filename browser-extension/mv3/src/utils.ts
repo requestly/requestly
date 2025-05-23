@@ -1,7 +1,7 @@
 import { SourceKey, SourceOperator, UrlSource } from "common/types";
 import config from "common/config";
 import { matchSourceUrl } from "./common/ruleMatcher";
-import { Variable, getVariable } from "./service-worker/variable";
+import { getVariable, Variable } from "./service-worker/variable";
 import { ChangeType, getRecord, onRecordChange } from "common/storage";
 import { STORAGE_KEYS } from "common/constants";
 

@@ -1,9 +1,6 @@
 import { onVariableChange, setVariable, Variable } from "../variable";
-import extensionIconManager from "./extensionIconManager";
 import { isExtensionEnabled } from "../../utils";
-
-// TODO: fix circular dependency
-// import { sendMessageToApp } from "./messageHandler";
+import extensionIconManager from "./extensionIconManager";
 
 enum MenuItem {
   TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
@@ -24,8 +21,6 @@ export const updateActivationStatus = (isExtensionEnabled: boolean) => {
   } else {
     extensionIconManager.markExtensionDisabled();
   }
-
-  // sendMessageToApp({ isExtensionEnabled });
 };
 
 export const initContextMenu = async () => {
