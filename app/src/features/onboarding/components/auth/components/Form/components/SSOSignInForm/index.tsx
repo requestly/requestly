@@ -64,6 +64,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
       await loginWithSSO(providerId, email);
     } else {
       setIsNoConnectionFoundCardVisible(true);
+      //@ts-ignore
       trackLoginFailedEvent({
         auth_provider: AUTH_PROVIDERS.SSO,
         email,
@@ -122,6 +123,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
           placeholder="E.g., you@company.com"
           label="Your work email"
           onPressEnter={handleLoginWithSSO}
+          type="email"
         />
       </div>
       <RQButton
