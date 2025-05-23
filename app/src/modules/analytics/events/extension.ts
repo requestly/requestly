@@ -51,8 +51,15 @@ export const getEventsEngineFlag = {
   [CONSTANTS.STORAGE_KEYS.SEND_EXECUTION_EVENTS]: true,
 };
 
-export const trackExtensionStatusUpdated = (isExtensionEnabled: boolean): void => {
+export const trackExtensionStatusUpdated = ({
+  isExtensionEnabled,
+  extensionIconState,
+}: {
+  isExtensionEnabled: boolean;
+  extensionIconState: any;
+}): void => {
   trackEvent("extension_status_updated", {
     is_extension_enabled: isExtensionEnabled,
+    extension_icon_state: extensionIconState,
   });
 };

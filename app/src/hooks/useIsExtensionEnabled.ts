@@ -26,21 +26,27 @@ export const useIsExtensionEnabled = () => {
             dispatch(globalActions.updateIsExtensionEnabled(isEnabled));
           });
 
-          PageScriptMessageHandler.addMessageListener("notifyExtensionStatusUpdated", (message: any) => {
-            const { isExtensionEnabled } = message;
-            trackExtensionStatusUpdated(isExtensionEnabled);
-            if (isExtensionEnabled !== undefined) {
-              dispatch(globalActions.updateIsExtensionEnabled(isExtensionEnabled));
-            } else {
-              dispatch(globalActions.updateIsExtensionEnabled(true));
-              captureException(new Error("Extension status is undefined in notifyExtensionStatusUpdated message"), {
-                extra: {
-                  message,
-                  extension_version: getExtensionVersion(),
-                },
+          PageScriptMessageHandler.addMessageListener(
+            "notifyExtensionStatusUpdated",
+            (message: { action: string; isExtensionEnabled: boolean; extensionIconState: any }) => {
+              const { isExtensionEnabled } = message;
+              trackExtensionStatusUpdated({
+                isExtensionEnabled: isExtensionEnabled as boolean,
+                extensionIconState: message.extensionIconState,
               });
+              if (isExtensionEnabled !== undefined) {
+                dispatch(globalActions.updateIsExtensionEnabled(isExtensionEnabled));
+              } else {
+                dispatch(globalActions.updateIsExtensionEnabled(true));
+                captureException(new Error("Extension status is undefined in notifyExtensionStatusUpdated message"), {
+                  extra: {
+                    message,
+                    extension_version: getExtensionVersion(),
+                  },
+                });
+              }
             }
-          });
+          );
         } else {
           StorageService(appMode)
             .getRecord("rq_var_isExtensionEnabled")
