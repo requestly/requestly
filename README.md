@@ -27,6 +27,7 @@ Requestly is a powerful combination of a local HTTP Proxy and an API client with
 *   [Support Channels](#-best-in-class-support)
 *   [👩‍💻 Development](#-development)
 *   [🙏 Contributing](#-contributing)
+*   [![DeepWiki Docs](https://deepwiki.com/badge.svg)](https://deepwiki.com/requestly/requestly)
 
 <br/>
 <br/>
