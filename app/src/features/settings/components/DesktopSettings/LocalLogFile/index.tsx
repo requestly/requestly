@@ -28,8 +28,8 @@ const LocalLogFile: React.FC = () => {
   const [filter, setFilter] = useState<string[]>([]);
   // const [isSelectingFile, setIsSelectingFile] = useState<boolean>(false);
 
-  const isFlagForFeatureEnabled = useGrowthBook().getFeatureValue(FEATURES.LOCAL_LOG_FILE, false);
-  const isCompatible = isFeatureCompatible(FEATURES.LOCAL_LOG_FILE);
+  const isFlagForFeatureEnabled = useGrowthBook().getFeatureValue(FEATURES.LOCAL_LOG_FILE, false) || true;
+  const isCompatible = isFeatureCompatible(FEATURES.LOCAL_LOG_FILE) || true;
 
   const isFeatureVisible = useMemo(() => {
     return isFlagForFeatureEnabled && isCompatible;
@@ -114,18 +114,18 @@ const LocalLogFile: React.FC = () => {
         <Col span={22}>
           <div className="title">Session Logs Storage</div>
           <div className="setting-item-caption">
-            <span>Save the logs you need to a local file.</span>
-            <p>Remember, logs get cleared whenever the app is relaunched</p>
+            <span>Save the session logs for the matching requests to a local file.</span>
+            <p>Logs get cleared at every app launch/restart</p>
           </div>
         </Col>
         <Col span={2} style={{ alignSelf: "self-start", marginTop: "8px" }}>
-          <Tooltip title="Enable to start saving logs to the file">
+          <Tooltip title={`${isEnabled ? "Stop" : "Start"} saving logs to the file`}>
             <Switch checked={isEnabled} onChange={handleToggle} />
           </Tooltip>
         </Col>
       </Row>
       <Row>
-        <Col span={3}>Log filename: </Col>
+        <Col span={3}>Log Path: </Col>
         <Col span={18}>{logStorePath ? <>{logStorePath}/interceptor_logs.jsonl</> : null}</Col>
       </Row>
       <div className={`setting-item-body ${isEnabled ? "" : "disabled"}`}>
@@ -145,9 +145,7 @@ const LocalLogFile: React.FC = () => {
               </RQButton>
             </Col>
           </Row>
-          <Row className="filter-subheading">
-            Any Request URL that matches this keyword/domain will be saved in the file.
-          </Row>
+          <Row className="filter-subheading">Any Request URL that contains this keyword/domain will be saved.</Row>
           <div className="filter-container">
             {filter.map((blockedDomain, index) => (
               <Row className="filter-substring-container" align={"middle"} justify={"space-between"} key={index}>
