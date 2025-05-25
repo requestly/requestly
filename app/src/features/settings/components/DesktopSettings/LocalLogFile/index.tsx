@@ -28,8 +28,8 @@ const LocalLogFile: React.FC = () => {
   const [filter, setFilter] = useState<string[]>([]);
   // const [isSelectingFile, setIsSelectingFile] = useState<boolean>(false);
 
-  const isFlagForFeatureEnabled = useGrowthBook().getFeatureValue(FEATURES.LOCAL_LOG_FILE, false) || true;
-  const isCompatible = isFeatureCompatible(FEATURES.LOCAL_LOG_FILE) || true;
+  const isFlagForFeatureEnabled = useGrowthBook().getFeatureValue(FEATURES.LOCAL_LOG_FILE, false);
+  const isCompatible = isFeatureCompatible(FEATURES.LOCAL_LOG_FILE);
 
   const isFeatureVisible = useMemo(() => {
     return isFlagForFeatureEnabled && isCompatible;
