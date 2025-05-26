@@ -3,7 +3,7 @@ import { registerCommands } from "./services/commands";
 import { initContextMenu } from "./services/contextMenu";
 import { initDevtoolsListener } from "./services/devtools";
 import { handleInstallUninstall } from "./services/installUninstall";
-import { initMessageHandler } from "./services/messageHandler/listener";
+import { initExternalMessageListener, initMessageHandler } from "./services/messageHandler/listener";
 import { initRulesManager } from "./services/rulesManager";
 import { initWebRequestInterceptor } from "./services/webRequestInterceptor";
 
@@ -15,6 +15,7 @@ import { initWebRequestInterceptor } from "./services/webRequestInterceptor";
   handleInstallUninstall();
   initRulesManager();
   initMessageHandler();
+  initExternalMessageListener();
   initContextMenu();
   initWebRequestInterceptor();
   initDevtoolsListener();
