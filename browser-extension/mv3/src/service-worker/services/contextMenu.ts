@@ -63,6 +63,7 @@ export const initContextMenu = async () => {
       sendMessageToApp({
         action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED,
         isExtensionEnabled: extensionStatus,
+        extensionIconState: extensionIconManager.getState(),
       });
     }
   });

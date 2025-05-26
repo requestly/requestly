@@ -53,11 +53,17 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
   const [isRenaming, setIsRenaming] = useState(false);
-  const [openTab, activeTabId, closeTabBySource] = useTabServiceWithSelector((state) => [
+  const [openTab, closeTabBySource, activeTabSource] = useTabServiceWithSelector((state) => [
     state.openTab,
-    state.activeTabId,
     state.closeTabBySource,
+    state.activeTabSource,
   ]);
+
+  const activeTabSourceId = useMemo(() => {
+    if (activeTabSource) {
+      return activeTabSource.getSourceId();
+    }
+  }, [activeTabSource]);
 
   const handleEnvironmentRename = useCallback(async () => {
     if (newEnvironmentName === environment.name) {
@@ -153,7 +159,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
 
   return (
     <div
-      className={`environments-list-item ${environment.id === envId && `${activeTabId}` === envId ? "active" : ""}`}
+      className={`environments-list-item ${environment.id === activeTabSourceId ? "active" : ""}`}
       onClick={() => {
         openTab(new EnvironmentViewTabSource({ id: environment.id, title: environment.name }));
       }}
