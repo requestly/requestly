@@ -26,10 +26,6 @@ import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 import { RequestBillingTeamAccessReminder } from "features/settings";
 import { useFeatureValue } from "@growthbook/growthbook-react";
-import { IncentiveTaskCompletedModal, IncentiveTasksListModal } from "features/incentivization";
-import { getIncentivizationActiveModals } from "store/features/incentivization/selectors";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { IncentivizationModal } from "store/features/incentivization/types";
 import { RequestBot } from "features/requestBot";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { OnboardingModal, PersonaSurveyModal } from "features/onboarding";
@@ -41,7 +37,6 @@ const DashboardContent = () => {
   //Global state
   const dispatch = useDispatch();
   const activeModals = useSelector(getActiveModals);
-  const incentiveActiveModals = useSelector(getIncentivizationActiveModals);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
@@ -51,14 +46,6 @@ const DashboardContent = () => {
   const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
   const isRequestBotVisible = requestBotDetails?.isActive;
   const isOnboardingCompleted = useSelector(getIsOnboardingCompleted);
-
-  const toggleIncentiveTasksListModal = () => {
-    dispatch(incentivizationActions.toggleActiveModal({ modalName: IncentivizationModal.TASKS_LIST_MODAL }));
-  };
-
-  const toggleIncentiveTaskCompletedModal = () => {
-    dispatch(incentivizationActions.toggleActiveModal({ modalName: IncentivizationModal.TASK_COMPLETED_MODAL }));
-  };
 
   const toggleSpinnerModal = () => {
     dispatch(globalActions.toggleActiveModal({ modalName: "loadingModal" }));
@@ -112,20 +99,6 @@ const DashboardContent = () => {
       {isInsideIframe ? null : (
         <>
           {/* MODALS */}
-          {incentiveActiveModals[IncentivizationModal.TASKS_LIST_MODAL]?.isActive ? (
-            <IncentiveTasksListModal
-              isOpen={incentiveActiveModals[IncentivizationModal.TASKS_LIST_MODAL]?.isActive}
-              toggle={() => toggleIncentiveTasksListModal()}
-              {...incentiveActiveModals[IncentivizationModal.TASKS_LIST_MODAL].props}
-            />
-          ) : null}
-          {incentiveActiveModals[IncentivizationModal.TASK_COMPLETED_MODAL].isActive ? (
-            <IncentiveTaskCompletedModal
-              isOpen={incentiveActiveModals[IncentivizationModal.TASK_COMPLETED_MODAL]?.isActive}
-              toggle={() => toggleIncentiveTaskCompletedModal()}
-              {...incentiveActiveModals[IncentivizationModal.TASK_COMPLETED_MODAL].props}
-            />
-          ) : null}
           {activeModals.loadingModal.isActive ? (
             <SpinnerModal isOpen={activeModals.loadingModal.isActive} toggle={() => toggleSpinnerModal()} />
           ) : null}

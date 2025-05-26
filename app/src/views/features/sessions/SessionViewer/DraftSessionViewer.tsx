@@ -39,7 +39,6 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { toast } from "utils/Toast";
 import Logger from "../../../../../../common/logger";
-import { useIncentiveActions } from "features/incentivization/hooks";
 import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 export interface DraftSessionViewerProps {
@@ -79,8 +78,6 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const [isDiscardSessionClicked, setIsDiscardSessionClicked] = useState(false);
   const [isSessionSaving, setIsSessionSaving] = useState(false);
-
-  const { claimIncentiveRewards } = useIncentiveActions();
 
   const hasUserCreatedSessions = useMemo(
     () =>
@@ -245,8 +242,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
       sessionRecordingMetadata,
       sessionEvents,
       [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS],
-      source,
-      claimIncentiveRewards
+      source
     )
       .catch((err) => {
         setIsSessionSaving(false);
@@ -266,7 +262,6 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
     userAttributes,
     activeWorkspaceId,
     isSessionSaving,
-    claimIncentiveRewards,
   ]);
 
   useEffect(() => {

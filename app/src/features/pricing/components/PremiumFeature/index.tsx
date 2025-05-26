@@ -10,10 +10,6 @@ import { globalActions } from "store/slices/global/slice";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytics";
 import { capitalize } from "lodash";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
-import { INCENTIVIZATION_SOURCE } from "features/incentivization";
-import { IncentivizationModal } from "store/features/incentivization/types";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import LINKS from "config/constants/sub/links";
 import "./index.scss";
@@ -52,7 +48,6 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
-  const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   const isExceedingLimits = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
@@ -61,24 +56,9 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const isBreachingLimit = features.some((feat) => checkIfFeatureLimitReached(feat, "reached"));
 
   const handlePopoverSecondaryAction = useCallback(() => {
-    if (isIncentivizationEnabled) {
-      onUpgradeForFreeClickCallback();
-      trackUpgradeOptionClicked("upgrade_for_free");
-
-      dispatch(
-        incentivizationActions.toggleActiveModal({
-          modalName: IncentivizationModal.TASKS_LIST_MODAL,
-          newValue: true,
-          newProps: {
-            source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
-          },
-        })
-      );
-    } else {
-      redirectToUrl(LINKS.ACCELERATOR_PROGRAM_FORM_LINK, true);
-      trackUpgradeOptionClicked("upgrade_for_6_months");
-    }
-  }, [dispatch, isIncentivizationEnabled, onUpgradeForFreeClickCallback]);
+    redirectToUrl(LINKS.ACCELERATOR_PROGRAM_FORM_LINK, true);
+    trackUpgradeOptionClicked("upgrade_for_6_months");
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -124,8 +104,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           showArrow={false}
           placement={popoverPlacement}
           okText={user.loggedIn ? "See upgrade plans" : "Sign up"}
-          cancelText={isIncentivizationEnabled ? "Upgrade for free" : null}
-          cancelButtonProps={{ style: { display: isIncentivizationEnabled ? "inline-flex" : "none" } }}
+          cancelText={null}
+          cancelButtonProps={{ style: { display: "none" } }}
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
             if (user.loggedIn) {

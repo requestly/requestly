@@ -16,10 +16,6 @@ import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "../../anal
 import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { INCENTIVIZATION_SOURCE } from "features/incentivization";
-import { IncentivizationModal } from "store/features/incentivization/types";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./index.scss";
 import { getBillingTeamById } from "store/features/billing/selectors";
 import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
@@ -56,7 +52,6 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [postRequestMessage, setPostRequestMessage] = useState(null);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeams[0]?.id, billingTeams[0]?.owner));
-  const isIncentivizationEnabled = useIsIncentivizationEnabled();
   const billingTeamDetails = useSelector(getBillingTeamById(billingTeams[0].id));
   const isAcceleratorTeam = billingTeamDetails?.isAcceleratorTeam;
 
@@ -154,34 +149,6 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const ModalActionButtons = useMemo(() => {
     return (
       <Row className="mt-16" justify="space-between" align="middle">
-        {isIncentivizationEnabled && (
-          <Col>
-            <RQButton
-              type="text"
-              className="request-modal-text-btn"
-              disabled={isLoading}
-              onClick={() => {
-                onUpgradeForFreeClickCallback();
-                trackUpgradeOptionClicked("upgrade_for_free");
-                dispatch(
-                  incentivizationActions.toggleActiveModal({
-                    modalName: IncentivizationModal.TASKS_LIST_MODAL,
-                    newValue: true,
-                    newProps: {
-                      source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
-                    },
-                  })
-                );
-
-                setOpenPopup(false);
-                setPostRequestMessage(null);
-              }}
-            >
-              Upgrade for free
-            </RQButton>
-          </Col>
-        )}
-
         <Col>
           <Space direction="horizontal" size={8}>
             <RQButton
@@ -241,13 +208,11 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
       </Row>
     );
   }, [
-    isIncentivizationEnabled,
     isLoading,
     billingTeams,
     isAcceleratorTeam,
     handleJoinAcceleratorTeam,
     handleSendRequest,
-    onUpgradeForFreeClickCallback,
     dispatch,
     setOpenPopup,
     onUpgradeYourselfClickCallback,
