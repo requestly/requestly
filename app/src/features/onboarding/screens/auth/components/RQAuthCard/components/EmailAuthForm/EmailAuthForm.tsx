@@ -55,7 +55,14 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ isLoading, onSendE
         >
           Edit
         </Button>
-        <AuthFormInput placeholder="" label="Your work email" value={email} onValueChange={() => {}} disabled />
+        <AuthFormInput
+          placeholder=""
+          label="Your work email"
+          type="email"
+          value={email}
+          onValueChange={() => {}}
+          disabled
+        />
       </div>
       {isDesktopSignIn ? (
         <AuthFormInput

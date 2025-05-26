@@ -14,15 +14,11 @@ export const trackLoginAttemptedEvent = ({ auth_provider, email, place, email_ty
   trackEvent(AUTH.LOGIN.ATTEMPTED, params);
 };
 
-export const trackLoginFailedEvent = ({ auth_provider, place, email, error_code, error_message, source }) => {
-  const params = {
-    auth_provider,
-    place,
-    email,
-    error_code,
-    error_message,
-    source,
-  };
+/**
+ *
+ * @param { {auth_provider, place, email, error_code?:string, error_message, source} } params
+ */
+export const trackLoginFailedEvent = (params) => {
   trackEvent(AUTH.LOGIN.FAILED, params);
 };
 

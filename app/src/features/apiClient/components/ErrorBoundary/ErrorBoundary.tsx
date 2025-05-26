@@ -24,6 +24,28 @@ function sendErrorToSentry(error: any) {
   });
 }
 
+function createError(message?: string) {
+  return new Error("An unexpected error occurred");
+}
+
+function sanitizeError(rawError: any) {
+  if (rawError === undefined || rawError === null) {
+    return createError();
+  }
+  if (rawError.message && rawError.stack) {
+    return rawError as Error;
+  }
+  const error = createError();
+  if (rawError.message) {
+    error.message = rawError.message;
+  }
+  if (rawError.stack) {
+    error.stack = rawError.stack;
+  }
+
+  return error;
+}
+
 export class ApiClientErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -39,19 +61,20 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: unknown) {
-    sendErrorToSentry(error);
+    sendErrorToSentry(sanitizeError(error));
   }
 
   private promiseRejectionHandler = (event: PromiseRejectionEvent) => {
-    this.setState({ hasError: true, error: event.reason });
-    sendErrorToSentry(event.reason);
+    const error = sanitizeError(event.reason);
+    this.setState({ hasError: true, error });
+    sendErrorToSentry(error);
   };
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    return { hasError: true, error: sanitizeError(error) };
   }
 
-  private showCustomError(error: any) {
+  private getCustomError(error: any) {
     if (error instanceof RenderableError) {
       return error.render();
     }
@@ -81,14 +104,10 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
             <div className="api-client-error-boundary-content__body">
               <div className="error-boundary__header">{this.getErrorHeading(error)}</div>
               <div className="error-boundary__error-message">
-                {error.message ? (
-                  <code>{error?.message}</code>
-                ) : (
-                  <div className="text-center">An unexpected error occurred</div>
-                )}
+                <code>{error.message}</code>
               </div>
             </div>
-            {this.showCustomError(error)}
+            {this.getCustomError(error)}
             <div className="error-boundary__contact">
               If the issue persists, contact <a href="mailto:contact@requestly.io">support</a>
             </div>
