@@ -64,6 +64,7 @@ export const CLIENT_MESSAGES = {
   SYNC_APPLIED_RULES: "syncAppliedRules",
   NOTIFY_RULE_EXECUTED: "notifyRuleExecuted",
   NOTIFY_RECORD_UPDATED: "notifyRecordUpdated",
+  NOTIFY_EXTENSION_STATUS_UPDATED: "notifyExtensionStatusUpdated",
 };
 
 export const STORAGE_TYPE = "local";

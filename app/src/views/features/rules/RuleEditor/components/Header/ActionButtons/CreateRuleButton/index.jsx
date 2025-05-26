@@ -10,7 +10,7 @@ import {
   getUserAttributes,
 } from "../../../../../../../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { trackRQLastActivity } from "../../../../../../../../utils/AnalyticsUtils";
+import { submitAttrUtil, trackRQLastActivity } from "../../../../../../../../utils/AnalyticsUtils";
 import { saveRule, validateSyntaxInRule } from "../actions";
 import {
   getModeData,
@@ -48,6 +48,7 @@ import { useFeatureValue } from "@growthbook/growthbook-react";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../constants/keyboardShortcuts";
 import { RBACButton } from "features/rbac";
 import "../RuleEditorActionButtons.css";
+import * as Sentry from "@sentry/react";
 
 const getEventParams = (rule) => {
   const eventParams = {};
@@ -274,6 +275,7 @@ const CreateRuleButton = ({
             rule_type = finalRuleData.ruleType;
           }
           if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isRuleEditorModal) {
+            submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_RULES, (userAttributes?.num_rules ?? 0) + 1);
             trackRuleCreatedEvent({
               rule_type,
               description: finalRuleData.description,
@@ -319,7 +321,8 @@ const CreateRuleButton = ({
             redirectToRuleEditor(navigate, finalRuleData.id, MODE, false, true);
           }
         })
-        .catch(() => {
+        .catch((e) => {
+          Sentry.captureException(e.message);
           toast.error("Error in saving rule. Please contact support.");
         });
     } else {

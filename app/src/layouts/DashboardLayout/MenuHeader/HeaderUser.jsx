@@ -29,6 +29,7 @@ import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { setRedirectMetadata } from "features/onboarding/utils";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -149,6 +150,7 @@ export default function HeaderUser() {
 
     if (isBrowserstackIntegrationOn) {
       setIsSignupButtonLoading(true);
+      setRedirectMetadata({ source: SOURCE.NAVBAR, redirectURL: window.location.href });
       redirectToOAuthUrl(navigate);
       return;
     } else {

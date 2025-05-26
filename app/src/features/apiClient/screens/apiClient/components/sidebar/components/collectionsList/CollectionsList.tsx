@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BulkActions, RQAPI } from "features/apiClient/types";
-import { Typography } from "antd";
+import { notification, Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { CollectionRow } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
@@ -154,7 +154,11 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             result.length === 1 ? onSaveRecord(head(result), "open") : onSaveBulkRecords(result);
           } catch (error) {
             console.error("Error Duplicating records: ", error);
-            toast.error("Failed to duplicate some records");
+            notification.error({
+              message: "Failed to duplicate some records",
+              description: error?.message,
+              placement: "bottomRight",
+            });
             Sentry.withScope((scope) => {
               scope.setTag("error_type", "api_client_record_duplication");
               Sentry.captureException(error);
@@ -344,13 +348,15 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               )}
             </div>
           ) : (
-            <ApiRecordEmptyState
-              disabled={!isValidPermission}
-              newRecordBtnText="New collection"
-              message={searchValue ? "No collection or request found" : "No collections created yet"}
-              onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.COLLECTION)}
-              analyticEventSource="collection_list_empty_state"
-            />
+            <div style={{ paddingTop: 6 }}>
+              <ApiRecordEmptyState
+                disabled={!isValidPermission}
+                newRecordBtnText="New collection"
+                message={searchValue ? "No collection or request found" : "No collections created yet"}
+                onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.COLLECTION)}
+                analyticEventSource="collection_list_empty_state"
+              />
+            </div>
           )}
         </div>
         {errorFiles.length > 0 && <ErrorFilesList errorFiles={errorFiles} />}

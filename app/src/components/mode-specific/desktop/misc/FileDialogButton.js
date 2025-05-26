@@ -17,12 +17,16 @@ export function displayFileSelector(callback) {
   }
 }
 
-export const displayFolderSelector = (callback) => {
+export const displayFolderSelector = (callback, onCancelCallback) => {
   const handleDialogPromise = (result) => {
     const { canceled, filePaths } = result;
     if (!canceled) {
       if (callback) {
         return callback(filePaths[0]);
+      }
+    } else {
+      if (onCancelCallback) {
+        return onCancelCallback();
       }
     }
   };

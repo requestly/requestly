@@ -1,6 +1,7 @@
 enum Feature {
   RULES = "RULES",
   API_CLIENT = "API_CLIENT",
+  FILE_SERVER = "FILE_SERVER",
 }
 
 export const KEY_ICONS: Record<string, string> = {
@@ -22,6 +23,12 @@ export const KEYBOARD_SHORTCUTS: Record<Feature, Record<string, KEYBOARD_SHORTCU
     SAVE_RULE: {
       hotKey: navigator.platform.match("Mac") ? "meta+s" : "ctrl+s",
       description: "Save rule",
+    },
+  },
+  [Feature.FILE_SERVER]: {
+    SAVE_FILE: {
+      hotKey: navigator.platform.match("Mac") ? "meta+s" : "ctrl+s",
+      description: "Save file",
     },
   },
   [Feature.API_CLIENT]: {
