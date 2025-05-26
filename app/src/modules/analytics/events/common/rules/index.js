@@ -193,11 +193,6 @@ export const trackErrorInSavingDNR = ({
   trackEvent(RULES.ERROR_IN_SAVING_DNR, params);
 };
 
-export const trackRuleEditorViewed = (source, rule_type) => {
-  const params = { source, rule_type };
-  trackEvent(RULES.RULE_EDITOR_VIEWED, params);
-};
-
 export const trackRuleEditorClosed = (reason, rule_type, mode) => {
   const params = { reason, rule_type, mode };
   trackEvent(RULES.RULE_EDITOR_CLOSED, params);
