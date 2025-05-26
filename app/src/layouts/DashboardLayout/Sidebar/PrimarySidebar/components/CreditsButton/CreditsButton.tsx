@@ -4,7 +4,6 @@ import { Badge } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { getUserIncentivizationDetails } from "store/features/incentivization/selectors";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization";
-import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import "./creditsButton.scss";
@@ -14,8 +13,6 @@ export const CreditsButton = () => {
   const userMilestoneAndRewardDetails = useSelector(getUserIncentivizationDetails);
 
   const handleCreditsClick = () => {
-    trackSidebarClicked("credits");
-
     dispatch(
       incentivizationActions.toggleActiveModal({
         modalName: IncentivizationModal.TASKS_LIST_MODAL,
