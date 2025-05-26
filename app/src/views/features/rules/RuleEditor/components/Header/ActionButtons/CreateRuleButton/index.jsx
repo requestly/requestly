@@ -27,7 +27,6 @@ import {
   trackRuleCreatedEvent,
   trackRuleEditedEvent,
   trackRuleResourceTypeSelected,
-  trackRuleSaveClicked,
 } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
 import { PremiumFeature } from "features/pricing";
@@ -228,7 +227,6 @@ const CreateRuleButton = ({
   };
 
   const handleBtnOnClick = async (saveType = "button_click") => {
-    trackRuleSaveClicked(MODE);
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
       dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
       return;

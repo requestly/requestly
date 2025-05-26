@@ -143,7 +143,6 @@ export const SOURCE = {
 export const RULES = {
   RULE_CREATED: "rule_created",
   RULE_EDITED: "rule_edited",
-  RULE_SAVE_CLICKED: "rule_save_clicked",
   RULE_DELETED: "rule_deleted",
   RULE_TOGGLED: "rule_toggled",
   RULE_TOGGLE_ATTEMPTED: "rule_toggle_attempted",
@@ -179,7 +178,6 @@ export const RULES = {
   SAMPLE_REGEX_CLICKED: "sample_regex_clicked",
 
   // rule details panel
-  RULE_DETAILS_PANEL_VIEWED: "rule_details_panel_viewed",
   RULE_DETAILS_PANEL_CLOSED: "rule_details_panel_closed",
   RULE_DETAILS_PANEL_DOCS_CLICKED: "rule_details_panel_docs_clicked",
   RULE_DETAILS_USE_CASE_CLICKED: "rule_details_use_case_clicked",

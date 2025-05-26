@@ -239,11 +239,6 @@ export const trackDesktopRuleViewedOnExtension = (rule_type) => {
 };
 
 // rule details panel
-export const trackRuleDetailsPanelViewed = (rule_type, source) => {
-  const params = { rule_type, source };
-  trackEvent(RULES.RULE_DETAILS_PANEL_VIEWED, params);
-};
-
 export const trackRuleDetailsPanelClosed = (rule_type, source) => {
   const params = { rule_type, source };
   trackEvent(RULES.RULE_DETAILS_PANEL_CLOSED, params);
