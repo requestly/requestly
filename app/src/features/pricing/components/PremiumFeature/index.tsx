@@ -153,7 +153,6 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           onOpenChange={(open) => {
             if (open) trackUpgradePopoverViewed("default", source);
           }}
-          // cancelButtonProps={{ style: { display: isIncentivizationEnabled ? "inline-flex" : "none" } }}
         >
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
