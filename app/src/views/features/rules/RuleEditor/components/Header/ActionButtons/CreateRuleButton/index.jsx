@@ -57,6 +57,7 @@ const getEventParams = (rule) => {
       }, rule.pairs[0].scripts[0]?.value?.length);
       break;
     case GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE:
+      eventParams.resource_type = rule.pairs[0].response?.resourceType;
       eventParams.num_characters = rule.pairs[0].response?.value?.length;
       break;
     case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
