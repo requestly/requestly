@@ -4,7 +4,6 @@ export const SETTINGS = {
 
   // TODO: Move these constants inside billin folder
   BILLING: {
-    BILLING_TEAM_VIEWED: "billing_team_viewed",
     BILLING_TEAM_NAVIGATED: "billing_team_navigated",
     BILLING_TEAM_ACTION_CLICKED: "billing_team_action_clicked",
     BILLING_TEAM_NO_MEMBER_FOUND: "billing_team_no_member_found_to_be_added",

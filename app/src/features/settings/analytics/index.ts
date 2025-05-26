@@ -9,10 +9,6 @@ export const trackAppSettingsSidebarClicked = (action: string) => {
   trackEvent(SETTINGS.APP_SETTINGS_SIDEBAR_CLICKED, { action });
 };
 
-export const trackBillingTeamViewed = (email_status: string, count_my_teams: number, role: string) => {
-  trackEvent(SETTINGS.BILLING.BILLING_TEAM_VIEWED, { email_status, count_my_teams, role });
-};
-
 export const trackBillingTeamNavigated = (navigated_to: string) => {
   trackEvent(SETTINGS.BILLING.BILLING_TEAM_NAVIGATED, { navigated_to });
 };
