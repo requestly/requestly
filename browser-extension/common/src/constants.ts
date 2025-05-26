@@ -43,6 +43,10 @@ export const EXTENSION_MESSAGES = {
   DESKTOP_APP_CONNECTION_STATUS_UPDATED: "desktopAppConnectionStatusUpdated",
 };
 
+export const EXTENSION_EXTERNAL_MESSAGES = {
+  GET_EXTENSION_METADATA: "getExtensionMetadata",
+};
+
 export const CLIENT_MESSAGES = {
   ADD_EVENT: "addEvent",
   ADD_EXECUTION_EVENT: "addExecutionEvent",
