@@ -58,7 +58,7 @@
     }
 
     &.active {
-      background-color: var(--requestly-color-white-t-10);
+      background-color: var(--requestly-color-white-t-20);
     }
 
     &__label {
@@ -87,9 +87,14 @@
   align-items: center;
   justify-content: center;
   opacity: 0;
+  transition: none;
 }
 
 .environments-list-item__label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
   span {
     font-size: 12px;
   }
