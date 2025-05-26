@@ -6,10 +6,12 @@ import Logger from "lib/logger";
 import { StorageService } from "init";
 import APP_CONSTANTS from "config/constants";
 import { globalActions } from "store/slices/global/slice";
-import { isExtensionEnabled, isExtensionManifestVersion3 } from "actions/ExtensionActions";
+import { getExtensionVersion, isExtensionEnabled, isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { captureException } from "@sentry/react";
+import { trackExtensionStatusUpdated } from "modules/analytics/events/extension";
 
 export const useIsExtensionEnabled = () => {
   const dispatch = useDispatch();
@@ -24,14 +26,27 @@ export const useIsExtensionEnabled = () => {
             dispatch(globalActions.updateIsExtensionEnabled(isEnabled));
           });
 
-          PageScriptMessageHandler.addMessageListener("notifyExtensionStatusUpdated", (message: any) => {
-            const { isExtensionEnabled } = message;
-            if (isExtensionEnabled !== undefined) {
-              dispatch(globalActions.updateIsExtensionEnabled(isExtensionEnabled));
-            } else {
-              dispatch(globalActions.updateIsExtensionEnabled(true));
+          PageScriptMessageHandler.addMessageListener(
+            "notifyExtensionStatusUpdated",
+            (message: { action: string; isExtensionEnabled: boolean; extensionIconState: any }) => {
+              const { isExtensionEnabled } = message;
+              trackExtensionStatusUpdated({
+                isExtensionEnabled: isExtensionEnabled as boolean,
+                extensionIconState: JSON.stringify(message.extensionIconState),
+              });
+              if (isExtensionEnabled !== undefined) {
+                dispatch(globalActions.updateIsExtensionEnabled(isExtensionEnabled));
+              } else {
+                dispatch(globalActions.updateIsExtensionEnabled(true));
+                captureException(new Error("Extension status is undefined in notifyExtensionStatusUpdated message"), {
+                  extra: {
+                    message,
+                    extension_version: getExtensionVersion(),
+                  },
+                });
+              }
             }
-          });
+          );
         } else {
           StorageService(appMode)
             .getRecord("rq_var_isExtensionEnabled")
