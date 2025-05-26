@@ -133,6 +133,9 @@ const Editor: React.FC<EditorProps> = ({
   Typing edits in editor is controlled by handleChange
   */
   const handleEditorSilentUpdate = useCallback((code: string): void => {
+    if (code === null || code === undefined) {
+      return;
+    }
     const view = editorRef.current?.view;
     const doc = view?.state?.doc;
 
