@@ -42,7 +42,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     isLoadingApiClientRecords,
     apiClientRecords,
     isRecordBeingCreated,
-    errorFiles,
     setIsDeleteModalOpen,
     updateRecordsToBeDeleted,
     onSaveRecord,
@@ -359,7 +358,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             </div>
           )}
         </div>
-        {errorFiles.length > 0 && <ErrorFilesList errorFiles={errorFiles} />}
+        <ErrorFilesList />
       </div>
 
       {isExportModalOpen && (

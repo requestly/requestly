@@ -31,7 +31,6 @@ export const EnvironmentsList = () => {
     addNewEnvironment,
     setCurrentEnvironment,
     getEnvironmentVariables,
-    errorEnvFiles,
   } = useEnvironmentManager();
   const [searchValue, setSearchValue] = useState("");
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
@@ -152,7 +151,7 @@ export const EnvironmentsList = () => {
                 </>
               )}
             </div>
-            {errorEnvFiles.length > 0 && <ErrorFilesList errorFiles={errorEnvFiles} />}
+            <ErrorFilesList />
           </div>
           {isExportModalOpen && (
             <ApiClientExportModal

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
@@ -10,15 +10,13 @@ import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManag
 import { toast } from "utils/Toast";
 import { notification } from "antd";
 
-interface ErrorFilesListProps {
-  errorFiles: ErroredRecord[];
-}
-
-export const ErrorFilesList: React.FC<ErrorFilesListProps> = ({ errorFiles }) => {
+export const ErrorFilesList = () => {
   const [errorFileToView, setErrorFileToView] = useState<ErroredRecord | null>(null);
   const [isErrorFileViewerModalOpen, setIsErrorFileViewerModalOpen] = useState(false);
-  const { apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const { forceRefreshEnvironments } = useEnvironmentManager();
+  const { apiClientRecordsRepository, forceRefreshApiClientRecords, errorFiles } = useApiClientContext();
+  const { forceRefreshEnvironments, errorEnvFiles } = useEnvironmentManager();
+
+  const files = useMemo(() => [...errorFiles, ...errorEnvFiles], [errorFiles, errorEnvFiles]);
 
   const handleDeleteErrorFile = async (errorFile: ErroredRecord) => {
     const result = await apiClientRecordsRepository.deleteRecords([errorFile.path]);
@@ -41,6 +39,11 @@ export const ErrorFilesList: React.FC<ErrorFilesListProps> = ({ errorFiles }) =>
     setErrorFileToView(file);
     setIsErrorFileViewerModalOpen(true);
   };
+
+  if (!files.length) {
+    return null;
+  }
+
   return (
     <>
       {isErrorFileViewerModalOpen && (
@@ -56,7 +59,7 @@ export const ErrorFilesList: React.FC<ErrorFilesListProps> = ({ errorFiles }) =>
 
       <div className="error-files-list-container">
         <div className="error-files-list-header">ERROR FILES</div>
-        {errorFiles.map((file) => (
+        {files.map((file) => (
           <div key={file.name} className="error-file-item" onClick={() => handleOpenErrorFile(file)}>
             <MdWarningAmber className="error-file-icon" />
             <span>{file.name}</span>
