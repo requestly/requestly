@@ -32,7 +32,7 @@ export const useIsExtensionEnabled = () => {
               const { isExtensionEnabled } = message;
               trackExtensionStatusUpdated({
                 isExtensionEnabled: isExtensionEnabled as boolean,
-                extensionIconState: message.extensionIconState,
+                extensionIconState: JSON.stringify(message.extensionIconState),
               });
               if (isExtensionEnabled !== undefined) {
                 dispatch(globalActions.updateIsExtensionEnabled(isExtensionEnabled));
