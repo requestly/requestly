@@ -25,7 +25,6 @@ import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExpor
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";
-import { ErrorFilesList } from "../ErrorFilesList/ErrorFileslist";
 import { useRBAC } from "features/rbac";
 import * as Sentry from "@sentry/react";
 
@@ -42,7 +41,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     isLoadingApiClientRecords,
     apiClientRecords,
     isRecordBeingCreated,
-    errorFiles,
     setIsDeleteModalOpen,
     updateRecordsToBeDeleted,
     onSaveRecord,
@@ -359,7 +357,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             </div>
           )}
         </div>
-        {errorFiles.length > 0 && <ErrorFilesList errorFiles={errorFiles} />}
       </div>
 
       {isExportModalOpen && (
