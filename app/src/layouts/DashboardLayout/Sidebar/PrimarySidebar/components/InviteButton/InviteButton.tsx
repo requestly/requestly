@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import InviteIcon from "assets/icons/invite.svg?react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
@@ -55,7 +54,6 @@ const InviteButton: React.FC = () => {
         type="text"
         onClick={() => {
           handleInviteClick();
-          trackSidebarClicked("invite");
         }}
         className="primary-sidebar-link w-full"
       >
