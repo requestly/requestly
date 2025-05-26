@@ -173,7 +173,6 @@ export const RULES = {
   RULES_EMPTY_STATE_CLICKED: "rules_empty_state_clicked",
   GETTING_STARTED_VIDEO_PLAYED: "getting_started_video_played",
   RULE_SIMULATOR_TRIED: "rule_simulator_tried",
-  RULE_RESOURCE_TYPE_SELECTED: "rule_resource_type_selected",
   DESKTOP_RULE_VIEWED_ON_EXTENSION: "desktop_rule_viewed_on_extension",
   SAMPLE_REGEX_CLICKED: "sample_regex_clicked",
 
