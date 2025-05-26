@@ -1,8 +1,6 @@
 .collections-list-container {
   width: 100%;
   height: inherit;
-  overflow: auto;
-  overflow-x: hidden;
   padding: 0px 0px 8px 0;
   flex: auto;
   display: flex;
@@ -134,21 +132,16 @@
         }
         .request-options {
           margin-left: auto;
-          visibility: hidden;
-          opacity: 0;
-          transition: opacity 0.3s;
+          display: none;
         }
 
         &:hover .request-options {
-          visibility: visible;
-          opacity: 1;
+          display: block;
         }
 
         &:hover,
         &.active {
           background: var(--requestly-color-surface-1);
-          visibility: visible;
-          opacity: 1;
         }
 
         &:hover {
@@ -238,7 +231,6 @@
           }
 
           .collection-name {
-            max-width: 140px;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -251,12 +243,10 @@
 
           .collection-options {
             flex-shrink: 0;
-            visibility: hidden;
             margin-left: auto;
-            display: flex;
             align-items: center;
             gap: var(--space-1, 2px);
-            visibility: hidden;
+            display: none;
 
             svg {
               color: var(--requestly-color-text-subtle);
@@ -264,8 +254,7 @@
 
             &:hover,
             &.active {
-              visibility: visible;
-              opacity: 1;
+              display: flex;
             }
           }
         }

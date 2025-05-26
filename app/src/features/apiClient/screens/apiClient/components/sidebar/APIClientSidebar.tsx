@@ -15,6 +15,7 @@ import { getEmptyAPIEntry } from "../../utils";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./apiClientSidebar.scss";
+import { ErrorFilesList } from "./components/ErrorFilesList/ErrorFileslist";
 
 interface Props {}
 
@@ -187,23 +188,26 @@ const APIClientSidebar: React.FC<Props> = () => {
   return (
     <>
       <div className={`api-client-sidebar ${user.loggedIn ? "" : "api-client-sidebar-disabled"}`}>
-        <ApiClientSidebarHeader
-          activeTab={activeKey}
-          history={history}
-          onClearHistory={clearHistory}
-          onImportClick={onImportClick}
-          onNewClick={(recordType) => handleNewRecordClick(recordType, "api_client_sidebar_header")}
-        />
+        <div className="api-client-sidebar-content">
+          <ApiClientSidebarHeader
+            activeTab={activeKey}
+            history={history}
+            onClearHistory={clearHistory}
+            onImportClick={onImportClick}
+            onNewClick={(recordType) => handleNewRecordClick(recordType, "api_client_sidebar_header")}
+          />
 
-        <Tabs
-          items={items}
-          size="small"
-          tabPosition="left"
-          className="api-client-sidebar-tabs"
-          activeKey={activeKey}
-          defaultActiveKey={ApiClientSidebarTabKey.COLLECTIONS}
-          onChange={handleActiveTabChange}
-        />
+          <Tabs
+            items={items}
+            size="small"
+            tabPosition="left"
+            className="api-client-sidebar-tabs"
+            activeKey={activeKey}
+            defaultActiveKey={ApiClientSidebarTabKey.COLLECTIONS}
+            onChange={handleActiveTabChange}
+          />
+        </div>
+        <ErrorFilesList />
       </div>
 
       <DeleteApiRecordModal open={isDeleteModalOpen} records={recordsToBeDeleted} onClose={onDeleteModalClose} />
