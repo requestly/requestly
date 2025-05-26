@@ -1,4 +1,4 @@
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
+import { CLIENT_MESSAGES, EXTENSION_EXTERNAL_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
 import { applyScriptRules } from "../scriptRuleHandler";
 import {
@@ -33,6 +33,19 @@ import {
 import { sendMessageToApp } from "./sender";
 import { updateExtensionStatus } from "../utils";
 import extensionIconManager from "../extensionIconManager";
+
+export const initExternalMessageListener = () => {
+  chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
+    switch (message.action) {
+      case EXTENSION_EXTERNAL_MESSAGES.GET_EXTENSION_METADATA:
+        sendResponse({
+          name: chrome.runtime.getManifest().name,
+          version: chrome.runtime.getManifest().version,
+        });
+        break;
+    }
+  });
+};
 
 export const initMessageHandler = () => {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
