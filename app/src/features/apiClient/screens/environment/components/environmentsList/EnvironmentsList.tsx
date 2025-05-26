@@ -16,7 +16,6 @@ import { SidebarPlaceholderItem } from "features/apiClient/screens/apiClient/com
 import { isGlobalEnvironment } from "../../utils";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { EnvironmentData } from "backend/environment/types";
-import { ErrorFilesList } from "features/apiClient/screens/apiClient/components/sidebar/components/ErrorFilesList/ErrorFileslist";
 import { toast } from "utils/Toast";
 import { RBAC, useRBAC } from "features/rbac";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
@@ -151,7 +150,6 @@ export const EnvironmentsList = () => {
                 </>
               )}
             </div>
-            <ErrorFilesList />
           </div>
           {isExportModalOpen && (
             <ApiClientExportModal

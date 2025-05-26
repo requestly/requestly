@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
@@ -9,6 +9,8 @@ import "./errorFilesList.scss";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { toast } from "utils/Toast";
 import { notification } from "antd";
+import { CgStack } from "@react-icons/all-files/cg/CgStack";
+import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 
 export const ErrorFilesList = () => {
   const [errorFileToView, setErrorFileToView] = useState<ErroredRecord | null>(null);
@@ -40,6 +42,13 @@ export const ErrorFilesList = () => {
     setIsErrorFileViewerModalOpen(true);
   };
 
+  const renderFileIcon = useCallback((file: ErroredRecord) => {
+    if (file.type === FileType.ENVIRONMENT) {
+      return <CgStack className="error-file-icon" />;
+    }
+    return <MdOutlineSyncAlt className="error-file-icon" />;
+  }, []);
+
   if (!files.length) {
     return null;
   }
@@ -58,17 +67,22 @@ export const ErrorFilesList = () => {
       )}
 
       <div className="error-files-list-container">
-        <div className="error-files-list-header">ERROR FILES</div>
-        {files.map((file) => (
-          <div key={file.name} className="error-file-item" onClick={() => handleOpenErrorFile(file)}>
-            <MdWarningAmber className="error-file-icon" />
-            <span>{file.name}</span>
-            <div className="error-file-item-actions">
-              <MdEdit className="error-file-item-action-icon" onClick={() => handleOpenErrorFile(file)} />
-              <RiDeleteBin6Line className="error-file-item-action-icon" onClick={() => handleDeleteErrorFile(file)} />
+        <div className="error-files-list-header">
+          <MdWarningAmber />
+          ERROR FILES
+        </div>
+        <div className="error-files-list-body">
+          {files.map((file) => (
+            <div key={file.name} className="error-file-item" onClick={() => handleOpenErrorFile(file)}>
+              {renderFileIcon(file)}
+              <span>{file.name}</span>
+              <div className="error-file-item-actions">
+                <MdEdit className="error-file-item-action-icon" onClick={() => handleOpenErrorFile(file)} />
+                <RiDeleteBin6Line className="error-file-item-action-icon" onClick={() => handleDeleteErrorFile(file)} />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </>
   );
