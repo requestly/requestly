@@ -6,6 +6,7 @@ import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { EditorPopover } from "componentsV2/CodeEditor/components/EditorV2/components/PopOver";
 import "componentsV2/CodeEditor/components/EditorV2/components/PopOver/popover.scss";
 import generateCompletionsForVariables from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
+import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
 
@@ -42,6 +43,14 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     if (editorViewRef.current) {
       editorViewRef.current.destroy();
       editorViewRef.current = null;
+    }
+
+    if (typeof defaultValue !== "string") {
+      Sentry.captureException(new Error("Editor defaultValue must be a string"), {
+        extra: {
+          defaultValue,
+        },
+      });
     }
 
     /*
