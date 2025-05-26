@@ -143,7 +143,6 @@ export const SOURCE = {
 export const RULES = {
   RULE_CREATED: "rule_created",
   RULE_EDITED: "rule_edited",
-  RULE_SAVE_CLICKED: "rule_save_clicked",
   RULE_DELETED: "rule_deleted",
   RULE_TOGGLED: "rule_toggled",
   RULE_TOGGLE_ATTEMPTED: "rule_toggle_attempted",
@@ -166,7 +165,6 @@ export const RULES = {
   RULE_FEATURE_USAGE: "rule_feature_usage",
   ERROR_IN_RULE_CREATION: "error_in_rule_creation",
   ERROR_IN_SAVING_DNR: "error_in_saving_dnr",
-  RULE_EDITOR_VIEWED: "rule_editor_viewed",
   RULE_EDITOR_CLOSED: "rule_editor_closed",
   RULE_EDITOR_HEADER_CLICKED: "rule_editor_header_clicked",
   NEW_RULE_BUTTON_CLICKED: "new_rule_button_clicked",
@@ -175,12 +173,10 @@ export const RULES = {
   RULES_EMPTY_STATE_CLICKED: "rules_empty_state_clicked",
   GETTING_STARTED_VIDEO_PLAYED: "getting_started_video_played",
   RULE_SIMULATOR_TRIED: "rule_simulator_tried",
-  RULE_RESOURCE_TYPE_SELECTED: "rule_resource_type_selected",
   DESKTOP_RULE_VIEWED_ON_EXTENSION: "desktop_rule_viewed_on_extension",
   SAMPLE_REGEX_CLICKED: "sample_regex_clicked",
 
   // rule details panel
-  RULE_DETAILS_PANEL_VIEWED: "rule_details_panel_viewed",
   RULE_DETAILS_PANEL_CLOSED: "rule_details_panel_closed",
   RULE_DETAILS_PANEL_DOCS_CLICKED: "rule_details_panel_docs_clicked",
   RULE_DETAILS_USE_CASE_CLICKED: "rule_details_use_case_clicked",
@@ -204,7 +200,6 @@ export const GROUPS = {
 export const ONBOARDING = {
   INSTALL_EXTENSION_LINK_CLICKED: "install_extension_link_clicked",
   VIEW_ALL_PLATFORMS_CLICKED: "view_all_platforms_clicked",
-  SIDEBAR_CLICKED: "sidebar_clicked",
   HEADER_CLICKED: "header_clicked",
   TOPBAR_CLICKED: "topbar_clicked",
   HELPDESK_CLICKED: "helpdesk_clicked",

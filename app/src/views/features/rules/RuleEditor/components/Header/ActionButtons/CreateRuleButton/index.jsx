@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 import {
@@ -26,8 +25,6 @@ import {
   trackErrorInRuleCreation,
   trackRuleCreatedEvent,
   trackRuleEditedEvent,
-  trackRuleResourceTypeSelected,
-  trackRuleSaveClicked,
 } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
 import { PremiumFeature } from "features/pricing";
@@ -35,7 +32,7 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { globalActions } from "store/slices/global/slice";
 import { IncentivizeEvent } from "features/incentivization/types";
-import { ResponseRule, RuleType } from "@requestly/shared/types/entities/rules";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import Logger from "../../../../../../../../../../common/logger";
 import { IncentivizationModal } from "store/features/incentivization/types";
@@ -60,6 +57,7 @@ const getEventParams = (rule) => {
       }, rule.pairs[0].scripts[0]?.value?.length);
       break;
     case GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE:
+      eventParams.resource_type = rule.pairs[0].response?.resourceType;
       eventParams.num_characters = rule.pairs[0].response?.value?.length;
       break;
     case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
@@ -228,7 +226,6 @@ const CreateRuleButton = ({
   };
 
   const handleBtnOnClick = async (saveType = "button_click") => {
-    trackRuleSaveClicked(MODE);
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
       dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
       return;
@@ -306,14 +303,6 @@ const CreateRuleButton = ({
           }
           ruleModifiedAnalytics(user);
           trackRQLastActivity("rule_saved");
-
-          if (finalRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
-            const resourceType = finalRuleData?.pairs?.[0]?.response?.resourceType;
-
-            if (resourceType && resourceType !== ResponseRule.ResourceType.UNKNOWN) {
-              trackRuleResourceTypeSelected(GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE, snakeCase(resourceType));
-            }
-          }
         })
         .then(() => {
           if (!isRuleEditorModal && MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
