@@ -60,16 +60,16 @@ export const WindowsAndLinuxGatedHoc: React.FC<WindowsAndLinuxGatedHocProps> = (
           </div>
           <div className="action-btns">
             <RQButton
+              onClick={() => {
+                // track event
+                window.open("https://github.com/requestly/requestly/issues/3062", "_blank");
+              }}
               icon={
                 <img
                   width={16}
                   height={16}
                   alt="Github logo"
                   className="anticon"
-                  onClick={() => {
-                    // track event
-                    window.open("https://github.com/requestly/requestly/issues/3062", "_blank");
-                  }}
                   src={"/assets/media/common/github-white-logo.svg"}
                 />
               }
