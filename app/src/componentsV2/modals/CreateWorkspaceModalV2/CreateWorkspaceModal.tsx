@@ -8,9 +8,6 @@ import { displayFolderSelector } from "components/mode-specific/desktop/misc/Fil
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { IncentivizeEvent } from "features/incentivization/types";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { IncentivizationModal } from "store/features/incentivization/types";
 import {
   trackAddTeamMemberSuccess,
   trackNewTeamCreateFailure,
@@ -25,11 +22,10 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
-import { useIncentiveActions } from "features/incentivization/hooks";
 import "./createWorkspaceModal.scss";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
 import { teamsActions } from "store/features/teams/slice";
-import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
 
@@ -45,15 +41,12 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
-  const availableWorkspaces = useSelector(getAllWorkspaces);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [workspaceName, setWorkspaceName] = useState("");
   const [workspaceType, setWorkspaceType] = useState(user.loggedIn ? WorkspaceType.SHARED : WorkspaceType.LOCAL);
   const [folderPath, setFolderPath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
-
-  const { claimIncentiveRewards } = useIncentiveActions();
 
   const folderSelectCallback = (path: string) => {
     setFolderPath(path);
@@ -94,32 +87,6 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
       user?.details?.isSyncEnabled,
       workspaceType,
     ]
-  );
-
-  const handleIncentiveRewards = useCallback(
-    async (availableTeamsLength: number, dispatch: any) => {
-      const response = await claimIncentiveRewards({
-        type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
-        metadata: { num_workspaces: availableTeamsLength || 1 },
-      });
-
-      if (response?.data?.success) {
-        dispatch(
-          incentivizationActions.setUserMilestoneAndRewardDetails({
-            userMilestoneAndRewardDetails: response.data?.data,
-          })
-        );
-
-        dispatch(
-          incentivizationActions.toggleActiveModal({
-            modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-            newValue: true,
-            newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
-          })
-        );
-      }
-    },
-    [claimIncentiveRewards]
   );
 
   const handleDomainInvitesCreation = useCallback(
@@ -207,8 +174,6 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
         }
       })();
 
-      await handleIncentiveRewards(availableWorkspaces?.length, dispatch);
-
       trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal");
       toast.info("Workspace Created");
 
@@ -242,7 +207,6 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
       setIsLoading(false);
     }
   }, [
-    availableWorkspaces?.length,
     billingTeams,
     callback,
     dispatch,
@@ -250,7 +214,6 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
     toggleModal,
     user?.details?.profile?.email,
     workspaceName,
-    handleIncentiveRewards,
     handlePostTeamCreationStep,
     handleDomainInvitesCreation,
     workspaceType,
