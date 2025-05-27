@@ -12,4 +12,16 @@
       margin-right: 4px;
     }
   }
+
+  .test-results-stats {
+    letter-spacing: -0.4px;
+
+    &.passed {
+      color: var(--requestly-color-success-300);
+    }
+
+    &.failed {
+      color: var(--requestly-color-error-300);
+    }
+  }
 }
