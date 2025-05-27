@@ -8,7 +8,6 @@ import firebaseApp from "../../../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./premiumPlanBadge.scss";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { getPrettyPlanName } from "utils/FormattingHelper";
@@ -22,7 +21,6 @@ const PremiumPlanBadge = () => {
   const planStatus = userPlanDetails?.status;
   const planEndDateString = userPlanDetails?.subscription?.endDate;
   const [isAppSumoDeal, setIsAppSumoDeal] = useState(false);
-  const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   let daysLeft = 0;
 
@@ -94,9 +92,7 @@ const PremiumPlanBadge = () => {
         >
           <div className="premium-plan-name">{`${planName} (Trial)`}</div>
           <div className="premium-plan-days-left">
-            {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
-              ? `${daysLeft}d left ${isIncentivizationEnabled ? "plan" : ""}`
-              : "Expired"}
+            {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING ? `${daysLeft}d left` : "Expired"}
           </div>
         </div>
       </Tooltip>

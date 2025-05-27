@@ -25,7 +25,6 @@ import { trackDraftSessionSaved } from "modules/analytics/events/features/sessio
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/features/ruleEditor";
 import { DraftSessionViewerProps } from "./DraftSessionViewer";
-import { useIncentiveActions } from "features/incentivization/hooks";
 import { saveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/utils";
 import Logger from "../../../../../../common/logger";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
@@ -56,8 +55,6 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const appMode = useSelector(getAppMode);
-
-  const { claimIncentiveRewards } = useIncentiveActions();
 
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
@@ -136,8 +133,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
         sessionRecordingMetadata,
         sessionEvents,
         includedDebugInfo,
-        source,
-        claimIncentiveRewards
+        source
       )
         .then(() => {
           onClose?.();
@@ -163,7 +159,6 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       source,
       userAttributes,
       onClose,
-      claimIncentiveRewards,
     ]
   );
 
