@@ -4,7 +4,7 @@
     "description": "Requestly browser extension name which is visible in Web Stores"
   },
   "extDesc": {
-    "message": "Powerful webdev toolkit - HTTP Interceptor, API Mocking & API Client. Features - Redirects, Headers, API Collections, Environments & Mocks",
+    "message": "Powerful webdev toolkit: HTTP Interceptor,API Mocking & API Client. Features: Redirects,Headers,API Collections,Environments & Mocks",
     "description": "Requestly browser extension description visible in Web Stores"
   },
   "extIconTitle": {
