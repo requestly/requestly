@@ -10,7 +10,7 @@ import {
 
 interface TourProps {
   completeTourOnUnmount?: boolean;
-  startWalkthrough: boolean;
+  startWalkthrough?: boolean;
   tourFor: string;
   context?: any;
   onTourComplete: () => void;

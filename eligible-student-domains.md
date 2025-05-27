@@ -31,6 +31,7 @@ The following domains are eligible for the student programme:
     ".edu.vn",
     ".ac.id",
     "bennington.edu",
+    "udg.mx",
     ".ac.kr",
     "lakeheadu.ca",
     "estg.ipp.pt",

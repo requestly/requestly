@@ -1,5 +1,5 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { TestThisRule } from "components/features/rules/TestThisRule";
 import { BottomSheet } from "componentsV2/BottomSheet";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -10,8 +10,7 @@ import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS } from "components/misc/ProductWalkthrough/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
-import { getAppMode, getCurrentlySelectedRuleData, getIsMiscTourCompleted } from "store/selectors";
-import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
+import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
 import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 
 interface RuleEditorBottomSheetProps {
@@ -21,33 +20,8 @@ interface RuleEditorBottomSheetProps {
 export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mode }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const miscTours = useSelector(getIsMiscTourCompleted);
-  const isIncentivizationEnabled = useIsIncentivizationEnabled();
-  const [startWalkthrough, setStartWalkthrough] = useState(false);
-  const isTestThisRuleTourCompleted = miscTours?.testThisRule;
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isSampleRule = currentlySelectedRuleData?.isSample;
-
-  useEffect(() => {
-    let timerId: NodeJS.Timeout;
-
-    if (
-      isIncentivizationEnabled &&
-      mode === RULE_EDITOR_CONFIG.MODES.EDIT &&
-      isFeatureCompatible(FEATURES.TEST_THIS_RULE) &&
-      !isTestThisRuleTourCompleted
-    ) {
-      timerId = setTimeout(() => {
-        setStartWalkthrough(true);
-      }, 2 * 1000);
-    }
-
-    return () => {
-      if (timerId) {
-        clearTimeout(timerId);
-      }
-    };
-  }, [mode, isTestThisRuleTourCompleted, isIncentivizationEnabled]);
 
   const BOTTOM_SHEET_TAB_KEYS = {
     TEST_RULE: "TEST_RULE",
@@ -78,7 +52,6 @@ export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mo
           <ProductWalkthrough
             completeTourOnUnmount={false}
             tourFor={MISC_TOURS.APP_ENGAGEMENT.TEST_THIS_RULE}
-            startWalkthrough={startWalkthrough}
             onTourComplete={() => {
               dispatch(
                 globalActions.updateProductTourCompleted({
