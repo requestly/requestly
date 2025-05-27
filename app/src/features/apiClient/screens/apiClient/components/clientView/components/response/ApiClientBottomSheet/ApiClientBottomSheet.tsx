@@ -13,8 +13,8 @@ import { ApiClientLoader } from "../LoadingPlaceholder/ApiClientLoader";
 import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
 import { AbortError } from "../../errors/AbortError";
 import { RequestError } from "../../errors/RequestError";
-import "./apiclientBottomSheet.scss";
 import { ApiClientWarningPanel } from "../../errors/ApiClientWarningPanel/ApiClientWarningPanel";
+import "./apiclientBottomSheet.scss";
 
 interface Props {
   response: RQAPI.Response;
@@ -25,6 +25,7 @@ interface Props {
   onCancelRequest: () => void;
   handleTestResultRefresh: () => Promise<void>;
   executeRequest: () => Promise<void>;
+  onDismissError: () => void;
   error?: RQAPI.ExecutionError;
   warning?: RQAPI.ExecutionWarning;
 }
@@ -46,6 +47,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   error,
   warning,
   executeRequest,
+  onDismissError,
 }) => {
   const contentTypeHeader = useMemo(() => {
     return response?.headers ? getContentTypeFromResponseHeaders(response.headers) : "";
@@ -62,6 +64,8 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
       </Tag>
     );
   }, [testResults]);
+
+  console.log("DBG TABS", isLoading, isFailed, isRequestCancelled);
 
   const bottomSheetTabItems = useMemo(() => {
     const baseTabItems = [
@@ -98,7 +102,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         return baseTabItems.map((tabItem) => {
           return {
             ...tabItem,
-            children: <AbortError error={error} onRetry={executeRequest} />,
+            children: <AbortError error={error} onRetry={executeRequest} onDismiss={onDismissError} />,
           };
         });
       }
@@ -139,6 +143,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
     response,
     testResults,
     testResultsStats,
+    onDismissError,
   ]);
 
   return (

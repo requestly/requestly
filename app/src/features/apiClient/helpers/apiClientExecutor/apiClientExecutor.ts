@@ -1,6 +1,6 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
-import { RQAPI } from "../../types";
+import { AbortType, RQAPI } from "../../types";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { getHeadersAndQueryParams, getEffectiveAuthForEntry, updateRequestWithAuthOptions } from "../auth";
 import {
@@ -337,6 +337,6 @@ export class ApiClientExecutor {
   }
 
   abort() {
-    this.abortController.abort();
+    this.abortController.abort(AbortType.USER_CANCELLED);
   }
 }

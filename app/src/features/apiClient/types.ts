@@ -237,3 +237,7 @@ export enum PostmanBodyMode {
   URL_ENCODED = "urlencoded",
   GRAPHQL = "graphql",
 }
+
+export enum AbortType {
+  USER_CANCELLED = "user_cancelled",
+}

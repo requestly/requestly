@@ -303,7 +303,6 @@ const APIClientView: React.FC<Props> = ({
     //Need to change the response and error to null
     setEntry((entry) => ({
       ...entry,
-      response: null,
       error: null,
     }));
 
@@ -323,6 +322,7 @@ const APIClientView: React.FC<Props> = ({
         response: executedEntry.response,
         testResults: executedEntry.testResults,
       };
+      console.log("DBG entryWithResponse", entryWithResponse);
       setEntry(entryWithResponse);
 
       if (apiClientExecutionResult.status === "success") {
@@ -392,6 +392,13 @@ const APIClientView: React.FC<Props> = ({
     dispatch,
     notifyApiRequestFinished,
   ]);
+
+  const handleDismissError = () => {
+    setError(null);
+    setIsFailed(false);
+    setIsLoadingResponse(false);
+    setIsRequestCancelled(false);
+  };
 
   const handleRecordNameUpdate = async () => {
     if (!requestName || requestName === apiEntryDetails?.name) {
@@ -481,7 +488,7 @@ const APIClientView: React.FC<Props> = ({
     setIsRequestSaving(false);
   }, [apiClientRecordsRepository, apiEntryDetails, entry, isCreateMode, onSaveCallback, onSaveRecord, resetChanges]);
 
-  const cancelRequest = useCallback(() => {
+  const handleCancelRequest = useCallback(() => {
     apiClientExecutor.abort();
     trackAPIRequestCancelled();
     setIsRequestCancelled(true);
@@ -666,9 +673,10 @@ const APIClientView: React.FC<Props> = ({
             isLoading={isLoadingResponse}
             isFailed={isFailed}
             isRequestCancelled={isRequestCancelled}
-            onCancelRequest={cancelRequest}
+            onCancelRequest={handleCancelRequest}
             handleTestResultRefresh={handleTestResultRefresh}
             error={error}
+            onDismissError={handleDismissError}
             warning={warning}
             executeRequest={onSendButtonClick}
           />

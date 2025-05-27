@@ -2,6 +2,8 @@ import { WorkerPool } from "modules/webWorkers/workerPool";
 import { RQScriptWebWorker } from "../worker/implementation/RQScriptWebWorker";
 import { ScriptWorkload, WorkErrorType, WorkResult, WorkResultType } from "./workLoadTypes";
 import { buildAbortErrorObject, TaskAbortedError } from "modules/errors";
+import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
+import { AbortType } from "features/apiClient/types";
 
 export class APIClientWorkloadManager {
   private workerPool: WorkerPool<RQScriptWebWorker>;
@@ -15,13 +17,20 @@ export class APIClientWorkloadManager {
     });
   }
 
+  private createAbortError(abortSignal: AbortSignal) {
+    if (abortSignal.reason === AbortType.USER_CANCELLED) {
+      return buildAbortErrorObject(new UserAbortError());
+    }
+    return buildAbortErrorObject(new TaskAbortedError());
+  }
+
   private async executeWorkload(
     workload: ScriptWorkload,
     resolve: (result: WorkResult) => void,
     abortSignal: AbortSignal
   ): Promise<void> {
     if (abortSignal.aborted) {
-      resolve(buildAbortErrorObject(new TaskAbortedError()));
+      resolve(this.createAbortError(abortSignal));
     }
 
     try {
@@ -30,7 +39,7 @@ export class APIClientWorkloadManager {
       const abortListener = () => {
         abortSignal.removeEventListener("abort", abortListener);
         this.workerPool.release(worker);
-        resolve(buildAbortErrorObject(new TaskAbortedError()));
+        resolve(this.createAbortError(abortSignal));
       };
 
       abortSignal.addEventListener("abort", abortListener);

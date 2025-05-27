@@ -1,6 +1,6 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
-import { KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import { AbortType, KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
@@ -9,6 +9,14 @@ import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
 import { getDefaultAuth } from "./components/clientView/components/request/components/AuthorizationView/defaults";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
+import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
+
+const createAbortError = (signal: AbortSignal) => {
+  if (signal.reason === AbortType.USER_CANCELLED) {
+    return new UserAbortError();
+  }
+  return new Error("Request aborted");
+};
 
 type ResponseOrError = RQAPI.Response | { error: string };
 export const makeRequest = async (
@@ -19,12 +27,11 @@ export const makeRequest = async (
   return new Promise((resolve, reject) => {
     if (signal) {
       if (signal.aborted) {
-        reject(new Error("Request aborted"));
+        reject(createAbortError(signal));
       }
-
       const abortListener = () => {
         signal.removeEventListener("abort", abortListener);
-        reject(new Error("Request aborted"));
+        reject(createAbortError(signal));
       };
       signal.addEventListener("abort", abortListener);
     }
